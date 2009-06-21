@@ -1,0 +1,240 @@
+/* Forms */
+body.Settings #Content h1,
+form h1 {
+   border-bottom: 1px solid #ccc;
+   margin-bottom: 10px;
+}
+body.Settings #Content h1,
+body.Settings #Content h2,
+body.Settings #Content h3,
+body.Settings #Content h4,
+body.Settings #Content h5,
+body.Settings #Content h6 {
+   padding: 6px 0 0;
+   line-height: 115%;
+}
+form ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+form ul li {
+   border-bottom: 1px solid #eee;
+   margin-bottom: 10px;
+   padding: 0px 0px 10px 3px;
+   font-size: 12px;
+   color: #555555;
+}
+form ul li label {
+   color: #222;
+   float: left;
+   display: block;
+   width: 150px;
+   font-size: 14px;
+   padding: 6px 6px 0px 4px;
+   }
+form ul li label.RadioLabel {
+   float: none;
+   display: inline;
+   font-weight: normal;
+}
+form ul li label.RadioLabel input {
+   height: 10px;
+}
+table.Label tbody th {
+   width: 140px;
+}
+form ul li table label {
+   float: none;
+   display: inline;
+   width: auto;
+}
+form ul li label.CheckBoxLabel {
+   float: none;
+   width: auto;
+   display: block;
+   font-size: 13px;
+   cursor: pointer;
+   margin: 0px;
+   padding: 0px;
+   line-height: 27px;
+}
+form ul li label.CheckBoxLabel input {
+   margin: 7px 6px 4px 2px;
+   padding: 0px;
+   float: left;
+   
+}
+form ul li label span {
+   font-size: 11px;
+   color: #999;
+   padding-left: 6px;
+   }
+form li.RadioInput label {
+   display: inline;
+   }
+input.SmallButton {
+   cursor: pointer;
+   margin: 0px 0px 0px 0px;
+   font-size: 11px;
+}
+input.SmallInput {
+   width: 80px;
+}
+   
+/* FormTable */
+table {
+   width: 100%;
+   border-collapse: collapse;
+   margin: 10px 0;
+}
+table label {
+   font-size: 12px;
+   padding: 0px;
+}
+table tr.Last td,
+table tr.Last th {
+   border-bottom: 0px;
+}
+table th,
+table td {
+   font-weight: normal;
+   font-size: 12px;
+   color: #555;
+   padding: 6px;
+}
+table thead th,
+table thead td {
+   border-bottom: 1px solid #c7cfe0;
+}
+table tbody th,
+table tbody td {
+   border-bottom: 1px solid #e2e6ef;
+   vertical-align: middle;
+   line-height: 150%;
+}
+table tbody tr.FootNote td {
+   background: #ff9;
+   color: #454545;
+   border-bottom: 0px;
+}
+table thead th {
+   font-size: 13px;
+   color: #000;
+}
+table input.Button {
+   margin: 0px;
+   }
+table.AltRows tr.Alt th,
+table.AltRows tr.Alt td {
+   background: #f8f8f8;
+}
+table.AltColumns th.Alt,
+table.AltColumns td.Alt {
+   background: #f8f8f8;
+}
+table.AltColumns tr.Alt {
+   background: none;
+}
+table.AltColumns tr.Parent td,
+table tr.Parent td {
+   background: #ff9;
+}
+table tr.Child td.First {
+   padding-left: 20px;
+}
+table tr.Highlight th,
+table tr.Highlight td {
+   color: #000;
+}
+table tbody td blockquote {
+   margin: 0px;
+   padding: 2px;
+}
+table.Sortable tbody td {
+   cursor: move;
+}
+
+/* CheckBoxGrid */
+.CheckBoxGrid {
+   margin: 10px 0px 10px 0px;
+   width: auto;
+}
+.CheckBoxGrid a {
+   display: block !important;
+   padding: 5px 5px;
+}
+.CheckBoxGrid a:hover {
+   background: #ff9;
+   text-decoration: none;
+}
+.CheckBoxGrid th a,
+.CheckBoxGrid td a,
+.CheckBoxGrid th a:hover,
+.CheckBoxGrid td a:hover {
+   color: #555555 !important;
+}
+.CheckBoxGrid td {
+   text-align: center;
+}
+.CheckBoxGrid tbody th {
+   font-weight: normal;
+}
+.CheckBoxGrid tbody th,
+.CheckBoxGrid tbody td {
+   vertical-align: middle;
+}
+.CheckBoxGrid thead th a,
+.CheckBoxGrid thead th a:hover {
+   color: #333333 !important;
+}
+.CheckBoxGrid tbody th a span.Parent {
+   background: url('parent_divider.gif') center right no-repeat;
+   padding: 6px 10px 6px 0px;
+   margin: 0px 6px 0px 0px;
+}
+.CheckBoxGrid th {
+   width: 150px;
+}
+.CheckBoxGrid td {
+   width: 50px;
+}
+.CheckBoxGrid th,
+.CheckBoxGrid td {
+   padding: 3px;
+}
+.CheckBoxGrid th.Alt,
+.CheckBoxGrid td.Alt {
+   background: #f8f8f8;
+}
+
+/* CheckColumn */
+.CheckColumn thead td a {
+   display: block !important;
+   padding: 6px 5px;
+   color: #333333 !important;
+   font-weight: bold;
+}
+.CheckColumn thead td a:hover {
+   background: #f9f4c0;
+   text-decoration: none;
+   color: #333333 !important;
+}
+
+/* CheckBoxList */
+.CheckBoxList {
+   padding: 4px 0px 4px 0px;
+}
+.CheckBoxList li {
+   border: 0px;
+   margin: 0px;
+   padding: 3px 0px 3px 0px;
+   font-size: 11px;
+}
+.CheckBoxList li label.CheckBoxLabel {
+   float: none;
+   display: inline;
+   width: auto;
+   font-weight: normal;
+   padding: 0px 0px 0px 0px;
+}

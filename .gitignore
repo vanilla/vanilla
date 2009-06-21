@@ -1,0 +1,6 @@
+/cache/*/
+/cache/*.php
+/uploads/*/
+/uploads/*.*
+/conf/config.php
+.DS_Store

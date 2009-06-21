@@ -1,0 +1,254 @@
+<?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Mark O'Sullivan
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+*/
+
+/**
+ * The MySQLStructure class is a MySQL-specific class for manipulating
+ * database structure.
+ *
+ * @author Mark O'Sullivan
+ * @copyright 2003 Mark O'Sullivan
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @version @@GARDEN-VERSION@@
+ * @namespace Lussumo.Garden.Database
+ */
+require_once(dirname(__FILE__).DS.'class.databasestructure.php');
+
+class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+   /**
+    * Adds a column to be added to $this->Table().
+    *
+    * @param string $Name The name of the column to create.
+    * @param mixed $Type The data type of the column to be created. If an array
+    * of values is provided, the type will be set as "enum" and the array will be
+    * assigned as the column's Enum property.
+    * @param mixed $Length The length of the column.
+    * @param boolean $Null Does the column allow null values.
+    * @param mixed $Default The default value of the column. If NULL is provided
+    * (default), there will be no default value.
+    * @param string $KeyType What type of key is this column on the table.
+    * Options are primary, key, and FALSE (not a key).
+    * @param boolean $AutoIncrement A boolean value indicating if this column
+    * auto-increments.
+    */
+   public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
+      // Make sure that the column type is valid for MySQL before continuing:
+      if (!is_array($Type) && !in_array($Type, explode(',', 'int,varchar,varbinary,datetime,text')))
+         throw new Exception(Gdn::Translate('The specified data type ('.$Type.') is not accepted for the MySQL database.'));
+
+      return parent::Column($Name, $Type, $Length, $Null, $Default, $KeyType, $AutoIncrement);
+   }
+
+   /**
+    * Drops $this->Table() from the database.
+    */
+   public function Drop() {
+      return $this->Database->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+   }
+
+   /**
+    * Drops $Name column from $this->Table().
+    *
+    * @param string $Name The name of the column to drop from $this->Table().
+    * @return boolean
+    */
+   public function DropColumn($Name) {
+      if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`'))
+         throw new Exception(Gdn::Translate('Failed to remove the `'.$Name.'` column from the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+
+      return TRUE;
+   }
+
+   /**
+    * Renames a column in $this->Table().
+    *
+    * @param string $OldName The name of the column to be renamed.
+    * @param string $NewName The new name for the column being renamed.
+    * @param string $TableName
+    * @return boolean
+    * @todo $TableName needs a description.
+    */
+   public function RenameColumn($OldName, $NewName, $TableName = '') {
+      if ($TableName != '')
+         $this->_TableName = $TableName;
+
+      // Get the schema for this table
+      $OldPrefix = $this->Database->DatabasePrefix;
+      $this->Database->DatabasePrefix = $this->_DatabasePrefix;
+      $Schema = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+      $this->Database->DatabasePrefix = $OldPrefix;
+
+      // Get the definition for this column
+      $OldColumn = ArrayValue($OldName, $Schema);
+      $NewColumn = ArrayValue($NewName, $Schema);
+
+      // Make sure that one column, or the other exists
+      if (!$OldColumn && !$NewColumn)
+         throw new Exception(Gdn::Translate('The `'.$OldName.'` column does not exist.'));
+
+      // Make sure the new column name isn't already taken
+      if ($OldColumn && $NewColumn)
+         throw new Exception(Gdn::Translate('You cannot rename the `'.$OldName.'` column to `'.$NewName.'` because that column already exists.'));
+
+      // Rename the column
+      // The syntax for renaming a column is:
+      // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
+      if (!$this->Database->Query('alter table `'.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn)))
+         throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+
+      return TRUE;
+   }
+
+   /**
+    * Renames a table in the database.
+    *
+    * @param string $OldName The name of the table to be renamed.
+    * @param string $NewName The new name for the table being renamed.
+    * @param boolean $UsePrefix A boolean value indicating if $this->_DatabasePrefix should be prefixed
+    * before $OldName and $NewName.
+    * @return boolean
+    */
+   public function RenameTable($OldName, $NewName, $UsePrefix = FALSE) {
+      if (!$this->Database->Query('rename table `'.$OldName.'` to `'.$NewName.'`'))
+         throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+
+      return TRUE;
+   }
+
+   /**
+    * Specifies the name of the view to create or modify.
+    *
+    * @param string $Name The name of the view.
+    * @param string $Query The actual query to create as the view. Typically
+    * this can be generated with the $Database object.
+    */
+   public function View($Name, $SQL) {
+      if(is_string($SQL)) {
+         $SQLString = $SQL;
+         $SQL = NULL;
+      } else {
+         $SQLString = $SQL->GetSelect();
+      }
+      
+      $Result = $this->Database->Query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
+      if(!is_null($SQL)) {
+         $SQL->Reset();
+      }
+   }
+
+   /**
+    * Creates the table defined with $this->Table() and $this->Column().
+    */
+   protected function _Create() {
+      $PrimaryKeys = array();
+      $Keys = '';
+      $Sql = '';
+
+      foreach ($this->_Columns as $ColumnName => $Column) {
+         if ($Sql != '')
+            $Sql .= ',';
+
+         $Sql .= "\n".$this->_DefineColumn($Column);
+
+         if ($Column->KeyType == 'primary')
+            $PrimaryKeys[] = $ColumnName;
+         elseif ($Column->KeyType == 'key')
+            $Keys .= ",\nkey `".Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+      }
+      // Build primary keys
+      if (count($PrimaryKeys) > 0)
+         $Keys .= ",\nprimary key (`".implode('`, `', $PrimaryKeys)."`)";
+
+      $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
+         .$Sql
+         .$Keys
+      ."\n)";
+
+      if ($this->_CharacterEncoding !== FALSE && $this->_CharacterEncoding != '')
+         $Sql .= ' default character set '.$this->_CharacterEncoding;
+
+      $Result = $this->Database->Query($Sql);
+      $this->_Reset();
+      
+      return $Result;
+   }
+
+   /**
+    * Modifies $this->Table() with the columns specified with $this->Column().
+    *
+    * @param boolean $Explicit If TRUE, this method will remove any columns from the table that were not
+    * defined with $this->Column().
+    */
+   protected function _Modify($Explicit = FALSE) {
+      // Get the columns from the table
+      $ExistingColumns = $this->Database->SQL()->FetchColumns($this->_DatabasePrefix.$this->_TableName);
+
+      // 1. Remove any unnecessary columns if this is an explicit modification
+      if ($Explicit) {
+         // array_diff returns values from the first array that aren't present
+         // in the second array. In this example, all columns currently in the
+         // table that are NOT in $this->_Columns.
+         $RemoveColumns = array_diff($ExistingColumns, array_keys($this->_Columns));
+         foreach ($RemoveColumns as $Column) {
+            $this->DropColumn($Column);
+         }
+      }
+
+      // 2. Add new columns
+
+      // array_diff returns values from the first array that aren't present in
+      // the second array. In this example, all columns in $this->_Columns that
+      // are NOT in the table.
+      $NewColumns = array_diff(array_keys($this->_Columns), $ExistingColumns);
+      foreach ($NewColumns as $Column) {
+         if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add '.$this->_DefineColumn(ArrayValue($Column, $this->_Columns))))
+            throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+
+         // Add keys if necessary
+         $Col = ArrayValue($Column, $this->_Columns);
+         if ($Col->KeyType == 'primary') {
+            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
+               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         } else if ($Col->KeyType == 'key') {
+            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         }
+      }
+
+      $this->_Reset();
+      return TRUE;
+   }
+
+   /**
+    * Undocumented method.
+    *
+    * @param string $Column
+    * @todo This method and $Column need descriptions.
+    */
+   protected function _DefineColumn($Column) {
+      $Return = '`'.$Column->Name.'` '.$Column->Type;
+      if ($Column->Length != '')
+         $Return .= '('.$Column->Length.')';
+
+      if (is_array($Column->Enum))
+         $Return .= "('".implode("','", $Column->Enum)."')";
+
+      if (!$Column->AllowNull)
+         $Return .= ' not null';
+
+      if ($Column->Default != NULL)
+         $Return .= " default '".$Column->Default."'";
+
+      if ($Column->AutoIncrement)
+         $Return .= ' auto_increment';
+
+      return $Return;
+   }
+}

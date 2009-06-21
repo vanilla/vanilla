@@ -1,0 +1,507 @@
+/* Vanilla Categories */
+
+.Categories {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+body.Discussions h1,
+body.Categories h1,
+body.Categories h2 {
+   padding: 10px 0px 0px 0px;
+   font-size: 160%;
+   margin: 0px;
+}
+h1 span {
+   color: #555;
+   padding: 0 4px;
+   font-size: 70%;
+}
+body.Categories h1 a {
+   color: #000;
+}
+.More {
+   list-style: none;
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   }
+.More a {
+   font-size: 12px;
+   font-weight: normal;
+   text-align: right;
+}
+.More a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
+}
+
+/* CommentOption is presented to the user in place of the add comment form when they don't have a valid session. */
+
+.CommentOption {
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   background: #e9f9ff;
+   color: #555;
+}
+
+/* Back is the same as MorePager... */
+.Back {
+   margin: 0px;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   margin-top: 1px;
+   }
+.Back a {
+   font-size: 12px;
+   font-weight: normal;
+   text-align: right;
+}
+.Back a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
+}
+.Back {
+   text-align: left;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+}
+
+
+#Panel a.Bookmark,
+a.NewDiscussion {
+   padding: 6px 0px;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   background: #44c7f4;
+   color: #fff;
+   text-decoration: none;
+   margin: 0px 0px 10px 0px;
+}
+a.NewDiscussion:hover {
+   background: #11e420;
+   color: #fff;
+}
+#Panel a.Bookmark {
+   background: #9f0;
+   color: #fff;
+}
+#Panel a.Bookmark:hover {
+   background: #ff6b39;
+   color: #fff;
+}
+
+/* Vanilla Discussions */
+body.Discussions h1#AnnouncementsHeading {
+   padding: 0px;
+}
+ul.Discussions {
+   border-top: 1px solid #dbe3e6;
+}
+ul.Discussions li {
+   margin: 0px;
+   padding: 0px 0px 4px 0px;
+    border-bottom: 1px solid #dbe3e6;
+}
+ul.Discussions li li {
+   border: 0px;
+   padding: 0px;
+}
+ul.Discussions,
+ul.Discussions li ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+ul.Discussions li ul li.Topic a {
+   border-left: 2px solid #dbe3e6;
+   margin: 8px 4px 6px 10px;
+   padding: 0px 0px 0px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+   display: none;
+}
+ul.Drafts li ul li.Topic a {
+   display: block;
+}
+ul.Drafts li ul li.Topic a.DeleteDraft {
+   float: right;
+   width: auto;
+   padding: 4px;
+   margin: 3px 1px 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Drafts li ul li.Topic a.DeleteDraft:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+
+
+ul.Discussions li ul li.Topic h3 {
+   padding: 6px 0px 0px 10px;
+   margin: 0px;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.Discussions li ul li.Topic h3 a {
+   display: inline;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+   color: #2d7bb2;
+}
+ul.Discussions li ul li.Meta {
+   font-family: tahoma;
+   margin-left: 9px;
+   font-size: 80%;
+   color: #80828c;
+}
+ul.Discussions li ul li.Meta span,
+ul.Discussions li ul li.Meta span a,
+ul.Discussions li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.Discussions li ul li.Meta strong {
+   background: #ff0;
+   padding: 0px 2px;
+}
+ul.Discussions li ul li.Meta a {
+   color: #2b2d33;
+}
+/*
+  Discussion/Comment Option (dropdown) Menu customizations
+  (the layout css for these is in /applications/garden/design/menu.screen.css)
+*/
+a.Bookmark,
+a.Bookmarking {
+   float: right;
+   display: block;
+   background: url('star_light.png') center center no-repeat;
+   height: 22px;
+   width: 22px;
+   margin: 2px 2px 0 4px;
+}
+a.Bookmark span,
+a.Bookmarking span {
+   display: none;
+}
+a.Bookmarked {
+   background: url('star_yellow.png') center center no-repeat;
+}
+a.Bookmarking {
+   background: url('star_blue.png') center center no-repeat;
+}
+
+ul.Options li.Parent h3 {
+   padding: 4px;
+   margin: 3px 1px 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Options li.Parent h3:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+ul.Options li.Active h3:hover,
+ul.Options li.Active h3 {
+   color: #fff;
+   background: #9c9c9c !important;
+   border: 1px solid #9c9c9c;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+}
+ul.Options li {
+   float: right;
+}
+ul.Options li.Active {
+   background: none;
+}
+ul.Options li.Active ul {
+   border: 1px solid #9c9c9c;
+   background: #fafafa;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+ul.Options li.Active ul li a {
+   background: none;
+}
+ul.Options li.Active a {
+   color: #595959;
+}
+ul.Options li.Active a:hover {
+   background: #8d8d8d;
+   color: #fff;
+}
+
+
+/* Panel Discussions */
+ul.PanelDiscussions li {
+   background: #f5fcff;
+   border-bottom: 1px solid #caf0fe;
+   padding: 2px 4px;
+}
+ul.PanelDiscussions li ul li {
+   background: none;
+   border-bottom: 0px;
+   padding: 0px;
+}
+ul.PanelDiscussions li.Topic {
+   font-weight: bold;
+}
+ul.PanelDiscussions li.Meta {
+   font-size: 80%;
+   font-family: tahoma;
+}
+ul.PanelDiscussions li.Meta span,
+ul.PanelDiscussions li.Meta strong {
+   margin-right: 8px;
+}
+ul.PanelDiscussions li.Meta span a {
+   margin-left: 8px;
+}
+ul.PanelDiscussions li.Meta strong {
+   color: #80828C;
+   background: #ff6;
+   padding: 0px 2px;
+}
+
+/* Vanilla Comments */
+
+body.Discussion #Content {
+   margin-bottom: 20px;
+}
+body.Discussion #Content h2 {
+   font-size:115%;
+   font-weight:bold;
+   margin:0;
+   padding:6px 0 0 10px;
+   color: #333;
+   padding: 6px 0;
+   line-height: 100%;
+}
+body.Discussion #Content h2 span {
+   padding: 0 10px;
+   color: #777;
+   font-size: 12px;
+}
+
+.Preview,
+.Preview li,
+.Preview ul,
+.Preview ul li,
+#Discussion,
+#Discussion li,
+#Discussion ul,
+#Discussion ul li {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+#Discussion {
+   margin-bottom: 1px;
+}
+#Discussion .Comment {
+   clear: left;
+   border-top: 1px solid #ddd;
+}
+.Preview li ul.Info,
+#Discussion li ul.Info {
+   float: left;
+   font-size: 11px;
+   color: #777;
+   padding: 8px 0px 0px 8px;
+}
+.Preview li ul.Info {
+   padding: 0px;
+}
+.Preview li ul.Info li.Author img,
+#Discussion li ul.Info li.Author img {
+   height: 40px;
+   width: 40px;
+   border: 0px;
+   margin: 0px 10px 0px 0px;
+   float: left;
+}
+.Preview li ul.Info li,
+#Discussion li ul.Info li {
+   display: inline;
+}
+.Preview li ul.Info li.Created,
+#Discussion li ul.Info li.Created {
+   padding-left: 10px;
+}
+.Preview li ul.Info li.Author a,
+#Discussion li ul.Info li.Author a {
+   font-size: 15px;
+   font-weight: bold;
+}
+.Preview li .Body,
+#Discussion li .Body {
+   clear: both;
+   padding: 1px 8px 2px;
+   line-height: 170%;
+   color: #454545;
+}
+.Body p {
+   margin: 8px 0;
+}
+.Body code,
+.Body pre {
+   display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+   white-space: pre;
+   font-family: monospace;
+   overflow: auto;
+}
+.Body strong {
+   font-weight: bold;
+}
+.Body em {
+   font-style: oblique;
+}
+
+#Discussion fieldset,
+#Discussion form {
+   margin: 0px;
+   padding: 0px;
+}
+
+/* Comment Preview */
+div.Popup ul.Preview li.Comment {
+   padding: 0px;
+}
+div.Popup ul.Preview li.Comment div.Body {
+   min-height: 53px;
+}
+
+#PagerMore {
+   margin-bottom: 1px;
+}
+
+/* Comment Form */
+#CommentForm {
+   background: #e9f9ff;
+   border-top: 1px solid #eee;
+   padding: 8px;
+}
+div.Popup #CommentForm {
+   background: none;
+   border: 0;
+   padding: 0;
+}
+#CommentForm h3 {
+   font-size: 115%;
+   color: #2786C2;
+   font-weight: bold;
+}
+div.Popup #CommentForm h3 {
+   color: #000;
+}
+#CommentForm textarea {
+   width: 650px;
+   height: 100px;
+   min-height: 100px;
+   margin: 0px 0px 6px;
+}
+div.Popup #CommentForm textarea {
+   width: 470px;
+   max-height: 500px;
+}
+#CommentForm input.Button,
+#DiscussionForm input.Button {
+   margin-right: 6px;
+}
+
+body.Post #Panel {
+   display: none;
+}
+body.Post #Content {
+   width: auto;
+}
+body.Post #CommentForm,
+#DiscussionForm {
+   border: 0px;
+   background: #daf4fd;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 8px 10px 10px;
+}
+#CommentForm label.Heading,
+#DiscussionForm label.Heading {
+   font-weight: bold;
+   font-size: 120%;
+   color: #2786c2;
+   line-height: 100%;
+   display: block;
+   margin-bottom: 4px;
+}
+body.Post #CommentForm textarea,
+#DiscussionForm textarea {
+   width: 930px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 400px;
+   margin: 0px 0px 6px;
+}
+#DiscussionForm input.InputBox {
+   width: 930px;
+   margin-bottom: 10px;
+}
+#DiscussionForm select {
+   margin: 0 0 10px 6px;
+}
+a.Cancel {
+   margin-left: 20px;
+}
+#DiscussionForm ul {
+   margin: 0 0 8px;
+}
+#DiscussionForm ul.PostOptions li {
+   display: inline;
+   padding: 0 8px 0 0;
+}
+#DiscussionForm ul.PostOptions label {
+   display: inline;
+   font-weight: normal;
+   font-size: 95%;
+   color: #555;
+}
+
+/* Panel Boxes */
+
+#Panel ul.Discussions {
+   border: 0px;
+}

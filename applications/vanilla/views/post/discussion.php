@@ -1,0 +1,49 @@
+<?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
+$CancelUrl = '/vanilla/discussions';
+if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
+   foreach ($this->CategoryData->Result() as $Cat) {
+      if ($Cat->CategoryID == $this->CategoryID) {
+         $CancelUrl = '/vanilla/discussions/0/'.$Cat->CategoryID.'/'.Format::Url($Cat->Name);
+         break;
+      }      
+   }
+}
+?>
+<div id="DiscussionForm">
+   <?php
+      echo $this->Form->Open();
+      echo $this->Form->Label(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Add Discussion', 'Name', array('class' => 'Heading'));
+      echo $this->Form->Errors();
+      echo $this->Form->TextBox('Name', array('maxlength' => 100));
+      if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+         echo $this->Form->Label('Category', 'CategoryID');
+         echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+      }
+      echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
+      
+      $Options = '';
+      // If the user has any of the following permissions (regardless of junction), show the options
+      // Note: I need to validate that they have permission in the specified category on the back-end
+      // TODO: hide these boxes depending on which category is selected in the dropdown above.
+      if ($Session->CheckPermission('Vanilla.Discussions.Announce'))
+         $Options .= '<li>'.$this->Form->CheckBox('Announce', 'Announce this discussion', array('value' => '1')).'</li>';
+
+      if ($Session->CheckPermission('Vanilla.Discussions.Close'))
+         $Options .= '<li>'.$this->Form->CheckBox('Close', 'Close this discussion', array('value' => '1')).'</li>';
+
+      if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
+         $Options .= '<li>'.$this->Form->CheckBox('Sink', 'Sink this discussion', array('value' => '1')).'</li>';
+         
+      if ($Options != '')
+         echo '<ul class="PostOptions">' . $Options .'</ul>';
+
+      echo $this->Form->Button('Post Discussion');
+      if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || $this->Discussion->Draft == '1') {
+         echo $this->Form->Button('Save Draft');
+      }
+      echo $this->Form->Button('Preview');
+      echo Anchor('Cancel', $CancelUrl, 'Cancel');
+      echo $this->Form->Close();
+   ?>
+</div>

@@ -1,0 +1,44 @@
+.Comment .CommentScore {
+	float: right;
+	font-weight: bold;
+	margin-left: 4px;
+	padding-top: 4px;
+}
+
+.Comment .CommentScore span {
+	color: #666;
+	font-size: 16px;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.Comment .CommentScore a {
+	color: #FFF;
+	font-size: 11px;
+	padding: 2px;
+}
+
+.Comment .CommentScore a.Neg {
+	-moz-border-radius-bottomleft:5px;
+	-moz-border-radius-topleft:5px;
+	background: #FF6B39;
+	padding-left: 5px;
+}
+
+.Comment .CommentScore a.Pos {
+	-moz-border-radius-topright:5px;
+	-moz-border-radius-bottomright:5px;
+	background: #99FF00;
+	padding-right: 4px;
+}
+
+.Comment .CommentScore .Score {
+	
+}
+
+.Comment .CommentScore .Animate {
+	position: absolute;
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   user-select: none;
+}

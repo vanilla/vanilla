@@ -1,0 +1,5 @@
+1. Upload this entire file structure up to your web server.
+2. Navigate to that folder in your web browser.
+3. Follow the instructions on screen.
+
+Troubleshooting Help: http://gardenplatform.com/docs

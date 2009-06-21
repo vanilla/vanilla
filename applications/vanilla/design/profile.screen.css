@@ -1,0 +1,56 @@
+ul.Discussions li {
+   margin: 0px;
+   padding: 0px 0px 4px 0px;
+    border-bottom: 1px solid #dbe3e6;
+}
+ul.Discussions li li {
+   border: 0px;
+   padding: 0px;
+}
+ul.Discussions,
+ul.Discussions li ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+ul.Discussions li ul li.Topic a {
+   display: block;
+   border-left: 2px solid #dbe3e6;
+   margin: 8px 4px 6px 10px;
+   padding: 0px 0px 0px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+   display: none;
+}
+ul.Discussions li ul li.Topic h3 {
+   padding: 6px 0px 0px 10px;
+   margin: 0px;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.Discussions li ul li.Topic h3 a {
+   display: inline;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+   color: #2d7bb2;
+}
+ul.Discussions li ul li.Meta {
+   font-family: tahoma;
+   margin-left: 9px;
+   font-size: 80%;
+   color: #80828c;
+}
+ul.Discussions li ul li.Meta span,
+ul.Discussions li ul li.Meta span a,
+ul.Discussions li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.Discussions li ul li.Meta strong {
+   background: #ff0;
+   padding: 0px 2px;
+}
+ul.Discussions li ul li.Meta a {
+   color: #2b2d33;
+}

@@ -1,0 +1,204 @@
+fieldset {
+  padding: 0px !important;
+}
+.Conversations h2 a {
+  font-weight: normal;
+}
+h2.NewConversation {
+  float: right;
+}
+h2.NewConversation a {
+  font-weight: bold;
+}
+#Conversation,
+#Conversation ul,
+#Conversations,
+#Conversations ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+#Conversation,
+#Conversations {
+  border-top: 1px solid #eee;
+}
+#Conversation li,
+#Conversations li {
+  border-bottom: 1px solid #eee;
+  padding: 0px 0px 8px;
+}
+#Conversation li {
+  padding: 0px;
+}
+#Conversations li.Empty {
+  margin: 0px;
+  padding: 12px;
+  border: 0px;
+  background: #ffc;
+  -moz-border-radius-bottomleft: 2px;
+  -moz-border-radius-bottomright: 2px;
+  -webkit-border-bottom-left-radius: 2px;
+  -webkit-border-bottom-right-radius: 2px;
+}
+#Conversations li.Active {
+  cursor: pointer;
+}
+#Conversation li ul li,
+#Conversations li ul li {
+  display: inline;
+  border: 0px;
+}
+#Conversation li ul.Info,
+#Conversations li ul.Info {
+   font-size: 11px;
+   color: #777;
+   padding: 8px 0px 0px 8px;
+}
+#Conversation li ul.Info {
+  line-height: 200%;
+}
+#Conversation li ul.Info li,
+#Conversations li ul.Info li {
+   display: inline;
+}
+#Conversation li ul.Info li.Inserted,
+#Conversations li ul.Info li.Updated,
+#Conversations li ul.Info li.MessageCount {
+   padding-left: 12px;
+}
+#Conversation li ul.Info li.Author a,
+#Conversations li ul.Info li.Authors a {
+   font-size: 15px;
+   font-weight: bold;
+}
+#Conversation li.Author img,
+#Conversations li.Authors img {
+  float: left;
+  height: 42px;
+  width: 42px;
+  margin: 0px 8px 0px 0px;
+}
+#Conversations li ul li.MessageCount span {
+  background: #fffa22;
+  color: #000;
+  font-weight: bold;
+  margin-left: 20px;
+  padding: 0px 2px 2px 2px;
+}
+#Conversations li a.Link {
+  display: block;
+  margin: 0px 8px;
+  line-height: 140%;
+  color: #aaa;
+}
+#Conversations li.Active a.Link {
+  color: #555;
+}
+#Conversation div.Message {
+  padding: 0px 8px 5px;
+}
+
+
+/* Big Buttons */
+a.ClearConversation,
+a.NewConversation {
+   padding: 6px 0px;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #44c7f4;
+   color: #fff;
+   text-decoration: none;
+   margin: 0px 0px 10px 0px;
+}
+a.ClearConversation:hover,
+a.NewConversation:hover {
+   background: #11e420;
+   color: #fff;
+}
+
+a.ClearConversation {
+   background: #f06;
+}
+a.ClearConversation:hover {
+   background: #c36;
+}
+
+/* Add Message Form */
+body.Index #Content form {
+  background: #e9f9ff;
+  padding: 4px 8px 8px;
+  margin: 1px 0 0;
+  -moz-border-radius-bottomleft: 2px;
+  -moz-border-radius-bottomright: 2px;
+  -webkit-border-bottom-left-radius: 2px;
+  -webkit-border-bottom-right-radius: 2px;
+}
+body.Index #Content form h3 {
+  font-size: 115%;
+  color: #2786C2;
+  font-weight: bold;
+}
+body.Index #Content form textarea {
+  width: 654px;
+  height: 100px;
+  min-height: 100px;
+  margin-bottom: 2px;
+}
+
+/* New Conversation Form */
+body.add #Panel {
+   display: none;
+}
+body.add #Content {
+   width: auto;
+}
+#ConversationForm {
+   border: 0px;
+   background: #daf4fd;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 8px 10px 10px;
+}
+#ConversationForm label {
+  float: left;
+  display: block;
+  width: 30px;
+  margin: 0 10px 0 0;
+}
+#ConversationForm label.Heading {
+  font-weight: bold;
+  font-size: 120%;
+  color: #2786c2;
+  line-height: 100%;
+  display: block;
+  width: auto;
+  float: none;
+  margin: 0 0px 8px 0;
+}
+#ConversationForm textarea.MultiComplete {
+  width: 896px;
+}
+#ConversationForm .TextBox {
+   width: 930px;
+   height: 100px;
+   min-height: 100px;
+   margin: 8px 0px 6px;
+}
+a.Cancel {
+   margin-left: 20px;
+}
+
+
+/* Panel Forms */
+div.AddPeople h4 {
+  border-bottom: 0px;
+}
+#Panel input.InputBox,
+div.AddPeople textarea.MultiComplete {
+  width: 225px;
+  margin-bottom: 2px;
+}

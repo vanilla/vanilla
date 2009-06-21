@@ -271,7 +271,7 @@ class SettingsController extends GardenController {
       
       // Create a model to save configuration settings
       $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'configuration.php', $Validation);
+      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array('Garden.Registration.Method', 'Garden.Registration.DefaultRoles', 'Garden.Registration.CaptchaPrivateKey', 'Garden.Registration.CaptchaPublicKey', 'Garden.Registration.InviteExpiration'));
       
       // Define some validation rules for the fields being saved

@@ -133,11 +133,12 @@ class GardenSetupController extends GardenController {
             // Apply the validation results to the form(s)
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          } else {
+            $Host = Url::Host();
             $Domain = Url::Domain();
 
             // Set up cookies now so that the user can be signed in.
             $ConfigurationFormValues['Garden.Cookie.Salt'] = RandomString(10);
-            $ConfigurationFormValues['Garden.Cookie.Domain'] = strpos($Domain, '.') === FALSE ? '' : $Domain; // Don't assign the domain if it is a non .com domain as that will break cookies.
+            $ConfigurationFormValues['Garden.Cookie.Domain'] = strpos($Host, '.') === FALSE ? '' : $Host; // Don't assign the domain if it is a non .com domain as that will break cookies.
             $ConfigurationModel->Save($ConfigurationFormValues);
             
             // If changing locale, redefine locale sources:

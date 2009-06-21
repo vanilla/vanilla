@@ -232,7 +232,7 @@ $Construct->Table('Activity')
 // Search Document Type Table
 $Construct->Table('TableType')
 	->Column('TableName', 'varchar', 50, FALSE, NULL, 'primary')
-	->Column('PermissionTableName', 'int', 11)
+	->Column('PermissionTableName', 'varchar', 50, TRUE)
 	->Set($Explicit, $Drop);
 	
 // Search Document Table

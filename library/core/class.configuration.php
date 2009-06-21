@@ -243,15 +243,15 @@ class Gdn_Configuration {
     * @return boolean
     */
    public function Load($File, $LoadFor = 'Use', $Name = 'Configuration') {
-      if(!file_exists($File)) {
-         return FALSE;
-      }
-      
       // Prevent someone from calling Save and wiping out a config file accidentally.
       if($LoadFor == 'Save')
          $this->_File = $File;
       else
          $this->_File = '';
+      
+      if(!file_exists($File)) {
+         return FALSE;
+      }
       
       switch($LoadFor) {
          case 'Save':

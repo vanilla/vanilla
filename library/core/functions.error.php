@@ -66,7 +66,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    if (!defined('PATH_ROOT')) $PanicError = TRUE;
    if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
    if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-   $WebRoot = class_exists('Url', FALSE) ? Url::WebRoot() : '';
+   $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
 
    if ($PanicError === FALSE) {
       // See if we can get the file that caused the error

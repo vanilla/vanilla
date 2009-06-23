@@ -16,17 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// A singleton class used to identify extensions, register them in a central
 /// location, and instantiate/call them when necessary.
 /// </summary>
-class Gdn_PluginManager implements ISingleton {
-   
-   private static $_Instance;
-
-   public static function GetInstance() {
-      if (!isset(self::$_Instance))
-         self::$_Instance = new PluginManager; 
-
-      return self::$_Instance;
-   }
-   
+class Gdn_PluginManager {
    /// <prop type="array">
    /// An associative array of arrays containing information about each
    /// enabled plugin. This value is assigned in the garden bootstrap.php.
@@ -56,12 +46,12 @@ class Gdn_PluginManager implements ISingleton {
    
    /// <summary>
    /// Examines all declared classes, identifying which ones implement
-   /// IPlugin and registers all of their event handlers and method
+   /// Gdn_IPlugin and registers all of their event handlers and method
    /// overrides. It recognizes them because Handlers end with _Handler,
    /// _Before, and _After and overrides end with "_Override". They are prefixed
    /// with the name of the class and method (or event) to be handled or
    /// overridden. For example:
-   ///  class MyPlugin implements IPlugin {
+   ///  class MyPlugin implements Gdn_IPlugin {
    ///   public function MyController_SignIn_After($Sender) {
    ///      // Do something neato
    ///   }
@@ -74,9 +64,9 @@ class Gdn_PluginManager implements ISingleton {
       // Loop through all declared classes looking for ones that implement iPlugin.
       // print_r(get_declared_classes());
       foreach(get_declared_classes() as $ClassName) {
-         // Only implement the plugin if it implements the IPlugin interface and
+         // Only implement the plugin if it implements the Gdn_IPlugin interface and
          // it has it's properties defined in $this->EnabledPlugins.
-         if (in_array('IPlugin', class_implements($ClassName))) {
+         if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
             $ClassMethods = get_class_methods($ClassName);
             foreach ($ClassMethods as $Method) {
                $MethodName = strtolower($Method);
@@ -330,13 +320,13 @@ class Gdn_PluginManager implements ISingleton {
       CheckRequirements($PluginName, $RequiredPlugins, $this->EnabledPlugins, 'plugin');
       
       // Required Themes
-      $ThemeManager = new ThemeManager();
+      $ThemeManager = new Gdn_ThemeManager();
       $EnabledThemes = $ThemeManager->EnabledThemeInfo();
       $RequiredThemes = ArrayValue('RequiredTheme', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       
       // Required Applications
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
       $RequiredApplications = ArrayValue('RequiredApplications', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
@@ -375,7 +365,7 @@ class Gdn_PluginManager implements ISingleton {
       $Config->Set('EnabledPlugins'.'.'.$PluginName, $PluginFolder);
       $Config->Save();      
       
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $ApplicationManager->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
       return TRUE;
@@ -400,7 +390,7 @@ class Gdn_PluginManager implements ISingleton {
       unset($this->EnabledPlugins[$PluginName]);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $ApplicationManager->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
    }

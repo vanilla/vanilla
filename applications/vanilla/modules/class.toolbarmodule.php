@@ -11,7 +11,7 @@ if (!class_exists('ToolbarModule', FALSE)) {
    /// <summary>
    /// Renders a toolbar object.
    /// </summary>
-   class Toolbar implements IModule {
+   class Toolbar implements Gdn_IModule {
       
       /// <prop type="array">
       /// An array of toolbar items.

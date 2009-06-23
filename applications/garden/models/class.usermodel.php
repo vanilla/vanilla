@@ -200,7 +200,7 @@ class Gdn_UserModel extends Model {
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
          // Make sure to encrypt the password for saving...
          if (array_key_exists('Password', $Fields)) {
-            $PasswordHash = new GardenPasswordHash();
+            $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          }
 
@@ -261,7 +261,7 @@ class Gdn_UserModel extends Model {
 
       // Add & apply any extra validation rules:
       $Name = ArrayValue('Name', $FormPostValues, '');
-      $FormPostValues['Email'] = ArrayValue('Email', $FormPostValues, strtolower($Name.'@'.Url::Host()));
+      $FormPostValues['Email'] = ArrayValue('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
       $FormPostValues['ShowEmail'] = '0';
       $FormPostValues['TermsOfService'] = '1';
       $FormPostValues['DateOfBirth'] = '1975-09-16';
@@ -666,13 +666,13 @@ class Gdn_UserModel extends Model {
       }
 
       $UserData = $DataSet->FirstRow();
-      $PasswordHash = new GardenPasswordHash();
+      $PasswordHash = new Gdn_PasswordHash();
       if (!$PasswordHash->CheckPassword($Password, $UserData->Password)) {
          return False;
       }
 
       if ($PasswordHash->Weak) {
-         $PasswordHash = new GardenPasswordHash();
+         $PasswordHash = new Gdn_PasswordHash();
          $this->SQL->Update('User')
             ->Set('Password', $PasswordHash->HashPassword($Password))
             ->Where('UserID', $UserData->UserID)
@@ -729,7 +729,7 @@ class Gdn_UserModel extends Model {
          $this->SaveRoles($UserID, $RoleIDs);
 
          // Send out a notification to the user
-         $SignInUrl = CombinePaths(array(Url::WebRoot(TRUE), 'entry', 'signin'), '/');
+         $SignInUrl = CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'entry', 'signin'), '/');
          $User = $this->Get($UserID);
          if ($User) {
             $Email->Subject(Gdn::Translate('MembershipApprovedSubject'));
@@ -1042,7 +1042,7 @@ class Gdn_UserModel extends Model {
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
-      $Email = new Email();
+      $Email = new Gdn_Email();
       $Email->Subject(sprintf(Gdn::Translate('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
       $Email->From($Sender->Email, $Sender->Name);
@@ -1052,7 +1052,7 @@ class Gdn_UserModel extends Model {
             $User->Name,
             $Sender->Name,
             $AppTitle,
-            Url::WebRoot(TRUE),
+            Gdn_Url::WebRoot(TRUE),
             $Password
          )
       );
@@ -1064,7 +1064,7 @@ class Gdn_UserModel extends Model {
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
-      $Email = new Email();
+      $Email = new Gdn_Email();
       $Email->Subject(sprintf(Gdn::Translate('[%s] Password Reset'), $AppTitle));
       $Email->To($User->Email);
       $Email->From($Sender->Email, $Sender->Name);
@@ -1074,7 +1074,7 @@ class Gdn_UserModel extends Model {
             $User->Name,
             $Sender->Name,
             $AppTitle,
-            Url::WebRoot(TRUE),
+            Gdn_Url::WebRoot(TRUE),
             $Password
          )
       );

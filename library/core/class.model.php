@@ -36,7 +36,7 @@ if (!defined('APPLICATION'))
  *
  * @package Garden
  */
-class Model extends Pluggable {
+class Model extends Gdn_Pluggable {
 
 
    /**
@@ -153,7 +153,7 @@ class Model extends Pluggable {
 
       $this->Database = Gdn::Database();
       $this->SQL = $this->Database->SQL();
-      $this->Validation = new Validation();
+      $this->Validation = new Gdn_Validation();
       $this->Name = $Name;
       parent::__construct();
    }
@@ -167,7 +167,7 @@ class Model extends Pluggable {
     */
    public function DefineSchema() {
       if (!isset($this->Schema)) {
-         $this->Schema = new Schema($this->Name);
+         $this->Schema = new Gdn_Schema($this->Name);
          $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name);
          if (is_array($this->PrimaryKey))
             $this->PrimaryKey = $this->PrimaryKey[0];

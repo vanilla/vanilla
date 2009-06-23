@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class ConversationsController extends Controller {
+class ConversationsController extends Gdn_Controller {
    
    /// <summary>
    /// Returns an array of pages that contain settings information for this

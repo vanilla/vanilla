@@ -20,7 +20,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class Control extends Pluggable {
+class Gdn_Control extends Gdn_Pluggable {
 
    /**
     * An array of class names to instantiate and make properties of this class.

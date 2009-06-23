@@ -7,7 +7,7 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
-class ConversationsHooks implements IPlugin {
+class ConversationsHooks implements Gdn_IPlugin {
    
    public function Gdn_UserModel_SessionQuery_Handler(&$Sender) {
       // Add some extra fields to the session query

@@ -19,7 +19,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class Gdn_Dispatcher extends Pluggable {
+class Gdn_Dispatcher extends Gdn_Pluggable {
 
    /**
     * An array of folders within the application that are OK to search through
@@ -292,7 +292,7 @@ class Gdn_Dispatcher extends Pluggable {
     * @param string $AssetName The name of the asset collection to add the string to.
     * @param mixed $Asset The string asset to be added. The asset can be one of two things.
     * - <b>string</b>: The string will be rendered to the page.
-    * - <b>IModule</b>: The IModule::Render() method will be called when the asset is rendered.
+    * - <b>Gdn_IModule</b>: The Gdn_IModule::Render() method will be called when the asset is rendered.
     */
    public function PassAsset($AssetName, $Asset) {
       $this->_AssetCollection[$AssetName][] = $Asset;
@@ -337,7 +337,7 @@ class Gdn_Dispatcher extends Pluggable {
 
       // Retrieve and parse the request
       if ($this->Request == '') {
-         $this->Request = Url::Request();
+         $this->Request = Gdn_Url::Request();
          $Prefix = strtolower(substr($this->Request, 0, strpos($this->Request, '/')));
          switch ($Prefix) {
             case 'rss':

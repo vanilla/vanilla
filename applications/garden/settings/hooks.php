@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class GardenHooks implements IPlugin {
+class GardenHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }

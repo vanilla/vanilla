@@ -19,17 +19,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * Handles analyzing and returning various parts of the current url.
  *
  * @package Garden
  */
-class Url {
+class Gdn_Url {
 
 
    /**
@@ -61,9 +56,9 @@ class Url {
       
       if (is_string($WebRoot) && $WebRoot != '') {
          // Strip forward slashes from the beginning of webroot
-         return ($WithDomain ? Url::Domain() : '') . preg_replace('/(^\/+)/', '', $WebRoot);
+         return ($WithDomain ? Gdn_Url::Domain() : '') . preg_replace('/(^\/+)/', '', $WebRoot);
       } else {
-         return $WithDomain ? Url::Domain() : '';
+         return $WithDomain ? Gdn_Url::Domain() : '';
       }
    }
 
@@ -171,7 +166,7 @@ class Url {
       }
 
       if ($WithWebRoot)
-         $Return = Url::WebRoot($WithDomain) . '/' . $Return;
+         $Return = Gdn_Url::WebRoot($WithDomain) . '/' . $Return;
 
       return $Return;
    }

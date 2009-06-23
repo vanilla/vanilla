@@ -34,17 +34,15 @@ $('.CommentScore a').click(function() {
          var setLink = function(score, query) {
             $element = $(query, $parent);
             
-            if((score == 0 && $element.attr('href') == '') || (score != 0 && $element.attr('href') != ''))
-               return;
-            
             if(score == 0) {
                $element.attr('href2', $element.attr('href'));
                $element.attr('href', '');
                $element.attr('title', '');
                $element.addClass('Disabled');
             } else {
-               $element.attr('href', $element.attr('href2'));
-               $element.attr('title', score);
+               if($element.attr('href') == '')
+                  $element.attr('href', $element.attr('href2'));
+               $element.attr('title', (score > 0 ? '+' : '') + score);
                $element.removeClass('Disabled');
             }
          }

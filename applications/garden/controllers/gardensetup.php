@@ -67,7 +67,7 @@ class GardenSetupController extends GardenController {
             $AppKey = $CurrentStep - 2;
             $AppFolder = $AppFolders[$AppKey];
             $AppName = $AppNames[$AppKey];
-            $Validation = new Validation();
+            $Validation = new Gdn_Validation();
             $this->ApplicationManager->RegisterPermissions($AppName, $Validation);
             if ($this->ApplicationManager->ApplicationSetup($AppName, $this, $Validation)) {
                ++$CurrentStep;
@@ -105,8 +105,8 @@ class GardenSetupController extends GardenController {
       $ConfigFile = PATH_CONF . DS . 'config.php';
       
       // Create a model to save configuration settings
-      $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', $ConfigFile, $Validation);
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', $ConfigFile, $Validation);
       $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password'));
       
       // Set the models on the forms.
@@ -133,8 +133,8 @@ class GardenSetupController extends GardenController {
             // Apply the validation results to the form(s)
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          } else {
-            $Host = Url::Host();
-            $Domain = Url::Domain();
+            $Host = Gdn_Url::Host();
+            $Domain = Gdn_Url::Domain();
 
             // Set up cookies now so that the user can be signed in.
             $ConfigurationFormValues['Garden.Cookie.Salt'] = RandomString(10);
@@ -144,7 +144,7 @@ class GardenSetupController extends GardenController {
             // If changing locale, redefine locale sources:
             $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
             if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
-               $ApplicationManager = new ApplicationManager();
+               $ApplicationManager = new Gdn_ApplicationManager();
                $PluginManager = Gdn::Factory('PluginManager');
                $Locale = Gdn::Locale();
                $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
@@ -197,7 +197,7 @@ class GardenSetupController extends GardenController {
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'garden' . DS . 'settings' . DS . 'about.php')));
             $Config->Load($ConfigFile, 'Save');
             $Config->Set('Garden.Version', ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'));
-            $Config->Set('Garden.WebRoot', Url::WebRoot());
+            $Config->Set('Garden.WebRoot', Gdn_Url::WebRoot());
             $Config->Set('Garden.RewriteUrls', (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE);
             $Config->Set('Garden.Domain', $Domain);
             $Config->Set('Garden.CanProcessImages', function_exists('gd_info'));

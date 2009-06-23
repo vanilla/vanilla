@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class VanillaController extends Controller {
+class VanillaController extends Gdn_Controller {
    
    public function Initialize() {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {

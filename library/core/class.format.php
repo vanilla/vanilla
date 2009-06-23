@@ -374,7 +374,7 @@ class Format {
     * array of $Array[Property] => Value sets.
     *
     * @param array $Array An array to be converted to object.
-    * @return ShellClass
+    * @return Gdn_ShellClass
     *
     * @todo could be just "return (object) $Array;"?
     */
@@ -382,7 +382,7 @@ class Format {
       if (!is_array($Array))
          return $Array;
 
-      $Return = new ShellClass();
+      $Return = new Gdn_ShellClass();
       foreach($Array as $Property => $Value) {
          $Return->$Property = $Value;
       }

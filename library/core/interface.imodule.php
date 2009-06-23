@@ -21,16 +21,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * An interface for in-page modules.
  *
  * @package Garden
  */
-interface IModule {
+interface Gdn_IModule {
 
 
    /**

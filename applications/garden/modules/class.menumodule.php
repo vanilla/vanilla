@@ -101,7 +101,7 @@ if (!class_exists('MenuModule', FALSE)) {
             $HighlightRoute = $this->_HighlightRoute;
             
          if ($HighlightRoute == '')
-            $HighlightRoute = Url::Request();
+            $HighlightRoute = Gdn_Url::Request();
          
          $Username = '';
          $UserID = '';

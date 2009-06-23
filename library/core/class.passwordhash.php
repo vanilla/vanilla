@@ -28,7 +28,7 @@ include PATH_LIBRARY . '/vendors/phpass/PasswordHash.php';
  *
  * @namespace Lussumo.Garden.Core
  */
-class GardenPasswordHash extends PasswordHash {
+class Gdn_PasswordHash extends PasswordHash {
 
    public $Weak = FALSE;
 

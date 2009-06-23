@@ -19,7 +19,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class ApplicationManager {
+class Gdn_ApplicationManager {
 
    /**
     * An array of available applications. Never access this directly, instead

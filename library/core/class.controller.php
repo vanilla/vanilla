@@ -20,7 +20,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class Controller extends Control {
+class Gdn_Controller extends Gdn_Control {
 
    /**
     * The name of the application that this controller can be found in
@@ -327,7 +327,7 @@ class Controller extends Control {
     * @param string $AssetContainer The name of the asset container to add $Asset to.
     * @param mixed $Asset The asset to be rendered in the view. This can be one of:
     * - <b>string</b>: The string will be rendered.
-    * - </b>IModule</b>: IModule::Render() will be called.
+    * - </b>Gdn_IModule</b>: Gdn_IModule::Render() will be called.
     * @param string $AssetName The name of the asset being added. This can be
     * used later to sort assets before rendering.
     */
@@ -380,9 +380,9 @@ class Controller extends Control {
                __autoload($Module);
 
             if (class_exists($Module)) {
-               // Make sure that the class implements IModule
+               // Make sure that the class implements Gdn_IModule
                $ReflectionClass = new ReflectionClass($Module);
-               if ($ReflectionClass->implementsInterface("IModule"))
+               if ($ReflectionClass->implementsInterface("Gdn_IModule"))
                   $Module = new $Module($this);
 
             }
@@ -408,7 +408,7 @@ class Controller extends Control {
          <ul id="Definitions" style="display: none;">
             <li id="TransportError">'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'</li>
             <li id="TransientKey">'.$Session->TransientKey().'</li>
-            <li id="WebRoot">'.Url::WebRoot(TRUE).'</li>
+            <li id="WebRoot">'.Gdn_Url::WebRoot(TRUE).'</li>
             <li id="ConfirmText">'.Gdn::Translate('Are you sure you want to proceed?').'</li>
             <li id="Okay">'.Gdn::Translate('Okay').'</li>
             <li id="Cancel">'.Gdn::Translate('Cancel').'</li>
@@ -700,7 +700,7 @@ class Controller extends Control {
             // Render
             $this->RenderMaster();
          } else {
-            if($View instanceof IModule) {
+            if($View instanceof Gdn_IModule) {
                $View->Render();
             } else {
                echo $View;

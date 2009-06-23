@@ -23,7 +23,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class ConfigurationModel {
+class Gdn_ConfigurationModel {
 
    /**
     * The name of the configuration array that this model is intended to

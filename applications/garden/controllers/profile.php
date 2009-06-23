@@ -227,7 +227,7 @@ class ProfileController extends GardenController {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
-         $UploadImage = new UploadImage();
+         $UploadImage = new Gdn_UploadImage();
          try {
             // Validate the upload
             $TmpImage = $UploadImage->ValidateUpload('Picture');
@@ -412,7 +412,7 @@ class ProfileController extends GardenController {
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey)) {
          try {
-            $Email = new Email();
+            $Email = new Gdn_Email();
             $InvitationModel->Send($InvitationID, $Email);
          } catch (Exception $ex) {
             $this->Form->AddError(strip_tags($ex->getMessage()));

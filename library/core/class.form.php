@@ -752,7 +752,7 @@ class Form {
       // Action
       $ActionFromAttributes = ArrayValueI('action', $Attributes);
       if ($this->Action == '')
-         $this->Action = Url(Url::Request());
+         $this->Action = Url(Gdn_Url::Request());
       $this->Action = $ActionFromAttributes === FALSE ? $this->Action : $ActionFromAttributes;
       
       $Return .= ' method="' . $this->Method . '"'

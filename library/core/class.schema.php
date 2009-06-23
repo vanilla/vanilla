@@ -15,7 +15,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Manages defining and examining the schema of a database table.
 /// </summary>
-class Schema {
+class Gdn_Schema {
    
    /// <prop type="array">
    /// An associative array of TableName => Fields associative arrays that

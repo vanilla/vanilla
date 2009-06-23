@@ -18,7 +18,7 @@ class Gdn_ModuleCollection extends Module {
 		foreach($this->Items as $Item) {
 			if(is_string($Item)) {
 				echo $Item;
-			} elseif($Item instanceof IModule) {
+			} elseif($Item instanceof Gdn_IModule) {
 				$Item->Render();
 			} else {
 				throw new Exception();

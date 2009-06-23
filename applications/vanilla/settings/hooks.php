@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class VanillaHooks implements IPlugin {
+class VanillaHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }

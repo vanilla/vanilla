@@ -10,7 +10,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 
 /*
-class SkeletonHooks implements IPlugin {
+class SkeletonHooks implements Gdn_IPlugin {
    public function Controller_Event_Handler($Sender) {
       // Do something
    }

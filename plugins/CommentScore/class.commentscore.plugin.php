@@ -25,7 +25,7 @@ $PluginInfo['CommentScore'] = array(
    'AuthorUrl' => 'http://toddburry.com'
 );
 
-class Gdn_CommentScorePlugin implements IPlugin {
+class Gdn_CommentScorePlugin implements Gdn_IPlugin {
    
    public function DiscussionController_Render_Before($Sender) {
       $Sender->Head->AddCss('/plugins/CommentScore/commentscore.css');

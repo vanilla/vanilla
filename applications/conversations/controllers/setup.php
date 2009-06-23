@@ -11,7 +11,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Conversations Setup Controller
 /// </summary>
-class SetupController extends Controller {
+class SetupController extends Gdn_Controller {
    
    public $Uses = array('Form');
    
@@ -26,7 +26,7 @@ class SetupController extends Controller {
       $Drop = Gdn::Config('Conversations.Version') === FALSE ? TRUE : FALSE;
       $Explicit = TRUE;
       $Construct = $Database->Structure();
-      $Validation = new Validation(); // This is going to be needed by structure.php to validate permission names
+      $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
       try {
          include(PATH_APPLICATIONS . DS . 'conversations' . DS . 'settings' . DS . 'structure.php');
       } catch (Exception $ex) {

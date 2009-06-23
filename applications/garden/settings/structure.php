@@ -47,7 +47,7 @@ $Construct->Table('Role')
 
 // Insert some permissions for the Garden setup
 if (!is_object($Validation))
-   $Validation = new Validation();
+   $Validation = new Gdn_Validation();
    
 $PermissionModel = new PermissionModel($Validation);
 $Permissions = array();

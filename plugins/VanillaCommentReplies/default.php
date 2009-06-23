@@ -31,7 +31,7 @@ Gdn::FactoryInstall(
    FALSE
 );
 
-class VanillaCommentRepliesPlugin implements IPlugin {
+class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    
    public $ReplyModel;
    

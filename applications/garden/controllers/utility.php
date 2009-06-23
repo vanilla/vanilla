@@ -95,7 +95,7 @@ class UtilityController extends GardenController {
       $this->Permission('Garden.AdminUser.Only');
       $File = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
       if (file_exists($File)) {
-         $Validation = new Validation();
+         $Validation = new Gdn_Validation();
          $Database = Gdn::Database();
          $Construct = $Database->Structure();
          $Drop = $Drop == '0' ? FALSE : TRUE;

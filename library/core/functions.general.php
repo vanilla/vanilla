@@ -16,7 +16,11 @@ function __autoload($ClassName) {
       return false;
 
    $FileSystem = FileSystem::GetInstance();
-   $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
+   
+   if(substr($ClassName, 0, 4) === 'Gdn_')
+      $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
+   else
+      $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
    $ApplicationWhiteList = property_exists($FileSystem, 'ApplicationWhiteList') ? $FileSystem->ApplicationWhiteList : FALSE;
    $LibraryPath = FALSE;
 
@@ -290,13 +294,13 @@ if (!function_exists('Url')) {
          return $Destination;
       } else if ($Destination == '#' || $Destination == '') {
          if ($WithDomain)
-            return Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
+            return Gdn_Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
          else
-            return '/'.Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
+            return '/'.Gdn_Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
       } else if ($RewriteUrls === TRUE) {
-         return CombinePaths(array('/', Url::WebRoot($WithDomain), $Destination), '/');
+         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), $Destination), '/');
       } else {
-         return CombinePaths(array('/', Url::WebRoot($WithDomain), 'index.php', $Destination), '/');
+         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), 'index.php', $Destination), '/');
       }
    }
 }
@@ -307,7 +311,7 @@ if (!function_exists('Asset')) {
       if (substr($Destination, 0, 7) == 'http://') {
          return $Destination;
       } else {
-         return CombinePaths(array('/', Url::WebRoot($WithDomain), $Destination), '/');
+         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), $Destination), '/');
       }
    }
 }
@@ -505,7 +509,7 @@ if (!function_exists('Attribute')) {
 
 if (!function_exists('GetApplicationMenus')) {
    function GetApplicationMenus(&$Menu) {
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
 
       // Get all settings pages from the specified applications:

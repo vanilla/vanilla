@@ -11,7 +11,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Handles uploading files.
 /// </summary>
-class Upload {
+class Gdn_Upload {
    
    protected $_MaxFileSize;
    protected $_AllowedFileExtensions;

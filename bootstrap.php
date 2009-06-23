@@ -74,8 +74,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Garden hasn't been installed yet.
-if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Url::Request(), 'gardensetup') === FALSE) {
-   header('location: '.CombinePaths(array(Url::WebRoot(TRUE), 'index.php/garden/gardensetup'), '/'));
+if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'gardensetup') === FALSE) {
+   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/garden/gardensetup'), '/'));
    exit();
 }
 

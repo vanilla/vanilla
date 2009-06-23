@@ -15,4 +15,4 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// A simple class definition that any object can use or extend.
 /// </summary>
-class ShellClass {}
+class Gdn_ShellClass {}

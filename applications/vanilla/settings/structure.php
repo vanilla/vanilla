@@ -15,7 +15,7 @@ if ($Drop) {
    $Permissions[] = 'Vanilla.Categories.Manage';
    $Permissions[] = 'Vanilla.Spam.Manage';
    if (!is_object($Validation))
-      $Validation = new Validation();
+      $Validation = new Gdn_Validation();
       
    $PermissionModel = new PermissionModel($Validation);
    $PermissionModel->InsertNew($Permissions);

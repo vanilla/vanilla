@@ -50,7 +50,7 @@ class ActivityController extends GardenController {
       }
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         Redirect(GetIncomingValue('Return', Url::WebRoot()));
+         Redirect(GetIncomingValue('Return', Gdn_Url::WebRoot()));
       }
       $this->ControllerName = 'Home';
       $this->View = 'FileNotFound';
@@ -76,7 +76,7 @@ class ActivityController extends GardenController {
       }
       // Redirect back to the sending location if this isn't an ajax request
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         Redirect($this->Form->GetValue('Return', Url::WebRoot()));
+         Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
       } else {
          $this->Html = new Html();
          // Load the newly added comment

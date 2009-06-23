@@ -44,7 +44,7 @@ class PermissionModel extends Model {
     * @return array
     */
    public function GetAllowedPermissionNamespaces() {
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
       $PluginManager = Gdn::Factory('PluginManager');
       return array_merge(array_keys($EnabledApplications), array_keys($PluginManager->EnabledPlugins));      

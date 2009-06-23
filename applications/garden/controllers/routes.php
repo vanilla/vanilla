@@ -44,8 +44,8 @@ class RoutesController extends GardenController {
          $this->Route = ArrayValue($RouteIndex, $Keys);
       }
       
-      $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array('Route', 'Target'));
       
       // Set the model on the form.

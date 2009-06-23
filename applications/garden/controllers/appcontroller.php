@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class GardenController extends Controller {
+class GardenController extends Gdn_Controller {
    
    public function __construct() {
       parent::__construct();

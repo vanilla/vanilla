@@ -28,7 +28,7 @@ $PluginInfo['Debugger'] = array(
 if(Gdn::Config('EnabledPlugins.Debugger'))
    Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.database.debug.php', Gdn::FactorySingleton, array('Database'));
 
-class DebuggerPlugin implements IPlugin {
+class DebuggerPlugin implements Gdn_IPlugin {
    // Specifying "Base" as the class name allows us to make the method get called for every
    // class that implements a base class's method. For example, Base_Render_After
    // would allow all controllers that call Controller.Render() to have that method

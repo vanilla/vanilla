@@ -21,10 +21,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * Handles user information throughout a session. This class is a singleton.
  *
@@ -135,7 +131,7 @@ class Gdn_Session {
    /**
     * End a session
     *
-    * @param IAuthenticator $Authenticator
+    * @param Gdn_IAuthenticator $Authenticator
     */
    function End($Authenticator) {
       $Authenticator->DeAuthenticate();
@@ -221,7 +217,7 @@ class Gdn_Session {
    /**
     * Authenticates the user with the provided Authenticator class.
     *
-    * @param IAuthenticator $Authenticator The authenticator used to identify the user making the request.
+    * @param Gdn_IAuthenticator $Authenticator The authenticator used to identify the user making the request.
     */
    function Start($Authenticator) {
       // Retrieve the authenticated UserID from the Authenticator module.

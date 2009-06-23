@@ -159,7 +159,7 @@ class Gdn_Factory {
 	 *
 	 */
 	public function InstallDependency($Alias, $PropertyName, $SourceAlias, $Override = TRUE) {
-		if(!array_key_exists($Alias)) {
+		if(!array_key_exists($Alias, $this->_Dependencies)) {
 			$this->_Dependencies[$Alias] = array($PropertyName => $SourceAlias);
 		} else {
 			$this->_Dependencies[$Alias][$PropertyName] = $SourceAlias;

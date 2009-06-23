@@ -241,7 +241,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             for($i = 0; $i < count($Data); $i++) {
                if($i > 0)
                   $Sql .= ', ';
-               $Sql .= "\n(".implode(', ', array_values($Data[$i])).')';
+               $Sql .= "\n('".implode('\', \'', array_values($Data[$i])).'\')';
             }
          } else {
             $Sql .= "\n(".implode(', ', array_keys($Data)).') '

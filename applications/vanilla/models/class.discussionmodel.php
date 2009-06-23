@@ -507,8 +507,20 @@ class DiscussionModel extends VanillaModel {
    }
    
    public function Delete($DiscussionID) {
+      $Search = Gdn::Factory('SearchModel');
+      if(!is_null($Search)) {
+         // Get a list of all of the comments in the discussion first.
+         $Data = $this->SQL->Select('CommentID')->From('Comment')->Where('DiscussionID', $DiscussionID)->Get();
+         
+         // Delete the search for each comment.
+         foreach($Data as $Row) {
+            $Search->Delete(array('TableName' => 'Comment', 'PrimaryID' => $Row->CommentID));
+         }
+      }
+      
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
+      
       return TRUE;
    }
 }

@@ -253,7 +253,7 @@ abstract class Gdn_SQLDriver {
     *     In this case Value will be assumed to be a string.
     *
     * <b>New Syntax</b>
-    * The $Field and Value expressions can begin with special characters to do certain thing.
+    * The $Field and Value expressions can begin with special characters to do certain things.
     * <ul>
     * <li><b>=</b>: This means that the argument is a function call.
     *   If you want to pass field reference arguments into the function then enclose them in square brackets.
@@ -282,7 +282,8 @@ abstract class Gdn_SQLDriver {
          if(stripos($FunctionCall, '%s') === FALSE) 
             $Value = '=' . $FunctionCall . '(' . $FunctionArg . ')';
          else
-            $Value = '=' . sprintf($FunctionCall, $FunctionArg);  
+            $Value = '=' . sprintf($FunctionCall, $FunctionArg);
+         $EscapeValueSql = FALSE;
       } else if(!$EscapeValueSql && !is_null($Value)) {
          $Value = '@' . $Value;
       }
@@ -301,7 +302,7 @@ abstract class Gdn_SQLDriver {
          $Field = $Split[0];
          $Op = $Split[1];
          if(count($Split) > 2) {
-            $Value = '@' . $Split[2];
+            $Value = null;
          }
       } else {
          $Op = '=';
@@ -311,16 +312,17 @@ abstract class Gdn_SQLDriver {
          // This is a special case where the value SQL is checking for an is null operation.
          $Op = 'is';
          $Value = '@null';
+         $EscapeValueSql = FALSE;
       }
       
       // Add the left hand side of the expression.
-      $Expr .= $this->_ParseExpr($Field);
+      $Expr .= $this->_ParseExpr($Field, NULL, $EscapeFieldSql);
       
       // Add the expression operator.
       $Expr .= ' '.$Op.' ';
       
       // Add the right side of the expression.
-      $Expr .= $this->_ParseExpr($Value, $Field);
+      $Expr .= $this->_ParseExpr($Value, $Field, $EscapeValueSql);
       
       return $Expr;
    }
@@ -1330,46 +1332,45 @@ abstract class Gdn_SQLDriver {
     * @param string $Name A name to give the parameter if $Expr becomes a named parameter.
     * @return string The parsed expression.
     */
-   protected function _ParseExpr($Expr, $Name = NULL) {
+   protected function _ParseExpr($Expr, $Name = NULL, $EscapeExpr = FALSE) {
       $Result = '';
       
-      switch(substr($Expr, 0, 1)) {
-         case '=':
-            // This is a function call. Each parameter has to be 
-            $FunctionArray = preg_split('/(\[[^\]]+\])', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
-            for($i = 0; $i < count($FunctionArray); $i++) {
-               $Part = $FunctionArray[$i];
-               if(substr($Part, 1) == '[') {
-                  // Translate the part of the function call.
-                  $Part = $this->_FieldExpr(substr($Part, 1, strlen($Part) - 2), $Name);
-                  $FunctionArray[$i] = $Part;
-               }
+      $C = substr($Expr, 0, 1);
+      
+      if($C === '=' && $EscapeExpr === FALSE) {
+         // This is a function call. Each parameter has to be parsed.
+         $FunctionArray = preg_split('/(\[[^\]]+\])', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
+         for($i = 0; $i < count($FunctionArray); $i++) {
+            $Part = $FunctionArray[$i];
+            if(substr($Part, 1) == '[') {
+               // Translate the part of the function call.
+               $Part = $this->_FieldExpr(substr($Part, 1, strlen($Part) - 2), $Name);
+               $FunctionArray[$i] = $Part;
             }
-            // Combine the array back to the original function call.
-            $Result = join($FunctionArray);
-            break;
-         case '@':
-            // This is a literal. Don't do anything.
-            $Result = substr($Expr, 1);
-            break;
-         default:
-            // This is a column reference.
-            if(is_null($Name)) {
-               $Result = $this->EscapeIdentifier($Expr);
+         }
+         // Combine the array back to the original function call.
+         $Result = join($FunctionArray);
+      } elseif($C === '@' && $EscapeExpr === FALSE) {
+         // This is a literal. Don't do anything.
+         $Result = substr($Expr, 1);
+      } else {
+         // This is a column reference.
+         if(is_null($Name)) {
+            $Result = $this->EscapeIdentifier($Expr);
+         } else {
+            // This is a named parameter.
+            
+            // Check to see if the named parameter is valid.
+            if(in_array(substr($Expr, 0, 1), array('=', '@'))) {
+               // The parameter has to be a default name.
+               $Result = $this->NamedParameter('Param', TRUE);
             } else {
-               // This is a named parameter.
-               
-               // Check to see if the named parameter is valid.
-               if(in_array(substr($Expr, 0, 1), array('=', '@'))) {
-                  // The parameter has to be a default name.
-                  $Result = $this->NamedParameter('Param', TRUE);
-               } else {
-                  $Result = $this->NamedParameter($Name, TRUE);
-               }
-               $this->_NamedParameters[$Result] = $Expr;
+               $Result = $this->NamedParameter($Name, TRUE);
             }
-            break;
+            $this->_NamedParameters[$Result] = $Expr;
+         }
       }
+   
       return $Result;
    }
    

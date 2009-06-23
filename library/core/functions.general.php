@@ -62,17 +62,17 @@ if (!function_exists('RemoveKeyFromArray')) {
 }
 
 if (!function_exists('Anchor')) {
-   function Anchor($Code, $Destination = '', $CssClass = '', $Attributes = '') {
+   function Anchor($Code, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
          $CssClass = array('class' => $CssClass);
 
-      if ($Destination == '')
+      if ($Destination == '' && $ForceAnchor === FALSE)
          return $Code;
       
       if ($Attributes == '')
          $Attributes = array();
 
-      if (substr($Destination, 0, 7) != 'http://')
+      if (substr($Destination, 0, 7) != 'http://' && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Url($Destination);
 
       return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Code.'</a>';

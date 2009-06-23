@@ -17,7 +17,7 @@ $PluginInfo['CommentScore'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
-   //'RegisterPermissions' => array('Plugins.MetaData.Manage'),
+   'RegisterPermissions' => array('Plugins.Vanilla.CommentScore.Single', 'Plugins.Vanilla.CommentScore.Unlimited'),
    //'SettingsUrl' => '/garden/plugin/metadata', // Url of the plugin's settings page.
    //'SettingsPermission' => 'Plugins.MetaData.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
@@ -36,32 +36,38 @@ class Gdn_CommentScorePlugin implements IPlugin {
       $Comment = $Sender->CurrentComment;
       $Session = Gdn::Session();
       
-      $Inc = 1;
-      $Signs = array(-$Inc => 'Neg', $Inc => 'Pos');
+      $Inc = $this->GetScoreIncrements($Comment->CommentID);
+      
+      $Signs = array(-1 => 'Neg', +1 => 'Pos');
       
       // Create a container for the score.
       echo '<div class="CommentScore">';
       
-      // Write the negative button.
-      $Inc = -$Inc;
-      echo Anchor(
-         ($Inc < 0 ? '-' : '+') . abs($Inc),
-         '/vanilla/discussion/score/' . $Comment->CommentID . '/' . $Signs[$Inc] . abs($Inc) . '/' . $Session->TransientKey() . '?Target=' . urlencode($Sender->SelfUrl),
-         $Signs[$Inc] . ' Inc',
-         array('title' => ($Inc < 0 ? '-' : '+') . abs($Inc))
-      );
+      $SumScore = (is_null($Comment->SumScore) ? 0 : $Comment->SumScore);
       
       // Write the current score.
-      echo '<span class="Score">' . $Comment->SumScore . '</span>';
+      echo '<span class="Score">' . sprintf(Plural($SumScore, '%s point', '%s points'), $SumScore) . '</span>';
       
-      // Write the positive button.
-      $Inc = -$Inc;
-      echo Anchor(
-         ($Inc < 0 ? '-' : '+') . abs($Inc),
-         '/vanilla/discussion/score/' . $Comment->CommentID . '/' . $Signs[$Inc] . abs($Inc) . '/' . $Session->TransientKey() . '?Target=' . urlencode($Sender->SelfUrl),
-         $Signs[$Inc] . ' Inc',
-         array('title' => ($Inc < 0 ? '-' : '+') . abs($Inc))
-      );
+      // Write the buttons.
+      foreach($Inc as $Key => $IncAmount) {
+         $Button = '<span>'.($Key < 0 ? '-' : '+').'</span>';
+         
+         $Attributes = array();
+         $CssClass = $Signs[$Key] . ' Inc';
+         $Href = '/vanilla/discussion/score/' . $Comment->CommentID . '/' . $Signs[$Key] . '/' . $Session->TransientKey() . '?Target=' . urlencode($Sender->SelfUrl);
+         
+         if($IncAmount == 0) {
+            $Attributes['href2'] = $Href;
+            $CssClass .= ' Disabled';
+            $Href = '';
+         } else {
+            $Attributes['title'] = ($Key > 0 ? '+' : '') . $Inc[$Key];
+         }
+         
+         // Display an increment button.
+         $Foo = Anchor($Button, $Href, $CssClass, $Attributes, TRUE);
+         echo $Foo;
+      }
       
       echo '</div>';
    }
@@ -73,7 +79,7 @@ class Gdn_CommentScorePlugin implements IPlugin {
     */
    public function DiscussionController_Score_Create($Sender, $Args) {
       $CommentID = $Args[0];
-      $Score = substr($Args[1], 3) * (substr($Args[1], 0, 3) == 'Neg' ? -1 : 1);
+      $ScoreKey = (substr($Args[1], 0, 3) == 'Neg' ? -1 : 1);
       //$TransientKey = $Args[2];
       
       $SQL = Gdn::SQL();
@@ -87,46 +93,55 @@ class Gdn_CommentScorePlugin implements IPlugin {
          ->Where('uc.UserID', $Session->UserID)
          ->Get()
          ->FirstRow();
-      $CurrentScore = $Data ? $Data->Score : 0;
+      $UserScore = $Data ? $Data->Score : 0;
       
-      if($Data) {
-         // Update the score on an existing comment.
+      // Get the score increments.
+      $Inc = $this->GetScoreIncrements($CommentID, $UserScore);
+      $Score = $Inc[$ScoreKey];
+      $UserScore += $Score;
+      
+      if($Score != 0) {
+         if($Data) {
+            // Update the score on an existing comment.
+            $SQL
+               ->Update('UserComment')
+               ->Set('Score', $UserScore)
+               ->Set('DateUpdated', Format::ToDateTime())
+               ->Set('UpdateUserID', $Session->UserID)
+               ->Where('UserID', $Session->UserID)
+               ->Where('CommentID', $CommentID)
+               ->Put();
+         } else {
+            // Insert a new score.
+            $SQL
+               ->Insert('UserComment', array(
+               'CommentID' => $CommentID,
+               'UserID' => $Session->UserID,
+               'Score'=> $UserScore,
+               'DateInserted' => Format::ToDateTime(),
+               'InsertUserID' => $Session->UserID,
+               'DateUpdated' => Format::ToDateTime(),
+               'UpdateUserID' => $Session->UserID)
+               );
+         }
+   
+         // Update the comment table with the sum of the scores.
+         $Data = $SQL
+            ->Select('uc.Score', 'sum', 'SumScore')
+            ->From('UserComment uc')
+            ->Where('uc.CommentID', $CommentID)
+            ->Get()
+            ->FirstRow();
+         $SumScore = $Data ? $Data->SumScore : 0;
+         
          $SQL
-            ->Update('UserComment')
-            ->Set('Score', $CurrentScore + $Score)
-            ->Set('DateUpdated', Format::ToDateTime())
-            ->Set('UpdateUserID', $Session->UserID)
-            ->Where('UserID', $Session->UserID)
+            ->Update('Comment')
+            ->Set('SumScore', $SumScore)
             ->Where('CommentID', $CommentID)
             ->Put();
-      } else {
-         // Insert a new score.
-         $SQL
-            ->Insert('UserComment', array(
-            'CommentID' => $CommentID,
-            'UserID' => $Session->UserID,
-            'Score'=> $Score,
-            'DateInserted' => Format::ToDateTime(),
-            'InsertUserID' => $Session->UserID,
-            'DateUpdated' => Format::ToDateTime(),
-            'UpdateUserID' => $Session->UserID)
-            );
+            
+         $Inc = $this->GetScoreIncrements($CommentID, $UserScore);
       }
-
-      // Update the comment table with the sum of the scores.
-      $Data = $SQL
-         ->Select('uc.Score', 'sum', 'SumScore')
-         ->From('UserComment uc')
-         ->Where('uc.CommentID', $CommentID)
-         ->Get()
-         ->FirstRow();
-      $SumScore = $Data ? $Data->SumScore : 0;
-      
-      $SQL
-         ->Update('Comment')
-         ->Set('SumScore', $SumScore)
-         ->Where('CommentID', $CommentID)
-         ->Put();
          
       // Redirect back where the user came from if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_BOOL) {
@@ -135,10 +150,50 @@ class Gdn_CommentScorePlugin implements IPlugin {
       }
       
       // Send the current information back to be dealt with on the client side.
-      $Sender->SetJson('SumScore', $SumScore);
-      $Sender->SetJson('Enabled', TRUE);
+      $Sender->SetJson('SumScore', isset($SumScore) ? sprintf(Plural($SumScore, '%s point', '%s points'), $SumScore) : NULL);
+      $Sender->SetJson('Inc', $Inc);
       $Sender->Render();   
       break;
+   }
+   
+   public function GetScoreIncrements($CommentID, $UserScore = NULL) {
+      $Session = Gdn::Session();
+      
+      // Figure out how much the user can increment the score by depending on permissions.
+      $SinglePermission = $Session->CheckPermission('Plugins.Vanilla.CommentScore.Single');
+      $UnlimitPermission = $Session->CheckPermission('Plugins.Vanilla.CommentScore.Unlimited');
+      
+      $Inc = array(-1 => 0, +1 => 0);
+      if($SinglePermission || $UnlimitPermission) {
+         if(is_null($UserScore)) {
+            $UserScore = Gdn::SQL()
+               ->Select('uc.Score')
+               ->From('UserComment uc')
+               ->Where('uc.CommentID', $CommentID)
+               ->Where('uc.UserID', $Session->UserID)
+               ->Get()
+               ->FirstRow();
+            $UserScore = $UserScore ? $UserScore->Score : 0;
+         }
+            
+         if($UnlimitPermission) {
+            // A user with unlimit permission can sway the score by any number of points.
+            if(abs($UserScore) <= 15) {
+               $Inc = array(-1 => -5, +1 => +5);
+            } else {
+               $Inc = array(-1 => -10, +1 => +10);
+            }
+         } elseif($SinglePermission) {
+            // A user with the single permission can only sway the score by one point.
+            switch($UserScore) {
+               case -1; $Inc[1] = 1; break;
+               case 0; $Inc[-1] = -1; $Inc[1] = 1; break;
+               case 1; $Inc[-1] = -1; break;
+            }
+         }
+      }
+      
+      return $Inc;
    }
    
    public function Setup() {

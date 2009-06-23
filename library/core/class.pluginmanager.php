@@ -74,40 +74,36 @@ class Gdn_PluginManager implements ISingleton {
       // Loop through all declared classes looking for ones that implement iPlugin.
       // print_r(get_declared_classes());
       foreach(get_declared_classes() as $ClassName) {
-         $Suffix = strtolower(substr($ClassName, -6));
-         // Small optimization here so that we don't have to instantiate a reflectionclass for every single class defined by php.
-         if ($Suffix == 'plugin' || substr($Suffix, 1) == 'hooks') {
-            $ReflectionClass = new ReflectionClass($ClassName);
-            // Only implement the plugin if it implements the IPlugin interface and
-            // it has it's properties defined in $this->EnabledPlugins.
-            if ($ReflectionClass->implementsInterface("IPlugin")) {
-               foreach ($ReflectionClass->getMethods() as $Method) {
-                  $MethodName = strtolower($Method->name);
-                  // Loop through their individual methods looking for event handlers and method overrides.
-                  if (isset($MethodName[9])) {
-                     if (substr($MethodName, -8) == '_handler' || substr($MethodName, -7) == '_before' || substr($MethodName, -6) == '_after') {
-                        // Create a new array of handler class names if it doesn't exist yet.
-                        if (array_key_exists($MethodName, $this->_EventHandlerCollection) === FALSE)
-                           $this->_EventHandlerCollection[$MethodName] = array();
-                        
-                        // Specify this class as a handler for this method if it hasn't been done yet.
-                        if (in_array($ClassName, $this->_EventHandlerCollection[$MethodName]) === FALSE)
-                           $this->_EventHandlerCollection[$MethodName][] = $ClassName;
-                     } else if (substr($MethodName, -9) == '_override') {
-                        // Throw an error if this method has already been overridden.
-                        if (array_key_exists($MethodName, $this->_MethodOverrideCollection) === TRUE)
-                           trigger_error(ErrorMessage('Any object method can only be overridden by a single plugin. The "'.$MethodName.'" override has already been assigned by the "'.$this->_MethodOverrideCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
-                        
-                        // Otherwise, specify this class as the source for the override.
-                        $this->_MethodOverrideCollection[$MethodName] = $ClassName;
-                     } else if (substr($MethodName, -7) == '_create') {
-                        // Throw an error if this method has already been created.
-                        if (array_key_exists($MethodName, $this->_NewMethodCollection) === TRUE)
-                           trigger_error(ErrorMessage('New object methods must be unique. The new "'.$MethodName.'" method has already been assigned by the "'.$this->_NewMethodCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
-                           
-                        // Otherwise, specify this class as the source for the new method.
-                        $this->_NewMethodCollection[$MethodName] = $ClassName;
-                     }
+         // Only implement the plugin if it implements the IPlugin interface and
+         // it has it's properties defined in $this->EnabledPlugins.
+         if (in_array('IPlugin', class_implements($ClassName))) {
+            $ClassMethods = get_class_methods($ClassName);
+            foreach ($ClassMethods as $Method) {
+               $MethodName = strtolower($Method);
+               // Loop through their individual methods looking for event handlers and method overrides.
+               if (isset($MethodName[9])) {
+                  if (substr($MethodName, -8) == '_handler' || substr($MethodName, -7) == '_before' || substr($MethodName, -6) == '_after') {
+                     // Create a new array of handler class names if it doesn't exist yet.
+                     if (array_key_exists($MethodName, $this->_EventHandlerCollection) === FALSE)
+                        $this->_EventHandlerCollection[$MethodName] = array();
+
+                     // Specify this class as a handler for this method if it hasn't been done yet.
+                     if (in_array($ClassName, $this->_EventHandlerCollection[$MethodName]) === FALSE)
+                        $this->_EventHandlerCollection[$MethodName][] = $ClassName;
+                  } else if (substr($MethodName, -9) == '_override') {
+                     // Throw an error if this method has already been overridden.
+                     if (array_key_exists($MethodName, $this->_MethodOverrideCollection) === TRUE)
+                        trigger_error(ErrorMessage('Any object method can only be overridden by a single plugin. The "'.$MethodName.'" override has already been assigned by the "'.$this->_MethodOverrideCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
+
+                     // Otherwise, specify this class as the source for the override.
+                     $this->_MethodOverrideCollection[$MethodName] = $ClassName;
+                  } else if (substr($MethodName, -7) == '_create') {
+                     // Throw an error if this method has already been created.
+                     if (array_key_exists($MethodName, $this->_NewMethodCollection) === TRUE)
+                        trigger_error(ErrorMessage('New object methods must be unique. The new "'.$MethodName.'" method has already been assigned by the "'.$this->_NewMethodCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
+
+                     // Otherwise, specify this class as the source for the new method.
+                     $this->_NewMethodCollection[$MethodName] = $ClassName;
                   }
                }
             }

@@ -40,6 +40,11 @@ class Gdn_DataSet implements IteratorAggregate {
     */
    private $_Cursor;
    
+   /**
+    * Determines what type of result is returned from the various methods by default.
+    *
+    * @var int Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
+    */
    public $DefaultDatasetType = DATASET_TYPE_OBJECT;
 
    /**

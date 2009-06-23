@@ -48,9 +48,13 @@ class Gdn {
 	 * @param mixed $Default The result to return if the configuration setting is not found.
 	 * @return mixed The configuration setting.
 	 */
-	public static function Config($Name, $Default = FALSE) {
-		$Config = self::$_Config; //self::Factory(self::AliasConfig);
-		$Result = $Config->Get($Name, $Default);
+	public static function Config($Name = FALSE, $Default = FALSE) {
+		$Config = self::$_Config;
+		if($Name === FALSE)
+			$Result = $Config;
+		else
+			$Result = $Config->Get($Name, $Default);
+			
 		return $Result;
 	}
 	

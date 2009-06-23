@@ -6,34 +6,36 @@
 }
 
 .Comment .CommentScore span {
-	color: #666;
-	font-size: 16px;
+	color: #777;
 	margin-left: 4px;
 	margin-right: 4px;
 }
 
 .Comment .CommentScore a {
-	color: #FFF;
-	font-size: 11px;
+	display: block;
 	padding: 2px;
+	border: solid 1px grey;
+	width: 20px;
 }
 
-.Comment .CommentScore a.Neg {
-	-moz-border-radius-bottomleft:5px;
-	-moz-border-radius-topleft:5px;
-	background: #FF6B39;
-	padding-left: 5px;
-}
-
-.Comment .CommentScore a.Pos {
-	-moz-border-radius-topright:5px;
-	-moz-border-radius-bottomright:5px;
-	background: #99FF00;
-	padding-right: 4px;
+.Comment .CommentScore a.Disabled {
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   user-select: none;
+	cursor: default;
 }
 
 .Comment .CommentScore .Score {
-	
+	float: left;
+	font-size: 14px;
+}
+
+.Comment .CommentScore a.Neg {
+	float: left;
+}
+
+.Comment .CommentScore a.Pos {
+	float: right;
 }
 
 .Comment .CommentScore .Animate {

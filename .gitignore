@@ -4,5 +4,3 @@
 /uploads/*.*
 /conf/config.php
 .DS_Store
-*.swp
-.htaccess

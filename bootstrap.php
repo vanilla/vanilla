@@ -52,9 +52,10 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.gdn.php');
 /// Install the factory.
 require_once(PATH_LIBRARY_CORE . DS . 'class.factory.php');
 Gdn::SetFactory(new Gdn_Factory(), FALSE);
+Gdn::$FactoryOverwrite = FALSE;
 
 /// Install the configuration.
-Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
 /// Configuration Defaults.
@@ -81,27 +82,29 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'garden
 
 /// Install some of the services.
 // Default database.
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'), FALSE);
+Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
 // Database drivers.
-Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactorySingleton, NULL, FALSE);
-Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactorySingleton);
 // Authenticator & Session.
 $AuthModule = Gdn::Config('Garden.AuthenticatorModule', 'Cookie');
-Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthModule.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthModule).'.authenticator.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthModule.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthModule).'.authenticator.php', Gdn::FactorySingleton);
 unset($AuthModule);
-Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php', Gdn::FactorySingleton);
 // Dispatcher.
-Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton);
 // Smarty Templating Engine
 Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6.25'.DS.'libs'.DS.'Smarty.class.php', Gdn::FactorySingleton);
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
+// Application manager.
+Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
 
 // Other objects.
-Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);
 if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	require_once(PATH_LIBRARY_CORE.DS.'class.locale.php');
 	$Gdn_Locale = new Gdn_Locale(Gdn::Config('Garden.Locale', ''), Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
-	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', PATH_LIBRARY_CORE.DS.'class.locale.php', Gdn::FactorySingleton, $Gdn_Locale, FALSE);
+	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', PATH_LIBRARY_CORE.DS.'class.locale.php', Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
 }
 // Execute other application startup.
@@ -119,13 +122,16 @@ unset($Gdn_Path);
 
 // Set up the plugin manager (doing this early so it has fewer classes to
 // examine to determine if they are plugins).
-Gdn::FactoryInstall('PluginManager', 'Gdn_PluginManager', PATH_LIBRARY . DS . 'core' . DS . 'class.pluginmanager.php', Gdn::FactorySingleton, NULL, FALSE);
+Gdn::FactoryInstall('PluginManager', 'Gdn_PluginManager', PATH_LIBRARY . DS . 'core' . DS . 'class.pluginmanager.php', Gdn::FactorySingleton);
 $PluginManager = Gdn::Factory('PluginManager');
 $PluginInfo = $PluginManager->IncludePlugins();
 $PluginManager->EnabledPlugins = $PluginInfo;
 $PluginManager->RegisterPlugins();
 unset($EnabledPlugins);
 unset($PluginInfo);
+
+
+Gdn::$FactoryOverwrite = TRUE;
 
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))

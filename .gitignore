@@ -3,4 +3,5 @@
 /uploads/*/
 /uploads/*.*
 /conf/config.php
+*.kpf
 .DS_Store

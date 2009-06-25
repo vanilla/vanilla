@@ -112,10 +112,8 @@ class Gdn_Factory {
 	 *   The instance can be passed to the $Data argument on installation, or it will be lazy created when first accessed.
 	 *   You can also pass an array to $Data and it will be used as the arguments for the lazy construction.</li>
 	 * </ul>
-	 *   
-	 * @param boolean $Override Whether or not to override an existing factory alias.
 	 */
-	public function Install($Alias, $ClassName, $Path, $FactoryType, $Data = NULL, $Override = TRUE) {
+	public function Install($Alias, $ClassName, $Path, $FactoryType, $Data = NULL) {
 		$FactoryType = ucfirst($FactoryType);
 		if(!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton))) {
 			throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton));
@@ -155,10 +153,9 @@ class Gdn_Factory {
 	 * @param string $Alias The alias of the class that will have the dependency.
 	 * @param string $PropertyName The name of the property on the class that will have the dependency.
 	 * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
-	 * @param boolean $Override Whether or not to override an existing dependency.
 	 *
 	 */
-	public function InstallDependency($Alias, $PropertyName, $SourceAlias, $Override = TRUE) {
+	public function InstallDependency($Alias, $PropertyName, $SourceAlias) {
 		if(!array_key_exists($Alias, $this->_Dependencies)) {
 			$this->_Dependencies[$Alias] = array($PropertyName => $SourceAlias);
 		} else {

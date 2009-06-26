@@ -227,7 +227,11 @@ class Gdn_PermissionModel extends Model {
       return $RolePermissions;
    }
    
-
+   public static function PermissionNamespace($PermissionName) {
+      if($Index = strpos($PermissionName))
+         return substr($PermissionName, 0, $Index);
+      return '';
+   }
    
    /**
     * Returns all rows from the specified JunctionTable/Column combination. This
@@ -366,11 +370,32 @@ class Gdn_PermissionModel extends Model {
          ->Put();        
    }
    
-   public function UnpivotPermissions($Permissions) {
-      $Result = array();
+   /**
+    * Split a permission name into its constituant parts.
+    *
+    * @param string $PermissionName The name of the permission.
+    * @return array The split permission in the form array(Namespace, Permission,Suffix).
+    */
+   public static function SplitPermission($PermissionName) {
+      $i = strpos($PermissionName, '.');
+      $j = strrpos($PermissionName, '.');
+      
+      if($i !== FALSE) { // $j must also not be false
+         return array(substr($PermissionName, 0, $i), substr($PermissionName, $i + 1, $j - $i), substr($PermissionName, $j + 1));
+      } else {
+         return array($PermissionName, '', '');
+      }
    }
    
-   protected function _UnpivotPermissionsRow($Row, &$Result) {
+   public function UnpivotPermissions($Permissions) {
+      $Result = array();
+      foreach($Permissions as $Row) {
+         $this->_UnpivotPermissionsRow($Row, $Result);
+      }
+      return $Result;
+   }
+   
+   protected function _UnpivotPermissionsRow($Row, &$Result, $InclueRoleID = FALSE) {
       $GlobalName = ArrayValue('Name', $Row);
       
       // Loop through each permission in the row and place them in the correct place in the grid.
@@ -392,35 +417,12 @@ class Gdn_PermissionModel extends Model {
          
          // Augment the value depending on the junction ID.
          if(array_key_exists('JunctionTable', $Row) && ($JunctionTable = $Row['JunctionTable'])) {
-            $PostValue = $JunctionTable.','.$Row['JunctionID'];
+            $PostName = $JunctionTable.'-'.$Row['JunctionID'].($InclueRoleID ? '-'.$Row['RoleID'] : '');
          } else {
-            $PostValue = 1;
+            $PostName = 'Permission'.($InclueRoleID ? '-'.$Row['RoleID'] : '');
          }
          
-         $NamespaceArray[] = array('Column' => $Suffix, 'Row' => $Row, 'Value' => $Value, 'PostName' => $PermissionName, 'PostValue' => $PostValue);
-      }
-   }
-   
-   public static function PermissionNamespace($PermissionName) {
-      if($Index = strpos($PermissionName))
-         return substr($PermissionName, 0, $Index);
-      return '';
-   }
-   
-   /**
-    * Split a permission name into its constituant parts.
-    *
-    * @param string $PermissionName The name of the permission.
-    * @return array The split permission in the form array(Namespace, Permission,Suffix).
-    */
-   public static function SplitPermission($PermissionName) {
-      $i = strpos($PermissionName, '.');
-      $j = strrpos($PermissionName, '.');
-      
-      if($i !== FALSE) { // $j must also not be false
-         return array(substr($PermissionName, 0, $i), substr($PermissionName, $i + 1, $j - $i), substr($PermissionName, $j + 1));
-      } else {
-         return array($PermissionName, '', '');
+         $NamespaceArray[] = array('Column' => $Suffix, 'Row' => $Row, 'Value' => $Value, 'PostName' => $PostName, 'PostValue' => $PermissionName);
       }
    }
 }

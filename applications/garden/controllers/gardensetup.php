@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Garden Setup Controller
-/// </summary>
+/**
+ * Garden Setup Controller
+ */
 class GardenSetupController extends GardenController {
    
    public $Uses = array('Form', 'ApplicationManager', 'Database');
@@ -20,11 +20,11 @@ class GardenSetupController extends GardenController {
       $this->AddCssFile('setup.screen.css');
    }
    
-   /// <summary>
-   /// The summary of all settings available. The menu items displayed here are
-   /// collected from each application's appcontroller and all plugin's
-   /// definitions.
-   /// </summary>
+   /**
+    * The summary of all settings available. The menu items displayed here are
+    * collected from each application's appcontroller and all plugin's
+    * definitions.
+    */
    public function Index($CurrentStep = 1) {
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
@@ -96,10 +96,10 @@ class GardenSetupController extends GardenController {
       }
    }
    
-   /// <summary>
-   /// Allows the configuration of basic setup information in Garden. This
-   /// should not be functional after the application has been set up.
-   /// </summary>
+   /**
+    * Allows the configuration of basic setup information in Garden. This
+    * should not be functional after the application has been set up.
+    */
    public function Configure($RedirectUrl = '') {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $ConfigFile = PATH_CONF . DS . 'config.php';

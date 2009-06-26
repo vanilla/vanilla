@@ -9,14 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class Gdn_UserModel extends Model {
-   /// <summary>
-   /// Class constructor. Defines the related database table name.
-   /// </summary>
-   /// <param name="Name" type="string" required="false" default="get_class($this)">
-   /// An optional parameter that allows you to explicitly define the name of
-   /// the table that this model represents. You can also explicitly set this
-   /// value with $this->Name.
-   /// </param>
+   /**
+    * Class constructor. Defines the related database table name.
+    */
    public function __construct() {
       parent::__construct('User');
    }
@@ -68,8 +63,8 @@ class Gdn_UserModel extends Model {
          return $this->SQL->Where('u.Name', $UserReference)->Get()->FirstRow();
    }
    
-   /*
-    * Returns all users inthe applicant role
+   /**
+    * Returns all users in the applicant role
     */
    public function GetApplicants() {
       return $this->SQL->Select('u.*')
@@ -155,9 +150,9 @@ class Gdn_UserModel extends Model {
          ->Put();
    }
 
-   /// <summary>
-   /// Generic save procedure.
-   /// </summary>
+   /**
+    * Generic save procedure.
+    */
    public function Save($FormPostValues, $Settings = FALSE) {
       // See if the user's related roles should be saved or not.
       $SaveRoles = ArrayValue('SaveRoles', $Settings);
@@ -255,7 +250,9 @@ class Gdn_UserModel extends Model {
       return $UserID;
    }
    
-   // Force the admin user into UserID 1.
+   /**
+    * Force the admin user into UserID 1.
+    */
    public function SaveAdminUser($FormPostValues) {
       $UserID = 0;
 
@@ -389,9 +386,9 @@ class Gdn_UserModel extends Model {
       }
    }
 
-   /// <summary>
-   /// To be used for invitation registration
-   /// </summary>
+   /**
+    * To be used for invitation registration
+    */
    public function InsertForInvite($FormPostValues) {
       // Define the primary key in this model's table.
       $this->DefineSchema();
@@ -475,9 +472,9 @@ class Gdn_UserModel extends Model {
       return $UserID;
    }
 
-   /// <summary>
-   /// To be used for approval registration
-   /// </summary>
+   /**
+    * To be used for approval registration
+    */
    public function InsertForApproval($FormPostValues) {
       // Define the primary key in this model's table.
       $this->DefineSchema();
@@ -518,9 +515,9 @@ class Gdn_UserModel extends Model {
       return $UserID;
    }
 
-   /// <summary>
-   /// To be used for basic registration, and captcha registration
-   /// </summary>
+   /**
+    * To be used for basic registration, and captcha registration
+    */
    public function InsertForBasic($FormPostValues) {
       $UserID = FALSE;
 
@@ -577,7 +574,7 @@ class Gdn_UserModel extends Model {
       return $UserID;
    }
 
-   /// parent override
+   // parent override
    public function AddInsertFields(&$Fields) {
       $this->DefineSchema();
 
@@ -683,9 +680,9 @@ class Gdn_UserModel extends Model {
       return $UserData;
    }
 
-   /// <summary>
-   /// Checks to see if FieldValue is unique in FieldName.
-   /// </summary>
+   /**
+    * Checks to see if FieldValue is unique in FieldName.
+    */
    public function ValidateUniqueFields($Username, $Email, $UserID = '') {
       $Where = array();
       if (is_numeric($UserID))
@@ -849,15 +846,12 @@ class Gdn_UserModel extends Model {
       }
    }
 
-   /// <summary>
-   /// Reduces the user's CountInvitations value by the specified amount.
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The unique id of the user being affected.
-   /// </param>
-   /// <param name="ReduceBy" type="int" required="false" default="1">
-   /// The number to reduce CountInvitations by.
-   /// </param>
+   /**
+    * Reduces the user's CountInvitations value by the specified amount.
+    *
+    * @param int The unique id of the user being affected.
+    * @param int The number to reduce CountInvitations by.
+    */
    public function ReduceInviteCount($UserID, $ReduceBy = 1) {
       $CurrentCount = $this->GetInvitationCount($UserID);
 
@@ -875,15 +869,12 @@ class Gdn_UserModel extends Model {
          ->Put();
    }
 
-   /// <summary>
-   /// Increases the user's CountInvitations value by the specified amount.
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The unique id of the user being affected.
-   /// </param>
-   /// <param name="IncreaseBy" type="int" required="false" default="1">
-   /// The number to increase CountInvitations by.
-   /// </param>
+   /**
+    * Increases the user's CountInvitations value by the specified amount.
+    *
+    * @param int The unique id of the user being affected.
+    * @param int The number to increase CountInvitations by.
+    */
    public function IncreaseInviteCount($UserID, $IncreaseBy = 1) {
       $CurrentCount = $this->GetInvitationCount($UserID);
 
@@ -897,15 +888,12 @@ class Gdn_UserModel extends Model {
          ->Put();
    }
 
-   /// <summary>
-   /// Saves the user's About field.
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The UserID to save.
-   /// </param>
-   /// <param name="About" type="string">
-   /// The about message being saved.
-   /// </param>
+   /**
+    * Saves the user's About field.
+    *
+    * @param int The UserID to save.
+    * @param string The about message being saved.
+    */
    public function SaveAbout($UserID, $About) {
       $About = substr($About, 0, 1000);
       $this->SQL->Update($this->Name)->Set('About', $About)->Where('UserID', $UserID)->Put();
@@ -916,27 +904,17 @@ class Gdn_UserModel extends Model {
          AddActivity($UserID, 'AboutUpdate', $About);
    }
 
-   /// <summary>
-   /// Saves a name/value to the user's specified $Column. This method throws
-   /// exceptions when errors are encountered. Use try ... catch blocks to
-   /// capture these exceptions.
-   /// </summary>
-   /// <param name="Column" type="string">
-   /// The name of the serialized column to save to. At the time of this writing
-   /// there are three serialized columns on the user table: Permissions,
-   /// Preferences, and Attributes.
-   /// </param>
-   /// <param name="UserID" type="int">
-   /// The UserID to save.
-   /// </param>
-   /// <param  name="Name" type="mixed">
-   /// The name of the value being saved, or an associative array of name =>
-   /// value pairs to be saved. If this is an associative array, the $Value
-   /// argument will be ignored.
-   /// </param>
-   /// <param name="Value" type="mixed" required="false" default="empty">
-   /// The value being saved.
-   /// </param>
+   /**
+    * Saves a name/value to the user's specified $Column.
+    *
+    * This method throws exceptions when errors are encountered. Use try ...
+    * catch blocks to capture these exceptions.
+    *
+    * @param string The name of the serialized column to save to. At the time of this writing there are three serialized columns on the user table: Permissions, Preferences, and Attributes.
+    * @param int The UserID to save.
+    * @param mixed The name of the value being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
+    * @param mixed The value being saved.
+    */
    public function SaveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
       // Load the existing values
       $UserData = $this->SQL->Select($Column)
@@ -966,21 +944,15 @@ class Gdn_UserModel extends Model {
       return $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));
    }
 
-   /// <summary>
-   /// Saves a user preference to the database. This is a convenience method
-   /// that uses $this->SaveToSerializedColumn().
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The UserID to save.
-   /// </param>
-   /// <param  name="Preference" type="mixed">
-   /// The name of the preference being saved, or an associative array of name =>
-   /// value pairs to be saved. If this is an associative array, the $Value
-   /// argument will be ignored.
-   /// </param>
-   /// <param name="Value" type="mixed" required="false" default="empty">
-   /// The value being saved.
-   /// </param>
+   /**
+    * Saves a user preference to the database.
+    *
+    * This is a convenience method that uses $this->SaveToSerializedColumn().
+    *
+    * @param int The UserID to save.
+    * @param mixed The name of the preference being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
+    * @param mixed The value being saved.
+    */
    public function SavePreference($UserID, $Preference, $Value = '') {
       // Make sure that changes to the current user become effective immediately.
       $Session = Gdn::Session();
@@ -990,21 +962,15 @@ class Gdn_UserModel extends Model {
       return $this->SaveToSerializedColumn('Preferences', $UserID, $Preference, $Value);
    }
 
-   /// <summary>
-   /// Saves a user attribute to the database. This is a convenience method
-   /// that uses $this->SaveToSerializedColumn().
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The UserID to save.
-   /// </param>
-   /// <param  name="Attribute" type="mixed">
-   /// The name of the attribute being saved, or an associative array of name =>
-   /// value pairs to be saved. If this is an associative array, the $Value
-   /// argument will be ignored.
-   /// </param>
-   /// <param name="Value" type="mixed" required="false" default="empty">
-   /// The value being saved.
-   /// </param>
+   /**
+    * Saves a user attribute to the database.
+    *
+    * This is a convenience method that uses $this->SaveToSerializedColumn().
+    *
+    * @param int The UserID to save.
+    * @param mixed The name of the attribute being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
+    * @param mixed The value being saved.
+    */
    public function SaveAttribute($UserID, $Attribute, $Value = '') {
       // Make sure that changes to the current user become effective immediately.
       $Session = Gdn::Session();

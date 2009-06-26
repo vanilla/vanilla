@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// RBAC (Role Based Access Control)
-/// </summary>
+/**
+ * RBAC (Role Based Access Control)
+ */
 class RoleController extends GardenController {
    
    public $Uses = array('Database', 'Form', 'RoleModel');

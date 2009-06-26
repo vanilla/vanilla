@@ -33,11 +33,11 @@ class EntryController extends GardenController {
       $this->Render();
    }
 
-   /// <summary>
-   /// This is a good example of how to use the form, model, and validator to
-   /// validate a form that does use the model, but doesn't save data to the
-   /// model.
-   /// </summary>
+   /**
+    * This is a good example of how to use the form, model, and validator to
+    * validate a form that does use the model, but doesn't save data to the
+    * model.
+    */
    public function SignIn() {
       if ($this->Head)
          $this->Head->AddScript('/applications/garden/js/entry.js');
@@ -76,9 +76,9 @@ class EntryController extends GardenController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Calls the appropriate registration method based on the configuration setting.
-   /// </summary>
+   /**
+    * Calls the appropriate registration method based on the configuration setting.
+    */
    public function Register($InvitationCode = '') {
       $this->Form->SetModel($this->UserModel);
 
@@ -148,7 +148,7 @@ class EntryController extends GardenController {
                $this->Form->GetValue('RememberMe', FALSE)
             );
             
-            /// ... and redirect them appropriately
+            // ... and redirect them appropriately
             $Route = $this->RedirectTo();
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
@@ -182,7 +182,7 @@ class EntryController extends GardenController {
                $this->Form->GetValue('RememberMe', FALSE)
             );
             
-            /// ... and redirect them appropriately
+            // ... and redirect them appropriately
             $Route = $this->RedirectTo();
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
@@ -219,7 +219,7 @@ class EntryController extends GardenController {
                $this->Form->GetValue('Password'),
                $this->Form->GetValue('RememberMe', FALSE));
             
-            /// ... and redirect them appropriately
+            // ... and redirect them appropriately
             $Route = $this->RedirectTo();
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);

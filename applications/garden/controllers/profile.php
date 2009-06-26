@@ -486,12 +486,12 @@ class ProfileController extends GardenController {
       $this->AddCssFile('profile.screen.css');
    }
    
-   /// <summary>
-   /// Adds a tab (or array of tabs) to the profile tab collection.
-   /// </summary>
-   /// <param name="TabName" type="mixed">
-   /// The tab name (or array of tab names) to add to the profile tab collection.
-   /// </param>
+   /**
+    * Adds a tab (or array of tabs) to the profile tab collection.
+    *
+    * @param mixed The tab name (or array of tab names) to add to the profile tab collection.
+    * @param string URL the tab should point to.
+    */
    public function AddProfileTab($TabName, $TabUrl = '') {
       if (!is_array($TabName))
          $TabName = array($TabName => $TabUrl);

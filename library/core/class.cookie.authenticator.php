@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Mark O'Sullivan
 This file is part of Garden.
@@ -18,8 +18,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-if (!defined('APPLICATION'))
-   exit();
+
 
 
 /**
@@ -29,7 +28,7 @@ if (!defined('APPLICATION'))
  *
  * @package Garden
  */
-class Gdn_CookieAuthenticator implements IAuthenticator {
+class Gdn_CookieAuthenticator implements Gdn_IAuthenticator {
 
 
    /**
@@ -49,7 +48,7 @@ class Gdn_CookieAuthenticator implements IAuthenticator {
     */
    public function GetPermissionModel() {
       if ($this->_PermissionModel === null) {
-         $this->_PermissionModel = new PermissionModel(new Validation());
+         $this->_PermissionModel = new PermissionModel(new Gdn_Validation());
       }
       return $this->_PermissionModel;
    }

@@ -98,7 +98,7 @@ abstract class Gdn_DatabaseStructure {
       if (!in_array($KeyType, array('primary', 'key', FALSE)))
          $KeyType = FALSE;
 
-      $Column = new ShellClass();
+      $Column = new Gdn_ShellClass();
       $Column->Name = $Name;
       $Column->Type = is_array($Type) ? 'enum' : $Type;
       $Column->Length = $Length;

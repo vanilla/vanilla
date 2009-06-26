@@ -22,11 +22,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * The Pluggable class is extended by other classes to enable the plugins
  * and the custom event model in plugins. Any class that extends this class
@@ -35,7 +30,7 @@ if (!defined('APPLICATION'))
  *
  * @package Garden
  */
-abstract class Pluggable {
+abstract class Gdn_Pluggable {
 
 
    /**

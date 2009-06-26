@@ -31,6 +31,9 @@ class Gdn {
 	/** @var Gdn_Factory The factory used to create core objects in the application. */
 	protected static $_Factory = NULL;
 	
+	/** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
+	public static $FactoryOverwrite = TRUE;
+	
 	protected static $_Locale = NULL;
 	
 	protected static $_Session = NULL;
@@ -48,9 +51,13 @@ class Gdn {
 	 * @param mixed $Default The result to return if the configuration setting is not found.
 	 * @return mixed The configuration setting.
 	 */
-	public static function Config($Name, $Default = FALSE) {
-		$Config = self::$_Config; //self::Factory(self::AliasConfig);
-		$Result = $Config->Get($Name, $Default);
+	public static function Config($Name = FALSE, $Default = FALSE) {
+		$Config = self::$_Config;
+		if($Name === FALSE)
+			$Result = $Config;
+		else
+			$Result = $Config->Get($Name, $Default);
+			
 		return $Result;
 	}
 	
@@ -74,7 +81,11 @@ class Gdn {
 	 * @param mixed $Args A variable number of arguments to pass to the constructor.
 	 * @see Gdn_Factory::Factory()
 	 */
-	public static function Factory($Alias) {
+	public static function Factory($Alias = FALSE) {
+		if($Alias === FALSE) {
+			return self::$_Factory;
+		}
+		
 		// Get the arguments to pass to the factory.
 		$Args = func_get_args();
 		array_shift($Args);
@@ -102,11 +113,14 @@ class Gdn {
 	 * @param string $ClassName The actual name of the class.
 	 * @param string $Path The path to the class' file. You can prefix the path with ~ to start at the application root.
 	 * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
-	 * @param boolean $Override Whether or not to override an existing factory alias.
 	 * @see Gdn_Factory::Install()
 	 */
-	public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL, $Override = TRUE) {
-		self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data, $Override);
+	public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL) {
+		// Don't overwrite an existing definition.
+		if(self::$FactoryOverwrite === FALSE && self::FactoryExists($Alias))
+			return;
+		
+		self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
 		
 		// Cache some of the more commonly used factory objects as properties.
 		switch($Alias) {
@@ -125,11 +139,10 @@ class Gdn {
 	 *	@param string $Alias The alias of the class that will have the dependency.
 	 * @param string $PropertyName The name of the property on the class that will have the dependency.
 	 * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
-	 * @param boolean $Override Whether or not to override an existing dependency.
 	 * @see Gdn_Factory::InstalDependency()
 	 */
-	public static function FactoryInstallDependency($Alias, $PropertyName, $SourceAlias, $Override = TRUE) {
-		self::$_Factory->InstallDependency($Alias, $PropertyName, $SourceAlias, $Override);
+	public static function FactoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
+		self::$_Factory->InstallDependency($Alias, $PropertyName, $SourceAlias);
 	}
 	
 	/**

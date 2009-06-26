@@ -225,7 +225,7 @@ class UserController extends GardenController {
             $UserModel = new Gdn_UserModel();
             if (is_numeric($UserID)) {
                try {
-                  $Email = new Email();
+                  $Email = new Gdn_Email();
                   $UserModel->$Action($UserID, $Email);
                } catch(Exception $ex) {
                   $this->Form->AddError(strip_tags($ex->getMessage()));

@@ -26,10 +26,28 @@ class SearchController extends GardenController {
 	public $Form;
 	
 	/// METHODS ///
-	public function Index() {
+	public function Index($Offset = 0, $Limit = NULL) {
+		if(!is_numeric($Limit)) {
+			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
+		}
+		
 		$Search = $this->Form->GetFormValue('Search');
 		
-		$this->SetData('SearchResults', $this->SearchModel->Search($Search));
+		$this->SetData('SearchResults', $this->SearchModel->Search($Search, $Offset, $Limit));
+		
+		// Build a pager
+		$PagerFactory = new PagerFactory();
+		$Pager = $PagerFactory->GetPager('MorePager', $this);
+		$Pager->MoreCode = 'More Results';
+		$Pager->LessCode = 'Previous Results';
+		$Pager->ClientID = 'Pager';
+		$Pager->Configure(
+			$Offset,
+			$Limit,
+			$Offset + $Limit + 1,
+			'garden/search/%1$s/%2$s/?Search='.Format::Url($Search)
+		);
+		$this->SetData('Pager', $Pager);
 		
 		$this->View = 'results';
 		$this->Render();

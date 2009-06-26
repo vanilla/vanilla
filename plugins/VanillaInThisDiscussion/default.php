@@ -23,7 +23,7 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
    'SettingsPermission' => FALSE
 );
 
-class VanillaInThisDiscussionPlugin implements IPlugin {
+class VanillaInThisDiscussionPlugin implements Gdn_IPlugin {
    public function DiscussionController_DiscussionRenderBefore_Handler(&$Sender) {
       include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
       $InThisDiscussionModule = new InThisDiscussionModule($Sender);

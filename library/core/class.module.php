@@ -28,7 +28,7 @@ if (!defined('APPLICATION'))
  * Base module object
  * @package Garden
  */
-class Module extends Pluggable implements IModule {
+class Module extends Gdn_Pluggable implements Gdn_IModule {
 
 
    /**

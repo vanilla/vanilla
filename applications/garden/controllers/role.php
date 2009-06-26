@@ -45,7 +45,7 @@ class RoleController extends GardenController {
       if ($this->Form->AuthenticatedPostBack()) {
          // Make sure that a replacement role has been selected if there were going to be orphaned users
          if ($this->OrphanedUsers > 0) {
-            $Validation = new Validation();
+            $Validation = new Gdn_Validation();
             $Validation->ApplyRule('ReplacementRoleID', 'Required', 'You must choose a replacement role for orphaned users.');
             $Validation->Validate($this->Form->FormValues());
             $this->Form->SetValidationResults($Validation->Results());

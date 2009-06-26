@@ -22,11 +22,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * A simple interface that all plugins must follow. Aside from the Setup
  * method, this is used more to identify plugins than to enforce structure upon
@@ -35,7 +30,7 @@ if (!defined('APPLICATION'))
  * @package Garden
  * @todo Could it include a Disable and Uninstall method? (from damien)
  */
-interface IPlugin {
+interface Gdn_IPlugin {
 
 
    /**

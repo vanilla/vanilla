@@ -11,7 +11,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Handles uploading image files.
 /// </summary>
-class UploadImage extends Upload {
+class Gdn_UploadImage extends Gdn_Upload {
 
    /// <summary>
    /// Validates the uploaded image. Returns the temporary name of the uploaded file.

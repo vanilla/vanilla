@@ -15,7 +15,7 @@ if ($Drop) {
    $Permissions[] = 'Vanilla.Categories.Manage';
    $Permissions[] = 'Vanilla.Spam.Manage';
    if (!is_object($Validation))
-      $Validation = new Validation();
+      $Validation = new Gdn_Validation();
       
    $PermissionModel = new PermissionModel($Validation);
    $PermissionModel->InsertNew($Permissions);
@@ -67,7 +67,7 @@ $SQL->Select('c.CategoryID, c.CountDiscussions, c.Description, c.Sort, c.InsertU
    ->Select("' > ', p.Name, c.Name", 'concat_ws', 'Name')
    ->From('Category c')
    ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
-   ->Where('c.AllowDiscussions', '@1');
+   ->Where('c.AllowDiscussions', '1', TRUE, FALSE);
 $Construct->View('vw_Category', $SQL);
 
 if ($Drop)
@@ -114,6 +114,7 @@ $Construct->Table('Comment')
    ->Column('DateInserted', 'datetime')
    ->Column('DateDeleted', 'datetime', '', TRUE)
    ->Column('DateUpdated', 'datetime', '', TRUE)
+   ->Column('Flag', 'int', 2, TRUE, 0)
    ->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments on a per-user basis.

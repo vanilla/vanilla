@@ -22,7 +22,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class Email extends Pluggable {
+class Gdn_Email extends Gdn_Pluggable {
 
    /**
     * @var PHPMailer

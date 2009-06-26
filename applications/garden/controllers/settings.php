@@ -38,11 +38,11 @@ class SettingsController extends GardenController {
       $FinalRedirect = FALSE;   
       $SetupRender = FALSE;
       
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableApplications();
       
       // Check the update server for updates to these applications
-      $this->UpdateManager = new UpdateManager();
+      $this->UpdateManager = new Gdn_UpdateManager();
       // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
       // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_APPLICATION, array_keys($this->AvailableApplications));
       
@@ -66,7 +66,7 @@ class SettingsController extends GardenController {
                   }
                   if ($this->Form->ErrorCount() == 0) {
                      // 2. Register any specified permissions
-                     $Validation = new Validation();
+                     $Validation = new Gdn_Validation();
                      $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
                      if (count($Validation->Results()) == 0) {
                         if (!$ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation, TRUE)) {
@@ -87,7 +87,7 @@ class SettingsController extends GardenController {
                } elseif ($Action == 'setup') {
                   // 3. Run the setup method of the application
                   $SetupRender = TRUE;
-                  $Validation = new Validation();
+                  $Validation = new Gdn_Validation();
                   if ($ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation)) {
                      $SetupRender = FALSE;
                      $FinalRedirect = TRUE;
@@ -112,8 +112,8 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
       
-      $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls'));
       
       // Set the model on the form.
@@ -137,7 +137,7 @@ class SettingsController extends GardenController {
          // If changing locale, redefine locale sources:
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
          if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
-            $ApplicationManager = new ApplicationManager();
+            $ApplicationManager = new Gdn_ApplicationManager();
             $PluginManager = Gdn::Factory('PluginManager');
             $Locale = Gdn::Locale();
             $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
@@ -160,8 +160,8 @@ class SettingsController extends GardenController {
       if ($this->Head)
          $this->Head->AddScript('/applications/garden/js/email.js');      
       
-      $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array(
          'Garden.Email.SupportName',
          'Garden.Email.SupportAddress',
@@ -232,7 +232,7 @@ class SettingsController extends GardenController {
       $this->AvailablePlugins = $PluginManager->AvailablePlugins();
       
       // Check the update server for updates to these plugins
-      $this->UpdateManager = new UpdateManager();
+      $this->UpdateManager = new Gdn_UpdateManager();
       // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
       // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_PLUGIN, array_keys($this->AvailablePlugins));
       
@@ -243,7 +243,7 @@ class SettingsController extends GardenController {
                if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                   $PluginManager->DisablePlugin($PluginName);
                } else {
-                  $Validation = new Validation();
+                  $Validation = new Gdn_Validation();
                   if (!$PluginManager->EnablePlugin($PluginName, $Validation))
                      $this->Form->SetValidationResults($Validation->Results());
                }
@@ -270,8 +270,8 @@ class SettingsController extends GardenController {
          $this->Head->AddScript('/applications/garden/js/registration.js');
       
       // Create a model to save configuration settings
-      $Validation = new Validation();
-      $ConfigurationModel = new ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array('Garden.Registration.Method', 'Garden.Registration.DefaultRoles', 'Garden.Registration.CaptchaPrivateKey', 'Garden.Registration.CaptchaPublicKey', 'Garden.Registration.InviteExpiration'));
       
       // Define some validation rules for the fields being saved
@@ -354,7 +354,7 @@ class SettingsController extends GardenController {
       if ($Preview != '')
          $this->Theme = $Preview;
          
-      $ThemeManager = new ThemeManager();
+      $ThemeManager = new Gdn_ThemeManager();
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
       $this->EnabledTheme = $ThemeManager->EnabledTheme();
       

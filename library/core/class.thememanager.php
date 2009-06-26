@@ -15,7 +15,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Manages available themes, enabling and disabling them.
 /// </summary>
-class ThemeManager {
+class Gdn_ThemeManager {
    
    /// <prop type="array">
    /// An array of available themes. Never access this directly, instead
@@ -74,7 +74,7 @@ class ThemeManager {
    
    public function EnableTheme($ThemeName) {
       // 1. Make sure that the theme's requirements are met
-      $ApplicationManager = new ApplicationManager();
+      $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
       $AvailableThemes = $this->AvailableThemes();
       $NewThemeInfo = ArrayValue($ThemeName, $AvailableThemes, array());

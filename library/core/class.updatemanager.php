@@ -15,7 +15,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// <summary>
 /// Handles building the update request, sending it, and returning results.
 /// </summary>
-class UpdateManager {
+class Gdn_UpdateManager {
    /// <prop type="array">
    /// A collection of Type => Items to check for updates.
    /// </prop>
@@ -45,8 +45,8 @@ class UpdateManager {
       if (count($this->_Items) > 0) {
          // TODO: Use garden update check url instead of this:
          $UpdateUrl = Url('/lussumo/update', TRUE, TRUE);
-         $Host = Url::Host();
-         $Path = CombinePaths(array(Url::WebRoot(), 'lussumo', 'update'), '/');
+         $Host = Gdn_Url::Host();
+         $Path = CombinePaths(array(Gdn_Url::WebRoot(), 'lussumo', 'update'), '/');
          $Port = 80;
          /*
          $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl', '');
@@ -57,7 +57,7 @@ class UpdateManager {
          */
          $Path .= '?Check='.urlencode(Format::Serialize($this->_Items));
          $Locale = Gdn::Config('Garden.Locale', 'Undefined');
-         $Referer = Url::WebRoot(TRUE);
+         $Referer = Gdn_Url::WebRoot(TRUE);
          if ($Referer === FALSE)
             $Referer = 'Undefined';
             

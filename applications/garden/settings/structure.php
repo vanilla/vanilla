@@ -47,7 +47,7 @@ $Construct->Table('Role')
 
 // Insert some permissions for the Garden setup
 if (!is_object($Validation))
-   $Validation = new Validation();
+   $Validation = new Gdn_Validation();
    
 $PermissionModel = new PermissionModel($Validation);
 $Permissions = array();
@@ -241,7 +241,7 @@ $Construct->Table('SearchDocument')
 	->Column('TableName', 'varchar', 50)
 	->Column('PrimaryID', 'int', 11, FALSE)
 	->Column('PermissionJunctionID', 'int', 11, TRUE)
-	->Column('Title', 'varchar', 50, FALSE)
+	->Column('Title', 'varchar', 100, FALSE)
 	->Column('Summary', 'varchar', 200, FALSE)
 	->Column('Url', 'varchar', 255, FALSE)
 	->Column('InsertUserID', 'int', 10, FALSE)

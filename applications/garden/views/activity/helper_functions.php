@@ -18,7 +18,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          && ($Session->UserID == $Activity->InsertUserID
             || $Session->CheckPermission('Garden.Activity.Delete'))
          )
-         echo Anchor('Delete', 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Url::Request()), 'Delete');
+         echo Anchor('Delete', 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
    ?><strong><?php
       echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
    ?><em><?php
@@ -54,7 +54,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
                $CommentForm = new Form();
                $CommentForm->SetModel($Sender->ActivityModel);
                $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
-               $CommentForm->AddHidden('Return', Url::Request());
+               $CommentForm->AddHidden('Return', Gdn_Url::Request());
                echo $CommentForm->Open(array('action' => Url('/garden/activity/comment'), 'class' => 'Hidden'));
                echo $CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => ''));
                echo $CommentForm->Close('Comment');
@@ -79,7 +79,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
       }
    }
    ?><h3><?php
-      echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? Anchor('Delete', 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Url::Request()), 'Delete') : '';
+      echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? Anchor('Delete', 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete') : '';
    ?><strong><?php
       echo Format::ActivityHeadline($Comment, $Sender->ProfileUserID);
    ?><em><?php

@@ -146,7 +146,7 @@ class Gdn_MSSQLDriver extends Gdn_SQLDriver {
       $DataSet = $this->Query($this->FetchColumnSql($Table));
       $Schema = array();
       foreach ($DataSet->Result() as $Field) {
-         $Object = new ShellClass();
+         $Object = new Gdn_ShellClass();
          $Object->Name = $Field->COLUMN_NAME;
          $Object->PrimaryKey = (strlen($Field->CONSTRAINT_NAME) > 3 && strtolower(substr($Field->CONSTRAINT_NAME, 0, 3)) == 'pk_') ? TRUE : FALSE;
          $Object->Type = $Field->DATA_TYPE;

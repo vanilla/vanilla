@@ -24,6 +24,33 @@ class Gdn_SearchModel extends Model {
 		}
 	}
 	
+	public function Delete($Document) {
+		$DocumentID = NULL;
+		
+		if(is_array($Document)) {
+			// Get the document id.
+			if(!array_key_exists('DocumentID', $Document)) {
+				// See if there is already a document.
+				$Data = $this->SQL->GetWhere('SearchDocument', array('TableName' => $Document['TableName'], 'PrimaryID' => $Document['PrimaryID']))->FirstRow();
+				if($Data) {
+					// The document was found, but must be updated.
+					$DocumentID = $Data->DocumentID;
+				} else {
+					$DocumentID = NULL;
+				}
+				
+			} else {
+				$DocumentID = $Document['DocumentID'];
+			}
+		} else {
+			$DocumentID = $Document;
+		}
+		
+		// Delete the keyword mappings.
+		$this->SQL->Delete('SearchKeywordDocument', array('DocumentID' => $DocumentID));
+		$this->SQL->Delete('SearchDocument', array('DocumentID' => $DocumentID));
+	}
+	
 	/**
 	 * Filter out all non-indexable words from a keyword string or array.
 	 *
@@ -37,18 +64,26 @@ class Gdn_SearchModel extends Model {
 		}
 		
 		if(is_string($Keywords)) {
-			$Keywords = preg_split('/\W+/', strip_tags($Keywords));
+			// Remove tags and accents.
+			$Keywords = utf8_decode(self::StripAccents($Keywords)); //self::StripAccents(strip_tags($Keywords)));
+			$Keywords = strtolower(strip_tags($Keywords));
+			// Split on non-words, but support tagging with "@" and "#" characters.
+			$Keywords = preg_split('/([^\w@#]|_)+/', strip_tags($Keywords));
 		}
 		
 		$count = count($Keywords);
 		for($i = 0; $i < $count; ++$i) {
-			$Keyword = strtolower(trim($Keywords[$i]));
-			if(strlen($Keyword) <= 2 || array_key_exists($Keyword, $this->NoiseWords)) {
+			$Keyword = $Keywords[$i];
+			if(strlen($Keyword) <= 2 || strlen($Keyword) > 50 || array_key_exists($Keyword, $this->NoiseWords)) {
 				// The keyword is either empty or a noise word, so unset it.
 				unset($Keywords[$i]);
 			} else {
 				$Keywords[$i] = $Keyword;
 			}
+		}
+		
+		foreach($Keywords as $i => $Keyword) {
+			$Keywords[$i] = utf8_encode($Keyword);
 		}
 		
 		return $Keywords;
@@ -103,10 +138,11 @@ class Gdn_SearchModel extends Model {
 				->Get();
 			
 			while($Row = $Data->NextRow()) {
-				$this->_KeywordCache[$Row->Keyword] = $Row->KeywordID;
-				if(array_key_exists($Row->Keyword, $Keywords)) {
+				$Keyword = $Row->Keyword;
+				$this->_KeywordCache[$Keyword] = $Row->KeywordID;
+				if(array_key_exists($Keyword, $Keywords)) {
 					// The keyword doesn't have to be inserted.
-					unset($Keywords[$Row->Keyword]);
+					unset($Keywords[$Keyword]);
 				} else {
 					// The keyword has to be deleted.
 					$KeywordsToDelete[] = $Row->KeywordID;
@@ -119,6 +155,8 @@ class Gdn_SearchModel extends Model {
 		foreach($Keywords as $Keyword => $KeywordID) {
 			if(!is_null($KeywordID))
 				continue;
+			
+			$Keyword = substr($Keyword, 0, 50);
 			
 			// Make sure the keyword is inserted.
 			if(array_key_exists($Keyword, $this->_KeywordCache)) {
@@ -137,16 +175,16 @@ class Gdn_SearchModel extends Model {
 			$Set[] = array('KeywordID' => $KeywordID, 'DocumentID' => $DocumentID);
 		}
 		
+		// Delete the keyword links.
+		if(count($KeywordsToDelete) > 0) {
+			$this->SQL->WhereIn('KeywordID', $KeywordsToDelete)->Delete('SearchKeywordDocument', array('DocumentID' => $DocumentID));
+		}
+		
 		// Insert the link to this document.
 		$this->SQL->Insert('SearchKeywordDocument', $Set);
-		
-		// Delete the keywords.
-		foreach($KeywordsToDelete as $KeywordID) {
-			$this->SQL->Delete('SearchKeywordDocument', array('DocumentID' => $DocumentID, 'KeywordID' => $KeywordID));
-		}
 	}
 	
-	public function Search($Search) {
+	public function Search($Search, $Offset = 0, $Limit = 20) {
 		// Check to see if this is a quoted search.
 		if(preg_match('/["\'].*["\']/', $Search)) {
 			$All = TRUE;
@@ -182,14 +220,15 @@ class Gdn_SearchModel extends Model {
 			->Join('SearchDocument d', 'd.DocumentID = kd.DocumentID')
 			->Join('User u', 'd.InsertUserID = u.UserID')
 			->GroupBy()
+			->Limit($Limit, $Offset)
 			->OrderBy('Relavence', 'desc');
 			
 		if($All) {
-			$this->SQL->Having('count(*) >=', '@'.count($Keywords));
+			$this->SQL->Having('count(*) >=', count($Keywords));
 		}
 		
 		if(count($KeywordIDs) == 0) {
-			$this->SQL->Where('@0', '@1');
+			$this->SQL->Where('@0', '1');
 		} elseif(count($KeywordIDs) == 1) {
 			$this->SQL->Where('kd.KeywordID', $KeywordIDs[0]);
 		} else {
@@ -197,6 +236,27 @@ class Gdn_SearchModel extends Model {
 		}
 		
 		$Result = $this->SQL->Get();
+		$Result->DefaultDatasetType = DATASET_TYPE_ARRAY;
+		return $Result;
+	}
+	
+	public static function StripAccents($String) {
+		$Fr = 'ÀÁÃÄÅÂÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáãäåâæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
+		$To = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr';
+		
+		$Result = strtr(utf8_decode($String), utf8_decode($Fr), $To);
+		$Result = utf8_decode($Result);
+		
+		return $Result;
+	}
+	
+	public static function StripAccents($String) {
+		$Fr = 'ÀÁÃÄÅÂÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáãäåâæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
+		$To = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr';
+		
+		$Result = strtr(utf8_decode($String), utf8_decode($Fr), $To);
+		$Result = utf8_decode($Result);
+		
 		return $Result;
 	}
 	
@@ -204,7 +264,7 @@ class Gdn_SearchModel extends Model {
 		if(array_key_exists($Key, $Array)) {
 			$Value = trim(strip_tags($Array[$Key]));
 			if(strlen($Value) > $Length) {
-				$Value = substr($Value, 0, $Length - 3) . '...';
+				$Value = utf8_encode(substr(utf8_decode($Value), 0, $Length - 3)) . '...';
 			}
 			$Array[$Key] = $Value;
 		}

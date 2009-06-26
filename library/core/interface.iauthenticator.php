@@ -20,17 +20,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * An interface for authenticator classes.
  *
  * @package Garden
  */
-interface IAuthenticator {
+interface Gdn_IAuthenticator {
 
 
    /**

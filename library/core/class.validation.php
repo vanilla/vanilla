@@ -28,7 +28,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  *
  * @package Garden
  */
-class Validation {
+class Gdn_Validation {
 
 
    /**

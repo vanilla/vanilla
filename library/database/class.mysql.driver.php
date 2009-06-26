@@ -145,7 +145,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Length = '';
          }
 
-         $Object = new ShellClass();
+         $Object = new Gdn_ShellClass();
          $Object->Name = $Field->Field;
          $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
          $Object->Type = $Type;
@@ -241,7 +241,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             for($i = 0; $i < count($Data); $i++) {
                if($i > 0)
                   $Sql .= ', ';
-               $Sql .= "\n(".implode(', ', array_values($Data[$i])).')';
+               $Sql .= "\n('".implode('\', \'', array_values($Data[$i])).'\')';
             }
          } else {
             $Sql .= "\n(".implode(', ', array_keys($Data)).') '

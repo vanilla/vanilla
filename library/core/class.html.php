@@ -19,7 +19,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.UI
  */
 
-class Html extends Pluggable {
+class Html extends Gdn_Pluggable {
 
    public static function Anchor($Link, $Text, $Attributes = '') {
       return '<a href="'.Url($Link).'"'.$this->BuildAttributes($Attributes).'>'.Translate($Text).'</a>';

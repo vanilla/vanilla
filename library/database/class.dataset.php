@@ -22,7 +22,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Database
  */
 
-class Gdn_DataSet {
+class Gdn_DataSet implements IteratorAggregate {
 
    /**
     * Contains a reference to the open database connection. FALSE by default.
@@ -39,6 +39,13 @@ class Gdn_DataSet {
     * @var int
     */
    private $_Cursor;
+   
+   /**
+    * Determines what type of result is returned from the various methods by default.
+    *
+    * @var int Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
+    */
+   public $DefaultDatasetType = DATASET_TYPE_OBJECT;
 
    /**
     * Contains a PDOStatement object returned by a PDO query. FALSE by default.
@@ -117,7 +124,9 @@ class Gdn_DataSet {
     * @param string $RowType The format in which the result should be returned: object or array. It
     * will fill a different array depending on which type is specified.
     */
-   private function _FetchAllRows($RowType = DATASET_TYPE_OBJECT) {
+   private function _FetchAllRows($RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       if ($this->_PDOStatementFetched === FALSE) {
       // Get all records from the pdostatement's result set.
          if ($RowType == DATASET_TYPE_OBJECT) {
@@ -144,7 +153,9 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which the result should be returned: object or array.
     */
-   public function FirstRow($FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
+   public function FirstRow($FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       $Result = $this->Result('', $RowType);
       if (count($Result) == 0)
          return FALSE;
@@ -160,6 +171,14 @@ class Gdn_DataSet {
          $this->_PDOStatement->closeCursor();
       $this->_PDOStatement = NULL;
    }
+   
+   /**
+    * Interface method for IteratorAggregate;
+    *
+    */
+   public function getIterator() {
+      return new ArrayIterator($this->Result());
+   }
 
    /**
     * Returns the last row in the requested format or FALSE if there are no
@@ -168,7 +187,9 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which the result should be returned: object or array.
     */
-   public function LastRow($FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
+   public function LastRow($FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       $Result = $this->Result('', $RowType);
       if (count($Result) == 0)
          return FALSE;
@@ -183,7 +204,9 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which the result should be returned: object or array.
     */
-   public function NextRow($FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
+   public function NextRow($FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       $Result = $this->Result('', $RowType);
       ++$this->_Cursor;
       if (isset($Result[$this->_Cursor])) {
@@ -208,7 +231,9 @@ class Gdn_DataSet {
     * there are). Hinting this way can save processing time later so we don't
     * need to convert from object to array or vice-versa.
     */
-   public function NumRows($RowTypeHint = DATASET_TYPE_OBJECT) {
+   public function NumRows($RowTypeHint = FALSE) {
+      if($RowTypeHint === FALSE) $RowTypeHint = $this->DefaultDatasetType;
+      
       if ($this->_ResultArrayFetched === TRUE)
          return count($this->_ResultArray);
       else if ($this->_ResultObjectFetched === TRUE)
@@ -224,7 +249,9 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which the result should be returned: object or array.
     */
-   public function PreviousRow($FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
+   public function PreviousRow($FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       $Result = $this->Result('', $RowType);
       --$this->_Cursor;
       if (isset($Result[$this->_Cursor])) {
@@ -243,8 +270,13 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which to return a row: object or array.
     */
-   public function Result($FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
-      return $RowType == DATASET_TYPE_OBJECT ? $this->ResultObject($FormatType) : $this->ResultArray($FormatType);
+   public function Result($FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
+      if($RowType == DATASET_TYPE_OBJECT)
+         return $this->ResultObject($FormatType);
+      else
+         return $this->ResultArray($FormatType);
    }
 
    /**
@@ -292,7 +324,9 @@ class Gdn_DataSet {
     * @param string $FormatType The type of formatting to use on each of the result fields. Defaults to none.
     * @param string $RowType The format in which the result should be returned: object or array.
     */
-   public function Row($RowIndex, $FormatType = '', $RowType = DATASET_TYPE_OBJECT) {
+   public function Row($RowIndex, $FormatType = '', $RowType = FALSE) {
+      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
+      
       $Result = $this->Result('', $RowType);
       if (count($Result) == 0)
          return $Result;
@@ -333,7 +367,10 @@ class Gdn_DataSet {
     *
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
-   public function PDOStatement($PDOStatement) {
-      $this->_PDOStatement = $PDOStatement;
+   public function PDOStatement($PDOStatement = FALSE) {
+      if($PDOStatement === FALSE)
+         return $this->_PDOStatement;
+      else
+         $this->_PDOStatement = $PDOStatement;
    }
 }

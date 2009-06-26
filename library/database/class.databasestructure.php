@@ -97,6 +97,13 @@ abstract class Gdn_DatabaseStructure {
    public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
       if (!in_array($KeyType, array('primary', 'key', FALSE)))
          $KeyType = FALSE;
+         
+      // Check for a length in the type.
+      if(is_string($Type) && preg_match('/([_a-zA-Z]\w*)\s*(?:\((\d+)\))?/', $Type, $Matches)) {
+         $Type = $Matches[1];
+         if(count($Matches) >= 3)
+            $Length = $Matches[2];
+      }
 
       $Column = new Gdn_ShellClass();
       $Column->Name = $Name;

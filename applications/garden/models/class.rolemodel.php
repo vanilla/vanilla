@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class RoleModel extends Model {
+class Gdn_RoleModel extends Model {
    /// <summary>
    /// Class constructor. Defines the related database table name.
    /// </summary>
@@ -19,6 +19,32 @@ class RoleModel extends Model {
    /// </param>
    public function __construct() {
       parent::__construct('Role');
+   }
+   
+   public function Define($Values) {
+      if(array_key_exists('RoleID', $Values)) {
+         $RoleID = $Values['RoleID'];
+         unset($Values['RoleID']);
+         
+         $this->SQL->Replace('Role', $Values, array('RoleID' => $RoleID));
+      } else {
+         // Check to see if there is a role with the same name.
+         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Name']))->Value('RoleID', NULL);
+         
+         if(is_null($RoleID)) {
+            // Figure out the next role ID which is the next biggest power of two.
+            $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Value('RoleID', 0);
+            $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+            $Values['RoleID'] = $RoleID;
+            
+            // Insert the role.
+            $this->SQL->Insert('Role', $Values);
+         } else {
+            // Update the role.
+            $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID));
+         }
+      }
+      
    }
    
    /// <summary>
@@ -169,7 +195,12 @@ class RoleModel extends Model {
       $RoleID = ArrayValue('RoleID', $FormPostValues);
       $Insert = $RoleID > 0 ? FALSE : TRUE;
       if ($Insert) {
-         $this->AddInsertFields($FormPostValues);               
+         // Figure out the next role ID which is the next biggest power of two.
+         $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Value('RoleID', 0);
+         $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+         
+         $this->AddInsertFields($FormPostValues);
+         $FormPostValues['RoleID'] = $RoleID;
       } else {
          $this->AddUpdateFields($FormPostValues);
       }

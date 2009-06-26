@@ -751,7 +751,7 @@ abstract class Gdn_SQLDriver {
             $Field = 'case ' . $Field . $CaseOptions . ' end';
 
          if ($Alias != '')
-            $Field .= ' as '.$this->EscapeIdentifier($Alias);
+            $Field .= ' as '.$this->QuoteIdentifier($Alias);
 
          if ($Field != '')
             $Selects[] = $Field;
@@ -1034,6 +1034,27 @@ abstract class Gdn_SQLDriver {
       $Result = $this->Query($Sql);
       
       return $Result;
+   }
+   
+   /**
+    * Inserts or updates values in the table depending on whether they are already there.
+    *
+    * @param string $Table The name of the table to insert/update.
+    * @param array $Set The columns to update.
+    * @param array $Where The columns to find the row to update.
+    * If a row is not found then one is inserted and the items in this array are merged with $Set.
+    */
+   public function Replace($Table = '', $Set = NULL, $Where) {
+      // Check to see if there is a row in the table like this.
+      $Count = $this->GetCount($Table, $Where);
+      if($Count > 0) {
+         // Update the table.
+         $this->Put($Table, $Set, $Where);
+      } else {
+         // Insert the table.
+         $Set = array_merge($Set, $Where);
+         $this->Insert($Table, $Set);
+      }
    }
    
    /**
@@ -1451,6 +1472,10 @@ abstract class Gdn_SQLDriver {
       
       return $Result;
    }
+   
+   public function QuoteIdentifier($String) {
+      return '`'.$String.'`';
+   }
 
    /**
     * Resets properties of this object that relate to building a select
@@ -1598,14 +1623,14 @@ abstract class Gdn_SQLDriver {
             foreach($v as $FunctionName => $Val) {
                if ($EscapeString === FALSE) {
                   if (is_string($FunctionName) !== FALSE) {
-                     $this->_Sets[$this->EscapeSql($f)] = $FunctionName.'('.$Val.')';
+                     $this->_Sets[$this->QuoteIdentifier($f)] = $FunctionName.'('.$Val.')';
                   } else {
-                     $this->_Sets[$this->EscapeSql($f)] = $Val;
+                     $this->_Sets[$this->QuoteIdentifier($f)] = $Val;
                   }
                } else {
                   $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
                   $this->_NamedParameters[$NamedParameter] = $Val;
-                  $this->_Sets[$this->EscapeSql($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
+                  $this->_Sets[$this->QuoteIdentifier($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
                }
             }
          }
@@ -1756,7 +1781,7 @@ abstract class Gdn_SQLDriver {
     * clause.
     */
    public function _WhereIn($Field, $Values, $Op = 'in') {
-      if ($Field === NULL || !is_array($Values))
+      if (is_null($Field) || !is_array($Values))
          return;
       
       $FieldExpr = $this->_ParseExpr($Field);

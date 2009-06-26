@@ -93,7 +93,7 @@ class Gdn_Database {
 	 *   - <b>ConnectionOptions</b>: Other PDO connection attributes.
 	 */
    public function Init($Config = NULL) {
-		if($Config === NULL)
+		if(is_null($Config))
 			return Gdn::Factory(Gdn::ObjectDatabase);
 		elseif(is_string($Config))
 			$Config = Gdn::Config($Config);

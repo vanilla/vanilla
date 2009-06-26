@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Mark O'Sullivan
 This file is part of Garden.
@@ -17,8 +17,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Lussumo.Garden.Database
  */
-
-if (!defined('APPLICATION')) exit();
 
 /**
  * Helps with the rendering of form controls that link directly to a data model.

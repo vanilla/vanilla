@@ -130,7 +130,7 @@ class CommentModel extends VanillaModel {
          $Max = 0;
          
       $Search = Gdn::Factory('SearchModel');
-      if($Search == NULL) {
+      if(is_null($Search)) {
          return;
       }
       

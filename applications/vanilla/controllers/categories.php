@@ -9,8 +9,8 @@ class CategoriesController extends VanillaController {
    
    public function Add() {
       $this->Permission('Vanilla.Categories.Manage');
-      $RoleModel = new RoleModel();
-      $PermissionModel = new PermissionModel();
+      $RoleModel = new Gdn_RoleModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
       if ($this->Head) {
@@ -119,8 +119,8 @@ class CategoriesController extends VanillaController {
    
    public function Edit($CategoryID = '') {
       $this->Permission('Vanilla.Categories.Manage');
-      $RoleModel = new RoleModel();
-      $PermissionModel = new PermissionModel();
+      $RoleModel = new Gdn_RoleModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       if ($this->Head)

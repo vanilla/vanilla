@@ -31,21 +31,29 @@ class Gdn_UserModel extends Model {
    }
 
    public function DefinePermissions($UserID) {
-      $DataSet = $this->SQL->Select('p.Name, rp.JunctionID')
+      $DataSet = $this->SQL->Select('p.*')
          ->From('Permission p')
-         ->Join('RolePermission rp', 'p.PermissionID = rp.PermissionID')
-         ->Join('UserRole ur', 'rp.RoleID = ur.RoleID')
-         ->Where('ur.UserID', $UserID)
-         ->GroupBy('p.Name, rp.JunctionID')
+         ->Join('User u', 'p.RoleID & u.CacheRoleID > 0')
+         ->Where('u.UserID', $UserID)
          ->Get();
 
       $Permissions = array();
-      if ($DataSet->NumRows() > 0) {
-         foreach ($DataSet->Result() as $Permission) {
-            if (is_numeric($Permission->JunctionID) && $Permission->JunctionID > 0)
-               $Permissions[$Permission->Name][] = $Permission->JunctionID;
-            else
-               $Permissions[] = $Permission->Name;
+      $Data = $DataSet->ResultArray();
+      foreach($Data as $i => $Row) {
+         $JunctionTable = $Row['JunctionTable'];
+         $JunctionColumn = $Row['JunctionColumn'];
+         $JunctionID = $Row['JunctionID'];
+         unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
+         
+         foreach($Row as $PermissionName => $Value) {
+            if($Value == 0)
+               continue;
+            
+            if(is_numeric($JunctionID) && $JunctionID > 0) {
+               $Permissions[$PermissionName][] = $JunctionID;
+            } else {
+               $Permissions[] = $PermissionName;
+            }
          }
       }
       // Throw a fatal error if the user has no permissions
@@ -291,7 +299,7 @@ class Gdn_UserModel extends Model {
                Gdn::Translate('Welcome to Vanilla!')
             );
          }
-         $this->SaveRoles($UserID, array(5), FALSE);
+         $this->SaveRoles($UserID, array(16), FALSE);
       }
       return $UserID;
    }
@@ -300,7 +308,7 @@ class Gdn_UserModel extends Model {
       if (!is_array($RoleIDs))
          $RoleIDs = array($RoleIDs);
 
-      // Get the old roles
+      // Get the current roles.
       $OldRoleIDs = array();
       $OldRoleData = $this->SQL
          ->Select('ur.RoleID, r.Name')
@@ -310,29 +318,43 @@ class Gdn_UserModel extends Model {
          ->Get()
          ->ResultArray();
 
-      if ($OldRoleData !== FALSE)
+      if ($OldRoleData !== FALSE) {
          $OldRoleIDs = ConsolidateArrayValuesByKey($OldRoleData, 'RoleID');
+      }
+      
+      // 1a) Figure out which roles to delete.
+      $DeleteRoleIDs = array_diff($OldRoleIDs, $RoleIDs);
+      // 1b) Remove old role associations for this user.
+      if(count($DeleteRoleIDs) > 0)
+         $this->SQL->WhereIn('RoleID', $DeleteRoleIDs)->Delete('UserRole', array('UserID' => $UserID));
+      
+      // 2a) Figure out which roles to insert.
+      $InsertRoleIDs = array_diff($RoleIDs, $OldRoleIDs);
+      // 2b) Insert the new role associations for this user.
+      $Count = count($InsertRoleIDs);
+      for ($i = 0; $i < $Count; $i++) {
+         if (is_numeric($InsertRoleIDs[$i]))
+            $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleIDs[$i]));
+      }      
+      
+      // 3. Figure out the ID that is a combination of all of the roles.
+      $CacheRoleID = 0;
+      foreach($RoleIDs as $RoleID) {
+         $CacheRoleID = $CacheRoleID | $RoleID;
+      }
 
-      // 1. Remove old role associations for this user
-      $this->SQL->Delete('UserRole', array('UserID' => $UserID));
 
-      // 2. Remove the cached permissions for this user.
+      // 4. Remove the cached permissions for this user.
       // Note: they are not reset here because I want this action to be
       // performed in one place - /garden/library/core/class.session.php
       // It is done in the session because when a role's permissions are changed
       // I can then just erase all cached permissions on the user table for
       // users that are assigned to that changed role - and they can reset
       // themselves the next time the session is referenced.
-      $this->SQL->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
+      $this->SQL->Put('User', array('Permissions' => ''), array('UserID' => $UserID, 'CacheRoleID' => $CacheRoleID));
 
-      // 3. Insert the new role associations for this user.
-      $Count = count($RoleIDs);
-      for ($i = 0; $i < $Count; $i++) {
-         if (is_numeric($RoleIDs[$i]))
-            $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $RoleIDs[$i]));
-      }
 
-      if ($RecordActivity && (count(array_diff($OldRoleIDs, $RoleIDs)) > 0 || count(array_diff($RoleIDs, $OldRoleIDs)) > 0)) {
+      if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->Get($UserID);
          $Session = Gdn::Session();
 

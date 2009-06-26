@@ -48,7 +48,7 @@ class Gdn_CookieAuthenticator implements Gdn_IAuthenticator {
     */
    public function GetPermissionModel() {
       if ($this->_PermissionModel === null) {
-         $this->_PermissionModel = new PermissionModel(new Gdn_Validation());
+         $this->_PermissionModel = Gdn::PermissionModel();
       }
       return $this->_PermissionModel;
    }

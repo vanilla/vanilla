@@ -64,7 +64,7 @@ class RoleController extends GardenController {
    public function Edit($RoleID = FALSE) {
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
-      $PermissionModel = new PermissionModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
       if ($this->Head)
@@ -79,28 +79,7 @@ class RoleController extends GardenController {
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
       
       // Load all non-junction permissions based on enabled applications and plugins
-      $this->PermissionData = $PermissionModel->GetPermissions($LimitToSuffix);
-      
-      // Define all junction tables
-      $JunctionTables = $PermissionModel->GetJunctionTables();
-         
-      // Define all of the junction rows/permissions
-      $this->JunctionTableData = array();
-      $this->HasJunctionPermissionData = FALSE;
-      foreach ($JunctionTables->Result() as $Table) {
-         // Load all junction table rows (these will represent the checkbox group name)
-         $this->JunctionTableData[$Table->JunctionTable]['Rows'] = $PermissionModel->GetJunctionData($Table->JunctionTable, $Table->JunctionColumn);
-            
-         // Load all available junction permissions
-         $JunctionPermissionData = $PermissionModel->GetJunctionPermissions($Table->JunctionTable, $LimitToSuffix);
-         $this->JunctionTableData[$Table->JunctionTable]['Permissions'] = $JunctionPermissionData;
-         if ($JunctionPermissionData->NumRows() > 0)
-            $this->HasJunctionPermissionData = TRUE;
-      }
-      
-      // Initialize the permission data containers
-      $this->RolePermissionData = FALSE;
-      $this->RoleJunctionPermissionData = FALSE;
+      $this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
 
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {

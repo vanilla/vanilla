@@ -183,12 +183,12 @@ class UtilityController extends GardenController {
       $this->ConstructView('vw_Applicant', $View);
       
       // vw_RolePermission
-      $View = $Database->Select('rp.*')
+      /*$View = $Database->Select('rp.*')
          ->Select('p.Name', '', 'Permission')
          ->From('RolePermission rp')
          ->Join('Permission p', 'rp.PermissionID = p.PermissionID')
          ->GetSelect();
-      $this->ConstructView('vw_RolePermission', $View);
+      $this->ConstructView('vw_RolePermission', $View);*/
       
       $View = $Database
          ->Select('c.CategoryID, c.CountDiscussions, c.Description, c.Sort, c.InsertUserID, c.UpdateUserID, c.DateInserted, c.DateUpdated')

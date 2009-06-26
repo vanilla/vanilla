@@ -6,48 +6,8 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
    
-$SQL = $Database->SQL();
-
-if ($Drop) {
-   // Insert some permissions for the Vanilla categories
-   $Permissions = array();
-   $Permissions[] = 'Vanilla.Settings.Manage';
-   $Permissions[] = 'Vanilla.Categories.Manage';
-   $Permissions[] = 'Vanilla.Spam.Manage';
-   if (!is_object($Validation))
-      $Validation = new Gdn_Validation();
-      
-   $PermissionModel = new PermissionModel($Validation);
-   $PermissionModel->InsertNew($Permissions);
-   $Permissions = array();
-   $Permissions[] = 'Vanilla.Discussions.View';
-   $Permissions[] = 'Vanilla.Discussions.Add';
-   $Permissions[] = 'Vanilla.Discussions.Edit';
-   $Permissions[] = 'Vanilla.Discussions.Announce';
-   $Permissions[] = 'Vanilla.Discussions.Sink';
-   $Permissions[] = 'Vanilla.Discussions.Close';
-   $Permissions[] = 'Vanilla.Discussions.Delete';
-   $Permissions[] = 'Vanilla.Comments.Add';
-   $Permissions[] = 'Vanilla.Comments.Edit';
-   $Permissions[] = 'Vanilla.Comments.Delete';
-   $PermissionModel->InsertNew($Permissions, 'Category', 'CategoryID');
-   // Make sure that User.Permissions is blank so new permissions for users get applied.
-   $SQL->Update('User', array('Permissions' => ''))->Put();
-
-   // Fix permissions for Vanilla
-   if ($SQL->GetWhere('vw_RolePermission', array('RoleID' => '4', 'Permission' => 'Vanilla.Discussions.Add'))->NumRows() == 0) {
-      // Member Role
-      $Select = $SQL->Select("4, PermissionID, 1")->From('vw_RolePermission')->Where('Permission', 'Vanilla.Discussions.Add')->GetSelect();
-      $SQL->Insert('RolePermission', array('RoleID', 'PermissionID', 'JunctionID'), $Select);
-      $Select = $SQL->Select("4, PermissionID, 1")->From('vw_RolePermission')->Where('Permission', 'Vanilla.Comments.Add')->GetSelect();
-      $SQL->Insert('RolePermission', array('RoleID', 'PermissionID', 'JunctionID'), $Select);
-   }
-
-   // Admin permissions
-   $SQL->Delete('RolePermission', array('RoleID' => 5));
-   $Select = $SQL->Select('5, PermissionID')->From('Permission')->GetSelect();
-   $SQL->Insert('RolePermission', array('RoleID', 'PermissionID'), $Select);
-}
+$SQL = Gdn::SQL();
+$Construct = Gdn::Structure();
 
 $Construct->Table('Category')
    ->Column('CategoryID', 'int', 4, FALSE, NULL, 'primary', TRUE)
@@ -72,7 +32,7 @@ $Construct->View('vw_Category', $SQL);
 
 if ($Drop)
    $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'General', 'Description' => 'General discussions', 'Sort' => '1'));
-   
+
 // Construct the discussion table.
 $Construct->Table('Discussion')
    ->Column('DiscussionID', 'int', 11, FALSE, NULL, 'primary', TRUE)
@@ -153,7 +113,85 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() 
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+
+if ($Drop) {
+   $PermissionModel = Gdn::PermissionModel();
    
+   // Define some global vanilla permissions.
+   $PermissionModel->Define(array(
+      'Vanilla.Settings.Manage',
+      'Vanilla.Categories.Manage',
+      'Vanilla.Spam.Manage'
+      ));
+   
+   // Define some permissions for the Vanilla categories.
+   $PermissionModel->Define(array(
+      'Vanilla.Discussions.View',
+      'Vanilla.Discussions.Add',
+      'Vanilla.Discussions.Edit',
+      'Vanilla.Discussions.Announce',
+      'Vanilla.Discussions.Sink',
+      'Vanilla.Discussions.Close',
+      'Vanilla.Discussions.Delete',
+      'Vanilla.Comments.Add',
+      'Vanilla.Comments.Edit',
+      'Vanilla.Comments.Delete'),
+      'tinyint',
+      'Category',
+      'CategoryID'
+      );
+   
+   // Get the general category so we can assign permissions to it.
+   $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
+   
+   // Set the intial member permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 8,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'CategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.Add' => 1,
+      'Vanilla.Comments.Add' => 1
+      ));
+      
+   // Set the initial administrator permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 16,
+      'Vanilla.Settings.Manage' => 1,
+      'Vanilla.Categories.Manage' => 1,
+      'Vanilla.Spam.Manage' => 1,
+      // Giving the category permissions here gives admins default permissions for new categories.
+      'Vanilla.Discussions.Add' => 1,
+      'Vanilla.Discussions.Edit' => 1,
+      'Vanilla.Discussions.Announce' => 1,
+      'Vanilla.Discussions.Sink' => 1,
+      'Vanilla.Discussions.Close' => 1,
+      'Vanilla.Discussions.Delete' => 1,
+      'Vanilla.Comments.Add' => 1,
+      'Vanilla.Comments.Edit' => 1,
+      'Vanilla.Comments.Delete' => 1
+      ));
+   
+   $PermissionModel->Save(array(
+      'RoleID' => 16,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'CategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.Add' => 1,
+      'Vanilla.Discussions.Edit' => 1,
+      'Vanilla.Discussions.Announce' => 1,
+      'Vanilla.Discussions.Sink' => 1,
+      'Vanilla.Discussions.Close' => 1,
+      'Vanilla.Discussions.Delete' => 1,
+      'Vanilla.Comments.Add' => 1,
+      'Vanilla.Comments.Edit' => 1,
+      'Vanilla.Comments.Delete' => 1
+      ));
+   
+   // Make sure that User.Permissions is blank so new permissions for users get applied.
+   $SQL->Update('User', array('Permissions' => ''))->Put();
+}
+
 // Add the search types for Vanilla.
 $Gdn_Search = Gdn::Factory('SearchModel');
 if(!is_null($Gdn_Search)) {

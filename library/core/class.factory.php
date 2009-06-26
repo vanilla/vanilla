@@ -82,7 +82,7 @@ class Gdn_Factory {
 					$Singleton = $SingletonDef;
 				}
 				
-				if($Singleton == NULL) {
+				if(is_null($Singleton)) {
 					// Lazy create the singleton instance.
 					$Singleton = $this->_InstantiateObject($Alias, $ClassName, $Args);
 					$Def[Gdn::FactorySingleton] = $Singleton;
@@ -169,7 +169,7 @@ class Gdn_Factory {
 	 * Note: This function currently only supports a maximum of 8 arguments.
 	 */
 	protected function _InstantiateObject($Alias, $ClassName, $Args = NULL) {
-		if($Args === NULL) $Args = array();
+		if(is_null($Args)) $Args = array();
 		$Result = NULL;
 		
 		// Instantiate the object with the correct arguments.

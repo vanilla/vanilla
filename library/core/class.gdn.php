@@ -16,9 +16,10 @@ class Gdn {
 	const AliasDatabaseStructure = 'DatabaseStructure';
 	const AliasDispatcher = 'Dispatcher';
 	const AliasLocale = 'Locale';
+	const AliasPermissionModel = 'PermissionModel';
 	const AliasSession = 'Session';
 	const AliasSqlDriver = 'SqlDriver';
-	const AliasUser = 'UserModel';
+	const AliasUserModel = 'UserModel';
 	
 	const FactoryInstance = 'Instance';
 	const FactoryPrototype = 'Prototype';
@@ -239,6 +240,15 @@ class Gdn {
 	}
 	
 	/**
+	 * Geth the permission model for the application.
+	 *
+	 * @return Gdn_PermissionModel
+	 */
+	public static function PermissionModel() {
+		return self::Factory(self::AliasPermissionModel);
+	}
+	
+	/**
 	 * Get the session object.
 	 *
 	 * @return Gdn_Session
@@ -297,7 +307,7 @@ class Gdn {
 	 * @return Gdn_User
 	 */
 	public static function UserModel() {
-		$Result = self::Factory(self::AliasUser);
+		$Result = self::Factory(self::AliasUserModel);
 		return $Result;
 	}
 	
@@ -308,7 +318,7 @@ class Gdn {
 	 * @param boolean $Override whether to override the property if it is already set.
 	 */
 	public static function SetFactory($Factory, $Override = TRUE) {
-		if($Override || self::$_Factory == NULL)
+		if($Override || is_null(self::$_Factory))
 			self::$_Factory = $Factory;
 	}
 }

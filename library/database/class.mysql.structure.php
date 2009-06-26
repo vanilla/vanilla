@@ -22,6 +22,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 require_once(dirname(__FILE__).DS.'class.databasestructure.php');
 
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+   /// Constructor ///
+   
+   public function __construct($Database = NULL) {
+      parent::__construct($Database);
+   }
+   
    /**
     * Adds a column to be added to $this->Table().
     *
@@ -40,7 +46,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
       // Make sure that the column type is valid for MySQL before continuing:
-      if (!is_array($Type) && !in_array($Type, explode(',', 'int,varchar,varbinary,datetime,text')))
+      if (!is_array($Type) && !in_array($Type, explode(',', 'tinyint,int,varchar,varbinary,datetime,text')))
          throw new Exception(Gdn::Translate('The specified data type ('.$Type.') is not accepted for the MySQL database.'));
 
       return parent::Column($Name, $Type, $Length, $Null, $Default, $KeyType, $AutoIncrement);
@@ -243,12 +249,22 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if (!$Column->AllowNull)
          $Return .= ' not null';
 
-      if ($Column->Default != NULL)
-         $Return .= " default '".$Column->Default."'";
+      if (!is_null($Column->Default))
+         $Return .= " default ".self::_QuoteValue($Column->Default);
 
       if ($Column->AutoIncrement)
          $Return .= ' auto_increment';
 
       return $Return;
+   }
+   
+   protected static function _QuoteValue($Value) {
+      if(is_numeric($Value)) {
+         return $Value;
+      } else if(is_bool($Value)) {
+         return $Value ? '1' : '0';
+      } else {
+         return "'".str_replace("'", "''", $Value)."'";
+      }
    }
 }

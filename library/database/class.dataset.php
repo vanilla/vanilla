@@ -373,4 +373,19 @@ class Gdn_DataSet implements IteratorAggregate {
       else
          $this->_PDOStatement = $PDOStatement;
    }
+   
+   /**
+    * Advances to the next row and returns the value rom a column.
+    *
+    * @param string $ColumnName The name of the column to get the value from.
+    * @param string $DefaultValue The value to return if there is no data.
+    * @return mixed The value from the column or $DefaultValue.
+    */
+   public function Value($ColumnName, $DefaultValue = NULL) {
+      if($Row = $this->NextRow('', DATASET_TYPE_ARRAY)) {
+         return $Row[$ColumnName];
+      } else {
+         return $DefaultValue;
+      }
+   }
 }

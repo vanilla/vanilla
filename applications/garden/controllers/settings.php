@@ -282,7 +282,7 @@ class SettingsController extends GardenController {
       $this->Form->SetModel($ConfigurationModel);
       
       // Load roles with sign-in permission
-      $RoleModel = new RoleModel();
+      $RoleModel = new Gdn_RoleModel();
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
       
       // Get the currently selected default roles

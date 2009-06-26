@@ -8,7 +8,7 @@
 			<li class="Title"><h3><a href="{url dest=$Row.Url}">{$Row.Title|escape}</a></h3></li>
 			<li class="Summary">{$Row.Summary|escape}</li>
 			<li class="Meta">
-				<span><a href="{$Row.Url}">{$Row.Url}</a></span>
+				<span><a href="{url dest=$Row.Url}">{url dest=$Row.Url}</a></span>
 				<span>{"by"|translate} <a href="{url dest='/profile/'|cat:$Row.Name}">{$Row.Name}</a></span>
 				<span>{$Row.DateInserted|date}</span>
 			</li>

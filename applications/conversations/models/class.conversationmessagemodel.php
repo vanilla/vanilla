@@ -9,9 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class ConversationMessageModel extends Model {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct() {
       parent::__construct('ConversationMessage');
    }
@@ -129,10 +129,10 @@ class ConversationMessageModel extends Model {
       return $MessageID;
    }
    
-   /// </summary>
-   /// Update the CountUnreadConversations attribute on all users related to a
-   /// specific conversation.
-   /// </summary>
+   /**
+    * Update the CountUnreadConversations attribute on all users related to a
+    * specific conversation.
+    */
    public function UpdateCountUnreadConversations($ConversationID, $MessageUserID) {
       $UnreadData = $this->SQL
          ->Select('c.UserID')

@@ -9,9 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class ConversationModel extends Model {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct() {
       parent::__construct('Conversation');
    }
@@ -203,9 +203,9 @@ class ConversationModel extends Model {
       return $ConversationID;
    }
    
-   /// <summary>
-   /// Clear a conversation for a specific user id.
-   /// </summary>
+   /**
+    * Clear a conversation for a specific user id.
+    */
    public function Clear($ConversationID, $ClearingUserID) {
       $this->SQL->Update('UserConversation')
          ->Set('CountNewMessages', 0)
@@ -217,9 +217,9 @@ class ConversationModel extends Model {
          ->Put();
    }
 
-   /// <summary>
-   /// Update a conversation as read for a specific user id.
-   /// </summary>
+   /**
+    * Update a conversation as read for a specific user id.
+    */
    public function MarkRead($ConversationID, $ReadingUserID) {
       $this->SQL->Update('UserConversation')
          ->Set('CountNewMessages', 0)
@@ -244,9 +244,9 @@ class ConversationModel extends Model {
          ->Put();
    }
    
-   /// <summary>
-   /// Bookmark (or unbookmark) a conversation for a specific user id.
-   /// </summary>
+   /**
+    * Bookmark (or unbookmark) a conversation for a specific user id.
+    */
    public function Bookmark($ConversationID, $UserID) {
       $Bookmark = FALSE;
       $Discussion = $this->GetID($ConversationID, $UserID);

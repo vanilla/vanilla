@@ -8,18 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Conversations Setup Controller
-/// </summary>
+/**
+ * Conversations Setup Controller
+ */
 class SetupController extends Gdn_Controller {
    
    public $Uses = array('Form');
    
-   /// <summary>
-   /// The methods in setup controllers should not call "Render". Rendering will
-   /// be handled by the controller that initiated the setup. This method should
-   /// return a boolean value indicating success.
-   /// </summary>
+   /**
+    * Setup the application.
+    *
+    * The methods in setup controllers should not call "Render". Rendering will
+    * be handled by the controller that initiated the setup. This method should
+    * return a boolean value indicating success.
+    *
+    * @return bool True on successful setup
+    */
    public function Index() {
       $Database = Gdn::Database();
       $Config = Gdn::Factory(Gdn::AliasConfig);

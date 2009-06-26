@@ -1,7 +1,7 @@
 <?php
-/// <summary>
-/// An associative array of information about this application.
-/// </summary>
+/**
+ * An associative array of information about this application.
+ */
 $ApplicationInfo['Conversations'] = array(
    'Description' => "Conversations allows users to take part in private conversations.",
    'Version' => '1.0',

@@ -10,10 +10,11 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 class ConversationsController extends Gdn_Controller {
    
-   /// <summary>
-   /// Returns an array of pages that contain settings information for this
-   /// application.
-   /// </summary>
+   /**
+    * Returns an array of pages that contain settings information for this application.
+    *
+    * @return array
+    */
    public function GetSettingsPages(&$Menu) {
       // There are no configuration pages for Conversations
    }

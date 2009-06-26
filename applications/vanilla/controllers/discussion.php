@@ -77,6 +77,7 @@ class DiscussionController extends VanillaController {
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
+      $this->Form->AddHidden('DraftID', '');
       $this->Form->Action = Url('/vanilla/post/comment/');
       
       // Deliver json data if necessary

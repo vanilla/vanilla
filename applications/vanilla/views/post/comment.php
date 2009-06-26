@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$NewOrDraft = !isset($this->Comment) || $this->Comment->Draft == '1' ? TRUE : FALSE;
+$NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? TRUE : FALSE;
 $Editing = isset($this->Comment);
 ?>
 <div id="CommentForm">

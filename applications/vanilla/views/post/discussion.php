@@ -30,7 +30,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
          $Options .= '<li>'.$this->Form->CheckBox('Announce', 'Announce this discussion', array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
-         $Options .= '<li>'.$this->Form->CheckBox('Close', 'Close this discussion', array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Closed', 'Close this discussion', array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
          $Options .= '<li>'.$this->Form->CheckBox('Sink', 'Sink this discussion', array('value' => '1')).'</li>';
@@ -39,7 +39,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
          echo '<ul class="PostOptions">' . $Options .'</ul>';
 
       echo $this->Form->Button('Post Discussion');
-      if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || $this->Discussion->Draft == '1') {
+      if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
          echo $this->Form->Button('Save Draft');
       }
       echo $this->Form->Button('Preview');

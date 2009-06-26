@@ -6,7 +6,7 @@ if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0) {
    <h4><?php echo Gdn::Translate('My Drafts'); ?></h4>
    <ul class="PanelDiscussions">
       <?php foreach ($this->_DraftData->Result() as $Draft) {
-         $EditUrl = $Draft->FirstCommentID == $Draft->CommentID ? '/post/editdiscussion/'.$Draft->DiscussionID : '/post/editcomment/'.$Draft->CommentID;
+         $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;
       ?>
       <li>
          <ul>

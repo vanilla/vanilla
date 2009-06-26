@@ -83,7 +83,6 @@ $Construct->Table('Discussion')
    ->Column('LastCommentID', 'int', 11, TRUE, NULL, 'key')
    ->Column('Name', 'varchar', 100)
    ->Column('CountComments', 'int', 4, FALSE, '1')
-   ->Column('Draft', array('1', '0'), '', FALSE, '1')
    ->Column('Closed', array('1', '0'), '', FALSE, '0')
    ->Column('Announce', array('1', '0'), '', FALSE, '0')
    ->Column('Sink', array('1', '0'), '', FALSE, '0')
@@ -112,7 +111,6 @@ $Construct->Table('Comment')
    ->Column('DeleteUserID', 'int', 10, TRUE)
    ->Column('Body', 'text')
    ->Column('Format', 'varchar', 20, TRUE)
-   ->Column('Draft', array('1', '0'), '', FALSE, '1')
    ->Column('DateInserted', 'datetime')
    ->Column('DateDeleted', 'datetime', '', TRUE)
    ->Column('DateUpdated', 'datetime', '', TRUE)
@@ -133,7 +131,22 @@ $Construct->Table('User')
    ->Column('CountDrafts', 'int', 11, FALSE, '0')
    ->Column('CountBookmarks', 'int', 11, FALSE, '0')
    ->Set();
-   
+
+$Construct->Table('Draft')
+   ->Column('DraftID', 'int', 11, FALSE, NULL, 'primary', TRUE)
+   ->Column('DiscussionID', 'int', 11, TRUE, NULL, 'key')
+   ->Column('CategoryID', 'int', 4, TRUE, NULL, 'key')
+   ->Column('InsertUserID', 'int', 10, FALSE, NULL, 'key')
+   ->Column('UpdateUserID', 'int', 10, FALSE, NULL)
+   ->Column('Name', 'varchar', 100, TRUE)
+   ->Column('Closed', array('1', '0'), '', FALSE, '0')
+   ->Column('Announce', array('1', '0'), '', FALSE, '0')
+   ->Column('Sink', array('1', '0'), '', FALSE, '0')
+   ->Column('Body', 'text')
+   ->Column('Format', 'varchar', 20, TRUE)
+   ->Column('DateInserted', 'datetime')
+   ->Column('DateUpdated', 'datetime', '', TRUE)
+   ->Set($Explicit, $Drop);
 
 // Insert some activity types
 ///  %1 = ActivityName
@@ -152,6 +165,14 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() 
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+
+// People mentioning others in discussion topics
+if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionMention'))->NumRows() == 0)
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionMention', 'FullHeadline' => '%1$s mentioned you in a %8$s.', 'ProfileHeadline' => '%1$s mentioned you in a %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+
+// People mentioning others in comments
+if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows() == 0)
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => '%1$s mentioned you in a %8$s.', 'ProfileHeadline' => '%1$s mentioned you in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
    
 // Add the search types for Vanilla.
 $Gdn_Search = Gdn::Factory('SearchModel');

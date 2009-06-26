@@ -37,6 +37,7 @@ jQuery(document).ready(function($) {
       var frm = $(btn).parents('form').get(0);
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
+      var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
       var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
       
@@ -73,6 +74,9 @@ jQuery(document).ready(function($) {
             // Assign the comment id to the form if it was defined
             if (commentID != null && commentID != '')
                $(inpCommentID).val(commentID);
+
+            if (json.DraftID != null && json.DraftID != '')
+               $(inpDraftID).val(json.DraftID);
                
             if (json.MyDrafts != null)
                $('ul#Menu li.MyDrafts a').html(json.MyDrafts);

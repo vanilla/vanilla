@@ -1131,8 +1131,7 @@ class Form {
     * @param string $ButtonCode The translation code of the button to check for.
     * @return boolean
     */
-   public function ButtonExists(
-      $ButtonCode) {
+   public function ButtonExists($ButtonCode) {
       $NameKey = $this->_EscapeString($ButtonCode);
       return array_key_exists($NameKey, $this->FormValues()) ? TRUE : FALSE;
    }
@@ -1247,11 +1246,12 @@ class Form {
          // retrieve it's values as arrays
          if ($Data instanceof DataSet) {
             $ResultSet = $Data->ResultArray();
-            if (count($ResultSet) > 0) $this->_DataArray = $ResultSet[0];
+            if (count($ResultSet) > 0)
+               $this->_DataArray = $ResultSet[0];
+               
          } else {
             // Otherwise assume it is an object representation of a data row.
-            $this->_DataArray = Format::ObjectAsArray(
-               $Data);
+            $this->_DataArray = Format::ObjectAsArray($Data);
          }
       } else if (is_array($Data)) {
          $this->_DataArray = $Data;

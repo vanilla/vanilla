@@ -67,8 +67,6 @@ class DiscussionModel extends VanillaModel {
       
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
-
-         $this->SQL->Where('d.Draft', '0');
       
       if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
          $this->SQL
@@ -104,7 +102,6 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Where($Wheres);
          
       return $this->SQL
-         ->Where('d.Draft', '0')
          ->Where('d.Announce', '1')
          ->Where('w.Dismissed is null')
          ->OrderBy('lc.DateInserted', 'desc')
@@ -161,8 +158,7 @@ class DiscussionModel extends VanillaModel {
 	         ->From('Discussion d')
             ->Join('Category c', 'd.CategoryID = c.CategoryID')
 	         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
-            ->Where($Wheres)
-            ->Where('d.Draft', '0');
+            ->Where($Wheres);
       }
       return $this->SQL
          ->Get()
@@ -170,40 +166,6 @@ class DiscussionModel extends VanillaModel {
          ->CountDiscussions;
    }
 
-   public function GetDrafts($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
-
-      if (!is_numeric($Limit) || $Limit < 1)
-         $Limit = 100;
-         
-      $this->DiscussionQuery();
-      $this->SQL
-         ->Select('c.CommentID, c.DateInserted, c.Body')
-         ->Select('d.Name, d.FirstCommentID, d.DiscussionID')
-         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID', 'inner')
-         ->Where('c.InsertUserID', $UserID)
-         ->Where('c.Draft', '1')
-         ->OrderBy('c.DateInserted', 'desc')
-         ->Limit($Limit, $Offset);
-         
-      if (is_numeric($DiscussionID) && $DiscussionID > 0)
-         $this->SQL->Where('c.DiscussionID', $DiscussionID);
-      
-      return $this->SQL->Get();
-   }
-   
-   public function GetDraftCount($UserID) {
-      return $this->SQL
-         ->Select('CommentID', 'count', 'CountDrafts')
-         ->From('Comment')
-         ->Where('Draft', '1')
-         ->Where('InsertUserID', $UserID)
-         ->Get()
-         ->FirstRow()
-         ->CountDrafts;
-   }
-   
    public function GetID($DiscussionID) {
       $Session = Gdn::Session();
       return $this->SQL
@@ -324,16 +286,10 @@ class DiscussionModel extends VanillaModel {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
             $DiscussionID = intval(ArrayValue('DiscussionID', $Fields, 0));
             $Fields = RemoveKeyFromArray($Fields, 'DiscussionID'); // Remove the primary key from the fields for saving
-            $OldDiscussion = FALSE;
+            $Discussion = FALSE;
             if ($DiscussionID > 0) {
-               $OldDiscussion = $this->GetID($DiscussionID);
-               
-               // If switching from draft to post, update the dateinserted
-               if ($Fields['Draft'] == '0' && $OldDiscussion->Draft == '1')
-                  $Fields['DateInserted'] = Format::ToDateTime();
-               
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
-               
+            
                // Get the CommentID from the discussion table before saving
                $FormPostValues['CommentID'] = $this->SQL
                   ->Select('FirstCommentID')
@@ -343,8 +299,6 @@ class DiscussionModel extends VanillaModel {
                   ->FirstRow()
                   ->FirstCommentID;
                $CommentModel->Save($FormPostValues);
-               
-               
             } else {
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                // Assign the new DiscussionID to the comment before saving
@@ -355,17 +309,26 @@ class DiscussionModel extends VanillaModel {
                   array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID),
                   array($this->PrimaryKey => $DiscussionID)
                );
-            }
-            // If this was freshly posted (ie. inserted not as a draft, or
-            // updated from draft to non-draft) record the activity and update
-            // the discussion count:
-            $Draft = ArrayValue('Draft', $Fields) == '1' ? TRUE : FALSE;
-            
-            if (!$Draft && (!is_object($OldDiscussion) || $OldDiscussion->Draft == '1')) {
+               // Notify users of mentions
                $DiscussionName = ArrayValue('Name', $Fields, '');
-               $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
-               $this->UpdateDiscussionCount($DiscussionID);
+               $Usernames = GetMentions($DiscussionName);
+               $UserModel = Gdn::UserModel();
+               foreach ($Usernames as $Username) {
+                  $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
+                  if ($User && $User->UserID != $Session->UserID) {
+                     AddActivity(
+                        $User->UserID,
+                        'DiscussionMention',
+                        '',
+                        $Session->UserID,
+                        '/discussion/'.$DiscussionID.'/'.Format::Url($DiscussionName)
+                     );
+                  }
+               }
             }
+            $DiscussionName = ArrayValue('Name', $Fields, '');
+            $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
+            $this->UpdateDiscussionCount($DiscussionID);
          }
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
@@ -391,7 +354,6 @@ class DiscussionModel extends VanillaModel {
          ->Select('DiscussionID', 'count', 'CountDiscussions')
          ->From('Discussion')
          ->Where('InsertUserID', $UserID)
-         ->Where('Draft', '0')
          ->Get();
       
       // Save the count to the user table
@@ -416,7 +378,6 @@ class DiscussionModel extends VanillaModel {
          ->From('Discussion d')
          ->Join('Discussion d2', 'd.CategoryID = d2.CategoryID')
          ->Where('d.DiscussionID', $DiscussionID)
-         ->Where('d2.Draft', '0')
          ->GroupBy('d2.CategoryID')
          ->Get()
          ->FirstRow();

@@ -10,7 +10,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 class ProfileController extends GardenController {
    
-   public $Uses = array('Database', 'Form', 'Gdn_UserModel', 'Html');
+   public $Uses = array('Form', 'Gdn_UserModel', 'Html');
 
    public $User;
    public $AboutForm;
@@ -186,7 +186,8 @@ class ProfileController extends GardenController {
       $this->Permission('Garden.SignIn.Allow');
       $Session = Gdn::Session();
       // Drop notification count back to zero.
-      $this->Database
+      $SQL = Gdn::SQL();
+      $SQL
          ->Update('User')
          ->Set('CountNotifications', '0')
          ->Where('UserID', $Session->UserID)

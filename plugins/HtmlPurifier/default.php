@@ -49,7 +49,6 @@ class HTMLPurifierPlugin {
 	
 	/// METHODS ///
 	public function Format($Html) {
-		$Result = $this->_HtmlPurifier->purify($Html);
-		return $Result;
+		return $this->_HtmlPurifier->purify($Html);
 	}
 }

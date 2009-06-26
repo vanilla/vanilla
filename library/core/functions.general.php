@@ -631,6 +631,36 @@ if (!function_exists('RemoveQuoteSlashes')) {
 		return str_replace("\\\"", '"', $String);
 	}
 }
+
+if (!function_exists('GetMentions')) {
+   function GetMentions($String) {
+      $Mentions = array();
+      
+      // This one grabs mentions that start at the beginning of $String
+      preg_match(
+         '/^(@([\d\w_]{1,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 3)
+         $Mentions[] = $Matches[2];
+      
+      // This one handles all other mentions
+      preg_match_all(
+         '/([\s]+)(@([\d\w_]{3,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 4) {
+         for ($i = 0; $i < count($Matches[3]); ++$i) {
+            $Mentions[] = $Matches[3][$i];
+         }
+      }
+      return array_unique($Mentions);
+   }
+}
+
+// Needed this to fix a bug: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
 if (!function_exists('getallheaders')) {
    function getallheaders() {
       foreach($_SERVER as $name => $value)

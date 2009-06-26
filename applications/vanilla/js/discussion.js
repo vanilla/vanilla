@@ -131,6 +131,7 @@ jQuery(document).ready(function($) {
       var frm = $('#CommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
+      frm.find('input:hidden[name$=DraftID]').val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
       $(frm).trigger('clearCommentForm');

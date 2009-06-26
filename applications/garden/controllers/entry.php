@@ -61,7 +61,7 @@ class EntryController extends GardenController {
             } else if ($AuthenticatedUserID == 0) {
                $this->Form->AddError('ErrorCredentials');
             } else {
-               AddActivity($AuthenticatedUserID, 'SignIn');
+               // AddActivity($AuthenticatedUserID, 'SignIn');
                $this->FireEvent('Authenticated');
                $Route = $this->RedirectTo();
                if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

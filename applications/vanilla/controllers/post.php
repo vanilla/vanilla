@@ -47,6 +47,9 @@ class PostController extends VanillaController {
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
+         if ($DraftID == 0)
+            $DraftID = $this->Form->GetFormValue('DraftID', 0);
+            
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
@@ -68,7 +71,7 @@ class PostController extends VanillaController {
                   $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
                   if ($DiscussionID > 0 && $DraftID > 0)
-                     $this->DraftModel->Delete($DraftID);                  
+                     $this->DraftModel->Delete($DraftID);
                }
             }
          } else {
@@ -179,6 +182,9 @@ class PostController extends VanillaController {
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
+         if ($DraftID == 0)
+            $DraftID = $this->Form->GetFormValue('DraftID', 0);
+         
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $this->EventArguments['Draft'] = $Draft;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
@@ -228,8 +234,16 @@ class PostController extends VanillaController {
                $this->SetJson('CommentID', $CommentID);
                $this->SetJson('DraftID', $DraftID);
                
+               if ($Preview) {
+                  // If this was a preview click, create a comment shell with the values for this comment
+                  $this->Comment = new stdClass();
+                  $this->Comment->InsertName = $Session->User->Name;
+                  $this->Comment->InsertPhoto = $Session->User->Photo;
+                  $this->Comment->DateInserted = Format::Date();
+                  $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+                  $this->View = 'preview';
+               } elseif (!$Draft) {
                // If the comment was not a draft
-               if (!$Draft) {
                   // If adding a comment 
                   if ($Editing) {
                      // Just reload the comment in question
@@ -263,14 +277,6 @@ class PostController extends VanillaController {
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
-               } elseif ($Preview) {
-                  // If this was a preview click, create a comment shell with the values for this comment
-                  $this->Comment = new stdClass();
-                  $this->Comment->InsertName = $Session->User->Name;
-                  $this->Comment->InsertPhoto = $Session->User->Photo;
-                  $this->Comment->DateInserted = Format::Date();
-                  $this->Comment->Body = ArrayValue('Body', $FormValues, '');
-                  $this->View = 'preview';
                } else {
                   // If this was a draft save, notify the user about the save
                   $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());

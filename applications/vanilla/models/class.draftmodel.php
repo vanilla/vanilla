@@ -118,16 +118,17 @@ class DraftModel extends VanillaModel {
 
    public function Delete($DraftID) {
       // Get some information about this draft
-      $UserID = $this->SQL
+      $DraftUser = $this->SQL
          ->Select('InsertUserID')
          ->From('Draft')
          ->Where('DraftID', $DraftID)
          ->Get()
-         ->FirstRow()
-         ->InsertUserID;
+         ->FirstRow();
          
       $this->SQL->Delete('Draft', array('DraftID' => $DraftID));
-      $this->UpdateUser($UserID);
+      if (is_object($DraftUser))
+         $this->UpdateUser($DraftUser->InsertUserID);
+
       return TRUE;
    }
    

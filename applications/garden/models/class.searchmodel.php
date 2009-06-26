@@ -250,16 +250,6 @@ class Gdn_SearchModel extends Model {
 		return $Result;
 	}
 	
-	public static function StripAccents($String) {
-		$Fr = 'ÀÁÃÄÅÂÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáãäåâæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
-		$To = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr';
-		
-		$Result = strtr(utf8_decode($String), utf8_decode($Fr), $To);
-		$Result = utf8_decode($Result);
-		
-		return $Result;
-	}
-	
 	protected static function _TrimString($Key, &$Array, $Length) {
 		if(array_key_exists($Key, $Array)) {
 			$Value = trim(strip_tags($Array[$Key]));

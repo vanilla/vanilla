@@ -348,6 +348,55 @@ class Form {
       */
       return $Return . $this->GetCheckBoxGridGroup($LastGroup, $Group, $Rows, $Cols);
    }
+   
+   public function CheckBoxGridGroups($Data) {
+      $Result = '';
+      foreach($Data as $GroupName => $GroupData) {
+         $Result .= $this->CheckBoxGridGroup($GroupName, $GroupData) . "\n";
+      }
+      return $Result;
+   }
+   
+   public function CheckBoxGridGroup($GroupName, $Data) {
+      // Get the column and row info.
+      $Columns = $Data['_Columns'];
+      ksort($Columns);
+      $Rows = $Data['_Rows'];
+      ksort($Rows);
+      unset($Data['_Columns'], $Data['_Rows']);
+      
+      $Result = '<table class="CheckBoxGrid">';
+      // Append the header.
+      $Result .= '<thead><tr><th>'.Gdn::Translate($GroupName).'</th>';
+      $Alt = TRUE;
+      foreach($Columns as $ColumnName => $X) {
+         $Result .=
+            '<td'.($Alt ? ' class="Alt"' : '').'>'
+            . Gdn::Translate($ColumnName)
+            . '</td>';
+            
+         $Alt = !$Alt;
+      }
+      $Result . '</tr></thead>';
+      
+      // Append the rows.
+      $Result .= '<tbody>';
+      foreach($Rows as $RowName => $X) {
+         $Result .= '<tr><th>'.Gdn::Translate($RowName).'</td>';
+         // Append the columns within the rows.
+         $Alt = TRUE;
+         foreach($Columns as $ColumnName => $Y) {
+            $Result .=
+               '<td'.($Alt ? ' class="Alt"' : '').'>'
+               . '</td>';
+               
+            $Alt = !$Alt;
+         }
+         $Result .= '</tr>';
+      }
+      $Result .= '</tbody></table>';
+      return $Result;
+   }
 
    /**
     * Returns a checkbox table.

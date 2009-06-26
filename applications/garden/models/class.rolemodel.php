@@ -119,27 +119,26 @@ class Gdn_RoleModel extends Model {
    }
    
    public function GetPermissions($RoleID) {
-      return $this->SQL->Select('rp.PermissionID')
-         ->From('RolePermission rp')
-         ->Join('Permission p', 'p.PermissionID = rp.PermissionID')
-         ->Where('rp.RoleID', $RoleID)
-         ->Where('p.JunctionTable is null')
-         ->Get();
+      $PermissionModel = Gdn::PermissionModel();
+      $LimitToSuffix = $this->CanSession == '1' ? '' : 'View';
+      
+      $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
+      return $Result;      
    }
    
-   public function GetJunctionPermissionsForRole($RoleID) {
-      $Data = $this->SQL->Select('JunctionID, PermissionID')
-         ->From('RolePermission')
-         ->Where('RoleID', $RoleID)
-         ->Where('JunctionID >', 0)
-         ->Get();
-         
-      $JunctionPermissions = array();         
-      foreach ($Data->Result() as $JP) {
-         $JunctionPermissions[] = $JP->JunctionID . '-' . $JP->PermissionID;
-      }
-      return $JunctionPermissions;
-   }
+   //public function GetJunctionPermissionsForRole($RoleID) {
+   //   $Data = $this->SQL->Select('JunctionID, PermissionID')
+   //      ->From('RolePermission')
+   //      ->Where('RoleID', $RoleID)
+   //      ->Where('JunctionID >', 0)
+   //      ->Get();
+   //      
+   //   $JunctionPermissions = array();         
+   //   foreach ($Data->Result() as $JP) {
+   //      $JunctionPermissions[] = $JP->JunctionID . '-' . $JP->PermissionID;
+   //   }
+   //   return $JunctionPermissions;
+   //}
    
    /// <summary>
    /// Returns the number of users assigned to the provided RoleID. If

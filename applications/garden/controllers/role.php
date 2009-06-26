@@ -78,16 +78,15 @@ class RoleController extends GardenController {
       
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
       
-      // Load all non-junction permissions based on enabled applications and plugins
-      $this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
+      // Load all permissions based on enabled applications and plugins
+      //$this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
 
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.
-         if ($RoleID > 0 // && $this->EditablePermissions
-             ) {
-            $this->RolePermissionData = $this->RoleModel->GetPermissions($RoleID);
-            $this->RoleJunctionPermissionData = $this->RoleModel->GetJunctionPermissionsForRole($RoleID);
+         if ($RoleID > 0) { // && $this->EditablePermissions
+            $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
+            //$this->RoleJunctionPermissionData = $this->RoleModel->GetJunctionPermissionsForRole($RoleID);
          }
             
          $this->Form->SetData($this->Role);

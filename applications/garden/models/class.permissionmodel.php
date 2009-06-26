@@ -141,8 +141,14 @@ class Gdn_PermissionModel extends Model {
       $Result[] = $GlobalPermissions;
       
       $JunctionPermissions = $this->GetJunctionPermissions($RoleID, NULL, $LimitToSuffix);
-      $Result = array_merge(array(), $JunctionPermissions);
+      $Result = array_merge($Result, $JunctionPermissions);
       
+      return $Result;
+   }
+   
+   public function GetPermissionsEdit($RoleID, $LimitToSuffix = '') {
+      $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix);
+      return $this->UnpivotPermissions($Permissions);
    }
    
    public function GetGlobalPermissions($RoleID, $LimitToSuffix = '') {
@@ -381,7 +387,7 @@ class Gdn_PermissionModel extends Model {
       $j = strrpos($PermissionName, '.');
       
       if($i !== FALSE) { // $j must also not be false
-         return array(substr($PermissionName, 0, $i), substr($PermissionName, $i + 1, $j - $i), substr($PermissionName, $j + 1));
+         return array(substr($PermissionName, 0, $i), substr($PermissionName, $i + 1, $j - $i - 1), substr($PermissionName, $j + 1));
       } else {
          return array($PermissionName, '', '');
       }
@@ -408,12 +414,12 @@ class Gdn_PermissionModel extends Model {
             
          // Check to see if the namespace is in the result.
          if(!array_key_exists($Namespace, $Result))
-            $Result[$Namespace] = array('Columns' => array(), 'Rows' => array());
+            $Result[$Namespace] = array('_Columns' => array(), '_Rows' => array());
          $NamespaceArray = &$Result[$Namespace];
          
          // Add the names to the columns and rows.
-         $NamespaceArray['Columns'][$Suffix] = TRUE;
-         $NamespaceArray['Rows'][$Name] = TRUE;
+         $NamespaceArray['_Columns'][$Suffix] = TRUE;
+         $NamespaceArray['_Rows'][$Name] = TRUE;
          
          // Augment the value depending on the junction ID.
          if(array_key_exists('JunctionTable', $Row) && ($JunctionTable = $Row['JunctionTable'])) {
@@ -422,7 +428,7 @@ class Gdn_PermissionModel extends Model {
             $PostName = 'Permission'.($InclueRoleID ? '-'.$Row['RoleID'] : '');
          }
          
-         $NamespaceArray[] = array('Column' => $Suffix, 'Row' => $Row, 'Value' => $Value, 'PostName' => $PostName, 'PostValue' => $PermissionName);
+         $NamespaceArray[$Name.'.'.$Suffix] = array('Value' => $Value, 'PostName' => $PostName, 'PostValue' => $PermissionName);
       }
    }
 }

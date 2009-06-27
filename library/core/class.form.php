@@ -349,15 +349,15 @@ class Form {
       return $Return . $this->GetCheckBoxGridGroup($LastGroup, $Group, $Rows, $Cols);
    }
    
-   public function CheckBoxGridGroups($Data) {
+   public function CheckBoxGridGroups($Data, $FieldName) {
       $Result = '';
       foreach($Data as $GroupName => $GroupData) {
-         $Result .= $this->CheckBoxGridGroup($GroupName, $GroupData) . "\n";
+         $Result .= $this->CheckBoxGridGroup($GroupName, $GroupData, $FieldName) . "\n";
       }
       return $Result;
    }
    
-   public function CheckBoxGridGroup($GroupName, $Data) {
+   public function CheckBoxGridGroup($GroupName, $Data, $FieldName) {
       // Get the column and row info.
       $Columns = $Data['_Columns'];
       ksort($Columns);
@@ -386,9 +386,19 @@ class Form {
          // Append the columns within the rows.
          $Alt = TRUE;
          foreach($Columns as $ColumnName => $Y) {
-            $Result .=
-               '<td'.($Alt ? ' class="Alt"' : '').'>'
-               . '</td>';
+            $Result .= '<td'.($Alt ? ' class="Alt"' : '').'>';
+            // Check to see if there is a row corresponding to this area.
+            if(array_key_exists($RowName.'.'.$ColumnName, $Data)) {
+               $CheckBox = $Data[$RowName.'.'.$ColumnName];
+               $Attributes = array('value' => $CheckBox['PostValue']);
+               if($CheckBox['Value'])
+                  $Attributes['checked'] = 'checked';
+                  
+               $Result .= $this->CheckBox($FieldName.'[]', '', $Attributes);
+            } else {
+               $Result .= ' ';
+            }        
+            $Result .= '</td>';
                
             $Alt = !$Alt;
          }

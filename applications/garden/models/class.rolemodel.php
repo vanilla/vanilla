@@ -206,11 +206,9 @@ class Gdn_RoleModel extends Model {
       
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
-         $this->Validation->AddValidationField('PermissionID', $FormPostValues);
-         $this->Validation->AddValidationField('JunctionPermissionID', $FormPostValues);
+         $this->Validation->AddValidationField('Permission', $FormPostValues);
          $Fields = $this->Validation->ValidationFields();
-         $PermissionIDs = ArrayValue('PermissionID', $Fields);
-         $JunctionPermissionIDs = ArrayValue('JunctionPermissionID', $Fields);
+         $Permissions = ArrayValue('Permission', $Fields);
          $Fields = $this->Validation->SchemaValidationFields();
          $Fields = RemoveKeyFromArray($Fields, 'RoleID');
 
@@ -222,7 +220,11 @@ class Gdn_RoleModel extends Model {
          }
          // Now update the role permissions
          $Role = $this->GetByRoleID($RoleID);
-         // if ($Role->EditablePermissions)
+         
+         $PermissionModel = Gdn::PermissionModel();
+         $Permissions = $PermissionModel->UnpivotPermissions($Permissions, $RoleID);
+         $PermissionModel->SaveAll($Permissions);
+         
          $this->SavePermissions($RoleID, $PermissionIDs, $JunctionPermissionIDs);
       } else {
          $RoleID = FALSE;

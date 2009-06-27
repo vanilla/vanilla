@@ -33,7 +33,7 @@ echo $this->Form->Errors();
       <li>
          <?php
             echo '<strong>'.Gdn::Translate('Check all permissions that apply to this role:').'</strong>';
-            echo $this->Form->CheckBoxGridGroups($this->PermissionData);
+            echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
          ?>
       </li>
    <?php

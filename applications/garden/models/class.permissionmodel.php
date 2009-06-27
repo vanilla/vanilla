@@ -239,6 +239,49 @@ class Gdn_PermissionModel extends Model {
       return '';
    }
    
+   public function PivotPermissions($Data, $RoleID = NULL) {
+      // Get all of the columns in the permissions table.
+      $Schema = $this->SQL->Get('Permisson', '', '', 1)->FirstRow();
+      foreach($Schema as $Key => $Value) {
+         if(strpos($Key, '.') !== FALSE)
+            $Schema[$Key] = 0;
+      }
+      
+      $Result = array();
+      foreach($Data as $SetPermission) {
+         // Get the parts out of the permission.
+         $Parts = explode('/', $SetPermission);
+         if(count($Parts) > 1) {
+            // This is a junction permission.
+            $PermissionName = $Parts[1];
+            $Key = $Parts[0];
+            $Parts = explode('-', $Key);
+            $JunctionTable = $Parts[0];
+            $JunctionID = $Parts[1];
+            if(count($Parts) >= 3)
+               $RoleID = $Parts[2];
+         } else {
+            // This is a global permission.
+            $PermissionName = $Parts[0];
+            $Key = 'Global';
+            $JunctionTable = NULL;
+            $JunctionID = NULL;
+         }
+         
+         // Check for a row in the result for these permissions.
+         if(!array_key_exists($Key, $Result)) {
+            $NewRow = $Schema;
+            $NewRow['RoleID'] = $RoleID;
+            $NewRow['JunctionTable'] = $JunctionTable;
+            $NewRow['JunctionID'] = $JunctionID;
+            $Result[$Key] = $NewRow;
+         }
+         $Result[$Key][$PermissionName] = 1;
+      }
+      
+      return $Result;
+   }
+   
    /**
     * Returns all rows from the specified JunctionTable/Column combination. This
     * method assumes that $JuntionTable has a "Name" column.
@@ -332,7 +375,8 @@ class Gdn_PermissionModel extends Model {
             $Where['JunctionTable'] = $Values['JunctionTable'];
 
             // If the junction table was given then so must the other values.
-            $Where['JunctionColumn'] = $Values['JunctionColumn'];
+            if(array_key_exists('JunctionColumn', $Values))
+               $Where['JunctionColumn'] = $Values['JunctionColumn'];
             $Where['JunctionID'] = $Values['JunctionID'];
             
             unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
@@ -346,34 +390,12 @@ class Gdn_PermissionModel extends Model {
       }
    }
    
-   /**
-    * Saves Permissions for the specified JunctionID.
-    *
-    * @param array $FormPostValues The values posted in a form. This should contain an array 'RolePermissionID' checkbox values.
-    * @param int $JunctionID The JunctionID to associate the form-posted permissions with.
-    */
-   public function SaveJunctionPermissions($FormPostValues, $JunctionID) {
-      // Remove old permissions for this JunctionID
-      $this->SQL->Delete('RolePermission', array('JunctionID' => $JunctionID));
-
-      $RolePermissionIDs = ArrayValue('RolePermissionID', $FormPostValues);
-      if (is_array($RolePermissionIDs)) {
-         $Count = count($RolePermissionIDs);
-         for ($i = 0; $i < $Count; $i++) {
-            $Parts = explode('-', $RolePermissionIDs[$i]);
-            if (count($Parts) == 2) {
-               $PermissionID = array_pop($Parts);
-               $RoleID = $Parts[0];
-               // Insert new ones
-               $this->SQL->Insert('RolePermission', array('RoleID' => $RoleID, 'PermissionID' => $PermissionID, 'JunctionID' => $JunctionID));
-            }
-         }
+   public function SaveAll($Permissions) {
+      foreach($Permissions as $Row) {
+         $this->Save($Row);
       }
       
-      // Remove the cached permissions for all users.
-      $this->SQL->Update('User')
-         ->Set('Permissions', '')
-         ->Put();        
+      // TODO: Clear the permissions for rows that aren't here.
    }
    
    /**
@@ -401,7 +423,7 @@ class Gdn_PermissionModel extends Model {
       return $Result;
    }
    
-   protected function _UnpivotPermissionsRow($Row, &$Result, $InclueRoleID = FALSE) {
+   protected function _UnpivotPermissionsRow($Row, &$Result, $JunctionIDName = 'JunctionID') {
       $GlobalName = ArrayValue('Name', $Row);
       
       // Loop through each permission in the row and place them in the correct place in the grid.
@@ -423,12 +445,12 @@ class Gdn_PermissionModel extends Model {
          
          // Augment the value depending on the junction ID.
          if(array_key_exists('JunctionTable', $Row) && ($JunctionTable = $Row['JunctionTable'])) {
-            $PostName = $JunctionTable.'-'.$Row['JunctionID'].($InclueRoleID ? '-'.$Row['RoleID'] : '');
+            $PostValue = $JunctionTable.'-'.$Row[$JunctionIDName].'/'.$PermissionName;
          } else {
-            $PostName = 'Permission'.($InclueRoleID ? '-'.$Row['RoleID'] : '');
+            $PostValue = $PermissionName;
          }
          
-         $NamespaceArray[$Name.'.'.$Suffix] = array('Value' => $Value, 'PostName' => $PostName, 'PostValue' => $PermissionName);
+         $NamespaceArray[$Name.'.'.$Suffix] = array('Value' => $Value, 'PostValue' => $PostValue);
       }
    }
 }

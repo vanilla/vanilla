@@ -8,48 +8,45 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Core
-/// </namespace>
+/**
+ * Lussumo.Garden.Core
+ */
 
-/// <summary>
-/// Manages defining and examining the schema of a database table.
-/// </summary>
+/**
+ * Manages defining and examining the schema of a database table.
+ */
 class Gdn_Schema {
    
-   /// <prop type="array">
-   /// An associative array of TableName => Fields associative arrays that
-   /// describe the table's field properties. Each field is represented by an
-   /// object with the following properties: 
-   ///  Name, PrimaryKey, Type, AllowNull, Default, Length, Enum
-   /// </prop>
+   /**
+    * An associative array of TableName => Fields associative arrays that
+    * describe the table's field properties. Each field is represented by an
+    * object with the following properties:
+    *  Name, PrimaryKey, Type, AllowNull, Default, Length, Enum
+    */
    protected $_Schema;
    
-   /// <prop type="string">
-   /// The name of the table currently being examined.
-   /// </prop>
+   /**
+    * The name of the table currently being examined.
+    */
    public $CurrentTable;
    
-   /// <summary>
-   /// Class constructor. Defines the related database table name.
-   /// </summary>
-   /// <param name="TableName" type="string" required="false" default="get_class($this)">
-   /// An optional parameter that allows you to explicitly define the name of
-   /// the table that this model represents. You can also explicitly set this
-   /// value with $this->TableName.
-   /// </param>
+   /**
+    * Class constructor. Defines the related database table name.
+    *
+    * @param string Explicitly define the name of the table that this model represents. You can also explicitly set this value with $this->TableName.
+    */
    public function __construct($Table = '') {
       if ($Table != '')
          $this->Fetch($Table);
    }
    
-   /// <summary>
-   /// Fetches the schema for the requested table. If it does not exist yet, it
-   /// will connect to the database and define it.
-   /// </summary>
-   /// <param name="Table" type="string" required="false" default="FALSE">
-   /// The name of the table schema to fetch from the database (or cache?).
-   /// </param>   
+   /**
+    * Fetches the schema for the requested table. If it does not exist yet, it
+    * will connect to the database and define it.
+    *
+    * @param string The name of the table schema to fetch from the database (or cache?).
+    * @return array
+    */
    public function Fetch($Table = FALSE) {
       if ($Table !== FALSE)
          $this->CurrentTable = $Table;
@@ -64,17 +61,12 @@ class Gdn_Schema {
       return $this->_Schema[$this->CurrentTable];
    }
    
-   /// <summary>
-   /// Returns a the entire field object.
-   /// </summary>
-   /// <param name="Field" type="string">
-   /// The name of the field to look for in $this->CurrentTable (or $Table if it
-   /// is defined).
-   /// </param>
-   /// <param name="Table" type="string" required="false" default="$this->CurrentTable">
-   /// If this value is specified, $this->CurrentTable will be switched to
-   /// $Table.
-   /// </param>
+   /**
+    * Returns a the entire field object.
+    *
+    * @param string The name of the field to look for in $this->CurrentTable (or $Table if it is defined).
+    * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
+    */
    public function GetField($Field, $Table = '') {
       if ($Table != '')
          $this->CurrentTable = $Table;
@@ -89,25 +81,14 @@ class Gdn_Schema {
       return $Field;
    }
    
-   /// <summary>
-   /// Returns a the value of $Property or $Default if not found.
-   /// </summary>
-   /// <param name="Field" type="string">
-   /// The name of the field to look for in $this->CurrentTable (or $Table if it
-   /// is defined).
-   /// </param>
-   /// <param name="Property" type="string">
-   /// The name of the property to retrieve from $Field. Options are: Name,
-   /// PrimaryKey, Type, AllowNull, Default, Length, and Enum.
-   /// </param>
-   /// <param name="Default" type="string" required="false" default="FALSE">
-   /// The default value to return if $Property is not found in $Field of
-   /// $Table.
-   /// </param>
-   /// <param name="Table" type="string" required="false" default="$this->CurrentTable">
-   /// If this value is specified, $this->CurrentTable will be switched to
-   /// $Table.
-   /// </param>
+   /**
+    * Returns a the value of $Property or $Default if not found.
+    *
+    * @param string The name of the field to look for in $this->CurrentTable (or $Table if it is defined).
+    * @param string The name of the property to retrieve from $Field. Options are: Name, PrimaryKey, Type, AllowNull, Default, Length, and Enum.
+    * @param string The default value to return if $Property is not found in $Field of $Table.
+    * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
+    */
    public function GetProperty($Field, $Property, $Default = FALSE, $Table = '') {
       $Return = $Default;
       if ($Table != '')
@@ -123,16 +104,13 @@ class Gdn_Schema {
       return $Return;
    }
    
-   /// <summary>
-   /// Returns a boolean value indicating if the specified $Field exists in
-   /// $Table. Assumes that $this->Fetch() has been called for $Table.
-   /// </summary>
-   /// <param name="Table" type="string">
-   /// The name of the table to look for $Field in.
-   /// </param>
-   /// <param name="Field" type="string">
-   /// The name of the field to look for in $Table.
-   /// </param>
+   /**
+    * Returns a boolean value indicating if the specified $Field exists in
+    * $Table. Assumes that $this->Fetch() has been called for $Table.
+    *
+    * @param string The name of the table to look for $Field in.
+    * @param string The name of the field to look for in $Table.
+    */
    public function FieldExists($Table, $Field) {
       if (array_key_exists($Table, $this->_Schema)
          && is_array($this->_Schema[$Table])
@@ -143,13 +121,12 @@ class Gdn_Schema {
          return FALSE;
    }
    
-   /// <summary>
-   /// Returns the name (or array of names) of the field(s) that represents the
-   /// primary key on $Table.
-   /// </summary>
-   /// <param name="Table" type="string">
-   /// The name of the table for which to find the primary key(s).
-   /// </param>
+   /**
+    * Returns the name (or array of names) of the field(s) that represents the
+    * primary key on $Table.
+    *
+    * @param string The name of the table for which to find the primary key(s).
+    */
    public function PrimaryKey($Table) {
       $Schema = $this->Fetch($Table);
       $PrimaryKeys = array();

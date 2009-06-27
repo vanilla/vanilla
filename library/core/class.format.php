@@ -289,20 +289,12 @@ class Format {
    }
 
 
-   /// <summary>
-   /// Takes a string and formats it so that it can be saved to a PHP file in
-   /// double-quotes of an array value assignment. For example, from garden/library/core/class.locale.php:
-   ///  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->ArrayValueForPhp($LocaleSources[$i])."';";
-   /// </summary>
-   /// <param name="String" type="string">
-   /// The string to be formatted.
-   /// </param>
    /**
     * Takes a string and formats it so that it can be saved to a PHP file in
     * double-quotes of an array value assignment. For example, from garden/library/core/class.locale.php:
     *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->ArrayValueForPhp($LocaleSources[$i])."';";
     *
-    * @param string $String The string to be formatted.
+    * @param string The string to be formatted.
     * @return string
     */
    public static function ArrayValueForPhp($String) {

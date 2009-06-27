@@ -9,26 +9,16 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 
-/// <summary>
-/// A custom error handler that displays much more, very useful information when
-/// errors are encountered in Garden.
-/// </summary>
-/// <param name="ErrorNumber" type="int">
-/// The level of the error raised.
-/// </param>
-/// <param name="Message" type="string">
-/// The error message.
-/// </param>
-/// <param name="File" type="string">
-/// The filename that the error was raised in.
-/// </param>
-/// <param name="Line" type="string">
-/// The line number the error was raised at.
-/// </param>
-/// <param name="Arguments" type="string">
-/// An array that of every variable that existed in the scope the error was
-/// triggered in.
-/// </param>
+/**
+ * A custom error handler that displays much more, very useful information when
+ * errors are encountered in Garden.
+ *
+ * @param int The level of the error raised.
+ * @param string The error message.
+ * @param string The filename that the error was raised in.
+ * @param string The line number the error was raised at.
+ * @param string An array of every variable that existed in the scope the error was triggered in.
+ */
 function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that have a @ before them (ie. @function();)
    if (error_reporting() == 0)
@@ -222,52 +212,34 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
 }
 
 if (!function_exists('ErrorMessage')) {
-   /// <summary>
-   /// Returns an error message formatted in a way that the custom ErrorHandler
-   /// function can understand (allows a little more information to be displayed
-   /// on errors).
-   /// </summary>
-   /// <param name="Message" type="string">
-   /// The actual error message.
-   /// </param>
-   /// <param name="SenderObject" type="string">
-   /// The name of the object that encountered the error.
-   /// </param>
-   /// <param name="SenderMethod" type="string">
-   /// The name of the method that encountered the error.
-   /// </param>
-   /// <param name="Code" type="string" required="false" default="blank">
-   /// Any additional information that could be useful to debuggers.
-   /// </param>
+   /**
+    * Returns an error message formatted in a way that the custom ErrorHandler
+    * function can understand (allows a little more information to be displayed
+    * on errors).
+    *
+    * @param string The actual error message.
+    * @param string The name of the object that encountered the error.
+    * @param string The name of the method that encountered the error.
+    * @param string Any additional information that could be useful to debuggers.
+    */
    function ErrorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
       return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
    }
 }
 
 if (!function_exists('LogMessage')) {
-   /// <summary>
-   /// Logs errors to a file. This function does not throw errors because it is
-   /// a last-ditch effort after errors have already
-   /// been rendered.
-   /// </summary>
-   /// <param name="File" type="string">
-   /// The file to save the error log in.
-   /// </param>
-   /// <param name="Line" type="int">
-   /// The line number that encountered the error.
-   /// </param>
-   /// <param name="Object" type="string">
-   /// The name of the object that encountered the error.
-   /// </param>
-   /// <param name="Method" type="string">
-   /// The name of the method that encountered the error.
-   /// </param>
-   /// <param name="Message" type="string">
-   /// The error message.
-   /// </param>
-   /// <param name="Code" type="string" required="false" default="blank">
-   /// Any additional information that could be useful to debuggers.
-   /// </param>
+   /**
+    * Logs errors to a file. This function does not throw errors because it is
+    * a last-ditch effort after errors have already
+    * been rendered.
+    *
+    * @param string The file to save the error log in.
+    * @param int The line number that encountered the error.
+    * @param string The name of the object that encountered the error.
+    * @param string The name of the method that encountered the error.
+    * @param string The error message.
+    * @param string Any additional information that could be useful to debuggers.
+    */
    function LogMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
       // Figure out where to save the log
       if(class_exists('Gdn', FALSE)) {

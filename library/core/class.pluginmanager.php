@@ -8,58 +8,60 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Core
-/// </namespace>
+/**
+ * Lussumo.Garden.Core
+ */
 
-/// <summary>
-/// A singleton class used to identify extensions, register them in a central
-/// location, and instantiate/call them when necessary.
-/// </summary>
+/**
+ * A singleton class used to identify extensions, register them in a central
+ * location, and instantiate/call them when necessary.
+ */
 class Gdn_PluginManager {
-   /// <prop type="array">
-   /// An associative array of arrays containing information about each
-   /// enabled plugin. This value is assigned in the garden bootstrap.php.
-   /// </prop>
+   /**
+    * An associative array of arrays containing information about each
+    * enabled plugin. This value is assigned in the garden bootstrap.php.
+    */
    public $EnabledPlugins = array();
 
-   /// <prop type="array">
-   /// An associative array of EventHandlerName => PluginName pairs.
-   /// </prop>
+   /**
+    * An associative array of EventHandlerName => PluginName pairs.
+    */
    private $_EventHandlerCollection = array();
 
-   /// <prop type="array">
-   /// An associative array of MethodOverrideName => PluginName pairs.
-   /// </prop>
+   /**
+    * An associative array of MethodOverrideName => PluginName pairs.
+    */
    private $_MethodOverrideCollection = array();
    
-   /// <prop type="array">
-   /// An associative array of NewMethodName => PluginName pairs.
-   /// </prop>
+   /**
+    * An associative array of NewMethodName => PluginName pairs.
+    */
    private $_NewMethodCollection = array();
    
-   /// <prop type="array">
-   /// An array of available plugins. Never access this directly, instead use
-   /// $this->AvailablePlugins();
-   /// </prop>
+   /**
+    * An array of available plugins. Never access this directly, instead use
+    * $this->AvailablePlugins();
+    */
    private $_AvailablePlugins = NULL;
    
-   /// <summary>
-   /// Examines all declared classes, identifying which ones implement
-   /// Gdn_IPlugin and registers all of their event handlers and method
-   /// overrides. It recognizes them because Handlers end with _Handler,
-   /// _Before, and _After and overrides end with "_Override". They are prefixed
-   /// with the name of the class and method (or event) to be handled or
-   /// overridden. For example:
-   ///  class MyPlugin implements Gdn_IPlugin {
-   ///   public function MyController_SignIn_After($Sender) {
-   ///      // Do something neato
-   ///   }
-   ///   public function Url_AppRoot_Override($WithDomain) {
-   ///      return "MyCustomAppRoot!";
-   ///   }
-   ///  }
-   /// </summary>
+   /**
+    * Register all enabled plugins
+    *
+    * Examines all declared classes, identifying which ones implement
+    * Gdn_IPlugin and registers all of their event handlers and method
+    * overrides. It recognizes them because Handlers end with _Handler,
+    * _Before, and _After and overrides end with "_Override". They are prefixed
+    * with the name of the class and method (or event) to be handled or
+    * overridden. For example:
+    *  class MyPlugin implements Gdn_IPlugin {
+    *   public function MyController_SignIn_After($Sender) {
+    *      // Do something neato
+    *   }
+    *   public function Url_AppRoot_Override($WithDomain) {
+    *      return "MyCustomAppRoot!";
+    *   }
+    *  }
+    */
    public function RegisterPlugins() {
       // Loop through all declared classes looking for ones that implement iPlugin.
       // print_r(get_declared_classes());
@@ -101,22 +103,20 @@ class Gdn_PluginManager {
       }
    }
    
-   /// <summary>
-   /// Looks through $this->_EventHandlerCollection for matching event
-   /// signatures to handle. If it finds any, it executes them in the order it
-   /// found them. It instantiates any plugins and adds them as properties to
-   /// this class (unless they were previously instantiated), and then calls
-   /// the handler in question.
-   /// </summary>
-   /// <param name="Sender" type="object">
-   /// The object that fired the event being handled.
-   /// </param>
-   /// <param name="ClassName" type="string">
-   /// The name of the class that fired the event being handled.
-   /// </param>
-   /// <param name="EventName" type="string">
-   /// The name of the event being fired.
-   /// </param>
+   /**
+    * Transfer control to the plugins
+    *
+    * Looks through $this->_EventHandlerCollection for matching event
+    * signatures to handle. If it finds any, it executes them in the order it
+    * found them. It instantiates any plugins and adds them as properties to
+    * this class (unless they were previously instantiated), and then calls
+    * the handler in question.
+    *
+    * @param object The object that fired the event being handled.
+    * @param string The name of the class that fired the event being handled.
+    * @param string The name of the event being fired.
+    * @return bool True if an event was executed.
+    */
    public function CallEventHandlers(&$Sender, $ClassName, $EventName, $HandlerType = 'Handler') {
       $Return = FALSE;
       
@@ -146,21 +146,17 @@ class Gdn_PluginManager {
       return $Return;
    }
    
-   /// <summary>
-   /// Looks through $this->_MethodOverrideCollection for a matching method
-   /// signature to override. It instantiates any plugins and adds them as
-   /// properties to this class (unless they were previously instantiated), then
-   /// calls the method in question.
-   /// </summary>
-   /// <param name="Sender" type="object">
-   /// The object being worked on.
-   /// </param>
-   /// <param name="ClassName" type="string">
-   /// The name of the class that called the method being overridden.
-   /// </param>
-   /// <param name="MethodName" type="string">
-   /// The name of the method that is being overridden.
-   /// </param>
+   /**
+    * Looks through $this->_MethodOverrideCollection for a matching method
+    * signature to override. It instantiates any plugins and adds them as
+    * properties to this class (unless they were previously instantiated), then
+    * calls the method in question.
+    *
+    * @param object The object being worked on.
+    * @param string The name of the class that called the method being overridden.
+    * @param string The name of the method that is being overridden.
+    * @return mixed Return value of overridden method.
+    */
    public function CallMethodOverride(&$Sender, $ClassName, $MethodName) {
       $Return = FALSE;
       $OverrideMethodName = strtolower($ClassName.'_'.$MethodName.'_Override');
@@ -171,35 +167,29 @@ class Gdn_PluginManager {
       return $this->$PluginName->$OverrideMethodName($Sender, $Sender->EventArguments);
    }
    
-   /// <summary>
-   /// Checks to see if there are any plugins that override the method being
-   /// executed.
-   /// </summary>
-   /// <param name="ClassName" type="string">
-   /// The name of the class that called the method being overridden.
-   /// </param>
-   /// <param name="MethodName" type="string">
-   /// The name of the method that is being overridden.
-   /// </param>
+   /**
+    * Checks to see if there are any plugins that override the method being
+    * executed.
+    *
+    * @param string The name of the class that called the method being overridden.
+    * @param string The name of the method that is being overridden.
+    * @return bool True if an override exists.
+    */
    public function HasMethodOverride($ClassName, $MethodName) {
       return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Override'), $this->_MethodOverrideCollection) ? TRUE : FALSE;
    }
    
-   /// <summary>
-   /// Looks through $this->_NewMethodCollection for a matching method signature
-   /// to call. It instantiates any plugins and adds them as properties to this
-   /// class (unless they were previously instantiated), then calls the method
-   /// in question.
-   /// </summary>
-   /// <param name="Sender" type="object">
-   /// The object being worked on.
-   /// </param>
-   /// <param name="ClassName" type="string">
-   /// The name of the class that called the method being created.
-   /// </param>
-   /// <param name="MethodName" type="string">
-   /// The name of the method that is being created.
-   /// </param>
+   /**
+    * Looks through $this->_NewMethodCollection for a matching method signature
+    * to call. It instantiates any plugins and adds them as properties to this
+    * class (unless they were previously instantiated), then calls the method
+    * in question.
+    *
+    * @param object The object being worked on.
+    * @param string The name of the class that called the method being created.
+    * @param string The name of the method that is being created.
+    * @return mixed Return value of new method.
+    */
    public function CallNewMethod(&$Sender, $ClassName, $MethodName) {
       $Return = FALSE;
       $NewMethodName = strtolower($ClassName.'_'.$MethodName.'_Create');
@@ -210,26 +200,24 @@ class Gdn_PluginManager {
       return $this->$PluginName->$NewMethodName($Sender, $Sender->EventArguments);
    }
    
-   /// <summary>
-   /// Checks to see if there are any plugins that create the method being
-   /// executed.
-   /// </summary>
-   /// <param name="ClassName" type="string">
-   /// The name of the class that called the method being created.
-   /// </param>
-   /// <param name="MethodName" type="string">
-   /// The name of the method that is being created.
-   /// </param>
+   /**
+    * Checks to see if there are any plugins that create the method being
+    * executed.
+    *
+    * @param string The name of the class that called the method being created.
+    * @param string The name of the method that is being created.
+    * @return True if method exists.
+    */
    public function HasNewMethod($ClassName, $MethodName) {
       return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Create'), $this->_NewMethodCollection) ? TRUE : FALSE;
    }
    
-   /// <summary>
-   /// Looks through the plugins directory for valid plugins and returns them
-   /// as an associative array of "PluginName" => "Plugin Info Array". It also
-   /// adds "Folder", and "ClassName" definitions to the Plugin Info Array for
-   /// each plugin.
-   /// </summary>
+   /**
+    * Looks through the plugins directory for valid plugins and returns them
+    * as an associative array of "PluginName" => "Plugin Info Array". It also
+    * adds "Folder", and "ClassName" definitions to the Plugin Info Array for
+    * each plugin.
+    */
    public function AvailablePlugins() {
       if (!is_array($this->_AvailablePlugins)) {
          $PluginInfo = array();

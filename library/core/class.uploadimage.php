@@ -8,14 +8,14 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Handles uploading image files.
-/// </summary>
+/**
+ * Handles uploading image files.
+ */
 class Gdn_UploadImage extends Gdn_Upload {
 
-   /// <summary>
-   /// Validates the uploaded image. Returns the temporary name of the uploaded file.
-   /// </summary>
+   /**
+    * Validates the uploaded image. Returns the temporary name of the uploaded file.
+    */
    public function ValidateUpload($InputName) {
       // Make sure that all standard file upload checks are performed.
       $TmpFileName = parent::ValidateUpload($InputName);
@@ -28,40 +28,19 @@ class Gdn_UploadImage extends Gdn_Upload {
       return $TmpFileName;
    }
    
-   /// <summary>
-   /// Saves the specified image at $Target in the specified format with the
-   /// specified dimensions (or the existing dimensions if height/width are not
-   /// provided.
-   /// </summary>
-   /// <param name="Source" type="string">
-   /// The path to the source image. Typically this is the tmp file name
-   /// returned by $this->ValidateUpload();
-   /// </param>
-   /// <param name="Target" type="string">
-   /// The full path to where the image should be saved, including image name.
-   /// </param>
-   /// <param name="Height" type="int" required="false" default="Original Image Height">
-   /// An integer value indicating the maximum allowed height of the image (in
-   /// pixels).
-   /// </param>
-   /// <param name="Width" type="int" required="false" default="Original Image Width">
-   /// An integer value indicating the maximum allowed width of the image (in
-   /// pixels).
-   /// </param>
-   /// <param name="Crop" type="bool" required="false" default="FALSE">
-   /// Image proportions will always remain constrained. The Crop parameter is a
-   /// boolean value indicating if the image should be cropped when one
-   /// dimension (height or width) goes beyond the constrained proportions.
-   /// </param>
-   /// <param name="OutputType" type="string" required="false" default="jpg">
-   /// The format in which the output image should be saved. Options
-   /// are: jpg, png, and gif. Default is jpg.
-   /// </param>
-   /// <param name="ImageQuality" type="int" required="false" default="75">
-   /// An integer value representing the qualityof the saved image. Ranging from
-   /// 0 (worst quality, smaller file) to 100 (best quality, biggest file). The
-   /// default is 75.
-   /// </param>
+   /**
+    * Saves the specified image at $Target in the specified format with the
+    * specified dimensions (or the existing dimensions if height/width are not
+    * provided.
+    *
+    * @param string The path to the source image. Typically this is the tmp file name returned by $this->ValidateUpload();
+    * @param string The full path to where the image should be saved, including image name.
+    * @param int An integer value indicating the maximum allowed height of the image (in pixels).
+    * @param int An integer value indicating the maximum allowed width of the image (in pixels).
+    * @param bool Image proportions will always remain constrained. The Crop parameter is a boolean value indicating if the image should be cropped when one dimension (height or width) goes beyond the constrained proportions.
+    * @param string The format in which the output image should be saved. Options are: jpg, png, and gif. Default is jpg.
+    * @param int An integer value representing the qualityof the saved image. Ranging from 0 (worst quality, smaller file) to 100 (best quality, biggest file).
+    */
    public function SaveImageAs($Source, $Target, $Height = '', $Width = '', $Crop = FALSE, $OutputType = 'jpg', $ImageQuality = 75) {
       // Make sure type, height & width are properly defined
       $Size = getimagesize($Source);

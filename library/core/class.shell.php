@@ -8,11 +8,11 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Core
-/// </namespace>
+/**
+ * Lussumo.Garden.Core
+ */
 
-/// <summary>
-/// A simple class definition that any object can use or extend.
-/// </summary>
+/**
+ * A simple class definition that any object can use or extend.
+ */
 class Gdn_ShellClass {}

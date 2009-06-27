@@ -101,7 +101,7 @@ class PermissionModel extends Model {
       $this->SQL
          ->Select('PermissionID,Name')
          ->From('Permission')
-         ->Where('JunctionTable is null');
+         ->Where('JunctionTable', NULL, FALSE, FALSE);
          
       if ($LimitToSuffix != '')
          $this->SQL->Like('Name', $LimitToSuffix, 'left');
@@ -131,7 +131,7 @@ class PermissionModel extends Model {
       $RoleData = $RoleModel->Get(); // $RoleModel->GetEditablePermissions();
       $RoleIDs = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'RoleID');
       $RoleNames = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'Name');
-      $this->RoleArray = array_combine($RoleIDs, $RoleNames);
+      $this->RoleArray = ArrayCombine($RoleIDs, $RoleNames);
 
       // Define all of the roles/permissions
       $RolePermissions = array();

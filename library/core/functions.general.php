@@ -673,3 +673,51 @@ if (!function_exists('getallheaders')) {
       return $headers;
    }
 }
+
+if (!function_exists('ArrayCombine')) {
+   // PHP has a ridiculous limitation that doesn't allow array_combine to work if
+   // either of the arrays are empty
+   function ArrayCombine($Array1, $Array2) {
+      if (count($Array1) > 0 && count($Array2) > 0)
+         return array_combine($Array1, $Array2);
+      elseif (count($Array1) == 0)
+         return $Array2;
+      else
+         return $Array1;
+   }
+}
+
+if (!function_exists('filter_input')) {
+   if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
+   if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
+   if (!defined('FILTER_SANITIZE_STRING')) define('FILTER_SANITIZE_STRING', 'FILTER_SANITIZE_STRING');
+   if (!defined('FILTER_REQUIRE_ARRAY')) define('FILTER_REQUIRE_ARRAY', 'FILTER_REQUIRE_ARRAY');
+   function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
+      $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
+      return ArrayValue($FieldName, $Collection, '');
+   }
+}
+
+if (!function_exists('json_encode')) {
+   require_once PATH_LIBRARY . DS . 'vendors' . DS . 'JSON' . DS . 'JSON.php';
+   
+   function json_encode($arg) {
+      global $services_json;
+      if (!isset($services_json)) {
+         $services_json = new Services_JSON();
+      }
+      return $services_json->encode($arg);
+   }
+   
+   function json_decode($arg, $assoc = FALSE) {
+      global $services_json;
+      if (!isset($services_json)) {
+         $services_json = new Services_JSON();
+      }
+      $obj = $services_json->decode($arg);
+      if ($assoc)
+         return Format::ObjectAsArray($obj);
+      else
+         return $obj;
+   }
+}

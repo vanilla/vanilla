@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
 	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php');
@@ -129,7 +128,6 @@ $PluginManager->EnabledPlugins = $PluginInfo;
 $PluginManager->RegisterPlugins();
 unset($EnabledPlugins);
 unset($PluginInfo);
-
 
 Gdn::$FactoryOverwrite = TRUE;
 

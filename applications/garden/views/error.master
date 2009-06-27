@@ -4,7 +4,7 @@
    <title>Fatal Error</title>
    <?php
    if ($CssPath !== FALSE)
-      echo '<link rel="stylesheet" type="text/css" href="',$CssPath,'" />';
+      echo '<link rel="stylesheet" type="text/css" href="',Asset($CssPath),'" />';
    ?>
 </head>
 <body>

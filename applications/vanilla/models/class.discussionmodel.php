@@ -103,7 +103,7 @@ class DiscussionModel extends VanillaModel {
          
       return $this->SQL
          ->Where('d.Announce', '1')
-         ->Where('w.Dismissed is null')
+         ->Where('w.Dismissed', NULL, FALSE, FALSE)
          ->OrderBy('lc.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();

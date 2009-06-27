@@ -42,7 +42,7 @@ class RoleModel extends Model {
       $RoleData = $this->Get();
       $RoleIDs = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'RoleID');
       $RoleNames = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'Name');
-      return array_combine($RoleIDs, $RoleNames);
+      return ArrayCombine($RoleIDs, $RoleNames);
    }
    /*
    /// <summary>

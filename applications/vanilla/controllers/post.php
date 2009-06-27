@@ -90,7 +90,6 @@ class PostController extends VanillaController {
                $this->View = 'preview';
             }
          }
-         
          if ($this->Form->ErrorCount() > 0) {
             // Return the form errors
             $this->StatusMessage = $this->Form->Errors();

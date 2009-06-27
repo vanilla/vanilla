@@ -122,7 +122,7 @@ class SettingsController extends GardenController {
       // Load the locales for the locale dropdown
       $Locale = Gdn::Locale();
       $AvailableLocales = $Locale->GetAvailableLocaleSources();
-      $this->LocaleData = array_combine($AvailableLocales, $AvailableLocales);
+      $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
       
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -330,7 +330,7 @@ class SettingsController extends GardenController {
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');
          $InvitationCounts = $this->Form->GetValue('InvitationCount');
-         $this->ExistingRoleInvitations = array_combine($InvitationRoleIDs, $InvitationCounts);
+         $this->ExistingRoleInvitations = ArrayCombine($InvitationRoleIDs, $InvitationCounts);
          $ConfigurationModel->ForceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
          
          // Save!

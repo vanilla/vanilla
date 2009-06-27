@@ -133,7 +133,7 @@ class CategoryModel extends Model {
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')
          ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
-         
+
       if (is_numeric($CategoryID) && $CategoryID > 0)
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
       else

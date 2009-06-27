@@ -166,10 +166,12 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * Free's the result resource referenced by $this->_PDOStatement.
     */
-   public function FreePDOStatement() {
+   public function FreePDOStatement($DestroyPDOStatement = TRUE) {
       if (is_object($this->_PDOStatement))
          $this->_PDOStatement->closeCursor();
-      $this->_PDOStatement = NULL;
+         
+      if ($DestroyPDOStatement)
+         $this->_PDOStatement = NULL;
    }
    
    /**
@@ -367,7 +369,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
-   public function PDOStatement($PDOStatement = FALSE) {
+   public function PDOStatement(&$PDOStatement = FALSE) {
       if($PDOStatement === FALSE)
          return $this->_PDOStatement;
       else

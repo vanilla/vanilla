@@ -36,6 +36,8 @@ class Gdn_Database {
    
    /** @var string The instance name of this class or the class that inherits from this class. */
    public $ClassName;
+	
+	private $_CurrentResultSet;
    
    /** @var PDO The connectio to the database. */
    protected $_Connection = FALSE;
@@ -45,7 +47,11 @@ class Gdn_Database {
     */
    public function Connection() {
       if($this->_Connection === FALSE) {
-         $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
+			try {
+				$this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
+			} catch (Exception $ex) {
+				trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
+			}
       }
       
       return $this->_Connection;
@@ -128,7 +134,16 @@ class Gdn_Database {
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
-         $PDOStatement = $this->Connection()->prepare($Sql);
+			// Make sure other unbufferred queries are not open
+			if (is_object($this->_CurrentResultSet))
+				$this->_CurrentResultSet->FreePDOStatement(FALSE);
+
+			$PDOStatement = $this->Connection()->prepare($Sql);
+
+			if (!is_object($PDOStatement)) {
+				$ErrorInfo = $this->Connection()->errorInfo();
+				trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $ErrorInfo[2]), E_USER_ERROR);
+			}
 
          if ($PDOStatement->execute($InputParameters) === FALSE) {
             $Error = $PDOStatement->errorInfo();
@@ -146,19 +161,19 @@ class Gdn_Database {
       $Result = TRUE;
       // Did this query modify data in any way?
       if (preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
-         $Result = $this->Connection()->lastInsertId(); // TODO: APPARENTLY THIS IS NOT RELIABLE WITH DB'S OTHER THAN MYSQL
+         $this->_CurrentResultSet = $this->Connection()->lastInsertId(); // TODO: APPARENTLY THIS IS NOT RELIABLE WITH DB'S OTHER THAN MYSQL
       } else {
          // TODO: LOOK INTO SEEING IF AN UPDATE QUERY CAN RETURN # OF AFFECTED RECORDS?
 
          if (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
             // Create a DataSet to manage the resultset
-            $Result = new Gdn_DataSet();
-            $Result->Connection = $this->Connection();
-            $Result->PDOStatement($PDOStatement);
+            $this->_CurrentResultSet = new Gdn_DataSet();
+            $this->_CurrentResultSet->Connection = $this->Connection();
+            $this->_CurrentResultSet->PDOStatement($PDOStatement);
          }
       }
       
-      return $Result;
+      return $this->_CurrentResultSet;
    }
    
    /**

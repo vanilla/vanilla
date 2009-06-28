@@ -365,6 +365,11 @@ class Form {
       ksort($Rows);
       unset($Data['_Columns'], $Data['_Rows']);
       
+      if(array_key_exists('_Info', $Data)) {
+         $GroupName = $Data['_Info']['Name'];
+         unset($Data['_Info']);
+      }
+      
       $Result = '<table class="CheckBoxGrid">';
       // Append the header.
       $Result .= '<thead><tr><th>'.Gdn::Translate($GroupName).'</th>';
@@ -474,67 +479,6 @@ class Form {
          $Cells = '';
       }
       return $Return == '' ? '' : '<table class="CheckBoxGrid">'.$Return.'</tbody></table>';
-   }
-   
-   /**
-    * Writes a set of permission checkboxes for junction tables.
-    *
-    * @param array $RoleArray An array of RoleID => RoleName pairs.
-    * @param array $RolePermissions An array of RoleID => PermissionData pairs representing all role permission pairs.
-    * @param array $RolePermissionData An array of RolePermissionID values representing the currently selected permissions.
-    */
-   public function PermissionCheckBoxGrid($RoleArray, $RolePermissions, $RolePermissionData) {
-      $Return = '';
-      foreach ($RolePermissions as $RoleID => $PermissionData) {
-         if (is_object($PermissionData)) {
-            $i = 1;
-            $Group = array();
-            $Rows = array();
-            $Cols = array();
-            $CheckBox = '';
-            foreach($PermissionData->Result() as $Permission) {
-               $Value = $RoleID.'-'.$Permission->PermissionID;
-               $Attributes = array(
-                  'value' => $Value,
-                  'id' => 'RolePermissionID'.$i
-               );
-               
-               if (is_array($RolePermissionData) && in_array($Value, $RolePermissionData))
-                  $Attributes['checked'] = 'checked';
-
-               $CheckBox = $this->CheckBox(
-                  'RolePermissionID[]',
-                  '',
-                  $Attributes
-               );
-   
-               // Organize the checkbox into an array for this group
-               $aPermissionName = explode('.', $Permission->Name);
-               $ColName = array_pop($aPermissionName);
-               array_shift($aPermissionName);
-               $RowName = implode('.', $aPermissionName);
-               ++$i;
-               
-               if (array_key_exists($ColName, $Group) === FALSE || is_array($Group[$ColName]) === FALSE) {
-                  $Group[$ColName] = array();
-                  if (!in_array($ColName, $Cols))
-                     $Cols[] = $ColName;
-               }
-
-               if (!in_array($RowName, $Rows))
-                  $Rows[] = $RowName;
-
-               $Group[$ColName][$RowName] = $CheckBox;
-            }
-            $Return .= $this->GetCheckBoxGridGroup(
-               $RoleArray[$RoleID],
-               $Group,
-               $Rows,
-               $Cols
-            );
-         }
-      }
-      return $Return;
    }
 
    /**

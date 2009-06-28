@@ -151,6 +151,7 @@ if ($Drop) {
       'JunctionColumn' => 'CategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
+      'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1
       ));
       
@@ -160,16 +161,6 @@ if ($Drop) {
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
-      // Giving the category permissions here gives admins default permissions for new categories.
-      'Vanilla.Discussions.Add' => 1,
-      'Vanilla.Discussions.Edit' => 1,
-      'Vanilla.Discussions.Announce' => 1,
-      'Vanilla.Discussions.Sink' => 1,
-      'Vanilla.Discussions.Close' => 1,
-      'Vanilla.Discussions.Delete' => 1,
-      'Vanilla.Comments.Add' => 1,
-      'Vanilla.Comments.Edit' => 1,
-      'Vanilla.Comments.Delete' => 1
       ));
    
    $PermissionModel->Save(array(
@@ -183,6 +174,7 @@ if ($Drop) {
       'Vanilla.Discussions.Sink' => 1,
       'Vanilla.Discussions.Close' => 1,
       'Vanilla.Discussions.Delete' => 1,
+      'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1,
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1

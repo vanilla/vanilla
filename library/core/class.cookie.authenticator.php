@@ -103,11 +103,10 @@ class Gdn_CookieAuthenticator implements Gdn_IAuthenticator {
 
          // Get Sign-in permission
          $SignInPermission = $UserData->Admin == '1' ? TRUE : FALSE;
-         if ($SignInPermission == FALSE) {
+         if ($SignInPermission === FALSE) {
             $PermissionModel = $this->GetPermissionModel();
-            foreach($PermissionModel->GetUserPermissions($UserID) as $PermissionData) {
-               if (is_numeric($PermissionData->PermissionID))
-                  $SignInPermission = TRUE;
+            foreach($PermissionModel->GetUserPermissions($UserID) as $Permissions) {
+               $SignInPermission |= ArrayValue('Garden.SignIn.Allow', $Permissions, FALSE);
             }
          }
 

@@ -93,6 +93,11 @@ class Module extends Gdn_Pluggable implements Gdn_IModule {
       $ViewPath = $this->FetchViewLocation();
       $String = '';
       ob_start();
+      if(is_object($this->_Sender) && isset($this->_Sender->Data)) {
+         $Data = $this->_Sender->Data;
+      } else {
+         $Data = array();
+      }
       include ($ViewPath);
       $String = ob_get_contents();
       @ob_end_clean();

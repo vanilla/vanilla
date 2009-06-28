@@ -23,10 +23,10 @@ class DiscussionController extends VanillaController {
       
       // Load the discussion record
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       // Check Permissions
       $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
-      $this->CategoryID = $this->Discussion->CategoryID;
+      $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       if ($this->Discussion === FALSE) {
          return $this->ReDispatch('garden/home/filenotfound');
       } else {
@@ -56,7 +56,7 @@ class DiscussionController extends VanillaController {
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
          
          // Load the comments
-         $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset);
+         $this->SetData('CommentData', $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
 
          // Build a pager
          $PagerFactory = new PagerFactory();

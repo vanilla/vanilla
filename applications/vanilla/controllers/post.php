@@ -40,6 +40,8 @@ class PostController extends VanillaController {
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          if (isset($this->Discussion))
             $this->Form->SetData($this->Discussion);
+         else
+            $this->Form->SetData(array('CategoryID' => $CategoryID));
             
       } else {
          // Save as a draft?

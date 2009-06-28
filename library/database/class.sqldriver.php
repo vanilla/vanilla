@@ -1401,29 +1401,11 @@ abstract class Gdn_SQLDriver {
     *
     * @param string $JunctionTable The table to join to (ie. Category)
     * @param string $JunctionColumn The primary key column name of $JunctionTable (ie. CategoryID).
-    * @param mixed $Permission The permission name (or array of names) to use when limiting the query.
+    * @param mixed $Permissions The permission name (or array of names) to use when limiting the query.
     */
-   public function Permission($JunctionTableAlias, $JunctionColumn, $Permission) {
-      $Session = Gdn::Session();
-      if ($Session->UserID <= 0 || (is_object($Session->User) && $Session->User->Admin != '1')) {
-         $this ->Distinct()
-         ->Join('RolePermission jrp', 'jrp.JunctionID = '.$JunctionTableAlias.'.'.$JunctionColumn, 'left')
-         ->Join('UserRole jur', 'jrp.RoleID = jur.RoleID', 'left')
-         ->Join('Permission jp', 'jrp.PermissionID = jp.PermissionID', 'left')
-         ->BeginWhereGroup()
-         ->Where('jur.UserID', $Session->UserID);
-         
-         if (is_array($Permission))
-            $this->WhereIn('jp.Name', $Permission);
-         else
-            $this->Where('jp.Name', $Permission);
-            
-         $this->EndWhereGroup();
-      } else {
-         // Force this method to play nice in case it is used in an or clause
-         // (ie. it returns true in a sql sense by doing 1 = 1)
-         $this->Where('1', '1', FALSE, FALSE);
-      }
+   public function Permission($JunctionTableAlias, $JunctionColumn, $Permissions) {
+      $PermissionModel = Gdn::PermissionModel();
+      $PermissionModel->SQLPermission($this, $JunctionTableAlias, $JunctionColumn, $Permissions);
   
       return $this;
    }

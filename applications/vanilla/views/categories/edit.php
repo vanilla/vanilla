@@ -23,11 +23,7 @@ echo $this->Form->Errors();
             echo Gdn::Translate('This is a parent category that does not allow discussions.');
          } else {
             echo Gdn::Translate('Check all permissions that apply for each role');
-            echo $this->Form->PermissionCheckBoxGrid(
-               $this->RoleArray,
-               $this->RolePermissions,
-               $this->RolePermissionData
-            );
+            echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
          }
       ?>
    </li>

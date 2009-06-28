@@ -25,11 +25,7 @@ echo $this->Form->Errors();
    <li id="Permissions">
       <?php
          echo Gdn::Translate('Check all permissions that apply for each role');
-         echo $this->Form->PermissionCheckBoxGrid(
-            $this->RoleArray,
-            $this->RolePermissions,
-            $this->RolePermissionData
-         );
+         echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
       ?>
    </li>
 </ul>

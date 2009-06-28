@@ -31,14 +31,8 @@ class Gdn_UserModel extends Model {
    }
 
    public function DefinePermissions($UserID) {
-      $DataSet = $this->SQL->Select('p.*')
-         ->From('Permission p')
-         ->Join('User u', 'p.RoleID & u.CacheRoleID > 0')
-         ->Where('u.UserID', $UserID)
-         ->Get();
-
+      $Data = Gdn::PermissionModel()->CachePermissions($UserID);
       $Permissions = array();
-      $Data = $DataSet->ResultArray();
       foreach($Data as $i => $Row) {
          $JunctionTable = $Row['JunctionTable'];
          $JunctionColumn = $Row['JunctionColumn'];
@@ -672,7 +666,7 @@ class Gdn_UserModel extends Model {
          throw new Exception('The user name or id is required');
       }
 
-      $this->SQL->Select('UserID, Attributes, Admin, Password')
+      $this->SQL->Select('UserID, Attributes, Admin, Password, CacheRoleID')
          ->From('User');
 
       if ($ID) {

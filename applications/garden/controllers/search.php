@@ -44,7 +44,7 @@ class SearchController extends GardenController {
 		$Pager->Configure(
 			$Offset,
 			$Limit,
-			$Offset + $Limit + 1,
+			$Offset + $this->Data['SearchResults']->NumRows() + 1,
 			'garden/search/%1$s/%2$s/?Search='.Format::Url($Search)
 		);
 		$this->SetData('Pager', $Pager);

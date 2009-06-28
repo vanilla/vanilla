@@ -33,7 +33,7 @@ class Gdn {
 	protected static $_Factory = NULL;
 	
 	/** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
-	public static $FactoryOverwrite = TRUE;
+	protected static $_FactoryOverwrite = TRUE;
 	
 	protected static $_Locale = NULL;
 	
@@ -118,7 +118,7 @@ class Gdn {
 	 */
 	public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL) {
 		// Don't overwrite an existing definition.
-		if(self::$FactoryOverwrite === FALSE && self::FactoryExists($Alias))
+		if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
 			return;
 		
 		self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
@@ -208,6 +208,16 @@ class Gdn {
 				self::FactoryInstallFromConfig($DependencyConfig, $Alias);
 			}
 		}
+	}
+	
+	public static function FactoryOverwrite($Value = NULL) {
+		$Result = (self::$_FactoryOverwrite & 1 > 0);
+		
+		if(!is_null($Value)) {
+			self::$_FactoryOverwrite = $Value;
+		}
+		
+		return $Result;
 	}
 	
 	/**

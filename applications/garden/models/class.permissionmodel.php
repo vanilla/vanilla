@@ -101,7 +101,7 @@ class PermissionModel extends Model {
       $this->SQL
          ->Select('PermissionID,Name')
          ->From('Permission')
-         ->Where('JunctionTable', NULL, FALSE, FALSE);
+         ->Where('JunctionTable is null');
          
       if ($LimitToSuffix != '')
          $this->SQL->Like('Name', $LimitToSuffix, 'left');

@@ -47,7 +47,7 @@ class ActivityModel extends Model {
    
    public function Get($UserID = '', $Offset = '0', $Limit = '50') {
       $this->ActivityQuery();
-      $this->SQL->Where('a.CommentActivityID', NULL, FALSE, FALSE);
+      $this->SQL->Where('a.CommentActivityID is null');
       if ($UserID != '') {
          $this->SQL
             ->BeginWhereGroup()

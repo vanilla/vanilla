@@ -721,3 +721,8 @@ if (!function_exists('json_encode')) {
          return $obj;
    }
 }
+if (!function_exists('array_fill_keys')) {
+   function array_fill_keys($Keys, $Val) {
+      return array_combine($Keys,array_fill(0,count($Keys),$Val));
+   }
+}

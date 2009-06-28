@@ -13,7 +13,8 @@ $Configuration['Database']['Name']                             = 'dbname';
 $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
-                                                                  PDO::ATTR_PERSISTENT => FALSE,
+                                                                  PDO::ATTR_PERSISTENT => TRUE,
+                                                                  PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
                                                                   PDO::MYSQL_ATTR_INIT_COMMAND => "set names 'utf8'"
                                                                );
 $Configuration['Database']['Prefix']                           = 'GDN_';

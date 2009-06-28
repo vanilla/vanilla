@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
       showDelay: 0,
       hideDelay: 0
    });
-
+   
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
@@ -88,5 +88,19 @@ jQuery(document).ready(function($) {
          $('<div class="Messages Information"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
       }
    }
+
+   // Fill the search input with "search" if empty and blurred
+   var searchText = definition('Search', 'Search');
+   $('#Search input.InputBox').val(searchText);
+   $('#Search input.InputBox').blur(function() {
+      var searchText = definition('Search', 'Search');
+      if ($(this).val() == '')
+         $(this).val(searchText);
+   });
+   $('#Search input.InputBox').focus(function() {
+      var searchText = definition('Search', 'Search');
+      if ($(this).val() == searchText)
+         $(this).val('');      
+   });
 
 });

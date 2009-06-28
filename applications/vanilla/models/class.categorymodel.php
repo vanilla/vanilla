@@ -101,7 +101,7 @@ class CategoryModel extends Model {
          // If there is only one category, make sure that Categories are not used
          $CountCategories = $this->Get()->NumRows();
          $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Config->Load(PATH_CONF . DS . 'configuration.php', 'Save');
+         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
          $Config->Set('Vanilla.Categories.Use', $CountCategories > 1, TRUE, 'ForSave');
          $Config->Save();
       }

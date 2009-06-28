@@ -19,8 +19,6 @@ class DiscussionsController extends VanillaController {
    
    public function Index($Offset = '0') {
       if ($this->Head) {
-         // $this->Head->AddScript('/js/library/jquery.resizable.js');
-         // $this->Head->AddScript('/js/library/jquery.ui.packed.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
       }
@@ -123,6 +121,13 @@ class DiscussionsController extends VanillaController {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
       }
+      
+      // Add Modules
+      $this->AddModule('NewDiscussionModule');
+      $this->AddModule('CategoriesModule');
+      $DraftsModule = new DraftsModule($this);
+      $DraftsModule->GetData();
+      $this->AddModule($DraftsModule);
       
       $this->Render();
    }

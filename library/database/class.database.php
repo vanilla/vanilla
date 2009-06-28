@@ -135,8 +135,10 @@ class Gdn_Database {
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
 			// Make sure other unbufferred queries are not open
-			if (is_object($this->_CurrentResultSet))
+			if (is_object($this->_CurrentResultSet)) {
+				$this->_CurrentResultSet->FetchAllRows();
 				$this->_CurrentResultSet->FreePDOStatement(FALSE);
+			}
 
 			$PDOStatement = $this->Connection()->prepare($Sql);
 

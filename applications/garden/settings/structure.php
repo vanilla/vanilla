@@ -260,6 +260,10 @@ $Construct->Table('SearchKeywordDocument')
 	->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
 	->Set($Explicit, $Drop);
 
+/*
+ 
+2009-06-27 - Removing Views so we can support older versions of mysql.
+
 // vw_SingleRoleUser Returns all UserIDs that have only one role.
 $SQL->Select('UserID')
    ->From('UserRole')
@@ -287,3 +291,4 @@ $SQL->Select('rp.*')
    ->From('RolePermission rp')
    ->Join('Permission p', 'rp.PermissionID = p.PermissionID');
 $Construct->View('vw_RolePermission', $SQL);
+*/

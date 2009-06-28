@@ -35,11 +35,27 @@ if ($Drop) {
    $SQL->Update('User', array('Permissions' => ''))->Put();
 
    // Fix permissions for Vanilla
-   if ($SQL->GetWhere('vw_RolePermission', array('RoleID' => '4', 'Permission' => 'Vanilla.Discussions.Add'))->NumRows() == 0) {
+   if ($SQL->Select('rp.*')
+      ->Select('p.Name', '', 'Permission')
+      ->From('RolePermission rp')
+      ->Join('Permission p', 'rp.PermissionID = p.PermissionID')
+      ->Where('RoleID', '4')
+      ->Where('p.Name', 'Vanilla.Discussions.Add')
+      ->Get()
+      ->NumRows() == 0)
+   {
       // Member Role
-      $Select = $SQL->Select("4, PermissionID, 1")->From('vw_RolePermission')->Where('Permission', 'Vanilla.Discussions.Add')->GetSelect();
+      $Select = $SQL->Select('4, p.PermissionID, 1')
+         ->From('RolePermission rp')
+         ->Join('Permission p', 'rp.PermissionID = p.PermissionID')
+         ->Where('p.Name', 'Vanilla.Discussions.Add')
+         ->GetSelect();
       $SQL->Insert('RolePermission', array('RoleID', 'PermissionID', 'JunctionID'), $Select);
-      $Select = $SQL->Select("4, PermissionID, 1")->From('vw_RolePermission')->Where('Permission', 'Vanilla.Comments.Add')->GetSelect();
+      $Select = $SQL->Select('4, p.PermissionID, 1')
+         ->From('RolePermission rp')
+         ->Join('Permission p', 'rp.PermissionID = p.PermissionID')
+         ->Where('p.Name', 'Vanilla.Comments.Add')
+         ->GetSelect();
       $SQL->Insert('RolePermission', array('RoleID', 'PermissionID', 'JunctionID'), $Select);
    }
 

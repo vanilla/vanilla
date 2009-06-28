@@ -4,7 +4,7 @@ $this->DiscussionData = $this->AnnounceData;
 if ($this->AnnounceData && $this->AnnounceData->NumRows() > 0) {
 ?>
 <h1 id="AnnouncementsHeading"><?php echo Gdn::Translate('Announcements'); ?></h1>
-<ul class="Announcements Discussions">
+<ul class="DataList Announcements">
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php
@@ -20,7 +20,7 @@ else
 
 ?></h1>
 <?php echo $this->Pager->ToString('less'); ?>
-<ul class="Discussions">
+<ul class="DataList Discussions">
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php echo $this->Pager->ToString('more');

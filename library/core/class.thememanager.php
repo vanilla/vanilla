@@ -87,7 +87,7 @@ class Gdn_ThemeManager {
          throw new Exception(Gdn::Translate('The theme folder was not properly defined.'));
       } else {
          $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Config->Load(PATH_CONF . DS . 'configuration.php', 'Save');
+         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
          $Config->Set('Garden.Theme', $ThemeFolder);
          $Config->Save();
       }

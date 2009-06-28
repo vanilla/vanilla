@@ -129,10 +129,12 @@ class RoleModel extends Model {
    /// </param>
    public function GetUserCount($RoleID, $UsersOnlyWithThisRole = FALSE) {
       if ($UsersOnlyWithThisRole) {
-         return $this->SQL->Select('UserRole.UserID', 'count', 'UserCount')
-            ->From('UserRole')
-            ->Join('vw_SingleRoleUser', 'UserRole.UserID = vw_SingleRoleUser.UserID')
-            ->Where('UserRole.RoleID', $RoleID)
+         return $this->SQL->Select('ur.UserID', 'count', 'UserCount')
+            ->From('UserRole ur')
+            ->Join('UserRole urs', 'ur.UserID = urs.UserID')
+            ->GroupBy('urs.UserID')
+            ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)
+            ->Where('ur.RoleID', $RoleID)
             ->Get()
             ->FirstRow()
             ->UserCount;
@@ -238,7 +240,9 @@ class RoleModel extends Model {
       // First update users that will be orphaned
       if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
          $this->SQL->Update('UserRole')
-            ->Join('vw_SingleRoleUser', 'UserRole.UserID = vw_SingleRoleUser.UserID')
+            ->Join('UserRole urs', 'UserRole.UserID = urs.UserID')
+            ->GroupBy('urs.UserID')
+            ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)
             ->Set('UserRole.RoleID', $ReplacementRoleID)
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();

@@ -61,7 +61,8 @@ ul#Menu {
    -moz-border-radius-bottomleft: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-bottom-left-radius: 2px;
-   color: #888;
+   color: #969696;
+   font-size: 13px;
 }
 #Head form input.Button {
    border: 0;
@@ -691,6 +692,7 @@ body.Entry #Register form ul li label.BirthDate {
 body.Entry span.Incorrect {
    display: block;
    color: red;
+   padding-left: 140px;
 }
 
 /* Dashboard Styles */
@@ -719,3 +721,70 @@ li.two { background: url('two.png') no-repeat center left; }
 li.three { background: url('three.png') no-repeat center left; }
 li.four { background: url('four.png') no-repeat center left; }
 li.five { background: url('five.png') no-repeat center left; }
+
+/* DataList (search results, vanilla discussions, drafts, etc) */
+
+ul.DataList {
+   border-top: 1px solid #dbe3e6;
+}
+ul.DataList li {
+   margin: 0px;
+   padding: 0px 0px 4px 0px;
+    border-bottom: 1px solid #dbe3e6;
+}
+ul.DataList li li {
+   border: 0px;
+   padding: 0px;
+}
+ul.DataList,
+ul.DataList li ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+ul.DataList li ul li.Title a,
+ul.DataList li ul li.Title p {
+   border-left: 2px solid #dbe3e6;
+   margin: 8px 4px 6px 10px;
+   padding: 0px 0px 0px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+}
+ul.DataList li ul li.Title h3 {
+   padding: 6px 0px 0px 10px;
+   margin: 0px;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.DataList li ul li.Title h3 a {
+   display: inline;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+   color: #2d7bb2;
+}
+ul.DataList li ul li.Meta {
+   font-family: tahoma;
+   margin-left: 9px;
+   font-size: 80%;
+   color: #80828c;
+}
+ul.DataList li ul li.Meta span,
+ul.DataList li ul li.Meta span a,
+ul.DataList li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff0;
+   padding: 0px 2px;
+}
+ul.DataList li ul li.Meta a {
+   color: #2b2d33;
+}
+/* Search Page Heading */
+body.Search h1 {
+   font-size:160%;
+   margin:0;
+   padding:10px 0 0;
+}

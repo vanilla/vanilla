@@ -8,7 +8,6 @@ if (!isset($Explicit))
    
 $SQL = Gdn::SQL();
 $Construct = Gdn::Structure();
-   if ($SQL->Select('rp.*')
 
 $Construct->Table('Category')
    ->Column('CategoryID', 'int', 4, FALSE, NULL, 'primary', TRUE)

@@ -17,6 +17,7 @@ define('DELIVERY_TYPE_ASSET', 2); // Deliver all content for the requested asset
 define('DELIVERY_TYPE_VIEW', 3); // Deliver only the view
 define('DELIVERY_TYPE_BOOL', 4); // Deliver only the success status (or error) of the request
 define('DELIVERY_TYPE_NONE', 5); // Deliver nothing
+define('DELIVERY_TYPE_MESSAGES', 6); // Just deliver messages.
 
 // Delivery method enumerators
 define('DELIVERY_METHOD_XHTML', 1);

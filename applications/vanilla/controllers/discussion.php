@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Discussion Controller
-/// </summary>
+/**
+ * Discussion Controller
+ */
 class DiscussionController extends VanillaController {
    
    public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
@@ -139,9 +139,9 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
    
-   /// <summary>
-   /// Allows you to bookmark or unbookmark a discussion (depending on it's current state).
-   /// </summary>
+   /**
+    * Allows you to bookmark or unbookmark a discussion (depending on it's current state).
+    */
    public function Bookmark($DiscussionID = '', $TransientKey = '') {
       $Session = Gdn::Session();
       $State = FALSE;
@@ -180,9 +180,9 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
    
-   /// <summary>
-   /// Allows you to announce or unannounce a discussion (depending on it's current state).
-   /// </summary>
+   /**
+    * Allows you to announce or unannounce a discussion (depending on it's current state).
+    */
    public function Announce($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
@@ -210,9 +210,9 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
 
-   /// <summary>
-   /// Allows you to sink or unsink a discussion (depending on it's current state).
-   /// </summary>
+   /**
+    * Allows you to sink or unsink a discussion (depending on it's current state).
+    */
    public function Sink($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
@@ -247,9 +247,9 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
 
-   /// <summary>
-   /// Allows you to close or re-open a discussion (depending on it's current state).
-   /// </summary>
+   /**
+    * Allows you to close or re-open a discussion (depending on it's current state).
+    */
    public function Close($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
@@ -284,9 +284,9 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
 
-   /// <summary>
-   /// Allows you to delete a discussion.
-   /// </summary>
+   /**
+    * Allows you to delete a discussion.
+    */
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();

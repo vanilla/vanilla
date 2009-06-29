@@ -1,7 +1,7 @@
 <?php
-/// <summary>
-/// An associative array of information about this application.
-/// </summary>
+/**
+ * An associative array of information about this application.
+ */
 $ApplicationInfo['Vanilla'] = array(
    'Description' => "Vanilla is the Lussumo's flagship application built with the Garden framework. Vanilla is a standards-compliant, open-source discussion forum for the web. Vanilla does a lot more with a lot less.",
    'Version' => '2.0',

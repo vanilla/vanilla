@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class CommentModel extends VanillaModel {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct() {
       parent::__construct('Comment');
    }
@@ -96,12 +96,11 @@ class CommentModel extends VanillaModel {
          ->Get();
    }
    
-   /// <summary>
-   /// Returns the offset of the specified comment in it's related discussion.
-   /// </summary>
-   /// <param name="CommentID" type="int">
-   /// The comment id for which the offset is being defined.
-   /// </param>
+   /**
+    * Returns the offset of the specified comment in it's related discussion.
+    *
+    * @param int The comment id for which the offset is being defined.
+    */
    public function GetOffset($CommentID) {
       $this->FireEvent('GetOffsetBefore');
       return $this->SQL
@@ -119,7 +118,7 @@ class CommentModel extends VanillaModel {
    /**
     * Reindex comments for the search.
     *
-    *  @param int $DiscussionID Optional. A discussion ID to index the comments for.
+    * @param int $DiscussionID Optional. A discussion ID to index the comments for.
     */
    public function Reindex($DiscussionID = NULL, $Max = 250, $Echo = FALSE) {
       if(!is_null($DiscussionID))
@@ -381,13 +380,12 @@ class CommentModel extends VanillaModel {
          );
    }
    
-   /// <summary>
-   /// Updates the CountComments value on the discussion based on the CommentID
-   /// being saved. 
-   /// </summary>
-   /// <param name="CommentID" type="int">
-   /// The CommentID relating to the discussion we are updating.
-   /// </param>
+   /**
+    * Updates the CountComments value on the discussion based on the CommentID
+    * being saved. 
+    *
+    * @param int The CommentID relating to the discussion we are updating.
+    */
    public function UpdateCommentCount($CommentID) {
       $this->FireEvent('UpdateCommentCountBefore');
       $Data = $this->SQL

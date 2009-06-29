@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class DiscussionModel extends VanillaModel {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct() {
       parent::__construct('Discussion');
    }
@@ -183,15 +183,12 @@ class DiscussionModel extends VanillaModel {
          ->FirstRow();
    }
    
-   /// <summary>
-   /// Marks the specified announcement as dismissed by the specified user.
-   /// </summary>
-   /// <param name="DiscussionID" type="int">
-   /// The unique id of the discussion being affected.
-   /// </param>
-   /// <param name="UserID" type="int">
-   /// The unique id of the user being affected.
-   /// </param>
+   /**
+    * Marks the specified announcement as dismissed by the specified user.
+    *
+    * @param int The unique id of the discussion being affected.
+    * @param int The unique id of the user being affected.
+    */
    public function DismissAnnouncement($DiscussionID, $UserID) {
       $Count = $this->SQL
          ->Select('UserID')
@@ -364,13 +361,12 @@ class DiscussionModel extends VanillaModel {
          ->Put();
    }
    
-   /// <summary>
-   /// Updates the CountDiscussions value on the category based on the DiscussionID
-   /// being saved. 
-   /// </summary>
-   /// <param name="DiscussionID" type="int">
-   /// The DiscussionID relating to the category we are updating.
-   /// </param>
+   /**
+    * Updates the CountDiscussions value on the category based on the DiscussionID
+    * being saved. 
+    *
+    * @param int The DiscussionID relating to the category we are updating.
+    */
    public function UpdateDiscussionCount($DiscussionID) {
       $Data = $this->SQL
          ->Select('d2.CategoryID')
@@ -401,9 +397,9 @@ class DiscussionModel extends VanillaModel {
       }
    }
    
-   /// <summary>
-   /// Announces (or unannounces) a discussion. Returns the value that was set.
-   /// </summary>
+   /**
+    * Announces (or unannounces) a discussion. Returns the value that was set.
+    */
    public function SetProperty($DiscussionID, $Property, $ForceValue = FALSE) {
       if ($ForceValue !== FALSE) {
          $Value = $ForceValue;
@@ -420,10 +416,10 @@ class DiscussionModel extends VanillaModel {
       return $Value;
    }
       
-   /// <summary>
-   /// Bookmarks (or unbookmarks) a discussion. Returns the current state of the
-   /// bookmark (ie. TRUE for bookmarked, FALSE for unbookmarked)
-   /// </summary>
+   /**
+    * Bookmarks (or unbookmarks) a discussion. Returns the current state of the
+    * bookmark (ie. TRUE for bookmarked, FALSE for unbookmarked)
+    */
    public function BookmarkDiscussion($DiscussionID, $UserID) {
       $State = '1';
       $Discussion = $this->GetID($DiscussionID);
@@ -448,9 +444,9 @@ class DiscussionModel extends VanillaModel {
       return $State == '1' ? TRUE : FALSE;
    }
    
-   /// <summary>
-   /// The number of bookmarks the specified $UserID has.
-   /// </summary>
+   /**
+    * The number of bookmarks the specified $UserID has.
+    */
    public function BookmarkCount($UserID) {
       $Data = $this->SQL
          ->Select('ud.DiscussionID', 'count', 'Count')

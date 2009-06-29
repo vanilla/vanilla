@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Vanilla Categories Controller
-/// </summary>
+/**
+ * Vanilla Categories Controller
+ */
 class CategoriesController extends VanillaController {
    
    public $Uses = array('Database', 'Form', 'CategoryModel');

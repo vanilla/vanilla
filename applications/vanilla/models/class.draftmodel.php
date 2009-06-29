@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class DraftModel extends VanillaModel {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct() {
       parent::__construct('Draft');
    }

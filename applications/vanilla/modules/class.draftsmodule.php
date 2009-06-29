@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders user drafts. If rendered within a discussion, it only shows drafts
-/// related to that discussion.
-/// </summary>
+/**
+ * Renders user drafts. If rendered within a discussion, it only shows drafts
+ * related to that discussion.
+ */
 class DraftsModule extends Module {
    
    protected $_DraftData;

@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// The VanillaModel introduces common methods that child classes can use.
-/// </summary>
+/**
+ * The VanillaModel introduces common methods that child classes can use.
+ */
 abstract class VanillaModel extends Model {
-   /// <summary>
-   /// Class constructor.
-   /// </summary>
+   /**
+    * Class constructor.
+    */
    public function __construct($Name = '') {
       parent::__construct($Name);
    }
    
-   /// <summary>
-   /// Checks to see if the user is spamming. Returns TRUE if the user is spamming.
-   /// </summary>
+   /**
+    * Checks to see if the user is spamming. Returns TRUE if the user is spamming.
+    */
    public function CheckForSpam($Type) {
       $Spam = FALSE;
       if (!in_array($Type, array('Comment', 'Discussion')))

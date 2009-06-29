@@ -236,6 +236,7 @@ class Gdn_SearchModel extends Model {
 		}
 		
 		$Result = $this->SQL->Get();
+		$Result->DefaultDatasetType = DATASET_TYPE_ARRAY;
 		return $Result;
 	}
 	

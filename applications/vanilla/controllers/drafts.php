@@ -5,7 +5,7 @@
 /// </summary>
 class DraftsController extends VanillaController {
    
-   public $Uses = array('Database', 'DiscussionModel', 'CommentModel');
+   public $Uses = array('Database', 'DraftModel');
    
    public function Index($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
@@ -22,9 +22,8 @@ class DraftsController extends VanillaController {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
-      $DiscussionModel = new DiscussionModel();
-      $this->DraftData = $DiscussionModel->GetDrafts($Session->UserID, $Offset, $Limit);
-      $CountDrafts = $DiscussionModel->GetDraftCount($Session->UserID);
+      $this->DraftData = $this->DraftModel->Get($Session->UserID, $Offset, $Limit);
+      $CountDrafts = $this->DraftModel->GetCount($Session->UserID);
       
       // Build a pager
       $PagerFactory = new PagerFactory();
@@ -55,5 +54,33 @@ class DraftsController extends VanillaController {
       
       // Render the controller
       $this->Render();
+   }
+   
+   public function Delete($DraftID = '', $TransientKey = '') {
+      $Form = new Form();
+      $Session = Gdn::Session();
+      if (
+         is_numeric($DraftID)
+         && $DraftID > 0
+         && $Session->UserID > 0
+         && $Session->ValidateTransientKey($TransientKey)
+      ) {
+         $Draft = $this->DraftModel->GetID($DraftID);
+         if ($Draft && !$this->DraftModel->Delete($DraftID))
+            $Form->AddError('Failed to delete discussion');
+      } else {
+         $Form->AddError('ErrPermission');
+      }
+      
+      // Redirect
+      if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
+         $Target = GetIncomingValue('Target', '/vanilla/drafts');
+         Redirect($Target);
+      }
+         
+      if ($Form->ErrorCount() > 0)
+         $this->SetJson('ErrorMessage', $Form->Errors());
+         
+      $this->Render();         
    }
 }

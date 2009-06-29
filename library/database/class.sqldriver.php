@@ -301,7 +301,7 @@ abstract class Gdn_SQLDriver {
       if(count($Split) > 1) {
          $Field = $Split[0];
          $Op = $Split[1];
-         if(count($Split) > 2) {
+         if (count($Split) > 2) {
             $Value = null;
          }
       } else {
@@ -321,8 +321,12 @@ abstract class Gdn_SQLDriver {
       // Add the expression operator.
       $Expr .= ' '.$Op.' ';
       
-      // Add the right side of the expression.
-      $Expr .= $this->_ParseExpr($Value, $Field, $EscapeValueSql);
+      if ($Op == 'is' || $Op == 'is not' && is_null($Value)) {
+         $Expr .= 'null';
+      } else {
+         // Add the right side of the expression.
+         $Expr .= $this->_ParseExpr($Value, $Field, $EscapeValueSql);
+      }
       
       return $Expr;
    }

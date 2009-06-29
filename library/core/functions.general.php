@@ -635,11 +635,94 @@ if (!function_exists('RemoveQuoteSlashes')) {
 		return str_replace("\\\"", '"', $String);
 	}
 }
+
+if (!function_exists('GetMentions')) {
+   function GetMentions($String) {
+      $Mentions = array();
+      
+      // This one grabs mentions that start at the beginning of $String
+      preg_match(
+         '/^(@([\d\w_]{1,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 3)
+         $Mentions[] = $Matches[2];
+      
+      // This one handles all other mentions
+      preg_match_all(
+         '/([\s]+)(@([\d\w_]{3,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 4) {
+         for ($i = 0; $i < count($Matches[3]); ++$i) {
+            $Mentions[] = $Matches[3][$i];
+         }
+      }
+      return array_unique($Mentions);
+   }
+}
+
+// Needed this to fix a bug: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
 if (!function_exists('getallheaders')) {
    function getallheaders() {
       foreach($_SERVER as $name => $value)
           if(substr($name, 0, 5) == 'HTTP_')
               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
       return $headers;
+   }
+}
+
+if (!function_exists('ArrayCombine')) {
+   // PHP has a ridiculous limitation that doesn't allow array_combine to work if
+   // either of the arrays are empty
+   function ArrayCombine($Array1, $Array2) {
+      if (count($Array1) > 0 && count($Array2) > 0)
+         return array_combine($Array1, $Array2);
+      elseif (count($Array1) == 0)
+         return $Array2;
+      else
+         return $Array1;
+   }
+}
+
+if (!function_exists('filter_input')) {
+   if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
+   if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
+   if (!defined('FILTER_SANITIZE_STRING')) define('FILTER_SANITIZE_STRING', 'FILTER_SANITIZE_STRING');
+   if (!defined('FILTER_REQUIRE_ARRAY')) define('FILTER_REQUIRE_ARRAY', 'FILTER_REQUIRE_ARRAY');
+   function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
+      $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
+      return ArrayValue($FieldName, $Collection, '');
+   }
+}
+
+if (!function_exists('json_encode')) {
+   require_once PATH_LIBRARY . DS . 'vendors' . DS . 'JSON' . DS . 'JSON.php';
+   
+   function json_encode($arg) {
+      global $services_json;
+      if (!isset($services_json)) {
+         $services_json = new Services_JSON();
+      }
+      return $services_json->encode($arg);
+   }
+   
+   function json_decode($arg, $assoc = FALSE) {
+      global $services_json;
+      if (!isset($services_json)) {
+         $services_json = new Services_JSON();
+      }
+      $obj = $services_json->decode($arg);
+      if ($assoc)
+         return Format::ObjectAsArray($obj);
+      else
+         return $obj;
+   }
+}
+if (!function_exists('array_fill_keys')) {
+   function array_fill_keys($Keys, $Val) {
+      return array_combine($Keys,array_fill(0,count($Keys),$Val));
    }
 }

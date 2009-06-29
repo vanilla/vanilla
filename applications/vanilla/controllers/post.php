@@ -5,7 +5,7 @@
 /// </summary>
 class PostController extends VanillaController {
    
-   public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel');
+   public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
    /// <summary>
    /// Create a discussion.
@@ -16,6 +16,7 @@ class PostController extends VanillaController {
    public function Discussion($CategoryID = '') {
       $Session = Gdn::Session();
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
+      $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
          $CategoryModel = new CategoryModel();
@@ -40,15 +41,19 @@ class PostController extends VanillaController {
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          if (isset($this->Discussion))
             $this->Form->SetData($this->Discussion);
+         else if (isset($this->Draft))
+            $this->Form->SetData($this->Draft);
          else
             $this->Form->SetData(array('CategoryID' => $CategoryID));
             
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
-         $Draft = $this->Form->ButtonExists('Post Discussion') ? FALSE : TRUE;
+         if ($DraftID == 0)
+            $DraftID = $this->Form->GetFormValue('DraftID', 0);
+            
+         $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
-         $FormValues['Draft'] = $Draft ? '1' : '0';
          if (!$Preview) {
             // Check category permissions
             if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', $this->CategoryID))
@@ -61,53 +66,59 @@ class PostController extends VanillaController {
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
             if ($this->Form->ErrorCount() == 0) {
-               $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
-               $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
+               if ($Draft) {
+                  $DraftID = $this->DraftModel->Save($FormValues);
+                  $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
+               } else {
+                  $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
+                  $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
+                  if ($DiscussionID > 0 && $DraftID > 0)
+                     $this->DraftModel->Delete($DraftID);
+               }
             }
          } else {
             // If this was a preview click, create a discussion/comment shell with the values for this comment
-            // if ($DiscussionID > 0) {
-            //    $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
-            //    $this->Comment = $this->CommentModel->GetID($this->Discussion->FirstCommentID);
-            // } else {
-               $this->Discussion = new stdClass();
-               $this->Discussion->Name = $this->Form->GetValue('Name', '');
-               $this->Comment = new stdClass();
-               $this->Comment->InsertName = $Session->User->Name;
-               $this->Comment->InsertPhoto = $Session->User->Photo;
-               $this->Comment->DateInserted = Format::Date();
-               $this->Comment->Body = ArrayValue('Body', $FormValues, '');
-            // }
+            $this->Discussion = new stdClass();
+            $this->Discussion->Name = $this->Form->GetValue('Name', '');
+            $this->Comment = new stdClass();
+            $this->Comment->InsertName = $Session->User->Name;
+            $this->Comment->InsertPhoto = $Session->User->Photo;
+            $this->Comment->DateInserted = Format::Date();
+            $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                $this->AddAsset('Content', $this->FetchView('preview'));
             } else {
                $this->View = 'preview';
             }
          }
-         
          if ($this->Form->ErrorCount() > 0) {
             // Return the form errors
             $this->StatusMessage = $this->Form->Errors();
-         } else if ($DiscussionID > 0) {
-            // Make sure that the ajax request form knows about the newly created discussion id
+         } else if ($DiscussionID > 0 || $DraftID > 0) {
+            // Make sure that the ajax request form knows about the newly created discussion or draft id
             $this->SetJson('DiscussionID', $DiscussionID);
+            $this->SetJson('DraftID', $DraftID);
             
-            // If the discussion was not a draft
-            if (!$Draft) {
-               // Redirect to the new discussion
-               $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-               if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                  Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Format::Url($Discussion->Name));
+            if (!$Preview) {
+               // If the discussion was not a draft
+               if (!$Draft) {
+                  // Redirect to the new discussion
+                  $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+                     Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Format::Url($Discussion->Name));
+                  } else {
+                     $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Format::Url($Discussion->Name));
+                  }
                } else {
-                  $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Format::Url($Discussion->Name));
+                  // If this was a draft save, notify the user about the save
+                  $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
                }
-            } else if ($Draft && !$Preview) {
-               // If this was a draft save, notify the user about the save
-               $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
             }
          }
       }
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
+      $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       $this->Render();
    }
    
@@ -118,9 +129,14 @@ class PostController extends VanillaController {
    /// The DiscussionID of the discussion to edit. If blank, this method will
    /// throw an error.
    /// </param>
-   public function EditDiscussion($DiscussionID = '') {
-      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
-      $this->CategoryID = $this->Discussion->CategoryID;
+   public function EditDiscussion($DiscussionID = '', $DraftID = '') {
+      if ($DraftID != '') {
+         $this->Draft = $this->DraftModel->GetID($DraftID);
+         $this->CategoryID = $this->Draft->CategoryID;
+      } else {
+         $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
+         $this->CategoryID = $this->Discussion->CategoryID;
+      }
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);
    }
@@ -141,13 +157,15 @@ class PostController extends VanillaController {
 
       $Session = Gdn::Session();
       $this->Form->SetModel($this->CommentModel);
-      $CommentID = isset($this->Comment) ? $this->Comment->CommentID : '';
+      $CommentID = isset($this->Comment) && property_exists($this->Comment, 'CommentID') ? $this->Comment->CommentID : '';
+      $DraftID = isset($this->Comment) && property_exists($this->Comment, 'DraftID') ? $this->Comment->DraftID : '';
       $this->EventArguments['CommentID'] = $CommentID;
-      $Editing = $CommentID > 0;
+      $Editing = $CommentID > 0 || $DraftID > 0;
       $this->EventArguments['Editing'] = $Editing;
       $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('CommentID', $CommentID);
+      $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       $this->DiscussionID = $DiscussionID;
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if ($Editing) {
@@ -165,13 +183,21 @@ class PostController extends VanillaController {
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
-         $Draft = $this->Form->ButtonExists('Post Comment') ? FALSE : TRUE;
+         if ($DraftID == 0)
+            $DraftID = $this->Form->GetFormValue('DraftID', 0);
+         
+         $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $this->EventArguments['Draft'] = $Draft;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
-         $FormValues['Draft'] = $Draft ? '1' : '0';
-         if (!$Preview) {
+         if ($Draft) {
+            $DraftID = $this->DraftModel->Save($FormValues);
+            $this->Form->AddHidden('DraftID', $DraftID, TRUE);
+            $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
+         } else if (!$Preview) {
             $CommentID = $this->CommentModel->Save($FormValues);
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());
+            if ($CommentID > 0 && $DraftID > 0)
+               $this->DraftModel->Delete($DraftID);
          }
          
          // Handle non-ajax requests first:
@@ -205,11 +231,20 @@ class PostController extends VanillaController {
                // Return the form errors
                $this->StatusMessage = $this->Form->Errors();               
             } else {
-               // Make sure that the ajax request form knows about the newly created comment id
+               // Make sure that the ajax request form knows about the newly created comment or draft id
                $this->SetJson('CommentID', $CommentID);
+               $this->SetJson('DraftID', $DraftID);
                
+               if ($Preview) {
+                  // If this was a preview click, create a comment shell with the values for this comment
+                  $this->Comment = new stdClass();
+                  $this->Comment->InsertName = $Session->User->Name;
+                  $this->Comment->InsertPhoto = $Session->User->Photo;
+                  $this->Comment->DateInserted = Format::Date();
+                  $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+                  $this->View = 'preview';
+               } elseif (!$Draft) {
                // If the comment was not a draft
-               if (!$Draft) {
                   // If adding a comment 
                   if ($Editing) {
                      // Just reload the comment in question
@@ -243,14 +278,6 @@ class PostController extends VanillaController {
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
-               } elseif ($Preview) {
-                  // If this was a preview click, create a comment shell with the values for this comment
-                  $this->Comment = new stdClass();
-                  $this->Comment->InsertName = $Session->User->Name;
-                  $this->Comment->InsertPhoto = $Session->User->Photo;
-                  $this->Comment->DateInserted = Format::Date();
-                  $this->Comment->Body = ArrayValue('Body', $FormValues, '');
-                  $this->View = 'preview';
                } else {
                   // If this was a draft save, notify the user about the save
                   $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
@@ -277,9 +304,14 @@ class PostController extends VanillaController {
    /// <param name="CommentID" type="int" required="FALSE" default="empty">
    /// The CommentID of the comment to edit.
    /// </param>
-   public function EditComment($CommentID = '') {
-      $this->Form->SetModel($this->CommentModel);
-      $this->Comment = $this->CommentModel->GetID($CommentID);
+   public function EditComment($CommentID = '', $DraftID = '') {
+      if ($DraftID != '') {
+         $this->Form->SetModel($this->DraftModel);
+         $this->Comment = $this->DraftModel->GetID($DraftID);
+      } else {
+         $this->Form->SetModel($this->CommentModel);
+         $this->Comment = $this->CommentModel->GetID($CommentID);
+      }
       $this->View = 'Comment';
       $this->Comment($this->Comment->DiscussionID);
    }

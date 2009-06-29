@@ -101,7 +101,7 @@ class RoutesController extends GardenController {
          && $Key !== FALSE
       ) {
          $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Path = PATH_CONF . DS . 'routes.php';
+         $Path = PATH_CONF . DS . 'config.php';
          $Config->Load($Path, 'Save');            
          $Config->Remove('Routes'.'.'.$Key);
          $Config->Save($Path);

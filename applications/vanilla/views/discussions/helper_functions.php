@@ -63,7 +63,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             }          
          ?>
       </li>
-      <li class="Topic">
+      <li class="Title">
          <h3><?php
             echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
          ?></h3>

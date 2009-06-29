@@ -77,6 +77,7 @@ class DiscussionController extends VanillaController {
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
+      $this->Form->AddHidden('DraftID', '');
       $this->Form->Action = Url('/vanilla/post/comment/');
       
       // Deliver json data if necessary
@@ -335,7 +336,7 @@ class DiscussionController extends VanillaController {
          $Comment = $this->CommentModel->GetID($CommentID);
          if ($Comment) {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
-            $HasPermission = $Comment->Draft == '1' && $Comment->InsertUserID = $Session->UserID;
+            $HasPermission = $Comment->InsertUserID = $Session->UserID;
             if (!$HasPermission && $Discussion)
                $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', $Discussion->CategoryID);
             

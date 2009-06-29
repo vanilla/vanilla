@@ -2,9 +2,9 @@
 $Count = array(1, 2, 3, 4, 5, 10, 15, 20, 25, 30);
 $Time = array(30, 60, 90, 120, 240);
 $Lock = array(30, 60, 90, 120, 240);
-$SpamCount = array_combine($Count, $Count);
-$SpamTime = array_combine($Time, $Time);
-$SpamLock = array_combine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5, 10));
+$SpamCount = ArrayCombine($Count, $Count);
+$SpamTime = ArrayCombine($Time, $Time);
+$SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5, 10));
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>

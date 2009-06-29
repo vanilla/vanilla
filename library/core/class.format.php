@@ -178,10 +178,25 @@ class Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
-         // Kludge to allow the code tag to keep all enclosed html encoded.
+         // Allow the code tag to keep all enclosed html encoded.
          $Mixed = preg_replace(
             array('/<code([^>]*)>(.+?)<\/code>/sei'), 
             array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></code>\''), 
+            $Mixed
+         );
+         
+         // Handle @mentions
+         // This one grabs mentions that start at the beginning of $Mixed
+         $Mixed = preg_replace(
+            '/^(@([\d\w_]{1,20}))/si',
+            Anchor('\\1', '/profile/\\2'),
+            $Mixed
+         );
+         
+         // This one handles all other mentions
+         $Mixed = preg_replace(
+            '/([\s]+)(@([\d\w_]{3,20}))/si',
+            '\\1'.Anchor('\\2', '/profile/\\3'),
             $Mixed
          );
          
@@ -191,24 +206,6 @@ class Format {
          } else {
             return $Formatter->Format($Mixed);
          }
-         
-         /*if (!class_exists('HTMLPurifier'))
-            __autoload('HTMLPurifier');
-            
-         $HPConfig = HTMLPurifier_Config::createDefault();
-         $HPConfig->set('HTML', 'Doctype', 'XHTML 1.0 Strict');
-         // Get HtmlPurifier configuration settings from Garden
-         $HPSettings = Gdn::Config('HtmlPurifier');
-         if (is_array($HPSettings)) {
-            foreach ($HPSettings as $Namespace => $Setting) {
-               foreach ($Setting as $Name => $Value) {
-                  // Assign them to htmlpurifier
-                  $HPConfig->set($Namespace, $Name, $Value);
-               }
-            }
-         }
-         $HtmlPurifier = new HTMLPurifier($HPConfig);
-         return $HtmlPurifier->purify($Mixed);*/
       }
    }
    

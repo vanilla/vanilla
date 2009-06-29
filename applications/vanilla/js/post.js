@@ -8,6 +8,7 @@ jQuery(document).ready(function($) {
       var frm = $(btn).parents('form').get(0);
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
+      var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
       var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
       var postValues = $(frm).serialize();
@@ -36,6 +37,9 @@ jQuery(document).ready(function($) {
             // Assign the comment id to the form if it was defined
             if (json.CommentID != null && json.CommentID != '')
                $(inpCommentID).val(json.CommentID);
+               
+            if (json.DraftID != null && json.DraftID != '')
+               $(inpDraftID).val(json.DraftID);
                
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
@@ -67,6 +71,7 @@ jQuery(document).ready(function($) {
       var frm = $(btn).parents('form').get(0);
       var textbox = $(frm).find('textarea');
       var inpDiscussionID = $(frm).find(':hidden[name$=DiscussionID]');
+      var inpDraftID = $(frm).find(':hidden[name$=DraftID]');
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
       var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
       var postValues = $(frm).serialize();
@@ -92,6 +97,9 @@ jQuery(document).ready(function($) {
             // Assign the discussion id to the form if it was defined
             if (json.DiscussionID != null)
                $(inpDiscussionID).val(json.DiscussionID);
+               
+            if (json.DraftID != null)
+               $(inpDraftID).val(json.DraftID);
 
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();

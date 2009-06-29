@@ -256,6 +256,10 @@ if($SearchModel instanceof Gdn_SearchModel) {
 		->Set($Explicit, $Drop);
 }
 
+/*
+ 
+2009-06-27 - Removing Views so we can support older versions of mysql.
+
 // vw_SingleRoleUser Returns all UserIDs that have only one role.
 $SQL->Select('UserID')
    ->From('UserRole')
@@ -276,3 +280,4 @@ $SQL->Select('User.*')
    ->From('User')
    ->Join('vw_ApplicantID', 'User.UserID = vw_ApplicantID.UserID');
 $Construct->View('vw_Applicant', $SQL);
+*/

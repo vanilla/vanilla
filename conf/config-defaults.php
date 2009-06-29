@@ -7,14 +7,17 @@ $Configuration = array();
 
 $Configuration['EnabledApplications']['Garden'] = 'garden';
 
-$Configuration['Database']['Engine']                  = 'MySQL';
-$Configuration['Database']['Host']                    = 'dbhost';
-$Configuration['Database']['Name']                    = 'dbname';
-$Configuration['Database']['User']                    = 'dbuser';
-$Configuration['Database']['Password']                = '';
-$Configuration['Database']['ConnectionOptions']    = array(PDO::ATTR_PERSISTENT => TRUE);
-$Configuration['Database']['CharacterEncoding']       = 'utf8';
-$Configuration['Database']['Prefix']                  = 'GDN_';
+$Configuration['Database']['Engine']                           = 'MySQL';
+$Configuration['Database']['Host']                             = 'dbhost';
+$Configuration['Database']['Name']                             = 'dbname';
+$Configuration['Database']['User']                             = 'dbuser';
+$Configuration['Database']['Password']                         = '';
+$Configuration['Database']['ConnectionOptions']                = array(
+                                                                  PDO::ATTR_PERSISTENT => TRUE,
+                                                                  PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
+                                                                  PDO::MYSQL_ATTR_INIT_COMMAND => "set names 'utf8'"
+                                                               );
+$Configuration['Database']['Prefix']                           = 'GDN_';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';

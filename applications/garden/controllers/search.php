@@ -27,13 +27,21 @@ class SearchController extends GardenController {
 	
 	/// METHODS ///
 	public function Index($Offset = 0, $Limit = NULL) {
-		if(!is_numeric($Limit)) {
+      if ($this->Head) {
+			$this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
+         $this->Head->AddScript('/applications/garden/js/search.js');
+      }
+
+		if(!is_numeric($Limit))
 			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
-		}
 		
 		$Search = $this->Form->GetFormValue('Search');
-		
-		$this->SetData('SearchResults', $this->SearchModel->Search($Search, $Offset, $Limit));
+		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
+		$this->SetData('SearchResults', $ResultSet);
+		$this->SetData('SearchTerm', Format::Text($Search));
+		$NumResults = $ResultSet->NumRows();
+		if ($NumResults == $Offset + $Limit)
+			$NumResults++;
 		
 		// Build a pager
 		$PagerFactory = new PagerFactory();
@@ -44,7 +52,7 @@ class SearchController extends GardenController {
 		$Pager->Configure(
 			$Offset,
 			$Limit,
-			$Offset + $this->Data['SearchResults']->NumRows() + 1,
+			$NumResults,
 			'garden/search/%1$s/%2$s/?Search='.Format::Url($Search)
 		);
 		$this->SetData('Pager', $Pager);

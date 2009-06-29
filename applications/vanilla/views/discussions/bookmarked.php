@@ -4,7 +4,7 @@ echo $this->Pager->ToString('less');
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
 <h1><?php echo Gdn::Translate('Bookmarked Discussions'); ?></h1>
-<ul class="Discussions Bookmarks">
+<ul class="DataList Discussions Bookmarks">
    <?php include($ViewLocation); ?>
 </ul>
 <?php

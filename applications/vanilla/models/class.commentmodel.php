@@ -27,7 +27,6 @@ class CommentModel extends VanillaModel {
       $this->CommentQuery();
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
-         ->Where('c.Draft', '0')
          ->OrderBy('c.DateInserted', 'asc')
          ->Limit($Limit, $Offset)
          ->Get();
@@ -75,7 +74,6 @@ class CommentModel extends VanillaModel {
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
-         ->Where('Draft', '0')
          ->Get()
          ->FirstRow()
          ->CountComments;
@@ -94,7 +92,6 @@ class CommentModel extends VanillaModel {
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
          ->Where('c.CommentID >', $LastCommentID)
-         ->Where('c.Draft', '0')
          ->OrderBy('c.DateInserted', 'asc')
          ->Get();
    }
@@ -113,7 +110,6 @@ class CommentModel extends VanillaModel {
          ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
          ->Join('Comment c2', 'd.DiscussionID = c2.DiscussionID')
          ->Where('c2.CommentID <=', $CommentID)
-         ->Where('c2.Draft', '0')
          ->Where('c.CommentID', $CommentID)
          ->Get()
          ->FirstRow()
@@ -281,86 +277,89 @@ class CommentModel extends VanillaModel {
             $Fields = $this->Validation->SchemaValidationFields();
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
             if ($Insert === FALSE) {
-               // If switching from draft to post, update the dateinserted
-               
-               if ($Fields['Draft'] == '0') {
-                  $OldComment = $this->GetID($CommentID);
-                  if ($OldComment->Draft == '1')
-                     $Fields['DateInserted'] = Format::ToDateTime();
-
-               }
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
                // Make sure that the comments get formatted in the method defined by Garden
                $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
-            }
-            // Record user-comment activity if this comment is not a draft
-            $Draft = ArrayValue('Draft', $Fields);
-            $Draft = $Draft == '1' ? TRUE : FALSE;
-            if (!$Draft) {
-               $DiscussionID = ArrayValue('DiscussionID', $Fields);
-               if ($DiscussionID !== FALSE)
-                  $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID);
-
-               $this->UpdateCommentCount($CommentID);
                
-               // Update the discussion author's CountUnreadDiscussions (ie.
-               // the number of discussions created by the user that s/he has
-               // unread messages in) if this comment was not added by the
-               // discussion author.
-               $Data = $this->SQL
-                  ->Select('d.InsertUserID')
-                  ->Select('d.DiscussionID', 'count', 'CountDiscussions')
-                  ->From('Discussion d')
-                  ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
-                  ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
-                  ->Where('w.CountComments >', 0)
-                  ->Where('c.InsertUserID', $Session->UserID)
-                  ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
-                  ->Where('d.Draft', '0')
-                  ->GroupBy('d.InsertUserID')
-                  ->Get();
-               
-               if ($Data->NumRows() > 0) {
-                  $UserData = $Data->FirstRow();
-                  $this->SQL
-                     ->Update('User')
-                     ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
-                     ->Where('UserID', $UserData->InsertUserID)
-                     ->Put();
-               }
-               
-               // Index the post.
-               $Search = Gdn::Factory('SearchModel');
-               if(!$Draft && !is_null($Search)) {
-                  if(array_key_exists('Name', $FormPostValues) && array_key_exists('CategoryID', $FormPostValues)) {
-                     $Title = $FormPostValues['Name'];
-                     $CategoryID = $FormPostValues['CategoryID'];
-                  } else {
-                     // Get the name from the discussion.
-                     $Row = $this->SQL
-                        ->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))
-                        ->FirstRow();
-                     if(is_object($Row)) {
-                        $Title = $Row->Name;
-                        $CategoryID = $Row->CategoryID;
-                     }
+               // Notify any users who were mentioned in the comment
+               $Usernames = GetMentions($Fields['Body']);
+               $UserModel = Gdn::UserModel();
+               foreach ($Usernames as $Username) {
+                  $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
+                  if ($User && $User->UserID != $Session->UserID) {
+                     AddActivity(
+                        $User->UserID,
+                        'CommentMention',
+                        '',
+                        $Session->UserID,
+                        'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
+                     );
                   }
-                  
-                  $Offset = $this->GetOffset($CommentID);
-                  
-                  // Index the discussion.
-                  $Document = array(
-                     'TableName' => 'Comment',
-                     'PrimaryID' => $CommentID,
-                     'PermissionJunctionID' => $CategoryID,
-                     'Title' => $Title,
-                     'Summary' => $FormPostValues['Body'],
-                     'Url' => '/discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
-                     'InsertUserID' => $Session->UserID);
-                  $Search->Index($Document, $Offset == 1 ? $Document['Title'] . ' ' . $Document['Summary'] : NULL);
                }
+            }
+            // Record user-comment activity
+            $DiscussionID = ArrayValue('DiscussionID', $Fields);
+            if ($DiscussionID !== FALSE)
+               $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID);
+
+            $this->UpdateCommentCount($CommentID);
+            
+            // Update the discussion author's CountUnreadDiscussions (ie.
+            // the number of discussions created by the user that s/he has
+            // unread messages in) if this comment was not added by the
+            // discussion author.
+            $Data = $this->SQL
+               ->Select('d.InsertUserID')
+               ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+               ->From('Discussion d')
+               ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
+               ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
+               ->Where('w.CountComments >', 0)
+               ->Where('c.InsertUserID', $Session->UserID)
+               ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
+               ->GroupBy('d.InsertUserID')
+               ->Get();
+            
+            if ($Data->NumRows() > 0) {
+               $UserData = $Data->FirstRow();
+               $this->SQL
+                  ->Update('User')
+                  ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
+                  ->Where('UserID', $UserData->InsertUserID)
+                  ->Put();
+            }
+            
+            // Index the post.
+            $Search = Gdn::Factory('SearchModel');
+            if(!is_null($Search)) {
+               if(array_key_exists('Name', $FormPostValues) && array_key_exists('CategoryID', $FormPostValues)) {
+                  $Title = $FormPostValues['Name'];
+                  $CategoryID = $FormPostValues['CategoryID'];
+               } else {
+                  // Get the name from the discussion.
+                  $Row = $this->SQL
+                     ->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))
+                     ->FirstRow();
+                  if(is_object($Row)) {
+                     $Title = $Row->Name;
+                     $CategoryID = $Row->CategoryID;
+                  }
+               }
+               
+               $Offset = $this->GetOffset($CommentID);
+               
+               // Index the discussion.
+               $Document = array(
+                  'TableName' => 'Comment',
+                  'PrimaryID' => $CommentID,
+                  'PermissionJunctionID' => $CategoryID,
+                  'Title' => $Title,
+                  'Summary' => $FormPostValues['Body'],
+                  'Url' => '/discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
+                  'InsertUserID' => $Session->UserID);
+               $Search->Index($Document, $Offset == 1 ? $Document['Title'] . ' ' . $Document['Summary'] : NULL);
             }
             $this->UpdateUser($Session->UserID);
          }
@@ -398,7 +397,6 @@ class CommentModel extends VanillaModel {
          ->Join('Comment c2', 'c.DiscussionID = c2.DiscussionID')
          ->Join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
          ->Where('c.CommentID', $CommentID)
-         ->Where('c2.Draft', '0')
          ->Where('c2.CommentID <>', 'd.FirstCommentID', TRUE, FALSE)
          ->GroupBy('c2.DiscussionID')
          ->Get()
@@ -426,31 +424,19 @@ class CommentModel extends VanillaModel {
    }
    
    public function UpdateUser($UserID) {
-      // 1. Retrieve a draft count
-      $CountDrafts = $this->SQL
-         ->Select('CommentID', 'count', 'CountDrafts')
-         ->From('Comment')
-         ->Where('InsertUserID', $UserID)
-         ->Where('Draft', '1')
-         ->Get()
-         ->FirstRow()
-         ->CountDrafts;
-         
-      // 2. Retrieve a comment count (don't include FirstCommentIDs)
+      // Retrieve a comment count (don't include FirstCommentIDs)
       $CountComments = $this->SQL
          ->Select('c.CommentID', 'count', 'CountComments')
          ->From('Comment c')
          ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID and c.CommentID <> d.FirstCommentID')
          ->Where('c.InsertUserID', $UserID)
-         ->Where('c.Draft', '0')
          ->Get()
          ->FirstRow()
          ->CountComments;
       
-      // Save them to the attributes column of the user table for this user.
+      // Save to the attributes column of the user table for this user.
       $this->SQL
          ->Update('User')
-         ->Set('CountDrafts', $CountDrafts)
          ->Set('CountComments', $CountComments)
          ->Where('UserID', $UserID)
          ->Put();
@@ -461,7 +447,7 @@ class CommentModel extends VanillaModel {
 
       // Check to see if this is the first comment in the discussion
       $Data = $this->SQL
-         ->Select('d.DiscussionID, d.FirstCommentID')
+         ->Select('d.DiscussionID, d.FirstCommentID, c.InsertUserID')
          ->From('Discussion d')
          ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
          ->Where('c.CommentID', $CommentID)
@@ -483,6 +469,8 @@ class CommentModel extends VanillaModel {
                $Search->Delete(array('TableName' => 'Comment', 'PrimaryID' => $CommentID));
             }
          }
+         // Update the user's comment count
+         $this->UpdateUser($Data->InsertUserID);
       }
       return TRUE;
    }   

@@ -124,7 +124,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $RowType The format in which the result should be returned: object or array. It
     * will fill a different array depending on which type is specified.
     */
-   private function _FetchAllRows($RowType = FALSE) {
+   public function FetchAllRows($RowType = FALSE) {
       if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
       
       if ($this->_PDOStatementFetched === FALSE) {
@@ -166,10 +166,12 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * Free's the result resource referenced by $this->_PDOStatement.
     */
-   public function FreePDOStatement() {
+   public function FreePDOStatement($DestroyPDOStatement = TRUE) {
       if (is_object($this->_PDOStatement))
          $this->_PDOStatement->closeCursor();
-      $this->_PDOStatement = NULL;
+         
+      if ($DestroyPDOStatement)
+         $this->_PDOStatement = NULL;
    }
    
    /**
@@ -292,7 +294,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       } else {
-         $this->_FetchAllRows(DATASET_TYPE_ARRAY);
+         $this->FetchAllRows(DATASET_TYPE_ARRAY);
       }
 
       return Format::To($this->_ResultArray, $FormatType);
@@ -311,7 +313,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       } else {
-         $this->_FetchAllRows(DATASET_TYPE_OBJECT);
+         $this->FetchAllRows(DATASET_TYPE_OBJECT);
       }
 
       return Format::To($this->_ResultObject, $FormatType);
@@ -367,7 +369,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
-   public function PDOStatement($PDOStatement = FALSE) {
+   public function PDOStatement(&$PDOStatement = FALSE) {
       if($PDOStatement === FALSE)
          return $this->_PDOStatement;
       else

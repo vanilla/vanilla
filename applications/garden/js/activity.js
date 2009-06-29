@@ -24,7 +24,6 @@ jQuery(document).ready(function($) {
          $(this).find('h3:first > a.Delete').hide();
       });
    });
-   
 
 
 /* Comments */
@@ -103,5 +102,5 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
 });

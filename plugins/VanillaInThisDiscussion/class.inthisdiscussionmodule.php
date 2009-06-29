@@ -30,7 +30,6 @@ class InThisDiscussionModule extends Module {
          ->Join('Photo p', 'u.PhotoID = p.PhotoID', 'left')
          ->Join('Comment c', 'u.UserID = c.InsertUserID')
          ->Where('c.DiscussionID', $DiscussionID)
-         ->Where('c.Draft', '0')
          ->GroupBy('u.UserID, u.Name, p.Name')
          ->OrderBy('u.Name', 'asc')
          ->Get();

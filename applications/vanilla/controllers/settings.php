@@ -14,7 +14,7 @@ class SettingsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/settings.js');
 
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'configuration.php', $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.PerPage',
@@ -58,7 +58,7 @@ class SettingsController extends VanillaController {
       $this->AddSideMenu('vanilla/settings/spam');
       
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'configuration.php', $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussion.SpamCount',
          'Vanilla.Discussion.SpamTime',

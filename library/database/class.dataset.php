@@ -124,7 +124,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $RowType The format in which the result should be returned: object or array. It
     * will fill a different array depending on which type is specified.
     */
-   private function _FetchAllRows($RowType = FALSE) {
+   public function FetchAllRows($RowType = FALSE) {
       if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
       
       if ($this->_PDOStatementFetched === FALSE) {
@@ -166,10 +166,12 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * Free's the result resource referenced by $this->_PDOStatement.
     */
-   public function FreePDOStatement() {
+   public function FreePDOStatement($DestroyPDOStatement = TRUE) {
       if (is_object($this->_PDOStatement))
          $this->_PDOStatement->closeCursor();
-      $this->_PDOStatement = NULL;
+         
+      if ($DestroyPDOStatement)
+         $this->_PDOStatement = NULL;
    }
    
    /**
@@ -292,7 +294,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       } else {
-         $this->_FetchAllRows(DATASET_TYPE_ARRAY);
+         $this->FetchAllRows(DATASET_TYPE_ARRAY);
       }
 
       return Format::To($this->_ResultArray, $FormatType);
@@ -311,7 +313,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       } else {
-         $this->_FetchAllRows(DATASET_TYPE_OBJECT);
+         $this->FetchAllRows(DATASET_TYPE_OBJECT);
       }
 
       return Format::To($this->_ResultObject, $FormatType);
@@ -367,10 +369,25 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
-   public function PDOStatement($PDOStatement = FALSE) {
+   public function PDOStatement(&$PDOStatement = FALSE) {
       if($PDOStatement === FALSE)
          return $this->_PDOStatement;
       else
          $this->_PDOStatement = $PDOStatement;
+   }
+   
+   /**
+    * Advances to the next row and returns the value rom a column.
+    *
+    * @param string $ColumnName The name of the column to get the value from.
+    * @param string $DefaultValue The value to return if there is no data.
+    * @return mixed The value from the column or $DefaultValue.
+    */
+   public function Value($ColumnName, $DefaultValue = NULL) {
+      if($Row = $this->NextRow('', DATASET_TYPE_ARRAY)) {
+         return $Row[$ColumnName];
+      } else {
+         return $DefaultValue;
+      }
    }
 }

@@ -13,31 +13,13 @@ if (!isset($Drop))
    
 if (!isset($Explicit))
    $Explicit = TRUE;
-	
+
+$SQL = Gdn::SQL();
 $Construct = Gdn::Structure();
-   
-// Permission Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Permission')
-   ->Column('PermissionID', 'int', 4, FALSE, NULL, 'primary', TRUE)
-   ->Column('Name', 'varchar', 200)
-   // Used for joining permissions to separate tables.
-   // ie. Specific permissions for categories:
-   // select c.*
-   // from Category c
-   // join RolePermission rp
-   //    on c.CategoryID = rp.JunctionID
-   // join Permission p
-   //    on rp.PermissionID = p.PermissionID
-   //    and p.JunctionTable = 'Category' // <-- There's actually no need for this part of the query since the permission will only ever be applied to categories based on separate business rules on the edit role screen.
-   // where p.Name in ('List of permission names')
-   ->Column('JunctionTable', 'varchar', 100, TRUE) 
-   ->Column('JunctionColumn', 'varchar', 100, TRUE) 
-   ->Set($Explicit, $Drop);
 
 // Role Table
 $Construct->Table('Role')
-   ->Column('RoleID', 'int', 2, FALSE, NULL, 'primary', TRUE)
+   ->Column('RoleID', 'int', NULL, FALSE, NULL, 'primary')
    ->Column('Name', 'varchar', 100)
    ->Column('Description', 'varchar', 200, TRUE)
    ->Column('Sort', 'int', 2, TRUE)
@@ -45,69 +27,16 @@ $Construct->Table('Role')
    ->Column('CanSession', array('1', '0'), '', FALSE, '1')
    ->Set($Explicit, $Drop);
 
-// Insert some permissions for the Garden setup
-if (!is_object($Validation))
-   $Validation = new Gdn_Validation();
-   
-$PermissionModel = new PermissionModel($Validation);
-$Permissions = array();
-$Permissions[] = 'Garden.Settings.Manage';
-$Permissions[] = 'Garden.Email.Manage';
-$Permissions[] = 'Garden.Routes.Manage';
-$Permissions[] = 'Garden.Applications.Manage';
-$Permissions[] = 'Garden.Plugins.Manage';
-$Permissions[] = 'Garden.Themes.Manage';
-$Permissions[] = 'Garden.SignIn.Allow';
-$Permissions[] = 'Garden.Registration.Manage';
-$Permissions[] = 'Garden.Applicants.Manage';
-$Permissions[] = 'Garden.Roles.Manage';
-$Permissions[] = 'Garden.Users.Add';
-$Permissions[] = 'Garden.Users.Edit';
-$Permissions[] = 'Garden.Users.Delete';
-$Permissions[] = 'Garden.Users.Approve';
-$Permissions[] = 'Garden.Activity.Delete';
-$PermissionModel->InsertNew($Permissions);
 
-// Insert some roles
-$SQL = $Database->SQL();
-if ($SQL->GetWhere('Role', array('Name' => 'Banned'))->NumRows() == 0)
-   $SQL->Insert('Role', array('Sort' => '1', 'Deletable' => '1', 'CanSession' => '1', 'Name' => 'Banned', 'Description' => 'Ex-members who do not have permission to sign in.'));
-if ($SQL->GetWhere('Role', array('Name' => 'Guest'))->NumRows() == 0)
-   $SQL->Insert('Role', array('Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Name' => 'Guest', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
-if ($SQL->GetWhere('Role', array('Name' => 'Applicant'))->NumRows() == 0)
-   $SQL->Insert('Role', array('Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Name' => 'Applicant', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
-if ($SQL->GetWhere('Role', array('Name' => 'Member'))->NumRows() == 0)
-   $SQL->Insert('Role', array('Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Name' => 'Member', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
-if ($SQL->GetWhere('Role', array('Name' => 'Administrator'))->NumRows() == 0)
-   $SQL->Insert('Role', array('Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Name' => 'Administrator', 'Description' => 'Administrators have access to everything in the application.'));
+// Define some roles.
+// Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
+$RoleModel = Gdn::Factory('RoleModel');
 
-// RolePermission Table
-$Construct->Table('RolePermission')
-   ->Column('RoleID', 'int', 2, FALSE, NULL, 'primary')
-   ->Column('PermissionID', 'int', 4, FALSE, NULL, 'primary')
-   // The table that this JunctionID relates to is based on the value in
-   // Permission.JunctionTable. JunctionID should relate to the primary key of
-   // JunctionTable.
-   ->Column('JunctionID', 'int', 11, TRUE, NULL, 'primary') 
-   ->Set($Explicit, $Drop);
-
-// Insert some permissions for Garden
-// Member permissions
-$PermissionID = $SQL->Select('PermissionID')
-   ->From('Permission')
-   ->Where('Name', 'Garden.SignIn.Allow')
-   ->Get()
-   ->FirstRow()
-   ->PermissionID;
-if ($SQL->GetWhere('RolePermission', array('RoleID' => '4', 'PermissionID' => $PermissionID))->NumRows() == 0)
-   $SQL->Insert('RolePermission', array('RoleID' => '4', 'PermissionID' => $PermissionID));
-   
-// Admin permissions
-$SQL->Delete('RolePermission', array('RoleID' => '5'));
-$Select = $SQL->Select('5, PermissionID')
-   ->From('Permission')
-   ->GetSelect();
-$SQL->Insert('RolePermission', array('RoleID', 'PermissionID'), $Select);
+$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Ex-members who do not have permission to sign in.'));
+$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
+$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
+$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
+$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
 
 // User Table
 $Construct->Table('User')
@@ -134,6 +63,8 @@ $Construct->Table('User')
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime', '', TRUE)
    ->Column('HourOffset', 'int', 2, FALSE, '0')
+	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
+	->Column('CacheRoleID', 'int', 4, TRUE)
    ->Column('Admin', array('1', '0'), '', FALSE, '0')
    ->Set($Explicit, $Drop);
 
@@ -142,10 +73,70 @@ $Construct->Table('UserRole')
    ->Column('UserID', 'int', 10, FALSE, NULL, 'primary')
    ->Column('RoleID', 'int', 2, FALSE, NULL, 'primary')
    ->Set($Explicit, $Drop);
+	
+// Assign the guest user to the guest role
+$SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
+
+
+// Only Create the permission table if we are using Garden's permission model.
+$PermissionModel = Gdn::PermissionModel();
+if($PermissionModel instanceof Gdn_PermissionModel) {
+	// Permission Table
+	$Construct->Table('Permission')
+		->Column('PermissionID', 'int', 4, FALSE, NULL, 'primary', TRUE)
+		->Column('RoleID', 'int', 4, FALSE, 0, 'key')
+		->Column('JunctionTable', 'varchar', 100, TRUE) 
+		->Column('JunctionColumn', 'varchar', 100, TRUE)
+		->Column('JunctionID', 'int', 4, TRUE)
+		// The actual permissions will be added by Gdn_PermissionModel::Define()
+		->Set($Explicit, $Drop);
+}
    
-// Assign the guest user to the guest role 
-if ($SQL->GetWhere('UserRole', array('UserID' => '0'))->NumRows() == 0)
-   $SQL->Insert('UserRole', array('UserID' => 0, 'RoleID' => 2));
+// Define the set of permissions that garden uses.
+$PermissionModel->Define(array(
+	'Garden.Settings.Manage',
+	'Garden.Email.Manage',
+	'Garden.Routes.Manage',
+	'Garden.Applications.Manage',
+	'Garden.Plugins.Manage',
+	'Garden.Themes.Manage',
+	'Garden.SignIn.Allow',
+	'Garden.Registration.Manage',
+	'Garden.Applicants.Manage',
+	'Garden.Roles.Manage',
+	'Garden.Users.Add',
+	'Garden.Users.Edit',
+	'Garden.Users.Delete',
+	'Garden.Users.Approve',
+	'Garden.Activity.Delete'
+	));
+
+// Set initial member permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 8,
+	'Garden.Signin.Allow' => 1
+	));
+
+// Set initial admininstrator permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 16,
+	'Garden.Settings.Manage' => 1,
+	'Garden.Email.Manage' => 1,
+	'Garden.Routes.Manage' => 1,
+	'Garden.Applications.Manage' => 1,
+	'Garden.Plugins.Manage' => 1,
+	'Garden.Themes.Manage' => 1,
+	'Garden.SignIn.Allow' => 1,
+	'Garden.Registration.Manage' => 1,
+	'Garden.Applicants.Manage' => 1,
+	'Garden.Roles.Manage' => 1,
+	'Garden.Users.Add' => 1,
+	'Garden.Users.Edit' => 1,
+	'Garden.Users.Delete' => 1,
+	'Garden.Users.Approve' => 1,
+	'Garden.Activity.Delete' => 1
+	));
+
 
 // Photo Table
 $Construct->Table('Photo')
@@ -228,37 +219,46 @@ $Construct->Table('Activity')
    ->Column('InsertUserID', 'int', 10, TRUE, NULL, 'key')
    ->Column('DateInserted', 'datetime')
    ->Set($Explicit, $Drop);
-	
-// Search Document Type Table
-$Construct->Table('TableType')
-	->Column('TableName', 'varchar', 50, FALSE, NULL, 'primary')
-	->Column('PermissionTableName', 'varchar', 50, TRUE)
-	->Set($Explicit, $Drop);
-	
-// Search Document Table
-$Construct->Table('SearchDocument')
-	->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-	->Column('TableName', 'varchar', 50)
-	->Column('PrimaryID', 'int', 11, FALSE)
-	->Column('PermissionJunctionID', 'int', 11, TRUE)
-	->Column('Title', 'varchar', 100, FALSE)
-	->Column('Summary', 'varchar', 200, FALSE)
-	->Column('Url', 'varchar', 255, FALSE)
-	->Column('InsertUserID', 'int', 10, FALSE)
-	->Column('DateInserted', 'datetime', FALSE)
-	->Set($Explicit, $Drop);
-	
-// Search Index Table
-$Construct->Table('SearchKeyword')
-	->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-	->Column('Keyword', 'varchar', 50, FALSE, FALSE, 'key')
-	->Set($Explicit, $Drop);
-	
-// Search Index to Document table.
-$Construct->Table('SearchKeywordDocument')
-	->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary')
-	->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
-	->Set($Explicit, $Drop);
+
+
+// Construct the search table only if the search model hasn't been overridden.
+$SearchModel = Gdn::Factory('SearchModel');
+if($SearchModel instanceof Gdn_SearchModel) {
+	// Search Document Type Table
+	$Construct->Table('TableType')
+		->Column('TableName', 'varchar', 50, FALSE, NULL, 'primary')
+		->Column('PermissionTableName', 'varchar', 50, TRUE)
+		->Set($Explicit, $Drop);
+		
+	// Search Document Table
+	$Construct->Table('SearchDocument')
+		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary', TRUE)
+		->Column('TableName', 'varchar', 50)
+		->Column('PrimaryID', 'int', 11, FALSE)
+		->Column('PermissionJunctionID', 'int', 11, TRUE)
+		->Column('Title', 'varchar', 100, FALSE)
+		->Column('Summary', 'varchar', 200, FALSE)
+		->Column('Url', 'varchar', 255, FALSE)
+		->Column('InsertUserID', 'int', 10, FALSE)
+		->Column('DateInserted', 'datetime', FALSE)
+		->Set($Explicit, $Drop);
+		
+	// Search Index Table
+	$Construct->Table('SearchKeyword')
+		->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary', TRUE)
+		->Column('Keyword', 'varchar', 50, FALSE, FALSE, 'key')
+		->Set($Explicit, $Drop);
+		
+	// Search Index to Document table.
+	$Construct->Table('SearchKeywordDocument')
+		->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary')
+		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
+		->Set($Explicit, $Drop);
+}
+
+/*
+ 
+2009-06-27 - Removing Views so we can support older versions of mysql.
 
 // vw_SingleRoleUser Returns all UserIDs that have only one role.
 $SQL->Select('UserID')
@@ -280,10 +280,4 @@ $SQL->Select('User.*')
    ->From('User')
    ->Join('vw_ApplicantID', 'User.UserID = vw_ApplicantID.UserID');
 $Construct->View('vw_Applicant', $SQL);
-
-// vw_RolePermission
-$SQL->Select('rp.*')
-   ->Select('p.Name', '', 'Permission')
-   ->From('RolePermission rp')
-   ->Join('Permission p', 'rp.PermissionID = p.PermissionID');
-$Construct->View('vw_RolePermission', $SQL);
+*/

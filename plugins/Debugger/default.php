@@ -25,8 +25,10 @@ $PluginInfo['Debugger'] = array(
 );
 
 // Install the debugger database.
-if(Gdn::Config('EnabledPlugins.Debugger'))
-   Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.database.debug.php', Gdn::FactorySingleton, array('Database'));
+$tmp = Gdn::FactoryOverwrite(TRUE);
+Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.database.debug.php', Gdn::FactorySingleton, array('Database'));
+Gdn::FactoryOverwrite($tmp);
+unset($tmp);
 
 class DebuggerPlugin implements Gdn_IPlugin {
    // Specifying "Base" as the class name allows us to make the method get called for every

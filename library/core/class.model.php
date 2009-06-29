@@ -169,8 +169,10 @@ class Model extends Gdn_Pluggable {
       if (!isset($this->Schema)) {
          $this->Schema = new Gdn_Schema($this->Name);
          $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name);
-         if (is_array($this->PrimaryKey))
+         if (is_array($this->PrimaryKey)) {
+            print_r($this->PrimaryKey);
             $this->PrimaryKey = $this->PrimaryKey[0];
+         }
 
          $this->Validation->ApplyRulesBySchema($this->Schema);
       }

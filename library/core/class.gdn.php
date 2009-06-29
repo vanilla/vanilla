@@ -16,9 +16,10 @@ class Gdn {
 	const AliasDatabaseStructure = 'DatabaseStructure';
 	const AliasDispatcher = 'Dispatcher';
 	const AliasLocale = 'Locale';
+	const AliasPermissionModel = 'PermissionModel';
 	const AliasSession = 'Session';
 	const AliasSqlDriver = 'SqlDriver';
-	const AliasUser = 'UserModel';
+	const AliasUserModel = 'UserModel';
 	
 	const FactoryInstance = 'Instance';
 	const FactoryPrototype = 'Prototype';
@@ -32,7 +33,7 @@ class Gdn {
 	protected static $_Factory = NULL;
 	
 	/** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
-	public static $FactoryOverwrite = TRUE;
+	protected static $_FactoryOverwrite = TRUE;
 	
 	protected static $_Locale = NULL;
 	
@@ -117,7 +118,7 @@ class Gdn {
 	 */
 	public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL) {
 		// Don't overwrite an existing definition.
-		if(self::$FactoryOverwrite === FALSE && self::FactoryExists($Alias))
+		if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
 			return;
 		
 		self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
@@ -209,6 +210,16 @@ class Gdn {
 		}
 	}
 	
+	public static function FactoryOverwrite($Value = NULL) {
+		$Result = (self::$_FactoryOverwrite & 1 > 0);
+		
+		if(!is_null($Value)) {
+			self::$_FactoryOverwrite = $Value;
+		}
+		
+		return $Result;
+	}
+	
 	/**
 	 * Uninstall an class from the factory.
 	 * 
@@ -236,6 +247,15 @@ class Gdn {
 			self::$_Locale = self::Factory(self::AliasLocale);
 		
 		return self::$_Locale;
+	}
+	
+	/**
+	 * Geth the permission model for the application.
+	 *
+	 * @return Gdn_PermissionModel
+	 */
+	public static function PermissionModel() {
+		return self::Factory(self::AliasPermissionModel);
 	}
 	
 	/**
@@ -297,7 +317,7 @@ class Gdn {
 	 * @return Gdn_User
 	 */
 	public static function UserModel() {
-		$Result = self::Factory(self::AliasUser);
+		$Result = self::Factory(self::AliasUserModel);
 		return $Result;
 	}
 	
@@ -308,7 +328,7 @@ class Gdn {
 	 * @param boolean $Override whether to override the property if it is already set.
 	 */
 	public static function SetFactory($Factory, $Override = TRUE) {
-		if($Override || self::$_Factory == NULL)
+		if($Override || is_null(self::$_Factory))
 			self::$_Factory = $Factory;
 	}
 }

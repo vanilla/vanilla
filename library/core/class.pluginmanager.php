@@ -338,8 +338,8 @@ class Gdn_PluginManager {
       // 3. If setup succeeded, register any specified permissions
       $PermissionName = ArrayValue('RegisterPermissions', $PluginInfo, FALSE);
       if ($PermissionName != FALSE) {
-         $PermissionModel = new PermissionModel($Validation);
-         $PermissionModel->InsertNew($PermissionName);
+         $PermissionModel = Gdn::PermissionModel();
+         $PermissionModel->Define($PermissionName);
       }
 
       if (count($Validation->Results()) > 0)

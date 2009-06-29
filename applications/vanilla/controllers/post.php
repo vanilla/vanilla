@@ -42,6 +42,8 @@ class PostController extends VanillaController {
             $this->Form->SetData($this->Discussion);
          else if (isset($this->Draft))
             $this->Form->SetData($this->Draft);
+         else
+            $this->Form->SetData(array('CategoryID' => $CategoryID));
             
       } else {
          // Save as a draft?
@@ -89,7 +91,6 @@ class PostController extends VanillaController {
                $this->View = 'preview';
             }
          }
-         
          if ($this->Form->ErrorCount() > 0) {
             // Return the form errors
             $this->StatusMessage = $this->Form->Errors();

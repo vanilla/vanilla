@@ -270,7 +270,7 @@ class Gdn_Configuration {
       include($File);
       
       // Make sure the config variable is here and is an array.
-      if($$Name == NULL || !is_array($$Name)) {
+      if(is_null($$Name) || !is_array($$Name)) {
          return TRUE;
       }
       

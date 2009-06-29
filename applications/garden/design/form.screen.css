@@ -179,6 +179,7 @@ table.Sortable tbody td {
 }
 .CheckBoxGrid tbody th {
    font-weight: normal;
+   padding: 0;
 }
 .CheckBoxGrid tbody th,
 .CheckBoxGrid tbody td {
@@ -187,6 +188,9 @@ table.Sortable tbody td {
 .CheckBoxGrid thead th a,
 .CheckBoxGrid thead th a:hover {
    color: #333333 !important;
+}
+.CheckBoxGrid thead td {
+   padding: 0;
 }
 .CheckBoxGrid tbody th a span.Parent {
    background: url('parent_divider.gif') center right no-repeat;

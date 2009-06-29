@@ -17,6 +17,11 @@ class RoleController extends GardenController {
    
    public function Add() {
       $this->Permission('Garden.Roles.Manage');
+      
+      // Load default permissions.
+      //$PermissionModel = Gdn::PermissionModel();
+      //$this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit(0, FALSE), TRUE);
+      
       // Use the edit form with no roleid specified.
       $this->View = 'Edit';
       $this->Edit();
@@ -60,11 +65,11 @@ class RoleController extends GardenController {
       $this->Render();
    }
    
-   public $HasJunctionPermissionData;
+   //public $HasJunctionPermissionData;
    public function Edit($RoleID = FALSE) {
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
-      $PermissionModel = new PermissionModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
       if ($this->Head)
@@ -78,52 +83,23 @@ class RoleController extends GardenController {
       
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
       
-      // Load all non-junction permissions based on enabled applications and plugins
-      $this->PermissionData = $PermissionModel->GetPermissions($LimitToSuffix);
-      
-      // Define all junction tables
-      $JunctionTables = $PermissionModel->GetJunctionTables();
-         
-      // Define all of the junction rows/permissions
-      $this->JunctionTableData = array();
-      $this->HasJunctionPermissionData = FALSE;
-      foreach ($JunctionTables->Result() as $Table) {
-         // Load all junction table rows (these will represent the checkbox group name)
-         $this->JunctionTableData[$Table->JunctionTable]['Rows'] = $PermissionModel->GetJunctionData($Table->JunctionTable, $Table->JunctionColumn);
-            
-         // Load all available junction permissions
-         $JunctionPermissionData = $PermissionModel->GetJunctionPermissions($Table->JunctionTable, $LimitToSuffix);
-         $this->JunctionTableData[$Table->JunctionTable]['Permissions'] = $JunctionPermissionData;
-         if ($JunctionPermissionData->NumRows() > 0)
-            $this->HasJunctionPermissionData = TRUE;
-      }
-      
-      // Initialize the permission data containers
-      $this->RolePermissionData = FALSE;
-      $this->RoleJunctionPermissionData = FALSE;
+      // Load all permissions based on enabled applications and plugins
+      //$this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
 
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.
-         if ($RoleID > 0 // && $this->EditablePermissions
-             ) {
-            $this->RolePermissionData = $this->RoleModel->GetPermissions($RoleID);
-            $this->RoleJunctionPermissionData = $this->RoleModel->GetJunctionPermissionsForRole($RoleID);
-         }
+         $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix), true);
             
          $this->Form->SetData($this->Role);
       } else {
          // If the form has been posted back...
          // 2. Save the data (validation occurs within):
-         if ($this->Form->Save()) {
+         if ($RoleID = $this->Form->Save()) {
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
-            // TODO - redirect after save?
-            // $this->RedirectUrl = Url('/role/');
+            // Reload the permission data.
+            $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
          }
-         $this->RolePermissionData = $this->Form->GetFormValue('PermissionID');
-         $this->RoleJunctionPermissionData = $this->Form->GetFormValue('JunctionPermissionID');
-         if (!is_array($this->RoleJunctionPermissionData))
-            $this->RoleJunctionPermissionData = array();
       }
       
       $this->Render();

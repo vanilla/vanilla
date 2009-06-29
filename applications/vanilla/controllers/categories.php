@@ -9,8 +9,8 @@ class CategoriesController extends VanillaController {
    
    public function Add() {
       $this->Permission('Vanilla.Categories.Manage');
-      $RoleModel = new RoleModel();
-      $PermissionModel = new PermissionModel();
+      $RoleModel = new Gdn_RoleModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
       if ($this->Head) {
@@ -23,24 +23,20 @@ class CategoriesController extends VanillaController {
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
       
-      // Get all of the available roles/permissions for this junction
-      $this->RolePermissions = $PermissionModel->GetAvailableRolePermissionsForJunction('Category');
-      
       if (!$this->Form->AuthenticatedPostBack()) {
          $this->Form->SetData(array('AllowDiscussions' => '1')); // Checked by default
-         $this->RolePermissionData = array();
       } else {
-         $this->RolePermissionData = $this->Form->GetFormValue('RolePermissionID');
          $CategoryID = $this->Form->Save();
-         if ($CategoryID) {
-            // Save the permissions if necessary
-            if ($this->Form->GetFormValue('AllowDiscussions') == '1')
-               $PermissionModel->SaveJunctionPermissions($this->Form->FormValues(), $CategoryID);
-               
+         if ($CategoryID) {               
             $this->StatusMessage = Gdn::Translate('The category was created successfully.');
             $this->RedirectUrl = Url('vanilla/categories/manage');
          }
       }
+      // Get all of the currently selected role/permission combinations for this junction
+      $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+      $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+      $this->SetData('PermissionData', $Permissions, TRUE);
+      
       $this->Render();      
    }
    
@@ -119,8 +115,8 @@ class CategoriesController extends VanillaController {
    
    public function Edit($CategoryID = '') {
       $this->Permission('Vanilla.Categories.Manage');
-      $RoleModel = new RoleModel();
-      $PermissionModel = new PermissionModel();
+      $RoleModel = new Gdn_RoleModel();
+      $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       if ($this->Head)
@@ -135,23 +131,22 @@ class CategoriesController extends VanillaController {
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
       
-      // Get all of the available roles/permissions for this junction
-      $this->RolePermissions = $PermissionModel->GetAvailableRolePermissionsForJunction('Category');
-      
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($this->Category);
-         // Get all of the currently selected role/permission combinations for this junction
-         $this->RolePermissionData = $PermissionModel->GetSelectedRolePermissionsForJunction($CategoryID);
       } else {
-         $this->RolePermissionData = $this->Form->GetFormValue('RolePermissionID');
          if ($this->Form->Save()) {
-            // Save junction permissions
-            $PermissionModel->SaveJunctionPermissions($this->Form->FormValues(), $CategoryID);
             // Report success
             $this->StatusMessage = Gdn::Translate('The category was saved successfully.');
             $this->RedirectUrl = Url('vanilla/categories/manage');
          }
       }
+       
+      // Get all of the currently selected role/permission combinations for this junction
+      $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category');
+      $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+      $this->SetData('PermissionData', $Permissions, TRUE);
+      
+      
       $this->Render();
    }
    

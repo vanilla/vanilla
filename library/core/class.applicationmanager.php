@@ -192,8 +192,8 @@ class Gdn_ApplicationManager {
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       $PermissionName = ArrayValue('RegisterPermissions', $ApplicationInfo, FALSE);
       if ($PermissionName != FALSE) {
-         $PermissionModel = new PermissionModel($Validation);
-         $PermissionModel->InsertNew($PermissionName);
+         $PermissionModel = Gdn::PermissionModel();
+         $PermissionModel->Define($PermissionName);
       }
    }
 

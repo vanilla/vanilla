@@ -111,92 +111,14 @@ class UtilityController extends GardenController {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
       if ($Name != '') {
-         $Database = Gdn::Database();
-         if ($Database
-            ->Select('UserID')
-            ->From('User')
-            ->Where('Name', $Name)
-            ->Get()
-            ->NumRows() > 0)
-         $Available = FALSE;
+         $UserModel = Gdn::UserModel();
+         if ($UserModel->Get($Name))
+            $Available = FALSE;
       }
       if (!$Available)
          $this->Form->AddError('Username unavailable');
          
       $this->Render();
-   }
-   
-   public function Views() {
-      $Database = Gdn::Database();
-      // vw_AddOnCount
-      $View = $Database->Select('a.AddOnID')
-         ->Select('av.CountDownloads', 'count', 'CountDownloads')
-         ->From('AddOn a')
-         ->Join('AddOnVersion av', 'a.AddOnID = av.AddOnID')
-         ->GroupBy('a.AddOnID')
-         ->GetSelect();
-      $this->ConstructView('vw_AddOnCount', $View);
-      
-      // vw_AddOn
-      $View = $Database->Select('a.AddOnID, a.InsertUserID, a.CurrentVersionID, a.Name, a.Description, a.LongDescription, a.Hidden, a.DateInserted, a.UpdateUserID, a.DateUpdated')
-         ->Select('t.Name', '', 'AddOnType')
-         ->Select('ac.CountDownloads')
-         ->Select('cv.Version, cv.FileUrl, cv.FileSize')
-         ->Select('iu.Name', '', 'InsertName')
-         ->From('AddOn a')
-         ->Join('AddOnType t', 'a.AddOnTypeID = t.AddOnTypeID')
-         ->Join('vw_AddOnCount ac', 'a.AddOnID = ac.AddOnID')
-         ->Join('AddOnVersion cv', 'a.CurrentVersionID = cv.AddOnVersionID')
-         ->Join('User iu', 'a.InsertUserID = iu.UserID')
-         ->GetSelect();
-      $this->ConstructView('vw_AddOn', $View);
-
-      // vw_SingleRoleUser Returns all UserIDs that have only one role.
-      $View = $Database->Select('UserID')
-         ->From('UserRole')
-         ->GroupBy('UserID')
-         ->Having('count(RoleID) =', '1', TRUE, FALSE)
-         ->GetSelect();
-      $this->ConstructView('vw_SingleRoleUser', $View);
-      
-      // vw_ApplicantID Returns all UserIDs in the applicant role.
-      $View = $Database->Select('User.UserID')
-         ->From('User')
-         ->Join('UserRole', 'User.UserID = UserRole.UserID')
-         ->Where('UserRole.RoleID', '3', TRUE, FALSE) // 3 is Applicant RoleID
-         ->GroupBy('UserID')
-         ->GetSelect();
-      $this->ConstructView('vw_ApplicantID', $View);
-      
-      // vw_Applicant Returns all users in the applicant role.
-      $View = $Database->Select('User.*')
-         ->From('User')
-         ->Join('vw_ApplicantID', 'User.UserID = vw_ApplicantID.UserID')
-         ->GetSelect();
-      $this->ConstructView('vw_Applicant', $View);
-      
-      // vw_RolePermission
-      $View = $Database->Select('rp.*')
-         ->Select('p.Name', '', 'Permission')
-         ->From('RolePermission rp')
-         ->Join('Permission p', 'rp.PermissionID = p.PermissionID')
-         ->GetSelect();
-      $this->ConstructView('vw_RolePermission', $View);
-      
-      $View = $Database
-         ->Select('c.CategoryID, c.CountDiscussions, c.Description, c.Sort, c.InsertUserID, c.UpdateUserID, c.DateInserted, c.DateUpdated')
-         ->Select("' > ', p.Name, c.Name", 'concat_ws', 'Name')
-         ->From('Category c')
-         ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
-         ->Where('c.AllowDiscussions', '1')
-         ->GetSelect();
-      $this->ConstructView('vw_Category', $View);
-      
-      die();
-   }
-   
-   private function ConstructView($Name, $View) {
-      echo '<pre>create or replace view GDN_'.$Name." as ".$View.';</pre>';
    }
    
    public function SqlDrriverTest() {

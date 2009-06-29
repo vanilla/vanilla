@@ -101,7 +101,7 @@ class ImportController extends GardenController {
             if ($this->Form->ErrorCount() == 0) {
                // Save the sourceprefix
                $Config = Gdn::Factory(Gdn::AliasConfig);
-               $Config->Load(PATH_CONF . DS . 'configuration.php', 'Save');
+               $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
                $Config->Set('Garden.Import.SourcePrefix', $SourcePrefix);
                $Config->Save();
                

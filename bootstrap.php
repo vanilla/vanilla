@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
 	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php');
@@ -52,7 +51,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.gdn.php');
 /// Install the factory.
 require_once(PATH_LIBRARY_CORE . DS . 'class.factory.php');
 Gdn::SetFactory(new Gdn_Factory(), FALSE);
-Gdn::$FactoryOverwrite = FALSE;
+$FactoryOverwriteBak = Gdn::FactoryOverwrite(FALSE);
 
 /// Install the configuration.
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
@@ -130,8 +129,8 @@ $PluginManager->RegisterPlugins();
 unset($EnabledPlugins);
 unset($PluginInfo);
 
-
-Gdn::$FactoryOverwrite = TRUE;
+Gdn::FactoryOverwrite($FactoryOverwriteBak);
+unset($FactoryOverwriteBak);
 
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))

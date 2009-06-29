@@ -7,7 +7,7 @@ if ($this->DraftData->NumRows() > 0) {
    ?>
 <h1><?php echo Gdn::Translate('My Drafts'); ?></h1>
 <?php echo $this->Pager->ToString('less'); ?>
-<ul class="Discussions Drafts">
+<ul class="DataList Drafts">
    <?php
    include($ViewLocation);
    ?>

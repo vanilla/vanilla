@@ -23,21 +23,9 @@ class CategoryModel extends Model {
       ) {
          throw new Exception(Gdn::Translate('Invalid category for deletion.'));
       } else {
-         // Remove category permissions
-         $PermissionIDData = $this->SQL
-            ->Select('PermissionID')
-            ->From('Permission')
-            ->Where('JunctionTable', 'Category')
-            ->Get()
-            ->ResultArray();
-         $PermissionIDs = ConsolidateArrayValuesByKey($PermissionIDData, 'PermissionID');
-         
-         if (count($PermissionIDs) > 0) {
-            $this->SQL
-               ->WhereIn('PermissionID', $PermissionIDs)
-               ->Where('JunctionID', $Category->CategoryID)
-               ->Delete('RolePermission');
-         }
+         // Remove permissions.
+         $PermissionModel = Gdn::PermissionModel();
+         $PermissionModel->Delete(NULL, 'Category', 'CategoryID', $Category->CategoryID);
          
          // If there is a replacement category...
          if ($ReplacementCategoryID > 0) {
@@ -101,7 +89,7 @@ class CategoryModel extends Model {
          // If there is only one category, make sure that Categories are not used
          $CountCategories = $this->Get()->NumRows();
          $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Config->Load(PATH_CONF . DS . 'configuration.php', 'Save');
+         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
          $Config->Set('Vanilla.Categories.Use', $CountCategories > 1, TRUE, 'ForSave');
          $Config->Save();
       }
@@ -133,7 +121,7 @@ class CategoryModel extends Model {
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')
          ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
-         
+
       if (is_numeric($CategoryID) && $CategoryID > 0)
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
       else
@@ -288,6 +276,12 @@ class CategoryModel extends Model {
             }
             $this->Organize();
          }
+         
+         // Save the permissions
+         
+         $PermissionModel = Gdn::PermissionModel();
+         $Permissions = $PermissionModel->PivotPermissions($FormPostValues['Permission'], array('JunctionID' => $CategoryID));
+         $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
       } else {
          $CategoryID = FALSE;
       }

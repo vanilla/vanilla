@@ -130,7 +130,6 @@ class Gdn_Schema {
    public function PrimaryKey($Table) {
       $Schema = $this->Fetch($Table);
       $PrimaryKeys = array();
-      
       foreach ($Schema as $FieldName => $Properties) {
          if ($Properties->PrimaryKey === TRUE)
             $PrimaryKeys[] = $FieldName;

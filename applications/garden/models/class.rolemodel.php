@@ -8,12 +8,38 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class RoleModel extends Model {
+class Gdn_RoleModel extends Model {
    /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Role');
+   }
+   
+   public function Define($Values) {
+      if(array_key_exists('RoleID', $Values)) {
+         $RoleID = $Values['RoleID'];
+         unset($Values['RoleID']);
+         
+         $this->SQL->Replace('Role', $Values, array('RoleID' => $RoleID));
+      } else {
+         // Check to see if there is a role with the same name.
+         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Name']))->Value('RoleID', NULL);
+         
+         if(is_null($RoleID)) {
+            // Figure out the next role ID which is the next biggest power of two.
+            $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Value('RoleID', 0);
+            $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+            $Values['RoleID'] = $RoleID;
+            
+            // Insert the role.
+            $this->SQL->Insert('Role', $Values);
+         } else {
+            // Update the role.
+            $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID));
+         }
+      }
+      
    }
    
    /**
@@ -37,7 +63,7 @@ class RoleModel extends Model {
       $RoleData = $this->Get();
       $RoleIDs = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'RoleID');
       $RoleNames = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'Name');
-      return array_combine($RoleIDs, $RoleNames);
+      return ArrayCombine($RoleIDs, $RoleNames);
    }
 
    /**
@@ -85,26 +111,11 @@ class RoleModel extends Model {
    }
    
    public function GetPermissions($RoleID) {
-      return $this->SQL->Select('rp.PermissionID')
-         ->From('RolePermission rp')
-         ->Join('Permission p', 'p.PermissionID = rp.PermissionID')
-         ->Where('rp.RoleID', $RoleID)
-         ->Where('p.JunctionTable is null')
-         ->Get();
-   }
-   
-   public function GetJunctionPermissionsForRole($RoleID) {
-      $Data = $this->SQL->Select('JunctionID, PermissionID')
-         ->From('RolePermission')
-         ->Where('RoleID', $RoleID)
-         ->Where('JunctionID >', 0)
-         ->Get();
-         
-      $JunctionPermissions = array();         
-      foreach ($Data->Result() as $JP) {
-         $JunctionPermissions[] = $JP->JunctionID . '-' . $JP->PermissionID;
-      }
-      return $JunctionPermissions;
+      $PermissionModel = Gdn::PermissionModel();
+      $LimitToSuffix = $this->CanSession == '1' ? '' : 'View';
+      
+      $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
+      return $Result;      
    }
    
    /**
@@ -117,10 +128,12 @@ class RoleModel extends Model {
     */
    public function GetUserCount($RoleID, $UsersOnlyWithThisRole = FALSE) {
       if ($UsersOnlyWithThisRole) {
-         return $this->SQL->Select('UserRole.UserID', 'count', 'UserCount')
-            ->From('UserRole')
-            ->Join('vw_SingleRoleUser', 'UserRole.UserID = vw_SingleRoleUser.UserID')
-            ->Where('UserRole.RoleID', $RoleID)
+         return $this->SQL->Select('ur.UserID', 'count', 'UserCount')
+            ->From('UserRole ur')
+            ->Join('UserRole urs', 'ur.UserID = urs.UserID')
+            ->GroupBy('urs.UserID')
+            ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)
+            ->Where('ur.RoleID', $RoleID)
             ->Get()
             ->FirstRow()
             ->UserCount;
@@ -138,14 +151,17 @@ class RoleModel extends Model {
       if (!is_array($Permission))
          $Permission = array($Permission);
          
-      $this->SQL->Select('Role.*')
-         ->From('Role')
-         ->Join('RolePermission', "Role.RoleID = RolePermission.RoleID")
-         ->Join('Permission per', "RolePermission.PermissionID = per.PermissionID");
+      $this->SQL->Select('r.*')
+         ->From('Role r')
+         ->Join('Permission per', "per.RoleID = r.RoleID")
+         ->Where('per.JunctionTable is null');
+         
+      $this->SQL->BeginWhereGroup();
       $PermissionCount = count($Permission);
       for ($i = 0; $i < $PermissionCount; ++$i) {
-         $this->SQL->OrWhere('per.Name', $Permission[$i]);
+         $this->SQL->OrWhere('per.`'.$Permission[$i].'`', 1);
       }
+      $this->SQL->EndWhereGroup();
       return $this->SQL->Get();
    }
    
@@ -156,88 +172,70 @@ class RoleModel extends Model {
       $RoleID = ArrayValue('RoleID', $FormPostValues);
       $Insert = $RoleID > 0 ? FALSE : TRUE;
       if ($Insert) {
-         $this->AddInsertFields($FormPostValues);               
+         // Figure out the next role ID which is the next biggest power of two.
+         $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
+         $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+         
+         $this->AddInsertFields($FormPostValues);
+         $FormPostValues['RoleID'] = strval($RoleID); // string for validation
       } else {
          $this->AddUpdateFields($FormPostValues);
       }
       
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
-         $this->Validation->AddValidationField('PermissionID', $FormPostValues);
-         $this->Validation->AddValidationField('JunctionPermissionID', $FormPostValues);
+         $this->Validation->AddValidationField('Permission', $FormPostValues);
          $Fields = $this->Validation->ValidationFields();
-         $PermissionIDs = ArrayValue('PermissionID', $Fields);
-         $JunctionPermissionIDs = ArrayValue('JunctionPermissionID', $Fields);
+         $Permissions = ArrayValue('Permission', $Fields);
          $Fields = $this->Validation->SchemaValidationFields();
-         $Fields = RemoveKeyFromArray($Fields, 'RoleID');
 
          if ($Insert === FALSE) {
+            $Fields = RemoveKeyFromArray($Fields, 'RoleID');
             // Don't update the primary key
             $this->Update($Fields, array('RoleID' => $RoleID));
          } else {
-            $RoleID = $this->Insert($Fields);
+            $this->Insert($Fields);
          }
          // Now update the role permissions
          $Role = $this->GetByRoleID($RoleID);
-         // if ($Role->EditablePermissions)
-         $this->SavePermissions($RoleID, $PermissionIDs, $JunctionPermissionIDs);
+         
+         $PermissionModel = Gdn::PermissionModel();
+         $Permissions = $PermissionModel->PivotPermissions($Permissions, array('RoleID' => $RoleID));
+         $PermissionModel->SaveAll($Permissions, array('RoleID' => $RoleID));
+         
+         // Remove the cached permissions for all users with this role.
+         $this->SQL->Update('User')
+            ->Join('UserRole', 'User.UserID = UserRole.UserID')
+            ->Set('Permissions', '')
+            ->Where(array('UserRole.RoleID' => $RoleID))
+            ->Put();
       } else {
          $RoleID = FALSE;
       }
       return $RoleID;
    }   
    
-   public function SavePermissions($RoleID, $PermissionIDs, $JunctionPermissionIDs = '') {
-      if (!is_array($PermissionIDs))
-         $PermissionIDs = array();
-
-      // 1. Remove old role associations for this role
-      $this->SQL->Delete('RolePermission', array('RoleID' => $RoleID));
-      
-      // 2. Insert the new permissions for this role.
-      $Count = count($PermissionIDs);
-      for ($i = 0; $i < $Count; $i++) {
-         $this->SQL->Insert('RolePermission', array('RoleID' => $RoleID, 'PermissionID' => $PermissionIDs[$i]));
-      }
-      
-      // 3. Insert junction permissions if they were present
-      if (is_array($JunctionPermissionIDs)) {
-         $Count = count($JunctionPermissionIDs);
-         for ($i = 0; $i < $Count; $i++) {
-            $Parts = explode('-', $JunctionPermissionIDs[$i]);
-            if (count($Parts) == 2) {
-               $PermissionID = array_pop($Parts);
-               $JunctionID = $Parts[0];
-               $this->SQL->Insert('RolePermission', array('RoleID' => $RoleID, 'PermissionID' => $PermissionID, 'JunctionID' => $JunctionID));
-            }
-         }
-      }
-
-      // 4. Remove the cached permissions for all users with this role.
-      $this->SQL->Update('User')
-         ->Join('UserRole', 'User.UserID = UserRole.UserID')
-         ->Set('User.Permissions', '')
-         ->Where(array('UserRole.RoleID' => $RoleID))
-         ->Put();      
-   }
-   
    public function Delete($RoleID, $ReplacementRoleID) {
       // First update users that will be orphaned
       if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
          $this->SQL->Update('UserRole')
-            ->Join('vw_SingleRoleUser', 'UserRole.UserID = vw_SingleRoleUser.UserID')
+            ->Join('UserRole urs', 'UserRole.UserID = urs.UserID')
+            ->GroupBy('urs.UserID')
+            ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)
             ->Set('UserRole.RoleID', $ReplacementRoleID)
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
       }
       
-      // Remove old role associations for this role
-      $this->SQL->Delete('RolePermission', array('RoleID' => $RoleID));
+      // Remove permissions for this role.
+      $PermissionModel = Gdn::PermissionModel();
+      $PermissionModel->Delete($RoleID);
       
       // Remove the cached permissions for all users with this role.
       $this->SQL->Update('User')
          ->Join('UserRole', 'User.UserID = UserRole.UserID')
-         ->Set('User.Permissions', '')
+         ->Set('Permissions', '')
+         ->Set('CacheRoleID', NULL)
          ->Where(array('UserRole.RoleID' => $RoleID))
          ->Put();
       

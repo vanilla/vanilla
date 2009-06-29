@@ -8,7 +8,7 @@ foreach ($this->DraftData->Result() as $Draft) {
    ?>
    <li class="<?php echo 'DiscussionRow Draft'.$Alt; ?>">
       <ul>
-         <li class="Topic">
+         <li class="Title">
             <?php
                echo Anchor('Delete', 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'DeleteDraft');
             ?>

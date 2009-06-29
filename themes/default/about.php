@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// An associative array of information about this application.
-/// </summary>
+/**
+ * An associative array of information about this application.
+ */
 $ThemeInfo['Default'] = array(
    'Description' => "The default theme for Garden. Pretty boring since it uses all of the views and designs from the base application(s).",
    'Version' => '1.0',

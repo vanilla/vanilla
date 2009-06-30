@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
          var textbox = $(frm).find('textarea');
          // Post the form, and append the results to #Discussion, and erase the textbox
          var postValues = $(frm).serialize();
-         postValues += '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+         postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
          postValues += '&'+button.name+'='+button.value;
          var prefix = textbox.attr('name').replace('Message', '');
          // Get the last message id on the page
@@ -119,7 +119,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),
-         data: $(frm).serialize() + '&DeliveryType=3&DeliveryMethod=2',
+         data: $(frm).serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('span.Progress').remove();

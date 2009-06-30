@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
       var tabs = $('ul.Tabs');
       tabs.nextAll().remove();
       tabs.after('<div class="Loading">&nbsp;</div>');
-      $.post(this.href, {'DeliveryType': 3}, function(data) {
+      $.post(this.href, {'DeliveryType': 'VIEW'}, function(data) {
          tabs.nextAll().remove();
          tabs.after(data);
       });
@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
    $('form.About').submit(function() {
       var frm = this;
       var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=4&DeliveryMethod=2';
+      postValues += '&DeliveryType=BOOL&DeliveryMethod=JSON';
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),
@@ -68,7 +68,7 @@ jQuery(document).ready(function($) {
          $('span.Progress').remove();
          $(but).after('<span class="Progress">&nbsp;</span>');
          var postValues = $(frm).serialize();
-         postValues += '&DeliveryType=3&DeliveryMethod=2';
+         postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({
             type: "POST",
             url: $(frm).attr('action'),

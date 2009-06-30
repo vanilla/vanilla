@@ -43,7 +43,7 @@ jQuery(document).ready(function($) {
       
       // Post the form, and append the results to #Discussion, and erase the textbox
       var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+      postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
       var discussionID = $(frm).find('[name$=DiscussionID]');
       var prefix = discussionID.attr('name').replace('DiscussionID', '');
@@ -172,7 +172,7 @@ jQuery(document).ready(function($) {
    $('a.DeleteComment').popup({
       confirm: true,
       followConfirm: false,
-      deliveryType: 4, // DELIVERY_TYPE_BOOL
+      deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {
          var row = $(sender).parents('li.Comment');
          if (json.ErrorMessage) {
@@ -191,7 +191,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: btn.href,
-         data: 'DeliveryType=4&DeliveryMethod=2',
+         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Popup the error

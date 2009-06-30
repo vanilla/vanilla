@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       $(this).find('form').each(function() {
          options = $.extend({
             frm:  this,
-            data: { 'DeliveryType' : 2, 'DeliveryMethod' : 2 },
+            data: { 'DeliveryType' : 'ASSET', 'DeliveryMethod' : 'JSON' },
             dataType: 'json',
             beforeSubmit: function(frm_data, frm) {
                options.frm = frm;
@@ -30,8 +30,8 @@ jQuery(document).ready(function($) {
                   // Check to see if a target has been specified for the data.
                   if(json.Target) {
                      $(json.Target).html(json.Data);
-                  } else if(json.DeliveryType == 6) {
-                     inform(json.Data);
+                  } else if(json.DeliveryType == 'MESSAGE') {
+                     inform(json.Data, false);
                      $frm.find('input.Button').show();
                      $frm.find('span.Progress').remove();
                   } else {

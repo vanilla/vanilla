@@ -175,7 +175,7 @@ class EntryController extends GardenController {
          if (!$this->UserModel->InsertForBasic($this->Form->FormValues())) {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             if($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->_DeliveryType = DELIVERY_TYPE_MESSAGES;
+               $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
             }
          } else {
             // The user has been created successfully, so sign in now

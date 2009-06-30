@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
                // var webRoot = $('#Definitions #WebRoot').text();
                // var transientKey = $('#Definitions #TransientKey').text();
                // var height = $('#CommentForm textarea').height();
-               // $.get(webRoot + '/garden/utility/set/preference/CommentBoxHeight/'+ height + '/' + transientKey + '/?DeliveryType=4');
+               // $.get(webRoot + '/garden/utility/set/preference/CommentBoxHeight/'+ height + '/' + transientKey + '/?DeliveryType=BOOL');
             }
          });
       }
@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
          $('div.ToolbarPopup input[name=ToolbarUrl]').val($(btn).attr('href'));
          
          // Get the bookmarks and put them into the new container
-         $('div.ToolbarPopup div.Content').load($(btn).attr('href') + '?DeliveryType=3&DeliveryMethod=1');
+         $('div.ToolbarPopup div.Content').load($(btn).attr('href') + '?DeliveryType=VIEW&DeliveryMethod=XHTML');
       });
       
       return false;

@@ -665,7 +665,7 @@ class Gdn_Controller extends Gdn_Control {
             $View = $this->Form->ErrorCount() > 0 ? FALSE : TRUE;
       }
       
-      if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGES && $this->Form) {
+      if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGE && $this->Form) {
          $View = $this->Form->Errors();
       }
 
@@ -856,9 +856,10 @@ class Gdn_Controller extends Gdn_Control {
     */
    public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
       $Session = Gdn::Session();
-      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch))
+      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
+         // TODO: Make this work with different delivery types.
          Redirect($this->Routes['DefaultPermission']);
-
+      }
    }
 
    /**

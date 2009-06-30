@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
    $('a.AddRoute, a.EditRoute').popup({
       onUnload: function(settings) {
          var webRoot = $('#Definitions #WebRoot').text();
-         $('#Content').load(webRoot + '/garden/routes?DeliveryType=2');
+         $('#Content').load(webRoot + '/garden/routes?DeliveryType=VIEW');
       }   
    });
    

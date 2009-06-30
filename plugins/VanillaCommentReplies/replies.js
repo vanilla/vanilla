@@ -83,7 +83,7 @@ jQuery(document).ready(function($) {
       var textbox = $(frm).find('textarea');
       
       // Post the form and place the results above the input and erase the textbox
-      var postValues = frm.serialize() + '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+      var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       // Get the most recent reply CommentID to be added
       var replyCommentID = frm.find('[name$=ReplyCommentID]');
       var prefix = replyCommentID.attr('name').replace('ReplyCommentID', '');
@@ -134,7 +134,7 @@ jQuery(document).ready(function($) {
    $('a.DeleteReply').popup({
       confirm: true,
       followConfirm: false,
-      deliveryType: 4, // DELIVERY_TYPE_BOOL
+      deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {
          var row = $(sender).parents('li.Reply');
          if (json.ErrorMessage) {

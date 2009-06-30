@@ -77,7 +77,7 @@ class Gdn_UserModel extends Model {
       return $this->SQL->Select('u.*')
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', '3', TRUE, FALSE) // 3 is Applicant RoleID
+         ->Where('ur.RoleID', '4', TRUE, FALSE) // 4 is Applicant RoleID
          ->GroupBy('UserID')
          ->OrderBy('DateInserted', 'desc')
          ->Get();
@@ -732,7 +732,7 @@ class Gdn_UserModel extends Model {
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == 3)
+            if ($Role->RoleID == 4)
                $ApplicantFound = TRUE;
          }
       }
@@ -774,7 +774,7 @@ class Gdn_UserModel extends Model {
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == 3)
+            if ($Role->RoleID == 4)
                $ApplicantFound = TRUE;
          }
       }

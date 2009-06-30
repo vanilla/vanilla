@@ -1609,14 +1609,14 @@ abstract class Gdn_SQLDriver {
             foreach($v as $FunctionName => $Val) {
                if ($EscapeString === FALSE) {
                   if (is_string($FunctionName) !== FALSE) {
-                     $this->_Sets[$this->QuoteIdentifier($f)] = $FunctionName.'('.$Val.')';
+                     $this->_Sets[$this->EscapeIdentifier($f)] = $FunctionName.'('.$Val.')';
                   } else {
-                     $this->_Sets[$this->QuoteIdentifier($f)] = $Val;
+                     $this->_Sets[$this->EscapeIdentifier($f)] = $Val;
                   }
                } else {
                   $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
                   $this->_NamedParameters[$NamedParameter] = $Val;
-                  $this->_Sets[$this->QuoteIdentifier($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
+                  $this->_Sets[$this->EscapeIdentifier($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
                }
             }
          }

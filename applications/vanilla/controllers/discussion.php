@@ -24,6 +24,10 @@ class DiscussionController extends VanillaController {
       // Load the discussion record
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
+      if(!is_object($this->Discussion)) {
+         Redirect('FileNotFound');
+      }
+      
       // Check Permissions
       $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);

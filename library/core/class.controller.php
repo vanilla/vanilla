@@ -664,6 +664,10 @@ class Gdn_Controller extends Gdn_Control {
          if (property_exists($this, 'Form') && is_object($this->Form))
             $View = $this->Form->ErrorCount() > 0 ? FALSE : TRUE;
       }
+      
+      if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGE && $this->Form) {
+         $View = $this->Form->Errors();
+      }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          // Format the view as JSON with some extra information about the
@@ -674,6 +678,7 @@ class Gdn_Controller extends Gdn_Control {
             $FormSaved = TRUE;
 
          $this->SetJson('FormSaved', $FormSaved);
+         $this->SetJson('DeliveryType', $this->_DeliveryType);
          $this->SetJson('Data', $View);
          $this->SetJson('StatusMessage', $this->StatusMessage);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
@@ -851,9 +856,10 @@ class Gdn_Controller extends Gdn_Control {
     */
    public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
       $Session = Gdn::Session();
-      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch))
+      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
+         // TODO: Make this work with different delivery types.
          Redirect($this->Routes['DefaultPermission']);
-
+      }
    }
 
    /**

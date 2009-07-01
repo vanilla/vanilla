@@ -17,6 +17,14 @@ class Gdn_PermissionModel extends Model {
       parent::__construct('Permission');
    }
    
+   protected function _Backtick($Values) {
+      $NewValues = array();
+      foreach($Values as $Key => $Value) {
+         $NewValues['`'.$Key.'`'] = $Value;
+      }
+      return $NewValues;
+   }
+   
    public function Define($PermissionNames, $Type = 'tinyint', $JunctionTable = NULL, $JunctionColumn = NULL) {
       if(!is_array($PermissionNames))
          $PermissionNames = array($PermissionNames);
@@ -33,7 +41,7 @@ class Gdn_PermissionModel extends Model {
       
       // Set the default permissions so we know how to administer them.
       $DefaultPermissions = array_fill_keys($PermissionNames, 2);
-      $this->SQL->Replace('Permission', $DefaultPermissions, array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn));
+      $this->SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn));
    }
    
    public function Delete($RoleID = NULL, $JunctionTable = NULL, $JunctionColumn = NULL, $JunctionID = NULL) {
@@ -417,7 +425,7 @@ class Gdn_PermissionModel extends Model {
          $Where = array('PermissionID' => $Values['PermissionID']);
          unset($Values['PermissionID']);
          
-         $this->SQL->Update('Permission', $Values, $Where)->Put();
+         $this->SQL->Update('Permission', $this->_Backtick($Values), $Where)->Put();
       } else {
          $Where = array();
          
@@ -443,7 +451,7 @@ class Gdn_PermissionModel extends Model {
             $Where['JunctionID'] = NULL;
          }
          
-         $this->SQL->Replace('Permission', $Values, $Where);
+         $this->SQL->Replace('Permission', $this->_Backtick($Values), $Where);
       }
    }
    

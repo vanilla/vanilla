@@ -77,7 +77,7 @@ jQuery(document).ready(function($) {
       var textbox = $(row).find('textarea');
       
       // Post the form, place the results above the input, and erase the textbox
-      var postValues = frm.serialize() + '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+      var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       var activityId = frm.find('[name$=ActivityID]').val();
       var action = frm.attr('action');
       $.ajax({

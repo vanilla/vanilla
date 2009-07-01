@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
    // Hijack "clear status" link clicks
    $('#Status a').live('click', function() {
       // hijack the request and clear out the status
-      jQuery.get($(this).attr('href') + '?DeliveryType=4');
+      jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
       $('#Status').remove();      
       return false;      
    });
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
          $('span.Progress').remove();
          $(but).after('<span class="Progress">&nbsp;</span>');
          var postValues = $(frm).serialize();
-         postValues += '&DeliveryType=3&DeliveryMethod=2';
+         postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({
             type: "POST",
             url: $(frm).attr('action'),

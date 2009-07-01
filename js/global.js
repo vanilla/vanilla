@@ -82,10 +82,17 @@ jQuery(document).ready(function($) {
          
       return def;
    }
-   inform = function(message) {
+   inform = function(message, wrapInfo) {
+      if(wrapInfo == undefined) {
+         wrapInfo = true;
+      }
+      
       if (message && message != null && message != '') {
          $('div.Messages').remove();
-         $('<div class="Messages Information"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
+         if(wrapInfo)
+            $('<div class="Messages Information"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
+         else
+            $(message).appendTo('body').show();
       }
    }
 

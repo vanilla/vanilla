@@ -40,11 +40,11 @@ jQuery(document).ready(function($) {
          var webRoot = $('#Definitions #WebRoot').text();
          var transientKey = $('#Definitions #TransientKey').text();
          var tableId = $($.tableDnD.currentTable).attr('id');
-         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&DeliveryType=3&Form/TransientKey=' + transientKey;
+         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&DeliveryType=VIEW&Form/TransientKey=' + transientKey;
          $.post(webRoot + "/vanilla/categories/sort/", data, function(response) {
             if (response == 'TRUE') {
                // Reload the page content...
-               $.get(webRoot + '/vanilla/categories/manage/?DeliveryType=3', function(data){
+               $.get(webRoot + '/vanilla/categories/manage/?DeliveryType=VIEW', function(data){
                   $('#Content form').remove();
                   $('#Content').append(data);
                   $('table.Sortable tbody tr td').effect("highlight", {}, 1000);

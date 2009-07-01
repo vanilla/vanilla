@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: $(btn).attr('href'),
-         data: 'DeliveryType=4&DeliveryMethod=2',
+         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: $(btn).attr('href'),
-         data: 'DeliveryType=4&DeliveryMethod=2',
+         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: $(btn).attr('href'),
-         data: 'DeliveryType=4&DeliveryMethod=2',
+         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
@@ -132,7 +132,7 @@ jQuery(document).ready(function($) {
    $('a.DeleteDiscussion, a.DeleteDraft').popup({
       confirm: true,
       followConfirm: false,
-      deliveryType: 4, // DELIVERY_TYPE_BOOL
+      deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {
          var row = $(sender).parents('li.DiscussionRow');
          if (json.ErrorMessage) {

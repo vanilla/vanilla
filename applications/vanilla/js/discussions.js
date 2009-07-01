@@ -38,7 +38,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: btn.href,
-         data: 'DeliveryType=4&DeliveryMethod=2',
+         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Popup the error

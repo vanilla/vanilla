@@ -219,9 +219,9 @@ class UserController extends GardenController {
          $this->Form->AddError('ErrorInput');
       } else {
          $Session = Gdn::Session();
-         if (!$Session->CheckPermission('Garden.Users.Approve')) {
-            $this->Form->AddError('ErrorPermission');
-         } else {
+         //if (!$Session->CheckPermission('Garden.Users.Approve')) {
+         //   $this->Form->AddError('ErrorPermission');
+         //} else {
             $UserModel = new Gdn_UserModel();
             if (is_numeric($UserID)) {
                try {
@@ -231,7 +231,7 @@ class UserController extends GardenController {
                   $this->Form->AddError(strip_tags($ex->getMessage()));
                }
             }
-         }
+         //}
       }
       $this->Render();
    }

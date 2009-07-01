@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       $(this).find('form').each(function() {
          options = $.extend({
             frm:  this,
-            data: { 'DeliveryType' : 2, 'DeliveryMethod' : 2 },
+            data: { 'DeliveryType' : 'ASSET', 'DeliveryMethod' : 'JSON' },
             dataType: 'json',
             beforeSubmit: function(frm_data, frm) {
                options.frm = frm;
@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
               $(frm).find('input.Button').hide();
               $(frm).find('input.Button').after('<span class="Progress">&nbsp;</span>');
             },
-            success: function(json) {
+            success: function(json, status, $frm) {
                if (json.FormSaved == true) {
                   inform(json.StatusMessage);
                   if (json.RedirectUrl) {
@@ -27,7 +27,16 @@ jQuery(document).ready(function($) {
                      $('span.Progress').hide();
                   }
                } else {
-                  $('#' + options.frm.attr('id')).parents('div:first').html(json.Data);
+                  // Check to see if a target has been specified for the data.
+                  if(json.Target) {
+                     $(json.Target).html(json.Data);
+                  } else if(json.DeliveryType == 'MESSAGE') {
+                     inform(json.Data, false);
+                     $frm.find('input.Button').show();
+                     $frm.find('span.Progress').remove();
+                  } else {
+                     $('#' + options.frm.attr('id')).parents('div:first').html(json.Data);
+                  }
                }
                // Re-attach the handler
                $($(handle).selector).handleAjaxForm();

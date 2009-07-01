@@ -13,7 +13,6 @@ class ProfileController extends GardenController {
    public $Uses = array('Form', 'Gdn_UserModel', 'Html');
 
    public $User;
-   public $AboutForm;
    protected $_TabView;
    protected $_TabController;
    protected $_TabApplication;
@@ -21,7 +20,6 @@ class ProfileController extends GardenController {
    protected $_ProfileTabs;
    
    public function __construct() {
-      $this->AboutForm = FALSE;
       $this->User = FALSE;
       $this->_TabView = 'Activity';
       $this->_TabController = 'ProfileController';
@@ -60,13 +58,7 @@ class ProfileController extends GardenController {
    
    public function BuildProfile($UserReference = '') {
       $Session = Gdn::Session();
-      $this->AboutForm = new Form();
-      $this->AboutForm->InputPrefix = 'About';
       
-      // Update About if necessary
-      if ($this->AboutForm->AuthenticatedPostBack())
-         $this->UserModel->SaveAbout($Session->UserID, $this->AboutForm->GetFormValue('About'));
-
       $this->CssClass = 'Profile';
       if (!$this->GetUserInfo($UserReference))
          return FALSE;
@@ -90,6 +82,15 @@ class ProfileController extends GardenController {
    
    public function Index($UserReference = '') {
       $this->Activity($UserReference);
+   }
+   
+   public function Clear($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey))
+         $this->UserModel->SaveAbout($Session->UserID, '');
+         
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+         Redirect('/profile');
    }
 
    public function SetTabView($UserReference, $CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Garden') {
@@ -121,7 +122,19 @@ class ProfileController extends GardenController {
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
          
-         $NewActivityID = $this->ActivityModel->Add($Session->UserID, 'WallComment', $Comment, $this->User->UserID);
+         // Update About if necessary
+         $ActivityType = 'WallComment';
+         if ($Session->UserID == $this->User->UserID) {
+            $this->UserModel->SaveAbout($Session->UserID, $Comment);
+            $this->User->About = $Comment;
+            $this->SetJson('UserData', $this->FetchView('user'));
+            $ActivityType = 'AboutUpdate';
+         }
+         $NewActivityID = $this->ActivityModel->Add($Session->UserID, $ActivityType, $Comment, $this->User->UserID);
+/*         if (strlen(trim($About)) > 0)
+            AddActivity($UserID, 'AboutUpdate', $About);
+*/
+         
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('garden/profile/'.$UserReference);
          } else {

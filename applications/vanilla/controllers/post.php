@@ -305,12 +305,12 @@ class PostController extends VanillaController {
    /// The CommentID of the comment to edit.
    /// </param>
    public function EditComment($CommentID = '', $DraftID = '') {
-      if ($DraftID != '') {
-         $this->Form->SetModel($this->DraftModel);
-         $this->Comment = $this->DraftModel->GetID($DraftID);
-      } else {
+      if ($CommentID != '' && is_numeric($CommentID)) {
          $this->Form->SetModel($this->CommentModel);
          $this->Comment = $this->CommentModel->GetID($CommentID);
+      } else {
+         $this->Form->SetModel($this->DraftModel);
+         $this->Comment = $this->DraftModel->GetID($DraftID);
       }
       $this->View = 'Comment';
       $this->Comment($this->Comment->DiscussionID);

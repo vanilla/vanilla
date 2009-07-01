@@ -95,7 +95,7 @@ abstract class Gdn_DatabaseStructure {
     * @param boolean $AutoIncrement A boolean value indicating if this column auto-increments.
     */
    public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
-      if (!in_array($KeyType, array('primary', 'key', FALSE)))
+      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', FALSE)))
          $KeyType = FALSE;
          
       // Check for a length in the type.

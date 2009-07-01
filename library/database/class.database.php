@@ -116,9 +116,24 @@ class Gdn_Database {
 		} else {
          if(array_key_exists('Name', $Config) && !array_key_exists('Dbname', $Config))
             $Config['Dbname'] = $Config['Name'];
+			
+			// Was the port explicitly defined in the config?
+			$Port = ArrayValue('Port', $Config, '');
+			if ($Port != '') {
+				$Dsn .= 'port='.$Port.';';
+			} else {
+				// Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
+				$Dsn = 'host=%s;dbname=%s;';
+				$Host = $Config['Host'];
+				$Host = explode(':', $Host);
+				$Port = count($Host) == 2 ? $Host[1] : '';
+				$Host = $Host[0];
+				if ($Port != '')
+					$Dsn .= 'port='.$Port.';';
+			}
             
          // Construct the dsn from the config.
-         $this->Dsn = sprintf('host=%s;dbname=%s;', $Config['Host'], $Config['Dbname']);
+         $this->Dsn = sprintf($Dsn, $Host, $Config['Dbname']);
 		}
    }
    

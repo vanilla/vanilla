@@ -12,7 +12,7 @@ if ($this->InvitationCount != 0) {
    <?php
       echo $this->Form->Label('Email', 'Email');
       echo $this->Form->TextBox('Email');
-      echo $this->Form->Button(Gdn::Translate('Invite'));
+      echo $this->Form->Button('Invite');
    ?></li>
 </ul>
 <?php } ?>

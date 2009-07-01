@@ -66,12 +66,12 @@ if (!function_exists('RemoveKeyFromArray')) {
 }
 
 if (!function_exists('Anchor')) {
-   function Anchor($Code, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
+   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
          $CssClass = array('class' => $CssClass);
 
       if ($Destination == '' && $ForceAnchor === FALSE)
-         return $Code;
+         return $Text;
       
       if ($Attributes == '')
          $Attributes = array();
@@ -79,7 +79,7 @@ if (!function_exists('Anchor')) {
       if (substr($Destination, 0, 7) != 'http://' && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Url($Destination);
 
-      return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Code.'</a>';
+      return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 if (!function_exists('UserAnchor')) {
@@ -297,10 +297,17 @@ if (!function_exists('Url')) {
             return Gdn_Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
          else
             return '/'.Gdn_Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
-      } else if ($RewriteUrls === TRUE) {
-         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), $Destination), '/');
       } else {
-         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), 'index.php', $Destination), '/');
+         $Paths = array();
+         if (!$WithDomain)
+            $Paths[] = '/';
+            
+         $Paths[] = Gdn_Url::WebRoot($WithDomain);
+         if (!$RewriteUrls)
+            $Paths[] = 'index.php';
+            
+         $Paths[] = $Destination;
+         return CombinePaths($Paths, '/');
       }
    }
 }
@@ -450,7 +457,13 @@ if (!function_exists('ArrayInArray')) {
 
 if (!function_exists('GetConnectionString')) {
    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
-      return $ServerType.':host='.$HostName.';dbname='.$DatabaseName;
+      $HostName = explode(':', $HostName);
+      $Port = count($HostName) == 2 ? $HostName[1] : '';
+      $HostName = $HostName[0];
+      $String = $ServerType.':host='.$HostName;
+      if ($Port != '')
+         $String .= ';port='.$Port;
+      return $String .= ';dbname='.$DatabaseName;
    }
 }
 
@@ -694,7 +707,11 @@ if (!function_exists('filter_input')) {
    if (!defined('FILTER_REQUIRE_ARRAY')) define('FILTER_REQUIRE_ARRAY', 'FILTER_REQUIRE_ARRAY');
    function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
       $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
-      return ArrayValue($FieldName, $Collection, '');
+      $Value = ArrayValue($FieldName, $Collection, '');
+      if (get_magic_quotes_gpc())
+         return stripslashes($Value);
+         
+      return $Value;     
    }
 }
 

@@ -927,9 +927,6 @@ class Gdn_UserModel extends Model {
       $this->SQL->Update($this->Name)->Set('About', $About)->Where('UserID', $UserID)->Put();
       if (strlen($About) > 500)
          $About = SliceString($About, 500) . '...';
-
-      if (strlen(trim($About)) > 0)
-         AddActivity($UserID, 'AboutUpdate', $About);
    }
 
    /// <summary>
@@ -1095,5 +1092,39 @@ class Gdn_UserModel extends Model {
          )
       );
       $Email->Send();
+   }
+   
+   public function PasswordRequest($Email) {
+      $User = $this->GetWhere(array('Email' => $Email))->FirstRow();
+      if (!is_object($User) || $Email == '')
+         return FALSE;
+      
+      $PasswordResetKey = RandomString(6);
+      $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
+      $AppTitle = Gdn::Config('Garden.Title');
+      $Email = new Gdn_Email();
+      $Email->Subject(sprintf(Gdn::Translate('[%s] Password Reset Request'), $AppTitle));
+      $Email->To($User->Email);
+      $Email->From(Gdn::Config('Garden.Support.Email'), Gdn::Config('Garden.Support.Name'));
+      $Email->Message(
+         sprintf(
+            Gdn::Translate('PasswordRequest'),
+            $User->Name,
+            $AppTitle,
+            Url('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey, TRUE)
+         )
+      );
+      $Email->Send();
+      return TRUE;
+   }
+
+   public function PasswordReset($UserID, $Password) {
+      // Encrypt the password before saving
+      $PasswordHash = new Gdn_PasswordHash();
+      $Password = $PasswordHash->HashPassword($Password);
+
+      $this->SQL->Update('User')->Set('Password', $Password)->Where('UserID', $UserID)->Put();
+      $this->SaveAttribute($UserID, 'PasswordResetKey', '');
+      return $this->Get($UserID);
    }
 }

@@ -15,49 +15,14 @@ jQuery(document).ready(function($) {
       return false;
    });
    
-   // Hide the about form and replace it with text that is clickable
-   $.fn.hideAboutForm = function() {
-      // Hide the about form and replace it with a clickable about that reveals the form
-      $(this).hide().hide(function() {
-         var frm = this;
-         var inp = $(frm).find('.InputBox');
-         var about = $(inp).val();
-         if (about == '')
-            about = $('#Definitions #DefaultAbout').text();
-
-         $(frm).before('<h4 class="AboutLink"><a href="#">'+ about +'</a></h4>');
-         $(frm).prev('h4.AboutLink').click(function() {
-            $('h4.AboutLink').remove();
-            $(frm).show();
-            $(inp).focus();
-         });
-      });
-   }
-
-   $('form.About').hideAboutForm();
-
-   // Hijack about form submits
-   $('form.About').submit(function() {
-      var frm = this;
-      var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=4&DeliveryMethod=2';
-      $.ajax({
-         type: "POST",
-         url: $(frm).attr('action'),
-         data: postValues,
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
-         },
-         success: function(json) {
-            if (json['FormSaved'] == true) {
-               $('form.About').hideAboutForm();
-            }
-         }
-      });
-      return false;
+   // Hijack "clear status" link clicks
+   $('#Status a').live('click', function() {
+      // hijack the request and clear out the status
+      jQuery.get($(this).attr('href') + '?DeliveryType=4');
+      $('#Status').remove();      
+      return false;      
    });
-   
+
    // Hijack activity comment form submits
    $('form.Activity :submit').live('click', function() {
       var but = this;
@@ -86,6 +51,11 @@ jQuery(document).ready(function($) {
                   $('ul.Activities li.Empty').slideUp('fast');
                   // Make sure that hidden items appear
                   $('ul.Activities li.Hidden').slideDown('fast');
+                  // If the user's status was updated, show it.
+                  if (json['UserData'] != '') {
+                     $('div.User').remove();
+                     $('div.Profile').prepend(json['UserData']);
+                  }
                }
             }
          });

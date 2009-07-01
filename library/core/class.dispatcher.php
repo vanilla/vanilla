@@ -449,7 +449,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          $PathParts[] = strtolower($this->_ControllerName).'.php';
          $ControllerFileName = CombinePaths($PathParts);
-         $FileSystem = FileSystem::GetInstance();
 
          // Force the mapping to search in the app folder if it was in the request
          if ($this->_ApplicationFolder != '' && InArrayI($this->_ApplicationFolder, $ControllerWhiteList)) {
@@ -457,7 +456,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $ControllerWhiteList = array($this->_ApplicationFolder);
          }
 
-         $ControllerPath = $FileSystem->FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
+         $ControllerPath = Gdn_FileSystem::FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
          if ($ControllerPath !== FALSE) {
             // Strip the "Application Folder" from the controller path (this is
             // used by the controller for various purposes. ie. knowing which
@@ -482,7 +481,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                // Return a 404 message
                list($this->_ApplicationFolder, $this->_ControllerName, $this->_ControllerMethod) = explode('/', $this->Routes['Default404']);
                $ControllerFileName = CombinePaths(array('controllers', strtolower($this->_ControllerName) . '.php'));
-               $ControllerPath = $FileSystem->FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
+               $ControllerPath = Gdn_FileSystem::FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
                include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'appcontroller.php')));
                include($ControllerPath);
             }

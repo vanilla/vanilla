@@ -20,35 +20,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @todo Make this object deliver content with a save as dialogue.
  */
 
-class FileSystem implements ISingleton {
-
-   /**
-    * Holds a static instance of this class.
-    *
-    * @var object
-    */
-   private static $_Instance;
-
-   /**
-    * Private constructor prevents direct instantiation of object.
-    *
-    * @return void
-    */
-   private function __construct() {
-   }
-
-   /**
-    * This is the singleton method that return the static
-    * FileSystem::Instance.
-    */
-   public static function GetInstance() {
-      if (!isset(self::$_Instance)) {
-         $c = __CLASS__;
-         self::$_Instance = new $c;
-      }
-      return self::$_Instance;
-   }
-
+class Gdn_FileSystem {
    /**
     * Searches the provided file path(s). Returns the first one it finds in the
     * filesystem.
@@ -56,7 +28,7 @@ class FileSystem implements ISingleton {
     * @param mixed $Files The path (or array of paths) to files which should be checked for
     * existence.
     */
-   public function Exists($Files) {
+   public static function Exists($Files) {
       if (!is_array($Files))
          $Files = array($Files);
 
@@ -79,26 +51,30 @@ class FileSystem implements ISingleton {
     * @param string $SourceFolder
     * @todo Documentation and variable type is needed for $SourceFolder.
     */
-   public function Folders($SourceFolder) {
-      if ($DirectoryHandle = opendir($SourceFolder)) {
-         if ($DirectoryHandle === FALSE)
-            return FALSE;
-
-         $BlackList = Gdn::Config('Garden.FolderBlacklist');
-         if (!is_array($BlackList))
-            $BlackList = array('.', '..');
-
-         $SubFolders = array();
-         while (($Item = readdir($DirectoryHandle)) !== FALSE) {
-            $SubFolder = CombinePaths(array($SourceFolder, $Item));
-            if (!in_array($Item, $BlackList) && is_dir($SubFolder))
-               $SubFolders[] = $Item;
+   public static function Folders($SourceFolders) {
+      if(!is_array($SourceFolders))
+         $SourceFolders = array($SourceFolders);
+   
+      $BlackList = Gdn::Config('Garden.FolderBlacklist');
+      if (!is_array($BlackList))
+         $BlackList = array('.', '..');
+         
+      $Result = array();
+      
+      foreach($SourceFolders as $SourceFolder) {
+         if ($DirectoryHandle = opendir($SourceFolder)) {
+            while (($Item = readdir($DirectoryHandle)) !== FALSE) {
+               $SubFolder = CombinePaths(array($SourceFolder, $Item));
+               if (!in_array($Item, $BlackList) && is_dir($SubFolder))
+                  $Result[] = $Item;
+            }
+            closedir($DirectoryHandle);
+            $Result[] = $SubFolders;
          }
-         closedir($DirectoryHandle);
-         return $SubFolders;
-      } else {
-         return FALSE;
       }
+      if(count($Result) == 0)
+         return FALSE;
+      return $Result;
    }
 
    /**
@@ -112,8 +88,8 @@ class FileSystem implements ISingleton {
     * search can be performed. If no white-list is provided, the search will
     * only be performed in $SourceFolder.
     */
-   public function Find($SourceFolders, $FileName, $WhiteList = FALSE) {
-      $Return = $this->_Find($SourceFolders, $WhiteList, $FileName, TRUE);
+   public static function Find($SourceFolders, $FileName, $WhiteList = FALSE) {
+      $Return = self::_Find($SourceFolders, $WhiteList, $FileName, TRUE);
       if (is_array($Return))
          return count($Return) > 0 ? $Return[0] : FALSE;
       else
@@ -132,8 +108,8 @@ class FileSystem implements ISingleton {
     * search can be performed. If no white-list is provided, the search will
     * only be performed in $SourceFolder.
     */
-   public function FindAll($SourceFolders, $FileName, $WhiteList = FALSE) {
-      return $this->_Find($SourceFolders, $WhiteList, $FileName, FALSE);
+   public static function FindAll($SourceFolders, $FileName, $WhiteList = FALSE) {
+      return self::_Find($SourceFolders, $WhiteList, $FileName, FALSE);
    }
 
    /**
@@ -152,7 +128,7 @@ class FileSystem implements ISingleton {
     * or should it return an array of every instance in which it is found?
     * Default is to return an array of every instance.
     */
-   private function _Find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = FALSE) {
+   private static function _Find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = FALSE) {
       $Return = array();
 
       if (!is_array($SourceFolders))
@@ -170,7 +146,7 @@ class FileSystem implements ISingleton {
          } else {
             if ($DirectoryHandle = opendir($SourceFolder)) {
                if ($DirectoryHandle === FALSE)
-                  trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
+                  trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
 
                $SubFolders = array();
                foreach ($WhiteList as $WhiteFolder) {
@@ -211,7 +187,7 @@ class FileSystem implements ISingleton {
     * @param string $LibraryName The name of the library to search for. This is a valid file name.
     * ie. "class.database.php"
     */
-   public function FindByMapping($MappingsFileName, $MappingsArrayName, $SourceFolders, $FolderWhiteList, $LibraryName) {
+   public static function FindByMapping($MappingsFileName, $MappingsArrayName, $SourceFolders, $FolderWhiteList, $LibraryName) {
       // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
       if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1)
          $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
@@ -235,9 +211,9 @@ class FileSystem implements ISingleton {
 
          // Attempt to find the file directly off the root (if the app folder was provided in the querystring)
          if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1) {
-            $LibraryPath = $this->Find($SourceFolders, $LibraryName);
+            $LibraryPath = self::Find($SourceFolders, $LibraryName);
          } else {
-            $LibraryPath = $this->Find($SourceFolders, $LibraryName, $FolderWhiteList);
+            $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
          }
 
          // If the controller was found
@@ -257,22 +233,22 @@ class FileSystem implements ISingleton {
     * exist. Note that this is only useful for static content since any php
     * code will be parsed as if it were within this method of this object.
     */
-   public function GetContents() {
+   public static function GetContents() {
       $File = CombinePaths(func_get_args());
       if (file_exists($File) && is_file($File))
-         return $this->_GetContents($File);
+         return self::_GetContents($File);
       else
          return FALSE;
    }
 
    /**
     * Returns the contents of the specified file. Does not check for existence
-    * of the file first. Use the public $this->GetContents() for the extra
+    * of the file first. Use the public self::GetContents() for the extra
     * security.
     *
     * @param string $File The full path and name of the file being examined.
     */
-   private function _GetContents($File) {
+   private static function _GetContents($File) {
       ob_start();
       include($File);
       $Contents = ob_get_contents();
@@ -286,7 +262,7 @@ class FileSystem implements ISingleton {
     * @param string $FileName The full path and name of the file to be saved.
     * @param string $FileContents The contents of the file being saved.
     */
-   public function SaveFile($FileName, $FileContents) {
+   public static function SaveFile($FileName, $FileContents) {
       file_put_contents($FileName, $FileContents);
       return TRUE;
    }
@@ -297,7 +273,7 @@ class FileSystem implements ISingleton {
     *
     * @param string $FileName The full path to the file being touched.
     */
-   public function Touch($FileName) {
+   public static function Touch($FileName) {
       if (!file_exists($FileName))
          file_put_contents($FileName, '');
    }

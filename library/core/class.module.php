@@ -144,8 +144,7 @@ class Module extends Gdn_Pluggable implements Gdn_IModule {
       // 4. Garden default. eg. /path/to/application/garden/views/modules/
       $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'garden', 'views', 'modules', $View . '.php'));
 
-      $FileSystem = FileSystem::GetInstance();
-      $ViewPath = $FileSystem->Exists($ViewPaths);
+      $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
       if ($ViewPath === FALSE)
          trigger_error(ErrorMessage('Could not find a `' . $View . '` view for the `' . $this->Name() . '` module in the `' . $ApplicationFolder . '` application.', get_class($this), 'FetchView'), E_USER_ERROR);
 

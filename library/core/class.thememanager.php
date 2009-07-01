@@ -31,9 +31,8 @@ class Gdn_ThemeManager {
    public function AvailableThemes() {
       if (!is_array($this->_AvailableThemes)) {
          $ThemeInfo = array();
-         $FileSystem = FileSystem::GetInstance();
-         $ThemeFolders = $FileSystem->Folders(PATH_THEMES);
-         $ThemeAboutFiles = $FileSystem->FindAll(PATH_THEMES, 'about.php', $ThemeFolders);
+         $ThemeFolders = Gdn_FileSystem::Folders(PATH_THEMES);
+         $ThemeAboutFiles = Gdn_FileSystem::FindAll(PATH_THEMES, 'about.php', $ThemeFolders);
          // Include them all right here and fill the theme info array
          $ThemeCount = is_array($ThemeAboutFiles) ? count($ThemeAboutFiles) : 0;
          for ($i = 0; $i < $ThemeCount; ++$i) {

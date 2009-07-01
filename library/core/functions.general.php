@@ -12,24 +12,27 @@ function __autoload($ClassName) {
    // echo $ClassName;
    if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
       return true;
-   if(!class_exists('FileSystem', FALSE))
+   if(!class_exists('Gdn_FileSystem', FALSE))
       return false;
-
-   $FileSystem = FileSystem::GetInstance();
    
    if(substr($ClassName, 0, 4) === 'Gdn_')
       $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
    else
       $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
-   $ApplicationWhiteList = property_exists($FileSystem, 'ApplicationWhiteList') ? $FileSystem->ApplicationWhiteList : FALSE;
+   
+   if(!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
+      $ApplicationWhiteList = Gdn::Factory('ApplicationManager')->EnabledApplicationFolders();
+   else
+      $ApplicationWhiteList = NULL;
+   
    $LibraryPath = FALSE;
 
    // If this is a model, look in the models folder(s)
    if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = $FileSystem->FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    if ($LibraryPath === FALSE)
-      $LibraryPath = $FileSystem->FindByMapping(
+      $LibraryPath = Gdn_FileSystem::FindByMapping(
          'library_mappings.php',
          'Library',
          PATH_LIBRARY,
@@ -44,7 +47,7 @@ function __autoload($ClassName) {
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = $FileSystem->FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);

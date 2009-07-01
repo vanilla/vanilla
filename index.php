@@ -33,8 +33,6 @@ $Dispatcher	= Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::Config('EnabledApplications');
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
-$FileSystem = FileSystem::GetInstance();
-$FileSystem->ApplicationWhiteList = $Dispatcher->EnabledApplicationFolders();
 
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 $Dispatcher->Routes = Gdn::Config('Routes');

@@ -17,7 +17,7 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
                                                                   PDO::MYSQL_ATTR_INIT_COMMAND => "set names 'utf8'"
                                                                );
-$Configuration['Database']['Prefix']                           = 'GDN_';
+$Configuration['Database']['DatabasePrefix']                           = 'GDN_';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';

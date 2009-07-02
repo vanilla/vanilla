@@ -45,7 +45,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             $.ajax({
                 type: "GET",
                 url: target,
-                data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 2 },
+                data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON' },
                 dataType: 'json',
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
                    $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
@@ -239,7 +239,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Called after the confirm url has been loaded via ajax
     },                              // Event to fire if the confirm was ajaxed
     hijackForms:      true,         // Hijack popup forms so they are handled in-page instead of posting the entire page back
-    deliveryType:     3,            // Adds DeliveryType=3 to url so Garden doesn't pull the entire page
+    deliveryType:     'VIEW',            // Adds DeliveryType=3 to url so Garden doesn't pull the entire page
     mouseoverClass:   'Popable',    // CssClass to be applied to a popup link when hovering
     onSave:           function(settings) {
       if (settings.sender) {

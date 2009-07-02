@@ -162,8 +162,12 @@ class Gdn_Email extends Gdn_Pluggable {
 
          $this->_PhpMailer->Host = $SmtpHost;
          $this->_PhpMailer->Port = $SmtpPort;
-         $this->_PhpMailer->Username = Gdn::Config('Garden.Email.SmtpUser', '');
-         $this->_PhpMailer->Password = Gdn::Config('Garden.Email.SmtpPassword', '');
+         $this->_PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
+         $this->_PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
+         if(!empty($Username))
+            $this->_PhpMailer->SMTPAuth = TRUE;
+
+         
       } else {
          $this->_PhpMailer->IsMail();
       }
@@ -177,7 +181,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
    /**
     * Adds subject of the message to the email.
-    *
+    * 
     * @param string $Subject The subject of the message.
     */
    public function Subject($Subject) {

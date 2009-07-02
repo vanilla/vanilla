@@ -1,7 +1,10 @@
+ul.Discussions {
+   border: 0;
+}
 ul.Discussions li {
    margin: 0px;
    padding: 0px 0px 4px 0px;
-    border-bottom: 1px solid #dbe3e6;
+   border-bottom: 1px solid #dbe3e6;
 }
 ul.Discussions li li {
    border: 0px;

@@ -631,6 +631,7 @@ body.Entry p.Leaving {
 body.register #Content,
 body.signin #Content,
 body.passwordrequest #Content,
+body.passwordreset #Content,
 body.Entry #SignIn,
 body.Entry #Password,
 body.Entry #Register {
@@ -645,6 +646,10 @@ body.Entry #Register {
 body.Entry #SignIn,
 body.Entry #Password {
    margin: 0 15px 15px 0;
+}
+body.Entry #Password p {
+   width: 242px;
+   overflow: hidden;
 }
 body.Entry #Content h1 {
    border-bottom:1px solid #CAF0FE;
@@ -742,14 +747,14 @@ ul.DataList li ul {
    margin: 0px;
    padding: 0px;
 }
-ul.DataList li ul li.Title a,
-ul.DataList li ul li.Title p {
+ul.DataList li ul li.Title a {
    border-left: 2px solid #dbe3e6;
    margin: 8px 4px 6px 10px;
    padding: 0px 0px 0px 8px;
    line-height: 130%;
    color: #2b3033;
    font-size: 105%;
+   display: block;
 }
 ul.DataList li ul li.Title h3 {
    padding: 6px 0px 0px 10px;

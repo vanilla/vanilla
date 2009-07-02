@@ -21,7 +21,7 @@ $('.CommentScore a').click(function() {
    $.ajax({
       type: "POST",
       url: $btn.attr('href'),
-      data: 'DeliveryType=4&DeliveryMethod=2',
+      data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
       dataType: 'json',
       error: function(XMLHttpRequest, textStatus, errorThrown) {
          // Popup the error

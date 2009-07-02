@@ -61,28 +61,38 @@ $Definition['DateOfBirth'] = 'Birth date';
 $Definition['RoleID'] = 'role';
 
 $Definition['EmailInvitation'] = 'Hello!
-%1$s has invited you to join %2$s. If you want to join, you can do so by
-clicking this link:
 
-%3$s
+%1$s has invited you to join %2$s. If you want to join, you can do so by clicking this link:
+
+  %3$s
 
 Have a great day!';
 $Definition['EmailWelcome'] = 'Hello %1$s,
+
 %2$s has created an account for you at %3$s. Your login credentials are:
 
-Username: %1$s
-Password: %5$s
-Url: %4$s
+  Username: %1$s
+  Password: %5$s
+  Url: %4$s
 
 Have a great day!';
 $Definition['EmailPassword'] = 'Hello %1$s,
+
 %2$s has reset your password at %3$s. Your login credentials are now:
 
-Username: %1$s
-Password: %5$s
-Url: %4$s
+  Username: %1$s
+  Password: %5$s
+  Url: %4$s
 
 Have a great day!';
+$Definition['PasswordRequest'] = 'Hello %1$s,
+
+Someone has requested to reset your password at %2$s. To reset your password, follow this link:
+
+  %3$s
+
+If you did not make this request, disregard this email.';
+
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).
 

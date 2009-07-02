@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
       var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW DELIVERY_METHOD_JSON
+      postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW DELIVERY_METHOD_JSON
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
       if (json.NextUrl != null && json.NextUrl != 'Finished')
          $.ajax({
             type: "GET",
-            url: json.NextUrl + '?DeliveryType=3&DeliveryMethod=2',
+            url: json.NextUrl + '?DeliveryType=VIEW&DeliveryMethod=JSON',
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Remove any old popups

@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       var btn = $(frm).find(':button');
       options = $.extend({
          frm:  frm,
-         data: { 'DeliveryType' : 2, 'DeliveryMethod' : 2 }, // Make sure only the view/content is delivered.
+         data: { 'DeliveryType' : 'ASSET', 'DeliveryMethod' : 'JSON' }, // Make sure only the view/content is delivered.
          dataType: 'json',
          beforeSubmit: function(frm_data, frm) {
            // Hide the submit button & add a spinner
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
                }
             } else if (json.Go) {
                $.ajax({
-                  url: json.Go + '?DeliveryType=3&DeliveryMethod=2',
+                  url: json.Go + '?DeliveryType=VIEW&DeliveryMethod=JSON',
                   cache: false,
                   success: function(html){
                     $.popup({}, html);

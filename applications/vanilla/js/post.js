@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
       var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
       var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+      postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
       var discussionID = $(frm).find('[name$=DiscussionID]').val();
       var action = $(frm).attr('action') + '/' + discussionID;
@@ -75,7 +75,7 @@ jQuery(document).ready(function($) {
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
       var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
       var postValues = $(frm).serialize();
-      postValues += '&DeliveryType=3&DeliveryMethod=2'; // DELIVERY_TYPE_VIEW
+      postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
       // Add a spinner and disable the buttons
       $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');

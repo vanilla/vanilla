@@ -16,9 +16,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @package Garden
  */
 class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
-   public function Authenticate($Username, $Password, $PersistentSession, $ClientHour = '');
+   public function Authenticate($Data) {
+	}
 
-   public function DeAuthenticate();
+   public function DeAuthenticate() {
+	}
 
-   public function GetIdentity();
+   public function GetIdentity() {
+	}
 }

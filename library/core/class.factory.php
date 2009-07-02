@@ -113,7 +113,7 @@ class Gdn_Factory {
 	 *   You can also pass an array to $Data and it will be used as the arguments for the lazy construction.</li>
 	 * </ul>
 	 */
-	public function Install($Alias, $ClassName, $Path, $FactoryType, $Data = NULL) {
+	public function Install($Alias, $ClassName, $Path, $FactoryType = Gdn::FactorySingleton, $Data = NULL) {
 		$FactoryType = ucfirst($FactoryType);
 		if(!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton))) {
 			throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton));

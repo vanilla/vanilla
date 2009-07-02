@@ -8,46 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/**
- * An interface for authenticator classes.
- *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Core
- */
-
-/**
- * An interface for authenticator classes.
- *
- * @package Garden
- */
-interface Gdn_IAuthenticator {
-
-
-   /**
-    * Returns the unique id assigned to the user in the database, 0 if the
-    * username/password combination weren't found, or -1 if the user does not
-    * have permission to sign in.
-    *
-    * @param array $Data The data that has to be used to authenticate the data.
-    */
-   public function Authenticate($Data);
-
-
-   /**
-    * Destroys the user's session information.
-    */
-   public function DeAuthenticate();
-
-
-   /**
+interface Gdn_IIdentity {
+	/**
     * Returns the unique id assigned to the user in the database (retrieved
     * from the session cookie if the cookie authenticates) or FALSE if not
     * found or authentication fails.
+    *
+    * @return int
     */
    public function GetIdentity();
+	
+	/**
+    * Generates the user's session cookie.
+    *
+    * @param int $UserID The unique id assigned to the user in the database.
+    * @param boolean $Persist Should the user's session remain persistent across visits?
+    */
+   public function SetIdentity($UserID, $Persist = FALSE);
+	
 }

@@ -51,10 +51,12 @@ class EntryController extends GardenController {
          if ($this->Form->ValidateModel() == 0) {
             // Attempt to authenticate...
             $Authenticator = Gdn::Authenticator();
-            $AuthenticatedUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
+            $AuthenticatedUserID = $Authenticator->Authenticate($this->Form->FormValues());
+            
+            /*$AuthenticatedUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
                $this->Form->GetValue('Password'),
                $this->Form->GetValue('RememberMe', FALSE),
-               $this->Form->GetValue('ClientHour', ''));
+               $this->Form->GetValue('ClientHour', ''));*/
             
             if ($AuthenticatedUserID < 0) {
                $this->Form->AddError('ErrorPermission');

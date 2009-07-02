@@ -238,10 +238,12 @@ class Model extends Gdn_Pluggable {
     * @todo add doc
     */
    public function Update($Fields, $Where = FALSE, $Limit = FALSE) {
+      $Result = FALSE;
       if ($this->Validate($Fields)) {
          $this->AddUpdateFields($Fields);
-         $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
+         $Result = $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
       }
+      return $Result;
    }
 
 

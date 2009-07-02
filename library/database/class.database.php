@@ -124,7 +124,7 @@ class Gdn_Database {
 			elseif(array_key_exists('Dbname', $DefaultConfig))
 				$Dbname = $DefaultConfig['Dbname'];
 			elseif(array_key_exists('Name', $DefaultConfig))
-				$Dbname = $DefaultConfig['Dbname'];
+				$Dbname = $DefaultConfig['Name'];
 			// Was the port explicitly defined in the config?
 			$Port = ArrayValue('Port', $Config, ArrayValue('Port', $DefaultConfig, ''));
 			

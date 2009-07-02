@@ -38,9 +38,9 @@ class Gdn_Schema {
    /// the table that this model represents. You can also explicitly set this
    /// value with $this->TableName.
    /// </param>
-   public function __construct($Table = '') {
+   public function __construct($Table = '', $Database = '') {
       if ($Table != '')
-         $this->Fetch($Table);
+         $this->Fetch($Table, $Database);
    }
    
    /// <summary>
@@ -50,7 +50,7 @@ class Gdn_Schema {
    /// <param name="Table" type="string" required="false" default="FALSE">
    /// The name of the table schema to fetch from the database (or cache?).
    /// </param>   
-   public function Fetch($Table = FALSE) {
+   public function Fetch($Table = FALSE, $Database = '') {
       if ($Table !== FALSE)
          $this->CurrentTable = $Table;
       
@@ -58,7 +58,12 @@ class Gdn_Schema {
          $this->_Schema = array();
          
       if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
-         $SQL = Gdn::SQL();
+         if($Database != '') {
+            $SQL = $Database->SQL();
+         }
+         else {
+            $SQL = Gdn::SQL();
+         }
          $this->_Schema[$this->CurrentTable] = $SQL->FetchTableSchema($this->CurrentTable);
       }
       return $this->_Schema[$this->CurrentTable];
@@ -150,8 +155,8 @@ class Gdn_Schema {
    /// <param name="Table" type="string">
    /// The name of the table for which to find the primary key(s).
    /// </param>
-   public function PrimaryKey($Table) {
-      $Schema = $this->Fetch($Table);
+   public function PrimaryKey($Table, $Database = '') {
+      $Schema = $this->Fetch($Table, $Database);
       $PrimaryKeys = array();
       foreach ($Schema as $FieldName => $Properties) {
          if ($Properties->PrimaryKey === TRUE)

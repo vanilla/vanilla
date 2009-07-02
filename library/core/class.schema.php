@@ -16,7 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /// Manages defining and examining the schema of a database table.
 /// </summary>
 class Gdn_Schema {
-   
+
    /// <prop type="array">
    /// An associative array of TableName => Fields associative arrays that
    /// describe the table's field properties. Each field is represented by an
@@ -38,7 +38,7 @@ class Gdn_Schema {
    /// the table that this model represents. You can also explicitly set this
    /// value with $this->TableName.
    /// </param>
-   public function __construct($Table = '', $Database = '') {
+   public function __construct($Table = '', $Database = NULL) {
       if ($Table != '')
          $this->Fetch($Table, $Database);
    }
@@ -50,7 +50,7 @@ class Gdn_Schema {
    /// <param name="Table" type="string" required="false" default="FALSE">
    /// The name of the table schema to fetch from the database (or cache?).
    /// </param>   
-   public function Fetch($Table = FALSE, $Database = '') {
+   public function Fetch($Table = FALSE, $Database = NULL) {
       if ($Table !== FALSE)
          $this->CurrentTable = $Table;
       
@@ -58,7 +58,7 @@ class Gdn_Schema {
          $this->_Schema = array();
          
       if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
-         if($Database != '') {
+         if($Database !== NULL) {
             $SQL = $Database->SQL();
          }
          else {
@@ -155,7 +155,7 @@ class Gdn_Schema {
    /// <param name="Table" type="string">
    /// The name of the table for which to find the primary key(s).
    /// </param>
-   public function PrimaryKey($Table, $Database = '') {
+   public function PrimaryKey($Table, $Database = NULL) {
       $Schema = $this->Fetch($Table, $Database);
       $PrimaryKeys = array();
       foreach ($Schema as $FieldName => $Properties) {

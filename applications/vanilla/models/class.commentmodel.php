@@ -289,10 +289,10 @@ class CommentModel extends VanillaModel {
                   $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
                   if ($User && $User->UserID != $Session->UserID) {
                      AddActivity(
-                        $User->UserID,
+                        $Session->UserID,
                         'CommentMention',
                         '',
-                        $Session->UserID,
+                        $User->UserID,
                         'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
                      );
                   }

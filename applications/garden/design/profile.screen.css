@@ -46,7 +46,7 @@ div.User h1 {
    font-size: 150%;
    line-height: 100%;
 }
-div.User h4 {
+#Status {
    -moz-border-radius-topleft: 2px;
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
@@ -54,12 +54,21 @@ div.User h4 {
    background: #e9f9ff;
    margin: 0px;
    padding: 8px 8px 0px;
+   color: #999;
    font-weight: normal;
    line-height: 100%;
 }
-div.User h4 a:hover {
-   text-decoration: underline !important;
-   display: block;
+#Status strong {
+   font-size: 120%;
+   color: #6c6c6c;
+}
+#Status a {
+   text-transform: lowercase;
+   font-size: 11px;
+   text-decoration: none;
+}
+#Status a:hover {
+   text-decoration: underline;
 }
 div.User form {
    -moz-border-radius-topleft: 2px;

@@ -239,13 +239,47 @@ class EntryController extends GardenController {
    
    public function PasswordRequest() {
       $this->Form->SetModel($this->UserModel);
+      if (
+         $this->Form->IsPostBack() === TRUE
+         && $this->Form->ValidateModel() == 0)
+      {
+         try {
+            $this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''));
+         } catch (Exception $ex) {
+            $this->Form->AddError($ex->getMessage());
+         }
+         if ($this->Form->ErrorCount() == 0) {
+            $this->Form->AddError('Success!');
+            $this->View = 'PasswordRequestSent';
+         }
+      } else {
+         $this->Form->AddError('That email address was not found.');
+      }
+      $this->Render();
+   }
+
+   public function PasswordReset($UserID = '', $PasswordResetKey = '') {
+      if (!is_numeric($UserID)
+          || $PasswordResetKey == ''
+          || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
+         ) $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
       
-      // If the form has been posted back...
-      if ($this->Form->AuthenticatedPostBack() === TRUE) {
-         // If there were no errors...
-         if ($this->Form->ValidateModel() == 0) {
-            // Add one...
-            $this->Form->AddError('ErrorPermission');
+      if ($this->Form->ErrorCount() == 0
+         && $this->Form->IsPostBack() === TRUE
+      ) {
+         $Password = $this->Form->GetFormValue('Password', '');
+         $Confirm = $this->Form->GetFormValue('Confirm', '');
+         if ($Password == '')
+            $this->Form->AddError('Your new password is invalid');
+         else if ($Password != $Confirm)
+            $this->Form->AddError('Your passwords did not match.');
+
+         if ($this->Form->ErrorCount() == 0) {
+            $User = $this->UserModel->PasswordReset($UserID, $Password);
+            $Authenticator = Gdn::Authenticator();
+            $Authenticator->Authenticate($User->Name, $Password, FALSE);
+            $this->StatusMessage = Gdn::Translate('Password saved. Signing you in now...');
+            $this->RedirectUrl = Url('/');
          }
       }
       $this->Render();

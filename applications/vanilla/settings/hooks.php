@@ -42,13 +42,15 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
-      // Add the discussion tab
-      $Sender->AddProfileTab(Gdn::Translate('Discussions'));
-      // Add the discussion tab's css
-      $Sender->AddCssFile('profile.screen.css', 'vanilla');
-      if ($Sender->Head) {
-         $Sender->Head->AddScript('/js/library/jquery.gardenmorepager.js');
-         $Sender->Head->AddScript('/applications/vanilla/js/discussions.js');
+      if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
+         // Add the discussion tab
+         $Sender->AddProfileTab(Gdn::Translate('Discussions'));
+         // Add the discussion tab's css
+         $Sender->AddCssFile('profile.screen.css', 'vanilla');
+         if ($Sender->Head) {
+            $Sender->Head->AddScript('/js/library/jquery.gardenmorepager.js');
+            $Sender->Head->AddScript('/applications/vanilla/js/discussions.js');
+         }
       }
    }
    

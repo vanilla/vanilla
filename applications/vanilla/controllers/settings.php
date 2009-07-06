@@ -47,6 +47,7 @@ class SettingsController extends VanillaController {
    }
    
    public function Initialize() {
+      $this->AddCssFile('default.screen.css');
       $this->AddCssFile('form.screen.css');
       parent::Initialize();
       if ($this->Menu)

@@ -24,6 +24,9 @@ function smarty_function_asset($Params, &$Smarty) {
 	$Name = ArrayValue('name', $Params);
 	$Tag = ArrayValue('tag', $Params, '');
 	$Id = ArrayValue('id', $Params, $Name);
+	$Class = ArrayValue('class', $Params, '');
+	if ($Class != '')
+		$Class = ' class="'.$Class.'"';
 	
 	$Controller = $Smarty->get_template_vars('Controller');
 	
@@ -38,7 +41,7 @@ function smarty_function_asset($Params, &$Smarty) {
 	}
 	
 	if(!empty($Tag)) {
-		$Result = '<' . $Tag . ' id="' . $Id . '">' . $Asset . '</' . $Tag . '>';
+		$Result = '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
 	} else {
 		$Result = $Asset;
 	}

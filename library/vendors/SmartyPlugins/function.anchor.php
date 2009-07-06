@@ -8,15 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-
-/*
-class SkeletonHooks implements Gdn_IPlugin {
-   public function Controller_Event_Handler($Sender) {
-      // Do something
-   }
-   
-   public function Setup() {
-      // No need for anything here...
-   }
+function smarty_function_anchor($Params, &$Smarty) {
+	$Text = ArrayValue('text', $Params, '');
+	$Destination = ArrayValue('destination', $Params, '');
+	$CssClass = ArrayValue('class', $Params, '');
+	return Anchor($Text, $Destination, $CssClass);
 }
-*/

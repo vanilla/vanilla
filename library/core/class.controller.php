@@ -332,7 +332,9 @@ class Gdn_Controller extends Gdn_Control {
     * used later to sort assets before rendering.
     */
    public function AddAsset($AssetContainer, $Asset, $AssetName = '') {
-      if ($AssetName == '')
+      if (is_object($AssetName))
+         return FALSE;
+      else if ($AssetName == '')
          $this->Assets[$AssetContainer][] = $Asset;
       else
          $this->Assets[$AssetContainer][$AssetName] = $Asset;

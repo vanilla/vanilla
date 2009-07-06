@@ -167,6 +167,7 @@ class Gdn_Email extends Gdn_Pluggable {
          if(!empty($Username))
             $this->_PhpMailer->SMTPAuth = TRUE;
 
+         
       } else {
          $this->_PhpMailer->IsMail();
       }

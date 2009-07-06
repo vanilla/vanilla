@@ -100,41 +100,53 @@ class Gdn_Database {
 	 */
    public function Init($Config = NULL) {
 		if(is_null($Config))
-			return Gdn::Factory(Gdn::ObjectDatabase);
+			$Config = Gdn::Config('Database');
 		elseif(is_string($Config))
 			$Config = Gdn::Config($Config);
 			
-		$this->Engine = $Config['Engine'];
-		$this->User = ArrayValue('User', $Config, '');
-		$this->Password = ArrayValue('Password', $Config, '');
-		$this->ConnectionOptions = ArrayValue('ConnectionOptions', $Config, NULL);
-      $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, ''));
+		$DefaultConfig = Gdn::Config('Database');
+			
+		$this->Engine = ArrayValue('Engine', $Config, $DefaultConfig['Engine']);
+		$this->User = ArrayValue('User', $Config, $DefaultConfig['User']);
+		$this->Password = ArrayValue('Password', $Config, $DefaultConfig['Password']);
+		$this->ConnectionOptions = ArrayValue('ConnectionOptions', $Config, $DefaultConfig['ConnectionOptions']);
+      $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, $DefaultConfig['DatabasePrefix']));
 		
 		if(array_key_exists('Dsn', $Config)) {
          // Get the dsn from the property.
-			$this->Dsn = $Config['Dsn'];
-		} else {
-         if(array_key_exists('Name', $Config) && !array_key_exists('Dbname', $Config))
-            $Config['Dbname'] = $Config['Name'];
-			
+			$Dsn = $Config['Dsn'];
+		} else {	
+			$Host = ArrayValue('Host', $Config, ArrayValue('Host', $DefaultConfig, ''));
+			if(array_key_exists('Dbname', $Config))
+				$Dbname = $Config['Dbname'];
+			elseif(array_key_exists('Name', $Config))
+				$Dbname = $Config['Name'];
+			elseif(array_key_exists('Dbname', $DefaultConfig))
+				$Dbname = $DefaultConfig['Dbname'];
+			elseif(array_key_exists('Name', $DefaultConfig))
+				$Dbname = $DefaultConfig['Name'];
 			// Was the port explicitly defined in the config?
-			$Port = ArrayValue('Port', $Config, '');
-			if ($Port != '') {
-				$Dsn .= 'port='.$Port.';';
+			$Port = ArrayValue('Port', $Config, ArrayValue('Port', $DefaultConfig, ''));
+			
+			if(!isset($Dbname)) {
+				$Dsn = $DefaultConfig['Dsn'];
 			} else {
-				// Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
-				$Dsn = 'host=%s;dbname=%s;';
-				$Host = $Config['Host'];
-				$Host = explode(':', $Host);
-				$Port = count($Host) == 2 ? $Host[1] : '';
-				$Host = $Host[0];
-				if ($Port != '')
-					$Dsn .= 'port='.$Port.';';
+				if(empty($Port)) {
+					// Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
+					$Host = explode(':', $Host);
+					$Port = count($Host) == 2 ? $Host[1] : '';
+					$Host = $Host[0];
+				}
+				
+				if(empty($Port)) {
+					$Dsn = sprintf('host=%s;dbname=%s;', $Host, $Dbname);
+				} else {
+					$Dsn = sprintf('host=%s;port=%s;dbname=$s;', $Host, $Port, $Dbname);
+				}
 			}
-            
-         // Construct the dsn from the config.
-         $this->Dsn = sprintf($Dsn, $Host, $Config['Dbname']);
 		}
+		
+      $this->Dsn = $Dsn;
    }
    
    /**

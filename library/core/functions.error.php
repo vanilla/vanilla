@@ -282,4 +282,4 @@ if (!function_exists('LogMessage')) {
 }
 
 // Set up Garden to handle php errors
-set_error_handler('ErrorHandler');
+set_error_handler('ErrorHandler', E_ALL);

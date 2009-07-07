@@ -1,0 +1,795 @@
+body {
+   background: #ffffff;
+   margin: 0px;
+   padding: 0px;
+   text-align: center;
+   font-size: small;
+   }
+.Hidden {
+   display: none;
+}
+#Head {
+   background: #44c7f4;
+   padding: 0px;
+   text-align: right;
+   height: 50px;
+}
+#Head h1 {
+   display: block;
+   font-size: 22px;
+   font-weight: bold;
+   margin: 0;
+   padding: 8px 0 0;
+}
+div#Head h1 a {
+   background: url('logo.vanilla.png') top left no-repeat;
+   display: block;
+   height: 40px;
+   width: 75px;
+   float: left;
+   margin: 2px 10px 0 0;
+}
+div#Head h1 a span {
+   display: none;
+}
+div.Menu {
+   text-align: right;
+   width: 960px;
+   margin: 0px auto;
+}
+ul#Menu {
+   float: left;
+   margin: 0px auto;
+   padding: 14px 0px 0px 10px;
+}
+#Head form {
+   float: right;
+   width: 250px;
+   background: #fff;
+   padding: 0;
+   margin: 4px 0 0;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+#Head form input.InputBox {
+   width: 204px;
+   border: 0;
+   padding: 4px 2px 4px 0;
+   background: #fff;
+   margin: 0;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   color: #969696;
+   font-size: 13px;
+}
+#Head form input.Button {
+   border: 0;
+   width: 38px;
+   height: 26px;
+   background: #E9F9FF;
+   color: #2786C2;
+   padding: 3px 0 4px;
+   margin: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+#Body {
+   width: 960px;
+   text-align: left;
+   margin: 0px auto;
+}
+#Body {
+   margin: 15px auto 0px auto;
+   }
+/*
+ #Head div a.Title {
+   color: #fff;
+   font-weight: bold;
+   text-transform: uppercase;
+   font-size: 14px;
+   float: left;
+   margin-right: 20px;
+   padding: 8px 12px;
+   -moz-border-radius-topleft: 1px;
+   -moz-border-radius-topright: 1px;
+   -webkit-border-top-left-radius: 1px;
+   -webkit-border-top-right-radius: 1px;
+}
+*/
+#Content {
+   float: left;
+   width: 680px;
+}
+/* Progress Bars */
+.Loading {
+   height: 100px;
+   padding: 0px 20px;
+   background: url('progress.gif') center center no-repeat;
+}
+.Progress {
+   padding: 10px 40px 10px 0px;
+   background: url('progress.gif') center center no-repeat;
+}
+/* Messages */
+div.Messages {
+   text-align: center;
+   position: fixed;
+   top: 0;
+   left: 0;
+   z-index: 200;
+   margin: 0px !important;
+   padding: 0px !important;
+   list-style: none !important;
+   font-size: 12px;
+   display: block;
+   width: 100%;
+}
+* html div.Messages {
+  position: absolute;
+  width: 100%;/*IE5.5*/
+  top: 0;
+  left: 0;
+  overflow: visible; 
+  top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop);
+}
+div.Messages ul {
+   cursor: pointer;
+   width: auto !important;
+   border: 0 !important;
+   margin: 0 auto !important;
+   padding: 4px 8px !important;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   background: #ff9 !important;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+}
+div.Messages ul li {
+   text-align: left !important;
+   border: 0 !important;
+   color: #000 !important;
+   padding: 0 !important;
+   margin: 0 !important;
+   list-style-position: outside;
+}
+
+div.Errors ul {
+   background: #d50a0a !important;
+}
+div.Errors ul li {
+   color: #fff !important;
+}
+
+.Warning {
+   background: #ff9;
+   color: #000;
+   padding: 3px 6px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+
+/* Close buttons */
+a.Close {
+   font-weight: bold;
+   font-family: tahoma;
+   font-size: 10px;
+   text-transform: uppercase;
+   color: #bbb;
+   background: #f9f9f9;
+   -moz-border-radius: 8px;
+   -webkit-border-radius: 8px;
+   padding: 1px 4px 2px 5px;
+   margin: 0px;
+   line-height: 100%;
+   border: 1px solid #ddd;
+}
+a.Close:hover {
+   border: 1px solid #bbb;
+   color: #999;
+   background: #fff;
+}
+.Errors a.Close,
+.StatusMessage a.Close {
+   float: right;
+   color: #e4c100;
+   background: #ffffa4;
+   padding: 2px 4px 3px 5px;
+   margin: 2px 0px 0px;
+   display: block;
+   border: 1px solid #ffd800;
+}
+.Errors a.Close {
+   background: #e11414;
+   border: 1px solid #b00;
+   color: #ff6;
+}
+.Errors a.Close:hover {
+   color: #ff0;
+   background: #d11;
+   border: 1px solid #a00;
+}
+.StatusMessage a.Close:hover {
+   background: #ffffe2;
+}
+
+/* Panels */
+#Panel {
+   width: 250px;
+   float: right;
+}
+/* Panel Boxes */
+div.Box {
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #e9f9ff;
+   color: #999;
+   padding: 6px 10px;
+   margin: 0px 0px 10px 0px;
+}
+div.Box h4 {
+   font-size: 110%;
+   color: #2786c2;
+   font-weight: bold;
+   margin: 0px;
+   padding: 0px 0px 1px;
+   border-bottom: 1px solid #caf0fe;
+}
+div.Box dl {
+   border-bottom: 1px solid #caf0fe;
+   background: #f0fbff;
+   padding: 3px;
+   font-size: 90%;
+   overflow: hidden;
+}
+div.Box dl dt {
+   float: left;
+   width: 80px;
+   color: #0766a2;
+}
+div.Box dl dd {
+   margin-left: 80px;
+}
+div.Box p {
+   font-size: 100%;
+   padding: 0 0 4px;
+   color: #555;
+}
+/* Side Menu */
+ul.SideMenu,
+ul.SideMenu li ul {
+   margin: 0px;
+   padding: 0px;
+   list-style: none;
+}
+ul.SideMenu {
+   font-size: 110%;
+   color: #2786c2;
+   font-weight: bold;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #e9f9ff;
+   padding: 6px 10px;
+   margin: 0px 0px 10px 0px;   
+}
+ul.SideMenu li ul {
+   padding: 0px 3px;
+   border-top: 1px solid #CAF0FE;
+   border-bottom: 1px solid #CAF0FE;
+   margin: 4px 0px 6px 0px;
+   background: #f0fbff;
+}
+
+ul.SideMenu li ul li a {
+   font-size: 12px;
+   font-weight: normal;
+}
+ul.SideMenu li ul li a:hover {
+   color: #2786c2;
+   text-decoration: underline;
+}
+ul.SideMenu li ul li.Highlight a {
+   color: #ff0084;
+}
+
+/* Panel Info */
+ul.PanelInfo li {
+   background: #f5fcff;
+   border-bottom: 1px solid #caf0fe;
+   padding: 2px 4px;
+   font-family: tahoma;
+   font-size: 80%;
+   text-align: right;
+}
+ul.PanelInfo li h2 {
+   text-align: left;
+   display: inline;
+   font-size: 130%;
+   margin-right: 12px;
+}
+ul.PanelInfo li a {
+   float: left;
+}
+ul.PanelInfo li.Active {
+   background: #fff;
+   border-bottom: 1px solid #a3e6ff;
+}
+
+/* Foot */
+#Foot {
+   padding-top: 20px;
+   clear: both;
+}
+
+/* Activities
+TODO: MOVE VANILLA-SPECIFIC STYLES TO VANILLA CSS??
+
+*/
+body.Activity h1 {
+   padding: 0px 0px 0px 0px;
+   font-size: 160%;
+   margin: 0px;
+}
+
+ul.Activities {
+   border-top: 1px solid #ddd;
+}
+ul.Activities li {
+   border-bottom: 1px solid #ddd;
+   padding: 0px 0px 8px;
+   color: #454545;
+   clear: left;
+}
+/*
+ul.Activities li.Empty h2 {
+   font-size: 12px;
+   padding: 8px;
+   font-weight: normal;
+   margin: 0px;
+}
+*/
+ul.Activities li img {
+   float: left;
+   margin: 8px 8px 8px 8px;
+   border: 0px;
+   height: 40px;
+   width: 40px;
+}
+ul.Activities li.ActivityComment img {
+   height: 32px;
+   width: 32px;
+}
+ul.Activities li h3 {
+   margin: 0px 0px 0px 8px !important;
+   padding: 0px;
+   font-size: 90%;
+   font-weight: normal;
+   font-family: Tahoma, 'Trebuchet MS', arial;
+}
+ul.Activities li strong {
+   display: block;
+   padding: 8px 0px 0px;
+   line-height: 100%;
+}
+ul.Activities li h3 em {
+   font-weight: normal;
+   font-style: normal;
+   color: #33afda;
+   font-size: 10px;
+   margin: 0px 10px;
+}
+ul.Activities li h3 a.CommentOption {
+   font-size: 10px;
+}
+ul.Activities li h3 a.Delete {
+   float: right;
+   width: auto;
+   padding: 4px;
+   margin: 3px 1px 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Activities li h3 a.Delete:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+ul.Activities ul.Comments a.Delete {
+   margin: 4px 4px 0 0;
+}
+ul.Activities li blockquote {
+   margin: 4px 4px 4px;
+   padding: 2px 6px;
+   background: #ffd;
+   color: #555;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.Activities li.PictureChange blockquote {
+   background: none;
+   margin: 4px 0px 0px;
+   padding: 0px 8px;
+}
+ul.Activities ul.Comments blockquote {
+   background: none;
+   padding: 0px;
+   margin: 0px 4px;
+}
+ul.Activities li blockquote blockquote {
+   margin: 2px 0px 0px;
+   padding: 0px;
+   background: none;
+   color: #999;
+}
+ul.Activities li.ActivityComment h3 strong,
+ul.Activities li.ActivityComment h3 strong a {
+   font-weight: normal;
+}
+ul.Activities li.ActivityComment blockquote {
+   margin: 0px;
+   padding: 0px 8px 6px;
+}
+
+ul.Activities li blockquote img {
+   height: auto;
+   width: auto;
+   background: #fff;
+   padding: 2px;
+   border: 1px solid #ccc;
+   float: none;
+   margin: 0px 4px 0px 0px;
+}
+ul.Activities ul.Comments {
+   background: #fff;
+   margin: 0px 8px;
+   padding: 1px 0px 0px;
+   list-style: none;
+}
+ul.Activities ul.Comments li {
+   background: #e9f9ff;
+   margin-bottom: 1px;
+   border-bottom: 0px;
+   padding: 0px;
+}
+ul.Activities ul.Comments li.CommentForm {
+   clear: left;
+   padding: 8px;
+}
+ul.Activities ul.Comments li.CommentForm a.CommentLink,
+ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
+   cursor: text;
+   background: #fff;
+   color: #bbb !important;
+   font-size: 14px;
+   padding: 5px;
+   text-decoration: none;
+   border: 1px solid #aaa;
+   display: block;
+   line-height: 100%;
+}
+ul.Activities li.CommentForm textarea {
+   width: 648px;
+   height: 40px;
+   margin-bottom: 2px;
+}
+
+
+/* Pager */
+.MorePager {
+   list-style: none;
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   }
+.MorePager a {
+   font-size: 12px;
+   font-weight: normal;
+   text-align: right;
+}
+.MorePager a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
+}
+#PagerLess {
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-topleft: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-top-left-radius: 2px;
+}
+tr#PagerMore td {
+   border: 0px;
+   text-align: right;
+}
+/* jQuery Autocomplete */
+textarea.MultiComplete {
+   height: 20px;
+   padding: 3px 0px;
+   width: 400px;
+   text-align: left;
+}
+.ac_results {
+   padding: 0px;
+   border: 1px solid #bbb;
+   border-top: 0px;
+   background-color: white;
+   overflow: hidden;
+   z-index: 99999;
+}
+
+.ac_results ul {
+   width: 100%;
+   list-style-position: outside;
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+
+.ac_results li {
+   margin: 0px;
+   padding: 5px;
+   cursor: default;
+   display: block;
+   /* 
+   if width will be 100% horizontal scrollbar will apear 
+   when scroll mode will be used
+   */
+   /*width: 100%;*/
+   font-size: 12px;
+   /* 
+   it is very important, if line-height not setted or setted 
+   in relative units scroll will be broken in firefox
+   */
+   line-height: 16px;
+   overflow: hidden;
+   border-bottom: 1px solid #bbb;
+   text-align: left;
+}
+.ac_lastitem {
+   border-bottom: 0px !important;
+}
+.ac_results strong {
+   font-weight: bold;
+   background: #daf4fd;
+}
+.ac_over strong {
+   font-weight: bold;
+   background: #2ab0de;
+}
+.ac_over {
+   background: #44c7f4;
+   color: #fff;
+}
+
+.disclaimer #Content h2 {
+   font-size: 120%;
+   font-weight: bold;
+   line-height: 100%;
+}
+.disclaimer #Content ul {
+   margin: 8px 0px 0px;
+}
+.disclaimer #Content li {
+   border-top: 1px solid #efefef;
+   padding: 3px 0px;
+   font-size: 90%;
+}
+.disclaimer #Content li strong {
+   font-weight: bold;
+}
+
+#NewPassword div {
+   margin: 6px 0 0 160px;
+}
+#NewPassword div a {
+   margin-right: 6px;
+}
+
+/* Entry Screen */
+body.Entry {
+   text-align: center;
+}
+body.Entry div.Panel {
+   display: none;
+}
+body.Entry #Content {
+   float: none;
+   margin: 0;
+   width: auto;
+   text-align: center;
+}
+body.Entry #Leave {
+   width: 400px;
+   margin: 0 auto;
+   background: #E9F9FF;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   padding: 10px 10px 0 10px;
+   text-align: left;
+}
+body.Entry p.Leaving {
+   background: url('progress.gif') left top no-repeat;
+   padding-left: 50px;
+
+}
+body.register #Content,
+body.signin #Content,
+body.passwordrequest #Content,
+body.passwordreset #Content,
+body.Entry #SignIn,
+body.Entry #Password,
+body.Entry #Register {
+   text-align: left;
+   float: left;
+   background: #E9F9FF;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 2px;
+   padding: 10px 10px 0 10px;
+   margin: 0 0 15px;
+}
+body.Entry #SignIn,
+body.Entry #Password {
+   margin: 0 15px 15px 0;
+}
+body.Entry #Password p {
+   width: 242px;
+   overflow: hidden;
+}
+body.Entry #Content h1 {
+   border-bottom:1px solid #CAF0FE;
+   color:#2786C2;
+   font-size:110%;
+   font-weight:bold;
+   margin: 0 0 10px;
+   padding:0 0 1px;
+}
+body.Entry p {
+   padding:0 0 10px;
+   color: #999999;
+}
+body.Entry form ul li {
+   border: 0;
+}
+body.Entry #SignIn form ul li label {
+   width: 80px;
+}
+body.Entry #Password form ul li label {
+   width: 50px;
+}
+body.Entry #Register form ul li label {
+   width: 130px;
+}
+body.Entry #SignIn form ul li label.CheckBoxLabel,
+body.Entry #Register form ul li label.CheckBoxLabel {
+   width: auto;
+}
+body.Entry input.DateBox,
+body.Entry input.InputBox,
+body.Entry textarea {
+   width: 157px;
+   margin-right: 10px;
+}
+body.Entry #Register input.DateBox,
+body.Entry #Register input.InputBox,
+body.Entry #Register textarea {
+   width: 190px;
+   margin-right: 10px;
+}
+body.Entry #Register form ul li label.BirthDate {
+   width: 110px;
+}
+body.Entry span.Incorrect {
+   display: block;
+   color: red;
+   padding-left: 140px;
+}
+
+/* Dashboard Styles */
+#garden_settings_index h1 {
+   border: 0 !important;
+   line-height: 80%;
+   margin-bottom: 0 !important;
+}
+#garden_settings_index p {
+   font-size: 14px;
+   line-height: 100%;
+}
+ul.BigList {
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   background: #f0fbff;
+   padding: 8px;
+   margin: 10px 0 0;
+}
+ul.BigList li {
+   font-size: 16px;
+   padding: 12px 0 12px 55px;   
+}
+li.one { background: url('one.png') no-repeat center left; }
+li.two { background: url('two.png') no-repeat center left; }
+li.three { background: url('three.png') no-repeat center left; }
+li.four { background: url('four.png') no-repeat center left; }
+li.five { background: url('five.png') no-repeat center left; }
+
+/* DataList (search results, vanilla discussions, drafts, etc) */
+
+ul.DataList {
+   border-top: 1px solid #dbe3e6;
+}
+ul.DataList li {
+   margin: 0px;
+   padding: 0px 0px 4px 0px;
+    border-bottom: 1px solid #dbe3e6;
+}
+ul.DataList li li {
+   border: 0px;
+   padding: 0px;
+}
+ul.DataList,
+ul.DataList li ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+ul.DataList li ul li.Title a {
+   border-left: 2px solid #dbe3e6;
+   margin: 8px 4px 6px 10px;
+   padding: 0px 0px 0px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+   display: block;
+}
+ul.DataList li ul li.Title h3 {
+   padding: 6px 0px 0px 10px;
+   margin: 0px;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.DataList li ul li.Title h3 a {
+   display: inline;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+   color: #2d7bb2;
+}
+ul.DataList li ul li.Meta {
+   font-family: tahoma;
+   margin-left: 9px;
+   font-size: 80%;
+   color: #80828c;
+}
+ul.DataList li ul li.Meta span,
+ul.DataList li ul li.Meta span a,
+ul.DataList li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff0;
+   padding: 0px 2px;
+}
+ul.DataList li ul li.Meta a {
+   color: #2b2d33;
+}
+/* Search Page Heading */
+body.Search h1 {
+   font-size:160%;
+   margin:0;
+   padding:10px 0 0;
+}

@@ -10,13 +10,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 class SkeletonController extends Gdn_Controller {
    
-   /// <summary>
-   /// Returns an array of pages that contain settings information for this
-   /// application.
-   /// </summary>
-   public function GetSettingsPages(&$Menu) {
-   }
-   
    public function __construct() {
       parent::__construct();
    }

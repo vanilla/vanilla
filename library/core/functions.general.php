@@ -67,7 +67,17 @@ if (!function_exists('RemoveKeyFromArray')) {
       return $Array;
    }
 }
+if (!function_exists('Img')) {
+   function Img($Image, $Attributes = '') {
+      if ($Attributes == '')
+         $Attributes = array();
 
+      if (substr($Image, 0, 7) != 'http://' && $Image != '')
+         $Image = Url($Image);
+
+      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
+   }
+}
 if (!function_exists('Anchor')) {
    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
@@ -711,9 +721,16 @@ if (!function_exists('filter_input')) {
    function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
       $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
       $Value = ArrayValue($FieldName, $Collection, '');
-      if (get_magic_quotes_gpc())
-         return stripslashes($Value);
-         
+      if (get_magic_quotes_gpc()) {
+         if (is_array($Value)) {
+            $Count = count($Value);
+            for ($i = 0; $i < $Count; ++$i) {
+               $Value[$i] = stripslashes($Value[$i]);
+            }
+         } else {
+            $Value = stripslashes($Value);
+         }
+      }
       return $Value;     
    }
 }

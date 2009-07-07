@@ -87,7 +87,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       if (is_object($Sender->CurrentReply) && $Sender->CurrentReply->ReplyCommentID == $Comment->CommentID) {
          echo '<ul class="Replies">';
          while (is_object($Sender->CurrentReply) && $Sender->CurrentReply->ReplyCommentID == $Comment->CommentID) {
-            VanillaCommentRepliesPlugin::WriteReply(&$Sender, &$Session);
+            VanillaCommentRepliesPlugin::WriteReply($Sender, $Session);
             $Sender->CurrentReply = $Sender->ReplyData->NextRow();
          }
       } else {

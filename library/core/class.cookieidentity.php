@@ -55,7 +55,7 @@ class Gdn_CookieIdentity {
       if ($HMAC != $Hash)
          return 0;
 
-      if (!is_numeric($UserID) || $UserID <= 0)
+      if (!is_numeric($UserID) || $UserID < -2) // allow for handshake special id
          return 0;
 
       return $UserID;

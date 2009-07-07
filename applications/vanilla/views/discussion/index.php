@@ -40,8 +40,12 @@ if ($this->Discussion->Closed == '1') {
       ?>
       <div class="CommentOption">
          <?php echo Gdn::Translate('Want to take part in this discussion? Click one of these:'); ?>
-         <?php echo Anchor('Sign In', '/entry/?Target='.urlencode($this->SelfUrl), 'Button'); ?> 
-         <?php echo Anchor('Register For Membership', '/entry/?Target='.urlencode($this->SelfUrl), 'Button'); ?>      
+         <?php echo Anchor('Sign In', Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button'); ?> 
+         <?php
+            $Url = Gdn::Authenticator()->RegisterUrl($this->SelfUrl);
+            if(!empty($Url))
+               echo Anchor('Register For Membership', $Url, 'Button');
+         ?>
       </div>
       <?php 
    }

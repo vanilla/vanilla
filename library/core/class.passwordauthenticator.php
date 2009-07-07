@@ -157,6 +157,18 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
     * @return int
     */
    public function GetIdentity() {
-      return $this->_Identity->GetIdentity();
+      $Result = $this->_Identity->GetIdentity();
+      if($Result < 0)
+         $Result = 0;
+      return $Result;
+   }
+   
+   public function RegisterUrl($Redirect = '/') {
+      return $this->SignInUrl($Redirect);
+	}
+   
+   public function SignInUrl($Redirect = '/') {
+		$Url = '/entry/?Target='.urlencode($Redirect);
+		return $Url;
    }
 }

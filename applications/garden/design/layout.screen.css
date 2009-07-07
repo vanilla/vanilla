@@ -634,7 +634,8 @@ body.passwordrequest #Content,
 body.passwordreset #Content,
 body.Entry #SignIn,
 body.Entry #Password,
-body.Entry #Register {
+body.Entry #Register,
+body.Entry #Handshake {
    text-align: left;
    float: left;
    background: #E9F9FF;

@@ -746,3 +746,19 @@ if (!function_exists('array_fill_keys')) {
       return array_combine($Keys,array_fill(0,count($Keys),$Val));
    }
 }
+
+if (!function_exists('parse_ini_string')) {
+   function parse_ini_string ($Ini) {
+      $Lines = split("\n", $Ini);
+      $Result = array();
+      foreach($Lines as $Line) {
+         $Parts = split('=', $Line, 2);
+         if(count($Parts) == 1) {
+            $Result[trim($Parts[0])] = '';
+         } elseif(count($Parts) >= 2) {
+            $Result[trim($Parts[0])] = trim($Parts[1]);
+         }
+      }
+      return $Result;
+   }
+}

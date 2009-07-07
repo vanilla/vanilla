@@ -20,6 +20,7 @@ class GardenHooks implements Gdn_IPlugin {
          $Sender->Menu->AddLink('Dashboard', 'Dashboard', '/garden/settings', array('Garden.Settings.Manage'));
          $Sender->Menu->AddLink('Dashboard', 'Users', '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
          $Sender->Menu->AddLink('Activity', 'Activity', '/activity');
+         $Authenticator = Gdn::Authenticator();
          if ($Session->IsValid()) {
             $Sender->Menu->AddLink('SignOut', 'Sign Out', '/entry/leave/{Session_TransientKey}', FALSE, array('class' => 'NonTab'));
             $Notifications = Gdn::Translate('Notifications');
@@ -31,7 +32,7 @@ class GardenHooks implements Gdn_IPlugin {
             $Sender->Menu->AddLink('User', $Notifications, 'profile/notifications/{Username}');
             $Sender->Menu->AddLink('User', 'My Activity', '/profile/activity/{Username}');
          } else {
-            $Sender->Menu->AddLink('Entry', 'Sign In', '/entry');
+            $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl());
          }
       }
    }

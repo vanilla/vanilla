@@ -50,4 +50,16 @@ interface Gdn_IAuthenticator {
     * found or authentication fails.
     */
    public function GetIdentity();
+   
+   /**
+    * Returns the url used to register for an account in the application.
+    */
+   public function RegisterUrl($Redirect = '/');
+   
+   /**
+    * Returns the url used to sign in to the application.
+    *
+    * @return string
+    */
+   public function SignInUrl($Redirect = '/');
 }

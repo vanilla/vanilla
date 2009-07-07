@@ -77,6 +77,12 @@ $Construct->Table('UserRole')
 // Assign the guest user to the guest role
 $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
 
+// Create the authentication table.
+$Construct->Table('UserAuthentication')
+	->Column('UniqueID', 'varchar', 30, FALSE, NULL, 'primary')
+	->Column('UserID', 'int', '', FALSE, NULL, 'key')
+	->Set($Explicit, $Drop);
+
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();

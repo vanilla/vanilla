@@ -69,7 +69,6 @@ class Gdn_FileSystem {
                   $Result[] = $Item;
             }
             closedir($DirectoryHandle);
-            $Result[] = $SubFolders;
          }
       }
       if(count($Result) == 0)

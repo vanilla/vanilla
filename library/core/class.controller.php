@@ -596,7 +596,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method GetImports() needs a description.
     */
    public function GetImports() {
-      if(!is_array($this->Uses))
+      if(!isset($this->Uses) || !is_array($this->Uses))
          return;
       
       // Load any classes in the uses array and make them properties of this class

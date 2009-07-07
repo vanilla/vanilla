@@ -268,10 +268,14 @@ class Format {
     * @return mixed
     */
    public static function Url($Mixed) {
-      if (!is_string($Mixed))
+      if (!is_string($Mixed)) {
          return self::To($Mixed, 'Url');
-      else
-         return str_replace(' ', '-', trim(preg_replace('/-+/', '-', preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
+      } else {
+         $Mixed = utf8_decode($Mixed);
+         $Mixed = str_replace(' ', '-', trim(preg_replace('/-+/', '-', preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
+         $Mixed = utf8_encode($Mixed);
+         return $Mixed;
+      }
    }
 
 

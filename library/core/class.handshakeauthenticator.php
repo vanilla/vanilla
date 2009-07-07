@@ -9,12 +9,31 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 /**
- * Validating, Setting, and Retrieving session data in cookies. The HMAC
- * Hashing method used here was inspired by Wordpress 2.5 and this document in
- * particular: http://www.cse.msu.edu/~alexliu/publications/Cookie/cookie.pdf
+ * Validates sessions by handshaking with another site that can share cookies with this site.
+ * In order to use this authentication method you need to set the following values in your config.php file:
+ * <ul>
+ *  <li><b>Garden.Authenticator.Type</b>: Handshake</li>
+ *  <li><b>Garden.Authenticator.AuthenticateUrl</b>: A url that will return information about the currently signed on user.
+ *  Here is an example:
+ *  UniqueID = 1234
+ *  Name = SomeUser
+ *  DateOfBirth: 1980-10-13
+ *  Gender: Male
+ *  </li>
+ *  <li><b>Garden.Authenticator.Encoding</b>: The encoding of the authenticate url.
+ *   Valid values are 'ini' and 'json'</li>
+ *  <li><b>Garden.Authenticator.SignInUrl</b>: The url that a user uses to sign into the system.
+ *   A %s in this url will be replaced with a url that can be redirected to after the sign out.</li>
+ *  <li><b>Garden.Authenticator.SignOutUrl</b>: The url that will sign a user out of the other system.
+ *   A %s in this url will be replaced with a url that can be redirected to after the sign out.</li>
+ *  <li><b>Garden.Authenticator.RegisterUrl</b>: The url that a user can use to register for a new account.
+ *   This url is optional if users cannot self-register for an account.
+ *   A %s in this url will be replaced with a url that can be redirected to after the sign out.</li>
+ * </ul>
  *
  * @package Garden
  */
+
 class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 	const SignedIn = 1;
 	const SignedOut = -1;
@@ -24,13 +43,17 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 	
 	public $AuthenticateUrl;
 	
-	public $DeAuthenticateUrl;
-	
 	public $Encoding;
 	
 	private $_HandshakeData;
 	
 	private $_Identity;
+	
+	private $_RegisterUrl;
+	
+	private $_SignInUrl;
+	
+	private $_SignOutUrl;
 	
 	/// Constructor ///
 	
@@ -39,7 +62,9 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 			$Config = Gdn::Config($Config);
 			
 		$this->AuthenticateUrl = ArrayValue('AuthenticateUrl', $Config);
-		$this->DeAuthenticateUrl = ArrayValue('DeAuthenticateUrl', $Config);
+		$this->_RegisterUrl = ArrayValue('RegisterUrl', $Config);
+		$this->_SignInUrl = ArrayValue('SignInUrl', $Config);
+		$this->_SignOutUrl = ArrayValue('SignOutUrl', $Config);
 		$this->Encoding = ArrayValue('Encoding', $Config, 'ini');
 		
 		$this->_Identity = Gdn::Factory('Identity');
@@ -154,7 +179,12 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 	}
 	
 	public function RegisterUrl($Redirect = '/') {
-		$Url = sprintf(Gdn::Config('Garden.Authenticator.RegisterUrl'), urlencode(Url($Redirect, TRUE)));
+		$Url = sprintf($this->_RegisterUrl, urlencode(Url($Redirect, TRUE)));
+		return $Url;
+	}
+	
+	public function RemoteSignInUrl($Redirect = '/') {
+		$Url = sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
 		return $Url;
 	}
 	
@@ -167,7 +197,7 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 	}
 	
 	public function SignOutUrl() {
-		$Url = sprintf(Gdn::Config('Garden.Authenticator.SignOutUrl'), urlencode(Gdn_Url::Request()));
+		$Url = sprintf($this->_SignOutUrl, urlencode(Gdn_Url::Request()));
 		return Gdn::Config('Garden.Authenticator.SignOutUrl');
 	}
 	

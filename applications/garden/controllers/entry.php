@@ -105,7 +105,7 @@ class EntryController extends GardenController {
             // Once signed in, we need to come back here to make sure there was no problem with the handshake.
             $Target = Url('/entry/handshake/?Target='.urlencode($Target), TRUE);
             // Redirect to the external server to sign in.
-            $SignInUrl = sprintf(Gdn::Config('Garden.Authenticator.SignInUrl'), urlencode($Target));
+            $SignInUrl = $Authenticator->RemoteSignInUrl($Target);
             Redirect($SignInUrl);
          }
          

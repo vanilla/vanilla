@@ -14,7 +14,7 @@
          <h2><?php echo $SenderMessage ?></h2>
          <?php
          if ($SenderCode != '')
-            echo '<code>',htmlentities($SenderCode),"</code>\n";
+            echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
 
          if (is_array($ErrorLines) && $Line > -1) {
             echo '<h3>The error occurred on or near: <strong>',$File,'</strong></h3>
@@ -32,7 +32,7 @@
                            
                         $Class .= 'Highlight';
                      }
-                     echo '<pre',($Class == '' ? '' : ' class="'.$Class.'"'),'>',str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',htmlentities(str_replace("\n", '', $ErrorLines[$i])),"</pre>\n";
+                     echo '<pre',($Class == '' ? '' : ' class="'.$Class.'"'),'>',str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',htmlentities(str_replace("\n", '', $ErrorLines[$i]), ENT_COMPAT, 'UTF-8'),"</pre>\n";
                      $Odd = $Odd == TRUE ? FALSE : TRUE;
                   }
                }
@@ -79,7 +79,7 @@
                   arsort($tmp);
                   foreach ($tmp as $Name => $Parameter) {
                      $Pattern = '/(.+)('.$Name.')([\W\s]*)(.*)/';
-                     $Replacement = "$1'".htmlentities($Parameter)."'$3$4";
+                     $Replacement = "$1'".htmlentities($Parameter, ENT_COMPAT, 'UTF-8')."'$3$4";
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
                   echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>',$Query,'; <small>',number_format($QueryTimes[$Key], 6),'s</small></pre>';
@@ -97,7 +97,7 @@
                // Don't echo the configuration array as it contains sensitive information
                if (!in_array($Key, array('Config', 'Configuration'))) {
                   echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
-                  echo htmlentities(var_export($Value, TRUE));
+                  echo htmlentities(var_export($Value, TRUE), ENT_COMPAT, 'UTF-8');
                   echo "</pre>\r\n";
                   $Odd = $Odd == TRUE ? FALSE : TRUE;
                }

@@ -59,7 +59,7 @@ class DebuggerPlugin implements Gdn_IPlugin {
                   arsort($tmp);
                   foreach ($tmp as $Name => $Parameter) {
                      $Pattern = '/(.+)('.$Name.')([\W\s]*)(.*)/';
-                     $Replacement = "$1'".htmlentities($Parameter)."'$3$4";
+                     $Replacement = "$1'".htmlentities($Parameter, ENT_COMPAT, 'UTF-8')."'$3$4";
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
                }

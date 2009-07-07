@@ -796,8 +796,10 @@ class Form {
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $MultiLine === TRUE ? '' : $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
-      $Return .= $MultiLine === TRUE ? '>' . htmlentities(
-         ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '</textarea>' : ' />';
+      
+      $Value = ArrayValueI('value', $Attributes, $this->GetValue($FieldName));
+      
+      $Return .= $MultiLine === TRUE ? '>' . htmlentities($Value, ENT_COMPAT, 'UTF-8') . '</textarea>' : ' />';
       return $Return;
    }
 

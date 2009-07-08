@@ -19,7 +19,7 @@ $Construct = Gdn::Structure();
 
 // Role Table
 $Construct->Table('Role')
-   ->Column('RoleID', 'int', NULL, FALSE, NULL, 'primary')
+   ->Column('RoleID', 'int', '', FALSE, NULL, 'primary')
    ->Column('Name', 'varchar', 100)
    ->Column('Description', 'varchar', 200, TRUE)
    ->Column('Sort', 'int', 2, TRUE)
@@ -64,14 +64,14 @@ $Construct->Table('User')
    ->Column('DateUpdated', 'datetime', '', TRUE)
    ->Column('HourOffset', 'int', 2, FALSE, '0')
 	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
-	->Column('CacheRoleID', 'int', 4, TRUE)
+	->Column('CacheRoleID', 'int', '', TRUE)
    ->Column('Admin', array('1', '0'), '', FALSE, '0')
    ->Set($Explicit, $Drop);
 
 // UserRole Table
 $Construct->Table('UserRole')
    ->Column('UserID', 'int', 10, FALSE, NULL, 'primary')
-   ->Column('RoleID', 'int', 2, FALSE, NULL, 'primary')
+   ->Column('RoleID', 'int', '', FALSE, NULL, 'primary')
    ->Set($Explicit, $Drop);
 	
 // Assign the guest user to the guest role
@@ -90,7 +90,7 @@ if($PermissionModel instanceof Gdn_PermissionModel) {
 	// Permission Table
 	$Construct->Table('Permission')
 		->Column('PermissionID', 'int', 4, FALSE, NULL, 'primary', TRUE)
-		->Column('RoleID', 'int', 4, FALSE, 0, 'key')
+		->Column('RoleID', 'int', '', FALSE, 0, 'key')
 		->Column('JunctionTable', 'varchar', 100, TRUE) 
 		->Column('JunctionColumn', 'varchar', 100, TRUE)
 		->Column('JunctionID', 'int', 4, TRUE)

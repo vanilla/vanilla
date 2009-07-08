@@ -91,6 +91,12 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
    }
 
    public function Authenticate($Data) {
+      // Backwards compatibility.
+      if(func_num_args == 3) {
+         $Args = func_get_args();
+         $this->_Authenticate($Args[0], $Args[1], $Args[2]);
+      }
+      
       return $this->_Authenticate(
          ArrayValue('Name', $Data),
          ArrayValue('Password', $Data),

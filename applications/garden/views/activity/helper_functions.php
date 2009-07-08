@@ -28,7 +28,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    ?></strong></h3><?php
    if ($Activity->Story != '') {
    ?><blockquote><?php
-      echo Format::Html($Activity->Story);
+      echo $Activity->Story; // story should be cleaned before being saved.
    ?></blockquote>
    <?php
    }

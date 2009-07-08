@@ -26,7 +26,7 @@ require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 
-class HTMLPurifierPlugin {
+class HTMLPurifierPlugin implements Gdn_IPlugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
 		$HPConfig = HTMLPurifier_Config::createDefault();
@@ -50,5 +50,9 @@ class HTMLPurifierPlugin {
 	/// METHODS ///
 	public function Format($Html) {
 		return $this->_HtmlPurifier->purify($Html);
+	}
+	
+	public function Setup() {
+		if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
 	}
 }

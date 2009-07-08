@@ -178,6 +178,12 @@ class Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if(is_null($Formatter)) {
+            // If there is no HtmlFormatter then make sure that script injections won't work.
+            return self::Display($Mixed);
+         }
+         
          // Allow the code tag to keep all enclosed html encoded.
          $Mixed = preg_replace(
             array('/<code([^>]*)>(.+?)<\/code>/sei'), 
@@ -200,12 +206,7 @@ class Format {
             $Mixed
          );
          
-         $Formatter = Gdn::Factory('HtmlFormatter');
-         if(is_null($Formatter)) {
-            return $Mixed;
-         } else {
-            return $Formatter->Format($Mixed);
-         }
+         return $Formatter->Format($Mixed);
       }
    }
    
@@ -272,7 +273,7 @@ class Format {
          return self::To($Mixed, 'Url');
       } else {
          $Mixed = utf8_decode($Mixed);
-         $Mixed = str_replace(' ', '-', trim(preg_replace('/-+/', '-', preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
+         $Mixed = preg_replace('/-+/', '-', str_replace(' ', '-', trim(preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
          $Mixed = utf8_encode($Mixed);
          return $Mixed;
       }

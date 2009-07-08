@@ -671,7 +671,8 @@ body.Discussion #Content h2 span {
    display: inline;
 }
 .Preview li ul.Info li.Created,
-#Discussion li ul.Info li.Created {
+#Discussion li ul.Info li.Created,
+#Discussion li ul.Info li.Permalink {
    padding-left: 10px;
 }
 .Preview li ul.Info li.Author a,

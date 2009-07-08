@@ -21,7 +21,6 @@ $PluginInfo['VanillaCommentReplies'] = array(
    'SettingsPermission' => FALSE
 );
 
-
 Gdn::FactoryInstall(
    'ReplyModel',
    'ReplyModel',
@@ -35,12 +34,16 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    
    public $ReplyModel;
    
+   public function DiscussionController_CommentRenderBefore_Handler(&$Sender) {
+      $this->DiscussionController_DiscussionRenderBefore_Handler($Sender);
+   }
+   
    public function DiscussionController_DiscussionRenderBefore_Handler(&$Sender) {
       $Sender->Head->AddScript('/plugins/VanillaCommentReplies/replies.js');
       $Sender->Head->AddCss('/plugins/VanillaCommentReplies/style.css');
       $this->ReplyModel = Gdn::Factory('ReplyModel');
       $RequestMethod = strtolower($Sender->RequestMethod);
-      if ($RequestMethod == 'index') {
+      if (in_array($RequestMethod, array('index', 'comment'))) {
          // Load the replies
          if ($Sender->CommentData->NumRows() > 0) {
             $FirstCommentID = $Sender->CommentData->FirstRow()->CommentID;
@@ -59,7 +62,10 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    
    public function DiscussionController_CommentsRenderBefore_Handler(&$Sender) {
       $ReplyFormAction = Url('vanilla/post/reply');
-      $Sender->CurrentReply = is_object($Sender->ReplyData) ? $Sender->ReplyData->NextRow() : FALSE;
+      if(isset($Sender->ReplyData) && is_object($Sender->ReplyData))
+         $Sender->CurrentReply = $Sender->ReplyData->NextRow();
+      else
+         $Sender->CurrentReply = FALSE;
    }
    
    public function DiscussionController_CommentMetaAfter_Handler(&$Sender) {
@@ -122,8 +128,9 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
                   echo UserAnchor($Sender->CurrentReply->InsertName);
                ?></li>
                <li class="Created"><?php echo Format::Date($Sender->CurrentReply->DateInserted); ?></li>
+               <li class="Permalink"><?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.(isset($Sender->CurrentComment) ? $Sender->CurrentComment->CommentID : $Sender->ReplyCommentID).'/#Comment_'.$Sender->CurrentReply->CommentID, Gdn::Translate('Permalink')); ?></li>
             </ul>
-            <div class="Body"><?php echo Format::Display($Sender->CurrentReply->Body); ?></div>
+            <div class="Body"><?php echo Format::To($Sender->CurrentReply->Body, $Sender->CurrentReply->Format); ?></div>
          </li>
       <?php
    }
@@ -150,14 +157,14 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    }
    
    public function PostController_CommentRenderBefore_Handler(&$Sender, $DiscussionID = '') {
-      $Draft = $Sender->EventArguments['Draft'];
+      //$Draft = $Sender->EventArguments['Draft'];
       $Editing = $Sender->EventArguments['Editing'];
       $DiscussionID = $Sender->DiscussionID;
       $CommentID = $Sender->EventArguments['CommentID'];
       if ($Sender->Form->AuthenticatedPostBack() !== FALSE
-         && $Sender->_DeliveryType == DELIVERY_TYPE_ALL
-         && $Sender->Form->Errors() == 0
-         && !$Draft) {
+         && $Sender->DeliveryType() == DELIVERY_TYPE_ALL
+         && $Sender->Form->Errors() == 0) {
+         //&& !$Draft) {
          $Sender->ReplyModel = Gdn::Factory('ReplyModel');
          if ($Editing) {
             $Sender->ReplyData = $Sender->ReplyModel->Get($DiscussionID, $CommentID, $CommentID);
@@ -244,24 +251,25 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
 
    
    public function Setup() {
-      /*
+      $Structure = Gdn::Structure();
+      
       // Make sure to add the ReplyCommentID field if it is not there already.
-      $Construct->Table('Discussion')
+      $Structure->Table('Discussion')
          ->Column('CountReplies', 'int', 4, FALSE, '0')
          ->Set(FALSE, FALSE);
       
-      $Construct->Table('Comment')
+      $Structure->Table('Comment')
          ->Column('ReplyCommentID', 'int', 11, TRUE, NULL, 'key')
          ->Column('CountReplies', 'int', 4, FALSE, '0')
          ->Set(FALSE, FALSE);
          
-      $Construct->Table('CommentWatch')
+      $Structure->Table('CommentWatch')
          ->Column('CountReplies', 'int', 4, FALSE, '0')
          ->Set(FALSE, FALSE);
 
       // Add the activities & activity types for replies
+      $SQL = Gdn::SQL();
       if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentReply'))->NumRows() == 0)
-         $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentReply', 'FullHeadline' => '%1$s replied to %4$s %8$s.', 'ProfileHeadline' => '%1$s replied to %4$s %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
-      */
+         $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentReply', 'FullHeadline' => '%1$s replied to %4$s %8$s.', 'ProfileHeadline' => '%1$s replied to %4$s %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));      
    }
 }

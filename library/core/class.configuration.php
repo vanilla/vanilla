@@ -70,6 +70,11 @@ class Gdn_Configuration {
     */
    protected $_SaveData;
    
+   
+   public function ClearSaveData() {
+      $this->_SaveData = array();
+   }
+   
    /**
     * Finds the data at a given position and returns a reference to it.
     *

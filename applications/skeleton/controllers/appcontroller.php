@@ -15,6 +15,8 @@ class SkeletonController extends Gdn_Controller {
    }
    
    public function Initialize() {
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+         $this->Head = new HeadModule($this);
       parent::Initialize();
    }
 }

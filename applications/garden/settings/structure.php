@@ -152,12 +152,6 @@ $Construct->Table('Photo')
    ->Column('DateInserted', 'datetime')
    ->Set($Explicit, $Drop);
 
-// UserPhoto Table
-$Construct->Table('UserPhoto')
-   ->Column('UserID', 'int', 10, FALSE, NULL, 'primary')
-   ->Column('PhotoID', 'int', 8, FALSE, NULL, 'primary')
-   ->Set($Explicit, $Drop);
-
 // Invitation Table
 $Construct->Table('Invitation')
    ->Column('InvitationID', 'int', 10, FALSE, NULL, 'primary', TRUE)

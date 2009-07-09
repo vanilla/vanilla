@@ -154,7 +154,9 @@ class DiscussionController extends VanillaController {
          && $DiscussionID > 0
          && $Session->UserID > 0
          && $Session->ValidateTransientKey($TransientKey)
-      ) $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID);
+      )
+      $Discussion = NULL;
+      $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
 
       $CountBookmarks = $this->DiscussionModel->BookmarkCount($Session->UserID);
       
@@ -181,6 +183,37 @@ class DiscussionController extends VanillaController {
       $this->SetJson('ButtonLink', Gdn::Translate($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
       $this->SetJson('AnchorTitle', Gdn::Translate($State ? 'Unbookmark' : 'Bookmark'));
       $this->SetJson('MenuLink', $MyBookmarks);
+      
+      $Targets = array();
+      if($State) {
+         // Grab the individual bookmark and send it to the client.
+         $Bookmarks = new BookmarkedModule($this);
+         if($CountBookmarks == 1) {
+            // When there is only one bookmark we have to get the whole module.
+            $Target = '#Panel';
+            $Type = 'Append';
+            $Bookmarks->GetData();
+            $Data = $Bookmarks->ToString();
+         } else {
+            $Target = '#Bookmark_List';
+            $Type = 'Prepend';
+            $Loc = $Bookmarks->FetchViewLocation('discussion');
+            
+            ob_start();
+            include($Loc);
+            $Data = ob_get_clean();
+         }
+         $Targets[] = array('Target' => $Target, 'Type' => $Type, 'Data' => $Data);
+      } else {
+         // Send command to remove bookmark html.
+         if($CountBookmarks == 0) {
+            $Targets[] = array('Target' => '#Bookmarks', 'Type' => 'Remove');
+         } else {
+            $Targets[] = array('Target' => '#Bookmark_'.$DiscussionID, 'Type' => 'Remove');
+         }
+      }
+      $this->SetJson('Targets', $Targets);
+      
       $this->Render();         
    }
    

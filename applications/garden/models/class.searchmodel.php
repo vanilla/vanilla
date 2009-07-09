@@ -97,6 +97,8 @@ class Gdn_SearchModel extends Model {
 			$Keywords = ArrayValue('Summary', $Document, '');
 		}
 		$this->FilterKeywords($Keywords);
+		if(!is_array($Keywords) || count($Keywords) == 0)
+			return;
 		$Keywords = array_fill_keys($Keywords, NULL);
 		$KeywordsToDelete = array();
 		

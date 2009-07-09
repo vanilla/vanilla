@@ -95,6 +95,39 @@ jQuery(document).ready(function($) {
             $(message).appendTo('body').show();
       }
    }
+   
+   
+
+   processTargets = function(targets) {
+      if(!targets || !targets.length)
+         return;
+      for(i = 0; i < targets.length; i++) {
+         item = targets[i];
+         $target = $(item.Target);
+         switch(item.Type) {
+            case 'Append':
+               $target.append(item.Data);
+               break;
+            case 'Before':
+               $target.before(item.Data);
+               break;
+            case 'After':
+               $target.after(item.Data);
+               break;
+            case 'Prepend':
+               $target.prepend(item.Data);
+               break;
+            case 'Remove':
+               $target.remove();
+               break;
+            case 'Text':
+               $target.text(item.Data);
+               break;
+            case 'Html':
+               $target.hml(item.Data);
+         }
+      }
+   }
 
    // Fill the search input with "search" if empty and blurred
    var searchText = definition('Search', 'Search');

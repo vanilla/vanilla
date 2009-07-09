@@ -1,28 +1,58 @@
 .Comment .CommentScore {
 	float: right;
 	font-weight: bold;
-	margin-left: 4px;
 	padding-top: 4px;
 }
 
 .Comment .CommentScore span {
 	color: #777;
-	margin-left: 4px;
-	margin-right: 4px;
 }
 
-.Comment .CommentScore a {
+.Comment .CommentScore a.Inc {
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+
+	background: #FFF3B1;
 	display: block;
-	padding: 2px;
-	border: solid 1px grey;
-	width: 20px;
+	height: 18px;
+	margin-left: 4px;
+	position: relative;
+	padding: 0;
+	border: solid 2px #ECC61F;
+	text-align: center;
+	vertical-align: middle;
+	width: 18px;
+}
+
+.Comment .CommentScore a.Inc span {
+	color: #0B8CB7;
+	display: block;
+	font-size: 15px;
+	font-weight: bold;
+	position: absolute;
+	text-align: center;
+	width: 18px;
+}
+
+.Comment .CommentScore a.Neg span {
+	top: -2px;
+}
+
+.Comment .CommentScore a.Pos span {
+	top: -1px;
 }
 
 .Comment .CommentScore a.Disabled {
    -moz-user-select: none;
    -khtml-user-select: none;
-   user-select: none;
+	background: #efefef;
+	border-color: #dedede;
 	cursor: default;
+   user-select: none;
+}
+
+.Comment .CommentScore a.Disabled span {
+	color: #ccc;
 }
 
 .Comment .CommentScore .Score {

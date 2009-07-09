@@ -91,8 +91,19 @@ class Gdn_PermissionModel extends Model {
    public function GetAllowedPermissionNamespaces() {
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
+      
       $PluginManager = Gdn::Factory('PluginManager');
-      return array_merge(array_keys($EnabledApplications), array_keys($PluginManager->EnabledPlugins));      
+      $PluginNamespaces = array();
+      foreach($PluginManager->EnabledPlugins as $Plugin) {
+         if(!array_key_exists('RegisterPermissions', $Plugin) || !is_array($Plugin['RegisterPermissions']))
+            continue;
+         foreach($Plugin['RegisterPermissions'] as $PermissionName) {
+            $Namespace = substr($PermissionName, 0, strrpos($PermissionName, '.'));
+            $PluginNamespaces[$Namespace] = TRUE;
+         }
+      }
+      
+      return array_merge(array_keys($EnabledApplications), array_keys($PluginNamespaces));      
    }
    
    public function CachePermissions($UserID = NULL, $RoleID = NULL) {     
@@ -208,8 +219,8 @@ class Gdn_PermissionModel extends Model {
     * @return DataSet
     */
    public function GetPermissions($RoleID, $LimitToSuffix = '') {
-      $Namespaces = $this->GetAllowedPermissionNamespaces();
-      $NamespaceCount = count($Namespaces);
+      //$Namespaces = $this->GetAllowedPermissionNamespaces();
+      //$NamespaceCount = count($Namespaces);
       
       $Result = array();
       
@@ -258,7 +269,7 @@ class Gdn_PermissionModel extends Model {
          if(!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix)
             unset($GlobalPermissions[$PermissionName]); // permission not in $LimitToSuffix
          if($index = strpos($PermissionName, '.')) {
-            if(!in_array(substr($PermissionName, 0, $index), $Namespaces))
+            if(!in_array(substr($PermissionName, 0, $index), $Namespaces) && !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces))
                unset($GlobalPermissions[$PermissionName]);; // permission not in allowed namespaces
          }
       }

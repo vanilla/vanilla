@@ -40,6 +40,18 @@ jQuery(document).ready(function($) {
                      $('#' + options.frm.attr('id')).parents('div:first').html(json.Data);
                   }
                }
+               // If there are additional targets in the result then set them now.
+               if(json.Targets) {
+                  for(var i = 0; i < json.Targets.length; i++) {
+                     var item = json.Targets[i];
+                     if(item.Type == 'Text') {
+                        $(item.Target).text(item.Data);
+                     } else {
+                        $(item.Target).html(item.Data);
+                     }
+                  }
+               }
+               
                // Re-attach the handler
                $($(handle).selector).handleAjaxForm();
              }

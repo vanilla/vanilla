@@ -387,7 +387,14 @@ class Form {
       // Append the rows.
       $Result .= '<tbody>';
       foreach($Rows as $RowName => $X) {
-         $Result .= '<tr><th>'.Gdn::Translate($RowName).'</td>';
+         $Result .= '<tr><th>';
+         
+         // If the row name is still seperated by dots then put those in spans.
+         $RowNames = explode('.', $RowName);
+         for($i = 0; $i < count($RowNames) - 1; ++$i) {
+            $Result .= '<span class="Parent">'.Gdn::Translate($RowNames[$i]).'</span>';
+         }
+         $Result .= Gdn::Translate($RowNames[count($RowNames) - 1]).'</th>';
          // Append the columns within the rows.
          $Alt = TRUE;
          foreach($Columns as $ColumnName => $Y) {

@@ -18,7 +18,7 @@ echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_U
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Name', 'Name');
+         echo $this->Form->Label('Username', 'Name');
          echo $this->Form->TextBox('Name');
          echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.Gdn::Translate('Name Unavailable').'</span>';
       ?>

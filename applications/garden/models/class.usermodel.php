@@ -94,7 +94,7 @@ class Gdn_UserModel extends Model {
       $Data = $this->SQL
          ->BeginWhereGroup()
          ->Where('ur.RoleID is null')
-         ->OrWhere('ur.RoleID <>', '3', TRUE, FALSE) // 3 is Applicant RoleID
+         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
          ->EndWhereGroup()
          ->Get()
          ->FirstRow();
@@ -113,7 +113,7 @@ class Gdn_UserModel extends Model {
       return $this->SQL
          ->BeginWhereGroup()
          ->Where('ur.RoleID is null')
-         ->OrWhere('ur.RoleID <>', '3', TRUE, FALSE) // 3 is Applicant RoleID
+         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
          ->EndWhereGroup()
          ->GroupBy('u.UserID')
          ->OrderBy($OrderFields, $OrderDirection)

@@ -305,7 +305,7 @@ class PostController extends VanillaController {
    /// The CommentID of the comment to edit.
    /// </param>
    public function EditComment($CommentID = '', $DraftID = '') {
-      if ($CommentID != '' && is_numeric($CommentID)) {
+      if (is_numeric($CommentID) && $CommentID > 0) {
          $this->Form->SetModel($this->CommentModel);
          $this->Comment = $this->CommentModel->GetID($CommentID);
       } else {

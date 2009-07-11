@@ -149,6 +149,16 @@ class MorePagerModule extends Module {
       }
       return $Details;
    }
+   
+   /**
+    * Whether or not this is the last page of the pager.
+    *
+    * @return bool True if this is the last page.
+    */
+   public function LastPage() {
+      $Result = $this->Offset + $this->Limit >= $this->TotalRecords;
+      return $Result;
+   }
 
    /// <summary>
    /// Returns the "show x more (or less) items" link.

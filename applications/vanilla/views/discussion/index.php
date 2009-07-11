@@ -24,6 +24,12 @@ if ($Session->IsValid()) {
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
+
+if($this->Pager->LastPage()) {
+   $this->AddDefinition('DiscussionID', $this->Data['Discussion']->DiscussionID);
+   $this->AddDefinition('LastCommentID', $this->Data['Discussion']->LastCommentID);
+}
+
 echo $this->Pager->ToString('more');
 
 // Write out the comment form

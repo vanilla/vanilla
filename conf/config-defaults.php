@@ -17,7 +17,7 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
                                                                   PDO::MYSQL_ATTR_INIT_COMMAND => "set names 'utf8'"
                                                                );
-$Configuration['Database']['DatabasePrefix']                           = 'GDN_';
+$Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
@@ -59,7 +59,7 @@ $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '1024000';
-$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png');
+$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png', 'zip', 'gz', 'tar.gz');
 $Configuration['Garden']['Picture']['MaxHeight']                = 1000;
 $Configuration['Garden']['Picture']['MaxWidth']                 = 600;
 $Configuration['Garden']['Profile']['MaxHeight']                = 1000;

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $EditUser = $Session->CheckPermission('Garden.Users.Edit');
-echo $this->Form->Open(array('action' => '/user/browse'));
+echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
 <h1><?php echo Gdn::Translate('Manage Users'); ?></h1>
 <ul>

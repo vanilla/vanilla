@@ -271,7 +271,7 @@ $Construct->View('vw_SingleRoleUser', $SQL);
 $SQL->Select('User.UserID')
    ->From('User')
    ->Join('UserRole', 'User.UserID = UserRole.UserID')
-   ->Where('UserRole.RoleID', '3', TRUE, FALSE) // 3 is Applicant RoleID
+   ->Where('UserRole.RoleID', '4', TRUE, FALSE) // 4 is Applicant RoleID
    ->GroupBy('UserID');
 $Construct->View('vw_ApplicantID', $SQL);
 

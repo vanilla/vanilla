@@ -84,5 +84,17 @@ class Gdn_Upload {
       return $_FILES[$InputName]['tmp_name'];
    }
 
+   public function GenerateTargetName($TargetFolder, $Extension) {
+      $Name = RandomString(12);
+      while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
+         $Name = RandomString(12);
+      }
+      return $TargetFolder . DS . $Name . '.' . $Extension;
+   }
+   
+   public function SaveAs($Source, $Target) {
+      if (!move_uploaded_file($Source, $Target))
+         throw new Exception(sprintf(Gdn::Translate('Failed to move uploaded file to target destination (%s).'), $Target));
+   }
    
 }

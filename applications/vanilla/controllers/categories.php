@@ -47,6 +47,7 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
 
       $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.screen.css');
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddSideMenu('vanilla/categories/manage');
       

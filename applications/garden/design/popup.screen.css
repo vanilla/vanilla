@@ -34,6 +34,9 @@ div.Popup div.Body {
   -webkit-border-radius: 5px;
   border: 8px solid #555;
 }
+div.Popup div.Body div.Body {
+   border: 0;
+}
 div.Popup .Content {
   padding: 10px;
   border-bottom: 1px solid #ddd;

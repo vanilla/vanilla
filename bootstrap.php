@@ -31,7 +31,6 @@ require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
 
 require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.control.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
@@ -83,13 +82,13 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'garden
 // Default database.
 Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
 // Database drivers.
-Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactorySingleton);
-Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactorySingleton);
-// Authenticator & Session.
-$AuthModule = Gdn::Config('Garden.AuthenticatorModule', 'Cookie');
-Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthModule.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthModule).'.authenticator.php', Gdn::FactorySingleton);
-unset($AuthModule);
-Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php');
+Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php');
+// Identity, Authenticator & Session.
+Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');
+$AuthType = Gdn::Config('Garden.Authenticator.Type', 'Password');
+Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthType.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthType).'authenticator.php', Gdn::FactorySingleton, array('Garden.Authenticator'));
+Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php');
 // Dispatcher.
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton);
 // Smarty Templating Engine

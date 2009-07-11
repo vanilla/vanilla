@@ -94,13 +94,12 @@ class Gdn_Locale {
       } else {
          $LocaleSources = array();
          // Get application-based locale definition files
-         $FileSystem = FileSystem::GetInstance();
-         $ApplicationLocaleSources = $FileSystem->FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
+         $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
          if ($ApplicationLocaleSources !== FALSE)
             $LocaleSources = $ApplicationLocaleSources;
 
          // Get plugin-based locale definition files
-         $PluginLocaleSources = $FileSystem->FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
 
@@ -111,7 +110,7 @@ class Gdn_Locale {
          for($i = 0; $i < $Count; ++$i) {
             $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . Format::ArrayValueForPhp($LocaleSources[$i]) . "';";
          }
-         $FileSystem->SaveFile($LocaleMappings, implode("\n", $FileContents));
+         Gdn_FileSystem::SaveFile($LocaleMappings, implode("\n", $FileContents));
       }
 
       // Set up defaults
@@ -200,8 +199,7 @@ class Gdn_Locale {
     * @return array
     */
    public function GetAvailableLocaleSources() {
-      $FileSystem = FileSystem::GetInstance();
-      return $FileSystem->Folders(PATH_APPLICATIONS . DS . 'garden' . DS . 'locale');
+      return Gdn_FileSystem::Folders(PATH_APPLICATIONS . DS . 'garden' . DS . 'locale');
    }
 
 

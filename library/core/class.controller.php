@@ -20,7 +20,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @namespace Lussumo.Garden.Core
  */
 
-class Gdn_Controller extends Gdn_Control {
+class Gdn_Controller extends Gdn_Pluggable {
 
    /**
     * The name of the application that this controller can be found in
@@ -538,8 +538,7 @@ class Gdn_Controller extends Gdn_Control {
                break;
             }
          }
-         //$FileSystem = FileSystem::GetInstance();
-         //$ViewPath = $FileSystem->Exists($ViewPaths);
+         //$ViewPath = Gdn_FileSystem::Exists($ViewPaths);
          
          $this->_ViewLocations[$LocationName] = $ViewPath;
       }
@@ -590,6 +589,44 @@ class Gdn_Controller extends Gdn_Control {
          $Result = new Gdn_ModuleCollection();
          $Result->Items = $Assets;
          return $Result;
+      }
+   }
+   
+   /**
+    * Undocumented method.
+    *
+    * @todo Method GetImports() needs a description.
+    */
+   public function GetImports() {
+      if(!isset($this->Uses) || !is_array($this->Uses))
+         return;
+      
+      // Load any classes in the uses array and make them properties of this class
+      foreach ($this->Uses as $Class) {
+         if(strlen($Class) >= 4 && substr_compare($Class, 'Gdn_', 0, 4) == 0) {
+            $Property = substr($Class, 4);
+         } else {
+            $Property = $Class;
+         }
+         
+         // Find the class and instantiate an instance..
+         if(Gdn::FactoryExists($Property)) {
+            $this->$Property = Gdn::Factory($Property);
+         } if(Gdn::FactoryExists($Class)) {
+            // Instantiate from the factory.
+            $this->$Property = Gdn::Factory($Class);
+         } elseif(class_exists($Class)) {               
+            // Instantiate as an object.
+            $ReflectionClass = new ReflectionClass($Class);
+            // Is this class a singleton?
+            if ($ReflectionClass->implementsInterface("ISingleton")) {
+               eval('$this->'.$Property.' = '.$Class.'::GetInstance();');
+            } else {
+               $this->$Property = new $Class();
+            }
+         } else {
+            trigger_error(ErrorMessage('The "'.$Class.'" class could not be found.', $this->ClassName, '__construct'), E_USER_ERROR);
+         }
       }
    }
 
@@ -769,7 +806,6 @@ class Gdn_Controller extends Gdn_Control {
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
             // And now search for/add all css files
-            $FileSystem = FileSystem::GetInstance();
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                $AppFolder = $CssInfo['AppFolder'];
@@ -789,7 +825,7 @@ class Gdn_Controller extends Gdn_Control {
                // 4. Garden default. eg. root/applications/garden/design/
                $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssFile;
 
-               $CssPath = $FileSystem->Exists($CssPaths);
+               $CssPath = Gdn_FileSystem::Exists($CssPaths);
                if ($CssPath !== FALSE) {
                   $CssPath = str_replace(
                      array(PATH_ROOT, DS),

@@ -155,6 +155,8 @@ class GardenSetupController extends GardenController {
             $Config->Set('Database.Name', $ConfigurationFormValues['Database.Name']);
             $Config->Set('Database.User', $ConfigurationFormValues['Database.User']);
             $Config->Set('Database.Password', $ConfigurationFormValues['Database.Password']);
+            $Config->ClearSaveData();
+            
             Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array(Gdn::Config('Database')));
             
             // Install db structure & basic data.
@@ -183,9 +185,10 @@ class GardenSetupController extends GardenController {
             } else {
                // The user has been created successfully, so sign in now
                $Authenticator = Gdn::Authenticator();
-               $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-                  $this->Form->GetValue('Password'),
-                  TRUE
+               $AuthUserID = $Authenticator->Authenticate(array(
+                  'Name' => $this->Form->GetValue('Name'),
+                  'Password' => $this->Form->GetValue('Password'),
+                  'RememberMe' => TRUE)
                );
             }
             

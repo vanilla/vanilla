@@ -21,6 +21,8 @@ jQuery(document).ready(function($) {
                   inform(json.StatusMessage);
                   if (json.RedirectUrl) {
                      setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                  } else if(json.DeliveryType == 'ASSET') {
+                     $frm.parents('div:first').html(json.Data);
                   } else {
                      // Show the button again if not redirecting...
                      $(options.frm).find('input.Button').show();

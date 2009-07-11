@@ -36,6 +36,13 @@ class Gdn_ApplicationManager {
     * @var array
     */
    private $_EnabledApplications = NULL;
+   
+   /**
+    * The valid paths to search for applications.
+    *
+    * @var array
+    */
+   public $Paths = array(PATH_APPLICATIONS);
 
    /**
     * Looks through the root Garden directory for valid applications and
@@ -46,9 +53,9 @@ class Gdn_ApplicationManager {
    public function AvailableApplications() {
       if (!is_array($this->_AvailableApplications)) {
          $ApplicationInfo = array();
-         $FileSystem = FileSystem::GetInstance();
-         $AppFolders = $FileSystem->Folders(PATH_APPLICATIONS); // Get an array of all application folders
-         $ApplicationAboutFiles = $FileSystem->FindAll(PATH_APPLICATIONS, 'settings' . DS . 'about.php', $AppFolders); // Now look for about files within them.
+         
+         $AppFolders = Gdn_FileSystem::Folders(PATH_APPLICATIONS); // Get an array of all application folders
+         $ApplicationAboutFiles = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, 'settings' . DS . 'about.php', $AppFolders); // Now look for about files within them.
          // Include them all right here and fill the application info array
          $ApplicationCount = count($ApplicationAboutFiles);
          for ($i = 0; $i < $ApplicationCount; ++$i) {

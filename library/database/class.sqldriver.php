@@ -1207,7 +1207,7 @@ abstract class Gdn_SQLDriver {
     * @param boolean $CreateNew Wether or not this is a new or existing parameter.
     * @return string The cleaned up named parameter name.
     */
-   public function NamedParameter($Name, $CreateNew = FALSE) {
+   public function NamedParameter($Name, $CreateNew = FALSE, $Value = NULL) {
       // Format the parameter name so it is safe for sql
       $NiceName = ':'.preg_replace('/([^\w\d_-])/', '', $Name); // Removes everything from the string except letters, numbers, dashes, and underscores
 
@@ -1220,6 +1220,10 @@ abstract class Gdn_SQLDriver {
             ++$i;
          }
          $NiceName = $NumberedName;
+      }
+      
+      if(!is_null($Value)) {
+         $this->_NamedParameters[$NiceName] = $Value;
       }
          
       return $NiceName;

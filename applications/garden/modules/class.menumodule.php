@@ -162,7 +162,11 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
                      }
                      
                      $Url = ArrayValue('Url', $Link);
-                     $Text = str_replace('{Username}', $Username, Gdn::Translate($Link['Code']));
+                     if(substr($Link['Code'], 0, 1) === '\\') {
+                        $Text = substr($Link['Code'], 1);
+                     } else {
+                        $Text = str_replace('{Username}', $Username, Gdn::Translate($Link['Code']));
+                     }
                      $Attributes = ArrayValue('Attributes', $Link, array());
                      if ($Url !== FALSE) {
                         $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);

@@ -16,6 +16,9 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
          echo Format::Date($Comment->DateInserted);
          ?>
       </li>
+      <li class="Permalink">
+         <?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, Gdn::Translate('Permalink')); ?>
+      </li>
       <?php
       $Sender->EventArguments['Comment'] = &$Comment;
       $Sender->FireEvent('CommentMetaAfter');

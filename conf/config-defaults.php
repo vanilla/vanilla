@@ -18,6 +18,7 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                   PDO::MYSQL_ATTR_INIT_COMMAND => "set names 'utf8'"
                                                                );
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
+$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
@@ -34,7 +35,7 @@ $Configuration['Garden']['Cookie']['Name']                      = 'Lussumo';
 $Configuration['Garden']['Cookie']['Path']                      = '/';
 $Configuration['Garden']['Cookie']['Domain']                    = '';
 $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 or sha1
-$Configuration['Garden']['AuthenticatorModule']                 = 'Cookie'; // Currently the CookieAuthenticator is the only one available.
+$Configuration['Garden']['Authenticator']['Type']               = 'Password'; // Types include 'Password' and 'Handshake'
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = PATH_CACHE . DS . 'error.log';
 $Configuration['Garden']['Registration']['Method']              = 'Basic'; // Options are: Basic, Captcha, Approval, Invitation

@@ -183,6 +183,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
       if ($this->_CharacterEncoding !== FALSE && $this->_CharacterEncoding != '')
          $Sql .= ' default character set '.$this->_CharacterEncoding;
+         
+      if (array_key_exists('Collate', $this->Database->ExtendedProperties)) {
+         $Sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
+      }
 
       $Result = $this->Database->Query($Sql);
       $this->_Reset();

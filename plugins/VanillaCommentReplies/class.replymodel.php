@@ -70,9 +70,10 @@ class ReplyModel extends CommentModel {
       // Add/define extra fields for saving
       $ReplyCommentID = intval(ArrayValue('ReplyCommentID', $FormPostValues, 0));
       $Discussion = $this->SQL
-         ->Select('DiscussionID')
-         ->From('Comment')
-         ->Where('CommentID', $ReplyCommentID)
+         ->Select('c.DiscussionID, d.Name, d.CategoryID')
+         ->From('Comment c')
+         ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+         ->Where('c.CommentID', $ReplyCommentID)
          ->Get()
          ->FirstRow();
          
@@ -93,17 +94,31 @@ class ReplyModel extends CommentModel {
       if ($this->Validation->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields();
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         // Make sure there are no reply drafts
-         $Fields['Draft'] = '0';
+         $Session = Gdn::Session();
+         // Make sure there are no reply drafts.
          if ($Insert === FALSE) {
             $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
          } else {
-            $Session = Gdn::Session();
             $CommentID = $this->SQL->Insert($this->Name, $Fields);
             $this->UpdateReplyCount($ReplyCommentID);
             
             // Report user-comment activity
             $this->RecordActivity($ReplyCommentID, $Session->UserID, $CommentID);
+         }
+         
+         // Index the comment.
+         $Search = Gdn::Factory('SearchModel');
+         if(!is_null($Search)) {
+            // Index the discussion.
+            $Document = array(
+               'TableName' => 'Comment',
+               'PrimaryID' => $CommentID,
+               'PermissionJunctionID' => $Discussion->CategoryID,
+               'Title' => $Discussion->Name,
+               'Summary' => $Fields['Body'],
+               'Url' => '/discussion/comment/'.$ReplyCommentID.'/#Comment_'.$CommentID,
+               'InsertUserID' => $Session->UserID);
+            $Search->Index($Document);
          }
       }
       return $CommentID;

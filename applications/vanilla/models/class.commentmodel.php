@@ -8,7 +8,13 @@ class CommentModel extends VanillaModel {
       parent::__construct('Comment');
    }
    
-   public function CommentQuery() {
+   /**
+    * Select the data for a single comment.
+    *
+    * @param boolean $FireEvent Whether or not to fire the event.
+    * This is a bit of a kludge to fix an issue with the VanillaCommentReplies plugin.
+    */
+   public function CommentQuery($FireEvent = TRUE) {
       $this->SQL->Select('c.*')
          ->Select('iu.Name', '', 'InsertName')
          ->Select('iup.Name', '', 'InsertPhoto')
@@ -20,7 +26,8 @@ class CommentModel extends VanillaModel {
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left')
          ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left')
          ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
-      $this->FireEvent('CommentQueryAfter');
+      if($FireEvent)
+         $this->FireEvent('CommentQueryAfter');
    }
    
    public function Get($DiscussionID, $Limit, $Offset = 0) {
@@ -80,7 +87,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function GetID($CommentID) {
-      $this->CommentQuery();
+      $this->CommentQuery(FALSE);
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get()

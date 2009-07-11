@@ -70,6 +70,11 @@ class Gdn_Configuration {
     */
    protected $_SaveData;
    
+   
+   public function ClearSaveData() {
+      $this->_SaveData = array();
+   }
+   
    /**
     * Finds the data at a given position and returns a reference to it.
     *
@@ -374,8 +379,7 @@ class Gdn_Configuration {
          trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
 
       // echo 'saving '.$File;
-      //$FileSystem = FileSystem::GetInstance();
-      //$FileSystem->SaveFile($File, $FileContents);
+      //Gdn_FileSystem::SaveFile($File, $FileContents);
       
       // Call the built in method to remove the dependancy to an external object.
       file_put_contents($File, $FileContents);

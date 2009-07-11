@@ -22,19 +22,19 @@ class VanillaHooks implements Gdn_IPlugin {
             if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
                $Bookmarked .= '<span>'.$CountBookmarks.'</span>';            
             
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), $Bookmarked, '/discussions/bookmarked', FALSE, array('class' => 'MyBookmarks'));
+            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$Bookmarked, '/discussions/bookmarked', FALSE, array('class' => 'MyBookmarks'));
             $MyDiscussions = Gdn::Translate('My Discussions');
             $CountDiscussions = $Session->User->CountDiscussions;
             if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
                $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';            
 
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), $MyDiscussions, '/discussions/mine', FALSE, array('class' => 'MyDiscussions'));
+            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$MyDiscussions, '/discussions/mine', FALSE, array('class' => 'MyDiscussions'));
             $MyDrafts = Gdn::Translate('My Drafts');
             $CountDrafts = $Session->User->CountDrafts;
             if (is_numeric($CountDrafts) && $CountDrafts > 0)
                $MyDrafts .= '<span>'.$CountDrafts.'</span>';            
 
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), $MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
+            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
          }
          if ($Session->IsValid())
             $Sender->Menu->AddLink(Gdn::Translate('Discussions'), 'New Discussion', '/post/discussion', FALSE);

@@ -33,12 +33,9 @@ interface Gdn_IAuthenticator {
     * username/password combination weren't found, or -1 if the user does not
     * have permission to sign in.
     *
-    * @param string $Username The unique name assigned to the user in the database.
-    * @param string $Password The password assigned to the user in the database.
-    * @param boolean $PersistentSession Should the user's session remain persistent across visits?
-    * @param int $ClientHour The current hour (24 hour format) of the client.
+    * @param array $Data The data that has to be used to authenticate the data.
     */
-   public function Authenticate($Username, $Password, $PersistentSession, $ClientHour = '');
+   public function Authenticate($Data);
 
 
    /**
@@ -53,4 +50,16 @@ interface Gdn_IAuthenticator {
     * found or authentication fails.
     */
    public function GetIdentity();
+   
+   /**
+    * Returns the url used to register for an account in the application.
+    */
+   public function RegisterUrl($Redirect = '/');
+   
+   /**
+    * Returns the url used to sign in to the application.
+    *
+    * @return string
+    */
+   public function SignInUrl($Redirect = '/');
 }

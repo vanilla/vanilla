@@ -274,10 +274,6 @@ class SettingsController extends GardenController {
       $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array('Garden.Registration.Method', 'Garden.Registration.DefaultRoles', 'Garden.Registration.CaptchaPrivateKey', 'Garden.Registration.CaptchaPublicKey', 'Garden.Registration.InviteExpiration'));
       
-      // Define some validation rules for the fields being saved
-      $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');
-      $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
-
       // Set the model on the forms.
       $this->Form->SetModel($ConfigurationModel);
       
@@ -326,7 +322,12 @@ class SettingsController extends GardenController {
       
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($ConfigurationModel->Data);
-      } else {
+      } else {   
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
+         if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
+            $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
+         
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');
          $InvitationCounts = $this->Form->GetValue('InvitationCount');

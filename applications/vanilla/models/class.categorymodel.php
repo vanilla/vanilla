@@ -62,8 +62,8 @@ class CategoryModel extends Model {
          } else {
             // Delete comments in this category
             $this->SQL->From('Comment')
-               ->Join('Discussion d', 'Comment.DiscussionID = d.DiscussionID')
-               ->Delete('Comment', array('d.CategoryID' => $Category->CategoryID));
+               ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+               ->Delete('Comment c', array('d.CategoryID' => $Category->CategoryID));
                
             // Delete discussions in this category
             $this->SQL->Delete('Discussion', array('CategoryID' => $Category->CategoryID));

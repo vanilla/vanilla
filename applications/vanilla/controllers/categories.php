@@ -124,6 +124,7 @@ class CategoriesController extends VanillaController {
       if ($this->Head)
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
          
+      $this->AddCssFile('default.screen.css');
       $this->AddCssFile('form.screen.css');
       $this->AddSideMenu('vanilla/categories/manage');
       

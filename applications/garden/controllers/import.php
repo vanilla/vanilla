@@ -172,7 +172,7 @@ class ImportController extends GardenController {
          // 5. Import user role history into activity table
          $Database->Query("insert into ".$DestPrefix."Activity
          (ActivityTypeID, ActivityUserID, RegardingUserID, Story, InsertUserID, DateInserted)
-         select 8, au.UserID, nu.UserID, concat('Assigned to ', r.Name, ' Role <blockquote>', rh.Notes, '</blockquote>'), au.UserID, rh.Date
+         select 9, au.UserID, nu.UserID, concat('Assigned to ', r.Name, ' Role <blockquote>', rh.Notes, '</blockquote>'), au.UserID, rh.Date
          from ".$SourcePrefix."UserRoleHistory rh
          inner join ".$SourcePrefix."Role r
             on rh.RoleID = r.RoleID

@@ -24,8 +24,8 @@ echo $this->Form->Errors();
       <div>
          <?php
             echo $this->Form->Label('&nbsp;');
-            echo Anchor('Generate Password', '#', 'GeneratePassword');
-            echo Anchor('Reveal Password', '#', 'RevealPassword');
+            echo Anchor('Generate Password', '#', 'GeneratePassword Button');
+            echo Anchor('Reveal Password', '#', 'RevealPassword Button');
          ?>
       </div>
    </li>

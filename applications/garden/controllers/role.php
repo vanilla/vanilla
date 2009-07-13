@@ -97,6 +97,7 @@ class RoleController extends GardenController {
          // 2. Save the data (validation occurs within):
          if ($RoleID = $this->Form->Save()) {
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->RedirectUrl = Url('garden/role');
             // Reload the permission data.
             $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
          }

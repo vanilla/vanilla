@@ -72,13 +72,21 @@ jQuery(document).ready(function($) {
       });
    }
 
-   definition = function(definition, defaultVal) {
+   definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
          
-      var def = $('#Definitions #' + definition).text();
-      if (def == '')
+      var $def = $('#Definitions #' + definition);
+      var def;
+      
+      if(set) {
+         $def.text(defaultVal);
          def = defaultVal;
+      } else {
+         def = $def.text();
+         if (def == '')
+            def = defaultVal;
+      }
          
       return def;
    }

@@ -17,6 +17,7 @@ class SettingsController extends VanillaController {
       $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussions.PerPage',
+         'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
          'Vanilla.Categories.Use',
          'Vanilla.Discussions.Home'
@@ -33,6 +34,7 @@ class SettingsController extends VanillaController {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Categories.Use', 'Required');

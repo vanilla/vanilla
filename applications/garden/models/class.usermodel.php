@@ -336,10 +336,9 @@ class Gdn_UserModel extends Model {
       // 2a) Figure out which roles to insert.
       $InsertRoleIDs = array_diff($RoleIDs, $OldRoleIDs);
       // 2b) Insert the new role associations for this user.
-      $Count = count($InsertRoleIDs);
-      for ($i = 0; $i < $Count; $i++) {
-         if (is_numeric($InsertRoleIDs[$i]))
-            $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleIDs[$i]));
+      foreach($InsertRoleIDs as $InsertRoleID) {
+         if (is_numeric($InsertRoleID))
+            $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleID));
       }      
       
       // 3. Figure out the ID that is a combination of all of the roles.

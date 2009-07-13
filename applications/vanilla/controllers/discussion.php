@@ -102,6 +102,32 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
+   public function GetNew($DiscussionID, $LastCommentID) {
+      $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
+      
+      // Check permissions.
+      $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
+      $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
+      
+      // Get the comments.
+      $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+      
+      // Set the data.
+      $CommentData = $this->CommentData->Result();
+      if(count($CommentData) > 0) {
+         $LastComment = $CommentData[count($CommentData) - 1];
+         // Mark the comment read.
+         $this->SetData('Offset', $this->Discussion->CountComments, TRUE);
+         $this->CommentModel->SetWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
+         
+         $this->SetJson('LastCommentID', $LastComment->CommentID, TRUE);
+      } else {
+         $this->SetData('Offset', $this->CommentModel->GetOffset($LastCommentID), TRUE);
+      }
+      
+      $this->View = 'comments';
+      $this->Render();
+   }
    
    public function Initialize() {
       parent::Initialize();

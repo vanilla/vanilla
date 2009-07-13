@@ -72,8 +72,9 @@ jQuery(document).ready(function($) {
             var commentID = json.CommentID;
             
             // Assign the comment id to the form if it was defined
-            if (commentID != null && commentID != '')
+            if (commentID != null && commentID != '') {
                $(inpCommentID).val(commentID);
+            }
 
             if (json.DraftID != null && json.DraftID != '')
                $(inpDraftID).val(json.DraftID);
@@ -99,9 +100,12 @@ jQuery(document).ready(function($) {
                var existingCommentRow = $('#Comment_' + commentID);
                if (existingCommentRow.length > 0) {
                   existingCommentRow.after(json.Data).remove();
-               } else {
+                  $('#Comment_' + commentID).effect("highlight", {}, "slow");
+               } else {   
+                  definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
-                  $('#Discussion').append(json.Data);
+                  $(json.Data).appendTo('#Discussion')
+                     .effect("highlight", {}, "slow");
                }
                
                // Remove any "More" pager links
@@ -210,5 +214,42 @@ jQuery(document).ready(function($) {
       });
       return false;
    });   
-
+   
+   getNewTimeout = function() {   
+      if(autoRefresh <= 0)
+         return;
+   
+      setTimeout(function() {
+         discussionID = definition('DiscussionID', 0);
+         lastCommentID = definition('LastCommentID', 0);
+         if(lastCommentID <= 0)
+            return;
+         
+         $.ajax({
+            type: "POST",
+            url: definition('WebRoot', '') + '/discussion/getnew/' + discussionID + '/' + lastCommentID,
+            data: "DeliveryType=ASSET&DeliveryMethod=JSON",
+            dataType: "json",
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               // Popup the error
+               $(btn).attr('class', oldClass);
+               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            },
+            success: function(json) {               
+               if(json.Data) {
+                  definition('LastCommentID', json.LastCommentID, true);
+                  $current = $("#Discussion").contents();
+                  $(json.Data).appendTo("#Discussion")
+                     .effect("highlight", {}, "slow");
+               }
+               
+               getNewTimeout();
+            }
+         });
+      }, autoRefresh);
+   }
+   
+   // Load new comments like a chat.
+   autoRefresh = definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
+   getNewTimeout();
 });

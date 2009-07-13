@@ -35,8 +35,10 @@ jQuery(document).ready(function($) {
                $('.Popup').remove();
             
             // Assign the comment id to the form if it was defined
-            if (json.CommentID != null && json.CommentID != '')
+            if (json.CommentID != null && json.CommentID != '') {
                $(inpCommentID).val(json.CommentID);
+               definition('LastCommentID', json.CommentID, true);
+            }
                
             if (json.DraftID != null && json.DraftID != '')
                $(inpDraftID).val(json.DraftID);

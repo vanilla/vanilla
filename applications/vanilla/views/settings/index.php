@@ -20,6 +20,13 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         $Options2 = array('0' => 'Don\'t Refresh', '5' => 'Every 5 seconds', '10' => 'Every 10 seconds', '30' => 'Every 30 seconds', '60' => 'Every 1 minute', '300' => 'Every 5 minutes');
+         echo $this->Form->Label('Refresh Comments', 'Vanilla.Comments.AutoRefresh');
+         echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
+      ?>
+   </li>
+   <li>
+      <?php
          echo $this->Form->CheckBox('Vanilla.Categories.Use', 'Use categories to organize discussions');
       ?>
    </li>

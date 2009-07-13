@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 // An individual discussion record for all panel modules to use when rendering a discussion list.
 ?>
-<li>
+<li id="<?php echo 'Bookmark_'.$Discussion->DiscussionID; ?>">
    <ul>
       <li class="Topic">
          <?php

@@ -201,7 +201,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $('#'+settings.popupId+' form').ajaxForm({
         data: {
           'DeliveryType' : settings.deliveryType,
-          'DeliveryMethod' : 2
+          'DeliveryMethod' : 'JSON'
         },
         dataType: 'json',
         beforeSubmit: function() {

@@ -240,6 +240,7 @@ class Gdn_Session {
          } else {
             $this->UserID = 0;
             $this->User = FALSE;
+            $Authenticator->DeAuthenticate();
          }
       }
       // Load guest permissions if necessary

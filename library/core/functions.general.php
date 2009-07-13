@@ -12,24 +12,27 @@ function __autoload($ClassName) {
    // echo $ClassName;
    if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
       return true;
-   if(!class_exists('FileSystem', FALSE))
+   if(!class_exists('Gdn_FileSystem', FALSE))
       return false;
-
-   $FileSystem = FileSystem::GetInstance();
    
    if(substr($ClassName, 0, 4) === 'Gdn_')
       $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
    else
       $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
-   $ApplicationWhiteList = property_exists($FileSystem, 'ApplicationWhiteList') ? $FileSystem->ApplicationWhiteList : FALSE;
+   
+   if(!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
+      $ApplicationWhiteList = Gdn::Factory('ApplicationManager')->EnabledApplicationFolders();
+   else
+      $ApplicationWhiteList = NULL;
+   
    $LibraryPath = FALSE;
 
    // If this is a model, look in the models folder(s)
    if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = $FileSystem->FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    if ($LibraryPath === FALSE)
-      $LibraryPath = $FileSystem->FindByMapping(
+      $LibraryPath = Gdn_FileSystem::FindByMapping(
          'library_mappings.php',
          'Library',
          PATH_LIBRARY,
@@ -44,7 +47,7 @@ function __autoload($ClassName) {
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = $FileSystem->FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
@@ -64,7 +67,17 @@ if (!function_exists('RemoveKeyFromArray')) {
       return $Array;
    }
 }
+if (!function_exists('Img')) {
+   function Img($Image, $Attributes = '') {
+      if ($Attributes == '')
+         $Attributes = array();
 
+      if (substr($Image, 0, 7) != 'http://' && $Image != '')
+         $Image = Url($Image);
+
+      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
+   }
+}
 if (!function_exists('Anchor')) {
    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
@@ -688,9 +701,16 @@ if (!function_exists('filter_input')) {
    function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
       $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
       $Value = ArrayValue($FieldName, $Collection, '');
-      if (get_magic_quotes_gpc())
-         return stripslashes($Value);
-         
+      if (get_magic_quotes_gpc()) {
+         if (is_array($Value)) {
+            $Count = count($Value);
+            for ($i = 0; $i < $Count; ++$i) {
+               $Value[$i] = stripslashes($Value[$i]);
+            }
+         } else {
+            $Value = stripslashes($Value);
+         }
+      }
       return $Value;     
    }
 }
@@ -721,5 +741,21 @@ if (!function_exists('json_encode')) {
 if (!function_exists('array_fill_keys')) {
    function array_fill_keys($Keys, $Val) {
       return array_combine($Keys,array_fill(0,count($Keys),$Val));
+   }
+}
+
+if (!function_exists('parse_ini_string')) {
+   function parse_ini_string ($Ini) {
+      $Lines = split("\n", $Ini);
+      $Result = array();
+      foreach($Lines as $Line) {
+         $Parts = split('=', $Line, 2);
+         if(count($Parts) == 1) {
+            $Result[trim($Parts[0])] = '';
+         } elseif(count($Parts) >= 2) {
+            $Result[trim($Parts[0])] = trim($Parts[1]);
+         }
+      }
+      return $Result;
    }
 }

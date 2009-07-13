@@ -16,7 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * Manages defining and examining the schema of a database table.
  */
 class Gdn_Schema {
-   
+
    /**
     * An associative array of TableName => Fields associative arrays that
     * describe the table's field properties. Each field is represented by an
@@ -34,10 +34,11 @@ class Gdn_Schema {
     * Class constructor. Defines the related database table name.
     *
     * @param string Explicitly define the name of the table that this model represents. You can also explicitly set this value with $this->TableName.
+    * @param Gdn_Database
     */
-   public function __construct($Table = '') {
+   public function __construct($Table = '', $Database = NULL) {
       if ($Table != '')
-         $this->Fetch($Table);
+         $this->Fetch($Table, $Database);
    }
    
    /**
@@ -45,9 +46,10 @@ class Gdn_Schema {
     * will connect to the database and define it.
     *
     * @param string The name of the table schema to fetch from the database (or cache?).
+    * @param Gdn_Database
     * @return array
     */
-   public function Fetch($Table = FALSE) {
+   public function Fetch($Table = FALSE, $Database = NULL) {
       if ($Table !== FALSE)
          $this->CurrentTable = $Table;
       
@@ -55,7 +57,12 @@ class Gdn_Schema {
          $this->_Schema = array();
          
       if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
-         $SQL = Gdn::SQL();
+         if($Database !== NULL) {
+            $SQL = $Database->SQL();
+         }
+         else {
+            $SQL = Gdn::SQL();
+         }
          $this->_Schema[$this->CurrentTable] = $SQL->FetchTableSchema($this->CurrentTable);
       }
       return $this->_Schema[$this->CurrentTable];
@@ -127,8 +134,8 @@ class Gdn_Schema {
     *
     * @param string The name of the table for which to find the primary key(s).
     */
-   public function PrimaryKey($Table) {
-      $Schema = $this->Fetch($Table);
+   public function PrimaryKey($Table, $Database = NULL) {
+      $Schema = $this->Fetch($Table, $Database);
       $PrimaryKeys = array();
       foreach ($Schema as $FieldName => $Properties) {
          if ($Properties->PrimaryKey === TRUE)

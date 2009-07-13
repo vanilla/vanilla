@@ -28,16 +28,16 @@ class ImportController extends GardenController {
       
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
-      $Construct = new DatabaseStructure($Database);
-      $SourcePrefix = Gdn::Config('Garden.Import.SourcePrefix', 'LUM_');
-      $DestPrefix = Gdn::Config('Garden.Database.Prefix', '');
+      $Construct = $Database->Structure();
+      $SourcePrefix = Gdn::Config('Import.SourcePrefix', 'LUM_');
+      $DestPrefix = Gdn::Config('Database.DatabasePrefix', '');
       if ($Step == 0) {
          $this->View = 'import';
          if ($this->Form->AuthenticatedPostBack()) {
             // Make sure that all of the destination tables exist (assuming that
             // columns are there if tables are there since they were likely just
             // installed moments ago).
-            $DbTables = $Database->SQL->FetchTables();
+            $DbTables = $Database->SQL()->FetchTables();
             $DestTables = explode(',', 'Role,User,UserRole,Conversation,ConversationMessage,UserConversation,Category,Discussion,Comment,UserDiscussion');
             for ($i = 0; $i < count($DestTables); ++$i) {
                $Table = $DestPrefix.$DestTables[$i];
@@ -57,7 +57,7 @@ class ImportController extends GardenController {
                      $this->Form->AddError('The "'.$Table.'" source table was not found. Are you sure "'.$SourcePrefix.'" is the correct table prefix for your Vanilla 1 tables?');
                      break;
                   }
-                  $Columns = $Database->FetchColumns($Table);
+                  $Columns = $Database->SQL()->FetchColumns($Table);
                   switch ($SourceTables[$i]) {
                      case 'Role':
                         $RequiredColumns = explode(',', 'RoleID,Name,Description');
@@ -126,10 +126,23 @@ class ImportController extends GardenController {
          $this->Message = Gdn::Translate('<strong>2/19</strong> Preparing tables for import.');
          $this->RedirectUrl = Url('/import/2');
       } else if ($Step == 2) {
-         // 2. Copy roles from old database into new one.
-         $Database->Query("insert into ".$DestPrefix."Role
-         (Name, Description, Deletable, CanSession, ImportID)
-         select Name, Description, '1', '1', RoleID from ".$SourcePrefix."Role");
+         // 2. Move roles from old database into new one.
+         $RoleModel = new Gdn_RoleModel();
+         // Get the old roles
+         $OldRoles = $Database->Query('select * from '.$SourcePrefix.'Role');
+         // Loop through each, inserting if it doesn't exist and updating ImportID if it does
+         foreach ($OldRoles->Result() as $OldRole) {
+            $RoleData = $Database->Query("select * from ".$DestPrefix."Role where Name = '".$OldRole->Name."'");
+            if ($RoleData->NumRows() == 0) {
+               $Role = array();
+               $Role['ImportID'] = $OldRole->RoleID;
+               $Role['Name'] = $OldRole->Name;
+               $Role['Description'] = $OldRole->Description;
+               $RoleModel->Save($Role);
+            } else {
+               $Database->Query("update ".$DestPrefix."Role set ImportID = '".$OldRole->RoleID."' where RoleID = ".$RoleData->FirstRow()->RoleID);
+            }
+         }
          
          $this->Message = Gdn::Translate('<strong>3/19</strong> Importing roles.');
          $this->RedirectUrl = Url('/import/3');
@@ -159,7 +172,7 @@ class ImportController extends GardenController {
          // 5. Import user role history into activity table
          $Database->Query("insert into ".$DestPrefix."Activity
          (ActivityTypeID, ActivityUserID, RegardingUserID, Story, InsertUserID, DateInserted)
-         select 8, au.UserID, nu.UserID, concat('Assigned to ', r.Name, ' Role <blockquote>', rh.Notes, '</blockquote>'), au.UserID, rh.Date
+         select 9, au.UserID, nu.UserID, concat('Assigned to ', r.Name, ' Role <blockquote>', rh.Notes, '</blockquote>'), au.UserID, rh.Date
          from ".$SourcePrefix."UserRoleHistory rh
          inner join ".$SourcePrefix."Role r
             on rh.RoleID = r.RoleID
@@ -316,8 +329,8 @@ class ImportController extends GardenController {
       } else if ($Step == 13) {
          // 13. Import Discussions
          $Database->Query("insert into ".$DestPrefix."Discussion
-         (ImportID, CategoryID, InsertUserID, UpdateUserID, Name, CountComments, Draft, Closed, Announce, Sink, DateInserted, DateUpdated, DateLastComment)
-         select od.DiscussionID, nc.CategoryID, niu.UserID, nuu.UserID, od.Name, od.CountComments, '0', od.Closed, od.Sticky, od.Sink, od.DateCreated, od.DateLastActive, od.DateLastActive
+         (ImportID, CategoryID, InsertUserID, UpdateUserID, Name, CountComments, Closed, Announce, Sink, DateInserted, DateUpdated, DateLastComment)
+         select od.DiscussionID, nc.CategoryID, niu.UserID, nuu.UserID, od.Name, od.CountComments, od.Closed, od.Sticky, od.Sink, od.DateCreated, od.DateLastActive, od.DateLastActive
          from ".$SourcePrefix."Discussion od
          join ".$DestPrefix."Category nc
             on od.CategoryID = nc.ImportID
@@ -333,8 +346,8 @@ class ImportController extends GardenController {
       } else if ($Step == 14) {
          // 14. Import Comments
          $Database->Query("insert into ".$DestPrefix."Comment
-         (DiscussionID, InsertUserID, UpdateUserID, Body, Draft, Format, DateInserted, DateUpdated)
-         select nd.DiscussionID, niu.UserID, nuu.UserID, Body, '0', case FormatType when 'Text' then 'Display' else FormatType end, oc.DateCreated, oc.DateEdited
+         (DiscussionID, InsertUserID, UpdateUserID, Body, Format, DateInserted, DateUpdated)
+         select nd.DiscussionID, niu.UserID, nuu.UserID, Body, case FormatType when 'Text' then 'Display' else FormatType end, oc.DateCreated, oc.DateEdited
          from ".$SourcePrefix."Comment oc
          join ".$DestPrefix."Discussion nd
             on oc.DiscussionID = nd.ImportID
@@ -444,7 +457,6 @@ class ImportController extends GardenController {
       $this->Head->AddScript('js/global.js');
 
       $this->AddCssFile('setup.screen.css');
-      $this->AddCssFile('form.screen.css');      
-      Controller::Initialize();
+      Gdn_Controller::Initialize();
    }   
 }

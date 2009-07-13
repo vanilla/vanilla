@@ -128,15 +128,16 @@ class Gdn_RoleModel extends Model {
     */
    public function GetUserCount($RoleID, $UsersOnlyWithThisRole = FALSE) {
       if ($UsersOnlyWithThisRole) {
-         return $this->SQL->Select('ur.UserID', 'count', 'UserCount')
+         $Data = $this->SQL->Select('ur.UserID', 'count', 'UserCount')
             ->From('UserRole ur')
             ->Join('UserRole urs', 'ur.UserID = urs.UserID')
             ->GroupBy('urs.UserID')
             ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)
             ->Where('ur.RoleID', $RoleID)
             ->Get()
-            ->FirstRow()
-            ->UserCount;
+            ->FirstRow();
+            
+         return $Data ? $Data->UserCount : 0;
       } else {
          return $this->SQL->GetCount('UserRole', array('RoleID' => $RoleID));
       }

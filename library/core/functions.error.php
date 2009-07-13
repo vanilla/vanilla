@@ -123,7 +123,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
       // This is an ajax request, so dump an error that is more eye-friendly in the debugger
       echo 'FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();\n\"".$SenderMessage."\"\n";
       if ($SenderCode != '')
-         echo htmlentities($SenderCode)."\n";
+         echo htmlentities($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
          
       if (is_array($ErrorLines) && $Line > -1)
          echo "LOCATION: ",$File,"\n";
@@ -167,7 +167,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    <h2>',$SenderMessage,"</h2>\n";
 
    if ($SenderCode != '')
-      echo '<code>',htmlentities($SenderCode),"</code>\n";
+      echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
 
    if (is_array($ErrorLines) && $Line > -1) {
       echo '<h3><strong>The error occurred on or near:</strong> ',$File,'</h3>
@@ -176,7 +176,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
          $Padding = strlen($Line+4);
          for ($i = 0; $i < $LineCount; ++$i) {
             if ($i > $Line-6 && $i < $Line+4) {
-               echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i]);
+               echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i], ENT_COMPAT, 'UTF-8');
             }
          }
       echo "</pre>\n";
@@ -254,4 +254,4 @@ if (!function_exists('LogMessage')) {
 }
 
 // Set up Garden to handle php errors
-set_error_handler('ErrorHandler');
+set_error_handler('ErrorHandler', E_ALL);

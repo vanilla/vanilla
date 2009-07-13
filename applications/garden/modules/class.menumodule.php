@@ -12,7 +12,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * Lussumo.Garden.UI
  */
 
-if (!class_exists('MenuModule', FALSE)) {
+if (!class_exists('Gdn_MenuModule', FALSE)) {
    /**
     * Manages the items in the page menu and eventually returns the menu as a
     * string with ToString();
@@ -162,7 +162,11 @@ if (!class_exists('MenuModule', FALSE)) {
                      }
                      
                      $Url = ArrayValue('Url', $Link);
-                     $Text = str_replace('{Username}', $Username, Gdn::Translate($Link['Code']));
+                     if(substr($Link['Code'], 0, 1) === '\\') {
+                        $Text = substr($Link['Code'], 1);
+                     } else {
+                        $Text = str_replace('{Username}', $Username, Gdn::Translate($Link['Code']));
+                     }
                      $Attributes = ArrayValue('Attributes', $Link, array());
                      if ($Url !== FALSE) {
                         $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);

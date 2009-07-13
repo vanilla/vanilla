@@ -17,6 +17,7 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
       }
+      $this->AddCssFile('default.screen.css');
       $this->AddCssFile('form.screen.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -46,6 +47,7 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
 
       $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.screen.css');
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -122,6 +124,7 @@ class CategoriesController extends VanillaController {
       if ($this->Head)
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
          
+      $this->AddCssFile('default.screen.css');
       $this->AddCssFile('form.screen.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -286,6 +289,7 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
       }
       $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.screen.css');
       $this->CategoryData = $this->CategoryModel->Get('Sort');
       $this->Render();
    }

@@ -8,15 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-
-/*
-class SkeletonHooks implements Gdn_IPlugin {
-   public function Controller_Event_Handler($Sender) {
-      // Do something
-   }
-   
-   public function Setup() {
-      // No need for anything here...
-   }
+interface Gdn_IIdentity {
+	/**
+    * Returns the unique id assigned to the user in the database (retrieved
+    * from the session cookie if the cookie authenticates) or FALSE if not
+    * found or authentication fails.
+    *
+    * @return int
+    */
+   public function GetIdentity();
+	
+	/**
+    * Generates the user's session cookie.
+    *
+    * @param int $UserID The unique id assigned to the user in the database.
+    * @param boolean $Persist Should the user's session remain persistent across visits?
+    */
+   public function SetIdentity($UserID, $Persist = FALSE);
+	
 }
-*/

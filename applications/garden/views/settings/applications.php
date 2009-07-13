@@ -25,6 +25,7 @@ $Alt = FALSE;
 foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    $Alt = $Alt ? FALSE : TRUE;
    $AppVersion = ArrayValue('Version', $AppInfo, '');
+   $ScreenName = ArrayValue('Name', $AppInfo, $AppName);
    $CurrentVersion = $this->UpdateManager->GetCurrentVersion(ADDON_TYPE_APPLICATION, $AppName);
    if (is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion) {
       ?>
@@ -39,7 +40,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    }
    ?>   
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-      <th><?php echo Anchor($AppName, ArrayValue('Url', $AppInfo, '')); ?></th>
+      <th><?php echo Anchor($ScreenName, ArrayValue('Url', $AppInfo, '')); ?></th>
       <td class="Alt"><?php echo ArrayValue('Version', $AppInfo, ''); ?></td>
       <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
       <td class="Alt">

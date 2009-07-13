@@ -14,7 +14,6 @@ class VanillaController extends Gdn_Controller {
          $this->Head->AddScript('js/global.js');
       }
       
-      $this->AddCssFile('default.screen.css');
       $this->AddCssFile('menu.screen.css');
       $this->AddCssFile('popup.screen.css');
       $GuestModule = new GuestModule($this);

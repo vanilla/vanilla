@@ -167,8 +167,8 @@ class Model extends Gdn_Pluggable {
     */
    public function DefineSchema() {
       if (!isset($this->Schema)) {
-         $this->Schema = new Gdn_Schema($this->Name);
-         $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name);
+         $this->Schema = new Gdn_Schema($this->Name, $this->Database);
+         $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name, $this->Database);
          if (is_array($this->PrimaryKey)) {
             print_r($this->PrimaryKey);
             $this->PrimaryKey = $this->PrimaryKey[0];
@@ -238,10 +238,12 @@ class Model extends Gdn_Pluggable {
     * @todo add doc
     */
    public function Update($Fields, $Where = FALSE, $Limit = FALSE) {
+      $Result = FALSE;
       if ($this->Validate($Fields)) {
          $this->AddUpdateFields($Fields);
-         $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
+         $Result = $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
       }
+      return $Result;
    }
 
 

@@ -1,6 +1,7 @@
 div.Popup .Loading {
    width: 500px;
 }
+/*
 div.Overlay {
   position: absolute;
   top: 0%;
@@ -13,6 +14,7 @@ div.Overlay {
   opacity:.60;
   filter: alpha(opacity=60);
 }
+*/
 div.Popup {
   position: absolute;
   width: 100%;
@@ -30,6 +32,10 @@ div.Popup div.Body {
   max-width: 500px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
+  border: 8px solid #555;
+}
+div.Popup div.Body div.Body {
+   border: 0;
 }
 div.Popup .Content {
   padding: 10px;

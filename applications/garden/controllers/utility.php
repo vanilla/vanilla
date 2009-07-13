@@ -25,10 +25,9 @@ class UtilityController extends GardenController {
             if (is_array($Rows)) {
                try {
                   $Table = str_replace('Table', '', $TableID);
-                  $Database = Gdn::Database();
+                  $TableModel = new Model($Table);
                   foreach ($Rows as $Sort => $ID) {
-                     $Database->Update($Table, array('Sort' => $Sort), array($Table.'ID' => $ID));
-                     $Database->Put();
+                     $TableModel->Update(array('Sort' => $Sort), array($Table.'ID' => $ID));
                   }
                   $Success = TRUE;
                } catch (Exception $ex) {

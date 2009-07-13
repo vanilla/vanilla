@@ -387,7 +387,14 @@ class Form {
       // Append the rows.
       $Result .= '<tbody>';
       foreach($Rows as $RowName => $X) {
-         $Result .= '<tr><th>'.Gdn::Translate($RowName).'</td>';
+         $Result .= '<tr><th>';
+         
+         // If the row name is still seperated by dots then put those in spans.
+         $RowNames = explode('.', $RowName);
+         for($i = 0; $i < count($RowNames) - 1; ++$i) {
+            $Result .= '<span class="Parent">'.Gdn::Translate($RowNames[$i]).'</span>';
+         }
+         $Result .= Gdn::Translate($RowNames[count($RowNames) - 1]).'</th>';
          // Append the columns within the rows.
          $Alt = TRUE;
          foreach($Columns as $ColumnName => $Y) {
@@ -796,8 +803,10 @@ class Form {
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $MultiLine === TRUE ? '' : $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
-      $Return .= $MultiLine === TRUE ? '>' . htmlentities(
-         ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '</textarea>' : ' />';
+      
+      $Value = ArrayValueI('value', $Attributes, $this->GetValue($FieldName));
+      
+      $Return .= $MultiLine === TRUE ? '>' . htmlentities($Value, ENT_COMPAT, 'UTF-8') . '</textarea>' : ' />';
       return $Return;
    }
 

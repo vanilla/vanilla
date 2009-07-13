@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
                   // Make sure that hidden items appear
                   $('ul.Activities li.Hidden').slideDown('fast');
                   // If the user's status was updated, show it.
-                  if (json['UserData'] != '') {
+                  if (typeof(json['UserData']) != 'undefined') {
                      $('div.User').remove();
                      $('div.Profile').prepend(json['UserData']);
                   }

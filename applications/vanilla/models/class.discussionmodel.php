@@ -174,10 +174,15 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.Name', '', 'Category')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('lc.DateInserted', '', 'LastDate')
+         ->Select('lc.InsertUserID', '', 'LastUserID')
+         ->Select('lcu.Name', '', 'LastName')
          ->From('Discussion d')
          ->Join('Comment c', 'd.FirstCommentID = c.CommentID', 'left')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
+         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
+         ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->Where('d.DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow();
@@ -420,7 +425,7 @@ class DiscussionModel extends VanillaModel {
     * Bookmarks (or unbookmarks) a discussion. Returns the current state of the
     * bookmark (ie. TRUE for bookmarked, FALSE for unbookmarked)
     */
-   public function BookmarkDiscussion($DiscussionID, $UserID) {
+   public function BookmarkDiscussion($DiscussionID, $UserID, &$Discussion = NULL) {
       $State = '1';
       $Discussion = $this->GetID($DiscussionID);
       if ($Discussion->CountCommentWatch == '') {

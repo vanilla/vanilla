@@ -64,6 +64,8 @@ jQuery(document).ready(function($) {
                   
             }
             $('ul#Menu li.MyBookmarks a').html(json.MenuLink);
+            // Add/remove the bookmark from the side menu.
+            processTargets(json.Targets);
          }
       });
       return false;

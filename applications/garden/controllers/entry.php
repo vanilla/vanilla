@@ -32,6 +32,115 @@ class EntryController extends GardenController {
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
       $this->Render();
    }
+   
+   public function Handshake() {
+      $this->Head->AddScript('/applications/garden/js/entry.js');
+      
+      $this->Form->SetModel($this->UserModel);
+      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
+      $this->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
+      
+      $Target = GetIncomingValue('Target', '/');
+      
+      if ($this->Form->IsPostBack() === TRUE) {
+         $FormValues = $this->Form->FormValues();
+         if($FormValues['Handshake'] == 'NEW') {
+            // Try and synchronize the user with the new username/email.
+            $FormValues['Name'] = $FormValues['NewName'];
+            $FormValues['Email'] = $FormValues['NewEmail'];
+            $UserID = $this->UserModel->Synchronize($FormValues['UniqueID'], $FormValues);
+            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+         } else {
+            // Try and sign the user in.
+            $Password = new Gdn_PasswordAuthenticator();
+            $UserID = $Password->Authenticate(array('Name' => $FormValues['SignInName'], 'Password' => $FormValues['SignInPassword']));
+            
+            if ($UserID < 0) {
+               $this->Form->AddError('ErrorPermission');
+            } else if ($UserID == 0) {
+               $this->Form->AddError('ErrorCredentials');
+            }
+            
+            if($UserID) {
+               $Data = $FormValues;
+               $Data['UserID'] = $UserID;
+               $Data['Name'] = $FormValues['SignInName'];
+               $this->UserModel->Synchronize($FormValues['UniqueID'], $Data);
+            }
+         }
+         
+         if($UserID) {
+            $Authenticator = Gdn::Authenticator();
+            // The user has been created successfully, so sign in now
+            $AuthUserID = $Authenticator->Authenticate(array('UserID' => $UserID));
+            
+            /// ... and redirect them appropriately
+            $Route = $this->RedirectTo();
+            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+               $this->RedirectUrl = Url($Route);
+            } else {
+               if ($Route !== FALSE)
+                  Redirect($Route);
+            }
+         } else {
+            // Add the hidden inputs back into the form.
+            foreach($FormValues as $Key => $Value) {
+               if(in_array($Key, array('UniqueID', 'DateOfBirth', 'HourOffset', 'Gender', 'Name', 'Email')))
+                  $this->Form->AddHidden($Key, $Value);
+            }
+         }
+      } else {
+         $Authenticator = Gdn::Authenticator();
+         
+         // Clear out the authentication and try and get the authentication again.
+         $Id = $Authenticator->GetIdentity(TRUE);
+         if($Id > 0) {
+            // The user is signed in so we can just go back to the homepage.
+            Redirect($Target);
+         }
+         
+         if($Authenticator->State() == Gdn_HandshakeAuthenticator::SignedOut) {
+            // Clear out the authentication so it will fetch when we come back here.
+            $Authenticator->SetIdentity(NULL);
+            // Once signed in, we need to come back here to make sure there was no problem with the handshake.
+            $Target = Url('/entry/handshake/?Target='.urlencode($Target), TRUE);
+            // Redirect to the external server to sign in.
+            $SignInUrl = $Authenticator->RemoteSignInUrl($Target);
+            Redirect($SignInUrl);
+         }
+         
+         // There was a handshake error so we need to allow the user to fix the problems.
+         $HandshakeData = $Authenticator->GetHandshakeData();
+         
+         // Check to see if there is a problem with the handshake.
+         $this->UserModel->ValidateUniqueFields($HandshakeData['Name'], $HandshakeData['Email']);
+         $ValidationResults = $this->UserModel->ValidationResults();
+         $this->Form->SetValidationResults($ValidationResults);
+         
+         // Set the defaults for a new user.
+         if(!array_key_exists('Name', $ValidationResults)) {
+            $this->Form->SetFormValue('NewName', $HandshakeData['Name']);
+         }
+         if(!array_key_exists('Email', $ValidationResults)) {
+            $this->Form->SetFormValue('NewEmail', $HandshakeData['Email']);
+         }
+         
+         // Set the default for the login.
+         $this->Form->SetFormValue('SignInName', $HandshakeData['Name']);
+         $this->Form->SetFormValue('Handshake', 'NEW');
+         
+         // Add the handshake data as hidden fields.
+         foreach($HandshakeData as $Key => $Value) {
+            $this->Form->AddHidden($Key, $Value);
+         }
+         
+      }
+      
+      $this->SetData('Name', $this->Form->HiddenInputs['Name']);
+      $this->SetData('Email', $this->Form->HiddenInputs['Email']);
+      
+      $this->Render();
+   }
 
    /**
     * This is a good example of how to use the form, model, and validator to
@@ -51,10 +160,12 @@ class EntryController extends GardenController {
          if ($this->Form->ValidateModel() == 0) {
             // Attempt to authenticate...
             $Authenticator = Gdn::Authenticator();
-            $AuthenticatedUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
+            $AuthenticatedUserID = $Authenticator->Authenticate($this->Form->FormValues());
+            
+            /*$AuthenticatedUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
                $this->Form->GetValue('Password'),
                $this->Form->GetValue('RememberMe', FALSE),
-               $this->Form->GetValue('ClientHour', ''));
+               $this->Form->GetValue('ClientHour', ''));*/
             
             if ($AuthenticatedUserID < 0) {
                $this->Form->AddError('ErrorPermission');
@@ -277,7 +388,7 @@ class EntryController extends GardenController {
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
             $Authenticator = Gdn::Authenticator();
-            $Authenticator->Authenticate($User->Name, $Password, FALSE);
+            $Authenticator->Authenticate(array('Name' => $User->Name, 'Password' => $Password, 'RememberMe' => FALSE));
             $this->StatusMessage = Gdn::Translate('Password saved. Signing you in now...');
             $this->RedirectUrl = Url('/');
          }

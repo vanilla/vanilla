@@ -62,6 +62,9 @@ class Gdn_Database {
    
    /** @var string The prefix to all database tables. */
    public $DatabasePrefix;
+	
+	/** @var array Extented properties that a specific driver can use. **/
+	public $ExtendedProperties;
    
    /** @var string The PDO dsn for the database connection.
     *  Note: This does NOT include the engine before the dsn.
@@ -111,6 +114,7 @@ class Gdn_Database {
 		$this->Password = ArrayValue('Password', $Config, $DefaultConfig['Password']);
 		$this->ConnectionOptions = ArrayValue('ConnectionOptions', $Config, $DefaultConfig['ConnectionOptions']);
       $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, $DefaultConfig['DatabasePrefix']));
+		$this->ExtendedProperties = ArrayValue('ExtendedProperties', $Config, array());
 		
 		if(array_key_exists('Dsn', $Config)) {
          // Get the dsn from the property.
@@ -124,7 +128,7 @@ class Gdn_Database {
 			elseif(array_key_exists('Dbname', $DefaultConfig))
 				$Dbname = $DefaultConfig['Dbname'];
 			elseif(array_key_exists('Name', $DefaultConfig))
-				$Dbname = $DefaultConfig['Dbname'];
+				$Dbname = $DefaultConfig['Name'];
 			// Was the port explicitly defined in the config?
 			$Port = ArrayValue('Port', $Config, ArrayValue('Port', $DefaultConfig, ''));
 			

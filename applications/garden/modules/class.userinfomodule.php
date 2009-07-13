@@ -8,13 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders a list of users who are taking part in a particular discussion.
-/// </summary>
+/**
+ * Renders a list of users who are taking part in a particular discussion.
+ */
 class UserInfoModule extends Module {
    
    public $User;

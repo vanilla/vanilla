@@ -8,45 +8,45 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.UI
-/// </namespace>
+/**
+ * Lussumo.Garden.UI
+ */
 
 if (!class_exists('Gdn_MenuModule', FALSE)) {
-   /// <summary>
-   /// Manages the items in the page menu and eventually returns the menu as a
-   /// string with ToString();
-   /// </summary>
+   /**
+    * Manages the items in the page menu and eventually returns the menu as a
+    * string with ToString();
+    */
    class Gdn_MenuModule extends Module {
       
-      /// <prop type="array">
-      /// An array of menu items.
-      /// </prop>
+      /**
+       * An array of menu items.
+       */
       public $Items;
       
-      /// <prop type="string">
-      /// The html id attribute to be applied to the root element of the menu.
-      /// Default is "Menu".
-      /// </prop>
+      /**
+       * The html id attribute to be applied to the root element of the menu.
+       * Default is "Menu".
+       */
       public $HtmlId;
       
-      /// <prop type="string">
-      /// The class attribute to be applied to the root element of the
-      /// breadcrumb. Default is none.
-      /// </prop>
+      /**
+       * The class attribute to be applied to the root element of the
+       * breadcrumb. Default is none.
+       */
       public $CssClass;
       
-      /// <prop type="array">
-      /// An array of menu group names arranged in the order that the menu
-      /// should be rendered.
-      /// </prop>
+      /**
+       * An array of menu group names arranged in the order that the menu
+       * should be rendered.
+       */
       public $Sort;
       
-      /// <prop type="string">
-      /// A route that, if found in the menu links, should cause that link to
-      /// have the Highlight class applied. This property is assigned with
-      /// $this->Highlight();
-      /// </prop>
+      /**
+       * A route that, if found in the menu links, should cause that link to
+       * have the Highlight class applied. This property is assigned with
+       * $this->Highlight();
+       */
       private $_HighlightRoute;
    
       public function __construct(&$Sender = '') {
@@ -81,16 +81,16 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
          $this->_HighlightRoute = $Route;
       }
 
-      /// <summary>
-      /// Removes all links from a specific group.
-      /// </summary>
+      /**
+       * Removes all links from a specific group.
+       */
       public function RemoveLinks($Group) {
          $this->Links[$Group] = array();
       }
       
-      /// <summary>
-      /// Removes an entire group of links, and the group itself, from the menu.
-      /// </summary>
+      /**
+       * Removes an entire group of links, and the group itself, from the menu.
+       */
       public function RemoveGroup($Group) {
          if (array_key_exists($Group, $this->Groups))
             unset($this->Groups[$Group]);

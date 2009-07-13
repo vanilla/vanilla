@@ -9,14 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class Gdn_RoleModel extends Model {
-   /// <summary>
-   /// Class constructor. Defines the related database table name.
-   /// </summary>
-   /// <param name="Name" type="string" required="false" default="get_class($this)">
-   /// An optional parameter that allows you to explicitly define the name of
-   /// the table that this model represents. You can also explicitly set this
-   /// value with $this->Name.
-   /// </param>
+   /**
+    * Class constructor. Defines the related database table name.
+    */
    public function __construct() {
       parent::__construct('Role');
    }
@@ -47,9 +42,9 @@ class Gdn_RoleModel extends Model {
       
    }
    
-   /// <summary>
-   /// Returns a resultset of all roles.
-   /// </summary>
+   /**
+    * Returns a resultset of all roles.
+    */
    public function Get() {
       return $this->SQL
          ->Select()
@@ -70,10 +65,10 @@ class Gdn_RoleModel extends Model {
       $RoleNames = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'Name');
       return ArrayCombine($RoleIDs, $RoleNames);
    }
-   /*
-   /// <summary>
-   /// Returns a resultset of all roles that have editable permissions.
-   /// </summary>
+
+   /**
+    * Returns a resultset of all roles that have editable permissions.
+    *
    public function GetEditablePermissions() {
       return $this->SQL
          ->Select()
@@ -84,22 +79,20 @@ class Gdn_RoleModel extends Model {
    }
    */
 
-   /// <summary>
-   /// Returns a resultset of role data related to the specified RoleID.
-   /// </summary>
-   /// <param name="RoleID" type="int">
-   /// The RoleID to filter to.
-   /// </param>
+   /**
+    * Returns a resultset of role data related to the specified RoleID.
+    *
+    * @param int The RoleID to filter to.
+    */
    public function GetByRoleID($RoleID) {
       return $this->GetWhere(array('RoleID' => $RoleID))->FirstRow();
    }
    
-   /// <summary>
-   /// Returns a resultset of role data related to the specified UserID.
-   /// </summary>
-   /// <param name="UserID" type="int">
-   /// The UserID to filter to.
-   /// </param>
+   /**
+    * Returns a resultset of role data related to the specified UserID.
+    *
+    * @param int The UserID to filter to.
+    */
    public function GetByUserID($UserID) {
       return $this->SQL->Select()
          ->From('Role')
@@ -108,12 +101,11 @@ class Gdn_RoleModel extends Model {
          ->Get();
    }
 
-   /// <summary>
-   /// Returns a resultset of role data NOT related to the specified RoleID.
-   /// </summary>
-   /// <param name="RoleID" type="int">
-   /// The RoleID to filter out.
-   /// </param>
+   /**
+    * Returns a resultset of role data NOT related to the specified RoleID.
+    *
+    * @param int The RoleID to filter out.
+    */
    public function GetByNotRoleID($RoleID) {
       return $this->GetWhere(array('RoleID <>' => $RoleID));
    }
@@ -126,18 +118,14 @@ class Gdn_RoleModel extends Model {
       return $Result;      
    }
    
-   /// <summary>
-   /// Returns the number of users assigned to the provided RoleID. If
-   /// $UsersOnlyWithThisRole is TRUE, it will return the number of users who
-   /// are assigned to this RoleID and NO OTHER.
-   /// </summary>
-   /// <param name="RoleID" type="int">
-   /// The RoleID to filter to.
-   /// </param>
-   /// <param name="UsersOnlyWithThisRole" type="bool" required="false" default="FALSE">
-   /// A boolean value indicating if the count should be any users with this
-   /// RoleID, or users who are ONLY assigned to this RoleID.
-   /// </param>
+   /**
+    * Returns the number of users assigned to the provided RoleID. If
+    * $UsersOnlyWithThisRole is TRUE, it will return the number of users who
+    * are assigned to this RoleID and NO OTHER.
+    *
+    * @param int The RoleID to filter to.
+    * @param bool Indicating if the count should be any users with this RoleID, or users who are ONLY assigned to this RoleID.
+    */
    public function GetUserCount($RoleID, $UsersOnlyWithThisRole = FALSE) {
       if ($UsersOnlyWithThisRole) {
          $Data = $this->SQL->Select('ur.UserID', 'count', 'UserCount')
@@ -155,12 +143,11 @@ class Gdn_RoleModel extends Model {
       }
    }
    
-   /// <summary>
-   /// Retrieves all roles with the specified permission(s).
-   /// </summary>
-   /// <param name="Permission" type="mixed">
-   /// A permission (or array of permissions) to match.
-   /// </param>
+   /**
+    * Retrieves all roles with the specified permission(s).
+    *
+    * @param mixed A permission (or array of permissions) to match.
+    */
    public function GetByPermission($Permission) {
       if (!is_array($Permission))
          $Permission = array($Permission);

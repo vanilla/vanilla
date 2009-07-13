@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Manages discussion categories.
-/// </summary>
+/**
+ * Manages discussion categories.
+ */
 class CategoryModel extends Model {
    
-   /// <summary>
-   /// Class constructor. Defines the related database table name.
-   /// </summary>
+   /**
+    * Class constructor. Defines the related database table name.
+    */
    public function __construct() {
       parent::__construct('Category');
    }
@@ -150,12 +150,12 @@ class CategoryModel extends Model {
       return $ChildData->NumRows() > 0 ? TRUE : FALSE;
    }
    
-   /// <summary>
-   /// Organizes the category table so that all child categories are sorted
-   /// below the appropriate parent category (they can get out of wack when
-   /// parent categories are deleted and their children are re-assigned to a new
-   /// parent category).
-   /// </summary>
+   /**
+    * Organizes the category table so that all child categories are sorted
+    * below the appropriate parent category (they can get out of wack when
+    * parent categories are deleted and their children are re-assigned to a new
+    * parent category).
+    */
    public function Organize() {
       // Load all categories
       $CategoryData = $this->Get('Sort');

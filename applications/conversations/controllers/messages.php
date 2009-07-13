@@ -284,9 +284,12 @@ class MessagesController extends ConversationsController {
          $this->Render();
    }
    
-   /// <summary>
-   /// Show bookmarked conversations for the current user.
-   /// </summary>
+   /**
+    * Show bookmarked conversations for the current user.
+    *
+    * @param int
+    * @param string
+    */
    public function Bookmarked($Offset = 0, $Limit = '') {
       $this->View = 'All';
       $this->All($Offset, $Limit, TRUE);

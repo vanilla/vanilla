@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
       var tabs = $('ul.Tabs');
       tabs.nextAll().remove();
       tabs.after('<div class="Loading">&nbsp;</div>');
-      $.post(this.href, {'DeliveryType': 3}, function(data) {
+      $.post(this.href, {'DeliveryType': 'VIEW'}, function(data) {
          tabs.nextAll().remove();
          tabs.after(data);
       });

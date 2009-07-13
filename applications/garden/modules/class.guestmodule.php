@@ -8,13 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders the "You should register or sign in" panel box.
-/// </summary>
+/**
+ * Renders the "You should register or sign in" panel box.
+ */
 class GuestModule extends Module {
    
    public $MessageCode = "It looks like you're new here. If you want to get involved, click one of these buttons!";

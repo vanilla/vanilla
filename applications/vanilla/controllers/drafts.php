@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Discussions Controller
-/// </summary>
+/**
+ * Discussions Controller
+ */
 class DraftsController extends VanillaController {
    
    public $Uses = array('Database', 'DraftModel');

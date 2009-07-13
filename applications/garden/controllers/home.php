@@ -8,22 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Garden Home Controller
-/// </summary>
+/**
+ * Garden Home Controller
+ */
 class HomeController extends GardenController {
    
-   /// <summary>
-   /// The garden welcome message.
-   /// </summary>
+   /**
+    * The garden welcome message.
+    */
    public function Index() {
       $this->Render();
    }
    
-   /// <summary>
-   /// A standard 404 File Not Found error message is delivered when this action
-   /// is encountered.
-   /// </summary>
+   /**
+    * A standard 404 File Not Found error message is delivered when this action
+    * is encountered.
+    */
    public function FileNotFound() {
       $this->Render();
    }
@@ -36,10 +36,10 @@ class HomeController extends GardenController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Displays a message telling the user that their registration will be
-   /// reviewed by an administrator.
-   /// </summary>
+   /**
+    * Displays a message telling the user that their registration will be
+    * reviewed by an administrator.
+    */
    public function RegistrationUnderApproval() {
       $this->Render();
    }

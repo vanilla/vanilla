@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders the "Start a New Discussion" button.
-/// </summary>
+/**
+ * Renders the "Start a New Discussion" button.
+ */
 class NewDiscussionModule extends Module {
 
    public function AssetTarget() {

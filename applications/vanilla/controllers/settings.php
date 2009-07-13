@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Settings Controller
-/// </summary>
+/**
+ * Settings Controller
+ */
 class SettingsController extends VanillaController {
    
    public $Uses = array('Database', 'Form');

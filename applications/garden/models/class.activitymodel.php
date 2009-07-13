@@ -9,14 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class ActivityModel extends Model {
-   /// <summary>
-   /// Class constructor. Defines the related database table name.
-   /// </summary>
-   /// <param name="Name" type="string" required="false" default="get_class($this)">
-   /// An optional parameter that allows you to explicitly define the name of
-   /// the table that this model represents. You can also explicitly set this
-   /// value with $this->Name.
-   /// </param>
+   /**
+    * Class constructor. Defines the related database table name.
+    */
    public function __construct() {
       parent::__construct('Activity');
    }

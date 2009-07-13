@@ -8,13 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders a list of people in the specified conversation.
-/// </summary>
+/**
+ * Renders a list of people in the specified conversation.
+ */
 class InThisConversationModule extends Module {
 
    protected $_UserData;

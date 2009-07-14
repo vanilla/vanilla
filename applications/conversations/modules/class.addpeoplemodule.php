@@ -8,13 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders a form that allows people to be added to conversations.
-/// </summary>
+/**
+ * Renders a form that allows people to be added to conversations.
+ */
 class AddPeopleModule extends Module {
 
    public $Conversation;

@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders the discussion categories.
-/// </summary>
+/**
+ * Renders the discussion categories.
+ */
 class CategoriesModule extends Module {
    
    protected $_CategoryData;

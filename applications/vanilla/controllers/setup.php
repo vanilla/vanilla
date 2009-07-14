@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Vanilla Setup Controller
-/// </summary>
+/**
+ * Vanilla Setup Controller
+ */
 class SetupController extends Gdn_Controller {
    
    public $Uses = array('Form');
    
-   /// <summary>
-   /// The methods in setup controllers should not call "Render". Rendering will
-   /// be handled by the controller that initiated the setup. This method should
-   /// return a boolean value indicating success.
-   /// </summary>
+   /**
+    * The methods in setup controllers should not call "Render". Rendering will
+    * be handled by the controller that initiated the setup. This method should
+    * return a boolean value indicating success.
+    */
    public function Index() {
       $Database = Gdn::Database();
       $Config = Gdn::Factory(Gdn::AliasConfig);

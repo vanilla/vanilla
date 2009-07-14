@@ -8,17 +8,17 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Core
-/// </namespace>
+/**
+ * Lussumo.Garden.Core
+ */
 
-/// <summary>
-/// Handles building the update request, sending it, and returning results.
-/// </summary>
+/**
+ * Handles building the update request, sending it, and returning results.
+ */
 class Gdn_UpdateManager {
-   /// <prop type="array">
-   /// A collection of Type => Items to check for updates.
-   /// </prop>
+   /**
+    * A collection of Type => Items to check for updates.
+    */
    private $_Items;
    
    public function __construct() {

@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Garden Utility Controller
-/// </summary>
+/**
+ * Garden Utility Controller
+ */
 class UtilityController extends GardenController {
    
    public $Uses = array('Form');
@@ -42,27 +42,20 @@ class UtilityController extends GardenController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Allows the setting of data into one of two serialized data columns on the
-   /// user table: Preferences and Attributes. The method expects "Name" &
-   /// "Value" to be in the $_POST collection. This method always saves to the
-   /// row of the user id performing this action (ie. $Session->UserID). The
-   /// type of property column being saved should be specified in the url:
-   ///  ie. /garden/utility/set/preference/name/value/transientKey
-   ///  or /garden/utility/set/attribute/name/value/transientKey
-   /// </summary>
-   /// <param name="UserPropertyColumn" type="string" required="false" default="empty">
-   /// The type of value being saved: preference or attribute.
-   /// </param>
-   /// <param name="Name" type="string" required="false" default="empty">
-   /// The name of the property being saved.
-   /// </param>
-   /// <param name="Value" type="string" required="false" default="empty">
-   /// The value of the property being saved.
-   /// </param>
-   /// <param name="TransientKey" type="string" required="false" default="empty">
-   /// A unique transient key to authenticate that the user intended to perform this action.
-   /// </param>
+   /**
+    * Allows the setting of data into one of two serialized data columns on the
+    * user table: Preferences and Attributes. The method expects "Name" &
+    * "Value" to be in the $_POST collection. This method always saves to the
+    * row of the user id performing this action (ie. $Session->UserID). The
+    * type of property column being saved should be specified in the url:
+    *  ie. /garden/utility/set/preference/name/value/transientKey
+    *  or /garden/utility/set/attribute/name/value/transientKey
+    *
+    * @param string The type of value being saved: preference or attribute.
+    * @param string The name of the property being saved.
+    * @param string The value of the property being saved.
+    * @param string A unique transient key to authenticate that the user intended to perform this action.
+    */
    public function Set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();

@@ -8,26 +8,26 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.Core
-/// </namespace>
+/**
+ * Lussumo.Garden.Core
+ */
 
-/// <summary>
-/// Manages available themes, enabling and disabling them.
-/// </summary>
+/**
+ * Manages available themes, enabling and disabling them.
+ */
 class Gdn_ThemeManager {
    
-   /// <prop type="array">
-   /// An array of available themes. Never access this directly, instead
-   /// use $this->AvailableThemes();
-   /// </prop>
+   /**
+    * An array of available themes. Never access this directly, instead
+    * use $this->AvailableThemes();
+    */
    private $_AvailableThemes = NULL;
    
-   /// <summary>
-   /// Looks through the themes directory for valid themes and returns them as
-   /// an associative array of "Theme Name" => "Theme Info Array". It also adds
-   /// a "Folder" definition to the Theme Info Array for each.
-   /// </summary>
+   /**
+    * Looks through the themes directory for valid themes and returns them as
+    * an associative array of "Theme Name" => "Theme Info Array". It also adds
+    * a "Folder" definition to the Theme Info Array for each.
+    */
    public function AvailableThemes() {
       if (!is_array($this->_AvailableThemes)) {
          $ThemeInfo = array();

@@ -8,89 +8,89 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.UI
-/// </namespace>
+/**
+ * Lussumo.Garden.UI
+ */
 
-/// <summary>
-/// Builds a pager control related to a dataset.
-/// </summary>
+/**
+ * Builds a pager control related to a dataset.
+ */
 class MorePagerModule extends Module {
 
-   /// <prop type="int">
-   /// The id applied to the div tag that contains the pager.
-   /// </prop>
+   /**
+    * The id applied to the div tag that contains the pager.
+    */
    public $ClientID;
    
-   /// <prop type="string">
-   /// The name of the stylesheet class to be applied to the pager. Default is
-   /// 'Pager';
-   /// </prop>
+   /**
+    * The name of the stylesheet class to be applied to the pager. Default is
+    * 'Pager';
+    */
    public $CssClass;
 
-   /// <prop type="string">
-   /// Translation code to be used for "more" link.
-   /// </prop>
+   /**
+    * Translation code to be used for "more" link.
+    */
    public $MoreCode;
 
-   /// <prop type="string">
-   /// If there are no pages to page through, this string will be returned in
-   /// place of the pager. Default is an empty string.
-   /// </prop>
+   /**
+    * If there are no pages to page through, this string will be returned in
+    * place of the pager. Default is an empty string.
+    */
    public $PagerEmpty;
    
-   /// <prop type="string">
-   /// The xhtml code that should wrap around the pager link.
-   ///  ie. '<div %1$s>%2$s</div>';
-   /// where %1$s represents id and class attributes (if defined by
-   /// $this->ClientID and $this->CssClass) and %2$s represents the pager link.
-   /// </prop>
+   /**
+    * The xhtml code that should wrap around the pager link.
+    *  ie. '<div %1$s>%2$s</div>';
+    * where %1$s represents id and class attributes (if defined by
+    * $this->ClientID and $this->CssClass) and %2$s represents the pager link.
+    */
    public $Wrapper;
 
-   /// <prop type="string">
-   /// Translation code to be used for "less" link.
-   /// </prop>
+   /**
+    * Translation code to be used for "less" link.
+    */
    public $LessCode;
 
-   /// <prop type="int">
-   /// The number of records being displayed on a single page of data. Default
-   /// is 30.
-   /// </prop>
+   /**
+    * The number of records being displayed on a single page of data. Default
+    * is 30.
+    */
    public $Limit;
    
-   /// <prop type="int">
-   /// The total number of records in the dataset.
-   /// </prop>
+   /**
+    * The total number of records in the dataset.
+    */
    public $TotalRecords;
    
-   /// <prop type="string">
-   /// The string to contain the record offset. ie. /controller/action/%s/
-   /// </prop>
+   /**
+    * The string to contain the record offset. ie. /controller/action/%s/
+    */
    public $Url;
    
-   /// <prop type="int">
-   /// The first record of the current page (the dataset offset).
-   /// </prop>
+   /**
+    * The first record of the current page (the dataset offset).
+    */
    private $Offset;
    
-   /// <prop type="int">
-   /// The last offset of the current page. (ie. Offset to LastOffset of TotalRecords)
-   /// </prop>
+   /**
+    * The last offset of the current page. (ie. Offset to LastOffset of TotalRecords)
+    */
    private $_LastOffset;
    
-   /// <prop type="int">
-   /// Certain properties are required to be defined before the pager can build
-   /// itself. Once they are created, this property is set to true so they are
-   /// not needlessly recreated.
-   /// </prop>
+   /**
+    * Certain properties are required to be defined before the pager can build
+    * itself. Once they are created, this property is set to true so they are
+    * not needlessly recreated.
+    */
    private $_PropertiesDefined;
    
-   /// <prop type="boolean">
-   /// A boolean value indicating if the total number of records is known or
-   /// not. Retrieving this number can be a costly database query, so sometimes
-   /// it is not retrieved and simple "next/previous" links are displayed
-   /// instead. Default is FALSE, meaning that the simple pager is displayed.
-   /// </prop>
+   /**
+    * A boolean value indicating if the total number of records is known or
+    * not. Retrieving this number can be a costly database query, so sometimes
+    * it is not retrieved and simple "next/previous" links are displayed
+    * instead. Default is FALSE, meaning that the simple pager is displayed.
+    */
    private $_Totalled;
 
    public function __construct(&$Sender = '') {
@@ -114,9 +114,9 @@ class MorePagerModule extends Module {
       return FALSE;
    }
 
-   /// <summary>
-   /// Define all required parameters to create the Pager and PagerDetails.
-   /// </summary>
+   /**
+    * Define all required parameters to create the Pager and PagerDetails.
+    */
    public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = FALSE) {
       if ($this->_PropertiesDefined === FALSE || $ForceConfigure === TRUE) {
          $this->Url = $Url;
@@ -160,12 +160,11 @@ class MorePagerModule extends Module {
       return $Result;
    }
 
-   /// <summary>
-   /// Returns the "show x more (or less) items" link.
-   /// </summary>
-   /// <param name="Type" type="string" required="false" default="more">
-   /// The type of link to return: more or less
-   /// </param>
+   /**
+    * Returns the "show x more (or less) items" link.
+    *
+    * @param string The type of link to return: more or less
+    */
    public function ToString($Type = 'more') {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
@@ -212,4 +211,3 @@ class MorePagerModule extends Module {
          return sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
    }
 }
-?>

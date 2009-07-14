@@ -1,7 +1,7 @@
 <?php
-/// <summary>
-/// An associative array of information about this application.
-/// </summary>
+/**
+ * An associative array of information about this application.
+ */
 $ApplicationInfo['Garden'] = array(
    'Description' => "Garden is Lussumo's development framework. It comes loaded with user, role, permission, plugin, theme, and application management ready to roll.",
    'Version' => '1.0',

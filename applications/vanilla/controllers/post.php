@@ -1,18 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <summary>
-/// Discussion Controller
-/// </summary>
+/**
+ * Discussion Controller
+ */
 class PostController extends VanillaController {
    
    public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
-   /// <summary>
-   /// Create a discussion.
-   /// </summary>
-   /// <param name="CategoryID" type="int" required="FALSE" default="empty">
-   /// The CategoryID to add the discussion to.
-   /// </param>
+   /**
+    * Create a discussion.
+    *
+    * @param int The CategoryID to add the discussion to.
+    */
    public function Discussion($CategoryID = '') {
       $Session = Gdn::Session();
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
@@ -122,13 +121,11 @@ class PostController extends VanillaController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Edit a discussion.
-   /// </summary>
-   /// <param name="DiscussionID" type="int" required="FALSE" default="empty">
-   /// The DiscussionID of the discussion to edit. If blank, this method will
-   /// throw an error.
-   /// </param>
+   /**
+    * Edit a discussion.
+    *
+    * @param int The DiscussionID of the discussion to edit. If blank, this method will throw an error.
+    */
    public function EditDiscussion($DiscussionID = '', $DraftID = '') {
       if ($DraftID != '') {
          $this->Draft = $this->DraftModel->GetID($DraftID);
@@ -141,13 +138,11 @@ class PostController extends VanillaController {
       $this->Discussion($this->CategoryID);
    }
    
-   /// <summary>
-   /// Create a comment.
-   /// </summary>
-   /// <param name="DiscussionID" type="int" required="FALSE" default="empty">
-   /// The DiscussionID to add the comment to. If blank, this method will throw
-   /// an error.
-   /// </param>
+   /**
+    * Create a comment.
+    *
+    * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
+    */
    public function Comment($DiscussionID = '') {
       if ($this->Head) {
          $this->Head->AddScript('js/library/jquery.autogrow.js');
@@ -298,12 +293,11 @@ class PostController extends VanillaController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Edit a comment.
-   /// </summary>
-   /// <param name="CommentID" type="int" required="FALSE" default="empty">
-   /// The CommentID of the comment to edit.
-   /// </param>
+   /**
+    * Edit a comment.
+    *
+    * @param int The CommentID of the comment to edit.
+    */
    public function EditComment($CommentID = '', $DraftID = '') {
       if (is_numeric($CommentID) && $CommentID > 0) {
          $this->Form->SetModel($this->CommentModel);

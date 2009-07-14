@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Renders a list of users who are taking part in a particular discussion.
-/// </summary>
+/**
+ * Renders a list of users who are taking part in a particular discussion.
+ */
 class InThisDiscussionModule extends Module {
    
    protected $_UserData;

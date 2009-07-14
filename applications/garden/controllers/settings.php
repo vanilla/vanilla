@@ -8,16 +8,16 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Garden Settings Controller
-/// </summary>
+/**
+ * Garden Settings Controller
+ */
 class SettingsController extends GardenController {
    
    public $Uses = array('Form', 'Database');
    
-   /// <summary>
-   /// Application management screen.
-   /// </summary>
+   /**
+    * Application management screen.
+    */
    public function Applications($Action = '', $ApplicationName = '', $TransientKey = '') {
       $this->Permission('Garden.Applications.Manage');
       $this->AddSideMenu('garden/settings/applications');
@@ -105,9 +105,9 @@ class SettingsController extends GardenController {
 
    }
    
-   /// <summary>
-   /// Garden management screen.
-   /// </summary>
+   /**
+    * Garden management screen.
+    */
    public function Configure() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
@@ -151,9 +151,9 @@ class SettingsController extends GardenController {
       $this->Render();      
    }      
    
-   /// <summary>
-   /// Garden management screen.
-   /// </summary>
+   /**
+    * Garden management screen.
+    */
    public function Email() {
       $this->Permission('Garden.Email.Manage');
       $this->AddSideMenu('garden/settings/email');
@@ -192,9 +192,9 @@ class SettingsController extends GardenController {
       $this->Render();      
    }      
    
-   /// <summary>
-   /// Garden settings dashboard.
-   /// </summary>
+   /**
+    * Garden settings dashboard.
+    */
    var $RequiredAdminPermissions = array();
    public function Index() {
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
@@ -259,9 +259,9 @@ class SettingsController extends GardenController {
       $this->Render();
    }
    
-   /// <summary>
-   /// Configuration of registration settings.
-   /// </summary>
+   /**
+    * Configuration of registration settings.
+    */
    public function Registration($RedirectUrl = '') {
       $this->Permission('Garden.Registration.Manage');
       $this->AddSideMenu('garden/settings/registration');
@@ -345,9 +345,9 @@ class SettingsController extends GardenController {
       $this->Render();
    }
 
-   /// <summary>
-   /// Theme management screen.
-   /// </summary>
+   /**
+    * Theme management screen.
+    */
    public function Themes($Preview = '') {
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');

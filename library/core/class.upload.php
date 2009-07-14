@@ -8,17 +8,17 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// Handles uploading files.
-/// </summary>
+/**
+ * Handles uploading files.
+ */
 class Gdn_Upload {
    
    protected $_MaxFileSize;
    protected $_AllowedFileExtensions;
 
-   /// <summary>
-   /// Class constructor
-   /// </summary>
+   /**
+    * Class constructor
+    */
    public function __construct() {
       $this->Clear();
    }
@@ -28,13 +28,12 @@ class Gdn_Upload {
       $this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
    }
    
-   /// <summary>
-   /// Adds an extension (or array of extensions) to the array of allowed file
-   /// extensions.
-   /// </summary>
-   /// <param name="Extension" type="mixed">
-   /// The name (or array of names) of the extension to allow.
-   /// </param>
+   /**
+    * Adds an extension (or array of extensions) to the array of allowed file
+    * extensions.
+    *
+    * @param mixed The name (or array of names) of the extension to allow.
+    */
    public function AllowFileExtension($Extension) {
       if (is_array($Extension))
          array_merge($this->_AllowedFileExtensions, $Extension);
@@ -42,9 +41,9 @@ class Gdn_Upload {
          $this->_AllowedFileExtensions[] = $Extension;
    }
 
-   /// <summary>
-   /// Validates the uploaded file. Returns the temporary name of the uploaded file.
-   /// </summary>
+   /**
+    * Validates the uploaded file. Returns the temporary name of the uploaded file.
+    */
    public function ValidateUpload($InputName) {
       if (
          !array_key_exists($InputName, $_FILES)

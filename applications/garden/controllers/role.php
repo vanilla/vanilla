@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// RBAC (Role Based Access Control)
-/// </summary>
+/**
+ * RBAC (Role Based Access Control)
+ */
 class RoleController extends GardenController {
    
    public $Uses = array('Database', 'Form', 'RoleModel');
@@ -97,6 +97,7 @@ class RoleController extends GardenController {
          // 2. Save the data (validation occurs within):
          if ($RoleID = $this->Form->Save()) {
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->RedirectUrl = Url('garden/role');
             // Reload the permission data.
             $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
          }

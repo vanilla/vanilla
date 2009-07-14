@@ -9,10 +9,10 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 
-/// <summary>
-/// A "reply" is essentially a comment that has a value in
-/// Comment.ReplyCommentID other than NULL.
-/// </summary>
+/**
+ * A "reply" is essentially a comment that has a value in
+ * Comment.ReplyCommentID other than NULL.
+ */
 class ReplyModel extends CommentModel {
    
    public function ReplyQuery() {
@@ -124,13 +124,12 @@ class ReplyModel extends CommentModel {
       return $CommentID;
    }
    
-   /// <summary>
-   /// Retrieves an object with the discussion id and name based on the
-   /// CommentID of the reply.
-   /// </summary>
-   /// <param name="CommentID" type="int">
-   /// The CommentID of the reply for which we are fetching discussion info.
-   /// </param>
+   /**
+    * Retrieves an object with the discussion id and name based on the
+    * CommentID of the reply.
+    *
+    * @param int The CommentID of the reply for which we are fetching discussion info.
+    */
    public function GetDiscussion($CommentID) {
       return $this->SQL
          ->Select('d.DiscussionID, d.Name')
@@ -141,13 +140,12 @@ class ReplyModel extends CommentModel {
          ->FirstRow();
    }
    
-   /// <summary>
-   /// Updates the CountReplies value on the comment & discussion based on the
-   /// CommentID of the comment being replied to.
-   /// </summary>
-   /// <param name="CommentID" type="int">
-   /// The CommentID of the comment being replied to.
-   /// </param>
+   /**
+    * Updates the CountReplies value on the comment & discussion based on the
+    * CommentID of the comment being replied to.
+    *
+    * @param int The CommentID of the comment being replied to.
+    */
    public function UpdateReplyCount($ReplyCommentID) {
       // Update CountReplies in the comment table
       $Info = $this->SQL

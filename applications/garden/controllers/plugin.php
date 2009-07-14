@@ -8,16 +8,16 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <summary>
-/// The Plugin controller offers plugins a place to have their own pages. Create
-/// a custom plugin page by using Pluggable's Create method to magically add a
-/// method to this controller.
-///
-/// For example, to create a page at http://localhost/garden/plugin/mynewmethod
-/// your plugin should have a method called:
-///  public function PluginController_MyNewMethod_Create($Sender) {
-///     $Sender->Render('/path/to/some/view.php');
-///  }
-/// </summary>
+/**
+ * The Plugin controller offers plugins a place to have their own pages. Create
+ * a custom plugin page by using Pluggable's Create method to magically add a
+ * method to this controller.
+ *
+ * For example, to create a page at http://localhost/garden/plugin/mynewmethod
+ * your plugin should have a method called:
+ *  public function PluginController_MyNewMethod_Create($Sender) {
+ *     $Sender->Render('/path/to/some/view.php');
+ *  }
+ */
 class PluginController extends GardenController {
 }

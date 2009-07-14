@@ -8,41 +8,41 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.UI
-/// </namespace>
+/**
+ * Lussumo.Garden.UI
+ */
 
 if (!class_exists('HeadModule', FALSE)) {
-   /// <summary>
-   /// Manages collections of items to be placed between the <HEAD> tags of the
-   /// page.
-   /// </summary>
+   /**
+    * Manages collections of items to be placed between the <HEAD> tags of the
+    * page.
+    */
    class HeadModule extends Module {
       
-      /// <prop type="array">
-      /// A collection of tags to be placed in the head.
-      /// </prop>
+      /**
+       * A collection of tags to be placed in the head.
+       */
       private $_Tags;
       
-      /// <prop type="array">
-      /// A collection of strings to be placed in the head.
-      /// </prop>
+      /**
+       * A collection of strings to be placed in the head.
+       */
       private $_Strings;
       
-      /// <prop type="string">
-      /// The main text for the "title" tag in the head.
-      /// </prop>
+      /**
+       * The main text for the "title" tag in the head.
+       */
       protected $_Title;
       
-      /// <prop type="string">
-      /// A string to be concatenated with $this->_Title.
-      /// </prop>
+      /**
+       * A string to be concatenated with $this->_Title.
+       */
       protected $_SubTitle;
    
-      /// <prop type="string">
-      /// A string to be concatenated with $this->_Title if there is also a
-      /// $this->_SubTitle string being concatenated.
-      /// </prop>
+      /**
+       * A string to be concatenated with $this->_Title if there is also a
+       * $this->_SubTitle string being concatenated.
+       */
       protected $_TitleDivider;
       
       public function __construct(&$Sender = '') {
@@ -54,17 +54,12 @@ if (!class_exists('HeadModule', FALSE)) {
          parent::__construct($Sender);
       }
 
-      /// <summary>
-      /// Adds a "link" tag to the head containing a reference to a stylesheet. 
-      /// </summary>
-      /// <param name="HRef" type="string">
-      /// The location of the stylesheet relative to the web root (if an absolute
-      /// path with http:// is provided, it will use the HRef as provided).
-      ///  ie. /themes/default/css/layout.css or http://url.com/layout.css
-      /// </param>
-      /// <param name="Media" type="string" required="false" default="empty">
-      /// Type media for the stylesheet. ie. "screen", "print", etc
-      /// </param>
+      /**
+       * Adds a "link" tag to the head containing a reference to a stylesheet.
+       *
+       * @param string The location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
+       * @param string Type media for the stylesheet. ie. "screen", "print", etc.
+       */
       public function AddCss($HRef, $Media = '') {
          $this->AddTag('link', array('rel' => 'stylesheet',
             'type' => 'text/css',
@@ -72,15 +67,12 @@ if (!class_exists('HeadModule', FALSE)) {
             'media' => $Media));
       }
 
-      /// <summary>
-      /// Adds a new tag to the head. 
-      /// </summary>
-      /// <param name="Tag" type="string">
-      /// The type of tag to add to the head. ie. "link", "script", "base", "meta".
-      /// </param>
-      /// <param name="Properties" type="array">
-      /// An associative array of property => value pairs to be placed in the tag.
-      /// </param>
+      /**
+       * Adds a new tag to the head.
+       *
+       * @param string The type of tag to add to the head. ie. "link", "script", "base", "meta".
+       * @param array An associative array of property => value pairs to be placed in the tag.
+       */
       public function AddTag($Tag, $Properties) {
          $Tag = strtolower($Tag);
          
@@ -91,25 +83,21 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->_Tags[$Tag][] = $Properties;
       }
       
-      /// <summary>
-      /// Adds a "script" tag to the head. 
-      /// </summary>
-      /// <param name="Src" type="string">
-      /// The location of the script relative to the web root. ie. "/js/jquery.js"
-      /// </param>
-      /// <param name="Type" type="string" required="false" default="text/javascript">
-      /// The type of script being added. ie. "text/javascript"
-      /// </param>
+      /**
+       * Adds a "script" tag to the head.
+       *
+       * @param string The location of the script relative to the web root. ie. "/js/jquery.js"
+       * @param string The type of script being added. ie. "text/javascript"
+       */
       public function AddScript($Src, $Type = 'text/javascript') {
          $this->AddTag('script', array('src' => Asset($Src), 'type' => $Type));
       }
       
-      /// <summary>
-      /// Adds a string to the collection of strings to be inserted into the head.
-      /// </summary>
-      /// <param name="String" type="string">
-      /// The string to be inserted.
-      /// </param>
+      /**
+       * Adds a string to the collection of strings to be inserted into the head.
+       *
+       * @param string The string to be inserted.
+       */
       public function AddString($String) {
          $this->_Strings[] = $String;
       }
@@ -118,33 +106,29 @@ if (!class_exists('HeadModule', FALSE)) {
          return 'Head';
       }
       
-      /// <summary>
-      /// Removes any added stylesheets from the head.
-      /// </summary>
+      /**
+       * Removes any added stylesheets from the head.
+       */
       public function ClearCSS() {
          $this->ClearTag('link', 'rel', 'stylesheet');
       }
       
-      /// <summary>
-      /// Removes any script include tags from the head.
-      /// </summary>
+      /**
+       * Removes any script include tags from the head.
+       */
       public function ClearScripts() {
          $this->ClearTag('script');
       }
       
-      /// <summary>
-      /// Removes any tags with the specified $Tag, $Property, and $Value. Only
-      /// $Tag is required.
-      /// </summary>
-      /// <param name="Tag" type="string">
-      /// The name of the tag to remove from the head.  ie. "link"
-      /// </param>
-      /// <param name="Property" type="string" required="false" default="empty">
-      /// Any property to search for in the tag.
-      /// </param>
-      /// <param name="Value" type="string" required="false" default="empty">
-      /// Any value to search for in the specified property.
-      /// </param>
+      /**
+       * Removes any tags with the specified $Tag, $Property, and $Value.
+       *
+       * Only $Tag is required.
+       *
+       * @param string The name of the tag to remove from the head.  ie. "link"
+       * @param string Any property to search for in the tag.
+       * @param string Any value to search for in the specified property.
+       */
       public function ClearTag($Tag, $Property = '', $Value = '') {
          $Tag = strtolower($Tag);
    
@@ -167,13 +151,11 @@ if (!class_exists('HeadModule', FALSE)) {
          }
       }
    
-      /// <summary>
-      /// Sets the favicon location.
-      /// </summary>
-      /// <param name="HRef" type="string">
-      /// The location of the fav icon relative to the web root.
-      /// ie. /themes/default/images/layout.css
-      /// </param>
+      /**
+       * Sets the favicon location.
+       *
+       * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
+       */
       public function SetFavIcon($HRef) {
          $this->_Tags['link']['favico'] = array(
             'rel' => 'shortcut icon',

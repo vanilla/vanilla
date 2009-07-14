@@ -9,12 +9,11 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 
-/// <summary>
-/// English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
-/// </summary>
-/// <param name="Word" type="string">
-/// The word to format.
-/// </param>
+/**
+ * English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
+ *
+ * @param string The word to format.
+ */
 function FormatPossessive($Word) {
    return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
 }

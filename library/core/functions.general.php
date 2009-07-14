@@ -153,17 +153,12 @@ if (!function_exists('Translate')) {
 //}
 
 if (!function_exists('MergeArrays')) {
-   /// <summary>
-   /// Merge two associative arrays into a single array.
-   /// </summary>
-   /// <param name="Dominant" type="array">
-   /// The "dominant" array, who's values will be chosen over those of the
-   /// subservient.
-   /// </param>
-   /// <param name="Subservient" type="array">
-   /// The "subservient" array, who's values will be disregarded over those of the
-   /// dominant.
-   /// </param>
+   /**
+    * Merge two associative arrays into a single array.
+    *
+    * @param array The "dominant" array, who's values will be chosen over those of the subservient.
+    * @param array The "subservient" array, who's values will be disregarded over those of the dominant.
+    */
    function MergeArrays(&$Dominant, $Subservient) {
       foreach ($Subservient as $Key => $Value) {
          if (!array_key_exists($Key, $Dominant)) {
@@ -219,19 +214,14 @@ if (!function_exists('CombinePaths')) {
 }
 
 if (!function_exists('ArrayValue')) {
-   /// <summary>
-   /// Returns the value associated with the $Needle key in the $Haystack
-   /// associative array or FALSE if not found. This is a CASE-SENSITIVE search.
-   /// </summary>
-   /// <param name="Needle" type="string">
-   /// The key to look for in the $Haystack associative array.
-   /// </param>
-   /// <param name="Haystack" type="array">
-   /// The associative array in which to search for the $Needle key.
-   /// </param>
-   /// <param name="Default" type="string" required="false" default="FALSE">
-   /// The default value to return if the requested value is not found. Default is FALSE.
-   /// </param>
+   /**
+    * Returns the value associated with the $Needle key in the $Haystack
+    * associative array or FALSE if not found. This is a CASE-SENSITIVE search.
+    *
+    * @param string The key to look for in the $Haystack associative array.
+    * @param array The associative array in which to search for the $Needle key.
+    * @param string The default value to return if the requested value is not found. Default is FALSE.
+    */
    function ArrayValue($Needle, $Haystack, $Default = FALSE) {
       $Return = $Default;
       if (is_array($Haystack) === TRUE && array_key_exists($Needle, $Haystack) === TRUE) {
@@ -242,20 +232,15 @@ if (!function_exists('ArrayValue')) {
 }
 
 if (!function_exists('ArrayValueI')) {
-   /// <summary>
-   /// Returns the value associated with the $Needle key in the $Haystack
-   /// associative array or FALSE if not found. This is a CASE-INSENSITIVE
-   /// search.
-   /// </summary>
-   /// <param name="Needle" type="string">
-   /// The key to look for in the $Haystack associative array.
-   /// </param>
-   /// <param name="Haystack" type="array">
-   /// The associative array in which to search for the $Needle key.
-   /// </param>
-   /// <param name="Default" type="string" required="false" default="FALSE">
-   /// The default value to return if the requested value is not found. Default is FALSE.
-   /// </param>
+   /**
+    * Returns the value associated with the $Needle key in the $Haystack
+    * associative array or FALSE if not found. This is a CASE-INSENSITIVE
+    * search.
+    *
+    * @param string The key to look for in the $Haystack associative array.
+    * @param array The associative array in which to search for the $Needle key.
+    * @param string The default value to return if the requested value is not found. Default is FALSE.
+    */
    function ArrayValueI($Needle, $Haystack, $Default = FALSE) {
       $Return = $Default;
       if (is_array($Haystack)) {
@@ -271,9 +256,9 @@ if (!function_exists('ArrayValueI')) {
 }
 
 if (!function_exists('InArrayI')) {
-   /// <summary>
-   /// Case-insensitive version of php's native in_array function.
-   /// </summary>
+   /**
+    * Case-insensitive version of php's native in_array function.
+    */
    function InArrayI($Needle, $Haystack) {
       $Needle = strtolower($Needle);
       foreach ($Haystack as $Item) {
@@ -364,11 +349,11 @@ if (!function_exists('Redirect')) {
 }
 
 if (!function_exists('CalculateNumberOfPages')) {
-   /// <summary>
-   /// Based on the total number of items and the number of items per page,
-   /// this function will calculate how many pages there are.
-   /// Returns the number of pages available
-   /// </summary>
+   /**
+    * Based on the total number of items and the number of items per page,
+    * this function will calculate how many pages there are.
+    * Returns the number of pages available
+    */
    function CalculateNumberOfPages($ItemCount, $ItemsPerPage) {
       $TmpCount = ($ItemCount/$ItemsPerPage);
       $RoundedCount = intval($TmpCount);
@@ -414,10 +399,10 @@ if (!function_exists('ArrayValuesToKeys')) {
 }
 
 if (!function_exists('ConsolidateArrayValuesByKey')) {
-   /// <summary>
-   /// Takes an array of associative arrays (ie. a dataset array), a $Key, and
-   /// merges all of the values for that key into a single array, returning it.
-   /// </summary>
+   /**
+    * Takes an array of associative arrays (ie. a dataset array), a $Key, and
+    * merges all of the values for that key into a single array, returning it.
+    */
    function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
@@ -443,20 +428,15 @@ if (!function_exists('Now')) {
 }
 
 if (!function_exists('ArrayInArray')) {
-   /// <summary>
-   /// Searches Haystack array for items in Needle array. If FullMatch is TRUE,
-   /// all items in Needle must also be in Haystack. If FullMatch is FALSE, only
-   /// one-or-more items in Needle must be in Haystack.
-   /// </summary>
-   /// <param name="Needle" type="array">
-   /// The array containing items to match to Haystack.
-   /// </param>
-   /// <param name="Needle" type="array">
-   /// The array to search in for Needle items.
-   /// </param>
-   /// <param name="FullMatch" type="bool" required="false" default="TRUE">
-   /// Should all items in Needle be found in Haystack to return TRUE?
-   /// </param>
+   /**
+    * Searches Haystack array for items in Needle array. If FullMatch is TRUE,
+    * all items in Needle must also be in Haystack. If FullMatch is FALSE, only
+    * one-or-more items in Needle must be in Haystack.
+    *
+    * @param array The array containing items to match to Haystack.
+    * @param array The array to search in for Needle items.
+    * @param bool Should all items in Needle be found in Haystack to return TRUE?
+    */
    function ArrayInArray($Needle, $Haystack, $FullMatch = TRUE) {
       $Count = count($Needle);
       $Return = $FullMatch ? TRUE : FALSE;
@@ -516,9 +496,9 @@ if (!function_exists('SliceString')) {
 }
 
 if (!function_exists('AddActivity')) {
-   /// <summary>
-   /// A convenience function that allows adding to the activity table with a single line.
-   /// </summary>
+   /**
+    * A convenience function that allows adding to the activity table with a single line.
+    */
    function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '') {
       $ActivityModel = new ActivityModel();
       $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route);

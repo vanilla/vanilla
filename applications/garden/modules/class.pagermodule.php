@@ -8,139 +8,139 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-/// <namespace>
-/// Lussumo.Garden.UI
-/// </namespace>
+/**
+ * Lussumo.Garden.UI
+ */
 
-/// <summary>
-/// Builds a pager control related to a dataset.
-/// </summary>
+/**
+ * Builds a pager control related to a dataset.
+ */
 class PagerModule extends Module {
 
-   /// <prop type="int">
-   /// The id applied to the div tag that contains the pager.
-   /// </prop>
+   /**
+    * The id applied to the div tag that contains the pager.
+    */
    public $ClientID;
    
-   /// <prop type="string">
-   /// The name of the stylesheet class to be applied to the pager. Default is
-   /// 'Pager';
-   /// </prop>
+   /**
+    * The name of the stylesheet class to be applied to the pager. Default is
+    * 'Pager';
+    */
    public $CssClass;
 
-   /// <prop type="int">
-   /// The page number currently being displayed.
-   /// </prop>
+   /**
+    * The page number currently being displayed.
+    */
    public $CurrentPage;
 
-   /// <prop type="string">
-   /// Text to be used for "next page". ">" by default.
-   /// </prop>
+   /**
+    * Text to be used for "next page". ">" by default.
+    */
    public $NextText;
    
-   /// <prop type="string">
-   /// The tag that should encapsulate blank items in the pager (like the
-   /// elipsis in "1 ... 5 6 7 ... 32". Default is:
-   ///  "<li>{blank}</li>\n";
-   /// </prop>
+   /**
+    * The tag that should encapsulate blank items in the pager (like the
+    * elipsis in "1 ... 5 6 7 ... 32". Default is:
+    *  "<li>{blank}</li>\n";
+    */
    public $PagerBlankItem;
    
-   /// <prop type="string">
-   /// The tag that should be placed at the end of the pager. Default is:
-   ///  '</ul>';
-   /// </prop>
+   /**
+    * The tag that should be placed at the end of the pager. Default is:
+    *  '</ul>';
+    */
    public $PagerClose;
 
-   /// <prop type="string">
-   /// The tag that should encapsulate the currently selected page link. Default
-   /// is:
-   ///  "<li class=\"CurrentPage\"><a href=\"{url}\">{page}</a></li>\n";
-   /// </prop>
+   /**
+    * The tag that should encapsulate the currently selected page link. Default
+    * is:
+    *  "<li class=\"CurrentPage\"><a href=\"{url}\">{page}</a></li>\n";
+    */
    public $PagerCurrentItem;
 
-   /// <prop type="string">
-   /// If there are no pages to page through, this string will be returned in
-   /// place of the pager. Default is an empty string.
-   /// </prop>
+   /**
+    * If there are no pages to page through, this string will be returned in
+    * place of the pager. Default is an empty string.
+    */
    public $PagerEmpty;
    
-   /// <prop type="string">
-   /// The tag that should encapsulate one page link. Default is:
-   ///  "<li><a href=\"{url}\">{page}</a></li>\n";
-   /// </prop>
+   /**
+    * The tag that should encapsulate one page link. Default is:
+    *  "<li><a href=\"{url}\">{page}</a></li>\n";
+    */
    public $PagerItem;
 
-   /// <prop type="string">
-   /// The tag that should be placed at the beginning of the pager. Default is:
-   ///  "<ul {id} class=\"{class}\">\n";
-   /// Note that if $this->ClientID is specified, it will replace {id} with
-   /// 'id="'.$this->ClientID.'"';
-   /// </prop>
+   /**
+    * The tag that should be placed at the beginning of the pager. Default is:
+    *  "<ul {id} class=\"{class}\">\n";
+    * Note that if $this->ClientID is specified, it will replace {id} with
+    * 'id="'.$this->ClientID.'"';
+    */
    public $PagerOpen;
 
-   /// <prop type="int">
-   /// Maximum number of page links to display per page. Default is 10.
-   /// </prop>
+   /**
+    * Maximum number of page links to display per page. Default is 10.
+    */
    public $PagesToDisplay;
 
-   /// <prop type="string">
-   /// Text to be used for "previous page". "<" by default.
-   /// </prop>
+   /**
+    * Text to be used for "previous page". "<" by default.
+    */
    public $PreviousText;
 
-   /// <prop type="int">
-   /// The number of records being displayed on a single page of data. Default
-   /// is 30.
-   /// </prop>
+   /**
+    * The number of records being displayed on a single page of data. Default
+    * is 30.
+    */
    public $RecordsPerPage;
    
-   /// <prop type="int">
-   /// The total number of records in the dataset.
-   /// </prop>
+   /**
+    * The total number of records in the dataset.
+    */
    public $TotalRecords;
    
-   /// <prop type="string">
-   /// The string to contain the page number. ie. /controller/action/{page}/
-   /// </prop>
+   /**
+    * The string to contain the page number. ie. /controller/action/{page}/
+    */
    public $Url;
    
-   /// <prop type="int">
-   /// The first record of the current page (the dataset offset).
-   /// </prop>
+   /**
+    * The first record of the current page (the dataset offset).
+    */
    private $_FirstRecord;
    
-   /// <prop type="int">
-   /// The last record of the current page.
-   /// </prop>
+   /**
+    * The last record of the current page.
+    */
    private $_LastRecord;
    
-   /// <prop type="int">
-   /// The total number of pages.
-   /// </prop>
+   /**
+    * The total number of pages.
+    */
    private $_PageCount;
    
-   /// <prop type="int">
-   /// Certain properties are required to be defined before the pager can build
-   /// itself. Once they are created, this property is set to true so they are
-   /// not needlessly recreated.
-   /// </prop>
+   /**
+    * Certain properties are required to be defined before the pager can build
+    * itself. Once they are created, this property is set to true so they are
+    * not needlessly recreated.
+    */
    private $_PropertiesDefined;
    
-   /// <prop type="boolean">
-   /// A boolean value indicating if the total number of records is known or
-   /// not. Retrieving this number can be a costly database query, so sometimes
-   /// it is not retrieved and simple "next/previous" links are displayed
-   /// instead. Default is FALSE, meaning that the simple pager is displayed.
-   /// </prop>
+   /**
+    * A boolean value indicating if the total number of records is known or
+    * not. Retrieving this number can be a costly database query, so sometimes
+    * it is not retrieved and simple "next/previous" links are displayed
+    * instead. Default is FALSE, meaning that the simple pager is displayed.
+    */
    private $_Totalled;
 
    function AssetTarget() {
       return FALSE;
    }
 
-   /// <summary>
-   /// Define all required parameters to create the Pageer and PageerDetails.
-   /// </summary>
+   /**
+    * Define all required parameters to create the Pageer and PageerDetails.
+    */
    public function Configure($CurrentPage, $RecordsPerPage, $TotalRecords, $Url, $ForceConfigure = FALSE) {
       if ($this->_PropertiesDefined === FALSE || $ForceConfigure === TRUE) {
          $this->Url = $Url;
@@ -195,9 +195,9 @@ class PagerModule extends Module {
       return $Details;
    }
 
-   /// <summary>
-   /// Builds and returns the xhtml for a numeric page list (ie. "prev 1 2 3 next")
-   /// </summary>
+   /**
+    * Builds and returns the xhtml for a numeric page list (ie. "prev 1 2 3 next")
+    */
    public function ToString() {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'Pager', 'GetNumeric'), E_USER_ERROR);
@@ -314,4 +314,3 @@ class PagerModule extends Module {
       parent::__construct($Sender);
    }
 }
-?>

@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/// <namespace>
-/// Lussumo.Garden.Modules
-/// </namespace>
+/**
+ * Lussumo.Garden.Modules
+ */
 
-/// <summary>
-/// Renders recently active bookmarked discussions
-/// </summary>
+/**
+ * Renders recently active bookmarked discussions
+ */
 class BookmarkedModule extends Module {
    
    protected $_DiscussionData;

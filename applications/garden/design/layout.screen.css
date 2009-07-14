@@ -1,5 +1,5 @@
 body {
-   background: #ffffff;
+   background: #ffffff /* Body Background Color */;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -68,8 +68,8 @@ ul#Menu {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Heading Font Color */;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -273,11 +273,11 @@ ul.SideMenu li ul {
 }
 ul.SideMenu {
    font-size: 110%;
-   color: #2786c2;
+   color: #2786c2 /* Panel Heading Font Color */;
    font-weight: bold;
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    padding: 6px 10px;
    margin: 0px 0px 10px 0px;   
 }
@@ -286,25 +286,26 @@ ul.SideMenu li ul {
    border-top: 1px solid #CAF0FE;
    border-bottom: 1px solid #CAF0FE;
    margin: 4px 0px 6px 0px;
-   background: #f0fbff;
+   background: #f0fbff /* Panel Inlay Background Color */;
 }
 
 ul.SideMenu li ul li a {
+   color: #2786C2 /* Panel Inlay Font Color */;
    font-size: 12px;
    font-weight: normal;
 }
 ul.SideMenu li ul li a:hover {
-   color: #2786c2;
+   color: #2786c2 /* Panel Inlay Font Color */;
    text-decoration: underline;
 }
 ul.SideMenu li ul li.Highlight a {
-   color: #ff0084;
+   color: #ff0084 /* Panel Selected Font Color */;
 }
 
 /* Panel Info */
 ul.PanelInfo li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #f5fcff /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
    font-family: tahoma;
    font-size: 80%;
@@ -638,7 +639,7 @@ body.Entry #Register,
 body.Entry #Handshake {
    text-align: left;
    float: left;
-   background: #E9F9FF;
+   background: #E9F9FF /* Panel Background Color */;
    -moz-border-radius: 1px;
    -webkit-border-radius: 2px;
    padding: 10px 10px 0 10px;
@@ -654,7 +655,7 @@ body.Entry #Password p {
 }
 body.Entry #Content h1 {
    border-bottom:1px solid #CAF0FE;
-   color:#2786C2;
+   color: #2786C2 /* Panel Heading Font Color */;
    font-size:110%;
    font-weight:bold;
    margin: 0 0 10px;

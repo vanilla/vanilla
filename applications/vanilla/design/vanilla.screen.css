@@ -1,8 +1,8 @@
-@import url(reset.css);
+@import url(reset.css) /* NoFollow */;
 @import url(typography.screen.css);
 
 body {
-   background: #ffffff;
+   background: #ffffff /* Body Background Color */;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -12,7 +12,7 @@ body {
    display: none;
 }
 #Head {
-   background: #44c7f4;
+   background: #44c7f4 /* Banner Background Color */;
    padding: 0px;
    text-align: right;
    height: 50px;

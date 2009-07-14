@@ -1418,6 +1418,28 @@ class Form {
       return $this->_FormValues;
    }
 
+   public function FormDataSet() {
+      if(is_null($this->_FormValues)) {
+         $this->FormValues();
+      }
+      
+      $Result = array(array());
+      foreach($this->_FormValues as $Key => $Value) {
+         if(is_array($Value)) {
+            foreach($Value as $RowIndex => $RowValue) {
+               if(!array_key_exists($RowIndex, $Result))
+                  $Result[$RowIndex] = array($Key => $RowValue);
+               else
+                  $Result[$RowIndex][$Key] = $RowValue;
+            }
+         } else {
+            $Result[0][$Key] = $Value;
+         }
+      }
+      
+      return $Result;
+   }
+
    /**
     * Emptys the $this->_FormValues collection so that all form fields will load empty.
     */

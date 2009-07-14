@@ -808,6 +808,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
+               $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                $AppFolder = $CssInfo['AppFolder'];
                if ($AppFolder == '')
                   $AppFolder = $this->ApplicationFolder;
@@ -816,16 +817,31 @@ class Gdn_Controller extends Gdn_Pluggable {
                $CssPaths = array();
                if ($this->Theme) {
                   // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
                   // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
+                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
                }
                // 3. Application default. eg. root/applications/app_name/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+               $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
                // 4. Garden default. eg. root/applications/garden/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssFile;
+               $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssGlob;
 
-               $CssPath = Gdn_FileSystem::Exists($CssPaths);
+               // Find the first file that matches the path.
+               $CssPath = FALSE;
+               foreach($CssPaths as $Glob) {
+                  $Paths = glob($Glob);
+                  if(is_array($Paths) && count($Paths) > 0) {
+                     $CssPath = $Paths[0];
+                     break;
+                  }
+               }
+               
+               // Check to see if there is a CSS cacher.
+               $CssCacher = Gdn::Factory('CssCacher');
+               if(!is_null($CssCacher)) {
+                  $CssPath = $CssCacher->Get($CssPath, $AppFolder);
+               }
+               
                if ($CssPath !== FALSE) {
                   $CssPath = str_replace(
                      array(PATH_ROOT, DS),

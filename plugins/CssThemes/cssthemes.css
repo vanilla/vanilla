@@ -1,0 +1,25 @@
+#CssThemes {
+	width: auto;
+}
+
+#CssThemes td {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#CssThemes .ColorPicker {
+	border: 2px solid #E2E6EF;
+	cursor: pointer;
+	height: 30px;
+	width: 50px;
+}
+
+#CssThemes .ColorRow input.InputBox {
+	width: 100px;
+	text-align: center;
+}
+
+#CssThemes .ColorRow td,
+#CssThemes .ColorRow input.InputBox {
+	font-size: 18px;
+}

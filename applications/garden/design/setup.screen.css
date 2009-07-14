@@ -142,7 +142,7 @@ form ul {
 form ul li {
    border-bottom: 1px solid #eee;
    padding: 10px 0;
-   color: #555555;
+   color: #555 /* Body Text Font Color */;
    font-size: 18px;
 }
 form ul li.Warning {
@@ -169,7 +169,7 @@ form ul li input.InputBox {
    padding: 8px;
    width: 485px;
    border: 1px solid #999;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
 }
 form ul li input.InputBox:focus {
    color: #000;

@@ -23,7 +23,7 @@ form ul li {
    margin-bottom: 10px;
    padding: 0px 0px 10px 3px;
    font-size: 12px;
-   color: #555555;
+   color: #555 /* Body Text Font Color */;
 }
 form ul li label {
    color: #222;
@@ -100,7 +100,7 @@ table th,
 table td {
    font-weight: normal;
    font-size: 12px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    padding: 6px;
 }
 table thead th,
@@ -172,7 +172,7 @@ table.Sortable tbody td {
 .CheckBoxGrid td a,
 .CheckBoxGrid th a:hover,
 .CheckBoxGrid td a:hover {
-   color: #555555 !important;
+   color: #555 /* Body Text Font Color */ !important;
 }
 .CheckBoxGrid td {
    text-align: center;

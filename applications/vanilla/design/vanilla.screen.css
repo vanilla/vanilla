@@ -216,14 +216,14 @@ a.Close:hover {
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    color: #999;
    padding: 6px 10px;
    margin: 0px 0px 10px 0px;
 }
 div.Box h4 {
    font-size: 110%;
-   color: #2786c2;
+   color: #2786c2 /* Panel Font Color */;
    font-weight: bold;
    margin: 0px;
    padding: 0px 0px 1px;
@@ -247,13 +247,13 @@ div.Box dl dd {
 div.Box p {
    font-size: 100%;
    padding: 0 0 4px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
 }
 
 /* Panel Info */
 ul.PanelInfo li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #f5fcff /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
    font-family: tahoma;
    font-size: 80%;
@@ -334,7 +334,7 @@ ul.DataList li ul li.Title a {
    margin: 8px 4px 6px 10px;
    padding: 0px 0px 0px 8px;
    line-height: 130%;
-   color: #2b3033;
+   color: #2b3033 /* Body Link Font Color */;
    font-size: 105%;
    display: block;
 }
@@ -349,13 +349,13 @@ ul.DataList li ul li.Title h3 a {
    border: 0px;
    padding: 0px;
    margin: 0px;
-   color: #2d7bb2;
+   color: #2d7bb2 /* Body Link Font Color */;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
    margin-left: 9px;
    font-size: 80%;
-   color: #80828c;
+   color: #80828c /* Meta Label Font Color */;
 }
 ul.DataList li ul li.Meta span,
 ul.DataList li ul li.Meta span a,
@@ -367,7 +367,7 @@ ul.DataList li ul li.Meta strong {
    padding: 0px 2px;
 }
 ul.DataList li ul li.Meta a {
-   color: #2b2d33;
+   color: #2b2d33 /* Meta Font Color */;
 }
 
 
@@ -386,7 +386,7 @@ body.Categories h2 {
    margin: 0px;
 }
 h1 span {
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    padding: 0 4px;
    font-size: 70%;
 }
@@ -416,7 +416,7 @@ body.Categories h1 a {
    margin: 1px 0 0;
    padding: 3px 6px;
    background: #e9f9ff;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
 }
 
 /* Back is the same as MorePager... */
@@ -424,16 +424,17 @@ body.Categories h1 a {
    margin: 0px;
    padding: 3px 6px;
    text-align: right;
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    margin-top: 1px;
    }
 .Back a {
+   color: #2786C2 /* Panel Font Color */;
    font-size: 12px;
    font-weight: normal;
    text-align: right;
 }
 .Back a:hover {
-   color: #2786c2 !important;
+   color: #2786c2 /* Panel Hover Font Color */ !important;
    text-decoration: underline;
 }
 .Back {
@@ -454,14 +455,14 @@ a.NewDiscussion {
    font-weight: bold;
    -moz-border-radius: 2px;
    -webkig-border-radius: 2px;
-   background: #44c7f4;
-   color: #fff;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
    text-decoration: none;
    margin: 0px 0px 10px 0px;
 }
 a.NewDiscussion:hover {
-   background: #11e420;
-   color: #fff;
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
 }
 #Panel a.Bookmark {
    background: #9f0;
@@ -491,7 +492,7 @@ ul.Drafts li ul li.Title a.DeleteDraft {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkig-border-radius: 2px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    cursor: pointer;
    line-height: 100%;
 }
@@ -534,7 +535,7 @@ ul.Options li.Parent h3 {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    cursor: pointer;
    line-height: 100%;
 }
@@ -580,8 +581,8 @@ ul.Options li.Active a:hover {
 
 /* Panel Discussions */
 ul.PanelDiscussions li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #f5fcff /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
 }
 ul.PanelDiscussions li ul li {
@@ -728,7 +729,7 @@ div.Popup ul.Preview li.Comment div.Body {
 
 /* Comment Form */
 #CommentForm {
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    border-top: 1px solid #eee;
    padding: 8px;
 }
@@ -739,7 +740,7 @@ div.Popup #CommentForm {
 }
 #CommentForm h3 {
    font-size: 115%;
-   color: #2786C2;
+   color: #2786C2 /* Panel Font Color */;
    font-weight: bold;
 }
 div.Popup #CommentForm h3 {
@@ -778,7 +779,7 @@ body.Post #CommentForm,
 #DiscussionForm label.Heading {
    font-weight: bold;
    font-size: 120%;
-   color: #2786c2;
+   color: #2786c2 /* Panel Font Color */;
    line-height: 100%;
    display: block;
    margin-bottom: 4px;
@@ -812,7 +813,7 @@ a.Cancel {
    display: inline;
    font-weight: normal;
    font-size: 95%;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
 }
 
 /* Panel Boxes */

@@ -92,7 +92,7 @@ h2.NewConversation a {
   color: #aaa;
 }
 #Conversations li.Active a.Link {
-  color: #555;
+  color: #555 /* Body Text Font Color */;
 }
 #Conversation div.Message {
   padding: 0px 8px 5px;

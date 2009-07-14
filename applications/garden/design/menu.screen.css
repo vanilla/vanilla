@@ -99,8 +99,8 @@
    height: 28px;
 }
 #Menu a:hover {
-   color: #fff /* Menu Highlight Font Color */ !important;
-   background: #28bcef /* Menu Highlight Background Color */;
+   color: #fff /* Menu Hover Font Color */ !important;
+   background: #28bcef /* Menu Hover Background Color */;
 }
 #Menu ul li {
  display: block;
@@ -116,7 +116,7 @@
    font-weight: normal;
 }
 #Menu li.NonTab a:hover {
-   color: #fff /* Menu Highlight Font Color */ !important;
+   color: #fff /* Menu Hover Font Color */ !important;
 }
 #Menu a span,
 #Menu li.Active a span,

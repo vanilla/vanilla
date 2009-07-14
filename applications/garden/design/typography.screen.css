@@ -1,7 +1,9 @@
 body {
+   color: #000 /* Body Default Font Color */;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 h1, h2, h3, h4, h5, h6 {
+   color: #000 /* Body Heading Font Color */;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
@@ -23,11 +25,11 @@ h3 {
 }
 h4 {
    font-size: 120%;
-   color: #6C6C6C;
+   color: #6C6C6C /* Body Subheading Font Color */;
 }
 h5 {
    font-size: 120%;
-   color: #6C6C6C;
+   color: #6C6C6C /* Body Subheading Font Color */;
 }
 
 /* Special formatting for anchors */
@@ -36,11 +38,11 @@ a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #2786c2;
+   color: #2786c2 /* Body Link Font Color */;
 }
 a:hover {
    text-decoration: none;
-   color: #ff0084;
+   color: #ff0084 /* Body Hover Font Color */;
 }
 
 /* Common formatting for form inputs */

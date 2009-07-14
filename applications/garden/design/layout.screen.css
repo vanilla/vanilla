@@ -9,7 +9,7 @@ body {
    display: none;
 }
 #Head {
-   background: #44c7f4;
+   background: #44c7f4 /* Banner Background Color */;
    padding: 0px;
    text-align: right;
    height: 50px;
@@ -69,7 +69,7 @@ ul#Menu {
    width: 38px;
    height: 26px;
    background: #E9F9FF /* Panel Background Color */;
-   color: #2786C2 /* Panel Heading Font Color */;
+   color: #2786C2 /* Panel Font Color */;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -262,7 +262,7 @@ div.Box dl dd {
 div.Box p {
    font-size: 100%;
    padding: 0 0 4px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
 }
 /* Side Menu */
 ul.SideMenu,
@@ -273,7 +273,7 @@ ul.SideMenu li ul {
 }
 ul.SideMenu {
    font-size: 110%;
-   color: #2786c2 /* Panel Heading Font Color */;
+   color: #2786c2 /* Panel Font Color */;
    font-weight: bold;
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
@@ -403,7 +403,7 @@ ul.Activities li h3 a.Delete {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    cursor: pointer;
    line-height: 100%;
 }
@@ -418,7 +418,7 @@ ul.Activities li blockquote {
    margin: 4px 4px 4px;
    padding: 2px 6px;
    background: #ffd;
-   color: #555;
+   color: #555 /* Body Text Font Color */;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -655,7 +655,7 @@ body.Entry #Password p {
 }
 body.Entry #Content h1 {
    border-bottom:1px solid #CAF0FE;
-   color: #2786C2 /* Panel Heading Font Color */;
+   color: #2786C2 /* Panel Font Color */;
    font-size:110%;
    font-weight:bold;
    margin: 0 0 10px;
@@ -715,7 +715,7 @@ body.Entry span.Incorrect {
 ul.BigList {
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
-   background: #f0fbff;
+   background: #f0fbff /* Panel Background Color */;
    padding: 8px;
    margin: 10px 0 0;
 }

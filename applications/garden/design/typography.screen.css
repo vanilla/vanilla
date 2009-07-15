@@ -70,7 +70,7 @@ select.Day,
 select.Year {
    margin-left: 4px;
 }
-.Button {
+.Button, a.Button {
    cursor: pointer;
    margin: 0px 0px 0px 0px;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
@@ -81,7 +81,7 @@ select.Year {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   }
+}
 input.Button {
    font-weight: bold;
 }

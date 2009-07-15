@@ -227,7 +227,7 @@ div.Box h4 {
    font-weight: bold;
    margin: 0px;
    padding: 0px 0px 1px;
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
 }
 div.Box dl {
    border-bottom: 1px solid #caf0fe;

@@ -103,8 +103,9 @@ class DiscussionModel extends VanillaModel {
             ->BeginWhereGroup()
             ->Where('d.Announce', '0');
          
-         if ($UserID > 0)
-            $this->SQL->OrWhere('w.Dismissed', '1');
+         // Removing this for speed.
+         //if ($UserID > 0)
+            //$this->SQL->OrWhere('w.Dismissed', '1');
             
          $this->SQL->EndWhereGroup();
       }

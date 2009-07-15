@@ -10,7 +10,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 
 // Define the plugin:
-$PluginInfo['CommentScore'] = array(
+$PluginInfo['VanillaCommentScore'] = array(
    'Description' => 'The comment score plugin allows users to assign scores to comments.',
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '>=2'),
@@ -25,7 +25,7 @@ $PluginInfo['CommentScore'] = array(
    'AuthorUrl' => 'http://toddburry.com'
 );
 
-class Gdn_CommentScorePlugin implements Gdn_IPlugin {
+class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
    
    public function DiscussionController_Render_Before($Sender) {
       $Sender->AddCssFile('/plugins/CommentScore/commentscore.css');

@@ -38,6 +38,36 @@ class DiscussionModel extends VanillaModel {
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
    }
    
+   public function DiscussionSummaryQuery() {
+      $Perms = $this->_GetCategoryPermissions();
+      if($Perms !== TRUE) {
+         $this->SQL->WhereIn('d.CategoryID', $Perms);
+      }
+      
+      $this->SQL
+         ->Select('d.InsertUserID', '', 'FirstUserID')
+         ->Select('d.DateInserted', '', 'FirstDate')
+         //->Select('iu.Name', '', 'FirstName')
+         //->Select('iup.Name', '', 'FirstPhoto')
+         // ->Select('fc.Body', '', 'FirstBody')
+         ->Select('lc.DateInserted', '', 'LastDate')
+         ->Select('lc.InsertUserID', '', 'LastUserID')
+         ->Select('lcu.Name', '', 'LastName')
+         //->Select('lcup.Name', '', 'LastPhoto')
+         //->Select('lc.Body', '', 'LastBody')
+         ->Select("' &bull; ', pc.Name, ca.Name", 'concat_ws', 'Category')
+         ->From('Discussion d')
+         //->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
+         //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
+         //->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
+         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID') // Last comment
+         ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
+         //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
+         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
+         ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
+         //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
+   }
+   
    public function Get($Offset = '0', $Limit = '', $Wheres = '') {
       if ($Limit == '') 
          $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
@@ -46,7 +76,7 @@ class DiscussionModel extends VanillaModel {
       
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
-      $this->DiscussionQuery();
+      $this->DiscussionSummaryQuery();
       $this->SQL
          ->Select('d.*');
          
@@ -90,7 +120,7 @@ class DiscussionModel extends VanillaModel {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
-      $this->DiscussionQuery();
+      $this->DiscussionSummaryQuery();
       $this->SQL
          ->Select('d.*')
          ->Select('w.UserID', '', 'WatchUserID')

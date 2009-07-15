@@ -438,7 +438,7 @@ body.Categories h1 a {
    text-align: right;
 }
 .Back a:hover {
-   color: #2786c2 /* Panel Hover Font Color */ !important;
+   color: #2786c2 /* Panel Font Color */ !important;
    text-decoration: underline;
 }
 .Back {

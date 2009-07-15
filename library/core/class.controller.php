@@ -556,31 +556,41 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method GetAsset() and $AssetName needs descriptions.
     */
    public function GetAsset($AssetName) {
+      if(!array_key_exists($AssetName, $this->Assets))
+         return '';
+      if(!is_array($this->Assets[$AssetName]))
+         return $this->Assets[$AssetName];
+      
+      // Include the module sort
+      $Modules = Gdn::Config('Modules', array());
+   
+      if($this->ModuleSortContainer === FALSE)
+         $ModuleSort = FALSE; // no sort wanted
+      elseif(array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
+         $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
+      elseif(array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
+         $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
+      
+      $ThisAssets = $this->Assets[$AssetName];
       $Assets = array();
-      if (array_key_exists($AssetName, $this->Assets)) {
-         if (is_array($this->Assets[$AssetName])) {
-            if ($this->ModuleSortContainer != '') {
-               // Include the module sort
-               $Modules = Gdn::Config('Modules', array());
-               if (array_key_exists($this->ModuleSortContainer, $Modules)) {
-                  if (array_key_exists($AssetName, $Modules[$this->ModuleSortContainer])) {
-                     foreach ($Modules[$this->ModuleSortContainer][$AssetName] as $Name) {
-                        if (array_key_exists($Name, $this->Assets[$AssetName])) {
-                           $Assets[] = $this->Assets[$AssetName][$Name];
-                           unset($this->Assets[$AssetName][$Name]);
-                        }
-                     }
-                  }
-               }
+      if(isset($ModuleSort) && is_array($ModuleSort)) {
+         // There is a specified sort so sort by it.
+         foreach($ModuleSort as $Name) {
+            if(array_key_exists($Name, $ThisAssets)) {
+               if(defined("DEBUG"))
+                  $Assets[] = "\n<!-- Asset: $Name -->\n";
+               $Assets[] = $ThisAssets[$Name];
+               unset($ThisAssets[$Name]);
             }
-            // Pick up any leftover assets
-            foreach ($this->Assets[$AssetName] as $Name => $Part) {
-               $Assets[] = $Part;
-            }
-         } else {
-            $Assets[] = $this->Assets[$AssetName];
          }
       }
+      // Pick up any leftover assets
+      foreach($ThisAssets as $Name => $Asset) {
+         if(defined("DEBUG"))
+            $Assets[] = "\n<!-- Asset: $Name -->\n";
+         $Assets[] = $Asset;
+      }
+         
       if(count($Assets) == 0) {
          return '';
       } elseif(count($Assets) == 1) {
@@ -718,7 +728,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          $this->SetJson('FormSaved', $FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
-         $this->SetJson('Data', $View);
+         if($View instanceof Gdn_IModule) {
+            $this->SetJson('Data', $View->ToString());
+         } else {
+            $this->SetJson('Data', $View);
+         }
          $this->SetJson('StatusMessage', $this->StatusMessage);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 

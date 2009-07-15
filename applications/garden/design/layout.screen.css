@@ -231,22 +231,22 @@ a.Close:hover {
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff;
-   color: #999;
+   background: #e9f9ff /* Panel Background Color */;
+   color: #999 /* Panel Font Color */;
    padding: 6px 10px;
    margin: 0px 0px 10px 0px;
 }
 div.Box h4 {
    font-size: 110%;
-   color: #2786c2;
+   color: #2786c2 /* Panel Font Color */;
    font-weight: bold;
    margin: 0px;
    padding: 0px 0px 1px;
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
 }
 div.Box dl {
-   border-bottom: 1px solid #caf0fe;
-   background: #f0fbff;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
+   background: #f0fbff /* Panel Inlay Background Color */;
    padding: 3px;
    font-size: 90%;
    overflow: hidden;
@@ -254,7 +254,7 @@ div.Box dl {
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #0766a2;
+   color: #0766a2 /* Panel Inlay Font Color */;
 }
 div.Box dl dd {
    margin-left: 80px;
@@ -406,7 +406,7 @@ ul.Activities li h3 a.Delete {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
    cursor: pointer;
    line-height: 100%;
 }
@@ -420,8 +420,8 @@ ul.Activities ul.Comments a.Delete {
 ul.Activities li blockquote {
    margin: 4px 4px 4px;
    padding: 2px 6px;
-   background: #ffd;
-   color: #555 /* Body Text Font Color */;
+   background: #ffd /* Panel Background Color */;
+   color: #555 /* Panel Font Color */;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }

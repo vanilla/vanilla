@@ -20,11 +20,11 @@ h2.NewConversation a {
 }
 #Conversation,
 #Conversations {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eee /* Body Line Color */;
 }
 #Conversation li,
 #Conversations li {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee /* Body Line Color */;
   padding: 0px 0px 8px;
 }
 #Conversation li {
@@ -34,7 +34,7 @@ h2.NewConversation a {
   margin: 0px;
   padding: 12px;
   border: 0px;
-  background: #ffc;
+  background: #ffc /* Body Background Color */;
   -moz-border-radius-bottomleft: 2px;
   -moz-border-radius-bottomright: 2px;
   -webkit-border-bottom-left-radius: 2px;
@@ -89,7 +89,7 @@ h2.NewConversation a {
   display: block;
   margin: 0px 8px;
   line-height: 140%;
-  color: #aaa;
+  color: #aaa /* Body Link Font Color */;
 }
 #Conversations li.Active a.Link {
   color: #555 /* Body Text Font Color */;
@@ -109,8 +109,8 @@ a.NewConversation {
    font-weight: bold;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   background: #44c7f4;
-   color: #fff;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
    text-decoration: none;
    margin: 0px 0px 10px 0px;
 }
@@ -129,7 +129,7 @@ a.ClearConversation:hover {
 
 /* Add Message Form */
 body.Index #Content form {
-  background: #e9f9ff;
+  background: #e9f9ff /* Panel Background Color */;
   padding: 4px 8px 8px;
   margin: 1px 0 0;
   -moz-border-radius-bottomleft: 2px;
@@ -139,7 +139,7 @@ body.Index #Content form {
 }
 body.Index #Content form h3 {
   font-size: 115%;
-  color: #2786C2;
+  color: #2786C2 /* Panel Font Color */;
   font-weight: bold;
 }
 body.Index #Content form textarea {
@@ -158,7 +158,7 @@ body.add #Content {
 }
 #ConversationForm {
    border: 0px;
-   background: #daf4fd;
+   background: #daf4fd /* Panel Background Color */;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    padding: 8px 10px 10px;
@@ -172,7 +172,7 @@ body.add #Content {
 #ConversationForm label.Heading {
   font-weight: bold;
   font-size: 120%;
-  color: #2786c2;
+  color: #2786c2 /* Panel Font Color */;
   line-height: 100%;
   display: block;
   width: auto;

@@ -23,7 +23,7 @@ ul.SideMenu li ul {
    background: none;
 }
 ul.SideMenu li ul li {
-   border-bottom: 1px solid #dbe3e6;
+   border-bottom: 1px solid #dbe3e6 /* Panel Inlay Border Color */;
 }
 ul.SideMenu li ul li a {
    padding: 0px 8px;
@@ -31,7 +31,7 @@ ul.SideMenu li ul li a {
 }
 ul.SideMenu li ul li a:hover {
    text-decoration: none;
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Hover Font Color */;
 }
 div.User {
    line-height: 150%;
@@ -92,10 +92,10 @@ ul.Tabs li {
 ul.Tabs {
    clear: left;
    display: block;
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 10px 0px 0px 10px;
    margin: 0px 0px 0px 0px;
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
 }
 ul.Tabs li {
    padding: 5px 0px 5px 0px;
@@ -107,9 +107,9 @@ ul.Tabs li {
    -webkit-border-top-right-radius: 3px;
 }
 ul.Tabs li.Active {
-   border: 1px solid #caf0fe;
+   border: 1px solid #caf0fe /* Panel Inlay Border Color */;
    border-bottom: 0px;
-   background: #fff;
+   background: #fff /* Panel Selected Background Color */;
 }
 ul.Tabs li a,
 ul.Tabs li a:link,
@@ -121,20 +121,20 @@ ul.Tabs li a:visited {
    -webkit-border-top-left-radius: 3px;
    -webkit-border-top-right-radius: 3px;
    display: inline;
-   background: #daf4fd;
+   background: #daf4fd /* Panel Inlay Background Color */;
    font-weight: bold;
-   color: #1781a6 !important;
+   color: #1781a6 /* Panel Inlay Font Color */ !important;
    text-decoration: none;
    padding: 5px 10px 4px 10px;
    margin: 1px 0px 0px 0px;
 }
 ul.Tabs li a:hover {
-   background: #f3fcff;
-   color: #269dc6 !important;
+   background: #f3fcff /* Panel Inlay Background Color */;
+   color: #269dc6 /* Panel Hover Font Color */ !important;
 }
 ul.Tabs li.Active a {
-   background: #fff !important;
-   color: #454545 !important;
+   background: #fff /* Panel Selected Background Color */ !important;
+   color: #454545 /* Panel Selected Font Color */ !important;
    text-decoration: none;
    padding: 5px 10px 4px 10px;
 }

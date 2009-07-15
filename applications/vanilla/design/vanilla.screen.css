@@ -269,8 +269,12 @@ ul.PanelInfo li a {
    float: left;
 }
 ul.PanelInfo li.Active {
-   background: #fff;
-   border-bottom: 1px solid #a3e6ff;
+   background: #fff /* Panel Selected Background Color */;
+   border-bottom: 1px solid #a3e6ff /* Panel Inlay Border Color */;
+}
+
+ul.PanelInfo li.Active a {
+   color: #2786C2 /* Panel Selected Font Color */;
 }
 
 /* Foot */

@@ -283,8 +283,8 @@ ul.SideMenu {
 }
 ul.SideMenu li ul {
    padding: 0px 3px;
-   border-top: 1px solid #CAF0FE;
-   border-bottom: 1px solid #CAF0FE;
+   border-top: 1px solid #CAF0FE /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #CAF0FE /* Panel Inlay Border Color */;
    margin: 4px 0px 6px 0px;
    background: #f0fbff /* Panel Inlay Background Color */;
 }
@@ -297,6 +297,9 @@ ul.SideMenu li ul li a {
 ul.SideMenu li ul li a:hover {
    color: #2786c2 /* Panel Inlay Font Color */;
    text-decoration: underline;
+}
+ul.SideMenu li ul li.Highlight {
+   background: #fff /* Panel Selected Background Color */;
 }
 ul.SideMenu li ul li.Highlight a {
    color: #ff0084 /* Panel Selected Font Color */;

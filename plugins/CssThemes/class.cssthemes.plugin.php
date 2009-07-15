@@ -65,16 +65,6 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 		}
 		
 		$Css = file_get_contents($OriginalPath);
-		// TODO: process the imports.
-		/*if(preg_match('/@[^;]+;/', $Css)) {
-			// Imports not currently supported.
-			//$ImportPath = str_replace(array(PATH_ROOT, DS), array('', '/'), $OriginalPath);
-			//$Css = '@import url("'.Asset($ImportPath).'");';
-			//file_put_contents($CachePath, $Css);
-			//return $CachePath;
-			
-			$Css = preg_replace_callback(self::ImportRegEx, array($this, '_ApplyImport'), $Css);
-		}*/
 		// Process the urls.
 		$Css = preg_replace_callback(self::UrlRegEx, array($this, '_ApplyUrl'), $Css);
 		

@@ -71,8 +71,8 @@ ul#Menu {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Font Color */;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -535,7 +535,7 @@ ul.Options li.Parent h3 {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
    cursor: pointer;
    line-height: 100%;
 }

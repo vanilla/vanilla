@@ -76,7 +76,7 @@ select.Year {
    padding: 4px;
    font-size: 11px;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #555;
+   color: #555 !important;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;

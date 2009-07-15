@@ -120,18 +120,18 @@ table tbody tr.FootNote td {
 }
 table thead th {
    font-size: 13px;
-   color: #000;
+   color: #000 /* Body Heading Font Color */;
 }
 table input.Button {
    margin: 0px;
-   }
+}
 table.AltRows tr.Alt th,
 table.AltRows tr.Alt td {
-   background: #f8f8f8;
+   background: #f8f8f8 /* Body Alt Background Color */;
 }
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-   background: #f8f8f8;
+   background: #f8f8f8 /* Body Alt Background Color */;
 }
 table.AltColumns tr.Alt {
    background: none;
@@ -209,7 +209,7 @@ table.Sortable tbody td {
 }
 .CheckBoxGrid th.Alt,
 .CheckBoxGrid td.Alt {
-   background: #f8f8f8;
+   background: #f8f8f8  /* Body Alt Background Color */;
 }
 
 /* CheckColumn */

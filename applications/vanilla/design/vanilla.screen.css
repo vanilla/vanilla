@@ -624,7 +624,7 @@ body.Discussion #Content h2 {
    font-weight:bold;
    margin:0;
    padding:6px 0 0 10px;
-   color: #333;
+   color: #333 /* Body Heading Font Color */;
    padding: 6px 0;
    line-height: 100%;
 }
@@ -690,7 +690,7 @@ body.Discussion #Content h2 span {
    clear: both;
    padding: 1px 8px 2px;
    line-height: 170%;
-   color: #454545;
+   color: #454545 /* Body Text Font Color */;
 }
 .Body p {
    margin: 8px 0;

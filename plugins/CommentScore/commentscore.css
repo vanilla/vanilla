@@ -5,7 +5,7 @@
 }
 
 .Comment .CommentScore span {
-	color: #777;
+	color: #777 /* Meta Label Font Color */;
 }
 
 .Comment .CommentScore a.Inc {

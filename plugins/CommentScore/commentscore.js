@@ -4,6 +4,10 @@ jQuery(document).ready(function($) {
 $('.CommentScore a').click(function() {
    var $btn = $(this);
    
+   if($btn.attr('href') == "") {
+      return false;
+   }
+   
    // Create an animated number.
    var inc = $btn.attr('title');
    var animate = '<div class="Animate">' + inc + '</div>';

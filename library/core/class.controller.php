@@ -808,23 +808,29 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
-               $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
-               $AppFolder = $CssInfo['AppFolder'];
-               if ($AppFolder == '')
-                  $AppFolder = $this->ApplicationFolder;
-
-               // CSS comes from one of four places:
-               $CssPaths = array();
-               if ($this->Theme) {
-                  // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-                  // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
+               
+               if(strpos($CssFile, '/') !== FALSE) {
+                  // A direct path to the file was given.
+                  $CssPaths = array(PATH_ROOT.str_replace('/', DS, $CssFile));
+               } else {
+                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
+                  $AppFolder = $CssInfo['AppFolder'];
+                  if ($AppFolder == '')
+                     $AppFolder = $this->ApplicationFolder;
+   
+                  // CSS comes from one of four places:
+                  $CssPaths = array();
+                  if ($this->Theme) {
+                     // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
+                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                     // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
+                  }
+                  // 3. Application default. eg. root/applications/app_name/design/
+                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                  // 4. Garden default. eg. root/applications/garden/design/
+                  $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssGlob;
                }
-               // 3. Application default. eg. root/applications/app_name/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-               // 4. Garden default. eg. root/applications/garden/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssGlob;
 
                // Find the first file that matches the path.
                $CssPath = FALSE;

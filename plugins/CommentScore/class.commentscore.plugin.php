@@ -28,7 +28,7 @@ $PluginInfo['CommentScore'] = array(
 class Gdn_CommentScorePlugin implements Gdn_IPlugin {
    
    public function DiscussionController_Render_Before($Sender) {
-      $Sender->Head->AddCss('/plugins/CommentScore/commentscore.css');
+      $Sender->AddCssFile('/plugins/CommentScore/commentscore.css');
       $Sender->Head->AddScript('/plugins/CommentScore/commentscore.js');
    }
    
@@ -57,7 +57,7 @@ class Gdn_CommentScorePlugin implements Gdn_IPlugin {
          $Href = '/vanilla/discussion/score/' . $Comment->CommentID . '/' . $Signs[$Key] . '/' . $Session->TransientKey() . '?Target=' . urlencode($Sender->SelfUrl);
          
          if($IncAmount == 0) {
-            $Attributes['href2'] = $Href;
+            $Attributes['href2'] = Url($Href);
             $CssClass .= ' Disabled';
             $Href = '';
          } else {

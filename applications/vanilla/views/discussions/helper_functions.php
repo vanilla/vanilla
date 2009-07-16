@@ -7,7 +7,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <ul>
+   <ul class="Discussion">
       <li class="Options">
          <?php
             // Build up the options that the user has for each discussion
@@ -52,7 +52,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                if ($Sender->Options != '') {
                ?>
                <ul class="Options">
-                  <li><h3><?php echo Gdn::Translate('Options'); ?></h3>
+                  <li><strong><?php echo Gdn::Translate('Options'); ?></strong>
                      <ul>
                         <?php echo $Sender->Options; ?>
                      </ul>

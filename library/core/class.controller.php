@@ -105,7 +105,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    /**
     * If specified, this string will be used to identify the sort collection
     * in conf/modules.php to use when organizing modules within page assets.
-    * $Modules['ModuleSortContainer']['AssetName'] = array('Module1', 'Module2');
+    * $Configuration['Modules']['ModuleSortContainer']['AssetName'] = array('Module1', 'Module2');
     *
     * @var string
     */

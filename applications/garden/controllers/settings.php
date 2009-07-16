@@ -348,33 +348,72 @@ class SettingsController extends GardenController {
    /**
     * Theme management screen.
     */
-   public function Themes($Preview = '') {
+   public function Themes($ThemeFolder = '', $TransientKey = '') {
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');
-      
-      if ($Preview != '')
-         $this->Theme = $Preview;
-         
+
+      $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
       $this->EnabledTheme = $ThemeManager->EnabledTheme();
       
-      if ($this->Form->AuthenticatedPostBack()) {
-         $ThemeName = $this->Form->GetValue('ThemeName', '');
-         if ($ThemeName != '') {
-            try {
-               if (array_key_exists($ThemeName, $this->AvailableThemes) === TRUE) {
+      if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
+         try {
+            foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+               if ($ThemeInfo['Folder'] == $ThemeFolder) {
+                  $UserModel = Gdn::UserModel();
+                  $UserModel->SavePreference($Session->UserID, 'PreviewTheme', ''); // Clear out the preview
                   $ThemeManager->EnableTheme($ThemeName);
                }
-            } catch (Exception $e) {
-               $this->Form->AddError(strip_tags($e->getMessage()));
             }
-            if ($this->Form->ErrorCount() == 0) {
-               $this->StatusMessage = Gdn::Translate('Finalizing changes...');
-               $this->RedirectUrl = Url($this->SelfUrl);
-            }
+         } catch (Exception $e) {
+            $this->Form->AddError(strip_tags($e->getMessage()));
          }
+         if ($this->Form->ErrorCount() == 0)
+            Redirect('/settings/themes');
+
       }
       $this->Render();
-   }   
+   }
+   
+   public function PreviewTheme($ThemeFolder = '') {
+      // Clear out all css & js and use the "empty" master view
+      $this->MasterView = 'empty';
+      $this->_CssFiles = array();
+      $this->Head->ClearScripts();
+      // Add jquery, custom css & js
+      $this->AddCssFile('previewtheme.css');
+      $this->Head->AddScript('js/library/jquery.js');
+      $this->Head->AddScript('applications/garden/js/previewtheme.js');
+
+      $this->Permission('Garden.Themes.Manage');
+      $ThemeManager = new Gdn_ThemeManager();
+      $this->AvailableThemes = $ThemeManager->AvailableThemes();
+      $this->ThemeName = '';
+      $this->ThemeFolder = $ThemeFolder;
+      foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+         if ($ThemeInfo['Folder'] == $ThemeFolder)
+            $this->ThemeName = $ThemeName;
+      }
+      // If we failed to get the requested theme, default back to the one currently enabled
+      if ($this->ThemeName == '') {
+         $this->ThemeName = $ThemeManager->EnabledTheme();
+         foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+            if ($ThemeName == $this->ThemeName)
+               $this->ThemeFolder = $ThemeInfo['Folder'];
+         }
+      }
+
+      $Session = Gdn::Session();
+      $UserModel = Gdn::UserModel();
+      $UserModel->SavePreference($Session->UserID, 'PreviewTheme', $this->ThemeFolder);
+      $this->Render();
+   }
+   
+   public function CancelPreview() {
+      $Session = Gdn::Session();
+      $UserModel = Gdn::UserModel();
+      $UserModel->SavePreference($Session->UserID, 'PreviewTheme', '');
+      Redirect('settings/themes');
+   }
 }

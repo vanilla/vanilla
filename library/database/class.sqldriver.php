@@ -1135,7 +1135,7 @@ abstract class Gdn_SQLDriver {
                if(strlen($Match) == 0)
                   $SubValue = '%';
                else
-                  $SubValue .= '%' . $SubValue . '%';
+                  $SubValue = '%' . $SubValue . '%';
                break;
          }
          $Expr = $this->ConditionExpr($SubField, $SubValue);

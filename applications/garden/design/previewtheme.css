@@ -1,0 +1,53 @@
+/* Begin Typography */
+body {
+   margin: 0;
+   padding: 0;
+}
+div {
+   font: 14px "Helvetica Neue",Helvetica,arial,sans-serif;
+   padding: 0 12px;
+   background: #F0FBFF;
+   border-bottom: 1px solid #caf0fe;
+   color: #2786C2;
+   text-align: right;
+   height: 40px;
+   overflow: hidden;
+}
+div div {
+   padding: 10px 0 8px;
+   height: auto;
+   border: 0;
+}
+strong {
+   padding: 11px 0;
+   display: block;
+   float: left;
+   font-weight: normal;
+}
+strong em {
+   font-weight: bold;
+   font-style: normal;
+}
+.Button {
+   cursor: pointer;
+   margin: 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   padding: 4px;
+   font-size: 11px;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #555;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   text-decoration: none;
+   }
+.Button:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+iframe {
+   width: 100%;
+   border: 0;
+   margin: 0;
+   padding: 0;
+}

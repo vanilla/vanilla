@@ -126,7 +126,7 @@ class Gdn_UserModel extends Model {
 
    public function GetSession($UserID) {
       $this->SQL
-         ->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin')
+         ->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
          ->Select('p.Name', '', 'Photo')
          ->From('User u')
          ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
@@ -204,9 +204,12 @@ class Gdn_UserModel extends Model {
          // If the primary key exists in the validated fields and it is a
          // numeric value greater than zero, update the related database row.
          if ($UserID > 0) {
-            // Make sure the username & email aren't already being used (by someone other than this user)
-            if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
-               return FALSE;
+            // If they are changing the username & email, make sure they aren't
+            // already being used (by someone other than this user)
+            if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
+               if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
+                  return FALSE;
+            }
 
             $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
 

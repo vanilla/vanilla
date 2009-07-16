@@ -7,17 +7,21 @@ jQuery(document).ready(function($) {
       $(this).hover(function() {
          $(this).find('ul.Options:first').show();
       }, function() {
+         $(this).find('ul.Options:first').hide();
+         /*
          var opts = $(this).find('ul.Options:first');
          if (!$(opts).find('li.Parent').hasClass('Active'))
             $(opts).hide();
+         */
       });
    });
    
 /* Comment Form */
 
-   $('textarea.TextBox').livequery(function() {
-      $(this).autogrow();
-   });
+   if ($.autogrow)
+      $('textarea.TextBox').livequery(function() {
+         $(this).autogrow();
+      });
 
    // Hijack the "Cancel" button on the comment form
    $('a.Cancel').hide().live('click', function() {
@@ -187,33 +191,6 @@ jQuery(document).ready(function($) {
          }
       }
    });
-   
-   $('a.Bookmark').click(function() {
-      var btn = this;
-      var oldClass = $(btn).attr('class');
-      $(btn).addClass('Bookmarking');
-      $.ajax({
-         type: "POST",
-         url: btn.href,
-         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            // Popup the error
-            $(btn).attr('class', oldClass);
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
-         },
-         success: function(json) {
-            // Otherwise just change the class & title on the anchor
-            $(btn).attr('title', json.AnchorTitle);
-            $(btn).attr('class', 'Bookmark');
-            if (json.State == '1')
-               $(btn).addClass('Bookmarked');
-                  
-            $('ul#Menu li.MyBookmarks a').html(json.MenuLink);
-         }
-      });
-      return false;
-   });   
    
    getNewTimeout = function() {   
       if(autoRefresh <= 0)

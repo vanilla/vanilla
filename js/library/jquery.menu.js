@@ -123,7 +123,7 @@ jQuery children() function.
         if (opt.showOnClick == 1) {
           var row = this;
           // Show/Hide on click
-          $(this).children('h3').click(function() {
+          $(this).children('strong').click(function() {
             // $('#Debug').html($('#Debug').html() + '<br />show');
             $(row).addClass('Active');
             opt.show.call($(row).children(opt.menuSel).get(0));

@@ -296,6 +296,7 @@ class Gdn_DataSet implements IteratorAggregate {
       } else {
          $this->FetchAllRows(DATASET_TYPE_ARRAY);
       }
+      $this->_ResultArrayFetched = TRUE;
 
       return Format::To($this->_ResultArray, $FormatType);
    }
@@ -315,6 +316,7 @@ class Gdn_DataSet implements IteratorAggregate {
       } else {
          $this->FetchAllRows(DATASET_TYPE_OBJECT);
       }
+      $this->_ResultObjectFetched = TRUE;
 
       return Format::To($this->_ResultObject, $FormatType);
    }

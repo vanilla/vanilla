@@ -35,6 +35,12 @@ class GardenHooks implements Gdn_IPlugin {
             $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl());
          }
       }
+      // Enable theme previewing
+      if ($Session->IsValid()) {
+         $PreviewTheme = $Session->GetPreference('PreviewTheme', '');
+         if ($PreviewTheme != '')
+            $Sender->Theme = $PreviewTheme;
+      }
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {

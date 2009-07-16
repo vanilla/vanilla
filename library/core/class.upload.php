@@ -15,6 +15,7 @@ class Gdn_Upload {
    
    protected $_MaxFileSize;
    protected $_AllowedFileExtensions;
+   protected $_UploadedFile;
 
    /**
     * Class constructor
@@ -80,7 +81,12 @@ class Gdn_Upload {
          throw new Exception(sprintf(Gdn::Translate('You cannot upload files with this extension (%s).'), $Extension));
 
       // If all validations were successful, return the tmp name/location of the file.
-      return $_FILES[$InputName]['tmp_name'];
+      $this->_UploadedFile = $_FILES[$InputName];
+      return $this->_UploadedFile['tmp_name'];
+   }
+   
+   public function GetUploadedFileName() {
+      return $this->_UploadedFile['name'];
    }
 
    public function GenerateTargetName($TargetFolder, $Extension) {

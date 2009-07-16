@@ -3,27 +3,6 @@
 function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
 ?>
 <li class="Comment" id="Comment_<?php echo $Comment->CommentID; ?>">
-   <a name="Item_<?php echo $CurrentOffset;?>" />
-   <ul class="Info<?php echo ($Comment->InsertUserID == $Session->UserID ? ' Mine' : '') ?>">
-      <li class="Author">
-         <?php 
-         echo UserPhoto($Comment->InsertName, $Comment->InsertPhoto);
-         echo UserAnchor($Comment->InsertName);
-         ?>
-      </li>
-      <li class="Created">
-         <?php
-         echo Format::Date($Comment->DateInserted);
-         ?>
-      </li>
-      <li class="Permalink">
-         <?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, Gdn::Translate('Permalink')); ?>
-      </li>
-      <?php
-      $Sender->EventArguments['Comment'] = &$Comment;
-      $Sender->FireEvent('CommentMetaAfter');
-      ?>
-   </ul>
    <?php
    $Options = '';
    $IsFirstComment = $Comment->CommentID == $Sender->Discussion->FirstCommentID;
@@ -69,7 +48,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
    if ($Options != '') {
       ?>
    <ul class="Options">
-      <li><h3><?php echo Gdn::Translate('Options'); ?></h3>
+      <li><strong><?php echo Gdn::Translate('Options'); ?></strong>
          <ul>
             <?php echo $Options; ?>
          </ul>
@@ -78,6 +57,26 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       <?php
    }
    ?>
+   <ul class="Info<?php echo ($Comment->InsertUserID == $Session->UserID ? ' Mine' : '') ?>">
+      <li class="Author">
+         <?php 
+         echo UserPhoto($Comment->InsertName, $Comment->InsertPhoto);
+         echo UserAnchor($Comment->InsertName);
+         ?>
+      </li>
+      <li class="Created">
+         <?php
+         echo Format::Date($Comment->DateInserted);
+         ?>
+      </li>
+      <li class="Permalink">
+         <?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, 'Permalink', array('name' => 'Item_'.$CurrentOffset)); ?>
+      </li>
+      <?php
+      $Sender->EventArguments['Comment'] = &$Comment;
+      $Sender->FireEvent('CommentMetaAfter');
+      ?>
+   </ul>
    <div class="Body"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
    <?php
       $Sender->FireEvent('CommentBodyAfter');

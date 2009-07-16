@@ -173,7 +173,7 @@ class MorePagerModule extends Module {
       if ($Type == 'more') {
          $ClientID = $this->ClientID == '' ? '' : $this->ClientID . 'More';
          if ($this->Offset + $this->Limit >= $this->TotalRecords) {
-            $Pager = '';
+            $Pager = ''; // $this->Offset .' + '. $this->Limit .' >= '. $this->TotalRecords;
          } else {
             $ActualRecordsLeft = $RecordsLeft = $this->TotalRecords - $this->_LastOffset;
             if ($RecordsLeft > $this->Limit)

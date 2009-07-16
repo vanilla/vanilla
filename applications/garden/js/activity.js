@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
    $('form.Activity textarea').setMaxChars(1000);
    
    // Hide activity deletes and hijack their clicks to confirm
-   $('ul.Activities li h3 a.Delete').popup({
+   $('ul.Activities li a.Delete').popup({
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
@@ -17,11 +17,11 @@ jQuery(document).ready(function($) {
    
    // Reveal activity deletes on hover
    $('ul.Activities li').livequery(function() {
-      $(this).find('h3:first > a.Delete').hide();
+      $(this).find('a.Delete').hide();
       $(this).hover(function() {
-         $(this).find('h3:first > a.Delete').show();
+         $(this).find('a.Delete').show();
       }, function() {
-         $(this).find('h3:first > a.Delete').hide();
+         $(this).find('a.Delete').hide();
       });
    });
 

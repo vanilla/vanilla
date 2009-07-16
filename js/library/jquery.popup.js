@@ -257,7 +257,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Called after an ajax request resulted in success, and before "close" is called.
     },
     popupHtml:       '\
-  <div class="Overlay" /> \
+  <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
       <div class="Body"> \
         <div class="Content"> \
@@ -269,7 +269,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     </div> \
   </div>',
     confirmHtml:       '\
-  <div class="Overlay" /> \
+  <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
       <div class="Body"> \
         <div class="Content">Are you sure you want to proceed?</div> \

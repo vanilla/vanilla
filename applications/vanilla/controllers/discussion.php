@@ -17,6 +17,7 @@ class DiscussionController extends VanillaController {
          $this->Head->AddScript('/js/library/jquery.autogrow.js');
          $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussion.js');
          $this->Head->AddScript('/applications/vanilla/js/autosave.js');
       }
@@ -97,6 +98,9 @@ class DiscussionController extends VanillaController {
       $DraftsModule = new DraftsModule($this);
       $DraftsModule->GetData(20, $DiscussionID);
       $this->AddModule($DraftsModule);
+      $BookmarkedModule = new BookmarkedModule($this);
+      $BookmarkedModule->GetData();
+      $this->AddModule($BookmarkedModule);
       
       $this->FireEvent('DiscussionRenderBefore');
       $this->Render();

@@ -41,16 +41,13 @@ echo $this->Form->Errors();
          echo $this->Form->Input('Database.Password', 'password');
       ?>
    </li>
-   <?php
-   /*
-   <li>
+   <li class="Warning">
+      <div>
       <?php
-         echo $this->Form->Label('Language', 'Garden.Locale');
-         echo $this->Form->DropDown('Garden.Locale', $this->LocaleData, array('TextField' => 'Code', 'ValueField' => 'Code'));
+         echo Gdn::Translate('Fret not, the next four inputs can be changed later if you want.');
       ?>
+      </div>
    </li>
-   */
-   ?>
    <li>
       <?php
          echo $this->Form->Label('Application Title', 'Garden.Title');
@@ -75,16 +72,6 @@ echo $this->Form->Errors();
          echo $this->Form->Input('PasswordMatch', 'password');
       ?>
    </li>
-   <?php
-   /*
-   <li>
-      <?php
-         echo $this->Form->Label('Web Root', 'Garden.WebRoot');
-         echo $this->Form->TextBox('Garden.WebRoot');
-      ?>
-   </li>
-   */
-   ?>
 </ul>
 <div class="Button">
    <?php echo $this->Form->Close('Continue'); ?>

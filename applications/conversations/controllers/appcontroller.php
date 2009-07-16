@@ -43,7 +43,6 @@ class ConversationsController extends Gdn_Controller {
       $this->AddCssFile('default.screen.css');
       $this->AddCssFile('menu.screen.css');
       $this->AddCssFile('popup.screen.css');
-      $this->AddCssFile('vanilla.screen.css');      
       $this->AddCssFile('conversations.screen.css');
       parent::Initialize();
    }

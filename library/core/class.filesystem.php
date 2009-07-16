@@ -277,5 +277,65 @@ class Gdn_FileSystem {
          file_put_contents($FileName, '');
    }
    
-   // TODO: MAKE THIS OBJECT DELIVER CONTENT WITH A SAVE AS DIALOGUE
+   /**
+    * Serves a file to the browser.
+    *
+    * @param string $File The full path to the file being served.
+    * @param string $Name The name to give the file being served (don't include file extension, it will be added automatically). Will use file's name on disk if ignored.
+    * @param string $MimeType The mime type of the file.
+    */
+   public static function ServeFile($File, $Name = '', $MimeType = '') {
+      if (is_readable($File)) {
+         $Size = filesize($File);
+         $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
+         if ($Name == '') {
+            $Name = pathinfo($File, PATHINFO_FILENAME);
+         } else {
+            $Name .= '.'.$Extension;
+         }
+         $Name = rawurldecode($Name);
+ 
+         // Figure out the MIME type
+         $MimeTypes = array(
+           "pdf" => "application/pdf",
+           "txt" => "text/plain",
+           "html" => "text/html",
+           "htm" => "text/html",
+           "exe" => "application/octet-stream",
+           "zip" => "application/zip",
+           "doc" => "application/msword",
+           "xls" => "application/vnd.ms-excel",
+           "ppt" => "application/vnd.ms-powerpoint",
+           "gif" => "image/gif",
+           "png" => "image/png",
+           "jpeg"=> "image/jpg",
+           "jpg" =>  "image/jpg",
+           "php" => "text/plain"
+         );
+         
+         if ($MimeType == '') {
+            if (array_key_exists($Extension, $MimeTypes)){
+              $MimeType = $MimeTypes[$Extension];
+            } else {
+              $MimeType = 'application/force-download';
+            };
+         };
+         
+         @ob_end_clean();
+         
+         // required for IE, otherwise Content-Disposition may be ignored
+         if(ini_get('zlib.output_compression'))
+            ini_set('zlib.output_compression', 'Off');
+         
+         header('Content-Type: ' . $MimeType);
+         header('Content-Disposition: attachment; filename="'.$Name.'"');
+         header("Content-Transfer-Encoding: binary");
+         header('Accept-Ranges: bytes');
+         header("Cache-control: private");
+         header('Pragma: private');
+         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+         readfile($File);
+         exit();
+      }
+   }
 }

@@ -20,6 +20,7 @@ class DiscussionsController extends VanillaController {
    public function Index($Offset = '0') {
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
+         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
       }
       if (!is_numeric($Offset) || $Offset < 0)
@@ -46,6 +47,8 @@ class DiscussionsController extends VanillaController {
       if ($Offset == 0) {
          $AnnounceData = $DiscussionModel->GetAnnouncements();
          $TmpLimit = $Limit - $AnnounceData->NumRows();
+         if ($TmpLimit <= 0)
+            $TmpLimit = 1;
       }
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
       
@@ -88,6 +91,7 @@ class DiscussionsController extends VanillaController {
       $this->Permission('Garden.SignIn.Allow');
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
       }
       // $this->AddToolbar();            
@@ -137,6 +141,7 @@ class DiscussionsController extends VanillaController {
       if ($this->Head) {
          $this->Head->AddScript('/js/library/jquery.resizable.js');
          $this->Head->AddScript('/js/library/jquery.ui.packed.js');
+         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
       }

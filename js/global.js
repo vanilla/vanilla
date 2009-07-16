@@ -1,3 +1,4 @@
+
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
 

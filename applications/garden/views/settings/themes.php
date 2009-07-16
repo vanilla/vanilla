@@ -49,16 +49,15 @@ foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
          }
       ?>
       </td>
-      <td>
+      <td class="nowrap">
          <?php
          if ($Active) {
             echo Gdn::Translate('Current');
          } else {
-            echo Anchor('Preview', 'garden/settings/themes/'.ArrayValue('Folder', $ThemeInfo), array('target' => '_new'))
-            .$this->Form->Open()
-            .$this->Form->Hidden('ThemeName', array('value' => $ThemeName))
-            .$this->Form->Button('Enable')
-            .$this->Form->Close();
+            $Session = Gdn::Session();
+            echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
+            echo ' ';
+            echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
          }
          ?>
       </td>

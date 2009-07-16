@@ -3,6 +3,13 @@
 function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    ?>
 <li id="Activity_<?php echo $Activity->ActivityID; ?>" class="Activity<?php echo ' ' . $Activity->ActivityType; ?>"><?php
+   if (
+      $Session->IsValid()
+      && ($Session->UserID == $Activity->InsertUserID
+         || $Session->CheckPermission('Garden.Activity.Delete'))
+      )
+      echo Anchor('Delete', 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
+
    if ($Activity->ActivityPhoto != '' && $Activity->ShowIcon == '1') {
       if ($Activity->InsertUserID == $Session->UserID) {
          echo '<a href="'.Url('/garden/profile/'.urlencode($Activity->ActivityName)).'">'
@@ -13,19 +20,12 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       }
    }
    ?><h3><?php
-      if (
-         $Session->IsValid()
-         && ($Session->UserID == $Activity->InsertUserID
-            || $Session->CheckPermission('Garden.Activity.Delete'))
-         )
-         echo Anchor('Delete', 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
-   ?><strong><?php
       echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
    ?><em><?php
       echo Format::Date($Activity->DateInserted);
    ?></em><?php
       echo $Activity->AllowComments == '1' && $Session->IsValid() ? ' '.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
-   ?></strong></h3><?php
+   ?></h3><?php
    if ($Activity->Story != '') {
    ?><blockquote><?php
       echo $Activity->Story; // story should be cleaned before being saved.

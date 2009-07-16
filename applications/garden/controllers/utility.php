@@ -101,9 +101,10 @@ class UtilityController extends GardenController {
             echo 'Success';
          else
             echo $this->Form->Errors();
-      } else {
-         echo 'File not found';
       }
+      $this->ControllerName = 'home';
+      $this->View = 'filenotfound';
+      $this->Render();
    }
    
    public function UsernameAvailable($Name = '') {

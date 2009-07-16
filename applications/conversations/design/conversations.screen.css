@@ -25,10 +25,11 @@ h2.NewConversation a {
 #Conversation li,
 #Conversations li {
   border-bottom: 1px solid #eee;
-  padding: 0px 0px 8px;
+  padding: 8px 0px 8px 8px;
 }
-#Conversation li {
-  padding: 0px;
+#Conversation li li,
+#Conversations li li {
+  padding: 0;
 }
 #Conversations li.Empty {
   margin: 0px;
@@ -50,9 +51,9 @@ h2.NewConversation a {
 }
 #Conversation li ul.Info,
 #Conversations li ul.Info {
-   font-size: 11px;
-   color: #777;
-   padding: 8px 0px 0px 8px;
+  display: inline;
+  font-size: 11px;
+  color: #777;
 }
 #Conversation li ul.Info {
   line-height: 200%;

@@ -1,10 +1,98 @@
 @import url(reset.css);
-@import url(typography.screen.css);
 
+/* Begin Typography */
+body {
+   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-weight: normal;
+   margin: 0;
+}
+p {
+   margin: 0.5em 0 0 0;
+   /* font-size: 110%; */
+   line-height: 1.6em;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+}
+h1 {
+   font-size: 180%;
+}
+h2 {
+   font-size: 160%;
+}
+h3 {
+   font-size: 140%;
+}
+h4 {
+   font-size: 120%;
+   color: #6C6C6C;
+}
+h5 {
+   font-size: 120%;
+   color: #6C6C6C;
+}
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2786c2;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084;
+}
+input.DateBox,
+input.InputBox,
+textarea {
+   font-family: arial;
+   color: #222;
+   font-size: 14px;
+   padding: 3px;
+   margin: 0px;
+   width: 250px;
+}
+textarea {
+   line-height: 128%;
+}
+select {
+   font-family: arial;
+   font-size: 14px;
+   color: #222;
+   margin: 0px;
+   padding: 3px;
+   }
+select.Day,
+select.Year {
+   margin-left: 4px;
+}
+.Button {
+   cursor: pointer;
+   margin: 0px 0px 0px 0px;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   padding: 4px;
+   font-size: 11px;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #555;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   }
+input.Button {
+   font-weight: bold;
+}
+.Button:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+/* End Typography */
+
+/* Begin Layout */
 body {
    background: #ffffff;
-   margin: 0px;
-   padding: 0px;
+   margin: 0;
+   padding: 0;
    text-align: center;
    font-size: small;
    }
@@ -13,7 +101,7 @@ body {
 }
 #Head {
    background: #44c7f4;
-   padding: 0px;
+   padding: 0;
    text-align: right;
    height: 50px;
 }
@@ -38,12 +126,12 @@ div#Head h1 a span {
 div.Menu {
    text-align: right;
    width: 960px;
-   margin: 0px auto;
+   margin: 0 auto;
 }
 ul#Menu {
    float: left;
-   margin: 0px auto;
-   padding: 14px 0px 0px 10px;
+   margin: 0 auto;
+   padding: 14px 0 0 10px;
 }
 #Head form {
    float: right;
@@ -85,7 +173,7 @@ ul#Menu {
 #Body {
    width: 960px;
    text-align: left;
-   margin: 15px auto 0px auto;
+   margin: 15px auto 0 auto;
    }
 #Content {
    float: left;
@@ -94,11 +182,11 @@ ul#Menu {
 /* Progress Bars */
 .Loading {
    height: 100px;
-   padding: 0px 20px;
+   padding: 0 20px;
    background: url('progress.gif') center center no-repeat;
 }
 .Progress {
-   padding: 10px 40px 10px 0px;
+   padding: 10px 40px 10px 0;
    background: url('progress.gif') center center no-repeat;
 }
 /* Messages */
@@ -108,8 +196,8 @@ div.Messages {
    top: 0;
    left: 0;
    z-index: 200;
-   margin: 0px !important;
-   padding: 0px !important;
+   margin: 0 !important;
+   padding: 0 !important;
    list-style: none !important;
    font-size: 12px;
    display: block;
@@ -174,7 +262,7 @@ a.Close {
    -moz-border-radius: 8px;
    -webkit-border-radius: 8px;
    padding: 1px 4px 2px 5px;
-   margin: 0px;
+   margin: 0;
    line-height: 100%;
    border: 1px solid #ddd;
 }
@@ -189,7 +277,7 @@ a.Close:hover {
    color: #e4c100;
    background: #ffffa4;
    padding: 2px 4px 3px 5px;
-   margin: 2px 0px 0px;
+   margin: 2px 0 0;
    display: block;
    border: 1px solid #ffd800;
 }
@@ -219,14 +307,14 @@ div.Box {
    background: #e9f9ff;
    color: #999;
    padding: 6px 10px;
-   margin: 0px 0px 10px 0px;
+   margin: 0 0 10px 0;
 }
 div.Box h4 {
    font-size: 110%;
    color: #2786c2;
    font-weight: bold;
-   margin: 0px;
-   padding: 0px 0px 1px;
+   margin: 0;
+   padding: 0 0 1px;
    border-bottom: 1px solid #caf0fe;
 }
 div.Box dl {
@@ -304,7 +392,7 @@ ul.PanelInfo li.Active {
    -webkit-border-top-left-radius: 2px;
 }
 tr#PagerMore td {
-   border: 0px;
+   border: 0;
    text-align: right;
 }
 
@@ -315,45 +403,51 @@ ul.DataList {
    border-top: 1px solid #dbe3e6;
 }
 ul.DataList li {
-   margin: 0px;
-   padding: 0px 0px 4px 0px;
-    border-bottom: 1px solid #dbe3e6;
+   margin: 0;
+   padding: 0 0 4px 0;
+   border-bottom: 1px solid #dbe3e6;
 }
 ul.DataList li li {
-   border: 0px;
-   padding: 0px;
+   border: 0;
+   padding: 0;
 }
 ul.DataList,
 ul.DataList li ul {
    list-style: none;
-   margin: 0px;
-   padding: 0px;
+   margin: 0;
+   padding: 0;
+}
+ul.DataList li ul li.Title {
+   float: left;
+}
+ul.DataList li ul li.Meta {
+   clear: both;
 }
 ul.DataList li ul li.Title a {
    border-left: 2px solid #dbe3e6;
    margin: 8px 4px 6px 10px;
-   padding: 0px 0px 0px 8px;
+   padding: 0 0 0 8px;
    line-height: 130%;
    color: #2b3033;
    font-size: 105%;
    display: block;
 }
 ul.DataList li ul li.Title h3 {
-   padding: 6px 0px 0px 10px;
-   margin: 0px;
+   padding: 6px 0 0 6px;
+   margin: 0;
    font-size: 110%;
    font-weight: bold;
 }
 ul.DataList li ul li.Title h3 a {
    display: inline;
-   border: 0px;
-   padding: 0px;
-   margin: 0px;
+   border: 0;
+   padding: 0;
+   margin: 0;
    color: #2d7bb2;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
-   margin-left: 9px;
+   margin-left: 5px;
    font-size: 80%;
    color: #80828c;
 }
@@ -364,26 +458,30 @@ ul.DataList li ul li.Meta strong {
 }
 ul.DataList li ul li.Meta strong {
    background: #ff0;
-   padding: 0px 2px;
+   padding: 0 2px;
 }
 ul.DataList li ul li.Meta a {
    color: #2b2d33;
 }
-
+li.DiscussionRow ul.Discussion {
+   /* Fixes an IE7 Spacing issue */
+   display: inline !important;
+}
 
 /* Vanilla Categories */
 
 .Categories {
    list-style: none;
-   margin: 0px;
-   padding: 0px;
+   margin: 0;
+   padding: 0;
 }
 body.Discussions h1,
 body.Categories h1,
-body.Categories h2 {
-   padding: 10px 0px 0px 0px;
-   font-size: 160%;
-   margin: 0px;
+body.Categories #Content h2 {
+   font-size:140%;
+   font-weight:bold;
+   padding:8px 6px 4px;
+   margin: 0;
 }
 h1 span {
    color: #555;
@@ -421,7 +519,7 @@ body.Categories h1 a {
 
 /* Back is the same as MorePager... */
 .Back {
-   margin: 0px;
+   margin: 0;
    padding: 3px 6px;
    text-align: right;
    background: #e9f9ff;
@@ -447,7 +545,7 @@ body.Categories h1 a {
 
 #Panel a.Bookmark,
 a.NewDiscussion {
-   padding: 6px 0px;
+   padding: 6px 0;
    display: block;
    text-align: center;
    font-size: 16px;
@@ -457,7 +555,7 @@ a.NewDiscussion {
    background: #44c7f4;
    color: #fff;
    text-decoration: none;
-   margin: 0px 0px 10px 0px;
+   margin: 0 0 10px 0;
 }
 a.NewDiscussion:hover {
    background: #11e420;
@@ -473,10 +571,17 @@ a.NewDiscussion:hover {
 }
 
 /* Vanilla Discussions */
-body.Discussions h1#AnnouncementsHeading {
-   padding: 0px;
+ul.Drafts li ul {
+   display: inline;
 }
-ul.Drafts li ul li.Title a {
+ul.Drafts li ul li.Title {
+   float: none;
+}
+ul.Drafts li ul li.Title h3 {
+   float: left;
+}
+ul.Drafts li ul li.Title a.DraftCommentLink {
+   clear: left;
    display: block;
 }
 ul.Drafts li ul li.Title a.DeleteDraft {
@@ -523,8 +628,13 @@ a.Bookmarked {
 a.Bookmarking {
    background: url('star_blue.png') center center no-repeat;
 }
-
-ul.Options li.Parent h3 {
+ul.Discussion li.Options {
+   float: right;
+	height: 22px;
+	width: 160px;
+}
+ul.Options li.Parent strong {
+   display: block;
    padding: 4px;
    margin: 3px 1px 0 0;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
@@ -538,12 +648,12 @@ ul.Options li.Parent h3 {
    cursor: pointer;
    line-height: 100%;
 }
-ul.Options li.Parent h3:hover {
+ul.Options li.Parent strong:hover {
    color: #333;
    border: 1px solid #888;
 }
-ul.Options li.Active h3:hover,
-ul.Options li.Active h3 {
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong {
    color: #fff;
    background: #9c9c9c !important;
    border: 1px solid #9c9c9c;
@@ -584,29 +694,27 @@ ul.PanelDiscussions li {
    border-bottom: 1px solid #caf0fe;
    padding: 2px 4px;
 }
-ul.PanelDiscussions li ul li {
-   background: none;
-   border-bottom: 0px;
-   padding: 0px;
-}
-ul.PanelDiscussions li.Topic {
+ul.PanelDiscussions li strong {
    font-weight: bold;
+   display: block;
 }
 ul.PanelDiscussions li.Meta {
    font-size: 80%;
    font-family: tahoma;
 }
-ul.PanelDiscussions li.Meta span,
-ul.PanelDiscussions li.Meta strong {
+ul.PanelDiscussions div.Meta span,
+ul.PanelDiscussions div.Meta strong {
    margin-right: 8px;
 }
-ul.PanelDiscussions li.Meta span a {
+ul.PanelDiscussions div.Meta span a {
    margin-left: 8px;
 }
-ul.PanelDiscussions li.Meta strong {
+ul.PanelDiscussions div.Meta strong {
+   font-weight: normal;
+   display: inline;
    color: #80828C;
    background: #ff6;
-   padding: 0px 2px;
+   padding: 0 2px;
 }
 
 /* Vanilla Comments */
@@ -615,13 +723,12 @@ body.Discussion #Content {
    margin-bottom: 20px;
 }
 body.Discussion #Content h2 {
-   font-size:115%;
+   font-size:140%;
    font-weight:bold;
-   margin:0;
-   padding:6px 0 0 10px;
+   margin: 0;
    color: #333;
    padding: 6px 0;
-   line-height: 100%;
+   line-height: 1;
 }
 body.Discussion #Content h2 span {
    padding: 0 10px;
@@ -638,32 +745,31 @@ body.Discussion #Content h2 span {
 #Discussion ul,
 #Discussion ul li {
    list-style: none;
-   margin: 0px;
-   padding: 0px;
+   margin: 0;
+   padding: 0;
 }
 #Discussion {
    margin-bottom: 1px;
 }
 #Discussion .Comment {
-   clear: left;
    border-top: 1px solid #ddd;
+overflow: hidden;   
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
-   float: left;
    font-size: 11px;
    color: #777;
-   padding: 8px 0px 0px 8px;
+   padding: 8px 0 0 8px;
 }
 .Preview li ul.Info {
-   padding: 0px;
+   padding: 0;
 }
 .Preview li ul.Info li.Author img,
 #Discussion li ul.Info li.Author img {
    height: 40px;
    width: 40px;
-   border: 0px;
-   margin: 0px 10px 0px 0px;
+   border: 0;
+   margin: 0 10px 0 0;
    float: left;
 }
 .Preview li ul.Info li,
@@ -710,13 +816,13 @@ body.Discussion #Content h2 span {
 
 #Discussion fieldset,
 #Discussion form {
-   margin: 0px;
-   padding: 0px;
+   margin: 0;
+   padding: 0;
 }
 
 /* Comment Preview */
 div.Popup ul.Preview li.Comment {
-   padding: 0px;
+   padding: 0;
 }
 div.Popup ul.Preview li.Comment div.Body {
    min-height: 53px;
@@ -749,7 +855,7 @@ div.Popup #CommentForm h3 {
    width: 650px;
    height: 100px;
    min-height: 100px;
-   margin: 0px 0px 6px;
+   margin: 0 0 6px;
 }
 div.Popup #CommentForm textarea {
    width: 470px;
@@ -768,7 +874,7 @@ body.Post #Content {
 }
 body.Post #CommentForm,
 #DiscussionForm {
-   border: 0px;
+   border: 0;
    background: #daf4fd;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
@@ -789,14 +895,17 @@ body.Post #CommentForm textarea,
    height: 100px;
    min-height: 100px;
    max-height: 400px;
-   margin: 0px 0px 6px;
+   margin: 0 0 6px;
 }
 #DiscussionForm input.InputBox {
    width: 930px;
    margin-bottom: 10px;
 }
-#DiscussionForm select {
-   margin: 0 0 10px 6px;
+#DiscussionForm div.Category {
+   padding: 0 0 10px;   
+}
+#DiscussionForm div.Category label {
+   padding: 0 8px 0 0;
 }
 a.Cancel {
    margin-left: 20px;
@@ -818,5 +927,7 @@ a.Cancel {
 /* Panel Boxes */
 
 #Panel ul.Discussions {
-   border: 0px;
+   border: 0;
 }
+
+/* End Typography */

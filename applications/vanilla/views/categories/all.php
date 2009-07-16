@@ -11,7 +11,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       <h1><?php
          echo Anchor($Category->Name, '/discussions/0/'.$Category->CategoryID.'/'.Format::Url($Category->Name));
       ?></h1>
-      <ul class="Discussions">
+      <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>
       </ul>
       <?php

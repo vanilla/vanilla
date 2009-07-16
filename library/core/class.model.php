@@ -273,7 +273,25 @@ class Model extends Gdn_Pluggable {
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
+   
+   /**
+    * Returns a count of the # of records in the table
+    * @param array $Wheres
+    */
+   public function GetCount($Wheres = '') {
+      $this->SQL
+         ->Select('*', 'count', 'Count')
+         ->From($this->Name);
 
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+
+      $Data = $this->SQL
+         ->Get()
+         ->FirstRow();
+
+      return $Data === FALSE ? 0 : $Data->Count;
+   }
 
    /**
     * @param unknown_type $Where

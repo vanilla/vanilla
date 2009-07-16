@@ -17,8 +17,10 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Name', array('maxlength' => 100));
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+         echo '<div class="Category">';
          echo $this->Form->Label('Category', 'CategoryID');
          echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+         echo '</div>';
       }
       echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
       

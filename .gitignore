@@ -3,6 +3,8 @@
 /uploads/*/
 /uploads/*.*
 /conf/config.php
+/conf/bootstrap.before.php
+/conf/bootstrap.after.php
 *.kpf
 .DS_Store
 *.swp

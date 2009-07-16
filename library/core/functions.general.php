@@ -403,11 +403,18 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     * Takes an array of associative arrays (ie. a dataset array), a $Key, and
     * merges all of the values for that key into a single array, returning it.
     */
-   function ConsolidateArrayValuesByKey($Array, $Key) {
+   function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
-         if (array_key_exists($Key, $AssociativeArray))
-            $Return[] = $AssociativeArray[$Key];
+         if (array_key_exists($Key, $AssociativeArray)) {
+            if($ValueKey === '') {
+               $Return[] = $AssociativeArray[$Key];
+            } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
+               $Return[$AssociativeArray[$Key]] = $AssociativeArray[$ValueKey];
+            } else {
+               $Return[$AssociativeArray[$Key]] = $DefaultValue;
+            }
+         }
       }
       return $Return;
    }

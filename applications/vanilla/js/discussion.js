@@ -65,8 +65,8 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
-            $('.Popup,.Overlay').remove();
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            //$('.Popup,.Overlay').remove();
+            //$.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -209,16 +209,16 @@ jQuery(document).ready(function($) {
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $(btn).attr('class', oldClass);
                $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
             },
             success: function(json) {               
-               if(json.Data) {
+               if(json.Data && json.LastCommentID) {
                   definition('LastCommentID', json.LastCommentID, true);
                   $current = $("#Discussion").contents();
                   $(json.Data).appendTo("#Discussion")
                      .effect("highlight", {}, "slow");
                }
+               processTargets(json.Targets);
                
                getNewTimeout();
             }

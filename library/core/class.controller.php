@@ -358,8 +358,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Definition
     * @todo Method AddDefinition(), $Term and $Definition need descriptions.
     */
-   public function AddDefinition($Term, $Definition) {
-      $this->_Definitions[$Term] = $Definition;
+   public function AddDefinition($Term, $Definition = NULL) {
+      if(!is_null($Definition))
+         $this->_Definitions[$Term] = $Definition;
+      return ArrayValue($Term, $this->_Definitions);
    }
 
    /**
@@ -556,31 +558,41 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method GetAsset() and $AssetName needs descriptions.
     */
    public function GetAsset($AssetName) {
+      if(!array_key_exists($AssetName, $this->Assets))
+         return '';
+      if(!is_array($this->Assets[$AssetName]))
+         return $this->Assets[$AssetName];
+      
+      // Include the module sort
+      $Modules = Gdn::Config('Modules', array());
+   
+      if($this->ModuleSortContainer === FALSE)
+         $ModuleSort = FALSE; // no sort wanted
+      elseif(array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
+         $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
+      elseif(array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
+         $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
+      
+      $ThisAssets = $this->Assets[$AssetName];
       $Assets = array();
-      if (array_key_exists($AssetName, $this->Assets)) {
-         if (is_array($this->Assets[$AssetName])) {
-            if ($this->ModuleSortContainer != '') {
-               // Include the module sort
-               $Modules = Gdn::Config('Modules', array());
-               if (array_key_exists($this->ModuleSortContainer, $Modules)) {
-                  if (array_key_exists($AssetName, $Modules[$this->ModuleSortContainer])) {
-                     foreach ($Modules[$this->ModuleSortContainer][$AssetName] as $Name) {
-                        if (array_key_exists($Name, $this->Assets[$AssetName])) {
-                           $Assets[] = $this->Assets[$AssetName][$Name];
-                           unset($this->Assets[$AssetName][$Name]);
-                        }
-                     }
-                  }
-               }
+      if(isset($ModuleSort) && is_array($ModuleSort)) {
+         // There is a specified sort so sort by it.
+         foreach($ModuleSort as $Name) {
+            if(array_key_exists($Name, $ThisAssets)) {
+               if(defined("DEBUG"))
+                  $Assets[] = "\n<!-- Asset: $Name -->\n";
+               $Assets[] = $ThisAssets[$Name];
+               unset($ThisAssets[$Name]);
             }
-            // Pick up any leftover assets
-            foreach ($this->Assets[$AssetName] as $Name => $Part) {
-               $Assets[] = $Part;
-            }
-         } else {
-            $Assets[] = $this->Assets[$AssetName];
          }
       }
+      // Pick up any leftover assets
+      foreach($ThisAssets as $Name => $Asset) {
+         if(defined("DEBUG"))
+            $Assets[] = "\n<!-- Asset: $Name -->\n";
+         $Assets[] = $Asset;
+      }
+         
       if(count($Assets) == 0) {
          return '';
       } elseif(count($Assets) == 1) {
@@ -718,7 +730,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          $this->SetJson('FormSaved', $FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
-         $this->SetJson('Data', $View);
+         if($View instanceof Gdn_IModule) {
+            $this->SetJson('Data', $View->ToString());
+         } else {
+            $this->SetJson('Data', $View);
+         }
          $this->SetJson('StatusMessage', $this->StatusMessage);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 
@@ -808,24 +824,46 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
-               $AppFolder = $CssInfo['AppFolder'];
-               if ($AppFolder == '')
-                  $AppFolder = $this->ApplicationFolder;
-
-               // CSS comes from one of four places:
-               $CssPaths = array();
-               if ($this->Theme) {
-                  // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssFile;
-                  // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-                  $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
+               
+               if(strpos($CssFile, '/') !== FALSE) {
+                  // A direct path to the file was given.
+                  $CssPaths = array(PATH_ROOT.str_replace('/', DS, $CssFile));
+               } else {
+                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
+                  $AppFolder = $CssInfo['AppFolder'];
+                  if ($AppFolder == '')
+                     $AppFolder = $this->ApplicationFolder;
+   
+                  // CSS comes from one of four places:
+                  $CssPaths = array();
+                  if ($this->Theme) {
+                     // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
+                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                     // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
+                  }
+                  // 3. Application default. eg. root/applications/app_name/design/
+                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                  // 4. Garden default. eg. root/applications/garden/design/
+                  $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssGlob;
                }
-               // 3. Application default. eg. root/applications/app_name/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
-               // 4. Garden default. eg. root/applications/garden/design/
-               $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $CssFile;
 
-               $CssPath = Gdn_FileSystem::Exists($CssPaths);
+               // Find the first file that matches the path.
+               $CssPath = FALSE;
+               foreach($CssPaths as $Glob) {
+                  $Paths = glob($Glob);
+                  if(is_array($Paths) && count($Paths) > 0) {
+                     $CssPath = $Paths[0];
+                     break;
+                  }
+               }
+               
+               // Check to see if there is a CSS cacher.
+               $CssCacher = Gdn::Factory('CssCacher');
+               if(!is_null($CssCacher)) {
+                  $CssPath = $CssCacher->Get($CssPath, $AppFolder);
+               }
+               
                if ($CssPath !== FALSE) {
                   $CssPath = str_replace(
                      array(PATH_ROOT, DS),
@@ -983,5 +1021,29 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function SetJson($Key, $Value = '') {
       $this->_Json[$Key] = $Value;
+   }
+   
+   /**
+    * If JSON is going to be sent to the client, this method allows you to add
+    * extra values to the JSON array.
+    *
+    * @param string $Key The name of the array key to add.
+    * @param mixed $Value The value to be added. If null, then it won't be set.
+    * @return mixed The value at the key.
+    */
+   public function Json($Key, $Value = NULL) {
+      if(!is_null($Value)) {
+         $this->_Json[$Key] = $Value;
+      }
+      return ArrayValue($Key, $this->_Json, NULL);
+   }
+   
+   public function JsonTarget($Target, $Data, $Type = 'Html') {
+      $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
+      
+      if(!array_key_exists('Targets', $this->_Json))
+         $this->_Json['Targets'] = array($Item);
+      else
+         $this->_Json['Targets'][] = $Item;
    }
 }

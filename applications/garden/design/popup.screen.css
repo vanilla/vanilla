@@ -32,7 +32,7 @@ div.Popup div.Body {
   max-width: 500px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
-  border: 8px solid #555;
+  border: 8px solid #555 /* Body Text Font Color */;
 }
 div.Popup div.Body div.Body {
    border: 0;

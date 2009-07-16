@@ -14,7 +14,7 @@
    position: absolute;
    visibility: hidden;
    z-index: 100;
-   background: #44c7f4;
+   background: #44c7f4 /* Menu Background Color */;
    -moz-border-radius-bottomleft: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
@@ -46,7 +46,7 @@
 }
 */
 #Menu li.Active {
-   background: #44c7f4;
+   background: #44c7f4 /* Menu Background Color */;
 }
 #Menu li
 #Menu li a,
@@ -77,7 +77,7 @@
    -webkit-border-bottom-right-radius: 1px;
 }
 #Menu li.Active a {
-   color: #fff;
+   color: #fff /* Menu Font Color */;
 }
 #Menu li ul li {
    margin: 0px;
@@ -89,7 +89,7 @@
 }
 #Menu a {
    border: 0px;
-   color: #fff;
+   color: #fff /* Banner Font Color */;
    text-decoration: none;
    display: block;
    position: relative;
@@ -99,8 +99,8 @@
    height: 28px;
 }
 #Menu a:hover {
-   color: #fff !important;
-   background: #28bcef;
+   color: #fff /* Menu Hover Font Color */ !important;
+   background: #28bcef /* Menu Hover Background Color */;
 }
 #Menu ul li {
  display: block;
@@ -116,7 +116,7 @@
    font-weight: normal;
 }
 #Menu li.NonTab a:hover {
-   color: #fff !important;
+   color: #fff /* Menu Hover Font Color */ !important;
 }
 #Menu a span,
 #Menu li.Active a span,

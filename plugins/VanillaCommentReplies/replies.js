@@ -103,9 +103,11 @@ jQuery(document).ready(function($) {
          success: function(json) {
             $('.ReplyForm .Errors').remove();
             if (json.FormSaved == false) {
-               if (json.StatusMessage != null && json.StatusMessage != '')
+               if (json.StatusMessage != null && json.StatusMessage != '') {
                   $(row).prepend(json.StatusMessage);
+               }
             } else {
+               definition('LastCommentID', json.CommentID, true);
                $(row).before(json.Data);
                $(row).parents('.Comment').find('ul.Info li.ReplyCount a').text(json.Replies);
                textbox.val('').blur();

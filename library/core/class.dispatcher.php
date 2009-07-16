@@ -197,11 +197,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $PluginManager = Gdn::Factory('PluginManager');
          $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
          if (!$PluginManagerHasReplacementMethod && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
-            if ($this->_ControllerMethod != '')
-               array_unshift($this->_ControllerMethodArgs, $this->_ControllerMethod);
-
-            $this->_ControllerMethod = 'Index';
-            $ControllerMethod = 'Index';
+            // Check to see if there is an 'x' version of the method.
+            if(method_exists($Controller, 'x'.$ControllerMethod)) {
+               $PluginManagerHasReplacementMethod = TRUE;
+            } else {
+               if ($this->_ControllerMethod != '')
+                  array_unshift($this->_ControllerMethodArgs, $this->_ControllerMethod);
+               
+               $this->_ControllerMethod = 'Index';
+               $ControllerMethod = 'Index';
+            }
          }
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;

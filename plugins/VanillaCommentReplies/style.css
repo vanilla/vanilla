@@ -30,7 +30,7 @@ li.Reply a.DeleteReply:hover {
 }
 #Discussion li.Reply {
    margin: 1px 0px 0px;
-   background: #f3fcff;
+   background: #f3fcff /* Panel Background Color */;
 }
 #Discussion li.Reply ul.Info {
    float: none;
@@ -60,7 +60,7 @@ li.Reply a.DeleteReply:hover {
 #Discussion li.ReplyForm {
    padding: 8px;
    margin: 1px 0px;
-   background: #f3fcff;
+   background: #f3fcff /* Panel Background Color */;
 }
 #Discussion li.ReplyForm a.ReplyLink {
    cursor: text;

@@ -166,11 +166,9 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.screen.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
-         // $this->Head->AddScript('/js/library/jquery.resizable.js');
-         // $this->Head->AddScript('/js/library/jquery.ui.packed.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
-      }
+         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');      }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
          
@@ -222,7 +220,7 @@ class CategoriesController extends VanillaController {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/%1$s/'.$this->CategoryID
+         'categories/'.$CategoryIdentifier.'/%1$s'
       );
       
       // Change the controller name so that it knows to grab the discussion views

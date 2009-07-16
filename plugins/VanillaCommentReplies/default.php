@@ -40,7 +40,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    
    public function DiscussionController_DiscussionRenderBefore_Handler(&$Sender) {
       $Sender->Head->AddScript('/plugins/VanillaCommentReplies/replies.js');
-      $Sender->Head->AddCss('/plugins/VanillaCommentReplies/style.css');
+      $Sender->AddCssFile('/plugins/VanillaCommentReplies/style.css');
       $this->ReplyModel = Gdn::Factory('ReplyModel');
       $RequestMethod = strtolower($Sender->RequestMethod);
       if (in_array($RequestMethod, array('index', 'comment'))) {
@@ -49,6 +49,16 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             $FirstCommentID = $Sender->CommentData->FirstRow()->CommentID;
             $LastCommentID = $Sender->CommentData->LastRow()->CommentID;
             $Sender->ReplyData = $this->ReplyModel->Get($Sender->Discussion->DiscussionID, $FirstCommentID, $LastCommentID);
+            
+            $LastID = 0;
+            foreach($Sender->ReplyData->Result() as $Row) {
+               if($Row->CommentID > $LastID)
+                  $LastID = $Row->CommentID;
+            }
+            
+            if($LastID > $LastCommentID) {
+               $Sender->AddDefinition('LastCommentID', $LastID);
+            }
          } else {
             $Sender->ReplyData = FALSE;
          }
@@ -135,6 +145,63 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       <?php
    }
    
+   public function DiscussionController_GetNew_Before(&$Sender, $EventArguments) {
+      $DiscussionID = $EventArguments[0];
+      $LastCommentID = $EventArguments[1];
+      
+      // Get all of the new replies.
+      $this->ReplyModel = Gdn::Factory('ReplyModel');
+      $Data = $this->ReplyModel->GetAllNew($DiscussionID, $LastCommentID)->Result();
+      $MaxCommentID = 0;
+      
+      if(count($Data) == 0)
+         return;
+      
+      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+      
+      // Loop through the replies and add them to the targets.
+      $LastReplyCommentID = FALSE;
+      $Replies = array();
+      for($i = 0; $i < count($Data); $i++) {
+         $Row = $Data[$i];
+         if($Row->CommentID > $MaxCommentID)
+            $MaxCommentID = $Row->CommentID;
+         
+         if($LastReplyCommentID != $Row->ReplyCommentID) {
+            $this->_AddReplyTargets($Discussion, $Replies, $Sender);
+            $Replies = array();
+            $LastReplyCommentID = $Row->ReplyCommentID;
+         }
+         $Replies[] = $Row;
+      }
+      $this->_AddReplyTargets($Discussion, $Replies, $Sender);
+      
+      $LastCommentID = $Sender->Json('LastCommentID');
+      if(is_null($LastCommentID) || $MaxCommentID > $LastCommentID) {
+         $Sender->Json('LastCommentID', $MaxCommentID);
+      }
+   }
+   
+   protected function _AddReplyTargets($Discussion, $Replies, $Sender) {
+      if(count($Replies) > 0) {
+         $ReplySender = new stdClass();
+         $ReplySender->ReplyCommentID = $Replies[0]->ReplyCommentID;
+         $ReplySender->Discussion = $Discussion;
+         
+         // Add a target to render the replies.
+         ob_start();
+         foreach($Replies as $Reply) {
+            $ReplySender->CurrentReply = $Reply;
+            self::WriteReply($ReplySender, Gdn::Session());
+         }
+         $Html = ob_get_clean();
+         $Sender->JsonTarget(
+            '#Comment_'.$ReplySender->ReplyCommentID.' li.ReplyForm',
+            $Html,
+            'Before');
+      }
+   }
+   
    /*
     * Add a Reply method to the DiscussionController to handle linking directly to a reply
     */
@@ -215,6 +282,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             $Sender->CurrentReply = is_object($Sender->ReplyData) ? $Sender->ReplyData->NextRow() : FALSE;
             $Replies = $Sender->ReplyComment->CountReplies + 1;
             $Sender->SetJson('Replies', sprintf(Translate(Plural($Replies, '%s Reply', '%s Replies')), $Replies));
+            $Sender->SetJson('CommentID', $CommentID);
             $Sender->Discussion = $Sender->DiscussionModel->GetID($Sender->ReplyComment->DiscussionID);
             $Sender->ControllerName = 'discussion';
             $Sender->View = PATH_PLUGINS.DS.'VanillaCommentReplies'.DS.'views'.DS.'replies.php';

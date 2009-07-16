@@ -23,13 +23,6 @@ $Construct->Table('Category')
    ->Column('DateUpdated', 'datetime')
    ->Set($Explicit, $Drop);
 
-$SQL->Select('c.CategoryID, c.CountDiscussions, c.Description, c.Sort, c.InsertUserID, c.UpdateUserID, c.DateInserted, c.DateUpdated')
-   ->Select("' > ', p.Name, c.Name", 'concat_ws', 'Name')
-   ->From('Category c')
-   ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
-   ->Where('c.AllowDiscussions', '1', TRUE, FALSE);
-$Construct->View('vw_Category', $SQL);
-
 if ($Drop)
    $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'General', 'Description' => 'General discussions', 'Sort' => '1'));
 

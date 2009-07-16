@@ -148,6 +148,17 @@ abstract class Gdn_DatabaseStructure {
    }
 
    /**
+    * Defines a primary key column on a table.
+    *
+    * @param string $Name The name of the column.
+    * @param string $Type The data type of the column.
+    * @return Gdn_DatabaseStructure $this.
+    */
+   public function PrimaryKey($Name, $Type = 'int') {
+      return $this->Column($Name, $Type, '', FALSE, NULL, 'primary', TRUE);
+   }
+   
+   /**
     * Renames a column in $this->Table().
     *
     * @param string $OldName The name of the column to be renamed.

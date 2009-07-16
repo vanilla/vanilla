@@ -27,7 +27,9 @@ if ($Session->IsValid()) {
 
 if($this->Pager->LastPage()) {
    $this->AddDefinition('DiscussionID', $this->Data['Discussion']->DiscussionID);
-   $this->AddDefinition('LastCommentID', $this->Data['Discussion']->LastCommentID);
+   $LastCommentID = $this->AddDefinition('LastCommentID');
+   if(is_null($LastCommentID) || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+      $this->AddDefinition('LastCommentID', $this->Data['Discussion']->LastCommentID);
    $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
 }
 

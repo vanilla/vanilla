@@ -204,7 +204,7 @@ abstract class Gdn_Pluggable {
       }
 
       // Call the "After" event handlers
-      $PluginManager->CallEventHandlers($this, $this->ClassName, $MethodName, 'Before');
+      $PluginManager->CallEventHandlers($this, $this->ClassName, $MethodName, 'After');
 
       return $Return;
    }

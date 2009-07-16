@@ -102,7 +102,7 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
-   public function GetNew($DiscussionID, $LastCommentID) {
+   public function xGetNew($DiscussionID, $LastCommentID) {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
       // Check permissions.
@@ -120,7 +120,10 @@ class DiscussionController extends VanillaController {
          $this->SetData('Offset', $this->Discussion->CountComments, TRUE);
          $this->CommentModel->SetWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
          
-         $this->SetJson('LastCommentID', $LastComment->CommentID, TRUE);
+         $LastCommentID = $this->Json('LastCommentID');
+         if(is_null($LastCommentID) || $LastComment->CommentID > $LastCommentID) {
+            $this->Json('LastCommentID', $LastComment->CommentID);
+         }
       } else {
          $this->SetData('Offset', $this->CommentModel->GetOffset($LastCommentID), TRUE);
       }

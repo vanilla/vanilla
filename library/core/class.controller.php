@@ -358,8 +358,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Definition
     * @todo Method AddDefinition(), $Term and $Definition need descriptions.
     */
-   public function AddDefinition($Term, $Definition) {
-      $this->_Definitions[$Term] = $Definition;
+   public function AddDefinition($Term, $Definition = NULL) {
+      if(!is_null($Definition))
+         $this->_Definitions[$Term] = $Definition;
+      return ArrayValue($Term, $this->_Definitions);
    }
 
    /**
@@ -1019,5 +1021,29 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function SetJson($Key, $Value = '') {
       $this->_Json[$Key] = $Value;
+   }
+   
+   /**
+    * If JSON is going to be sent to the client, this method allows you to add
+    * extra values to the JSON array.
+    *
+    * @param string $Key The name of the array key to add.
+    * @param mixed $Value The value to be added. If null, then it won't be set.
+    * @return mixed The value at the key.
+    */
+   public function Json($Key, $Value = NULL) {
+      if(!is_null($Value)) {
+         $this->_Json[$Key] = $Value;
+      }
+      return ArrayValue($Key, $this->_Json, NULL);
+   }
+   
+   public function JsonTarget($Target, $Data, $Type = 'Html') {
+      $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
+      
+      if(!array_key_exists('Targets', $this->_Json))
+         $this->_Json['Targets'] = array($Item);
+      else
+         $this->_Json['Targets'][] = $Item;
    }
 }

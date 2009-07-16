@@ -16,7 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 class ReplyModel extends CommentModel {
    
    public function ReplyQuery() {
-      $this->SQL
+      return $this->SQL
          ->Select('c.*')
          ->Select('iu.Name', '', 'InsertName')
          ->Select('iup.Name', '', 'InsertPhoto')
@@ -56,6 +56,15 @@ class ReplyModel extends CommentModel {
          ->Where('c.ReplyCommentID', $ReplyCommentID)
          ->Where('c.CommentID >', $LastCommentID)
          ->OrderBy('c.DateInserted', 'asc')
+         ->Get();
+   }
+   
+   public function GetAllNew($DiscussionID, $LastCommentID) {
+      return $this
+         ->ReplyQuery()
+         ->Where('c.DiscussionID', $DiscussionID)
+         ->Where('c.CommentID >', $LastCommentID)
+         ->OrderBy('c.ReplyCommentID, c.DateInserted')
          ->Get();
    }
    

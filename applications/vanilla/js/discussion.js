@@ -61,8 +61,8 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
-            $('.Popup,.Overlay').remove();
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            //$('.Popup,.Overlay').remove();
+            //$.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -241,6 +241,7 @@ jQuery(document).ready(function($) {
                   $(json.Data).appendTo("#Discussion")
                      .effect("highlight", {}, "slow");
                }
+               processTargets(json.Targets);
                
                getNewTimeout();
             }

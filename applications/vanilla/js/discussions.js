@@ -23,10 +23,8 @@ jQuery(document).ready(function($) {
    
    // Set up paging
    if ($.morepager)
-      $('.MorePager').livequery(function() {
-         $(this).morepager({
-            pageContainerSelector: 'ul.Discussions:last'
-         });
+      $('.MorePager').morepager({
+         pageContainerSelector: 'ul.Discussions:last'
       });
 
 });

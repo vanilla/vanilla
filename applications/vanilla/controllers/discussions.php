@@ -50,6 +50,7 @@ class DiscussionsController extends VanillaController {
          if ($TmpLimit <= 0)
             $TmpLimit = 1;
       }
+      $this->SetJson('Loading', $Offset . ' to ' . $TmpLimit);
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
       
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $TmpLimit), TRUE);
@@ -82,7 +83,7 @@ class DiscussionsController extends VanillaController {
       parent::Initialize();
       $this->ShowOptions = TRUE;
       $this->Menu->HighlightRoute('/discussions');
-      $this->AddCssFile('vanilla.screen.css');
+      $this->AddCssFile('vanilla.css');
       if ($this->Head)
          $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
    }

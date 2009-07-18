@@ -9,7 +9,7 @@ class DiscussionController extends VanillaController {
    public $CategoryID;
    
    public function Index($DiscussionID = '', $Offset = '', $Limit = '') {
-      $this->AddCssFile('vanilla.screen.css');
+      $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
       if ($this->Head) {
          $this->Head->AddScript('/js/library/jquery.resizable.js');

@@ -9,8 +9,8 @@ class DraftsController extends VanillaController {
    
    public function Index($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddCssFile('vanilla.screen.css');
-      $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('vanilla.css');
+      $this->AddCssFile('form.css');
       $Session = Gdn::Session();
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');

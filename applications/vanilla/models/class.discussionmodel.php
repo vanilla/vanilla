@@ -511,6 +511,7 @@ class DiscussionModel extends VanillaModel {
          }
       }
       
+      $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
       

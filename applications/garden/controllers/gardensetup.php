@@ -17,7 +17,7 @@ class GardenSetupController extends GardenController {
    
    public function Initialize() {
       $this->Head = new HeadModule($this);
-      $this->AddCssFile('setup.screen.css');
+      $this->AddCssFile('setup.css');
    }
    
    /**
@@ -225,15 +225,15 @@ class GardenSetupController extends GardenController {
          file_put_contents($ConfigFile, '');
          
       if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
-         $this->Form->AddError('Your configuration file does not have the correct permissions. PHP needs to be able to <a href="http://gardenplatform.com/docs/FilePermissions/">read and write</a> to this file: <code>'.$ConfigFile.'</code>');
+         $this->Form->AddError('Your configuration file does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code>'.$ConfigFile.'</code>');
 
       $UploadsFolder = PATH_ROOT . DS . 'uploads';
       if (!is_readable($UploadsFolder) || !is_writable($UploadsFolder))
-         $this->Form->AddError('Your uploads folder does not have the correct permissions. PHP needs to be able to <a href="http://gardenplatform.com/docs/FilePermissions/">read and write</a> to this folder: <code>'.$UploadsFolder.'</code>');
+         $this->Form->AddError('Your uploads folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code>'.$UploadsFolder.'</code>');
 
       // Make sure the cache folder is writeable
       if (!is_readable(PATH_CACHE) || !is_writable(PATH_CACHE)) {
-         $this->Form->AddError('Your cache folder does not have the correct permissions. PHP needs to be able to <a href="http://gardenplatform.com/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code>'.PATH_CACHE.'</code>');
+         $this->Form->AddError('Your cache folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code>'.PATH_CACHE.'</code>');
       } else {
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');

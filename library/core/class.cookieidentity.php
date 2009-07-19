@@ -37,8 +37,8 @@ class Gdn_CookieIdentity {
 		$this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
 		$this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
 		$this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
-		$this->CookieDomain = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
-		$this->CookieDomain = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
+		$this->CookieHashMethod = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
+		$this->CookieSalt = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
 	}
 	
 	/**

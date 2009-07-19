@@ -27,13 +27,16 @@ class Gdn_CookieIdentity {
 	public $CookieSalt;
 	
 	public function __contruct($Config = NULL) {
+		$this->Init($Config);
+	}
+	
+	public function Init($Config = NULL) {
 		if(is_null($Config))
 			$Config = Gdn::Config('Garden.Cookie');
 		elseif(is_string($Config))
 			$Config = Gdn::Config($Config);
 			
-		$DefaultConfig = Gdn::Config('Database');
-			
+		$DefaultConfig = Gdn::Config('Garden.Cookie');			
 		$this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
 		$this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
 		$this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);

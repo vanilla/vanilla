@@ -139,14 +139,14 @@ if ($Drop) {
    $PermissionModel = Gdn::PermissionModel();
    
    // Define some global vanilla permissions.
-   $PermissionModel->Define(array(
+   $PermissionModel->Define($Construct, $SQL, array(
       'Vanilla.Settings.Manage',
       'Vanilla.Categories.Manage',
       'Vanilla.Spam.Manage'
       ));
    
    // Define some permissions for the Vanilla categories.
-   $PermissionModel->Define(array(
+   $PermissionModel->Define($Construct, $SQL, array(
       'Vanilla.Discussions.View',
       'Vanilla.Discussions.Add',
       'Vanilla.Discussions.Edit',

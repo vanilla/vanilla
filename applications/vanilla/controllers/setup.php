@@ -17,7 +17,6 @@ class SetupController extends Gdn_Controller {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
       $Explicit = TRUE;
-      $Construct = $Database->Structure();
       $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
       try {
          include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'structure.php');

@@ -6,8 +6,8 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
    
-$SQL = Gdn::SQL();
-$Construct = Gdn::Structure();
+$SQL = $Database->SQL();
+$Construct = $Database->Structure();
 
 $Construct->Table('Category')
    ->Column('CategoryID', 'int', 4, FALSE, NULL, 'primary', TRUE)

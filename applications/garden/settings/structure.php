@@ -14,8 +14,8 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
 
-$SQL = Gdn::SQL();
-$Construct = Gdn::Structure();
+$SQL = $Database->SQL();
+$Construct = $Database->Structure();
 
 // Role Table
 $Construct->Table('Role')

@@ -161,7 +161,6 @@ class GardenSetupController extends GardenController {
             
             // Install db structure & basic data.
             $Database = Gdn::Database();
-            $Construct = $Database->Structure();
             $Drop = FALSE; // Gdn::Config('Garden.Version') === FALSE ? TRUE : FALSE;
             $Explicit = FALSE;
             try {

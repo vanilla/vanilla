@@ -68,6 +68,7 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 		$this->Encoding = ArrayValue('Encoding', $Config, 'ini');
 		
 		$this->_Identity = Gdn::Factory('Identity');
+		$this->_Identity->Init();
 	}
 	
 	/// Methods ///

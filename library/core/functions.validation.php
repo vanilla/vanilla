@@ -36,7 +36,7 @@ if (!function_exists('ValidateRegex')) {
 }
 
 if (!function_exists('ValidateRequired')) {
-   function ValidateRequired($Value, $Field) {
+   function ValidateRequired($Value, $Field = '') {
       if (is_array($Value) === TRUE)
          return count($Value) > 0 ? TRUE : FALSE;
 
@@ -94,7 +94,7 @@ if (!function_exists('ValidateOldPassword')) {
 }
 
 if (!function_exists('ValidateEmail')) {
-   function ValidateEmail($Value, $Field) {
+   function ValidateEmail($Value, $Field = '') {
       return ValidateRegex(
          $Value,
          '/^([\w\d+_-][\w\d+_.-]{0,63})@(([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})|([\w\d][\w\d.-]{0,244}\.[\w]{2,10}))$/'

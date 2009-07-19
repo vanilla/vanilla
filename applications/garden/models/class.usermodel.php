@@ -286,7 +286,7 @@ class Gdn_UserModel extends Model {
             $this->SQL->Put($this->Name, $Fields);
          } else {
             // Insert the new user
-            $this->SQL->Insert($this->Name, $Fields);
+            $UserID = $this->SQL->Insert($this->Name, $Fields);
             AddActivity(
                $UserID,
                'Join',

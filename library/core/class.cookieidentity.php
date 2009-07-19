@@ -66,7 +66,7 @@ class Gdn_CookieIdentity {
          return 0;
 
       $Key = $this->_Hash($UserID . $Expiration);
-      $Hash = $this->_HashHMAC($this->HashMethod, $UserID . $Expiration, $Key);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
 
       if ($HMAC != $Hash)
          return 0;
@@ -84,10 +84,10 @@ class Gdn_CookieIdentity {
     * @param string $Data The data to place in the hash.
     */
    private function _Hash($Data) {
-      if (empty($this->Salt))
+      if (empty($this->CookieSalt))
          trigger_error(ErrorMessage("The server's salt key has not been configured.", 'Session', 'Hash'), E_USER_ERROR);
 
-      return $this->_HashHMAC($this->HashMethod, $Data, $this->Salt);
+      return $this->_HashHMAC($this->CookieHashMethod, $Data, $this->CookieSalt);
    }
 	
 	/**
@@ -141,7 +141,7 @@ class Gdn_CookieIdentity {
 
       // Create the cookie contents
       $Key = $this->_Hash($UserID . $Expiration);
-      $Hash = $this->_HashHMAC($this->HashMethod, $UserID . $Expiration, $Key);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
       $CookieContents = $UserID . '|' . $Expiration . '|' . $Hash;
 
       // Create the cookie.

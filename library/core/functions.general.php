@@ -688,9 +688,15 @@ if (!function_exists('getallheaders')) {
 }
 
 if (!function_exists('ArrayCombine')) {
-   // PHP has a ridiculous limitation that doesn't allow array_combine to work if
-   // either of the arrays are empty
+   // PHP has a limitation that doesn't allow array_combine to work if either of
+   // the arrays are empty
    function ArrayCombine($Array1, $Array2) {
+      if (!is_array($Array1))
+         $Array1 = array();
+         
+      if (!is_array($Array2))
+         $Array2 = array();
+         
       if (count($Array1) > 0 && count($Array2) > 0)
          return array_combine($Array1, $Array2);
       elseif (count($Array1) == 0)

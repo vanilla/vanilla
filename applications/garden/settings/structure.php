@@ -31,7 +31,8 @@ $Construct->Table('Role')
 // Define some roles.
 // Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
 $RoleModel = Gdn::Factory('RoleModel');
-
+$RoleModel->Database = $Database;
+$RoleModel->SQL = $Database->SQL();
 $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Ex-members who do not have permission to sign in.'));
 $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
 $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));

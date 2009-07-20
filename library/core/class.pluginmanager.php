@@ -339,8 +339,7 @@ class Gdn_PluginManager {
       $PermissionName = ArrayValue('RegisterPermissions', $PluginInfo, FALSE);
       if ($PermissionName != FALSE) {
          $PermissionModel = Gdn::PermissionModel();
-         $Database = Gdn::Database();
-         $PermissionModel->Define($Database->Structure(), $Database->SQL(), $PermissionName);
+         $PermissionModel->Define($PermissionName);
       }
 
       if (count($Validation->Results()) > 0)

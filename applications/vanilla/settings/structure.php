@@ -137,16 +137,18 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows()
 
 if ($Drop) {
    $PermissionModel = Gdn::PermissionModel();
+   $PermissionModel->Database = $Database;
+   $PermissionModel->SQL = $SQL;
    
    // Define some global vanilla permissions.
-   $PermissionModel->Define($Construct, $SQL, array(
+   $PermissionModel->Define(array(
       'Vanilla.Settings.Manage',
       'Vanilla.Categories.Manage',
       'Vanilla.Spam.Manage'
       ));
    
    // Define some permissions for the Vanilla categories.
-   $PermissionModel->Define($Construct, $SQL, array(
+   $PermissionModel->Define(array(
       'Vanilla.Discussions.View',
       'Vanilla.Discussions.Add',
       'Vanilla.Discussions.Edit',

@@ -74,7 +74,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
       
             if ($CurrentTheme != '') {
                // Look for CSS in the theme folder:
-               $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . 'error.screen.css';
+               $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . 'error.css';
                
                // Look for Master View in the theme folder:
                $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . 'error.master';
@@ -82,7 +82,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
          }
             
          // Look for CSS in the garden design folder.
-         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . 'error.screen.css';
+         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . 'error.css';
          // Look for Master View in the garden view folder.
          $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'views' . DS . 'error.master';
          

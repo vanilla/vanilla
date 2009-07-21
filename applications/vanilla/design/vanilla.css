@@ -22,7 +22,7 @@ h1, h2 {
    font-weight:bold;
    margin-bottom:10px;
 }
-3 {
+h3 {
    font-size: 140%;
 }
 h4 {
@@ -129,7 +129,7 @@ body {
 #Head h1 a span {
    font-size: 24px;
    color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;   
+   text-shadow:0 1px 0 #30ACD6;
 }
 #Head h1 a:hover span {
    color:#f3fcff;
@@ -478,6 +478,12 @@ li.DiscussionRow ul.Discussion {
    /* Fixes an IE7 Spacing issue */
    display: inline !important;
 }
+
+/* Announcements */
+ul.Announcements {
+   padding: 0 0 20px;
+}
+
 
 /* Vanilla Discussion List Colors
 Classes applied to List Items are:

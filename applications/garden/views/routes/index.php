@@ -3,11 +3,11 @@ $Session = Gdn::Session();
 echo $this->Form->Open();
 ?>
 <h1><?php echo Gdn::Translate('Manage Routes'); ?></h1>
-<p><?php
-   echo Gdn::Translate('Routes can be used to redirect users to various parts of your site depending on the url. Use this screen to manage your custom routes. ');
+<div class="FilterMenu"><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute'); ?></div>
+<div class="Info"><?php
+   echo Gdn::Translate('Routes can be used to redirect users to various parts of your site depending on the url. ');
    echo Anchor('Get more information on creating custom routes', 'http://vanillaforums.org/page/routes');
-?></p>
-<p><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute Button'); ?></p>
+?></div>
 <table class="AltRows" id="RouteTable">
    <thead>
       <tr>

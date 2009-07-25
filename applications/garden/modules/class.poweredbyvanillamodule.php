@@ -9,12 +9,16 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 /**
- * An associative array of information about this application.
+ * Renders the "Powered By Vanilla" footer.
  */
-$ThemeInfo['Default'] = array(
-   'Description' => "The default theme for Garden. Pretty boring since it uses all of the views and designs from the base application(s).",
-   'Version' => '1.0',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
-   'AuthorUrl' => 'http://lussumo.com'
-);
+class PoweredByVanillaModule extends Module {
+   
+   public function AssetTarget() {
+      return 'Foot';
+   }
+   
+   public function ToString() {
+      return parent::ToString();
+   }   
+
+}

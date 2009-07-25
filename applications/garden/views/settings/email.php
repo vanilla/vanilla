@@ -5,7 +5,7 @@ echo $this->Form->Errors();
 <h1><?php echo Gdn::Translate('Outgoing Email Settings'); ?></h1>
 <ul>
    <li>
-      <p class="Warning"><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></p>
+      <div class="Info"><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></div>
    </li>
    <li>
       <?php
@@ -20,7 +20,7 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li>
-      <p class="Warning"><?php echo Gdn::Translate('Garden will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'); ?></p>
+      <div class="Info"><?php echo Gdn::Translate('Garden will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'); ?></div>
    </li>
    <li>
       <?php

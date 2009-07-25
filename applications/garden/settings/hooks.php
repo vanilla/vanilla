@@ -58,6 +58,7 @@ class GardenHooks implements Gdn_IPlugin {
       $Menu->AddLink('Users', 'Users', 'garden/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
       $Menu->AddLink('Users', 'Roles & Permissions', 'garden/role', 'Garden.Roles.Manage');
       $Menu->AddLink('Users', 'Registration', 'garden/settings/registration', 'Garden.Registration.Manage');
-      $Menu->AddLink('Users', 'Applicants', 'garden/user/applicants', 'Garden.Applicants.Manage');
+      if (Gdn::Config('Garden.Registration.Method') == 'Approval')
+         $Menu->AddLink('Users', 'Applicants', 'garden/user/applicants', 'Garden.Applicants.Manage');
    }
 }

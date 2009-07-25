@@ -3,7 +3,7 @@
  * An associative array of information about this application.
  */
 $ApplicationInfo['Vanilla'] = array(
-   'Description' => "Vanilla is the Lussumo's flagship application built with the Garden framework. Vanilla is a standards-compliant, open-source discussion forum for the web. Vanilla does a lot more with a lot less.",
+   'Description' => "Vanilla is the sweetest discussion forum on the web.",
    'Version' => '2.0',
    // 'RequiredApplications' => array('Garden' => '1.0'),
    'RegisterPermissions' => FALSE, // Permissions that should be added to the application when it is installed.

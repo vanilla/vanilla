@@ -9,7 +9,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <h1><?php echo Gdn::Translate('Manage Spam'); ?></h1>
-<p><?php echo Gdn::Translate('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></p>
+<div class="Info"><?php echo Gdn::Translate('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></div>
 <table class="AltColumns">
    <thead>
       <tr>
@@ -51,7 +51,7 @@ echo $this->Form->Errors();
 </table>
 <ul>
    <li>
-      <p class="Warning"><?php echo Translate("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></p>
+      <div class="Info"><?php echo Translate("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
    </li>
    <li>
       <?php

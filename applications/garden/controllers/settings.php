@@ -18,7 +18,13 @@ class SettingsController extends GardenController {
    /**
     * Application management screen.
     */
-   public function Applications($Action = '', $ApplicationName = '', $TransientKey = '') {
+   public function Applications($Filter = '', $TransientKey = '') {
+      $Session = Gdn::Session();
+      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      if (!in_array($Filter, array('enabled', 'disabled')))
+         $Filter = '';
+         
+      $this->Filter = $Filter;
       $this->Permission('Garden.Applications.Manage');
       $this->AddSideMenu('garden/settings/applications');
 
@@ -27,82 +33,40 @@ class SettingsController extends GardenController {
          
       $Session = Gdn::Session();
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
-      // Todd: Is this part necessary?
-      if (!$Session->ValidateTransientKey($TransientKey)) {
-      // if(!$AuthenticatedPostBack) {
-         $Action = '';
-         $ApplicationName = '';
-      } else {
-         $AuthenticatedPostBack = TRUE;
-      }
-      $FinalRedirect = FALSE;   
-      $SetupRender = FALSE;
       
       $ApplicationManager = new Gdn_ApplicationManager();
-      $this->AvailableApplications = $ApplicationManager->AvailableApplications();
+      $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
+      $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
       
       // Check the update server for updates to these applications
       $this->UpdateManager = new Gdn_UpdateManager();
       // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
       // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_APPLICATION, array_keys($this->AvailableApplications));
       
-      if ($AuthenticatedPostBack) {
-         $ApplicationName = $this->Form->GetValue('ApplicationName', $ApplicationName);
-         if ($ApplicationName != '') {
-            if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
-               try {
-                  $ApplicationManager->DisableApplication($ApplicationName);
-               } catch (Exception $e) {
-                  $this->Form->AddError(strip_tags($e->getMessage()));
-               }
-               $FinalRedirect = TRUE;
-            } else {
-               if ($Action == '') {
-                  // 1. Make sure that the application's requirements are met
-                  try {
-                     $ApplicationManager->CheckRequirements($ApplicationName);
-                  } catch (Exception $e) {
-                     $this->Form->AddError(strip_tags($e->getMessage()));
-                  }
-                  if ($this->Form->ErrorCount() == 0) {
-                     // 2. Register any specified permissions
-                     $Validation = new Gdn_Validation();
-                     $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
-                     if (count($Validation->Results()) == 0) {
-                        if (!$ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation, TRUE)) {
-                           $SetupUrl = '/garden/settings/applications/setup/'.$ApplicationName.'/'.$Session->TransientKey();
-                           if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-                              Redirect($SetupUrl);
-                           } else {
-                              $this->SetJson('Go', Url($SetupUrl)); // <---- THIS IS WHAT MAKES IT GET PICKED UP BY THE POPUP
-                              $this->Database->CloseConnection();
-                              exit(json_encode($this->GetJson()));
-                           }
-                        } else {
-                           $FinalRedirect = TRUE;
-                        }
-                     }
-                  }
-                  $this->Form->SetValidationResults($Validation->Results());
-               } elseif ($Action == 'setup') {
-                  // 3. Run the setup method of the application
-                  $SetupRender = TRUE;
-                  $Validation = new Gdn_Validation();
-                  if ($ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation)) {
-                     $SetupRender = FALSE;
-                     $FinalRedirect = TRUE;
-                  }
-               }
+      if ($ApplicationName != '') {
+         if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
+            try {
+               $ApplicationManager->DisableApplication($ApplicationName);
+            } catch (Exception $e) {
+               $this->Form->AddError(strip_tags($e->getMessage()));
             }
-            if ($FinalRedirect && $this->Form->ErrorCount() == 0) {
-               $this->StatusMessage = Gdn::Translate('Finalizing changes...');
-               $this->RedirectUrl = Url('/garden/settings/applications/');
+         } else {
+            try {
+               $ApplicationManager->CheckRequirements($ApplicationName);
+            } catch (Exception $e) {
+               $this->Form->AddError(strip_tags($e->getMessage()));
             }
+            if ($this->Form->ErrorCount() == 0) {
+               $Validation = new Gdn_Validation();
+               $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
+               $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+            }
+            $this->Form->SetValidationResults($Validation->Results());
          }
+         if ($this->Form->ErrorCount() == 0)
+            Redirect('settings/applications');
       }
-      if (!$SetupRender)
-         $this->Render();
-
+      $this->Render();
    }
    
    /**
@@ -222,7 +186,13 @@ class SettingsController extends GardenController {
          $this->Menu->HighlightRoute('/garden/settings');
    }
    
-   public function Plugins() {
+   public function Plugins($Filter = '', $TransientKey = '') {
+      $Session = Gdn::Session();
+      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      if (!in_array($Filter, array('enabled', 'disabled')))
+         $Filter = '';
+         
+      $this->Filter = $Filter;
       $this->Permission('Garden.Plugins.Manage');
       $this->AddSideMenu('garden/settings/plugins');
       
@@ -236,25 +206,20 @@ class SettingsController extends GardenController {
       // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
       // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_PLUGIN, array_keys($this->AvailablePlugins));
       
-      if ($this->Form->AuthenticatedPostBack()) {
-         $PluginName = $this->Form->GetValue('PluginName', '');
-         if ($PluginName != '') {
-            try {
-               if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
-                  $PluginManager->DisablePlugin($PluginName);
-               } else {
-                  $Validation = new Gdn_Validation();
-                  if (!$PluginManager->EnablePlugin($PluginName, $Validation))
-                     $this->Form->SetValidationResults($Validation->Results());
-               }
-            } catch (Exception $e) {
-               $this->Form->AddError(strip_tags($e->getMessage()));
+      if ($PluginName != '') {
+         try {
+            if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
+               $PluginManager->DisablePlugin($PluginName);
+            } else {
+               $Validation = new Gdn_Validation();
+               if (!$PluginManager->EnablePlugin($PluginName, $Validation))
+                  $this->Form->SetValidationResults($Validation->Results());
             }
-            if ($this->Form->ErrorCount() == 0) {
-               $this->StatusMessage = Gdn::Translate('Finalizing changes...');
-               $this->RedirectUrl = Url($this->SelfUrl);
-            }
+         } catch (Exception $e) {
+            $this->Form->AddError(strip_tags($e->getMessage()));
          }
+         if ($this->Form->ErrorCount() == 0)
+            Redirect('/settings/plugins');
       }
       $this->Render();
    }
@@ -355,7 +320,11 @@ class SettingsController extends GardenController {
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $this->EnabledTheme = $ThemeManager->EnabledTheme();
+      $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
+      $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
+      $Name = array_keys($this->EnabledTheme);
+      $Name = $Name[0];
+      $this->EnabledTheme = $this->EnabledTheme[$Name];
       
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {

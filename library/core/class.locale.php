@@ -102,7 +102,7 @@ class Gdn_Locale {
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
-
+            
          // Save the mappings
          $FileContents = array();
          $FileContents[] = "<?php if (!defined('APPLICATION')) exit();";
@@ -110,6 +110,11 @@ class Gdn_Locale {
          for($i = 0; $i < $Count; ++$i) {
             $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . Format::ArrayValueForPhp($LocaleSources[$i]) . "';";
          }
+         // Add the config locale if it exists
+         $ConfigLocale = PATH_CONF . DS . 'locale.php';
+         if (file_exists($ConfigLocale))
+            $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . $ConfigLocale . "';";
+            
          Gdn_FileSystem::SaveFile($LocaleMappings, implode("\n", $FileContents));
       }
 

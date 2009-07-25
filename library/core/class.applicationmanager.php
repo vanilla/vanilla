@@ -84,16 +84,6 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplications() {
       if (!is_array($this->_EnabledApplications)) {
-         /*$EnabledApplications = array('Garden' => 'garden');
-         include(PATH_CONF. DS . 'applications.php');
-         // Deliver more information than just the name and folder...
-         $Return = array();
-         foreach ($EnabledApplications as $AppName => $AppInfo) {
-            if (array_key_exists($AppName, $EnabledApplications))
-               $Return[$AppName] = $AppInfo;
-         }
-         $this->_EnabledApplications = $Return;*/
-         
          $EnabledApplications = Gdn::Config('EnabledApplications', array('Garden' => 'garden'));
          // Add some information about the applications to the array.
          foreach($EnabledApplications as $Name => $Folder) {
@@ -104,6 +94,30 @@ class Gdn_ApplicationManager {
       }
 
       return $this->_EnabledApplications;
+   }
+   
+   public function AvailableVisibleApplications() {
+      $AvailableApplications = $this->AvailableApplications();
+      foreach ($AvailableApplications as $ApplicationName => $Info) {
+         if (!ArrayValue('AllowEnable', $Info, TRUE) || !ArrayValue('AllowDisable', $Info, TRUE))
+            unset($AvailableApplications[$ApplicationName]);
+      }
+      return $AvailableApplications;
+   }
+
+   public function EnabledVisibleApplications() {
+      $AvailableApplications = $this->AvailableApplications();
+      $EnabledApplications = $this->EnabledApplications();
+      foreach ($AvailableApplications as $ApplicationName => $Info) {
+         if (array_key_exists($ApplicationName, $EnabledApplications)) {
+            if (!ArrayValue('AllowEnable', $Info, TRUE) || !ArrayValue('AllowDisable', $Info, TRUE)) {
+               unset($AvailableApplications[$ApplicationName]);
+            }
+         } else {
+            unset($AvailableApplications[$ApplicationName]);
+         }
+      }
+      return $AvailableApplications;
    }
 
    /**

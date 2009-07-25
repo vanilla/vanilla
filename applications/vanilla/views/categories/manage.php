@@ -5,7 +5,7 @@ $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->Paren
 echo $this->Form->Open();
 ?>
 <h1><?php echo Gdn::Translate('Manage Categories'); ?></h1>
-<p><?php echo Anchor('Add Category', 'vanilla/categories/add', 'Button'); ?></p>
+<div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/categories/add'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
       <tr id="0">

@@ -193,6 +193,7 @@ ul#Menu {
 #Content {
    float: left;
    width: 680px;
+   margin: 0 0 40px;
 }
 /* Progress Bars */
 .Loading {
@@ -279,9 +280,9 @@ a.Close {
    background: #f9f9f9;
    -moz-border-radius: 8px;
    -webkit-border-radius: 8px;
-   padding: 1px 4px 2px 5px;
+   padding: 1px 5px 2px;
    margin: 0px;
-   line-height: 100%;
+   line-height: 1;
    border: 1px solid #ddd;
 }
 a.Close:hover {
@@ -865,6 +866,62 @@ body.Search h1 {
    font-size:160%;
    margin:0;
    padding:10px 0 0;
+}
+
+/* FilterMenu */
+.FilterMenu {
+   color: #aaa;
+   padding: 0 6px 10px;
+}
+.FilterMenu strong {
+   font-weight: bold;
+   color: #111;
+}
+.FilterMenu span {
+   color: #999;
+   padding: 0 4px;
+}
+
+/* Info blocks */
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+}
+
+/* User Search */
+#garden_user_index div.Info .InputBox {
+   margin-right: 6px;
+}
+#garden_user_index div.Info .Button {
+   margin-right: 20px;
+}
+
+/* Powered by Vanilla Footer */
+
+#Foot {
+   border-top: 1px solid #E9F9FF;
+   border-bottom: 1px solid #E9F9FF;
+   background: #F0FBFF;
+   padding: 16px 0;
+   margin: 20px auto 0;
+}
+#Foot div {
+   width: 940px;
+   margin: 0 auto;
+   text-align: right;
+   color: #CAF0FE;
+}
+#Foot span {
+   display: none;
+}
+#Foot a {
+   background: url('logo.vanilla.png') center center no-repeat;
+   padding: 8px 40px;
+   margin: 0 0 0 10px;
 }
 
 /* End Layout */

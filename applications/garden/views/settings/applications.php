@@ -1,83 +1,133 @@
 <?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
 $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
+$AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
 <h1><?php echo Gdn::Translate('Manage Applications'); ?></h1>
-<p><?php
+<?php
+// Build a filter menu for applications
+$AppCount = count($this->AvailableApplications);
+$EnabledCount = count($this->EnabledApplications);
+$DisabledCount = $AppCount - $EnabledCount;
+echo '<div class="FilterMenu">',
+   $this->Filter == '' ? '<strong>'.Translate('All').'</strong>' : Anchor('All', '/settings/plugins/'),
+   ' ('.$AppCount.') <span>|</span> ',
+   $this->Filter == 'enabled' ? '<strong>'.Translate('Enabled').'</strong>' : Anchor('Enabled', '/settings/applications/enabled'),
+   ' ('.$EnabledCount.') <span>|</span> ',
+   $this->Filter == 'disabled' ? '<strong>'.Translate('Disabled').'</strong>' : Anchor('Disabled', '/settings/applications/disabled'),
+   ' ('.$DisabledCount.')';
+   
+if ($AddonUrl != '')
+   echo ' <span>|</span> '.Anchor('Get More Applications', $AddonUrl);
+?>
+</div>
+<div class="Info">
+   <?php
    printf(
-      Translate("Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here."),
+      Translate('ApplicationHelp'),
       '<span class="Warning">'.PATH_APPLICATIONS.'</span>'
-   ); ?></p>
-<p><?php echo Anchor('Get More Applications', 'http://lussumo.com/addons', 'Button'); ?></p>
-<?php echo $this->Form->Errors(); ?>
+   );
+   ?>
+</div>
 <table class="AltRows">
    <thead>
       <tr>
          <th><?php echo Gdn::Translate('Application'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Version'); ?></th>
-         <th><?php echo Gdn::Translate('Description'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Requires'); ?></th>
-         <th><?php echo Gdn::Translate('Options'); ?></th>
+         <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
       </tr>
    </thead>
    <tbody>
 <?php
 $Alt = FALSE;
 foreach ($this->AvailableApplications as $AppName => $AppInfo) {
-   $Alt = $Alt ? FALSE : TRUE;
-   $AppVersion = ArrayValue('Version', $AppInfo, '');
-   $ScreenName = ArrayValue('Name', $AppInfo, $AppName);
-   $CurrentVersion = $this->UpdateManager->GetCurrentVersion(ADDON_TYPE_APPLICATION, $AppName);
-   if (is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion) {
-      ?>
-      <tr class="FootNote">
-         <td colspan="5"><a href="<?php
-            echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
-         ?>"><?php
-            printf(Gdn::Translate('%1$s version %2$s is available.'), $AppName, $CurrentVersion);
-         ?></a></td>
+   $Css = array_key_exists($AppName, $this->EnabledApplications) ? 'Enabled' : 'Disabled';
+   $State = strtolower($Css);
+   if ($this->Filter == '' || $this->Filter == $State) {
+      $Alt = $Alt ? FALSE : TRUE;
+      $AppVersion = ArrayValue('Version', $AppInfo, '');
+      $ScreenName = ArrayValue('Name', $AppInfo, $AppName);
+      $SettingsUrl = $State == 'enabled' ? ArrayValue('SettingsUrl', $AppInfo, '') : '';
+      $AppUrl = ArrayValue('Url', $AppInfo, '');
+      $Author = ArrayValue('Author', $AppInfo, '');
+      $AuthorUrl = ArrayValue('AuthorUrl', $AppInfo, '');
+      $CurrentVersion = $this->UpdateManager->GetCurrentVersion(ADDON_TYPE_APPLICATION, $AppName);
+      $Upgrade = is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion;
+      $CssClass = $Upgrade ? 'More' : '';
+      if ($Alt) $CssClass = $CssClass . ' Alt';
+      $CssClass = trim($CssClass);
+      if ($CssClass != '')
+         $CssClass = ' class="'.$CssClass.'"';
+      ?>   
+      <tr class="More <?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+         <th><?php echo $ScreenName; ?></th>
+         <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
+      </tr>
+      <tr class="<?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+         <td class="Info"><?php
+            echo Anchor(
+               array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable',
+               '/settings/applications/'.$AppName.'/'.$Session->TransientKey()
+            );
+            
+            if ($SettingsUrl != '') {
+               echo '<span>|</span>';
+               echo Anchor('Settings', $SettingsUrl);
+            }
+         ?></td>
+         <td class="Alt Info"><?php
+            $RequiredApplications = ArrayValue('RequiredApplications', $AppInfo, FALSE);
+            $Info = '';
+            if ($AppVersion != '')
+               $Info = sprintf(Translate('Version %s'), $AppVersion);
+               
+            if (is_array($RequiredApplications)) {
+               if ($Info != '')
+                  $Info .= '<span>|</span>';
+
+               $Info .= Translate('Requires: ');
+            }
+               
+            $i = 0;
+            if (is_array($RequiredApplications)) {
+               if ($i > 0)
+                  $Info .= ', ';
+               
+               foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+                  $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                  ++$i;
+               }
+            }
+
+            if ($Author != '') {
+               $Info .= '<span>|</span>';
+               $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
+            }
+            
+            if ($AppUrl != '') {
+               $Info .= '<span>|</span>';
+               $Info .= Anchor('Visit Application Site', $AppUrl);
+            }
+            
+            echo $Info != '' ? $Info : '&nbsp;';
+            ?>
+         </td>
       </tr>
       <?php
+      if (is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion) {
+         ?>
+         <tr class="FootNote">
+            <td colspan="2"><a href="<?php
+               echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
+            ?>"><?php
+               printf(Gdn::Translate('%1$s version %2$s is available.'), $AppName, $CurrentVersion);
+            ?></a></td>
+         </tr>
+         <?php
+      }
    }
-   ?>   
-   <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-      <th><?php echo Anchor($ScreenName, ArrayValue('Url', $AppInfo, '')); ?></th>
-      <td class="Alt"><?php echo ArrayValue('Version', $AppInfo, ''); ?></td>
-      <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
-      <td class="Alt">
-         <?php
-         $RequiredApplications = ArrayValue('RequiredApplications', $AppInfo, FALSE);
-         if ($RequiredApplications === FALSE) {
-            echo '&nbsp;';
-         } else {
-            $i = 0;
-            foreach ($RequiredApplications as $RequiredApp => $VersionInfo) {
-               if ($i > 0)
-                  echo ', ';
-                  
-               printf(Gdn::Translate('%1$s (version %2$s'), $RequiredApp, $VersionInfo);
-               ++$i;
-            }
-         }
-         ?>
-      </td>
-      <td>
-         <?php
-         $Action = array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable';
-         $Allow = ArrayValue('Allow'.$Action, $AppInfo, TRUE);
-         if ($Allow) {
-            echo $this->Form->Open()
-            .$this->Form->Hidden('ApplicationName', array('value' => $AppName))
-            .$this->Form->Button($Action)
-            .$this->Form->Close();
-         } else {
-            echo '&nbsp;';
-         }
-         ?>
-      </td>
-   </tr>
-<?php } ?>
+}
+?>
    </tbody>
 </table>
-<h2><?php echo Gdn::Translate('Problems?'); ?></h2>
-<p><?php echo Translate("If something goes wrong and this page stops functioning properly, you can disable applications manually by editing:");?></p>
-<p class="Warning"><?php echo PATH_CONF.DS.'config.php'; ?></p>
+<?php
+   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');

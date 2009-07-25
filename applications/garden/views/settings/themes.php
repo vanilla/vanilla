@@ -1,65 +1,96 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
+$AddonUrl = Gdn::Config('Garden.AddonUrl');
+?>
 <h1><?php echo Gdn::Translate('Manage Themes'); ?></h1>
-<?php echo $this->Form->Errors(); ?>
-<p><?php
-   printf(
-      Translate("Themes allow you to change the colors, fonts, and layout of your site.<br />Once a theme has been added to your %s folder, you can enable it here."),
-      '<span class="Warning">'.PATH_THEMES.'</span>'
-   ); ?></p>
-<p><?php echo Anchor('Get More Themes', 'http://lussumo.com/addons', 'Button'); ?></p>   
+<?php
+if ($AddonUrl != '')
+   echo '<div class="FilterMenu">',
+      Anchor('Get More Themes', $AddonUrl),
+      '</div>';
+         
+?>
+<div class="Info">
+<?php
+printf(
+   Translate('ThemeHelp'),
+   '<span class="Warning">'.PATH_THEMES.'</span>'
+);
+?></div>
 <table class="AltRows">
    <thead>
       <tr>
          <th><?php echo Gdn::Translate('Theme'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Version'); ?></th>
          <th><?php echo Gdn::Translate('Description'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Requires'); ?></th>
-         <th><?php echo Gdn::Translate('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
 <?php
 $Alt = FALSE;
 foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-   $Alt = $Alt ? FALSE : TRUE;
-   $CssClass = $Alt ? 'Alt' : '';
    $ThemeFolder = ArrayValue('Folder', $ThemeInfo, '');
-   $Active = $ThemeFolder == $this->EnabledTheme;
-   $CssClass .= $Active ? ' Highlight' : '';
-   $CssClass = trim($CssClass);
+   $ThemeVersion = ArrayValue('Version', $ThemeInfo, '');
+   $ThemeUrl = ArrayValue('Url', $ThemeInfo, '');
+   $Author = ArrayValue('Author', $ThemeInfo, '');
+   $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
+   $Active = $ThemeFolder == $this->EnabledThemeFolder;
+   $Alt = $Alt ? FALSE : TRUE;
+   $CssClass = $Alt ? ' Alt ' : '';
+   $CssClass .= $Active ? ' Enabled' : ' Disabled';
    ?>
-   <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
-      <th><?php echo Anchor($ThemeName, ArrayValue('Url', $ThemeInfo)); ?></th>
-      <td class="Alt"><?php echo ArrayValue('Version', $ThemeInfo, '&nbsp;'); ?></td>
-      <td><?php echo ArrayValue('Description', $ThemeInfo, '&nbsp;'); ?></td>
-      <td class="Alt">
-      <?php
-         $RequiredApps = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
-         if ($RequiredApps === FALSE) {
-            echo '&nbsp;';
+   <tr class="More<?php echo $CssClass != '' ? ' '.$CssClass : ''; ?>">
+      <th><?php echo $ThemeName; ?></th>
+      <td class="Alt"><?php echo ArrayValue('Description', $ThemeInfo, '&nbsp;'); ?></td>
+   </tr>
+   <tr class="<?php echo $CssClass != '' ? ' '.$CssClass : ''; ?>">
+      <td class="Info">
+         <?php
+         if($Active) {
+            echo Translate('Active');
          } else {
-            $i = 0;
-            foreach ($RequiredApps as $RequiredApp => $VersionInfo) {
-               if ($i > 0)
-                  echo ', ';
-                  
-               printf(Gdn::Translate('%1$s %2$s'), $RequiredApp, $VersionInfo);
+            echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), '', array('target' => '_top'));
+            echo '<span>|</span>';
+            echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, '', array('target' => '_top'));
+         }
+         ?>
+      </td>
+      <td class="Info Alt">
+      <?php
+         $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
+         $Info = '';
+         if ($ThemeVersion != '')
+            $Info = sprintf(Translate('Version %s'), $ThemeVersion);
+            
+         if (is_array($RequiredApplications)) {
+            if ($Info != '')
+               $Info .= '<span>|</span>';
+
+            $Info .= Translate('Requires: ');
+         }
+            
+         $i = 0;
+         if (is_array($RequiredApplications)) {
+            if ($i > 0)
+               $Info .= ', ';
+            
+            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+               $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
                ++$i;
             }
          }
-      ?>
-      </td>
-      <td class="nowrap">
-         <?php
-         if ($Active) {
-            echo Gdn::Translate('Current');
-         } else {
-            $Session = Gdn::Session();
-            echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
-            echo ' ';
-            echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
+
+         if ($Author != '') {
+            $Info .= '<span>|</span>';
+            $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
          }
-         ?>
+         
+         if ($ThemeUrl != '') {
+            $Info .= '<span>|</span>';
+            $Info .= Anchor('Visit Theme Site', $ThemeUrl);
+         }
+         
+         echo $Info != '' ? $Info : '&nbsp;';
+      ?>
       </td>
    </tr>
    <?php
@@ -67,7 +98,5 @@ foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
 ?>
    </tbody>
 </table>
-<h2><?php echo Gdn::Translate('Problems?'); ?></h2>
-<p><?php echo Translate("If something goes wrong with a theme and you can't use your site, you can disable themes manually by removing the \"Theme\" configuration setting in:"); ?></p>
-<p class="Warning"><?php echo PATH_CONF.DS.'config.php'; ?></p>
-
+<?php
+   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');

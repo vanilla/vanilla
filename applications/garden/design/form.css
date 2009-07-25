@@ -99,10 +99,13 @@ table thead th,
 table thead td {
    border-bottom: 1px solid #c7cfe0;
 }
+table tbody th {
+   font-weight: bold;
+   color: #000;
+}
 table tbody th,
 table tbody td {
    border-bottom: 1px solid #e2e6ef;
-   vertical-align: middle;
    line-height: 150%;
 }
 table tbody tr.FootNote td {
@@ -110,8 +113,19 @@ table tbody tr.FootNote td {
    color: #454545;
    border-bottom: 0px;
 }
+table tbody tr.More th,
+table tbody tr.More td {
+   border-bottom: 0;
+}
+table tbody td.Info span {
+   padding: 0 6px;
+   font-weight: bold;
+   color: #888;
+}
 table thead th {
+   font-weight: bold;
    font-size: 13px;
+   line-height: 100%;
    color: #000 /* Body Heading Font Color */;
 }
 table input.Button {
@@ -145,6 +159,21 @@ table tbody td blockquote {
 }
 table.Sortable tbody td {
    cursor: move;
+}
+
+/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications, themes) that need to override default styles */
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+   background: #fff;
+   color: #000;
+}
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td {
+   background: #f8f8f8;
 }
 
 /* CheckBoxGrid */

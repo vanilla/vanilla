@@ -4,15 +4,18 @@ $EditUser = $Session->CheckPermission('Garden.Users.Edit');
 echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
 <h1><?php echo Gdn::Translate('Manage Users'); ?></h1>
-<ul>
-   <li><?php
+<div class="FilterMenu">
+   <?php echo Anchor('Add User', 'garden/user/add', 'Popup'); ?>
+</div>
+<div class="Info">
+   <?php
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button('Go');
       printf(Gdn::Translate('%s user(s) found.'), $this->Pager->TotalRecords);
-      echo Anchor('Add User', 'garden/user/add', 'Button Popup');
-   ?></li>
-</ul>
+      
+   ?>
+</div>
 <table id="Users" class="AltColumns">
    <thead>
       <tr>

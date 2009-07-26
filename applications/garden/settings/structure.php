@@ -27,7 +27,6 @@ $Construct->Table('Role')
    ->Column('CanSession', array('1', '0'), '', FALSE, '1')
    ->Set($Explicit, $Drop);
 
-
 // Define some roles.
 // Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
 $RoleModel = Gdn::Factory('RoleModel');
@@ -104,8 +103,8 @@ if($PermissionModel instanceof Gdn_PermissionModel) {
 // Define the set of permissions that garden uses.
 $PermissionModel->Define(array(
 	'Garden.Settings.Manage',
-	'Garden.Email.Manage',
 	'Garden.Routes.Manage',
+   'Garden.Messages.Manage',
 	'Garden.Applications.Manage',
 	'Garden.Plugins.Manage',
 	'Garden.Themes.Manage',
@@ -258,3 +257,14 @@ if($SearchModel instanceof Gdn_SearchModel) {
 		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
 		->Set($Explicit, $Drop);
 }
+
+// Message Table
+$Construct->Table('Message')
+   ->Column('MessageID', 'int', 10, FALSE, NULL, 'primary', TRUE)
+   ->Column('Content', 'text')
+   ->Column('Format', 'varchar', 20, TRUE)
+   ->Column('AllowDismiss', array('1', '0'), '', FALSE, '1')
+   ->Column('Enabled', array('1', '0'), '', FALSE, '1')
+   ->Column('Controller', 'varchar', 50, TRUE)
+   ->Column('AssetTarget', 'varchar', 20, TRUE)
+   ->Set($Explicit, $Drop);

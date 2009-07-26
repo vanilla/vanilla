@@ -89,7 +89,6 @@ class UtilityController extends GardenController {
       if (file_exists($File)) {
          $Validation = new Gdn_Validation();
          $Database = Gdn::Database();
-         $Construct = $Database->Structure();
          $Drop = $Drop == '0' ? FALSE : TRUE;
          $Explicit = $Explicit == '0' ? FALSE : TRUE;
          try {

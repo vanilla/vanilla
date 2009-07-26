@@ -1019,13 +1019,14 @@ abstract class Gdn_SQLDriver {
     * @param string $Select A select query that will fill the FieldNames specified in $Set.
     */
    public function Insert($Table = '', $Set = NULL, $Select = '') {
+      if (count($Set) == 0 && count($this->_Sets) == 0) {
+         return FALSE;
+      }
+      
       if (!is_null($Set) && $Select == '' && !array_key_exists(0, $Set)) {
          $this->Set($Set);
          $Set = $this->_Sets;
       }
-
-      if (count($Set) == 0)
-         return FALSE;
 
       if ($Table == '') {
          if (!isset($this->_Froms[0]))
@@ -1444,11 +1445,10 @@ abstract class Gdn_SQLDriver {
    public function Put($Table = '', $Set = NULL, $Where = FALSE, $Limit = FALSE) {
       $this->Update($Table, $Set, $Where, $Limit);
 
-      if (count($this->_Sets) == 0)
+      if (count($this->_Sets) == 0 || !isset($this->_Froms[0])) {
+         $this->Reset();
          return FALSE;
-
-      if (!isset($this->_Froms[0]))
-         return FALSE;
+      }
 
       $Sql = $this->GetUpdate($this->_Froms[0], $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
       $Result = $this->Query($Sql);
@@ -1481,7 +1481,6 @@ abstract class Gdn_SQLDriver {
          case 2:
             return;
       }
-      
       $this->_Selects         = array();
       $this->_Froms           = array();
       $this->_Joins           = array();

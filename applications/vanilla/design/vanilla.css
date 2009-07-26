@@ -979,26 +979,25 @@ a.Cancel {
 /* Powered by Vanilla Footer */
 
 #Foot {
-   clear: both;
-   border-top: 1px solid #E9F9FF;
-   border-bottom: 1px solid #E9F9FF;
-   background: #F0FBFF;
-   padding: 16px 0;
-   margin: 0 auto;
+   text-align: center;
+   margin: 8px 0;
 }
 #Foot div {
-   width: 940px;
-   margin: 0 auto;
-   text-align: right;
-   color: #CAF0FE;
-}
-#Foot span {
-   display: none;
+   display: inline;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   background: #f8f8f8;
+   -moz-border-radius: 20px;
+   line-height: 1;
+   border: 1px solid #eee;
 }
 #Foot a {
-   background: url('logo.vanilla.png') center center no-repeat;
-   padding: 8px 40px;
-   margin: 0 0 0 10px;
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
 }
 
 

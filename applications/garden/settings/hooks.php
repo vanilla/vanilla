@@ -46,8 +46,8 @@ class GardenHooks implements Gdn_IPlugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Site Settings', 'Site Settings');
       $Menu->AddLink('Site Settings', 'General', 'garden/settings/configure', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', 'Outgoing Email', 'garden/settings/email', 'Garden.Email.Manage');
       $Menu->AddLink('Site Settings', 'Routes', 'garden/routes', 'Garden.Routes.Manage');
+      $Menu->AddLink('Site Settings', 'Messages', 'garden/messages', 'Garden.Messages.Manage');
       
       $Menu->AddItem('Add-ons', 'Add-ons');
       $Menu->AddLink('Add-ons', 'Applications', 'garden/settings/applications', 'Garden.Applications.Manage');

@@ -75,10 +75,23 @@ class SettingsController extends GardenController {
    public function Configure() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
+      if ($this->Head)
+         $this->Head->AddScript('/applications/garden/js/email.js');      
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls'));
+      $ConfigurationModel->SetField(array(
+         'Garden.Locale',
+         'Garden.Title',
+         'Garden.RewriteUrls',
+         'Garden.Email.SupportName',
+         'Garden.Email.SupportAddress',
+         'Garden.Email.UseSmtp',
+         'Garden.Email.SmtpHost',
+         'Garden.Email.SmtpUser',
+         'Garden.Email.SmtpPassword',
+         'Garden.Email.SmtpPort'
+      ));
       
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
@@ -97,6 +110,9 @@ class SettingsController extends GardenController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Locale', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.RewriteUrls', 'Boolean');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
          
          // If changing locale, redefine locale sources:
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
@@ -116,53 +132,11 @@ class SettingsController extends GardenController {
    }      
    
    /**
-    * Garden management screen.
-    */
-   public function Email() {
-      $this->Permission('Garden.Email.Manage');
-      $this->AddSideMenu('garden/settings/email');
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/email.js');      
-      
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
-      $ConfigurationModel->SetField(array(
-         'Garden.Email.SupportName',
-         'Garden.Email.SupportAddress',
-         'Garden.Email.UseSmtp',
-         'Garden.Email.SmtpHost',
-         'Garden.Email.SmtpUser',
-         'Garden.Email.SmtpPassword',
-         'Garden.Email.SmtpPort'
-      ));
-      
-      // Set the model on the form.
-      $this->Form->SetModel($ConfigurationModel);
-      
-      // If seeing the form for the first time...
-      if (!$this->Form->AuthenticatedPostBack()) {
-         // Apply the config settings to the form.
-         $this->Form->SetData($ConfigurationModel->Data);
-      } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
-         if ($this->Form->Save() !== FALSE)
-            $this->StatusMessage = Translate("Your settings have been saved.");
-
-      }
-      
-      $this->Render();      
-   }      
-   
-   /**
     * Garden settings dashboard.
     */
    var $RequiredAdminPermissions = array();
    public function Index() {
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Email.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';

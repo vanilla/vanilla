@@ -56,6 +56,15 @@ textarea {
    width: 250px;
    border: 1px solid #888;
 }
+textarea.TextBox {
+   width: 500px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 500px;
+}
+#Popup textarea.TextBox {
+   width: 465px;
+}
 input.SmallInput,
 input.InputBox {
    font-size: 15px;
@@ -803,9 +812,11 @@ li.five { background: url('five.png') no-repeat center left; }
 
 /* DataList (search results, vanilla discussions, drafts, etc) */
 
+/*
 ul.DataList {
    border-top: 1px solid #dbe3e6;
 }
+*/
 ul.DataList li {
    margin: 0px;
    padding: 0px 0px 4px 0px;
@@ -822,9 +833,12 @@ ul.DataList li ul {
    padding: 0px;
 }
 ul.DataList li ul li.Title a {
-   border-left: 2px solid #dbe3e6;
-   margin: 8px 4px 6px 10px;
-   padding: 0px 0px 0px 8px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 2px 8px;
    line-height: 130%;
    color: #2b3033;
    font-size: 105%;
@@ -842,6 +856,7 @@ ul.DataList li ul li.Title h3 a {
    padding: 0px;
    margin: 0px;
    color: #2d7bb2;
+   background: none;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
@@ -863,7 +878,6 @@ ul.DataList li ul li.Meta a {
 }
 /* Search Page Heading */
 body.Search h1 {
-   font-size:160%;
    margin:0;
    padding:10px 0 0;
 }
@@ -903,25 +917,25 @@ div.Info {
 /* Powered by Vanilla Footer */
 
 #Foot {
-   border-top: 1px solid #E9F9FF;
-   border-bottom: 1px solid #E9F9FF;
-   background: #F0FBFF;
-   padding: 16px 0;
-   margin: 20px auto 0;
+   text-align: center;
+   margin: 2px 0;
 }
 #Foot div {
-   width: 940px;
-   margin: 0 auto;
-   text-align: right;
-   color: #CAF0FE;
-}
-#Foot span {
-   display: none;
+   display: inline;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   background: #f8f8f8;
+   -moz-border-radius: 20px;
+   line-height: 1;
+   border: 1px solid #eee;
 }
 #Foot a {
-   background: url('logo.vanilla.png') center center no-repeat;
-   padding: 8px 40px;
-   margin: 0 0 0 10px;
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
 }
 
 /* End Layout */

@@ -1199,8 +1199,7 @@ class Form {
             // NOTE: THE VALIDATION FUNCTION NAMES ARE ALSO THE LANGUAGE
             // TRANSLATIONS OF THE ERROR MESSAGES. CHECK THEM OUT IN THE LOCALE
             // FILE.
-            $this->SetValidationResults(
-               $this->_Model->ValidationResults());
+            $this->SetValidationResults($this->_Model->ValidationResults());
          }
       }
       return $SaveResult;

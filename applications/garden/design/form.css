@@ -117,10 +117,14 @@ table tbody tr.More th,
 table tbody tr.More td {
    border-bottom: 0;
 }
+table.AltRows tbody tr.Enabled td.Info,
+table.AltColumns tbody tr.Enabled td.Info,
+table.AltRows tbody tr.Disabled td.Info,
+table.AltColumns tbody tr.Disabled td.Info {
+   color: #aaa;
+}
 table tbody td.Info span {
    padding: 0 6px;
-   font-weight: bold;
-   color: #888;
 }
 table thead th {
    font-weight: bold;
@@ -166,7 +170,7 @@ table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-   background: #fff;
+   background: #ffd;
    color: #000;
 }
 table.AltRows tr.Disabled th,

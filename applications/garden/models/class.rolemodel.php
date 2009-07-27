@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class Gdn_RoleModel extends Model {
+class Gdn_RoleModel extends Gdn_Model {
    /**
     * Class constructor. Defines the related database table name.
     */

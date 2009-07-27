@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 class MessagesController extends ConversationsController {
    
-   public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
+   public $Uses = array('Form', 'Gdn_ConversationModel', 'Gdn_ConversationMessageModel');
    
    public function Initialize() {
       parent::Initialize();

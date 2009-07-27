@@ -3,7 +3,7 @@
 /**
  * The VanillaModel introduces common methods that child classes can use.
  */
-abstract class VanillaModel extends Model {
+abstract class Gdn_VanillaModel extends Gdn_Model {
    /**
     * Class constructor.
     */
@@ -74,7 +74,7 @@ abstract class VanillaModel extends Model {
          }
       }
       // Update the user profile after every comment
-      $UserModel = new Gdn_UserModel();
+      $UserModel = Gdn::UserModel();
       $UserModel->SaveAttribute($Session->UserID, $Attributes);
       
       return $Spam;

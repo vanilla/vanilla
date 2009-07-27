@@ -191,7 +191,7 @@ class ReplyModel extends CommentModel {
    
    public function RecordActivity($ReplyCommentID, $ActivityUserID, $CommentID) {
       // Get the author of the discussion
-      $CommentModel = new CommentModel();
+      $CommentModel = new Gdn_CommentModel();
       $Comment = $CommentModel->GetID($ReplyCommentID);
       if ($ActivityUserID != $Comment->InsertUserID)
          AddActivity(

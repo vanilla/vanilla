@@ -16,28 +16,28 @@ class UtilityController extends GardenController {
    public $Uses = array('Form');
    
    public function Sort() {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Success = FALSE;
-      if ($this->Form->AuthenticatedPostBack()) {
+      $Session = Gdn::Session();
+      $TransientKey = GetPostValue('TransientKey', '');
+      $Target = GetPostValue('Target', '');
+      if ($Session->ValidateTransientKey($TransientKey)) {
          $TableID = GetPostValue('TableID', FALSE);
          if ($TableID) {
             $Rows = GetPostValue($TableID, FALSE);
             if (is_array($Rows)) {
                try {
                   $Table = str_replace('Table', '', $TableID);
-                  $TableModel = new Model($Table);
+                  $TableModel = new Gdn_Model($Table);
                   foreach ($Rows as $Sort => $ID) {
                      $TableModel->Update(array('Sort' => $Sort), array($Table.'ID' => $ID));
                   }
-                  $Success = TRUE;
                } catch (Exception $ex) {
                   $this->Form->AddError($ex->getMessage());
                }
             }
          }
       }
-      if (!$Success)
-         $this->Form->AddError('ErrorBool');
+      if ($this->DeliveryType() != DELIVERY_TYPE_BOOL)
+         Redirect($Target);
          
       $this->Render();
    }

@@ -1000,5 +1000,34 @@ a.Cancel {
    color: #aaa;
 }
 
+/* Info blocks */
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+
+/* Dismiss Messages */
+
+a.DismissMessage {
+   font-size: 11px;
+   line-height: 1;
+   float: right;
+   background: #fafafa;
+   padding: 4px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   color: #aaa;
+   margin: 4px;
+}
+a.DismissMessage:hover {
+   background: #fafafa;
+   border: 1px solid #ddd;
+   color: #777;
+}
 
 /* End Typography */

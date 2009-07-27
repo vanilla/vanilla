@@ -12,8 +12,8 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Page', 'Controller');
-         echo $this->Form->DropDown('Controller', $this->ControllerData);
+         echo $this->Form->Label('Page', 'Location');
+         echo $this->Form->DropDown('Location', $this->LocationData);
       ?>
    </li>
    <li>

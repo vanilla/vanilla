@@ -36,7 +36,7 @@ if (!defined('APPLICATION'))
  *
  * @package Garden
  */
-class Model extends Gdn_Pluggable {
+class Gdn_Model extends Gdn_Pluggable {
 
 
    /**

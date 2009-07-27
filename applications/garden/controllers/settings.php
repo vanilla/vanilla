@@ -14,6 +14,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 class SettingsController extends GardenController {
    
    public $Uses = array('Form', 'Database');
+   public $ModuleSortContainer = 'Dashboard';
    
    /**
     * Application management screen.

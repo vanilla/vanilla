@@ -3,7 +3,7 @@
 /**
  * Manages discussion categories.
  */
-class CategoryModel extends Model {
+class Gdn_CategoryModel extends Gdn_Model {
    
    /**
     * Class constructor. Defines the related database table name.

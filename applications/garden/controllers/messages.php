@@ -13,27 +13,46 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 class MessagesController extends GardenController {
    
-   public $Uses = array('Form');
-   
-   public function Index() {
-      $this->Permission('Garden.Messages.Manage');
-      $this->AddSideMenu('garden/messages');
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/applications/garden/js/messages.js');
-      }
-         
-      // Load all messages from the db
-      $MessageModel = new Model('Message');
-      $this->MessageData = $MessageModel->Get();
-      $this->Render();
-   }
+   public $Uses = array('Form', 'Gdn_MessageModel');
    
    public function Add() {
       $this->Permission('Garden.Messages.Manage');
       // Use the edit form with no MessageID specified.
       $this->View = 'Edit';
       $this->Edit();
+   }
+   
+   public function Delete($MessageID = '', $TransientKey = FALSE) {
+      $this->Permission('Garden.Messages.Manage');
+      $this->DeliveryType(DELIVERY_TYPE_BOOL);
+      $Session = Gdn::Session();
+      
+      if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
+         $Message = $this->MessageModel->Delete(array('MessageID' => $MessageID));
+         // Reset the message cache
+         $this->_SetMessageCache();
+      }
+      
+      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+         Redirect('garden/messages');
+
+      $this->Render();      
+   }
+   
+   public function Dismiss($MessageID = '', $TransientKey = FALSE) {
+      $Session = Gdn::Session();
+      
+      if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
+         $Prefs = $Session->GetPreference('DismissedMessages', array());
+         $Prefs[] = $MessageID;
+         $UserModel = Gdn::UserModel();
+         $UserModel->SavePreference($Session->UserID, 'DismissedMessages', $Prefs);
+      }
+      
+      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
+
+      $this->Render();      
    }
    
    public function Edit($MessageID = '') {
@@ -44,26 +63,29 @@ class MessagesController extends GardenController {
          
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('garden/messages');
-      $MessageModel = new Model('Message');
-      $this->Message = $MessageModel->GetWhere(array('MessageID' => $MessageID));
-      $this->Message = $this->Message->NumRows() == 0 ? FALSE : $this->Message->FirstRow();
       
       // Generate some Controller & Asset data arrays
-      $this->ControllerData = $this->_GetControllerData();
+      $this->LocationData = $this->_GetLocationData();
       $this->AssetData = $this->_GetAssetData();
       
       // Set the model on the form.
-      $this->Form->SetModel($MessageModel);
+      $this->Form->SetModel($this->MessageModel);
+      $this->Message = $this->MessageModel->GetID($MessageID);
       
       // Make sure the form knows which item we are editing.
       if (is_numeric($MessageID) && $MessageID > 0)
          $this->Form->AddHidden('MessageID', $MessageID);
+
 
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($this->Message);
       } else {
          if ($MessageID = $this->Form->Save()) {
+            // Reset the message cache
+            $this->_SetMessageCache();
+            
+            // Redirect
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
             $this->RedirectUrl = Url('garden/messages');
          }
@@ -71,14 +93,26 @@ class MessagesController extends GardenController {
       $this->Render();
    }
    
-   protected function _GetControllerData() {
-      $ControllerData = array();
-      $ControllerData['Settings'] = 'Dashboard';
-      $ControllerData['Base'] = 'Every Page';
-      $ControllerData['Discussions'] = 'Discussions Page';
-      $ControllerData['Discussion'] = 'Comments Page';
-      return $ControllerData;
+   public function Index() {
+      $this->Permission('Garden.Messages.Manage');
+      $this->AddSideMenu('garden/messages');
+      if ($this->Head) {
+         $this->Head->AddScript('js/library/jquery.autogrow.js');
+         $this->Head->AddScript('/js/library/jquery.tablednd.js');
+         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
+         $this->Head->AddScript('/applications/garden/js/messages.js');
+      }
+         
+      // Load all messages from the db
+      $this->MessageData = $this->MessageModel->Get('Sort');
+      $this->Render();
    }
+   
+   public function Initialize() {
+      parent::Initialize();
+      if ($this->Menu)
+         $this->Menu->HighlightRoute('/garden/settings');
+   }   
    
    protected function _GetAssetData() {
       $AssetData = array();
@@ -87,26 +121,21 @@ class MessagesController extends GardenController {
       return $AssetData;
    }
    
-   public function Delete($MessageID = '', $TransientKey = FALSE) {
-      $this->Permission('Garden.Messages.Manage');
-      $this->DeliveryType(DELIVERY_TYPE_BOOL);
-      $Session = Gdn::Session();
-      
-      if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
-         $MessageModel = new Model('Message');
-         $Message = $MessageModel->Delete(array('MessageID' => $MessageID));
-      }
-      
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('garden/messages');
-
-      $this->Render();      
+   protected function _GetLocationData() {
+      $ControllerData = array();
+      $ControllerData['Garden/Settings/Index'] = 'Dashboard';
+      $ControllerData['Garden/Profile/Index'] = 'Profile Page';
+      $ControllerData['Vanilla/Discussions/Index'] = 'Discussions Page';
+      $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
+      $ControllerData['Base'] = 'Every Page';
+      return $ControllerData;
    }
-   
-   
-   public function Initialize() {
-      parent::Initialize();
-      if ($this->Menu)
-         $this->Menu->HighlightRoute('/garden/settings');
-   }   
+
+   protected function _SetMessageCache() {
+      // Retrieve an array of all controllers that have enabled messages associated
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
+      $Config->Set('Garden.Messages.Cache', $this->MessageModel->GetEnabledLocations());
+      $Config->Save();
+   }
 }

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class DraftModel extends VanillaModel {
+class Gdn_DraftModel extends Gdn_VanillaModel {
    /**
     * Class constructor.
     */

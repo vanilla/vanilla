@@ -16,7 +16,7 @@ class CategoriesModule extends Module {
       $this->_CategoryData = FALSE;
       if (Gdn::Config('Vanilla.Categories.Use') == TRUE) {
          if (!property_exists($Sender, 'CategoryModel') || !is_object($Sender->CategoryModel))
-            $Sender->CategoryModel = new CategoryModel();
+            $Sender->CategoryModel = new Gdn_CategoryModel();
             
          $this->_CategoryData = $Sender->CategoryModel->GetFull();
       }

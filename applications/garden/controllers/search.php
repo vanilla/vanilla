@@ -21,7 +21,7 @@ class SearchController extends GardenController {
 	}
 	
 	/// PROPERTIES ///
-   public $Uses = array('Database', 'SearchModel');
+   public $Uses = array('Database', 'Gdn_SearchModel');
 	
 	public $Form;
 	

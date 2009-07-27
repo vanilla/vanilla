@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class ConversationModel extends Model {
+class Gdn_ConversationModel extends Gdn_Model {
    /**
     * Class constructor.
     */

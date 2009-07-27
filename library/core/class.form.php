@@ -995,7 +995,7 @@ class Form {
     */
    public function __construct($TableName = '') {
       if ($TableName != '') {
-         $TableModel = new Model($TableName);
+         $TableModel = new Gdn_Model($TableName);
          $this->SetModel($TableModel);
       }
    }

@@ -5,7 +5,7 @@
  */
 class DiscussionController extends VanillaController {
    
-   public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
+   public $Uses = array('Gdn_DiscussionModel', 'Gdn_CommentModel', 'Form');
    public $CategoryID;
    
    public function Index($DiscussionID = '', $Offset = '', $Limit = '') {

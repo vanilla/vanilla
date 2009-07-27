@@ -5,7 +5,7 @@
  */
 class DraftsController extends VanillaController {
    
-   public $Uses = array('Database', 'DraftModel');
+   public $Uses = array('Database', 'Gdn_DraftModel');
    
    public function Index($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');

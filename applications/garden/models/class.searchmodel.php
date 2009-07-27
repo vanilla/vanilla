@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class Gdn_SearchModel extends Model {
+class Gdn_SearchModel extends Gdn_Model {
 	/// CONSTANTS ///
 	protected $NoiseWords = array('and', 'are', 'but', 'for', 'have', 'not', 'out', 'that', 'the', 'this', 'you', 'was', 'with');
 	

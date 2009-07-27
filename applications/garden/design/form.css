@@ -126,6 +126,10 @@ table.AltColumns tbody tr.Disabled td.Info {
 table tbody td.Info span {
    padding: 0 6px;
 }
+table tbody td.Info strong {
+   font-weight: bold;
+   color: #000;
+}
 table thead th {
    font-weight: bold;
    font-size: 13px;

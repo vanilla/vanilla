@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 class RoleController extends GardenController {
    
-   public $Uses = array('Database', 'Form', 'RoleModel');
+   public $Uses = array('Database', 'Form', 'Gdn_RoleModel');
    
    public function Add() {
       $this->Permission('Garden.Roles.Manage');

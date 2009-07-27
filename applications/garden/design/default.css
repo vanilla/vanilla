@@ -914,7 +914,30 @@ div.Info {
    margin-right: 20px;
 }
 
-/* Powered by Vanilla Footer */
+/* Dismiss Messages */
+
+a.DismissMessage {
+   font-size: 11px;
+   line-height: 1;
+   float: right;
+   background: #fafafa;
+   padding: 4px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   color: #aaa;
+   margin: 4px;
+}
+#garden_settings_index a.DismissMessage {
+   background: #fff;
+   border: 1px solid #fff;
+}
+a.DismissMessage:hover {
+   background: #fafafa;
+   border: 1px solid #ddd;
+   color: #777;
+}
+
+/* Powered by Vanilla Footer 
 
 #Foot {
    text-align: center;
@@ -937,5 +960,5 @@ div.Info {
 #Foot a:hover {
    color: #aaa;
 }
-
+*/
 /* End Layout */

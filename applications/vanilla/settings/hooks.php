@@ -65,7 +65,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset = 0;
       
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('d.InsertUserID' => $Sender->User->UserID));
       $CountDiscussions = $Offset + $Sender->DiscussionData->NumRows();
       if ($Sender->DiscussionData->NumRows() == $Limit)

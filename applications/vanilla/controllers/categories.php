@@ -5,7 +5,7 @@
  */
 class CategoriesController extends VanillaController {
    
-   public $Uses = array('Database', 'Form', 'CategoryModel');
+   public $Uses = array('Database', 'Form', 'Gdn_CategoryModel');
    
    public function Add() {
       $this->Permission('Vanilla.Categories.Manage');
@@ -194,7 +194,7 @@ class CategoriesController extends VanillaController {
       $this->AddModule($DraftsModule);
 
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       $this->Permission('Vanilla.Discussions.View', $this->CategoryID);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
@@ -251,7 +251,7 @@ class CategoriesController extends VanillaController {
       }
          
       $this->DiscussionsPerCategory = Gdn::Config('Vanilla.Discussions.PerCategory', 5);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $this->CategoryData = $this->CategoryModel->GetFull();
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {

@@ -20,10 +20,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * Base module object
  * @package Garden

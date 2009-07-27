@@ -1,10 +1,13 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
-<rss version="2.0">
-   <channel>
+
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
       <title><?php echo $this->Head->Title(); ?></title>
       <link><?php echo Url('', TRUE, TRUE); ?></link>
-      <lastBuildDate><?php echo date(DATE_RFC822); ?></lastBuildDate>
-      
+      <pubDate><?php echo date(DATE_RFC822); ?></pubDate>
       <?php
          $this->RenderAsset('RssHead');
       

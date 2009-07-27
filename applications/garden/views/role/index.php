@@ -9,7 +9,6 @@ echo $this->Form->Open();
       <tr id="0">
          <th><?php echo Gdn::Translate('Role'); ?></th>
          <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
-         <th><?php echo Gdn::Translate('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -19,15 +18,20 @@ foreach ($this->RoleData->Result() as $Role) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
    <tr id="<?php echo $Role->RoleID; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-      <td><a href="<?php echo Url('/role/edit/'.$Role->RoleID); ?>"><?php echo $Role->Name; ?></a></td>
-      <td class="Alt"><?php echo $Role->Description; ?></td>
-      <td><?php
-         if ($Role->Deletable)
+      <td class="Info">
+         <strong><?php echo $Role->Name; ?></strong>
+         <div>
+            <?php
+            echo Anchor('Edit', '/role/edit/'.$Role->RoleID);
+            if ($Role->Deletable) {
+            ?>
+            <span>|</span>
+            <?php
             echo Anchor('Delete', '/role/delete/'.$Role->RoleID);
-         else
-            echo '&nbsp;';
-            
-         ?></td>
+            }
+            ?>
+      </td>
+      <td class="Alt"><?php echo $Role->Description; ?></td>
    </tr>
 <?php } ?>
    </tbody>

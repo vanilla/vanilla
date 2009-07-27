@@ -92,7 +92,7 @@ class UserController extends GardenController {
 
       $this->AddSideMenu('garden/user');
       $UserModel = new Gdn_UserModel();
-      $RoleModel = new Model('Role');
+      $RoleModel = new Gdn_Model('Role');
       $this->RoleData = $RoleModel->Get();
       $this->UserRoleData = FALSE;
       $this->User = FALSE;
@@ -126,7 +126,7 @@ class UserController extends GardenController {
 
       $this->AddSideMenu('garden/user');
 
-      $RoleModel = new Model('Role');
+      $RoleModel = new Gdn_Model('Role');
       $this->RoleData = $RoleModel->Get();
 
       $UserModel = new Gdn_UserModel();

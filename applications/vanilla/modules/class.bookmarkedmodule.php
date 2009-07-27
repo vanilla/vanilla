@@ -19,7 +19,7 @@ class BookmarkedModule extends Module {
    public function GetData($Limit = 10) {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
-         $DiscussionModel = new DiscussionModel();
+         $DiscussionModel = new Gdn_DiscussionModel();
          $this->_DiscussionData = $DiscussionModel->Get(
             0,
             $Limit,

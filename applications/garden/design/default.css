@@ -16,11 +16,11 @@ p {
    line-height: 1.6em;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
-h1 {
-   font-size: 180%;
-}
-h2 {
-   font-size: 160%;
+h1, h2 {
+   border-bottom:1px solid #bbb;
+   font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
 }
 h3 {
    font-size: 140%;
@@ -46,6 +46,7 @@ a:hover {
 }
 input.DateBox,
 input.InputBox,
+input.SmallInput,
 textarea {
    font-family: arial;
    color: #222;
@@ -53,6 +54,17 @@ textarea {
    padding: 3px;
    margin: 0px;
    width: 250px;
+   border: 1px solid #888;
+}
+input.SmallInput,
+input.InputBox {
+   font-size: 15px;
+   padding: 6px 3px;
+}
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea:focus {
+   background: #ffe;
 }
 textarea {
    line-height: 128%;
@@ -106,40 +118,39 @@ body {
    text-align: right;
    height: 50px;
 }
-#Head h1 {
+body #Head h1 {
    display: block;
-   font-size: 22px;
    font-weight: bold;
    margin: 0;
-   padding: 8px 0 0;
-}
-div#Head h1 a {
-   background: url('logo.vanilla.png') top left no-repeat;
-   display: block;
-   height: 40px;
-   width: 75px;
+   padding: 21px 7px 0 0;
+   border: 0;
    float: left;
-   margin: 2px 10px 0 0;
+   line-height: 1;
 }
-div#Head h1 a span {
-   display: none;
+#Head h1 a span {
+   font-size: 24px;
+   color:#E4F7FE;
+   text-shadow:0 1px 0 #30ACD6;   
+}
+#Head h1 a:hover span {
+   color:#f3fcff;
 }
 div.Menu {
    text-align: right;
    width: 960px;
-   margin: 0px auto;
+   margin: 0 auto;
 }
 ul#Menu {
    float: left;
-   margin: 0px auto;
-   padding: 14px 0px 0px 10px;
+   margin: 0 auto;
+   padding: 22px 0 0 10px;
 }
 #Head form {
    float: right;
    width: 250px;
    background: #fff;
    padding: 0;
-   margin: 4px 0 0;
+   margin: 15px 0 0;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -414,18 +425,9 @@ ul.PanelInfo li.Active {
    clear: both;
 }
 
-/* Activities
-TODO: MOVE VANILLA-SPECIFIC STYLES TO VANILLA CSS??
-
-*/
+/* Activities */
 body.Activity h1 {
-   padding: 0px 0px 0px 0px;
-   font-size: 160%;
-   margin: 0px;
-}
-
-ul.Activities {
-   border-top: 1px solid #ddd;
+   margin: 0;
 }
 ul.Activities li {
    border-bottom: 1px solid #ddd;
@@ -470,10 +472,10 @@ ul.Activities li a.Delete {
    font-size: 10px;
    font-weight: normal;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #bbb;
+   border: 1px solid #ddd;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #555;
+   color: #888;
    cursor: pointer;
    line-height: 100%;
 }
@@ -569,8 +571,8 @@ ul.Activities li.CommentForm textarea {
    background: #e9f9ff;
    }
 .MorePager a {
-   font-size: 12px;
-   font-weight: normal;
+   font-size: 13px;
+   font-weight: bold;
    text-align: right;
 }
 .MorePager a:hover {

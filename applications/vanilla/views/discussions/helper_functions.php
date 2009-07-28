@@ -5,6 +5,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
+   $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+   $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
 ?>
 <li class="<?php echo $CssClass; ?>">
    <ul class="Discussion">
@@ -73,7 +76,6 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             echo '<span>';
             echo sprintf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
             echo '</span>';
-            $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
             if ($CountUnreadComments > 0 && $Session->IsValid())
                echo '<strong>',sprintf(Gdn::Translate('%s new'), $CountUnreadComments),'</strong>';
                
@@ -81,7 +83,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Discussion->LastName), Format::Date($Discussion->LastDate));
             echo '</span>';
 
-            printf(Gdn::Translate('in %s'), Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category'));
+            echo Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category');
          ?>
       </li>
    </ul>

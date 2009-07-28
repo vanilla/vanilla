@@ -402,7 +402,7 @@ class ProfileController extends GardenController {
    
    public function Invitations() {
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('form.css');
       $this->GetUserInfo();
       $InvitationModel = new InvitationModel();
       $this->Form->SetModel($InvitationModel);
@@ -496,7 +496,7 @@ class ProfileController extends GardenController {
       $this->MasterView = 'profile';
       parent::Initialize();
       // Add a css file for all profile pages
-      $this->AddCssFile('profile.screen.css');
+      $this->AddCssFile('profile.css');
    }
    
    /**

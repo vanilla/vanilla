@@ -424,8 +424,11 @@ class Format {
             // Use the time format
             $Format = Gdn::Config('Garden.DefaultTimeFormat', '');
          } else if (date('Y', $Timestamp) == date('Y', time())) {
-            // If the year is the same, use the day format
+            // If the timestamp is the same year, show the month and date
             $Format = Gdn::Config('Garden.DefaultDayFormat', '');
+         } else if (date('Y', $Timestamp) != date('Y', time())) {
+            // If the timestamp is not the same year, just show the year
+            $Format = Gdn::Config('Garden.DefaultYearFormat', '');
          } else {
             // Otherwise, use the date format
             $Format = Gdn::Config('Garden.DefaultDateFormat', '');

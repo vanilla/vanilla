@@ -2,7 +2,7 @@
 
 function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
 ?>
-<li class="Comment" id="Comment_<?php echo $Comment->CommentID; ?>">
+<li class="Comment<?php echo ($Comment->InsertUserID == $Session->UserID ? ' Mine' : '') ?>" id="Comment_<?php echo $Comment->CommentID; ?>">
    <?php
    $Options = '';
    $IsFirstComment = $Comment->CommentID == $Sender->Discussion->FirstCommentID;
@@ -57,7 +57,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       <?php
    }
    ?>
-   <ul class="Info<?php echo ($Comment->InsertUserID == $Session->UserID ? ' Mine' : '') ?>">
+   <ul class="Info">
       <li class="Author">
          <?php 
          echo UserPhoto($Comment->InsertName, $Comment->InsertPhoto);

@@ -5,7 +5,7 @@ echo $this->Form->Open();
 <h1><?php echo Gdn::Translate('Manage Routes'); ?></h1>
 <p><?php
    echo Gdn::Translate('Routes can be used to redirect users to various parts of your site depending on the url. Use this screen to manage your custom routes. ');
-   echo Anchor('Get more information on creating custom routes', 'http://gardenplatform.com/page/routes');
+   echo Anchor('Get more information on creating custom routes', 'http://vanillaforums.org/page/routes');
 ?></p>
 <p><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute Button'); ?></p>
 <table class="AltRows" id="RouteTable">

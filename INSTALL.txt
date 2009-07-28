@@ -2,4 +2,4 @@
 2. Navigate to that folder in your web browser.
 3. Follow the instructions on screen.
 
-Troubleshooting Help: http://gardenplatform.com/docs
+Troubleshooting Help: http://vanillaforums.org/docs

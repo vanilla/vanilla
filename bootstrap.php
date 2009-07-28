@@ -82,8 +82,8 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'garden
 // Default database.
 Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
 // Database drivers.
-Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php');
-Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php');
+Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactoryInstance);
 
 // Identity, Authenticator & Session.
 Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');

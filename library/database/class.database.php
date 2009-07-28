@@ -41,6 +41,11 @@ class Gdn_Database {
    
    /** @var PDO The connectio to the database. */
    protected $_Connection = FALSE;
+	
+	
+	protected $_SQL = NULL;
+	
+	protected $_Structure = NULL;
    
    /** Get the PDO connection to the database.
     * @return PDO The connection to the database.
@@ -241,11 +246,13 @@ class Gdn_Database {
     * @return Gdn_DatabaseDriver The database driver class associated with this database.
     */
    public function SQL() {
-      $Name = $this->Engine . 'Driver';
-      $Result = Gdn::Factory($Name);
-      $Result->Database = $this;
+		if(is_null($this->_SQL)) {
+			$Name = $this->Engine . 'Driver';
+			$this->_SQL = Gdn::Factory($Name);
+			$this->_SQL->Database = $this;
+		}
       
-      return $Result;
+      return $this->_SQL;
    }
    
    /**
@@ -254,10 +261,12 @@ class Gdn_Database {
     * @return Gdn_DatabaseStructure The database structure class for this database.
     */
    public function Structure() {
-      $Name = $this->Engine . 'Structure';
-      $Result = Gdn::Factory($Name);
-      $Result->Database = $this;
+		if(is_null($this->_Structure)) {
+			$Name = $this->Engine . 'Structure';
+			$this->_Structure = Gdn::Factory($Name);
+			$this->_Structure->Database = $this;
+		}
       
-      return $Result;
+      return $this->_Structure;
    }
 }

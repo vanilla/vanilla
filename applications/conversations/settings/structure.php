@@ -13,6 +13,9 @@ if (!isset($Drop))
    
 if (!isset($Explicit))
    $Explicit = TRUE;
+   
+$SQL = $Database->SQL();
+$Construct = $Database->Structure();
 
 // Contains all conversations. A conversation takes place between X number of
 // ppl. This table keeps track of the unique id of the conversation, the person
@@ -72,7 +75,6 @@ $Construct->Table('User')
 ///  %8 = RouteCode & Route (will be changed to <a href="route">routecode</a>)
 
 // X sent you a message
-$SQL = $Database->SQL();
 if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'ConversationMessage', 'FullHeadline' => '%1$s sent you a %8$s.', 'ProfileHeadline' => '%1$s sent you a %8$s.', 'RouteCode' => 'message', 'Notify' => '1', 'Public' => '0'));
    

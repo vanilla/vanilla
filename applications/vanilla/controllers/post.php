@@ -311,7 +311,7 @@ class PostController extends VanillaController {
    }
    
    public function Initialize() {
-      $this->AddCssFile('vanilla.screen.css');
+      $this->AddCssFile('vanilla.css');
       parent::Initialize();
    }
 }

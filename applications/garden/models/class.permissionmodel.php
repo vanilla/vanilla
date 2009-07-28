@@ -25,23 +25,22 @@ class Gdn_PermissionModel extends Model {
       return $NewValues;
    }
    
-   public function Define($PermissionNames, $Type = 'tinyint', $JunctionTable = NULL, $JunctionColumn = NULL) {
+   public function Define($Structure, $SQL, $PermissionNames, $Type = 'tinyint', $JunctionTable = NULL, $JunctionColumn = NULL) {
       if(!is_array($PermissionNames))
          $PermissionNames = array($PermissionNames);
       
       
-      $St = $this->Database->Structure();
-      $St->Table('Permission');
+      $Structure->Table('Permission');
       
       foreach($PermissionNames as $PermissionName) {
          // Define the column.
-         $St->Column($PermissionName, $Type, '', FALSE, 0);
+         $Structure->Column($PermissionName, $Type, '', FALSE, 0);
       }
-      $St->Set(FALSE, FALSE);
+      $Structure->Set(FALSE, FALSE);
       
       // Set the default permissions so we know how to administer them.
       $DefaultPermissions = array_fill_keys($PermissionNames, 2);
-      $this->SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn));
+      $SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn));
    }
    
    public function Delete($RoleID = NULL, $JunctionTable = NULL, $JunctionColumn = NULL, $JunctionID = NULL) {

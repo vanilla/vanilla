@@ -17,8 +17,8 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
       }
-      $this->AddCssFile('default.screen.css');
-      $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.css');
+      $this->AddCssFile('form.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
       // Load all roles with editable permissions
@@ -46,8 +46,8 @@ class CategoriesController extends VanillaController {
       if ($this->Head)
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
 
-      $this->AddCssFile('form.screen.css');
-      $this->AddCssFile('default.screen.css');
+      $this->AddCssFile('form.css');
+      $this->AddCssFile('default.css');
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -124,8 +124,8 @@ class CategoriesController extends VanillaController {
       if ($this->Head)
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
          
-      $this->AddCssFile('default.screen.css');
-      $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.css');
+      $this->AddCssFile('form.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
       // Make sure the form knows which item we are editing.
@@ -163,7 +163,7 @@ class CategoriesController extends VanillaController {
     * Show all discussions in a particular category.
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
-      $this->AddCssFile('vanilla.screen.css');
+      $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
@@ -243,7 +243,7 @@ class CategoriesController extends VanillaController {
     * Show all categories, and few discussions from each.
     */
    public function All() {
-      $this->AddCssFile('vanilla.screen.css');
+      $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
@@ -286,8 +286,8 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/js/library/jquery.ui.packed.js');
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
       }
-      $this->AddCssFile('form.screen.css');
-      $this->AddCssFile('default.screen.css');
+      $this->AddCssFile('form.css');
+      $this->AddCssFile('default.css');
       $this->CategoryData = $this->CategoryModel->Get('Sort');
       $this->Render();
    }

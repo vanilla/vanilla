@@ -43,8 +43,8 @@ div.User a {
 div.User h1 {
    padding: 0px 0px 8px;
    margin: 0px;
-   font-size: 150%;
    line-height: 100%;
+   border: 0;
 }
 #Status {
    -moz-border-radius-topleft: 2px;
@@ -151,6 +151,7 @@ form.Activity textarea {
 
 /* Activity Items */
 ul.Activities {
+   border-top: 1px solid #bbb;
    margin: 10px 0px 0px;
 }
 

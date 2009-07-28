@@ -70,6 +70,20 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
       
       return 0;
    }
+
+   public function GetCountWhere($Wheres = '') {
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+         
+      $Data = $this->SQL
+         ->Select('MessageID', 'count', 'Count')
+         ->From('ConversationMessage')
+         ->Get();
+      if ($Data->NumRows() > 0)
+         return $Data->FirstRow()->Count;
+      
+      return 0;
+   }
    
    public function Save($FormPostValues) {
       $Session = Gdn::Session();

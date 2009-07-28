@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $DiscussionData = $this->DiscussionData;
 $this->DiscussionData = $this->AnnounceData;
-if ($this->AnnounceData && $this->AnnounceData->NumRows() > 0) {
+$HasAnnouncements = $this->AnnounceData && $this->AnnounceData->NumRows() > 0;
+if ($HasAnnouncements) {
 ?>
 <h1 id="AnnouncementsHeading"><?php echo Gdn::Translate('Announcements'); ?></h1>
 <ul class="DataList Announcements">
@@ -24,4 +25,9 @@ else
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php echo $this->Pager->ToString('more');
+} else if (!$HasAnnouncements) {
+   ?>
+   <h1><?php echo Gdn::Translate('Discussions'); ?></h1>
+   <div class="Info EmptyInfo"><?php echo Gdn::Translate('Not much happening yet...'); ?></div>
+<?php
 }

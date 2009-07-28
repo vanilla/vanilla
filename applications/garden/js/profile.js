@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
    // Hijack activity comment form submits
    $('form.Activity :submit').live('click', function() {
       var but = this;
-      var frm = $(this).parent('form');
+      var frm = $(this).parents('form');
       var inp = $(frm).find('textarea');
       // Only submit the form if the textarea isn't empty
       if ($(inp).val() != '') {

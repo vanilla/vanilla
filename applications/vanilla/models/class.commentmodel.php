@@ -85,6 +85,17 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          ->FirstRow()
          ->CountComments;
    }
+
+   public function GetCountWhere($Where = FALSE) {
+      if (is_array($Where))
+         $this->SQL->Where($Where);
+         
+      return $this->SQL->Select('CommentID', 'count', 'CountComments')
+         ->From('Comment')
+         ->Get()
+         ->FirstRow()
+         ->CountComments;
+   }
    
    public function GetID($CommentID) {
       $this->CommentQuery(FALSE);

@@ -30,6 +30,19 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         echo $this->Form->Label('Appearance', 'CssClass');
+         echo $this->Form->Radio('CssClass', '', array('value' => 'Info'));
+         echo '<div class="Info" style="display: inline;">'.Gdn::Translate('Information').'</div>';
+         echo $this->Form->Radio('CssClass', '', array('value' => 'Warning'));
+         echo '<div class="Warning" style="display: inline;">'.Gdn::Translate('Warning').'</div>';
+         echo $this->Form->Radio('CssClass', '', array('value' => 'Box'));
+         echo '<div class="Box" style="display: inline;">'.Gdn::Translate('Panel Box').'</div>';
+         echo $this->Form->Radio('CssClass', '', array('value' => ''));
+         echo '<span>'.Gdn::Translate('None').'</span>';
+      ?>
+   </li>
+   <li>
+      <?php
          echo $this->Form->CheckBox('AllowDismiss', 'Allow users to dismiss this message', array('value' => '1'));
       ?>
    </li>

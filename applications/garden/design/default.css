@@ -23,7 +23,7 @@ h1, h2 {
    margin-bottom:10px;
 }
 h3 {
-   font-size: 140%;
+   font-size:140%;
 }
 h4 {
    font-size: 120%;
@@ -323,6 +323,64 @@ a.Close:hover {
    background: #ffffe2;
 }
 
+/* Dashboard */
+#garden_settings_index #Content h3 {
+   background: #eee;
+   -moz-border-radius-topleft: 4px;
+   -moz-border-radius-topright: 4px;
+   -webkit-border-radius-top-left: 4px;
+   -webkit-border-radius-top-right: 4px;
+   border: 1px solid #ddd;
+   border-bottom: 1px solid #e9e9e9;
+   font-size: 120%;
+   padding: 8px;
+   margin: 10px 0 0;
+   font-weight: bold;
+}
+#garden_settings_index #Content ul.RecentUsers,
+dl {
+   background: #fafafa;
+   -moz-border-radius-bottomleft: 4px;
+   -moz-border-radius-bottomright: 4px;
+   -webkit-border-radius-bottom-left: 4px;
+   -webkit-border-radius-bottom-right: 4px;
+   padding: 0 6px;
+   color: #555;
+   border: 1px solid #eee;
+   border-top: 0;
+}
+dl dt {
+   font-size: 120%;
+   font-weight: bold;
+   padding: 8px 20px 8px 8px;
+   width: 80px;
+   text-align: right;
+   float: left;
+}
+#garden_settings_index #Content ul.RecentUsers li,
+dl dd {
+   font-size: 110%;
+   padding: 8px;
+   border-bottom: 1px solid #eee;
+}
+#garden_settings_index #Content ul.RecentUsers li {
+   line-height: 3.5;
+   clear: left;
+}
+#garden_settings_index #Content ul.RecentUsers li.Last,
+dl dd.Last {
+   border-bottom: 0;
+}
+#garden_settings_index #Content ul.RecentUsers li img {
+   margin-right: 10px;
+   float: left;
+}
+#garden_settings_index #Content ul.RecentUsers li a {
+   margin-right: 10px;
+   font-weight: bold;
+}
+
+
 /* Panels */
 #Panel {
    width: 250px;
@@ -438,6 +496,9 @@ ul.PanelInfo li.Active {
 /* Activities */
 body.Activity h1 {
    margin: 0;
+}
+div.EmptyInfo {
+   margin: 10px 0;
 }
 ul.Activities li {
    border-bottom: 1px solid #ddd;
@@ -567,7 +628,7 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    line-height: 100%;
 }
 ul.Activities li.CommentForm textarea {
-   width: 648px;
+   width: 640px;
    height: 40px;
    margin-bottom: 2px;
 }
@@ -799,6 +860,7 @@ ul.BigList {
    background: #f0fbff /* Panel Background Color */;
    padding: 8px;
    margin: 10px 0 0;
+   border: 1px solid #dff4fc;
 }
 ul.BigList li {
    font-size: 16px;
@@ -925,7 +987,6 @@ a.DismissMessage {
    border: 1px solid #eee;
    -moz-border-radius: 2px;
    color: #aaa;
-   margin: 4px;
 }
 #garden_settings_index a.DismissMessage {
    background: #fff;
@@ -937,22 +998,16 @@ a.DismissMessage:hover {
    color: #777;
 }
 
-/* Powered by Vanilla Footer 
+/* Powered by Vanilla Footer */
 
 #Foot {
    text-align: center;
    margin: 2px 0;
-}
-#Foot div {
-   display: inline;
    font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
    padding: 4px 9px;
    font-size: 13px;
    color: #ddd;
-   background: #f8f8f8;
-   -moz-border-radius: 20px;
    line-height: 1;
-   border: 1px solid #eee;
 }
 #Foot a {
    color: #ccc;
@@ -960,5 +1015,5 @@ a.DismissMessage:hover {
 #Foot a:hover {
    color: #aaa;
 }
-*/
+
 /* End Layout */

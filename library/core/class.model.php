@@ -195,8 +195,6 @@ class Gdn_Model extends Gdn_Pluggable {
 
       // See if a primary key value was posted and decide how to save
       $PrimaryKeyVal = ArrayValue($this->PrimaryKey, $FormPostValues);
-      if ($PrimaryKeyVal == '')
-         $PrimaryKeyVal = FALSE;
          
       $Insert = $PrimaryKeyVal === FALSE ? TRUE : FALSE;
       if ($Insert) {
@@ -214,6 +212,8 @@ class Gdn_Model extends Gdn_Pluggable {
          } else {
             $PrimaryKeyVal = $this->Insert($Fields);
          }
+      } else {
+         $PrimaryKeyVal = FALSE;
       }
       return $PrimaryKeyVal;
    }

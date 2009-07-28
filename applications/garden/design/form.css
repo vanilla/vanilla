@@ -28,6 +28,9 @@ form ul li label {
    font-size: 14px;
    padding: 6px 6px 0px 4px;
    }
+body.Messages div.Popup form ul li label {
+   width: 100px;
+}
 form ul li label.RadioLabel {
    float: none;
    display: inline;
@@ -41,6 +44,7 @@ form ul li table label {
    display: inline;
    width: auto;
 }
+body.Messages div.Popup form ul li label.CheckBoxLabel,
 form ul li label.CheckBoxLabel {
    float: none;
    width: auto;

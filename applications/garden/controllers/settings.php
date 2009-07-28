@@ -152,6 +152,28 @@ class SettingsController extends GardenController {
       $this->FireEvent('DefineAdminPermissions');
       $this->Permission($this->RequiredAdminPermissions, '', FALSE);
       $this->AddSideMenu('garden/settings');
+
+      $UserModel = Gdn::UserModel();
+      
+      // Load some data to display on the dashboard
+      $this->BuzzData = array();
+      // Get the number of users in the database
+      $CountUsers = $UserModel->GetCountLike();
+      $this->AddDefinition('CountUsers', $CountUsers);
+      $this->BuzzData[Translate('Users')] = number_format($CountUsers);
+      // Get the number of new users in the last day
+      $this->BuzzData[Translate('New users in the last day')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Get the number of new users in the last week
+      $this->BuzzData[Translate('New users in the last week')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      
+      // Get recently active users
+      $this->ActiveUserData = $UserModel->GetActiveUsers(5);
+      
+      // Make sure the phone-home code knows where to ping:
+      $this->AddDefinition('UpdateCheckUrl', Gdn::Config('Garden.UpdateCheckUrl', ''));
+      
+      // Fire an event so other applications can add some data to be displayed
+      $this->FireEvent('DashboardData');
       $this->Render();
    }
    

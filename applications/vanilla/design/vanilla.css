@@ -256,11 +256,12 @@ div.Errors ul li {
 }
 
 .Warning {
-   background: #ff9;
+   background: #ffd;
+   border: 1px solid #ff9;
    color: #000;
-   padding: 3px 6px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   padding: 6px 8px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
 }
 
 /* Close buttons */
@@ -980,18 +981,12 @@ a.Cancel {
 
 #Foot {
    text-align: center;
-   margin: 8px 0;
-}
-#Foot div {
-   display: inline;
+   margin: 2px 0;
    font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
    padding: 4px 9px;
    font-size: 13px;
    color: #ddd;
-   background: #f8f8f8;
-   -moz-border-radius: 20px;
    line-height: 1;
-   border: 1px solid #eee;
 }
 #Foot a {
    color: #ccc;
@@ -999,6 +994,7 @@ a.Cancel {
 #Foot a:hover {
    color: #aaa;
 }
+
 
 /* Info blocks */
 div.Info {
@@ -1010,9 +1006,22 @@ div.Info {
    padding: 6px;
    margin: 0 0 10px;
 }
+div.EmptyInfo {
+   margin: 10px 0;
+}
+
 
 /* Dismiss Messages */
 
+div.DismissMessage {
+   margin: 0 0 10px;
+}
+div.DismissMessage p {
+   margin: 0;
+}
+div.Box p {
+   padding: 2px 0;
+}
 a.DismissMessage {
    font-size: 11px;
    line-height: 1;
@@ -1022,7 +1031,6 @@ a.DismissMessage {
    border: 1px solid #eee;
    -moz-border-radius: 2px;
    color: #aaa;
-   margin: 4px;
 }
 a.DismissMessage:hover {
    background: #fafafa;

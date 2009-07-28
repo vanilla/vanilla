@@ -147,9 +147,19 @@ form.Activity {
 form.Activity textarea {
    width: 660px;
    margin-bottom: 2px;
+   height: 60px;
+   min-height: 60px;
+   max-height: 300px;
 }
 
 /* Activity Items */
+ul.Activities {
+   margin-top: 10px;
+   border-top: 1px solid #ddd;
+}
+div.EmptyInfo {
+   margin: 10px;
+}
 #garden_profile_notifications h2 {
    margin-bottom: 0;
 }

@@ -74,6 +74,21 @@ class Gdn_ConversationModel extends Gdn_Model {
       return 0;
    }   
 
+   public function GetCountWhere($Wheres = '') {
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+         
+      $Data = $this->SQL
+         ->Select('ConversationID', 'count', 'Count')
+         ->From('Conversation')
+         ->Get();
+
+      if ($Data->NumRows() > 0)
+         return $Data->FirstRow()->Count;
+      
+      return 0;
+   }   
+
    public function GetID($ConversationID, $ViewingUserID) {
       $this->ConversationQuery($ViewingUserID);
       return $this->SQL

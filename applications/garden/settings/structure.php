@@ -269,5 +269,6 @@ $Construct->Table('Message')
    ->Column('Controller', 'varchar', 255, TRUE)
    ->Column('Method', 'varchar', 255, TRUE)
    ->Column('AssetTarget', 'varchar', 20, TRUE)
+	->Column('CssClass', 'varchar', 20, TRUE)
    ->Column('Sort', 'int', 2, TRUE)
    ->Set($Explicit, $Drop);

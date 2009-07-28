@@ -419,6 +419,25 @@ ul.PanelInfo li.Active {
    border-bottom: 1px solid #a3e6ff;
 }
 
+#Panel a.PanelButton {
+   padding: 6px 0;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
+   text-decoration: none;
+   margin: 0 0 10px 0;
+}
+
+#Panel a.PanelButton:hover {
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
+}
+
 /* Foot */
 #Foot {
    padding-top: 20px;

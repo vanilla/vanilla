@@ -19,6 +19,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 class Gdn_CookieIdentity {
+
 	/**
     * Destroys the user's session cookie - essentially de-authenticating them.
     */

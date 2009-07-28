@@ -20,13 +20,13 @@ if (!isset($Explicit))
 // the conversation (and when).
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('Conversation')
-   ->Column('ConversationID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-   ->Column('Contributors', 'varchar', 255)
-   ->Column('FirstMessageID', 'int', 11, TRUE, NULL, 'key')
-   ->Column('InsertUserID', 'int', 10, FALSE, NULL, 'key')
-   ->Column('DateInserted', 'datetime')
-   ->Column('UpdateUserID', 'int', 10, FALSE, NULL, 'key')
-   ->Column('DateUpdated', 'datetime')
+   ->PrimaryKey('ConversationID')
+   ->Column2('Contributors', 'varchar(255)')
+   ->Column2('FirstMessageID', 'int', TRUE, 'key')
+   ->Column2('InsertUserID', 'int', FALSE, 'key')
+   ->Column2('DateInserted', 'datetime')
+   ->Column2('UpdateUserID', 'int', FALSE, 'key')
+   ->Column2('DateUpdated', 'datetime')
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are
@@ -34,32 +34,32 @@ $Construct->Table('Conversation')
 // per-user date relating to when each users last cleared the conversation
 // history, and 
 $Construct->Table('UserConversation')
-   ->Column('UserID', 'int', 11, FALSE, NULL, 'primary')
-   ->Column('ConversationID', 'int', 11, FALSE, NULL, 'primary')
-   ->Column('CountNewMessages', 'int', 11, FALSE, '0') // # of unread messages
-   ->Column('CountMessages', 'int', 11, FALSE, '0') // # of uncleared messages
-   ->Column('LastMessageID', 'int', 11, TRUE, NULL, 'key') // The last message posted by a user other than this one, unless this user is the only person who has added a message
-   ->Column('DateLastViewed', 'datetime', '', TRUE)
-   ->Column('DateCleared', 'datetime', '', TRUE)
-   ->Column('Bookmarked', array('1', '0'), '', FALSE, '0')
+   ->Column2('UserID', 'int', FALSE, 'primary')
+   ->Column2('ConversationID', 'int', FALSE, 'primary')
+   ->Column2('CountNewMessages', 'int', 0) // # of unread messages
+   ->Column2('CountMessages', 'int', 0) // # of uncleared messages
+   ->Column2('LastMessageID', 'int', NULL, 'key') // The last message posted by a user other than this one, unless this user is the only person who has added a message
+   ->Column2('DateLastViewed', 'datetime', NULL)
+   ->Column2('DateCleared', 'datetime', NULL)
+   ->Column2('Bookmarked', array('1', '0'), '0')
    ->Set($Explicit, $Drop);
    
 // Contains messages for each conversation, as well as who inserted the message
 // and when it was inserted. Users cannot edit or delete their messages once
 // they have been sent.
 $Construct->Table('ConversationMessage')
-   ->Column('MessageID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-   ->Column('ConversationID', 'int', 11)
-   ->Column('Body', 'text')
-   ->Column('Format', 'varchar', 20, TRUE)
-   ->Column('InsertUserID', 'int', 10, FALSE, NULL, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->PrimaryKey('MessageID')
+   ->Column2('ConversationID', 'int')
+   ->Column2('Body', 'text')
+   ->Column2('Format', 'varchar(20)', NULL)
+   ->Column2('InsertUserID', 'int', FALSE, 'key')
+   ->Column2('DateInserted', 'datetime')
    ->Set($Explicit, $Drop);
    
 // Add extra columns to user table for tracking discussions, comments & replies
 $Construct->Table('User')
-   ->Column('CountUnreadConversations', 'int', 11, FALSE, '0')
-   ->Set();
+   ->Column2('CountUnreadConversations', 'int', 0)
+   ->Set(FALSE, FALSE);
    
 // Insert some activity types
 ///  %1 = ActivityName

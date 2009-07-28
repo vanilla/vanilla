@@ -976,6 +976,15 @@ abstract class Gdn_SQLDriver {
 
       return $this;
    }
+   
+   public function History($UpdateFields = TRUE, $InsertFields = FALSE) {
+      $UserID = Gdn::Session()->UserID;
+      if($InsertFields)
+         $this->Set('DateInserted', Format::ToDateTime())->Set('InsertUserID', $UserID);
+      if($UpdateFields)
+         $this->Set('DateUpdated', Format::ToDateTime())->Set('UpdateUserID', $UserID);
+      return $this;
+   }
 
    /**
     * Returns the last identity to be inserted into the database at
@@ -1049,6 +1058,18 @@ abstract class Gdn_SQLDriver {
     * If a row is not found then one is inserted and the items in this array are merged with $Set.
     */
    public function Replace($Table = '', $Set = NULL, $Where) {
+      if(count($this->_Sets) > 0) {
+         foreach($this->_Sets as $Key => $Value) {
+            if(array_key_exists($Value, $this->_NamedParameters)) {
+               $Set[$Key] = $this->_NamedParameters[$Value];
+               unset($this->_NamedParameters[$Value]);
+            } else {
+               $Set[$Key] = $Value;
+            }
+         }
+         $this->_Sets = array();
+      }
+      
       // Check to see if there is a row in the table like this.
       $Count = $this->GetCount($Table, $Where);
       if($Count > 0) {

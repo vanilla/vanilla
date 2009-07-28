@@ -46,7 +46,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
       // Make sure that the column type is valid for MySQL before continuing:
-      if (!is_array($Type) && !in_array($Type, explode(',', 'tinyint,int,varchar,varbinary,datetime,text')))
+      if (!is_array($Type) && !in_array($Type, array('tinyint', 'int', 'varchar', 'varbinary', 'datetime', 'text', 'decimal')))
          throw new Exception(Gdn::Translate('The specified data type ('.$Type.') is not accepted for the MySQL database.'));
 
       return parent::Column($Name, $Type, $Length, $Null, $Default, $KeyType, $AutoIncrement);
@@ -153,7 +153,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * Creates the table defined with $this->Table() and $this->Column().
     */
    protected function _Create() {
-      $PrimaryKeys = array();
+      $PrimaryKey = array();
+      $UniqueKey = array();
       $Keys = '';
       $Sql = '';
 
@@ -164,17 +165,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $Sql .= "\n".$this->_DefineColumn($Column);
 
          if ($Column->KeyType == 'primary')
-            $PrimaryKeys[] = $ColumnName;
+            $PrimaryKey[] = $ColumnName;
          elseif ($Column->KeyType == 'key')
             $Keys .= ",\nkey `".Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'index')
             $Keys .= ",\nindex `".Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'unique')
-            $Keys .= ",\nunique index `".Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            $UniqueKey[] = $ColumnName;
       }
       // Build primary keys
-      if (count($PrimaryKeys) > 0)
-         $Keys .= ",\nprimary key (`".implode('`, `', $PrimaryKeys)."`)";
+      if (count($PrimaryKey) > 0)
+         $Keys .= ",\nprimary key (`".implode('`, `', $PrimaryKey)."`)";
+      // Build unique keys.
+      if (count($UniqueKey) > 0)
+         $Keys .= ",\nunique index `".Format::AlphaNumeric('`UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
 
       $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
          .$Sql
@@ -254,8 +258,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    protected function _DefineColumn($Column) {
       $Return = '`'.$Column->Name.'` '.$Column->Type;
-      if ($Column->Length != '')
-         $Return .= '('.$Column->Length.')';
+      if ($Column->Length != '') {
+         if($Column->Precision != '')
+            $Return .= '('.$Column->Length.', '.$Column->Precision.')';
+         else
+            $Return .= '('.$Column->Length.')';
+      }
+      if (property_exists($Column, 'Unsigned') && $Column->Unsigned) {
+         $Return .= ' unsigned';
+      }
 
       if (is_array($Column->Enum))
          $Return .= "('".implode("','", $Column->Enum)."')";

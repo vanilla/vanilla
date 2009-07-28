@@ -5,6 +5,7 @@
 /conf/config.php
 /conf/bootstrap.before.php
 /conf/bootstrap.after.php
+/applications/vanillaforumscom
 *.kpf
 .DS_Store
 *.swp

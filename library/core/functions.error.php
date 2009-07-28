@@ -57,6 +57,13 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
    if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
    $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
+   
+   // Try and rollback a database transaction.
+   if(class_exists('Gdn', FALSE)) {
+      $Database = Gdn::Database();
+      if(is_object($Database))
+         $Database->RollbackTransaction();
+   }
 
    if ($PanicError === FALSE) {
       // See if we can get the file that caused the error

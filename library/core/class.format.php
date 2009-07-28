@@ -474,7 +474,17 @@ class Format {
          return FALSE;
       }
    }
-
+   
+   /** Format a timestamp or the current time to go into the database.
+    *
+    * @param int $Timestamp
+    * @return string The formatted date.
+    */
+   public static function ToDate($Timestamp = '') {
+      if ($Timestamp == '')
+         $Timestamp = time();
+      return date('Y-m-d', $Timestamp);
+   }
 
    /**
     * @param int $Timestamp

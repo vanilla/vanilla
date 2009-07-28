@@ -78,6 +78,7 @@ if (!function_exists('Img')) {
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
    }
 }
+
 if (!function_exists('Anchor')) {
    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')

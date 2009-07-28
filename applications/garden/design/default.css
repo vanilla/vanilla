@@ -890,4 +890,8 @@ body.Search h1 {
 	text-align: center;
 }
 
+.Right {
+   text-align: right;
+}
+
 /* End Layout */

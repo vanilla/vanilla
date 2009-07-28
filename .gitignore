@@ -1,5 +1,7 @@
 /cache/*/
 /cache/*.php
+*vanillaforums*
+/applications/wiki*
 /uploads/*/
 /uploads/*.*
 /conf/config.php

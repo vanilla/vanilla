@@ -164,6 +164,7 @@ if (!class_exists('HeadModule', FALSE)) {
       }
       
       public function Title($SubTitle = FALSE, $Title = FALSE, $TitleDivider = ' - ') {
+         $this->_TitleDivider = '';
          if ($Title === FALSE)
             $Title = Gdn::Config('Garden.Title', FALSE);
             

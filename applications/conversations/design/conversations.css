@@ -1,9 +1,6 @@
 fieldset {
   padding: 0px !important;
 }
-.Conversations h2 a {
-  font-weight: normal;
-}
 h2.NewConversation {
   float: right;
 }
@@ -18,9 +15,8 @@ h2.NewConversation a {
   margin: 0px;
   padding: 0px;
 }
-#Conversation,
-#Conversations {
-  border-top: 1px solid #eee /* Body Line Color */;
+body.Conversations h2 {
+  margin: 0;
 }
 #Conversation li,
 #Conversations li {

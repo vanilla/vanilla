@@ -26,10 +26,10 @@ class GardenController extends Gdn_Controller {
          $this->Head->AddScript('js/global.js');
       }
       
-      $this->AddCssFile('default.screen.css');
-      $this->AddCssFile('menu.screen.css');
-      $this->AddCssFile('popup.screen.css');
-      $this->AddCssFile('form.screen.css');
+      $this->AddCssFile('default.css');
+      $this->AddCssFile('menu.css');
+      $this->AddCssFile('popup.css');
+      $this->AddCssFile('form.css');
       parent::Initialize();
    }
    

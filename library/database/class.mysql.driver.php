@@ -111,7 +111,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->Database->DatabasePrefix ?
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
-      $Sql = "show tables from `".$this->DatabaseName()."`";
+      $Sql = "show tables";
       if ($LimitToPrefix !== FALSE && $this->Database->DatabasePrefix != '')
          $Sql .= " like ".$this->Connection()->quote($this->Database->DatabasePrefix.'%');
 

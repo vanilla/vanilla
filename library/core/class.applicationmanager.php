@@ -200,7 +200,8 @@ class Gdn_ApplicationManager {
       $PermissionName = ArrayValue('RegisterPermissions', $ApplicationInfo, FALSE);
       if ($PermissionName != FALSE) {
          $PermissionModel = Gdn::PermissionModel();
-         $PermissionModel->Define($PermissionName);
+         $Database = Gdn::Database();
+         $PermissionModel->Define($Database->Structure(), $Database->SQL(), $PermissionName);
       }
    }
 

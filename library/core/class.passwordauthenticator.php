@@ -50,6 +50,7 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
    
    public function __construct() {
       $this->_Identity = Gdn::Factory('Identity');
+      $this->_Identity->Init();
    }
 
 

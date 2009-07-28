@@ -19,17 +19,38 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 class Gdn_CookieIdentity {
+	
+	public $CookieName;
+	public $CookiePath;
+	public $CookieDomain;
+	public $CookieHashMethod;
+	public $CookieSalt;
+	
+	public function __contruct($Config = NULL) {
+		$this->Init($Config);
+	}
+	
+	public function Init($Config = NULL) {
+		if(is_null($Config))
+			$Config = Gdn::Config('Garden.Cookie');
+		elseif(is_string($Config))
+			$Config = Gdn::Config($Config);
+			
+		$DefaultConfig = Gdn::Config('Garden.Cookie');			
+		$this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
+		$this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
+		$this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
+		$this->CookieHashMethod = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
+		$this->CookieSalt = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
+	}
+	
 	/**
     * Destroys the user's session cookie - essentially de-authenticating them.
     */
    protected function _ClearIdentity() {
-      // Retrieve information about the cookie.
-      $CookieName = Gdn::Config('Garden.Cookie.Name', 'GardenCookie');
-      $CookiePath = Gdn::Config('Garden.Cookie.Path', '/');
-      $CookieDomain = Gdn::Config('Garden.Cookie.Domain', '');
       // Destroy the cookie.
-      setcookie($CookieName, ' ', time() - 3600, $CookiePath, $CookieDomain);
-      unset($_COOKIE[$CookieName]);
+      setcookie($this->CookieName, ' ', time() - 3600, $this->CookiePath, $this->CookieDomain);
+      unset($_COOKIE[$this->CookieName]);
    }
 	
 	/**
@@ -40,17 +61,15 @@ class Gdn_CookieIdentity {
     * @return int
     */
    public function GetIdentity() {
-      $CookieName = Gdn::Config('Garden.Cookie.Name', 'LussumoCookie');
-      $HashMethod = Gdn::Config('Garden.Cookie.HashMethod', '');
-      if (empty($_COOKIE[$CookieName]))
+      if (empty($_COOKIE[$this->CookieName]))
          return 0;
 
-      list($UserID, $Expiration, $HMAC) = explode('|', $_COOKIE[$CookieName]);
+      list($UserID, $Expiration, $HMAC) = explode('|', $_COOKIE[$this->CookieName]);
       if ($Expiration < time())
          return 0;
 
       $Key = $this->_Hash($UserID . $Expiration);
-      $Hash = $this->_HashHMAC($HashMethod, $UserID . $Expiration, $Key);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
 
       if ($HMAC != $Hash)
          return 0;
@@ -68,12 +87,10 @@ class Gdn_CookieIdentity {
     * @param string $Data The data to place in the hash.
     */
    private function _Hash($Data) {
-      $Salt = Gdn::Config('Garden.Cookie.Salt');
-      $HashMethod = Gdn::Config('Garden.Cookie.HashMethod');
-      if (empty($Salt))
+      if (empty($this->CookieSalt))
          trigger_error(ErrorMessage("The server's salt key has not been configured.", 'Session', 'Hash'), E_USER_ERROR);
 
-      return $this->_HashHMAC($HashMethod, $Data, $Salt);
+      return $this->_HashHMAC($this->CookieHashMethod, $Data, $this->CookieSalt);
    }
 	
 	/**
@@ -124,19 +141,14 @@ class Gdn_CookieIdentity {
          // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
          $Expire = 0;
       }
-      // Load some configuration settings.
-      $CookieName = Gdn::Config('Garden.Cookie.Name');
-      $CookiePath = Gdn::Config('Garden.Cookie.Path');
-      $CookieDomain = Gdn::Config('Garden.Cookie.Domain');
-      $HashMethod = Gdn::Config('Garden.Cookie.HashMethod');
 
       // Create the cookie contents
       $Key = $this->_Hash($UserID . $Expiration);
-      $Hash = $this->_HashHMAC($HashMethod, $UserID . $Expiration, $Key);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
       $CookieContents = $UserID . '|' . $Expiration . '|' . $Hash;
 
       // Create the cookie.
-      setcookie($CookieName, $CookieContents, $Expire, $CookiePath, $CookieDomain);
+      setcookie($this->CookieName, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain);
    }
 	
 }

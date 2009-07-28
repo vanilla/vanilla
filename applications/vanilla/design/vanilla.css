@@ -16,13 +16,13 @@ p {
    line-height: 1.6em;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
-h1 {
-   font-size: 180%;
+h1, h2 {
+   border-bottom:1px solid #bbb;
+   font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
 }
-h2 {
-   font-size: 160%;
-}
-h3 {
+3 {
    font-size: 140%;
 }
 h4 {
@@ -46,6 +46,7 @@ a:hover {
 }
 input.DateBox,
 input.InputBox,
+input.SmallInput,
 textarea {
    font-family: arial;
    color: #222;
@@ -53,6 +54,17 @@ textarea {
    padding: 3px;
    margin: 0px;
    width: 250px;
+   border: 1px solid #888;
+}
+input.SmallInput,
+input.InputBox {
+   font-size: 15px;
+   padding: 6px 3px;
+}
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea:focus {
+   background: #ffe;
 }
 textarea {
    line-height: 128%;
@@ -108,21 +120,19 @@ body {
 }
 #Head h1 {
    display: block;
-   font-size: 22px;
    font-weight: bold;
    margin: 0;
-   padding: 8px 0 0;
-}
-div#Head h1 a {
-   background: url('logo.vanilla.png') top left no-repeat;
-   display: block;
-   height: 40px;
-   width: 75px;
+   padding: 21px 7px 0 0;
+   border: 0;
    float: left;
-   margin: 2px 10px 0 0;
 }
-div#Head h1 a span {
-   display: none;
+#Head h1 a span {
+   font-size: 24px;
+   color:#E4F7FE;
+   text-shadow:0 1px 0 #30ACD6;   
+}
+#Head h1 a:hover span {
+   color:#f3fcff;
 }
 div.Menu {
    text-align: right;
@@ -132,14 +142,14 @@ div.Menu {
 ul#Menu {
    float: left;
    margin: 0 auto;
-   padding: 14px 0 0 10px;
+   padding: 22px 0 0 10px;
 }
 #Head form {
    float: right;
    width: 250px;
    background: #fff;
    padding: 0;
-   margin: 4px 0 0;
+   margin: 15px 0 0;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -382,8 +392,8 @@ ul.PanelInfo li.Active a {
    background: #e9f9ff;
    }
 .MorePager a {
-   font-size: 12px;
-   font-weight: normal;
+   font-size: 13px;
+   font-weight: bold;
    text-align: right;
 }
 .MorePager a:hover {
@@ -391,10 +401,7 @@ ul.PanelInfo li.Active a {
    text-decoration: underline;
 }
 #PagerLess {
-   -moz-border-radius-topright: 2px;
-   -moz-border-radius-topleft: 2px;
-   -webkit-border-top-right-radius: 2px;
-   -webkit-border-top-left-radius: 2px;
+   margin-bottom: 1px;
 }
 tr#PagerMore td {
    border: 0;
@@ -403,10 +410,6 @@ tr#PagerMore td {
 
 
 /* DataList (search results, vanilla discussions, drafts, etc) */
-
-ul.DataList {
-   border-top: 1px solid #dbe3e6;
-}
 ul.DataList li {
    margin: 0;
    padding: 0 0 4px 0;
@@ -424,6 +427,7 @@ ul.DataList li ul {
 }
 ul.DataList li ul li.Title {
    float: left;
+   width: 560px;
 }
 ul.DataList li ul li.Meta {
    clear: both;
@@ -463,7 +467,9 @@ ul.DataList li ul li.Meta strong {
 }
 ul.DataList li ul li.Meta strong {
    background: #ff0;
-   padding: 0 2px;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
 }
 ul.DataList li ul li.Meta a {
    color: #2b2d33 /* Meta Font Color */;
@@ -471,6 +477,28 @@ ul.DataList li ul li.Meta a {
 li.DiscussionRow ul.Discussion {
    /* Fixes an IE7 Spacing issue */
    display: inline !important;
+}
+
+/* Vanilla Discussion List Colors
+Classes applied to List Items are:
+Bookmarked: the user has bookmarked that topic
+Announcement: the discussion has been announced
+Mine: the user created the discussion
+New: there are new comments since the last viewed the discussion
+*/
+.Mine { background: #F5FCFF; }
+li.New { background: #ffd; }
+ul.DataList li ul li.Meta a.Category {
+   background: #fafafa;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList li.Mine ul li.Meta a.Category {
+   background: #fafdff;
+}
+ul.DataList li.New ul li.Meta a.Category {
+   background: #ffe;
 }
 
 /* Vanilla Categories */
@@ -483,9 +511,6 @@ li.DiscussionRow ul.Discussion {
 body.Discussions h1,
 body.Categories h1,
 body.Categories #Content h2 {
-   font-size:140%;
-   font-weight:bold;
-   padding:8px 6px 4px;
    margin: 0;
 }
 h1 span {
@@ -498,14 +523,14 @@ body.Categories h1 a {
 }
 .More {
    list-style: none;
-   margin: 1px 0 0;
+   margin: 1px 0 20px;
    padding: 3px 6px;
    text-align: right;
    background: #e9f9ff;
    }
 .More a {
-   font-size: 12px;
-   font-weight: normal;
+   font-size: 13px;
+   font-weight: bold;
    text-align: right;
 }
 .More a:hover {
@@ -576,15 +601,20 @@ a.NewDiscussion:hover {
    color: #fff;
 }
 
-/* Vanilla Discussions */
+/* Vanilla Drafts */
+body.Drafts h1 {
+   margin: 0;
+}
 ul.Drafts li ul {
    display: inline;
 }
 ul.Drafts li ul li.Title {
    float: none;
+   width: auto;
 }
 ul.Drafts li ul li.Title h3 {
    float: left;
+   margin: 0 0 2px;
 }
 ul.Drafts li ul li.Title a.DraftCommentLink {
    clear: left;
@@ -613,7 +643,7 @@ ul.Drafts li ul li.Topic a.DeleteDraft:hover {
 
 /*
   Discussion/Comment Option (dropdown) Menu customizations
-  (the layout css for these is in /applications/garden/design/menu.screen.css)
+  (the layout css for these is in /applications/garden/design/menu.css)
 */
 a.Bookmark,
 a.Bookmarking {
@@ -637,12 +667,12 @@ a.Bookmarking {
 ul.Discussion li.Options {
    float: right;
 	height: 22px;
-	width: 160px;
+	width: 120px;
 }
 ul.Options li.Parent strong {
    display: block;
    padding: 4px;
-   margin: 3px 1px 0 0;
+   margin: 3px 4px 0 0;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
    font-size: 10px;
    font-weight: normal;
@@ -704,9 +734,8 @@ ul.PanelDiscussions li strong {
    font-weight: bold;
    display: block;
 }
-ul.PanelDiscussions li.Meta {
-   font-size: 80%;
-   font-family: tahoma;
+ul.PanelDiscussions div.Meta {
+   font-size: 90%;
 }
 ul.PanelDiscussions div.Meta span,
 ul.PanelDiscussions div.Meta strong {
@@ -758,8 +787,11 @@ body.Discussion #Content h2 span {
    margin-bottom: 1px;
 }
 #Discussion .Comment {
-   border-top: 1px solid #ddd;
-overflow: hidden;   
+   border-bottom: 1px solid #ddd;
+}
+/* Fixes IE 7 Glitch */
+*:first-child+html #Discussion .Comment {
+   overflow: hidden;
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
@@ -781,6 +813,7 @@ overflow: hidden;
 .Preview li ul.Info li,
 #Discussion li ul.Info li {
    display: inline;
+   line-height: 2.5;
 }
 .Preview li ul.Info li.Created,
 #Discussion li ul.Info li.Created,
@@ -797,6 +830,7 @@ overflow: hidden;
    clear: both;
    padding: 1px 8px 2px;
    line-height: 170%;
+   font-size: 110%;
    color: #454545 /* Body Text Font Color */;
 }
 .Body p {
@@ -841,7 +875,6 @@ div.Popup ul.Preview li.Comment div.Body {
 /* Comment Form */
 #CommentForm {
    background: #e9f9ff /* Panel Background Color */;
-   border-top: 1px solid #eee;
    padding: 8px;
 }
 div.Popup #CommentForm {

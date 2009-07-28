@@ -1,10 +1,5 @@
 /* Forms */
 body.Settings #Content h1,
-form h1 {
-   border-bottom: 1px solid #ccc;
-   margin-bottom: 10px;
-}
-body.Settings #Content h1,
 body.Settings #Content h2,
 body.Settings #Content h3,
 body.Settings #Content h4,
@@ -37,9 +32,6 @@ form ul li label.RadioLabel {
    float: none;
    display: inline;
    font-weight: normal;
-}
-form ul li label.RadioLabel input {
-   height: 10px;
 }
 table.Label tbody th {
    width: 140px;

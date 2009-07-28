@@ -5,7 +5,7 @@ echo $this->Form->Errors();
 <h1><?php echo Gdn::Translate('Outgoing Email Settings'); ?></h1>
 <ul>
    <li>
-      <p><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></p>
+      <p class="Warning"><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></p>
    </li>
    <li>
       <?php

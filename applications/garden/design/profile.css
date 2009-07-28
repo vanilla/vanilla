@@ -150,9 +150,8 @@ form.Activity textarea {
 }
 
 /* Activity Items */
-ul.Activities {
-   border-top: 1px solid #bbb;
-   margin: 10px 0px 0px;
+#garden_profile_notifications h2 {
+   margin-bottom: 0;
 }
 
 

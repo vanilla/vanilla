@@ -4,7 +4,7 @@ if (property_exists($this, 'Discussion')) { ?>
 <?php } ?>
 <ul class="Discussion Preview">
    <li class="Comment">
-      <ul class="Info Mine">
+      <ul class="Info">
          <li class="Author"><?php 
             echo UserPhoto($this->Comment->InsertName, $this->Comment->InsertPhoto);
             echo UserAnchor($this->Comment->InsertName);

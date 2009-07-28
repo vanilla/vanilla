@@ -89,7 +89,7 @@ class Gdn_Schema {
    }
    
    /**
-    * Returns a the value of $Property or $Default if not found.
+    * Returns the value of $Property or $Default if not found.
     *
     * @param string The name of the field to look for in $this->CurrentTable (or $Table if it is defined).
     * @param string The name of the property to retrieve from $Field. Options are: Name, PrimaryKey, Type, AllowNull, Default, Length, and Enum.

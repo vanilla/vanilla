@@ -30,7 +30,6 @@ class GardenHooks implements Gdn_IPlugin {
                
             $Sender->Menu->AddLink('User', '{Username}', '/profile/{Username}', array('Garden.SignIn.Allow'));
             $Sender->Menu->AddLink('User', '\\'.$Notifications, 'profile/notifications/{Username}');
-            $Sender->Menu->AddLink('User', 'My Activity', '/profile/activity/{Username}');
          } else {
             $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl());
          }

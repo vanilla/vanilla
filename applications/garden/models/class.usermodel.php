@@ -9,6 +9,9 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
 class Gdn_UserModel extends Model {
+   
+   public $SessionColumns;
+   
    /**
     * Class constructor. Defines the related database table name.
     */
@@ -131,6 +134,10 @@ class Gdn_UserModel extends Model {
          ->From('User u')
          ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
          ->Where('UserID', $UserID);
+         
+      if(is_array($this->SessionColumns)) {
+         $this->SQL->Select($this->SessionColumns);
+      }
 
       $this->FireEvent('SessionQuery');
 

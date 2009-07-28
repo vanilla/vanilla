@@ -99,21 +99,86 @@ abstract class Gdn_DatabaseStructure {
          $KeyType = FALSE;
          
       // Check for a length in the type.
-      if(is_string($Type) && preg_match('/([_a-zA-Z]\w*)\s*(?:\((\d+)\))?/', $Type, $Matches)) {
+      if(is_string($Type) && preg_match('/(\w+)\s*\(\s*(\d+)\s*(?:,\s*(\d+)\s*)?\)/', $Type, $Matches)) {
          $Type = $Matches[1];
-         if(count($Matches) >= 3)
-            $Length = $Matches[2];
+         $Length = $Matches[2];
+         if(count($Matches) >= 4) {
+            $Precision = $Matches[3];
+         }
       }
 
-      $Column = new Gdn_ShellClass();
+      $Column = new stdClass();
       $Column->Name = $Name;
       $Column->Type = is_array($Type) ? 'enum' : $Type;
+      $Column->Unsigned = FALSE;
       $Column->Length = $Length;
+      if(isset($Precision))
+         $Column->Precision = $Precision;
+      else
+         $Column->Precision = '';
       $Column->Enum = is_array($Type) ? $Type : FALSE;
       $Column->AllowNull = $Null;
       $Column->Default = $Default;
       $Column->KeyType = $KeyType;
       $Column->AutoIncrement = $AutoIncrement;
+      $this->_Columns[$Name] = $Column;
+      return $this;
+   }
+   
+   protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
+      $Length = '';
+      $Precision = '';
+      
+      // Check to see if the type starts with a 'u' for unsigned.
+      if(is_string($Type) && strncasecmp($Type, 'u', 1) == 0) {
+         $Type = substr($Type, 1);
+         $Unsigned = TRUE;
+      } else {
+         $Unsigned = FALSE;
+      }
+      
+      // Check for a length in the type.
+      if(is_string($Type) && preg_match('/(\w+)\s*\(\s*(\d+)\s*(?:,\s*(\d+)\s*)?\)/', $Type, $Matches)) {
+         $Type = $Matches[1];
+         $Length = $Matches[2];
+         if(count($Matches) >= 4)
+            $Precision = $Matches[3];
+      }
+      
+      $Column = new stdClass();
+      $Column->Name = $Name;
+      $Column->Type = is_array($Type) ? 'enum' : $Type;
+      $Column->Length = $Length;
+      $Column->Precision = $Precision;
+      $Column->Enum = is_array($Type) ? $Type : FALSE;
+      $Column->AllowNull = $Null;
+      $Column->Default = $Default;
+      $Column->KeyType = $KeyType;
+      $Column->Unsigned = $Unsigned;
+      $Column->AutoIncrement = FALSE;
+      
+      return $Column;
+   }
+   
+   public function Column2($Name, $Type, $NullDefault = FALSE, $KeyType = FALSE) {
+      if(is_null($NullDefault) || $NullDefault === TRUE) {
+         $Null = TRUE;
+         $Default = NULL;
+      } elseif($NullDefault === FALSE) {
+         $Null = FALSE;
+         $Default = NULL;
+      } elseif(is_array($NullDefault)) {
+         $Null = ArrayValue('Null', $NullDefault);
+         $Default = ArrayValue('Default', $NullDefault, NULL);
+      } else {
+         $Null = FALSE;
+         $Default = $NullDefault;
+      }
+      
+      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', FALSE)))
+         $KeyType = FALSE;
+
+      $Column = $this->_CreateColumn($Name, $Type, $Null, $Default, $KeyType);
       $this->_Columns[$Name] = $Column;
       return $this;
    }
@@ -154,8 +219,12 @@ abstract class Gdn_DatabaseStructure {
     * @param string $Type The data type of the column.
     * @return Gdn_DatabaseStructure $this.
     */
-   public function PrimaryKey($Name, $Type = 'int') {
-      return $this->Column($Name, $Type, '', FALSE, NULL, 'primary', TRUE);
+   public function PrimaryKey($Name, $Type = 'uint') {
+      $Column = $this->_CreateColumn($Name, $Type, FALSE, NULL, 'primary');
+      $Column->AutoIncrement = TRUE;
+      $this->_Columns[$Name] = $Column;
+      
+      return $this;
    }
    
    /**

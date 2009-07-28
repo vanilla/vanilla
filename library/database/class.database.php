@@ -70,6 +70,9 @@ class Gdn_Database {
 	
 	/** @var array Extented properties that a specific driver can use. **/
 	public $ExtendedProperties;
+	
+	/** $var bool Whether or not the connection is in a transaction. **/
+	protected $_InTransaction = FALSE;
    
    /** @var string The PDO dsn for the database connection.
     *  Note: This does NOT include the engine before the dsn.
@@ -86,12 +89,30 @@ class Gdn_Database {
    public $User;
    
    /// METHODS ///
+	
+	/**
+	 * Begin a transaction on the database.
+	 */
+	public function BeginTransaction() {
+		if($this->_InTransaction)
+			$this->_InTransaction = $this->Connection()->beginTransaction();
+	}
    
    public function CloseConnection() {
       if (Gdn::Config('Garden.Database.PersistentConnection') !== TRUE) {
+			$this->CommitTransaction();
          $this->_Connection = null;
       }
    }
+	
+	/**
+	 * Commit a transaction on the database.
+	 */
+	public function CommitTransaction() {
+		if($this->_InTransaction) {
+			$this->_InTransaction = !$this->Connection()->commit();
+		}
+	}
    
    /**
     * Initialize the properties of this object.
@@ -213,6 +234,12 @@ class Gdn_Database {
       
       return $this->_CurrentResultSet;
    }
+	
+	public function RollbackTransaction() {
+		if($this->_InTransaction) {
+			$this->_InTransaction = !$this->Connection()->rollBack();
+		}
+	}
    
    /**
     * Get the database driver class for the database.

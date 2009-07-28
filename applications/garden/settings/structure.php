@@ -31,7 +31,8 @@ $Construct->Table('Role')
 // Define some roles.
 // Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
 $RoleModel = Gdn::Factory('RoleModel');
-
+$RoleModel->Database = $Database;
+$RoleModel->SQL = $SQL;
 $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Ex-members who do not have permission to sign in.'));
 $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
 $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
@@ -86,6 +87,8 @@ $Construct->Table('UserAuthentication')
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();
+$PermissionModel->Database = $Database;
+$PermissionModel->SQL = $SQL;
 if($PermissionModel instanceof Gdn_PermissionModel) {
 	// Permission Table
 	$Construct->Table('Permission')
@@ -99,7 +102,7 @@ if($PermissionModel instanceof Gdn_PermissionModel) {
 }
    
 // Define the set of permissions that garden uses.
-$PermissionModel->Define($Construct, $SQL, array(
+$PermissionModel->Define(array(
 	'Garden.Settings.Manage',
 	'Garden.Email.Manage',
 	'Garden.Routes.Manage',
@@ -255,29 +258,3 @@ if($SearchModel instanceof Gdn_SearchModel) {
 		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
 		->Set($Explicit, $Drop);
 }
-
-/*
- 
-2009-06-27 - Removing Views so we can support older versions of mysql.
-
-// vw_SingleRoleUser Returns all UserIDs that have only one role.
-$SQL->Select('UserID')
-   ->From('UserRole')
-   ->GroupBy('UserID')
-   ->Having('count(RoleID) =', '1', TRUE, FALSE);
-$Construct->View('vw_SingleRoleUser', $SQL);
-
-// vw_ApplicantID Returns all UserIDs in the applicant role.
-$SQL->Select('User.UserID')
-   ->From('User')
-   ->Join('UserRole', 'User.UserID = UserRole.UserID')
-   ->Where('UserRole.RoleID', '4', TRUE, FALSE) // 4 is Applicant RoleID
-   ->GroupBy('UserID');
-$Construct->View('vw_ApplicantID', $SQL);
-
-// vw_Applicant Returns all users in the applicant role.
-$SQL->Select('User.*')
-   ->From('User')
-   ->Join('vw_ApplicantID', 'User.UserID = vw_ApplicantID.UserID');
-$Construct->View('vw_Applicant', $SQL);
-*/

@@ -89,7 +89,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    /**
     * The name of the master view that has been requested. Typically this is
-    * part of the master view's file name. ie. $this->MasterView.'.master'
+    * part of the master view's file name. ie. $this->MasterView.'.master.tpl'
     *
     * @var string
     */
@@ -881,17 +881,20 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // Master views come from one of four places:
       $MasterViewPaths = array();
-      if ($this->Theme) {
-         // 1. Application-specific theme view. eg. root/themes/theme_name/app_name/views/
-         $MasterViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView . '.master*'));
-         // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
-         $MasterViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView . '.master*'));
+      if(strpos($this->MasterView, '/') !== FALSE) {
+         $MasterViewPaths[] = CombinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
+      } else {
+         if ($this->Theme) {
+            // 1. Application-specific theme view. eg. root/themes/theme_name/app_name/views/
+            $MasterViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView . '.master*'));
+            // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
+            $MasterViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView . '.master*'));
+         }
+         // 3. Application default. eg. root/app_name/views/
+         $MasterViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView . '.master*'));
+         // 4. Garden default. eg. root/garden/views/
+         $MasterViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'garden', 'views', $this->MasterView . '.master*'));
       }
-      // 3. Application default. eg. root/app_name/views/
-      $MasterViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView . '.master*'));
-      // 4. Garden default. eg. root/garden/views/
-      $MasterViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'garden', 'views', $this->MasterView . '.master*'));
-
       
       // Find the first file that matches the path.
       $MasterViewPath = FALSE;

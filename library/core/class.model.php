@@ -211,6 +211,8 @@ class Model extends Gdn_Pluggable {
          } else {
             $PrimaryKeyVal = $this->Insert($Fields);
          }
+      } else {
+         $PrimaryKeyVal = FALSE;
       }
       return $PrimaryKeyVal;
    }

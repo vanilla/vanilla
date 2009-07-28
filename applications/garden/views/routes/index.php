@@ -21,7 +21,7 @@ echo $this->Form->Open();
 $i = 0;
 $Alt = FALSE;
 foreach ($this->Routes as $Route => $Target) {
-   $Alt = $Alt ? FALSE : TRUE;
+   $Alt = !$Alt;
 ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td><?php echo Anchor($Route, '/garden/routes/edit/'.$i, 'EditRoute'); ?></td>

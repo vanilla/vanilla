@@ -10,7 +10,7 @@ $AppCount = count($this->AvailableApplications);
 $EnabledCount = count($this->EnabledApplications);
 $DisabledCount = $AppCount - $EnabledCount;
 echo '<div class="FilterMenu">',
-   $this->Filter == '' ? '<strong>'.Translate('All').'</strong>' : Anchor('All', '/settings/plugins/'),
+   $this->Filter == '' ? '<strong>'.Translate('All').'</strong>' : Anchor('All', '/settings/applications/'),
    ' ('.$AppCount.') <span>|</span> ',
    $this->Filter == 'enabled' ? '<strong>'.Translate('Enabled').'</strong>' : Anchor('Enabled', '/settings/applications/enabled'),
    ' ('.$EnabledCount.') <span>|</span> ',

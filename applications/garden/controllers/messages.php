@@ -30,7 +30,7 @@ class MessagesController extends GardenController {
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
          $Message = $this->MessageModel->Delete(array('MessageID' => $MessageID));
          // Reset the message cache
-         $this->_SetMessageCache();
+         $this->MessageModel->SetMessageCache();
       }
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
@@ -83,7 +83,7 @@ class MessagesController extends GardenController {
       } else {
          if ($MessageID = $this->Form->Save()) {
             // Reset the message cache
-            $this->_SetMessageCache();
+            $this->MessageModel->SetMessageCache();
             
             // Redirect
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
@@ -130,13 +130,5 @@ class MessagesController extends GardenController {
       $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
       $ControllerData['Base'] = 'Every Page';
       return $ControllerData;
-   }
-
-   protected function _SetMessageCache() {
-      // Retrieve an array of all controllers that have enabled messages associated
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-      $Config->Set('Garden.Messages.Cache', $this->MessageModel->GetEnabledLocations());
-      $Config->Save();
    }
 }

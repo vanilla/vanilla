@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
                      if (json.messages != '')
                         $('#Content').load(
                            webroot + '/garden/settings/index',
-                           'DeliveryType=VIEW&DeliveryMethod=XHTML'
+                           'DeliveryType=ASSET&DeliveryMethod=XHTML'
                         );
                   }
                });

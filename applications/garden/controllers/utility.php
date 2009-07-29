@@ -145,7 +145,7 @@ class UtilityController extends GardenController {
                }
             }
          }
-/*
+
          // Load the config file so we can save some info in it         
          $Config = Gdn::Factory(Gdn::AliasConfig);
          $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
@@ -157,7 +157,6 @@ class UtilityController extends GardenController {
          // Record the current update check time in the config.
          $Config->Set('Garden.UpdateCheckDate', time());
          $Config->Save();
-*/
       }
    }
    

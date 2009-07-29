@@ -207,7 +207,7 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 	 */
 	public function PluginController_CssThemes_Create($Sender) {
 		$Sender->Form = new Form();
-		$Model = new Model('ThemeSetting');
+		$Model = new Gdn_Model('ThemeSetting');
 		$Sender->Form->SetModel($Model);
 		
 		if($Sender->Form->AuthenticatedPostBack() === FALSE) {

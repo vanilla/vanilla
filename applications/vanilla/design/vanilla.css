@@ -189,6 +189,7 @@ ul#Menu {
 #Content {
    float: left;
    width: 680px;
+   margin: 0 0 40px;
 }
 /* Progress Bars */
 .Loading {
@@ -255,11 +256,26 @@ div.Errors ul li {
 }
 
 .Warning {
-   background: #ff9;
+   background: #ffc;
+   border: 1px solid #ff9;
    color: #000;
+   padding: 6px 8px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert {
+   background: #d00;
+   border: 1px solid #b00;
+   color: #fff;
    padding: 3px 6px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert a {
+   color: #fff;
+}
+.Alert a:hover {
+   text-decoration: underline;
 }
 
 /* Close buttons */
@@ -973,6 +989,67 @@ a.Cancel {
 
 #Panel ul.Discussions {
    border: 0;
+}
+
+/* Powered by Vanilla Footer */
+
+#Foot {
+   text-align: center;
+   margin: 2px 0;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   line-height: 1;
+}
+#Foot a {
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
+}
+
+
+/* Info blocks */
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+div.EmptyInfo {
+   margin: 10px 0;
+}
+
+
+/* Dismiss Messages */
+
+div.DismissMessage {
+   margin: 0 0 10px;
+}
+div.DismissMessage p {
+   margin: 0;
+}
+div.Box p {
+   padding: 2px 0;
+}
+a.DismissMessage {
+   font-size: 11px;
+   line-height: 1;
+   float: right;
+   background: #fafafa;
+   padding: 4px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   color: #aaa;
+}
+a.DismissMessage:hover {
+   background: #fafafa;
+   border: 1px solid #ddd;
+   color: #777;
 }
 
 /* End Typography */

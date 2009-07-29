@@ -5,7 +5,7 @@
  */
 class DraftsController extends VanillaController {
    
-   public $Uses = array('Database', 'DraftModel');
+   public $Uses = array('Database', 'Gdn_DraftModel');
    
    public function Index($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
@@ -15,6 +15,7 @@ class DraftsController extends VanillaController {
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->Title(Translate('My Drafts'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

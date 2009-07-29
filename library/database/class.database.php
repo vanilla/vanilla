@@ -200,21 +200,18 @@ class Gdn_Database {
 			$PDOStatement = $this->Connection()->prepare($Sql);
 
 			if (!is_object($PDOStatement)) {
-				$ErrorInfo = $this->Connection()->errorInfo();
-				trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $ErrorInfo[2]), E_USER_ERROR);
+				trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($this->Connection()->errorInfo())), E_USER_ERROR);
 			}
 
          if ($PDOStatement->execute($InputParameters) === FALSE) {
-            $Error = $PDOStatement->errorInfo();
-            trigger_error(ErrorMessage($Error[2], $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+            trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDOStatement->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
          }
       } else {
          $PDOStatement = $this->Connection()->query($Sql);
       }
 
       if ($PDOStatement === FALSE) {
-         $Error = $this->Connection()->errorInfo();
-         trigger_error(ErrorMessage($Error[2], $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+         trigger_error(ErrorMessage($this->GetPDOErrorMessage($this->Connection()->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
       }
       
       $Result = TRUE;
@@ -239,6 +236,19 @@ class Gdn_Database {
 		if($this->_InTransaction) {
 			$this->_InTransaction = !$this->Connection()->rollBack();
 		}
+	}
+	public function GetPDOErrorMessage($ErrorInfo) {
+		$ErrorMessage = '';
+		if (is_array($ErrorInfo)) {
+			if (count($ErrorInfo) >= 2)
+				$ErrorMessage = $ErrorInfo[2];
+			elseif (count($ErrorInfo) >= 1)
+				$ErrorMessage = $ErrorInfo[0];
+		} elseif (is_string($ErrorInfo)) {
+			$ErrorMessage = $ErrorInfo;
+		}
+
+		return $ErrorMessage;
 	}
    
    /**

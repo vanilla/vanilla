@@ -13,9 +13,12 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 class RoleController extends GardenController {
    
-   public $Uses = array('Database', 'Form', 'RoleModel');
+   public $Uses = array('Database', 'Form', 'Gdn_RoleModel');
    
    public function Add() {
+      if ($this->Head)
+         $this->Head->Title(Translate('Add Role'));
+         
       $this->Permission('Garden.Roles.Manage');
       
       // Load default permissions.
@@ -28,6 +31,9 @@ class RoleController extends GardenController {
    }
    
    public function Delete($RoleID = FALSE) {
+      if ($this->Head)
+         $this->Head->Title(Translate('Delete Role'));
+         
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
       
@@ -67,6 +73,9 @@ class RoleController extends GardenController {
    
    //public $HasJunctionPermissionData;
    public function Edit($RoleID = FALSE) {
+      if ($this->Head && $this->Head->Title() == '')
+         $this->Head->Title(Translate('Edit Role'));
+         
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
       $PermissionModel = Gdn::PermissionModel();
@@ -112,6 +121,7 @@ class RoleController extends GardenController {
       if ($this->Head) {
          $this->Head->AddScript('/js/library/jquery.tablednd.js');
          $this->Head->AddScript('/js/library/jquery.ui.packed.js');
+         $this->Head->Title(Translate('Roles & Permissions'));
       }
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();

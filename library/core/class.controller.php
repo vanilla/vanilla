@@ -58,7 +58,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    /**
     * The name of the controller that holds the view (used by $this->FetchView
-    * when retrieving the view). Default values is $this->ClassName.
+    * when retrieving the view). Default value is $this->ClassName.
     *
     * @var string
     */
@@ -332,12 +332,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     * used later to sort assets before rendering.
     */
    public function AddAsset($AssetContainer, $Asset, $AssetName = '') {
-      if (is_object($AssetName))
+      if (is_object($AssetName)) {
          return FALSE;
-      else if ($AssetName == '')
+      } else if ($AssetName == '') {
          $this->Assets[$AssetContainer][] = $Asset;
-      else
-         $this->Assets[$AssetContainer][$AssetName] = $Asset;
+      } else {
+         if (isset($this->Assets[$AssetContainer][$AssetName]))
+            $this->Assets[$AssetContainer][$AssetName] .= $Asset;
+         else
+            $this->Assets[$AssetContainer][$AssetName] = $Asset;
+      }
    }
 
    /**
@@ -394,7 +398,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       if (is_object($Module)) {
          $AssetTarget = ($AssetTarget == '' ? $Module->AssetTarget() : $AssetTarget);
-         // echo '<div>adding: '.$Module->Name().' ('.(property_exists($Module, 'HtmlId') ? $Module->HtmlId : '').') to '.$AssetTarget.'</div>';
+         // echo '<div>adding: '.$Module->Name().' ('.(property_exists($Module, 'HtmlId') ? $Module->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$Module->ToString().'</textarea></div>';
          $this->AddAsset($AssetTarget, $Module->ToString(), $Module->Name());
       }
 
@@ -419,7 +423,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<li id="'.$Term.'">'.$Definition.'</li>';
+         $Return .= '<li id="'.$Term.'">'.$Definition."</li>\n";
       }
 
       return $Return .'</ul>';

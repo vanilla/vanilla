@@ -21,7 +21,7 @@ class SearchController extends GardenController {
 	}
 	
 	/// PROPERTIES ///
-   public $Uses = array('Database', 'SearchModel');
+   public $Uses = array('Database', 'Gdn_SearchModel');
 	
 	public $Form;
 	
@@ -30,6 +30,7 @@ class SearchController extends GardenController {
       if ($this->Head) {
 			$this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
          $this->Head->AddScript('/applications/garden/js/search.js');
+			$this->Head->Title(Translate('Search'));
       }
 
 		if(!is_numeric($Limit))

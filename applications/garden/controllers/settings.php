@@ -14,95 +14,86 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 class SettingsController extends GardenController {
    
    public $Uses = array('Form', 'Database');
+   public $ModuleSortContainer = 'Dashboard';
    
    /**
     * Application management screen.
     */
-   public function Applications($Action = '', $ApplicationName = '', $TransientKey = '') {
+   public function Applications($Filter = '', $TransientKey = '') {
+      $Session = Gdn::Session();
+      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      if (!in_array($Filter, array('enabled', 'disabled')))
+         $Filter = '';
+         
+      $this->Filter = $Filter;
       $this->Permission('Garden.Applications.Manage');
       $this->AddSideMenu('garden/settings/applications');
 
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/garden/js/applications.js');
+         $this->Head->Title(Translate('Applications'));
+      }
          
       $Session = Gdn::Session();
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
-      // Todd: Is this part necessary?
-      if (!$Session->ValidateTransientKey($TransientKey)) {
-      // if(!$AuthenticatedPostBack) {
-         $Action = '';
-         $ApplicationName = '';
-      } else {
-         $AuthenticatedPostBack = TRUE;
-      }
-      $FinalRedirect = FALSE;   
-      $SetupRender = FALSE;
       
       $ApplicationManager = new Gdn_ApplicationManager();
-      $this->AvailableApplications = $ApplicationManager->AvailableApplications();
+      $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
+      $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
+      
+      // Loop through all of the available visible apps and mark them if they have an update available
+      // Retrieve the list of apps that require updates from the config file
+      $RequiredUpdates = Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      if (is_array($RequiredUpdates)) {
+         foreach ($RequiredUpdates as $UpdateInfo) {
+            if (is_object($UpdateInfo))
+               $UpdateInfo = Format::ObjectAsArray($UpdateInfo);
+               
+            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
+            $Name = ArrayValue('Name', $UpdateInfo, '');
+            $Type = ArrayValue('Type', $UpdateInfo, '');
+            foreach ($this->AvailableApplications as $App => $Info) {
+               $CurrentName = ArrayValue('Name', $Info, $App);
+               if (
+                  $CurrentName == $Name
+                  && $Type == 'Application'
+               ) {
+                  $Info['NewVersion'] = $NewVersion;
+                  $this->AvailableApplications[$App] = $Info;
+               }
+            }
+         }
+      }
       
       // Check the update server for updates to these applications
       $this->UpdateManager = new Gdn_UpdateManager();
       // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
       // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_APPLICATION, array_keys($this->AvailableApplications));
       
-      if ($AuthenticatedPostBack) {
-         $ApplicationName = $this->Form->GetValue('ApplicationName', $ApplicationName);
-         if ($ApplicationName != '') {
-            if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
-               try {
-                  $ApplicationManager->DisableApplication($ApplicationName);
-               } catch (Exception $e) {
-                  $this->Form->AddError(strip_tags($e->getMessage()));
-               }
-               $FinalRedirect = TRUE;
-            } else {
-               if ($Action == '') {
-                  // 1. Make sure that the application's requirements are met
-                  try {
-                     $ApplicationManager->CheckRequirements($ApplicationName);
-                  } catch (Exception $e) {
-                     $this->Form->AddError(strip_tags($e->getMessage()));
-                  }
-                  if ($this->Form->ErrorCount() == 0) {
-                     // 2. Register any specified permissions
-                     $Validation = new Gdn_Validation();
-                     $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
-                     if (count($Validation->Results()) == 0) {
-                        if (!$ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation, TRUE)) {
-                           $SetupUrl = '/garden/settings/applications/setup/'.$ApplicationName.'/'.$Session->TransientKey();
-                           if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-                              Redirect($SetupUrl);
-                           } else {
-                              $this->SetJson('Go', Url($SetupUrl)); // <---- THIS IS WHAT MAKES IT GET PICKED UP BY THE POPUP
-                              $this->Database->CloseConnection();
-                              exit(json_encode($this->GetJson()));
-                           }
-                        } else {
-                           $FinalRedirect = TRUE;
-                        }
-                     }
-                  }
-                  $this->Form->SetValidationResults($Validation->Results());
-               } elseif ($Action == 'setup') {
-                  // 3. Run the setup method of the application
-                  $SetupRender = TRUE;
-                  $Validation = new Gdn_Validation();
-                  if ($ApplicationManager->ApplicationSetup($ApplicationName, $this, $Validation)) {
-                     $SetupRender = FALSE;
-                     $FinalRedirect = TRUE;
-                  }
-               }
+      if ($ApplicationName != '') {
+         if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
+            try {
+               $ApplicationManager->DisableApplication($ApplicationName);
+            } catch (Exception $e) {
+               $this->Form->AddError(strip_tags($e->getMessage()));
             }
-            if ($FinalRedirect && $this->Form->ErrorCount() == 0) {
-               $this->StatusMessage = Gdn::Translate('Finalizing changes...');
-               $this->RedirectUrl = Url('/garden/settings/applications/');
+         } else {
+            try {
+               $ApplicationManager->CheckRequirements($ApplicationName);
+            } catch (Exception $e) {
+               $this->Form->AddError(strip_tags($e->getMessage()));
             }
+            if ($this->Form->ErrorCount() == 0) {
+               $Validation = new Gdn_Validation();
+               $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
+               $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+            }
+            $this->Form->SetValidationResults($Validation->Results());
          }
+         if ($this->Form->ErrorCount() == 0)
+            Redirect('settings/applications');
       }
-      if (!$SetupRender)
-         $this->Render();
-
+      $this->Render();
    }
    
    /**
@@ -111,10 +102,25 @@ class SettingsController extends GardenController {
    public function Configure() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
+      if ($this->Head) {
+         $this->Head->AddScript('/applications/garden/js/email.js');
+         $this->Head->Title(Translate('General Settings'));
+      }
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls'));
+      $ConfigurationModel->SetField(array(
+         'Garden.Locale',
+         'Garden.Title',
+         'Garden.RewriteUrls',
+         'Garden.Email.SupportName',
+         'Garden.Email.SupportAddress',
+         'Garden.Email.UseSmtp',
+         'Garden.Email.SmtpHost',
+         'Garden.Email.SmtpUser',
+         'Garden.Email.SmtpPassword',
+         'Garden.Email.SmtpPort'
+      ));
       
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
@@ -133,6 +139,9 @@ class SettingsController extends GardenController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Locale', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.RewriteUrls', 'Boolean');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
          
          // If changing locale, redefine locale sources:
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
@@ -152,53 +161,16 @@ class SettingsController extends GardenController {
    }      
    
    /**
-    * Garden management screen.
-    */
-   public function Email() {
-      $this->Permission('Garden.Email.Manage');
-      $this->AddSideMenu('garden/settings/email');
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/email.js');      
-      
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
-      $ConfigurationModel->SetField(array(
-         'Garden.Email.SupportName',
-         'Garden.Email.SupportAddress',
-         'Garden.Email.UseSmtp',
-         'Garden.Email.SmtpHost',
-         'Garden.Email.SmtpUser',
-         'Garden.Email.SmtpPassword',
-         'Garden.Email.SmtpPort'
-      ));
-      
-      // Set the model on the form.
-      $this->Form->SetModel($ConfigurationModel);
-      
-      // If seeing the form for the first time...
-      if (!$this->Form->AuthenticatedPostBack()) {
-         // Apply the config settings to the form.
-         $this->Form->SetData($ConfigurationModel->Data);
-      } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
-         if ($this->Form->Save() !== FALSE)
-            $this->StatusMessage = Translate("Your settings have been saved.");
-
-      }
-      
-      $this->Render();      
-   }      
-   
-   /**
     * Garden settings dashboard.
     */
    var $RequiredAdminPermissions = array();
    public function Index() {
+      if ($this->Head) {
+         $this->Head->AddScript('/applications/garden/js/settings.js');
+         $this->Head->Title(Translate('Dashboard'));
+      }
+         
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Email.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
@@ -213,6 +185,83 @@ class SettingsController extends GardenController {
       $this->FireEvent('DefineAdminPermissions');
       $this->Permission($this->RequiredAdminPermissions, '', FALSE);
       $this->AddSideMenu('garden/settings');
+
+      $UserModel = Gdn::UserModel();
+      
+      // Load some data to display on the dashboard
+      $this->BuzzData = array();
+      // Get the number of users in the database
+      $CountUsers = $UserModel->GetCountLike();
+      $this->AddDefinition('CountUsers', $CountUsers);
+      $this->BuzzData[Translate('Users')] = number_format($CountUsers);
+      // Get the number of new users in the last day
+      $this->BuzzData[Translate('New users in the last day')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Get the number of new users in the last week
+      $this->BuzzData[Translate('New users in the last week')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      
+      // Get recently active users
+      $this->ActiveUserData = $UserModel->GetActiveUsers(5);
+      
+      // Make sure the phone-home code knows where to ping:
+      $this->AddDefinition('UpdateCheckUrl', Gdn::Config('Garden.UpdateCheckUrl', ''));
+      
+      // Check to see if the application needs to phone-home for updates. Doing
+      // this here because this method is always called when admin pages are
+      // loaded regardless of the application loading them.
+      $UpdateCheckDate = Gdn::Config('Garden.UpdateCheckDate', '');
+      if (
+         $UpdateCheckDate == '' // was not previous defined
+         || !IsTimestamp($UpdateCheckDate) // was not a valid timestamp
+         || $UpdateCheckDate < strtotime("-1 day") // was not done within the last day
+      ) {
+         $UpdateData = array();
+         
+         // Grab all of the plugins & versions
+         $PluginManager = Gdn::Factory('PluginManager');
+         $Plugins = $PluginManager->AvailablePlugins();
+         foreach ($Plugins as $Plugin => $Info) {
+            $Version = ArrayValue('Version', $Info, '');
+            if ($Version != '')
+               $UpdateData[] = array(
+                  'Name' => $Plugin,
+                  'Version' => $Version,
+                  'Type' => 'Plugin'
+               );
+         }
+         
+         // Grab all of the applications & versions
+         $ApplicationManager = Gdn::Factory('ApplicationManager');
+         $Applications = $ApplicationManager->AvailableApplications();
+         foreach ($Applications as $Application => $Info) {
+            $Version = ArrayValue('Version', $Info, '');
+            if ($Version != '')
+               $UpdateData[] = array(
+                  'Name' => $Application,
+                  'Version' => $Version,
+                  'Type' => 'Application'
+               );
+         }
+
+         // Grab all of the themes & versions
+         $ThemeManager = new Gdn_ThemeManager;
+         $Themes = $ThemeManager->AvailableThemes();
+         foreach ($Themes as $Theme => $Info) {
+            $Version = ArrayValue('Version', $Info, '');
+            if ($Version != '')
+               $UpdateData[] = array(
+                  'Name' => $Theme,
+                  'Version' => $Version,
+                  'Type' => 'Theme'
+               );
+         }
+
+         // Dump the entire set of information into the definition list (jQuery
+         // will pick it up and ping the VanillaForums.org server with this info).
+         $this->AddDefinition('UpdateChecks', Format::Serialize($UpdateData));
+      }
+      
+      // Fire an event so other applications can add some data to be displayed
+      $this->FireEvent('DashboardData');
       $this->Render();
    }
    
@@ -222,7 +271,16 @@ class SettingsController extends GardenController {
          $this->Menu->HighlightRoute('/garden/settings');
    }
    
-   public function Plugins() {
+   public function Plugins($Filter = '', $TransientKey = '') {
+      if ($this->Head)
+         $this->Head->Title(Translate('Plugins'));
+         
+      $Session = Gdn::Session();
+      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      if (!in_array($Filter, array('enabled', 'disabled')))
+         $Filter = '';
+         
+      $this->Filter = $Filter;
       $this->Permission('Garden.Plugins.Manage');
       $this->AddSideMenu('garden/settings/plugins');
       
@@ -231,30 +289,44 @@ class SettingsController extends GardenController {
       $this->EnabledPlugins = $PluginManager->EnabledPlugins;
       $this->AvailablePlugins = $PluginManager->AvailablePlugins();
       
-      // Check the update server for updates to these plugins
-      $this->UpdateManager = new Gdn_UpdateManager();
-      // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
-      // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_PLUGIN, array_keys($this->AvailablePlugins));
-      
-      if ($this->Form->AuthenticatedPostBack()) {
-         $PluginName = $this->Form->GetValue('PluginName', '');
-         if ($PluginName != '') {
-            try {
-               if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
-                  $PluginManager->DisablePlugin($PluginName);
-               } else {
-                  $Validation = new Gdn_Validation();
-                  if (!$PluginManager->EnablePlugin($PluginName, $Validation))
-                     $this->Form->SetValidationResults($Validation->Results());
+      // Loop through all of the available plugins and mark them if they have an update available
+      // Retrieve the list of plugins that require updates from the config file
+      $RequiredUpdates = Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      if (is_array($RequiredUpdates)) {
+         foreach ($RequiredUpdates as $UpdateInfo) {
+            if (is_object($UpdateInfo))
+               $UpdateInfo = Format::ObjectAsArray($UpdateInfo);
+               
+            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
+            $Name = ArrayValue('Name', $UpdateInfo, '');
+            $Type = ArrayValue('Type', $UpdateInfo, '');
+            foreach ($this->AvailablePlugins as $Plugin => $Info) {
+               $CurrentName = ArrayValue('Name', $Info, $Plugin);
+               if (
+                  $CurrentName == $Name
+                  && $Type == 'Plugin'
+               ) {
+                  $Info['NewVersion'] = $NewVersion;
+                  $this->AvailablePlugins[$Plugin] = $Info;
                }
-            } catch (Exception $e) {
-               $this->Form->AddError(strip_tags($e->getMessage()));
-            }
-            if ($this->Form->ErrorCount() == 0) {
-               $this->StatusMessage = Gdn::Translate('Finalizing changes...');
-               $this->RedirectUrl = Url($this->SelfUrl);
             }
          }
+      }
+      
+      if ($PluginName != '') {
+         try {
+            if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
+               $PluginManager->DisablePlugin($PluginName);
+            } else {
+               $Validation = new Gdn_Validation();
+               if (!$PluginManager->EnablePlugin($PluginName, $Validation))
+                  $this->Form->SetValidationResults($Validation->Results());
+            }
+         } catch (Exception $e) {
+            $this->Form->AddError(strip_tags($e->getMessage()));
+         }
+         if ($this->Form->ErrorCount() == 0)
+            Redirect('/settings/plugins');
       }
       $this->Render();
    }
@@ -266,8 +338,10 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Registration.Manage');
       $this->AddSideMenu('garden/settings/registration');
       
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/garden/js/registration.js');
+         $this->Head->Title(Translate('Registration'));
+      }
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
@@ -349,13 +423,46 @@ class SettingsController extends GardenController {
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
+      if ($this->Head)
+         $this->Head->Title(Translate('Themes'));
+         
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $this->EnabledTheme = $ThemeManager->EnabledTheme();
+      $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
+      $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
+      $Name = array_keys($this->EnabledTheme);
+      $Name = $Name[0];
+      $this->EnabledTheme = $this->EnabledTheme[$Name];
+      
+      // Loop through all of the available themes and mark them if they have an update available
+      // Retrieve the list of themes that require updates from the config file
+      $RequiredUpdates = Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      if (is_array($RequiredUpdates)) {
+         foreach ($RequiredUpdates as $UpdateInfo) {
+            if (is_object($UpdateInfo))
+               $UpdateInfo = Format::ObjectAsArray($UpdateInfo);
+               
+            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
+            $Name = ArrayValue('Name', $UpdateInfo, '');
+            $Type = ArrayValue('Type', $UpdateInfo, '');
+            foreach ($this->AvailableThemes as $Theme => $Info) {
+               $CurrentName = ArrayValue('Name', $Info, $Theme);
+               if (
+                  $CurrentName == $Name
+                  && $Type == 'Theme'
+               ) {
+                  $Info['NewVersion'] = $NewVersion;
+                  $this->AvailableThemes[$Theme] = $Info;
+               }
+            }
+         }
+      }
+      
+      
       
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {
@@ -377,6 +484,9 @@ class SettingsController extends GardenController {
    }
    
    public function PreviewTheme($ThemeFolder = '') {
+      if ($this->Head)
+         $this->Head->Title(Translate('Theme Preview'));
+         
       // Clear out all css & js and use the "empty" master view
       $this->MasterView = 'empty';
       $this->_CssFiles = array();

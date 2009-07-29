@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class Gdn_UserModel extends Model {
+class Gdn_UserModel extends Gdn_Model {
    
    public $SessionColumns;
    
@@ -67,6 +67,15 @@ class Gdn_UserModel extends Model {
       else
          return $this->SQL->Where('u.Name', $UserReference)->Get()->FirstRow();
    }
+
+   public function GetActiveUsers($Limit = 5) {
+      $this->UserQuery();
+      return $this
+         ->SQL
+         ->OrderBy('u.DateLastActive', 'desc')
+         ->Limit($Limit, 0)
+         ->Get();
+   }
    
    /**
     * Returns all users in the applicant role
@@ -88,6 +97,25 @@ class Gdn_UserModel extends Model {
          ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
       if (is_array($Like))
          $this->SQL->Like($Like, '', 'right');
+
+      $Data = $this->SQL
+         ->BeginWhereGroup()
+         ->Where('ur.RoleID is null')
+         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
+         ->EndWhereGroup()
+         ->Get()
+         ->FirstRow();
+
+      return $Data === FALSE ? 0 : $Data->UserCount;
+   }
+
+   public function GetCountWhere($Where = FALSE) {
+      $this->SQL
+         ->Select('u.UserID', 'count', 'UserCount')
+         ->From('User u')
+         ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
+      if (is_array($Where))
+         $this->SQL->Where($Where);
 
       $Data = $this->SQL
          ->BeginWhereGroup()

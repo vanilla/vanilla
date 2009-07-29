@@ -109,7 +109,7 @@ if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Photo, $CssClass = '') {
       $Name = is_object($User) ? $User->Name : $User;
       if ($Photo != '') {
-         return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Url('uploads/n'.$Photo).'" /></a>';
+         return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Url('uploads/n'.$Photo).'" alt="'.$Name.'" /></a>';
       } else {
          return ''; // Anchor($Name, '/profile/'.Format::Url($Name), $CssClass);
       }
@@ -270,7 +270,17 @@ if (!function_exists('InArrayI')) {
    }
 }
 
-if(!function_exists('TrueStripSlashes')) {
+if (!function_exists('IsTimestamp')) {
+   function IsTimestamp($Stamp) {
+      return checkdate(
+         @date("m", $Stamp),
+         @date("d", $Stamp),
+         @date("Y", $Stamp)
+      );
+   }
+}
+
+if (!function_exists('TrueStripSlashes')) {
    if(get_magic_quotes_gpc()) {
       function TrueStripSlashes($String) {
          return stripslashes($String);
@@ -382,9 +392,9 @@ if (!function_exists('GetPostValue')) {
 if (!function_exists('GetIncomingValue')) {
    function GetIncomingValue($FieldName, $Default = FALSE) {
       if (array_key_exists($FieldName, $_POST) === TRUE) {
-         return $_POST[$FieldName];
+         return filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
       } else if (array_key_exists($FieldName, $_GET) === TRUE) {
-         return $_GET[$FieldName];
+         return filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
       } else {
          return $Default;
       }
@@ -501,7 +511,7 @@ if (!function_exists('AddActivity')) {
     * A convenience function that allows adding to the activity table with a single line.
     */
    function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '') {
-      $ActivityModel = new ActivityModel();
+      $ActivityModel = new Gdn_ActivityModel();
       $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route);
    }
 }

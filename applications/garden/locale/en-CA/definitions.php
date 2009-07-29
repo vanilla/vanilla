@@ -54,8 +54,6 @@ $Definition['PageDetailsMessage'] = '%1$s to %2$s';
 $Definition['RoleID'] = 'role';
 $Definition['Garden.Registration.DefaultRoles'] = 'default role';
 
-$Definition['Category1'] = 'Fiddlesticks!';
-$Definition['Category2'] = 'Gravy';
 $Definition['DateOfBirth'] = 'Birth date';
 $Definition['RoleID'] = 'role';
 
@@ -91,9 +89,9 @@ Someone has requested to reset your password at %2$s. To reset your password, fo
   %3$s
 
 If you did not make this request, disregard this email.';
-
+$Definition['PluginHelp'] = "Plugins allow you to add functionality to your site.<br />Once a plugin has been added to your %s folder, you can enable or disable it here.";
+$Definition['ApplicationHelp'] = "Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.";
+$Definition['ThemeHelp'] = "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";
+$Definition['AddonProblems'] = "<h2>Problems?</h2><p>If something goes wrong with an addon and you can't use your site, you can disable them manually by editing:</p>%s";
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).
-
-// Begin Literal Translations:
-$Definition['{0} (version {1})'] = '{0} (version {1})';

@@ -19,6 +19,7 @@ $PluginInfo['Debugger'] = array(
    'RegisterPermissions' => array('Plugins.Debugger.View','Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
    'SettingsUrl' => '/garden/plugin/debugger', // Url of the plugin's settings page.
    'SettingsPermission' => 'Plugins.Debugger.Manage', // The permission required to view the SettingsUrl.
+   'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@lussumo.com',
    'AuthorUrl' => 'http://markosullivan.ca'

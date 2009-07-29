@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 class MessagesController extends ConversationsController {
    
-   public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
+   public $Uses = array('Form', 'Gdn_ConversationModel', 'Gdn_ConversationMessageModel');
    
    public function Initialize() {
       parent::Initialize();
@@ -86,6 +86,9 @@ class MessagesController extends ConversationsController {
     * Show all conversations for the currently authenticated user.
     */
    public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
+      if ($this->Head) {
+         $this->Head->Title(Translate('Conversations'));
+      }
       $this->Offset = $Offset;
       $this->AddCssFile('form.css');
       $Session = Gdn::Session();
@@ -180,6 +183,9 @@ class MessagesController extends ConversationsController {
     * @todo ENFORCE PERMISSIONS SO THAT PEOPLE CAN'T READ OTHER PEOPLE'S MESSAGES
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
+      if ($this->Head) {
+         $this->Head->Title(Translate('Conversations'));
+      }
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($ConversationID) || $ConversationID < 0)

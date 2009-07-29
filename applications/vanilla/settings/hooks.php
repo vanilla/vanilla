@@ -54,6 +54,29 @@ class VanillaHooks implements Gdn_IPlugin {
       }
    }
    
+   // Load some information into the BuzzData collection
+   public function SettingsController_DashboardData_Handler(&$Sender) {
+      $DiscussionModel = new Gdn_DiscussionModel();
+      // Number of Discussions
+      $CountDiscussions = $DiscussionModel->GetCount();
+      $Sender->AddDefinition('CountDiscussions', $CountDiscussions);
+      $Sender->BuzzData[Gdn::Translate('Discussions')] = number_format($CountDiscussions);
+      // Number of New Discussions in the last day
+      $Sender->BuzzData[Translate('New discussions in the last day')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Number of New Discussions in the last week
+      $Sender->BuzzData[Translate('New discussions in the last week')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+
+      $CommentModel = new Gdn_CommentModel();
+      // Number of Comments
+      $CountComments = $CommentModel->GetCountWhere();
+      $Sender->AddDefinition('CountComments', $CountComments);
+      $Sender->BuzzData[Gdn::Translate('Comments')] = number_format($CountComments);
+      // Number of New Comments in the last day
+      $Sender->BuzzData[Translate('New comments in the last day')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Number of New Comments in the last week
+      $Sender->BuzzData[Translate('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+   }
+   
    public function ProfileController_Discussions_Create(&$Sender) {
       $UserReference = ArrayValue(0, $Sender->EventArguments, '');
       $Offset = ArrayValue(1, $Sender->EventArguments, 0);
@@ -65,7 +88,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset = 0;
       
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('d.InsertUserID' => $Sender->User->UserID));
       $CountDiscussions = $Offset + $Sender->DiscussionData->NumRows();
       if ($Sender->DiscussionData->NumRows() == $Limit)

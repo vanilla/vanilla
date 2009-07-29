@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class DiscussionModel extends VanillaModel {
+class Gdn_DiscussionModel extends Gdn_VanillaModel {
    /**
     * Class constructor.
     */
@@ -47,9 +47,10 @@ class DiscussionModel extends VanillaModel {
       $this->SQL
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
-         //->Select('iu.Name', '', 'FirstName')
+         ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          //->Select('iup.Name', '', 'FirstPhoto')
-         // ->Select('fc.Body', '', 'FirstBody')
+         ->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
+         ->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
          ->Select('lc.DateInserted', '', 'LastDate')
          ->Select('lc.InsertUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -57,9 +58,9 @@ class DiscussionModel extends VanillaModel {
          //->Select('lc.Body', '', 'LastBody')
          ->Select("' &bull; ', pc.Name, ca.Name", 'concat_ws', 'Category')
          ->From('Discussion d')
-         //->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
+         ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         //->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
+         ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
          ->Join('Comment lc', 'd.LastCommentID = lc.CommentID') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo

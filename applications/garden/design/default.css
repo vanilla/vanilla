@@ -23,7 +23,7 @@ h1, h2 {
    margin-bottom:10px;
 }
 h3 {
-   font-size: 140%;
+   font-size:140%;
 }
 h4 {
    font-size: 120%;
@@ -55,6 +55,15 @@ textarea {
    margin: 0px;
    width: 250px;
    border: 1px solid #888;
+}
+textarea.TextBox {
+   width: 500px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 500px;
+}
+#Popup textarea.TextBox {
+   width: 465px;
 }
 input.SmallInput,
 input.InputBox {
@@ -193,6 +202,7 @@ ul#Menu {
 #Content {
    float: left;
    width: 680px;
+   margin: 0 0 40px;
 }
 /* Progress Bars */
 .Loading {
@@ -262,11 +272,26 @@ div.Errors ul li {
 }
 
 .Warning {
-   background: #ff9;
+   background: #ffc;
+   border: 1px solid #ff9;
    color: #000;
    padding: 3px 6px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert {
+   background: #d00;
+   border: 1px solid #b00;
+   color: #fff;
+   padding: 3px 6px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert a {
+   color: #fff;
+}
+.Alert a:hover {
+   text-decoration: underline;
 }
 
 /* Close buttons */
@@ -279,9 +304,9 @@ a.Close {
    background: #f9f9f9;
    -moz-border-radius: 8px;
    -webkit-border-radius: 8px;
-   padding: 1px 4px 2px 5px;
+   padding: 1px 5px 2px;
    margin: 0px;
-   line-height: 100%;
+   line-height: 1;
    border: 1px solid #ddd;
 }
 a.Close:hover {
@@ -312,6 +337,64 @@ a.Close:hover {
 .StatusMessage a.Close:hover {
    background: #ffffe2;
 }
+
+/* Dashboard */
+#garden_settings_index #Content h3 {
+   background: #eee;
+   -moz-border-radius-topleft: 4px;
+   -moz-border-radius-topright: 4px;
+   -webkit-border-radius-top-left: 4px;
+   -webkit-border-radius-top-right: 4px;
+   border: 1px solid #ddd;
+   border-bottom: 1px solid #e9e9e9;
+   font-size: 120%;
+   padding: 8px;
+   margin: 10px 0 0;
+   font-weight: bold;
+}
+#garden_settings_index #Content ul.RecentUsers,
+#garden_settings_index dl {
+   background: #fafafa;
+   -moz-border-radius-bottomleft: 4px;
+   -moz-border-radius-bottomright: 4px;
+   -webkit-border-radius-bottom-left: 4px;
+   -webkit-border-radius-bottom-right: 4px;
+   padding: 0 6px;
+   color: #555;
+   border: 1px solid #eee;
+   border-top: 0;
+}
+#garden_settings_index dl dt {
+   font-size: 120%;
+   font-weight: bold;
+   padding: 8px 20px 8px 8px;
+   width: 80px;
+   text-align: right;
+   float: left;
+}
+#garden_settings_index #Content ul.RecentUsers li,
+#garden_settings_index dl dd {
+   font-size: 110%;
+   padding: 8px;
+   border-bottom: 1px solid #eee;
+}
+#garden_settings_index #Content ul.RecentUsers li {
+   line-height: 3.5;
+   clear: left;
+}
+#garden_settings_index #Content ul.RecentUsers li.Last,
+#garden_settings_index dl dd.Last {
+   border-bottom: 0;
+}
+#garden_settings_index #Content ul.RecentUsers li img {
+   margin-right: 10px;
+   float: left;
+}
+#garden_settings_index #Content ul.RecentUsers li a {
+   margin-right: 10px;
+   font-weight: bold;
+}
+
 
 /* Panels */
 #Panel {
@@ -419,25 +502,6 @@ ul.PanelInfo li.Active {
    border-bottom: 1px solid #a3e6ff;
 }
 
-#Panel a.PanelButton {
-   padding: 6px 0;
-   display: block;
-   text-align: center;
-   font-size: 16px;
-   font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkig-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-}
-
-#Panel a.PanelButton:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-}
-
 /* Foot */
 #Foot {
    padding-top: 20px;
@@ -447,6 +511,9 @@ ul.PanelInfo li.Active {
 /* Activities */
 body.Activity h1 {
    margin: 0;
+}
+div.EmptyInfo {
+   margin: 10px 0;
 }
 ul.Activities li {
    border-bottom: 1px solid #ddd;
@@ -576,7 +643,7 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    line-height: 100%;
 }
 ul.Activities li.CommentForm textarea {
-   width: 648px;
+   width: 640px;
    height: 40px;
    margin-bottom: 2px;
 }
@@ -808,6 +875,7 @@ ul.BigList {
    background: #f0fbff /* Panel Background Color */;
    padding: 8px;
    margin: 10px 0 0;
+   border: 1px solid #dff4fc;
 }
 ul.BigList li {
    font-size: 16px;
@@ -821,9 +889,11 @@ li.five { background: url('five.png') no-repeat center left; }
 
 /* DataList (search results, vanilla discussions, drafts, etc) */
 
+/*
 ul.DataList {
    border-top: 1px solid #dbe3e6;
 }
+*/
 ul.DataList li {
    margin: 0px;
    padding: 0px 0px 4px 0px;
@@ -840,9 +910,12 @@ ul.DataList li ul {
    padding: 0px;
 }
 ul.DataList li ul li.Title a {
-   border-left: 2px solid #dbe3e6;
-   margin: 8px 4px 6px 10px;
-   padding: 0px 0px 0px 8px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 2px 8px;
    line-height: 130%;
    color: #2b3033;
    font-size: 105%;
@@ -860,6 +933,7 @@ ul.DataList li ul li.Title h3 a {
    padding: 0px;
    margin: 0px;
    color: #2d7bb2;
+   background: none;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
@@ -881,9 +955,69 @@ ul.DataList li ul li.Meta a {
 }
 /* Search Page Heading */
 body.Search h1 {
-   font-size:160%;
    margin:0;
    padding:10px 0 0;
+}
+
+/* FilterMenu */
+.FilterMenu {
+   color: #aaa;
+   padding: 0 6px 10px;
+}
+.FilterMenu strong {
+   font-weight: bold;
+   color: #111;
+}
+.FilterMenu span {
+   color: #999;
+   padding: 0 4px;
+}
+
+/* Info blocks */
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+}
+
+/* User Search */
+#garden_user_index div.Info .InputBox {
+   margin-right: 6px;
+}
+#garden_user_index div.Info .Button {
+   margin-right: 20px;
+}
+
+/* Dismiss Messages */
+
+div.DismissMessage a.Close {
+   float: right;
+   display: block;
+   height: 10px;
+   width: 6px;
+   overflow: hidden;
+   margin: 3px;
+}
+
+/* Powered by Vanilla Footer */
+
+#Foot {
+   text-align: center;
+   margin: 2px 0;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   line-height: 1;
+}
+#Foot a {
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
 }
 
 .Center {
@@ -891,7 +1025,26 @@ body.Search h1 {
 }
 
 .Right {
-   text-align: right;
+	text-align: right;
+}
+
+#Panel a.PanelButton {
+   padding: 6px 0;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
+   text-decoration: none;
+   margin: 0 0 10px 0;
+}
+
+#Panel a.PanelButton:hover {
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
 }
 
 /* End Layout */

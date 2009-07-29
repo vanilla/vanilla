@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class CommentModel extends VanillaModel {
+class Gdn_CommentModel extends Gdn_VanillaModel {
    /**
     * Class constructor.
     */
@@ -81,6 +81,17 @@ class CommentModel extends VanillaModel {
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
+         ->Get()
+         ->FirstRow()
+         ->CountComments;
+   }
+
+   public function GetCountWhere($Where = FALSE) {
+      if (is_array($Where))
+         $this->SQL->Where($Where);
+         
+      return $this->SQL->Select('CommentID', 'count', 'CountComments')
+         ->From('Comment')
          ->Get()
          ->FirstRow()
          ->CountComments;
@@ -375,7 +386,7 @@ class CommentModel extends VanillaModel {
       
    public function RecordActivity($DiscussionID, $ActivityUserID, $CommentID) {
       // Get the author of the discussion
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $Discussion = $DiscussionModel->GetID($DiscussionID);
       if ($Discussion->InsertUserID != $ActivityUserID) 
          AddActivity(
@@ -448,7 +459,7 @@ class CommentModel extends VanillaModel {
          
       if ($Data) {
          if ($Data->FirstCommentID == $CommentID) {
-            $DiscussionModel = new DiscussionModel();
+            $DiscussionModel = new Gdn_DiscussionModel();
             $DiscussionModel->Delete($Data->DiscussionID);
          } else {
             $this->FireEvent('DeleteComment');

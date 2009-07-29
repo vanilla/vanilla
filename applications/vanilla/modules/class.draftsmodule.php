@@ -21,7 +21,7 @@ class DraftsModule extends Module {
    public function GetData($Limit = 20, $DiscussionID = '') {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
-         $DraftModel = new DraftModel();
+         $DraftModel = new Gdn_DraftModel();
          $this->_DraftData = $DraftModel->Get($Session->UserID, 0, $Limit, $DiscussionID);
       }
       $this->Form = $this->_Sender->Form;

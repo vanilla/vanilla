@@ -5,7 +5,7 @@
  */
 class PostController extends VanillaController {
    
-   public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
+   public $Uses = array('Form', 'Database', 'Gdn_CommentModel', 'Gdn_DiscussionModel', 'Gdn_DraftModel');
    
    /**
     * Create a discussion.
@@ -18,13 +18,14 @@ class PostController extends VanillaController {
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
-         $CategoryModel = new CategoryModel();
+         $CategoryModel = new Gdn_CategoryModel();
          $this->CategoryData = $CategoryModel->GetFull();
       }
       if ($this->Head) {
          $this->Head->AddScript('js/library/jquery.autogrow.js');
          $this->Head->AddScript('/applications/vanilla/js/post.js');
          $this->Head->AddScript('/applications/vanilla/js/autosave.js');
+         $this->Head->Title(Translate('Start a New Discussion'));
       }
       
       if (isset($this->Discussion)) {

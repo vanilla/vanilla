@@ -67,6 +67,15 @@ if (!class_exists('HeadModule', FALSE)) {
             'media' => $Media));
       }
 
+      public function AddRss($HRef, $Title) {
+         $this->AddTag('link', array(
+            'rel' => 'alternate',
+            'type' => 'application/rss+xml',
+            'title' => $Title,
+            'href' => Asset($HRef)
+         ));
+      }
+
       /**
        * Adds a new tag to the head.
        *
@@ -163,7 +172,7 @@ if (!class_exists('HeadModule', FALSE)) {
          );
       }
       
-      public function Title($SubTitle = FALSE, $Title = FALSE, $TitleDivider = ' - ') {
+      public function SubTitle($SubTitle = FALSE, $Title = FALSE, $TitleDivider = ' - ') {
          $this->_TitleDivider = '';
          if ($Title === FALSE)
             $Title = Gdn::Config('Garden.Title', FALSE);
@@ -178,6 +187,16 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->_TitleDivider = $TitleDivider;
             
          return $this->_Title.$this->_TitleDivider.$this->_SubTitle;
+      }
+   
+      public function Title($Title = '') {
+         if ($Title != '')
+            $this->_Title = $Title;
+            
+         if ($this->_Title == '')
+            $this->_Title = Gdn::Config('Garden.Title', '');
+            
+         return $this->_Title;
       }
    
       public function ToString() {

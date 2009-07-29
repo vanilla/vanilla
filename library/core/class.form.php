@@ -496,7 +496,7 @@ class Form {
     * @return string
     */
    public function Close($ButtonCode = '', $Xhtml = '') {
-      $Return = "</form>";
+      $Return = "</div>\n</form>";
       if ($Xhtml != '') $Return = $Xhtml . $Return;
 
       if ($ButtonCode != '') $Return = $this->Button($ButtonCode) . $Return;
@@ -766,7 +766,7 @@ class Form {
       $Return .= ' method="' . $this->Method . '"'
          .' action="' . $this->Action . '"'
          .$this->_AttributesToString($Attributes)
-         .">\n";
+         .">\n<div>\n";
 
       // Postback Key - don't allow it to be posted in the url (prevents csrf attacks & hijacks)
       if ($this->Method != "get") {
@@ -795,7 +795,19 @@ class Form {
     * @return string
     */
    public function TextBox($FieldName, $Attributes = FALSE) {
+      if (!is_array($Attributes))
+         $Attributes = array();
+      
       $MultiLine = ArrayValueI('MultiLine', $Attributes);
+      
+      if ($MultiLine) {
+         if (!InArrayI('rows', $Attributes))
+            $Attributes['rows'] = '6'; // For xhtml compliance
+   
+         if (!InArrayI('cols', $Attributes))
+            $Attributes['cols'] = '100'; // For xhtml compliance
+      }
+
       $CssClass = ArrayValueI('class', $Attributes);
       if ($CssClass == FALSE) $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
       $Return = $MultiLine === TRUE ? '<textarea' : '<input type="text"';
@@ -995,7 +1007,7 @@ class Form {
     */
    public function __construct($TableName = '') {
       if ($TableName != '') {
-         $TableModel = new Model($TableName);
+         $TableModel = new Gdn_Model($TableName);
          $this->SetModel($TableModel);
       }
    }
@@ -1199,8 +1211,7 @@ class Form {
             // NOTE: THE VALIDATION FUNCTION NAMES ARE ALSO THE LANGUAGE
             // TRANSLATIONS OF THE ERROR MESSAGES. CHECK THEM OUT IN THE LOCALE
             // FILE.
-            $this->SetValidationResults(
-               $this->_Model->ValidationResults());
+            $this->SetValidationResults($this->_Model->ValidationResults());
          }
       }
       return $SaveResult;
@@ -1309,7 +1320,9 @@ class Form {
                   'action',
                   'type',
                   'multiline',
-                  'default'))) $Return .= ' ' . $Attribute .
+                  'default',
+                  'textfield',
+                  'valuefield'))) $Return .= ' ' . $Attribute .
                 '="' . $Value . '"';
          }
       }

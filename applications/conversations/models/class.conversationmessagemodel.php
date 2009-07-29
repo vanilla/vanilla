@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class ConversationMessageModel extends Model {
+class Gdn_ConversationMessageModel extends Gdn_Model {
    /**
     * Class constructor.
     */
@@ -64,6 +64,20 @@ class ConversationMessageModel extends Model {
          ->EndWhereGroup()
          ->GroupBy('cm.ConversationID')
          ->Where('cm.ConversationID', $ConversationID)
+         ->Get();
+      if ($Data->NumRows() > 0)
+         return $Data->FirstRow()->Count;
+      
+      return 0;
+   }
+
+   public function GetCountWhere($Wheres = '') {
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+         
+      $Data = $this->SQL
+         ->Select('MessageID', 'count', 'Count')
+         ->From('ConversationMessage')
          ->Get();
       if ($Data->NumRows() > 0)
          return $Data->FirstRow()->Count;

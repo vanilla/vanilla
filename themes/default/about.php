@@ -14,9 +14,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 $ThemeInfo['Default'] = array(
    'Description' => "The default theme for Garden. Pretty boring since it uses all of the views and designs from the base application(s).",
    'Version' => '1.0',
-   'RequiredApplications' => array('Garden' => ''),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@lussumo.com',
-   'AuthorUrl' => 'http://lussumo.com',
-   'License' => 'MIT License (http://lussumo.com/garden/license)'
+   'AuthorUrl' => 'http://lussumo.com'
 );

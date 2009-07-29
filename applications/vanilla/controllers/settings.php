@@ -10,8 +10,10 @@ class SettingsController extends VanillaController {
    public function Index() {
       $this->Permission('Vanilla.Settings.Manage');
       $this->AddSideMenu('vanilla/settings');
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/settings.js');
+         $this->Head->Title(Translate('Forum Settings'));
+      }
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
@@ -57,6 +59,9 @@ class SettingsController extends VanillaController {
    }   
    
    public function Spam() {
+      if ($this->Head)
+         $this->Head->Title(Translate('Spam'));
+         
       $this->Permission('Vanilla.Spam.Manage');
       $this->AddSideMenu('vanilla/settings/spam');
       

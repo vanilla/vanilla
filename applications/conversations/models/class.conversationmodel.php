@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class ConversationModel extends Model {
+class Gdn_ConversationModel extends Gdn_Model {
    /**
     * Class constructor.
     */
@@ -66,6 +66,21 @@ class ConversationModel extends Model {
          ->Where('uc.DateCleared is null') 
          ->OrWhere('c.DateUpdated >', 'uc.DateCleared', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.
          ->EndWhereGroup()
+         ->Get();
+
+      if ($Data->NumRows() > 0)
+         return $Data->FirstRow()->Count;
+      
+      return 0;
+   }   
+
+   public function GetCountWhere($Wheres = '') {
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+         
+      $Data = $this->SQL
+         ->Select('ConversationID', 'count', 'Count')
+         ->From('Conversation')
          ->Get();
 
       if ($Data->NumRows() > 0)

@@ -10,11 +10,13 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 class ActivityController extends GardenController {
    
-   public $Uses = array('Database', 'Form', 'ActivityModel', 'Html');
+   public $Uses = array('Database', 'Form', 'Gdn_ActivityModel', 'Html');
    
    public function Index() {
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/garden/js/activity.js');
+         $this->Head->Title(Translate('Recent Activity'));
+      }
          
       $Session = Gdn::Session();
       $this->ActivityData = $this->ActivityModel->Get();

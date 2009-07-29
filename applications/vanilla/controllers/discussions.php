@@ -5,7 +5,7 @@
  */
 class DiscussionsController extends VanillaController {
    
-   public $Uses = array('Database', 'DiscussionModel', 'Form');
+   public $Uses = array('Database', 'Gdn_DiscussionModel', 'Form');
    
    /**
     * A boolean value indicating if discussion options should be displayed when
@@ -22,6 +22,8 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
+         $this->Head->Title(Translate('All Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -38,7 +40,7 @@ class DiscussionsController extends VanillaController {
 
       $this->SetData('Category', FALSE, TRUE);
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
          
@@ -94,6 +96,7 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/options.js');
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
+         $this->Head->Title(Translate('My Bookmarks'));
       }
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
@@ -102,7 +105,7 @@ class DiscussionsController extends VanillaController {
       $Session = Gdn::Session();
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $Wheres = array('w.Bookmarked' => '1', 'w.UserID' => $Session->UserID);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->Category = FALSE;
@@ -145,6 +148,7 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->Title(Translate('My Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -152,7 +156,7 @@ class DiscussionsController extends VanillaController {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
-      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel = new Gdn_DiscussionModel();
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
       $CountDiscussions = $this->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
       

@@ -62,6 +62,9 @@ class ProfileController extends GardenController {
       $this->CssClass = 'Profile';
       if (!$this->GetUserInfo($UserReference))
          return FALSE;
+
+      if ($this->Head)
+         $this->Head->Title(Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
          $UserInfoModule = new UserInfoModule($this);
@@ -116,7 +119,7 @@ class ProfileController extends GardenController {
    
    public function Activity($UserReference = '') {
       $this->SetTabView($UserReference, 'Activity');
-      $this->ActivityModel = new ActivityModel();
+      $this->ActivityModel = new Gdn_ActivityModel();
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
@@ -131,10 +134,6 @@ class ProfileController extends GardenController {
             $ActivityType = 'AboutUpdate';
          }
          $NewActivityID = $this->ActivityModel->Add($Session->UserID, $ActivityType, $Comment, $this->User->UserID);
-/*         if (strlen(trim($About)) > 0)
-            AddActivity($UserID, 'AboutUpdate', $About);
-*/
-         
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('garden/profile/'.$UserReference);
          } else {
@@ -206,7 +205,7 @@ class ProfileController extends GardenController {
          ->Where('UserID', $Session->UserID)
          ->Put();
       
-      $ActivityModel = new ActivityModel();
+      $ActivityModel = new Gdn_ActivityModel();
       $this->NotificationData = $ActivityModel->GetNotifications($Session->UserID);
       $this->Render();
    }   
@@ -250,28 +249,16 @@ class ProfileController extends GardenController {
             $TargetImage = $UploadImage->GenerateTargetName(PATH_ROOT . DS . 'uploads');
             $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
             
-            // Save the uploaded image in large size
-            $UploadImage->SaveImageAs(
-               $TmpImage,
-               PATH_ROOT . DS . 'uploads' . DS . 'o'.$ImageBaseName,
-               Gdn::Config('Garden.Picture.MaxHeight', 1000),
-               Gdn::Config('Garden.Picture.MaxWidth', 1000)
-            );
-
+            // Delete any previously uploaded images
+            @unlink(PATH_ROOT . DS . 'uploads' . DS . 'p' . $this->User->Photo);
+            @unlink(PATH_ROOT . DS . 'uploads' . DS . 'n' . $this->User->Photo);
+            
             // Save the uploaded image in profile size
             $UploadImage->SaveImageAs(
                $TmpImage,
                PATH_ROOT . DS . 'uploads' . DS . 'p'.$ImageBaseName,
                Gdn::Config('Garden.Profile.MaxHeight', 1000),
                Gdn::Config('Garden.Profile.MaxWidth', 250)
-            );
-            
-            // Save the uploaded image in preview size
-            $UploadImage->SaveImageAs(
-               $TmpImage,
-               PATH_ROOT . DS . 'uploads' . DS . 't'.$ImageBaseName,
-               Gdn::Config('Garden.Preview.MaxHeight', 100),
-               Gdn::Config('Garden.Preview.MaxWidth', 75)
             );
             
             // Save the uploaded image in thumbnail size
@@ -289,7 +276,7 @@ class ProfileController extends GardenController {
          }
          // If there were no errors, associate the image with the user
          if ($this->Form->ErrorCount() == 0) {
-            $PhotoModel = new Model('Photo');
+            $PhotoModel = new Gdn_Model('Photo');
             $PhotoID = $PhotoModel->Insert(array('Name' => $ImageBaseName));
             if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'PhotoID' => $PhotoID, 'Photo' => $ImageBaseName)))
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -404,7 +391,7 @@ class ProfileController extends GardenController {
       $this->Permission('Garden.SignIn.Allow');
       $this->AddCssFile('form.css');
       $this->GetUserInfo();
-      $InvitationModel = new InvitationModel();
+      $InvitationModel = new Gdn_InvitationModel();
       $this->Form->SetModel($InvitationModel);
       if ($this->Form->AuthenticatedPostBack()) {
          // Send the invitation
@@ -422,7 +409,7 @@ class ProfileController extends GardenController {
    
    public function SendInvite($InvitationID = '', $PostBackKey = '') {
       $this->Permission('Garden.SignIn.Allow');
-      $InvitationModel = new InvitationModel();
+      $InvitationModel = new Gdn_InvitationModel();
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey)) {
          try {
@@ -443,7 +430,7 @@ class ProfileController extends GardenController {
    
    public function UnInvite($InvitationID = '', $PostBackKey = '') {
       $this->Permission('Garden.SignIn.Allow');
-      $InvitationModel = new InvitationModel();
+      $InvitationModel = new Gdn_InvitationModel();
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey)) {
          try {

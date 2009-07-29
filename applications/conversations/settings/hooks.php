@@ -28,6 +28,29 @@ class ConversationsHooks implements Gdn_IPlugin {
       }
    }
    
+   // Load some information into the BuzzData collection
+   public function SettingsController_DashboardData_Handler(&$Sender) {
+      $ConversationModel = new Gdn_ConversationModel();
+      // Number of Conversations
+      $CountConversations = $ConversationModel->GetCountWhere();
+      $Sender->AddDefinition('CountConversations', $CountConversations);
+      $Sender->BuzzData[Gdn::Translate('Conversations')] = number_format($CountConversations);
+      // Number of New Conversations in the last day
+      $Sender->BuzzData[Translate('New conversations in the last day')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Number of New Conversations in the last week
+      $Sender->BuzzData[Translate('New conversations in the last week')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+
+      $ConversationMessageModel = new Gdn_ConversationMessageModel();
+      // Number of Messages
+      $CountMessages = $ConversationMessageModel->GetCountWhere();
+      $Sender->AddDefinition('CountConversationMessages', $CountMessages);
+      $Sender->BuzzData[Gdn::Translate('Conversation Messages')] = number_format($CountMessages);
+      // Number of New Messages in the last day
+      $Sender->BuzzData[Translate('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      // Number of New Messages in the last week
+      $Sender->BuzzData[Translate('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+   }   
+   
    public function Setup() {
       return TRUE;
    }

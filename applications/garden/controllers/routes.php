@@ -19,8 +19,10 @@ class RoutesController extends GardenController {
    public function Index() {
       $this->Permission('Garden.Routes.Manage');
       $this->AddSideMenu('garden/routes');
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/garden/js/routes.js');
+         $this->Head->Title(Translate('Routes'));
+      }
          
       // Load all routes from conf
       $this->Routes = Gdn::Config('Routes', array());

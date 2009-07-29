@@ -36,7 +36,7 @@ if (!defined('APPLICATION'))
  *
  * @package Garden
  */
-class Model extends Gdn_Pluggable {
+class Gdn_Model extends Gdn_Pluggable {
 
 
    /**
@@ -195,6 +195,7 @@ class Model extends Gdn_Pluggable {
 
       // See if a primary key value was posted and decide how to save
       $PrimaryKeyVal = ArrayValue($this->PrimaryKey, $FormPostValues);
+         
       $Insert = $PrimaryKeyVal === FALSE ? TRUE : FALSE;
       if ($Insert) {
          $this->AddInsertFields($FormPostValues);

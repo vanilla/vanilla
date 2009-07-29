@@ -28,6 +28,9 @@ form ul li label {
    font-size: 14px;
    padding: 6px 6px 0px 4px;
    }
+body.Messages div.Popup form ul li label {
+   width: 100px;
+}
 form ul li label.RadioLabel {
    float: none;
    display: inline;
@@ -41,6 +44,7 @@ form ul li table label {
    display: inline;
    width: auto;
 }
+body.Messages div.Popup form ul li label.CheckBoxLabel,
 form ul li label.CheckBoxLabel {
    float: none;
    width: auto;
@@ -99,10 +103,13 @@ table thead th,
 table thead td {
    border-bottom: 1px solid #c7cfe0;
 }
+table tbody th {
+   font-weight: bold;
+   color: #000;
+}
 table tbody th,
 table tbody td {
    border-bottom: 1px solid #e2e6ef;
-   vertical-align: middle;
    line-height: 150%;
 }
 table tbody tr.FootNote td {
@@ -110,8 +117,27 @@ table tbody tr.FootNote td {
    color: #454545;
    border-bottom: 0px;
 }
+table tbody tr.More th,
+table tbody tr.More td {
+   border-bottom: 0;
+}
+table.AltRows tbody tr.Enabled td.Info,
+table.AltColumns tbody tr.Enabled td.Info,
+table.AltRows tbody tr.Disabled td.Info,
+table.AltColumns tbody tr.Disabled td.Info {
+   color: #aaa;
+}
+table tbody td.Info span {
+   padding: 0 6px;
+}
+table tbody td.Info strong {
+   font-weight: bold;
+   color: #000;
+}
 table thead th {
+   font-weight: bold;
    font-size: 13px;
+   line-height: 100%;
    color: #000 /* Body Heading Font Color */;
 }
 table input.Button {
@@ -145,6 +171,21 @@ table tbody td blockquote {
 }
 table.Sortable tbody td {
    cursor: move;
+}
+
+/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications, themes) that need to override default styles */
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+   background: #ffd;
+   color: #000;
+}
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td {
+   background: #f8f8f8;
 }
 
 /* CheckBoxGrid */

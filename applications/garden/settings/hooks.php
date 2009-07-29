@@ -40,14 +40,25 @@ class GardenHooks implements Gdn_IPlugin {
          if ($PreviewTheme != '')
             $Sender->Theme = $PreviewTheme;
       }
+      // Add Message Modules (if necessary)
+      $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
+      $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
+      if (in_array('Base', $MessageCache) || InArrayI($Location, $MessageCache)) {
+         $MessageModel = new Gdn_MessageModel();
+         $MessageData = $MessageModel->GetMessagesForLocation($Location);
+         foreach ($MessageData as $Message) {
+            $MessageModule = new Gdn_MessageModule($Sender, $Message);
+            $Sender->AddModule($MessageModule);
+         }
+      }
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Site Settings', 'Site Settings');
       $Menu->AddLink('Site Settings', 'General', 'garden/settings/configure', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', 'Outgoing Email', 'garden/settings/email', 'Garden.Email.Manage');
       $Menu->AddLink('Site Settings', 'Routes', 'garden/routes', 'Garden.Routes.Manage');
+      $Menu->AddLink('Site Settings', 'Messages', 'garden/messages', 'Garden.Messages.Manage');
       
       $Menu->AddItem('Add-ons', 'Add-ons');
       $Menu->AddLink('Add-ons', 'Applications', 'garden/settings/applications', 'Garden.Applications.Manage');
@@ -58,6 +69,7 @@ class GardenHooks implements Gdn_IPlugin {
       $Menu->AddLink('Users', 'Users', 'garden/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
       $Menu->AddLink('Users', 'Roles & Permissions', 'garden/role', 'Garden.Roles.Manage');
       $Menu->AddLink('Users', 'Registration', 'garden/settings/registration', 'Garden.Registration.Manage');
-      $Menu->AddLink('Users', 'Applicants', 'garden/user/applicants', 'Garden.Applicants.Manage');
+      if (Gdn::Config('Garden.Registration.Method') == 'Approval')
+         $Menu->AddLink('Users', 'Applicants', 'garden/user/applicants', 'Garden.Applicants.Manage');
    }
 }

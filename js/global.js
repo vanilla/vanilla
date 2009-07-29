@@ -13,6 +13,22 @@ jQuery(document).ready(function($) {
    // current screen).
    $('a.Popup').popup();
 
+   // Make sure that message dismissalls are ajax'd
+   $('div.DismissMessage a.Close').live('click', function() {
+      var anchor = this;
+      var container = $(anchor).parents('div.DismissMessage');
+      var transientKey = $('#Definitions #TransientKey').text();
+      var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
+      var webRoot = $('#Definitions #WebRoot').text();
+      $.post($(anchor).attr('href'), data, function(response) {
+         if (response == 'TRUE')
+            $(container).slideUp('fast',function() {
+               $(this).remove();
+            });
+      });
+      return false;
+   });
+
    // This turns any form into a "post-in-place" form so it is ajaxed to save
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
@@ -44,8 +60,8 @@ jQuery(document).ready(function($) {
       $("table.Sortable").tableDnD({onDrop: function(table, row) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
-         var transientKey = $(':hidden[name$=TransientKey]');
-         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&' + $(transientKey).attr('name') + '=' + $(transientKey).val();
+         var transientKey = $('#Definitions #TransientKey').text();
+         var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = $('#Definitions #WebRoot').text();
          $.post(webRoot + "/garden/utility/sort/", data, function(response) {
             if (response == 'TRUE')

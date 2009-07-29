@@ -22,6 +22,8 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
+         $this->Head->Title(Translate('All Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -94,6 +96,7 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/options.js');
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
+         $this->Head->Title(Translate('My Bookmarks'));
       }
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
@@ -145,6 +148,7 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->Title(Translate('My Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

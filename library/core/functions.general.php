@@ -269,7 +269,17 @@ if (!function_exists('InArrayI')) {
    }
 }
 
-if(!function_exists('TrueStripSlashes')) {
+if (!function_exists('IsTimestamp')) {
+   function IsTimestamp($Stamp) {
+      return checkdate(
+         @date("m", $Stamp),
+         @date("d", $Stamp),
+         @date("Y", $Stamp)
+      );
+   }
+}
+
+if (!function_exists('TrueStripSlashes')) {
    if(get_magic_quotes_gpc()) {
       function TrueStripSlashes($String) {
          return stripslashes($String);
@@ -381,9 +391,9 @@ if (!function_exists('GetPostValue')) {
 if (!function_exists('GetIncomingValue')) {
    function GetIncomingValue($FieldName, $Default = FALSE) {
       if (array_key_exists($FieldName, $_POST) === TRUE) {
-         return $_POST[$FieldName];
+         return filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
       } else if (array_key_exists($FieldName, $_GET) === TRUE) {
-         return $_GET[$FieldName];
+         return filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
       } else {
          return $Default;
       }

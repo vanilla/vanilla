@@ -44,25 +44,22 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    $State = strtolower($Css);
    if ($this->Filter == '' || $this->Filter == $State) {
       $Alt = $Alt ? FALSE : TRUE;
-      $AppVersion = ArrayValue('Version', $AppInfo, '');
+      $Version = ArrayValue('Version', $AppInfo, '');
       $ScreenName = ArrayValue('Name', $AppInfo, $AppName);
       $SettingsUrl = $State == 'enabled' ? ArrayValue('SettingsUrl', $AppInfo, '') : '';
       $AppUrl = ArrayValue('Url', $AppInfo, '');
       $Author = ArrayValue('Author', $AppInfo, '');
       $AuthorUrl = ArrayValue('AuthorUrl', $AppInfo, '');
-      $CurrentVersion = $this->UpdateManager->GetCurrentVersion(ADDON_TYPE_APPLICATION, $AppName);
-      $Upgrade = is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion;
-      $CssClass = $Upgrade ? 'More' : '';
-      if ($Alt) $CssClass = $CssClass . ' Alt';
-      $CssClass = trim($CssClass);
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
+      $NewVersion = ArrayValue('NewVersion', $AppInfo, '');
+      $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+      $RowClass = $Css;
+      if ($Alt) $RowClass .= ' Alt';
       ?>   
-      <tr class="More <?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+      <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
          <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
       </tr>
-      <tr class="<?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+      <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php
             echo Anchor(
                array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable',
@@ -77,8 +74,8 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
          <td class="Alt Info"><?php
             $RequiredApplications = ArrayValue('RequiredApplications', $AppInfo, FALSE);
             $Info = '';
-            if ($AppVersion != '')
-               $Info = sprintf(Translate('Version %s'), $AppVersion);
+            if ($Version != '')
+               $Info = sprintf(Translate('Version %s'), $Version);
                
             if (is_array($RequiredApplications)) {
                if ($Info != '')
@@ -113,16 +110,16 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
          </td>
       </tr>
       <?php
-      if (is_numeric($CurrentVersion) && is_numeric($AppVersion) && $AppVersion < $CurrentVersion) {
+      if ($Upgrade) {
          ?>
-         <tr class="FootNote">
-            <td colspan="2"><a href="<?php
-               echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
+         <tr class="<?php echo $RowClass; ?>">
+            <td colspan="2"><div class="Alert"><a href="<?php
+               echo CombinePaths(array($AddonUrl, 'find', urlencode($AppName)), '/');
             ?>"><?php
-               printf(Gdn::Translate('%1$s version %2$s is available.'), $AppName, $CurrentVersion);
-            ?></a></td>
+               printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+            ?></a></div></td>
          </tr>
-         <?php
+      <?php
       }
    }
 }

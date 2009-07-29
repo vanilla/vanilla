@@ -272,11 +272,26 @@ div.Errors ul li {
 }
 
 .Warning {
-   background: #ff9;
+   background: #ffc;
+   border: 1px solid #ff9;
    color: #000;
    padding: 3px 6px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert {
+   background: #d00;
+   border: 1px solid #b00;
+   color: #fff;
+   padding: 3px 6px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert a {
+   color: #fff;
+}
+.Alert a:hover {
+   text-decoration: underline;
 }
 
 /* Close buttons */
@@ -338,7 +353,7 @@ a.Close:hover {
    font-weight: bold;
 }
 #garden_settings_index #Content ul.RecentUsers,
-dl {
+#garden_settings_index dl {
    background: #fafafa;
    -moz-border-radius-bottomleft: 4px;
    -moz-border-radius-bottomright: 4px;
@@ -349,7 +364,7 @@ dl {
    border: 1px solid #eee;
    border-top: 0;
 }
-dl dt {
+#garden_settings_index dl dt {
    font-size: 120%;
    font-weight: bold;
    padding: 8px 20px 8px 8px;
@@ -358,7 +373,7 @@ dl dt {
    float: left;
 }
 #garden_settings_index #Content ul.RecentUsers li,
-dl dd {
+#garden_settings_index dl dd {
    font-size: 110%;
    padding: 8px;
    border-bottom: 1px solid #eee;
@@ -368,7 +383,7 @@ dl dd {
    clear: left;
 }
 #garden_settings_index #Content ul.RecentUsers li.Last,
-dl dd.Last {
+#garden_settings_index dl dd.Last {
    border-bottom: 0;
 }
 #garden_settings_index #Content ul.RecentUsers li img {
@@ -978,24 +993,13 @@ div.Info {
 
 /* Dismiss Messages */
 
-a.DismissMessage {
-   font-size: 11px;
-   line-height: 1;
+div.DismissMessage a.Close {
    float: right;
-   background: #fafafa;
-   padding: 4px;
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   color: #aaa;
-}
-#garden_settings_index a.DismissMessage {
-   background: #fff;
-   border: 1px solid #fff;
-}
-a.DismissMessage:hover {
-   background: #fafafa;
-   border: 1px solid #ddd;
-   color: #777;
+   display: block;
+   height: 10px;
+   width: 6px;
+   overflow: hidden;
+   margin: 3px;
 }
 
 /* Powered by Vanilla Footer */

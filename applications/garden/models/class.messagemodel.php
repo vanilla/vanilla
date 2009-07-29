@@ -93,20 +93,23 @@ class Gdn_MessageModel extends Gdn_Model {
    public function Save($FormPostValues, $Settings = FALSE) {
       // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
       $Location = ArrayValue('Location', $FormPostValues, '');
-      $Location = explode('/', $Location);
-      if ($Location[0] == 'Base') {
-         $FormPostValues['Controller'] = 'Base';
-      } else {
-         if (count($Location) >= 1) $FormPostValues['Application'] = $Location[0];
-         if (count($Location) >= 2) $FormPostValues['Controller'] = $Location[1];
-         if (count($Location) >= 3) $FormPostValues['Method'] = $Location[2];
-         // Make sure that messages on the dashboard get dropped below the page heading.
-         if (
-            $FormPostValues['Application'] == 'Garden'
-            && $FormPostValues['Controller'] == 'Settings'
-            && $FormPostValues['Method'] == 'Index'
-         ) $FormPostValues['AssetTarget'] = 'Messages';
+      if ($Location != '') {
+         $Location = explode('/', $Location);
+         if ($Location[0] == 'Base') {
+            $FormPostValues['Controller'] = 'Base';
+         } else {
+            if (count($Location) >= 1) $FormPostValues['Application'] = $Location[0];
+            if (count($Location) >= 2) $FormPostValues['Controller'] = $Location[1];
+            if (count($Location) >= 3) $FormPostValues['Method'] = $Location[2];
+         }
       }
+      // Make sure that messages on the dashboard get dropped below the page heading.
+      if (
+         $FormPostValues['Application'] == 'Garden'
+         && $FormPostValues['Controller'] == 'Settings'
+         && $FormPostValues['Method'] == 'Index'
+      ) $FormPostValues['AssetTarget'] = 'Messages';
+
       return parent::Save($FormPostValues, $Settings);
    }
    

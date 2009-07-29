@@ -48,25 +48,22 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
       $State = strtolower($Css);
       if ($this->Filter == '' || $this->Filter == $State) {
          $Alt = $Alt ? FALSE : TRUE;
-         $PluginVersion = ArrayValue('Version', $PluginInfo, '');
+         $Version = ArrayValue('Version', $PluginInfo, '');
          $ScreenName = ArrayValue('Name', $PluginInfo, $PluginName);
          $SettingsUrl = $State == 'enabled' ? ArrayValue('SettingsUrl', $PluginInfo, '') : '';
          $PluginUrl = ArrayValue('PluginUrl', $PluginInfo, '');
          $Author = ArrayValue('Author', $PluginInfo, '');
          $AuthorUrl = ArrayValue('AuthorUrl', $PluginInfo, '');
-         $CurrentVersion = $this->UpdateManager->GetCurrentVersion(ADDON_TYPE_PLUGIN, $PluginName);
-         $Upgrade = is_numeric($CurrentVersion) && is_numeric($PluginVersion) && $PluginVersion < $CurrentVersion;
-         $CssClass = $Upgrade ? 'More' : '';
-         if ($Alt) $CssClass = $CssClass . ' Alt';
-         $CssClass = trim($CssClass);
-         if ($CssClass != '')
-            $CssClass = ' class="'.$CssClass.'"';
+         $NewVersion = ArrayValue('NewVersion', $PluginInfo, '');
+         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+         $RowClass = $Css;
+         if ($Alt) $RowClass .= ' Alt';
          ?>
-         <tr class="More <?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+         <tr class="More <?php echo $RowClass; ?>">
             <th><?php echo $ScreenName; ?></th>
             <td class="Alt"><?php echo ArrayValue('Description', $PluginInfo, ''); ?></td>
          </tr>
-         <tr class="<?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
+         <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
             <td class="Info"><?php
                echo Anchor(
                   array_key_exists($PluginName, $this->EnabledPlugins) ? 'Disable' : 'Enable',
@@ -82,8 +79,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, FALSE);
                $RequiredPlugins = ArrayValue('RequiredPlugins', $PluginInfo, FALSE);
                $Info = '';
-               if ($PluginVersion != '')
-                  $Info = sprintf(Translate('Version %s'), $PluginVersion);
+               if ($Version != '')
+                  $Info = sprintf(Translate('Version %s'), $Version);
                   
                if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
                   if ($Info != '')
@@ -128,16 +125,16 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
             ?></td>
          </tr>
          <?php
-         if (is_numeric($CurrentVersion) && is_numeric($PluginVersion) && $PluginVersion < $CurrentVersion) {
+         if ($Upgrade) {
             ?>
-            <tr class="FootNote <?php echo $Css . ($Alt ? ' Alt' : ''); ?>">
-               <td colspan="2"><a href="<?php
-                  echo CombinePaths(array($UpdateUrl, 'find', urlencode($PluginName)), '/');
+            <tr class="<?php echo $RowClass; ?>">
+               <td colspan="2"><div class="Alert"><a href="<?php
+                  echo CombinePaths(array($AddonUrl, 'find', urlencode($PluginName)), '/');
                ?>"><?php
-                  printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $CurrentVersion);
-               ?></a></td>
+                  printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+               ?></a></div></td>
             </tr>
-            <?php
+         <?php
          }
       }
    }

@@ -423,7 +423,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<li id="'.$Term.'">'.$Definition.'</li>';
+         $Return .= '<li id="'.$Term.'">'.$Definition."</li>\n";
       }
 
       return $Return .'</ul>';

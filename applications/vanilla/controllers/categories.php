@@ -16,6 +16,7 @@ class CategoriesController extends VanillaController {
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
+         $this->Head->Title(Translate('Add Category'));
       }
       $this->AddCssFile('default.css');
       $this->AddCssFile('form.css');
@@ -43,8 +44,10 @@ class CategoriesController extends VanillaController {
    
    public function Delete($CategoryID = FALSE) {
       $this->Permission('Vanilla.Categories.Manage');
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
+         $this->Head->Title(Translate('Delete Category'));
+      }
 
       $this->AddCssFile('form.css');
       $this->AddCssFile('default.css');
@@ -121,8 +124,10 @@ class CategoriesController extends VanillaController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       $this->Category = $this->CategoryModel->GetID($CategoryID);
-      if ($this->Head)
+      if ($this->Head) {
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
+         $this->Head->Title(Translate('Edit Category'));
+      }
          
       $this->AddCssFile('default.css');
       $this->AddCssFile('form.css');
@@ -149,7 +154,6 @@ class CategoriesController extends VanillaController {
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
       $this->SetData('PermissionData', $Permissions, TRUE);
       
-      
       $this->Render();
    }
    
@@ -163,15 +167,6 @@ class CategoriesController extends VanillaController {
     * Show all discussions in a particular category.
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
-      $this->AddCssFile('vanilla.css');
-      $this->Menu->HighlightRoute('/discussions');      
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');      }
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
-         
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByName(urldecode($CategoryIdentifier));
       else
@@ -180,6 +175,19 @@ class CategoriesController extends VanillaController {
       
       if ($Category === FALSE)
          return $this->All();
+
+      $this->AddCssFile('vanilla.css');
+      $this->Menu->HighlightRoute('/discussions');      
+      if ($this->Head) {
+         $this->Head->Title($Category->Name);
+         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
+         $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
+         $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
+      }
+      if (!is_numeric($Offset) || $Offset < 0)
+         $Offset = 0;
+         
       
       $this->SetData('CategoryID', $this->Category->CategoryID, TRUE);
 
@@ -248,6 +256,7 @@ class CategoriesController extends VanillaController {
       if ($this->Head) {
          $this->Head->AddScript('/applications/vanilla/js/discussions.js');
          $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->Head->Title(Translate('All Categories'));
       }
          
       $this->DiscussionsPerCategory = Gdn::Config('Vanilla.Discussions.PerCategory', 5);
@@ -285,6 +294,7 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/js/library/jquery.tablednd.js');
          $this->Head->AddScript('/js/library/jquery.ui.packed.js');
          $this->Head->AddScript('/applications/vanilla/js/categories.js');
+         $this->Head->Title(Translate('Categories'));
       }
       $this->AddCssFile('form.css');
       $this->AddCssFile('default.css');

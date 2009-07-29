@@ -25,6 +25,7 @@ class PostController extends VanillaController {
          $this->Head->AddScript('js/library/jquery.autogrow.js');
          $this->Head->AddScript('/applications/vanilla/js/post.js');
          $this->Head->AddScript('/applications/vanilla/js/autosave.js');
+         $this->Head->Title(Translate('Start a New Discussion'));
       }
       
       if (isset($this->Discussion)) {

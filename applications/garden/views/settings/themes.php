@@ -28,21 +28,24 @@ printf(
 <?php
 $Alt = FALSE;
 foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+   $ScreenName = ArrayValue('Name', $ThemeInfo, $ThemeName);
    $ThemeFolder = ArrayValue('Folder', $ThemeInfo, '');
-   $ThemeVersion = ArrayValue('Version', $ThemeInfo, '');
+   $Version = ArrayValue('Version', $ThemeInfo, '');
    $ThemeUrl = ArrayValue('Url', $ThemeInfo, '');
    $Author = ArrayValue('Author', $ThemeInfo, '');
    $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
    $Active = $ThemeFolder == $this->EnabledThemeFolder;
    $Alt = $Alt ? FALSE : TRUE;
-   $CssClass = $Alt ? ' Alt ' : '';
-   $CssClass .= $Active ? ' Enabled' : ' Disabled';
+   $NewVersion = ArrayValue('NewVersion', $ThemeInfo, '');
+   $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+   $RowClass = $Active ? 'Enabled' : 'Disabled';
+   if ($Alt) $RowClass .= ' Alt';
    ?>
-   <tr class="More<?php echo $CssClass != '' ? ' '.$CssClass : ''; ?>">
+   <tr class="More <?php echo $RowClass; ?>">
       <th><?php echo $ThemeName; ?></th>
       <td class="Alt"><?php echo ArrayValue('Description', $ThemeInfo, '&nbsp;'); ?></td>
    </tr>
-   <tr class="<?php echo $CssClass != '' ? ' '.$CssClass : ''; ?>">
+   <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
       <td class="Info">
          <?php
          if($Active) {
@@ -58,8 +61,8 @@ foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
       <?php
          $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
          $Info = '';
-         if ($ThemeVersion != '')
-            $Info = sprintf(Translate('Version %s'), $ThemeVersion);
+         if ($Version != '')
+            $Info = sprintf(Translate('Version %s'), $Version);
             
          if (is_array($RequiredApplications)) {
             if ($Info != '')
@@ -94,6 +97,17 @@ foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
       </td>
    </tr>
    <?php
+   if ($Upgrade) {
+      ?>
+      <tr class="<?php echo $RowClass; ?>">
+         <td colspan="2"><div class="Alert"><a href="<?php
+            echo CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/');
+         ?>"><?php
+            printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+         ?></a></div></td>
+      </tr>
+   <?php
+   }
 }
 ?>
    </tbody>

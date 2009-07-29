@@ -62,6 +62,9 @@ class ProfileController extends GardenController {
       $this->CssClass = 'Profile';
       if (!$this->GetUserInfo($UserReference))
          return FALSE;
+
+      if ($this->Head)
+         $this->Head->Title(Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
          $UserInfoModule = new UserInfoModule($this);
@@ -131,10 +134,6 @@ class ProfileController extends GardenController {
             $ActivityType = 'AboutUpdate';
          }
          $NewActivityID = $this->ActivityModel->Add($Session->UserID, $ActivityType, $Comment, $this->User->UserID);
-/*         if (strlen(trim($About)) > 0)
-            AddActivity($UserID, 'AboutUpdate', $About);
-*/
-         
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('garden/profile/'.$UserReference);
          } else {

@@ -14,13 +14,13 @@ jQuery(document).ready(function($) {
    $('a.Popup').popup();
 
    // Make sure that message dismissalls are ajax'd
-   $('a.DismissMessage').click(function() {
+   $('div.DismissMessage a.Close').live('click', function() {
       var anchor = this;
       var container = $(anchor).parents('div.DismissMessage');
       var transientKey = $('#Definitions #TransientKey').text();
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
       var webRoot = $('#Definitions #WebRoot').text();
-      $.post($(this).attr('href'), data, function(response) {
+      $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
             $(container).slideUp('fast',function() {
                $(this).remove();

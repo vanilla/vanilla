@@ -101,6 +101,7 @@ class MessagesController extends GardenController {
          $this->Head->AddScript('/js/library/jquery.tablednd.js');
          $this->Head->AddScript('/js/library/jquery.ui.packed.js');
          $this->Head->AddScript('/applications/garden/js/messages.js');
+         $this->Head->Title(Translate('Messages'));
       }
          
       // Load all messages from the db

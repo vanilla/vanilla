@@ -106,6 +106,61 @@ class UtilityController extends GardenController {
       $this->Render();
    }
    
+   public function UpdateResponse() {
+      // Get the message, response, and transientkey
+      $Messages = GetIncomingValue('Messages', '');
+      $Response = GetIncomingValue('Response', '');
+      $TransientKey = GetIncomingValue('TransientKey', '');
+      
+      // If the key validates
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey)) {
+         // If messages wasn't empty
+         if ($Messages != '') {
+            // Unserialize them & save them if necessary
+            $Messages = Format::Unserialize($Messages);
+            if (is_array($Messages)) {
+               $MessageModel = new Gdn_MessageModel();
+               foreach ($Messages as $Message) {
+                  // Check to see if it already exists, and if not, add it.
+                  if (is_object($Message))
+                     $Message = Format::ObjectAsArray($Message);
+
+                  $Content = ArrayValue('Content', $Message, '');
+                  if ($Content != '') {
+                     $Data = $MessageModel->GetWhere(array('Content' => $Content));
+                     if ($Data->NumRows() == 0) {
+                        $MessageModel->Save(array(
+                           'Content' => $Content,
+                           'AllowDismiss' => ArrayValue('AllowDismiss', $Message, '1'),
+                           'Enabled' => ArrayValue('Enabled', $Message, '1'),
+                           'Application' => ArrayValue('Application', $Message, 'Garden'),
+                           'Controller' => ArrayValue('Controller', $Message, 'Settings'),
+                           'Method' => ArrayValue('Method', $Message, ''),
+                           'AssetTarget' => ArrayValue('AssetTarget', $Message, 'Content'),
+                           'CssClass' => ArrayValue('CssClass', $Message, '')
+                        ));
+                     }
+                  }
+               }
+            }
+         }
+/*
+         // Load the config file so we can save some info in it         
+         $Config = Gdn::Factory(Gdn::AliasConfig);
+         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
+         
+         // If the response wasn't empty, save it in the config
+         if ($Response != '')
+            $Config->Set('Garden.RequiredUpdates', $Response);
+      
+         // Record the current update check time in the config.
+         $Config->Set('Garden.UpdateCheckDate', time());
+         $Config->Save();
+*/
+      }
+   }
+   
    public function UsernameAvailable($Name = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;

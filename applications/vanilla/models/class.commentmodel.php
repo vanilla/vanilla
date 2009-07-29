@@ -310,7 +310,7 @@ class CommentModel extends VanillaModel {
             if ($DiscussionID !== FALSE)
                $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID);
 
-            $this->UpdateCommentCount($CommentID);
+            $this->UpdateCommentCount($DiscussionID);
             
             // Update the discussion author's CountUnreadDiscussions (ie.
             // the number of discussions created by the user that s/he has
@@ -393,37 +393,24 @@ class CommentModel extends VanillaModel {
     *
     * @param int The CommentID relating to the discussion we are updating.
     */
-   public function UpdateCommentCount($CommentID) {
+   public function UpdateCommentCount($DiscussionID) {
       $this->FireEvent('UpdateCommentCountBefore');
+      
       $Data = $this->SQL
-         ->Select('c2.DiscussionID')
-         ->Select('c2.DiscussionID', 'count', 'CountComments')
+         ->Select('c.CommentID', 'max', 'LastCommentID')
+         ->Select('c.DateInserted', 'max', 'DateLastComment')
+         ->Select('c.CommentID', 'count', 'CountComments')
          ->From('Comment c')
-         ->Join('Comment c2', 'c.DiscussionID = c2.DiscussionID')
-         ->Join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
-         ->Where('c.CommentID', $CommentID)
-         ->Where('c2.CommentID <>', 'd.FirstCommentID', TRUE, FALSE)
-         ->GroupBy('c2.DiscussionID')
-         ->Get()
-         ->FirstRow();
-      $Count = $Data ? $Data->CountComments : 0;
+         ->Where('c.DiscussionID', $DiscussionID)
+         ->Get()->FirstRow();
       
-      if ($Count > 0) {
-         $Data = $this->SQL
-            ->Select('DateInserted, CommentID, DiscussionID')
-            ->From('Comment')
-            ->Where('DiscussionID', $Data->DiscussionID)
-            ->OrderBy('DateInserted', 'desc')
-            ->Limit(1, 0)
-            ->Get()
-            ->FirstRow();
-      
+      if (!is_null($Data)) {
          $this->SQL
             ->Update('Discussion')
-            ->Set('DateLastComment', $Data->DateInserted)
-            ->Set('LastCommentID', $Data->CommentID)
-            ->Set('CountComments', $Count)
-            ->Where('DiscussionID', $Data->DiscussionID)
+            ->Set('DateLastComment', $Data->DateLastComment)
+            ->Set('LastCommentID', $Data->LastCommentID)
+            ->Set('CountComments', $Data->CountComments)
+            ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
    }

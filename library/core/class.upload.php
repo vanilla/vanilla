@@ -77,7 +77,7 @@ class Gdn_Upload {
       
       // Make sure that the file extension is allowed
       $Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
-      if (!in_array($Extension, $this->_AllowedFileExtensions))
+      if (!InArrayI($Extension, $this->_AllowedFileExtensions))
          throw new Exception(sprintf(Gdn::Translate('You cannot upload files with this extension (%s).'), $Extension));
 
       // If all validations were successful, return the tmp name/location of the file.

@@ -2,4 +2,9 @@
 2. Navigate to that folder in your web browser.
 3. Follow the instructions on screen.
 
+Worst case scenario, grant PHP write access to the following files/folders:
+/cache/*
+/conf/config.php
+/uploads/*
+
 Troubleshooting Help: http://vanillaforums.org/docs

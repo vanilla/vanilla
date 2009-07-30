@@ -1,13 +1,4 @@
 /* Forms */
-body.Settings #Content h1,
-body.Settings #Content h2,
-body.Settings #Content h3,
-body.Settings #Content h4,
-body.Settings #Content h5,
-body.Settings #Content h6 {
-   padding: 6px 0 0;
-   line-height: 115%;
-}
 form ul {
    list-style: none;
    margin: 0px;

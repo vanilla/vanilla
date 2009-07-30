@@ -27,16 +27,6 @@ body.Conversations h2 {
 #Conversations li li {
   padding: 0;
 }
-#Conversations li.Empty {
-  margin: 0px;
-  padding: 12px;
-  border: 0px;
-  background: #ffc /* Body Background Color */;
-  -moz-border-radius-bottomleft: 2px;
-  -moz-border-radius-bottomright: 2px;
-  -webkit-border-bottom-left-radius: 2px;
-  -webkit-border-bottom-right-radius: 2px;
-}
 #Conversations li.Active {
   cursor: pointer;
 }
@@ -104,8 +94,8 @@ a.NewConversation {
    text-align: center;
    font-size: 16px;
    font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
    background: #44c7f4 /* Banner Background Color */;
    color: #fff /* Banner Font Color */;
    text-decoration: none;

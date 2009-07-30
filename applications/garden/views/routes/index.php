@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-echo $this->Form->Open();
 ?>
 <h1><?php echo Gdn::Translate('Manage Routes'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute'); ?></div>
@@ -43,4 +42,3 @@ foreach ($this->Routes as $Route => $Target) {
 ?>
    </tbody>
 </table>
-<?php echo $this->Form->Close();

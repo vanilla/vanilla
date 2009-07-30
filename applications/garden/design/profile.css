@@ -160,10 +160,16 @@ ul.Activities {
 div.EmptyInfo {
    margin: 10px;
 }
+#garden_profile_notifications div.EmptyInfo {
+   margin: 10px 0 0;
+}
 #garden_profile_notifications h2 {
    margin-bottom: 0;
 }
-
+#garden_profile_notifications ul.Activities {
+   margin-top: 0;
+   border: 0;
+}
 
 /* Thumbnail Cropper */
 form.Thumbnail table {

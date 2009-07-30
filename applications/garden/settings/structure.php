@@ -129,7 +129,6 @@ $PermissionModel->Save(array(
 $PermissionModel->Save(array(
 	'RoleID' => 16,
 	'Garden.Settings.Manage' => 1,
-	'Garden.Email.Manage' => 1,
 	'Garden.Routes.Manage' => 1,
 	'Garden.Applications.Manage' => 1,
 	'Garden.Plugins.Manage' => 1,
@@ -272,3 +271,23 @@ $Construct->Table('Message')
 	->Column('CssClass', 'varchar', 20, TRUE)
    ->Column('Sort', 'int', 2, TRUE)
    ->Set($Explicit, $Drop);
+
+// Insert the welcome message
+$Message = "<p>Here's some stuff you might want to do:</p>
+<ul class=\"BigList\">
+   <li class=\"one\"><a href=\"../settings/registration\">Define how users register for your forum</a></li>
+   <li class=\"two\"><a href=\"../settings/plugins\">Manage your plugins</a></li>
+   <li class=\"three\"><a href=\"../categories/manage\">Organize your discussion categories</a></li>
+   <li class=\"four\"><a href=\"../profile\">Customize your profile</a></li>
+   <li class=\"five\"><a href=\"../post/discussion\">Start your first discussion</a></li>
+</ul>";
+$SQL->Replace('Message', array(
+	'Content' => $Message,
+	'AllowDismiss' => '1',
+	'Enabled' => '1',
+	'Application' => 'Garden',
+	'Controller' => 'Settings',
+	'Method' => 'Index',
+	'AssetTarget' => 'Messages',
+	'CssClass' => ''
+	), array('Content' => $Message));

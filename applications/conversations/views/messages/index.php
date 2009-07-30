@@ -24,14 +24,9 @@ echo $this->Pager->ToString('less');
 ?>
 <ul id="Conversation">
    <?php
-if ($this->MessageData->NumRows() == 0) {
-   ?>
-   <li class="Empty"><?php echo Gdn::Translate('The conversation is empty.'); ?></li>
-   <?php
-} else {
    $MessagesViewLocation = $this->FetchViewLocation('messages');
    include($MessagesViewLocation);
-} ?>
+   ?>
 </ul>
 <?php
 echo $this->Pager->ToString();

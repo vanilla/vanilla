@@ -109,7 +109,7 @@ if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Photo, $CssClass = '') {
       $Name = is_object($User) ? $User->Name : $User;
       if ($Photo != '') {
-         return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Url('uploads/n'.$Photo).'" alt="'.$Name.'" /></a>';
+         return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$Photo).'" alt="'.$Name.'" /></a>';
       } else {
          return ''; // Anchor($Name, '/profile/'.Format::Url($Name), $CssClass);
       }

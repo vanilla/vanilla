@@ -251,6 +251,7 @@ class ProfileController extends GardenController {
             
             // Delete any previously uploaded images
             @unlink(PATH_ROOT . DS . 'uploads' . DS . 'p' . $this->User->Photo);
+            @unlink(PATH_ROOT . DS . 'uploads' . DS . 't' . $this->User->Photo);
             @unlink(PATH_ROOT . DS . 'uploads' . DS . 'n' . $this->User->Photo);
             
             // Save the uploaded image in profile size
@@ -261,6 +262,14 @@ class ProfileController extends GardenController {
                Gdn::Config('Garden.Profile.MaxWidth', 250)
             );
             
+            // Save the uploaded image in preview size
+            $UploadImage->SaveImageAs(
+               $TmpImage,
+               PATH_ROOT . DS . 'uploads' . DS . 't'.$ImageBaseName,
+               Gdn::Config('Garden.Preview.MaxHeight', 100),
+               Gdn::Config('Garden.Preview.MaxWidth', 75)
+            );
+
             // Save the uploaded image in thumbnail size
             $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
             $UploadImage->SaveImageAs(

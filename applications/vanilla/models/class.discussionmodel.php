@@ -60,8 +60,8 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
-         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID') // Last comment
+         ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
+         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category

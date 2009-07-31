@@ -40,7 +40,6 @@ class ConversationsController extends Gdn_Controller {
          $this->Head->AddScript('/applications/conversations/js/conversations.js');
       }
       
-      $this->AddCssFile('default.css');
       $this->AddCssFile('menu.css');
       $this->AddCssFile('popup.css');
       $this->AddCssFile('conversations.css');

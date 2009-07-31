@@ -1,26 +1,77 @@
-@import url(reset.css);
+@import url('reset.css') /* NoFollow */; 
+/*
+Welcome to the Vanilla CSS File! 6 Things you should know:
 
-/* Begin Typography */
+1. The reset.css file imported above breaks all elements down to a base style.
+
+2. There is a menu.css file that is also included on every page of Vanilla. It
+   defines the main dropdown menu at the top of the page. If you want to change
+   the appearance of that menu, you should do it by defining overriding rules in
+   the Menu section of this file.
+   
+3. There is a popup.css file that is also included on every page of Vanilla. It
+   defines the appearance of popups (warnings, comment & discussion previews,
+   etc). If you want to change the appearance of the popup, you should do it by
+   defining overriding rules in this file.
+
+4. This css file will be included on all Vanilla pages. Those pages are:
+   + Discussions (All Discussions, Bookmarks, Your Discussions, etc)
+   + Drafts
+   + Categories
+   + Comments
+   + Start a New Discussion Form
+   + Add a Comment Form
+
+5. The profile page has it's own completely custom css file so you can do all
+   kinds of custom magic there (profile.css).
+
+6. This file is broken down into the following sections:
+   + Line 42:     General Styles & Typography
+   + Line 325:    Header
+   + Line 387:    Main Menu
+   + Line 399:    Panels / Sidebars
+   + Line 521:    Discussions
+   + Line 620:    Categories
+   + Line 657:    Comments
+   + Line 883:    Drafts
+   + Line 923:    Discussion & Comment Forms
+   + Line 1014:   Footer
+*/
+
+/* General Styles & Typography */
 body {
    color: #000 /* Body Default Font Color */;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   background: #ffffff /* Body Background Color */;
+   margin: 0;
+   padding: 0;
+   text-align: center;
+   font-size: small;
+}
+#Body {
+   width: 960px;
+   text-align: left;
+   margin: 15px auto 0 auto;
+   }
+#Content {
+   float: left;
+   width: 680px;
+   margin: 0 0 40px;
 }
 h1, h2, h3, h4, h5, h6 {
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-   font-weight: normal;
+   font: 100% normal "Helvetica Neue",Helvetica,arial,sans-serif;
    margin: 0;
 }
 p {
    margin: 0.5em 0 0 0;
-   /* font-size: 110%; */
    line-height: 1.6em;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 h1, h2 {
-   border-bottom:1px solid #bbb;
-   font-size:140%;
-   font-weight:bold;
-   margin-bottom:10px;
+   border-bottom: 1px solid #bbb;
+   font-size: 140%;
+   font-weight: bold;
+   margin-bottom: 10px;
 }
 h3 {
    font-size: 140%;
@@ -44,7 +95,6 @@ a:hover {
    text-decoration: none;
    color: #ff0084 /* Body Hover Font Color */;
 }
-input.DateBox,
 input.InputBox,
 input.SmallInput,
 textarea {
@@ -52,7 +102,7 @@ textarea {
    color: #222;
    font-size: 14px;
    padding: 3px;
-   margin: 0px;
+   margin: 0;
    width: 250px;
    border: 1px solid #888;
 }
@@ -73,7 +123,7 @@ select {
    font-family: arial;
    font-size: 14px;
    color: #222;
-   margin: 0px;
+   margin: 0;
    padding: 3px;
    }
 select.Day,
@@ -82,7 +132,7 @@ select.Year {
 }
 .Button {
    cursor: pointer;
-   margin: 0px 0px 0px 0px;
+   margin: 0 0 0 0;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
    padding: 4px;
    font-size: 11px;
@@ -99,99 +149,9 @@ input.Button {
    color: #333;
    border: 1px solid #888;
 }
-/* End Typography */
-
-/* Begin Layout */
-body {
-   background: #ffffff /* Body Background Color */;
-   margin: 0;
-   padding: 0;
-   text-align: center;
-   font-size: small;
-   }
 .Hidden {
    display: none;
 }
-#Head {
-   background: #44c7f4 /* Banner Background Color */;
-   padding: 0;
-   text-align: right;
-   height: 50px;
-}
-#Head h1 {
-   display: block;
-   font-weight: bold;
-   margin: 0;
-   padding: 21px 7px 0 0;
-   border: 0;
-   float: left;
-}
-#Head h1 a span {
-   font-size: 24px;
-   color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;
-}
-#Head h1 a:hover span {
-   color:#f3fcff;
-}
-div.Menu {
-   text-align: right;
-   width: 960px;
-   margin: 0 auto;
-}
-ul#Menu {
-   float: left;
-   margin: 0 auto;
-   padding: 22px 0 0 10px;
-}
-#Head form {
-   float: right;
-   width: 250px;
-   background: #fff;
-   padding: 0;
-   margin: 15px 0 0;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-}
-#Head form input.InputBox {
-   width: 204px;
-   border: 0;
-   padding: 4px 2px 4px 0;
-   background: #fff;
-   margin: 0;
-   -moz-border-radius-topleft: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-top-left-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   color: #969696;
-   font-size: 13px;
-}
-#Head form input.Button {
-   border: 0;
-   width: 38px;
-   height: 26px;
-   background: #E9F9FF /* Panel Background Color */;
-   color: #2786C2 /* Panel Font Color */;
-   padding: 3px 0 4px;
-   margin: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
-   -moz-border-radius-topright: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-top-right-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-}
-#Body {
-   width: 960px;
-   text-align: left;
-   margin: 15px auto 0 auto;
-   }
-#Content {
-   float: left;
-   width: 680px;
-   margin: 0 0 40px;
-}
-/* Progress Bars */
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -201,7 +161,8 @@ ul#Menu {
    padding: 10px 40px 10px 0;
    background: url('progress.gif') center center no-repeat;
 }
-/* Messages */
+/* Note: Messages are the yellow notices that appear at the top/center of the
+  page to notify users of things like drafts being saved, etc. */
 div.Messages {
    text-align: center;
    position: fixed;
@@ -247,14 +208,14 @@ div.Messages ul li {
    margin: 0 !important;
    list-style-position: outside;
 }
-
 div.Errors ul {
    background: #d50a0a !important;
 }
 div.Errors ul li {
    color: #fff !important;
 }
-
+/* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
+   strings & imply importance. */
 .Warning {
    background: #ffc;
    border: 1px solid #ff9;
@@ -277,8 +238,42 @@ div.Errors ul li {
 .Alert a:hover {
    text-decoration: underline;
 }
-
-/* Close buttons */
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+div.EmptyInfo {
+   margin: 10px 0;
+}
+/* Note: The MessageModule (in /applications/garden/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.DismissMessage {
+   margin: 0 0 10px;
+}
+div.DismissMessage p {
+   margin: 0;
+}
+div.DismissMessage a.Close {
+   font-size: 11px;
+   line-height: 1;
+   float: right;
+   background: #fafafa;
+   padding: 4px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   color: #aaa;
+}
+DismissMessage a.Close:hover {
+   background: #fafafa;
+   border: 1px solid #ddd;
+   color: #777;
+}
+/* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
    font-weight: bold;
    font-family: tahoma;
@@ -298,36 +293,114 @@ a.Close:hover {
    color: #999;
    background: #fff;
 }
-.Errors a.Close,
-.StatusMessage a.Close {
-   float: right;
-   color: #e4c100;
-   background: #ffffa4;
-   padding: 2px 4px 3px 5px;
-   margin: 2px 0 0;
-   display: block;
-   border: 1px solid #ffd800;
+/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
+.MorePager {
+   list-style: none;
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   }
+.MorePager a {
+   font-size: 13px;
+   font-weight: bold;
+   text-align: right;
 }
-.Errors a.Close {
-   background: #e11414;
-   border: 1px solid #b00;
-   color: #ff6;
+.MorePager a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
 }
-.Errors a.Close:hover {
-   color: #ff0;
-   background: #d11;
-   border: 1px solid #a00;
+#PagerLess {
+   margin-bottom: 1px;
 }
-.StatusMessage a.Close:hover {
-   background: #ffffe2;
+tr#PagerMore td {
+   border: 0;
+   text-align: right;
+}
+#PagerMore {
+   margin-bottom: 1px;
 }
 
-/* Panels */
+
+/* =================================================================== Header */
+#Head {
+   background: #44c7f4 /* Banner Background Color */;
+   padding: 0;
+   text-align: right;
+   height: 50px;
+}
+#Head h1 {
+   display: block;
+   font-weight: bold;
+   margin: 0;
+   padding: 21px 7px 0 0;
+   border: 0;
+   float: left;
+}
+#Head h1 a span {
+   font-size: 24px;
+   color:#E4F7FE;
+   text-shadow:0 1px 0 #30ACD6;
+}
+#Head h1 a:hover span {
+   color:#f3fcff;
+}
+#Head form {
+   float: right;
+   width: 250px;
+   background: #fff;
+   padding: 0;
+   margin: 15px 0 0;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+#Head form input.InputBox {
+   width: 204px;
+   border: 0;
+   padding: 4px 2px 4px 0;
+   background: #fff;
+   margin: 0;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   color: #969696;
+   font-size: 13px;
+}
+#Head form input.Button {
+   border: 0;
+   width: 38px;
+   height: 26px;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Font Color */;
+   padding: 3px 0 4px;
+   margin: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+
+
+/* ================================================================ Main Menu */
+div.Menu {
+   text-align: right;
+   width: 960px;
+   margin: 0 auto;
+}
+ul#Menu {
+   float: left;
+   margin: 0 auto;
+   padding: 22px 0 0 10px;
+}
+
+/* ======================================================== Panels / Sidebars */
 #Panel {
    width: 250px;
    float: right;
 }
-/* Panel Boxes */
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
@@ -364,21 +437,20 @@ div.Box p {
    padding: 0 0 4px;
    color: #555 /* Body Text Font Color */;
 }
-
-/* Panel Info */
 ul.PanelInfo li {
    background: #f5fcff /* Panel Inlay Background Color */;
    border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
-   font-family: tahoma;
    font-size: 80%;
+   font-family: tahoma;
    text-align: right;
 }
 ul.PanelInfo li h2 {
    text-align: left;
    display: inline;
-   font-size: 130%;
+   font-size: 120%;
    margin-right: 12px;
+   font-weight: normal;
 }
 ul.PanelInfo li a {
    float: left;
@@ -387,45 +459,68 @@ ul.PanelInfo li.Active {
    background: #fff /* Panel Selected Background Color */;
    border-bottom: 1px solid #a3e6ff /* Panel Inlay Border Color */;
 }
- 
 ul.PanelInfo li.Active a {
    color: #2786C2 /* Panel Selected Font Color */;
 }
-
-/* Foot */
-#Foot {
-   padding-top: 20px;
-   clear: both;
-}
-
-
-/* Pager */
-.MorePager {
-   list-style: none;
-   margin: 1px 0 0;
-   padding: 3px 6px;
-   text-align: right;
-   background: #e9f9ff;
-   }
-.MorePager a {
-   font-size: 13px;
+#Panel a.Bookmark,
+a.NewDiscussion {
+   padding: 6px 0;
+   display: block;
+   text-align: center;
+   font-size: 16px;
    font-weight: bold;
-   text-align: right;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
+   text-decoration: none;
+   margin: 0 0 10px 0;
 }
-.MorePager a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
+a.NewDiscussion:hover {
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
 }
-#PagerLess {
-   margin-bottom: 1px;
+#Panel a.Bookmark {
+   background: #9f0;
+   color: #fff;
 }
-tr#PagerMore td {
+#Panel a.Bookmark:hover {
+   background: #ff6b39;
+   color: #fff;
+}
+#Panel ul.Discussions {
    border: 0;
-   text-align: right;
+}
+ul.PanelDiscussions li {
+   background: #f5fcff /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
+   padding: 2px 4px;
+}
+ul.PanelDiscussions li strong {
+   font-weight: bold;
+   display: block;
+}
+ul.PanelDiscussions div.Meta {
+   font-size: 90%;
+}
+ul.PanelDiscussions div.Meta span,
+ul.PanelDiscussions div.Meta strong {
+   margin-right: 8px;
+}
+ul.PanelDiscussions div.Meta span a {
+   margin-left: 8px;
+}
+ul.PanelDiscussions div.Meta strong {
+   font-weight: normal;
+   display: inline;
+   color: #80828C;
+   background: #ff6;
+   padding: 0 2px;
 }
 
+/* ============================================================== Discussions */
 
-/* DataList (search results, vanilla discussions, drafts, etc) */
+/* Note: DataList is used in search results, vanilla discussions & drafts */
 ul.DataList li {
    margin: 0;
    padding: 0 0 4px 0;
@@ -490,23 +585,22 @@ ul.DataList li ul li.Meta strong {
 ul.DataList li ul li.Meta a {
    color: #2b2d33 /* Meta Font Color */;
 }
+body.Discussions h1 {
+   margin: 0;
+}
 li.DiscussionRow ul.Discussion {
    /* Fixes an IE7 Spacing issue */
    display: inline !important;
 }
-
-/* Announcements */
 ul.Announcements {
    padding: 0 0 20px;
 }
-
-
-/* Vanilla Discussion List Colors
-Classes applied to List Items are:
-Bookmarked: the user has bookmarked that topic
-Announcement: the discussion has been announced
-Mine: the user created the discussion
-New: there are new comments since the last viewed the discussion
+/* Note: The Vanilla Discussion List has the following classes applied to
+  individual list elements and can be styled:
+  + Bookmarked: the user has bookmarked that topic
+  + Announcement: the discussion has been announced
+  + Mine: the user created the discussion
+  + New: there are new comments since the last viewed the discussion
 */
 .Mine { background: #F5FCFF; }
 li.New { background: #ffd; }
@@ -523,14 +617,12 @@ ul.DataList li.New ul li.Meta a.Category {
    background: #ffe;
 }
 
-/* Vanilla Categories */
-
+/* =============================================================== Categories */
 .Categories {
    list-style: none;
    margin: 0;
    padding: 0;
 }
-body.Discussions h1,
 body.Categories h1,
 body.Categories #Content h2 {
    margin: 0;
@@ -543,6 +635,8 @@ h1 span {
 body.Categories h1 a {
    color: #000;
 }
+/* Note: This "More" style is custom to the categories page. It appears like
+  the MorePager listed above, but it is just a link to a different page. */
 .More {
    list-style: none;
    margin: 1px 0 20px;
@@ -560,16 +654,125 @@ body.Categories h1 a {
    text-decoration: underline;
 }
 
-/* CommentOption is presented to the user in place of the add comment form when they don't have a valid session. */
-
+/* ================================================================= Comments */
+body.Discussion #Content {
+   margin-bottom: 20px;
+}
+body.Discussion #Content h2 {
+   font-size:140%;
+   font-weight:bold;
+   margin: 0;
+   color: #333 /* Body Heading Font Color */;
+   padding: 6px 0;
+   line-height: 1;
+}
+body.Discussion #Content h2 span {
+   padding: 0 10px;
+   color: #777;
+   font-size: 12px;
+}
+.Preview,
+.Preview li,
+.Preview ul,
+.Preview ul li,
+#Discussion,
+#Discussion li,
+#Discussion ul,
+#Discussion ul li {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+}
+#Discussion {
+   margin-bottom: 1px;
+}
+#Discussion .Comment {
+   border-bottom: 1px solid #ddd;
+}
+/* Note: Fixes IE 7 Glitch */
+*:first-child+html #Discussion .Comment {
+   overflow: hidden;
+}
+.Preview li ul.Info,
+#Discussion li ul.Info {
+   font-size: 11px;
+   color: #777;
+   padding: 8px 0 0 8px;
+}
+.Preview li ul.Info {
+   padding: 0;
+}
+.Preview li ul.Info li.Author img,
+#Discussion li ul.Info li.Author img {
+   height: 40px;
+   width: 40px;
+   border: 0;
+   margin: 0 10px 0 0;
+   float: left;
+}
+.Preview li ul.Info li,
+#Discussion li ul.Info li {
+   display: inline;
+   line-height: 2.5;
+}
+.Preview li ul.Info li.Created,
+#Discussion li ul.Info li.Created,
+#Discussion li ul.Info li.Permalink {
+   padding-left: 10px;
+}
+.Preview li ul.Info li.Author a,
+#Discussion li ul.Info li.Author a {
+   font-size: 15px;
+   font-weight: bold;
+}
+.Preview li .Body,
+#Discussion li .Body {
+   clear: both;
+   padding: 1px 8px 2px;
+   line-height: 170%;
+   font-size: 110%;
+   color: #454545 /* Body Text Font Color */;
+}
+.Body p {
+   margin: 8px 0;
+}
+.Body code,
+.Body pre {
+   display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+   white-space: pre;
+   font-family: monospace;
+   overflow: auto;
+}
+.Body strong {
+   font-weight: bold;
+}
+.Body em {
+   font-style: oblique;
+}
+#Discussion fieldset,
+#Discussion form {
+   margin: 0;
+   padding: 0;
+}
+div.Popup ul.Preview li.Comment {
+   padding: 0;
+}
+div.Popup ul.Preview li.Comment div.Body {
+   min-height: 53px;
+}
+/* Note: CommentOption is presented to the user in place of the add comment form
+   when they don't have a valid session. */
 .CommentOption {
    margin: 1px 0 0;
    padding: 3px 6px;
    background: #e9f9ff;
    color: #555 /* Body Text Font Color */;
 }
-
-/* Back is the same as MorePager... */
+/* Note: Back appears the same as MorePager... */
 .Back {
    margin: 0;
    padding: 3px 6px;
@@ -594,78 +797,9 @@ body.Categories h1 a {
    -webkit-border-bottom-right-radius: 2px;
    -webkit-border-bottom-left-radius: 2px;
 }
-
-
-#Panel a.Bookmark,
-a.NewDiscussion {
-   padding: 6px 0;
-   display: block;
-   text-align: center;
-   font-size: 16px;
-   font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkig-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-}
-a.NewDiscussion:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-}
-#Panel a.Bookmark {
-   background: #9f0;
-   color: #fff;
-}
-#Panel a.Bookmark:hover {
-   background: #ff6b39;
-   color: #fff;
-}
-
-/* Vanilla Drafts */
-body.Drafts h1 {
-   margin: 0;
-}
-ul.Drafts li ul {
-   display: inline;
-}
-ul.Drafts li ul li.Title {
-   float: none;
-   width: auto;
-}
-ul.Drafts li ul li.Title h3 {
-   float: left;
-   margin: 0 0 2px;
-}
-ul.Drafts li ul li.Title a.DraftCommentLink {
-   clear: left;
-   display: block;
-}
-ul.Drafts li ul li.Title a.DeleteDraft {
-   float: right;
-   width: auto;
-   padding: 4px;
-   margin: 3px 1px 0 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   font-size: 10px;
-   font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkig-border-radius: 2px;
-   color: #555 /* Body Text Font Color */;
-   cursor: pointer;
-   line-height: 100%;
-}
-ul.Drafts li ul li.Topic a.DeleteDraft:hover {
-   color: #333;
-   border: 1px solid #888;
-}
-
 /*
-  Discussion/Comment Option (dropdown) Menu customizations
-  (the layout css for these is in /applications/garden/design/menu.css)
+  Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
+  css for these is in /applications/garden/design/menu.css. Override them here.
 */
 a.Bookmark,
 a.Bookmarking {
@@ -746,155 +880,47 @@ ul.Options li.Active a:hover {
 }
 
 
-/* Panel Discussions */
-ul.PanelDiscussions li {
-   background: #f5fcff /* Panel Inlay Background Color */;
-   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   padding: 2px 4px;
+/* =================================================================== Drafts */
+body.Drafts h1 {
+   margin: 0;
 }
-ul.PanelDiscussions li strong {
-   font-weight: bold;
-   display: block;
-}
-ul.PanelDiscussions div.Meta {
-   font-size: 90%;
-}
-ul.PanelDiscussions div.Meta span,
-ul.PanelDiscussions div.Meta strong {
-   margin-right: 8px;
-}
-ul.PanelDiscussions div.Meta span a {
-   margin-left: 8px;
-}
-ul.PanelDiscussions div.Meta strong {
-   font-weight: normal;
+ul.Drafts li ul {
    display: inline;
-   color: #80828C;
-   background: #ff6;
-   padding: 0 2px;
 }
-
-/* Vanilla Comments */
-
-body.Discussion #Content {
-   margin-bottom: 20px;
+ul.Drafts li ul li.Title {
+   float: none;
+   width: auto;
 }
-body.Discussion #Content h2 {
-   font-size:140%;
-   font-weight:bold;
-   margin: 0;
-   color: #333 /* Body Heading Font Color */;
-   padding: 6px 0;
-   line-height: 1;
-}
-body.Discussion #Content h2 span {
-   padding: 0 10px;
-   color: #777;
-   font-size: 12px;
-}
-
-.Preview,
-.Preview li,
-.Preview ul,
-.Preview ul li,
-#Discussion,
-#Discussion li,
-#Discussion ul,
-#Discussion ul li {
-   list-style: none;
-   margin: 0;
-   padding: 0;
-}
-#Discussion {
-   margin-bottom: 1px;
-}
-#Discussion .Comment {
-   border-bottom: 1px solid #ddd;
-}
-/* Fixes IE 7 Glitch */
-*:first-child+html #Discussion .Comment {
-   overflow: hidden;
-}
-.Preview li ul.Info,
-#Discussion li ul.Info {
-   font-size: 11px;
-   color: #777;
-   padding: 8px 0 0 8px;
-}
-.Preview li ul.Info {
-   padding: 0;
-}
-.Preview li ul.Info li.Author img,
-#Discussion li ul.Info li.Author img {
-   height: 40px;
-   width: 40px;
-   border: 0;
-   margin: 0 10px 0 0;
+ul.Drafts li ul li.Title h3 {
    float: left;
+   margin: 0 0 2px;
 }
-.Preview li ul.Info li,
-#Discussion li ul.Info li {
-   display: inline;
-   line-height: 2.5;
-}
-.Preview li ul.Info li.Created,
-#Discussion li ul.Info li.Created,
-#Discussion li ul.Info li.Permalink {
-   padding-left: 10px;
-}
-.Preview li ul.Info li.Author a,
-#Discussion li ul.Info li.Author a {
-   font-size: 15px;
-   font-weight: bold;
-}
-.Preview li .Body,
-#Discussion li .Body {
-   clear: both;
-   padding: 1px 8px 2px;
-   line-height: 170%;
-   font-size: 110%;
-   color: #454545 /* Body Text Font Color */;
-}
-.Body p {
-   margin: 8px 0;
-}
-.Body code,
-.Body pre {
+ul.Drafts li ul li.Title a.DraftCommentLink {
+   clear: left;
    display: block;
+}
+ul.Drafts li ul li.Title a.DeleteDraft {
+   float: right;
+   width: auto;
+   padding: 4px;
+   margin: 3px 1px 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
    -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #ff9;
-   padding: 4px 8px;
-   white-space: pre;
-   font-family: monospace;
-   overflow: auto;
+   -webkig-border-radius: 2px;
+   color: #555 /* Body Text Font Color */;
+   cursor: pointer;
+   line-height: 100%;
 }
-.Body strong {
-   font-weight: bold;
-}
-.Body em {
-   font-style: oblique;
+ul.Drafts li ul li.Topic a.DeleteDraft:hover {
+   color: #333;
+   border: 1px solid #888;
 }
 
-#Discussion fieldset,
-#Discussion form {
-   margin: 0;
-   padding: 0;
-}
-
-/* Comment Preview */
-div.Popup ul.Preview li.Comment {
-   padding: 0;
-}
-div.Popup ul.Preview li.Comment div.Body {
-   min-height: 53px;
-}
-
-#PagerMore {
-   margin-bottom: 1px;
-}
-
-/* Comment Form */
+/* =============================================== Discussion & Comment Forms */
 #CommentForm {
    background: #e9f9ff /* Panel Background Color */;
    padding: 8px;
@@ -926,7 +952,6 @@ div.Popup #CommentForm textarea {
 #DiscussionForm input.Button {
    margin-right: 6px;
 }
-
 body.Post #Panel {
    display: none;
 }
@@ -985,14 +1010,8 @@ a.Cancel {
    color: #555 /* Body Text Font Color */;
 }
 
-/* Panel Boxes */
 
-#Panel ul.Discussions {
-   border: 0;
-}
-
-/* Powered by Vanilla Footer */
-
+/* =================================================================== Footer */
 #Foot {
    text-align: center;
    margin: 2px 0;
@@ -1008,48 +1027,7 @@ a.Cancel {
 #Foot a:hover {
    color: #aaa;
 }
-
-
-/* Info blocks */
-div.Info {
-   font-size: 13px;
-   background: #fafafa;
-   border: 1px solid #eee;
-   color: #888;
-   -moz-border-radius: 4px;
-   padding: 6px;
-   margin: 0 0 10px;
+#Foot {
+   padding-top: 20px;
+   clear: both;
 }
-div.EmptyInfo {
-   margin: 10px 0;
-}
-
-
-/* Dismiss Messages */
-
-div.DismissMessage {
-   margin: 0 0 10px;
-}
-div.DismissMessage p {
-   margin: 0;
-}
-div.Box p {
-   padding: 2px 0;
-}
-a.DismissMessage {
-   font-size: 11px;
-   line-height: 1;
-   float: right;
-   background: #fafafa;
-   padding: 4px;
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   color: #aaa;
-}
-a.DismissMessage:hover {
-   background: #fafafa;
-   border: 1px solid #ddd;
-   color: #777;
-}
-
-/* End Typography */

@@ -1,3 +1,588 @@
+@import url('reset.css') /* NoFollow */; 
+/*
+Welcome to the Conversations CSS File! 6 Things you should know:
+
+1. The reset.css file imported above breaks all elements down to a base style.
+
+2. There is a menu.css file that is also included on every page of
+  Conversations. It defines the main dropdown menu at the top of the page. 
+   
+3. There is a popup.css file that is also included on every page of
+  Conversations. It defines the appearance of popups (warnings, editing routes &
+  messages, etc).
+
+4. This css file will be included on all Conversations pages. Specifically:
+   + Messages/*
+
+5. The profile page has it's own completely custom css file so you can do all
+   kinds of custom magic there (profile.css).
+   
+6. This file is broken down into the following sections:
+   + Line 32:     General Styles & Typography
+   + Line 400:    Header
+   + Line 463:    Main Menu
+   + Line 476:    Panels / Sidebars
+   + Line 586:    Conversations
+   + Line 701:    Add Message Form
+   + Line 725:    New Conversation Form
+   + Line 769:   Footer
+*/
+   
+   
+/* General Styles & Typography */
+body {
+   color: #000 /* Body Default Font Color */;
+   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   background: #ffffff  /* Body Background Color */;
+   margin: 0;
+   padding: 0;
+   text-align: center;
+   font-size: small;
+}
+#Body {
+   width: 960px;
+   text-align: left;
+   margin: 0 auto;
+}
+#Body {
+   margin: 15px auto 0 auto;
+   }
+#Content {
+   float: left;
+   width: 680px;
+   margin: 0 0 40px;
+}
+.Hidden {
+   display: none;
+}
+.nowrap {
+   white-space: nowrap;
+}
+.Center {
+	text-align: center;
+}
+.Right {
+	text-align: right;
+}
+h1, h2, h3, h4, h5, h6 {
+   color: #000 /* Body Heading Font Color */;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-weight: normal;
+   margin: 0;
+}
+p {
+   margin: 0.5em 0 0 0;
+   line-height: 1.6em;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+}
+h1, h2 {
+   border-bottom:1px solid #bbb;
+   font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
+}
+h3 {
+   font-size:140%;
+}
+h4 {
+   font-size: 120%;
+   color: #6C6C6C /* Body Subheading Font Color */;
+}
+h5 {
+   font-size: 120%;
+   color: #6C6C6C /* Body Subheading Font Color */;
+}
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2786c2  /* Body Link Font Color */;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084 /* Body Hover Font Color */;
+}
+input.DateBox,
+input.InputBox,
+input.SmallInput,
+textarea {
+   font-family: arial;
+   color: #222;
+   font-size: 14px;
+   padding: 3px;
+   margin: 0;
+   width: 250px;
+   border: 1px solid #888;
+}
+textarea.TextBox {
+   width: 500px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 500px;
+}
+#Popup textarea.TextBox {
+   width: 465px;
+}
+input.SmallInput,
+input.InputBox {
+   font-size: 15px;
+   padding: 6px 3px;
+}
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea:focus {
+   background: #ffe;
+}
+textarea {
+   line-height: 128%;
+}
+select {
+   font-family: arial;
+   font-size: 14px;
+   color: #222;
+   margin: 0;
+   padding: 3px;
+   }
+select.Day,
+select.Year {
+   margin-left: 4px;
+}
+.Button {
+   cursor: pointer;
+   margin: 0 0 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   padding: 4px;
+   font-size: 11px;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #555;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   }
+input.Button {
+   font-weight: bold;
+}
+.Button:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+.Loading {
+   height: 100px;
+   padding: 0 20px;
+   background: url('progress.gif') center center no-repeat;
+}
+.Progress {
+   padding: 10px 40px 10px 0;
+   background: url('progress.gif') center center no-repeat;
+}
+/* Note: Messages are the yellow notices that appear at the top/center of the
+  page to notify users of things like drafts being saved, etc. */
+div.Messages {
+   text-align: center;
+   position: fixed;
+   top: 0;
+   left: 0;
+   z-index: 200;
+   margin: 0 !important;
+   padding: 0 !important;
+   list-style: none !important;
+   font-size: 12px;
+   display: block;
+   width: 100%;
+}
+* html div.Messages {
+  position: absolute;
+  width: 100%;/*IE5.5*/
+  top: 0;
+  left: 0;
+  overflow: visible; 
+  top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop);
+}
+div.Messages ul {
+   cursor: pointer;
+   width: auto !important;
+   border: 0 !important;
+   margin: 0 auto !important;
+   padding: 4px 8px !important;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   background: #ff9 !important;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+}
+div.Messages ul li {
+   text-align: left !important;
+   border: 0 !important;
+   color: #000 !important;
+   padding: 0 !important;
+   margin: 0 !important;
+   list-style-position: outside;
+}
+div.Errors ul {
+   background: #d50a0a !important;
+}
+div.Errors ul li {
+   color: #fff !important;
+}
+/* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
+   strings & imply importance. */
+.Warning {
+   background: #ffc;
+   border: 1px solid #ff9;
+   color: #000;
+   padding: 6px 8px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert {
+   background: #d00;
+   border: 1px solid #b00;
+   color: #fff;
+   padding: 3px 6px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert a {
+   color: #fff;
+}
+.Alert a:hover {
+   text-decoration: underline;
+}
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+div.EmptyInfo {
+   margin: 10px 0;
+}
+/* Note: The MessageModule (in /applications/garden/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.DismissMessage {
+   margin: 0 0 10px;
+}
+div.DismissMessage p {
+   margin: 0;
+}
+div.DismissMessage a.Close {
+   float: right;
+   background: #fafafa;
+   line-height: 120%;
+   border: 1px solid #eee;
+   color: #aaa;
+}
+div.DismissMessage a.Close:hover {
+   background: #fafafa;
+   border: 1px solid #ccc;
+   color: #777;
+}
+/* Note: The close class is used on the "close" anchor in popups. */
+a.Close {
+   font-weight: bold;
+   font-family: tahoma;
+   font-size: 10px;
+   text-transform: uppercase;
+   color: #bbb;
+   background: #f9f9f9;
+   -moz-border-radius: 8px;
+   -webkit-border-radius: 8px;
+   padding: 1px 4px 2px 5px;
+   margin: 0;
+   line-height: 100%;
+   border: 1px solid #ddd;
+}
+a.Close:hover {
+   border: 1px solid #bbb;
+   color: #999;
+   background: #fff;
+}
+/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
+.MorePager {
+   list-style: none;
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   }
+.MorePager a {
+   font-size: 13px;
+   font-weight: bold;
+   text-align: right;
+}
+.MorePager a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
+}
+#PagerLess {
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-topleft: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-top-left-radius: 2px;
+   margin-bottom: 1px;
+}
+tr#PagerMore td {
+   border: 0;
+   text-align: right;
+}
+#PagerMore {
+   margin-bottom: 1px;
+}
+/* Note: jQuery Autocomplete used in conversations screens */
+textarea.MultiComplete {
+   height: 20px;
+   padding: 3px 0;
+   width: 400px;
+   text-align: left;
+}
+.ac_results {
+   padding: 0;
+   border: 1px solid #bbb;
+   border-top: 0;
+   background-color: white;
+   overflow: hidden;
+   z-index: 99999;
+}
+.ac_results ul {
+   width: 100%;
+   list-style-position: outside;
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+.ac_results li {
+   margin: 0;
+   padding: 5px;
+   cursor: default;
+   display: block;
+   /* 
+   if width will be 100% horizontal scrollbar will apear 
+   when scroll mode will be used
+   */
+   /*width: 100%;*/
+   font-size: 12px;
+   /* 
+   it is very important, if line-height not setted or setted 
+   in relative units scroll will be broken in firefox
+   */
+   line-height: 16px;
+   overflow: hidden;
+   border-bottom: 1px solid #bbb;
+   text-align: left;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   font-weight: bold;
+   background: #daf4fd;
+}
+.ac_over strong {
+   font-weight: bold;
+   background: #2ab0de;
+}
+.ac_over {
+   background: #44c7f4;
+   color: #fff;
+}
+
+
+
+/* =================================================================== Header */
+#Head {
+   background: #44c7f4  /* Banner Background Color */;
+   padding: 0;
+   text-align: right;
+   height: 50px;
+}
+body #Head h1 {
+   display: block;
+   font-weight: bold;
+   margin: 0;
+   padding: 21px 7px 0 0;
+   border: 0;
+   float: left;
+   line-height: 1;
+}
+#Head h1 a span {
+   font-size: 24px;
+   color:#E4F7FE;
+   text-shadow:0 1px 0 #30ACD6;   
+}
+#Head h1 a:hover span {
+   color:#f3fcff;
+}
+#Head form {
+   float: right;
+   width: 250px;
+   background: #fff;
+   padding: 0;
+   margin: 15px 0 0;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+#Head form input.InputBox {
+   width: 204px;
+   border: 0;
+   padding: 4px 2px 4px 0;
+   background: #fff;
+   margin: 0;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   color: #969696;
+   font-size: 13px;
+}
+#Head form input.Button {
+   border: 0;
+   width: 38px;
+   height: 26px;
+   background: #E9F9FF;
+   color: #2786C2;
+   padding: 3px 0 4px;
+   margin: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+
+
+/* ================================================================ Main Menu */
+div.Menu {
+   text-align: right;
+   width: 960px;
+   margin: 0 auto;
+}
+ul#Menu {
+   float: left;
+   margin: 0 auto;
+   padding: 22px 0 0 10px;
+}
+
+
+/* ======================================================== Panels / Sidebars */
+#Panel {
+   width: 250px;
+   float: right;
+}
+div.Box {
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #e9f9ff  /* Panel Background Color */;
+   color: #999  /* Panel Font Color */;
+   padding: 6px 10px;
+   margin: 0 0 10px 0;
+}
+div.Box h4 {
+   font-size: 110%;
+   color: #2786c2  /* Panel Font Color */;
+   font-weight: bold;
+   margin: 0;
+   padding: 0 0 1px;
+   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+}
+div.Box dl {
+   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+   background: #f0fbff /* Panel Inlay Background Color */;
+   padding: 3px;
+   font-size: 90%;
+   overflow: hidden;
+}
+div.Box dl dt {
+   float: left;
+   width: 80px;
+   color: #0766a2 /* Panel Inlay Font Color */;
+}
+div.Box dl dd {
+   margin-left: 80px;
+}
+div.Box p {
+   font-size: 100%;
+   padding: 0 0 4px;
+   color: #555 /* Body Text Font Color */;
+}
+ul.SideMenu,
+ul.SideMenu li ul {
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+ul.SideMenu {
+   font-size: 110%;
+   color: #2786c2 /* Panel Font Color */;
+   font-weight: bold;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #e9f9ff /* Panel Background Color */;
+   padding: 6px 10px;
+   margin: 0 0 10px 0;   
+}
+ul.SideMenu li ul {
+   padding: 0 3px;
+   border-top: 1px solid #CAF0FE /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #CAF0FE /* Panel Inlay Border Color */;
+   margin: 4px 0 6px 0;
+   background: #f0fbff /* Panel Inlay Background Color */;
+}
+ul.SideMenu li ul li a {
+   color: #2786C2 /* Panel Inlay Font Color */;
+   font-size: 12px;
+   font-weight: normal;
+}
+ul.SideMenu li ul li a:hover {
+   color: #2786c2 /* Panel Inlay Font Color */;
+   text-decoration: underline;
+}
+ul.SideMenu li ul li.Highlight {
+   background: auto /* Panel Selected Background Color */;
+}
+ul.SideMenu li ul li.Highlight a {
+   color: #ff0084 /* Panel Selected Font Color */;
+}
+ul.PanelInfo li {
+   background: #f5fcff /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
+   padding: 2px 4px;
+   font-family: tahoma;
+   font-size: 80%;
+   text-align: right;
+}
+ul.PanelInfo li h2 {
+   text-align: left;
+   display: inline;
+   font-size: 130%;
+   margin-right: 12px;
+}
+ul.PanelInfo li a {
+   float: left;
+}
+ul.PanelInfo li.Active {
+   background: #fff;
+   border-bottom: 1px solid #a3e6ff;
+}
+div.AddPeople h4 {
+  border-bottom: 0px;
+}
+#Panel input.InputBox,
+div.AddPeople textarea.MultiComplete {
+  width: 225px;
+  margin-bottom: 2px;
+}
+
+
+/* ============================================================ Conversations */
 fieldset {
   padding: 0px !important;
 }
@@ -64,6 +649,7 @@ body.Conversations h2 {
   height: 42px;
   width: 42px;
   margin: 0px 8px 0px 0px;
+  border: 0;
 }
 #Conversations li ul li.MessageCount span {
   background: #fffa22;
@@ -84,8 +670,6 @@ body.Conversations h2 {
 #Conversation div.Message {
   padding: 0px 8px 5px;
 }
-
-
 /* Big Buttons */
 a.ClearConversation,
 a.NewConversation {
@@ -106,7 +690,6 @@ a.NewConversation:hover {
    background: #11e420;
    color: #fff;
 }
-
 a.ClearConversation {
    background: #f06;
 }
@@ -114,7 +697,8 @@ a.ClearConversation:hover {
    background: #c36;
 }
 
-/* Add Message Form */
+
+/* ========================================================= Add Message Form */
 body.Index #Content form {
   background: #e9f9ff /* Panel Background Color */;
   padding: 4px 8px 8px;
@@ -136,7 +720,8 @@ body.Index #Content form textarea {
   margin-bottom: 2px;
 }
 
-/* New Conversation Form */
+
+/* ==================================================== New Conversation Form */
 body.add #Panel {
    display: none;
 }
@@ -180,12 +765,20 @@ a.Cancel {
 }
 
 
-/* Panel Forms */
-div.AddPeople h4 {
-  border-bottom: 0px;
+/* =================================================================== Footer */
+#Foot {
+   clear: both;
+   text-align: center;
+   margin: 2px 0;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   line-height: 1;
 }
-#Panel input.InputBox,
-div.AddPeople textarea.MultiComplete {
-  width: 225px;
-  margin-bottom: 2px;
+#Foot a {
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
 }

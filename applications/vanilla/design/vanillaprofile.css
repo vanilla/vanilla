@@ -1,3 +1,67 @@
+/* Add some custom css to the profile page so discussions appear properly when
+viewed on the profile discussions tab. */
+body.Search h1 {
+   margin:0;
+}
+ul.DataList li {
+   margin: 0;
+   padding: 0 0 4px 0;
+   border-bottom: 1px solid #dbe3e6;
+}
+ul.DataList li li {
+   border: 0;
+   padding: 0;
+}
+ul.DataList,
+ul.DataList li ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+}
+ul.DataList li ul li.Title a {
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 2px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+   display: block;
+}
+ul.DataList li ul li.Title h3 {
+   padding: 6px 0 0 6px;
+   margin: 0;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.DataList li ul li.Title h3 a {
+   display: inline;
+   border: 0;
+   padding: 0;
+   margin: 0;
+   color: #2d7bb2;
+   background: none;
+}
+ul.DataList li ul li.Meta {
+   font-family: tahoma;
+   margin-left: 5px;
+   font-size: 80%;
+   color: #80828c;
+}
+ul.DataList li ul li.Meta span,
+ul.DataList li ul li.Meta span a,
+ul.DataList li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff0;
+   padding: 0 2px;
+}
+ul.DataList li ul li.Meta a {
+   color: #2b2d33;
+}
 ul.Discussions {
    border: 0;
 }

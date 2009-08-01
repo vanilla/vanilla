@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-echo $this->Form->Open();
 ?>
 <h1><?php echo Gdn::Translate('Manage Messages'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/messages/add', 'AddMessage'); ?></div>
@@ -49,5 +48,3 @@ foreach ($this->MessageData->Result() as $Message) {
 <?php } ?>
    </tbody>
 </table>
-<?php
-echo $this->Form->Close();

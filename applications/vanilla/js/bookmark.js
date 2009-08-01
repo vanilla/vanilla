@@ -22,7 +22,6 @@ jQuery(document).ready(function($) {
             if ($(parent).children().length == 1) {
                // Remove the entire list
                $(parent).slideUp('fast', function() { $(this).remove(); });
-               $(parent).prev().slideUp('fast', function() { $(this).remove(); });
             } else if ($(parent).length > 0) {
                // Remove the affected row
                $(btn).parents('.DiscussionRow').slideUp('fast', function() { $(this).remove(); });

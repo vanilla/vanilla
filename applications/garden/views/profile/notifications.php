@@ -2,6 +2,9 @@
 $Session = Gdn::Session();
 ?>
 <h2><?php echo Gdn::Translate('Notifications'); ?></h2>
+<?php
+if ($this->NotificationData->NumRows() > 0) {
+?>
 <ul class="Activities">
    <?php
    foreach ($this->NotificationData->Result() as $Activity) {
@@ -34,3 +37,7 @@ $Session = Gdn::Session();
    }
    ?>
 </ul>
+<?php
+} else {
+   echo '<div class="Info EmptyInfo">'.Translate('You do not have any notifications.').'</div>';  
+}

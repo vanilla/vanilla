@@ -203,6 +203,8 @@ class GardenSetupController extends GardenController {
             $Config->Set('Garden.RewriteUrls', (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE);
             $Config->Set('Garden.Domain', $Domain);
             $Config->Set('Garden.CanProcessImages', function_exists('gd_info'));
+            $Config->Set('Garden.Messages.Cache', 'arr:["Garden\/Settings\/Index"]'); // Make sure that the "welcome" message is cached for viewing
+            $Config->Set('EnabledPlugins.HTMLPurifier', 'HtmlPurifier'); // Make sure html purifier is enabled so html has a default way of being safely parsed
             $Config->Save();
          }
       }

@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * A "reply" is essentially a comment that has a value in
  * Comment.ReplyCommentID other than NULL.
  */
-class ReplyModel extends CommentModel {
+class ReplyModel extends Gdn_CommentModel {
    
    public function ReplyQuery() {
       return $this->SQL

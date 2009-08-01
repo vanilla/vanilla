@@ -448,9 +448,9 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
    public function Delete($CommentID) {
       $this->EventArguments['CommentID'] = $CommentID;
 
-      // Check to see if this is the first comment in the discussion
+      // Check to see if this is the first or last comment in the discussion
       $Data = $this->SQL
-         ->Select('d.DiscussionID, d.FirstCommentID, c.InsertUserID')
+         ->Select('d.DiscussionID, d.FirstCommentID, d.LastCommentID, c.InsertUserID')
          ->From('Discussion d')
          ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
          ->Where('c.CommentID', $CommentID)
@@ -462,6 +462,24 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             $DiscussionModel = new Gdn_DiscussionModel();
             $DiscussionModel->Delete($Data->DiscussionID);
          } else {
+            // If this is the last comment, get the one before and update the LastCommentID field
+            if ($Data->LastCommentID == $CommentID) {
+               $OldData = $this->SQL
+                  ->Select('c.CommentID')
+                  ->From('Comment c')
+                  ->Where('c.DiscussionID', $Data->DiscussionID)
+                  ->OrderBy('c.DateInserted', 'desc')
+                  ->Limit(1, 1)
+                  ->Get()
+                  ->FirstRow();
+               if (is_object($OldData)) {
+                  $this->SQL->Update('Discussion')
+                     ->Set('LastCommentID', $OldData->CommentID)
+                     ->Where('DiscussionID', $Data->DiscussionID)
+                     ->Put();
+               }
+            }
+            
             $this->FireEvent('DeleteComment');
             // Delete the comment
             $this->SQL->Delete('Comment', array('CommentID' => $CommentID));

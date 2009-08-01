@@ -30,7 +30,7 @@ class Html extends Gdn_Pluggable {
    }
 
    public static function Image($Url, $Attributes = '') {
-      return '<img src="'.Url($Url).'"'.Attribute($Attributes).' />';
+      return '<img src="'.Asset($Url).'"'.Attribute($Attributes).' />';
    }
 }
 ?>

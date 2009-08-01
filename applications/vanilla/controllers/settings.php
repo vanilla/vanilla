@@ -51,9 +51,9 @@ class SettingsController extends VanillaController {
    }
    
    public function Initialize() {
-      $this->AddCssFile('default.css');
-      $this->AddCssFile('form.css');
       parent::Initialize();
+      $this->AddCssFile('form.css');
+      $this->AddCssFile('garden.css');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/garden/settings');
    }   

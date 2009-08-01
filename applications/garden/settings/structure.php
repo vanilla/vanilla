@@ -102,6 +102,7 @@ if($PermissionModel instanceof Gdn_PermissionModel) {
    
 // Define the set of permissions that garden uses.
 $PermissionModel->Define(array(
+	'Garden.Email.Manage',
 	'Garden.Settings.Manage',
 	'Garden.Routes.Manage',
    'Garden.Messages.Manage',

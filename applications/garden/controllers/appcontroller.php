@@ -26,15 +26,14 @@ class GardenController extends Gdn_Controller {
          $this->Head->AddScript('js/global.js');
       }
       
-      if ($this->ControllerName != 'profilecontroller') {
-         $this->AddCssFile('default.css');
-         $this->AddCssFile('form.css');
-      }
-         
       $this->AddCssFile('menu.css');
       $this->AddCssFile('popup.css');
       $this->AddModule('PoweredByVanillaModule');
       
+      if ($this->ControllerName != 'profilecontroller') {
+         $this->AddCssFile('form.css');
+         $this->AddCssFile('garden.css');
+      }
       parent::Initialize();
    }
    

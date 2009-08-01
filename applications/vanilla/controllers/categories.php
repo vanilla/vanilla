@@ -18,8 +18,8 @@ class CategoriesController extends VanillaController {
          $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
          $this->Head->Title(Translate('Add Category'));
       }
-      $this->AddCssFile('default.css');
       $this->AddCssFile('form.css');
+      $this->AddCssFile('garden.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
       // Load all roles with editable permissions
@@ -50,7 +50,7 @@ class CategoriesController extends VanillaController {
       }
 
       $this->AddCssFile('form.css');
-      $this->AddCssFile('default.css');
+      $this->AddCssFile('garden.css');
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -129,8 +129,8 @@ class CategoriesController extends VanillaController {
          $this->Head->Title(Translate('Edit Category'));
       }
          
-      $this->AddCssFile('default.css');
       $this->AddCssFile('form.css');
+      $this->AddCssFile('garden.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
       // Make sure the form knows which item we are editing.
@@ -297,7 +297,7 @@ class CategoriesController extends VanillaController {
          $this->Head->Title(Translate('Categories'));
       }
       $this->AddCssFile('form.css');
-      $this->AddCssFile('default.css');
+      $this->AddCssFile('garden.css');
       $this->CategoryData = $this->CategoryModel->Get('Sort');
       $this->Render();
    }

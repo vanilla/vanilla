@@ -72,7 +72,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
          $ErrorLines = @file($File);
          
       // If this error was encountered during an ajax request, don't bother gettting the css or theme files
-      if ($DeliveryType == 1) {
+      if ($DeliveryType == DELIVERY_TYPE_ALL) {
          $CssPaths = array(); // Potential places where the css can be found in the filesystem.
          $MasterViewPaths = array();
             
@@ -127,7 +127,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
       }
    }
    
-   if ($DeliveryType != 1) {
+   if ($DeliveryType != DELIVERY_TYPE_ALL) {
       // This is an ajax request, so dump an error that is more eye-friendly in the debugger
       echo 'FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();\n\"".$SenderMessage."\"\n";
       if ($SenderCode != '')
@@ -216,7 +216,6 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    // Attempt to log an error message no matter what.
    LogMessage($File, $Line, $SenderObject, $SenderMethod, $SenderMessage, $SenderCode);
-   die();
 }
 
 if (!function_exists('ErrorMessage')) {

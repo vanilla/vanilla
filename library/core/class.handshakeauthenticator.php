@@ -189,8 +189,8 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 		return $Url;
 	}
 	
-	public function SetIdentity($Value) {
-		$this->_Identity->SetIdentity($Value);
+	public function SetIdentity($Value, $Persist = FALSE) {
+		$this->_Identity->SetIdentity($Value, $Persist);
 	}
 	
 	public function SignInUrl($Redirect = '/') {

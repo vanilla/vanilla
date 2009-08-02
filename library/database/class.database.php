@@ -253,7 +253,7 @@ class Gdn_Database {
    
    /**
     * Get the database driver class for the database.
-    * @return Gdn_DatabaseDriver The database driver class associated with this database.
+    * @return Gdn_SQLDriver The database driver class associated with this database.
     */
    public function SQL() {
 		if(is_null($this->_SQL)) {

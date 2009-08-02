@@ -51,6 +51,8 @@ interface Gdn_IAuthenticator {
     */
    public function GetIdentity();
    
+   public function SetIdentity($UserID, $Persist = FALSE);
+   
    /**
     * Returns the url used to register for an account in the application.
     */

@@ -392,12 +392,13 @@ if (!function_exists('GetPostValue')) {
 if (!function_exists('GetIncomingValue')) {
    function GetIncomingValue($FieldName, $Default = FALSE) {
       if (array_key_exists($FieldName, $_POST) === TRUE) {
-         return filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+         $Result = filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
       } else if (array_key_exists($FieldName, $_GET) === TRUE) {
-         return filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+         $Result = filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING); //, FILTER_REQUIRE_ARRAY);
       } else {
-         return $Default;
+         $Result = $Default;
       }
+      return $Result;
    }
 }
 

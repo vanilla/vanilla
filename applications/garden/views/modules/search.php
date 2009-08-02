@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$Form = new Form();
+$Form = Gdn::Factory('Form');
 $Form->InputPrefix = '';
 echo 
    $Form->Open(array('action' => Url('/search'), 'method' => 'get')),

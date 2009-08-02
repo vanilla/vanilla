@@ -78,7 +78,7 @@ class DiscussionController extends VanillaController {
       }
       
       // Define the form for the comment input
-      $this->Form = new Form('Comment');
+      $this->Form = Gdn::Factory('Form', 'Comment');
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');

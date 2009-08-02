@@ -51,7 +51,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
             <li class="CommentForm">
             <?php
                echo Anchor('Write a comment', '/garden/activity/comment/'.$Activity->ActivityID, 'CommentLink');
-               $CommentForm = new Form();
+               $CommentForm = Gdn::Factory('Form');
                $CommentForm->SetModel($Sender->ActivityModel);
                $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
                $CommentForm->AddHidden('Return', Gdn_Url::Request());

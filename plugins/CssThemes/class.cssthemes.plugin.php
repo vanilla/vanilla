@@ -206,7 +206,7 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 	 * @package $Sender Gdn_Controller
 	 */
 	public function PluginController_CssThemes_Create($Sender) {
-		$Sender->Form = new Form();
+		$Sender->Form = Gdn::Factory('Form');
 		$Model = new Gdn_Model('ThemeSetting');
 		$Sender->Form->SetModel($Model);
 		

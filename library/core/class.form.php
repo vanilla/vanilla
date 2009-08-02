@@ -25,7 +25,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @todo reviews damien's conversion to phpdoc
  * @todo change formatting of tables in documentation
  */
-class Form {
+class Gdn_Form {
 
    /// =========================================================================
    /// 1. UI Components: Methods that return xhtml form elements.

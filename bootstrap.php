@@ -84,6 +84,8 @@ Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'databas
 // Database drivers.
 Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactoryInstance);
+// Form class
+Gdn::FactoryInstall('Form', 'Gdn_Form', PATH_LIBRARY.DS.'core'.DS.'class.form.php', Gdn::FactoryInstance);
 
 // Identity, Authenticator & Session.
 Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');

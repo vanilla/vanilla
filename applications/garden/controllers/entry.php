@@ -153,7 +153,7 @@ class EntryController extends GardenController {
          
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', 'test'));
+      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
       // If the form has been posted back...
       if ($this->Form->IsPostBack() === TRUE) {
          // If there were no errors...

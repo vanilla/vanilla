@@ -58,7 +58,7 @@ class DraftsController extends VanillaController {
    }
    
    public function Delete($DraftID = '', $TransientKey = '') {
-      $Form = new Form();
+      $Form = Gdn::Factory('Form');
       $Session = Gdn::Session();
       if (
          is_numeric($DraftID)

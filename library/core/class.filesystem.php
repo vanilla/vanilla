@@ -286,6 +286,10 @@ class Gdn_FileSystem {
     */
    public static function ServeFile($File, $Name = '', $MimeType = '') {
       if (is_readable($File)) {
+         // Get the db connection and make sure it is closed
+         $Database = Gdn::Database();
+         $Database->CloseConnection();
+         
          $Size = filesize($File);
          $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($Name == '') {

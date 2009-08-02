@@ -13,7 +13,7 @@ class SearchController extends GardenController {
 	public function __construct() {
 		parent::__construct();
 		
-		$Form = new Form();
+		$Form = Gdn::Factory('Form');
 		$Form->Method = 'get';
 		$Form->InputPrefix = '';
 		

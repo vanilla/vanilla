@@ -25,7 +25,7 @@ class AddPeopleModule extends Module {
       if (property_exists($Sender, 'Conversation'))
          $this->Conversation = $Sender->Conversation;
          
-      $this->Form = new Form('AddPeople');
+      $this->Form = Gdn::Factory('Form', 'AddPeople');
       // $this->Form->Action = $Sender->SelfUrl;
       // If the form was posted back, check for people to add to the conversation
       if ($this->Form->AuthenticatedPostBack()) {

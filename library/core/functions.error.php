@@ -44,7 +44,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    $Master = FALSE;  // The parsed master view
    $CssPath = FALSE; // The web-path to the css file
    $ErrorLines = FALSE; // The lines near the error's line #
-   $DeliveryType = 1;
+   $DeliveryType = DELIVERY_TYPE_ALL;
    if (array_key_exists('DeliveryType', $_POST)) {
       $DeliveryType = $_POST['DeliveryType'];
    } else if (array_key_exists('DeliveryType', $_GET)) {

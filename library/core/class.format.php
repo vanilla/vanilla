@@ -303,8 +303,9 @@ class Format {
     * @return string
     */
    public static function ArrayValueForPhp($String) {
-      $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
-      return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
+      return str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
+      // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
+      // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
    }
 
 

@@ -23,7 +23,6 @@ jQuery(document).ready(function($) {
                   if (json.RedirectUrl) {
                      setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                   } else if(json.DeliveryType == 'ASSET') {
-                     alert($(handle).selector);
                      $frm.parents($(handle).selector).html(json.Data);
                   } else {
                      // Remove the spinner if not redirecting...

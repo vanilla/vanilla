@@ -23,3 +23,7 @@
 #CssThemes .ColorRow input.InputBox {
 	font-size: 18px;
 }
+
+#CssThemes h2 {
+	border: none;
+}

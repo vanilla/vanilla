@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 ?>
 <h1><?php echo Gdn::Translate('Manage Messages'); ?></h1>
-<div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/messages/add', 'AddMessage'); ?></div>
+<div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/message/add', 'AddMessage'); ?></div>
 <div class="Info"><?php echo Gdn::Translate('Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
 <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
    <thead>
@@ -31,9 +31,9 @@ foreach ($this->MessageData->Result() as $Message) {
       ?><div>
          <strong><?php echo $Message->Enabled == '1' ? 'Enabled' : 'Disabled'; ?></strong>
          <span>|</span>
-         <?php echo Anchor('Edit', '/garden/messages/edit/'.$Message->MessageID, 'EditMessage'); ?>
+         <?php echo Anchor('Edit', '/garden/message/edit/'.$Message->MessageID, 'EditMessage'); ?>
          <span>|</span>
-         <?php echo Anchor('Delete', '/garden/messages/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage'); ?>
+         <?php echo Anchor('Delete', '/garden/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage'); ?>
          </div>
       </td>
       <td class="Alt"><?php

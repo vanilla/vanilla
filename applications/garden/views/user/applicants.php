@@ -40,7 +40,7 @@ if ($this->UserData->NumRows() == 0) {
    </tbody>
 </table>
    <?php
-   echo $this->Form->Button('Approve', array('name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
-   echo $this->Form->Button('Decline', array('name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
+   echo $this->Form->Button('Approve', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
+   echo $this->Form->Button('Decline', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
 }
 echo $this->Form->Close();

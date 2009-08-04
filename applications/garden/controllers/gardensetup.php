@@ -242,4 +242,20 @@ class GardenSetupController extends GardenController {
       }
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }
+   
+    public function First() {
+      // Start the session.
+      Gdn::Session()->Start(Gdn::Authenticator());
+   
+      $this->Permission('Garden.First'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
+      
+      // Enable all of the plugins.
+      $PluginManager = Gdn::Factory('PluginManager');
+      foreach($PluginManager->EnabledPlugins as $PluginName => $PluginFolder) {
+         $PluginManager->EnablePlugin($PluginName, $this->Form->Validation);
+      }
+      
+      Redirect('/');
+      
+   }
 }

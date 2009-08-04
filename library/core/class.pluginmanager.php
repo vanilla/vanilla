@@ -342,7 +342,7 @@ class Gdn_PluginManager {
          $PermissionModel->Define($PermissionName);
       }
 
-      if (count($Validation->Results()) > 0)
+      if (is_object($Validation) && count($Validation->Results()) > 0)
          return FALSE;
 
       // 4. If everything succeeded, add the plugin to the

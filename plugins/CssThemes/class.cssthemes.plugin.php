@@ -260,5 +260,37 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 			->Column('Name', 'varchar', '50', FALSE, NULL, 'primary')
 			->Column('Setting', 'varchar', '50')
 			->Set(FALSE, FALSE);
+			
+		// Insert default values.
+		$St->Database->Query('insert '.$St->Database->DatabasePrefix.'ThemeSetting (Name, Setting) values '.
+		"('Banner Background Color', '#44c7f4'),
+		('Banner Font Color', '#fff'),
+		('Banner Font Shadow Color', '#30ACD6'),
+		('Banner Hover Font Color', '#f3fcff'),
+		('Body Alt Background Color', '#f8f8f8'),
+		('Body Background Color', '#ffffff'),
+		('Body Default Font Color', '#000'),
+		('Body Heading Font Color', '#000'),
+		('Body Hover Font Color', '#ff0084'),
+		('Body Line Color', '#eee'),
+		('Body Link Font Color', '#2786c2'),
+		('Body Subheading Font Color', '#6C6C6C'),
+		('Body Text Font Color', '#555'),
+		('Discussion My Background Color', '#F5FCFF'),
+		('Discussion New Background Color', '#ffd'),
+		('Menu Background Color', '#44c7f4'),
+		('Menu Font Color', '#fff'),
+		('Menu Hover Background Color', '#28bcef'),
+		('Menu Hover Font Color', '#fff'),
+		('Meta Font Color', '#2b2d33'),
+		('Meta Label Font Color', '#80828c'),
+		('Panel Background Color', '#E9F9FF'),
+		('Panel Font Color', '#2786C2'),
+		('Panel Hover Font Color', '#e9f9ff'),
+		('Panel Inlay Background Color', '#f0fbff'),
+		('Panel Inlay Border Color', '#caf0fe'),
+		('Panel Inlay Font Color', '#0766a2'),
+		('Panel Selected Background Color', '#fff'),
+		('Panel Selected Font Color', '#ff0084')");
 	}
 }

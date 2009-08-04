@@ -529,7 +529,7 @@ class Gdn_UserModel extends Gdn_Model {
          );
 
          // Save the user's roles
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(4)); // 4 is "Member"
+         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(4)); // 4 is "Applicant"
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;
@@ -572,7 +572,7 @@ class Gdn_UserModel extends Gdn_Model {
          $UserID = $this->SQL->Insert($this->Name, $Fields);
 
          // Now update the role for this user
-         $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 3));
+         $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 4));
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;
@@ -633,7 +633,7 @@ class Gdn_UserModel extends Gdn_Model {
          );
 
          // Now update the role settings if necessary
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       }
       return $UserID;
@@ -786,7 +786,7 @@ class Gdn_UserModel extends Gdn_Model {
 
       if ($ApplicantFound) {
          // Retrieve the default role(s) for new users
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
 
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs);

@@ -252,7 +252,7 @@ class GardenSetupController extends GardenController {
       // Enable all of the plugins.
       $PluginManager = Gdn::Factory('PluginManager');
       foreach($PluginManager->EnabledPlugins as $PluginName => $PluginFolder) {
-         $PluginManager->EnablePlugin($PluginName, $this->Form->Validation);
+         $PluginManager->EnablePlugin($PluginName, NULL, TRUE);
       }
       
       Redirect('/settings');

@@ -300,7 +300,7 @@ class Gdn_PluginManager {
       return array_values($EnabledPlugins);
    }
    
-   public function EnablePlugin($PluginName, $Validation) {
+   public function EnablePlugin($PluginName, $Validation, $Setup = FALSE) {
       // 1. Make sure that the plugin's requirements are met
       // Required Plugins
       $AvailablePlugins = $this->AvailablePlugins();
@@ -333,6 +333,9 @@ class Gdn_PluginManager {
             $Plugin = new $PluginClassName();
             $Plugin->Setup();
          }
+      } elseif(class_exists($PluginClassName, FALSE) !== FALSE && $Setup === TRUE) {
+         $Plugin = new $PluginClassName();
+         $Plugin->Setup();
       }
       
       // 3. If setup succeeded, register any specified permissions

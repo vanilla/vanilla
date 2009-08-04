@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
                }
                
                // Re-attach the handler
-               $($(handle).selector).handleAjaxForm();
+               $($(handle).selector).handleAjaxForm(options);
              }
          }, options || {});
          

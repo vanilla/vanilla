@@ -102,7 +102,7 @@ if (!function_exists('ValidateEmail')) {
    }
 }
 if (!function_exists('ValidateUsername')) {
-	function ValidateUsername($Value, $Field) {
+	function ValidateUsername($Value, $Field = '') {
 		return ValidateRegex(
 			$Value,
 			'/^([\d\w_]{3,20})$/si'

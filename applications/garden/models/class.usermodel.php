@@ -572,7 +572,7 @@ class Gdn_UserModel extends Gdn_Model {
          $UserID = $this->SQL->Insert($this->Name, $Fields);
 
          // Now update the role for this user
-         $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 3));
+         $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 8));
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;

@@ -147,7 +147,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       if(is_null($this->_CategoryPermissions)) {
          $Session = Gdn::Session();
          
-         if(is_object($Session->User) && $Session->User->Admin == '1') {
+         if((is_object($Session->User) && $Session->User->Admin == '1')) {
             $this->_CategoryPermissions = TRUE;
          } else {
             $Data = $this->SQL

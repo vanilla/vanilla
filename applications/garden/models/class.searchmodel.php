@@ -225,6 +225,12 @@ class Gdn_SearchModel extends Gdn_Model {
 			->Limit($Limit, $Offset)
 			->OrderBy('Relavence', 'desc');
 			
+		$Session = Gdn::Session();
+		if(!(is_object($Session->User) && $Session->User->Admin == '1')) {
+			// Add the permission in for the search.
+			$this->SQL->Join('Permission p', 'd.PermissionJunctionID = p.JunctionID and p.`Vanilla.Discussions.View` = 1');
+		}
+			
 		if($All) {
 			$this->SQL->Having('count(*) >=', count($Keywords));
 		}

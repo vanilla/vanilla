@@ -102,15 +102,16 @@ class Gdn_CategoryModel extends Gdn_Model {
    }
 
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      return $this->SQL
+      $this->SQL
          ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions')
          ->From('Category c')
          ->BeginWhereGroup()
          ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View')
          ->EndWhereGroup()
          ->OrWhere('AllowDiscussions', '0')
-         ->OrderBy('Sort', 'asc')
-         ->Get();
+         ->OrderBy('Sort', 'asc');
+         
+      return $this->SQL->Get();
    }
    
    public function GetFull($CategoryID = '') {
@@ -119,8 +120,9 @@ class Gdn_CategoryModel extends Gdn_Model {
          ->Select("' &bull; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
-         ->Where('c.AllowDiscussions', '1')
-         ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
+         ->Where('c.AllowDiscussions', '1');
+         
+      $this->SQL->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
 
       if (is_numeric($CategoryID) && $CategoryID > 0)
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
@@ -129,14 +131,17 @@ class Gdn_CategoryModel extends Gdn_Model {
    }
 
    public function GetFullByName($CategoryName) {
-      return $this->SQL
+      $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
          ->Select("' &bull; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')
-         ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View')
-         ->Where('c.Name', $CategoryName)
+         ->Where('c.Name', $CategoryName);
+         
+      $this->SQL->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
+         
+      return $this->SQL
          ->Get()
          ->FirstRow();
    }
@@ -278,10 +283,12 @@ class Gdn_CategoryModel extends Gdn_Model {
          }
          
          // Save the permissions
-         
          $PermissionModel = Gdn::PermissionModel();
          $Permissions = $PermissionModel->PivotPermissions($FormPostValues['Permission'], array('JunctionID' => $CategoryID));
          $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+         
+         // Force the user permissions to refresh.
+         $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
       } else {
          $CategoryID = FALSE;
       }

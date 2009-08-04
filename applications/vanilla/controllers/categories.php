@@ -204,6 +204,7 @@ class CategoriesController extends VanillaController {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new Gdn_DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);
+      
       $this->Permission('Vanilla.Discussions.View', $this->CategoryID);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);

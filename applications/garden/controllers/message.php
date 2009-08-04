@@ -11,7 +11,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /**
  * Messages are used to display (optionally dismissable) information in various parts of the applications.
  */
-class MessagesController extends GardenController {
+class MessageController extends GardenController {
    
    public $Uses = array('Form', 'Gdn_MessageModel');
    
@@ -34,7 +34,7 @@ class MessagesController extends GardenController {
       }
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('garden/messages');
+         Redirect('garden/message');
 
       $this->Render();      
    }
@@ -62,7 +62,7 @@ class MessagesController extends GardenController {
       }
          
       $this->Permission('Garden.Messages.Manage');
-      $this->AddSideMenu('garden/messages');
+      $this->AddSideMenu('garden/message');
       
       // Generate some Controller & Asset data arrays
       $this->LocationData = $this->_GetLocationData();
@@ -87,7 +87,7 @@ class MessagesController extends GardenController {
             
             // Redirect
             $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
-            $this->RedirectUrl = Url('garden/messages');
+            $this->RedirectUrl = Url('garden/message');
          }
       }
       $this->Render();
@@ -95,7 +95,7 @@ class MessagesController extends GardenController {
    
    public function Index() {
       $this->Permission('Garden.Messages.Manage');
-      $this->AddSideMenu('garden/messages');
+      $this->AddSideMenu('garden/message');
       if ($this->Head) {
          $this->Head->AddScript('js/library/jquery.autogrow.js');
          $this->Head->AddScript('/js/library/jquery.tablednd.js');

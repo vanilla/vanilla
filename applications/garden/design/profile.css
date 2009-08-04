@@ -568,6 +568,11 @@ ul.SideMenu li ul li.Highlight a {
 body.Activity h1 {
    margin: 0;
 }
+
+ul.Activities {
+	margin-bottom: 6px;
+}
+
 ul.Activities li {
    border-bottom: 1px solid #ddd;
    padding: 8px 0 6px;
@@ -595,7 +600,7 @@ ul.Activities li h3 {
 ul.Activities li h3 em {
    font-weight: normal;
    font-style: normal;
-   color: #33afda;
+   color: #33afda /* Meta Label Font Color */;
    font-size: 10px;
    margin: 0 10px;
 }
@@ -673,7 +678,7 @@ ul.Activities ul.Comments {
    list-style: none;
 }
 ul.Activities ul.Comments li {
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    margin-bottom: 1px;
    border-bottom: 0;
    padding: 0;
@@ -707,7 +712,7 @@ div.EmptyInfo {
    margin: 10px;
 }
 #garden_profile_notifications div.EmptyInfo {
-   margin: 10px 0 0;
+   margin: 10px 0 6px;
 }
 #garden_profile_notifications h2 {
    margin-bottom: 0;

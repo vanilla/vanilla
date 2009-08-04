@@ -339,11 +339,11 @@ tr#PagerMore td {
 }
 #Head h1 a span {
    font-size: 24px;
-   color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;
+   color:#E4F7FE /* Banner Font Color */;
+   text-shadow:0 1px 0 #30ACD6 /* Banner Font Shadow Color */;
 }
 #Head h1 a:hover span {
-   color:#f3fcff;
+   color:#f3fcff /* Banner Hover Font Color */;
 }
 #Head form {
    float: right;
@@ -585,6 +585,9 @@ ul.DataList li ul li.Meta strong {
 ul.DataList li ul li.Meta a {
    color: #2b2d33 /* Meta Font Color */;
 }
+ul.Discussions {
+   margin-bottom: 6px;
+}
 body.Discussions h1 {
    margin: 0;
 }
@@ -602,8 +605,8 @@ ul.Announcements {
   + Mine: the user created the discussion
   + New: there are new comments since the last viewed the discussion
 */
-.Mine { background: #F5FCFF; }
-li.New { background: #ffd; }
+.Mine { background: #F5FCFF /* Discussion My Background Color */; }
+li.New { background: #ffd /* Discussion New Background Color */; }
 ul.DataList li ul li.Meta a.Category {
    background: #fafafa;
    padding: 2px 4px;
@@ -696,7 +699,7 @@ body.Discussion #Content h2 span {
 .Preview li ul.Info,
 #Discussion li ul.Info {
    font-size: 11px;
-   color: #777;
+   color: #777 /* Meta Label Font Color */;
    padding: 8px 0 0 8px;
 }
 .Preview li ul.Info {
@@ -779,6 +782,7 @@ div.Popup ul.Preview li.Comment div.Body {
    text-align: right;
    background: #e9f9ff /* Panel Background Color */;
    margin-top: 1px;
+   margin-bottom: 6px;
    }
 .Back a {
    color: #2786C2 /* Panel Font Color */;
@@ -961,7 +965,7 @@ body.Post #Content {
 body.Post #CommentForm,
 #DiscussionForm {
    border: 0;
-   background: #daf4fd;
+   background: #daf4fd /* Panel Background Color */;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    padding: 8px 10px 10px;

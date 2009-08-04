@@ -707,7 +707,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View = $this->FetchView($View, $ControllerName, $ApplicationFolder);
          // Add the view to the asset container if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_VIEW)
-            $this->AddAsset($AssetName, $View);
+            $this->AddAsset($AssetName, $View, 'Content');
       }
 
       // Redefine the view as the entire asset contents if necessary

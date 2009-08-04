@@ -122,7 +122,7 @@ table tbody td.Info span {
 }
 table tbody td.Info strong {
    font-weight: bold;
-   color: #000;
+   color: #000 /* Body Default Font Color */;
 }
 table thead th {
    font-weight: bold;
@@ -168,14 +168,14 @@ table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-   background: #ffd;
-   color: #000;
+   background: #ffd /* Discussion New Background Color */;
+   color: #000 /* Body Default Font Color */;
 }
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td {
-   background: #f8f8f8;
+   background: #f8f8f8 /* Body Background Color */;
 }
 
 /* CheckBoxGrid */

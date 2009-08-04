@@ -41,7 +41,7 @@ ul.DataList li ul li.Title h3 a {
    border: 0;
    padding: 0;
    margin: 0;
-   color: #2d7bb2;
+   color: #2d7bb2 /* Body Link Font Color */;
    background: none;
 }
 ul.DataList li ul li.Meta {
@@ -107,7 +107,7 @@ ul.Discussions li ul li.Meta {
    font-family: tahoma;
    margin-left: 9px;
    font-size: 80%;
-   color: #80828c;
+   color: #80828c /* Meta Label Font Color */;
 }
 ul.Discussions li ul li.Meta span,
 ul.Discussions li ul li.Meta span a,

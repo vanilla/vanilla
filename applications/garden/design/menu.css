@@ -121,8 +121,8 @@
 #Menu a span,
 #Menu li.Active a span,
 #Menu li.Highlight a:hover span {
-   background: #f2fcff;
-   color: #299fc7;
+   background: #f2fcff /* Menu Hover Background Color */;
+   color: #299fc7 /* Menu Hover Font Color */;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    margin-left: 4px;
@@ -195,5 +195,9 @@ ul.Options a {
 ul.Options ul li {
    display: block;
    float: none;
+}
+
+.Center {
+   text-align: center;
 }
 

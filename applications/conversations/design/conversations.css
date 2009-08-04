@@ -414,11 +414,11 @@ body #Head h1 {
 }
 #Head h1 a span {
    font-size: 24px;
-   color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;   
+   color:#E4F7FE /* Banner Font Color */;
+   text-shadow:0 1px 0 #30ACD6 /* Banner Font Shadow Color */;   
 }
 #Head h1 a:hover span {
-   color:#f3fcff;
+   color:#f3fcff /* Banner Hover Font Color */;
 }
 #Head form {
    float: right;
@@ -446,8 +446,8 @@ body #Head h1 {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Font Color */;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -670,6 +670,10 @@ body.Conversations h2 {
 #Conversation div.Message {
   padding: 0px 8px 5px;
 }
+#ConversationForm {
+	margin-bottom: 6px;
+}
+
 /* Big Buttons */
 a.ClearConversation,
 a.NewConversation {
@@ -687,8 +691,8 @@ a.NewConversation {
 }
 a.ClearConversation:hover,
 a.NewConversation:hover {
-   background: #11e420;
-   color: #fff;
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
 }
 a.ClearConversation {
    background: #f06;

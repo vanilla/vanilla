@@ -385,11 +385,11 @@ body #Head h1 {
 }
 #Head h1 a span {
    font-size: 24px;
-   color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;   
+   color:#E4F7FE /* Banner Font Color */;
+   text-shadow:0 1px 0 #30ACD6 /* Banner Font Shadow Color */;   
 }
 #Head h1 a:hover span {
-   color:#f3fcff;
+   color:#f3fcff /* Banner Hover Font Color */;
 }
 #Head form {
    float: right;
@@ -417,8 +417,8 @@ body #Head h1 {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Font Color */;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -568,6 +568,7 @@ ul.PanelInfo li.Active {
    -moz-border-radius-topright: 4px;
    -webkit-border-radius-top-left: 4px;
    -webkit-border-radius-top-right: 4px;
+	color: #555;
    border: 1px solid #ddd;
    border-bottom: 1px solid #e9e9e9;
    font-size: 120%;
@@ -632,7 +633,7 @@ ul.BigList {
    background: #f0fbff /* Panel Background Color */;
    padding: 8px;
    margin: 10px 0 0;
-   border: 1px solid #dff4fc;
+   border: 1px solid #dff4fc /* Panel Inlay Border Color */;
 }
 ul.BigList li {
    font-size: 16px;
@@ -648,6 +649,9 @@ li.five { background: url('five.png') no-repeat center left; }
 /* =============================================================== Activities */
 body.Activity h1 {
    margin: 0;
+}
+ul.Activities {
+	margin-bottom: 6px;
 }
 ul.Activities li {
    border-bottom: 1px solid #ddd;
@@ -754,7 +758,7 @@ ul.Activities ul.Comments {
    list-style: none;
 }
 ul.Activities ul.Comments li {
-   background: #e9f9ff;
+   background: #e9f9ff /* Panel Background Color */;
    margin-bottom: 1px;
    border-bottom: 0;
    padding: 0;
@@ -780,7 +784,6 @@ ul.Activities li.CommentForm textarea {
    height: 40px;
    margin-bottom: 2px;
 }
-
 
 /* ============================================================= Entry Screen */
 body.Entry {

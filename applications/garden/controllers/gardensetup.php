@@ -255,7 +255,7 @@ class GardenSetupController extends GardenController {
          $PluginManager->EnablePlugin($PluginName, $this->Form->Validation);
       }
       
-      Redirect('/');
+      Redirect('/settings');
       
    }
 }

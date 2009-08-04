@@ -303,6 +303,7 @@ class Gdn_UserModel extends Gdn_Model {
       $FormPostValues['TermsOfService'] = '1';
       $FormPostValues['DateOfBirth'] = '1975-09-16';
       $FormPostValues['DateLastActive'] = Format::ToDateTime();
+      $FormPostValues['DateUpdated'] = Format::ToDateTime();
       $FormPostValues['Gender'] = 'm';
       $FormPostValues['Admin'] = '1';
 

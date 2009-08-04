@@ -184,6 +184,7 @@ class UserController extends GardenController {
       }
       $UserModel = Gdn::UserModel();
       $this->UserData = $UserModel->GetApplicants();
+      $this->View = 'applicants';
       $this->Render();
    }
 
@@ -191,12 +192,14 @@ class UserController extends GardenController {
       $this->Permission('Garden.Users.Approve');
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey))
-         $this->HandleApplicant('Approve', $UserID);
+      
+         if($this->HandleApplicant('Approve', $UserID)) {
+            $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+         }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
          return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
       } else {
-         $this->View = 'Applicants';
          $this->Applicants();
       }
    }
@@ -212,16 +215,16 @@ class UserController extends GardenController {
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
          return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
       } else {
-         $this->View = 'Applicants';
          $this->Applicants();
       }
    }
 
    private function HandleApplicant($Action, $UserID) {
       $this->Permission('Garden.Users.Approve');
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
          $this->Form->AddError('ErrorInput');
+         $Result = FALSE;
       } else {
          $Session = Gdn::Session();
          //if (!$Session->CheckPermission('Garden.Users.Approve')) {
@@ -231,14 +234,14 @@ class UserController extends GardenController {
             if (is_numeric($UserID)) {
                try {
                   $Email = new Gdn_Email();
-                  $UserModel->$Action($UserID, $Email);
+                  $Result = $UserModel->$Action($UserID, $Email);
                } catch(Exception $ex) {
+                  $Result = FALSE;
                   $this->Form->AddError(strip_tags($ex->getMessage()));
                }
             }
          //}
       }
-      $this->Render();
    }
 
 

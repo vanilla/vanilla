@@ -58,6 +58,8 @@ jQuery(document).ready(function($) {
       var lastCommentID = $(lastComment).attr('id').replace('Comment_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
+      $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
+      $(frm).find(':submit').attr('disabled', 'disabled');            
       $.ajax({
          type: "POST",
          url: action,
@@ -125,6 +127,11 @@ jQuery(document).ready(function($) {
 
             }
             inform(json.StatusMessage);
+         },
+         complete: function(XMLHttpRequest, textStatus) {
+            // Remove any spinners, and re-enable buttons.
+            $('span.Progress').remove();
+            $(frm).find(':submit').removeAttr("disabled");
          }
       });
       return false;

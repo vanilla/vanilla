@@ -240,6 +240,9 @@ class Gdn_SearchModel extends Gdn_Model {
 		} elseif(count($KeywordIDs) == 1) {
 			$this->SQL->Where('kd.KeywordID', $KeywordIDs[0]);
 		} else {
+			foreach($KeywordIDs as $i => $Keyword) {
+				$KeywordIDs[$i] = '@'.$Keyword;
+			}
 			$this->SQL->WhereIn('kd.KeywordID', $KeywordIDs);
 		}
 		

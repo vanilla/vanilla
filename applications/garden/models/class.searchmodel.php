@@ -236,7 +236,7 @@ class Gdn_SearchModel extends Gdn_Model {
 		}
 		
 		if(count($KeywordIDs) == 0) {
-			$this->SQL->Where('@0', '1');
+			$this->SQL->Where('0', '1');
 		} elseif(count($KeywordIDs) == 1) {
 			$this->SQL->Where('kd.KeywordID', $KeywordIDs[0]);
 		} else {

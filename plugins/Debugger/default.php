@@ -40,6 +40,11 @@ class DebuggerPlugin implements Gdn_IPlugin {
    // SignIn_Render_After, etc. and it essentially *_Render_After
    
    public function Base_Render_Before($Sender) {
+      $Session = Gdn::Session();
+      if(!$Session->CheckPermission('Garden.Settings.Manage')) {
+         return;
+      }
+      
       if (!$Sender->Head)
          $Sender->Head = new HeadModule($Sender);
          

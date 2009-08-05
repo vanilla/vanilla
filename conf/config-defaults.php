@@ -78,6 +78,8 @@ $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;
 $Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
 $Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . DS . 'HtmlPurifier';
+$Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
+
 
 $Configuration['Routes']['DefaultController'] = 'home';
 $Configuration['Routes']['Default404'] = 'garden/home/filenotfound';

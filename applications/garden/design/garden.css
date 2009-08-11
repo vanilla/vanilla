@@ -473,7 +473,7 @@ div.Box dl {
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #0766a2 /* Panel Inlay Font Color */;
+   color: #2786C2 /* Panel Font Color */;
 }
 div.Box dl dd {
    margin-left: 80px;
@@ -483,64 +483,26 @@ div.Box p {
    padding: 0 0 4px;
    color: #555 /* Body Text Font Color */;
 }
-ul.SideMenu,
-ul.SideMenu li ul {
-   margin: 0;
-   padding: 0;
-   list-style: none;
+ul.PanelInfo {
+	margin-bottom: 4px;
 }
-ul.SideMenu {
-   font-size: 110%;
-   color: #2786c2 /* Panel Font Color */;
-   font-weight: bold;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   background: #e9f9ff /* Panel Background Color */;
-   padding: 6px 10px;
-   margin: 0 0 10px 0;   
-}
-ul.SideMenu li ul {
-   padding: 0 3px;
-   border-top: 1px solid #CAF0FE /* Panel Inlay Border Color */;
-   border-bottom: 1px solid #CAF0FE /* Panel Inlay Border Color */;
-   margin: 4px 0 6px 0;
-   background: #f0fbff /* Panel Inlay Background Color */;
-}
-ul.SideMenu li ul li a {
-   color: #2786C2 /* Panel Inlay Font Color */;
-   font-size: 12px;
-   font-weight: normal;
-}
-ul.SideMenu li ul li a:hover {
-   color: #2786c2 /* Panel Inlay Font Color */;
-   text-decoration: underline;
-}
-ul.SideMenu li ul li.Highlight {
-   background: auto /* Panel Selected Background Color */;
-}
-ul.SideMenu li ul li.Highlight a {
-   color: #ff0084 /* Panel Selected Font Color */;
+ul.PanelInfo {
+   border-bottom: 1px solid #caf0fe;
 }
 ul.PanelInfo li {
    background: #f5fcff /* Panel Inlay Background Color */;
-   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
    font-family: tahoma;
    font-size: 80%;
-   text-align: right;
 }
-ul.PanelInfo li h2 {
+ul.PanelInfo li strong {
+	font-weight: normal;
    text-align: left;
-   display: inline;
-   font-size: 130%;
+   font-size: 120%;
    margin-right: 12px;
-}
-ul.PanelInfo li a {
-   float: left;
 }
 ul.PanelInfo li.Active {
    background: #fff;
-   border-bottom: 1px solid #a3e6ff;
 }
 #Panel a.PanelButton {
    padding: 6px 0;
@@ -650,6 +612,7 @@ li.five { background: url('five.png') no-repeat center left; }
 body.Activity h1 {
    margin: 0;
 }
+
 ul.Activities {
 	margin-bottom: 6px;
 }
@@ -658,10 +621,16 @@ ul.Activities li {
    padding: 8px 0 6px;
    color: #454545;
    clear: left;
+   font-size: 105%;
+}
+ul.Activities div span {
+   padding: 0 6px 0 0;
+}
+ul.Activities li a.Photo {
+   float: left;
 }
 ul.Activities li img {
-   float: left;
-   margin: 8px;
+   margin: 0;
    border: 0;
    height: 40px;
    width: 40px;
@@ -672,7 +641,6 @@ ul.Activities li.ActivityComment img {
 }
 ul.Activities li h3 {
    display: inline;
-   margin: 0 0 0 8px !important;
    padding: 0;
    font-size: 100%;
    font-weight: normal;
@@ -686,6 +654,7 @@ ul.Activities li h3 em {
 }
 ul.Activities li h3 a.CommentOption {
    font-size: 10px;
+   font-weight: normal;
 }
 ul.Activities li a.Delete {
    float: right;
@@ -707,40 +676,29 @@ ul.Activities li a.Delete:hover {
    color: #333;
    border: 1px solid #888;
 }
-ul.Activities ul.Comments a.Delete {
-   margin: 4px 4px 0 0;
-}
 ul.Activities li blockquote {
-   margin: 4px 4px 4px;
-   padding: 2px 6px;
-   background: #ffd /* Panel Background Color */;
-   color: #555 /* Panel Font Color */;
+   border: 1px solid #eee;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 4px 6px;
+   line-height: 130%;
+   color: #2b3033;
+   display: block;
 }
 ul.Activities li.PictureChange blockquote {
+	border: 0;
    background: none;
    margin: 4px 0 0;
    padding: 0 8px;
-}
-ul.Activities ul.Comments blockquote {
-   background: none;
-   padding: 0;
-   margin: 0 4px;
 }
 ul.Activities li blockquote blockquote {
    margin: 2px 0 0;
    padding: 0;
    background: none;
+	border: 0;
    color: #999;
-}
-ul.Activities li.ActivityComment h3 strong,
-ul.Activities li.ActivityComment h3 strong a {
-   font-weight: normal;
-}
-ul.Activities li.ActivityComment blockquote {
-   margin: 0;
-   padding: 0 8px 6px;
 }
 ul.Activities li blockquote img {
    height: auto;
@@ -753,15 +711,56 @@ ul.Activities li blockquote img {
 }
 ul.Activities ul.Comments {
    background: #fff;
-   margin: 0 8px;
+   margin: 0 0 0 46px;
    padding: 1px 0 0;
    list-style: none;
+   font-size: 85%;
+   clear: left;
 }
 ul.Activities ul.Comments li {
    background: #e9f9ff /* Panel Background Color */;
    margin-bottom: 1px;
    border-bottom: 0;
-   padding: 0;
+   padding: 6px;
+   line-height: 1;
+}
+ul.Activities li.HasPhoto div {
+   margin-left: 46px;
+}
+ul.Activities li.HasPhoto ul.Comments div {
+   margin: 0;
+}
+ul.Activities ul.Comments li.HasPhoto div {
+   margin-left: 40px;
+}
+ul.Activities a.Name,
+ul.Activities a.Photo {
+   font-weight: bold;
+   padding-right: 6px;
+}
+ul.Activities p {
+   display: inline;
+   margin: 0;
+   line-height: 1.4;
+}
+ul.Activities span.Meta {
+   line-height: 1;
+   color: #888;
+   padding: 4px 0 0 6px;
+   font-size: 90%;
+}
+ul.Activities li.AboutUpdate span.Meta,
+ul.Activities li.WallComment span.Meta,
+ul.Activities ul.Comments span.Meta {
+   display: block;
+   padding: 4px 0 4px;
+}
+ul.Activities span.Meta a {
+   font-weight: normal;
+}
+ul.Activities span.Meta span {
+   padding: 0 6px;
+   font-size: 8px;
 }
 ul.Activities ul.Comments li.CommentForm {
    clear: left;
@@ -772,15 +771,16 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    cursor: text;
    background: #fff;
    color: #bbb !important;
-   font-size: 14px;
    padding: 5px;
    text-decoration: none;
    border: 1px solid #aaa;
    display: block;
    line-height: 100%;
+   font-weight: normal;
 }
-ul.Activities li.CommentForm textarea {
-   width: 640px;
+ul.Activities li.CommentForm textarea.TextBox {
+   width: 610px;
+	min-height: 40px;
    height: 40px;
    margin-bottom: 2px;
 }

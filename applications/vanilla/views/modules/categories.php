@@ -14,7 +14,7 @@ if ($this->_CategoryData !== FALSE) {
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><h2><?php echo Anchor('All Discussions', '/discussions'); ?></h2> <?php echo $CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor('All Discussions', '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
       <?php
    foreach ($this->_CategoryData->Result() as $Category) {
       ?>
@@ -22,7 +22,7 @@ if ($this->_CategoryData !== FALSE) {
       if ($CategoryID == $Category->CategoryID)
          echo ' class="Active"';
          
-      ?>><h2><?php echo Anchor($Category->Name, '/categories/'.urlencode($Category->Name)); ?></h2> <?php echo $Category->CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor($Category->Name, '/categories/'.urlencode($Category->Name)); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
       <?php
    }
       ?>

@@ -493,63 +493,10 @@ div.Box h4 {
    padding: 0 0 1px;
    border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
 }
-div.Box dl {
-   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
-   background: #f0fbff /* Panel Inlay Background Color */;
-   padding: 3px;
-   font-size: 90%;
-   overflow: hidden;
-}
-div.Box dl dt {
-   float: left;
-   width: 80px;
-   color: #0766a2 /* Panel Inlay Font Color */;
-}
-div.Box dl dd {
-   margin-left: 80px;
-}
 div.Box p {
    font-size: 100%;
    padding: 0 0 4px;
    color: #555 /* Body Text Font Color */;
-}
-ul.SideMenu,
-ul.SideMenu li ul {
-   margin: 0;
-   padding: 0;
-   list-style: none;
-}
-ul.SideMenu {
-   font-size: 110%;
-   color: #2786c2 /* Panel Font Color */;
-   font-weight: bold;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   background: #e9f9ff /* Panel Background Color */;
-   padding: 6px 10px;
-   margin: 0 0 10px 0;   
-}
-ul.SideMenu li ul {
-   padding: 0 3px;
-   border-top: 1px solid #CAF0FE /* Panel Inlay Border Color */;
-   border-bottom: 1px solid #CAF0FE /* Panel Inlay Border Color */;
-   margin: 4px 0 6px 0;
-   background: #f0fbff /* Panel Inlay Background Color */;
-}
-ul.SideMenu li ul li a {
-   color: #2786C2 /* Panel Inlay Font Color */;
-   font-size: 12px;
-   font-weight: normal;
-}
-ul.SideMenu li ul li a:hover {
-   color: #2786c2 /* Panel Inlay Font Color */;
-   text-decoration: underline;
-}
-ul.SideMenu li ul li.Highlight {
-   background: auto /* Panel Selected Background Color */;
-}
-ul.SideMenu li ul li.Highlight a {
-   color: #ff0084 /* Panel Selected Font Color */;
 }
 ul.PanelInfo li {
    background: #f5fcff /* Panel Inlay Background Color */;
@@ -559,10 +506,9 @@ ul.PanelInfo li {
    font-size: 80%;
    text-align: right;
 }
-ul.PanelInfo li h2 {
+ul.PanelInfo li strong {
    text-align: left;
-   display: inline;
-   font-size: 130%;
+   font-size: 120%;
    margin-right: 12px;
 }
 ul.PanelInfo li a {
@@ -606,7 +552,7 @@ body.Conversations h2 {
 #Conversation li,
 #Conversations li {
   border-bottom: 1px solid #eee /* Body Line Color */;
-  padding: 8px 0 8px 8px;
+  padding: 8px 0;
 }
 #Conversation li li,
 #Conversations li li {
@@ -625,6 +571,7 @@ body.Conversations h2 {
   display: inline;
   font-size: 11px;
   color: #777;
+  padding: 0 0 0 6px;
 }
 #Conversation li ul.Info {
   line-height: 200%;
@@ -660,12 +607,13 @@ body.Conversations h2 {
 }
 #Conversations li a.Link {
   display: block;
-  margin: 0px 8px;
+  border: 1px solid #eee;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  background: #fafafa;
+  padding: 4px 6px;
   line-height: 140%;
-  color: #aaa /* Body Link Font Color */;
-}
-#Conversations li.Active a.Link {
-  color: #555 /* Body Text Font Color */;
+  color: #2B3033 /* Body Link Font Color */;
 }
 #Conversation div.Message {
   padding: 0px 8px 5px;

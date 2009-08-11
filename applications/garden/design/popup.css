@@ -1,5 +1,5 @@
 div.Popup .Loading {
-   width: 500px;
+   display: block;
 }
 div.Overlay {
   position: absolute;

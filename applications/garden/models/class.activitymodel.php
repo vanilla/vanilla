@@ -79,17 +79,10 @@ class Gdn_ActivityModel extends Gdn_Model {
          ->Get();
    }
    
-   public function GetComments($FirstActivityID, $LastActivityID, $ActivityUserID = '') {
+   public function GetComments($ActivityIDs) {
       $this->ActivityQuery();
-      if (is_numeric($ActivityUserID)) {
-         $this->SQL
-            ->Join('Activity ca', 'a.CommentActivityID = ca.ActivityID')
-            ->Where('ca.ActivityUserID', $ActivityUserID);
-      }
-         
       return $this->SQL
-         ->Where('a.CommentActivityID >=', $FirstActivityID)
-         ->Where('a.CommentActivityID <=', $LastActivityID)
+         ->WhereIn('a.CommentActivityID', $ActivityIDs)
          ->OrderBy('a.CommentActivityID', 'desc')
          ->OrderBy('a.DateInserted', 'asc')
          ->Get();

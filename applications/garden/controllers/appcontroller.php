@@ -40,9 +40,8 @@ class GardenController extends Gdn_Controller {
    public function AddSideMenu($CurrentUrl) {
       // Only add to the assets if this is not a view-only request
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-         $SideMenu = new Gdn_MenuModule($this);
+         $SideMenu = new Gdn_SideMenuModule($this);
          $SideMenu->HtmlId = '';
-         $SideMenu->CssClass = 'SideMenu';
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('GetAppSettingsMenuItems');
          $this->AddModule($SideMenu, 'Panel');

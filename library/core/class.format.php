@@ -66,7 +66,7 @@ class Format {
          $RegardingName = $RegardingNameP = Gdn::Translate('your');
       } else {
          $RegardingName = $Activity->RegardingName == '' ? Gdn::Translate('somebody') : $Activity->RegardingName;
-         $RegardingNameP = ''; //FormatPossessive($RegardingName);
+         $RegardingNameP = FormatPossessive($RegardingName);
       }
       $RegardingWall = '';
 
@@ -89,6 +89,17 @@ class Format {
       else
          $Route = Anchor($Activity->RouteCode, $Activity->Route);
 
+      /*
+        Debug:
+      return $ActivityName
+      .'/'.$ActivityNameP
+      .'/'.$RegardingName
+      .'/'.$RegardingNameP
+      .'/'.$RegardingWall
+      .'/'.$Gender
+      .'/'.$Gender2
+      .'/'.$Route
+      */
       return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $Activity->FullHeadline : $Activity->ProfileHeadline, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
    }
 

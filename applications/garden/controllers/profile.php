@@ -147,6 +147,8 @@ class ProfileController extends GardenController {
          $this->ProfileUserID = $this->User->UserID;
          $this->ActivityData = $this->ActivityModel->Get($this->User->UserID);
          if ($this->ActivityData->NumRows() > 0) {
+            $ActivityData = $this->ActivityData->ResultArray();
+            $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
             $LastActivity = $this->ActivityData->FirstRow();
             $LastModifiedDate = Format::ToTimestamp($this->User->DateUpdated);
             $LastActivityDate = Format::ToTimestamp($LastActivity->DateInserted);
@@ -155,8 +157,7 @@ class ProfileController extends GardenController {
                
             // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
             $this->SetLastModified($LastModifiedDate);
-            $FirstActivityID = $this->ActivityData->LastRow()->ActivityID;
-            $this->CommentData = $this->ActivityModel->GetComments($FirstActivityID, $LastActivity->ActivityID, $this->User->UserID);
+            $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
          } else {
             $this->CommentData = FALSE;
          }
@@ -251,7 +252,8 @@ class ProfileController extends GardenController {
             
             // Delete any previously uploaded images
             @unlink(PATH_ROOT . DS . 'uploads' . DS . 'p' . $this->User->Photo);
-            @unlink(PATH_ROOT . DS . 'uploads' . DS . 't' . $this->User->Photo);
+            // Don't delete this one because it hangs around in activity streams:
+            // @unlink(PATH_ROOT . DS . 'uploads' . DS . 't' . $this->User->Photo); 
             @unlink(PATH_ROOT . DS . 'uploads' . DS . 'n' . $this->User->Photo);
             
             // Save the uploaded image in profile size
@@ -459,9 +461,8 @@ class ProfileController extends GardenController {
    
    public function AddSideMenu($CurrentUrl = '') {
       if ($this->User !== FALSE) {
-         $SideMenu = new Gdn_MenuModule($this);
+         $SideMenu = new Gdn_SideMenuModule($this);
          $SideMenu->HtmlId = '';
-         $SideMenu->CssClass = 'SideMenu';
          $Session = Gdn::Session();
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');
@@ -489,7 +490,6 @@ class ProfileController extends GardenController {
    
    public function Initialize() {
       $this->ModuleSortContainer = 'Profile';
-      $this->MasterView = 'profile';
       parent::Initialize();
       // Add a css file for all profile pages
       $this->AddCssFile('profile.css');

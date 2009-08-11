@@ -427,13 +427,12 @@ div.Box dl {
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #0766a2;
+   color: #2786C2; /* Panel Font Color */
 }
 div.Box dl dd {
    margin-left: 80px;
 }
 div.Box p {
-   font-size: 100%;
    padding: 0 0 4px;
    color: #555 /* Body Text Font Color */;
 }
@@ -441,19 +440,43 @@ ul.PanelInfo li {
    background: #f5fcff /* Panel Inlay Background Color */;
    border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 2px 4px;
-   font-size: 80%;
    font-family: tahoma;
    text-align: right;
 }
-ul.PanelInfo li h2 {
+ul.PanelInfo li strong {
+   font-weight: normal;
    text-align: left;
-   display: inline;
-   font-size: 120%;
    margin-right: 12px;
    font-weight: normal;
 }
 ul.PanelInfo li a {
    float: left;
+}
+ul.PanelInfo div.Meta {
+   font-size: 90%;
+}
+ul.PanelInfo div.Meta span,
+ul.PanelInfo div.Meta strong {
+   margin-right: 8px;
+}
+ul.PanelInfo div.Meta span a {
+   margin-left: 8px;
+}
+ul.PanelInfo div.Meta strong {
+   font-weight: normal;
+   display: inline;
+   color: #80828C;
+   background: #ff6;
+   padding: 0 2px;
+}
+ul.PanelDiscussions li {
+   text-align: left;
+}
+ul.PanelDiscussions li a {
+   float: none;
+}
+ul.PanelDiscussions li strong {
+   display: block;
 }
 ul.PanelInfo li.Active {
    background: #fff /* Panel Selected Background Color */;
@@ -491,32 +514,6 @@ a.NewDiscussion:hover {
 #Panel ul.Discussions {
    border: 0;
 }
-ul.PanelDiscussions li {
-   background: #f5fcff /* Panel Inlay Background Color */;
-   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   padding: 2px 4px;
-}
-ul.PanelDiscussions li strong {
-   font-weight: bold;
-   display: block;
-}
-ul.PanelDiscussions div.Meta {
-   font-size: 90%;
-}
-ul.PanelDiscussions div.Meta span,
-ul.PanelDiscussions div.Meta strong {
-   margin-right: 8px;
-}
-ul.PanelDiscussions div.Meta span a {
-   margin-left: 8px;
-}
-ul.PanelDiscussions div.Meta strong {
-   font-weight: normal;
-   display: inline;
-   color: #80828C;
-   background: #ff6;
-   padding: 0 2px;
-}
 
 /* ============================================================== Discussions */
 
@@ -544,13 +541,17 @@ ul.DataList li ul li.Meta {
    clear: both;
 }
 ul.DataList li ul li.Title a {
-   border-left: 2px solid #dbe3e6;
-   margin: 8px 4px 6px 10px;
-   padding: 0 0 0 8px;
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 2px 8px;
    line-height: 130%;
-   color: #2b3033 /* Body Link Font Color */;
+   color: #2b3033;
    font-size: 105%;
    display: block;
+   clear: left;
 }
 ul.DataList li ul li.Title h3 {
    padding: 6px 0 0 6px;
@@ -564,6 +565,7 @@ ul.DataList li ul li.Title h3 a {
    padding: 0;
    margin: 0;
    color: #2d7bb2 /* Body Link Font Color */;
+   background: none;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
@@ -584,9 +586,6 @@ ul.DataList li ul li.Meta strong {
 }
 ul.DataList li ul li.Meta a {
    color: #2b2d33 /* Meta Font Color */;
-}
-ul.Discussions {
-   margin-bottom: 6px;
 }
 body.Discussions h1 {
    margin: 0;

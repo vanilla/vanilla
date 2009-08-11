@@ -16,7 +16,7 @@ foreach ($this->DraftData->Result() as $Draft) {
                echo Anchor($Draft->Name, $EditUrl, 'DraftLink');
             ?></h3>
             <?php
-               echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl, 'DraftCommentLink');
+               echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl);
             ?>
          </li>
       </ul>

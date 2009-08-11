@@ -46,9 +46,14 @@ jQuery(document).ready(function($) {
                $('span.Progress').remove();
                if (json['FormSaved'] == true) {
                   $(inp).val('');
+                  // If there were no activities
+                  if ($('ul.Activities').length == 0) {
+                     // Make sure that empty rows are removed
+                     $('div.EmptyInfo').slideUp('fast');
+                     // And add the activity list
+                     $(frm).after('<ul class="Activities"></ul>');
+                  }
                   $('ul.Activities').prepend(json['Data']);
-                  // Make sure that empty rows are removed
-                  $('ul.Activities li.Empty').slideUp('fast');
                   // Make sure that hidden items appear
                   $('ul.Activities li.Hidden').slideDown('fast');
                   // If the user's status was updated, show it.

@@ -21,9 +21,9 @@ class ActivityController extends GardenController {
       $Session = Gdn::Session();
       $this->ActivityData = $this->ActivityModel->Get();
       if ($this->ActivityData->NumRows() > 0) {
-         $FirstActivityID = $this->ActivityData->LastRow()->ActivityID;
-         $LastActivityID = $this->ActivityData->FirstRow()->ActivityID;
-         $this->CommentData = $this->ActivityModel->GetComments($FirstActivityID, $LastActivityID);
+         $ActivityData = $this->ActivityData->ResultArray();
+         $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
+         $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
       } else {
          $this->CommentData = FALSE;
       }

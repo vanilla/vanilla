@@ -483,6 +483,7 @@ class ProfileController extends GardenController {
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', 'My Invitations', '/profile/invitations');
          }
+         $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');
       }

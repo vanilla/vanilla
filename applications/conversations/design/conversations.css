@@ -19,17 +19,17 @@ Welcome to the Conversations CSS File! 6 Things you should know:
    
 6. This file is broken down into the following sections:
    + Line 32:     General Styles & Typography
-   + Line 400:    Header
-   + Line 463:    Main Menu
-   + Line 476:    Panels / Sidebars
-   + Line 586:    Conversations
-   + Line 701:    Add Message Form
-   + Line 725:    New Conversation Form
-   + Line 769:   Footer
+   + Line 399:    Header
+   + Line 462:    Main Menu
+   + Line 497:    Panels / Sidebars
+   + Line 553:    Conversations
+   + Line 675:    Add Message Form
+   + Line 698:    New Conversation Form
+   + Line 742:    Footer
 */
    
    
-/* General Styles & Typography */
+/* ============================================== General Styles & Typography */
 body {
    color: #000 /* Body Default Font Color */;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
@@ -469,6 +469,28 @@ ul#Menu {
    float: left;
    margin: 0 auto;
    padding: 22px 0 0 10px;
+}
+#Menu ul,
+#Menu li.Active {
+   background: #44c7f4;
+}
+#Menu a,
+#Menu li.Active a {
+   color: #fff;
+}
+#Menu a:hover {
+   background: #28bcef;
+}
+#Menu a:hover,
+#Menu li.NonTab a:hover {
+   color: #fff !important;
+}
+/* Numbers next to menu items */
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #f2fcff;
+   color: #299fc7;
 }
 
 

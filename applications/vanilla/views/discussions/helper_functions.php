@@ -11,10 +11,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <ul class="Discussion">
+      <?php
+      if ($Sender->ShowOptions) {
+      ?>
       <li class="Options">
          <?php
             // Build up the options that the user has for each discussion
-            if ($Session->IsValid() && $Sender->ShowOptions) {
+            if ($Session->IsValid()) {
                // Bookmark link
                echo Anchor(
                   '<span>*</span>',
@@ -66,10 +69,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             }          
          ?>
       </li>
+      <?php
+      }
+      ?>
       <li class="Title">
-         <h3><?php
+         <strong><?php
             echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
-         ?></h3>
+         ?></strong>
       </li>
       <li class="Meta">
          <?php

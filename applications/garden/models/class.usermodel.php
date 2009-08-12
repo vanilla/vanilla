@@ -161,7 +161,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->Select('p.Name', '', 'Photo')
          ->From('User u')
          ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
-         ->Where('UserID', $UserID);
+         ->Where('u.UserID', $UserID);
          
       if(is_array($this->SessionColumns)) {
          $this->SQL->Select($this->SessionColumns);

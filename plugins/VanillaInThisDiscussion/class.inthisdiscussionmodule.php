@@ -50,9 +50,9 @@ class InThisDiscussionModule extends Module {
          foreach ($this->_UserData->Result() as $User) {
             ?>
             <li>
-               <h2><?php
+               <strong><?php
                   echo Anchor($User->Name, '/profile/'.urlencode($User->Name), 'UserLink');
-               ?></h2>
+               ?></strong>
                <?php
                   echo Format::Date($User->DateLastActive);
                ?>

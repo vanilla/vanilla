@@ -3,7 +3,7 @@
 }
 #Menu {
    height: 28px;
-   padding: 0px;
+   padding: 0;
 }
 #Menu,
 #Menu ul {
@@ -14,7 +14,6 @@
    position: absolute;
    visibility: hidden;
    z-index: 100;
-   background: #44c7f4 /* Menu Background Color */;
    -moz-border-radius-bottomleft: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
@@ -33,20 +32,9 @@
    display: block;
    list-style: none outside none;
    padding: 0;
-   margin: 0px 10px 0px 0px;
+   margin: 0 10px 0 0;
    font-weight: bold;
    text-align: left;
-}
-/*
-#Menu li.Highlight {
-   -moz-border-radius-topleft: 2px;
-   -moz-border-radius-topright: 2px;
-   background: #fff;
-   color: #44c7f4;
-}
-*/
-#Menu li.Active {
-   background: #44c7f4 /* Menu Background Color */;
 }
 #Menu li
 #Menu li a,
@@ -65,10 +53,10 @@
 #Menu li.Active ul li,
 #Menu li.Active ul li a,
 #Menu li.Active ul li a:hover {
-   -moz-border-radius-topleft: 0px;
-   -moz-border-radius-topright: 0px;
-   -webkit-border-top-left-radius: 0px;
-   -webkit-border-top-right-radius: 0px;
+   -moz-border-radius-topleft: 0;
+   -moz-border-radius-topright: 0;
+   -webkit-border-top-left-radius: 0;
+   -webkit-border-top-right-radius: 0;
 }
 #Menu li ul li.Last a {
    -moz-border-radius-bottomleft: 1px;
@@ -76,11 +64,8 @@
    -webkit-border-bottom-left-radius: 1px;
    -webkit-border-bottom-right-radius: 1px;
 }
-#Menu li.Active a {
-   color: #fff /* Menu Font Color */;
-}
 #Menu li ul li {
-   margin: 0px;
+   margin: 0;
    line-height: 22px;
    font-weight: normal;
 }
@@ -88,19 +73,14 @@
    height: auto;
 }
 #Menu a {
-   border: 0px;
-   color: #fff /* Banner Font Color */;
+   border: 0;
    text-decoration: none;
    display: block;
    position: relative;
-   padding: 0px 10px;
+   padding: 0 10px;
    white-space: nowrap;
    font-size: 11px;
    height: 28px;
-}
-#Menu a:hover {
-   color: #fff /* Menu Hover Font Color */ !important;
-   background: #28bcef /* Menu Hover Background Color */;
 }
 #Menu ul li {
  display: block;
@@ -112,21 +92,16 @@
 #Menu li.NonTab,
 #Menu li.NonTab a {
    background: transparent;
-   border: 0px;
+   border: 0;
    font-weight: normal;
-}
-#Menu li.NonTab a:hover {
-   color: #fff /* Menu Hover Font Color */ !important;
 }
 #Menu a span,
 #Menu li.Active a span,
 #Menu li.Highlight a:hover span {
-   background: #f2fcff /* Menu Hover Background Color */;
-   color: #299fc7 /* Menu Hover Font Color */;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    margin-left: 4px;
-   padding: 0px 2px;
+   padding: 0 2px;
    font-size: 9px;
    line-height: 12px;
    font-weight: normal;
@@ -158,31 +133,23 @@ ul.Options li {
    list-style: none outside none;
    padding: 0;
    font-size: 11px;
-   color: #44c7f4;
    line-height: 22px;
-}
-ul.Options li.Active {
-   background: #cbfeff;
 }
 ul.Options h3 {
    display: block;
    cursor: pointer;
-   margin: 0px;
-   padding: 0px;
-   color: #999;
-}
-ul.Options li.Active a {
-   background: #efefef;
+   margin: 0;
+   padding: 0;
 }
 ul.Options li ul li {
    float: none;
    text-align: left;
-   margin: 0px;
+   margin: 0;
    font-weight: normal;
 }
 ul.Options li ul li a {
    width: 104px;
-   padding: 0px 6px;
+   padding: 0 6px;
    height: auto;
 }
 ul.Options a {
@@ -196,8 +163,6 @@ ul.Options ul li {
    display: block;
    float: none;
 }
-
 .Center {
    text-align: center;
 }
-

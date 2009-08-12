@@ -29,8 +29,8 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
             echo '<span>&gt;</span>'.UserAnchor($Activity->RegardingName, 'Name');
          echo Format::Display($Activity->Story);
          echo '<span class="Meta">';
-         echo Format::Date($Activity->DateInserted);
-         echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
+            echo Format::Date($Activity->DateInserted);
+            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
          echo '</span>';
       echo '</div>';
    } else {
@@ -40,15 +40,16 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          .'</a>';
       }
       echo '<div>';
-      echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
-      echo '<span class="Meta">';
-      echo Format::Date($Activity->DateInserted);
-      echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
-      if ($Activity->Story != '') {
-         echo '<blockquote>';
-         echo $Activity->Story; // story should be cleaned before being saved.
-         echo '</blockquote>';
-      }
+         echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
+         echo '<span class="Meta">';
+            echo Format::Date($Activity->DateInserted);
+            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
+            if ($Activity->Story != '') {
+               echo '<blockquote>';
+               echo $Activity->Story; // story should be cleaned before being saved.
+               echo '</blockquote>';
+            }
+         echo '</span>';
       echo '</div>';
    }
    if ($Activity->AllowComments == '1') {
@@ -107,6 +108,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
    echo Format::Date($Comment->DateInserted);
    echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? '<span>&bull;</span>'.Anchor('Delete', 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request())) : '';
    echo '</span>';
+   echo '</div>';
    ?>
 </li>
 <?php

@@ -12,9 +12,9 @@ foreach ($this->DraftData->Result() as $Draft) {
             <?php
                echo Anchor('Delete', 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'DeleteDraft');
             ?>
-            <h3><?php
+            <strong><?php
                echo Anchor($Draft->Name, $EditUrl, 'DraftLink');
-            ?></h3>
+            ?></strong>
             <?php
                echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl);
             ?>

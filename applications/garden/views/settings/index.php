@@ -17,11 +17,9 @@ $this->RenderAsset('Messages');
 <dl>
 <?php
 $Count = count($this->BuzzData);
-$i = 0;
 foreach ($this->BuzzData as $Name => $Value) {
-   $i++;
    echo '<dt>'.$Value.'</dt>
-   <dd'.($Count == $i ? ' class="Last"' : '').'>'.$Name.'</dd>';
+   <dd>'.$Name.'</dd>';
 }
 ?>
 </dl>
@@ -31,8 +29,8 @@ foreach ($this->BuzzData as $Name => $Value) {
    <?php
    $i = 0;
    foreach ($this->ActiveUserData as $User) {
-      $i++;
-      echo '<li'.($i == 5 ? ' class="Last"' : '').'>',
+      $Css = $User->Photo != '' ? 'HasPhoto' : '';
+      echo '<li'.($Css != '' ? ' class="'.$Css.'"' : '').'>',
          UserPhoto($User->Name, $User->Photo),
          UserAnchor($User->Name),
          sprintf(Gdn::Translate('Last active %s'), Format::Date($User->DateLastActive)),

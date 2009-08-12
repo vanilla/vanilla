@@ -3,6 +3,7 @@ viewed on the profile discussions tab. */
 body.Search h1 {
    margin:0;
 }
+/* Note: DataList is used in search results, vanilla discussions & drafts */
 ul.DataList li {
    margin: 0;
    padding: 0 0 4px 0;
@@ -18,6 +19,13 @@ ul.DataList li ul {
    margin: 0;
    padding: 0;
 }
+ul.DataList li ul li.Title {
+   float: left;
+   width: 560px;
+}
+ul.DataList li ul li.Meta {
+   clear: both;
+}
 ul.DataList li ul li.Title a {
    border: 1px solid #eee;
    -moz-border-radius: 2px;
@@ -29,26 +37,28 @@ ul.DataList li ul li.Title a {
    color: #2b3033;
    font-size: 105%;
    display: block;
+   clear: left;
 }
-ul.DataList li ul li.Title h3 {
+ul.DataList li ul li.Title strong {
+   display: block;
    padding: 6px 0 0 6px;
    margin: 0;
    font-size: 110%;
    font-weight: bold;
 }
-ul.DataList li ul li.Title h3 a {
+ul.DataList li ul li.Title strong a {
    display: inline;
    border: 0;
    padding: 0;
    margin: 0;
-   color: #2d7bb2 /* Body Link Font Color */;
+   color: #2786C2 /* Body Link Font Color */;
    background: none;
 }
 ul.DataList li ul li.Meta {
    font-family: tahoma;
    margin-left: 5px;
    font-size: 80%;
-   color: #80828c;
+   color: #80828c /* Meta Label Font Color */;
 }
 ul.DataList li ul li.Meta span,
 ul.DataList li ul li.Meta span a,
@@ -57,10 +67,12 @@ ul.DataList li ul li.Meta strong {
 }
 ul.DataList li ul li.Meta strong {
    background: #ff0;
-   padding: 0 2px;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
 }
 ul.DataList li ul li.Meta a {
-   color: #2b2d33;
+   color: #2b2d33 /* Meta Font Color */;
 }
 ul.Discussions {
    border: 0;
@@ -120,4 +132,29 @@ ul.Discussions li ul li.Meta strong {
 }
 ul.Discussions li ul li.Meta a {
    color: #2b2d33;
+}
+/* Note: The Vanilla Discussion List has the following classes applied to
+  individual list elements and can be styled:
+  + Bookmarked: the user has bookmarked that topic
+  + Announcement: the discussion has been announced
+  + Mine: the user created the discussion
+  + New: there are new comments since the last viewed the discussion
+*/
+.Mine { background: #F5FCFF /* Discussion My Background Color */; }
+li.New { background: #ffd /* Discussion New Background Color */; }
+ul.DataList li ul li.Meta a.Category {
+   background: #fafafa;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList li.Mine ul li.Meta a.Category {
+   background: #fafdff;
+}
+ul.DataList li.New ul li.Meta a.Category {
+   background: #ffe;
+}
+li.DiscussionRow ul.Discussion {
+   /* Fixes an IE7 Spacing issue */
+   display: inline !important;
 }

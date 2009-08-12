@@ -15,15 +15,15 @@ Welcome to the Garden CSS File! 6 Things you should know:
 5. This css file will be included on the user profile page only.
    
 6. This file is broken down into the following sections:
-   + Line 31:     General Styles & Typography
-   + Line 340:    Header
-   + Line 403:    Main Menu
-   + Line 415:    Panels / Sidebars
-   + Line 496:    Activities
-   + Line 650:    Profile Page
-   + Line 747:    Profile Tab Menu
-   + Line 805:    Thumbnail Cropper
-   + Line 853:    Footer
+   + Line 30:     General Styles & Typography
+   + Line 411:    Header
+   + Line 474:    Main Menu
+   + Line 509:    Panels / Sidebars
+   + Line 570:    Activities
+   + Line 765:    Profile Page
+   + Line 862:    Profile Tab Menu
+   + Line 919:    Thumbnail Cropper
+   + Line 967:    Footer
 */
    
    
@@ -482,6 +482,29 @@ ul#Menu {
    margin: 0 auto;
    padding: 22px 0 0 10px;
 }
+#Menu ul,
+#Menu li.Active {
+   background: #44c7f4;
+}
+#Menu a,
+#Menu li.Active a {
+   color: #fff;
+}
+#Menu a:hover {
+   background: #28bcef;
+}
+#Menu a:hover,
+#Menu li.NonTab a:hover {
+   color: #fff !important;
+}
+/* Numbers next to menu items */
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #f2fcff;
+   color: #299fc7;
+}
+
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -506,7 +529,7 @@ div.Box h4 {
 }
 div.Box dl {
    border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
-   background: #f0fbff /* Panel Inlay Background Color */;
+   background: #F5FCFF /* Panel Inlay Background Color */;
    padding: 3px;
    overflow: hidden;
 }
@@ -530,7 +553,6 @@ ul.PanelInfo {
 ul.PanelInfo li {
    background: #f5fcff /* Panel Inlay Background Color */;
    padding: 2px 4px;
-   font-family: tahoma;
    font-size: 80%;
 }
 ul.PanelInfo li strong {
@@ -854,7 +876,7 @@ ul.Tabs {
 ul.Tabs li {
    padding: 5px 0;
    margin: 0;
-   line-height: 24px;
+   line-height: 23px;
    -moz-border-radius-topleft: 3px;
    -moz-border-radius-topright: 3px;
    -webkit-border-top-left-radius: 3px;
@@ -877,14 +899,13 @@ ul.Tabs li a:visited {
    display: inline;
    background: #daf4fd /* Panel Inlay Background Color */;
    font-weight: bold;
-   color: #1781a6 /* Panel Inlay Font Color */ !important;
+   color: #2786C2 /* Panel Inlay Font Color */ !important;
    text-decoration: none;
    padding: 5px 10px 4px 10px;
    margin: 1px 0 0;
 }
 ul.Tabs li a:hover {
    background: #f3fcff /* Panel Inlay Background Color */;
-   color: #269dc6 /* Panel Hover Font Color */ !important;
 }
 ul.Tabs li.Active a {
    background: #fff /* Panel Selected Background Color */ !important;

@@ -27,15 +27,15 @@ Welcome to the Vanilla CSS File! 6 Things you should know:
 
 6. This file is broken down into the following sections:
    + Line 42:     General Styles & Typography
-   + Line 325:    Header
-   + Line 387:    Main Menu
-   + Line 399:    Panels / Sidebars
-   + Line 521:    Discussions
-   + Line 620:    Categories
-   + Line 657:    Comments
-   + Line 883:    Drafts
-   + Line 923:    Discussion & Comment Forms
-   + Line 1014:   Footer
+   + Line 327:    Header
+   + Line 389:    Main Menu
+   + Line 424:    Panels / Sidebars
+   + Line 545:    Discussions
+   + Line 650:    Categories
+   + Line 688:    Comments
+   + Line 916:    Drafts
+   + Line 957:    Discussion & Comment Forms
+   + Line 1048:   Footer
 */
 
 /* General Styles & Typography */
@@ -244,6 +244,7 @@ div.Info {
    border: 1px solid #eee;
    color: #888;
    -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
    padding: 6px;
    margin: 0 0 10px;
 }
@@ -266,6 +267,7 @@ div.DismissMessage a.Close {
    padding: 4px;
    border: 1px solid #eee;
    -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    color: #aaa;
 }
 DismissMessage a.Close:hover {
@@ -333,7 +335,7 @@ tr#PagerMore td {
    display: block;
    font-weight: bold;
    margin: 0;
-   padding: 21px 7px 0 0;
+   padding: 13px 7px 0 0;
    border: 0;
    float: left;
 }
@@ -395,6 +397,29 @@ ul#Menu {
    margin: 0 auto;
    padding: 22px 0 0 10px;
 }
+#Menu ul,
+#Menu li.Active {
+   background: #44c7f4;
+}
+#Menu a,
+#Menu li.Active a {
+   color: #fff;
+}
+#Menu a:hover {
+   background: #28bcef;
+}
+#Menu a:hover,
+#Menu li.NonTab a:hover {
+   color: #fff !important;
+}
+/* Numbers next to menu items */
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #f2fcff;
+   color: #299fc7;
+}
+
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -493,15 +518,17 @@ a.NewDiscussion {
    font-size: 16px;
    font-weight: bold;
    -moz-border-radius: 2px;
-   -webkig-border-radius: 2px;
+   -webkit-border-radius: 2px;
    background: #44c7f4 /* Banner Background Color */;
    color: #fff /* Banner Font Color */;
    text-decoration: none;
    margin: 0 0 10px 0;
+   text-shadow: 0 1px 0 #30ACD6;
 }
 a.NewDiscussion:hover {
    background: #11e420 /* Menu Hover Background Color */;
    color: #fff /* Menu Hover Font Color */;
+   text-shadow: 0 1px 0 #01c400;
 }
 #Panel a.Bookmark {
    background: #9f0;
@@ -553,18 +580,19 @@ ul.DataList li ul li.Title a {
    display: block;
    clear: left;
 }
-ul.DataList li ul li.Title h3 {
+ul.DataList li ul li.Title strong {
+   display: block;
    padding: 6px 0 0 6px;
    margin: 0;
    font-size: 110%;
    font-weight: bold;
 }
-ul.DataList li ul li.Title h3 a {
+ul.DataList li ul li.Title strong a {
    display: inline;
    border: 0;
    padding: 0;
    margin: 0;
-   color: #2d7bb2 /* Body Link Font Color */;
+   color: #2786C2 /* Body Link Font Color */;
    background: none;
 }
 ul.DataList li ul li.Meta {
@@ -655,6 +683,7 @@ body.Categories h1 a {
    color: #2786c2 !important;
    text-decoration: underline;
 }
+
 
 /* ================================================================= Comments */
 body.Discussion #Content {
@@ -875,6 +904,7 @@ ul.Options li.Active ul li a {
    background: none;
 }
 ul.Options li.Active a {
+   background: #efefef;
    color: #595959;
 }
 ul.Options li.Active a:hover {
@@ -894,7 +924,7 @@ ul.Drafts li ul li.Title {
    float: none;
    width: auto;
 }
-ul.Drafts li ul li.Title h3 {
+ul.Drafts li ul li.Title strong {
    float: left;
    margin: 0 0 2px;
 }
@@ -922,6 +952,7 @@ ul.Drafts li ul li.Topic a.DeleteDraft:hover {
    color: #333;
    border: 1px solid #888;
 }
+
 
 /* =============================================== Discussion & Comment Forms */
 #CommentForm {

@@ -49,8 +49,8 @@
    jQuery.morepager.fn.extend = jQuery.morepager.extend = jQuery.extend;
    
    jQuery.morepager.fn.extend({
-      init: function() {         
-         var self = this;         
+      init: function() {
+         var self = this;
          $('#' + this.pager_row_id + ' a').live('click', function() {
             var anchor = this;
             self.page_source = self.options.pageSource || $(anchor).attr('href');

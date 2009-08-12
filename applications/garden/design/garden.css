@@ -30,16 +30,16 @@ Welcome to the Garden CSS File! 7 Things you should know:
    kinds of custom magic there (profile.css).
    
 7. This file is broken down into the following sections:
-   + Line 47:     General Styles & Typography
+   + Line 46:     General Styles & Typography
    + Line 370:    Header
    + Line 433:    Main Menu
-   + Line 445:    Panels / Sidebars
-   + Line 564:    Dashboard
-   + Line 648:    Activities
-   + Line 785:    Entry Screen
-   + Line 891:    DataList (Search Results)
-   + Line 956:    User Search Page
-   + Line 965:    Footer
+   + Line 468:    Panels / Sidebars
+   + Line 549:    Dashboard
+   + Line 634:    Activities
+   + Line 811:    Entry Screen
+   + Line 917:    DataList (Search Results)
+   + Line 983:    User Search Page
+   + Line 992:    Footer
 */
    
    
@@ -441,6 +441,29 @@ ul#Menu {
    margin: 0 auto;
    padding: 22px 0 0 10px;
 }
+#Menu ul,
+#Menu li.Active {
+   background: #44c7f4;
+}
+#Menu a,
+#Menu li.Active a {
+   color: #fff;
+}
+#Menu a:hover {
+   background: #28bcef;
+}
+#Menu a:hover,
+#Menu li.NonTab a:hover {
+   color: #fff !important;
+}
+/* Numbers next to menu items */
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #f2fcff;
+   color: #299fc7;
+}
+
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -525,30 +548,16 @@ ul.PanelInfo li.Active {
 
 /* ================================================= Dashboard Customizations */
 #garden_settings_index #Content h3 {
-   background: #eee;
-   -moz-border-radius-topleft: 4px;
-   -moz-border-radius-topright: 4px;
-   -webkit-border-radius-top-left: 4px;
-   -webkit-border-radius-top-right: 4px;
-	color: #555;
-   border: 1px solid #ddd;
-   border-bottom: 1px solid #e9e9e9;
    font-size: 120%;
-   padding: 8px;
+   padding: 8px 0 0;
    margin: 10px 0 0;
    font-weight: bold;
 }
 #garden_settings_index #Content ul.RecentUsers,
 #garden_settings_index dl {
-   background: #fafafa;
-   -moz-border-radius-bottomleft: 4px;
-   -moz-border-radius-bottomright: 4px;
-   -webkit-border-radius-bottom-left: 4px;
-   -webkit-border-radius-bottom-right: 4px;
-   padding: 0 6px;
-   color: #555;
-   border: 1px solid #eee;
-   border-top: 0;
+   padding: 0;
+   border-top: 1px solid #bbb;
+	color: #222;
 }
 #garden_settings_index dl dt {
    font-size: 120%;
@@ -562,15 +571,14 @@ ul.PanelInfo li.Active {
 #garden_settings_index dl dd {
    font-size: 110%;
    padding: 8px;
+	color: #555;
    border-bottom: 1px solid #eee;
 }
 #garden_settings_index #Content ul.RecentUsers li {
-   line-height: 3.5;
    clear: left;
 }
-#garden_settings_index #Content ul.RecentUsers li.Last,
-#garden_settings_index dl dd.Last {
-   border-bottom: 0;
+#garden_settings_index #Content ul.RecentUsers li.HasPhoto {
+   line-height: 3.5;
 }
 #garden_settings_index #Content ul.RecentUsers li img {
    margin-right: 10px;
@@ -922,13 +930,14 @@ ul.DataList li ul li.Title a {
    font-size: 105%;
    display: block;
 }
-ul.DataList li ul li.Title h3 {
+ul.DataList li ul li.Title strong {
+	display: block;
    padding: 6px 0 0 6px;
    margin: 0;
    font-size: 110%;
    font-weight: bold;
 }
-ul.DataList li ul li.Title h3 a {
+ul.DataList li ul li.Title strong a {
    display: inline;
    border: 0;
    padding: 0;

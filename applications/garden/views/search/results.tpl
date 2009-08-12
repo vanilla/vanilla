@@ -6,7 +6,7 @@
 	<li class="Row">
 		<ul>
 			<li class="Title">
-				<h3><a href="{url dest=$Row.Url}">{$Row.Title|escape}</a></h3>
+				<strong><a href="{url dest=$Row.Url}">{$Row.Title|escape}</a></strong>
 				<a href="{url dest=$Row.Url}">{$Row.Summary|escape}</a>
 			</li>
 			<li class="Meta">

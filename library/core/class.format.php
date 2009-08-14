@@ -270,7 +270,7 @@ class Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Text');
       else
-         return htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', ''));
+         return htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
    }
 
    /**

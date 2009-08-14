@@ -24,7 +24,6 @@ class MessagesController extends ConversationsController {
     * Add a new conversations.
     */
    public function Add() {
-      $this->AddCssFile('form.css');
       $this->Form->SetModel($this->ConversationModel);
       
       if ($this->Form->AuthenticatedPostBack()) {
@@ -50,7 +49,6 @@ class MessagesController extends ConversationsController {
     * Add a message to a conversation.
     */
    public function AddMessage($ConversationID = '') {
-      $this->AddCssFile('form.css');
       $this->Form->SetModel($this->ConversationMessageModel);
       if (is_numeric($ConversationID) && $ConversationID > 0)
          $this->Form->AddHidden('ConversationID', $ConversationID);
@@ -90,7 +88,6 @@ class MessagesController extends ConversationsController {
          $this->Head->Title(Translate('Conversations'));
       }
       $this->Offset = $Offset;
-      $this->AddCssFile('form.css');
       $Session = Gdn::Session();
       if (!is_numeric($this->Offset) || $this->Offset < 0)
          $this->Offset = 0;

@@ -1,19 +1,16 @@
 @import url('reset.css') /* NoFollow */; 
 /*
-Welcome to the Garden CSS File! 7 Things you should know:
+Welcome to the Garden CSS File! 6 Things you should know:
 
 1. The reset.css file imported above breaks all elements down to a base style.
 
 2. There is a menu.css file that is also included on every page of Garden. It
-   defines the main dropdown menu at the top of the page. 
+   defines the layout of the main dropdown menu at the top of the page. 
    
 3. There is a popup.css file that is also included on every page of Garden. It
    defines the appearance of popups (warnings, editing routes & messages, etc).
 
-4. There is a form.css file that is included on all Garden administrative pages.
-   It defines the appearance of all form elements.
-
-5. This css file will be included on most Garden pages. Specifically:
+4. This css file will be included on most Garden pages. Specifically:
    + Settings/*
    + Routes/*
    + Activity/*
@@ -26,11 +23,12 @@ Welcome to the Garden CSS File! 7 Things you should know:
    + Settings/*
    + User/*
 
-6. The profile page has it's own completely custom css file so you can do all
+5. The profile page has it's own completely custom css file so you can do all
    kinds of custom magic there (profile.css).
    
-7. This file is broken down into the following sections:
-   + Line 46:     General Styles & Typography
+6. This file is broken down into the following sections:
+   + Line 44:     General Styles & Typography
+   + Line 368:    Forms
    + Line 370:    Header
    + Line 433:    Main Menu
    + Line 468:    Panels / Sidebars
@@ -367,6 +365,270 @@ tr#PagerMore td {
 }
 
 
+/* ==================================================================== Forms */
+form ul {
+   list-style: none;
+   margin: 0px;
+   padding: 0px;
+}
+form ul li {
+   border-bottom: 1px solid #eee;
+   margin-bottom: 10px;
+   padding: 0px 0px 10px 3px;
+   font-size: 12px;
+   color: #555 /* Body Text Font Color */;
+}
+form ul li label {
+   color: #222 /* Body Text Font Color */;
+   float: left;
+   display: block;
+   width: 150px;
+   font-size: 14px;
+   padding: 6px 6px 0px 4px;
+   }
+body.Messages div.Popup form ul li label {
+   width: 100px;
+}
+form ul li label.RadioLabel {
+   float: none;
+   display: inline;
+   font-weight: normal;
+}
+table.Label tbody th {
+   width: 140px;
+}
+form ul li table label {
+   float: none;
+   display: inline;
+   width: auto;
+}
+body.Messages div.Popup form ul li label.CheckBoxLabel,
+form ul li label.CheckBoxLabel {
+   float: none;
+   width: auto;
+   display: block;
+   font-size: 13px;
+   cursor: pointer;
+   margin: 0px;
+   padding: 0px;
+   line-height: 27px;
+}
+form ul li label.CheckBoxLabel input {
+   margin: 7px 6px 4px 2px;
+   padding: 0px;
+   float: left;
+}
+form ul li label span {
+   font-size: 11px;
+   color: #999;
+   padding-left: 6px;
+   }
+form li.RadioInput label {
+   display: inline;
+   }
+input.SmallButton {
+   cursor: pointer;
+   margin: 0px 0px 0px 0px;
+   font-size: 11px;
+}
+input.SmallInput {
+   width: 80px;
+}
+/* FormTable */
+table {
+   width: 100%;
+   border-collapse: collapse;
+   margin: 10px 0;
+}
+table label {
+   font-size: 12px;
+   padding: 0px;
+}
+table tr.Last td,
+table tr.Last th {
+   border-bottom: 0px;
+}
+table th,
+table td {
+   font-weight: normal;
+   font-size: 12px;
+   color: #555 /* Body Text Font Color */;
+   padding: 6px;
+}
+table thead th,
+table thead td {
+   border-bottom: 1px solid #c7cfe0;
+}
+table tbody th {
+   font-weight: bold;
+   color: #000;
+}
+table tbody th,
+table tbody td {
+   border-bottom: 1px solid #e2e6ef;
+   line-height: 150%;
+}
+table tbody tr.FootNote td {
+   background: #ff9;
+   color: #454545;
+   border-bottom: 0px;
+}
+table tbody tr.More th,
+table tbody tr.More td {
+   border-bottom: 0;
+}
+table.AltRows tbody tr.Enabled td.Info,
+table.AltColumns tbody tr.Enabled td.Info,
+table.AltRows tbody tr.Disabled td.Info,
+table.AltColumns tbody tr.Disabled td.Info {
+   color: #aaa;
+}
+table tbody td.Info span {
+   padding: 0 6px;
+}
+table tbody td.Info strong {
+   font-weight: bold;
+   color: #000 /* Body Default Font Color */;
+}
+table thead th {
+   font-weight: bold;
+   font-size: 13px;
+   line-height: 100%;
+   color: #000 /* Body Heading Font Color */;
+}
+table input.Button {
+   margin: 0px;
+}
+table.AltRows tr.Alt th,
+table.AltRows tr.Alt td {
+   background: #f8f8f8 /* Body Alt Background Color */;
+}
+table.AltColumns th.Alt,
+table.AltColumns td.Alt {
+   background: #f8f8f8 /* Body Alt Background Color */;
+}
+table.AltColumns tr.Alt {
+   background: none;
+}
+table.AltColumns tr.Parent td,
+table tr.Parent td {
+   background: #ff9;
+}
+table tr.Child td.First {
+   padding-left: 20px;
+}
+table tr.Highlight th,
+table tr.Highlight td {
+   color: #000;
+}
+table tbody td blockquote {
+   margin: 0px;
+   padding: 2px;
+}
+table.Sortable tbody td {
+   cursor: move;
+}
+/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications, themes) that need to override default styles */
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+   background: #ffd /* Discussion New Background Color */;
+   color: #000 /* Body Default Font Color */;
+}
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td {
+   background: #f8f8f8 /* Body Background Color */;
+}
+/* CheckBoxGrid */
+.CheckBoxGrid {
+   margin: 10px 0px 10px 0px;
+   width: auto;
+}
+.CheckBoxGrid a {
+   display: block !important;
+   padding: 5px 5px;
+}
+.CheckBoxGrid a:hover {
+   background: #ff9;
+   text-decoration: none;
+}
+.CheckBoxGrid th a,
+.CheckBoxGrid td a,
+.CheckBoxGrid th a:hover,
+.CheckBoxGrid td a:hover {
+   color: #555 /* Body Text Font Color */ !important;
+}
+.CheckBoxGrid td {
+   text-align: center;
+}
+.CheckBoxGrid tbody th {
+   font-weight: normal;
+   padding: 0;
+}
+.CheckBoxGrid tbody th,
+.CheckBoxGrid tbody td {
+   vertical-align: middle;
+}
+.CheckBoxGrid thead th a,
+.CheckBoxGrid thead th a:hover {
+   color: #333333 !important;
+}
+.CheckBoxGrid thead td {
+   padding: 0;
+}
+.CheckBoxGrid tbody th a span.Parent {
+   background: url('parent_divider.gif') center right no-repeat;
+   padding: 6px 10px 6px 0px;
+   margin: 0px 6px 0px 0px;
+}
+.CheckBoxGrid th {
+   width: 150px;
+}
+.CheckBoxGrid td {
+   width: 50px;
+}
+.CheckBoxGrid th,
+.CheckBoxGrid td {
+   padding: 3px;
+}
+.CheckBoxGrid th.Alt,
+.CheckBoxGrid td.Alt {
+   background: #f8f8f8  /* Body Alt Background Color */;
+}
+/* CheckColumn */
+.CheckColumn thead td a {
+   display: block !important;
+   padding: 6px 5px;
+   color: #333333 !important;
+   font-weight: bold;
+}
+.CheckColumn thead td a:hover {
+   background: #f9f4c0;
+   text-decoration: none;
+   color: #333333 !important;
+}
+/* CheckBoxList */
+.CheckBoxList {
+   padding: 4px 0px 4px 0px;
+}
+.CheckBoxList li {
+   border: 0px;
+   margin: 0px;
+   padding: 3px 0px 3px 0px;
+   font-size: 11px;
+}
+.CheckBoxList li label.CheckBoxLabel {
+   float: none;
+   display: inline;
+   width: auto;
+   font-weight: normal;
+   padding: 0px 0px 0px 0px;
+}
+
+
 /* =================================================================== Header */
 #Head {
    background: #44c7f4  /* Banner Background Color */;
@@ -620,7 +882,6 @@ li.five { background: url('five.png') no-repeat center left; }
 body.Activity h1 {
    margin: 0;
 }
-
 ul.Activities {
 	margin-bottom: 6px;
 }
@@ -684,7 +945,7 @@ ul.Activities li a.Delete:hover {
    color: #333;
    border: 1px solid #888;
 }
-ul.Activities li blockquote {
+ul.Activities li div.Story {
    border: 1px solid #eee;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -695,20 +956,20 @@ ul.Activities li blockquote {
    color: #2b3033;
    display: block;
 }
-ul.Activities li.PictureChange blockquote {
+ul.Activities li.PictureChange div.Story {
 	border: 0;
    background: none;
    margin: 4px 0 0;
    padding: 0 8px;
 }
-ul.Activities li blockquote blockquote {
+ul.Activities li div.Story blockquote {
    margin: 2px 0 0;
    padding: 0;
    background: none;
 	border: 0;
    color: #999;
 }
-ul.Activities li blockquote img {
+ul.Activities li div.Story img {
    height: auto;
    width: auto;
    background: #fff;
@@ -751,22 +1012,24 @@ ul.Activities p {
    margin: 0;
    line-height: 1.4;
 }
-ul.Activities span.Meta {
+ul.Activities div.Meta {
    line-height: 1;
    color: #888;
    padding: 4px 0 0 6px;
+  	margin: 0 !important;
    font-size: 90%;
+	display: inline;
 }
-ul.Activities li.AboutUpdate span.Meta,
-ul.Activities li.WallComment span.Meta,
-ul.Activities ul.Comments span.Meta {
+ul.Activities li.AboutUpdate div.Meta,
+ul.Activities li.WallComment div.Meta,
+ul.Activities ul.Comments div.Meta {
    display: block;
    padding: 4px 0 4px;
 }
-ul.Activities span.Meta a {
+ul.Activities div.Meta a {
    font-weight: normal;
 }
-ul.Activities span.Meta span {
+ul.Activities div.Meta span {
    padding: 0 6px;
    font-size: 8px;
 }
@@ -792,6 +1055,7 @@ ul.Activities li.CommentForm textarea.TextBox {
    height: 40px;
    margin-bottom: 2px;
 }
+
 
 /* ============================================================= Entry Screen */
 body.Entry {

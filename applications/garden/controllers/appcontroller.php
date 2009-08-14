@@ -30,10 +30,9 @@ class GardenController extends Gdn_Controller {
       $this->AddCssFile('popup.css');
       $this->AddModule('PoweredByVanillaModule');
       
-      if ($this->ControllerName != 'profilecontroller') {
-         $this->AddCssFile('form.css');
+      if ($this->ControllerName != 'profilecontroller')
          $this->AddCssFile('garden.css');
-      }
+
       parent::Initialize();
    }
    

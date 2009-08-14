@@ -13,18 +13,21 @@ foreach ($this->MessageData->Result() as $Message) {
    if ($Message->InsertUserID == $Session->UserID)
       $Class .= ' Mine';
       
+   if ($Message->InsertPhoto != '')
+      $Class .= ' HasPhoto';
+      
    $Class = trim($Class);
    $Format = empty($Message->Format) ? 'Display' : $Message->Format;
 ?>
 <li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <a name="Item_<?php echo $CurrentOffset;?>" />
-   <ul class="Info">
-      <li class="Author"><?php
-         echo UserPhoto($Message->InsertName, $Message->InsertPhoto); 
-         echo UserAnchor($Message->InsertName);
-      ?></li>
-      <li class="Inserted"><?php echo Format::Date($Message->DateInserted); ?></li>
-   </ul>
-   <div class="Message"><?php echo Format::To($Message->Body, $Format); ?></div>
+   <a name="Item_<?php echo $CurrentOffset;?>" class="Item" />
+   <?php echo UserPhoto($Message->InsertName, $Message->InsertPhoto, 'Photo'); ?>
+   <div>
+      <?php
+         echo UserAnchor($Message->InsertName, 'Name');
+         echo Format::Date($Message->DateInserted);
+      ?>
+      <div class="Message"><?php echo Format::To($Message->Body, $Format); ?></div>
+   </div>
 </li>
 <?php }

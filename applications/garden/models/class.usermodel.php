@@ -251,7 +251,7 @@ class Gdn_UserModel extends Gdn_Model {
             // Record activity if the person changed his/her photo
             $Photo = ArrayValue('Photo', $FormPostValues);
             if ($Photo !== FALSE)
-               AddActivity($UserID, 'PictureChange', '<img src="'.Url('uploads/t'.$Photo).'" />');
+               AddActivity($UserID, 'PictureChange', '<img src="'.Url('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
 
          } else {
             $RecordRoleChange = FALSE;

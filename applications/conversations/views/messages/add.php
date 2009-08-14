@@ -8,6 +8,6 @@
    echo $this->Form->Label('To', 'To');
    echo $this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete'));
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
-   echo $this->Form->Close('Send');
+   echo $this->Form->Close('Start Conversation');
    ?>
 </div>

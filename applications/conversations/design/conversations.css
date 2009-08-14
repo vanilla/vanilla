@@ -560,90 +560,84 @@ h2.NewConversation {
 h2.NewConversation a {
   font-weight: bold;
 }
-#Conversation,
-#Conversation ul,
-#Conversations,
-#Conversations ul {
-  list-style: none;
-  margin: 0px;
-  padding: 0px;
-}
 body.Conversations h2 {
   margin: 0;
 }
-#Conversation li,
 #Conversations li {
-  border-bottom: 1px solid #eee /* Body Line Color */;
-  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  padding: 6px;
+  color: #888;
 }
-#Conversation li li,
-#Conversations li li {
-  padding: 0;
+#Conversations li.New {
+  background: #ffd;
 }
 #Conversations li.Active {
   cursor: pointer;
+  background: #ffe;
 }
-#Conversation li ul li,
-#Conversations li ul li {
-  display: inline;
-  border: 0px;
-}
-#Conversation li ul.Info,
-#Conversations li ul.Info {
-  display: inline;
-  font-size: 11px;
-  color: #777;
-  padding: 0 0 0 6px;
-}
-#Conversation li ul.Info {
-  line-height: 200%;
-}
-#Conversation li ul.Info li,
-#Conversations li ul.Info li {
-   display: inline;
-}
-#Conversation li ul.Info li.Inserted,
-#Conversations li ul.Info li.Updated,
-#Conversations li ul.Info li.MessageCount {
-   padding-left: 12px;
-}
-#Conversation li ul.Info li.Author a,
-#Conversations li ul.Info li.Authors a {
-   font-size: 15px;
-   font-weight: bold;
-}
-#Conversation li.Author img,
-#Conversations li.Authors img {
+#Conversations li a.Photo,
+#Conversation li a.Photo {
   float: left;
-  height: 42px;
-  width: 42px;
-  margin: 0px 8px 0px 0px;
-  border: 0;
+  padding: 0 10px 0 0;
 }
-#Conversations li ul li.MessageCount span {
+#Conversation li a.Photo img,
+#Conversations li a.Photo img {
+  height: 43px;
+  width: 43px;
+}
+#Conversations li a.Name {
+  font-size: 110%;
+  font-weight: bold;
+  padding: 0 10px 0 0;
+}
+#Conversations li a.Message {
+  float: none;
+  color: #000;
+}
+#Conversations div.Meta {
+  font-size: 90%;
+  line-height: 1;
+  padding: 4px 0;
+}
+#Conversations div.Meta span {
+  font-size: 8px;
+  padding: 0 8px;
+}
+#Conversations div.Meta em {
   background: #fffa22;
   color: #000;
-  font-weight: bold;
-  margin-left: 20px;
-  padding: 0px 2px 2px 2px;
-}
-#Conversations li a.Link {
-  display: block;
-  border: 1px solid #eee;
+  padding: 0 3px;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-  background: #fafafa;
-  padding: 4px 6px;
-  line-height: 140%;
-  color: #2B3033 /* Body Link Font Color */;
 }
-#Conversation div.Message {
-  padding: 0px 8px 5px;
+#Conversation li {
+  border-bottom: 1px solid #eee;
+  padding: 6px;
+  color: #888;
+  font-size: 90%;
+}
+#Conversation li a.Name {
+  font-weight: bold;
+  font-size: 120%;
+  margin-right: 10px;
+}
+#Conversation li div span {
+  font-size: 8px;
+  padding: 0 8px;
+}
+#Conversation li.HasPhoto div {
+  padding: 0 0 0 53px;
+}
+#Conversation li.HasPhoto div div {
+  padding: 0;
+}
+#Conversation li div.Message {
+  font-size: 110%;
+  color: #000;
 }
 #ConversationForm {
 	margin-bottom: 6px;
 }
-
 /* Big Buttons */
 a.ClearConversation,
 a.NewConversation {

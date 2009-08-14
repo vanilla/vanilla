@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
    $.fn.hoverRow = function() {
       return this.each(function() {
          var row = this;
-         var anchor = $(row).find('a.Link');
+         var anchor = $(row).find('a.Message');
          if (anchor.length > 0) {
             $(row).hover(function() {
                $(row).addClass('Active');

@@ -108,6 +108,7 @@ if (!function_exists('UserAnchor')) {
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Photo, $CssClass = '') {
       $Name = is_object($User) ? $User->Name : $User;
+      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
       if ($Photo != '') {
          return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$Photo).'" alt="'.$Name.'" /></a>';
       } else {

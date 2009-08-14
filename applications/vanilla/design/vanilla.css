@@ -38,7 +38,7 @@ Welcome to the Vanilla CSS File! 6 Things you should know:
    + Line 1048:   Footer
 */
 
-/* General Styles & Typography */
+/* ============================================== General Styles & Typography */
 body {
    color: #000 /* Body Default Font Color */;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;

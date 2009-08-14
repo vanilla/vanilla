@@ -7,30 +7,32 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    if ($Conversation->CountNewMessages > 0)
       $Class .= ' New';
       
+   if ($Conversation->LastMessagePhoto != '')
+      $Class .= ' HasPhoto';
+      
    $Class = trim($Class);
+   $Name = $Session->UserID == $Conversation->LastMessageUserID ? 'You' : $Conversation->LastMessageName;
+   $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
 ?>
 <li<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <ul class="Info">
-      <li class="Authors"><?php
-         // $CssClass = $Conversation->Starred == '1' ? 'Starred' : 'Star';
-         // echo Anchor('<span>*</span>', 'messages/star/'.$Conversation->ConversationID.'/'.$Session->TransientKey(), $CssClass);
-         // TODO: LOOP THROUGH ALL AUTHOR NAMES
-         $Name = $Session->UserID == $Conversation->LastMessageUserID ? 'You' : $Conversation->LastMessageName;
-         echo UserPhoto($Conversation->LastMessageName, $Conversation->LastMessagePhoto); 
-         echo Anchor($Name, '/profile/'.Format::Url($Conversation->LastMessageName));
-      ?></li>
-      <li class="Updated"><?php echo Format::Date($Conversation->DateLastMessage); ?></li>
-      <li class="MessageCount"><?php
+   <?php echo UserPhoto($Conversation->LastMessageName, $Conversation->LastMessagePhoto, 'Photo'); ?>
+   <div>
+      <?php
+      echo Anchor($Name, '/profile/'.Format::Url($Conversation->LastMessageName), 'Name');
+      echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message');
+      echo '<div class="Meta">';
+         echo Format::Date($Conversation->DateLastMessage);
+         echo '<span>&bull;</span>';
          printf(Translate(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages);
          if ($Conversation->CountNewMessages > 0) {
-            ?><span><?php printf(Gdn::Translate('%s new'), $Conversation->CountNewMessages); ?></span><?php
+            echo '<span>&bull;</span>';
+            echo '<em>';
+            printf(Gdn::Translate('%s new'), $Conversation->CountNewMessages);
+            echo '</em>';
          }
-      ?></li>
-   </ul>
-   <?php
-      $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-      echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Link');
-   ?>
+      echo '</div>';
+      ?>
+   </div>
 </li>
 <?php
 }

@@ -634,7 +634,7 @@ ul.Activities li a.Delete:hover {
    color: #333;
    border: 1px solid #888;
 }
-ul.Activities li blockquote {
+ul.Activities li div.Story {
    border: 1px solid #eee;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -645,20 +645,20 @@ ul.Activities li blockquote {
    color: #2b3033;
    display: block;
 }
-ul.Activities li.PictureChange blockquote {
+ul.Activities li.PictureChange div.Story {
 	border: 0;
    background: none;
    margin: 4px 0 0;
    padding: 0 8px;
 }
-ul.Activities li blockquote blockquote {
+ul.Activities li div.Story blockquote {
    margin: 2px 0 0;
    padding: 0;
    background: none;
 	border: 0;
    color: #999;
 }
-ul.Activities li blockquote img {
+ul.Activities li div.Story img {
    height: auto;
    width: auto;
    background: #fff;
@@ -701,22 +701,24 @@ ul.Activities p {
    margin: 0;
    line-height: 1.4;
 }
-ul.Activities span.Meta {
+ul.Activities div.Meta {
    line-height: 1;
    color: #888;
    padding: 4px 0 0 6px;
+  	margin: 0 !important;
    font-size: 90%;
+	display: inline;
 }
-ul.Activities li.AboutUpdate span.Meta,
-ul.Activities li.WallComment span.Meta,
-ul.Activities ul.Comments span.Meta {
+ul.Activities li.AboutUpdate div.Meta,
+ul.Activities li.WallComment div.Meta,
+ul.Activities ul.Comments div.Meta {
    display: block;
    padding: 4px 0 4px;
 }
-ul.Activities span.Meta a {
+ul.Activities div.Meta a {
    font-weight: normal;
 }
-ul.Activities span.Meta span {
+ul.Activities div.Meta span {
    padding: 0 6px;
    font-size: 8px;
 }
@@ -737,9 +739,9 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    font-weight: normal;
 }
 ul.Activities li.CommentForm textarea.TextBox {
-   width: 620px;
+   width: 610px;
+	min-height: 40px;
    height: 40px;
-   min-height: 40px;
    margin-bottom: 2px;
 }
 ul.Activities {
@@ -821,9 +823,13 @@ div.User h1 {
    font-weight: normal;
    line-height: 100%;
 }
-#Status strong {
+#Status p {
    font-size: 120%;
    color: #6c6c6c;
+   display: inline;
+   margin: 0;
+   padding: 0;
+   line-height: 1;
 }
 #Status a {
    text-transform: lowercase;
@@ -876,7 +882,7 @@ ul.Tabs {
 ul.Tabs li {
    padding: 5px 0;
    margin: 0;
-   line-height: 23px;
+   line-height: 24px;
    -moz-border-radius-topleft: 3px;
    -moz-border-radius-topright: 3px;
    -webkit-border-top-left-radius: 3px;

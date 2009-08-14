@@ -400,7 +400,6 @@ class ProfileController extends GardenController {
    
    public function Invitations() {
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddCssFile('form.css');
       $this->GetUserInfo();
       $InvitationModel = new Gdn_InvitationModel();
       $this->Form->SetModel($InvitationModel);

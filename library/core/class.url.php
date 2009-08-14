@@ -71,18 +71,19 @@ class Gdn_Url {
     */
    public static function Domain() {
       // Attempt to get the domain from the configuration array
-      $Domain = Gdn::Config('Garden.Domain');
+      $Domain = Gdn::Config('Garden.Domain', '');
 
-      if ($Domain !== FALSE && $Domain != '')
-         return $Domain;
-
-      if (isset($_SERVER['HTTP_HOST']))
-         $Host = $_SERVER['HTTP_HOST'];
-
-      if ($Host !== FALSE && $Host != '')
-         return 'http://' . $Host . '/';
-      else
-         return '';
+      if ($Domain === FALSE || $Domain == '')
+         $Domain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+      
+      if ($Domain != '' && $Domain !== FALSE) {
+         if (substr($Domain, 0, 7) != 'http://')
+            $Domain = 'http://'.$Domain;
+         
+         if (substr($Domain, 0, -1) != '/')
+            $Domain = $Domain . '/';
+      }
+      return $Domain;
    }
 
 

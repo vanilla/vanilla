@@ -204,7 +204,7 @@ class EntryController extends GardenController {
          $this->Head->AddScript('/applications/garden/js/entry.js');
          
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', 'test'));
+      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
 
       $RegistrationMethod = $this->_RegistrationView();
       $this->View = $RegistrationMethod;

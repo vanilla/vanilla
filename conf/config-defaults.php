@@ -58,7 +58,9 @@ $Configuration['Garden']['Email']['MimeType']                   = 'text/plain';
 $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';
 $Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/update';
-$Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
+// TODO: Need to change this back before release
+// $Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
+$Configuration['Garden']['AddonUrl']                            = '';
 $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';

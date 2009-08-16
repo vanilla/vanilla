@@ -316,10 +316,11 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                   }
                }
             }
+            
             // Record user-comment activity
             $DiscussionID = ArrayValue('DiscussionID', $Fields);
-            if ($DiscussionID !== FALSE)
-               $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID);
+            if ($Insert === TRUE && $DiscussionID !== FALSE)
+               $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID); // Only record activity if inserting a comment, not on edit.
 
             $this->UpdateCommentCount($DiscussionID);
             

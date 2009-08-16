@@ -51,8 +51,8 @@ class Format {
       if ($ProfileUserID != $Activity->ActivityUserID) {
          // If we're not looking at the activity user's profile, link the name
          $ActivityNameD = urlencode($Activity->ActivityName);
-         $ActivityName = Anchor($ActivityName, '/garden/profile/' . $ActivityNameD);
-         $ActivityNameP = Anchor($ActivityNameP, '/garden/profile/' . $ActivityNameD);
+         $ActivityName = Anchor($ActivityName, '/profile/' . $ActivityNameD);
+         $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $ActivityNameD);
       }
       $Gender = Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
@@ -63,7 +63,8 @@ class Format {
       ) $Gender = $Gender2 = 'your';
 
       if ($Session->UserID == $Activity->RegardingUserID) {
-         $RegardingName = $RegardingNameP = Gdn::Translate('your');
+         $RegardingName = Gdn::Translate('you');
+         $RegardingNameP = Gdn::Translate('your');
       } else {
          $RegardingName = $Activity->RegardingName == '' ? Gdn::Translate('somebody') : $Activity->RegardingName;
          $RegardingNameP = FormatPossessive($RegardingName);
@@ -77,9 +78,9 @@ class Format {
       } else if ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
-         $RegardingName = Anchor($RegardingName, '/garden/profile/' . $RegardingNameD);
-         $RegardingNameP = Anchor($RegardingNameP, '/garden/profile/' . $RegardingNameD);
-         $RegardingWall = Anchor('wall', '/garden/profile/activity/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
+         $RegardingName = Anchor($RegardingName, '/profile/' . $RegardingNameD);
+         $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $RegardingNameD);
+         $RegardingWall = Anchor('wall', '/profile/activity/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
       if ($RegardingWall == '')
          $RegardingWall = Gdn::Translate('wall');

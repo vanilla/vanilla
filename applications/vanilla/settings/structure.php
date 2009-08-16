@@ -122,11 +122,11 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRow
 
 // People mentioning others in discussion topics
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionMention'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionMention', 'FullHeadline' => 'You mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned you in a %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
 
 // People mentioning others in comments
 if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => 'You mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned you in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
 
 if ($Drop) {
    $PermissionModel = Gdn::PermissionModel();

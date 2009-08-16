@@ -23,13 +23,12 @@ class GardenHooks implements Gdn_IPlugin {
          $Authenticator = Gdn::Authenticator();
          if ($Session->IsValid()) {
             $Sender->Menu->AddLink('SignOut', 'Sign Out', '/entry/leave/{Session_TransientKey}', FALSE, array('class' => 'NonTab'));
-            $Notifications = Gdn::Translate('Notifications');
+            $Name = $Session->User->Name;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
-               $Notifications .= '<span>'.$CountNotifications.'</span>';
+               $Name .= '<span>'.$CountNotifications.'</span>';
                
-            $Sender->Menu->AddLink('User', '{Username}', '/profile/{Username}', array('Garden.SignIn.Allow'));
-            $Sender->Menu->AddLink('User', '\\'.$Notifications, 'profile/notifications/{Username}');
+            $Sender->Menu->AddLink('User', $Name, '/profile/{Username}', array('Garden.SignIn.Allow'));
          } else {
             $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl());
          }

@@ -76,7 +76,16 @@ class ProfileController extends GardenController {
             $this->Head->AddScript('/applications/garden/js/profile.js');
             $this->Head->AddScript('/applications/garden/js/activity.js');
          }
-         $this->AddProfileTab(array('Activity' => ''));
+         $this->AddProfileTab('Activity');
+         if ($this->User->UserID == $Session->UserID) {
+            $Notifications = Gdn::Translate('Notifications');
+            $CountNotifications = $Session->User->CountNotifications;
+            if (is_numeric($CountNotifications) && $CountNotifications > 0)
+               $Notifications .= '<span>'.$CountNotifications.'</span>';
+               
+            $this->AddProfileTab(array($Notifications => 'profile/notifications'));
+         }
+            
          $this->FireEvent('AddProfileTabs');
       }
       
@@ -206,8 +215,8 @@ class ProfileController extends GardenController {
          ->Where('UserID', $Session->UserID)
          ->Put();
       
-      $ActivityModel = new Gdn_ActivityModel();
-      $this->NotificationData = $ActivityModel->GetNotifications($Session->UserID);
+      $this->ActivityModel = new Gdn_ActivityModel();
+      $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID);
       $this->Render();
    }   
    

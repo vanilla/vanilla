@@ -751,13 +751,7 @@ ul.Activities {
 div.EmptyInfo {
    margin: 10px;
 }
-#garden_profile_notifications div.EmptyInfo {
-   margin: 10px 0 6px;
-}
-#garden_profile_notifications h2 {
-   margin-bottom: 0;
-}
-#garden_profile_notifications ul.Activities {
+ul.Notifications {
    margin-top: 0;
    border: 0;
 }
@@ -918,6 +912,17 @@ ul.Tabs li.Active a {
    color: #454545 /* Panel Selected Font Color */ !important;
    text-decoration: none;
    padding: 5px 10px 4px 10px;
+}
+ul.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+   background: #2786C2;
+   color: #eaf4fd;
+   margin: 0 0 0 4px;
 }
 
 

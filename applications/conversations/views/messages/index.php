@@ -31,11 +31,7 @@ echo $this->Pager->ToString('less');
 <?php
 echo $this->Pager->ToString();
 echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
-?>
-<h3><?php echo Translate("Add Message") ?></h3>
-<?php
-   echo $this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox'));
-   echo $this->Form->Button('Send Message');
-   // echo $this->Form->Button('Save Draft');
-   // echo $this->Form->Button('Preview');
-   echo $this->Form->Close();
+echo $this->Form->Label('Add Message', 'Body');
+echo $this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox'));
+echo $this->Form->Button('Send Message');
+echo $this->Form->Close();

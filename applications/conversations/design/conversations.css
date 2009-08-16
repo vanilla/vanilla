@@ -676,7 +676,7 @@ body.Index #Content form {
   -webkit-border-bottom-left-radius: 2px;
   -webkit-border-bottom-right-radius: 2px;
 }
-body.Index #Content form h3 {
+body.Index #Content form label {
   font-size: 115%;
   color: #2786C2 /* Panel Font Color */;
   font-weight: bold;

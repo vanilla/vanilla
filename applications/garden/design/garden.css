@@ -13,7 +13,6 @@ Welcome to the Garden CSS File! 6 Things you should know:
 4. This css file will be included on most Garden pages. Specifically:
    + Settings/*
    + Routes/*
-   + Activity/*
    + Entry/*
    + Home/*
    + Messages/*
@@ -27,21 +26,20 @@ Welcome to the Garden CSS File! 6 Things you should know:
    kinds of custom magic there (profile.css).
    
 6. This file is broken down into the following sections:
-   + Line 44:     General Styles & Typography
-   + Line 368:    Forms
-   + Line 370:    Header
-   + Line 433:    Main Menu
-   + Line 468:    Panels / Sidebars
-   + Line 549:    Dashboard
-   + Line 634:    Activities
-   + Line 811:    Entry Screen
-   + Line 917:    DataList (Search Results)
-   + Line 983:    User Search Page
-   + Line 992:    Footer
+   + Line 42:     General Styles & Typography
+   + Line 366:    Forms
+   + Line 630:    Header
+   + Line 693:    Main Menu
+   + Line 728:    Panels / Sidebars
+   + Line 809:    Dashboard
+   + Line 879:    Entry Screen
+   + Line 985:    DataList (Search Results)
+   + Line 1051:   User Search Page
+   + Line 1060:   Footer
 */
    
    
-/* General Styles & Typography */
+/* ============================================== General Styles & Typography */
 body {
    color: #000 /* Body Default Font Color */;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
@@ -876,185 +874,6 @@ li.two { background: url('two.png') no-repeat center left; }
 li.three { background: url('three.png') no-repeat center left; }
 li.four { background: url('four.png') no-repeat center left; }
 li.five { background: url('five.png') no-repeat center left; }
-
-
-/* =============================================================== Activities */
-body.Activity h1 {
-   margin: 0;
-}
-ul.Activities {
-	margin-bottom: 6px;
-}
-ul.Activities li {
-   border-bottom: 1px solid #ddd;
-   padding: 8px 0 6px;
-   color: #454545;
-   clear: left;
-   font-size: 105%;
-}
-ul.Activities div span {
-   padding: 0 6px 0 0;
-}
-ul.Activities li a.Photo {
-   float: left;
-}
-ul.Activities li img {
-   margin: 0;
-   border: 0;
-   height: 40px;
-   width: 40px;
-}
-ul.Activities li.ActivityComment img {
-   height: 32px;
-   width: 32px;
-}
-ul.Activities li h3 {
-   display: inline;
-   padding: 0;
-   font-size: 100%;
-   font-weight: normal;
-}
-ul.Activities li h3 em {
-   font-weight: normal;
-   font-style: normal;
-   color: #33afda;
-   font-size: 10px;
-   margin: 0 10px;
-}
-ul.Activities li h3 a.CommentOption {
-   font-size: 10px;
-   font-weight: normal;
-}
-ul.Activities li a.Delete {
-   float: right;
-   width: auto;
-   padding: 4px;
-   margin: 0 1px 0 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   font-size: 10px;
-   font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #ddd;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   color: #888;
-   cursor: pointer;
-   line-height: 100%;
-}
-ul.Activities li a.Delete:hover {
-   color: #333;
-   border: 1px solid #888;
-}
-ul.Activities li div.Story {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 4px 6px;
-   line-height: 130%;
-   color: #2b3033;
-   display: block;
-}
-ul.Activities li.PictureChange div.Story {
-	border: 0;
-   background: none;
-   margin: 4px 0 0;
-   padding: 0 8px;
-}
-ul.Activities li div.Story blockquote {
-   margin: 2px 0 0;
-   padding: 0;
-   background: none;
-	border: 0;
-   color: #999;
-}
-ul.Activities li div.Story img {
-   height: auto;
-   width: auto;
-   background: #fff;
-   padding: 2px;
-   border: 1px solid #ccc;
-   float: none;
-   margin: 0 4px 0 0;
-}
-ul.Activities ul.Comments {
-   background: #fff;
-   margin: 0 0 0 46px;
-   padding: 1px 0 0;
-   list-style: none;
-   font-size: 85%;
-   clear: left;
-}
-ul.Activities ul.Comments li {
-   background: #e9f9ff /* Panel Background Color */;
-   margin-bottom: 1px;
-   border-bottom: 0;
-   padding: 6px;
-   line-height: 1;
-}
-ul.Activities li.HasPhoto div {
-   margin-left: 46px;
-}
-ul.Activities li.HasPhoto ul.Comments div {
-   margin: 0;
-}
-ul.Activities ul.Comments li.HasPhoto div {
-   margin-left: 40px;
-}
-ul.Activities a.Name,
-ul.Activities a.Photo {
-   font-weight: bold;
-   padding-right: 6px;
-}
-ul.Activities p {
-   display: inline;
-   margin: 0;
-   line-height: 1.4;
-}
-ul.Activities div.Meta {
-   line-height: 1;
-   color: #888;
-   padding: 4px 0 0 6px;
-  	margin: 0 !important;
-   font-size: 90%;
-	display: inline;
-}
-ul.Activities li.AboutUpdate div.Meta,
-ul.Activities li.WallComment div.Meta,
-ul.Activities ul.Comments div.Meta {
-   display: block;
-   padding: 4px 0 4px;
-}
-ul.Activities div.Meta a {
-   font-weight: normal;
-}
-ul.Activities div.Meta span {
-   padding: 0 6px;
-   font-size: 8px;
-}
-ul.Activities ul.Comments li.CommentForm {
-   clear: left;
-   padding: 8px;
-}
-ul.Activities ul.Comments li.CommentForm a.CommentLink,
-ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
-   cursor: text;
-   background: #fff;
-   color: #bbb !important;
-   padding: 5px;
-   text-decoration: none;
-   border: 1px solid #aaa;
-   display: block;
-   line-height: 100%;
-   font-weight: normal;
-}
-ul.Activities li.CommentForm textarea.TextBox {
-   width: 610px;
-	min-height: 40px;
-   height: 40px;
-   margin-bottom: 2px;
-}
 
 
 /* ============================================================= Entry Screen */

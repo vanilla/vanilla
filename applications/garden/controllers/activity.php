@@ -12,6 +12,10 @@ class ActivityController extends GardenController {
    
    public $Uses = array('Database', 'Form', 'Gdn_ActivityModel', 'Html');
    
+   public function Initialize() {
+      parent::Initialize();
+      $this->AddCssFile('activity.css');
+   }
    public function Index() {
       if ($this->Head) {
          $this->Head->AddScript('/applications/garden/js/activity.js');

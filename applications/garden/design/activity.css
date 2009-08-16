@@ -1,0 +1,709 @@
+@import url('reset.css') /* NoFollow */; 
+/*
+Welcome to the Garden CSS File! 5 Things you should know:
+
+1. The reset.css file imported above breaks all elements down to a base style.
+
+2. There is a menu.css file that is also included on every page of Garden. It
+   defines the layout of the main dropdown menu at the top of the page. 
+   
+3. There is a popup.css file that is also included on every page of Garden. It
+   defines the appearance of popups (warnings, editing routes & messages, etc).
+
+4. This css file will be included on the activity pages. Specifically:
+   + Activity/*
+
+5. This file is broken down into the following sections:
+   + Line 26:     General Styles & Typography
+   + Line 335:    Header
+   + Line 398:    Main Menu
+   + Line 433:    Panels / Sidebars
+   + Line 514:    Activities
+   + Line 693:    Footer
+*/
+   
+   
+/* General Styles & Typography */
+body {
+   color: #000 /* Body Default Font Color */;
+   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   background: #ffffff  /* Body Background Color */;
+   margin: 0;
+   padding: 0;
+   text-align: center;
+   font-size: small;
+}
+#Body {
+   width: 960px;
+   text-align: left;
+   margin: 0 auto;
+}
+#Body {
+   margin: 15px auto 0 auto;
+   }
+#Content {
+   float: left;
+   width: 680px;
+   margin: 0 0 40px;
+}
+.Hidden {
+   display: none;
+}
+.nowrap {
+   white-space: nowrap;
+}
+.Center {
+	text-align: center;
+}
+.Right {
+	text-align: right;
+}
+h1, h2, h3, h4, h5, h6 {
+   color: #000 /* Body Heading Font Color */;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-weight: normal;
+   margin: 0;
+}
+p {
+   margin: 0.5em 0 0 0;
+   line-height: 1.6em;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+}
+h1, h2 {
+   border-bottom:1px solid #bbb;
+   font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
+}
+h3 {
+   font-size:140%;
+}
+h4 {
+   font-size: 120%;
+   color: #6C6C6C /* Body Subheading Font Color */;
+}
+h5 {
+   font-size: 120%;
+   color: #6C6C6C /* Body Subheading Font Color */;
+}
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2786c2  /* Body Link Font Color */;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084 /* Body Hover Font Color */;
+}
+input.DateBox,
+input.InputBox,
+input.SmallInput,
+textarea {
+   font-family: arial;
+   color: #222;
+   font-size: 14px;
+   padding: 3px;
+   margin: 0;
+   width: 250px;
+   border: 1px solid #888;
+}
+textarea.TextBox {
+   width: 500px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 500px;
+}
+#Popup textarea.TextBox {
+   width: 465px;
+}
+input.SmallInput,
+input.InputBox {
+   font-size: 15px;
+   padding: 6px 3px;
+}
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea:focus {
+   background: #ffe;
+}
+textarea {
+   line-height: 128%;
+}
+select {
+   font-family: arial;
+   font-size: 14px;
+   color: #222;
+   margin: 0;
+   padding: 3px;
+   }
+select.Day,
+select.Year {
+   margin-left: 4px;
+}
+.Button {
+   cursor: pointer;
+   margin: 0 0 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   padding: 4px;
+   font-size: 11px;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #555;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   }
+input.Button {
+   font-weight: bold;
+}
+.Button:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+.Loading {
+   height: 100px;
+   padding: 0 20px;
+   background: url('progress.gif') center center no-repeat;
+}
+.Progress {
+   padding: 10px 40px 10px 0;
+   background: url('progress.gif') center center no-repeat;
+}
+/* Note: Messages are the yellow notices that appear at the top/center of the
+  page to notify users of things like drafts being saved, etc. */
+div.Messages {
+   text-align: center;
+   position: fixed;
+   top: 0;
+   left: 0;
+   z-index: 200;
+   margin: 0 !important;
+   padding: 0 !important;
+   list-style: none !important;
+   font-size: 12px;
+   display: block;
+   width: 100%;
+}
+* html div.Messages {
+  position: absolute;
+  width: 100%;/*IE5.5*/
+  top: 0;
+  left: 0;
+  overflow: visible; 
+  top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop);
+}
+div.Messages ul {
+   cursor: pointer;
+   width: auto !important;
+   border: 0 !important;
+   margin: 0 auto !important;
+   padding: 4px 8px !important;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   background: #ff9 !important;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+}
+div.Messages ul li {
+   text-align: left !important;
+   border: 0 !important;
+   color: #000 !important;
+   padding: 0 !important;
+   margin: 0 !important;
+   list-style-position: outside;
+}
+div.Errors ul {
+   background: #d50a0a !important;
+}
+div.Errors ul li {
+   color: #fff !important;
+}
+/* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
+   strings & imply importance. */
+.Warning {
+   background: #ffc;
+   border: 1px solid #ff9;
+   color: #000;
+   padding: 6px 8px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert {
+   background: #d00;
+   border: 1px solid #b00;
+   color: #fff;
+   padding: 3px 6px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+.Alert a {
+   color: #fff;
+}
+.Alert a:hover {
+   text-decoration: underline;
+}
+div.Info {
+   font-size: 13px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+div.EmptyInfo {
+   margin: 10px 0;
+}
+/* Note: The MessageModule (in /applications/garden/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.DismissMessage {
+   margin: 0 0 10px;
+}
+div.DismissMessage p {
+   margin: 0;
+}
+div.DismissMessage a.Close {
+   float: right;
+   background: #fafafa;
+   line-height: 120%;
+   border: 1px solid #eee;
+   color: #aaa;
+}
+div.DismissMessage a.Close:hover {
+   background: #fafafa;
+   border: 1px solid #ccc;
+   color: #777;
+}
+/* Note: The close class is used on the "close" anchor in popups. */
+a.Close {
+   font-weight: bold;
+   font-family: tahoma;
+   font-size: 10px;
+   text-transform: uppercase;
+   color: #bbb;
+   background: #f9f9f9;
+   -moz-border-radius: 8px;
+   -webkit-border-radius: 8px;
+   padding: 1px 4px 2px 5px;
+   margin: 0;
+   line-height: 100%;
+   border: 1px solid #ddd;
+}
+a.Close:hover {
+   border: 1px solid #bbb;
+   color: #999;
+   background: #fff;
+}
+/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
+.MorePager {
+   list-style: none;
+   margin: 1px 0 0;
+   padding: 3px 6px;
+   text-align: right;
+   background: #e9f9ff;
+   }
+.MorePager a {
+   font-size: 13px;
+   font-weight: bold;
+   text-align: right;
+}
+.MorePager a:hover {
+   color: #2786c2 !important;
+   text-decoration: underline;
+}
+#PagerLess {
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-topleft: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-top-left-radius: 2px;
+   margin-bottom: 1px;
+}
+tr#PagerMore td {
+   border: 0;
+   text-align: right;
+}
+#PagerMore {
+   margin-bottom: 1px;
+}
+
+
+/* =================================================================== Header */
+#Head {
+   background: #44c7f4  /* Banner Background Color */;
+   padding: 0;
+   text-align: right;
+   height: 50px;
+}
+body #Head h1 {
+   display: block;
+   font-weight: bold;
+   margin: 0;
+   padding: 21px 7px 0 0;
+   border: 0;
+   float: left;
+   line-height: 1;
+}
+#Head h1 a span {
+   font-size: 24px;
+   color:#E4F7FE /* Banner Font Color */;
+   text-shadow:0 1px 0 #30ACD6 /* Banner Font Shadow Color */;   
+}
+#Head h1 a:hover span {
+   color:#f3fcff /* Banner Hover Font Color */;
+}
+#Head form {
+   float: right;
+   width: 250px;
+   background: #fff;
+   padding: 0;
+   margin: 15px 0 0;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+#Head form input.InputBox {
+   width: 204px;
+   border: 0;
+   padding: 4px 2px 4px 0;
+   background: #fff;
+   margin: 0;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   color: #969696;
+   font-size: 13px;
+}
+#Head form input.Button {
+   border: 0;
+   width: 38px;
+   height: 26px;
+   background: #E9F9FF /* Panel Background Color */;
+   color: #2786C2 /* Panel Font Color */;
+   padding: 3px 0 4px;
+   margin: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   -moz-border-radius-topright: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+
+
+/* ================================================================ Main Menu */
+div.Menu {
+   text-align: right;
+   width: 960px;
+   margin: 0 auto;
+}
+ul#Menu {
+   float: left;
+   margin: 0 auto;
+   padding: 22px 0 0 10px;
+}
+#Menu ul,
+#Menu li.Active {
+   background: #44c7f4;
+}
+#Menu a,
+#Menu li.Active a {
+   color: #fff;
+}
+#Menu a:hover {
+   background: #28bcef;
+}
+#Menu a:hover,
+#Menu li.NonTab a:hover {
+   color: #fff !important;
+}
+/* Numbers next to menu items */
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #f2fcff;
+   color: #299fc7;
+}
+
+
+/* ======================================================== Panels / Sidebars */
+#Panel {
+   width: 250px;
+   float: right;
+}
+div.Box {
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #e9f9ff  /* Panel Background Color */;
+   color: #999  /* Panel Font Color */;
+   padding: 6px 10px;
+   margin: 0 0 10px 0;
+}
+div.Box h4 {
+   font-size: 110%;
+   color: #2786c2  /* Panel Font Color */;
+   font-weight: bold;
+   margin: 0;
+   padding: 0 0 1px;
+   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+}
+div.Box dl {
+   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+   background: #f0fbff /* Panel Inlay Background Color */;
+   padding: 3px;
+   font-size: 90%;
+   overflow: hidden;
+}
+div.Box dl dt {
+   float: left;
+   width: 80px;
+   color: #2786C2 /* Panel Font Color */;
+}
+div.Box dl dd {
+   margin-left: 80px;
+}
+div.Box p {
+   font-size: 100%;
+   padding: 0 0 4px;
+   color: #555 /* Body Text Font Color */;
+}
+ul.PanelInfo {
+	margin-bottom: 4px;
+}
+ul.PanelInfo {
+   border-bottom: 1px solid #caf0fe;
+}
+ul.PanelInfo li {
+   background: #f5fcff /* Panel Inlay Background Color */;
+   padding: 2px 4px;
+   font-family: tahoma;
+   font-size: 80%;
+}
+ul.PanelInfo li strong {
+	font-weight: normal;
+   text-align: left;
+   font-size: 120%;
+   margin-right: 12px;
+}
+ul.PanelInfo li.Active {
+   background: #fff;
+}
+#Panel a.PanelButton {
+   padding: 6px 0;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkig-border-radius: 2px;
+   background: #44c7f4 /* Banner Background Color */;
+   color: #fff /* Banner Font Color */;
+   text-decoration: none;
+   margin: 0 0 10px 0;
+}
+#Panel a.PanelButton:hover {
+   background: #11e420 /* Menu Hover Background Color */;
+   color: #fff /* Menu Hover Font Color */;
+}
+
+
+/* =============================================================== Activities */
+body.Activity h1 {
+   margin: 0;
+}
+ul.Activities {
+	margin-bottom: 6px;
+}
+ul.Activities li {
+   border-bottom: 1px solid #ddd;
+   padding: 8px 0 6px;
+   color: #454545;
+   clear: left;
+   font-size: 105%;
+}
+ul.Activities div span {
+   padding: 0 6px 0 0;
+}
+ul.Activities li a.Photo {
+   float: left;
+}
+ul.Activities li img {
+   margin: 0;
+   border: 0;
+   height: 40px;
+   width: 40px;
+}
+ul.Activities li.ActivityComment img {
+   height: 32px;
+   width: 32px;
+}
+ul.Activities li h3 {
+   display: inline;
+   padding: 0;
+   font-size: 100%;
+   font-weight: normal;
+}
+ul.Activities li h3 em {
+   font-weight: normal;
+   font-style: normal;
+   color: #33afda;
+   font-size: 10px;
+   margin: 0 10px;
+}
+ul.Activities li h3 a.CommentOption {
+   font-size: 10px;
+   font-weight: normal;
+}
+ul.Activities li a.Delete {
+   float: right;
+   width: auto;
+   padding: 4px;
+   margin: 0 1px 0 0;
+   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #ddd;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #888;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Activities li a.Delete:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+ul.Activities li div.Story {
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 4px 6px;
+   line-height: 130%;
+   color: #2b3033;
+   display: block;
+}
+ul.Activities li.PictureChange div.Story {
+	border: 0;
+   background: none;
+   margin: 4px 0 0;
+   padding: 0 8px;
+}
+ul.Activities li div.Story blockquote {
+   margin: 2px 0 0;
+   padding: 0;
+   background: none;
+	border: 0;
+   color: #999;
+}
+ul.Activities li div.Story img {
+   height: auto;
+   width: auto;
+   background: #fff;
+   padding: 2px;
+   border: 1px solid #ccc;
+   float: none;
+   margin: 0 4px 0 0;
+}
+ul.Activities ul.Comments {
+   background: #fff;
+   margin: 0 0 0 46px;
+   padding: 1px 0 0;
+   list-style: none;
+   font-size: 85%;
+   clear: left;
+}
+ul.Activities ul.Comments li {
+   background: #e9f9ff /* Panel Background Color */;
+   margin-bottom: 1px;
+   border-bottom: 0;
+   padding: 6px;
+   line-height: 1;
+}
+ul.Activities li.HasPhoto div {
+   margin-left: 46px;
+}
+ul.Activities li.HasPhoto ul.Comments div {
+   margin: 0;
+}
+ul.Activities ul.Comments li.HasPhoto div {
+   margin-left: 40px;
+}
+ul.Activities a.Name,
+ul.Activities a.Photo {
+   font-weight: bold;
+   padding-right: 6px;
+}
+ul.Activities p {
+   display: inline;
+   margin: 0;
+   line-height: 1.4;
+}
+ul.Activities div.Meta {
+   line-height: 1;
+   color: #888;
+   padding: 4px 0 0 6px;
+  	margin: 0 !important;
+   font-size: 90%;
+	display: inline;
+}
+ul.Activities li.AboutUpdate div.Meta,
+ul.Activities li.WallComment div.Meta,
+ul.Activities ul.Comments div.Meta {
+   display: block;
+   padding: 4px 0 4px;
+}
+ul.Activities div.Meta a {
+   font-weight: normal;
+}
+ul.Activities div.Meta span {
+   padding: 0 6px;
+   font-size: 8px;
+}
+ul.Activities ul.Comments li.CommentForm {
+   clear: left;
+   padding: 8px;
+}
+ul.Activities ul.Comments li.CommentForm a.CommentLink,
+ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
+   cursor: text;
+   background: #fff;
+   color: #bbb !important;
+   padding: 5px;
+   text-decoration: none;
+   border: 1px solid #aaa;
+   display: block;
+   line-height: 100%;
+   font-weight: normal;
+}
+ul.Activities li.CommentForm textarea.TextBox {
+   width: 610px;
+	min-height: 40px;
+   height: 40px;
+   margin-bottom: 2px;
+}
+
+
+/* =================================================================== Footer */
+#Foot {
+   clear: both;
+   text-align: center;
+   margin: 2px 0;
+   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   padding: 4px 9px;
+   font-size: 13px;
+   color: #ddd;
+   line-height: 1;
+}
+#Foot a {
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
+}

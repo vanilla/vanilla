@@ -309,7 +309,6 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Sink']);
          
-
       // Validate the form posted values
       if (
          $this->Validate($FormPostValues, $Insert)

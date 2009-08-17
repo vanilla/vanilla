@@ -299,6 +299,8 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                // Make sure that the comments get formatted in the method defined by Garden
                $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
+               $this->EventArguments['CommentID'] = $CommentID;
+               $this->FireEvent('SaveCommentAfter');
                
                // Notify any users who were mentioned in the comment
                $Usernames = GetMentions($Fields['Body']);

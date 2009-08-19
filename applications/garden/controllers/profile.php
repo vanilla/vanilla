@@ -40,7 +40,7 @@ class ProfileController extends GardenController {
       }
          
       if ($this->User === FALSE) {
-         return $this->ReDispatch('garden/home/filenotfound');
+         Redirect('garden/home/filenotfound');
       } else {
          $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows() > 0) 

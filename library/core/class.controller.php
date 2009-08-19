@@ -261,14 +261,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_Json;
 
    /**
-    * A re-dispatch route that the dispatcher should use if defined. Defined and
-    * accessed by $this->ReDispatch();
-    *
-    * @var string
-    */
-   protected $_ReDispatchRoute;
-
-   /**
     * A collection of view locations that have already been found. Used to
     * prevent re-finding views.
     *
@@ -305,7 +297,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_DeliveryMethod = GetIncomingValue('DeliveryMethod', DELIVERY_METHOD_XHTML);
       $this->_DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
       $this->_Json = array();
-      $this->_ReDispatchRoute = FALSE;
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
          'X-Powered-By' => 'Lussumo '.APPLICATION.' '.APPLICATION_VERSION,
@@ -659,26 +650,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function Initialize() {
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
-   }
-
-   /**
-    * When called from inside a controller, this method defines the re-dispatch
-    * route that the dispatcher should use. This is done for things like
-    * redirecting to a custom error view when query string values fail to result
-    * in correct data (ie. someone puts bogus user id in the url for a profile
-    * request).
-    * When called by the dispatcher (with no arguments), this method returns
-    * the defined re-dispatch route (or FALSE if one is not defined).
-    *
-    * @param string $Route The route that the dispatcher should use.
-    */
-   public function ReDispatch($Route = '') {
-      if ($Route != '') {
-         $this->_ReDispatchRoute = $Route;
-         return FALSE;
-      } else {
-         return $this->_ReDispatchRoute;
-      }
    }
 
    /**

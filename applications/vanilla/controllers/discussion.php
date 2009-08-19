@@ -33,7 +33,7 @@ class DiscussionController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       if ($this->Discussion === FALSE) {
-         return $this->ReDispatch('garden/home/filenotfound');
+         Redirect('garden/home/filenotfound');
       } else {
          // Setup
          if ($this->Head)

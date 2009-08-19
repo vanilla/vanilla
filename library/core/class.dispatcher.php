@@ -108,14 +108,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_PropertyCollection;
 
    /**
-    * A boolean value indicating if the dispatcher has been re-dispatched by the
-    * controller that was originally dispatched.
-    *
-    * @var boolean
-    */
-   private $_Redispatched;
-
-   /**
     * Defined by the url of the request: SYNDICATION_RSS, SYNDICATION_ATOM, or
     * SYNDICATION_NONE (default).
     *
@@ -137,7 +129,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
       $this->_PropertyCollection = array();
-      $this->_Redispatched = FALSE;
    }
 
    /**
@@ -249,13 +240,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          } else {
             trigger_error(ErrorMessage('Controller method missing: '.$this->_ControllerName.'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
          }
-      }
-
-      // Check to see if the controller defined a redispatch
-      if ($Controller->ReDispatch() !== FALSE && !$this->_Redispatched) {
-         $this->_Redispatched = TRUE; // Make sure to avoid infinite loops
-         $this->Request = $Controller->ReDispatch();
-         $this->Dispatch();
       }
 
       // Destruct the db connection;

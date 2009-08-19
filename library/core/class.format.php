@@ -62,7 +62,9 @@ class Format {
             ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $Session->UserID))
       ) $Gender = $Gender2 = 'your';
 
+      $IsYou = FALSE;
       if ($Session->UserID == $Activity->RegardingUserID) {
+         $IsYou = TRUE;
          $RegardingName = Gdn::Translate('you');
          $RegardingNameP = Gdn::Translate('your');
       } else {
@@ -78,8 +80,10 @@ class Format {
       } else if ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
-         $RegardingName = Anchor($RegardingName, '/profile/' . $RegardingNameD);
-         $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $RegardingNameD);
+         if (!$IsYou) {
+            $RegardingName = Anchor($RegardingName, '/profile/' . $RegardingNameD);
+            $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $RegardingNameD);
+         }
          $RegardingWall = Anchor('wall', '/profile/activity/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
       if ($RegardingWall == '')

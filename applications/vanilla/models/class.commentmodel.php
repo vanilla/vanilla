@@ -293,6 +293,11 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          if (!$Insert || !$this->CheckForSpam('Comment')) {
             $Fields = $this->Validation->SchemaValidationFields();
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+            
+            $DiscussionModel = new Gdn_DiscussionModel();
+            $DiscussionID = ArrayValue('DiscussionID', $Fields);
+            $Discussion = $DiscussionModel->GetID($DiscussionID);
+            $DiscussionAuthorMentioned = FALSE;
             if ($Insert === FALSE) {
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
@@ -305,13 +310,17 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                // Notify any users who were mentioned in the comment
                $Usernames = GetMentions($Fields['Body']);
                $UserModel = Gdn::UserModel();
+               $DiscussionName = '';
                foreach ($Usernames as $Username) {
                   $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
                   if ($User && $User->UserID != $Session->UserID) {
+                     if ($User->UserID == $Discussion->InsertUserID)
+                        $DiscussionAuthorMentioned = TRUE;
+                        
                      AddActivity(
                         $Session->UserID,
                         'CommentMention',
-                        '',
+                        Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                         $User->UserID,
                         'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
                      );
@@ -320,9 +329,8 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             }
             
             // Record user-comment activity
-            $DiscussionID = ArrayValue('DiscussionID', $Fields);
-            if ($Insert === TRUE && $DiscussionID !== FALSE)
-               $this->RecordActivity($DiscussionID, $Session->UserID, $CommentID); // Only record activity if inserting a comment, not on edit.
+            if ($Insert === TRUE && $Discussion !== FALSE && $DiscussionAuthorMentioned === FALSE)
+               $this->RecordActivity($Discussion, $Session->UserID, $CommentID); // Only record activity if inserting a comment, not on edit.
 
             $this->UpdateCommentCount($DiscussionID);
             
@@ -387,15 +395,13 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
       return $CommentID;
    }
       
-   public function RecordActivity($DiscussionID, $ActivityUserID, $CommentID) {
+   public function RecordActivity($Discussion, $ActivityUserID, $CommentID) {
       // Get the author of the discussion
-      $DiscussionModel = new Gdn_DiscussionModel();
-      $Discussion = $DiscussionModel->GetID($DiscussionID);
       if ($Discussion->InsertUserID != $ActivityUserID) 
          AddActivity(
             $ActivityUserID,
             'DiscussionComment',
-            '',
+            Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
             $Discussion->InsertUserID,
             'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
          );

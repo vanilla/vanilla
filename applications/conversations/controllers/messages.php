@@ -195,7 +195,7 @@ class MessagesController extends ConversationsController {
       $this->Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);
       
       if ($this->Conversation === FALSE)
-         return $this->ReDispatch('garden/home/filenotfound');
+         Redirect('garden/home/filenotfound');
 
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
          $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);

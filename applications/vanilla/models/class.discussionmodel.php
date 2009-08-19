@@ -358,9 +358,9 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                      );
                   }
                }
+               $DiscussionName = ArrayValue('Name', $Fields, '');
+               $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
-            $DiscussionName = ArrayValue('Name', $Fields, '');
-            $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             $this->UpdateDiscussionCount($DiscussionID);
          }
       } else {

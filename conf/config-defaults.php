@@ -14,7 +14,7 @@ $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
                                                                   PDO::ATTR_PERSISTENT => TRUE,
-                                                                  PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
+                                                                  1000 => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
                                                                   1002 => "set names 'utf8'" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
                                                                );
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';

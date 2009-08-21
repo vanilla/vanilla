@@ -90,6 +90,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             echo '</span>';
 
             echo Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category');
+            $Sender->FireEvent('DiscussionMeta');
          ?>
       </li>
    </ul>

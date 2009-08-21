@@ -19,6 +19,7 @@ if ($Session->IsValid()) {
 ?></h2>
 <?php
    echo $this->Pager->ToString('less');
+   echo $this->RenderAsset('DiscussionBefore');
 ?>
 <ul id="Discussion">
    <?php echo $this->FetchView('comments'); ?>

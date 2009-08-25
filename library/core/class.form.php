@@ -1546,7 +1546,6 @@ class Gdn_Form {
     */
    protected function _ValueAttribute($FieldName, $Attributes) {
       // Value from $Attributes overrides the datasource and the postback.
-      return ' value="' . Format::Form(
-         ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
+      return ' value="' . Format::Form(ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
    }
 }

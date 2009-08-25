@@ -421,7 +421,11 @@ class Gdn_Configuration {
       } else if (in_array($Value, array('TRUE', 'FALSE'))) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
-         $Array[] = $Prefix .= " = '".Format::ArrayValueForPhp($Value)."';";
+         if (strpos($Value, "'") !== FALSE) {
+            $Array[] = $Prefix .= ' = "'.Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
+         } else {
+            $Array[] = $Prefix .= " = '".Format::ArrayValueForPhp($Value)."';";
+         }
       }
    }
 }

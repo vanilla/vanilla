@@ -185,7 +185,7 @@ class GardenSetupController extends GardenController {
                // The user has been created successfully, so sign in now
                $Authenticator = Gdn::Authenticator();
                $AuthUserID = $Authenticator->Authenticate(array(
-                  'Name' => $this->Form->GetValue('Name'),
+                  'Email' => $this->Form->GetValue('Email'),
                   'Password' => $this->Form->GetValue('Password'),
                   'RememberMe' => TRUE)
                );
@@ -213,7 +213,7 @@ class GardenSetupController extends GardenController {
    
    private function _CheckPrerequisites() {
       // Make sure we are running at least PHP 5.1
-      if (intval(str_replace('.', '', phpversion())) < 510)
+      if (version_compare(phpversion(), '5.1.0') < 0)
          $this->Form->AddError("You are running PHP version ".phpversion().". Vanilla requires PHP 5.1.0 or greater, so you'll need to upgrade PHP before you can continue.");
 
       // Make sure PDO is available
@@ -236,6 +236,7 @@ class GardenSetupController extends GardenController {
       if (!is_readable(PATH_CACHE) || !is_writable(PATH_CACHE)) {
          $this->Form->AddError('Your cache folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code>'.PATH_CACHE.'</code>');
       } else {
+         if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');

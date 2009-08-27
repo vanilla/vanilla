@@ -1,82 +1,56 @@
 body,
 div {
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-family: Arial, Helvetica, Verdana;
 }
 body {
-   background: #ffffff;
+   background: url('slicesplash.jpg') top center no-repeat #DCF5FE;
    margin: 0px;
    padding: 0px;
    text-align: center;
-   font-size: small;
-   }
-table {
-   border-collapse: separate;
-   }
-#Frame {
-   width: 800px;
-   text-align: left;
-   margin-left: auto;
-   margin-right: auto;
-   }
-#Content {
-   padding: 10px;
+   color:#076C8E;
+   text-shadow:0 1px 0 #FFFFFF;   
    }
 a,
 a:link,
-a:active {
-   color: #0063dc;
-   text-decoration: none;
-   }
+a:active,
 a:visited {
-   color: #ff0084;
+   color: #2786C2;
    text-decoration: none;
    }
 a:hover {
-   color: #0063dc !important;
+   color: #FF0084 !important;
    text-decoration: underline;
    }
 div.Title {
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   background: #E9F9FF;
-   color: #31b8e7;
-   padding: 0;
-   margin: 10px 0;
-   text-align: left;
-   height: 80px;
+   background:#F2FBFF none repeat scroll 0 0;
+   border-bottom:1px solid #FFFFFF;
+   padding: 30px 0;
+   text-align:left;
 }
 h1 {
-   -moz-border-radius-topleft: 4px;
-   -webkit-border-top-left-radius: 4px;
-   -moz-border-radius-bottomleft: 4px;
-   -webkit-border-bottom-left-radius: 4px;
-   background: url('install-vanilla.png') center center no-repeat #44c7f4;
-   color: #E9F9FF;
+   color: #02455B;
+   width: 800px;
+   margin: 0 auto;
    padding: 0;
-   margin: 0;
-   float: left;
-   display: block;
-   width: 180px;
-   height: 80px;
+   font-size: 180%;
 }
-h1 span {
-   display: none;
+div.Form {
+   border-top: 1px solid #C0E7F5;
+   text-align: center;
 }
-h2 {
-   padding: 28px 0 0;
-   margin: 0 0 10px;
-   text-align: left;
-   text-indent: 12px;
+div.Form ul {
+   width: 800px;
+   margin: 0 auto;
+   padding: 40px;
    }
-ul {
-   margin: 0px;
-   padding: 0px 40px 20px 40px;
-   }
+div.Form div.Errors ul {
+   padding: 0;
+}
 div.Errors {
-   -moz-border-radius: 4px;
    background: #d00;
-   padding: 0 8px !important;
+   padding: 20px 8px !important;
    margin: 0 0 10px;
+   border-bottom: 1px solid #C0E7F5;
 }
 .Errors li {
    padding: 4px 0 !important;
@@ -85,6 +59,7 @@ div.Errors {
    color: #fff !important;
    font-size: 16px;
    line-height: 150%;
+   text-shadow: #900 0 1px 0;
 }
 .Errors li a {
    color: #ff0;
@@ -92,16 +67,6 @@ div.Errors {
 .Errors li a:hover {
    color: #ff0 !important;
 }
-code {
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #b00;
-   font-family:Monaco,Verdana,Sans-serif;
-   overflow:auto;
-   padding:4px 8px;
-   font-size: 80%;
-}
-
 .ImportProgress {
    padding-left: 40px;
    background: url('progress.gif') left center no-repeat;
@@ -117,9 +82,6 @@ code {
 .Loading {
    height: 100px;
    background: url('progress.gif') center center no-repeat;
-}
-body.Profile .Loading {
-   margin-left: 232px;
 }
 .Progress {
    padding: 10px 40px 10px 0px;
@@ -140,9 +102,7 @@ form ul {
    padding: 10px;
 }
 form ul li {
-   border-bottom: 1px solid #eee;
    padding: 10px 0;
-   color: #555 /* Body Text Font Color */;
    font-size: 18px;
 }
 form ul li.Warning {
@@ -151,52 +111,54 @@ form ul li.Warning {
    font-size: 17px;
 }
 form ul li.Warning div {
-   background: #ff9;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
    font-size: 90%;
-   padding: 8px 12px;
+   padding: 16px 0 8px;
 }
 form ul li label {
-   color: #222;
+   font-weight: bold;
    float: left;
    display: block;
    width: 240px;
-   padding: 8px 6px 0px 4px;
+   padding: 8px 0 0;
+   font-size: 120%;
    }
 form ul li input.InputBox {
-   font-size: 18px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   font-size: 110%;
    padding: 8px;
-   width: 485px;
-   border: 1px solid #999;
+   width: 535px;
+   border: 1px solid #C0E7F5;
    color: #555 /* Body Text Font Color */;
 }
 form ul li input.InputBox:focus {
    color: #000;
-   border: 1px solid #333;
+   background: #FFFEDE;
+   border: 1px solid #a0c7c5;
 }
 form ul li.Last {
    padding: 12px 0 2px;
    border-bottom: 0;
 }
 div.Button {
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   background: #E9F9FF;
-   padding: 12px;
+   text-align: right;
+   padding: 12px 12px 30px;
+   width: 785px;
+   margin: 0 auto;
 }
 div.Button a,
 input.Button {
+   font-family: arial, helvetica, verdana;
    cursor: pointer;
-   margin: 0px 0px 0px 0px;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   padding: 4px;
-   font-size: 16px;
+   margin: 0;
+   padding: 3px 10px;
+   font-size: 25px;
+   text-shadow:0 1px 0 #FFFFFF;   
+   color: #073C5E;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #555;
    border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
    font-weight: bold;
 }
 div.Button a {

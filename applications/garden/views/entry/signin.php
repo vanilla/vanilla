@@ -8,8 +8,8 @@ echo $this->Form->Open(array('Action' => Url('/entry/signin'), 'id' => 'Form_Use
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Username', 'Name');
-         echo $this->Form->TextBox('Name');
+         echo $this->Form->Label('Email', 'Email');
+         echo $this->Form->TextBox('Email');
       ?>
    </li>
    <li>

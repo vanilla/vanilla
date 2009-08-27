@@ -3,14 +3,13 @@
 echo $this->Form->Open();
 ?>
 <div class="Title">
-   <h1><span>Vanilla</span></h1>
-   <h2><?php echo Translate("Ooopsy Daisy"); ?></h2>
+   <h1><?php echo Translate("Ooopsy Daisy"); ?></h1>
 </div>
-<?php
-echo $this->Form->Errors();
-?>
-<div class="Button">
-   <?php echo Anchor('Try Again', '/garden/gardensetup'); ?>
+<div class="Form">
+   <?php echo $this->Form->Errors(); ?>
+   <div class="Button">
+      <?php echo Anchor('Try Again', '/garden/gardensetup'); ?>
+   </div>
 </div>
 <?php
 $this->Form->Close();

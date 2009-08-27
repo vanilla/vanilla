@@ -560,14 +560,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       // Include the module sort
       $Modules = Gdn::Config('Modules', array());
-   
       if($this->ModuleSortContainer === FALSE)
          $ModuleSort = FALSE; // no sort wanted
       elseif(array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
          $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
       elseif(array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
          $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
-      
+
       $ThisAssets = $this->Assets[$AssetName];
       $Assets = array();
       if(isset($ModuleSort) && is_array($ModuleSort)) {

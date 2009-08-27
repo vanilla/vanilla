@@ -42,7 +42,7 @@ $Definition['ValidateMinimumAge'] = 'You must be at least 16 years old to procee
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
 
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
-$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the username and password you entered.';
+$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email and password you entered.';
 $Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
 $Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
 $Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
@@ -68,7 +68,7 @@ $Definition['EmailWelcome'] = 'Hello %1$s,
 
 %2$s has created an account for you at %3$s. Your login credentials are:
 
-  Username: %1$s
+  Email: %6$s
   Password: %5$s
   Url: %4$s
 
@@ -77,7 +77,7 @@ $Definition['EmailPassword'] = 'Hello %1$s,
 
 %2$s has reset your password at %3$s. Your login credentials are now:
 
-  Username: %1$s
+  Email: %6$s
   Password: %5$s
   Url: %4$s
 

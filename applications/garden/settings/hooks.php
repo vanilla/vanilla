@@ -30,7 +30,7 @@ class GardenHooks implements Gdn_IPlugin {
                
             $Sender->Menu->AddLink('User', $Name, '/profile/{Username}', array('Garden.SignIn.Allow'));
          } else {
-            $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl());
+            $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl($Sender->SelfUrl));
          }
       }
       // Enable theme previewing

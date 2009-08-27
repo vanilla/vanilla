@@ -100,10 +100,11 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
       }
       
       return $this->_Authenticate(
-         ArrayValue('Name', $Data),
+         ArrayValue('Email', $Data),
          ArrayValue('Password', $Data),
          ArrayValue('RememberMe', $Data, FALSE),
-         ArrayValue('ClientHour', $Data, ''));
+         ArrayValue('ClientHour', $Data, '')
+      );
    }
 
    /**
@@ -111,17 +112,17 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
     * username/password combination weren't found, or -1 if the user does not
     * have permission to sign in.
     *
-    * @param string $Username The unique name assigned to the user in the database.
+    * @param string $Email The email address (or unique username) assigned to the user in the database.
     * @param string $Password The password assigned to the user in the database.
     * @param boolean $PersistentSession Should the user's session remain persistent across visits?
     * @param int $ClientHour The current hour (24 hour format) of the client.
     */
-   protected function _Authenticate($Username, $Password, $PersistentSession, $ClientHour = '') {
+   protected function _Authenticate($Email, $Password, $PersistentSession, $ClientHour = '') {
       $UserID = 0;
 
       // Retrieve matching username/password values
       $UserModel = $this->GetUserModel();
-      $UserData = $UserModel->ValidateCredentials($Username, 0, $Password);
+      $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
       if ($UserData !== False) {
          // Get ID
          $UserID = $UserData->UserID;
@@ -176,11 +177,10 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
 	}
    
    public function RegisterUrl($Redirect = '/') {
-      return $this->SignInUrl($Redirect);
+      return sprintf(Gdn::Config('Garden.RegisterUrl', '/entry/?Target=%s'), $Redirect);
 	}
    
    public function SignInUrl($Redirect = '/') {
-		$Url = '/entry/?Target='.urlencode($Redirect);
-		return $Url;
+      return sprintf(Gdn::Config('Garden.SignInUrl', '/entry/?Target=%s'), $Redirect);
    }
 }

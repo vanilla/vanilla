@@ -13,15 +13,15 @@ echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_U
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Username', 'Name');
-         echo $this->Form->TextBox('Name');
-         echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.Gdn::Translate('Name Unavailable').'</span>';
+         echo $this->Form->Label('Email', 'Email');
+         echo $this->Form->TextBox('Email');
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Email', 'Email');
-         echo $this->Form->TextBox('Email');
+         echo $this->Form->Label('Name', 'Name');
+         echo $this->Form->TextBox('Name');
+         echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.Gdn::Translate('Name Unavailable').'</span>';
       ?>
    </li>
    <li>

@@ -694,7 +694,7 @@ class Gdn_UserModel extends Gdn_Model {
    /**
     * Validate User Credential
     *
-    * It will fetch a a user row by its name and compare the password.
+    * Fetches a user row by email (or name) and compare the password.
     * The password can be stored in plain text, in a md5
     * or a blowfish hash.
     *
@@ -703,14 +703,13 @@ class Gdn_UserModel extends Gdn_Model {
     *
     * Return the user's id, admin status and attributes.
     *
-    * @param string $Name
+    * @param string $Email
     * @param string $Password
     * @return object
     */
-   public function ValidateCredentials($Name='', $ID=0, $Password) {
-      if (!$Name && !$ID) {
-         throw new Exception('The user name or id is required');
-      }
+   public function ValidateCredentials($Email = '', $ID = 0, $Password) {
+      if (!$Email && !$ID)
+         throw new Exception('The email or id is required');
 
       $this->SQL->Select('UserID, Attributes, Admin, Password, CacheRoleID')
          ->From('User');
@@ -718,20 +717,21 @@ class Gdn_UserModel extends Gdn_Model {
       if ($ID) {
          $this->SQL->Where('UserID', $ID);
       } else {
-         $this->SQL->Where('Name', $Name);
+         if (strpos($Email, '@') > 0) {
+            $this->SQL->Where('Email', $Email);
+         } else {
+            $this->SQL->Where('Name', $Email);
+         }
       }
 
       $DataSet = $this->SQL->Get();
-
-      if ($DataSet->NumRows() < 1) {
-         return False;
-      }
+      if ($DataSet->NumRows() < 1)
+         return FALSE;
 
       $UserData = $DataSet->FirstRow();
       $PasswordHash = new Gdn_PasswordHash();
-      if (!$PasswordHash->CheckPassword($Password, $UserData->Password)) {
-         return False;
-      }
+      if (!$PasswordHash->CheckPassword($Password, $UserData->Password))
+         return FALSE;
 
       if ($PasswordHash->Weak) {
          $PasswordHash = new Gdn_PasswordHash();
@@ -1082,7 +1082,8 @@ class Gdn_UserModel extends Gdn_Model {
             $Sender->Name,
             $AppTitle,
             Gdn_Url::WebRoot(TRUE),
-            $Password
+            $Password,
+            $User->Email
          )
       );
       $Email->Send();
@@ -1104,7 +1105,8 @@ class Gdn_UserModel extends Gdn_Model {
             $Sender->Name,
             $AppTitle,
             Gdn_Url::WebRoot(TRUE),
-            $Password
+            $Password,
+            $User->Email
          )
       );
       $Email->Send();

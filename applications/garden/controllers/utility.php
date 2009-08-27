@@ -173,8 +173,4 @@ class UtilityController extends GardenController {
          
       $this->Render();
    }
-   
-   public function SqlDrriverTest() {
-      $this->Render();
-   }
 }

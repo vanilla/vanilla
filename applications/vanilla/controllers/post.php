@@ -19,6 +19,16 @@ class PostController extends VanillaController {
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
          $CategoryModel = new Gdn_CategoryModel();
+
+         // Filter to categories that this user can add to
+         $CategoryModel->SQL->Distinct()
+            ->Join('Permission _p2', '_p2.JunctionID = c.CategoryID', 'inner')
+            ->Join('UserRole _ur2', '_p2.RoleID = _ur2.RoleID', 'inner')
+            ->BeginWhereGroup()
+            ->Where('_ur2.UserID', $Session->UserID)
+            ->Where('_p2.`Vanilla.Discussions.Add`', 1)
+            ->EndWhereGroup();
+
          $this->CategoryData = $CategoryModel->GetFull();
       }
       if ($this->Head) {
@@ -65,6 +75,9 @@ class PostController extends VanillaController {
             if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', $this->CategoryID))
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
+            if (!$Session->CheckPermission('Vanilla.Discussions.Add', $this->CategoryID))
+               $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
+
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {
                   $DraftID = $this->DraftModel->Save($FormValues);

@@ -792,11 +792,10 @@ class Gdn_UserModel extends Gdn_Model {
          $this->SaveRoles($UserID, $RoleIDs);
 
          // Send out a notification to the user
-         $SignInUrl = CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'entry', 'signin'), '/');
          $User = $this->Get($UserID);
          if ($User) {
             $Email->Subject(Gdn::Translate('MembershipApprovedSubject'));
-            $Email->Message(sprintf(Gdn::Translate('MembershipApprovedEmail'), $User->Name, $SignInUrl));
+            $Email->Message(sprintf(Gdn::Translate('MembershipApprovedEmail'), $User->Name, Gdn::Authenticator()->SignInUrl()));
             $Email->To($User->Email);
             $Email->Send();
          }
@@ -1043,8 +1042,8 @@ class Gdn_UserModel extends Gdn_Model {
       return $this->SaveToSerializedColumn('Attributes', $UserID, $Attribute, $Value);
    }
 
-   public function SetTransientKey($UserID) {
-      $Key = RandomString(12);
+   public function SetTransientKey($UserID, $ExplicitKey = '') {
+      $Key = $ExplicitKey == '' ? RandomString(12) : $ExplicitKey;
       $this->SaveAttribute($UserID, 'TransientKey', $Key);
       return $Key;
    }
@@ -1116,7 +1115,7 @@ class Gdn_UserModel extends Gdn_Model {
     * Synchronizes the user based on a given UniqueID.
     *
     * @param string $UniqueID A string that uniquely identifies this user.
-    * @param array`$Data Information to put in the user table.
+    * @param array $Data Information to put in the user table.
     * @return int The ID of the user.
     */
    public function Synchronize($UniqueID, $Data) {
@@ -1140,17 +1139,21 @@ class Gdn_UserModel extends Gdn_Model {
       
       $User = $this->SQL->Get()->FirstRow();
       
-      if($User === FALSE) {   
+      if($User === FALSE) {
          // Clean the user data.
          $UserData['Name'] = $Data['Name'];
          $UserData['Password'] = '*****';
          $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
          $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Data, 'm'), 0, 1));
-         $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Data, NULL);
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Data, 0);
-      
+         $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Data, '');
+         if ($UserData['DateOfBirth'] == '')
+            $UserData['DateOfBirth'] = '1975-09-16';
+            
          // Insert the new user.
-         $UserID = $this->Save($UserData);
+         $this->AddInsertFields($UserData);
+         $UserID = $this->SQL->Insert($this->Name, $UserData);
+
          if($UserID) {
             // Save the roles.
             $Roles = ArrayValue('Roles', $Data, Gdn::Config('Garden.Registration.DefaultRoles'));
@@ -1208,6 +1211,11 @@ class Gdn_UserModel extends Gdn_Model {
             $this->SaveRoles($UserID, $Data['Roles']);
          }
       }
+      
+      // Synchronize the transientkey from the external user data source if it is present (eg. WordPress' wpnonce).
+      if (array_key_exists('TransientKey', $Data) && $Data['TransientKey'] != '' && $UserID > 0)
+         $this->SetTransientKey($UserID, $Data['TransientKey']);
+
       return $UserID;
    }
    

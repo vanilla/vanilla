@@ -868,15 +868,14 @@ ul.BigList {
    border: 1px solid #dff4fc /* Panel Inlay Border Color */;
 }
 ul.BigList li {
+	color: #0766a2;
    font-size: 16px;
-   padding: 12px 0 12px 55px;   
+	font-weight: bold;
+	margin: 0 0 0 30px;
+   padding: 8px 0 8px 4px;
+	list-style: decimal;
+	text-shadow: 0 1px 0 #fff;
 }
-li.one { background: url('one.png') no-repeat center left; }
-li.two { background: url('two.png') no-repeat center left; }
-li.three { background: url('three.png') no-repeat center left; }
-li.four { background: url('four.png') no-repeat center left; }
-li.five { background: url('five.png') no-repeat center left; }
-
 
 /* ============================================================= Entry Screen */
 body.Entry {
@@ -976,10 +975,10 @@ body.Entry span.Incorrect {
    color: red;
    padding-left: 140px;
 }
-#NewPassword div {
+div.InputButtons {
    margin: 6px 0 0 160px;
 }
-#NewPassword div a {
+div.InputButtons a {
    margin-right: 6px;
 }
 

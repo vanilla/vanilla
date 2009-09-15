@@ -119,6 +119,8 @@ class MessageController extends GardenController {
       $AssetData = array();
       $AssetData['Content'] = 'Above Main Content';
       $AssetData['Panel'] = 'Below Sidebar';
+      $this->EventArguments['AssetData'] = &$AssetData;
+      $this->FireEvent('GetAssetDataAfter');
       return $AssetData;
    }
    
@@ -129,6 +131,8 @@ class MessageController extends GardenController {
       $ControllerData['Vanilla/Discussions/Index'] = 'Discussions Page';
       $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
       $ControllerData['Base'] = 'Every Page';
+      $this->EventArguments['ControllerData'] = &$ControllerData;
+      $this->FireEvent('GetLocationDataAfter');
       return $ControllerData;
    }
 }

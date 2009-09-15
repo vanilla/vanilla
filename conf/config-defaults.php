@@ -37,6 +37,10 @@ $Configuration['Garden']['Cookie']['Path']                      = '/';
 $Configuration['Garden']['Cookie']['Domain']                    = '';
 $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 or sha1
 $Configuration['Garden']['Authenticator']['Type']               = 'Password'; // Types include 'Password' and 'Handshake'
+$Configuration['Garden']['Authenticator']['Encoding']           = 'ini';
+$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/?Target=%s';
+$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/?Target=%s';
+$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}';
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = PATH_CACHE . DS . 'error.log';
 $Configuration['Garden']['Registration']['Method']              = 'Basic'; // Options are: Basic, Captcha, Approval, Invitation

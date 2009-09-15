@@ -18,8 +18,9 @@ $this->RenderAsset('Messages');
 <?php
 $Count = count($this->BuzzData);
 foreach ($this->BuzzData as $Name => $Value) {
-   echo '<dt>'.$Value.'</dt>
-   <dd>'.$Name.'</dd>';
+   if ($Value > 0)
+      echo '<dt>'.$Value.'</dt>
+      <dd>'.$Name.'</dd>';
 }
 ?>
 </dl>

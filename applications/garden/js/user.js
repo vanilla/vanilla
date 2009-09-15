@@ -24,13 +24,7 @@ jQuery(document).ready(function($) {
    
    // Generate password
    $('a.GeneratePassword').live('click', function() {
-      var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
-      var passwd = '';
-      var pos = 0;
-      for (var i = 0; i < 7; i++) {
-         pos = Math.floor(Math.random() * chars.length);
-         passwd += chars.substring(pos, pos + 1);
-      }
+      var passwd = generateString(7);
       $(':password').val(passwd);
       $('#Form_ShowPassword').val(passwd);
       return false;

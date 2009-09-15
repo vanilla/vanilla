@@ -41,12 +41,12 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('ResetPassword', 'Reset password and send email notification to user');
       ?>
    </li>
-   <li id="NewPassword">
+   <li>
       <?php
          echo $this->Form->Label('New Password', 'NewPassword');
          echo $this->Form->Input('NewPassword', 'password');
       ?>
-      <div>
+      <div class="InputButtons">
          <?php
             echo Anchor('Generate Password', '#', 'GeneratePassword Button');
             echo Anchor('Reveal Password', '#', 'RevealPassword Button');

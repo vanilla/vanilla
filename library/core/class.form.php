@@ -1233,11 +1233,25 @@ class Gdn_Form {
     * @param string $FieldName The name of the field to set the value of.
     * @param mixed $Value The new value of $FieldName.
     */
-   public function SetFormValue(
-      $FieldName, $Value) {
+   public function SetFormValue($FieldName, $Value) {
       $this->FormValues();
       $this->_FormValues[$FieldName] = $Value;
    }
+   
+   /**
+    * Sets the value associated with $FieldName.
+    *
+    * It sets the value in $this->_DataArray rather than in $this->_FormValues.
+    *
+    * @param string $FieldName
+    * @param mixed $Default
+    */
+   public function SetValue($FieldName, $Value) {
+      if (!is_array($this->_DataArray))
+         $this->_DataArray = array();
+      
+      $this->_DataArray[$FieldName] = $Value;
+   }   
 
    /**
     * If not saving data directly to the model, this method allows you to

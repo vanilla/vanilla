@@ -116,7 +116,7 @@ class Gdn_InvitationModel extends Gdn_Model {
          throw new Exception(Gdn::Translate('ErrorPermission'));
       } else {
          // Some information for the email
-         $RegistrationUrl = CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'entry', 'register', $Invitation->Code), '/');
+         $RegistrationUrl = Gdn::Authenticator()->RegisterUrl($Invitation->Code);
          $AppTitle = Gdn::Config('Garden.Title');
          $Email = new Gdn_Email();
          $Email->Subject(sprintf(Gdn::Translate('[%s] Invitation'), $AppTitle));

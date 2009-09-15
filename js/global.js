@@ -120,8 +120,19 @@ jQuery(document).ready(function($) {
             $(message).appendTo('body').show();
       }
    }
-   
-   
+   generateString = function(length) {
+      if (length == null)
+         length = 5;
+         
+      var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
+      var string = '';
+      var pos = 0;
+      for (var i = 0; i < length; i++) {
+         pos = Math.floor(Math.random() * chars.length);
+         string += chars.substring(pos, pos + 1);
+      }
+      return string;
+   }
 
    processTargets = function(targets) {
       if(!targets || !targets.length)

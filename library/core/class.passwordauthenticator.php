@@ -177,10 +177,15 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
 	}
    
    public function RegisterUrl($Redirect = '/') {
-      return sprintf(Gdn::Config('Garden.RegisterUrl', '/entry/?Target=%s'), $Redirect);
+      return sprintf(Gdn::Config('Garden.Authenticator.RegisterUrl', '/entry/?Target=%s'), $Redirect);
 	}
    
    public function SignInUrl($Redirect = '/') {
-      return sprintf(Gdn::Config('Garden.SignInUrl', '/entry/?Target=%s'), $Redirect);
+      return sprintf(Gdn::Config('Garden.Authenticator.SignInUrl', '/entry/?Target=%s'), $Redirect);
    }
+
+   public function SignOutUrl() {
+      return Gdn::Config('Garden.Authenticator.SignOutUrl') == '' ? '/entry/leave/{Session_TransientKey}' : Gdn::Config('Garden.Authenticator.SignOutUrl');
+   }
+
 }

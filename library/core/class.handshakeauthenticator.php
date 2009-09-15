@@ -93,6 +93,7 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 		$Port = ArrayValue('port', $UrlParts, '80');
 		$Path = $UrlParts['path'];
 		$Referer = Gdn_Url::WebRoot(TRUE);
+		$Query = $UrlParts['query'];
 		
 		// Make a request to the authenticated Url to see if we are logged in.
 		$Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
@@ -114,19 +115,22 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 		if(strlen($Cookie) > 0)
 			$Cookie = "Cookie: $Cookie\r\n";
 			
-		// Send the necessary headers to get the file
-		fputs($Pointer, "GET $Path HTTP/1.0\r\n" .
+		
+		$Header = "GET $Path?$Query HTTP/1.1\r\n" .
 			"Host: $Host\r\n" .
-			"User-Agent: Vanilla/1.0\r\n" .
+			"User-Agent: Vanilla/2.0\r\n" .
 			"Accept: */*\r\n" .
-			//"Accept-Language: ".$Locale."\r\n" .
 			"Accept-Charset: utf-8;\r\n" .
-			"Keep-Alive: 300\r\n" .
-			"Connection: keep-alive\r\n" .
 			"Referer: $Referer\r\n" .
-			$Cookie .
-			"\r\n");
-
+			// "Keep-Alive: 300\r\n" .
+			// "Connection: keep-alive\r\n" .
+			"Connection: close\r\n" .
+			$Cookie."\r\n\r\n";
+			
+		// Send the necessary headers to get the file
+		fputs($Pointer, $Header);
+//		echo '<br /><textarea style="height: 400px; width: 700px;">'.$Header.'</textarea>';
+			
 		// Retrieve the response from the remote server
 		$Response = '';
 		$InBody = FALSE;
@@ -134,6 +138,7 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 			$Response .= $Line;
 		}
 		fclose($Pointer);
+//		echo '<br /><textarea style="height: 400px; width: 700px;">'.$Response.'</textarea>';
 		// Remove response headers
 		$Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
 		
@@ -156,8 +161,9 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 			$Id = $this->_Identity->GetIdentity();
 			if($Id > 0)
 				return $Id;
-			elseif($Id < 0)
-				return 0; // prevent session from grabbing constantly
+// DEBUG: add these back in after testing is complete
+//			elseif($Id < 0)
+//				return 0; // prevent session from grabbing constantly
 		}
 		
 		// Get the handshake data to authenticate.
@@ -198,8 +204,10 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 	}
 	
 	public function SignOutUrl() {
+		$Session = Gdn::Session();
 		$Url = sprintf($this->_SignOutUrl, urlencode(Gdn_Url::Request()));
-		return Gdn::Config('Garden.Authenticator.SignOutUrl');
+		$Url = str_replace('{Session_TransientKey}', $Session->TransientKey(), $Url);
+		return $Url;
 	}
 	
 	public function State() {

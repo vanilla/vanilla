@@ -229,7 +229,7 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 			}
 			
 			// Clear out the css cache.
-			$Files = glob(PATH_CACHE.DS.'css'.DS.'*.css');
+			$Files = Glob(PATH_CACHE.DS.'css'.DS.'*.css');
 			foreach($Files as $File) {
 				unlink($File);
 			}

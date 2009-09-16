@@ -529,7 +529,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
-            $Paths = glob($Glob);
+            $Paths = Glob($Glob);
             if(is_array($Paths) && count($Paths) > 0) {
                $ViewPath = $Paths[0];
                break;
@@ -825,7 +825,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                // Find the first file that matches the path.
                $CssPath = FALSE;
                foreach($CssPaths as $Glob) {
-                  $Paths = glob($Glob);
+                  $Paths = Glob($Glob);
                   if(is_array($Paths) && count($Paths) > 0) {
                      $CssPath = $Paths[0];
                      break;
@@ -873,7 +873,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Find the first file that matches the path.
       $MasterViewPath = FALSE;
       foreach($MasterViewPaths as $Glob) {
-         $Paths = glob($Glob);
+         $Paths = Glob($Glob);
          if(is_array($Paths) && count($Paths) > 0) {
             $MasterViewPath = $Paths[0];
             break;

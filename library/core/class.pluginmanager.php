@@ -231,7 +231,7 @@ class Gdn_PluginManager {
                   continue;
                }
                
-               $PluginPaths = glob(PATH_PLUGINS . DS . $Item . DS . '*plugin.php');
+               $PluginPaths = Glob(PATH_PLUGINS . DS . $Item . DS . '*plugin.php');
                $PluginPaths[] = PATH_PLUGINS . DS . $Item . DS . 'default.php';
                
                foreach($PluginPaths as $i => $PluginFile) {
@@ -406,7 +406,7 @@ class Gdn_PluginManager {
       $Paths = array();
       foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
          $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
-         $Paths = array_merge($Paths, glob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
+         $Paths = array_merge($Paths, Glob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
       }
       
       // Include all of the paths.

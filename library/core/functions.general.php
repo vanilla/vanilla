@@ -785,3 +785,13 @@ if (!function_exists('parse_ini_string')) {
       return $Result;
    }
 }
+
+if (!function_exists('Glob')) {
+   function Glob($Pattern, $Flags = 0) {
+      $Return = glob($Pattern, $Flags);
+      if ($Return == FALSE)
+         $Return = array();
+         
+      return $Return;
+   }
+}

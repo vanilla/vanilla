@@ -34,7 +34,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @package Garden
  */
 
-class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
+class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthenticator {
 	const SignedIn = 1;
 	const SignedOut = -1;
 	const HandshakeError = -2;
@@ -75,13 +75,12 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
    public function Authenticate($Data) {
 		if(array_key_exists('UserID', $Data)) {
 			$this->_Identity->SetIdentity($Data['UserID']);
+			$this->FireEvent('Authenticated');
 		}
 	}
 
    public function DeAuthenticate() {
-		$this->_Identity->SetIdentity(NULL);
-		$Url = sprintf($this->SignOutUrl(), urlencode(Url('/', TRUE)));
-		Redirect($Url);
+      $this->_Identity->SetIdentity(NULL);
 	}
 	
 	public function GetHandshakeData() {
@@ -93,7 +92,7 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 		$Port = ArrayValue('port', $UrlParts, '80');
 		$Path = $UrlParts['path'];
 		$Referer = Gdn_Url::WebRoot(TRUE);
-		$Query = $UrlParts['query'];
+		$Query = ArrayValue('query', $UrlParts, '');
 		
 		// Make a request to the authenticated Url to see if we are logged in.
 		$Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
@@ -112,24 +111,25 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 				
 			$Cookie .= $Key.'='.urlencode($Value);
 		}
+
 		if(strlen($Cookie) > 0)
 			$Cookie = "Cookie: $Cookie\r\n";
 			
 		
 		$Header = "GET $Path?$Query HTTP/1.1\r\n" .
 			"Host: $Host\r\n" .
+			// If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+			// "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
 			"User-Agent: Vanilla/2.0\r\n" .
 			"Accept: */*\r\n" .
 			"Accept-Charset: utf-8;\r\n" .
 			"Referer: $Referer\r\n" .
-			// "Keep-Alive: 300\r\n" .
-			// "Connection: keep-alive\r\n" .
 			"Connection: close\r\n" .
 			$Cookie."\r\n\r\n";
 			
 		// Send the necessary headers to get the file
 		fputs($Pointer, $Header);
-//		echo '<br /><textarea style="height: 400px; width: 700px;">'.$Header.'</textarea>';
+// echo '<br /><textarea style="height: 400px; width: 700px;">'.$Header.'</textarea>';
 			
 		// Retrieve the response from the remote server
 		$Response = '';
@@ -138,8 +138,9 @@ class Gdn_HandshakeAuthenticator implements Gdn_IAuthenticator {
 			$Response .= $Line;
 		}
 		fclose($Pointer);
-//		echo '<br /><textarea style="height: 400px; width: 700px;">'.$Response.'</textarea>';
-		// Remove response headers
+// echo '<br /><textarea style="height: 400px; width: 700px;">'.$Response.'</textarea>';
+// exit();
+// Remove response headers
 		$Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
 		
 		switch($this->Encoding) {

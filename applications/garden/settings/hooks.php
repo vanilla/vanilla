@@ -28,7 +28,7 @@ class GardenHooks implements Gdn_IPlugin {
                $Name .= '<span>'.$CountNotifications.'</span>';
                
             $Sender->Menu->AddLink('User', $Name, '/profile/{Username}', array('Garden.SignIn.Allow'));
-            $Sender->Menu->AddLink('SignOut', 'Sign Out', '/entry/leave/{Session_TransientKey}', FALSE, array('class' => 'NonTab'));
+            $Sender->Menu->AddLink('SignOut', 'Sign Out', $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
          } else {
             $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl($Sender->SelfUrl));
          }

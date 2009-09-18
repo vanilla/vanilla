@@ -28,7 +28,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  *
  * @package Garden
  */
-class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
+class Gdn_PasswordAuthenticator extends Gdn_Pluggable implements Gdn_IAuthenticator {
 
    /**
     * @var Gdn_IIdentity
@@ -51,6 +51,7 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
    public function __construct() {
       $this->_Identity = Gdn::Factory('Identity');
       $this->_Identity->Init();
+      parent::__construct();
    }
 
 
@@ -144,6 +145,8 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
 
             // Update some information about the user...
             $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
+            
+            $this->FireEvent('Authenticated');
          }
       }
       return $UserID;
@@ -177,15 +180,15 @@ class Gdn_PasswordAuthenticator implements Gdn_IAuthenticator {
 	}
    
    public function RegisterUrl($Redirect = '/') {
-      return sprintf(Gdn::Config('Garden.Authenticator.RegisterUrl', '/entry/?Target=%s'), $Redirect);
+      return sprintf('/entry/?Target=%s', $Redirect);
 	}
    
    public function SignInUrl($Redirect = '/') {
-      return sprintf(Gdn::Config('Garden.Authenticator.SignInUrl', '/entry/?Target=%s'), $Redirect);
+      return sprintf('/entry/?Target=%s', $Redirect);
    }
 
    public function SignOutUrl() {
-      return Gdn::Config('Garden.Authenticator.SignOutUrl') == '' ? '/entry/leave/{Session_TransientKey}' : Gdn::Config('Garden.Authenticator.SignOutUrl');
+      return '/entry/leave/{Session_TransientKey}';
    }
 
 }

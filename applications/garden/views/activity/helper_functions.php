@@ -17,16 +17,20 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    // If this was a status update or a wall comment, don't bother with activity strings
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
    $ActivityType = $ActivityType[0];
+   $Author = new stdClass();
+   $Author->UserID = $Activity->ActivityUserID;
+   $Author->Name = $Activity->ActivityName;
+   $Author->Photo = $Activity->ActivityPhoto;
    if (in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
-      if ($Activity->ActivityPhoto != '') {
-         echo '<a href="'.Url('/garden/profile/'.urlencode($Activity->ActivityName)).'" class="Photo">'
-            .$Sender->Html->Image('uploads/n'.$Activity->ActivityPhoto)
-         .'</a>';
-      }
+      echo UserPhoto($Author, 'Photo');
       echo '<div>';
-         echo UserAnchor($Activity->ActivityName, 'Name');
-         if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID))
-            echo '<span>&gt;</span>'.UserAnchor($Activity->RegardingName, 'Name');
+         echo UserAnchor($Author, 'Name');
+         if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
+            $Author->UserID = $Activity->RegardingUserID;
+            $Author->Name = $Activity->RegardingName;
+            $Author->Photo = '';
+            echo '<span>&gt;</span>'.UserAnchor($Author, 'Name');
+         }
          echo Format::Display($Activity->Story);
          echo '<div class="Meta">';
             echo Format::Date($Activity->DateInserted);
@@ -34,11 +38,9 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          echo '</div>';
       echo '</div>';
    } else {
-      if ($Activity->ActivityPhoto != '' && $Activity->ShowIcon == '1') {
-         echo '<a href="'.Url('/garden/profile/'.urlencode($Activity->ActivityName)).'" class="Photo">'
-            .$Sender->Html->Image('uploads/n'.$Activity->ActivityPhoto)
-         .'</a>';
-      }
+      if ($Activity->ShowIcon == '1')
+         echo UserPhoto($Author, 'Photo');
+
       echo '<div>';
          echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
          echo '<div class="Meta">';
@@ -90,19 +92,19 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
 }
 
 function WriteActivityComment($Comment, &$Sender, &$Session) {
+   $Author = new stdClass();
+   $Author->UserID = $Comment->ActivityUserID;
+   $Author->Name = $Comment->ActivityName;
+   $Author->Photo = $Comment->ActivityPhoto;
 ?>
 <li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php
    echo $Comment->ActivityType;
    if ($Comment->ActivityPhoto != '')
       echo ' HasPhoto';
 ?>"><?php
-   if ($Comment->ActivityPhoto != '') {
-      echo '<a href="'.Url('/garden/profile/'.urlencode($Comment->ActivityName)).'" class="Photo">'
-      .$Sender->Html->Image('uploads/n'.$Comment->ActivityPhoto)
-      .'</a>';
-   }
+   echo UserPhoto($Author, 'Photo');
    echo '<div>';
-      echo UserAnchor($Comment->ActivityName, 'Name');
+      echo UserAnchor($Author, 'Name');
       echo Format::Display($Comment->Story);
       echo '<div class="Meta">';
          echo Format::Date($Comment->DateInserted);

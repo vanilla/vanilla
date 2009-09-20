@@ -101,16 +101,14 @@ if (!function_exists('UserAnchor')) {
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      $Name = is_object($User) ? $User->Name : $User;
-      return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'>'.$Name.'</a>';
+      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
    }
 }
 if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $Photo, $CssClass = '') {
-      $Name = is_object($User) ? $User->Name : $User;
+   function UserPhoto($User, $CssClass = '') {
       $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($Photo != '') {
-         return '<a href="'.Url('/profile/'.urlencode($Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$Photo).'" alt="'.$Name.'" /></a>';
+      if ($User->Photo != '') {
+         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$User->Photo).'" alt="'.urlencode($User->Name).'" /></a>';
       } else {
          return ''; // Anchor($Name, '/profile/'.Format::Url($Name), $CssClass);
       }

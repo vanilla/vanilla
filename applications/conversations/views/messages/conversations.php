@@ -15,10 +15,16 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
 ?>
 <li<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <?php echo UserPhoto($Conversation->LastMessageName, $Conversation->LastMessagePhoto, 'Photo'); ?>
+   <?php
+   $LastAuthor = new stdClass();
+   $LastAuthor->UserID = $Conversation->LastMessageUserID;
+   $LastAuthor->Name = $Conversation->LastMessageName;
+   $LastAuthor->Photo = $Conversation->LastMessagePhoto;
+   echo UserPhoto($LastAuthor, 'Photo');
+   ?>
    <div>
       <?php
-      echo Anchor($Name, '/profile/'.Format::Url($Conversation->LastMessageName), 'Name');
+      echo UserAnchor($LastAuthor, 'Name');
       echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message');
       echo '<div class="Meta">';
          echo Format::Date($Conversation->DateLastMessage);

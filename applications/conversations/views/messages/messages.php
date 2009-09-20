@@ -18,13 +18,17 @@ foreach ($this->MessageData->Result() as $Message) {
       
    $Class = trim($Class);
    $Format = empty($Message->Format) ? 'Display' : $Message->Format;
+   $Author = new stdClass();
+   $Author->UserID = $Message->InsertUserID;
+   $Author->Name = $Message->InsertName;
+   $Author->Photo = $Message->InsertPhoto;
 ?>
 <li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
    <a name="Item_<?php echo $CurrentOffset;?>" class="Item" />
-   <?php echo UserPhoto($Message->InsertName, $Message->InsertPhoto, 'Photo'); ?>
+   <?php echo UserPhoto($Author, 'Photo'); ?>
    <div>
       <?php
-         echo UserAnchor($Message->InsertName, 'Name');
+         echo UserAnchor($Author, 'Name');
          echo Format::Date($Message->DateInserted);
       ?>
       <div class="Message"><?php echo Format::To($Message->Body, $Format); ?></div>

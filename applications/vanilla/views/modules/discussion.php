@@ -12,7 +12,10 @@
          if ($CountUnreadComments > 0)
             echo '<strong>'.sprintf('%s new', $CountUnreadComments).'</strong>';
             
-         echo '<span>'.Format::Date($Discussion->LastDate).' '.UserAnchor($Discussion->LastName).'</span>';
+         $Last = new stdClass();
+         $Last->UserID = $Discussion->LastUserID;
+         $Last->Name = $Discussion->LastName;
+         echo '<span>'.Format::Date($Discussion->LastDate).' '.UserAnchor($Last).'</span>';
       ?>
    </div>
 </li>

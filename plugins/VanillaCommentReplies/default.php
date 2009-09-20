@@ -133,9 +133,13 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
          
             ?>
             <ul class="Info<?php echo ($Sender->CurrentReply->InsertUserID == $Session->UserID ? ' Author' : '') ?>">
-               <li class="Author"><?php 
-                  echo UserPhoto($Sender->CurrentReply->InsertName, $Sender->CurrentReply->InsertPhoto);
-                  echo UserAnchor($Sender->CurrentReply->InsertName);
+               <li class="Author"><?php
+                  $Author = new stdClass();
+                  $Author->UserID = $Sender->CurrentReply->InsertUserID;
+                  $Author->Name = $Sender->CurrentReply->InsertName;
+                  $Author->Photo = $Sender->CurrentReply->InsertPhoto;
+                  echo UserPhoto($Author);
+                  echo UserAnchor($Author);
                ?></li>
                <li class="Created"><?php echo Format::Date($Sender->CurrentReply->DateInserted); ?></li>
                <li class="Permalink"><?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.(isset($Sender->CurrentComment) ? $Sender->CurrentComment->CommentID : $Sender->ReplyCommentID).'/#Comment_'.$Sender->CurrentReply->CommentID, Gdn::Translate('Permalink')); ?></li>

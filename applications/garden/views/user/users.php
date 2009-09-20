@@ -9,7 +9,7 @@ foreach ($this->UserData->Result('Text') as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-      <td><a href="<?php echo Url('/profile/'.$User->Name); ?>"><?php echo $User->Name; ?></a></td>
+      <td><?php echo UserAnchor($User); ?></td>
       <td class="Alt"><?php echo Format::Email($User->Email); ?></td>
       <td><?php echo Format::Date($User->DateFirstVisit); ?></td>
       <td class="Alt"><?php echo Format::Date($User->DateLastActive); ?></td>

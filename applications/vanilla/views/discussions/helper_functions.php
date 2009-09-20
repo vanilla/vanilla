@@ -86,7 +86,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                echo '<strong>',sprintf(Gdn::Translate('%s new'), $CountUnreadComments),'</strong>';
                
             echo '<span>';
-            printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Discussion->LastName), Format::Date($Discussion->LastDate));
+            $Last = new stdClass();
+            $Last->UserID = $Discussion->LastUserID;
+            $Last->Name = $Discussion->LastName;
+            printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
             echo '</span>';
 
             echo Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category');

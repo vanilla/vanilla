@@ -38,8 +38,8 @@ class SearchController extends GardenController {
 		
 		$Search = $this->Form->GetFormValue('Search');
 		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
-		$this->SetData('SearchResults', $ResultSet);
-		$this->SetData('SearchTerm', Format::Text($Search));
+		$this->SetData('SearchResults', $ResultSet, TRUE);
+		$this->SetData('SearchTerm', Format::Text($Search), TRUE);
 		$NumResults = $ResultSet->NumRows();
 		if ($NumResults == $Offset + $Limit)
 			$NumResults++;
@@ -56,7 +56,7 @@ class SearchController extends GardenController {
 			$NumResults,
 			'garden/search/%1$s/%2$s/?Search='.Format::Url($Search)
 		);
-		$this->SetData('Pager', $Pager);
+		$this->SetData('Pager', $Pager, TRUE);
 		
 		$this->View = 'results';
 		$this->Render();

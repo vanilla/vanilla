@@ -515,7 +515,7 @@ class ProfileController extends GardenController {
          $TabName = array($TabName => $TabUrl);
       foreach ($TabName as $Name => $Url) {
          if ($Url == '')
-            $Url = '/profile/'.strtolower($Name).'/'.urlencode($this->User->Name);
+            $Url = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.urlencode($this->User->Name);
             
          $this->_ProfileTabs[$Name] = $Url;
       }

@@ -32,8 +32,8 @@ foreach ($this->BuzzData as $Name => $Value) {
    foreach ($this->ActiveUserData as $User) {
       $Css = $User->Photo != '' ? 'HasPhoto' : '';
       echo '<li'.($Css != '' ? ' class="'.$Css.'"' : '').'>',
-         UserPhoto($User->Name, $User->Photo),
-         UserAnchor($User->Name),
+         UserPhoto($User),
+         UserAnchor($User),
          sprintf(Gdn::Translate('Last active %s'), Format::Date($User->DateLastActive)),
       '</li>';
    }

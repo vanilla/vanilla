@@ -5,9 +5,13 @@ if (property_exists($this, 'Discussion')) { ?>
 <ul class="Discussion Preview">
    <li class="Comment">
       <ul class="Info">
-         <li class="Author"><?php 
-            echo UserPhoto($this->Comment->InsertName, $this->Comment->InsertPhoto);
-            echo UserAnchor($this->Comment->InsertName);
+         <li class="Author"><?php
+            $Author = new stdClass();
+            $Author->UserID = $Comment->InsertUserID;
+            $Author->Name = $Comment->InsertName;
+            $Author->Photo = $Comment->InsertPhoto;
+            echo UserPhoto($Author);
+            echo UserAnchor($Author);
          ?></li>
          <li class="Created"><?php echo Format::Date($this->Comment->DateInserted); ?></li>
       </ul>

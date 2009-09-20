@@ -24,8 +24,11 @@ $this->FireEvent('BeforeInfo');
       <dd><?php echo implode(', ', $this->Roles); ?></dd>
       <?php               
       if ($this->User->InviteUserID > 0) {
+         $Inviter = new stdClass();
+         $Inviter->UserID = $this->User->InviteUserID;
+         $Inviter->Name = $this->User->InviteName;
          echo '<dt>'.Gdn::Translate('Invited by').'</dt>
-         <dd>'.UserAnchor($this->User->InviteName).'</dd>';
+         <dd>'.UserAnchor($Inviter).'</dd>';
       }
       $this->FireEvent('OnBasicInfo');
       ?>

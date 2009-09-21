@@ -40,9 +40,7 @@ class SetupController extends Gdn_Controller {
          $ApplicationInfo = array();
          include(CombinePaths(array(PATH_APPLICATIONS . DS . 'conversations' . DS . 'settings' . DS . 'about.php')));
          $Version = ArrayValue('Version', ArrayValue('Conversations', $ApplicationInfo, array()), 'Undefined');
-         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-         $Config->Set('Conversations.Version', $Version);
-         $Config->Save();
+         SaveToConfig('Conversations.Version', $Version);
       }
       
       return $this->Form->ErrorCount() > 0 ? FALSE : TRUE;

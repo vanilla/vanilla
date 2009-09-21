@@ -28,10 +28,11 @@ class SetupController extends Gdn_Controller {
          $ApplicationInfo = array();
          include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));
          $Version = ArrayValue('Version', ArrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
-         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-         $Config->Set('Vanilla.Version', $Version);
-         $Config->Set('Routes.DefaultController', 'discussions');
-         $Config->Save();
+         $Save = array(
+            'Vanilla.Version' => $Version,
+            'Routes.DefaultController' => 'discussions'
+         );
+         SaveToConfig($Save);
       }
       
       return $this->Form->ErrorCount() > 0 ? FALSE : TRUE;

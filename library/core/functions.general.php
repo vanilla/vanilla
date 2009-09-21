@@ -152,6 +152,36 @@ if (!function_exists('Translate')) {
 //   }
 //}
 
+if (!function_exists('SaveToConfig')) {
+   function SaveToConfig($Name, $Value = '') {
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Path = PATH_CONF . DS . 'config.php';
+      $Config->Load($Path, 'Save');
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+      
+      foreach ($Name as $k => $v) {
+         $Config->Set($k, $v);
+      }
+      return $Config->Save($Path);
+   }
+}
+
+if (!function_exists('RemoveFromConfig')) {
+   function RemoveFromConfig($Name) {
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Path = PATH_CONF . DS . 'config.php';
+      $Config->Load($Path, 'Save');
+      if (!is_array($Name))
+         $Name = array($Name);
+      
+      foreach ($Name as $k) {
+         $Config->Remove($k);
+      }
+      return $Config->Save($Path);
+   }
+}
+
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.

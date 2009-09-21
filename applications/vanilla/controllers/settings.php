@@ -16,7 +16,7 @@ class SettingsController extends VanillaController {
       }
 
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
@@ -65,7 +65,7 @@ class SettingsController extends VanillaController {
       $this->AddSideMenu('vanilla/settings/spam');
       
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussion.SpamCount',
          'Vanilla.Discussion.SpamTime',

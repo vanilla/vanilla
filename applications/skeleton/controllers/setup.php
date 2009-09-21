@@ -41,9 +41,7 @@ class SetupController extends Gdn_Controller {
          $ApplicationInfo = array();
          include(CombinePaths(array(PATH_APPLICATIONS . DS . 'skeleton' . DS . 'settings' . DS . 'about.php')));
          $Version = ArrayValue('Version', ArrayValue('Skeleton', $ApplicationInfo, array()), 'Undefined');
-         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-         $Config->Set('Skeleton.Version', $Version);
-         $Config->Save();
+         SaveToConfig('Skeleton.Version', $Version);
       }
       
       return $this->Form->ErrorCount() > 0 ? FALSE : TRUE;

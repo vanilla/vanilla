@@ -47,7 +47,7 @@ class RoutesController extends GardenController {
       }
       
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', PATH_CONF . DS . 'config.php', $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Route', 'Target'));
       
       // Set the model on the form.
@@ -69,11 +69,7 @@ class RoutesController extends GardenController {
             $FormPostValues['Route'] = $this->Route;
             
          if ($ConfigurationModel->Validate($FormPostValues)) {
-            $Config = Gdn::Factory(Gdn::AliasConfig);
-            $Path = PATH_CONF . DS . 'config.php';
-            $Config->Load($Path, 'Save');            
-            $Config->Set('Routes'.'.'.ArrayValue('Route', $FormPostValues), ArrayValue('Target', $FormPostValues));
-            $Config->Save($Path);
+            SaveToConfig('Routes'.'.'.ArrayValue('Route', $FormPostValues), ArrayValue('Target', $FormPostValues));
             $this->StatusMessage = Translate("The route was saved successfully.");
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
                $this->RedirectUrl = Url('garden/routes');
@@ -102,11 +98,7 @@ class RoutesController extends GardenController {
          && !in_array($Key, $this->ReservedRoutes)
          && $Key !== FALSE
       ) {
-         $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Path = PATH_CONF . DS . 'config.php';
-         $Config->Load($Path, 'Save');            
-         $Config->Remove('Routes'.'.'.$Key);
-         $Config->Save($Path);
+         RemoveFromConfig('Routes'.'.'.$Key);
       }
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)

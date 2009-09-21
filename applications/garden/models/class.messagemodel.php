@@ -115,9 +115,6 @@ class Gdn_MessageModel extends Gdn_Model {
    
    public function SetMessageCache() {
       // Retrieve an array of all controllers that have enabled messages associated
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-      $Config->Set('Garden.Messages.Cache', $this->GetEnabledLocations());
-      $Config->Save();
+      SaveToConfig('Garden.Messages.Cache', $this->GetEnabledLocations());
    }
 }

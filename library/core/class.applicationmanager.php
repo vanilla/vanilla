@@ -156,10 +156,7 @@ class Gdn_ApplicationManager {
       if ($ApplicationFolder == '') {
          throw new Exception(Gdn::Translate('The application folder was not properly defined.'));
       } else {
-         $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-         $Config->Set('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
-         $Config->Save();
+         SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
       }
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
@@ -191,10 +188,7 @@ class Gdn_ApplicationManager {
       }
 
       // 2. Disable it
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-      $Config->Remove('EnabledApplications'.'.'.$ApplicationName);
-      $Config->Save();
+      RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $PluginManager = Gdn::Factory('PluginManager');

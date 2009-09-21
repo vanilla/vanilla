@@ -77,9 +77,7 @@ class GardenSetupController extends GardenController {
          
          if ($CurrentStep == $TotalSteps) {
             // Save a variable so that the application knows it has been installed.
-            $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-            $Config->Set('Garden.Installed', TRUE);
-            $Config->Save();
+            SaveToConfig('Garden.Installed', TRUE);
             
             /*
             $Database = Gdn::Database();
@@ -102,11 +100,10 @@ class GardenSetupController extends GardenController {
     */
    public function Configure($RedirectUrl = '') {
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $ConfigFile = PATH_CONF . DS . 'config.php';
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel('Configuration', $ConfigFile, $Validation);
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password'));
       
       // Set the models on the forms.
@@ -197,15 +194,16 @@ class GardenSetupController extends GardenController {
             // Assign some extra settings to the configuration file if everything succeeded.
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'garden' . DS . 'settings' . DS . 'about.php')));
-            $Config->Load($ConfigFile, 'Save');
-            $Config->Set('Garden.Version', ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'));
-            $Config->Set('Garden.WebRoot', Gdn_Url::WebRoot());
-            $Config->Set('Garden.RewriteUrls', (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE);
-            $Config->Set('Garden.Domain', $Domain);
-            $Config->Set('Garden.CanProcessImages', function_exists('gd_info'));
-            $Config->Set('Garden.Messages.Cache', 'arr:["Garden\/Settings\/Index"]'); // Make sure that the "welcome" message is cached for viewing
-            $Config->Set('EnabledPlugins.HTMLPurifier', 'HtmlPurifier'); // Make sure html purifier is enabled so html has a default way of being safely parsed
-            $Config->Save();
+            $Save = array(
+               'Garden.Version' => ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'),
+               'Garden.WebRoot' => Gdn_Url::WebRoot(),
+               'Garden.RewriteUrls' => (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE,
+               'Garden.Domain' => $Domain,
+               'Garden.CanProcessImages' => function_exists('gd_info'),
+               'Garden.Messages.Cache' => 'arr:["Garden\/Settings\/Index"]', // Make sure that the "welcome" message is cached for viewing
+               'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
+            );
+            SaveToConfig($Save);
          }
       }
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;

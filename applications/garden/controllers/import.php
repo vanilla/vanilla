@@ -100,10 +100,7 @@ class ImportController extends GardenController {
             // If there were no errors...
             if ($this->Form->ErrorCount() == 0) {
                // Save the sourceprefix
-               $Config = Gdn::Factory(Gdn::AliasConfig);
-               $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-               $Config->Set('Garden.Import.SourcePrefix', $SourcePrefix);
-               $Config->Save();
+               SaveToConfig('Garden.Import.SourcePrefix', $SourcePrefix);
                
                // Proceed with the next step
                $this->Message = Gdn::Translate('<strong>1/19</strong> Checking source & destination tables.');

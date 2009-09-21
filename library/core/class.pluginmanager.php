@@ -351,10 +351,7 @@ class Gdn_PluginManager {
       // 4. If everything succeeded, add the plugin to the
       // $EnabledPlugins array in conf/plugins.php
       // $EnabledPlugins['PluginClassName'] = 'Plugin Folder Name';
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-      $Config->Set('EnabledPlugins'.'.'.$PluginName, $PluginFolder);
-      $Config->Save();      
+      SaveToConfig('EnabledPlugins'.'.'.$PluginName, $PluginFolder);
       
       $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();
@@ -373,10 +370,7 @@ class Gdn_PluginManager {
       }
       
       // 2. Disable it
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Config->Load(PATH_CONF . DS . 'config.php', 'Save');
-      $Config->Remove('EnabledPlugins'.'.'.$PluginName);
-      $Config->Save();
+      RemoveFromConfig('EnabledPlugins'.'.'.$PluginName);
          
       unset($this->EnabledPlugins[$PluginName]);
       

@@ -50,14 +50,6 @@ class Gdn_ConfigurationModel {
    public $Data;
 
    /**
-    * The full path to the configuration file where these settings should be
-    * saved.
-    *
-    * @var string
-    */
-   protected $_ConfigurationFile;
-
-   /**
     * A collection of Field => Values that will NOT be validated and WILL be
     * saved as long as validation succeeds. You can add to this collection with
     * $this->ForceSetting();
@@ -70,15 +62,12 @@ class Gdn_ConfigurationModel {
     * Class constructor. Defines the related database table name.
     *
     * @param string $ConfigurationArrayName The name of the configuration array that is being manipulated.
-    * @param string $ConfigurationFile
-    * @param string $Validation
-    * @todo $ConfigurationFile and $Validation need descriptions and correct variable types.
+    * @param object $Validation
     */
-   public function __construct($ConfigurationArrayName, $ConfigurationFile, &$Validation) {
-      $this->Name = $ConfigurationArrayName;
+   public function __construct(&$Validation) {
+      $this->Name = 'Configuration';
       $this->Data = array();
       $this->Validation = &$Validation;
-      $this->_ConfigurationFile = $ConfigurationFile;
    }
 
    /**
@@ -145,27 +134,18 @@ class Gdn_ConfigurationModel {
     * from the form in the $_POST or $_GET collection.
     */
    public function Save($FormPostValues) {
-      if (isset($this->_ConfigurationFile) === FALSE)
-         trigger_error(ErrorMessage('You must define the file where the configuration settings will be saved.', 'ConfigurationModel', 'Save'), E_USER_ERROR);
-
       // Fudge your way through the schema application. This will allow me to
       // force the validation object to expect the fieldnames contained in
       // $this->Data.
       $this->Validation->ApplySchema($this->Data);
       // Validate the form posted values
       if ($this->Validation->Validate($FormPostValues)) {
-         $Config = Gdn::Factory(Gdn::AliasConfig);
-         $Config->Load($this->_ConfigurationFile, 'Save', $this->Name);
          // Merge the validation fields and the forced settings into a single array
          $Settings = $this->Validation->ValidationFields();
          if (is_array($this->_ForceSettings))
             $Settings = MergeArrays($Settings, $this->_ForceSettings);
-
-         foreach ($Settings as $Setting => $Value) {
-            $Config->Set($Setting, $Value, TRUE);
-         }
-         // And save them to the conf file
-         return $Config->Save();
+            
+         return SaveToConfig($Settings);
       } else {
          return FALSE;
       }

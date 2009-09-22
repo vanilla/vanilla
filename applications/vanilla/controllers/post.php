@@ -224,6 +224,7 @@ class PostController extends VanillaController {
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
+                  $this->Comment->InsertUserID = $Session->User->UserID;
                   $this->Comment->InsertName = $Session->User->Name;
                   $this->Comment->InsertPhoto = $Session->User->Photo;
                   $this->Comment->DateInserted = Format::Date();
@@ -247,6 +248,7 @@ class PostController extends VanillaController {
                if ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
+                  $this->Comment->InsertUserID = $Session->User->UserID;
                   $this->Comment->InsertName = $Session->User->Name;
                   $this->Comment->InsertPhoto = $Session->User->Photo;
                   $this->Comment->DateInserted = Format::Date();

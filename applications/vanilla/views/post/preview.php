@@ -7,9 +7,9 @@ if (property_exists($this, 'Discussion')) { ?>
       <ul class="Info">
          <li class="Author"><?php
             $Author = new stdClass();
-            $Author->UserID = $Comment->InsertUserID;
-            $Author->Name = $Comment->InsertName;
-            $Author->Photo = $Comment->InsertPhoto;
+            $Author->UserID = $this->Comment->InsertUserID;
+            $Author->Name = $this->Comment->InsertName;
+            $Author->Photo = $this->Comment->InsertPhoto;
             echo UserPhoto($Author);
             echo UserAnchor($Author);
          ?></li>

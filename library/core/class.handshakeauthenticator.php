@@ -69,6 +69,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 		
 		$this->_Identity = Gdn::Factory('Identity');
 		$this->_Identity->Init();
+		parent::__construct();
 	}
 	
 	/// Methods ///
@@ -169,6 +170,11 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 		
 		// Get the handshake data to authenticate.
 		$Data = $this->GetHandshakeData();
+		
+		// Fire an event in case people want to do something based on the data returned from the external system.
+		$this->EventArguments['HandshakeData'] = $Data;
+		$this->FireEvent('AfterGetHandshakeData');
+		
 		if(!array_key_exists('UniqueID', $Data)) {
 			// There was some problem getting the userID.
 			// The user was probably signed out on the handshake system.

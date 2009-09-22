@@ -24,7 +24,7 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
 );
 
 class VanillaInThisDiscussionPlugin implements Gdn_IPlugin {
-   public function DiscussionController_DiscussionRenderBefore_Handler(&$Sender) {
+   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
       include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
       $InThisDiscussionModule = new InThisDiscussionModule($Sender);
       $InThisDiscussionModule->GetData($Sender->DiscussionID);

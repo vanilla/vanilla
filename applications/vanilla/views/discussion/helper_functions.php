@@ -78,12 +78,12 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       </li>
       <?php
       $Sender->EventArguments['Comment'] = &$Comment;
-      $Sender->FireEvent('CommentMetaAfter');
+      $Sender->FireEvent('AfterCommentMeta');
       ?>
    </ul>
    <div class="Body"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
    <?php
-      $Sender->FireEvent('CommentBodyAfter');
+      $Sender->FireEvent('AfterCommentBody');
    ?>
 </li>
 <?php

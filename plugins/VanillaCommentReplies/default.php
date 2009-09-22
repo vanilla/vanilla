@@ -34,11 +34,11 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    
    public $ReplyModel;
    
-   public function DiscussionController_CommentRenderBefore_Handler(&$Sender) {
-      $this->DiscussionController_DiscussionRenderBefore_Handler($Sender);
+   public function DiscussionController_BeforeCommentRender_Handler(&$Sender) {
+      $this->DiscussionController_BeforeDiscussionRender_Handler($Sender);
    }
    
-   public function DiscussionController_DiscussionRenderBefore_Handler(&$Sender) {
+   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
       $Sender->Head->AddScript('/plugins/VanillaCommentReplies/replies.js');
       $Sender->AddCssFile('/plugins/VanillaCommentReplies/style.css');
       $this->ReplyModel = Gdn::Factory('ReplyModel');
@@ -70,7 +70,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       }
    }
    
-   public function DiscussionController_CommentsRenderBefore_Handler(&$Sender) {
+   public function DiscussionController_BeforeCommentsRender_Handler(&$Sender) {
       $ReplyFormAction = Url('vanilla/post/reply');
       if(isset($Sender->ReplyData) && is_object($Sender->ReplyData))
          $Sender->CurrentReply = $Sender->ReplyData->NextRow();
@@ -78,7 +78,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
          $Sender->CurrentReply = FALSE;
    }
    
-   public function DiscussionController_CommentMetaAfter_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentMeta_Handler(&$Sender) {
       $Session = Gdn::Session();
       $Comment = $Sender->EventArguments['Comment'];
       if ($Session->IsValid()) {
@@ -97,7 +97,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       } 
    }
    
-   public function DiscussionController_CommentBodyAfter_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       $Session = Gdn::Session();
       $Comment = $Sender->EventArguments['Comment'];
       if (is_object($Sender->CurrentReply) && $Sender->CurrentReply->ReplyCommentID == $Comment->CommentID) {
@@ -227,7 +227,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       $Sender->Index($DiscussionID, $Offset, $Limit);
    }
    
-   public function PostController_CommentRenderBefore_Handler(&$Sender, $DiscussionID = '') {
+   public function PostController_BeforeCommentRender_Handler(&$Sender, $DiscussionID = '') {
       //$Draft = $Sender->EventArguments['Draft'];
       $Editing = $Sender->EventArguments['Editing'];
       $DiscussionID = $Sender->DiscussionID;
@@ -298,19 +298,19 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       $Sender->Render();
    }
    
-   public function CommentModel_CommentQueryAfter_Handler(&$Sender) {
+   public function CommentModel_AfterCommentQuery_Handler(&$Sender) {
       $Sender->SQL->Where('c.ReplyCommentID is null');
    }
    
-   public function CommentModel_GetCountBefore_Handler(&$Sender) {
+   public function CommentModel_BeforeGetCount_Handler(&$Sender) {
       $Sender->SQL->Where('ReplyCommentID is null');
    }
    
-   public function CommentModel_GetOffsetBefore_Handler(&$Sender) {
+   public function CommentModel_BeforeGetOffset_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    
-   public function CommentModel_UpdateCommentCountBefore_Handler(&$Sender) {
+   public function CommentModel_BeforeUpdateCommentCount_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    

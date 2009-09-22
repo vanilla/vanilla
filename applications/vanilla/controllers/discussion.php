@@ -102,7 +102,7 @@ class DiscussionController extends VanillaController {
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
       
-      $this->FireEvent('DiscussionRenderBefore');
+      $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
    

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$this->FireEvent('CommentsRenderBefore');
+$this->FireEvent('BeforeCommentsRender');
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 $CurrentOffset = $this->Offset;

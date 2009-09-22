@@ -305,7 +305,7 @@ class PostController extends VanillaController {
             }
          }
       }
-      $this->FireEvent('CommentRenderBefore');
+      $this->FireEvent('BeforeCommentRender');
       $this->Render();
    }
    

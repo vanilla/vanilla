@@ -120,7 +120,7 @@ class MessageController extends GardenController {
       $AssetData['Content'] = 'Above Main Content';
       $AssetData['Panel'] = 'Below Sidebar';
       $this->EventArguments['AssetData'] = &$AssetData;
-      $this->FireEvent('GetAssetDataAfter');
+      $this->FireEvent('AfterGetAssetData');
       return $AssetData;
    }
    
@@ -132,7 +132,7 @@ class MessageController extends GardenController {
       $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
       $ControllerData['Base'] = 'Every Page';
       $this->EventArguments['ControllerData'] = &$ControllerData;
-      $this->FireEvent('GetLocationDataAfter');
+      $this->FireEvent('AfterGetLocationData');
       return $ControllerData;
    }
 }

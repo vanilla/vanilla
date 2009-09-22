@@ -27,7 +27,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left')
          ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
       if($FireEvent)
-         $this->FireEvent('CommentQueryAfter');
+         $this->FireEvent('AfterCommentQuery');
    }
    
    public function Get($DiscussionID, $Limit, $Offset = 0) {
@@ -77,7 +77,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
    }
 
    public function GetCount($DiscussionID) {
-      $this->FireEvent('GetCountBefore');
+      $this->FireEvent('BeforeGetCount');
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
@@ -120,7 +120,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
     * @param int The comment id for which the offset is being defined.
     */
    public function GetOffset($CommentID) {
-      $this->FireEvent('GetOffsetBefore');
+      $this->FireEvent('BeforeGetOffset');
       return $this->SQL
          ->Select('c2.CommentID', 'count', 'CountComments')
          ->From('Comment c')
@@ -305,7 +305,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
                $this->EventArguments['CommentID'] = $CommentID;
-               $this->FireEvent('SaveCommentAfter');
+               $this->FireEvent('AfterSaveComment');
                
                // Notify any users who were mentioned in the comment
                $Usernames = GetMentions($Fields['Body']);
@@ -414,7 +414,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
     * @param int The CommentID relating to the discussion we are updating.
     */
    public function UpdateCommentCount($DiscussionID) {
-      $this->FireEvent('UpdateCommentCountBefore');
+      $this->FireEvent('BeforeUpdateCommentCount');
       
       $Data = $this->SQL
          ->Select('c.CommentID', 'max', 'LastCommentID')

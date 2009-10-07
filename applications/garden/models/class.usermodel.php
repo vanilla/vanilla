@@ -251,7 +251,7 @@ class Gdn_UserModel extends Gdn_Model {
             // Record activity if the person changed his/her photo
             $Photo = ArrayValue('Photo', $FormPostValues);
             if ($Photo !== FALSE)
-               AddActivity($UserID, 'PictureChange', '<img src="'.Url('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
+               AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
 
          } else {
             $RecordRoleChange = FALSE;
@@ -391,7 +391,7 @@ class Gdn_UserModel extends Gdn_Model {
       // I can then just erase all cached permissions on the user table for
       // users that are assigned to that changed role - and they can reset
       // themselves the next time the session is referenced.
-      $this->SQL->Put('User', array('Permissions' => ''), array('UserID' => $UserID, 'CacheRoleID' => $CacheRoleID));
+      $this->SQL->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
 
 
       if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {

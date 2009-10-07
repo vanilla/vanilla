@@ -92,8 +92,8 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
        * Removes an entire group of links, and the group itself, from the menu.
        */
       public function RemoveGroup($Group) {
-         if (array_key_exists($Group, $this->Groups))
-            unset($this->Groups[$Group]);
+         if (array_key_exists($Group, $this->Items))
+            unset($this->Items[$Group]);
       }
       
       public function ToString($HighlightRoute = '') {

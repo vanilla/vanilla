@@ -14,6 +14,7 @@ $Editing = isset($this->Comment);
          echo $this->Form->Button('Save Draft');
       
       echo $this->Form->Button('Preview');
+      $this->FireEvent('AfterFormButtons');
       echo Anchor(Gdn::Translate('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
       echo $this->Form->Close();
    ?>

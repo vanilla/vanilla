@@ -33,9 +33,9 @@ has the following arguments:
 Example table construction:
 
 $Construct->Table('ExampleTable')
-   ->Column('ExampleTableID', 'int', 4, FALSE, NULL, 'primary', TRUE)
-   ->Column('ExampleUserID', 'int', 10, TRUE)
-   ->Column('Field1', 'varchar', 50)
+	->PrimaryKey('ExampleTableID')
+   ->Column('ExampleUserID', 'int', TRUE)
+   ->Column('Field1', 'varchar(50)')
    ->Set($Explicit, $Drop);
 
 Example view construction:

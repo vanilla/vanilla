@@ -138,7 +138,7 @@ jQuery(document).ready(function($) {
       if(!targets || !targets.length)
          return;
       for(i = 0; i < targets.length; i++) {
-         item = targets[i];
+         var item = targets[i];
          $target = $(item.Target);
          switch(item.Type) {
             case 'Append':

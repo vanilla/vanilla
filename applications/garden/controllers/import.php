@@ -112,12 +112,12 @@ class ImportController extends GardenController {
          }
       } else if ($Step == 1) {
          // 1. Add Import IDs to various tables where necessary 
-         $Construct->Table('Role')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('User')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('Category')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('Discussion')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
+         $Construct->Table('Role')->Column('ImportID', 'int', FALSE, 'key')->Set();
+         $Construct->Table('User')->Column('ImportID', 'int', FALSE, 'key')->Set();
+         $Construct->Table('Category')->Column('ImportID', 'int', FALSE, 'key')->Set();
+         $Construct->Table('Discussion')->Column('ImportID', 'int', FALSE, 'key')->Set();
          $Construct->DatabasePrefix($SourcePrefix);
-         $Construct->Table('Comment')->Column('ConversationID', 'int', 11, FALSE, NULL, 'key')->Set();
+         $Construct->Table('Comment')->Column('ConversationID', 'int', FALSE, 'key')->Set();
          $Construct->DatabasePrefix($DestPrefix);
          
          $this->Message = Gdn::Translate('<strong>2/19</strong> Preparing tables for import.');

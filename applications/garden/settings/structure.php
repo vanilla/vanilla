@@ -19,12 +19,12 @@ $Construct = $Database->Structure();
 
 // Role Table
 $Construct->Table('Role')
-   ->Column('RoleID', 'int', '', FALSE, NULL, 'primary')
-   ->Column('Name', 'varchar', 100)
-   ->Column('Description', 'varchar', 200, TRUE)
-   ->Column('Sort', 'int', 2, TRUE)
-   ->Column('Deletable', array('1', '0'), '', FALSE, '1')
-   ->Column('CanSession', array('1', '0'), '', FALSE, '1')
+	->Column('RoleID', 'int', FALSE, 'primary')
+   ->Column('Name', 'varchar(100)')
+   ->Column('Description', 'varchar(200)', TRUE)
+   ->Column('Sort', 'int', TRUE)
+   ->Column('Deletable', array('1', '0'), '1')
+   ->Column('CanSession', array('1', '0'), '1')
    ->Set($Explicit, $Drop);
 
 // Define some roles.
@@ -40,38 +40,38 @@ $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '5
 
 // User Table
 $Construct->Table('User')
-   ->Column('UserID', 'int', 10, FALSE, NULL, 'primary', TRUE)
-   ->Column('PhotoID', 'int', 8, TRUE, NULL, 'key')
-   ->Column('Name', 'varchar', 20, FALSE, NULL, 'key')
-   ->Column('Password', 'varbinary', 34)
-   ->Column('About', 'text', '', TRUE)
-   ->Column('Email', 'varchar', 200)
-   ->Column('ShowEmail', array('1', '0'), '', FALSE, '0')
-   ->Column('Gender', array('m', 'f'), '', FALSE, 'm')
-   ->Column('CountVisits', 'int', 8, FALSE, '0')
-   ->Column('CountInvitations', 'int', 2, FALSE, '0')
-   ->Column('CountNotifications', 'int', 11, FALSE, '0')
-   ->Column('InviteUserID', 'int', 10, TRUE)
-   ->Column('DiscoveryText', 'text', '', TRUE)
-   ->Column('Preferences', 'text', '', TRUE)
-   ->Column('Permissions', 'text', '', TRUE)
-   ->Column('Attributes', 'text', '', TRUE)
-   ->Column('DateSetInvitations', 'datetime', '', TRUE)
-   ->Column('DateOfBirth', 'datetime', '', TRUE)
-   ->Column('DateFirstVisit', 'datetime', '', TRUE)
-   ->Column('DateLastActive', 'datetime', '', TRUE)
+	->PrimaryKey('UserID')
+   ->Column('PhotoID', 'int', TRUE, 'key')
+   ->Column('Name', 'varchar(20)', FALSE, 'key')
+   ->Column('Password', 'varbinary(34)')
+   ->Column('About', 'text', TRUE)
+   ->Column('Email', 'varchar(200)')
+   ->Column('ShowEmail', array('1', '0'), '0')
+   ->Column('Gender', array('m', 'f'), 'm')
+   ->Column('CountVisits', 'int', '0')
+   ->Column('CountInvitations', 'int', '0')
+   ->Column('CountNotifications', 'int', '0')
+   ->Column('InviteUserID', 'int', TRUE)
+   ->Column('DiscoveryText', 'text', TRUE)
+   ->Column('Preferences', 'text', TRUE)
+   ->Column('Permissions', 'text', TRUE)
+   ->Column('Attributes', 'text', TRUE)
+   ->Column('DateSetInvitations', 'datetime', TRUE)
+   ->Column('DateOfBirth', 'datetime', TRUE)
+   ->Column('DateFirstVisit', 'datetime', TRUE)
+   ->Column('DateLastActive', 'datetime', TRUE)
    ->Column('DateInserted', 'datetime')
-   ->Column('DateUpdated', 'datetime', '', TRUE)
-   ->Column('HourOffset', 'int', 2, FALSE, '0')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('HourOffset', 'int', '0')
 	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
-	->Column('CacheRoleID', 'int', '', TRUE)
-   ->Column('Admin', array('1', '0'), '', FALSE, '0')
+	->Column('CacheRoleID', 'int', TRUE)
+   ->Column('Admin', array('1', '0'), '0')
    ->Set($Explicit, $Drop);
 
 // UserRole Table
 $Construct->Table('UserRole')
-   ->Column('UserID', 'int', 10, FALSE, NULL, 'primary')
-   ->Column('RoleID', 'int', '', FALSE, NULL, 'primary')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('RoleID', 'int', FALSE, 'primary')
    ->Set($Explicit, $Drop);
 	
 // Assign the guest user to the guest role
@@ -79,8 +79,8 @@ $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('UniqueID', 'varchar', 30, FALSE, NULL, 'primary')
-	->Column('UserID', 'int', '', FALSE, NULL, 'key')
+	->Column('UniqueID', 'varchar(30)', FALSE, 'primary')
+	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
 
 
@@ -91,11 +91,11 @@ $PermissionModel->SQL = $SQL;
 if($PermissionModel instanceof Gdn_PermissionModel) {
 	// Permission Table
 	$Construct->Table('Permission')
-		->Column('PermissionID', 'int', 4, FALSE, NULL, 'primary', TRUE)
-		->Column('RoleID', 'int', '', FALSE, 0, 'key')
-		->Column('JunctionTable', 'varchar', 100, TRUE) 
-		->Column('JunctionColumn', 'varchar', 100, TRUE)
-		->Column('JunctionID', 'int', 4, TRUE)
+		->PrimaryKey('PermissionID')
+		->Column('RoleID', 'int', 0, 'key')
+		->Column('JunctionTable', 'varchar(100)', TRUE) 
+		->Column('JunctionColumn', 'varchar(100)', TRUE)
+		->Column('JunctionID', 'int', TRUE)
 		// The actual permissions will be added by Gdn_PermissionModel::Define()
 		->Set($Explicit, $Drop);
 }
@@ -148,33 +148,33 @@ $PermissionModel->Save(array(
 
 // Photo Table
 $Construct->Table('Photo')
-   ->Column('PhotoID', 'int', 8, FALSE, NULL, 'primary', TRUE)
-   ->Column('Name', 'varchar', 255)
-   ->Column('InsertUserID', 'int', 10, TRUE, NULL, 'key')
+	->PrimaryKey('PhotoID')
+   ->Column('Name', 'varchar(255)')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Set($Explicit, $Drop);
 
 // Invitation Table
 $Construct->Table('Invitation')
-   ->Column('InvitationID', 'int', 10, FALSE, NULL, 'primary', TRUE)
-   ->Column('Email', 'varchar', 200)
-   ->Column('Code', 'varchar', 50)
-   ->Column('InsertUserID', 'int', 10, TRUE, NULL, 'key')
+	->PrimaryKey('InvitationID')
+   ->Column('Email', 'varchar(200)')
+   ->Column('Code', 'varchar(50)')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
-   ->Column('AcceptedUserID', 'int', 10, TRUE)
+   ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
 // ActivityType Table
 $Construct->Table('ActivityType')
-   ->Column('ActivityTypeID', 'int', 3, FALSE, NULL, 'primary', TRUE)
-   ->Column('Name', 'varchar', 20)
-   ->Column('AllowComments', array('1', '0'), '', FALSE, '0')
-   ->Column('ShowIcon', array('1', '0'), '', FALSE, '0')
-   ->Column('ProfileHeadline', 'varchar', 255)
-   ->Column('FullHeadline', 'varchar', 255)
-   ->Column('RouteCode', 'varchar', 255, TRUE)
-   ->Column('Notify', array('1', '0'), '', FALSE, '0') // Add to RegardingUserID's notification list?
-   ->Column('Public', array('1', '0'), '', FALSE, '1') // Should everyone be able to see this, or just the RegardingUserID?
+	->PrimaryKey('ActivityTypeID')
+   ->Column('Name', 'varchar(20)')
+   ->Column('AllowComments', array('1', '0'), '0')
+   ->Column('ShowIcon', array('1', '0'), '0')
+   ->Column('ProfileHeadline', 'varchar(255)')
+   ->Column('FullHeadline', 'varchar(255)')
+   ->Column('RouteCode', 'varchar(255)', TRUE)
+   ->Column('Notify', array('1', '0'), '0') // Add to RegardingUserID's notification list?
+   ->Column('Public', array('1', '0'), '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
 
 // Insert some activity types
@@ -210,15 +210,15 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'ActivityComment'))->NumRows(
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('Activity')
-   ->Column('ActivityID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-   ->Column('CommentActivityID', 'int', 11, TRUE, NULL, 'key')
-   ->Column('ActivityTypeID', 'int', 3)
-   ->Column('ActivityUserID', 'int', 10, TRUE, NULL, 'key')
-   ->Column('RegardingUserID', 'int', 10, TRUE)
-   ->Column('Story', 'text', '', TRUE)
-   ->Column('Route', 'varchar', 255, TRUE)
-   ->Column('CountComments', 'int', 10, FALSE, '0')
-   ->Column('InsertUserID', 'int', 10, TRUE, NULL, 'key')
+	->PrimaryKey('ActivityID')
+   ->Column('CommentActivityID', 'int', TRUE, 'key')
+   ->Column('ActivityTypeID', 'int')
+   ->Column('ActivityUserID', 'int', TRUE, 'key')
+   ->Column('RegardingUserID', 'int', TRUE)
+   ->Column('Story', 'text', TRUE)
+   ->Column('Route', 'varchar(255)', TRUE)
+   ->Column('CountComments', 'int', '0')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Set($Explicit, $Drop);
 
@@ -228,49 +228,49 @@ $SearchModel = Gdn::Factory('SearchModel');
 if($SearchModel instanceof Gdn_SearchModel) {
 	// Search Document Type Table
 	$Construct->Table('TableType')
-		->Column('TableName', 'varchar', 50, FALSE, NULL, 'primary')
-		->Column('PermissionTableName', 'varchar', 50, TRUE)
+		->Column('TableName', 'varchar(50)', FALSE, 'primary')
+		->Column('PermissionTableName', 'varchar(50)', TRUE)
 		->Set($Explicit, $Drop);
 		
 	// Search Document Table
 	$Construct->Table('SearchDocument')
-		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-		->Column('TableName', 'varchar', 50)
-		->Column('PrimaryID', 'int', 11, FALSE)
-		->Column('PermissionJunctionID', 'int', 11, TRUE)
-		->Column('Title', 'varchar', 100, FALSE)
-		->Column('Summary', 'varchar', 200, FALSE)
-		->Column('Url', 'varchar', 255, FALSE)
-		->Column('InsertUserID', 'int', 10, FALSE)
-		->Column('DateInserted', 'datetime', FALSE)
+		->PrimaryKey('DocumentID')
+		->Column('TableName', 'varchar(50)')
+		->Column('PrimaryID', 'int', FALSE)
+		->Column('PermissionJunctionID', 'int', TRUE)
+		->Column('Title', 'varchar(100)')
+		->Column('Summary', 'varchar(200)')
+		->Column('Url', 'varchar(255)')
+		->Column('InsertUserID', 'int')
+		->Column('DateInserted', 'datetime')
 		->Set($Explicit, $Drop);
 		
 	// Search Index Table
 	$Construct->Table('SearchKeyword')
-		->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary', TRUE)
-		->Column('Keyword', 'varchar', 50, FALSE, FALSE, 'key')
+		->PrimaryKey('KeywordID')
+		->Column('Keyword', 'varchar(50)', FALSE, 'key')
 		->Set($Explicit, $Drop);
 		
 	// Search Index to Document table.
 	$Construct->Table('SearchKeywordDocument')
-		->Column('KeywordID', 'int', 11, FALSE, NULL, 'primary')
-		->Column('DocumentID', 'int', 11, FALSE, NULL, 'primary')
+		->Column('KeywordID', 'int', FALSE, 'primary')
+		->Column('DocumentID', 'int', FALSE, 'primary')
 		->Set($Explicit, $Drop);
 }
 
 // Message Table
 $Construct->Table('Message')
-   ->Column('MessageID', 'int', 10, FALSE, NULL, 'primary', TRUE)
+	->PrimaryKey('MessageID')
    ->Column('Content', 'text')
-   ->Column('Format', 'varchar', 20, TRUE)
-   ->Column('AllowDismiss', array('1', '0'), '', FALSE, '1')
-   ->Column('Enabled', array('1', '0'), '', FALSE, '1')
-   ->Column('Application', 'varchar', 255, TRUE)
-   ->Column('Controller', 'varchar', 255, TRUE)
-   ->Column('Method', 'varchar', 255, TRUE)
-   ->Column('AssetTarget', 'varchar', 20, TRUE)
-	->Column('CssClass', 'varchar', 20, TRUE)
-   ->Column('Sort', 'int', 2, TRUE)
+   ->Column('Format', 'varchar(20)', TRUE)
+   ->Column('AllowDismiss', array('1', '0'), '1')
+   ->Column('Enabled', array('1', '0'), '1')
+   ->Column('Application', 'varchar(255)', TRUE)
+   ->Column('Controller', 'varchar(255)', TRUE)
+   ->Column('Method', 'varchar(255)', TRUE)
+   ->Column('AssetTarget', 'varchar(20)', TRUE)
+	->Column('CssClass', 'varchar(20)', TRUE)
+   ->Column('Sort', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
 // Insert the welcome message

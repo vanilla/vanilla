@@ -500,7 +500,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       $ApplicationFolder = strtolower($ApplicationFolder);
       $ControllerName = strtolower($ControllerName);
-      $View = strtolower($View);
+      if(strpos($View, DS) === FALSE) // keep explicit paths as they are.
+         $View = strtolower($View);
 
       // If this is a syndication request, append the method to the view
       if ($this->SyndicationMethod == SYNDICATION_ATOM)

@@ -29,7 +29,7 @@ class ImportController extends GardenController {
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
       $Construct = $Database->Structure();
-      $SourcePrefix = Gdn::Config('Import.SourcePrefix', 'LUM_');
+      $SourcePrefix = Gdn::Config('Garden.Import.SourcePrefix', 'LUM_');
       $DestPrefix = Gdn::Config('Database.DatabasePrefix', '');
       if ($Step == 0) {
          $this->View = 'import';

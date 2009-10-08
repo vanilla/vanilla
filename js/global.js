@@ -3,10 +3,11 @@
 jQuery(document).ready(function($) {
 
    // Main Menu dropdowns
-   $('#Menu').menu({
-      showDelay: 0,
-      hideDelay: 0
-   });
+   if ($.fn.menu)
+      $('#Menu').menu({
+         showDelay: 0,
+         hideDelay: 0
+      });
    
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the

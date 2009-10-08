@@ -275,7 +275,7 @@ class Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Text');
       else
-         return htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
+         return htmlspecialchars(strip_tags($Mixed), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
    }
 
    /**
@@ -291,7 +291,7 @@ class Format {
          $Mixed = utf8_decode($Mixed);
          $Mixed = preg_replace('/-+/', '-', str_replace(' ', '-', trim(preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
          $Mixed = utf8_encode($Mixed);
-         return $Mixed;
+         return strtolower($Mixed);
       }
    }
 

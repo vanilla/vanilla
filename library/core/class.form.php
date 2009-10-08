@@ -1114,8 +1114,7 @@ class Gdn_Form {
     * @param mixed $Default The default value to return if $FieldName isn't found.
     * @return unknown
     */
-   public function GetFormValue(
-      $FieldName, $Default = '') {
+   public function GetFormValue($FieldName, $Default = '') {
       return ArrayValue($FieldName, $this->FormValues(), $Default);
    }
 

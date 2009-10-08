@@ -45,6 +45,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
          echo $this->Form->Button('Save Draft');
       }
       echo $this->Form->Button('Preview');
+      $this->FireEvent('AfterFormButtons');
       echo Anchor('Cancel', $CancelUrl, 'Cancel');
       echo $this->Form->Close();
    ?>

@@ -207,4 +207,13 @@ class Gdn_Email extends Gdn_Pluggable {
 
       return $this;
    }
+   
+   public function Charset($Use = ''){
+      if ($Use != '') {
+         $this->_PhpMailer->Charset = $Use;
+         return $this;
+      }
+      return $this->_PhpMailer->Charset;
+   }
+   
 }

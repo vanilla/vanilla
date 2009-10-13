@@ -137,22 +137,25 @@ class Gdn_Url {
 
       // Try PATH_INFO
       $Request = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : @getenv('PATH_INFO');
-      if ($Request)
+      if ($Request) {
          $Return = $Request;
+      }
 
       // Try ORIG_PATH_INFO
       if (!$Return) {
          $Request = (isset($_SERVER['ORIG_PATH_INFO'])) ? $_SERVER['ORIG_PATH_INFO'] : @getenv('ORIG_PATH_INFO');
-         if ($Request != '')
+         if ($Request != '') {
             $Return = $Request;
+         }
 
       }
       // Try with PHP_SELF
       if (!$Return) {
          $PhpSelf = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : @getenv('PHP_SELF');
          $ScriptName = (isset($_SERVER['SCRIPT_NAME'])) ? $_SERVER['SCRIPT_NAME'] : @getenv('SCRIPT_NAME');
-         if ($PhpSelf && $ScriptName)
+         if ($PhpSelf && $ScriptName) {
             $Return = substr($PhpSelf, strlen($ScriptName));
+         }
 
       }
 

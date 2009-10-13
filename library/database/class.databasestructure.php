@@ -78,52 +78,6 @@ abstract class Gdn_DatabaseStructure {
       $this->_TableName = '';
       $this->_Columns = array();
    }
-
-   /**
-    * Defines a column to be added to $this->Table().
-    *
-    * @param string $Name The name of the column to create.
-    * @param mixed $Type The data type of the column to be created. If an array of values is
-    * provided, the type will be set as "enum" and the array will be assigned
-    * as the column's Enum property.
-    * @param mixed $Length The length of the column.
-    * @param boolean $Null Does the column allow null values?
-    * @param mixed $Default The default value of the column. If NULL is provided (default), there
-    * will be no default value.
-    * @param string $KeyType What type of key is this column on the table? Options
-    * are primary, key, and FALSE (not a key).
-    * @param boolean $AutoIncrement A boolean value indicating if this column auto-increments.
-    */
-   public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
-      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', FALSE)))
-         $KeyType = FALSE;
-         
-      // Check for a length in the type.
-      if(is_string($Type) && preg_match('/(\w+)\s*\(\s*(\d+)\s*(?:,\s*(\d+)\s*)?\)/', $Type, $Matches)) {
-         $Type = $Matches[1];
-         $Length = $Matches[2];
-         if(count($Matches) >= 4) {
-            $Precision = $Matches[3];
-         }
-      }
-
-      $Column = new stdClass();
-      $Column->Name = $Name;
-      $Column->Type = is_array($Type) ? 'enum' : $Type;
-      $Column->Unsigned = FALSE;
-      $Column->Length = $Length;
-      if(isset($Precision))
-         $Column->Precision = $Precision;
-      else
-         $Column->Precision = '';
-      $Column->Enum = is_array($Type) ? $Type : FALSE;
-      $Column->AllowNull = $Null;
-      $Column->Default = $Default;
-      $Column->KeyType = $KeyType;
-      $Column->AutoIncrement = $AutoIncrement;
-      $this->_Columns[$Name] = $Column;
-      return $this;
-   }
    
    protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
       $Length = '';
@@ -160,7 +114,20 @@ abstract class Gdn_DatabaseStructure {
       return $Column;
    }
    
-   public function Column2($Name, $Type, $NullDefault = FALSE, $KeyType = FALSE) {
+   /**
+    * Defines a column to be added to $this->Table().
+    *
+    * @param string $Name The name of the column to create.
+    * @param mixed $Type The data type of the column to be created. Types with a length speecifty the length in barackets.
+    * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+    * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
+    * * TRUE: Nulls are allowed.
+    * * FALSE: Nullas are not allowed.
+    * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
+    * @param string $KeyType What type of key is this column on the table? Options
+    * are primary, key, and FALSE (not a key).
+    */
+   public function Column($Name, $Type, $NullDefault = FALSE, $KeyType = FALSE) {
       if(is_null($NullDefault) || $NullDefault === TRUE) {
          $Null = TRUE;
          $Default = NULL;
@@ -219,7 +186,7 @@ abstract class Gdn_DatabaseStructure {
     * @param string $Type The data type of the column.
     * @return Gdn_DatabaseStructure $this.
     */
-   public function PrimaryKey($Name, $Type = 'uint') {
+   public function PrimaryKey($Name, $Type = 'int') {
       $Column = $this->_CreateColumn($Name, $Type, FALSE, NULL, 'primary');
       $Column->AutoIncrement = TRUE;
       $this->_Columns[$Name] = $Column;

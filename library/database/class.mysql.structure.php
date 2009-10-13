@@ -27,30 +27,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    public function __construct($Database = NULL) {
       parent::__construct($Database);
    }
-   
-   /**
-    * Adds a column to be added to $this->Table().
-    *
-    * @param string $Name The name of the column to create.
-    * @param mixed $Type The data type of the column to be created. If an array
-    * of values is provided, the type will be set as "enum" and the array will be
-    * assigned as the column's Enum property.
-    * @param mixed $Length The length of the column.
-    * @param boolean $Null Does the column allow null values.
-    * @param mixed $Default The default value of the column. If NULL is provided
-    * (default), there will be no default value.
-    * @param string $KeyType What type of key is this column on the table.
-    * Options are primary, key, and FALSE (not a key).
-    * @param boolean $AutoIncrement A boolean value indicating if this column
-    * auto-increments.
-    */
-   public function Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE) {
-      // Make sure that the column type is valid for MySQL before continuing:
-      if (!is_array($Type) && !in_array($Type, array('tinyint', 'int', 'varchar', 'varbinary', 'datetime', 'text', 'decimal')))
-         throw new Exception(Gdn::Translate('The specified data type ('.$Type.') is not accepted for the MySQL database.'));
-
-      return parent::Column($Name, $Type, $Length, $Null, $Default, $KeyType, $AutoIncrement);
-   }
 
    /**
     * Drops $this->Table() from the database.
@@ -257,6 +233,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'varchar', 'varbinary', 'datetime', 'text', 'decimal', 'enum')))
+         throw new Exception(Gdn::Translate('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
+      
       $Return = '`'.$Column->Name.'` '.$Column->Type;
       if ($Column->Length != '') {
          if($Column->Precision != '')

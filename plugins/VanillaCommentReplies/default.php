@@ -327,16 +327,16 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       
       // Make sure to add the ReplyCommentID field if it is not there already.
       $Structure->Table('Discussion')
-         ->Column('CountReplies', 'int', 4, FALSE, '0')
+         ->Column('CountReplies', 'int', '0')
          ->Set(FALSE, FALSE);
       
       $Structure->Table('Comment')
-         ->Column('ReplyCommentID', 'int', 11, TRUE, NULL, 'key')
-         ->Column('CountReplies', 'int', 4, FALSE, '0')
+         ->Column('ReplyCommentID', 'int', TRUE, 'key')
+         ->Column('CountReplies', 'int', '0')
          ->Set(FALSE, FALSE);
          
       $Structure->Table('CommentWatch')
-         ->Column('CountReplies', 'int', 4, FALSE, '0')
+         ->Column('CountReplies', 'int', '0')
          ->Set(FALSE, FALSE);
 
       // Add the activities & activity types for replies

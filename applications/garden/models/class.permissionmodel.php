@@ -34,7 +34,7 @@ class Gdn_PermissionModel extends Gdn_Model {
       
       foreach($PermissionNames as $PermissionName) {
          // Define the column.
-         $Structure->Column($PermissionName, $Type, '', FALSE, 0);
+         $Structure->Column($PermissionName, $Type, 0);
       }
       $Structure->Set(FALSE, FALSE);
       

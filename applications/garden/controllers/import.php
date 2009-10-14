@@ -29,6 +29,7 @@ class ImportController extends GardenController {
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
       $Construct = $Database->Structure();
+      $PDO = $Database->Connection();
       $SourcePrefix = Gdn::Config('Garden.Import.SourcePrefix', 'LUM_');
       $DestPrefix = Gdn::Config('Database.DatabasePrefix', '');
       if ($Step == 0) {
@@ -112,12 +113,12 @@ class ImportController extends GardenController {
          }
       } else if ($Step == 1) {
          // 1. Add Import IDs to various tables where necessary 
-         $Construct->Table('Role')->Column('ImportID', 'int', FALSE, 'key')->Set();
-         $Construct->Table('User')->Column('ImportID', 'int', FALSE, 'key')->Set();
-         $Construct->Table('Category')->Column('ImportID', 'int', FALSE, 'key')->Set();
-         $Construct->Table('Discussion')->Column('ImportID', 'int', FALSE, 'key')->Set();
+         $Construct->Table('Role')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('User')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('Category')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('Discussion')->Column('ImportID', 'int', TRUE, 'key')->Set();
          $Construct->DatabasePrefix($SourcePrefix);
-         $Construct->Table('Comment')->Column('ConversationID', 'int', FALSE, 'key')->Set();
+         $Construct->Table('Comment')->Column('ConversationID', 'int', TRUE, 'key')->Set();
          $Construct->DatabasePrefix($DestPrefix);
          
          $this->Message = Gdn::Translate('<strong>2/19</strong> Preparing tables for import.');
@@ -129,7 +130,7 @@ class ImportController extends GardenController {
          $OldRoles = $Database->Query('select * from '.$SourcePrefix.'Role');
          // Loop through each, inserting if it doesn't exist and updating ImportID if it does
          foreach ($OldRoles->Result() as $OldRole) {
-            $RoleData = $Database->Query("select * from ".$DestPrefix."Role where Name = '".$OldRole->Name."'");
+            $RoleData = $Database->Query("select * from ".$DestPrefix."Role where Name = ".$PDO->quote($OldRole->Name));
             if ($RoleData->NumRows() == 0) {
                $Role = array();
                $Role['ImportID'] = $OldRole->RoleID;

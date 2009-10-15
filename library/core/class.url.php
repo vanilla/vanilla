@@ -160,8 +160,10 @@ class Gdn_Url {
       }
 
       $Return = trim($Return, '/');
-      if(strcasecmp($Return, 'index.php') == 0)
-         $Return = '';
+      if(strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
+         $Return = substr($Return, 9);
+      $Return = trim($Return, '/');
+         
 
       if ($RemoveSyndication) {
          $Prefix = strtolower(substr($Return, 0, strpos($Return, '/')));

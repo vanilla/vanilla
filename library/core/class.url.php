@@ -153,17 +153,18 @@ class Gdn_Url {
       if (!$Return) {
          $PhpSelf = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : @getenv('PHP_SELF');
          $ScriptName = (isset($_SERVER['SCRIPT_NAME'])) ? $_SERVER['SCRIPT_NAME'] : @getenv('SCRIPT_NAME');
+         
          if ($PhpSelf && $ScriptName) {
             $Return = substr($PhpSelf, strlen($ScriptName));
          }
 
       }
+      
+      $ScriptName = (isset($_SERVER['SCRIPT_NAME'])) ? $_SERVER['SCRIPT_NAME'] : @getenv('SCRIPT_NAME');
+      if(is_string($ScriptName) && strcasecmp(substr($Return, 0, strlen($ScriptName)), $ScriptName) == 0)
+         $Return = substr($Return, strlen($ScriptName));
 
       $Return = trim($Return, '/');
-      if(strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
-         $Return = substr($Return, 9);
-      $Return = trim($Return, '/');
-         
 
       if ($RemoveSyndication) {
          $Prefix = strtolower(substr($Return, 0, strpos($Return, '/')));

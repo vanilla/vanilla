@@ -160,10 +160,9 @@ class Gdn_Url {
 
       }
       
-      $ScriptName = (isset($_SERVER['SCRIPT_NAME'])) ? $_SERVER['SCRIPT_NAME'] : @getenv('SCRIPT_NAME');
-      if(is_string($ScriptName) && strcasecmp(substr($Return, 0, strlen($ScriptName)), $ScriptName) == 0)
-         $Return = substr($Return, strlen($ScriptName));
-
+      $Return = trim($Return, '/');
+      if(strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
+         $Return = substr($Return, 9);
       $Return = trim($Return, '/');
 
       if ($RemoveSyndication) {

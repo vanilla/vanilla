@@ -29,10 +29,8 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Applications.Manage');
       $this->AddSideMenu('garden/settings/applications');
 
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/applications.js');
-         $this->Head->Title(Translate('Applications'));
-      }
+      $this->AddJsFile('applications.js');
+      $this->Title(Translate('Applications'));
          
       $Session = Gdn::Session();
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
@@ -102,10 +100,8 @@ class SettingsController extends GardenController {
    public function Configure() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/email.js');
-         $this->Head->Title(Translate('General Settings'));
-      }
+      $this->AddJsFile('email.js');
+      $this->Title(Translate('General Settings'));
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -165,10 +161,8 @@ class SettingsController extends GardenController {
     */
    var $RequiredAdminPermissions = array();
    public function Index() {
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/settings.js');
-         $this->Head->Title(Translate('Dashboard'));
-      }
+      $this->AddJsFile('settings.js');
+      $this->Title(Translate('Dashboard'));
          
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -272,8 +266,7 @@ class SettingsController extends GardenController {
    }
    
    public function Plugins($Filter = '', $TransientKey = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Plugins'));
+      $this->Title(Translate('Plugins'));
          
       $Session = Gdn::Session();
       $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
@@ -338,10 +331,8 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Registration.Manage');
       $this->AddSideMenu('garden/settings/registration');
       
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/registration.js');
-         $this->Head->Title(Translate('Registration'));
-      }
+      $this->AddJsFile('registration.js');
+      $this->Title(Translate('Registration'));
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
@@ -423,8 +414,7 @@ class SettingsController extends GardenController {
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Themes'));
+      $this->Title(Translate('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');
@@ -484,8 +474,7 @@ class SettingsController extends GardenController {
    }
    
    public function PreviewTheme($ThemeFolder = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Theme Preview'));
+      $this->Title(Translate('Theme Preview'));
          
       // Clear out all css & js and use the "empty" master view
       $this->MasterView = 'empty';
@@ -493,8 +482,8 @@ class SettingsController extends GardenController {
       $this->Head->ClearScripts();
       // Add jquery, custom css & js
       $this->AddCssFile('previewtheme.css');
-      $this->Head->AddScript('js/library/jquery.js');
-      $this->Head->AddScript('applications/garden/js/previewtheme.js');
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('previewtheme.js');
 
       $this->Permission('Garden.Themes.Manage');
       $ThemeManager = new Gdn_ThemeManager();

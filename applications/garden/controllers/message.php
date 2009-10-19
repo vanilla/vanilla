@@ -56,10 +56,8 @@ class MessageController extends GardenController {
    }
    
    public function Edit($MessageID = '') {
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/applications/garden/js/messages.js');
-      }
+      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('messages.js');
          
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('garden/message');
@@ -96,13 +94,11 @@ class MessageController extends GardenController {
    public function Index() {
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('garden/message');
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/js/library/jquery.tablednd.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->AddScript('/applications/garden/js/messages.js');
-         $this->Head->Title(Translate('Messages'));
-      }
+      $this->AddJsFile('/js/library/jquery.autogrow.js');
+      $this->AddJsFile('/js/library/jquery.tablednd.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('messages.js');
+      $this->Title(Translate('Messages'));
          
       // Load all messages from the db
       $this->MessageData = $this->MessageModel->Get('Sort');

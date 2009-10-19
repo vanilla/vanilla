@@ -13,11 +13,9 @@ class CategoriesController extends VanillaController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/categories.js');
-         $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
-         $this->Head->Title(Translate('Add Category'));
-      }
+      $this->AddJsFile('categories.js');
+      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->Title(Translate('Add Category'));
       $this->AddCssFile('garden.css');
       $this->AddSideMenu('vanilla/categories/manage');
       
@@ -43,10 +41,8 @@ class CategoriesController extends VanillaController {
    
    public function Delete($CategoryID = FALSE) {
       $this->Permission('Vanilla.Categories.Manage');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/categories.js');
-         $this->Head->Title(Translate('Delete Category'));
-      }
+      $this->AddJsFile('categories.js');
+      $this->Title(Translate('Delete Category'));
 
       $this->AddCssFile('garden.css');
       $this->Category = $this->CategoryModel->GetID($CategoryID);
@@ -122,10 +118,8 @@ class CategoriesController extends VanillaController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       $this->Category = $this->CategoryModel->GetID($CategoryID);
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
-         $this->Head->Title(Translate('Edit Category'));
-      }
+      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->Title(Translate('Edit Category'));
          
       $this->AddCssFile('garden.css');
       $this->AddSideMenu('vanilla/categories/manage');
@@ -177,9 +171,9 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
          $this->Head->Title($Category->Name);
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
+         $this->AddJsFile('discussions.js');
+         $this->AddJsFile('options.js');
+         $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
          $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
       }
       if (!is_numeric($Offset) || $Offset < 0)
@@ -251,11 +245,9 @@ class CategoriesController extends VanillaController {
    public function All() {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->Title(Translate('All Categories'));
-      }
+      $this->AddJsFile('discussions.js');
+      $this->AddJsFile('options.js');
+      $this->Title(Translate('All Categories'));
          
       $this->DiscussionsPerCategory = Gdn::Config('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new Gdn_DiscussionModel();
@@ -288,12 +280,10 @@ class CategoriesController extends VanillaController {
    public function Manage() {
       $this->Permission('Vanilla.Categories.Manage');
       $this->AddSideMenu('vanilla/categories/manage');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.tablednd.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->AddScript('/applications/vanilla/js/categories.js');
-         $this->Head->Title(Translate('Categories'));
-      }
+      $this->AddJsFile('/js/library/jquery.tablednd.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('categories.js');
+      $this->Title(Translate('Categories'));
       $this->AddCssFile('garden.css');
       $this->CategoryData = $this->CategoryModel->Get('Sort');
       $this->Render();

@@ -975,6 +975,12 @@ form.Thumbnail table tr td {
    -webkit-border-radius: 3px;
 }
 
+table {
+	width: 100%;
+}
+table td {
+	font-weight: normal;
+}
 
 /* =================================================================== Footer */
 #Foot {

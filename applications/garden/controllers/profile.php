@@ -63,19 +63,16 @@ class ProfileController extends GardenController {
       if (!$this->GetUserInfo($UserReference))
          return FALSE;
 
-      if ($this->Head)
-         $this->Head->Title(Format::Text($this->User->Name));
+      $this->Title(Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
          $UserInfoModule = new UserInfoModule($this);
          $UserInfoModule->User = $this->User;
          $UserInfoModule->Roles = $this->Roles;
          $this->AddModule($UserInfoModule);
-         if ($this->Head) {
-            $this->Head->AddScript('/js/library/jquery.jcrop.pack.js');
-            $this->Head->AddScript('/applications/garden/js/profile.js');
-            $this->Head->AddScript('/applications/garden/js/activity.js');
-         }
+         $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+         $this->AddJsFile('profile.js');
+         $this->AddJsFile('activity.js');
          $this->AddProfileTab('Activity');
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = Gdn::Translate('Notifications');
@@ -339,10 +336,8 @@ class ProfileController extends GardenController {
    
    public function Thumbnail() {
       $this->Permission('Garden.SignIn.Allow');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.jcrop.pack.js');
-         $this->Head->AddScript('/applications/garden/js/profile.js');
-      }
+      $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+      $this->AddJsFile('profile.js');
             
       $Session = Gdn::Session();
       if (!$Session->IsValid())

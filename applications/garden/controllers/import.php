@@ -23,8 +23,7 @@ class ImportController extends GardenController {
    public function Index($Step = 0) {
       $this->Permission('Garden.Data.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
       
-      if ($this->Head)
-         $this->Head->AddScript('/applications/vanilla/js/import.js');
+      $this->AddJsFile('import.js');
       
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
@@ -445,13 +444,13 @@ class ImportController extends GardenController {
    
    public function Initialize() {
       $this->Head = new HeadModule($this);
-      $this->Head->AddScript('js/library/jquery.js');
-      $this->Head->AddScript('js/library/jquery.livequery.js');
-      $this->Head->AddScript('js/library/jquery.form.js');
-      $this->Head->AddScript('js/library/jquery.popup.js');
-      $this->Head->AddScript('js/library/jquery.menu.js');
-      $this->Head->AddScript('js/library/jquery.gardenhandleajaxform.js');
-      $this->Head->AddScript('js/global.js');
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('js/library/jquery.livequery.js');
+      $this->AddJsFile('js/library/jquery.form.js');
+      $this->AddJsFile('js/library/jquery.popup.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('js/global.js');
 
       $this->AddCssFile('setup.css');
       Gdn_Controller::Initialize();

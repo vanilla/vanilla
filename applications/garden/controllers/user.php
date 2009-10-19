@@ -22,11 +22,9 @@ class UserController extends GardenController {
          '',
          FALSE
       );
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.gardenmorepager.js');
-         $this->Head->AddScript('/applications/garden/js/user.js');
-         $this->Head->Title(Translate('Users'));
-      }
+      $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('user.js');
+      $this->Title(Translate('Users'));
 
       $this->AddSideMenu('garden/user');
 
@@ -88,10 +86,8 @@ class UserController extends GardenController {
 
    public function Add() {
       $this->Permission('Garden.Users.Add');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/user.js');
-         $this->Head->Title(Translate('Add User'));
-      }
+      $this->AddJsFile('user.js');
+      $this->Title(Translate('Add User'));
 
       $this->AddSideMenu('garden/user');
       $UserModel = new Gdn_UserModel();
@@ -124,8 +120,7 @@ class UserController extends GardenController {
 
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/user.js');
+      $this->AddJsFile('user.js');
 
       $this->AddSideMenu('garden/user');
 
@@ -166,10 +161,8 @@ class UserController extends GardenController {
    public function Applicants() {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('garden/user/applicants');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.gardencheckcolumn.js');
-         $this->Head->Title(Translate('Applicants'));
-      }
+      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
+      $this->Title(Translate('Applicants'));
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');

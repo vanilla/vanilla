@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo $this->Form->Open(array('action' => '/garden/profile/invitations'));
+echo $this->Form->Open();
 echo $this->Form->Errors();
 echo '<ul>';
 if ($this->InvitationCount > 0) {

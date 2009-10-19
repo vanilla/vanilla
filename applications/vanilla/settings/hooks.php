@@ -47,10 +47,8 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->AddProfileTab(Gdn::Translate('Discussions'));
          // Add the discussion tab's css
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
-         if ($Sender->Head) {
-            $Sender->Head->AddScript('/js/library/jquery.gardenmorepager.js');
-            $Sender->Head->AddScript('/applications/vanilla/js/discussions.js');
-         }
+         $Sender->AddJsFile('/js/library/jquery.gardenmorepager.js');
+         $Sender->AddJsFile('discussions.js');
       }
    }
    

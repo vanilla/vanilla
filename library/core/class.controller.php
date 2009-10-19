@@ -211,6 +211,14 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_CssFiles;
 
    /**
+    * An array of JS file names to search for in app folders & include in
+    * the page.
+    *
+    * @var array
+    */
+   protected $_JsFiles;
+
+   /**
     * A collection of definitions that will be written to the screen in a
     * hidden unordered list so that JavaScript has access to them (ie. for
     * language translations, web root, etc).
@@ -293,6 +301,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Theme = Gdn::Config('Garden.Theme');
       $this->View = '';
       $this->_CssFiles = array();
+      $this->_JsFiles = array();
       $this->_Definitions = array();
       $this->_DeliveryMethod = GetIncomingValue('DeliveryMethod', DELIVERY_METHOD_XHTML);
       $this->_DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
@@ -345,7 +354,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
-
+   
    /**
     * Undocumented method.
     *
@@ -357,6 +366,17 @@ class Gdn_Controller extends Gdn_Pluggable {
       if(!is_null($Definition))
          $this->_Definitions[$Term] = $Definition;
       return ArrayValue($Term, $this->_Definitions);
+   }
+
+   /**
+    * Adds a JS file to search for in the application or global js folder(s).
+    *
+    * @param string $FileName The CSS file to search for.
+    * @param string $AppFolder The application folder that should contain the JS file. Default is to
+    * use the application folder that this controller belongs to.
+    */
+   public function AddJsFile($FileName, $AppFolder = '') {
+      $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
 
    /**
@@ -848,6 +868,49 @@ class Gdn_Controller extends Gdn_Pluggable {
                   $this->Head->AddCss($CssPath, 'screen');
                }
             }
+            
+            // And now search for/add all JS files
+            foreach ($this->_JsFiles as $JsInfo) {
+               $JsFile = $JsInfo['FileName'];
+               
+               if (strpos($JsFile, '/') !== FALSE) {
+                  // A direct path to the file was given.
+                  $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
+               } else {
+                  $JsGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $JsFile);
+                  $AppFolder = $JsInfo['AppFolder'];
+                  if ($AppFolder == '')
+                     $AppFolder = $this->ApplicationFolder;
+   
+                  // JS can come from any of the application folders, or it can come from the global js folder:
+                  $JsPaths = array();
+                  // 1. This application folder
+                  $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsGlob;
+                  // 2. Global JS folder. eg. root/js/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsGlob;
+                  // 3. Global JS library folder. eg. root/js/library/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsGlob;
+               }
+
+               // Find the first file that matches the path.
+               $JsPath = FALSE;
+               foreach($JsPaths as $Glob) {
+                  $Paths = Glob($Glob);
+                  if(is_array($Paths) && count($Paths) > 0) {
+                     $JsPath = $Paths[0];
+                     break;
+                  }
+               }
+               
+               if ($JsPath !== FALSE) {
+                  $JsPath = str_replace(
+                     array(PATH_ROOT, DS),
+                     array('', '/'),
+                     $JsPath
+                  );
+                  $this->Head->AddScript($JsPath);
+               }
+            }
          }
          // Make sure the head and menu modules get passed into the assets collection.
          $this->AddModule('Head');
@@ -999,6 +1062,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function SetJson($Key, $Value = '') {
       $this->_Json[$Key] = $Value;
+   }
+   
+   /**
+    * If this object has a "Head" object as a property, this will set it's Title value.
+    * 
+    * @param string $Title The value to pass to $this->Head->Title().
+    */
+   public function Title($Title) {
+      if ($this->Head)
+         $this->Head->Title($Title);
    }
    
    /**

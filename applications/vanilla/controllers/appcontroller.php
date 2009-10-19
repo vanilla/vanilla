@@ -5,13 +5,13 @@ class VanillaController extends Gdn_Controller {
    public function Initialize() {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          $this->Head = new HeadModule($this);
-         $this->Head->AddScript('js/library/jquery.js');
-         $this->Head->AddScript('js/library/jquery.livequery.js');
-         $this->Head->AddScript('js/library/jquery.form.js');
-         $this->Head->AddScript('js/library/jquery.popup.js');
-         $this->Head->AddScript('js/library/jquery.menu.js');
-         $this->Head->AddScript('js/library/jquery.gardenhandleajaxform.js');
-         $this->Head->AddScript('js/global.js');
+         $this->AddJsFile('js/library/jquery.js');
+         $this->AddJsFile('js/library/jquery.livequery.js');
+         $this->AddJsFile('js/library/jquery.form.js');
+         $this->AddJsFile('js/library/jquery.popup.js');
+         $this->AddJsFile('js/library/jquery.menu.js');
+         $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+         $this->AddJsFile('js/global.js');
       }
       
       $this->AddCssFile('menu.css');

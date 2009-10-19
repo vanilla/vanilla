@@ -17,10 +17,8 @@ class ActivityController extends GardenController {
       $this->AddCssFile('activity.css');
    }
    public function Index() {
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/activity.js');
-         $this->Head->Title(Translate('Recent Activity'));
-      }
+      $this->AddJsFile('activity.js');
+      $this->Title(Translate('Recent Activity'));
          
       $Session = Gdn::Session();
       $this->ActivityData = $this->ActivityModel->Get();

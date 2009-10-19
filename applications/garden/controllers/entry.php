@@ -15,8 +15,7 @@ class EntryController extends GardenController {
    public $Uses = array('Database', 'Form', 'Session', 'Gdn_UserModel');
    
    public function Index() {
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
          
       // Define gender dropdown options (for registration)
       $this->GenderOptions = array(
@@ -34,7 +33,7 @@ class EntryController extends GardenController {
    }
    
    public function Handshake() {
-      $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
       
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
@@ -148,8 +147,7 @@ class EntryController extends GardenController {
     * model.
     */
    public function SignIn() {
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
          
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
@@ -194,8 +192,7 @@ class EntryController extends GardenController {
       );
 
       // Make sure that the hour offset for new users gets defined when their account is created
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
          
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));

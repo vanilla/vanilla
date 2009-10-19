@@ -796,7 +796,7 @@ ul.PanelInfo li.Active {
    font-size: 16px;
    font-weight: bold;
    -moz-border-radius: 2px;
-   -webkig-border-radius: 2px;
+   -webkit-border-radius: 2px;
    background: #44c7f4 /* Banner Background Color */;
    color: #fff /* Banner Font Color */;
    text-decoration: none;

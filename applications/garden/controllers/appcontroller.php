@@ -17,13 +17,13 @@ class GardenController extends Gdn_Controller {
    public function Initialize() {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          $this->Head = new HeadModule($this);
-         $this->Head->AddScript('js/library/jquery.js');
-         $this->Head->AddScript('js/library/jquery.livequery.js');
-         $this->Head->AddScript('js/library/jquery.form.js');
-         $this->Head->AddScript('js/library/jquery.popup.js');
-         $this->Head->AddScript('js/library/jquery.menu.js');
-         $this->Head->AddScript('js/library/jquery.gardenhandleajaxform.js');
-         $this->Head->AddScript('js/global.js');
+         $this->AddJsFile('jquery.js');
+         $this->AddJsFile('jquery.livequery.js');
+         $this->AddJsFile('jquery.form.js');
+         $this->AddJsFile('jquery.popup.js');
+         $this->AddJsFile('jquery.menu.js');
+         $this->AddJsFile('jquery.gardenhandleajaxform.js');
+         $this->AddJsFile('global.js');
       }
       
       $this->AddCssFile('menu.css');

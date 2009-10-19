@@ -27,17 +27,17 @@ class ConversationsController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          $this->Head = new HeadModule($this);
-         $this->Head->AddScript('js/library/jquery.js');
-         $this->Head->AddScript('js/library/jquery.livequery.js');
-         $this->Head->AddScript('js/library/jquery.form.js');
-         $this->Head->AddScript('js/library/jquery.popup.js');
-         $this->Head->AddScript('js/library/jquery.menu.js');
-         $this->Head->AddScript('js/library/jquery.gardenhandleajaxform.js');
-         $this->Head->AddScript('js/library/jquery.gardenmorepager.js');
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('js/library/jquery.autocomplete.js');
-         $this->Head->AddScript('js/global.js');
-         $this->Head->AddScript('/applications/conversations/js/conversations.js');
+         $this->AddJsFile('js/library/jquery.js');
+         $this->AddJsFile('js/library/jquery.livequery.js');
+         $this->AddJsFile('js/library/jquery.form.js');
+         $this->AddJsFile('js/library/jquery.popup.js');
+         $this->AddJsFile('js/library/jquery.menu.js');
+         $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+         $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+         $this->AddJsFile('js/library/jquery.autogrow.js');
+         $this->AddJsFile('js/library/jquery.autocomplete.js');
+         $this->AddJsFile('js/global.js');
+         $this->AddJsFile('conversations.js');
       }
       
       $this->AddCssFile('menu.css');

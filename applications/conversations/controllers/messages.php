@@ -84,9 +84,7 @@ class MessagesController extends ConversationsController {
     * Show all conversations for the currently authenticated user.
     */
    public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
-      if ($this->Head) {
-         $this->Head->Title(Translate('Conversations'));
-      }
+      $this->Title(Translate('Conversations'));
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($this->Offset) || $this->Offset < 0)
@@ -180,9 +178,7 @@ class MessagesController extends ConversationsController {
     * @todo ENFORCE PERMISSIONS SO THAT PEOPLE CAN'T READ OTHER PEOPLE'S MESSAGES
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
-      if ($this->Head) {
-         $this->Head->Title(Translate('Conversations'));
-      }
+      $this->Title(Translate('Conversations'));
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($ConversationID) || $ConversationID < 0)

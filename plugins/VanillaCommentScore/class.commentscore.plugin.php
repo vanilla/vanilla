@@ -201,18 +201,18 @@ class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
       
       // Construct the user comment table.
       $Structure->Table('UserComment')
-         ->Column('CommentID', 'int', 4, FALSE, NULL, 'primary', FALSE)
-         ->Column('UserID', 'int', 4, FALSE, NULL, 'primary', FALSE)
-         ->Column('Score', 'int', 4, TRUE)
-         ->Column('InsertUserID', 'int', 10, FALSE, NULL, 'key')
-         ->Column('UpdateUserID', 'int', 10, TRUE)
+         ->PrimaryKey('CommentID', 'int', FALSE, 'primary')
+         ->Column('UserID', 'int', FALSE, 'primary')
+         ->Column('Score', 'int', TRUE)
+         ->Column('InsertUserID', 'int', FALSE, 'key')
+         ->Column('UpdateUserID', 'int', TRUE)
          ->Column('DateInserted', 'datetime')
          ->Column('DateUpdated', 'datetime')
          ->Set(FALSE, FALSE);
          
       // Add the total score to the comment table.
       $Structure->Table('Comment')
-         ->Column('SumScore', 'int', 4, TRUE)
+         ->Column('SumScore', 'int', TRUE)
          ->Set(FALSE, FALSE);
    }
 }

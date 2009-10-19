@@ -1779,7 +1779,7 @@ abstract class Gdn_SQLDriver {
       }
       return $this;
    }
-    
+   
    /**
     * Adds to the $this->_WhereIns collection. Used to generate a "where field
     * in (1,2,3)" query. Called by $this->WhereIn(), $this->OrWhereIn(),
@@ -1788,9 +1788,10 @@ abstract class Gdn_SQLDriver {
     * @param string  $Field The field to search in for $Values.
     * @param array   $Values An array of values to look for in $Field.
     * @param string $Op Either 'in' or 'not in' for the respective operation.
+    * @param string $Escape Whether or not to escape the items in $Values.
     * clause.
     */
-   public function _WhereIn($Field, $Values, $Op = 'in') {
+   public function _WhereIn($Field, $Values, $Op = 'in', $Escape = TRUE) {
       if (is_null($Field) || !is_array($Values))
          return;
       
@@ -1799,7 +1800,7 @@ abstract class Gdn_SQLDriver {
       // Build up the in clause.
       $In = array();
       foreach ($Values as $Value) {
-         $ValueExpr = $this->_ParseExpr($Value, $Field);
+         $ValueExpr = $this->_ParseExpr($Value, $Field, $Escape);
          if(strlen($ValueExpr) > 0)
             $In[] = $ValueExpr;
       }
@@ -1822,16 +1823,16 @@ abstract class Gdn_SQLDriver {
     * @param string $Field  The field to search in for $Values.
     * @param array  $Values An array of values to look for in $Field.
     */
-   public function WhereIn($Field, $Values) {
-      return $this->_WhereIn($Field, $Values);
+   public function WhereIn($Field, $Values, $Escape = TRUE) {
+      return $this->_WhereIn($Field, $Values, 'in', $Escape);
    }
 
    /**
     * A convenience method for Gdn_DatabaseDriver::WhereIn() that changes the operator to 'not in.'
     * @see Gdn_DatabaseDriver::WhereIn()
     */
-   public function WhereNotIn($Field, $Values) {
-      return $this->_WhereIn($Field, $Values, 'not in');
+   public function WhereNotIn($Field, $Values, $Escape = TRUE) {
+      return $this->_WhereIn($Field, $Values, 'not in', $Escape);
    }
 
    /**

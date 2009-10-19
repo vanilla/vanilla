@@ -257,8 +257,8 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 		// Setup the theme table.
 		$St = Gdn::Structure();
 		$St->Table('ThemeSetting')
-			->Column('Name', 'varchar', '50', FALSE, NULL, 'primary')
-			->Column('Setting', 'varchar', '50')
+			->Column('Name', 'varchar(50)', FALSE, 'primary')
+			->Column('Setting', 'varchar(50)')
 			->Set(FALSE, FALSE);
 			
 		// Insert default values.

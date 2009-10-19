@@ -383,8 +383,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $FolderDepth = 1;
       }
       if ($FolderDepth == 2) {
-         // print_r($Parts);
-         // echo $Parts[1];
          $this->_ApplicationFolder = $Parts[0];
          $this->_ControllerFolder = $Parts[1];
          $this->_MapParts($Parts, 2);

@@ -28,7 +28,8 @@ class ImportController extends GardenController {
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
       $Construct = $Database->Structure();
-      $SourcePrefix = Gdn::Config('Import.SourcePrefix', 'LUM_');
+      $PDO = $Database->Connection();
+      $SourcePrefix = Gdn::Config('Garden.Import.SourcePrefix', 'LUM_');
       $DestPrefix = Gdn::Config('Database.DatabasePrefix', '');
       if ($Step == 0) {
          $this->View = 'import';
@@ -111,12 +112,12 @@ class ImportController extends GardenController {
          }
       } else if ($Step == 1) {
          // 1. Add Import IDs to various tables where necessary 
-         $Construct->Table('Role')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('User')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('Category')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
-         $Construct->Table('Discussion')->Column('ImportID', 'int', 11, FALSE, NULL, 'key')->Set();
+         $Construct->Table('Role')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('User')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('Category')->Column('ImportID', 'int', TRUE, 'key')->Set();
+         $Construct->Table('Discussion')->Column('ImportID', 'int', TRUE, 'key')->Set();
          $Construct->DatabasePrefix($SourcePrefix);
-         $Construct->Table('Comment')->Column('ConversationID', 'int', 11, FALSE, NULL, 'key')->Set();
+         $Construct->Table('Comment')->Column('ConversationID', 'int', TRUE, 'key')->Set();
          $Construct->DatabasePrefix($DestPrefix);
          
          $this->Message = Gdn::Translate('<strong>2/19</strong> Preparing tables for import.');
@@ -128,7 +129,7 @@ class ImportController extends GardenController {
          $OldRoles = $Database->Query('select * from '.$SourcePrefix.'Role');
          // Loop through each, inserting if it doesn't exist and updating ImportID if it does
          foreach ($OldRoles->Result() as $OldRole) {
-            $RoleData = $Database->Query("select * from ".$DestPrefix."Role where Name = '".$OldRole->Name."'");
+            $RoleData = $Database->Query("select * from ".$DestPrefix."Role where Name = ".$PDO->quote($OldRole->Name));
             if ($RoleData->NumRows() == 0) {
                $Role = array();
                $Role['ImportID'] = $OldRole->RoleID;
@@ -291,10 +292,10 @@ class ImportController extends GardenController {
 
          // Update the UserConversation.LastMessageID records
          // (ie. the last message in a conversation by someone other than the userconversation.userid person)
-         $Database->Query("update ".$DestPrefix."userconversation uc
+         $Database->Query("update ".$DestPrefix."UserConversation uc
          join (
            select ConversationID, InsertUserID, max(MessageID) as LastMessageID
-           from ".$DestPrefix."conversationmessage
+           from ".$DestPrefix."ConversationMessage
            group by ConversationID, InsertUserID
          ) m
            on uc.ConversationId = m.ConversationID

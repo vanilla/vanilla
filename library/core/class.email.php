@@ -39,6 +39,7 @@ class Gdn_Email extends Gdn_Pluggable {
     */
    function __construct() {
       $this->_PhpMailer = new PHPMailer();
+      $this->_PhpMailer->CharSet = 'utf-8';
       $this->Clear();
       parent::__construct();
    }

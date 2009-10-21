@@ -405,6 +405,9 @@ class Gdn_PluginManager {
       
       // Include all of the paths.
       $PluginInfo = array();
+      
+      
+      $Paths = (array)$Paths;
       foreach($Paths as $Path) {
          if(file_exists($Path))
             include($Path);

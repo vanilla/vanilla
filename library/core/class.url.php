@@ -80,7 +80,7 @@ class Gdn_Url {
          if (substr($Domain, 0, 7) != 'http://')
             $Domain = 'http://'.$Domain;
          
-         if (substr($Domain, 0, -1) != '/')
+         if (substr($Domain, -1) != '/')
             $Domain = $Domain . '/';
       }
       return $Domain;

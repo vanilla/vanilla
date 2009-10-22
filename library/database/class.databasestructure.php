@@ -111,6 +111,22 @@ abstract class Gdn_DatabaseStructure {
       $Column->Unsigned = $Unsigned;
       $Column->AutoIncrement = FALSE;
       
+      // Handle enums and sets as types.
+      if(is_array($Type)) {
+         if(count($Type) === 2 && is_array(ArrayValue(1, $Type))) {
+            // The type is specified as the first element in the array.
+            $Column->Type = $Type[0];
+            $Column->Enum = $Type[1];
+         } else {
+            // This is an enum.
+            $Column->Type = 'enum';
+            $Column->Enum = $Type;
+         }
+      } else {
+         $Column->Type = $Type;
+         $Column->Enum = FALSE;
+      }
+      
       return $Column;
    }
    
@@ -119,7 +135,8 @@ abstract class Gdn_DatabaseStructure {
     *
     * @param string $Name The name of the column to create.
     * @param mixed $Type The data type of the column to be created. Types with a length speecifty the length in barackets.
-    * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+    * * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+    * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
     * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
     * * TRUE: Nulls are allowed.
     * * FALSE: Nullas are not allowed.

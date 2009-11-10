@@ -40,10 +40,8 @@ class ConversationsController extends Gdn_Controller {
          $this->AddJsFile('conversations.js');
       }
       
-      $this->AddCssFile('menu.css');
-      $this->AddCssFile('popup.css');
+      $this->AddCssFile('style.css');
       $this->AddCssFile('conversations.css');
-      $this->AddModule('PoweredByVanillaModule');
       parent::Initialize();
    }
 }

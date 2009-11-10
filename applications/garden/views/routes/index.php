@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 ?>
 <h1><?php echo Gdn::Translate('Manage Routes'); ?></h1>
-<div class="FilterMenu"><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute'); ?></div>
+<div class="FilterMenu"><?php echo Anchor('Add Route', 'garden/routes/add', 'AddRoute Button'); ?></div>
 <div class="Info"><?php
    echo Gdn::Translate('Routes can be used to redirect users to various parts of your site depending on the url. ');
    echo Anchor('Get more information on creating custom routes', 'http://vanillaforums.org/page/routes');

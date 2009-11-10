@@ -44,7 +44,7 @@ class UserController extends GardenController {
          $this->Form->SetFormValue('Keywords', $Keywords);
 
       $UserModel = new Gdn_UserModel();
-      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords);
+      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       $Limit = 30;
       $TotalRecords = $UserModel->GetCountLike($Like);
       $this->UserData = $UserModel->GetLike($Like, 'u.Name', 'asc', $Limit, $Offset);

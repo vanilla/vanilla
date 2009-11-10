@@ -272,7 +272,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $ApplicationFolder = $this->_ApplicationFolder;
 
       $EnabledApplication = array_keys($this->_EnabledApplications, $ApplicationFolder);
-      return count($EnabledApplication) > 0 ? $EnabledApplication[0] : '';
+      $EnabledApplication = count($EnabledApplication) > 0 ? $EnabledApplication[0] : '';
+      $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+      $this->FireEvent('AfterEnabledApplication');
+      return $EnabledApplication;
    }
 
    /**

@@ -23,7 +23,7 @@ class MessagesController extends ConversationsController {
    /**
     * Add a new conversations.
     */
-   public function Add() {
+   public function Add($Recipient = '') {
       $this->Form->SetModel($this->ConversationModel);
       
       if ($this->Form->AuthenticatedPostBack()) {
@@ -41,6 +41,8 @@ class MessagesController extends ConversationsController {
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE)
             Redirect('messages/'.$ConversationID);
+      } else if ($Recipient != '') {
+         $this->Form->SetFormValue('To', $Recipient);
       }
       $this->Render();      
    }

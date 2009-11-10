@@ -13,6 +13,3 @@ Gdn::FactoryInstall('Menu', 'Gdn_MenuModule', PATH_APPLICATIONS.DS.'garden'.DS.'
 Gdn::Dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));
 // Search.
 Gdn::FactoryInstall('SearchModel', 'Gdn_SearchModel', PATH_APPLICATIONS.DS.'garden'.DS.'models'.DS.'class.searchmodel.php', Gdn::FactorySingleton);
-
-Gdn::FactoryInstall('SearchModule', 'Gdn_SearchModule', PATH_APPLICATIONS.DS.'garden'.DS.'modules'.DS.'class.searchmodule.php', Gdn::FactorySingleton);
-Gdn::Dispatcher()->PassAsset('Search', Gdn::Factory('SearchModule'));

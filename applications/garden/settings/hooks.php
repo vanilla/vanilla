@@ -16,10 +16,11 @@ class GardenHooks implements Gdn_IPlugin {
    public function Base_Render_Before(&$Sender) {
       // Add menu items.
       $Session = Gdn::Session();
+      /*
       if ($Sender->Menu) {
-         $Sender->Menu->AddLink('Dashboard', 'Dashboard', '/garden/settings', array('Garden.Settings.Manage'));
-         $Sender->Menu->AddLink('Dashboard', 'Users', '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-         $Sender->Menu->AddLink('Activity', 'Activity', '/activity');
+         $Sender->Menu->AddLink('Dashboard', Gdn::Translate('Dashboard'), '/garden/settings', array('Garden.Settings.Manage'));
+         $Sender->Menu->AddLink('Dashboard', Gdn::Translate('Users'), '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+         $Sender->Menu->AddLink('Activity', Gdn::Translate('Activity'), '/activity');
          $Authenticator = Gdn::Authenticator();
          if ($Session->IsValid()) {
             $Name = $Session->User->Name;
@@ -28,11 +29,12 @@ class GardenHooks implements Gdn_IPlugin {
                $Name .= '<span>'.$CountNotifications.'</span>';
                
             $Sender->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'));
-            $Sender->Menu->AddLink('SignOut', 'Sign Out', $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
+            $Sender->Menu->AddLink('SignOut', Gdn::Translate('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
          } else {
-            $Sender->Menu->AddLink('Entry', 'Sign In', $Authenticator->SignInUrl($Sender->SelfUrl));
+            $Sender->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($Sender->SelfUrl));
          }
       }
+      */
       // Enable theme previewing
       if ($Session->IsValid()) {
          $PreviewTheme = $Session->GetPreference('PreviewTheme', '');
@@ -54,21 +56,24 @@ class GardenHooks implements Gdn_IPlugin {
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Site Settings', 'Site Settings');
-      $Menu->AddLink('Site Settings', 'General', 'garden/settings/configure', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', 'Routes', 'garden/routes', 'Garden.Routes.Manage');
-      $Menu->AddLink('Site Settings', 'Messages', 'garden/message', 'Garden.Messages.Manage');
-      
-      $Menu->AddItem('Add-ons', 'Add-ons');
-      $Menu->AddLink('Add-ons', 'Applications', 'garden/settings/applications', 'Garden.Applications.Manage');
-      $Menu->AddLink('Add-ons', 'Plugins', 'garden/settings/plugins', 'Garden.Applications.Manage');
-      $Menu->AddLink('Add-ons', 'Themes', 'garden/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddItem('Dashboard', Gdn::Translate('Dashboard'));
+      $Menu->AddLink('Dashboard', Gdn::Translate('Dashboard'), 'garden/settings', 'Garden.Settings.Manage');
 
-      $Menu->AddItem('Users', 'Users');
-      $Menu->AddLink('Users', 'Users', 'garden/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-      $Menu->AddLink('Users', 'Roles & Permissions', 'garden/role', 'Garden.Roles.Manage');
-      $Menu->AddLink('Users', 'Registration', 'garden/settings/registration', 'Garden.Registration.Manage');
+      $Menu->AddItem('Site Settings', Gdn::Translate('Site Settings'));
+      $Menu->AddLink('Site Settings', Gdn::Translate('General'), 'garden/settings/configure', 'Garden.Settings.Manage');
+      $Menu->AddLink('Site Settings', Gdn::Translate('Routes'), 'garden/routes', 'Garden.Routes.Manage');
+      $Menu->AddLink('Site Settings', Gdn::Translate('Messages'), 'garden/message', 'Garden.Messages.Manage');
+      
+      $Menu->AddItem('Add-ons', Gdn::Translate('Add-ons'));
+      $Menu->AddLink('Add-ons', Gdn::Translate('Applications'), 'garden/settings/applications', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', Gdn::Translate('Plugins'), 'garden/settings/plugins', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', Gdn::Translate('Themes'), 'garden/settings/themes', 'Garden.Themes.Manage');
+
+      $Menu->AddItem('Users', Gdn::Translate('Users'));
+      $Menu->AddLink('Users', Gdn::Translate('Users'), 'garden/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+      $Menu->AddLink('Users', Gdn::Translate('Roles & Permissions'), 'garden/role', 'Garden.Roles.Manage');
+      $Menu->AddLink('Users', Gdn::Translate('Registration'), 'garden/settings/registration', 'Garden.Registration.Manage');
       if (Gdn::Config('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', 'Applicants', 'garden/user/applicants', 'Garden.Applicants.Manage');
+         $Menu->AddLink('Users', Gdn::Translate('Applicants'), 'garden/user/applicants', 'Garden.Applicants.Manage');
    }
 }

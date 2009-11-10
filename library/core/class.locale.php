@@ -40,7 +40,7 @@ if (!defined('APPLICATION'))
  * @see Gdn::Locale()
  * @see Gdn::Translate()
  */
-class Gdn_Locale {
+class Gdn_Locale extends Gdn_Pluggable {
 
 
    /**
@@ -61,6 +61,7 @@ class Gdn_Locale {
    
    public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
       $this->Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+      parent::__construct();
    }
 
    /**
@@ -169,6 +170,8 @@ class Gdn_Locale {
     * @return string
     */
    public function Translate($Code, $Default = '') {
+      $this->EventArguments['Code'] = $Code;
+      $this->FireEvent('BeforeTranslate');
       if (array_key_exists($Code, $this->_Definition)) {
          return $this->_Definition[$Code];
       } else {

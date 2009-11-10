@@ -8,8 +8,8 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class SearchController extends GardenController {
-	/// CONSTRUCTOR ///
+class SearchController extends Gdn_Controller {
+
 	public function __construct() {
 		parent::__construct();
 		
@@ -20,12 +20,28 @@ class SearchController extends GardenController {
 		$this->Form = $Form;
 	}
 	
-	/// PROPERTIES ///
+   public function Initialize() {
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('js/library/jquery.livequery.js');
+      $this->AddJsFile('js/library/jquery.form.js');
+      $this->AddJsFile('js/library/jquery.popup.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('js/global.js');
+      
+      $this->AddCssFile('style.css');
+      $this->AddCssFile('menu.css');
+      $GuestModule = new GuestModule($this);
+      $GuestModule->MessageCode = "It looks like you're new here. If you want to take part in the discussions, click one of these buttons!";
+      $this->AddModule($GuestModule);
+      parent::Initialize();
+   }
+
    public $Uses = array('Database', 'Gdn_SearchModel');
 	
 	public $Form;
 	
-	/// METHODS ///
 	public function Index($Offset = 0, $Limit = NULL) {
 		$this->AddJsFile('/js/library/jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');

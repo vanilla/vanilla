@@ -29,9 +29,9 @@ Welcome to the Garden CSS File! 6 Things you should know:
    
 /* ============================================== General Styles & Typography */
 body {
-   color: #000 /* Body Default Font Color */;
+   color: #000;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
-   background: #ffffff  /* Body Background Color */;
+   background: #fff;
    margin: 0;
    padding: 0;
    text-align: center;
@@ -46,7 +46,7 @@ body {
    margin: 15px auto 0;
 }
 #Content {
-   float: right;
+   float: left;
    width: 680px;
    margin: 0 0 40px;
 }
@@ -63,7 +63,7 @@ body {
 	text-align: right;
 }
 h1, h2, h3, h4, h5, h6 {
-   color: #000 /* Body Heading Font Color */;
+   color: #000;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
@@ -84,94 +84,22 @@ h3 {
 }
 h4 {
    font-size: 120%;
-   color: #6C6C6C /* Body Subheading Font Color */;
+   color: #6C6C6C;
 }
 h5 {
    font-size: 120%;
-   color: #6C6C6C /* Body Subheading Font Color */;
+   color: #6C6C6C;
 }
 a,
 a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #2786c2  /* Body Link Font Color */;
+   color: #2786c2;
 }
 a:hover {
    text-decoration: none;
-   color: #ff0084 /* Body Hover Font Color */;
-}
-form ul li {
-   border-bottom: 1px solid #eee;
-   margin-bottom: 10px;
-   padding: 0px 0px 10px 3px;
-   font-size: 12px;
-   color: #555 /* Body Text Font Color */;
-}
-form ul li label {
-   color: #222 /* Body Text Font Color */;
-   float: left;
-   display: block;
-   width: 150px;
-   font-size: 14px;
-   padding: 6px 6px 0px 4px;
-   }
-body.Messages div.Popup form ul li label {
-   width: 100px;
-}
-form ul li label.RadioLabel {
-   float: none;
-   display: inline;
-   font-weight: normal;
-}
-table.Label tbody th {
-   width: 140px;
-}
-form ul li table label {
-   float: none;
-   display: inline;
-   width: auto;
-}
-body.Messages div.Popup form ul li label.CheckBoxLabel,
-form ul li label.CheckBoxLabel {
-   float: none;
-   width: auto;
-   display: block;
-   font-size: 13px;
-   cursor: pointer;
-   margin: 0px;
-   padding: 0px;
-   line-height: 27px;
-}
-form ul li label.CheckBoxLabel input {
-   margin: 7px 6px 4px 2px;
-   padding: 0px;
-   float: left;
-}
-form ul li label span {
-   font-size: 11px;
-   color: #999;
-   padding-left: 6px;
-   }
-form li.RadioInput label {
-   display: inline;
-   }
-input.SmallButton {
-   cursor: pointer;
-   margin: 0px 0px 0px 0px;
-   font-size: 11px;
-}
-input.SmallInput {
-   width: 80px;
-}
-table th,
-table td {
-   font-size: 13px;
-   padding: 6px;
-   font-weight: bold;
-   color: #000;
-   border-bottom: 1px solid #e2e6ef;
-   line-height: 150%;
+   color: #ff0084;
 }
 input.DateBox,
 input.InputBox,
@@ -214,10 +142,6 @@ select {
    margin: 0;
    padding: 3px;
    }
-select.Day,
-select.Year {
-   margin-left: 4px;
-}
 .Button {
    cursor: pointer;
    margin: 0;
@@ -359,23 +283,15 @@ div.DismissMessage a.Dismiss:hover {
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
-   font-weight: bold;
-   font-family: tahoma;
-   font-size: 10px;
-   text-transform: uppercase;
-   color: #bbb;
-   background: #f9f9f9;
-   -moz-border-radius: 8px;
-   -webkit-border-radius: 8px;
-   padding: 1px 4px 2px 5px;
-   margin: 0;
-   line-height: 100%;
-   border: 1px solid #ddd;
+	color:#777;
+	font-family:monaco;
+	font-size:14px;
+	font-weight:bold;
+	cursor:pointer;
+	padding: 0 2px;
 }
 a.Close:hover {
-   border: 1px solid #bbb;
-   color: #999;
-   background: #fff;
+	color: #333;
 }
 /* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
 .MorePager {
@@ -412,7 +328,7 @@ tr#PagerMore td {
 
 /* =================================================================== Header */
 #Head {
-   background: #44c7f4  /* Banner Background Color */;
+   background: #44c7f4;
    padding: 0;
    text-align: right;
    height: 50px;
@@ -471,6 +387,174 @@ body #Head h1 {
    -webkit-border-top-right-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
 }
+#Menu * {
+   font-family: tahoma;
+}
+#Menu {
+   height: 28px;
+   padding: 0;
+}
+#Menu,
+#Menu ul {
+   margin: 0;
+   padding: 0;
+}
+#Menu ul {
+   position: absolute;
+   visibility: hidden;
+   z-index: 100;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+#Menu li ul li.First {
+   margin-top: 2px;
+}
+#Menu li ul li.Last {
+   padding-bottom: 2px;
+}
+#Menu li {
+   line-height: 27px;
+   float: left;
+   position: relative;
+   display: block;
+   list-style: none outside none;
+   padding: 0;
+   margin: 0 10px 0 0;
+   font-weight: bold;
+   text-align: left;
+}
+#Menu li
+#Menu li a,
+#Menu li a:hover,
+#Menu li.Active,
+#Menu li.Active a,
+#Menu li.Active a:hover {
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-topright: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+}
+#Menu li ul li,
+#Menu li ul li a,
+#Menu li ul li a:hover,
+#Menu li.Active ul li,
+#Menu li.Active ul li a,
+#Menu li.Active ul li a:hover {
+   -moz-border-radius-topleft: 0;
+   -moz-border-radius-topright: 0;
+   -webkit-border-top-left-radius: 0;
+   -webkit-border-top-right-radius: 0;
+}
+#Menu li ul li.Last a {
+   -moz-border-radius-bottomleft: 1px;
+   -moz-border-radius-bottomright: 1px;
+   -webkit-border-bottom-left-radius: 1px;
+   -webkit-border-bottom-right-radius: 1px;
+}
+#Menu li ul li {
+   margin: 0;
+   line-height: 22px;
+   font-weight: normal;
+}
+#Menu li ul li a {
+   height: auto;
+}
+#Menu a {
+   border: 0;
+   text-decoration: none;
+   display: block;
+   position: relative;
+   padding: 0 10px;
+   white-space: nowrap;
+   font-size: 11px;
+   height: 28px;
+}
+#Menu ul li {
+ display: block;
+ float: none;
+}
+#Menu ul .Active .First {
+ padding-left: 1px;
+}
+#Menu li.NonTab,
+#Menu li.NonTab a {
+   background: transparent;
+   border: 0;
+   font-weight: normal;
+}
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   margin-left: 4px;
+   padding: 0 2px;
+   font-size: 9px;
+   line-height: 12px;
+   font-weight: normal;
+}
+
+/* Option (dropdown) Menus
+
+Menu takes a z-index of 100
+Option menu takes a z-index of 300
+
+*/
+ul.Options,
+ul.Options ul {
+   margin: 0;
+   padding: 0;
+   display: none;
+}
+ul.Options {
+   z-index: 298;
+}
+ul.Options ul {
+   z-index: 300;
+   position: absolute;
+}
+ul.Options li {
+   float: left;
+   position: relative;
+   display: block;
+   list-style: none outside none;
+   padding: 0;
+   font-size: 11px;
+   line-height: 22px;
+}
+ul.Options h3 {
+   display: block;
+   cursor: pointer;
+   margin: 0;
+   padding: 0;
+}
+ul.Options li ul li {
+   float: none;
+   text-align: left;
+   margin: 0;
+   font-weight: normal;
+}
+ul.Options li ul li a {
+   width: 104px;
+   padding: 0 6px;
+   height: auto;
+}
+ul.Options a {
+   text-decoration: none;
+   display: block;
+   position: relative;
+   white-space: nowrap;
+   font-size: 11px;
+}
+ul.Options ul li {
+   display: block;
+   float: none;
+}
+.Center {
+   text-align: center;
+}
 
 
 /* ================================================================ Main Menu */
@@ -516,29 +600,29 @@ ul#Menu {
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff  /* Panel Background Color */;
-   color: #999  /* Panel Font Color */;
+   background: #e9f9ff;
+   color: #999;
    padding: 6px 10px;
    margin: 0 0 10px;
 }
 div.Box h4 {
    font-size: 110%;
-   color: #2786c2  /* Panel Font Color */;
+   color: #2786c2;
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
-   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+   /* border-bottom: 1px solid #caf0fe; <-- This caused a 2px underline where it was above PanelInfo */
 }
 div.Box dl {
-   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
-   background: #F5FCFF /* Panel Inlay Background Color */;
+   border-bottom: 1px solid #caf0fe;
+   background: #F5FCFF;
    padding: 3px;
    overflow: hidden;
 }
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #2786C2 /* Panel Font Color */;
+   color: #2786C2;
 }
 div.Box dl dd {
    margin-left: 80px;
@@ -546,24 +630,70 @@ div.Box dl dd {
 div.Box p {
    font-size: 100%;
    padding: 0 0 4px;
-   color: #555 /* Body Text Font Color */;
-}
-ul.PanelInfo {
-	border-top: 1px solid #caf0fe;
-   border-bottom: 1px solid #caf0fe;
+   color: #555;
 }
 ul.PanelInfo li {
-   background: #f5fcff /* Panel Inlay Background Color */;
+   background: #f5fcff;
+   border-bottom: 1px solid #caf0fe;
    padding: 2px 4px;
+   font-family: tahoma;
+   text-align: right;
+}
+ul.PanelInfo {
+   border-top: 1px solid #caf0fe;
+	border-bottom: 0;
 }
 ul.PanelInfo li strong {
-	font-weight: normal;
+   font-weight: normal;
    text-align: left;
-   font-size: 120%;
    margin-right: 12px;
+   font-weight: normal;
+}
+ul.PanelInfo li a {
+   float: left;
+}
+ul.PanelInfo div.Meta {
+   font-size: 90%;
+}
+ul.PanelInfo div.Meta span,
+ul.PanelInfo div.Meta strong {
+   margin-right: 8px;
+}
+ul.PanelInfo div.Meta span a {
+   margin-left: 8px;
+}
+ul.PanelInfo div.Meta strong {
+   font-weight: normal;
+   display: inline;
+   color: #80828C;
+   background: #ff6;
+   padding: 0 2px;
+}
+ul.PanelDiscussions li {
+   text-align: left;
+}
+ul.PanelDiscussions li a {
+   float: none;
+}
+ul.PanelDiscussions li strong {
+   display: block;
 }
 ul.PanelInfo li.Active {
-   background: #fff;
+   background: #fff /* Panel Selected Background Color */;
+   border-bottom: 1px solid #a3e6ff /* Panel Inlay Border Color */;
+}
+ul.PanelInfo li.Active a {
+   color: #2786C2 /* Panel Selected Font Color */;
+}
+body.Profile ul.PanelInfo {
+   border-bottom: 1px solid #caf0fe;
+}
+body.Profile ul.PanelInfo li {
+	border-bottom: 0;
+	text-align: left;
+}
+body.Profile ul.PanelInfo li a {
+   float: none;
 }
 
 
@@ -571,7 +701,6 @@ ul.PanelInfo li.Active {
 body.Activity h1 {
    margin: 0;
 }
-
 ul.Activities {
 	margin-bottom: 6px;
 }
@@ -618,22 +747,22 @@ ul.Activities li h3 a.CommentOption {
 ul.Activities li a.Delete {
    float: right;
    width: auto;
-   padding: 4px;
+   padding: 5px;
    margin: 0 1px 0 0;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   font-size: 10px;
-   font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #ddd;
+   font-size: 11px;
+   font-weight: bold;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   color: #888;
+   color: #555;
    cursor: pointer;
    line-height: 100%;
 }
 ul.Activities li a.Delete:hover {
+	padding: 4px;
    color: #333;
    border: 1px solid #888;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
 }
 ul.Activities li div.Story {
    border: 1px solid #eee;
@@ -745,7 +874,7 @@ ul.Activities li.CommentForm textarea.TextBox {
    height: 40px;
    margin-bottom: 2px;
 }
-ul.Activities {
+body.Profile ul.Activities {
    margin-top: 10px;
    border-top: 1px solid #ddd;
 }
@@ -757,14 +886,14 @@ ul.Notifications {
    border: 0;
 }
 
-
 /* ============================================================= Profile Page */
-#Content {
+body.Profile #Content {
    width: auto;
    margin: 0 0 40px 20px;
    width: 690px;
+	float: right;
 }
-#Panel {
+body.Profile #Panel {
    float: left;
    width: 250px;
 }
@@ -772,7 +901,6 @@ ul.SideMenu {
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
    background: none;
-   font-size:110%;
    padding: 0;
    margin: 0 0 10px;
 }
@@ -973,12 +1101,62 @@ form.Thumbnail table tr td {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-
-table {
+form.Thumbnail table {
 	width: 100%;
 }
-table td {
+form.Thumbnail table td {
 	font-weight: normal;
+}
+
+
+/* =================================================================== Popups */
+div.Popup .Loading {
+   display: block;
+}
+div.Overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+div.Popup {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  text-align: center;
+}
+div.Popup div.Body {
+  margin: 0px auto;
+  text-align: left;
+  position: relative;
+  padding: 0px;
+  background: #fff;
+  max-width: 500px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border: 8px solid #555;
+}
+div.Popup div.Body div.Body {
+   border: 0;
+}
+div.Popup .Content {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+div.Popup .Loading {
+  text-align: center;
+}
+div.Popup .Footer {
+  background: #f3f3f3;
+  text-align: right;
+  padding: 0 6px 2px 0;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
 }
 
 /* =================================================================== Footer */

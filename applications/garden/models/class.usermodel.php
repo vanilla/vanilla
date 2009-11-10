@@ -96,7 +96,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
       if (is_array($Like))
-         $this->SQL->Like($Like, '', 'right');
+         $this->SQL->OrLike($Like, '', 'right');
 
       $Data = $this->SQL
          ->BeginWhereGroup()
@@ -134,7 +134,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
 
       if (is_array($Like))
-         $this->SQL->Like($Like, '', 'right');
+         $this->SQL->OrLike($Like, '', 'right');
 
       return $this->SQL
          ->BeginWhereGroup()

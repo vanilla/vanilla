@@ -402,6 +402,8 @@ class Gdn_PluginManager {
          $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
          $Paths = array_merge($Paths, Glob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
       }
+      if (!is_array($Paths))
+         $Paths = array();
       
       // Include all of the paths.
       $PluginInfo = array();

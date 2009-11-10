@@ -23,7 +23,7 @@ class ImportController extends GardenController {
    public function Index($Step = 0) {
       $this->Permission('Garden.Data.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
       
-      $this->AddJsFile('import.js');
+      $this->AddJsFile('import.js', 'vanilla');
       
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();

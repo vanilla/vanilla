@@ -21,9 +21,8 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Password', 'Password');
          echo $this->Form->Input('Password', 'password');
       ?>
-      <div>
+      <div class="InputButtons">
          <?php
-            echo $this->Form->Label('&nbsp;');
             echo Anchor('Generate Password', '#', 'GeneratePassword Button');
             echo Anchor('Reveal Password', '#', 'RevealPassword Button');
          ?>
@@ -37,7 +36,6 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->Label('&nbsp;');
          echo $this->Form->CheckBox('ShowEmail', 'Email visible to other users');
       ?>
    </li>

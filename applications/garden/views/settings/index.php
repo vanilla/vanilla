@@ -1,41 +1,58 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php printf(Gdn::Translate('Welcome, %s!'), Gdn::Session()->User->Name); ?></h1>
-<?php
+<?php if (!defined('APPLICATION')) exit();
 $this->RenderAsset('Messages');
-/*
-<p>Here's some stuff you might want to do:</p>
-<ul class="BigList">
-   <li class="one"><a href="../settings/registration">Define how users register for your forum</a></li>
-   <li class="two"><a href="../settings/plugins">Manage your plugins</a></li>
-   <li class="three"><a href="../categories/manage">Organize your discussion categories</a></li>
-   <li class="four"><a href="../profile">Customize your profile</a></li>
-   <li class="five"><a href="../post/discussion">Start your first discussion</a></li>
-</ul>
-*/
 ?>
-<h3><?php echo Gdn::Translate("What's the Buzz?"); ?></h3>
-<dl>
-<?php
-$Count = count($this->BuzzData);
-foreach ($this->BuzzData as $Name => $Value) {
-   if ($Value > 0)
-      echo '<dt>'.$Value.'</dt>
-      <dd>'.$Name.'</dd>';
-}
-?>
-</dl>
-
-<h3><?php echo Gdn::Translate('Recently Active Users'); ?></h3>
-<ul class="DataList RecentUsers">
-   <?php
-   $i = 0;
-   foreach ($this->ActiveUserData as $User) {
-      $Css = $User->Photo != '' ? 'HasPhoto' : '';
-      echo '<li'.($Css != '' ? ' class="'.$Css.'"' : '').'>',
-         UserPhoto($User),
-         UserAnchor($User),
-         sprintf(Gdn::Translate('Last active %s'), Format::Date($User->DateLastActive)),
-      '</li>';
-   }
-   ?>
-</ul>
+<div class="Column Column1">
+   <h1><?php echo Gdn::Translate("What's the Buzz?"); ?></h1>
+   <table id="Buzz" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
+      <tbody>
+         <?php
+         $Alt = '';
+         foreach ($this->BuzzData as $Name => $Value) {
+            if ($Value > 0) {
+               ?>
+               <tr<?php
+                  $Alt = $Alt == '' ? ' class="Alt"' : '';
+                  echo $Alt;
+               ?>">
+                  <th><?php echo $Value; ?></th>
+                  <th class="Alt"><?php echo $Name; ?></th>
+               </tr>
+               <?php
+            }
+         }
+         ?>
+      </tbody>
+   </table>
+</div>
+<div class="Column Column2">
+   <h1><?php echo Gdn::Translate('Recently Active Users'); ?></h1>
+   <table id="RecentUsers" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
+      <!--
+      <thead>
+         <tr>
+            <th><?php echo Gdn::Translate('User'); ?></th>
+            <th class="Alt"><?php echo Gdn::Translate('Last Active'); ?></th>
+         </tr>
+      </thead>
+      -->
+      <tbody>
+         <?php
+         $Alt = '';
+         foreach ($this->ActiveUserData as $User) {
+            ?>
+            <tr<?php
+               $Alt = $Alt == '' ? ' class="Alt"' : '';
+               echo $Alt;
+            ?>>
+               <th><?php
+                  echo UserPhoto($User);
+                  echo UserAnchor($User);
+               ?></th>
+               <th class="Alt"><?php echo Format::Date($User->DateLastActive); ?></th>
+            </tr>
+            <?php
+         }
+         ?>
+      </tbody>
+   </table>
+</div>

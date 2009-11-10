@@ -15,24 +15,22 @@ class GardenController extends Gdn_Controller {
    }
    
    public function Initialize() {
-      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-         $this->Head = new HeadModule($this);
-         $this->AddJsFile('jquery.js');
-         $this->AddJsFile('jquery.livequery.js');
-         $this->AddJsFile('jquery.form.js');
-         $this->AddJsFile('jquery.popup.js');
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('jquery.js');
+      $this->AddJsFile('jquery.livequery.js');
+      $this->AddJsFile('jquery.form.js');
+      $this->AddJsFile('jquery.popup.js');
+      $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('global.js');
+      
+      if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
          $this->AddJsFile('jquery.menu.js');
-         $this->AddJsFile('jquery.gardenhandleajaxform.js');
-         $this->AddJsFile('global.js');
+         $this->AddCssFile('style.css');
+      } else {
+         $this->AddCssFile('admin.css');
       }
       
-      $this->AddCssFile('menu.css');
-      $this->AddCssFile('popup.css');
-      $this->AddModule('PoweredByVanillaModule');
-      
-      if (!in_array($this->ControllerName, array('profilecontroller', 'activitycontroller')))
-         $this->AddCssFile('garden.css');
-
+      $this->MasterView = 'admin';
       parent::Initialize();
    }
    
@@ -41,6 +39,7 @@ class GardenController extends Gdn_Controller {
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
          $SideMenu = new Gdn_SideMenuModule($this);
          $SideMenu->HtmlId = '';
+         $SideMenu->HighlightRoute($CurrentUrl);
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('GetAppSettingsMenuItems');
          $this->AddModule($SideMenu, 'Panel');

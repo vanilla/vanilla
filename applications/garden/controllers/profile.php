@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-class ProfileController extends GardenController {
+class ProfileController extends Gdn_Controller {
    
    public $Uses = array('Form', 'Gdn_UserModel', 'Html');
 
@@ -214,6 +214,7 @@ class ProfileController extends GardenController {
       
       $this->ActivityModel = new Gdn_ActivityModel();
       $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID);
+      $this->SetTabView($Session->UserID, 'Notifications');
       $this->Render();
    }   
    
@@ -496,9 +497,20 @@ class ProfileController extends GardenController {
    
    public function Initialize() {
       $this->ModuleSortContainer = 'Profile';
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('js/library/jquery.livequery.js');
+      $this->AddJsFile('js/library/jquery.form.js');
+      $this->AddJsFile('js/library/jquery.popup.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('js/global.js');
+      
+      $this->AddCssFile('style.css');
+      $GuestModule = new GuestModule($this);
+      $GuestModule->MessageCode = "It looks like you're new here. If you want to take part in the discussions, click one of these buttons!";
+      $this->AddModule($GuestModule);
       parent::Initialize();
-      // Add a css file for all profile pages
-      $this->AddCssFile('profile.css');
    }
    
    /**

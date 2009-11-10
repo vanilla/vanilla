@@ -102,7 +102,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             
             if ($AppUrl != '') {
                $Info .= '<span>|</span>';
-               $Info .= Anchor('Visit Application Site', $AppUrl);
+               $Info .= Anchor('Visit Site', $AppUrl);
             }
             
             echo $Info != '' ? $Info : '&nbsp;';

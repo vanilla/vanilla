@@ -1306,7 +1306,15 @@ abstract class Gdn_SQLDriver {
     * @See Gdn_DatabaseDriver::Like()
     */
    public function OrLike($Field, $Match = '', $Side = 'both', $Op = 'like') {
-      return $this->OrOp()->Like($Field, $Match, $Side, $Op);
+      if (!is_array($Field))
+         $Field = array($Field => $Match);
+      
+      foreach ($Field as $f => $v) {
+         $this->OrOp()->Like($f, $v, $Side, $Op);
+      }
+      return $this;
+
+//       return $this->OrOp()->Like($Field, $Match, $Side, $Op);
    }
    
    /** A convenience method for Gdn_DatabaseDriver::Like that changes the operator to 'not like,'

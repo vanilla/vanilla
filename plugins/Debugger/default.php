@@ -40,6 +40,10 @@ class DebuggerPlugin implements Gdn_IPlugin {
    // SignIn_Render_After, etc. and it essentially *_Render_After
    
    public function Base_Render_Before($Sender) {
+      $Sender->AddCssFile('/plugins/Debugger/style.css');
+   }
+
+   public function Base_AfterBody_Handler($Sender) {
       $Session = Gdn::Session();
       if(!$Session->CheckPermission('Garden.Settings.Manage')) {
          return;
@@ -69,7 +73,9 @@ class DebuggerPlugin implements Gdn_IPlugin {
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
                }
-               $String .= '<div>'.$QueryInfo['Method'].'</div><pre>'.$Query.';</pre><small>'.number_format($QueryTimes[$Key], 6).'s</small>';
+               $String .= $QueryInfo['Method']
+                  .'<small>'.number_format($QueryTimes[$Key], 6).'s</small>'
+                  .'<pre>'.$Query.';</pre>';
             }
          }
          global $Start;
@@ -83,7 +89,7 @@ class DebuggerPlugin implements Gdn_IPlugin {
          </div>';
               */
          $String .= '</div>';
-         $Sender->AddAsset('Foot', $String);
+         echo $String;
       //}
    }
    

@@ -122,7 +122,7 @@ abstract class Gdn_DatabaseStructure {
     * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
     * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
     * * TRUE: Nulls are allowed.
-    * * FALSE: Nullas are not allowed.
+    * * FALSE: Nulls are not allowed.
     * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
     * @param string $KeyType What type of key is this column on the table? Options
     * are primary, key, and FALSE (not a key).

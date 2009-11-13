@@ -1,29 +1,23 @@
 @import url('reset.css') /* NoFollow */; 
 /*
-Welcome to the Garden CSS File! 6 Things you should know:
+Welcome to the Generic Style CSS File! Some things you should know:
 
 1. The reset.css file imported above breaks all elements down to a base style.
 
-2. There is a menu.css file that is also included on the profile page. It
-   defines the main dropdown menu at the top of the page. Do not edit it,
-   instead add custom rules in this file.
-   
-3. There is a popup.css file that is also included on the profile page. It
-   defines the appearance of popups (warnings, editing thumbnails, etc). Do not
-   edit it, instead add custom rules in this file.
+2. This file is included on all front-end/user-facing pages. Individual
+   applications can override this file in their own custom files
+   (ie. vanilla.css or conversations.css).
 
-5. This css file will be included on the user profile page only.
-   
-6. This file is broken down into the following sections:
-   + Line 30:     General Styles & Typography
-   + Line 411:    Header
-   + Line 474:    Main Menu
-   + Line 509:    Panels / Sidebars
-   + Line 570:    Activities
-   + Line 765:    Profile Page
-   + Line 862:    Profile Tab Menu
-   + Line 919:    Thumbnail Cropper
-   + Line 967:    Footer
+3. This file is broken down into the following sections:
+   + Line 24:     General Styles & Typography
+   + Line 325:    Header
+   + Line 556:    Main Menu
+   + Line 591:    Panels / Sidebars
+   + Line 782:    Activities
+   + Line 971:    Profile Page
+   + Line 1072:   Profile Tab Menu
+   + Line 1194:   Thumbnail Cropper
+   + Line 1244:   Footer
 */
    
    
@@ -106,12 +100,14 @@ input.InputBox,
 input.SmallInput,
 textarea {
    font-family: arial;
-   color: #222;
-   font-size: 14px;
+   color: #555;
+   font-size: 16px;
    padding: 3px;
    margin: 0;
    width: 250px;
-   border: 1px solid #888;
+   border: 1px solid #C0E7F5;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
 }
 textarea.TextBox {
    width: 500px;
@@ -696,6 +692,92 @@ body.Profile ul.PanelInfo li a {
    float: none;
 }
 
+
+/* ============================================================= Entry Screen */
+body.Entry {
+   text-align: center;
+}
+body.Entry div.Panel {
+   display: none;
+}
+body.Entry #Content {
+   float: none;
+   margin: 0;
+   width: auto;
+   text-align: center;
+}
+body.Entry #Leave {
+   width: 400px;
+   margin: 0 auto;
+   background: #E9F9FF;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   padding: 10px 10px 0 10px;
+   text-align: left;
+}
+body.Entry p.Leaving {
+   background: url('progress.gif') left top no-repeat;
+   padding-left: 50px;
+}
+body.register #Content,
+body.signin #Content,
+body.passwordrequest #Content,
+body.passwordreset #Content,
+body.Entry #SignIn,
+body.Entry #Password,
+body.Entry #Register,
+body.Entry #Handshake {
+   text-align: left;
+   float: left;
+   background: #E9F9FF /* Panel Background Color */;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 2px;
+   padding: 10px;
+   margin: 0 0 15px;
+}
+body.Entry #SignIn,
+body.Entry #Password {
+   margin: 0 15px 15px 0;
+}
+body.Entry #Password p {
+   width: 242px;
+   overflow: hidden;
+}
+body.Entry #Content h1 {
+   border-bottom:1px solid #CAF0FE;
+   color: #2786C2 /* Panel Font Color */;
+   font-size:110%;
+   font-weight:bold;
+   margin: 0;
+   padding:0 0 1px;
+}
+body.Entry p {
+   padding:0 0 10px;
+   color: #999999;
+}
+body.Entry form ul li {
+   border: 0;
+}
+body.Entry form ul li label {
+	padding: 6px 0 0;
+	display: block;
+}
+body.Entry #SignIn form ul li label.CheckBoxLabel,
+body.Entry #Register form ul li label.CheckBoxLabel {
+   width: auto;
+}
+body.Entry input.DateBox,
+body.Entry input.InputBox,
+body.Entry textarea {
+   width: 282px;
+}
+body.Entry span.Incorrect {
+   display: block;
+   color: red;
+}
+body.Entry input.Button {
+	margin: 10px 0 0;
+}
 
 /* =============================================================== Activities */
 body.Activity h1 {

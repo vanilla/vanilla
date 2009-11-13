@@ -1,19 +1,11 @@
 /*
-Welcome to the Vanilla CSS File! 6 Things you should know:
+Welcome to the Vanilla CSS File! Some things you should know:
 
-1. The reset.css file imported above breaks all elements down to a base style.
-
-2. There is a menu.css file that is also included on every page of Vanilla. It
-   defines the main dropdown menu at the top of the page. If you want to change
-   the appearance of that menu, you should do it by defining overriding rules in
-   the Menu section of this file.
+1. There is a style.css file that is also included on every page of Vanilla. It
+   defines the common classes on all user-facing pages, including the user
+   profile page, activity page, and search results page.
    
-3. There is a popup.css file that is also included on every page of Vanilla. It
-   defines the appearance of popups (warnings, comment & discussion previews,
-   etc). If you want to change the appearance of the popup, you should do it by
-   defining overriding rules in this file.
-
-4. This css file will be included on all Vanilla pages. Those pages are:
+2. This css file will be included on all Vanilla pages. Those pages are:
    + Discussions (All Discussions, Bookmarks, Your Discussions, etc)
    + Drafts
    + Categories
@@ -21,21 +13,15 @@ Welcome to the Vanilla CSS File! 6 Things you should know:
    + Start a New Discussion Form
    + Add a Comment Form
 
-5. The profile page has it's own completely custom css file so you can do all
-   kinds of custom magic there (profile.css).
-
-6. This file is broken down into the following sections:
-   + Line 42:     General Styles & Typography
-   + Line 327:    Header
-   + Line 389:    Main Menu
-   + Line 424:    Panels / Sidebars
-   + Line 545:    Discussions
-   + Line 650:    Categories
-   + Line 688:    Comments
-   + Line 916:    Drafts
-   + Line 957:    Discussion & Comment Forms
-   + Line 1048:   Footer
+3. This file is broken down into the following sections:
+   + Line 27:     Panels / Sidebars
+   + Line 59:     Discussions
+   + Line 164:    Categories
+   + Line 202:    Comments
+   + Line 430:    Drafts
+   + Line 471:    Discussion & Comment Forms
 */
+
 
 
 /* ======================================================== Panels / Sidebars */

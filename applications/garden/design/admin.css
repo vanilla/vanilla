@@ -1,55 +1,31 @@
 @import url('reset.css') /* NoFollow */; 
 /*
-Welcome to the Admin CSS File! A few things you should know:
+Welcome to the Admin CSS File! Some things you should know:
 
 1. The reset.css file imported above breaks all elements down to a base style.
 
 2. This css file will be included on all "admin" pages. Specifically:
-   + Settings/*
-   + Routes/*
-   + Entry/*
    + Home/*
    + Messages/*
    + Role/*
    + Routes/*
-   + Search/*
    + Settings/*
    + User/*
 
-3. The profile page has it's own completely custom css file so you can do all
-   kinds of custom magic there (profile.css).
-   
-4. This file is broken down into the following sections:
-   + Line 42:     General Styles & Typography
-   + Line 366:    Forms
-   + Line 630:    Header
-   + Line 693:    Main Menu
-   + Line 728:    Panels / Sidebars
-   + Line 809:    Dashboard
-   + Line 879:    Entry Screen
-   + Line 985:    DataList (Search Results)
-   + Line 1051:   User Search Page
-   + Line 1060:   Footer
+3. This file is broken down into the following sections:
+   + Line 30:     Header
+   + Line 49:     Panels / Sidebars
+   + Line 126:    General Styles & Typography
+   + Line 449:    Forms
+   + Line 713:    Main Menu
+   + Line 746:    Dashboard
+   + Line 812:    DataList (Search Results)
+   + Line 821:    User Search Page
+   + Line 875:    Footer
 */
    
-   
-/* ============================================== General Styles & Typography */
-body {
-   color: #000;
-   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
-   margin: 0;
-   padding: 0;
-   font-size: small;
-   background: #ffffff;
-	background: #DCF5FE url(slicesplash.jpg) no-repeat scroll center top;
-}
-#Body {
-	border-top:1px solid #C0E7F5;
-}
-#Content {
-   margin: 15px 15px 15px 180px;
-}
 
+   
 /* =================================================================== Header */
 #Head {
 	background:#F2FBFF none repeat scroll 0 0;
@@ -147,7 +123,22 @@ ul.PanelInfo li.Active {
    color: #fff /* Menu Hover Font Color */;
 }
 
-/* ======================================================= Global Definitions */
+/* ============================================== General Styles & Typography */
+body {
+   color: #000;
+   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   margin: 0;
+   padding: 0;
+   font-size: small;
+   background: #ffffff;
+	background: #DCF5FE url(slicesplash.jpg) no-repeat scroll center top;
+}
+#Body {
+	border-top:1px solid #C0E7F5;
+}
+#Content {
+   margin: 15px 15px 15px 180px;
+}
 .Hidden {
    display: none;
 }
@@ -391,7 +382,6 @@ div.DismissMessage a.Dismiss:hover {
 	-webkit-border-radius: 2px;
 	padding: 1px 3px;
 }
-/* Note: The close class is used on the "close" anchor in popups. */
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
 	color:#777;
@@ -752,112 +742,6 @@ ul.BigList li {
 	list-style: decimal;
 	text-shadow: 0 1px 0 #fff;
 }
-
-/* ============================================================= Entry Screen */
-body.Entry {
-   text-align: center;
-}
-body.Entry div.Panel {
-   display: none;
-}
-body.Entry #Content {
-   float: none;
-   margin: 0;
-   width: auto;
-   text-align: center;
-}
-body.Entry #Leave {
-   width: 400px;
-   margin: 0 auto;
-   background: #E9F9FF;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   padding: 10px 10px 0 10px;
-   text-align: left;
-}
-body.Entry p.Leaving {
-   background: url('progress.gif') left top no-repeat;
-   padding-left: 50px;
-}
-body.register #Content,
-body.signin #Content,
-body.passwordrequest #Content,
-body.passwordreset #Content,
-body.Entry #SignIn,
-body.Entry #Password,
-body.Entry #Register,
-body.Entry #Handshake {
-   text-align: left;
-   float: left;
-   background: #E9F9FF /* Panel Background Color */;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 2px;
-   padding: 10px 10px 0 10px;
-   margin: 0 0 15px;
-}
-body.Entry #SignIn,
-body.Entry #Password {
-   margin: 0 15px 15px 0;
-}
-body.Entry #Password p {
-   width: 242px;
-   overflow: hidden;
-}
-body.Entry #Content h1 {
-   border-bottom:1px solid #CAF0FE;
-   color: #2786C2 /* Panel Font Color */;
-   font-size:110%;
-   font-weight:bold;
-   margin: 0 0 10px;
-   padding:0 0 1px;
-}
-body.Entry p {
-   padding:0 0 10px;
-   color: #999999;
-}
-body.Entry form ul li {
-   border: 0;
-}
-body.Entry #SignIn form ul li label {
-   width: 80px;
-}
-body.Entry #Password form ul li label {
-   width: 50px;
-}
-body.Entry #Register form ul li label {
-   width: 130px;
-}
-body.Entry #SignIn form ul li label.CheckBoxLabel,
-body.Entry #Register form ul li label.CheckBoxLabel {
-   width: auto;
-}
-body.Entry input.DateBox,
-body.Entry input.InputBox,
-body.Entry textarea {
-   width: 157px;
-   margin-right: 10px;
-}
-body.Entry #Register input.DateBox,
-body.Entry #Register input.InputBox,
-body.Entry #Register textarea {
-   width: 190px;
-   margin-right: 10px;
-}
-body.Entry #Register form ul li label.BirthDate {
-   width: 110px;
-}
-body.Entry span.Incorrect {
-   display: block;
-   color: red;
-   padding-left: 140px;
-}
-div.InputButtons {
-   margin: 6px 0 0;
-}
-div.InputButtons a {
-   margin-right: 6px;
-}
-
 
 /* ================================================ DataList (Search Results) */
 body.Search h1 {

@@ -186,6 +186,7 @@ class Gdn_Email extends Gdn_Pluggable {
     */
    public function Subject($Subject) {
       $this->_PhpMailer->Subject = $Subject;
+      return $this;  
    }
 
    /**

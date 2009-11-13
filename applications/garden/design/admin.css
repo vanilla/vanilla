@@ -392,24 +392,17 @@ div.DismissMessage a.Dismiss:hover {
 	padding: 1px 3px;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
+/* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
-   font-weight: bold;
-   font-family: tahoma;
-   font-size: 10px;
-   text-transform: uppercase;
-   color: #bbb;
-   background: #f9f9f9;
-   -moz-border-radius: 8px;
-   -webkit-border-radius: 8px;
-   padding: 1px 4px 2px 5px;
-   margin: 0;
-   line-height: 100%;
-   border: 1px solid #ddd;
+	color:#777;
+	font-family:monaco;
+	font-size:14px;
+	font-weight:bold;
+	cursor:pointer;
+	padding: 0 2px;
 }
 a.Close:hover {
-   border: 1px solid #bbb;
-   color: #999;
-   background: #fff;
+	color: #333;
 }
 /* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
 .MorePager {

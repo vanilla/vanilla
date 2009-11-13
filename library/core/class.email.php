@@ -27,7 +27,7 @@ class Gdn_Email extends Gdn_Pluggable {
    /**
     * @var PHPMailer
     */
-   private $_PhpMailer;
+   public $PhpMailer;
 
    /**
     * @var boolean
@@ -38,7 +38,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * Constructor
     */
    function __construct() {
-      $this->_PhpMailer = new PHPMailer();
+      $this->PhpMailer = new PHPMailer();
       $this->Clear();
       parent::__construct();
    }
@@ -53,7 +53,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Bcc($RecipientEmail, $RecipientName = '') {
-      $this->_PhpMailer->AddBCC($RecipientEmail, $RecipientName);
+      $this->PhpMailer->AddBCC($RecipientEmail, $RecipientName);
       return $this;
    }
 
@@ -66,7 +66,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Cc($RecipientEmail, $RecipientName = '') {
-      $this->_PhpMailer->AddCC($RecipientEmail, $RecipientName);
+      $this->PhpMailer->AddCC($RecipientEmail, $RecipientName);
       return $this;
    }
 
@@ -77,8 +77,8 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Clear() {
-      $this->_PhpMailer->ClearAllRecipients();
-      $this->_PhpMailer->Body = '';
+      $this->PhpMailer->ClearAllRecipients();
+      $this->PhpMailer->Body = '';
       $this->From();
       $this->_IsToSet = False;
       $this->MimeType(Gdn::Config('Garden.Email.MimeType', 'text/plain'));
@@ -102,8 +102,8 @@ class Gdn_Email extends Gdn_Pluggable {
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
 
-      $this->_PhpMailer->From = $SenderEmail;
-      $this->_PhpMailer->FromName = $SenderName;
+      $this->PhpMailer->From = $SenderEmail;
+      $this->PhpMailer->FromName = $SenderName;
       return $this;
    }
 
@@ -127,10 +127,10 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Message($Message) {
-      if ($this->_PhpMailer->ContentType == 'text/html') {
-         $this->_PhpMailer->MsgHTML($Message);
+      if ($this->PhpMailer->ContentType == 'text/html') {
+         $this->PhpMailer->MsgHTML($Message);
       } else {
-         $this->_PhpMailer->Body = $Message;
+         $this->PhpMailer->Body = $Message;
       }
       return $this;
    }
@@ -144,7 +144,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function MimeType($MimeType) {
-      $this->_PhpMailer->IsHTML($MimeType === 'text/html');
+      $this->PhpMailer->IsHTML($MimeType === 'text/html');
       return $this;
    }
 
@@ -153,27 +153,27 @@ class Gdn_Email extends Gdn_Pluggable {
     */
    public function Send() {
       if (Gdn::Config('Garden.Email.UseSmtp')) {
-         $this->_PhpMailer->IsSMTP();
+         $this->PhpMailer->IsSMTP();
          $SmtpHost = Gdn::Config('Garden.Email.SmtpHost', '');
          $SmtpPort = Gdn::Config('Garden.Email.SmtpPort', 25);
          if (strpos($SmtpHost, ':') !== FALSE) {
             list($SmtpHost, $SmtpPort) = explode(':', $SmtpHost);
          }
 
-         $this->_PhpMailer->Host = $SmtpHost;
-         $this->_PhpMailer->Port = $SmtpPort;
-         $this->_PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
-         $this->_PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
+         $this->PhpMailer->Host = $SmtpHost;
+         $this->PhpMailer->Port = $SmtpPort;
+         $this->PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
+         $this->PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
          if(!empty($Username))
-            $this->_PhpMailer->SMTPAuth = TRUE;
+            $this->PhpMailer->SMTPAuth = TRUE;
 
          
       } else {
-         $this->_PhpMailer->IsMail();
+         $this->PhpMailer->IsMail();
       }
 
-      if (!$this->_PhpMailer->Send()) {
-         throw new Exception($this->_PhpMailer->ErrorInfo);
+      if (!$this->PhpMailer->Send()) {
+         throw new Exception($this->PhpMailer->ErrorInfo);
       }
 
       return true;
@@ -185,7 +185,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $Subject The subject of the message.
     */
    public function Subject($Subject) {
-      $this->_PhpMailer->Subject = $Subject;
+      $this->PhpMailer->Subject = $Subject;
       return $this;  
    }
 
@@ -199,7 +199,7 @@ class Gdn_Email extends Gdn_Pluggable {
    public function To($RecipientEmail, $RecipientName = '') {
       // Only allow one address in the "to" field. Append all extras to the "cc" field.
       if (!$this->_IsToSet) {
-         $this->_PhpMailer->AddAddress($RecipientEmail, $RecipientName);
+         $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
          $this->_IsToSet = True;
       }
       else {
@@ -211,10 +211,10 @@ class Gdn_Email extends Gdn_Pluggable {
    
    public function Charset($Use = ''){
       if ($Use != '') {
-         $this->_PhpMailer->Charset = $Use;
+         $this->PhpMailer->Charset = $Use;
          return $this;
       }
-      return $this->_PhpMailer->Charset;
+      return $this->PhpMailer->Charset;
    }
    
 }

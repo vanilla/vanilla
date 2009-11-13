@@ -92,6 +92,7 @@ class PostController extends VanillaController {
             $this->Discussion = new stdClass();
             $this->Discussion->Name = $this->Form->GetValue('Name', '');
             $this->Comment = new stdClass();
+            $this->Comment->InsertUserID = $Session->User->UserID;
             $this->Comment->InsertName = $Session->User->Name;
             $this->Comment->InsertPhoto = $Session->User->Photo;
             $this->Comment->DateInserted = Format::Date();

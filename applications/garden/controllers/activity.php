@@ -42,10 +42,6 @@ class ActivityController extends Gdn_Controller {
          $this->CommentData = FALSE;
       }
       
-      $GuestModule = new GuestModule($this);
-      $GuestModule->MessageCode = "Just checking up on recent activity? When you're ready to get involved, click one of these buttons!";
-      $this->AddModule($GuestModule);
-      
       $this->View = 'all';
       $this->Render();
    }

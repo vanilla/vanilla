@@ -42,6 +42,9 @@ class Gdn_UserModel extends Gdn_Model {
                continue;
             
             if(is_numeric($JunctionID) && $JunctionID > 0) {
+               if (!is_array($Permissions[$PermissionName]))
+                  $Permissions[$PermissionName] = array();
+                  
                $Permissions[$PermissionName][] = $JunctionID;
             } else {
                $Permissions[] = $PermissionName;

@@ -41,15 +41,15 @@ class GettingStartedPlugin implements Gdn_IPlugin {
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStarted">'
             .Anchor('×', '/garden/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
-   ."<p>Here's how to get started:</p>
-   <ul>
-      <li class=\"One".(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '')."\"><a href=\"../settings/registration\">Define how users register for your forum</a></li>
-      <li class=\"Two".(Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '')."\"><a href=\"../settings/plugins\">Manage your plugins</a></li>
-      <li class=\"Three".(Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '')."\"><a href=\"../vanilla/settings/managecategories\">Organize your discussion categories</a></li>
-      <li class=\"Four".(Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '')."\"><a href=\"../profile\">Customize your profile</a></li>
-      <li class=\"Five".(Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '')."\"><a href=\"../post/discussion\">Start your first discussion</a></li>
+   ."<p>Here's how to get started:</p>"
+   .'<ul>
+      <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Define how users register for your forum'), '/settings/registration').'</li>
+      <li class="Two'.(Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Manage your plugins'), 'settings/plugins').'</li>
+      <li class="Three'.(Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Organize your discussion categories'), 'vanilla/settings/managecategories').'</li>
+      <li class="Four'.(Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Customize your profile'), 'profile').'</li>
+      <li class="Five'.(Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Start your first discussion'), 'post/discussion').'</li>
    </ul>
-</div>";
+</div>';
          $Sender->AddAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
       }
    }

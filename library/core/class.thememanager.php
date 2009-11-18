@@ -68,7 +68,7 @@ class Gdn_ThemeManager {
          if (ArrayValue('Folder', $ThemeInfo, '') == $ThemeFolder)
             return array($ThemeName => $ThemeInfo);
       }
-      return FALSE;
+      return array();
    }
    
    public function EnableTheme($ThemeName) {

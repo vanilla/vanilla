@@ -425,8 +425,8 @@ class SettingsController extends GardenController {
       $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
       $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
       $Name = array_keys($this->EnabledTheme);
-      $Name = $Name[0];
-      $this->EnabledTheme = $this->EnabledTheme[$Name];
+      $Name = ArrayValue(0, $Name, 'undefined');
+      $this->EnabledTheme = ArrayValue($Name, $this->EnabledTheme, 'undefined');
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file

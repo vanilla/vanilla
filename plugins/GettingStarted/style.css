@@ -1,0 +1,36 @@
+div.GettingStarted {
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   background: #F2FBFF /* Panel Background Color */;
+   padding: 0 8px 8px;
+   margin: 10px 0 20px;
+   border: 1px solid #C0E7F5 /* Panel Inlay Border Color */;
+}
+div.GettingStarted a.Dismiss {
+	font-weight: bold;
+	font-size: 22px;
+	float: right;
+}
+div.GettingStarted p {
+	color: #02455B;
+	font-size: 160%;
+	font-weight: bold;
+	text-shadow: 0 1px 0 #fff;
+	padding: 2px 0 0;
+	margin: 0;
+}
+div.GettingStarted ul li {
+	color: #000;
+   font-size: 16px;
+	margin: 0 0 0 30px;
+   padding: 8px 0 8px 4px;
+	list-style: decimal;
+	width: 400px;
+}
+div.GettingStarted ul li.Done,
+div.GettingStarted ul li.Done a {
+	color: #888;
+}
+div.GettingStarted ul li.Done {
+	background: url('check.png') no-repeat center right;
+}

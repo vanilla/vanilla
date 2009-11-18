@@ -817,7 +817,7 @@ if (!function_exists('parse_ini_string')) {
 if (!function_exists('Glob')) {
    function Glob($Pattern, $Flags = 0) {
       $Return = glob($Pattern, $Flags);
-      if ($Return == FALSE)
+      if (!is_array($Return))
          $Return = array();
          
       return $Return;

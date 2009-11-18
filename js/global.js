@@ -15,9 +15,9 @@ jQuery(document).ready(function($) {
    $('a.Popup').popup();
 
    // Make sure that message dismissalls are ajax'd
-   $('div.DismissMessage a.Dismiss').live('click', function() {
+   $('a.Dismiss').live('click', function() {
       var anchor = this;
-      var container = $(anchor).parents('div.DismissMessage');
+      var container = $(anchor).parent();
       var transientKey = $('#Definitions #TransientKey').text();
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
       var webRoot = $('#Definitions #WebRoot').text();

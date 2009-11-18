@@ -301,8 +301,8 @@ div.Messages ul {
    border: 1px solid #ee8 !important;
    margin: 0 auto !important;
    padding: 4px 8px !important;
-   -moz-border-radius: 6px;
-   -webkit-border-radius: 6px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    background: #ff9 !important;
    display:-moz-inline-stack;
    display:inline-block;
@@ -328,12 +328,26 @@ div.Errors ul li {
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .Warning {
+   font-size: 14px;
+	line-height: 180%;
    background: #ffc;
    border: 1px solid #ff9;
    color: #000;
-   padding: 6px 8px;
+   padding: 6px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+}
+div.Info {
+   font-size: 14px;
+	line-height: 180%;
+   background: #F2FBFF;
+   color: #333;
+   -moz-border-radius: 2px;
+   padding: 6px;
+   margin: 0 0 10px;
+}
+strong {
+	font-weight: bold;
 }
 .Alert {
    background: #d00;
@@ -349,14 +363,6 @@ div.Errors ul li {
 .Alert a:hover {
    text-decoration: underline;
 }
-div.Info {
-   font-size: 13px;
-   background: #F2FBFF;
-   color: #333;
-   -moz-border-radius: 4px;
-   padding: 6px;
-   margin: 0 0 10px;
-}
 div.EmptyInfo {
    margin: 10px 0;
 }
@@ -364,23 +370,21 @@ div.EmptyInfo {
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
    margin: 6px 0 10px;
+	padding: 0 6px 4px;
 }
 div.DismissMessage p {
    margin: 2px 0;
+	padding: 4px 0 0;
 }
 div.DismissMessage a.Dismiss {
    float: right;
+	font-size: 22px;
+	font-weight: bold;
    line-height: 120%;
    color: #999;
-	padding: 2px 4px;
 }
 div.DismissMessage a.Dismiss:hover {
-   background: #fafafa;
-   border: 1px solid #ccc;
-   color: #333;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	padding: 1px 3px;
+	color: #ff0084;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
@@ -725,23 +729,6 @@ table.AltColumns tr.Disabled td {
 	width: 20px;
 	margin-right: 8px;
 }
-ul.BigList {
-   -webkit-border-radius: 4px;
-   -moz-border-radius: 4px;
-   background: #f0fbff /* Panel Background Color */;
-   padding: 8px;
-   margin: 10px 0 0;
-   border: 1px solid #dff4fc /* Panel Inlay Border Color */;
-}
-ul.BigList li {
-	color: #0766a2;
-   font-size: 16px;
-	font-weight: bold;
-	margin: 0 0 0 30px;
-   padding: 8px 0 8px 4px;
-	list-style: decimal;
-	text-shadow: 0 1px 0 #fff;
-}
 
 /* ================================================ DataList (Search Results) */
 body.Search h1 {
@@ -819,6 +806,24 @@ ul.DataList li ul li.Meta a {
 
 
 /* =================================================================== Popups */
+div.Popup div.Messages {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+	margin: 0 0 10px !important;
+}
+div.Popup div.Messages ul {
+	display: block;
+}
+* html div.Popup div.Messages {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; 
+}
 div.Popup .Loading {
    display: block;
 }
@@ -869,6 +874,9 @@ div.Popup .Footer {
   -moz-border-radius-bottomright: 5px;
   -webkit-border-bottom-left-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
+}
+div.Popup .Footer input.Button {
+	font-size: 11px;
 }
 
 

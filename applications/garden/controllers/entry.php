@@ -377,7 +377,7 @@ class EntryController extends Gdn_Controller {
             $this->Form->AddError('Your passwords did not match.');
 
          if ($this->Form->ErrorCount() == 0) {
-            $User = $this->UserModel->PasswordReset($UserID, $Password);
+            $User = $this->UserModel->PasswordReset('', $UserID, $Password);
             $Authenticator = Gdn::Authenticator();
             $Authenticator->Authenticate(array('Name' => $User->Name, 'Password' => $Password, 'RememberMe' => FALSE));
             $this->StatusMessage = Gdn::Translate('Password saved. Signing you in now...');

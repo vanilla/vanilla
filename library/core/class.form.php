@@ -229,7 +229,7 @@ class Gdn_Form {
             if (in_array($ID, $CheckedValues)) $Instance['checked'] = 'checked';
 
             $Return .= '<li>' . $this->CheckBox($FieldName . '[]', $Text,
-               $Instance) . "<li>\n";
+               $Instance) . "</li>\n";
             ++$i;
          }
       }

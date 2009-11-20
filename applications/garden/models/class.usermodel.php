@@ -226,6 +226,9 @@ class Gdn_UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
       }
+      
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->FireEvent('BeforeSaveValidation');
 
       $RecordRoleChange = TRUE;
       if ($this->Validate($FormPostValues, $Insert) === TRUE) {
@@ -241,54 +244,63 @@ class Gdn_UserModel extends Gdn_Model {
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          }
-
-         // If the primary key exists in the validated fields and it is a
-         // numeric value greater than zero, update the related database row.
-         if ($UserID > 0) {
-            // If they are changing the username & email, make sure they aren't
-            // already being used (by someone other than this user)
-            if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
-               if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
+         
+         $this->EventArguments['Fields'] = $Fields;
+         $this->FireEvent('BeforeSave');
+         
+         // Check the validation results again in case something was added during the BeforeSave event.
+         if (count($this->Validation->Results()) == 0) {
+            // If the primary key exists in the validated fields and it is a
+            // numeric value greater than zero, update the related database row.
+            if ($UserID > 0) {
+               // If they are changing the username & email, make sure they aren't
+               // already being used (by someone other than this user)
+               if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
+                  if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
+                     return FALSE;
+               }
+   
+               $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
+   
+               // Record activity if the person changed his/her photo
+               $Photo = ArrayValue('Photo', $FormPostValues);
+               if ($Photo !== FALSE)
+                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
+   
+            } else {
+               $RecordRoleChange = FALSE;
+               if (!$this->ValidateUniqueFields($Username, $Email))
                   return FALSE;
+   
+               // Define the other required fields:
+               $Fields['Email'] = $Email;
+   
+               // And insert the new user
+               $UserID = $this->SQL->Insert($this->Name, $Fields);
+   
+               // Make sure that the user is assigned to one or more roles:
+               $SaveRoles = TRUE;
+   
+               // Report that the user was created
+               $Session = Gdn::Session();
+               AddActivity(
+                  $UserID,
+                  'JoinCreated',
+                  Gdn::Translate('Welcome Aboard!'),
+                  $Session->UserID > 0 ? $Session->UserID : ''
+               );
             }
-
-            $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
-
-            // Record activity if the person changed his/her photo
-            $Photo = ArrayValue('Photo', $FormPostValues);
-            if ($Photo !== FALSE)
-               AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
-
-         } else {
-            $RecordRoleChange = FALSE;
-            if (!$this->ValidateUniqueFields($Username, $Email))
-               return FALSE;
-
-            // Define the other required fields:
-            $Fields['Email'] = $Email;
-
-            // And insert the new user
-            $UserID = $this->SQL->Insert($this->Name, $Fields);
-
-            // Make sure that the user is assigned to one or more roles:
-            $SaveRoles = TRUE;
-
-            // Report that the user was created
-            $Session = Gdn::Session();
-            AddActivity(
-               $UserID,
-               'JoinCreated',
-               Gdn::Translate('Welcome Aboard!'),
-               $Session->UserID > 0 ? $Session->UserID : ''
-            );
-         }
-         // Now update the role settings if necessary
-         if ($SaveRoles) {
-            // If no RoleIDs were provided, use the system defaults
-            if (!is_array($RoleIDs))
-               $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
-
-            $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
+            // Now update the role settings if necessary
+            if ($SaveRoles) {
+               // If no RoleIDs were provided, use the system defaults
+               if (!is_array($RoleIDs))
+                  $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+   
+               $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
+            }
+         
+            $this->EventArguments['UserID'] = $UserID;
+            $this->FireEvent('AfterSave');
          }
       } else {
          $UserID = FALSE;

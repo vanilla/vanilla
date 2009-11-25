@@ -4,6 +4,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
 ?>
 <li class="Comment<?php echo ($Comment->InsertUserID == $Session->UserID ? ' Mine' : '') ?>" id="Comment_<?php echo $Comment->CommentID; ?>">
    <?php
+   $Sender->EventArguments['Comment'] = &$Comment;
    $Sender->Options = '';
    $IsFirstComment = $Comment->CommentID == $Sender->Discussion->FirstCommentID;
    
@@ -77,7 +78,6 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
          <?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, 'Permalink', array('name' => 'Item_'.$CurrentOffset)); ?>
       </li>
       <?php
-      $Sender->EventArguments['Comment'] = &$Comment;
       $Sender->FireEvent('AfterCommentMeta');
       ?>
    </ul>

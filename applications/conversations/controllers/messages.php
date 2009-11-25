@@ -180,7 +180,6 @@ class MessagesController extends ConversationsController {
     * @todo ENFORCE PERMISSIONS SO THAT PEOPLE CAN'T READ OTHER PEOPLE'S MESSAGES
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
-      $this->Title(Translate('Conversations'));
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($ConversationID) || $ConversationID < 0)
@@ -217,6 +216,27 @@ class MessagesController extends ConversationsController {
          $this->Offset,
          $Limit
       );
+      
+      $this->Participants = '';
+      // Who is in the conversation?
+      if ($this->RecipientData->NumRows() == 1) {
+         $this->Participants = Gdn::Translate('Just you!');
+      } else if ($this->RecipientData->NumRows() == 2) {
+         foreach ($this->RecipientData->Result() as $User) {
+            if ($User->UserID != $Session->UserID)
+               $this->Participants = sprintf(Gdn::Translate('%s and you'), UserAnchor($User));
+         }
+      } else {
+         $Users = array();
+         foreach ($this->RecipientData->Result() as $User) {
+            if ($User->UserID != $Session->UserID)
+               $Users[] = UserAnchor($User);
+         }
+         $this->Participants = sprintf(Gdn::Translate('%s, and you'), implode(', ', $Users));
+      }
+      
+      $this->Title(strip_tags($this->Participants));
+
       // $CountMessages = $this->ConversationMessageModel->GetCount($ConversationID, $Session->UserID);
       
       // Build a pager

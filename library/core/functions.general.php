@@ -814,8 +814,8 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
-if (!function_exists('Glob')) {
-   function Glob($Pattern, $Flags = 0) {
+if (!function_exists('SafeGlob')) {
+   function SafeGlob($Pattern, $Flags = 0) {
       $Return = glob($Pattern, $Flags);
       if (!is_array($Return))
          $Return = array();

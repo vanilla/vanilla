@@ -1,9 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h2><?php echo Gdn::Translate('Change My Picture'); ?></h2>
+<?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
-<h2><?php echo Gdn::Translate('Change My Picture'); ?></h2>
 <ul>
    <li>
       <p><?php echo Gdn::Translate('Select an image on your computer (2mb max)'); ?></p>

@@ -155,7 +155,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         return $.popup.close(settings);
       });
     } else {
-      $('#'+settings.popupId+' .Content').text(definition('ConfirmText', 'Are you sure you want to proceed?'));
+      $('#'+settings.popupId+' .Content h1').text(definition('ConfirmHeading', 'Confirm'));
+      $('#'+settings.popupId+' .Content p').text(definition('ConfirmText', 'Are you sure you want to do that?'));
       $('#'+settings.popupId+' .Okay').val(definition('Okay', 'Okay'));
       $('#'+settings.popupId+' .Cancel').val(definition('Cancel', 'Cancel')).click(function() {
         $.popup.close(settings);
@@ -186,7 +187,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $('#'+settings.popupId+' .Content').append(data);
     } else {
       formSaved = json['FormSaved'];
-      data = json['Data']
+      data = json['Data'];
       if (formSaved == false)
         $('#'+settings.popupId+' .Content').html(data);
     }
@@ -272,7 +273,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
       <div class="Body"> \
-        <div class="Content">Are you sure you want to proceed?</div> \
+        <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
         <div class="Footer"> \
           <input type="button" class="Button Okay" value="Okay" /> \
           <input type="button" class="Button Cancel" value="Cancel" /> \

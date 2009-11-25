@@ -361,7 +361,17 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                $DiscussionName = ArrayValue('Name', $Fields, '');
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
-            $this->UpdateDiscussionCount($DiscussionID);
+            $Data = $this->SQL
+               ->Select('CategoryID')
+               ->From('Discussion')
+               ->Where('DiscussionID', $DiscussionID)
+               ->Get();
+            
+            $CategoryID = FALSE;
+            if ($Data->NumRows() > 0)
+               $CategoryID = $Data->FirstRow()->CategoryID;
+
+            $this->UpdateDiscussionCount($CategoryID);
          }
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
@@ -398,38 +408,28 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    }
    
    /**
-    * Updates the CountDiscussions value on the category based on the DiscussionID
+    * Updates the CountDiscussions value on the category based on the CategoryID
     * being saved. 
     *
     * @param int The DiscussionID relating to the category we are updating.
     */
-   public function UpdateDiscussionCount($DiscussionID) {
-      $Data = $this->SQL
-         ->Select('d2.CategoryID')
-         ->Select('d2.CategoryID', 'count', 'CountDiscussions')
-         ->From('Discussion d')
-         ->Join('Discussion d2', 'd.CategoryID = d2.CategoryID')
-         ->Where('d.DiscussionID', $DiscussionID)
-         ->GroupBy('d2.CategoryID')
-         ->Get()
-         ->FirstRow();
-      $Count = $Data ? $Data->CountDiscussions : 0;
-      
-      $Data = $this->SQL
-         ->Select('CategoryID, InsertUserID')
-         ->From('Discussion')
-         ->Where('DiscussionID', $DiscussionID)
-         ->Get()
-         ->FirstRow();
-      
-      if ($Count > 0) {
-         $this->SQL
-            ->Update('Category')
-            ->Set('UpdateUserID', $Data->InsertUserID)
-            ->Set('DateUpdated', Format::ToDateTime())
-            ->Set('CountDiscussions', $Count)
-            ->Where('CategoryID', $Data->CategoryID)
-            ->Put();
+   public function UpdateDiscussionCount($CategoryID) {
+      if (is_numeric($CategoryID) && $CategoryID > 0) {
+         $Data = $this->SQL
+            ->Select('DiscussionID', 'count', 'CountDiscussions')
+            ->From('Discussion')
+            ->Where('CategoryID', $CategoryID)
+            ->Get()
+            ->FirstRow();
+         $Count = $Data ? $Data->CountDiscussions : 0;
+         
+         if ($Count > 0) {
+            $this->SQL
+               ->Update('Category')
+               ->Set('CountDiscussions', $Count)
+               ->Where('CategoryID', $CategoryID)
+               ->Put();
+         }
       }
    }
    
@@ -510,10 +510,20 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             $Search->Delete(array('TableName' => 'Comment', 'PrimaryID' => $Row->CommentID));
          }
       }
+      $Data = $this->SQL
+         ->Select('CategoryID')
+         ->From('Discussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Get();
+      
+      $CategoryID = FALSE;
+      if ($Data->NumRows() > 0)
+         $CategoryID = $Data->FirstRow()->CategoryID;
       
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
+      $this->UpdateDiscussionCount($CategoryID);
       
       return TRUE;
    }

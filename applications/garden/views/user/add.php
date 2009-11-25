@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
-
-echo $this->Form->Open(array('class' => 'User'));
-echo $this->Form->Errors();
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if (is_object($this->User))
       echo Gdn::Translate('Edit User');
    else
       echo Gdn::Translate('Add User');
 ?></h1>
+<?php
+echo $this->Form->Open(array('class' => 'User'));
+echo $this->Form->Errors();
+?>
 <ul>
    <li>
       <?php

@@ -1,9 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo Gdn::Translate('User Registration Settings'); ?></h1>
+<?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('User Registration Settings'); ?></h1>
 <ul>
    <li id="RegistrationMethods">
       <div class="Info"><?php echo Gdn::Translate('Choose the registration method for new users:'); ?></div>

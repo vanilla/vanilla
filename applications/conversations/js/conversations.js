@@ -6,7 +6,9 @@ jQuery(document).ready(function($) {
       followConfirm: false
    });
    
-   $('textarea.MessageBox, textarea.TextBox').autogrow();
+   $('textarea.MessageBox, textarea.TextBox').livequery(function() {
+      $(this).autogrow();
+   });
    
    // Make the entire row clickable on the conversation list.
    $.fn.hoverRow = function() {
@@ -92,15 +94,17 @@ jQuery(document).ready(function($) {
    }
    
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').autocomplete(
-      definition('WebRoot') + '/garden/user/autocomplete/',
-      {
-         minChars: 1,
-         multiple: true,
-         scrollHeight: 220,
-         selectFirst: true
-      }
-   ).autogrow();
+   $('.MultiComplete').livequery(function() {
+      $(this).autocomplete(
+         definition('WebRoot') + '/garden/user/autocomplete/',
+         {
+            minChars: 1,
+            multiple: true,
+            scrollHeight: 220,
+            selectFirst: true
+         }
+      ).autogrow();
+   });
    
    // Set up paging
    $('.MorePager').morepager({

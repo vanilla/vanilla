@@ -11,9 +11,9 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
 }
 ?>
 <div id="DiscussionForm">
+   <h2><?php echo property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'; ?></h2>
    <?php
       echo $this->Form->Open();
-      echo $this->Form->Label(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion', 'Name', array('class' => 'Heading'));
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Name', array('maxlength' => 100));
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {

@@ -30,6 +30,7 @@ class HomeController extends Gdn_Controller {
     * The garden welcome message.
     */
    public function Index() {
+      $this->View = 'FileNotFound';
       $this->Render();
    }
    

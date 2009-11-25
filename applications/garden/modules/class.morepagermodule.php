@@ -101,8 +101,8 @@ class MorePagerModule extends Module {
       $this->TotalRecords = 0;
       $this->Wrapper = '<div %1$s>%2$s</div>';
       $this->PagerEmpty = '';
-      $this->MoreCode = 'Show %s more records';
-      $this->LessCode = 'Show %s previous records';
+      $this->MoreCode = 'More';
+      $this->LessCode = 'Newer';
       $this->Url = '/controller/action/$s/';
       $this->_PropertiesDefined = FALSE;
       $this->_Totalled = FALSE;

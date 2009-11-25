@@ -474,9 +474,13 @@ class ProfileController extends Gdn_Controller {
          $EditUrl = $Session->CheckPermission('Garden.Users.Edit') ? '/user/edit/'.$this->User->UserID : '/profile/edit/'.$this->User->UserID;
          if ($this->User->UserID != $ViewingUserID) {
             // Add profile options for everyone
-            $SideMenu->AddLink('Options', 'Change Picture', '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            if ($this->User->Photo != '')
+               $SideMenu->AddLink('Options', 'Change Picture', '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            
             $SideMenu->AddLink('Options', 'Edit Account', $EditUrl, 'Garden.Users.Edit', array('class' => 'Popup'));
-            $SideMenu->AddLink('Options', 'Remove Picture', '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+            if ($this->User->Photo != '')
+               $SideMenu->AddLink('Options', 'Remove Picture', '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
+               
          } else {
             // Add profile options for the profile owner
             $SideMenu->AddLink('Options', 'Change My Picture', '/profile/picture', FALSE, array('class' => 'PictureLink'));
@@ -524,7 +528,7 @@ class ProfileController extends Gdn_Controller {
          $TabName = array($TabName => $TabUrl);
       foreach ($TabName as $Name => $Url) {
          if ($Url == '')
-            $Url = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.urlencode($this->User->Name);
+            $Url = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.Format::Url($this->User->Name);
             
          $this->_ProfileTabs[$Name] = $Url;
       }

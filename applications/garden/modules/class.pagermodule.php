@@ -29,34 +29,9 @@ class PagerModule extends Module {
    public $CssClass;
 
    /**
-    * The page number currently being displayed.
+    * Translation code to be used for "Next Page" link.
     */
-   public $CurrentPage;
-
-   /**
-    * Text to be used for "next page". ">" by default.
-    */
-   public $NextText;
-   
-   /**
-    * The tag that should encapsulate blank items in the pager (like the
-    * elipsis in "1 ... 5 6 7 ... 32". Default is:
-    *  "<li>{blank}</li>\n";
-    */
-   public $PagerBlankItem;
-   
-   /**
-    * The tag that should be placed at the end of the pager. Default is:
-    *  '</ul>';
-    */
-   public $PagerClose;
-
-   /**
-    * The tag that should encapsulate the currently selected page link. Default
-    * is:
-    *  "<li class=\"CurrentPage\"><a href=\"{url}\">{page}</a></li>\n";
-    */
-   public $PagerCurrentItem;
+   public $MoreCode;
 
    /**
     * If there are no pages to page through, this string will be returned in
@@ -65,34 +40,23 @@ class PagerModule extends Module {
    public $PagerEmpty;
    
    /**
-    * The tag that should encapsulate one page link. Default is:
-    *  "<li><a href=\"{url}\">{page}</a></li>\n";
+    * The xhtml code that should wrap around the pager link.
+    *  ie. '<div %1$s>%2$s</div>';
+    * where %1$s represents id and class attributes (if defined by
+    * $this->ClientID and $this->CssClass) and %2$s represents the pager link.
     */
-   public $PagerItem;
+   public $Wrapper;
 
    /**
-    * The tag that should be placed at the beginning of the pager. Default is:
-    *  "<ul {id} class=\"{class}\">\n";
-    * Note that if $this->ClientID is specified, it will replace {id} with
-    * 'id="'.$this->ClientID.'"';
+    * Translation code to be used for "less" link.
     */
-   public $PagerOpen;
-
-   /**
-    * Maximum number of page links to display per page. Default is 10.
-    */
-   public $PagesToDisplay;
-
-   /**
-    * Text to be used for "previous page". "<" by default.
-    */
-   public $PreviousText;
+   public $LessCode;
 
    /**
     * The number of records being displayed on a single page of data. Default
     * is 30.
     */
-   public $RecordsPerPage;
+   public $Limit;
    
    /**
     * The total number of records in the dataset.
@@ -100,24 +64,19 @@ class PagerModule extends Module {
    public $TotalRecords;
    
    /**
-    * The string to contain the page number. ie. /controller/action/{page}/
+    * The string to contain the record offset. ie. /controller/action/%s/
     */
    public $Url;
    
    /**
     * The first record of the current page (the dataset offset).
     */
-   private $_FirstRecord;
+   private $Offset;
    
    /**
-    * The last record of the current page.
+    * The last offset of the current page. (ie. Offset to LastOffset of TotalRecords)
     */
-   private $_LastRecord;
-   
-   /**
-    * The total number of pages.
-    */
-   private $_PageCount;
+   private $_LastOffset;
    
    /**
     * Certain properties are required to be defined before the pager can build
@@ -134,46 +93,42 @@ class PagerModule extends Module {
     */
    private $_Totalled;
 
+   public function __construct(&$Sender = '') {
+      $this->ClientID = '';
+      $this->CssClass = 'NumberedPager';
+      $this->Offset = 0;
+      $this->Limit = 30;
+      $this->TotalRecords = 0;
+      $this->Wrapper = '<div %1$s>%2$s</div>';
+      $this->PagerEmpty = '';
+      $this->MoreCode = '›';
+      $this->LessCode = '‹';
+      $this->Url = '/controller/action/$s/';
+      $this->_PropertiesDefined = FALSE;
+      $this->_Totalled = FALSE;
+      $this->_LastOffset = 0;
+      parent::__construct($Sender);
+   }
+
    function AssetTarget() {
       return FALSE;
    }
 
    /**
-    * Define all required parameters to create the Pageer and PageerDetails.
+    * Define all required parameters to create the Pager and PagerDetails.
     */
-   public function Configure($CurrentPage, $RecordsPerPage, $TotalRecords, $Url, $ForceConfigure = FALSE) {
+   public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = FALSE) {
       if ($this->_PropertiesDefined === FALSE || $ForceConfigure === TRUE) {
          $this->Url = $Url;
-         
-         $this->CurrentPage = is_numeric($CurrentPage) && $CurrentPage > 0 ? $CurrentPage : 1;
-         $this->RecordsPerPage = is_numeric($RecordsPerPage) && $RecordsPerPage > 0 ? $RecordsPerPage : $this->RecordsPerPage;
+
+         $this->Offset = $Offset;         
+         $this->Limit = is_numeric($Limit) && $Limit > 0 ? $Limit : $this->Limit;
          $this->TotalRecords = is_numeric($TotalRecords) ? $TotalRecords : 0;
-         $this->_Totalled = ($this->TotalRecords == $this->RecordsPerPage) ? FALSE : TRUE;
-            
-         if ($this->_Totalled === TRUE) {
-            $this->_PageCount = CalculateNumberOfPages($this->TotalRecords, $this->RecordsPerPage);
-            if ($this->CurrentPage > $this->_PageCount && $this->_PageCount > 0)
-               $this->CurrentPage = $this->_PageCount;
+         $this->_Totalled = ($this->TotalRecords >= $this->Limit) ? FALSE : TRUE;
+         $this->_LastOffset = $this->Offset + $this->Limit;
+         if ($this->_LastOffset > $this->TotalRecords)
+            $this->_LastOffset = $this->TotalRecords;
                
-            $this->_FirstRecord = (($this->CurrentPage - 1) * $this->RecordsPerPage) + 1;
-            $this->_LastRecord = $this->_FirstRecord + $this->RecordsPerPage - 1;
-            if ($this->_LastRecord > $this->TotalRecords)
-               $this->_LastRecord = $this->TotalRecords;
-               
-         } else {
-            $this->_PageCount = $this->CurrentPage;
-            if ($this->TotalRecords >= $this->RecordsPerPage)
-               ++$this->_PageCount;
-               
-            $this->_FirstRecord = (($this->CurrentPage - 1) * $this->RecordsPerPage) + 1;
-            $this->_LastRecord = $this->_FirstRecord + $this->TotalRecords - 1;
-            if ($this->_LastRecord < $this->_FirstRecord)
-               $this->_LastRecord = $this->_FirstRecord;
-               
-            if ($this->_PageCount > $this->CurrentPage)
-               $this->_LastRecord = $this->_LastRecord - 1;
-               
-         }
          $this->_PropertiesDefined = TRUE;
       }
    }
@@ -182,135 +137,113 @@ class PagerModule extends Module {
    // Returns the built string.
    public function Details() {
       if ($this->_PropertiesDefined === FALSE)
-         trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'Pager', 'Details'), E_USER_ERROR);
+         trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
          
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
-            $Details = sprintf(Gdn::Translate('PageDetailsMessageFull'), $this->_FirstRecord, $this->_LastRecord, $this->TotalRecords);
+            $Details = sprintf(Gdn::Translate('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
-            $Details = sprintf(Gdn::Translate('PageDetailsMessage'), $this->_FirstRecord, $this->_LastRecord);
+            $Details = sprintf(Gdn::Translate('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
          }
       }
       return $Details;
    }
+   
+   /**
+    * Whether or not this is the last page of the pager.
+    *
+    * @return bool True if this is the last page.
+    */
+   public function LastPage() {
+      $Result = $this->Offset + $this->Limit >= $this->TotalRecords;
+      return $Result;
+   }
 
    /**
-    * Builds and returns the xhtml for a numeric page list (ie. "prev 1 2 3 next")
+    * Returns the "show x more (or less) items" link.
+    *
+    * @param string The type of link to return: more or less
     */
-   public function ToString() {
+   public function ToString($Type = 'more') {
       if ($this->_PropertiesDefined === FALSE)
-         trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'Pager', 'GetNumeric'), E_USER_ERROR);
-      
-      // Variables that help define which page numbers to display:
-      // Subtract the first and last page from the number of pages to display
-      $PagesToDisplay = $this->PagesToDisplay - 2;
-      if ($PagesToDisplay <= 8)
-         $PagesToDisplay = 8;
+         trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
          
-      // Middle navigation point for the pager
-      $MidPoint = intval($PagesToDisplay / 2);
+      $PageCount = ceil($this->TotalRecords / $this->Limit);
+      $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
+      $PagesToDisplay = 7;
+      $MidPoint = 2; // Middle navigation point for the pager
       
       // First page number to display (based on the current page number and the
       // middle position, figure out which page number to start on).
-      $FirstPage = $this->CurrentPage - $MidPoint;
-      if ($FirstPage < 1)
-         $FirstPage = 1;
+      $FirstPage = $CurrentPage - $MidPoint;
 
-      // Last page number to display
-      $LastPage = $FirstPage + ($PagesToDisplay - 1);
-      if ($LastPage > $this->_PageCount) {
-         $LastPage = $this->_PageCount;
-         $FirstPage = $this->_PageCount - $PagesToDisplay;
-         if ($FirstPage < 1)
-            $FirstPage = 1;
+      // $Pager = '<span>TotalRecords: '.$this->TotalRecords.'; Limit: '.$this->Limit.'; Offset: '.$this->Offset.'; PageCount: '.$PageCount.'</span>';
+      $Pager = '';
+      $PreviousText = Gdn::Translate($this->LessCode);
+      $NextText = Gdn::Translate($this->MoreCode);
+      
+      if ($CurrentPage == 1) {
+         $Pager = '<span class="Previous">'.$PreviousText.'</span>';
+      } else {
+         $Offset = ($CurrentPage - 2) * $this->Limit;
+         $Pager .= Anchor($PreviousText, sprintf($this->Url, $Offset, $this->Limit), 'Previous');
       }
       
-      $Loop = 0;
-      $LoopPage = 0;
-
-      if ($this->_PageCount > 1) {
-         $CssClass = $this->CssClass.($this->_PageCount > 1 ? '' : ' PageListEmpty');
-         $ClientID = !empty($this->ClientID) && $this->ClientID != '' ? ' id="'.$this->ClientID.'"' : '';
-         $Pager = sprintf($this->PagerOpen, $ClientID, $CssClass);
-         
-         if ($this->CurrentPage > 1) {
-            $Url = $this->_Url($this->CurrentPage - 1);
-            $Pager .= sprintf($this->PagerItem, $Url, $this->PreviousText);
-         } else {
-            $Pager .= sprintf($this->PagerBlankItem, $this->PreviousText);
+      // We don't need elipsis at all (ie. 1 2 3 4 5)
+      if ($PageCount < 10) {
+         for ($i = 0; $i < $PageCount + 1; $i++) {
+            $Offset = $this->Limit * $i;
+            if ($Offset == 0) $Offset = '';
+            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit));
          }
-         
-         $Url = $this->_Url(1);
-
-         // Display first page & elipsis if we have moved past the second page
-         if ($FirstPage > 2) {
-            $Pager .= sprintf($this->PagerItem, $Url, '1');
-            $Pager .= sprintf($this->PagerBlankItem, '...');
-         } elseif ($FirstPage == 2) {
-            $Pager .= sprintf($this->PagerItem, $Url, '1');
+      } else if ($FirstPage <= 3) {
+         // We're on a page that is before the first elipsis (ie. 1 2 3 4 5 6 7 ... 81)
+         for ($i = 0; $i < 7; $i++) {
+            $Offset = $this->Limit * $i;
+            if ($Offset == 0) $Offset = '';
+            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
          }
 
-         $Loop = 0;
+         $Pager .= '<span>...</span>';
+         $Offset = $this->Limit * $PageCount - $this->Limit;
+         $Pager .= Anchor($PageCount, sprintf($this->Url, $Offset, $this->Limit));
+      } else if ($FirstPage >= $PageCount - 6) {
+         // We're on a page that is after the last elipsis (ie. 1 ... 75 76 77 78 79 80 81)
+         $Pager .= Anchor(1, sprintf($this->Url, '', $this->Limit));
+         $Pager .= '<span>...</span>';
 
-         for ($Loop = 1; $Loop <= $this->_PageCount; ++$Loop) {
-            if (($Loop >= $FirstPage) && ($Loop <= $LastPage)) {
-               $Url = $this->_Url($Loop);
-               
-               if ($Loop == $this->CurrentPage) {
-                  $Pager .= sprintf($this->PagerCurrentItem, $Url, $Loop);
-               } else {
-                  $Pager .= sprintf($this->PagerItem, $Url, $Loop);
-               }
-            }
+         for ($i = $PageCount - 6; $i <= $PageCount; $i++) {
+            $Offset = $this->Limit * $i - $this->Limit;
+            $Pager .= Anchor($i, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i, $CurrentPage));
          }
-
-         $Url = $this->_Url($this->_PageCount);
-         
-         // Display last page & elipsis if we are not yet at the second last page
-         if ($this->CurrentPage < ($this->_PageCount - $MidPoint) && $this->_PageCount > $this->PagesToDisplay - 1) {
-            $Pager .= sprintf($this->PagerBlankItem, '...');
-            $Pager .= sprintf($this->PagerItem, $Url, $this->_PageCount);
-         } else if ($this->CurrentPage == ($this->_PageCount - $MidPoint) && ($this->_PageCount > $this->PagesToDisplay)) {
-            $Pager .= sprintf($this->PagerItem, $Url, $this->_PageCount);
-         }
-
-         if ($this->CurrentPage != $this->_PageCount) {
-            $LoopPage = $this->CurrentPage + 1;
-            $Url = $this->_Url($LoopPage);
-            
-            $Pager .= sprintf($this->PagerItem, $Url, $this->NextText);
-         } else {
-            $Pager .= sprintf($this->PagerBlankItem, $this->NextText);
-         }
-         $Pager .= $this->PagerClose;
       } else {
-         $Pager = $this->PagerEmpty;
+         // We're between the two elipsises (ie. 1 ... 4 5 6 7 8 ... 81)
+         $Pager .= Anchor(1, sprintf($this->Url, '', $this->Limit));
+         $Pager .= '<span>...</span>';
+
+         for ($i = $CurrentPage - 3; $i < $CurrentPage + 2; $i++) {
+            $Offset = $this->Limit * $i;
+            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
+         }
+
+         $Pager .= '<span>...</span>';
+         $Offset = $this->Limit * $PageCount - $this->Limit;
+         $Pager .= Anchor($PageCount, sprintf($this->Url, $Offset, $this->Limit));
       }
-      return $Pager;
+      if ($CurrentPage == $PageCount) {
+         $Pager .= '<span class="Next">'.$NextText.'</span>';
+      } else {
+         $Offset = ($CurrentPage) * $this->Limit;
+         $Pager .= Anchor($NextText, sprintf($this->Url, $Offset, $this->Limit), 'Next');
+      }
+
+      $ClientID = $this->ClientID;
+      $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
+      return sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
    }
    
-   private function _Url($PageNumber) {
-      return Url(str_replace('{page}', $PageNumber, $this->Url));
-   }
-   
-   public function __construct(&$Sender = '') {
-      $this->ClientID = '';
-      $this->CurrentPage = 1;
-      $this->NextText = '&#62;';
-      $this->PagesToDisplay = 10;
-      $this->PreviousText = '&#60;';
-      $this->RecordsPerPage = 30;
-      $this->Url = '/controller/action/$s/';
-      $this->_PropertiesDefined = FALSE;
-      $this->_Totalled = FALSE;
-      $this->CssClass = 'Pager';
-      $this->PagerEmpty = '';
-      $this->PagerOpen = '<ul %1$s class="%2$s">'."\n";
-      $this->PagerItem = '<li><a href="%1$s">%2$s</a></li>'."\n";
-      $this->PagerCurrentItem = '<li class="CurrentPage"><a href="%1$s">%2$s</a></li>'."\n";
-      $this->PagerBlankItem = "<li>%s</li>\n";
-      $this->PagerClose = '</ul>';
-      parent::__construct($Sender);
+   private function _GetCssClass($ThisPage, $HighlightPage) {
+      return $ThisPage == $HighlightPage ? 'Highlight' : FALSE;
    }
 }

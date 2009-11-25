@@ -1,8 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo Gdn::Translate('General Settings'); ?></h1>
+<?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('General Settings'); ?></h1>
 <ul>
    <li>
       <?php

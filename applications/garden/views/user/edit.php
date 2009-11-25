@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
-
-echo $this->Form->Open(array('class' => 'User'));
-echo $this->Form->Errors();
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if (is_object($this->User))
       echo Gdn::Translate('Edit User');
    else
       echo Gdn::Translate('Add User');
 ?></h1>
+<?php
+echo $this->Form->Open(array('class' => 'User'));
+echo $this->Form->Errors();
+?>
 <ul>
    <li>
       <?php
@@ -33,7 +33,7 @@ echo $this->Form->Errors();
       <?php echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
 </ul>
-<h1><?php echo Gdn::Translate('Password Options'); ?></h1>
+<h3><?php echo Gdn::Translate('Password Options'); ?></h3>
 <ul>
    <li>
       <?php

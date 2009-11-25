@@ -71,9 +71,7 @@ class CategoriesController extends VanillaController {
 
       // Build a pager
       $PagerFactory = new PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'More Discussions';
-      $this->Pager->LessCode = 'Newer Discussions';
+      $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,

@@ -27,7 +27,7 @@ foreach ($this->RoleData->Result() as $Role) {
             ?>
             <span>|</span>
             <?php
-            echo Anchor('Delete', '/role/delete/'.$Role->RoleID);
+            echo Anchor('Delete', '/role/delete/'.$Role->RoleID, 'Popup');
             }
             ?>
       </td>

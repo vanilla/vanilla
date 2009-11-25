@@ -1,5 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo Gdn::Translate('Delete Role'); ?></h1>
+<?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
@@ -29,4 +30,4 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Proceed');
+<?php echo $this->Form->Close('Delete');

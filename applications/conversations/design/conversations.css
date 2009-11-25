@@ -95,9 +95,10 @@ body.Conversations h2 {
   margin: 0;
 }
 #Conversations li {
-  border-bottom: 1px solid #eee;
-  padding: 6px;
-  color: #888;
+	font-family: 'lucida grande';
+	border-bottom: 1px solid #eee;
+	padding: 6px;
+	color: #888;
 }
 #Conversations li.New {
   background: #ffd;
@@ -142,6 +143,7 @@ body.Conversations h2 {
   -webkit-border-radius: 2px;
 }
 #Conversation li {
+	font-family: 'lucida grande';
   border-bottom: 1px solid #eee;
   padding: 6px;
   color: #888;
@@ -165,6 +167,34 @@ body.Conversations h2 {
 #Conversation li div.Message {
   font-size: 110%;
   color: #000;
+}
+#Conversation div.Message p {
+   font-family: 'lucida grande';   
+   margin: 8px 0;
+}
+#Conversation  blockquote {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 4px 16px;
+   margin: 4px 0;
+   background: #ffc;
+}
+#Conversation  code,
+#Conversation  pre {
+   display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+   white-space: pre;
+   font-family: monospace;
+   overflow: auto;
+}
+#Conversation  strong {
+   font-weight: bold;
+}
+#Conversation  em {
+   font-style: oblique;
 }
 #ConversationForm {
 	margin-bottom: 6px;
@@ -229,36 +259,40 @@ body.add #Content {
 }
 #ConversationForm {
    border: 0px;
-   background: #daf4fd /* Panel Background Color */;
+   background: #daf4fd;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    padding: 8px 10px 10px;
 }
-#ConversationForm label {
-  float: left;
-  display: block;
-  width: 30px;
-  margin: 0 10px 0 0;
+#ConversationForm h2 {
+  margin: 0 0 8px 0;
 }
-#ConversationForm label.Heading {
-  font-weight: bold;
+#conversations_messages_add #ConversationForm h2 {
+  border: 0;
+  color:#2786C2;
   font-size: 120%;
-  color: #2786c2 /* Panel Font Color */;
-  line-height: 100%;
-  display: block;
-  width: auto;
-  float: none;
-  margin: 0 0px 8px 0;
 }
 #ConversationForm textarea.MultiComplete {
-  width: 896px;
+  width: 930px;
 }
 #ConversationForm .TextBox {
    width: 930px;
    height: 100px;
    min-height: 100px;
-   margin: 8px 0px 6px;
+   margin: 8px 0 6px;
+	padding: 0;
+	max-height: 300px;
 }
 a.Cancel {
    margin-left: 20px;
+}
+div.Popup #ConversationForm {
+	background: none;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	padding: 0;
+}
+div.Popup #ConversationForm textarea.MultiComplete,
+div.Popup #ConversationForm .TextBox {
+	width: 478px;
 }

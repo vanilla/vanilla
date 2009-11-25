@@ -38,8 +38,8 @@ $Configuration['Garden']['Cookie']['Domain']                    = '';
 $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 or sha1
 $Configuration['Garden']['Authenticator']['Type']               = 'Password'; // Types include 'Password' and 'Handshake'
 $Configuration['Garden']['Authenticator']['Encoding']           = 'ini';
-$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/?Target=%s';
-$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/?Target=%s';
+$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register/?Target=%s';
+$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin/?Target=%s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}';
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = PATH_CACHE . DS . 'error.log';
@@ -61,9 +61,8 @@ $Configuration['Garden']['Email']['SmtpPort']                   = '25';
 $Configuration['Garden']['Email']['MimeType']                   = 'text/plain';
 $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';
-$Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/update';
-// TODO: Need to change this back before release
-// $Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
+$Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/addons/update';
+$Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
 $Configuration['Garden']['AddonUrl']                            = '';
 $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?

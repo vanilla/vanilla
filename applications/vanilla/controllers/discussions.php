@@ -59,9 +59,7 @@ class DiscussionsController extends VanillaController {
 
       // Build a pager.
       $PagerFactory = new PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'More Discussions';
-      $this->Pager->LessCode = 'Newer Discussions';
+      $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -119,13 +117,14 @@ class DiscussionsController extends VanillaController {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/%1$s'
+         'discussions/bookmarked/%1$s'
       );
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+         $this->View = 'discussions';
       }
       
       // Add Modules

@@ -17,7 +17,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
       // Add a "send X a message" link to the side menu on the profile page
       $Session = Gdn::Session();
-      if ($Session->UserID != $Sender->User->UserID) {
+      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
          $SideMenu = $Sender->EventArguments['SideMenu'];
          $SideMenu->AddLink('Options', sprintf(Gdn::Translate('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name);
          $Sender->EventArguments['SideMenu'] = $SideMenu;

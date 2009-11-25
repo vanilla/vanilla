@@ -111,7 +111,7 @@ ul.DataList li ul li.Title strong a {
    background: none;
 }
 ul.DataList li ul li.Meta {
-   font-family: tahoma;
+   font-family: 'lucida grande';
    margin-left: 5px;
    font-size: 80%;
    color: #80828c /* Meta Label Font Color */;
@@ -208,9 +208,9 @@ body.Discussion #Content h2 {
    font-size:140%;
    font-weight:bold;
    margin: 0;
-   color: #333 /* Body Heading Font Color */;
+   color: #333;
    padding: 6px 0;
-   line-height: 1;
+   line-height: 1.2;
 }
 body.Discussion #Content h2 span {
    padding: 0 10px;
@@ -241,6 +241,7 @@ body.Discussion #Content h2 span {
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
+   font-family: 'lucida grande';
    font-size: 11px;
    color: #777 /* Meta Label Font Color */;
    padding: 8px 0 0 8px;
@@ -255,6 +256,8 @@ body.Discussion #Content h2 span {
    border: 0;
    margin: 0 10px 0 0;
    float: left;
+   overflow: hidden;
+   background: #eee;
 }
 .Preview li ul.Info li,
 #Discussion li ul.Info li {
@@ -275,12 +278,19 @@ body.Discussion #Content h2 span {
 #Discussion li .Body {
    clear: both;
    padding: 1px 8px 2px;
-   line-height: 170%;
-   font-size: 110%;
-   color: #454545 /* Body Text Font Color */;
+   line-height: 140%;
+   font-size: 100%;
 }
 .Body p {
+   font-family: 'lucida grande';   
    margin: 8px 0;
+}
+.Body blockquote {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 4px 16px;
+   margin: 4px 0;
+   background: #ffc;
 }
 .Body code,
 .Body pre {
@@ -515,14 +525,14 @@ body.Post #CommentForm,
    -webkit-border-radius: 3px;
    padding: 8px 10px 10px;
 }
-#CommentForm label.Heading,
-#DiscussionForm label.Heading {
-   font-weight: bold;
+body.Discussion #CommentForm h2,
+#DiscussionForm h2 {
    font-size: 120%;
-   color: #2786c2 /* Panel Font Color */;
-   line-height: 100%;
-   display: block;
-   margin-bottom: 4px;
+   color: #2786c2;
+   border-bottom: 0;
+   line-height: 1;
+   padding: 0;
+   margin: 0 0 4px;
 }
 body.Post #CommentForm textarea,
 #DiscussionForm textarea {

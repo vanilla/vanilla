@@ -428,7 +428,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             <li id="TransportError">'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'</li>
             <li id="TransientKey">'.$Session->TransientKey().'</li>
             <li id="WebRoot">'.Gdn_Url::WebRoot(TRUE).'</li>
-            <li id="ConfirmText">'.Gdn::Translate('Are you sure you want to proceed?').'</li>
+            <li id="ConfirmHeading">'.Gdn::Translate('Confirm').'</li>
+            <li id="ConfirmText">'.Gdn::Translate('Are you sure you want to do that?').'</li>
             <li id="Okay">'.Gdn::Translate('Okay').'</li>
             <li id="Cancel">'.Gdn::Translate('Cancel').'</li>
          ';
@@ -550,7 +551,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
-            $Paths = Glob($Glob);
+            $Paths = SafeGlob($Glob);
             if(is_array($Paths) && count($Paths) > 0) {
                $ViewPath = $Paths[0];
                break;
@@ -846,7 +847,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                // Find the first file that matches the path.
                $CssPath = FALSE;
                foreach($CssPaths as $Glob) {
-                  $Paths = Glob($Glob);
+                  $Paths = SafeGlob($Glob);
                   if(is_array($Paths) && count($Paths) > 0) {
                      $CssPath = $Paths[0];
                      break;
@@ -895,7 +896,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                // Find the first file that matches the path.
                $JsPath = FALSE;
                foreach($JsPaths as $Glob) {
-                  $Paths = Glob($Glob);
+                  $Paths = SafeGlob($Glob);
                   if(is_array($Paths) && count($Paths) > 0) {
                      $JsPath = $Paths[0];
                      break;
@@ -936,7 +937,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Find the first file that matches the path.
       $MasterViewPath = FALSE;
       foreach($MasterViewPaths as $Glob) {
-         $Paths = Glob($Glob);
+         $Paths = SafeGlob($Glob);
          if(is_array($Paths) && count($Paths) > 0) {
             $MasterViewPath = $Paths[0];
             break;

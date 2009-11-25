@@ -42,6 +42,18 @@ Welcome to the Admin CSS File! Some things you should know:
 	font-size:160%;
 	text-shadow: #fff 0 1px 0;
 }
+#Head h1 a span {
+	font-family: 'lucida grande';
+	font-size: 40%;
+	text-shadow: none;
+	font-weight: normal;
+	background: #DCF5FE;
+	border: 1px solid #CAF0FE;
+	padding: 2px 4px;
+	margin: 0 0 0 6px;
+	-moz-border-radius: 3px;
+	vertical-align: middle;
+}
 #Head div.User a {
 	margin-left: 20px;
 }
@@ -59,7 +71,7 @@ div.Box {
    color: #999  /* Panel Font Color */;
    padding: 6px 0;
    margin: 0 0 10px 0;
-	border: 1px solid #caf0fe;
+	border: 1px solid #C0E7F5;
 }
 div.Box h4 {
    font-size: 110%;
@@ -523,7 +535,7 @@ table {
    border-collapse: collapse;
    margin: 10px 0;
 	background: #F2FBFF;
-	border: 1px solid #CAF0FE;
+	border: 1px solid #C0E7F5;
 	border-bottom: 0;
 }
 table label {
@@ -537,9 +549,11 @@ table tr.Last th {
 table th,
 table td {
    font-weight: normal;
-   font-size: 12px;
    color: #555 /* Body Text Font Color */;
    padding: 6px;
+}
+form ul li table label {
+	font-size: 100%;
 }
 table thead th,
 table thead td {
@@ -730,71 +744,6 @@ table.AltColumns tr.Disabled td {
 	margin-right: 8px;
 }
 
-/* ================================================ DataList (Search Results) */
-body.Search h1 {
-   margin:0;
-}
-ul.DataList li {
-   margin: 0;
-   padding: 0 0 4px 0;
-   border-bottom: 1px solid #dbe3e6;
-}
-ul.DataList li li {
-   border: 0;
-   padding: 0;
-}
-ul.DataList,
-ul.DataList li ul {
-   list-style: none;
-   margin: 0;
-   padding: 0;
-}
-ul.DataList li ul li.Title a {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 2px 8px;
-   line-height: 130%;
-   color: #2b3033;
-   font-size: 105%;
-   display: block;
-}
-ul.DataList li ul li.Title strong {
-	display: block;
-   padding: 6px 0 0 6px;
-   margin: 0;
-   font-size: 110%;
-   font-weight: bold;
-}
-ul.DataList li ul li.Title strong a {
-   display: inline;
-   border: 0;
-   padding: 0;
-   margin: 0;
-   color: #2d7bb2 /* Body Link Font Color */;
-   background: none;
-}
-ul.DataList li ul li.Meta {
-   font-family: tahoma;
-   margin-left: 5px;
-   font-size: 80%;
-   color: #80828c /* Meta Label Font Color */;
-}
-ul.DataList li ul li.Meta span,
-ul.DataList li ul li.Meta span a,
-ul.DataList li ul li.Meta strong {
-   margin-right: 12px;
-}
-ul.DataList li ul li.Meta strong {
-   background: #ff0;
-   padding: 0 2px;
-}
-ul.DataList li ul li.Meta a {
-   color: #2b2d33;
-}
-
 
 /* ========================================================= User Search Page */
 #garden_user_index div.Info .InputBox {
@@ -805,17 +754,48 @@ ul.DataList li ul li.Meta a {
 }
 
 
+/* ================================================== Splash Information Page */
+.SplashInfo {
+	margin: 80px 0;
+	border-top: 1px solid #C0E7F5;
+	border-bottom: 1px solid #C0E7F5;
+	background: #F2FBFF;
+}
+.SplashInfo h1 {
+	text-align: center;
+	border-top: 1px solid #fff;
+	color:#02455B;
+	font-size:300%;
+	text-shadow:0 1px 0 #FFFFFF;
+	padding: 20px 0 0;
+}
+.SplashInfo p {
+	text-align: center;
+	border-bottom: 1px solid #fff;
+	margin: 0;
+	padding: 0 0 10px;
+	color: #076C8E;
+	font-size: 20px;
+}
+
+
 /* =================================================================== Popups */
+div.Popup div.Errors ul {
+	border: 1px solid #a00 !important;
+}
 div.Popup div.Messages {
    text-align: left;
    position: inherit;
    top: auto;
    left: auto;
    z-index: auto;
-	margin: 0 0 10px !important;
+	margin: 10px 0 !important;
+	font-family: 'lucida grande';
 }
 div.Popup div.Messages ul {
 	display: block;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
 }
 * html div.Popup div.Messages {
   position: inherit;
@@ -856,14 +836,65 @@ div.Popup div.Body {
 div.Popup div.Body div.Body {
    border: 0;
 }
-div.Popup .Content {
-  padding: 10px;
-  border-bottom: 1px solid #fff;
-  max-height: 400px;
-  overflow: auto;
+div.Popup div.Legal,
+div.Popup .Content form {
+	max-height: 440px;
+	overflow: auto;
+	padding: 0 10px 10px;
 }
 div.Popup .Loading {
   text-align: center;
+}
+div.Popup h1,
+div.Popup h2 {
+	font-size:150%;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #02455B;
+	background: #DCF5FE;
+	border-bottom: 1px solid #C0E7F5;
+	text-shadow: none;
+	padding: 6px 9px 4px;
+	text-shadow: 0 1px 0 #fff;
+}
+div.Popup h3 {
+	font-size: 120%;
+	font-weight: bold;
+	padding: 20px 0 10px;
+}
+div.Popup p {
+	padding: 6px 10px 10px;
+	font-family: 'lucida grande';
+}
+div.Popup div.Legal * {
+	font-family: 'lucida grande';
+}
+div.Popup div.Legal p {
+	padding: 6px 0 10px;
+}
+div.Popup small {
+	font-family: 'lucida grande';
+	font-size: 80%;
+}
+div.Popup form p {
+	padding: 0;
+}
+div.Popup form ul li label {
+	color:#000;
+	display:block;
+	font-size:14px;
+	font-weight:bold;
+	margin: 10px 0 0;
+}
+div.Popup form ul li label.RadioLabel,
+div.Popup form ul li label.CheckBoxLabel {
+	font-weight: normal;
+}
+div.Popup input.Button {
+	margin: 4px 0 2px;
+}
+body.Entry div.Popup p {
+	color: #000;
 }
 div.Popup .Footer {
 	border-top: 1px solid #C0E7F5;

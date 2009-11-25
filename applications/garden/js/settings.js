@@ -12,6 +12,7 @@ jQuery(document).ready(function($) {
          +'&discussions='+definition('CountDiscussions', 0)
          +'&comments='+definition('CountComments', 0)
          +'&updateChecks='+updateChecks
+
       $.ajax({
          type: "POST",
          url: homeUrl,

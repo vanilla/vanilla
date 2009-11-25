@@ -214,10 +214,11 @@ class SettingsController extends GardenController {
          $PluginManager = Gdn::Factory('PluginManager');
          $Plugins = $PluginManager->AvailablePlugins();
          foreach ($Plugins as $Plugin => $Info) {
+            $Name = ArrayValue('Name', $Info, $Plugin);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Plugin,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Plugin'
                );
@@ -227,10 +228,11 @@ class SettingsController extends GardenController {
          $ApplicationManager = Gdn::Factory('ApplicationManager');
          $Applications = $ApplicationManager->AvailableApplications();
          foreach ($Applications as $Application => $Info) {
+            $Name = ArrayValue('Name', $Info, $Application);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Application,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Application'
                );
@@ -240,10 +242,11 @@ class SettingsController extends GardenController {
          $ThemeManager = new Gdn_ThemeManager;
          $Themes = $ThemeManager->AvailableThemes();
          foreach ($Themes as $Theme => $Info) {
+            $Name = ArrayValue('Name', $Info, $Theme);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Theme,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Theme'
                );

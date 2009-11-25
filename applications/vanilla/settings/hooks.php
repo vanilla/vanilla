@@ -102,7 +102,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'profile/discussions/'.urlencode($Sender->User->Name).'/%1$s/'
+         'profile/discussions/'.Format::Url($Sender->User->Name).'/%1$s/'
       );
       
       // Deliver json data if necessary

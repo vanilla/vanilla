@@ -1,15 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo Translate("Apply for membership") ?></h1>
+<?php
 $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
-$TermsOfServiceText = sprintf(Gdn::Translate('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="{0}">terms of service</a>'), Url($TermsOfServiceUrl));
+$TermsOfServiceText = sprintf(Gdn::Translate('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
 $CaptchaPublicKey = Gdn::Config('Garden.Registration.CaptchaPublicKey');
 
 // Make sure to force this form to post to the correct place in case the view is
 // rendered within another view (ie. /garden/entry/index/):
 echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_User_Register'));
+echo $this->Form->Errors();
 ?>
-<h1><?php echo Translate("Apply for membership") ?></h1>
-<?php echo $this->Form->Errors(); ?>
 <ul>
    <li>
       <?php
@@ -49,7 +49,7 @@ echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_U
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
       ?>
    </li>
-   <li><?php
+   <li class="CaptchaInput"><?php
       echo recaptcha_get_html($CaptchaPublicKey);
    ?></li>
    <li>

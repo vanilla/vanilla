@@ -21,7 +21,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('RememberMe', 'Remember me on this computer', array('value' => '1', 'id' => 'SignInRememberMe'));
+         echo $this->Form->CheckBox('RememberMe', Gdn::Translate('Remember me on this computer'), array('value' => '1', 'id' => 'SignInRememberMe'));
       ?>
    </li>
    <li>

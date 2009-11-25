@@ -7,7 +7,7 @@
       <?php
          $Url = Gdn::Authenticator()->RegisterUrl($this->_Sender->SelfUrl);
          if(!empty($Url))
-            echo Anchor('Apply For Membership', $Url, 'Button');
+            echo Anchor('Apply for Membership', $Url, 'Button');
       ?>
    </p>
 </div>

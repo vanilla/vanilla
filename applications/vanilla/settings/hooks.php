@@ -44,7 +44,7 @@ class VanillaHooks implements Gdn_IPlugin {
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
          // Add the discussion tab
-         $Sender->AddProfileTab(Gdn::Translate('Discussions'));
+         $Sender->AddProfileTab(Gdn::Translate('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
          // Add the discussion tab's css
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
          $Sender->AddJsFile('/js/library/jquery.gardenmorepager.js');

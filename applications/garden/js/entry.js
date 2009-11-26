@@ -9,7 +9,9 @@ jQuery(document).ready(function($) {
    $('#Register input[name=User/Name], body.register input[name=User/Name]').blur(function() {
       var name = $(this).val();
       if (name != '') {
-         var checkUrl = $('#Definitions #WebRoot').text() + '/index.php/garden/utility/usernameavailable/'+encodeURIComponent(name);
+         var checkUrl = $('#Definitions #WebRoot').text();
+         checkUrl += checkUrl.substr(-1,1) != '/' ? '/' : '';
+         checkUrl += 'index.php/garden/utility/usernameavailable/'+encodeURIComponent(name);
          $.ajax({
             type: "GET",
             url: checkUrl,

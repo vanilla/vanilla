@@ -25,34 +25,10 @@
 							$this->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'));
 							$this->Menu->AddLink('SignOut', Gdn::Translate('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
 						} else {
-							$this->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab Popup'));
+							$this->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab'), array('class' => 'Popup'));
 						}
 						echo $this->Menu->ToString();
 					}
-
-				/*
-					$this->FireEvent('BeforeMenu');
-					
-					echo MenuItem('Dashboard', 'Dashboard', '/garden/settings', array('Garden.Settings.Manage'));
-					echo MenuItem('Dashboard', 'Users', '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-					echo MenuItem('Activity', 'Activity', '/activity');
-					
-					$this->FireEvent('BeforeMenuUser');
-					
-					if ($Session->IsValid()) {
-						$Name = $Session->User->Name;
-						$CountNotifications = $Session->User->CountNotifications;
-						if (is_numeric($CountNotifications) && $CountNotifications > 0)
-							$Name .= '<span>'.$CountNotifications.'</span>';
-               
-						echo MenuItem('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'));
-						echo MenuItem('SignOut', 'Sign Out', $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
-					} else {
-						echo MenuItem('Entry', 'Sign In', $Authenticator->SignInUrl($Sender->SelfUrl));
-					}
-					
-					$this->FireEvent('AfterMenu');
-				*/
 				?>
             <div id="Search"><?php
 					$Form = Gdn::Factory('Form');

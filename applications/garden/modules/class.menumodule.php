@@ -55,11 +55,11 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
          parent::__construct($Sender);
       }
       
-      public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '') {
+      public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '', $AnchorAttributes = '') {
          if (!array_key_exists($Group, $this->Items))
             $this->Items[$Group] = array();
 
-         $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes);
+         $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
       }
       
       public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
@@ -168,6 +168,7 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
                         $Text = str_replace('{Username}', $Username, $Link['Text']);
                      }
                      $Attributes = ArrayValue('Attributes', $Link, array());
+                     $AnchorAttributes = ArrayValue('AnchorAttributes', $Link, array());
                      if ($Url !== FALSE) {
                         $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);
                         if (substr($Url, 0, 5) != 'http:') {
@@ -179,7 +180,7 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
                         if ($CurrentLink)
                            $Attributes['class'] = $CssClass . ' Highlight';
                            
-                        $Group .= '<li'.Attribute($Attributes).'><a href="'.$Url.'">'.$Text.'</a>';
+                        $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
                      } else {
                         $Group .= '<li'.Attribute($Attributes).'>'.$Text;

@@ -1146,6 +1146,7 @@ div.User h1 {
    line-height: 1;
 }
 #Status a {
+	font-family: 'lucida grande';
    text-transform: lowercase;
    font-size: 11px;
    text-decoration: none;
@@ -1366,16 +1367,6 @@ div.Popup .Content form {
 div.Popup .Loading {
   text-align: center;
 }
-div.Popup .Footer {
-  background: #E9F9FF;
-  text-align: right;
-  padding: 0 6px 2px 0;
-  border-top:1px solid #CAF0FE;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
-}
 div.Popup h1,
 div.Popup h2 {
 	font-family: 'lucida grande';
@@ -1387,6 +1378,16 @@ div.Popup h2 {
 	border-bottom: 1px solid #3DB9E5;
 	text-shadow: none;
 	padding: 6px 9px 4px;
+}
+div.Popup .Footer {
+  background: #E9F9FF;
+  text-align: right;
+  padding: 0 6px 2px 0;
+  border-top:1px solid #CAF0FE;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
 }
 div.Popup h3 {
 	font-size: 120%;

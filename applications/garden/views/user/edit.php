@@ -24,7 +24,6 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->Label('&nbsp;');
          echo $this->Form->CheckBox('ShowEmail', 'Email visible to other users', array('value' => '1'));
       ?>
    </li>

@@ -314,6 +314,15 @@ body.Discussion #Content h2 span {
    margin: 0;
    padding: 0;
 }
+div.Popup .Preview {
+   margin: 4px 10px 10px;
+}
+div.Popup .Preview h2 {
+   background: none;
+   border-bottom: 1px solid #bbb;
+   color: #000;
+   margin: 0 0 8px;
+}
 div.Popup ul.Preview li.Comment {
    padding: 0;
 }

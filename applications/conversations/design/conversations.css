@@ -228,21 +228,22 @@ a.ClearConversation:hover {
 
 
 /* ========================================================= Add Message Form */
-body.Index #Content form {
-  background: #e9f9ff /* Panel Background Color */;
-  padding: 4px 8px 8px;
-  margin: 1px 0 0;
+#MessageForm {
+	background: #E9F9FF;
+	padding: 4px 8px 8px;
+	margin: 1px 0 0;
   -moz-border-radius-bottomleft: 2px;
   -moz-border-radius-bottomright: 2px;
   -webkit-border-bottom-left-radius: 2px;
   -webkit-border-bottom-right-radius: 2px;
 }
-body.Index #Content form label {
+#MessageForm h2 {
   font-size: 115%;
-  color: #2786C2 /* Panel Font Color */;
+  color: #2786C2;
   font-weight: bold;
+  border: 0;
 }
-body.Index #Content form textarea {
+#MessageForm textarea {
   width: 654px;
   height: 100px;
   min-height: 100px;

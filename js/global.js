@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
-   $('a.Popup, .Popup > a').popup();
+   $('a.Popup').popup();
 
    // Make sure that message dismissalls are ajax'd
    $('a.Dismiss').live('click', function() {

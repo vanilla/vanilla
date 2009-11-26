@@ -309,6 +309,16 @@ body.Discussion #Content h2 span {
 .Body em {
    font-style: oblique;
 }
+.Comment .Body ul,
+.Comment .Body ol {
+    margin-left: 3em ! important;
+}
+.Comment .Body ol li {
+  list-style: decimal ! important;
+}
+.Comment .Body ul li {
+  list-style: disc ! important;
+}
 #Discussion fieldset,
 #Discussion form {
    margin: 0;

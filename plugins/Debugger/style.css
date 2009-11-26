@@ -7,6 +7,7 @@ div#Foot {
    border-top: 1px solid #fff;
    padding: 10px 20px;
    margin: 0;
+	text-align: left;
 }
 #Sql h3 {
    font-size: 140%;

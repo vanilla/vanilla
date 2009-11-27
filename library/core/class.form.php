@@ -226,7 +226,10 @@ class Gdn_Form {
             if (is_numeric($Text)) $Text = $ID;
 
             $Instance['value'] = $ID;
-            if (in_array($ID, $CheckedValues)) $Instance['checked'] = 'checked';
+            if (is_array($CheckedValues) && in_array($Data->$ValueField,
+               $CheckedValues)) {
+               $Instance['checked'] = 'checked';
+            }
 
             $Return .= '<li>' . $this->CheckBox($FieldName . '[]', $Text,
                $Instance) . "</li>\n";

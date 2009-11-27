@@ -23,15 +23,15 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 class Gdn_Dummy {
    public function __call ($Name, $Arguments ) {
-		return $this;
+      return $this;
    }
    
    public function __get($Name) {
-		return $this;
+      return $this;
    }
    
    public function __set($Name, $Value) {
-		return $this;
+      return $this;
    }
    
    /**

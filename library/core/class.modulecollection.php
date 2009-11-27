@@ -8,7 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 */
 
-// A module that contains other modules.
+/** 
+ * A module that contains other modules.
+ */
 class Gdn_ModuleCollection extends Module {
    /// PROPERTIES ///
    public $Items = array();

@@ -10,35 +10,35 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 
 // A module that contains other modules.
 class Gdn_ModuleCollection extends Module {
-	/// PROPERTIES ///
-	public $Items = array();
-	
-	/// METHODS ///
-	public function Render() {
-		foreach($this->Items as $Item) {
-			if(is_string($Item)) {
-				echo $Item;
-			} elseif($Item instanceof Gdn_IModule) {
-				$Item->Render();
-			} else {
-				throw new Exception();
-			}
-		}
-	}
-	
-	public function ToString() {
-		$Result = '';
-		
-		foreach($this->Items as $Item) {
-			if(is_string($Item)) {
-				$Result .= $Item;
-			} elseif($Item instanceof Gdn_IModule) {
-				$Result .= $Item->ToString();
-			} else {
-				throw new Exception();
-			}
-		}
-		
-		return $Result;
-	}
+   /// PROPERTIES ///
+   public $Items = array();
+   
+   /// METHODS ///
+   public function Render() {
+      foreach($this->Items as $Item) {
+         if(is_string($Item)) {
+            echo $Item;
+         } elseif($Item instanceof Gdn_IModule) {
+            $Item->Render();
+         } else {
+            throw new Exception();
+         }
+      }
+   }
+   
+   public function ToString() {
+      $Result = '';
+      
+      foreach($this->Items as $Item) {
+         if(is_string($Item)) {
+            $Result .= $Item;
+         } elseif($Item instanceof Gdn_IModule) {
+            $Result .= $Item->ToString();
+         } else {
+            throw new Exception();
+         }
+      }
+      
+      return $Result;
+   }
 }

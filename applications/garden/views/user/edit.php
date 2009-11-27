@@ -40,7 +40,7 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('ResetPassword', 'Reset password and send email notification to user');
       ?>
    </li>
-   <li>
+   <li id="NewPassword">
       <?php
          echo $this->Form->Label('New Password', 'NewPassword');
          echo $this->Form->Input('NewPassword', 'password');

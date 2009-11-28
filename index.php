@@ -27,9 +27,9 @@ require_once(PATH_ROOT.DS.'bootstrap.php');
 
 // 3. Start the application.
 if(strpos(Gdn_Url::Request(), 'gardensetup') === FALSE)
-	Gdn::Session()->Start(Gdn::Authenticator());
+Gdn::Session()->Start(Gdn::Authenticator());
 
-$Dispatcher	= Gdn::Dispatcher();
+$Dispatcher= Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::Config('EnabledApplications');
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);

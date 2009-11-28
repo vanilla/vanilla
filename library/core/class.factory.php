@@ -128,7 +128,7 @@ class Gdn_Factory {
             break;
          case Gdn::FactoryPrototype:
             if(is_null($Data)) {
-               throw new Exception('You mus supply a prototype object when installing an object of type Prototype.');
+               throw new Exception('You must supply a prototype object when installing an object of type Prototype.');
             }
             $Def[Gdn::FactoryPrototype] = $Data;
             break;

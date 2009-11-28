@@ -105,7 +105,7 @@ class Gdn_Form {
             $EndYear = substr($YearRange, 5);
          }
       }
-      if ($StartYear >= $EndYear) {
+      if ($StartYear > $EndYear) {
          $StartYear = 1900;
          $EndYear = date('Y');
       }

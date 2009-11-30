@@ -28,8 +28,8 @@ $PluginInfo['VanillaCommentScore'] = array(
 class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
    
    public function DiscussionController_Render_Before($Sender) {
-      $Sender->AddCssFile('/plugins/CommentScore/commentscore.css');
-      $Sender->Head->AddScript('/plugins/CommentScore/commentscore.js');
+      $Sender->AddCssFile('/plugins/VanillaCommentScore/commentscore.css');
+      $Sender->Head->AddScript('/plugins/VanillaCommentScore/commentscore.js');
    }
    
    public function DiscussionController_CommentOptions_Handler($Sender) {

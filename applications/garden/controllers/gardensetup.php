@@ -219,6 +219,9 @@ class GardenSetupController extends GardenController {
       if (!class_exists('PDO'))
          $this->Form->AddError('You must have PDO enabled in PHP in order for Vanilla to connect to your database.');
 
+      if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
+         $this->Form->AddError('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.');
+
       // Make sure that the correct filesystem permissions are in place
       $ConfigFile = PATH_CONF . DS . 'config.php';
       if (!file_exists($ConfigFile))

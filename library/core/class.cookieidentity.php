@@ -19,32 +19,32 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 
 class Gdn_CookieIdentity {
-	
-	public $CookieName;
-	public $CookiePath;
-	public $CookieDomain;
-	public $CookieHashMethod;
-	public $CookieSalt;
-	
-	public function __contruct($Config = NULL) {
-		$this->Init($Config);
-	}
-	
-	public function Init($Config = NULL) {
-		if(is_null($Config))
-			$Config = Gdn::Config('Garden.Cookie');
-		elseif(is_string($Config))
-			$Config = Gdn::Config($Config);
-			
-		$DefaultConfig = Gdn::Config('Garden.Cookie');			
-		$this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
-		$this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
-		$this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
-		$this->CookieHashMethod = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
-		$this->CookieSalt = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
-	}
-	
-	/**
+   
+   public $CookieName;
+   public $CookiePath;
+   public $CookieDomain;
+   public $CookieHashMethod;
+   public $CookieSalt;
+   
+   public function __contruct($Config = NULL) {
+      $this->Init($Config);
+   }
+   
+   public function Init($Config = NULL) {
+      if(is_null($Config))
+         $Config = Gdn::Config('Garden.Cookie');
+      elseif(is_string($Config))
+         $Config = Gdn::Config($Config);
+         
+      $DefaultConfig = Gdn::Config('Garden.Cookie');         
+      $this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
+      $this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
+      $this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
+      $this->CookieHashMethod = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
+      $this->CookieSalt = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
+   }
+   
+   /**
     * Destroys the user's session cookie - essentially de-authenticating them.
     */
    protected function _ClearIdentity() {
@@ -52,8 +52,8 @@ class Gdn_CookieIdentity {
       setcookie($this->CookieName, ' ', time() - 3600, $this->CookiePath, $this->CookieDomain);
       unset($_COOKIE[$this->CookieName]);
    }
-	
-	/**
+   
+   /**
     * Returns the unique id assigned to the user in the database (retrieved
     * from the session cookie if the cookie authenticates) or FALSE if not
     * found or authentication fails.
@@ -79,8 +79,8 @@ class Gdn_CookieIdentity {
 
       return $UserID;
    }
-	
-	/**
+   
+   /**
     * Returns $this->_HashHMAC with the provided data, the default hashing method
     * (md5), and the server's COOKIE.SALT string as the key.
     *
@@ -92,8 +92,8 @@ class Gdn_CookieIdentity {
 
       return $this->_HashHMAC($this->CookieHashMethod, $Data, $this->CookieSalt);
    }
-	
-	/**
+   
+   /**
     * Returns the provided data hashed with the specified method using the
     * specified key.
     *
@@ -119,19 +119,19 @@ class Gdn_CookieIdentity {
 
       return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
    }
-	
-	
-	/**
+   
+   
+   /**
     * Generates the user's session cookie.
     *
     * @param int $UserID The unique id assigned to the user in the database.
     * @param boolean $Persist Should the user's session remain persistent across visits?
     */
    public function SetIdentity($UserID, $Persist = FALSE) {
-		if(is_null($UserID)) {
-			$this->_ClearIdentity();
-		}
-		
+      if(is_null($UserID)) {
+         $this->_ClearIdentity();
+      }
+      
       if ($Persist !== FALSE) {
          // Note: 2592000 is 60*60*24*30 or 30 days
          $Expiration = $Expire = time() + 2592000;
@@ -150,5 +150,5 @@ class Gdn_CookieIdentity {
       // Create the cookie.
       setcookie($this->CookieName, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain);
    }
-	
+   
 }

@@ -211,10 +211,10 @@ class Gdn_Email extends Gdn_Pluggable {
    
    public function Charset($Use = ''){
       if ($Use != '') {
-         $this->PhpMailer->Charset = $Use;
+         $this->PhpMailer->CharSet = $Use;
          return $this;
       }
-      return $this->PhpMailer->Charset;
+      return $this->PhpMailer->CharSet;
    }
    
 }

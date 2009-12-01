@@ -368,6 +368,7 @@ strong {
    padding: 3px 6px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+	text-shadow: 1px 1px 1px #444;
 }
 .Alert a {
    color: #fff;

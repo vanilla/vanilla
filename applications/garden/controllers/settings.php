@@ -196,9 +196,6 @@ class SettingsController extends GardenController {
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
       
-      // Make sure the phone-home code knows where to ping:
-      $this->AddDefinition('UpdateCheckUrl', Gdn::Config('Garden.UpdateCheckUrl', ''));
-      
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.

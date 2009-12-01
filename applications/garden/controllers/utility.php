@@ -106,6 +106,35 @@ class UtilityController extends GardenController {
       $this->Render();
    }
    
+   // Because you cannot send xmlhttprequests across domains, we need to use
+   // a proxy to check for updates.
+   public function UpdateProxy() {
+      $Fields = $_POST;
+      foreach ($Fields as $Field => $Value) {
+         if (get_magic_quotes_gpc()) {
+            if (is_array($Value)) {
+               $Count = count($Value);
+               for ($i = 0; $i < $Count; ++$i) {
+                  $Value[$i] = stripslashes($Value[$i]);
+               }
+            } else {
+               $Value = stripslashes($Value);
+            }
+            $Fields[$Field] = $Value;
+         }
+      }
+
+      $Handler = curl_init();
+      curl_setopt($Handler, CURLOPT_URL, Gdn::Config('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update'));
+      curl_setopt($Handler, CURLOPT_HEADER, 0);
+      curl_setopt($Handler, CURLOPT_POST, 1);
+      curl_setopt($Handler, CURLOPT_POSTFIELDS, http_build_query($Fields));
+      curl_exec($Handler);
+      curl_close($Handler);
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
+   }
+
    public function UpdateResponse() {
       // Get the message, response, and transientkey
       $Messages = GetIncomingValue('Messages', '');

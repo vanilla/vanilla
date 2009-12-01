@@ -1,9 +1,8 @@
 jQuery(document).ready(function($) {
    
    // Phone-home to the VanillaForums server to check for updates
-   var homeUrl = definition('UpdateCheckUrl', '');
    var updateChecks = definition('UpdateChecks', '');
-   if (homeUrl != '' && updateChecks != '') {
+   if (updateChecks != '') {
       var webroot = definition('WebRoot', '');
       var data = 'source='+webroot
          +'&users='+definition('CountUsers', 0)
@@ -15,7 +14,7 @@ jQuery(document).ready(function($) {
 
       $.ajax({
          type: "POST",
-         url: homeUrl,
+         url: webroot + '/garden/utility/updateproxy',
          data: data,
          dataType: 'json',
          success: function(json) {

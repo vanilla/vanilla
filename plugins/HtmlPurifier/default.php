@@ -15,9 +15,6 @@ $PluginInfo['HTMLPurifier'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
-   //'RegisterPermissions' => array('Plugins.MetaData.Manage'),
-   //'SettingsUrl' => '/garden/plugin/metadata', // Url of the plugin's settings page.
-   //'SettingsPermission' => 'Plugins.MetaData.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@lussumo.com',
    'AuthorUrl' => 'http://toddburry.com'
@@ -30,14 +27,14 @@ class HTMLPurifierPlugin implements Gdn_IPlugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
 		$HPConfig = HTMLPurifier_Config::createDefault();
-		$HPConfig->set('HTML', 'Doctype', 'XHTML 1.0 Strict');
+		$HPConfig->set('HTML.Doctype', 'XHTML 1.0 Strict');
 		// Get HtmlPurifier configuration settings from Garden
 		$HPSettings = Gdn::Config('HtmlPurifier');
 		if(is_array($HPSettings)) {
 			foreach ($HPSettings as $Namespace => $Setting) {
 				foreach ($Setting as $Name => $Value) {
 					// Assign them to htmlpurifier
-					$HPConfig->set($Namespace, $Name, $Value);
+					$HPConfig->set($Namespace.'.'.$Name, $Value);
 				}
 			}
 		}

@@ -1338,7 +1338,8 @@ class Gdn_Form {
                   'multiline',
                   'default',
                   'textfield',
-                  'valuefield'))) $Return .= ' ' . $Attribute .
+                  'valuefield',
+                  'includenull'))) $Return .= ' ' . $Attribute .
                 '="' . $Value . '"';
          }
       }

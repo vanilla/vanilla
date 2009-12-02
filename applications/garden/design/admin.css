@@ -793,6 +793,9 @@ div.Popup div.Messages {
 	margin: 10px 0 !important;
 	font-family: 'lucida grande';
 }
+div.Popup div.Warning {
+	margin: 10px 0 0;
+}
 div.Popup div.Messages ul {
 	display: block;
 	-moz-border-radius: 2px;

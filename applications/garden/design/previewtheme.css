@@ -4,11 +4,11 @@ body {
    padding: 0;
 }
 div {
-   font: 14px "Helvetica Neue",Helvetica,arial,sans-serif;
+   font: 14px 'lucida grande', "Helvetica Neue",Helvetica,arial,sans-serif;
    padding: 0 12px;
-   background: #F0FBFF;
-   border-bottom: 1px solid #caf0fe;
-   color: #2786C2;
+   background: #464646;
+   border-bottom: 1px solid #333;
+   color: #fff;
    text-align: right;
    height: 40px;
    overflow: hidden;
@@ -31,19 +31,16 @@ strong em {
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
+   font-family: 'lucida grande', Tahoma, 'Trebuchet MS', Arial, Verdana;
    padding: 4px;
-   font-size: 11px;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #555;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   margin-left: 16px;
+   font-size: 12px;
+   color: #ddd;
    text-decoration: none;
    }
 .Button:hover {
-   color: #333;
-   border: 1px solid #888;
+   color: #fff;
+   text-decoration: underline;
 }
 iframe {
    width: 100%;

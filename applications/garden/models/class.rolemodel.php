@@ -28,7 +28,7 @@ class Gdn_RoleModel extends Gdn_Model {
          
          if(is_null($RoleID)) {
             // Figure out the next role ID which is the next biggest power of two.
-            $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Value('RoleID', 0);
+            $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
             $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
             $Values['RoleID'] = $RoleID;
             

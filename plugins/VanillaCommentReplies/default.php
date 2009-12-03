@@ -39,7 +39,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      $Sender->Head->AddScript('/plugins/VanillaCommentReplies/replies.js');
+      $Sender->AddJsFile('/plugins/VanillaCommentReplies/replies.js');
       $Sender->AddCssFile('/plugins/VanillaCommentReplies/style.css');
       $this->ReplyModel = Gdn::Factory('ReplyModel');
       $RequestMethod = strtolower($Sender->RequestMethod);

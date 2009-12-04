@@ -14,33 +14,15 @@ class GardenHooks implements Gdn_IPlugin {
    }
    
    public function Base_Render_Before(&$Sender) {
-      // Add menu items.
       $Session = Gdn::Session();
-      /*
-      if ($Sender->Menu) {
-         $Sender->Menu->AddLink('Dashboard', Gdn::Translate('Dashboard'), '/garden/settings', array('Garden.Settings.Manage'));
-         $Sender->Menu->AddLink('Dashboard', Gdn::Translate('Users'), '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-         $Sender->Menu->AddLink('Activity', Gdn::Translate('Activity'), '/activity');
-         $Authenticator = Gdn::Authenticator();
-         if ($Session->IsValid()) {
-            $Name = $Session->User->Name;
-            $CountNotifications = $Session->User->CountNotifications;
-            if (is_numeric($CountNotifications) && $CountNotifications > 0)
-               $Name .= '<span>'.$CountNotifications.'</span>';
-               
-            $Sender->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'));
-            $Sender->Menu->AddLink('SignOut', Gdn::Translate('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab'));
-         } else {
-            $Sender->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($Sender->SelfUrl));
-         }
-      }
-      */
+
       // Enable theme previewing
       if ($Session->IsValid()) {
          $PreviewTheme = $Session->GetPreference('PreviewTheme', '');
          if ($PreviewTheme != '')
             $Sender->Theme = $PreviewTheme;
       }
+
       // Add Message Modules (if necessary)
       $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
       $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;

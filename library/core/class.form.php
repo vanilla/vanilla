@@ -804,11 +804,8 @@ class Gdn_Form {
       $MultiLine = ArrayValueI('MultiLine', $Attributes);
       
       if ($MultiLine) {
-         if (!InArrayI('rows', $Attributes))
-            $Attributes['rows'] = '6'; // For xhtml compliance
-   
-         if (!InArrayI('cols', $Attributes))
-            $Attributes['cols'] = '100'; // For xhtml compliance
+         $Attributes['rows'] = ArrayValueI('rows', $Attributes, '6'); // For xhtml compliance
+         $Attributes['cols'] = ArrayValueI('cols', $Attributes, '100'); // For xhtml compliance
       }
 
       $CssClass = ArrayValueI('class', $Attributes);

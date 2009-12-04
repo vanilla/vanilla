@@ -111,9 +111,9 @@ ul.DataList li ul li.Title strong a {
    background: none;
 }
 ul.DataList li ul li.Meta {
-   font-family: 'lucida grande';
+   font-family: 'lucida grande',tahoma,sans-serif;
    margin-left: 5px;
-   font-size: 80%;
+   font-size: 11px;
    color: #80828c /* Meta Label Font Color */;
 }
 ul.DataList li ul li.Meta span,
@@ -241,7 +241,7 @@ body.Discussion #Content h2 span {
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
-   font-family: 'lucida grande';
+   font-family: 'lucida grande',tahoma,sans-serif;
    font-size: 11px;
    color: #777 /* Meta Label Font Color */;
    padding: 8px 0 0 8px;
@@ -282,7 +282,7 @@ body.Discussion #Content h2 span {
    font-size: 100%;
 }
 .Body p {
-   font-family: 'lucida grande';   
+   font-family: 'lucida grande',tahoma,sans-serif;   
    margin: 8px 0;
 }
 .Body blockquote {
@@ -405,8 +405,8 @@ ul.Options li.Parent strong {
    display: block;
    padding: 4px;
    margin: 3px 4px 0 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   font-size: 10px;
+   font-family: 'lucida grande', Tahoma, sans-serif;
+   font-size: 11px;
    font-weight: normal;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
@@ -482,7 +482,7 @@ ul.Drafts li ul li.Title a.DeleteDraft {
    padding: 4px;
    margin: 3px 1px 0 0;
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   font-size: 10px;
+   font-size: 11px;
    font-weight: normal;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;

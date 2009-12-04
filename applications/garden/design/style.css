@@ -25,6 +25,7 @@ Welcome to the Generic Style CSS File! Some things you should know:
 body {
    color: #000;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    background: #fff;
    margin: 0;
    padding: 0;
@@ -141,9 +142,9 @@ select {
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   padding: 4px;
+   font-family: 'lucida grande', Tahoma, sans-serif;
    font-size: 11px;
+   padding: 4px;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
    color: #555;
    border: 1px solid #bbb;
@@ -324,7 +325,7 @@ tr#PagerMore td {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;
-	font-size: 120%;
+	font-size: 16px;
 }
 #PagerBefore {
    margin: 1px 0;
@@ -341,8 +342,8 @@ tr#PagerMore td {
 .NumberedPager span.Next,
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	font-family: 'lucida grande';
-	font-size: 120%;
+	font-family: 'lucida grande', tahoma, sans-serif;
+	font-size: 16px;
 	line-height: 10px;
 }
 .NumberedPager a.Next,
@@ -417,7 +418,7 @@ body #Head h1 {
    -webkit-border-bottom-right-radius: 2px;
 }
 #Menu * {
-   font-family: tahoma;
+   font-family: 'lucida grande', tahoma, sans-serif;
 }
 #Menu {
    height: 28px;
@@ -666,7 +667,7 @@ ul.PanelInfo li {
    background: #f5fcff;
    border-bottom: 1px solid #caf0fe;
    padding: 2px 4px;
-   font-family: tahoma;
+   font-family: 'lucida grande', tahoma, sans-serif;
    text-align: right;
 }
 ul.PanelInfo {
@@ -827,12 +828,10 @@ ul.Activities {
 	margin-bottom: 6px;
 }
 ul.Activities li {
-	font-family: 'lucida grande';
    border-bottom: 1px solid #ddd;
    padding: 8px 0 6px;
    color: #454545;
    clear: left;
-   font-size: 105%;
 }
 ul.Activities div span {
    padding: 0 6px 0 0;
@@ -936,7 +935,7 @@ ul.Activities ul.Comments li {
    line-height: 1;
 }
 ul.Activities ul.Comments li * {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande', tahoma, sans-serif;
 }
 ul.Activities li.HasPhoto div {
    margin-left: 46px;
@@ -1059,7 +1058,6 @@ ul.DataList li ul li.Title strong a {
    background: none;
 }
 ul.DataList li ul li.Meta {
-   font-family: tahoma;
    margin-left: 5px;
    font-size: 80%;
    color: #80828c /* Meta Label Font Color */;
@@ -1146,7 +1144,6 @@ div.User h1 {
    line-height: 1;
 }
 #Status a {
-	font-family: 'lucida grande';
    text-transform: lowercase;
    font-size: 11px;
    text-decoration: none;
@@ -1312,7 +1309,6 @@ div.Popup div.Messages {
    left: auto;
    z-index: auto;
 	margin: 10px 0 !important;
-	font-family: 'lucida grande';
 }
 div.Popup div.Messages ul {
 	display: block;
@@ -1369,7 +1365,6 @@ div.Popup .Loading {
 }
 div.Popup h1,
 div.Popup h2 {
-	font-family: 'lucida grande';
 	font-size:120%;
 	font-weight:bold;
 	margin-bottom: 0;
@@ -1396,17 +1391,16 @@ div.Popup h3 {
 }
 div.Popup p {
 	padding: 6px 10px 10px;
-	font-family: 'lucida grande';
 }
 div.Popup div.Legal * {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande', tahoma, sans-serif;
 }
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande';
-	font-size: 80%;
+	font-family: 'lucida grande', tahoma, sans-serif;
+	font-size: 11px;
 }
 div.Popup form p {
 	padding: 0;

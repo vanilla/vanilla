@@ -726,7 +726,9 @@ class Gdn_UserModel extends Gdn_Model {
     * @return object
     */
    public function ValidateCredentials($Email = '', $ID = 0, $Password) {
-      if (!$Email && !$ID)
+      $this->FireEvent('BeforeValidateCredentials');
+		
+		if (!$Email && !$ID)
          throw new Exception('The email or id is required');
 
       $this->SQL->Select('UserID, Attributes, Admin, Password, CacheRoleID')

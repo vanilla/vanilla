@@ -197,6 +197,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                
                $this->_ControllerMethod = 'Index';
                $ControllerMethod = 'Index';
+               
+               $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
             }
          }
          // Pass in the querystring values
@@ -211,31 +213,38 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Call the requested method on the controller - error out if not defined.
          if ($PluginManagerHasReplacementMethod || method_exists($Controller, $ControllerMethod)) {
             // call_user_func_array is too slow!!
-            // call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
-            $Args = $this->_ControllerMethodArgs;
-            $Count = count($Args);
-            if ($Count == 0) {
-               $Controller->$ControllerMethod();
-            } else if ($Count == 1) {
-               $Controller->$ControllerMethod($Args[0]);
-            } else if ($Count == 2) {
-               $Controller->$ControllerMethod($Args[0], $Args[1]);
-            } else if ($Count == 3) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2]);
-            } else if ($Count == 4) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3]);
-            } else if ($Count == 5) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
-            } else if ($Count == 6) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
-            } else if ($Count == 7) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
-            } else if ($Count == 8) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
-            } else if ($Count == 9) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8]);
+            //call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
+            
+            if ($PluginManagerHasReplacementMethod) {
+              $PluginManager->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
             } else {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8], $Args[9]);
+              
+              $Args = $this->_ControllerMethodArgs;
+              $Count = count($Args);
+              
+              if ($Count == 0) {
+                 $Controller->$ControllerMethod();
+              } else if ($Count == 1) {
+                 $Controller->$ControllerMethod($Args[0]);
+              } else if ($Count == 2) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1]);
+              } else if ($Count == 3) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2]);
+              } else if ($Count == 4) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3]);
+              } else if ($Count == 5) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
+              } else if ($Count == 6) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
+              } else if ($Count == 7) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
+              } else if ($Count == 8) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
+              } else if ($Count == 9) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8]);
+              } else {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8], $Args[9]);
+              }
             }
          } else {
             trigger_error(ErrorMessage('Controller method missing: '.$this->_ControllerName.'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);

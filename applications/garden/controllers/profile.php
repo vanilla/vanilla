@@ -471,16 +471,20 @@ class ProfileController extends Gdn_Controller {
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');
          
-         $EditUrl = $Session->CheckPermission('Garden.Users.Edit') ? '/user/edit/'.$this->User->UserID : '/profile/edit/'.$this->User->UserID;
          if ($this->User->UserID != $ViewingUserID) {
+            // Include user js files for people with edit users permissions
+            if ($Session->CheckPermission('Garden.Users.Edit')) {
+              $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+              $this->AddJsFile('user.js');
+            }
+            
             // Add profile options for everyone
             if ($this->User->Photo != '')
                $SideMenu->AddLink('Options', 'Change Picture', '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
             
-            $SideMenu->AddLink('Options', 'Edit Account', $EditUrl, 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', 'Edit Account', '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
             if ($this->User->Photo != '')
                $SideMenu->AddLink('Options', 'Remove Picture', '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
-               
          } else {
             // Add profile options for the profile owner
             $SideMenu->AddLink('Options', 'Change My Picture', '/profile/picture', FALSE, array('class' => 'PictureLink'));

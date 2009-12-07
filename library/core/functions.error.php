@@ -260,5 +260,25 @@ if (!function_exists('LogMessage')) {
    }
 }
 
+if (!function_exists('CleanErrorArguments')) {
+   function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
+      if (is_array($Var)) {
+         foreach ($Var as $Key => $Value) {
+            if (in_array(strtolower($Key), $BlackList)) {
+               $Var[$Key] = 'SECURITY';
+            } else {
+               if (is_object($Value)) {
+                  $Value = Format::ObjectAsArray($Value);
+                  $Var[$Key] = $Value;
+               }
+                  
+               if (is_array($Value))
+                  CleanErrorArguments($Var[$Key], $BlackList);
+            }
+         }
+      }
+   }
+}
+
 // Set up Garden to handle php errors
 set_error_handler('ErrorHandler', E_ALL);

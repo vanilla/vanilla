@@ -807,6 +807,9 @@ div.Popup div.Messages ul {
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
+div.Popup div.Info {
+	border: 0;
+}
 * html div.Popup div.Messages {
   position: inherit;
   width: auto;

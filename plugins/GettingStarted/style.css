@@ -7,6 +7,7 @@ div.GettingStarted {
    border: 1px solid #C0E7F5 /* Panel Inlay Border Color */;
 }
 div.GettingStarted a.Dismiss {
+	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 	font-weight: bold;
 	font-size: 22px;
 	float: right;

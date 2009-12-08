@@ -70,7 +70,7 @@ printf(
 <?php if (count($this->AvailableThemes) > 1) { ?>
 <div class="BrowseThemes">
    <h3><?php echo Gdn::Translate('Other Themes'); ?></h3>
-   <table class="Themes">
+   <table class="SelectionGrid Themes">
       <tbody>
    <?php
    $Alt = FALSE;

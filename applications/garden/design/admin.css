@@ -942,12 +942,12 @@ body.themes h3 {
 .CurrentTheme h4 span {
 	padding-left: 10px;
 }
-table.Themes {
+table.SelectionGrid {
 	background: none;
 	border-left: 0;
 	border-right: 0;
 }
-table.Themes td {
+table.SelectionGrid td {
 	width: 33%;
 	border: 1px solid #C0E7F5;
 	border-left: 0;
@@ -958,10 +958,10 @@ table.Themes td {
 table.Themes td h4 {
 	padding: 6px 0;
 }
-table td.FirstCol {
+table.SelectionGrid td.FirstCol {
 	border-right: 1px solid #C0E7F5;
 }
-table td.LastCol {
+table.SelectionGrid td.LastCol {
 	border-left: 1px solid #C0E7F5;
 }
 

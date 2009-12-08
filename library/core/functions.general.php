@@ -285,6 +285,18 @@ if (!function_exists('ArrayValueI')) {
    }
 }
 
+if (!function_exists('ArrayKeyExistsI')) {
+   function ArrayKeyExistsI($Key, $Search) {
+      if (is_array($Search)) {
+         foreach ($Search as $k => $v) {
+            if (strtolower($Key) == strtolower($k))
+               return TRUE;
+         }
+      }
+      return FALSE;
+   }
+}
+
 if (!function_exists('InArrayI')) {
    /**
     * Case-insensitive version of php's native in_array function.

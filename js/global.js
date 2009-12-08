@@ -134,6 +134,16 @@ jQuery(document).ready(function($) {
       }
       return string;
    }
+   
+   combinePaths = function(path1, path2) {
+      if (path1.substr(-1, 1) == '/')
+         path1 = path1.substr(0, path1.length - 1);
+         
+      if (path2.substring(0, 1) == '/')
+         path2 = path2.substring(1);
+      
+      return path1 + '/' + path2;
+   }
 
    processTargets = function(targets) {
       if(!targets || !targets.length)

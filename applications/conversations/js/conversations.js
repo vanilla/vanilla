@@ -96,7 +96,7 @@ jQuery(document).ready(function($) {
    // Enable multicomplete on selected inputs
    $('.MultiComplete').livequery(function() {
       $(this).autocomplete(
-         definition('WebRoot') + '/garden/user/autocomplete/',
+         combinePaths(definition('WebRoot'), 'index.php/garden/user/autocomplete/'),
          {
             minChars: 1,
             multiple: true,

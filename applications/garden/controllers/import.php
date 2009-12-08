@@ -179,6 +179,7 @@ class ImportController extends GardenController {
          $this->RedirectUrl = Url('/import/4');
       } else if ($Step == 4) {
          // 4. Import user role relationships
+         $SQL->Delete('UserRole', array('UserID <>' => 0));
          $Database->Query("insert into ".$DestPrefix."UserRole
          (UserID, RoleID)
          select u.UserID, r.RoleID

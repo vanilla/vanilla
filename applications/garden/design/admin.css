@@ -149,6 +149,7 @@ body {
 	border-top:1px solid #C0E7F5;
 }
 #Content {
+	font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
    margin: 15px 15px 15px 180px;
 }
 .Hidden {
@@ -169,6 +170,9 @@ h1, h2, h3, h4, h5, h6 {
    font-weight: normal;
    margin: 0;
 }
+#Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
+	font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+}
 p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
@@ -181,15 +185,14 @@ h1, h2 {
 	text-shadow: #fff 0 1px 0;
 }
 h3 {
-   font-size:140%;
+   font-size:120%;
 }
 h4 {
-   font-size: 120%;
-   color: #6C6C6C /* Body Subheading Font Color */;
+   font-size: 110%;
+	font-weight: bold;
 }
 h5 {
-   font-size: 120%;
-   color: #6C6C6C /* Body Subheading Font Color */;
+   font-size: 110%;
 }
 a,
 a:link,
@@ -207,12 +210,12 @@ input.InputBox,
 input.SmallInput,
 textarea {
    font-family: arial;
-   color: #555;
+   color: #888;
    font-size: 16px;
    padding: 3px;
    margin: 0;
    width: 250px;
-   border: 1px solid #C0E7F5;
+   border: 1px solid #ccc;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 }
@@ -235,6 +238,8 @@ input.SmallInput:focus,
 input.InputBox:focus,
 textarea:focus {
    background: #ffe;
+	color: #333;
+	border: 1px solid #aaa;
 }
 textarea {
    line-height: 128%;
@@ -357,6 +362,7 @@ div.Info {
    -moz-border-radius: 2px;
    padding: 6px;
    margin: 0 0 10px;
+	border: 1px solid #CAF0FE;
 }
 strong {
 	font-weight: bold;
@@ -537,7 +543,6 @@ table {
    margin: 10px 0;
 	background: #F2FBFF;
 	border: 1px solid #C0E7F5;
-	border-bottom: 0;
 }
 table label {
    font-size: 12px;
@@ -566,7 +571,7 @@ table tbody th {
 }
 table tbody th,
 table tbody td {
-   border-bottom: 1px solid #CAF0FE;
+   border-bottom: 1px solid #C0E7F5;
    line-height: 150%;
 }
 table tbody tr.FootNote td {
@@ -629,7 +634,7 @@ table tbody td blockquote {
 table.Sortable tbody td {
    cursor: move;
 }
-/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications, themes) that need to override default styles */
+/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications) that need to override default styles */
 table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
@@ -643,6 +648,7 @@ table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td {
    background: #E9F9FF /* Body Background Color */;
 }
+
 /* CheckBoxGrid */
 .CheckBoxGrid {
    margin: 10px 0;
@@ -913,6 +919,52 @@ div.Popup .Footer {
 div.Popup .Footer input.Button {
 	font-size: 11px;
 }
+
+/* =================================================================== Themes */
+body.themes #Content img {
+	border: 1px solid #777;
+}
+body.themes h3 {
+	padding: 0 0 10px;
+}
+.CurrentTheme img {
+	float: left;
+	margin: 0 20px 0 0;
+}
+.CurrentTheme {
+	min-height: 170px;
+	border-bottom: 1px solid #AFD3E0;
+	margin-bottom: 20px;
+}
+.CurrentTheme h4 {
+	padding: 6px 0;
+}
+.CurrentTheme h4 span {
+	padding-left: 10px;
+}
+table.Themes {
+	background: none;
+	border-left: 0;
+	border-right: 0;
+}
+table.Themes td {
+	width: 33%;
+	border: 1px solid #C0E7F5;
+	border-left: 0;
+	border-right: 0;
+	padding: 16px;
+	vertical-align: top;
+}
+table.Themes td h4 {
+	padding: 6px 0;
+}
+table td.FirstCol {
+	border-right: 1px solid #C0E7F5;
+}
+table td.LastCol {
+	border-left: 1px solid #C0E7F5;
+}
+
 
 
 /* =================================================================== Footer */

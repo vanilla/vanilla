@@ -17,100 +17,154 @@ printf(
    '<span class="Warning">'.PATH_THEMES.'</span>'
 );
 ?></div>
-<table class="AltRows">
-   <thead>
-      <tr>
-         <th><?php echo Gdn::Translate('Theme'); ?></th>
-         <th><?php echo Gdn::Translate('Description'); ?></th>
-      </tr>
-   </thead>
-   <tbody>
-<?php
-$Alt = FALSE;
-foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-   $ScreenName = ArrayValue('Name', $ThemeInfo, $ThemeName);
-   $ThemeFolder = ArrayValue('Folder', $ThemeInfo, '');
-   $Version = ArrayValue('Version', $ThemeInfo, '');
-   $ThemeUrl = ArrayValue('Url', $ThemeInfo, '');
-   $Author = ArrayValue('Author', $ThemeInfo, '');
-   $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
-   $Active = $ThemeFolder == $this->EnabledThemeFolder;
-   $Alt = $Alt ? FALSE : TRUE;
-   $NewVersion = ArrayValue('NewVersion', $ThemeInfo, '');
+<div class="CurrentTheme">
+   <h3><?php echo Gdn::Translate('Current Theme'); ?></h3>
+   <?php
+   $Version = ArrayValue('Version', $this->EnabledTheme, '');
+   $ThemeUrl = ArrayValue('Url', $this->EnabledTheme, '');
+   $Author = ArrayValue('Author', $this->EnabledTheme, '');
+   $AuthorUrl = ArrayValue('AuthorUrl', $this->EnabledTheme, '');   
+   $NewVersion = ArrayValue('NewVersion', $this->EnabledTheme, '');
    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-   $RowClass = $Active ? 'Enabled' : 'Disabled';
-   if ($Alt) $RowClass .= ' Alt';
-   ?>
-   <tr class="More <?php echo $RowClass; ?>">
-      <th><?php echo $ThemeName; ?></th>
-      <td class="Alt"><?php echo ArrayValue('Description', $ThemeInfo, '&nbsp;'); ?></td>
-   </tr>
-   <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
-      <td class="Info">
-         <?php
-         if($Active) {
-            echo Translate('Active');
-         } else {
-            echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), '', array('target' => '_top'));
-            echo '<span>|</span>';
-            echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, '', array('target' => '_top'));
-         }
-         ?>
-      </td>
-      <td class="Info Alt">
-      <?php
-         $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
-         $Info = '';
-         if ($Version != '')
-            $Info = sprintf(Translate('Version %s'), $Version);
-            
-         if (is_array($RequiredApplications)) {
-            if ($Info != '')
-               $Info .= '<span>|</span>';
-
-            $Info .= Translate('Requires: ');
-         }
-            
-         $i = 0;
-         if (is_array($RequiredApplications)) {
-            if ($i > 0)
-               $Info .= ', ';
-            
-            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
-               $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-               ++$i;
-            }
-         }
-
-         if ($Author != '') {
-            $Info .= '<span>|</span>';
-            $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
-         }
+   $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot{.gif,.jpg,.png}", GLOB_BRACE);
+   $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
+   if ($PreviewImage)
+      echo '<img src="'.Asset('/themes/'.$this->EnabledThemeFolder.'/'.$PreviewImage).'" alt="'.$this->EnabledThemeName.'" height="112" width="150" />';
+   
+   echo '<h4>';
+      echo $ThemeUrl != '' ? Url($this->EnabledThemeName, $ThemeUrl) : $this->EnabledThemeName;
+      if ($Version != '')
+         echo '<span class="Version">'.sprintf(Translate('version %s'), $Version).'</span>';
          
-         if ($ThemeUrl != '') {
-            $Info .= '<span>|</span>';
-            $Info .= Anchor('Visit Theme Site', $ThemeUrl);
-         }
-         
-         echo $Info != '' ? $Info : '&nbsp;';
-      ?>
-      </td>
-   </tr>
-   <?php
-   if ($Upgrade) {
-      ?>
-      <tr class="<?php echo $RowClass; ?>">
-         <td colspan="2"><div class="Alert"><a href="<?php
-            echo CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/');
-         ?>"><?php
-            printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
-         ?></a></div></td>
-      </tr>
-   <?php
+      if ($Author != '')
+         echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
+   
+   echo '</h4>';
+   echo '<div class="Description">'.ArrayValue('Description', $this->EnabledTheme, '').'</div>';
+   
+   $RequiredApplications = ArrayValue('RequiredApplications', $this->EnabledTheme, FALSE);
+   if (is_array($RequiredApplications)) {
+      echo '<div class="Requirements">'.Translate('Requires: ');
+
+      $i = 0;
+      if ($i > 0)
+         echo ', ';
+      
+      foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+         printf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+         ++$i;
+      }
+      echo '</div>';
    }
-}
-?>
-   </tbody>
-</table>
+   
+   if ($Upgrade) {
+      echo '<div class="Alert">';
+      echo Url(
+            sprintf(Gdn::Translate('%1$s version %2$s is available.'), $this->EnabledThemeName, $NewVersion),
+            CombinePaths(array($AddonUrl, 'find', urlencode($this->EnabledThemeName)), '/')
+         );
+      echo '</div>';
+   }
+   ?>
+</div>
+<?php if (count($this->AvailableThemes) > 1) { ?>
+<div class="BrowseThemes">
+   <h3><?php echo Gdn::Translate('Other Themes'); ?></h3>
+   <table class="Themes">
+      <tbody>
+   <?php
+   $Alt = FALSE;
+   $Cols = 3;
+   $Col = 0;
+   foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+      $ScreenName = ArrayValue('Name', $ThemeInfo, $ThemeName);
+      $ThemeFolder = ArrayValue('Folder', $ThemeInfo, '');
+      $Active = $ThemeFolder == $this->EnabledThemeFolder;
+      if (!$Active) {
+         $Version = ArrayValue('Version', $ThemeInfo, '');
+         $ThemeUrl = ArrayValue('Url', $ThemeInfo, '');
+         $Author = ArrayValue('Author', $ThemeInfo, '');
+         $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
+         $NewVersion = ArrayValue('NewVersion', $ThemeInfo, '');
+         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+         $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot{.gif,.jpg,.png}", GLOB_BRACE);
+         $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
+            
+         $Col++;
+         if ($Col == 1) {
+            $ColClass = 'FirstCol';
+            echo '<tr>';
+         } elseif ($Col == 2) {
+            $ColClass = 'MiddleCol';      
+         } else {
+            $ColClass = 'LastCol';
+            $Col = 0;
+         }
+         $ColClass .= $Active ? ' Enabled' : '';
+         ?>
+            <td class="<?php echo $ColClass; ?>">
+               <?php
+                  if ($PreviewImage) {
+                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="180" width="240" />',
+                        'garden/settings/previewtheme/'.$ThemeFolder,
+                        '',
+                        array('target' => '_top')
+                     );
+                  }
+                  echo '<h4>';
+                     echo $ThemeUrl != '' ? Url($ThemeName, $ThemeUrl) : $ThemeName;
+                     if ($Version != '')
+                        $Info = sprintf(Translate('Version %s'), $Version);
+                        
+                     if ($Author != '')
+                        $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
+      
+                  echo '</h4>';
+                  echo '<div class="FilterMenu">';
+                  echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), '', array('target' => '_top'));
+                  echo '<span>|</span>';
+                  echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, '', array('target' => '_top'));
+                  echo '</div>';
+                  echo ArrayValue('Description', $ThemeInfo, '&nbsp;');
+      
+                  $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
+                  if (is_array($RequiredApplications)) {
+                     echo Translate('Requires: ');
+                  }
+                  $i = 0;
+                  if (is_array($RequiredApplications)) {
+                     if ($i > 0)
+                        echo ', ';
+                     
+                     foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+                        printf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                        ++$i;
+                     }
+                  }
+                  
+                  if ($Upgrade) {
+                     echo '<div class="Alert">';
+                     echo Url(
+                           sprintf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
+                           CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')
+                        );
+                     echo '</div>';
+                  }
+               ?>
+            </td>
+            <?php
+         if ($Col == 3)
+            echo '</tr>';
+      }
+   }
+   // Close the row if it wasn't a full row.
+   if ($Col != 3)
+      echo '<td class="LastCol"'.($Col == 1 ? ' colspan="2"' : '').'>&nbsp;</td></tr>';
+   ?>
+      </tbody>
+   </table>
+</div>
 <?php
-   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+}
+
+printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');

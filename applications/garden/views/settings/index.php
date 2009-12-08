@@ -15,7 +15,7 @@ $this->RenderAsset('Messages');
                   echo $Alt;
                ?>">
                   <th><?php echo $Value; ?></th>
-                  <th class="Alt"><?php echo $Name; ?></th>
+                  <td class="Alt"><?php echo $Name; ?></td>
                </tr>
                <?php
             }
@@ -48,7 +48,7 @@ $this->RenderAsset('Messages');
                   echo UserPhoto($User);
                   echo UserAnchor($User);
                ?></th>
-               <th class="Alt"><?php echo Format::Date($User->DateLastActive); ?></th>
+               <td class="Alt"><?php echo Format::Date($User->DateLastActive); ?></td>
             </tr>
             <?php
          }

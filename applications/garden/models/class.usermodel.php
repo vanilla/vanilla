@@ -726,6 +726,7 @@ class Gdn_UserModel extends Gdn_Model {
     * @return object
     */
    public function ValidateCredentials($Email = '', $ID = 0, $Password) {
+      $this->EventArguments['Credentials'] = array('Email'=>$Email, 'ID'=>$ID, 'Password'=>$Password);
       $this->FireEvent('BeforeValidateCredentials');
 
       if (!$Email && !$ID)

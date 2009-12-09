@@ -306,10 +306,10 @@ class ImportController extends GardenController {
 
          // Update the UserConversation.LastMessageID records
          // (ie. the last message in a conversation by someone other than the userconversation.userid person)
-         $Database->Query("update ".$DestPrefix."userconversation uc
+         $Database->Query("update ".$DestPrefix."UserConversation uc
          join (
            select ConversationID, InsertUserID, max(MessageID) as LastMessageID
-           from ".$DestPrefix."conversationmessage
+           from ".$DestPrefix."ConversationMessage
            group by ConversationID, InsertUserID
          ) m
            on uc.ConversationId = m.ConversationID

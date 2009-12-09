@@ -27,7 +27,7 @@ $Construct->Table('Conversation')
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('DateInserted', 'datetime', FALSE, 'key')
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
    ->Set($Explicit, $Drop);
@@ -56,7 +56,7 @@ $Construct->Table('ConversationMessage')
    ->Column('Body', 'text')
    ->Column('Format', 'varchar(20)', NULL)
    ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('DateInserted', 'datetime', FALSE, 'key')
    ->Set($Explicit, $Drop);
    
 // Add extra columns to user table for tracking discussions, comments & replies

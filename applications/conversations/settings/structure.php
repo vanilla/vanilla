@@ -27,7 +27,7 @@ $Construct->Table('Conversation')
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('DateInserted', 'datetime', FALSE, 'key')
+   ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
    ->Set($Explicit, $Drop);
@@ -55,7 +55,7 @@ $Construct->Table('ConversationMessage')
    ->Column('ConversationID', 'int')
    ->Column('Body', 'text')
    ->Column('Format', 'varchar(20)', NULL)
-   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('InsertUserID', 'int', NULL, 'key')
    ->Column('DateInserted', 'datetime', FALSE, 'key')
    ->Set($Explicit, $Drop);
    

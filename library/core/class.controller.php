@@ -423,22 +423,22 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function DefinitionList() {
       $Session = Gdn::Session();
-      $Return = '<!-- Various Definitions for Javascript //-->
-         <ul id="Definitions" style="display: none;">
-            <li id="TransportError">'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'</li>
-            <li id="TransientKey">'.$Session->TransientKey().'</li>
-            <li id="WebRoot">'.Gdn_Url::WebRoot(TRUE).'</li>
-            <li id="ConfirmHeading">'.Gdn::Translate('Confirm').'</li>
-            <li id="ConfirmText">'.Gdn::Translate('Are you sure you want to do that?').'</li>
-            <li id="Okay">'.Gdn::Translate('Okay').'</li>
-            <li id="Cancel">'.Gdn::Translate('Cancel').'</li>
+      $Return = '<!-- Various definitions for Javascript //-->
+         <div id="Definitions" style="display: none;">
+            <input type="hidden" id="TransportError" value="'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'" />
+            <input type="hidden" id="TransientKey" value="'.$Session->TransientKey().'" />
+            <input type="hidden" id="WebRoot" value="'.Gdn_Url::WebRoot(TRUE).'" />
+            <input type="hidden" id="ConfirmHeading" value="'.Gdn::Translate('Confirm').'" />
+            <input type="hidden" id="ConfirmText" value="'.Gdn::Translate('Are you sure you want to do that?').'" />
+            <input type="hidden" id="Okay" value="'.Gdn::Translate('Okay').'" />
+            <input type="hidden" ="Cancel" value="'.Gdn::Translate('Cancel').'" />
          ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<li id="'.$Term.'">'.$Definition."</li>\n";
+         $Return .= '<input type="hidden id="'.$Term.'" value="'.$Definition.'" />'."\n";
       }
 
-      return $Return .'</ul>';
+      return $Return .'</div>';
    }
 
    /**
@@ -743,7 +743,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
-            $this->AddAsset($AssetName, '<div class="RedirectUrl Hidden">'.$this->RedirectUrl.'</div>');
+            $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
 
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {

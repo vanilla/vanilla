@@ -68,7 +68,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
             //$('.Popup,.Overlay').remove();
-            //$.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            //$.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -211,12 +211,12 @@ jQuery(document).ready(function($) {
          
          $.ajax({
             type: "POST",
-            url: definition('WebRoot', '') + '/discussion/getnew/' + discussionID + '/' + lastCommentID,
+            url: combinePaths(definition('WebRoot', ''), '/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {               
                if(json.Data && json.LastCommentID) {

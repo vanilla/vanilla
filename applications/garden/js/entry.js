@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
       var name = $(this).val();
       if (name != '') {
          var checkUrl = combinePaths(
-            $('#Definitions #WebRoot').text(),
+            definition('WebRoot', ''),
             'index.php/garden/utility/usernameavailable/'+encodeURIComponent(name)
          );
          $.ajax({
@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
             url: checkUrl,
             dataType: 'text',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(text) {
                if (text == 'TRUE')

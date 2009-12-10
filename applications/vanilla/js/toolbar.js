@@ -14,10 +14,8 @@ jQuery(document).ready(function($) {
             gripPosition: 'top',
             onEndDrag: function() {
                // Save the user's preference.
-               // var webRoot = $('#Definitions #WebRoot').text();
-               // var transientKey = $('#Definitions #TransientKey').text();
                // var height = $('#CommentForm textarea').height();
-               // $.get(webRoot + '/garden/utility/set/preference/CommentBoxHeight/'+ height + '/' + transientKey + '/?DeliveryType=BOOL');
+               // $.get(combinePaths(definition('WebRoot', ''), '/garden/utility/set/preference/CommentBoxHeight/'+ height + '/' + definition('TransientKey', '') + '/?DeliveryType=BOOL'));
             }
          });
       }

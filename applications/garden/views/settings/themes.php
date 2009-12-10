@@ -144,7 +144,7 @@ printf(
                   
                   if ($Upgrade) {
                      echo '<div class="Alert">';
-                     echo Url(
+                     echo Anchor(
                            sprintf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
                            CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')
                         );
@@ -153,12 +153,12 @@ printf(
                ?>
             </td>
             <?php
-         if ($Col == 3)
+         if ($Col == 0)
             echo '</tr>';
       }
    }
    // Close the row if it wasn't a full row.
-   if ($Col != 3)
+   if ($Col > 0)
       echo '<td class="LastCol"'.($Col == 1 ? ' colspan="2"' : '').'>&nbsp;</td></tr>';
    ?>
       </tbody>

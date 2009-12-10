@@ -66,11 +66,11 @@
          $.ajax({
             type: "POST",
             url: self.page_source,
-            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&Form/TransientKey='+$('#Definitions #TransientKey').text()+self.extra_pager_data,
+            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&Form/TransientKey='+definition('TransientKey', '')+self.extra_pager_data,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                if (self.pager_in_container == true) {

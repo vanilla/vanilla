@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
             data: postValues,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                $('span.Progress').remove();

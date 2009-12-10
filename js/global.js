@@ -2,6 +2,26 @@
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
 
+   definition = function(definition, defaultVal, set) {
+      if (defaultVal == null)
+         defaultVal = definition;
+         
+      var $def = $('#Definitions #' + definition);
+      var def;
+      
+      if(set) {
+         $def.val(defaultVal);
+         def = defaultVal;
+      } else {
+         def = $def.val();
+         if (typeof def == 'undefined' || def == '')
+            def = defaultVal;
+      }
+         
+      return def;
+   }
+
+
    // Main Menu dropdowns
    if ($.fn.menu)
       $('#Menu').menu({
@@ -18,9 +38,9 @@ jQuery(document).ready(function($) {
    $('a.Dismiss').live('click', function() {
       var anchor = this;
       var container = $(anchor).parent();
-      var transientKey = $('#Definitions #TransientKey').text();
+      var transientKey = definition('TransientKey');
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
-      var webRoot = $('#Definitions #WebRoot').text();
+      var webRoot = definition('WebRoot', '');
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
             $(container).slideUp('fast',function() {
@@ -52,7 +72,7 @@ jQuery(document).ready(function($) {
    });
 
    // If a page loads with a hidden redirect url, go there after a few moments.
-   var RedirectUrl = $('.RedirectUrl').text();
+   var RedirectUrl = definition('RedirectUrl', '');
    if (RedirectUrl != '')
       setTimeout("document.location = '"+RedirectUrl+"';", 2000);
 
@@ -61,10 +81,10 @@ jQuery(document).ready(function($) {
       $("table.Sortable").tableDnD({onDrop: function(table, row) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
-         var transientKey = $('#Definitions #TransientKey').text();
+         var transientKey = definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
-         var webRoot = $('#Definitions #WebRoot').text();
-         $.post(webRoot + "/garden/utility/sort/", data, function(response) {
+         var webRoot = definition('WebRoot', '');
+         $.post(combinePaths(webRoot, '/garden/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 
@@ -90,24 +110,6 @@ jQuery(document).ready(function($) {
       });
    }
 
-   definition = function(definition, defaultVal, set) {
-      if (defaultVal == null)
-         defaultVal = definition;
-         
-      var $def = $('#Definitions #' + definition);
-      var def;
-      
-      if(set) {
-         $def.text(defaultVal);
-         def = defaultVal;
-      } else {
-         def = $def.text();
-         if (def == '')
-            def = defaultVal;
-      }
-         
-      return def;
-   }
    inform = function(message, wrapInfo) {
       if(wrapInfo == undefined) {
          wrapInfo = true;
@@ -171,7 +173,7 @@ jQuery(document).ready(function($) {
                $target.text(item.Data);
                break;
             case 'Html':
-               $target.hml(item.Data);
+               $target.html(item.Data);
          }
       }
    }
@@ -181,7 +183,7 @@ jQuery(document).ready(function($) {
    $('#Search input.InputBox').val(searchText);
    $('#Search input.InputBox').blur(function() {
       var searchText = definition('Search', 'Search');
-      if ($(this).val() == '')
+      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
          $(this).val(searchText);
    });
    $('#Search input.InputBox').focus(function() {

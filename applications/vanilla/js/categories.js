@@ -37,11 +37,11 @@ jQuery(document).ready(function($) {
    // Make category table sortable
    if ($.tableDnD) {
       saveAndReload = function(table, row) {
-         var webRoot = $('#Definitions #WebRoot').text();
-         var transientKey = $('#Definitions #TransientKey').text();
+         var webRoot = definition('WebRoot', '');
+         var transientKey = definition('TransientKey');
          var tableId = $($.tableDnD.currentTable).attr('id');
          var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&DeliveryType=VIEW&Form/TransientKey=' + transientKey;
-         $.post(webRoot + "/vanilla/settings/sortcategories/", data, function(response) {
+         $.post(combinePaths(webRoot, '/vanilla/settings/sortcategories/'), data, function(response) {
             if (response == 'TRUE') {
                // Reload the page content...
                $.get(webRoot + '/vanilla/settings/managecategories/?DeliveryType=VIEW', function(data){

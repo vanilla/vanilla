@@ -48,7 +48,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                 data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON' },
                 dataType: 'json',
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                   $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+                   $.popup({}, definition('TransportError').replace('%s', textStatus));
                 },
                 success: function(json) {
                   $.popup.close(settings);

@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                $('.Popup').remove();
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                // Remove any old errors from the form
@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('span.Progress').remove();
             $(btn).show();
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             inform(json.StatusMessage);

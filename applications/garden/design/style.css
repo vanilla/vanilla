@@ -265,18 +265,15 @@ div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
+	font-family: 'lucida console', arial;
    float: right;
+	font-size: 22px;
+	font-weight: bold;
    line-height: 120%;
    color: #999;
-	padding: 2px 4px;
 }
 div.DismissMessage a.Dismiss:hover {
-   background: #fafafa;
-   border: 1px solid #ccc;
-   color: #333;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	padding: 1px 3px;
+	color: #ff0084;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {

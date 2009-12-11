@@ -26,7 +26,7 @@ class GardenHooks implements Gdn_IPlugin {
       // Add Message Modules (if necessary)
       $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
       $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
-      if (in_array('Base', $MessageCache) || InArrayI($Location, $MessageCache)) {
+      if ($Sender->MasterView != 'empty' && in_array('Base', $MessageCache) || InArrayI($Location, $MessageCache)) {
          $MessageModel = new Gdn_MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location);
          foreach ($MessageData as $Message) {

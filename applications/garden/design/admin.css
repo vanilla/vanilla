@@ -408,12 +408,12 @@ div.DismissMessage a.Dismiss:hover {
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
-	color:#777;
-	font-family:monaco;
-	font-size:14px;
-	font-weight:bold;
-	cursor:pointer;
-	padding: 0 2px;
+	color: #777;
+	cursor: pointer;
+	font-family: 'lucida console',arial;
+	font-size: 22px;
+	font-weight: bold;
+	padding: 0;
 }
 a.Close:hover {
 	color: #333;
@@ -912,17 +912,36 @@ body.Entry div.Popup p {
 }
 div.Popup .Footer {
 	border-top: 1px solid #C0E7F5;
-  background: #DCF5FE;
-  padding: 1px 10px 5px 5px;
-  text-align: right;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
+	background: #DCF5FE;
+	padding:4px 8px 0 5px;
+	text-align: right;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
 }
 div.Popup .Footer input.Button {
 	font-size: 11px;
 }
+
+/* ==================================================================== Legal */
+div.Legal ol {
+	list-style-position:outside;
+	list-style-type:decimal;
+	margin:0 30px 10px;
+}
+div.Legal ul {
+	list-style-position:outside;
+	list-style-type:disc;
+	margin:0 30px 10px;
+}
+div.Legal li {
+	padding: 5px 0;
+}
+div.Legal strong {
+	font-weight: bold;
+}
+
 
 /* =================================================================== Themes */
 body.themes #Content img {
@@ -965,6 +984,7 @@ table.Themes td h4 {
 table.SelectionGrid td.FirstCol {
 	border-right: 1px solid #C0E7F5;
 }
+table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol {
 	border-left: 1px solid #C0E7F5;
 }

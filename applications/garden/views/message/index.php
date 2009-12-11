@@ -36,14 +36,7 @@ foreach ($this->MessageData->Result() as $Message) {
          <?php echo Anchor('Delete', '/garden/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage'); ?>
          </div>
       </td>
-      <td class="Alt"><?php
-         if ($Message->CssClass != '')
-            echo '<div class="'.$Message->CssClass.'">';
-
-         echo Format::Text($Message->Content);
-         if ($Message->CssClass != '')
-            echo '</div>';
-      ?></td>
+      <td class="Alt"><?php echo Format::Text($Message->Content); ?></td>
    </tr>
 <?php } ?>
    </tbody>

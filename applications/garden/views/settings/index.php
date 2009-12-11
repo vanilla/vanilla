@@ -13,7 +13,7 @@ $this->RenderAsset('Messages');
                <tr<?php
                   $Alt = $Alt == '' ? ' class="Alt"' : '';
                   echo $Alt;
-               ?>">
+               ?>>
                   <th><?php echo $Value; ?></th>
                   <td class="Alt"><?php echo $Name; ?></td>
                </tr>

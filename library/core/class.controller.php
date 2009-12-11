@@ -431,11 +431,11 @@ class Gdn_Controller extends Gdn_Pluggable {
             <input type="hidden" id="ConfirmHeading" value="'.Gdn::Translate('Confirm').'" />
             <input type="hidden" id="ConfirmText" value="'.Gdn::Translate('Are you sure you want to do that?').'" />
             <input type="hidden" id="Okay" value="'.Gdn::Translate('Okay').'" />
-            <input type="hidden" ="Cancel" value="'.Gdn::Translate('Cancel').'" />
+            <input type="hidden" id="Cancel" value="'.Gdn::Translate('Cancel').'" />
          ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<input type="hidden id="'.$Term.'" value="'.$Definition.'" />'."\n";
+         $Return .= '<input type="hidden" id="'.$Term.'" value="'.$Definition.'" />'."\n";
       }
 
       return $Return .'</div>';

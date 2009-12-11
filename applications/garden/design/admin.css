@@ -396,6 +396,7 @@ div.DismissMessage p {
 	padding: 4px 0 0;
 }
 div.DismissMessage a.Dismiss {
+	font-family: 'lucida console', arial;
    float: right;
 	font-size: 22px;
 	font-weight: bold;

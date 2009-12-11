@@ -103,12 +103,6 @@ class Gdn_MessageModel extends Gdn_Model {
             if (count($Location) >= 3) $FormPostValues['Method'] = $Location[2];
          }
       }
-      // Make sure that messages on the dashboard get dropped below the page heading.
-      if (
-         $FormPostValues['Application'] == 'Garden'
-         && $FormPostValues['Controller'] == 'Settings'
-         && $FormPostValues['Method'] == 'Index'
-      ) $FormPostValues['AssetTarget'] = 'Messages';
 
       return parent::Save($FormPostValues, $Settings);
    }

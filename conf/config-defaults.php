@@ -87,9 +87,9 @@ $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 
 // Modules
 $Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Content'] = array('Notices', 'Content', 'Ads');
-$Configuration['Modules']['Garden']['Content'] = array('Notices', 'Content', 'Ads');
-$Configuration['Modules']['Conversations']['Content'] = array('Notices', 'Content', 'Ads');
+$Configuration['Modules']['Vanilla']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Garden']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Conversations']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
 
 // Routes
 $Configuration['Routes']['DefaultController'] = 'home';

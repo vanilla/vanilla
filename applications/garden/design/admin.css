@@ -43,7 +43,7 @@ Welcome to the Admin CSS File! Some things you should know:
 	text-shadow: #fff 0 1px 0;
 }
 #Head h1 a span {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande', 'Lucida Sans Unicode';
 	font-size: 40%;
 	text-shadow: none;
 	font-weight: normal;
@@ -149,7 +149,7 @@ body {
 	border-top:1px solid #C0E7F5;
 }
 #Content {
-	font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+	font-family: "Lucida Grande", 'Lucida Sans Unicode',Verdana,Arial,"Bitstream Vera Sans",sans-serif;
    margin: 15px 15px 15px 180px;
 }
 .Hidden {
@@ -171,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
    margin: 0;
 }
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
-	font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+	font-family: "Lucida Grande",'Lucida Sans Unicode',Verdana,Arial,"Bitstream Vera Sans",sans-serif;
 }
 p {
    margin: 0.5em 0 0 0;
@@ -798,7 +798,7 @@ div.Popup div.Messages {
    left: auto;
    z-index: auto;
 	margin: 10px 0 !important;
-	font-family: 'lucida grande';
+	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Popup div.Warning {
 	margin: 10px 0 0;
@@ -878,16 +878,16 @@ div.Popup h3 {
 }
 div.Popup p {
 	padding: 6px 10px 10px;
-	font-family: 'lucida grande';
+	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Popup div.Legal * {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande','Lucida Sans Unicode';
 	font-size: 80%;
 }
 div.Popup form p {

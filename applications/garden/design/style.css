@@ -142,7 +142,7 @@ select {
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: 'lucida grande', Tahoma, sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 11px;
    padding: 4px;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
@@ -339,7 +339,7 @@ tr#PagerMore td {
 .NumberedPager span.Next,
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	font-family: 'lucida grande', tahoma, sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 16px;
 	line-height: 10px;
 }
@@ -415,7 +415,7 @@ body #Head h1 {
    -webkit-border-bottom-right-radius: 2px;
 }
 #Menu * {
-   font-family: 'lucida grande', tahoma, sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 }
 #Menu {
    height: 28px;
@@ -664,7 +664,7 @@ ul.PanelInfo li {
    background: #f5fcff;
    border-bottom: 1px solid #caf0fe;
    padding: 2px 4px;
-   font-family: 'lucida grande', tahoma, sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
    text-align: right;
 }
 ul.PanelInfo {
@@ -932,7 +932,7 @@ ul.Activities ul.Comments li {
    line-height: 1;
 }
 ul.Activities ul.Comments li * {
-	font-family: 'lucida grande', tahoma, sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 }
 ul.Activities li.HasPhoto div {
    margin-left: 46px;
@@ -1390,13 +1390,13 @@ div.Popup p {
 	padding: 6px 10px 10px;
 }
 div.Popup div.Legal * {
-	font-family: 'lucida grande', tahoma, sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 }
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande', tahoma, sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 11px;
 }
 div.Popup form p {
@@ -1467,6 +1467,6 @@ div.Legal strong {
 	border-top: 1px solid #ddd;
 	padding: 6px 0;
 	margin: 20px auto 0;
-   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode','helvetica neue',helvetica,arial,sans-serif;
 	text-align: left;
 }

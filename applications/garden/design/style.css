@@ -265,7 +265,7 @@ div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
-	font-family: 'lucida grande','Lucida Sans Unicode', arial;
+	font-family: arial;
    float: right;
 	font-size: 22px;
 	font-weight: bold;
@@ -278,7 +278,7 @@ div.DismissMessage a.Dismiss:hover {
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
 	color:#777;
-	font-family:monaco;
+	font-family:arial;
 	font-size:14px;
 	font-weight:bold;
 	cursor:pointer;

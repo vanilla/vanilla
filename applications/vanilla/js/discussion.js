@@ -72,7 +72,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
-            if (!draft)
+            if (!draft && json.FormSaved == true)
                $('.Popup,.Overlay').remove();
                
             var commentID = json.CommentID;

@@ -544,7 +544,7 @@ body.Post #CommentForm,
    -webkit-border-radius: 3px;
    padding: 8px 10px 10px;
 }
-body.Discussion #CommentForm h2,
+body.Discussion #Content #CommentForm h2,
 #DiscussionForm h2 {
    font-size: 120%;
    color: #2786c2;
@@ -552,6 +552,9 @@ body.Discussion #CommentForm h2,
    line-height: 1;
    padding: 0;
    margin: 0 0 4px;
+}
+body.Discussion div.Popup #CommentForm textarea {
+   margin-top: 10px;
 }
 body.Post #CommentForm textarea,
 #DiscussionForm textarea {

@@ -4,9 +4,9 @@ echo '<h2>'.Gdn::Translate('Edit My Thumbnail').'</h2>';
 echo $this->Form->Open(array('class' => 'Thumbnail'));
 echo $this->Form->Errors();
 ?>
-<p><?php
+<div class="Info"><?php
    echo Gdn::Translate('Drag around and resize the square below to define your thumbnail icon.');
-?></p>
+?></div>
 <table>
    <thead>
       <tr>

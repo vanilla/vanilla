@@ -279,7 +279,7 @@ div.DismissMessage a.Dismiss:hover {
 a.Close {
 	color:#777;
 	font-family:arial;
-	font-size:14px;
+	font-size:20px;
 	font-weight:bold;
 	cursor:pointer;
 	padding: 0 2px;
@@ -1171,6 +1171,55 @@ form.Activity textarea {
    min-height: 60px;
    max-height: 300px;
 }
+/* Invitations Form */
+#Form_Invitation table {
+   width: 100%;
+   border-collapse: collapse;
+   margin: 10px 0;
+	background: #F2FBFF;
+	border: 1px solid #C0E7F5;
+}
+#Form_Invitation table label {
+   font-size: 12px;
+   padding: 0px;
+}
+#Form_Invitation table tr.Last td,
+#Form_Invitation table tr.Last th {
+   border-bottom: 0px;
+}
+#Form_Invitation table th,
+#Form_Invitation table td {
+   font-weight: normal;
+   color: #555 /* Body Text Font Color */;
+   padding: 6px;
+}
+#Form_Invitation table thead th,
+#Form_Invitation table thead td {
+   border-bottom: 1px solid #C0E7F5;
+}
+#Form_Invitation table tbody th {
+   font-weight: bold;
+   color: #000;
+}
+#Form_Invitation table tbody th,
+#Form_Invitation table tbody td {
+   border-bottom: 1px solid #C0E7F5;
+   line-height: 150%;
+}
+#Form_Invitation table thead th {
+   font-weight: bold;
+   font-size: 13px;
+   color: #000;
+}
+#Form_Invitation table.AltRows tr.Alt th,
+#Form_Invitation table.AltRows tr.Alt td,
+#Form_Invitation table.AltColumns th.Alt,
+#Form_Invitation table.AltColumns td.Alt {
+   background: #E9F9FF;
+}
+#Form_Invitation table.AltColumns tr.Alt {
+   background: none;
+}
 
 
 /* ========================================================= Profile Tab Menu */
@@ -1319,6 +1368,9 @@ div.Popup div.Messages ul {
   left: auto;
   overflow: auto; 
 }
+div.Popup .Info {
+	margin-top: 10px;
+}
 div.Popup .Loading {
    display: block;
 }
@@ -1374,7 +1426,7 @@ div.Popup h2 {
 div.Popup .Footer {
   background: #E9F9FF;
   text-align: right;
-  padding: 0 6px 2px 0;
+  padding: 2px 6px 0 0;
   border-top:1px solid #CAF0FE;
   -moz-border-radius-bottomleft: 5px;
   -moz-border-radius-bottomright: 5px;
@@ -1402,6 +1454,8 @@ div.Popup small {
 div.Popup form p {
 	padding: 0;
 }
+body.Profile #Form_Invitation ul li label,
+body.Profile #Form_User ul li label,
 div.Popup form ul li label {
 	color:#000;
 	display:block;
@@ -1409,17 +1463,23 @@ div.Popup form ul li label {
 	font-weight:bold;
 	margin: 10px 0 0;
 }
+body.Profile #Form_User ul li label.RadioLabel,
+body.Profile #Form_User ul li label.CheckBoxLabel,
 div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
+div.Profile #Form_User input.Button,
 div.Popup input.Button {
 	margin: 4px 0 2px;
 }
 body.Entry div.Popup p {
 	color: #000;
 }
-
+div.Popup #Form_User div.Warning,
+#garden_profile_picture #Form_User div.Warning {
+	margin: 6px 0;
+}
 
 /* ==================================================================== Legal */
 div.Legal h3 {

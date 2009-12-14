@@ -80,6 +80,13 @@ jQuery(document).ready(function($) {
       });
    }});
    
+   // Ajax invitation uninvites and send agains if they're in a popup
+   $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
+      var btn = this;
+      $('div.Popup .Content').load($(btn).attr('href') + '?DeliveryType=VIEW');
+      return false;
+   });
+   
    // Thumbnail Cropper
    // Popup the picture form when the link is clicked
    $('li.ThumbnailLink a').popup({hijackForms: false, afterLoad: function() {

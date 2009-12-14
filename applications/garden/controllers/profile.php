@@ -495,7 +495,7 @@ class ProfileController extends Gdn_Controller {
             $SideMenu->AddLink('Options', 'Edit My Account', '/profile/edit', FALSE, array('class' => 'Popup'));
             $SideMenu->AddLink('Options', 'Change My Password', '/profile/password', FALSE, array('class' => 'Popup'));
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', 'My Invitations', '/profile/invitations');
+               $SideMenu->AddLink('Options', 'My Invitations', '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');

@@ -70,14 +70,14 @@ jQuery(document).ready(function($) {
    
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
+   
    // Popup the picture form when the link is clicked
    $('li.PictureLink a').popup({hijackForms: false, afterLoad: function() {
-      $('.Popup :input').change(function() {
-         $('.Popup :input').click();
-         $('.Popup .Content').empty();
-         $('.Popup .Body').children().hide().end().append('<div class="Loading">&nbsp;</div>');
-      });
       $('.Popup :submit').hide();
+      $('.Popup :input').change(function() {
+         $('.Popup form').submit();
+         $('.Popup .Body').html('<div class="Loading">&nbsp;</div>');
+      });
    }});
    
    // Thumbnail Cropper

@@ -192,7 +192,7 @@ class PagerModule extends Module {
       
       // We don't need elipsis at all (ie. 1 2 3 4 5)
       if ($PageCount < 10) {
-         for ($i = 0; $i < $PageCount + 1; $i++) {
+         for ($i = 0; $i < $PageCount ; $i++) {
             $Offset = $this->Limit * $i;
             if ($Offset == 0) $Offset = '';
             $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit));

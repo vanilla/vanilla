@@ -915,7 +915,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->FirstRow();
 
       // If CountInvitations is null (ie. never been set before) or it is a new month since the DateSetInvitations
-      if (!is_string($User->CountInvitations) || Format::Date($User->DateSetInvitations, 'n Y') != Format::Date('', 'n Y')) {
+      if ($User->CountInvitations == '' || is_null($User->DateSetInvitations) || Format::Date($User->DateSetInvitations, 'n Y') != Format::Date('', 'n Y')) {
          // Reset CountInvitations and DateSetInvitations
          $this->SQL->Put(
             $this->Name,
@@ -925,7 +925,7 @@ class Gdn_UserModel extends Gdn_Model {
             ),
             array('UserID' => $UserID)
          );
-
+         return $InviteCount;
       } else {
          // Otherwise return CountInvitations
          return $User->CountInvitations;

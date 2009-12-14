@@ -260,6 +260,7 @@ div.EmptyInfo {
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
    margin: 6px 0 10px;
+	text-align: left;
 }
 div.DismissMessage p {
    margin: 2px 0;
@@ -786,10 +787,6 @@ body.Entry #Content h1 {
    font-weight:bold;
    margin: 0;
    padding:0 0 1px;
-}
-body.Entry p {
-   padding:0 0 10px;
-   color: #999999;
 }
 body.Entry form ul li {
    border: 0;

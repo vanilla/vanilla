@@ -17,7 +17,11 @@ if ($this->InvitationCount != 0) {
       echo $this->Form->Button('Invite');
    ?></li>
 </ul>
-<?php } ?>
+<?php
+}
+
+if ($this->InvitationData->NumRows() > 0) {
+?>
 <table class="AltRows">
    <thead>
       <tr>
@@ -61,4 +65,5 @@ foreach ($this->InvitationData->Result('Text') as $Invitation) {
     </tbody>
 </table>
 <?php
+}
 echo $this->Form->Close();

@@ -416,9 +416,8 @@ class ProfileController extends Gdn_Controller {
          }
       }
       $Session = Gdn::Session();
-      $UserID = $Session->UserID;
-      $this->InvitationCount = $this->UserModel->GetInvitationCount($UserID);
-      $this->InvitationData = $InvitationModel->GetByUserID($UserID);
+      $this->InvitationCount = $this->UserModel->GetInvitationCount($Session->UserID);
+      $this->InvitationData = $InvitationModel->GetByUserID($Session->UserID);
       $this->Render();
    }
    

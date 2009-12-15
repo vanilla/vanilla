@@ -101,16 +101,10 @@ printf(
             $Col = 0;
          }
          $ColClass .= $Active ? ' Enabled' : '';
+         $ColClass .= $PreviewImage ? ' HasPreview' : '';
          ?>
             <td class="<?php echo $ColClass; ?>">
                <?php
-                  if ($PreviewImage) {
-                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="180" width="240" />',
-                        'garden/settings/previewtheme/'.$ThemeFolder,
-                        '',
-                        array('target' => '_top')
-                     );
-                  }
                   echo '<h4>';
                      echo $ThemeUrl != '' ? Url($ThemeName, $ThemeUrl) : $ThemeName;
                      if ($Version != '')
@@ -120,26 +114,26 @@ printf(
                         $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
       
                   echo '</h4>';
-                  echo '<div class="FilterMenu">';
-                  echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), '', array('target' => '_top'));
-                  echo '<span>|</span>';
-                  echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, '', array('target' => '_top'));
-                  echo '</div>';
-                  echo ArrayValue('Description', $ThemeInfo, '&nbsp;');
-      
+                  
+                  $Description = ArrayValue('Description', $ThemeInfo);
+                  if ($Description)
+                     echo '<em>'.$Description.'</em>';
+                     
                   $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
-                     echo Translate('Requires: ');
-                  }
-                  $i = 0;
-                  if (is_array($RequiredApplications)) {
-                     if ($i > 0)
-                        echo ', ';
-                     
+                     echo '<dl>
+                        <dt>'.Translate('Requires').'</dt>
+                        <dd>';
+
+                     $i = 0;
                      foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
-                        printf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                        if ($i > 0)
+                           echo ', ';
+                           
+                        printf(Gdn::Translate('%1$s %2$s'), $RequiredApplication, $VersionInfo);
                         ++$i;
                      }
+                     echo '</dl>';
                   }
                   
                   if ($Upgrade) {
@@ -150,6 +144,19 @@ printf(
                         );
                      echo '</div>';
                   }
+
+                  if ($PreviewImage) {
+                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="112" width="150" />',
+                        'garden/settings/previewtheme/'.$ThemeFolder,
+                        '',
+                        array('target' => '_top')
+                     );
+                  }
+
+                  echo '<div class="Buttons">';
+                  echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
+                  echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
+                  echo '</div>';
                ?>
             </td>
             <?php
@@ -159,7 +166,7 @@ printf(
    }
    // Close the row if it wasn't a full row.
    if ($Col > 0)
-      echo '<td class="LastCol"'.($Col == 1 ? ' colspan="2"' : '').'>&nbsp;</td></tr>';
+      echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&nbsp;</td></tr>';
    ?>
       </tbody>
    </table>

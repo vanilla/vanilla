@@ -973,10 +973,13 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
       $Session = Gdn::Session();
-      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
-         // TODO: Make this work with different delivery types.
+      if (!$Session->IsValid())
+         Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
+
+      // TODO: Make this work with different delivery types.
+      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch))
          Redirect($this->Routes['DefaultPermission']);
-      }
+
    }
 
    /**

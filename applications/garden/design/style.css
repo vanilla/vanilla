@@ -746,7 +746,7 @@ body.Entry #Leave {
    background: #E9F9FF;
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   padding: 10px 10px 0 10px;
+   padding: 10px;
    text-align: left;
 }
 body.Entry p.Leaving {

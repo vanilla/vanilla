@@ -17,6 +17,7 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                   1000 => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
                                                                   1002 => "set names 'utf8'" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
                                                                );
+$Configuration['Database']['CharacterEncoding']                = 'utf8';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 

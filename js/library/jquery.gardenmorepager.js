@@ -4,7 +4,7 @@
  * mark@lussumo.com
  *
  * Copyright (c) 2009 Mark O'Sullivan (www.markosullivan.ca)
- * Licensed under the MIT license. 
+ * Licensed under the GPL v2. 
  *
  *
  * NOTE: This script requires jQuery to work.  Download jQuery at www.jquery.com

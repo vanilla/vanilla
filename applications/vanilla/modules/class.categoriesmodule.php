@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * Lussumo.Garden.Modules
+ * Garden.Modules
  */
 
 /**

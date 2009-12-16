@@ -126,9 +126,6 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
             ->Where('UserID <>', $Session->UserID)
             ->Put();
 
-         // Update the CountUnreadConversations count on each user related to the discussion.
-         $this->UpdateCountUnreadConversations($ConversationID, $Session->UserID);
-         
          // Update the userconversation records to reflect the most recently
          // added message for all users other than the one that added the
          // message (otherwise they would see their name/message on the
@@ -139,32 +136,44 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
             ->Where('ConversationID', $ConversationID)
             ->Where('UserID <>', $Session->UserID)
             ->Put();
+            
+         // Update the CountUnreadConversations count on each user related to the discussion.
+         // And notify the users of the new message
+         $UnreadData = $this->SQL
+            ->Select('c.UserID')
+            ->Select('c2.CountNewMessages', 'count', 'CountUnreadConversations')
+            ->From('UserConversation c')
+            ->Join('UserConversation c2', 'c.UserID = c2.UserID')
+            ->Where('c2.CountNewMessages >', 0)
+            ->Where('c.ConversationID', $ConversationID)
+            ->Where('c.UserID <>', $Session->UserID)
+            ->GroupBy('c.UserID')
+            ->Get();
+      
+         $ActivityModel = new Gdn_ActivityModel();
+         foreach ($UnreadData->Result() as $User) {
+            // Update the CountUnreadConversations count on each user related to the discussion.
+            $this->SQL
+               ->Update('User')
+               ->Set('CountUnreadConversations', $User->CountUnreadConversations)
+               ->Where('UserID', $User->UserID)
+               ->Put();
+            
+            // And notify the users of the new message
+            $ActivityID = $ActivityModel->Add(
+               $Session->UserID,
+               'ConversationMessage',
+               '',
+               $User->UserID,
+               '',
+               '/messages/'.$ConversationID.'#'.$MessageID,
+               FALSE
+            );
+            $Story = ArrayValue('Body', $Fields, '');
+            $ActivityModel->SendNotification($ActivityID, $Story);
+         }      
+            
       }
       return $MessageID;
-   }
-   
-   /**
-    * Update the CountUnreadConversations attribute on all users related to a
-    * specific conversation.
-    */
-   public function UpdateCountUnreadConversations($ConversationID, $MessageUserID) {
-      $UnreadData = $this->SQL
-         ->Select('c.UserID')
-         ->Select('c2.CountNewMessages', 'count', 'CountUnreadConversations')
-         ->From('UserConversation c')
-         ->Join('UserConversation c2', 'c.UserID = c2.UserID')
-         ->Where('c2.CountNewMessages >', 0)
-         ->Where('c.ConversationID', $ConversationID)
-         ->Where('c.UserID <>', $MessageUserID)
-         ->GroupBy('c.UserID')
-         ->Get();
-      
-      foreach ($UnreadData->Result() as $User) {
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadConversations', $User->CountUnreadConversations)
-            ->Where('UserID', $User->UserID)
-            ->Put();
-      }      
    }
 }

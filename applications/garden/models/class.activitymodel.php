@@ -88,7 +88,7 @@ class Gdn_ActivityModel extends Gdn_Model {
          ->Get();
    }
    
-   public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '') {
+   public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = TRUE) {
       // Make sure the user is authenticated
       // Get the ActivityTypeID & see if this is a notification
       $ActivityType = $this->SQL
@@ -131,7 +131,37 @@ class Gdn_ActivityModel extends Gdn_Model {
          
       $this->AddInsertFields($Fields);
       $this->DefineSchema();
-      return $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
+      $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
+
+      // If the activity was saved successfully and it was a notification, send a notification to the user.
+      if ($SendEmail && $ActivityID > 0 && $Notify)
+         $this->SendNotification($ActivityID);
+      
+      return $ActivityID;
+   }
+   
+   public function SendNotification($ActivityID, $Story = '') {
+      $Activity = $this->GetID($ActivityID);
+      $Story = Format::Text($Story == '' ? $Activity->Story : $Story);
+      $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
+      $User = $this->SQL->Select('Name, Email')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+      if ($User) {
+         $Email = new Gdn_Email();
+         $Email->Subject(sprintf(Gdn::Translate('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
+         $Email->To($User->Email, $User->Name);
+         $Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
+         $Email->Message(
+            sprintf(
+               Gdn::Translate($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+               $ActivityHeadline,
+               Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+               $Story
+            )
+         );
+         
+         // Fail silently if the notification email has problems.
+         $Email->Send();
+      }
    }
    
    public function Delete($ActivityID) {

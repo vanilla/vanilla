@@ -317,13 +317,18 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                      if ($User->UserID == $Discussion->InsertUserID)
                         $DiscussionAuthorMentioned = TRUE;
                         
-                     AddActivity(
+                     $ActivityModel = new Gdn_ActivityModel();   
+                     $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
                         'CommentMention',
                         Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                         $User->UserID,
-                        'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
+                        '',
+                        'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
+                        FALSE
                      );
+                     $Story = ArrayValue('Body', $Fields, '');
+                     $ActivityModel->SendNotification($ActivityID, $Story);
                   }
                }
             }

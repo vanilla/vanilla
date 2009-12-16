@@ -186,10 +186,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // This is something other than json, so just put it into the popup directly
       $('#'+settings.popupId+' .Content').append(data);
     } else {
+      if (json.StatusMessage)
+         inform(json.StatusMessage);
+
       formSaved = json['FormSaved'];
       data = json['Data'];
-      if (formSaved == false)
-        $('#'+settings.popupId+' .Content').html(data);
+      // mosullivan - need to always reload the data b/c when uninviting ppl
+      // we need to reload the invitation table. Is there a reason not to reload
+      // the content?
+      // if (formSaved == false)
+      $('#'+settings.popupId+' .Content').html(data);
     }
     
     $('#'+settings.popupId+' .Loading').remove();
@@ -209,9 +215,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           settings.onSave(settings) // Notify the user that it is being saved.
         },  
         success: function(json) {
+          if (json.StatusMessage)
+             inform(json.StatusMessage);
+
           if (json.FormSaved == true) {
-            if (json.StatusMessage)
-               inform(json.StatusMessage);
 
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);

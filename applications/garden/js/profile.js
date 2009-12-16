@@ -79,14 +79,27 @@ jQuery(document).ready(function($) {
          $('.Popup .Body').html('<div class="Loading">&nbsp;</div>');
       });
    }});
-   
+
    // Ajax invitation uninvites and send agains if they're in a popup
    $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
       var btn = this;
-      $('div.Popup .Content').load($(btn).attr('href') + '?DeliveryType=VIEW');
+      var popupId = $('div.Popup').attr('id');
+      $.ajax({
+         type: "GET",
+         url: $(btn).attr('href'),
+         data: { 'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON' },
+         dataType: 'json',
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
+         },
+         success: function(json) {
+            $.popup.reveal({ popupId: popupId }, json);
+         }
+      });
+
       return false;
    });
-   
+
    // Thumbnail Cropper
    // Popup the picture form when the link is clicked
    $('li.ThumbnailLink a').popup({hijackForms: false, afterLoad: function() {

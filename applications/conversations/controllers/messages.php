@@ -40,7 +40,7 @@ class MessagesController extends ConversationsController {
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE)
-            Redirect('messages/'.$ConversationID);
+            $this->RedirectUrl = Url('messages/'.$ConversationID);
       } else if ($Recipient != '') {
          $this->Form->SetFormValue('To', $Recipient);
       }

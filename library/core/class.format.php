@@ -40,9 +40,13 @@ class Format {
     *  looking at.
     * @return string
     */
-   public static function ActivityHeadline($Activity, $ProfileUserID = '') {
-      $Session = Gdn::Session();
-      if ($Session->UserID == $Activity->ActivityUserID) {
+   public static function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
+      if ($ViewingUserID == '') {
+         $Session = Gdn::Session();
+         $ViewingUserID = $Session->IsValid() ? $Session->UserID : -1;
+      }
+      
+      if ($ViewingUserID == $Activity->ActivityUserID) {
          $ActivityName = $ActivityNameP = Gdn::Translate('You');
       } else {
          $ActivityName = $Activity->ActivityName;
@@ -56,14 +60,11 @@ class Format {
       }
       $Gender = Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
-      if (
-         $Session->IsValid()
-         && ($Session->UserID == $Activity->RegardingUserID ||
-            ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $Session->UserID))
-      ) $Gender = $Gender2 = 'your';
+      if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID))
+         $Gender = $Gender2 = 'your';
 
       $IsYou = FALSE;
-      if ($Session->UserID == $Activity->RegardingUserID) {
+      if ($ViewingUserID == $Activity->RegardingUserID) {
          $IsYou = TRUE;
          $RegardingName = Gdn::Translate('you');
          $RegardingNameP = Gdn::Translate('your');

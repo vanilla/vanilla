@@ -197,7 +197,7 @@ class Gdn_PluginManager {
       if (property_exists($this, $PluginName) === FALSE)
          $this->$PluginName = new $PluginName($Sender);
          
-      return $this->$PluginName->$NewMethodName($Sender, $Sender->EventArguments);
+      return $this->$PluginName->$NewMethodName($Sender, $Sender->RequestArgs);
    }
    
    /**

@@ -191,19 +191,6 @@ class Gdn_ConversationModel extends Gdn_Model {
                ->Where('UserID <>', $Session->UserID)
                ->Put();
          }
-         
-         // NOTIFY ALL NEWLY ADDED USERS THAT THEY WERE ADDED TO THE CONVERSATION
-         foreach ($RecipientUserIDs as $UserID) {
-            if ($UserID != $Session->UserID)
-               AddActivity(
-                  $Session->UserID,
-                  'ConversationMessage',
-                  '',
-                  $UserID,
-                  '/messages/'.$ConversationID
-               );
-         }
-         
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
          foreach ($MessageModel->ValidationResults() as $FieldName => $Results) {
@@ -213,8 +200,6 @@ class Gdn_ConversationModel extends Gdn_Model {
          }
       }
 
-// TODO: NOTIFY ALL USERS (BESIDES THE PERSON WHO ADDED THE MESSAGE) OF THE NEW MESSAGE.
-      
       return $ConversationID;
    }
    

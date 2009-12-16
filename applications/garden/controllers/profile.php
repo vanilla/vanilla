@@ -432,7 +432,6 @@ class ProfileController extends Gdn_Controller {
          } catch (Exception $ex) {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
-            
          if ($this->Form->ErrorCount() == 0)
             $this->StatusMessage = Gdn::Translate('The invitation was sent successfully.');
 

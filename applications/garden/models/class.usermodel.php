@@ -301,6 +301,8 @@ class Gdn_UserModel extends Gdn_Model {
          
             $this->EventArguments['UserID'] = $UserID;
             $this->FireEvent('AfterSave');
+         } else {
+            $UserID = FALSE;
          }
       } else {
          $UserID = FALSE;

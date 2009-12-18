@@ -191,7 +191,9 @@ class PagerModule extends Module {
       }
       
       // We don't need elipsis at all (ie. 1 2 3 4 5)
-      if ($PageCount < 10) {
+      if ($PageCount <= 1) {
+         // Don't build anything
+      } else if ($PageCount < 10) {
          for ($i = 0; $i < $PageCount ; $i++) {
             $Offset = $this->Limit * $i;
             if ($Offset == 0) $Offset = '';
@@ -237,6 +239,8 @@ class PagerModule extends Module {
          $Offset = ($CurrentPage) * $this->Limit;
          $Pager .= Anchor($NextText, sprintf($this->Url, $Offset, $this->Limit), 'Next');
       }
+      if ($PageCount <= 1)
+         $Pager = '';
 
       $ClientID = $this->ClientID;
       $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';

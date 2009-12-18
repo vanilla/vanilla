@@ -138,7 +138,7 @@ li.DiscussionRow ul.Discussion {
    display: inline !important;
 }
 ul.Announcements {
-   padding: 0 0 20px;
+   margin: 0 0 20px;
 }
 /* Note: The Vanilla Discussion List has the following classes applied to
   individual list elements and can be styled:
@@ -349,12 +349,14 @@ div.Popup ul.Preview li.Comment div.Body {
 }
 /* Note: Back appears the same as MorePager... */
 .Back {
-   margin: 0;
+   margin: 1px 0 6px;
    padding: 3px 6px;
-   text-align: right;
    background: #e9f9ff /* Panel Background Color */;
-   margin-top: 1px;
-   margin-bottom: 6px;
+   text-align: left;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
    }
 .Back a {
    color: #2786C2 /* Panel Font Color */;
@@ -365,13 +367,6 @@ div.Popup ul.Preview li.Comment div.Body {
 .Back a:hover {
    color: #2786c2 /* Panel Font Color */ !important;
    text-decoration: underline;
-}
-.Back {
-   text-align: left;
-   -moz-border-radius-bottomright: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
 }
 /*
   Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
@@ -405,8 +400,8 @@ ul.Options li.Parent strong {
    display: block;
    padding: 4px;
    margin: 3px 4px 0 0;
-   font-family: 'lucida grande', Tahoma, sans-serif;
-   font-size: 11px;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 10px;
    font-weight: normal;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
@@ -446,6 +441,7 @@ ul.Options li.Active ul {
 }
 ul.Options li.Active ul li a {
    background: none;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 }
 ul.Options li.Active a {
    background: #efefef;

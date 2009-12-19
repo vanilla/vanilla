@@ -77,6 +77,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
          ?></strong>
       </li>
+      <?php
+         $Sender->FireEvent('AfterDiscussionTitle');
+      ?>
       <li class="Meta">
          <?php
             echo '<span>';

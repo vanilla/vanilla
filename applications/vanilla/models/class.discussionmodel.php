@@ -67,6 +67,8 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
+         
+      $this->FireEvent('AfterDiscussionSummaryQuery');
    }
    
    public function Get($Offset = '0', $Limit = '', $Wheres = '') {

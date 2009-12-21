@@ -552,7 +552,7 @@ if (!function_exists('AddActivity')) {
    /**
     * A convenience function that allows adding to the activity table with a single line.
     */
-   function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '', $SendEmail = TRUE) {
+   function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '', $SendEmail = '') {
       $ActivityModel = new Gdn_ActivityModel();
       return $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route, $SendEmail);
    }

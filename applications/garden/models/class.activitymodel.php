@@ -88,7 +88,7 @@ class Gdn_ActivityModel extends Gdn_Model {
          ->Get();
    }
    
-   public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = TRUE) {
+   public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = '') {
       // Make sure the user is authenticated
       // Get the ActivityTypeID & see if this is a notification
       $ActivityType = $this->SQL
@@ -133,8 +133,14 @@ class Gdn_ActivityModel extends Gdn_Model {
       $this->DefineSchema();
       $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
 
+      // If $SendEmail was FALSE or TRUE, let it override the $Notify setting.
+      if ($SendEmail === FALSE || $SendEmail === TRUE)
+         $Notify = $SendEmail;
+
+      // Otherwise let the decision to email lie with the $Notify setting.
+
       // If the activity was saved successfully and it was a notification, send a notification to the user.
-      if ($SendEmail && $ActivityID > 0 && $Notify)
+      if ($ActivityID > 0 && $Notify)
          $this->SendNotification($ActivityID);
       
       return $ActivityID;
@@ -143,9 +149,16 @@ class Gdn_ActivityModel extends Gdn_Model {
    public function SendNotification($ActivityID, $Story = '') {
       $Activity = $this->GetID($ActivityID);
       $Story = Format::Text($Story == '' ? $Activity->Story : $Story);
-      $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
+      // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
+      if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
+         $CommentActivity = $this->GetID($Activity->CommentActivityID);
+         $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
+         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+      }
       $User = $this->SQL->Select('Name, Email')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+
       if ($User) {
+         $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
          $Email = new Gdn_Email();
          $Email->Subject(sprintf(Gdn::Translate('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
          $Email->To($User->Email, $User->Name);
@@ -159,7 +172,6 @@ class Gdn_ActivityModel extends Gdn_Model {
             )
          );
          
-         // Fail silently if the notification email has problems.
          $Email->Send();
       }
    }

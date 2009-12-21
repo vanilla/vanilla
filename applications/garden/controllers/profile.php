@@ -133,13 +133,23 @@ class ProfileController extends Gdn_Controller {
          
          // Update About if necessary
          $ActivityType = 'WallComment';
+         $SendNotification = TRUE;
          if ($Session->UserID == $this->User->UserID) {
+            $SendNotification = FALSE;
             $this->UserModel->SaveAbout($Session->UserID, $Comment);
             $this->User->About = $Comment;
             $this->SetJson('UserData', $this->FetchView('user'));
             $ActivityType = 'AboutUpdate';
          }
-         $NewActivityID = $this->ActivityModel->Add($Session->UserID, $ActivityType, $Comment, $this->User->UserID);
+         $NewActivityID = $this->ActivityModel->Add(
+            $Session->UserID,
+            $ActivityType,
+            $Comment,
+            $this->User->UserID,
+            '',
+            '/profile/'.$this->User->UserID.'/'.Format::Url($this->User->Name),
+            $SendNotification);
+         
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('garden/profile/'.$UserReference);
          } else {

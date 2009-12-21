@@ -82,7 +82,9 @@ class ActivityController extends Gdn_Controller {
                'ActivityComment',
                $Body,
                '',
-               $ActivityID
+               $ActivityID,
+               '',
+               TRUE
             );
          }
       }

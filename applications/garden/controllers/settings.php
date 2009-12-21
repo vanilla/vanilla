@@ -63,11 +63,6 @@ class SettingsController extends GardenController {
          }
       }
       
-      // Check the update server for updates to these applications
-      $this->UpdateManager = new Gdn_UpdateManager();
-      // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
-      // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_APPLICATION, array_keys($this->AvailableApplications));
-      
       if ($ApplicationName != '') {
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
             try {

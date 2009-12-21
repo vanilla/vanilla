@@ -21,7 +21,7 @@ $PluginInfo['Debugger'] = array(
    'SettingsPermission' => 'Plugins.Debugger.Manage', // The permission required to view the SettingsUrl.
    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
+   'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 

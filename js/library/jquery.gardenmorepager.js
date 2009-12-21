@@ -1,7 +1,7 @@
 /* 
  * Garden's jQuery MorePager (1.0.0)
  * by Mark O'Sullivan (www.markosullivan.ca)
- * mark@lussumo.com
+ * mark@vanillaforums.com
  *
  * Copyright (c) 2009 Mark O'Sullivan (www.markosullivan.ca)
  * Licensed under the GPL v2. 

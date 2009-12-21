@@ -16,7 +16,7 @@ $PluginInfo['HTMLPurifier'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@lussumo.com',
+   'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://toddburry.com'
 );
 require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');

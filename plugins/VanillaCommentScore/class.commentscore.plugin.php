@@ -21,7 +21,7 @@ $PluginInfo['VanillaCommentScore'] = array(
    //'SettingsUrl' => '/garden/plugin/metadata', // Url of the plugin's settings page.
    //'SettingsPermission' => 'Plugins.MetaData.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@lussumo.com',
+   'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://toddburry.com'
 );
 

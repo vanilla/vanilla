@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Object Representation of an email. All public methods return $this for
  * chaining purposes. ie. $Email->Subject('Hi')->Message('Just saying hi!')-
- * To('joe@lussumo.com')->Send();
+ * To('joe@vanillaforums.com')->Send();
  *
  * @author Mark O'Sullivan
  * @copyright 2003 Mark O'Sullivan

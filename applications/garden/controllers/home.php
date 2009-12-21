@@ -61,4 +61,5 @@ class HomeController extends Gdn_Controller {
    public function Permission() {
       $this->Render();
    }
+   
 }

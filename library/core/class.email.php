@@ -197,16 +197,49 @@ class Gdn_Email extends Gdn_Pluggable {
     * an array of email addresses, this value will be ignored.
     */
    public function To($RecipientEmail, $RecipientName = '') {
-      // Only allow one address in the "to" field. Append all extras to the "cc" field.
-      if (!$this->_IsToSet) {
-         $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
-         $this->_IsToSet = True;
-      }
-      else {
-         $this->Cc($RecipientEmail, $RecipientName);
+      if (is_string($RecipientEmail) && StrPos($RecipientEmail, ',') > 0) {
+         $RecipientEmail = explode(',', $RecipientEmail);
+         $RecipientEmail = array_map('trim', $RecipientEmail);
       }
 
-      return $this;
+      if (!is_array($RecipientEmail)) {
+         // Only allow one address in the "to" field. Append all extras to the "cc" field.
+         if (!$this->_IsToSet) {
+            $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
+            $this->_IsToSet = True;
+         }
+         else {
+            $this->Cc($RecipientEmail, $RecipientName);
+         }
+   
+         return $this;
+      } else {
+         if ($this->PhpMailer->Mailer == 'smtp' || Gdn::Config('Garden.Email.UseSmtp'))
+            throw new Exception('You cannot address emails to more than one address when using SMTP.');
+         
+         // Need to set return-path, to prevent error: unknown, malformed, or incomplete option -f in mail()
+         if ($this->Sender == '')
+            $this->PhpMailer->Sender =& $this->PhpMailer->From;
+
+         $this->PhpMailer->SingleTo = True;
+         if (array_key_exists(0, $RecipientEmail)) {
+            if (is_object($RecipientEmail[0]) && property_exists($RecipientEmail[0], 'Email') && property_exists($RecipientEmail[0], 'Name')) {
+               foreach ($RecipientEmail as $Recipient)
+                  $this->PhpMailer->AddAddress($Recipient->Email, $Recipient->Name);
+               
+               return $this;
+            }
+            if (!is_array($RecipientName) || Count($RecipientEmail) != Count($RecipientName))
+               $RecipientName = array_fill(0, Count($RecipientEmail), '');
+
+            $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
+         }
+
+         foreach($RecipientEmail as $Email => $Name)
+            $this->PhpMailer->AddAddress($Email, $Name);
+         
+         return $this;
+      }
    }
    
    public function Charset($Use = ''){

@@ -218,7 +218,7 @@ class Gdn_Email extends Gdn_Pluggable {
             throw new Exception('You cannot address emails to more than one address when using SMTP.');
          
          // Need to set return-path, to prevent error: unknown, malformed, or incomplete option -f in mail()
-         if ($this->Sender == '')
+         if ($this->PhpMailer->Sender == '')
             $this->PhpMailer->Sender =& $this->PhpMailer->From;
 
          $this->PhpMailer->SingleTo = True;

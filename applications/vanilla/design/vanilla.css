@@ -488,7 +488,7 @@ ul.Drafts li ul li.Title a.DeleteDraft {
    cursor: pointer;
    line-height: 100%;
 }
-ul.Drafts li ul li.Topic a.DeleteDraft:hover {
+ul.Drafts li ul li.Title a.DeleteDraft:hover {
    color: #333;
    border: 1px solid #888;
 }

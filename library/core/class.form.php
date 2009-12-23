@@ -225,8 +225,7 @@ class Gdn_Form {
             if (is_numeric($Text)) $Text = $ID;
 
             $Instance['value'] = $ID;
-            if (is_array($CheckedValues) && in_array($Data->$ValueField,
-               $CheckedValues)) {
+            if (is_array($CheckedValues) && in_array($ID, $CheckedValues)) {
                $Instance['checked'] = 'checked';
             }
 

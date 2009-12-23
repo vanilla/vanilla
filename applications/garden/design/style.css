@@ -647,11 +647,12 @@ div.Box dl {
    background: #F5FCFF;
    padding: 3px;
    overflow: hidden;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;	
 }
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #2786C2;
+   color: #555;
 }
 div.Box dl dd {
    margin-left: 80px;
@@ -699,21 +700,12 @@ ul.PanelInfo div.Meta strong {
    background: #ff6;
    padding: 0 2px;
 }
-ul.PanelDiscussions li {
-   text-align: left;
-}
-ul.PanelDiscussions li a {
-   float: none;
-}
-ul.PanelDiscussions li strong {
-   display: block;
-}
 ul.PanelInfo li.Active {
-   background: #fff /* Panel Selected Background Color */;
-   border-bottom: 1px solid #a3e6ff /* Panel Inlay Border Color */;
+   background: #fff;
+   border-bottom: 1px solid #a3e6ff;
 }
 ul.PanelInfo li.Active a {
-   color: #2786C2 /* Panel Selected Font Color */;
+   color: #2786C2;
 }
 body.Profile ul.PanelInfo {
    border-bottom: 1px solid #caf0fe;
@@ -861,12 +853,13 @@ ul.Activities li h3 a.CommentOption {
    font-weight: normal;
 }
 ul.Activities li a.Delete {
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    float: right;
    width: auto;
    padding: 5px;
    margin: 0 1px 0 0;
    font-size: 11px;
-   font-weight: bold;
+   font-weight: normal;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    color: #555;
@@ -928,7 +921,7 @@ ul.Activities ul.Comments li {
    padding: 6px;
    line-height: 1;
 }
-ul.Activities ul.Comments li * {
+ul.Activities * {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 }
 ul.Activities li.HasPhoto div {
@@ -992,6 +985,7 @@ ul.Activities li.CommentForm textarea.TextBox {
 	min-height: 40px;
    height: 40px;
    margin-bottom: 2px;
+	font-size: 12px;
 }
 body.Profile ul.Activities {
    margin-top: 10px;

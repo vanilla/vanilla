@@ -56,6 +56,16 @@ a.NewDiscussion:hover {
 #Panel ul.Discussions {
    border: 0;
 }
+ul.PanelDiscussions li {
+   text-align: left;
+}
+ul.PanelDiscussions li a {
+   float: none;
+}
+ul.PanelDiscussions li strong {
+   display: block;
+}
+
 
 /* ============================================================== Discussions */
 

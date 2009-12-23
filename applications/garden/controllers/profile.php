@@ -474,7 +474,7 @@ class ProfileController extends Gdn_Controller {
    public function AddSideMenu($CurrentUrl = '') {
       if ($this->User !== FALSE) {
          $SideMenu = new Gdn_SideMenuModule($this);
-         $SideMenu->HtmlId = '';
+         $SideMenu->HtmlId = 'UserOptions';
          $Session = Gdn::Session();
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');
@@ -488,22 +488,22 @@ class ProfileController extends Gdn_Controller {
             
             // Add profile options for everyone
             if ($this->User->Photo != '')
-               $SideMenu->AddLink('Options', 'Change Picture', '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Change Picture'), '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
             
-            $SideMenu->AddLink('Options', 'Edit Account', '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
             if ($this->User->Photo != '')
-               $SideMenu->AddLink('Options', 'Remove Picture', '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
          } else {
             // Add profile options for the profile owner
-            $SideMenu->AddLink('Options', 'Change My Picture', '/profile/picture', FALSE, array('class' => 'PictureLink'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
             if ($this->User->Photo != '') {
-               $SideMenu->AddLink('Options', 'Edit My Thumbnail', '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
-               $SideMenu->AddLink('Options', 'Remove My Picture', '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }
-            $SideMenu->AddLink('Options', 'Edit My Account', '/profile/edit', FALSE, array('class' => 'Popup'));
-            $SideMenu->AddLink('Options', 'Change My Password', '/profile/password', FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', 'My Invitations', '/profile/invitations', FALSE, array('class' => 'Popup'));
+               $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');

@@ -170,7 +170,7 @@ class Gdn_Model extends Gdn_Pluggable {
          $this->Schema = new Gdn_Schema($this->Name, $this->Database);
          $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name, $this->Database);
          if (is_array($this->PrimaryKey)) {
-            print_r($this->PrimaryKey);
+            //print_r($this->PrimaryKey);
             $this->PrimaryKey = $this->PrimaryKey[0];
          }
 

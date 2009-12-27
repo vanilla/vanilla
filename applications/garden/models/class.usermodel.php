@@ -817,8 +817,8 @@ class Gdn_UserModel extends Gdn_Model {
          // Send out a notification to the user
          $User = $this->Get($UserID);
          if ($User) {
-            $Email->Subject(Gdn::Translate('MembershipApprovedSubject'));
-            $Email->Message(sprintf(Gdn::Translate('MembershipApprovedEmail'), $User->Name, Gdn::Authenticator()->SignInUrl()));
+            $Email->Subject(sprintf(Gdn::Translate('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
+            $Email->Message(sprintf(Gdn::Translate('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
             $Email->To($User->Email);
             $Email->Send();
          }

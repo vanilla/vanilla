@@ -425,7 +425,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             ->FirstRow();
          $Count = $Data ? $Data->CountDiscussions : 0;
          
-         if ($Count > 0) {
+         if ($Count >= 0) {
             $this->SQL
                ->Update('Category')
                ->Set('CountDiscussions', $Count)

@@ -124,47 +124,11 @@ class UtilityController extends GardenController {
          }
       }
       
-      if (function_exists('curl_init')) {
-         $Handler = curl_init();
-         curl_setopt($Handler, CURLOPT_URL, Gdn::Config('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update'));
-         curl_setopt($Handler, CURLOPT_HEADER, 0);
-         curl_setopt($Handler, CURLOPT_POST, 1);
-         curl_setopt($Handler, CURLOPT_POSTFIELDS, http_build_query($Fields));
-         curl_exec($Handler);
-         curl_close($Handler);
-      } else if (function_exists('fsockopen')) {
-         $UrlParts = parse_url(Gdn::Config('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update'));
-         $Host = $UrlParts['host'];
-         $Port = ArrayValue('port', $UrlParts, '80');
-         $Path = $UrlParts['path'];
-         $Referer = Gdn_Url::WebRoot(TRUE);
-         $Query = http_build_query($Fields);
+      echo ProxyRequest(
+         Gdn::Config('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update'),
+         $Fields = FALSE
+      );
       
-         // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
-         if (!$Pointer)
-            throw new Exception(sprintf(Gdn::Translate('Encountered an error when attempting to check for updates (%1$s): [%2$s] %3$s'), $this->AuthenticateUrl, $ErrorNumber, $Error));
-         
-         $Header = "GET $Path?$Query HTTP/1.1\r\n" .
-            "Host: $Host\r\n" .
-            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
-            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-            "User-Agent: Vanilla/2.0\r\n" .
-            "Accept: */*\r\n" .
-            "Accept-Charset: utf-8;\r\n" .
-            "Referer: $Referer\r\n" .
-            "Connection: close\r\n\r\n";
-         
-         // Send the headers and get the response
-         fputs($Pointer, $Header);
-         $Response = '';
-         while ($Line = fread($Pointer, 4096)) {
-            $Response .= $Line;
-         }
-         @fclose($Pointer);
-         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
-         echo $Response;
-      }
       $Database = Gdn::Database();
       $Database->CloseConnection();
    }

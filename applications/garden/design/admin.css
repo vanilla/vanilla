@@ -880,12 +880,6 @@ div.Popup p {
 	padding: 6px 10px 10px;
 	font-family: 'lucida grande','Lucida Sans Unicode';
 }
-div.Popup div.Legal * {
-	font-family: 'lucida grande','Lucida Sans Unicode';
-}
-div.Popup div.Legal p {
-	padding: 6px 0 10px;
-}
 div.Popup small {
 	font-family: 'lucida grande','Lucida Sans Unicode';
 	font-size: 80%;
@@ -941,6 +935,36 @@ div.Legal li {
 div.Legal strong {
 	font-weight: bold;
 }
+div.Legal * {
+	font-family: 'lucida grande','Lucida Sans Unicode';
+}
+div.Legal em {
+	font-style: italic;
+}
+div.Legal p {
+	padding: 6px 0 10px;
+}
+div.Legal h3 {
+	font-weight: bold;
+	padding: 6px 0 0;
+}
+div.Legal {
+	margin: 0 0 10px;
+	padding: 2px 10px;
+	border: 1px solid #c0e7f5;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	background: #f6ffff;
+}
+div.Popup div.Legal {
+	margin: 0;
+	padding: 0 10px 10px;
+	border: none;
+	background: none;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+}
+
 
 
 /* =================================================================== Themes */

@@ -77,7 +77,8 @@ if (!function_exists('Anchor')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if (substr($Destination, 0, 7) != 'http://' && ($Destination != '' || $ForceAnchor === FALSE))
+      $Prefix = substr($Destination, 0, 7);
+      if (!in_array($Prefix, array('http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Url($Destination);
 
       return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';

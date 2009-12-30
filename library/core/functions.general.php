@@ -657,9 +657,9 @@ if (!function_exists('ProxyRequest')) {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          $UrlParts = parse_url($Url);
-         $Host = $UrlParts['host'];
+         $Host = ArrayValue('host', $UrlParts, '');
          $Port = ArrayValue('port', $UrlParts, '80');
-         $Path = $UrlParts['path'];
+         $Path = ArrayValue('path', $UrlParts, '');
          $Referer = Gdn_Url::WebRoot(TRUE);
          if ($PostFields)
             $Path .= '?' . $PostFields;

@@ -128,18 +128,20 @@ class Gdn_DataSet implements IteratorAggregate {
       if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
       
       if ($this->_PDOStatementFetched === FALSE) {
-      // Get all records from the pdostatement's result set.
-         if ($RowType == DATASET_TYPE_OBJECT) {
-            $this->ResultObjectFetched = TRUE;
-            $this->_PDOStatement->setFetchMode(PDO::FETCH_OBJ);
-            while ($Row = $this->_PDOStatement->fetch()) {
-               $this->_ResultObject[] = $Row;
-            }
-         } else {
-            $this->ResultArrayFetched = TRUE;
-            $this->_PDOStatement->setFetchMode(PDO::FETCH_ASSOC);
-            while ($Row = $this->_PDOStatement->fetch()) {
-               $this->_ResultArray[] = $Row;
+         if (is_object($this->_PDOStatement)) {
+            // Get all records from the pdostatement's result set.
+            if ($RowType == DATASET_TYPE_OBJECT) {
+               $this->ResultObjectFetched = TRUE;
+               $this->_PDOStatement->setFetchMode(PDO::FETCH_OBJ);
+               while ($Row = $this->_PDOStatement->fetch()) {
+                  $this->_ResultObject[] = $Row;
+               }
+            } else {
+               $this->ResultArrayFetched = TRUE;
+               $this->_PDOStatement->setFetchMode(PDO::FETCH_ASSOC);
+               while ($Row = $this->_PDOStatement->fetch()) {
+                  $this->_ResultArray[] = $Row;
+               }
             }
          }
          $this->_PDOStatementFetched = TRUE;
@@ -221,7 +223,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * Returns the number of fields in the DataSet.
     */
    public function NumFields() {
-      return $this->_PDOStatement->columnCount();
+      return is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
    }
 
    /**
@@ -372,7 +374,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
    public function PDOStatement(&$PDOStatement = FALSE) {
-      if($PDOStatement === FALSE)
+      if ($PDOStatement === FALSE)
          return $this->_PDOStatement;
       else
          $this->_PDOStatement = $PDOStatement;

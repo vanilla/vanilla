@@ -201,9 +201,7 @@ class Gdn_Database {
 
          if (!is_object($PDOStatement)) {
             trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($this->Connection()->errorInfo())), E_USER_ERROR);
-         }
-
-         if ($PDOStatement->execute($InputParameters) === FALSE) {
+         } else if ($PDOStatement->execute($InputParameters) === FALSE) {
             trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDOStatement->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
          }
       } else {

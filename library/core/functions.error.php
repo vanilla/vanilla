@@ -25,7 +25,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
       return FALSE;
    
    // Clean the output buffer in case an error was encountered in-page.
-   ob_clean();
+   @ob_end_clean();
    header('Content-Type: text/html; charset=utf-8');
    
    $SenderMessage = $Message;
@@ -216,6 +216,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    // Attempt to log an error message no matter what.
    LogMessage($File, $Line, $SenderObject, $SenderMethod, $SenderMessage, $SenderCode);
+   exit();
 }
 
 if (!function_exists('ErrorMessage')) {

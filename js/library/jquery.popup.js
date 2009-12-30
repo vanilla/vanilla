@@ -133,7 +133,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       popupHtml = settings.confirmHtml;
     
     popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
+    
     $('body').append(popupHtml);
+    if (settings.containerCssClass != '')
+      $('#'+settings.popupId).addClass(settings.containerCssClass);
+      
     var pagesize = $.popup.getPageSize();
     $('div.Overlay').css({ height: pagesize[1] });
     
@@ -264,6 +268,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     afterSuccess:     function() {
       // Called after an ajax request resulted in success, and before "close" is called.
     },
+    containerCssClass: '',
     popupHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \

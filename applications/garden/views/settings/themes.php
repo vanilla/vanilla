@@ -115,6 +115,19 @@ printf(
       
                   echo '</h4>';
                   
+                  if ($PreviewImage) {
+                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="112" width="150" />',
+                        'garden/settings/previewtheme/'.$ThemeFolder,
+                        '',
+                        array('target' => '_top')
+                     );
+                  }
+
+                  echo '<div class="Buttons">';
+                  echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
+                  echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
+                  echo '</div>';
+
                   $Description = ArrayValue('Description', $ThemeInfo);
                   if ($Description)
                      echo '<em>'.$Description.'</em>';
@@ -145,18 +158,7 @@ printf(
                      echo '</div>';
                   }
 
-                  if ($PreviewImage) {
-                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="112" width="150" />',
-                        'garden/settings/previewtheme/'.$ThemeFolder,
-                        '',
-                        array('target' => '_top')
-                     );
-                  }
 
-                  echo '<div class="Buttons">';
-                  echo Anchor('Apply', 'garden/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
-                  echo Anchor('Preview', 'garden/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
-                  echo '</div>';
                ?>
             </td>
             <?php

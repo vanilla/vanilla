@@ -43,6 +43,9 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    $('a.Popdown').popup({hijackForms: false});
+   
+   // This turns SignInPopup anchors into in-page popups
+   $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
 
    // Make sure that message dismissalls are ajax'd
    $('a.Dismiss').live('click', function() {

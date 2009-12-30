@@ -57,25 +57,27 @@ jQuery(document).ready(function($) {
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
-               if (json.FormSaved == false) {
+               if (json.StatusMessage) {
                   $(frm).prepend(json.StatusMessage);
                   json.StatusMessage = null;
                }
-               // Clean up the form
-               clearMessageForm();                
-
-               // And show the new comments
-               $('#Conversation').append(json.Data);
-               
-               // Remove any "More" pager links
-               $('#PagerMore').remove();
-               
-               // And scroll to them
-               var target = $('#' + json.MessageID);
-               if (target.offset()) {
-                  $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+               if (json.FormSaved) {
+                  // Clean up the form
+                  clearMessageForm();                
+   
+                  // And show the new comments
+                  $('#Conversation').append(json.Data);
+                  
+                  // Remove any "More" pager links
+                  $('#PagerMore').remove();
+                  
+                  // And scroll to them
+                  var target = $('#' + json.MessageID);
+                  if (target.offset()) {
+                     $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+                  }
+                  inform(json.StatusMessage);
                }
-               inform(json.StatusMessage);
             }
          });
          return false;

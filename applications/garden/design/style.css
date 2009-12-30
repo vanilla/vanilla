@@ -181,6 +181,7 @@ div.Messages {
    font-size: 12px;
    display: block;
    width: 100%;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;	
 }
 * html div.Messages {
   position: absolute;
@@ -1390,6 +1391,9 @@ div.Popup div.Body {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border: 8px solid #555;
+}
+div.SignInPopup div.Body {
+	max-width: 280px;
 }
 div.Popup div.Body div.Body {
    border: 0;

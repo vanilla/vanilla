@@ -1007,9 +1007,6 @@ table.SelectionGrid em {
    padding: 3px 0 8px;
    font-style: oblique;
 }
-table.SelectionGrid img {
-	margin-top: 12px;
-}
 table.SelectionGrid div.Buttons {
    float: right;
    width: 70px;
@@ -1020,11 +1017,11 @@ table.SelectionGrid div.Buttons a {
    padding: 2px 4px;
    margin: 4px 0;
 }
-table.Themes td.HasPreview div.Buttons {
-	padding-top: 59px;
+table.Themes em {
+	padding-top: 13px;
 }
 table.Themes div.Buttons a {
-	margin: 8px 0 0;
+	margin: 0 0 8px;
 }
 table.SelectionGrid dl {
 	padding: 0 0 10px;

@@ -638,20 +638,16 @@ if (!function_exists('ProxyRequest')) {
     */
    function ProxyRequest($Url, $PostFields = FALSE) {
       $Response = '';
-      
-      if (is_array($PostFields))
-         $PostFields = http_build_query($PostFields);
-      else
-         $PostFields = FALSE;
+      $Query = is_array($PostFields) ? http_build_query($PostFields) : '';
       
       if (function_exists('curl_init')) {
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
-         if ($PostFields) {
+         if ($Query != '') {
             curl_setopt($Handler, CURLOPT_POST, 1);
-            curl_setopt($Handler, CURLOPT_POSTFIELDS, http_build_query($Fields));
+            curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          }
          $Response = curl_exec($Handler);
          curl_close($Handler);
@@ -661,15 +657,13 @@ if (!function_exists('ProxyRequest')) {
          $Port = ArrayValue('port', $UrlParts, '80');
          $Path = ArrayValue('path', $UrlParts, '');
          $Referer = Gdn_Url::WebRoot(TRUE);
-         if ($PostFields)
-            $Path .= '?' . $PostFields;
       
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
             throw new Exception(sprintf(Gdn::Translate('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
          
-         $Header = "GET $Path HTTP/1.1\r\n" .
+         $Header = "GET $Path?$Query HTTP/1.1\r\n" .
             "Host: $Host\r\n" .
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 

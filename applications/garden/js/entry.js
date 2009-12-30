@@ -1,10 +1,6 @@
 // This file contains javascript that is specific to the garden/entry controller.
 jQuery(document).ready(function($) {
    
-   // Set the ClientHour if there is an input looking for it.
-   var d = new Date();
-   $('input:hidden[name$=ClientHour]').val(d.getHours());
-   
    // Check to see if the selected username is valid
    $('#Register input[name=User/Name], body.register input[name=User/Name]').blur(function() {
       var name = $(this).val();

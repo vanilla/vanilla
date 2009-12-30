@@ -1,6 +1,12 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
+   
+   // Set the ClientHour if there is an input looking for it.
+   $('input:hidden[name$=ClientHour]').livequery(function() {
+      var d = new Date();
+      $(this).val(d.getHours());
+   });
 
    definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
@@ -33,6 +39,10 @@ jQuery(document).ready(function($) {
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
    $('a.Popup').popup();
+   
+   // This turns any anchor with the "Popdown" class into an in-page pop-up, but
+   // it does not hijack forms in the popup.
+   $('a.Popdown').popup({hijackForms: false});
 
    // Make sure that message dismissalls are ajax'd
    $('a.Dismiss').live('click', function() {

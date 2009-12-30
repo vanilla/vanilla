@@ -708,11 +708,13 @@ if (!function_exists('RandomString')) {
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination) {
-      @ob_end_clean();
-      header("location: ".Url($Destination));
       // Close any db connections before exit
       $Database = Gdn::Database();
       $Database->CloseConnection();
+      // Clear out any previously sent content
+      @ob_end_clean();
+      // re-assign the location header
+      header("location: ".Url($Destination));
       // Exit
       exit();
    }

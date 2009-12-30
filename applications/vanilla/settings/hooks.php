@@ -76,8 +76,8 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function ProfileController_Discussions_Create(&$Sender) {
-      $UserReference = ArrayValue(0, $Sender->EventArguments, '');
-      $Offset = ArrayValue(1, $Sender->EventArguments, 0);
+      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(1, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
       $Sender->SetTabView($UserReference, 'Discussions', 'Profile', 'Discussions', 'Vanilla');
       

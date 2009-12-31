@@ -25,10 +25,9 @@ Welcome to the Admin CSS File! Some things you should know:
 */
    
 
-   
 /* =================================================================== Header */
 #Head {
-	background:#F2FBFF none repeat scroll 0 0;
+	background:#e2f4ff none repeat scroll 0 0;
 	border-bottom:1px solid #FFFFFF;
 	padding: 18px;
    text-align: right;
@@ -38,7 +37,7 @@ Welcome to the Admin CSS File! Some things you should know:
 	float: left;
 }
 #Head h1 a {
-	color:#02455B;
+	color:#02475a;
 	font-size:160%;
 	text-shadow: #fff 0 1px 0;
 }
@@ -47,8 +46,8 @@ Welcome to the Admin CSS File! Some things you should know:
 	font-size: 40%;
 	text-shadow: none;
 	font-weight: normal;
-	background: #DCF5FE;
-	border: 1px solid #CAF0FE;
+	background: #c2e7fc;
+	border: 1px solid #aedefc;
 	padding: 2px 4px;
 	margin: 0 0 0 6px;
 	-moz-border-radius: 3px;
@@ -67,11 +66,11 @@ Welcome to the Admin CSS File! Some things you should know:
 div.Box {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   background: #e9f9ff  /* Panel Background Color */;
-   color: #999  /* Panel Font Color */;
+   background: #d3f0ff;
+   color: #999;
    padding: 6px 0;
    margin: 0 0 10px 0;
-	border: 1px solid #C0E7F5;
+	border: 1px solid #a5d0e7;
 }
 div.Box h4 {
    font-size: 110%;
@@ -82,7 +81,7 @@ div.Box h4 {
    padding: 0 6px;
 }
 div.Box dl {
-   border-bottom: 1px solid #caf0fe  /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #aedefc  /* Panel Inlay Border Color */;
    background: #f0fbff /* Panel Inlay Background Color */;
    padding: 3px;
    font-size: 90%;
@@ -143,10 +142,10 @@ body {
    padding: 0;
    font-size: small;
    background: #ffffff;
-	background: #DCF5FE url(slicesplash.jpg) no-repeat scroll center top;
+	background: #c2e7fc url(slicesplash.jpg) no-repeat scroll center top;
 }
 #Body {
-	border-top:1px solid #C0E7F5;
+	border-top:1px solid #a5d0e7;
 }
 #Content {
 	font-family: "Lucida Grande", 'Lucida Sans Unicode',Verdana,Arial,"Bitstream Vera Sans",sans-serif;
@@ -210,7 +209,7 @@ input.InputBox,
 input.SmallInput,
 textarea {
    font-family: arial;
-   color: #888;
+   color: #444;
    font-size: 16px;
    padding: 3px;
    margin: 0;
@@ -237,7 +236,7 @@ input.InputBox {
 input.SmallInput:focus,
 input.InputBox:focus,
 textarea:focus {
-   background: #ffe;
+   background: #ffd;
 	color: #333;
 	border: 1px solid #aaa;
 }
@@ -261,9 +260,9 @@ select.Year {
    padding: 4px;
    font-size: 11px;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #02455B;
+   color: #02475A;
 	text-shadow: #fff 0 1px 0;
-   border: 1px solid #bbb;
+   border: 1px solid #999;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    }
@@ -277,8 +276,8 @@ input.Button {
 }
 .FilterMenu a.Button:hover,
 .Button:hover {
-   color: #333;
-   border: 1px solid #888;
+   color: #111;
+   border: 1px solid #666;
 }
 .Loading {
    height: 100px;
@@ -344,25 +343,25 @@ div.Errors ul li {
 }
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
-.Warning {
+.DismissMessage {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    font-size: 14px;
+}
+.Warning {
 	line-height: 180%;
    background: #ffc;
-   border: 1px solid #ff9;
+   border: 1px solid #aaa;
    color: #000;
    padding: 6px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
 }
 div.Info {
-   font-size: 14px;
 	line-height: 180%;
-   background: #F2FBFF;
+   background: #e2f4ff;
    color: #333;
-   -moz-border-radius: 2px;
    padding: 6px;
    margin: 0 0 10px;
-	border: 1px solid #CAF0FE;
+	border: 1px solid #aedefc;
 }
 strong {
 	font-weight: bold;
@@ -424,7 +423,7 @@ a.Close:hover {
    margin: 1px 0 0;
    padding: 3px 6px;
    text-align: right;
-   background: #e9f9ff;
+   background: #d3f0ff;
    }
 .MorePager a {
    font-size: 13px;
@@ -448,7 +447,7 @@ a.Close:hover {
 tr#PagerMore td {
    border: 0;
    text-align: right;
-	border-bottom: 1px solid #CAF0FE;
+	border-bottom: 1px solid #aedefc;
 }
 #PagerMore {
    margin-bottom: 1px;
@@ -542,8 +541,8 @@ table {
    width: 100%;
    border-collapse: collapse;
    margin: 10px 0;
-	background: #F2FBFF;
-	border: 1px solid #C0E7F5;
+	background: #e2f4ff;
+	border: 1px solid #a5d0e7;
 }
 table label {
    font-size: 12px;
@@ -564,7 +563,7 @@ form ul li table label {
 }
 table thead th,
 table thead td {
-   border-bottom: 1px solid #C0E7F5;
+   border-bottom: 1px solid #a5d0e7;
 }
 table tbody th {
    font-weight: bold;
@@ -572,7 +571,7 @@ table tbody th {
 }
 table tbody th,
 table tbody td {
-   border-bottom: 1px solid #C0E7F5;
+   border-bottom: 1px solid #a5d0e7;
    line-height: 150%;
 }
 table tbody tr.FootNote td {
@@ -608,11 +607,11 @@ table input.Button {
 }
 table.AltRows tr.Alt th,
 table.AltRows tr.Alt td {
-   background: #E9F9FF /* Body Alt Background Color */;
+   background: #d3f0ff /* Body Alt Background Color */;
 }
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-   background: #E9F9FF /* Body Alt Background Color */;
+   background: #d3f0ff /* Body Alt Background Color */;
 }
 table.AltColumns tr.Alt {
    background: none;
@@ -647,7 +646,7 @@ table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td {
-   background: #E9F9FF /* Body Background Color */;
+   background: #d3f0ff /* Body Background Color */;
 }
 
 /* CheckBoxGrid */
@@ -704,7 +703,7 @@ table.AltColumns tr.Disabled td {
 }
 .CheckBoxGrid th.Alt,
 .CheckBoxGrid td.Alt {
-   background: #E9F9FF  /* Body Alt Background Color */;
+   background: #d3f0ff  /* Body Alt Background Color */;
 }
 /* CheckColumn */
 .CheckColumn thead td a {
@@ -765,9 +764,9 @@ table.AltColumns tr.Disabled td {
 /* ================================================== Splash Information Page */
 .SplashInfo {
 	margin: 80px 0;
-	border-top: 1px solid #C0E7F5;
-	border-bottom: 1px solid #C0E7F5;
-	background: #F2FBFF;
+	border-top: 1px solid #a5d0e7;
+	border-bottom: 1px solid #a5d0e7;
+	background: #e2f4ff;
 }
 .SplashInfo h1 {
 	text-align: center;
@@ -841,7 +840,7 @@ div.Popup div.Body {
   text-align: left;
   position: relative;
   padding: 0px;
-  background: #F2FBFF;
+  background: #e2f4ff;
   max-width: 500px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -865,8 +864,8 @@ div.Popup h2 {
 	font-weight:bold;
 	margin-bottom: 0;
 	color: #02455B;
-	background: #DCF5FE;
-	border-bottom: 1px solid #C0E7F5;
+	background: #c0e6fc;
+	border-bottom: 1px solid #a5d0e7;
 	text-shadow: none;
 	padding: 6px 9px 4px;
 	text-shadow: 0 1px 0 #fff;
@@ -905,8 +904,8 @@ body.Entry div.Popup p {
 	color: #000;
 }
 div.Popup .Footer {
-	border-top: 1px solid #C0E7F5;
-	background: #DCF5FE;
+	border-top: 1px solid #a5d0e7;
+	background: #c0e6fc;
 	padding:4px 8px 0 5px;
 	text-align: right;
 	-moz-border-radius-bottomleft: 5px;
@@ -951,7 +950,7 @@ div.Legal h3 {
 div.Legal {
 	margin: 0 0 10px;
 	padding: 2px 10px;
-	border: 1px solid #c0e7f5;
+	border: 1px solid #a5d0e7;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	background: #f6ffff;
@@ -996,7 +995,7 @@ table.SelectionGrid {
 }
 table.SelectionGrid td {
 	width: 33%;
-	border: 1px solid #C0E7F5;
+	border: 1px solid #a5d0e7;
 	border-left: 0;
 	border-right: 0;
 	padding: 16px;
@@ -1009,14 +1008,14 @@ table.Themes td h4 {
 	padding: 6px 0;
 }
 table.SelectionGrid td.FirstCol {
-	border-right: 1px solid #C0E7F5;
+	border-right: 1px solid #a5d0e7;
 }
 table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol {
-	border-left: 1px solid #C0E7F5;
+	border-left: 1px solid #a5d0e7;
 }
 table.SelectionGrid td:hover {
-   background: #F2FBFF;
+   background: #e2f4ff;
 }
 table.SelectionGrid td.EmptyCol:hover {
    background: none;
@@ -1053,7 +1052,7 @@ table.SelectionGrid dl {
 table.SelectionGrid dl dt {
 	display: inline;
    color: #000;
-   border-right: 1px solid #C0E7F5;
+   border-right: 1px solid #a5d0e7;
    padding: 4px 6px 4px 0;
 	margin: 0 4px 0 0;
 }
@@ -1065,11 +1064,11 @@ table.SelectionGrid dl dd {
 #Foot {
    clear: both;
    font-size: 13px;
-   border-bottom: 1px solid #C0E7F5;
+   border-bottom: 1px solid #a5d0e7;
    color: #076C8E;
    font-weight: bold;
    border-top: 1px solid #fff;
-   background: #F2FBFF;
+   background: #e2f4ff;
 	padding: 10px 18px;
 }
 #Foot a {

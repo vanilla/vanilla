@@ -743,12 +743,6 @@ body.Entry #Content div.Box {
 	margin: 0;
 	padding: 0;
 }
-div.SignInPopup div.Box {
-	margin: 0;
-	padding: 0;
-	background: none;
-	border: 0;
-}
 body.Entry p {
 	text-align: left;
 	padding: 0 10px;
@@ -1404,9 +1398,6 @@ div.Popup div.Body {
   -webkit-border-radius: 5px;
   border: 8px solid #555;
 }
-div.SignInPopup div.Body {
-	max-width: 280px;
-}
 div.Popup div.Body div.Body {
    border: 0;
 }
@@ -1486,6 +1477,18 @@ body.Entry div.Popup p {
 div.Popup #Form_User div.Warning,
 #garden_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
+}
+div.SignInPopup div.Body {
+	max-width: 320px;
+}
+div.SignInPopup .Content form {
+	padding: 0 30px 10px;
+}
+div.SignInPopup div.Box {
+	margin: 0;
+	padding: 0;
+	background: none;
+	border: 0;
 }
 
 /* ==================================================================== Legal */

@@ -61,7 +61,7 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li>
-      <?php echo $this->Form->Button('Apply!'); ?>
+      <?php echo $this->Form->Button('Apply →'); ?>
    </li>
 </ul>
 <?php echo $this->Form->Close();

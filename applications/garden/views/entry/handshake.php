@@ -53,7 +53,7 @@ echo $this->Form->Open(array('Action' => Url('/entry/handshake'), 'id' => 'Form_
    </li>
    <li>
       <?php
-         echo $this->Form->Button('Sign Me In!');
+         echo $this->Form->Button('Sign In →');
       ?>
    </li>
 </ul>

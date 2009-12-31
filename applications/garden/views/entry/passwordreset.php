@@ -21,7 +21,7 @@ echo $this->Form->Open();
    </li>
    <li>
       <?php
-         echo $this->Form->Button('Save your password');
+         echo $this->Form->Button('Save your password →');
       ?>
    </li>
 </ul>

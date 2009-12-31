@@ -15,21 +15,8 @@ class EntryController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'Session', 'Gdn_UserModel');
    
    public function Index() {
-      $this->AddJsFile('entry.js');
-         
-      // Define gender dropdown options (for registration)
-      $this->GenderOptions = array(
-         'm' => Gdn::Translate('Male'),
-         'f' => Gdn::Translate('Female')
-      );
-      $this->InvitationCode = $this->Form->GetValue('InvitationCode');
-      if ($this->_RegistrationView() == 'RegisterCaptcha') {
-         include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
-      }
-      $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-      $this->Render();
+      $this->View = 'signin';
+      $this->SignIn();
    }
    
    public function Handshake() {

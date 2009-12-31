@@ -146,17 +146,19 @@ select {
    font-size: 11px;
    padding: 4px;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #555;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
    }
 input.Button {
+	font-size: 14px;
    font-weight: bold;
 }
 .Button:hover {
-   color: #333;
-   border: 1px solid #888;
+   color: #111;
+   border: 1px solid #666;
 }
 .Loading {
    height: 100px;
@@ -729,83 +731,93 @@ body.Entry div.Panel {
 }
 body.Entry #Content {
    float: none;
-   margin: 0;
-   width: auto;
+   margin: 0 auto;
+   width: 360px;
    text-align: center;
 }
-body.Entry #Leave {
-   width: 400px;
-   margin: 0 auto;
-   background: #E9F9FF;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   padding: 10px;
-   text-align: left;
+body.Entry #Content div.Box {
+   background: #E2F4FF;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	border: 1px solid #A5D0E7;
+	margin: 0;
+	padding: 0;
+}
+div.SignInPopup div.Box {
+	margin: 0;
+	padding: 0;
+	background: none;
+	border: 0;
+}
+body.Entry p {
+	text-align: left;
+	padding: 0 10px;
+	margin: 10px 0 10px;
 }
 body.Entry p.Leaving {
-   background: url('progress.gif') left top no-repeat;
+	margin-left: 43px;
+   background: url('progress.gif') left center no-repeat;
    padding-left: 50px;
 }
-body.register #Content,
-body.signin #Content,
-body.passwordrequest #Content,
-body.passwordreset #Content,
-body.Entry #SignIn,
-body.Entry #Password,
-body.Entry #Register,
-body.Entry #Handshake {
-   text-align: left;
-   float: left;
-   background: #E9F9FF /* Panel Background Color */;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 2px;
-   padding: 10px;
-   margin: 0 0 15px;
-}
-body.Entry #Register {
-	max-width: 354px;
-}
-body.Entry #SignIn,
-body.Entry #Password {
-   margin: 0 15px 15px 0;
-}
-body.Entry #Password p {
-   width: 242px;
-   overflow: hidden;
-}
 body.Entry #Content h1 {
-   border-bottom:1px solid #CAF0FE;
-   color: #2786C2 /* Panel Font Color */;
-   font-size:110%;
+   border: none;
+   color: #02475A;
+   font-size:140%;
    font-weight:bold;
-   margin: 0;
-   padding:0 0 1px;
+   padding: 6px;
+	margin: 0;
+	text-align: left;
 }
-body.Entry form ul li {
-   border: 0;
+body.Entry #Content form {
+	text-align: left;
+	padding: 10px 30px 20px;
 }
 body.Entry form ul li label {
+	font-size: 14px;
+	color: #555;
+	font-weight: bold;
 	padding: 6px 0 0;
 	display: block;
 }
-body.Entry #SignIn form ul li label.CheckBoxLabel,
-body.Entry #Register form ul li label.CheckBoxLabel {
+body.Entry form ul li label.CheckBoxLabel,
+body.Entry form ul li label.RadioLabel {
+	font-size: 12px;
+	font-weight: normal;
    width: auto;
 }
 body.Entry input.DateBox,
 body.Entry input.InputBox,
 body.Entry textarea {
+   width: 290px;
+}
+body.Entry div.Popup input.DateBox,
+body.Entry div.Popup input.InputBox,
+body.Entry div.Popup textarea {
    width: 250px;
 }
 span.Incorrect {
    display: block;
    color: red;
 }
-form#Form_User_SignIn input.Button,
-form#Form_User_Password input.Button,
-form#Form_User_Register input.Button {
+body.Entry input.Button {
 	margin: 10px 0 0;
 }
+#Form_User_SignIn li.Buttons span {
+	padding: 0 6px;
+}
+#Form_User_SignIn li.Buttons input.Button,
+body.Entry li.Buttons input.Button {
+	margin: 10px 0;
+}
+#Form_User_Password,
+body.Entry #Content #Form_User_Password {
+	padding-top: 0;
+}
+#garden_entry_index #Form_User_Password ul li label,
+#garden_entry_signin #Form_User_Password ul li label {
+	padding: 0;
+}
+
 
 /* =============================================================== Activities */
 body.Activity h1 {

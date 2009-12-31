@@ -180,11 +180,11 @@ class Gdn_PasswordAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentica
 	}
    
    public function RegisterUrl($Redirect = '/') {
-      return sprintf('/entry/?Target=%s', $Redirect);
+      return sprintf('/entry/register?Target=%s', $Redirect);
 	}
    
    public function SignInUrl($Redirect = '/') {
-      return sprintf('/entry/signin/?Target=%s', $Redirect);
+      return sprintf('/entry/?Target=%s', $Redirect);
    }
 
    public function SignOutUrl() {

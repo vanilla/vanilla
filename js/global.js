@@ -7,6 +7,12 @@ jQuery(document).ready(function($) {
       var d = new Date();
       $(this).val(d.getHours());
    });
+   
+   // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
+   $('a.ForgotPassword').live('click', function() {
+      $('#Form_User_Password').slideToggle('fast');
+      return false;
+   });
 
    definition = function(definition, defaultVal, set) {
       if (defaultVal == null)

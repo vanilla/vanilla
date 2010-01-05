@@ -505,7 +505,7 @@ ul.Drafts li ul li.Title a.DeleteDraft:hover {
 
 
 /* =============================================== Discussion & Comment Forms */
-#CommentForm {
+body.Discussion #CommentForm {
    background: #e9f9ff /* Panel Background Color */;
    padding: 8px;
 }
@@ -536,22 +536,36 @@ div.Popup #CommentForm textarea {
 #DiscussionForm input.Button {
    margin-right: 6px;
 }
+#DiscussionForm label {
+   font-size: 14px;
+   font-weight: bold;
+   color: #666;
+}
 body.Post #Panel {
    display: none;
 }
 body.Post #Content {
    width: auto;
 }
-body.Post #CommentForm,
-#DiscussionForm {
-   border: 0;
-   background: #daf4fd /* Panel Background Color */;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   padding: 8px 10px 10px;
-}
-body.Discussion #Content #CommentForm h2,
+body.Post #CommentForm h2,
 #DiscussionForm h2 {
+   border: none;
+   color: #02475A;
+   font-size: 140%;
+   font-weight: bold;
+   margin: 0;
+   padding: 6px;
+}
+body.Post #CommentForm form,
+#DiscussionForm form {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #E2F4FF none repeat scroll 0 0;
+   border: 1px solid #A5D0E7;
+   margin: 0;
+   padding: 20px;
+}
+body.Discussion #Content #CommentForm h2 {
    font-size: 120%;
    color: #2786c2;
    border-bottom: 0;
@@ -584,7 +598,7 @@ a.Cancel {
    margin-left: 20px;
 }
 #DiscussionForm ul {
-   margin: 0 0 8px;
+   margin: 0 0 20px;
 }
 #DiscussionForm ul.PostOptions li {
    display: inline;

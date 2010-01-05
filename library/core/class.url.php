@@ -161,8 +161,9 @@ class Gdn_Url {
       }
       
       $Return = trim($Return, '/');
-      if(strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
+      if (strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
          $Return = substr($Return, 9);
+         
       $Return = trim($Return, '/');
 
       if ($RemoveSyndication) {
@@ -173,8 +174,13 @@ class Gdn_Url {
             $Return = substr($Return, 5);
       }
 
-      if ($WithWebRoot)
-         $Return = Gdn_Url::WebRoot($WithDomain) . '/' . $Return;
+      if ($WithWebRoot) {
+         $WebRoot = Gdn_Url::WebRoot($WithDomain);
+         if (substr($WebRoot, -1, 1) != '/')
+            $WebRoot .= '/';
+
+         $Return = $WebRoot . $Return;
+      }
 
       return $Return;
    }

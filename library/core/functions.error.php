@@ -253,9 +253,19 @@ if (!function_exists('LogMessage')) {
       if(class_exists('Gdn', FALSE)) {
          $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', FALSE);
          if ($LogErrors === TRUE) {
+            $Log = "[Garden] $File, $Line, $Object.$Method()";
+            if ($Message <> '')
+               $Log .= ", $Message";
+            if ($Code <> '')
+               $Log .= ", $Code";
+             
+            // Fail silently (there could be permission issues on badly set up servers).
             $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
-            $Log = date("Y-m-d H:i:s", time()) . ", $File, $Line, $Object, $Method, $Message, $Code\n";
-            file_put_contents($ErrorLogFile, $Log, FILE_APPEND);
+            if ($ErrorLogFile == '') {
+               @error_log($Log);
+            } else {
+               @error_log($Log, 3, $ErrorLogFile);
+            }
          }
       }
    }

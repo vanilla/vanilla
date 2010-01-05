@@ -43,7 +43,7 @@ $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/regist
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin/?Target=%s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}';
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
-$Configuration['Garden']['Errors']['LogFile']                   = PATH_CACHE . DS . 'error.log';
+$Configuration['Garden']['Errors']['LogFile']                   = '';
 $Configuration['Garden']['Registration']['Method']              = 'Basic'; // Options are: Basic, Captcha, Approval, Invitation
 $Configuration['Garden']['Registration']['DefaultRoles']        = array('8'); // The default role(s) to assign new users (4 is "Member")
 $Configuration['Garden']['Registration']['ApplicantRoleID']     = 4; // The "Applicant" RoleID.

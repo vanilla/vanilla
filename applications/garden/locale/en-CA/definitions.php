@@ -19,9 +19,6 @@ function FormatPossessive($Word) {
 }
 
 $Definition['Locale'] = 'en-CA';
-$Definition['GardenDefinition'] = 'From the garden locale source!';
-
-$Definition['Garden.Application.Title'] = 'Application title';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';

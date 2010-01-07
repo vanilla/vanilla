@@ -39,7 +39,7 @@ class Gdn_Email extends Gdn_Pluggable {
     */
    function __construct() {
       $this->PhpMailer = new PHPMailer();
-      $this->PhpMailer->CharSet(Gdn::Config('Garden.Charset', 'utf-8'));
+      $this->PhpMailer->CharSet = Gdn::Config('Garden.Charset', 'utf-8');
       $this->Clear();
       parent::__construct();
    }

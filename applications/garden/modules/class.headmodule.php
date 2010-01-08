@@ -208,7 +208,7 @@ if (!class_exists('HeadModule', FALSE)) {
          foreach ($this->_Tags as $Tag => $Collection) {
             $Count = count($Collection);
             for ($i = 0; $i < $Count; ++$i) {
-               $Head[] = '<'.$Tag.' '.Attribute($Collection[$i])
+               $Head[] = '<'.$Tag . Attribute($Collection[$i])
                   .($Tag == 'script' ? '></'.$Tag.'>' : ' />');
             }
          }

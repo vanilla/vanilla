@@ -496,11 +496,11 @@ class Gdn_Form {
     * @param string $Xhtml
     * @return string
     */
-   public function Close($ButtonCode = '', $Xhtml = '') {
+   public function Close($ButtonCode = '', $Xhtml = '', $Attributes = FALSE) {
       $Return = "</div>\n</form>";
       if ($Xhtml != '') $Return = $Xhtml . $Return;
 
-      if ($ButtonCode != '') $Return = $this->Button($ButtonCode) . $Return;
+      if ($ButtonCode != '') $Return = $this->Button($ButtonCode, $Attributes) . $Return;
 
       return $Return;
    }
@@ -922,7 +922,7 @@ class Gdn_Form {
     *  postback.
     * @param boolean $ForceValue
     */
-   public function AddHidden($FieldName, $Value, $ForceValue = FALSE) {
+   public function AddHidden($FieldName, $Value = NULL, $ForceValue = FALSE) {
       if ($this->IsPostBack() && $ForceValue === FALSE)
          $Value = $this->GetFormValue($FieldName, $Value);
 

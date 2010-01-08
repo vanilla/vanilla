@@ -374,7 +374,7 @@ class Gdn_Configuration {
       // Record who made the change and when
       if (is_array($NewLines)) {
          $Session = Gdn::Session();
-         $User = $Session->UserID > 0 ? $Session->User->Name : 'Unknown';
+         $User = $Session->UserID > 0 && is_object($Session->User) ? $Session->User->Name : 'Unknown';
          $NewLines[] = '';
          $NewLines[] = '// Last edited by '.$User.' '.Format::ToDateTime();
       }

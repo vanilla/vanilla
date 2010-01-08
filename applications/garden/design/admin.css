@@ -744,6 +744,10 @@ table.AltColumns tr.Disabled td {
 	margin: 0 0 10px;
    width: 98%;
 }
+.Col {
+	width: 175px;
+	float: left;
+}
 #RecentUsers img {
 	float: left;
 	height: 20px;

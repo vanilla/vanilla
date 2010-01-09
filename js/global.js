@@ -44,14 +44,17 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
-   $('a.Popup').popup();
+   if ($.fn.popup)
+      $('a.Popup').popup();
    
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
-   $('a.Popdown').popup({hijackForms: false});
+   if ($.fn.popup)
+      $('a.Popdown').popup({hijackForms: false});
    
    // This turns SignInPopup anchors into in-page popups
-   $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+   if ($.fn.popup)
+      $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
 
    // Make sure that message dismissalls are ajax'd
    $('a.Dismiss').live('click', function() {
@@ -72,7 +75,8 @@ jQuery(document).ready(function($) {
    // This turns any form into a "post-in-place" form so it is ajaxed to save
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
-   $('.AjaxForm').handleAjaxForm();
+   if ($.fn.handleAjaxForm)
+      $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
    $('div.Messages ul').live('click', function() {

@@ -113,6 +113,9 @@ ul.PanelInfo li a {
    font-size: 120%;
 	display: block;
 }
+ul.PanelInfo li.HighlightButton {
+	background: #ff5;
+}
 ul.PanelInfo li.Active {
    background: #fff;
 }

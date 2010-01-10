@@ -1,92 +1,38 @@
+@import url('reset.css');
+
+
+/* ============================================== General Styles & Typography */
 body {
-   background: #e7e7de;
-   font-family: arial, tahoma, trebuchet ms, sans-serif;
-   margin: 0px;
-   padding: 0px;
-   text-align: center;
+   color: #000;
+   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   margin: 0;
+   padding: 0;
    font-size: small;
-   }
-#Frame {
-   width: 980px;
-   text-align: left;
-   margin-left: auto;
-   margin-right: auto;
-   }
-#Content {
-   background: #fff;
-   padding: 0px 20px 20px 20px;
-   -moz-border-radius-topleft: 10px;
-   -moz-border-radius-topright: 10px;
-   -webkit-border-top-left-radius: 10px;
-   -webkit-border-top-right-radius: 10px;
-   }
-code {
-   display: block;
-   padding: 4px 0px 0px 4px;
-   color: #ff0084;
-   overflow: auto;
-   white-space: pre;
-   }
-.PreContainer {
-   overflow: auto;
-   }
-pre {
-   margin: 0px;
-   padding: 2px;
-   background: #ffffd3;
-   }
-pre.Odd {
-   background: #ffffb9;
-   }
-pre.Highlight {
-   color: #ff0000;
-   background: #ffff7f;
-   }
-a,
-a:link,
-a:active {
-   color: #0063dc;
-   text-decoration: none;
-   }
-a:visited {
-   color: #ff0084;
-   }
-a:hover {
-   color: #ffffff !important;
-   background: #0063dc !important;
-   }
-p {
-   padding: 4px 0px;
-   margin: 0px;
-   }
-h2 {
-   margin: 0px;
-   padding: 20px 0px 0px 0px;
-   }
-#MoreInformation {
-   background: #f3f3f3;
-   padding: 0px 20px 20px 20px;
-   -moz-border-radius-bottomleft: 10px;
-   -moz-border-radius-bottomright: 10px;
-   -webkit-border-bottom-left-radius: 10px;
-   -webkit-border-bottom-right-radius: 10px;
-   margin-bottom: 20px;
-   }
-h3 {
-   margin: 0px;
-   padding: 20px 0px 8px 0px;
-   font-weight: normal;
-   font-size: small;
-   }
-h4 {
-   margin: 0px;
-   padding: 0px;
-   font-weight: normal;
-   }
-ul {
-   margin: 0px;
-   padding: 10px 20px 0px 20px;
-   }
-ul li {
-   line-height: 160%;
-   }
+   background: #ffffff;
+	background: #c2e6fc url(slicesplash.jpg) no-repeat scroll center top;
+}
+.SplashInfo {
+	margin: 80px 0;
+	border-top: 1px solid #A4CFE6;
+	border-bottom: 1px solid #A4CFE6;
+	background: #E0F4FF;
+}
+.SplashInfo h1 {
+   font-weight:bold;
+	text-shadow: #fff 0 1px 0;
+	text-align: center;
+	border-top: 1px solid #fff;
+	color:#02455B;
+	font-size:300%;
+   margin: 0 0 10px;
+	padding: 20px 0 0;
+}
+.SplashInfo p {
+	text-align: center;
+	border-bottom: 1px solid #fff;
+	margin: 0;
+	padding: 0 0 10px;
+	color: #076C8E;
+	font-size: 20px;
+   line-height: 1.6em;
+}

@@ -75,24 +75,32 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
       if ($DeliveryType == DELIVERY_TYPE_ALL) {
          $CssPaths = array(); // Potential places where the css can be found in the filesystem.
          $MasterViewPaths = array();
+         $MasterViewName = 'error.master.php';
+         $MasterViewCss = 'error.css';
             
          if(class_exists('Gdn', FALSE)) {
             $CurrentTheme = ''; // The currently selected theme
             $CurrentTheme = Gdn::Config('Garden.Theme', '');
+            $MasterViewName = Gdn::Config('Garden.Errors.MasterView', $MasterViewName);
+            $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
+            if ($MasterViewCss == '')
+               $MasterViewCss = 'error';
+            
+            $MasterViewCss .= '.css';
       
             if ($CurrentTheme != '') {
                // Look for CSS in the theme folder:
-               $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . 'error.css';
+               $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . $MasterViewCss;
                
                // Look for Master View in the theme folder:
-               $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . 'error.master.php';
+               $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . $MasterViewName;
             }
          }
             
          // Look for CSS in the garden design folder.
-         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . 'error.css';
+         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $MasterViewCss;
          // Look for Master View in the garden view folder.
-         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'views' . DS . 'error.master.php';
+         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'views' . DS . $MasterViewName;
          
          $CssPath = FALSE;
          $Count = count($CssPaths);

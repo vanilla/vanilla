@@ -827,7 +827,8 @@ if (!function_exists('Url')) {
       static $RewriteUrls = NULL;
       if(is_null($RewriteUrls)) $RewriteUrls = ForceBool(Gdn::Config('Garden.RewriteUrls', FALSE));
       
-      if (substr($Destination, 0, 7) == 'http://') {
+      $Prefix = substr($Destination, 0, 7);
+      if (in_array($Prefix, array('http://', 'https:/'))) {
          return $Destination;
       } else if ($Destination == '#' || $Destination == '') {
          if ($WithDomain)

@@ -290,6 +290,10 @@ input.Button {
    padding: 0 20px;
    background: url('progress.gif') center center no-repeat;
 }
+.AfterButtonLoading {
+   background: url('progress.gif') center center no-repeat;
+   padding: 0 20px;
+}
 .Progress {
    padding: 10px 40px 10px 0;
    background: url('progress.gif') center center no-repeat;

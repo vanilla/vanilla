@@ -14,6 +14,7 @@ jQuery(document).ready(function($) {
       return false;
    });
 
+   // Grab a definition from hidden inputs in the page
    definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
@@ -32,7 +33,6 @@ jQuery(document).ready(function($) {
          
       return def;
    }
-
 
    // Main Menu dropdowns
    if ($.fn.menu)
@@ -133,6 +133,7 @@ jQuery(document).ready(function($) {
       });
    }
 
+   // Notify the user with a message
    inform = function(message, wrapInfo) {
       if(wrapInfo == undefined) {
          wrapInfo = true;
@@ -146,6 +147,8 @@ jQuery(document).ready(function($) {
             $(message).appendTo('body').show();
       }
    }
+   
+   // Generate a random string of specified length
    generateString = function(length) {
       if (length == null)
          length = 5;
@@ -160,6 +163,7 @@ jQuery(document).ready(function($) {
       return string;
    }
    
+   // Combine two paths and make sure that there is only a single directory concatenator
    combinePaths = function(path1, path2) {
       if (path1.substr(-1, 1) == '/')
          path1 = path1.substr(0, path1.length - 1);
@@ -213,6 +217,11 @@ jQuery(document).ready(function($) {
       var searchText = definition('Search', 'Search');
       if ($(this).val() == searchText)
          $(this).val('');      
+   });
+   
+   // Add a spinner onclick of buttons with this class
+   $('input.SpinOnClick').live('click', function() {
+      $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
 
 });

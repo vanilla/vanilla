@@ -689,11 +689,11 @@ if (!function_exists('ProxyRequest')) {
 }
 
 if (!function_exists('RandomString')) {
-   function RandomString($Length) {
-      $Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+   function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+      $CharLen = strlen($Characters) - 1;
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % 35;
+        $Offset = rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;

@@ -121,7 +121,7 @@ ul.DataList li ul li.Title strong a {
    background: none;
 }
 ul.DataList li ul li.Meta {
-   font-family: 'lucida grande',tahoma,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin-left: 5px;
    font-size: 11px;
    color: #80828c /* Meta Label Font Color */;
@@ -251,7 +251,7 @@ body.Discussion #Content h2 span {
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
-   font-family: 'lucida grande',tahoma,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 11px;
    color: #777 /* Meta Label Font Color */;
    padding: 8px 0 0 8px;
@@ -292,7 +292,7 @@ body.Discussion #Content h2 span {
    font-size: 100%;
 }
 .Body p {
-   font-family: 'lucida grande',tahoma,sans-serif;   
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin: 8px 0;
 }
 .Body blockquote {

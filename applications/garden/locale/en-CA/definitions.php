@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 
@@ -19,9 +19,6 @@ function FormatPossessive($Word) {
 }
 
 $Definition['Locale'] = 'en-CA';
-$Definition['GardenDefinition'] = 'From the garden locale source!';
-
-$Definition['Garden.Application.Title'] = 'Application title';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
@@ -89,6 +86,20 @@ Someone has requested to reset your password at %2$s. To reset your password, fo
   %3$s
 
 If you did not make this request, disregard this email.';
+$Definition['EmailNotification'] = '%1$s
+
+Follow the link below to check it out:
+%2$s
+
+Have a great day!';
+$Definition['EmailStoryNotification'] = '%1$s
+
+"%3$s"
+
+Follow the link below to check it out:
+%2$s
+
+Have a great day!';
 $Definition['PluginHelp'] = "Plugins allow you to add functionality to your site.<br />Once a plugin has been added to your %s folder, you can enable or disable it here.";
 $Definition['ApplicationHelp'] = "Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.";
 $Definition['ThemeHelp'] = "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";

@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
-
-echo $this->Form->Open();
-echo $this->Form->Errors();
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if (is_object($this->Role))
       echo Gdn::Translate('Edit Role');
    else
       echo Gdn::Translate('Add Role');
 ?></h1>
+<?php
+echo $this->Form->Open();
+echo $this->Form->Errors();
+?>
 <ul>
    <li>
       <?php

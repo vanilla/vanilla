@@ -19,9 +19,9 @@ class DiscussionsController extends VanillaController {
    
    public function Index($Offset = '0') {
       if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
+         $this->AddJsFile('discussions.js');
+         $this->AddJsFile('bookmark.js');
+         $this->AddJsFile('options.js');
          $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
          $this->Head->Title(Translate('All Discussions'));
       }
@@ -59,9 +59,7 @@ class DiscussionsController extends VanillaController {
 
       // Build a pager.
       $PagerFactory = new PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'More Discussions';
-      $this->Pager->LessCode = 'Newer Discussions';
+      $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -86,18 +84,16 @@ class DiscussionsController extends VanillaController {
       $this->ShowOptions = TRUE;
       $this->Menu->HighlightRoute('/discussions');
       $this->AddCssFile('vanilla.css');
-      if ($this->Head)
-         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
    }
    
    public function Bookmarked($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->Title(Translate('My Bookmarks'));
-      }
+      $this->AddJsFile('options.js');
+      $this->AddJsFile('bookmark.js');
+      $this->AddJsFile('discussions.js');
+      $this->Title(Translate('My Bookmarks'));
+
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -121,13 +117,14 @@ class DiscussionsController extends VanillaController {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/%1$s'
+         'discussions/bookmarked/%1$s'
       );
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+         $this->View = 'discussions';
       }
       
       // Add Modules
@@ -142,14 +139,13 @@ class DiscussionsController extends VanillaController {
    
    public function Mine($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.resizable.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->Title(Translate('My Discussions'));
-      }
+      $this->AddJsFile('/js/library/jquery.resizable.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('bookmark.js');
+      $this->AddJsFile('discussions.js');
+      $this->AddJsFile('options.js');
+      $this->Title(Translate('My Discussions'));
+
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       

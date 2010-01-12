@@ -5,7 +5,7 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
 <h1><?php echo Gdn::Translate('Manage Users'); ?></h1>
 <div class="FilterMenu">
-   <?php echo Anchor('Add User', 'garden/user/add', 'Popup'); ?>
+   <?php echo Anchor('Add User', 'garden/user/add', 'Popup Button'); ?>
 </div>
 <div class="Info">
    <?php

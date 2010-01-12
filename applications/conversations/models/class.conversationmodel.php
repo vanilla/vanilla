@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class Gdn_ConversationModel extends Gdn_Model {
@@ -191,19 +191,6 @@ class Gdn_ConversationModel extends Gdn_Model {
                ->Where('UserID <>', $Session->UserID)
                ->Put();
          }
-         
-         // NOTIFY ALL NEWLY ADDED USERS THAT THEY WERE ADDED TO THE CONVERSATION
-         foreach ($RecipientUserIDs as $UserID) {
-            if ($UserID != $Session->UserID)
-               AddActivity(
-                  $Session->UserID,
-                  'ConversationMessage',
-                  '',
-                  $UserID,
-                  '/messages/'.$ConversationID
-               );
-         }
-         
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
          foreach ($MessageModel->ValidationResults() as $FieldName => $Results) {
@@ -213,8 +200,6 @@ class Gdn_ConversationModel extends Gdn_Model {
          }
       }
 
-// TODO: NOTIFY ALL USERS (BESIDES THE PERSON WHO ADDED THE MESSAGE) OF THE NEW MESSAGE.
-      
       return $ConversationID;
    }
    

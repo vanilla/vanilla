@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -16,7 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Core
+ * @namespace Garden.Core
  */
 
 class Gdn_Dispatcher extends Gdn_Pluggable {
@@ -197,6 +197,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                
                $this->_ControllerMethod = 'Index';
                $ControllerMethod = 'Index';
+               
+               $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
             }
          }
          // Pass in the querystring values
@@ -211,31 +213,38 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Call the requested method on the controller - error out if not defined.
          if ($PluginManagerHasReplacementMethod || method_exists($Controller, $ControllerMethod)) {
             // call_user_func_array is too slow!!
-            // call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
-            $Args = $this->_ControllerMethodArgs;
-            $Count = count($Args);
-            if ($Count == 0) {
-               $Controller->$ControllerMethod();
-            } else if ($Count == 1) {
-               $Controller->$ControllerMethod($Args[0]);
-            } else if ($Count == 2) {
-               $Controller->$ControllerMethod($Args[0], $Args[1]);
-            } else if ($Count == 3) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2]);
-            } else if ($Count == 4) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3]);
-            } else if ($Count == 5) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
-            } else if ($Count == 6) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
-            } else if ($Count == 7) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
-            } else if ($Count == 8) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
-            } else if ($Count == 9) {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8]);
+            //call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
+            
+            if ($PluginManagerHasReplacementMethod) {
+              $PluginManager->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
             } else {
-               $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8], $Args[9]);
+              
+              $Args = $this->_ControllerMethodArgs;
+              $Count = count($Args);
+              
+              if ($Count == 0) {
+                 $Controller->$ControllerMethod();
+              } else if ($Count == 1) {
+                 $Controller->$ControllerMethod($Args[0]);
+              } else if ($Count == 2) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1]);
+              } else if ($Count == 3) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2]);
+              } else if ($Count == 4) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3]);
+              } else if ($Count == 5) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
+              } else if ($Count == 6) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
+              } else if ($Count == 7) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
+              } else if ($Count == 8) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
+              } else if ($Count == 9) {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8]);
+              } else {
+                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8], $Args[9]);
+              }
             }
          } else {
             trigger_error(ErrorMessage('Controller method missing: '.$this->_ControllerName.'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
@@ -272,7 +281,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $ApplicationFolder = $this->_ApplicationFolder;
 
       $EnabledApplication = array_keys($this->_EnabledApplications, $ApplicationFolder);
-      return count($EnabledApplication) > 0 ? $EnabledApplication[0] : '';
+      $EnabledApplication = count($EnabledApplication) > 0 ? $EnabledApplication[0] : '';
+      $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+      $this->FireEvent('AfterEnabledApplication');
+      return $EnabledApplication;
    }
 
    /**

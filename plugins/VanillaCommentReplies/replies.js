@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
                }
    
                // Add a link to reveal hidden replies
-               var text = (rowCount > 3) ? $('#Definitions #Replies').text().replace('%s', rowCount - 2) : $('#Definitions #Reply').text();
+               var text = (rowCount > 3) ? definition('Replies').replace('%s', rowCount - 2) : definition('Reply');
                $(children[0]).after('<li class="Reply Reveal"><a href="#">' + text + '</a></li>');
                
                // bind to the click event of the anchor and re-reveal the replies when it is clicked
@@ -98,7 +98,7 @@ jQuery(document).ready(function($) {
          data: postValues,
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             $('.ReplyForm .Errors').remove();

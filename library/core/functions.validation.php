@@ -1,24 +1,27 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/// <summary>
-/// All of these functions are used by ./class.validation.php to validate form
-/// input strings. With the exception of ValidateRegex, each function receives
-/// two parameters (the field value and the related database field properties)
-/// and is expected to return a boolean TRUE or FALSE indicating if the
-/// validation was successful.
-/// Note: $Field will be an object of field properties as defined in
-/// @@MySQLDriver->_FetchTableSchema (at the bottom of the file). Properties
-/// are: (string) Name, (bool) PrimaryKey, (string) Type, (bool) AllowNull,
-/// (string) Default, (int) Length, (array) Enum.
-/// </summary>
+/**
+ * All of these functions are used by ./class.validation.php to validate form
+ * input strings. With the exception of ValidateRegex, each function receives
+ * two parameters (the field value and the related database field properties)
+ * and is expected to return a boolean TRUE or FALSE indicating if the
+ * validation was successful.
+ *
+ * Note: $Field will be an object of field properties as defined in
+ * @@MySQLDriver->_FetchTableSchema (at the bottom of the file). Properties
+ * are: (string) Name, (bool) PrimaryKey, (string) Type, (bool) AllowNull,
+ * (string) Default, (int) Length, (array) Enum.
+ *
+ * @package Garden
+ */
 
 if (!function_exists('ValidateCaptcha')) {
    function ValidateCaptcha($Value) {
@@ -48,12 +51,12 @@ if (!function_exists('ValidateRequired')) {
 }
 
 if (!function_exists('ValidateRequiredArray')) {
-   /// <summary>
-   /// Checkbox lists and DropDown lists that have no values selected return a
-   /// value of FALSE. Since this could be a valid entry in any other kind of
-   /// input, these "array" form-data types need their own "required" validation
-   /// method.
-   /// </summary>
+   /**
+    * Checkbox lists and DropDown lists that have no values selected return a
+    * value of FALSE. Since this could be a valid entry in any other kind of
+    * input, these "array" form-data types need their own "required" validation
+    * method.
+    */
    function ValidateRequiredArray($Value, $Field) {
       if (is_array($Value) === TRUE)
          return count($Value) > 0 ? TRUE : FALSE;
@@ -89,7 +92,7 @@ if (!function_exists('ValidateOldPassword')) {
       $UserModel = new Gdn_UserModel();
       $UserID = $Session->UserID;
       return (bool) $UserModel->ValidateCredentials(
-      	'', $UserID, $OldPassword);
+         '', $UserID, $OldPassword);
    }
 }
 
@@ -102,12 +105,12 @@ if (!function_exists('ValidateEmail')) {
    }
 }
 if (!function_exists('ValidateUsername')) {
-	function ValidateUsername($Value, $Field = '') {
-		return ValidateRegex(
-			$Value,
-			'/^([\d\w_]{3,20})$/si'
-		);
-	}
+   function ValidateUsername($Value, $Field = '') {
+      return ValidateRegex(
+         $Value,
+         '/^([\d\w_]{3,20})$/si'
+      );
+   }
 }
 
 if (!function_exists('ValidateDate')) {
@@ -229,11 +232,11 @@ if (!function_exists('ValidatePermissionFormat')) {
 }
 
 if (!function_exists('ValidateMatch')) {
-   /// <summary>
-   /// Takes the FieldName being validated, appends "Match" to it, and searches
-   /// $PostedFields for the Match fieldname, compares their values, and returns
-   /// true if they match.
-   /// </summary>
+   /**
+    * Takes the FieldName being validated, appends "Match" to it, and searches
+    * $PostedFields for the Match fieldname, compares their values, and returns
+    * true if they match.
+    */
    function ValidateMatch($Value, $Field, $PostedFields) {
       $MatchValue = ArrayValue($Field->Name.'Match', $PostedFields);
       return $Value == $MatchValue ? TRUE : FALSE;

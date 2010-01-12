@@ -11,11 +11,11 @@ class DraftsController extends VanillaController {
       $this->Permission('Garden.SignIn.Allow');
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/vanilla/js/discussions.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->Title(Translate('My Drafts'));
-      }
+      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('discussions.js');
+      $this->AddJsFile('options.js');
+      $this->Title(Translate('My Drafts'));
+
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       

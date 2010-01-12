@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -17,7 +17,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Core
+ * @namespace Garden.Core
  */
 class Format {
 
@@ -40,9 +40,13 @@ class Format {
     *  looking at.
     * @return string
     */
-   public static function ActivityHeadline($Activity, $ProfileUserID = '') {
-      $Session = Gdn::Session();
-      if ($Session->UserID == $Activity->ActivityUserID) {
+   public static function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
+      if ($ViewingUserID == '') {
+         $Session = Gdn::Session();
+         $ViewingUserID = $Session->IsValid() ? $Session->UserID : -1;
+      }
+      
+      if ($ViewingUserID == $Activity->ActivityUserID) {
          $ActivityName = $ActivityNameP = Gdn::Translate('You');
       } else {
          $ActivityName = $Activity->ActivityName;
@@ -56,14 +60,11 @@ class Format {
       }
       $Gender = Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
-      if (
-         $Session->IsValid()
-         && ($Session->UserID == $Activity->RegardingUserID ||
-            ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $Session->UserID))
-      ) $Gender = $Gender2 = 'your';
+      if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID))
+         $Gender = $Gender2 = 'your';
 
       $IsYou = FALSE;
-      if ($Session->UserID == $Activity->RegardingUserID) {
+      if ($ViewingUserID == $Activity->RegardingUserID) {
          $IsYou = TRUE;
          $RegardingName = Gdn::Translate('you');
          $RegardingNameP = Gdn::Translate('your');
@@ -216,12 +217,77 @@ class Format {
          
          // This one handles all other mentions
          $Mixed = preg_replace(
-            '/([\s]+)(@([\d\w_]{3,20}))/si',
+            '/([\s]+)(@([\d\w_]{1,20}))/si',
             '\\1'.Anchor('\\2', '/profile/\\3'),
             $Mixed
          );
          
+         // Handle #hashtag searches
+         $Mixed = preg_replace(
+            '/^(#([\d\w_-]+))/si',
+            Anchor('\\1', '/search?Search=%23\\2'),
+            $Mixed
+         );
+         
+         $Mixed = preg_replace(
+            '/([\s]+)(#([\d\w_]+))/si',
+            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
+            $Mixed
+         );
+
          return $Formatter->Format($Mixed);
+      }
+   }
+
+   /**
+    * Takes a mixed variable.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function BBCode($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Html');
+      } else {         
+		$Mixed = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed);
+		$Mixed = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed);
+		$Mixed = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed);
+		$Mixed = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed);
+		$Mixed = preg_replace("#\[quote=('(.*?)',(.*?))\](.*?)\[/quote\]#si",'<p><cite>\\2</cite> napisał:</p><blockquote>\\4</blockquote>',$Mixed);
+		$Mixed = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed);
+		$Mixed = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed);
+		$Mixed = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed);
+		$Mixed = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed);
+		$Mixed = preg_replace("#\[url=(.*?)\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed);
+		$Mixed = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed);
+		$Mixed = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed);
+		$Mixed = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed);
+		$Mixed = preg_replace("#\[img=(.*?)\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed);
+		$Mixed = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed);
+		$Mixed = preg_replace("#\[color=(.*?)\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed);
+		$Mixed = preg_replace("#\[size=(.*?)\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed);
+		
+         // Handle @mentions
+         // This one grabs mentions that start at the beginning of $Mixed
+         $Mixed = preg_replace(
+            '/^(@([\d\w_]{1,20}))/si',
+            Anchor('\\1', '/profile/\\2'),
+            $Mixed
+         );
+         
+         // This one handles all other mentions
+         $Mixed = preg_replace(
+            '/([\s]+)(@([\d\w_]{3,20}))/si',
+            '\\1'.Anchor('\\2', '/profile/\\3'),
+            $Mixed
+         );
+		 
+		 $Formatter = Gdn::Factory('HtmlFormatter');
+         if(is_null($Formatter)) {
+            return $Mixed;
+         } else {
+            return $Formatter->Format($Mixed);
+         }
       }
    }
    

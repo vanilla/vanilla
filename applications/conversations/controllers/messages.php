@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -23,7 +23,7 @@ class MessagesController extends ConversationsController {
    /**
     * Add a new conversations.
     */
-   public function Add() {
+   public function Add($Recipient = '') {
       $this->Form->SetModel($this->ConversationModel);
       
       if ($this->Form->AuthenticatedPostBack()) {
@@ -40,7 +40,9 @@ class MessagesController extends ConversationsController {
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE)
-            Redirect('messages/'.$ConversationID);
+            $this->RedirectUrl = Url('messages/'.$ConversationID);
+      } else if ($Recipient != '') {
+         $this->Form->SetFormValue('To', $Recipient);
       }
       $this->Render();      
    }
@@ -84,9 +86,7 @@ class MessagesController extends ConversationsController {
     * Show all conversations for the currently authenticated user.
     */
    public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
-      if ($this->Head) {
-         $this->Head->Title(Translate('Conversations'));
-      }
+      $this->Title(Translate('Conversations'));
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($this->Offset) || $this->Offset < 0)
@@ -180,9 +180,6 @@ class MessagesController extends ConversationsController {
     * @todo ENFORCE PERMISSIONS SO THAT PEOPLE CAN'T READ OTHER PEOPLE'S MESSAGES
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
-      if ($this->Head) {
-         $this->Head->Title(Translate('Conversations'));
-      }
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($ConversationID) || $ConversationID < 0)
@@ -219,6 +216,27 @@ class MessagesController extends ConversationsController {
          $this->Offset,
          $Limit
       );
+      
+      $this->Participants = '';
+      // Who is in the conversation?
+      if ($this->RecipientData->NumRows() == 1) {
+         $this->Participants = Gdn::Translate('Just you!');
+      } else if ($this->RecipientData->NumRows() == 2) {
+         foreach ($this->RecipientData->Result() as $User) {
+            if ($User->UserID != $Session->UserID)
+               $this->Participants = sprintf(Gdn::Translate('%s and you'), UserAnchor($User));
+         }
+      } else {
+         $Users = array();
+         foreach ($this->RecipientData->Result() as $User) {
+            if ($User->UserID != $Session->UserID)
+               $Users[] = UserAnchor($User);
+         }
+         $this->Participants = sprintf(Gdn::Translate('%s, and you'), implode(', ', $Users));
+      }
+      
+      $this->Title(strip_tags($this->Participants));
+
       // $CountMessages = $this->ConversationMessageModel->GetCount($ConversationID, $Session->UserID);
       
       // Build a pager

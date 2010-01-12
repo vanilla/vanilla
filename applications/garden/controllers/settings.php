@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -29,10 +29,8 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Applications.Manage');
       $this->AddSideMenu('garden/settings/applications');
 
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/applications.js');
-         $this->Head->Title(Translate('Applications'));
-      }
+      $this->AddJsFile('applications.js');
+      $this->Title(Translate('Applications'));
          
       $Session = Gdn::Session();
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
@@ -64,11 +62,6 @@ class SettingsController extends GardenController {
             }
          }
       }
-      
-      // Check the update server for updates to these applications
-      $this->UpdateManager = new Gdn_UpdateManager();
-      // TODO: FIX UP THE PHONE-HOME CODE - AJAX, PERHAPS?
-      // $this->CurrentVersions = $this->UpdateManager->Check(ADDON_TYPE_APPLICATION, array_keys($this->AvailableApplications));
       
       if ($ApplicationName != '') {
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
@@ -102,10 +95,8 @@ class SettingsController extends GardenController {
    public function Configure() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/email.js');
-         $this->Head->Title(Translate('General Settings'));
-      }
+      $this->AddJsFile('email.js');
+      $this->Title(Translate('General Settings'));
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -172,10 +163,8 @@ class SettingsController extends GardenController {
     */
    var $RequiredAdminPermissions = array();
    public function Index() {
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/settings.js');
-         $this->Head->Title(Translate('Dashboard'));
-      }
+      $this->AddJsFile('settings.js');
+      $this->Title(Translate('Dashboard'));
          
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -209,9 +198,6 @@ class SettingsController extends GardenController {
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
       
-      // Make sure the phone-home code knows where to ping:
-      $this->AddDefinition('UpdateCheckUrl', Gdn::Config('Garden.UpdateCheckUrl', ''));
-      
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.
@@ -227,10 +213,11 @@ class SettingsController extends GardenController {
          $PluginManager = Gdn::Factory('PluginManager');
          $Plugins = $PluginManager->AvailablePlugins();
          foreach ($Plugins as $Plugin => $Info) {
+            $Name = ArrayValue('Name', $Info, $Plugin);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Plugin,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Plugin'
                );
@@ -240,10 +227,11 @@ class SettingsController extends GardenController {
          $ApplicationManager = Gdn::Factory('ApplicationManager');
          $Applications = $ApplicationManager->AvailableApplications();
          foreach ($Applications as $Application => $Info) {
+            $Name = ArrayValue('Name', $Info, $Application);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Application,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Application'
                );
@@ -253,10 +241,11 @@ class SettingsController extends GardenController {
          $ThemeManager = new Gdn_ThemeManager;
          $Themes = $ThemeManager->AvailableThemes();
          foreach ($Themes as $Theme => $Info) {
+            $Name = ArrayValue('Name', $Info, $Theme);
             $Version = ArrayValue('Version', $Info, '');
             if ($Version != '')
                $UpdateData[] = array(
-                  'Name' => $Theme,
+                  'Name' => $Name,
                   'Version' => $Version,
                   'Type' => 'Theme'
                );
@@ -279,8 +268,7 @@ class SettingsController extends GardenController {
    }
    
    public function Plugins($Filter = '', $TransientKey = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Plugins'));
+      $this->Title(Translate('Plugins'));
          
       $Session = Gdn::Session();
       $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
@@ -345,10 +333,8 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Registration.Manage');
       $this->AddSideMenu('garden/settings/registration');
       
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/registration.js');
-         $this->Head->Title(Translate('Registration'));
-      }
+      $this->AddJsFile('registration.js');
+      $this->Title(Translate('Registration'));
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
@@ -430,8 +416,7 @@ class SettingsController extends GardenController {
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Themes'));
+      $this->Title(Translate('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');
@@ -442,8 +427,9 @@ class SettingsController extends GardenController {
       $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
       $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
       $Name = array_keys($this->EnabledTheme);
-      $Name = $Name[0];
-      $this->EnabledTheme = $this->EnabledTheme[$Name];
+      $Name = ArrayValue(0, $Name, 'undefined');
+      $this->EnabledTheme = ArrayValue($Name, $this->EnabledTheme);
+      $this->EnabledThemeName = ArrayValue('Name', $this->EnabledTheme, $Name);
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
@@ -469,8 +455,6 @@ class SettingsController extends GardenController {
          }
       }
       
-      
-      
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {
             foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
@@ -491,8 +475,7 @@ class SettingsController extends GardenController {
    }
    
    public function PreviewTheme($ThemeFolder = '') {
-      if ($this->Head)
-         $this->Head->Title(Translate('Theme Preview'));
+      $this->Title(Translate('Theme Preview'));
          
       // Clear out all css & js and use the "empty" master view
       $this->MasterView = 'empty';
@@ -500,8 +483,8 @@ class SettingsController extends GardenController {
       $this->Head->ClearScripts();
       // Add jquery, custom css & js
       $this->AddCssFile('previewtheme.css');
-      $this->Head->AddScript('js/library/jquery.js');
-      $this->Head->AddScript('applications/garden/js/previewtheme.js');
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('previewtheme.js');
 
       $this->Permission('Garden.Themes.Manage');
       $ThemeManager = new Gdn_ThemeManager();

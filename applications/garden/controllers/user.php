@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class UserController extends GardenController {
@@ -22,11 +22,9 @@ class UserController extends GardenController {
          '',
          FALSE
       );
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.gardenmorepager.js');
-         $this->Head->AddScript('/applications/garden/js/user.js');
-         $this->Head->Title(Translate('Users'));
-      }
+      $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('user.js');
+      $this->Title(Translate('Users'));
 
       $this->AddSideMenu('garden/user');
 
@@ -46,7 +44,7 @@ class UserController extends GardenController {
          $this->Form->SetFormValue('Keywords', $Keywords);
 
       $UserModel = new Gdn_UserModel();
-      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords);
+      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       $Limit = 30;
       $TotalRecords = $UserModel->GetCountLike($Like);
       $this->UserData = $UserModel->GetLike($Like, 'u.Name', 'asc', $Limit, $Offset);
@@ -88,10 +86,8 @@ class UserController extends GardenController {
 
    public function Add() {
       $this->Permission('Garden.Users.Add');
-      if ($this->Head) {
-         $this->Head->AddScript('/applications/garden/js/user.js');
-         $this->Head->Title(Translate('Add User'));
-      }
+      $this->AddJsFile('user.js');
+      $this->Title(Translate('Add User'));
 
       $this->AddSideMenu('garden/user');
       $UserModel = new Gdn_UserModel();
@@ -124,8 +120,7 @@ class UserController extends GardenController {
 
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/user.js');
+      $this->AddJsFile('user.js');
 
       $this->AddSideMenu('garden/user');
 
@@ -166,10 +161,8 @@ class UserController extends GardenController {
    public function Applicants() {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('garden/user/applicants');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.gardencheckcolumn.js');
-         $this->Head->Title(Translate('Applicants'));
-      }
+      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
+      $this->Title(Translate('Applicants'));
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');

@@ -17,6 +17,7 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                   1000 => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
                                                                   1002 => "set names 'utf8'" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
                                                                );
+$Configuration['Database']['CharacterEncoding']                = 'utf8';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
@@ -38,11 +39,13 @@ $Configuration['Garden']['Cookie']['Domain']                    = '';
 $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 or sha1
 $Configuration['Garden']['Authenticator']['Type']               = 'Password'; // Types include 'Password' and 'Handshake'
 $Configuration['Garden']['Authenticator']['Encoding']           = 'ini';
-$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/?Target=%s';
-$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/?Target=%s';
+$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register/?Target=%s';
+$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin/?Target=%s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}';
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
-$Configuration['Garden']['Errors']['LogFile']                   = PATH_CACHE . DS . 'error.log';
+$Configuration['Garden']['Errors']['LogFile']                   = '';
+$Configuration['Garden']['Errors']['MasterView']                = 'error.master.php';
+// $Configuration['Garden']['Errors']['MasterView']                = 'deverror.master.php'; // <-- Use this error master view when debugging
 $Configuration['Garden']['Registration']['Method']              = 'Basic'; // Options are: Basic, Captcha, Approval, Invitation
 $Configuration['Garden']['Registration']['DefaultRoles']        = array('8'); // The default role(s) to assign new users (4 is "Member")
 $Configuration['Garden']['Registration']['ApplicantRoleID']     = 4; // The "Applicant" RoleID.
@@ -61,9 +64,8 @@ $Configuration['Garden']['Email']['SmtpPort']                   = '25';
 $Configuration['Garden']['Email']['MimeType']                   = 'text/plain';
 $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';
-$Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/update';
-// TODO: Need to change this back before release
-// $Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
+$Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/addons/update';
+$Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
 $Configuration['Garden']['AddonUrl']                            = '';
 $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
@@ -88,9 +90,9 @@ $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 
 // Modules
 $Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Content'] = array('Notices', 'Content', 'Ads');
-$Configuration['Modules']['Garden']['Content'] = array('Notices', 'Content', 'Ads');
-$Configuration['Modules']['Conversations']['Content'] = array('Notices', 'Content', 'Ads');
+$Configuration['Modules']['Vanilla']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Garden']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Conversations']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
 
 // Routes
 $Configuration['Routes']['DefaultController'] = 'home';

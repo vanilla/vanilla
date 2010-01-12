@@ -20,7 +20,6 @@ else
    echo Gdn::Translate('Discussions');
 
 ?></h1>
-<?php echo $this->Pager->ToString('less'); ?>
 <ul class="DataList Discussions">
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>

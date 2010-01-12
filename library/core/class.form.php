@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -15,7 +15,6 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Database
  */
 
 /**
@@ -105,7 +104,7 @@ class Gdn_Form {
             $EndYear = substr($YearRange, 5);
          }
       }
-      if ($StartYear >= $EndYear) {
+      if ($YearRange === FALSE || $StartYear > $EndYear) {
          $StartYear = 1900;
          $EndYear = date('Y');
       }
@@ -226,10 +225,12 @@ class Gdn_Form {
             if (is_numeric($Text)) $Text = $ID;
 
             $Instance['value'] = $ID;
-            if (in_array($ID, $CheckedValues)) $Instance['checked'] = 'checked';
+            if (is_array($CheckedValues) && in_array($ID, $CheckedValues)) {
+               $Instance['checked'] = 'checked';
+            }
 
             $Return .= '<li>' . $this->CheckBox($FieldName . '[]', $Text,
-               $Instance) . "<li>\n";
+               $Instance) . "</li>\n";
             ++$i;
          }
       }
@@ -495,11 +496,11 @@ class Gdn_Form {
     * @param string $Xhtml
     * @return string
     */
-   public function Close($ButtonCode = '', $Xhtml = '') {
+   public function Close($ButtonCode = '', $Xhtml = '', $Attributes = FALSE) {
       $Return = "</div>\n</form>";
       if ($Xhtml != '') $Return = $Xhtml . $Return;
 
-      if ($ButtonCode != '') $Return = $this->Button($ButtonCode) . $Return;
+      if ($ButtonCode != '') $Return = $this->Button($ButtonCode, $Attributes) . $Return;
 
       return $Return;
    }
@@ -801,11 +802,8 @@ class Gdn_Form {
       $MultiLine = ArrayValueI('MultiLine', $Attributes);
       
       if ($MultiLine) {
-         if (!InArrayI('rows', $Attributes))
-            $Attributes['rows'] = '6'; // For xhtml compliance
-   
-         if (!InArrayI('cols', $Attributes))
-            $Attributes['cols'] = '100'; // For xhtml compliance
+         $Attributes['rows'] = ArrayValueI('rows', $Attributes, '6'); // For xhtml compliance
+         $Attributes['cols'] = ArrayValueI('cols', $Attributes, '100'); // For xhtml compliance
       }
 
       $CssClass = ArrayValueI('class', $Attributes);
@@ -924,7 +922,7 @@ class Gdn_Form {
     *  postback.
     * @param boolean $ForceValue
     */
-   public function AddHidden($FieldName, $Value, $ForceValue = FALSE) {
+   public function AddHidden($FieldName, $Value = NULL, $ForceValue = FALSE) {
       if ($this->IsPostBack() && $ForceValue === FALSE)
          $Value = $this->GetFormValue($FieldName, $Value);
 
@@ -1335,7 +1333,8 @@ class Gdn_Form {
                   'multiline',
                   'default',
                   'textfield',
-                  'valuefield'))) $Return .= ' ' . $Attribute .
+                  'valuefield',
+                  'includenull'))) $Return .= ' ' . $Attribute .
                 '="' . $Value . '"';
          }
       }

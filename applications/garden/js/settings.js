@@ -1,9 +1,8 @@
 jQuery(document).ready(function($) {
    
    // Phone-home to the VanillaForums server to check for updates
-   var homeUrl = definition('UpdateCheckUrl', '');
    var updateChecks = definition('UpdateChecks', '');
-   if (homeUrl != '' && updateChecks != '') {
+   if (updateChecks != '') {
       var webroot = definition('WebRoot', '');
       var data = 'source='+webroot
          +'&users='+definition('CountUsers', 0)
@@ -12,9 +11,10 @@ jQuery(document).ready(function($) {
          +'&discussions='+definition('CountDiscussions', 0)
          +'&comments='+definition('CountComments', 0)
          +'&updateChecks='+updateChecks
+
       $.ajax({
          type: "POST",
-         url: homeUrl,
+         url: combinePaths(webroot, 'garden/utility/updateproxy'),
          data: data,
          dataType: 'json',
          success: function(json) {
@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
                // Save the message
                $.ajax({
                   type: "POST",
-                  url: webroot + '/garden/utility/updateresponse',
+                  url: combinePaths(webroot, 'garden/utility/updateresponse'),
                   data: 'Messages='+json.messages+'&Response='+json.response+'&TransientKey='+definition('TransientKey'),
                   success: function() {
                      // After the responses have been saved, re-fill the
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
                      // messages to be displayed)
                      if (json.messages != '')
                         $('#Content').load(
-                           webroot + '/garden/settings/index',
+                           combinePaths(webroot, 'garden/settings/index'),
                            'DeliveryType=ASSET&DeliveryMethod=XHTML'
                         );
                   }

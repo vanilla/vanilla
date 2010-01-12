@@ -44,13 +44,11 @@ class VanillaHooks implements Gdn_IPlugin {
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
          // Add the discussion tab
-         $Sender->AddProfileTab(Gdn::Translate('Discussions'));
+         $Sender->AddProfileTab(Gdn::Translate('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
          // Add the discussion tab's css
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
-         if ($Sender->Head) {
-            $Sender->Head->AddScript('/js/library/jquery.gardenmorepager.js');
-            $Sender->Head->AddScript('/applications/vanilla/js/discussions.js');
-         }
+         $Sender->AddJsFile('/js/library/jquery.gardenmorepager.js');
+         $Sender->AddJsFile('discussions.js');
       }
    }
    
@@ -78,8 +76,8 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function ProfileController_Discussions_Create(&$Sender) {
-      $UserReference = ArrayValue(0, $Sender->EventArguments, '');
-      $Offset = ArrayValue(1, $Sender->EventArguments, 0);
+      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(1, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
       $Sender->SetTabView($UserReference, 'Discussions', 'Profile', 'Discussions', 'Vanilla');
       
@@ -104,7 +102,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'profile/discussions/'.urlencode($Sender->User->Name).'/%1$s/'
+         'profile/discussions/'.Format::Url($Sender->User->Name).'/%1$s/'
       );
       
       // Deliver json data if necessary
@@ -135,10 +133,10 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Forum', 'Forum');
-      $Menu->AddLink('Forum', 'General', 'vanilla/settings', 'Vanilla.Settings.Manage');
-      $Menu->AddLink('Forum', 'Spam', 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
-      $Menu->AddLink('Forum', 'Categories', 'vanilla/categories/manage', 'Vanilla.Categories.Manage');
+      $Menu->AddItem('Forum', Gdn::Translate('Forum'));
+      $Menu->AddLink('Forum', Gdn::Translate('General'), 'vanilla/settings', 'Vanilla.Settings.Manage');
+      $Menu->AddLink('Forum', Gdn::Translate('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Forum', Gdn::Translate('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
    }
    
 }

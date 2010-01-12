@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -17,7 +17,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Core
+ * @namespace Garden.Core
  */
 
 class Gdn_Controller extends Gdn_Pluggable {
@@ -211,6 +211,14 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_CssFiles;
 
    /**
+    * An array of JS file names to search for in app folders & include in
+    * the page.
+    *
+    * @var array
+    */
+   protected $_JsFiles;
+
+   /**
     * A collection of definitions that will be written to the screen in a
     * hidden unordered list so that JavaScript has access to them (ie. for
     * language translations, web root, etc).
@@ -293,13 +301,14 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Theme = Gdn::Config('Garden.Theme');
       $this->View = '';
       $this->_CssFiles = array();
+      $this->_JsFiles = array();
       $this->_Definitions = array();
       $this->_DeliveryMethod = GetIncomingValue('DeliveryMethod', DELIVERY_METHOD_XHTML);
       $this->_DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
       $this->_Json = array();
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
-         'X-Powered-By' => 'Lussumo '.APPLICATION.' '.APPLICATION_VERSION,
+         'X-Powered-By' => APPLICATION.' '.APPLICATION_VERSION,
          'Content-Type' => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', ''), // PROPERLY ENCODE THE CONTENT
          'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT' // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
          // $Dispatcher->Header('Cache-Control', 'no-cache, must-revalidate'); // PREVENT PAGE CACHING: HTTP/1.1
@@ -345,7 +354,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
-
+   
    /**
     * Undocumented method.
     *
@@ -357,6 +366,17 @@ class Gdn_Controller extends Gdn_Pluggable {
       if(!is_null($Definition))
          $this->_Definitions[$Term] = $Definition;
       return ArrayValue($Term, $this->_Definitions);
+   }
+
+   /**
+    * Adds a JS file to search for in the application or global js folder(s).
+    *
+    * @param string $FileName The CSS file to search for.
+    * @param string $AppFolder The application folder that should contain the JS file. Default is to
+    * use the application folder that this controller belongs to.
+    */
+   public function AddJsFile($FileName, $AppFolder = '') {
+      $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
 
    /**
@@ -403,21 +423,22 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function DefinitionList() {
       $Session = Gdn::Session();
-      $Return = '<!-- Various Definitions for Javascript //-->
-         <ul id="Definitions" style="display: none;">
-            <li id="TransportError">'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'</li>
-            <li id="TransientKey">'.$Session->TransientKey().'</li>
-            <li id="WebRoot">'.Gdn_Url::WebRoot(TRUE).'</li>
-            <li id="ConfirmText">'.Gdn::Translate('Are you sure you want to proceed?').'</li>
-            <li id="Okay">'.Gdn::Translate('Okay').'</li>
-            <li id="Cancel">'.Gdn::Translate('Cancel').'</li>
+      $Return = '<!-- Various definitions for Javascript //-->
+         <div id="Definitions" style="display: none;">
+            <input type="hidden" id="TransportError" value="'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'" />
+            <input type="hidden" id="TransientKey" value="'.$Session->TransientKey().'" />
+            <input type="hidden" id="WebRoot" value="'.Gdn_Url::WebRoot(TRUE).'" />
+            <input type="hidden" id="ConfirmHeading" value="'.Gdn::Translate('Confirm').'" />
+            <input type="hidden" id="ConfirmText" value="'.Gdn::Translate('Are you sure you want to do that?').'" />
+            <input type="hidden" id="Okay" value="'.Gdn::Translate('Okay').'" />
+            <input type="hidden" id="Cancel" value="'.Gdn::Translate('Cancel').'" />
          ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<li id="'.$Term.'">'.$Definition."</li>\n";
+         $Return .= '<input type="hidden" id="'.$Term.'" value="'.$Definition.'" />'."\n";
       }
 
-      return $Return .'</ul>';
+      return $Return .'</div>';
    }
 
    /**
@@ -530,7 +551,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
-            $Paths = Glob($Glob);
+            $Paths = SafeGlob($Glob);
             if(is_array($Paths) && count($Paths) > 0) {
                $ViewPath = $Paths[0];
                break;
@@ -722,7 +743,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
-            $this->AddAsset($AssetName, '<div class="RedirectUrl Hidden">'.$this->RedirectUrl.'</div>');
+            $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
 
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
@@ -826,7 +847,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                // Find the first file that matches the path.
                $CssPath = FALSE;
                foreach($CssPaths as $Glob) {
-                  $Paths = Glob($Glob);
+                  $Paths = SafeGlob($Glob);
                   if(is_array($Paths) && count($Paths) > 0) {
                      $CssPath = $Paths[0];
                      break;
@@ -848,10 +869,52 @@ class Gdn_Controller extends Gdn_Pluggable {
                   $this->Head->AddCss($CssPath, 'screen');
                }
             }
+            
+            // And now search for/add all JS files
+            foreach ($this->_JsFiles as $JsInfo) {
+               $JsFile = $JsInfo['FileName'];
+               
+               if (strpos($JsFile, '/') !== FALSE) {
+                  // A direct path to the file was given.
+                  $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
+               } else {
+                  $JsGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $JsFile);
+                  $AppFolder = $JsInfo['AppFolder'];
+                  if ($AppFolder == '')
+                     $AppFolder = $this->ApplicationFolder;
+   
+                  // JS can come from any of the application folders, or it can come from the global js folder:
+                  $JsPaths = array();
+                  // 1. This application folder
+                  $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsGlob;
+                  // 2. Global JS folder. eg. root/js/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsGlob;
+                  // 3. Global JS library folder. eg. root/js/library/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsGlob;
+               }
+
+               // Find the first file that matches the path.
+               $JsPath = FALSE;
+               foreach($JsPaths as $Glob) {
+                  $Paths = SafeGlob($Glob);
+                  if(is_array($Paths) && count($Paths) > 0) {
+                     $JsPath = $Paths[0];
+                     break;
+                  }
+               }
+               
+               if ($JsPath !== FALSE) {
+                  $JsPath = str_replace(
+                     array(PATH_ROOT, DS),
+                     array('', '/'),
+                     $JsPath
+                  );
+                  $this->Head->AddScript($JsPath);
+               }
+            }
          }
-         // Make sure the head and menu modules get passed into the assets collection.
+         // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');
-         $this->AddModule('Menu');
       }
 
       // Master views come from one of four places:
@@ -874,7 +937,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Find the first file that matches the path.
       $MasterViewPath = FALSE;
       foreach($MasterViewPaths as $Glob) {
-         $Paths = Glob($Glob);
+         $Paths = SafeGlob($Glob);
          if(is_array($Paths) && count($Paths) > 0) {
             $MasterViewPath = $Paths[0];
             break;
@@ -910,10 +973,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
       $Session = Gdn::Session();
+
+      // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
-         // TODO: Make this work with different delivery types.
-         Redirect($this->Routes['DefaultPermission']);
+        if (!$Session->IsValid()) {
+           Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
+        } else {
+          Redirect($this->Routes['DefaultPermission']);
+        }
       }
+
    }
 
    /**
@@ -999,6 +1068,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function SetJson($Key, $Value = '') {
       $this->_Json[$Key] = $Value;
+   }
+   
+   /**
+    * If this object has a "Head" object as a property, this will set it's Title value.
+    * 
+    * @param string $Title The value to pass to $this->Head->Title().
+    */
+   public function Title($Title) {
+      if ($this->Head)
+         $this->Head->Title($Title);
    }
    
    /**

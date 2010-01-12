@@ -117,7 +117,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                
                if ($PluginUrl != '') {
                   $Info .= '<span>|</span>';
-                  $Info .= Anchor('Visit Plugin Site', $PluginUrl);
+                  $Info .= Anchor('Visit Site', $PluginUrl);
                }
                
                echo $Info != '' ? $Info : '&nbsp;';

@@ -1,23 +1,35 @@
-div.Vanilla #Foot {
-   padding-bottom: 30px !important;
+div#Foot {
+   border-bottom: 1px solid #C0E7F5;
 }
 #Sql {
-   color: #000;
-   background: #f3f3f3;
+   color: #076C8E;
+   font-weight: bold;
+   border-top: 1px solid #fff;
    padding: 10px 20px;
-   margin: 10px 0px 0px;
+   margin: 0;
    text-align: left;
 }
+#Sql h3 {
+   font-size: 140%;
+   font-weight: bold;
+   margin: 0;
+   padding: 4px 0;
+}
 #Sql pre {
+   font-family: monospace;
    padding: 4px;
-   margin: 4px 0px 2px;
+   margin: 4px 0px 8px;
    overflow: auto;
    font-size: 12px;
-   background: #fafafa;
+   font-weight: normal;
+   background: #F2FBFF;
+   color: #000;
 }
 #Sql small {
-   padding: 0px 4px;
+   padding: 0 4px;
+   margin: 0 10px;
    font-family: trebuchet ms;
    font-size: 12px;
+   font-weight: normal;
    color: #ff0084;
 }

@@ -48,7 +48,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                 data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON' },
                 dataType: 'json',
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                   $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+                   $.popup({}, definition('TransportError').replace('%s', textStatus));
                 },
                 success: function(json) {
                   $.popup.close(settings);
@@ -133,7 +133,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       popupHtml = settings.confirmHtml;
     
     popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
+    
     $('body').append(popupHtml);
+    if (settings.containerCssClass != '')
+      $('#'+settings.popupId).addClass(settings.containerCssClass);
+      
     var pagesize = $.popup.getPageSize();
     $('div.Overlay').css({ height: pagesize[1] });
     
@@ -155,7 +159,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         return $.popup.close(settings);
       });
     } else {
-      $('#'+settings.popupId+' .Content').text(definition('ConfirmText', 'Are you sure you want to proceed?'));
+      $('#'+settings.popupId+' .Content h1').text(definition('ConfirmHeading', 'Confirm'));
+      $('#'+settings.popupId+' .Content p').text(definition('ConfirmText', 'Are you sure you want to do that?'));
       $('#'+settings.popupId+' .Okay').val(definition('Okay', 'Okay'));
       $('#'+settings.popupId+' .Cancel').val(definition('Cancel', 'Cancel')).click(function() {
         $.popup.close(settings);
@@ -185,10 +190,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // This is something other than json, so just put it into the popup directly
       $('#'+settings.popupId+' .Content').append(data);
     } else {
+      if (json.StatusMessage)
+         inform(json.StatusMessage);
+
       formSaved = json['FormSaved'];
-      data = json['Data']
-      if (formSaved == false)
-        $('#'+settings.popupId+' .Content').html(data);
+      data = json['Data'];
+      // mosullivan - need to always reload the data b/c when uninviting ppl
+      // we need to reload the invitation table. Is there a reason not to reload
+      // the content?
+      // if (formSaved == false)
+      $('#'+settings.popupId+' .Content').html(data);
     }
     
     $('#'+settings.popupId+' .Loading').remove();
@@ -208,9 +219,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           settings.onSave(settings) // Notify the user that it is being saved.
         },  
         success: function(json) {
+          if (json.StatusMessage)
+             inform(json.StatusMessage);
+
           if (json.FormSaved == true) {
-            if (json.StatusMessage)
-               inform(json.StatusMessage);
 
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
@@ -256,6 +268,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     afterSuccess:     function() {
       // Called after an ajax request resulted in success, and before "close" is called.
     },
+    containerCssClass: '',
     popupHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
@@ -263,7 +276,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         <div class="Content"> \
         </div> \
         <div class="Footer"> \
-          <a href="#" class="Close">x</a> \
+          <a href="#" class="Close"><span>×</span></a> \
         </div> \
       </div> \
     </div> \
@@ -272,7 +285,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
       <div class="Body"> \
-        <div class="Content">Are you sure you want to proceed?</div> \
+        <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
         <div class="Footer"> \
           <input type="button" class="Button Okay" value="Okay" /> \
           <input type="button" class="Button Cancel" value="Cancel" /> \

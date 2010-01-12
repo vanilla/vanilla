@@ -1,15 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Lussumo.Garden.UI
+ * Garden.UI
  */
 
 if (!class_exists('Gdn_SideMenuModule', FALSE)) {
@@ -55,18 +55,18 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
          parent::__construct($Sender);
       }
       
-      public function AddLink($Group, $Code, $Url, $Permission = FALSE, $Attributes = '') {
+      public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '') {
          if (!array_key_exists($Group, $this->Items))
             $this->Items[$Group] = array();
 
-         $this->Items[$Group][] = array('Code' => $Code, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes);
+         $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes);
       }
       
-      public function AddItem($Group, $Code, $Permission = FALSE, $Attributes = '') {
+      public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
          if (!array_key_exists($Group, $this->Items))
             $this->Items[$Group] = array();
 
-         $this->Items[$Group][] = array('Code' => $Code, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
+         $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
       }      
       
       public function AssetTarget() {
@@ -92,8 +92,8 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
        * Removes an entire group of links, and the group itself, from the menu.
        */
       public function RemoveGroup($Group) {
-         if (array_key_exists($Group, $this->Groups))
-            unset($this->Groups[$Group]);
+         if (array_key_exists($Group, $this->Items))
+            unset($this->Items[$Group]);
       }
       
       public function ToString($HighlightRoute = '') {
@@ -162,10 +162,10 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
                      }
                      
                      $Url = ArrayValue('Url', $Link);
-                     if(substr($Link['Code'], 0, 1) === '\\') {
-                        $Text = substr($Link['Code'], 1);
+                     if(substr($Link['Text'], 0, 1) === '\\') {
+                        $Text = substr($Link['Text'], 1);
                      } else {
-                        $Text = str_replace('{Username}', $Username, Gdn::Translate($Link['Code']));
+                        $Text = str_replace('{Username}', $Username, $Link['Text']);
                      }
                      $Attributes = ArrayValue('Attributes', $Link, array());
                      if ($Url !== FALSE) {
@@ -179,11 +179,9 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
                         if ($CurrentLink)
                            $Attributes['class'] = $CssClass . ' Active';
                            
-                        $Group .= '<li'.Attribute($Attributes).'><strong><a href="'.$Url.'">'.$Text.'</a></strong>';
+                        $Group .= '<li'.Attribute($Attributes).'><a href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
                      } else {
-                        // $Group .= '<li'.Attribute($Attributes).'>'.$Text;
-                        // $Group .= '<h4>'.$Text.'</h4>';
                         if ($Text != '')
                            $Group .= '<h4>'.$Text.'</h4>';
                      }
@@ -195,7 +193,6 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
 
 
                if ($Group != '' && $LinkCount > 0) {
-                  // $Menu .= $Group . "</li>\r\n";
                   $Menu .= $Group . "\r\n";
                }
 

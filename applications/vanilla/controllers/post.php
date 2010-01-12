@@ -31,12 +31,10 @@ class PostController extends VanillaController {
 
          $this->CategoryData = $CategoryModel->GetFull();
       }
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/applications/vanilla/js/post.js');
-         $this->Head->AddScript('/applications/vanilla/js/autosave.js');
-         $this->Head->Title(Translate('Start a New Discussion'));
-      }
+      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('post.js');
+      $this->AddJsFile('autosave.js');
+      $this->Title(Translate('Start a New Discussion'));
       
       if (isset($this->Discussion)) {
          if ($this->Discussion->InsertUserID != $Session->UserID)
@@ -159,11 +157,9 @@ class PostController extends VanillaController {
     * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/applications/vanilla/js/post.js');
-         $this->Head->AddScript('/applications/vanilla/js/autosave.js');
-      }
+      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('post.js');
+      $this->AddJsFile('autosave.js');
 
       $Session = Gdn::Session();
       $this->Form->SetModel($this->CommentModel);

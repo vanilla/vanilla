@@ -8,6 +8,5 @@ entry_apply.js: should be included only on the entry.apply() page.
 Note 1: these are simply guidelines - you can name any file whatever you want and
 include it anywhere you want.
 
-Note 2: The $Head object becomes a property of the controller, so you can add a
-js file to the controller with:
-   $this->Head->AddScript('/appname/js/filename.js');
+Note 2: You can add a js file to the controller with:
+   $this->AddJsFile('filename.js');

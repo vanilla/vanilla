@@ -1,25 +1,25 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
  * A database-independent dataset management/manipulation class.
  *
- * This class is HEAVILY inspired by and, in places, flat out copied from
- * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
+ * This class is HEAVILY inspired by CodeIgniter (http://www.codeigniter.com).
+ * My hat is off to them.
  *
  * @author Mark O'Sullivan
  * @copyright 2003 Mark O'Sullivan
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Database
+ * @namespace Garden.Database
  */
 
 class Gdn_DataSet implements IteratorAggregate {
@@ -128,18 +128,20 @@ class Gdn_DataSet implements IteratorAggregate {
       if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
       
       if ($this->_PDOStatementFetched === FALSE) {
-      // Get all records from the pdostatement's result set.
-         if ($RowType == DATASET_TYPE_OBJECT) {
-            $this->ResultObjectFetched = TRUE;
-            $this->_PDOStatement->setFetchMode(PDO::FETCH_OBJ);
-            while ($Row = $this->_PDOStatement->fetch()) {
-               $this->_ResultObject[] = $Row;
-            }
-         } else {
-            $this->ResultArrayFetched = TRUE;
-            $this->_PDOStatement->setFetchMode(PDO::FETCH_ASSOC);
-            while ($Row = $this->_PDOStatement->fetch()) {
-               $this->_ResultArray[] = $Row;
+         if (is_object($this->_PDOStatement)) {
+            // Get all records from the pdostatement's result set.
+            if ($RowType == DATASET_TYPE_OBJECT) {
+               $this->ResultObjectFetched = TRUE;
+               $this->_PDOStatement->setFetchMode(PDO::FETCH_OBJ);
+               while ($Row = $this->_PDOStatement->fetch()) {
+                  $this->_ResultObject[] = $Row;
+               }
+            } else {
+               $this->ResultArrayFetched = TRUE;
+               $this->_PDOStatement->setFetchMode(PDO::FETCH_ASSOC);
+               while ($Row = $this->_PDOStatement->fetch()) {
+                  $this->_ResultArray[] = $Row;
+               }
             }
          }
          $this->_PDOStatementFetched = TRUE;
@@ -221,7 +223,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * Returns the number of fields in the DataSet.
     */
    public function NumFields() {
-      return $this->_PDOStatement->columnCount();
+      return is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
    }
 
    /**
@@ -372,7 +374,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
     */
    public function PDOStatement(&$PDOStatement = FALSE) {
-      if($PDOStatement === FALSE)
+      if ($PDOStatement === FALSE)
          return $this->_PDOStatement;
       else
          $this->_PDOStatement = $PDOStatement;

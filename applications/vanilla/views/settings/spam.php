@@ -13,7 +13,7 @@ echo $this->Form->Errors();
 <table class="AltColumns">
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Only Allow'); ?></th>
+         <th><?php echo Gdn::Translate('Only Allow Each User To Post'); ?></th>
          <th class="Alt"><?php echo Gdn::Translate('Within'); ?></th>
          <th><?php echo Gdn::Translate('Or Spamblock For'); ?></th>
       </tr>

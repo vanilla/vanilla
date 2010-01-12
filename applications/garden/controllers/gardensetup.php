@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -201,6 +201,7 @@ class GardenSetupController extends GardenController {
                'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'Garden.Messages.Cache' => 'arr:["Garden\/Settings\/Index"]', // Make sure that the "welcome" message is cached for viewing
+               'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
             );
             SaveToConfig($Save);
@@ -217,6 +218,9 @@ class GardenSetupController extends GardenController {
       // Make sure PDO is available
       if (!class_exists('PDO'))
          $this->Form->AddError('You must have PDO enabled in PHP in order for Vanilla to connect to your database.');
+
+      if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
+         $this->Form->AddError('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.');
 
       // Make sure that the correct filesystem permissions are in place
       $ConfigFile = PATH_CONF . DS . 'config.php';

@@ -8,9 +8,9 @@ $ApplicationInfo['Vanilla'] = array(
    // 'RequiredApplications' => array('Garden' => '1.0'),
    'RegisterPermissions' => FALSE, // Permissions that should be added to the application when it is installed.
    'SetupController' => 'setup',
-   'Url' => 'http://getvanilla.com',
+   'Url' => 'http://vanillaforums.org',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
-   'AuthorUrl' => 'http://lussumo.com',
-   'License' => 'MIT License (http://lussumo.com/license)'
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'License' => 'GPL v2'
 );

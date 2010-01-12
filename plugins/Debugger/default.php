@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
@@ -21,7 +21,7 @@ $PluginInfo['Debugger'] = array(
    'SettingsPermission' => 'Plugins.Debugger.Manage', // The permission required to view the SettingsUrl.
    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
+   'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 
@@ -40,6 +40,10 @@ class DebuggerPlugin implements Gdn_IPlugin {
    // SignIn_Render_After, etc. and it essentially *_Render_After
    
    public function Base_Render_Before($Sender) {
+      $Sender->AddCssFile('/plugins/Debugger/style.css');
+   }
+
+   public function Base_AfterBody_Handler($Sender) {
       $Session = Gdn::Session();
       if(!$Session->CheckPermission('Garden.Settings.Manage')) {
          return;
@@ -69,7 +73,9 @@ class DebuggerPlugin implements Gdn_IPlugin {
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
                }
-               $String .= '<div>'.$QueryInfo['Method'].'</div><pre>'.$Query.';</pre><small>'.number_format($QueryTimes[$Key], 6).'s</small>';
+               $String .= $QueryInfo['Method']
+                  .'<small>'.number_format($QueryTimes[$Key], 6).'s</small>'
+                  .'<pre>'.$Query.';</pre>';
             }
          }
          global $Start;
@@ -83,7 +89,7 @@ class DebuggerPlugin implements Gdn_IPlugin {
          </div>';
               */
          $String .= '</div>';
-         $Sender->AddAsset('Foot', $String);
+         echo $String;
       //}
    }
    

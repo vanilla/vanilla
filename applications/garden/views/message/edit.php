@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
-
-echo $this->Form->Open();
-echo $this->Form->Errors();
-?>
+<?php if (!defined('APPLICATION')) exit();?>
 <h1><?php
    if (is_object($this->Message))
       echo Gdn::Translate('Edit Message');
    else
       echo Gdn::Translate('Add Message');
 ?></h1>
+<?php
+echo $this->Form->Open();
+echo $this->Form->Errors();
+?>
 <ul>
    <li>
       <?php

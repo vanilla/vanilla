@@ -6,7 +6,9 @@ jQuery(document).ready(function($) {
       followConfirm: false
    });
    
-   $('textarea.MessageBox, textarea.TextBox').autogrow();
+   $('textarea.MessageBox, textarea.TextBox').livequery(function() {
+      $(this).autogrow();
+   });
    
    // Make the entire row clickable on the conversation list.
    $.fn.hoverRow = function() {
@@ -49,31 +51,33 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                $('.Popup').remove();
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
-               if (json.FormSaved == false) {
+               if (json.StatusMessage) {
                   $(frm).prepend(json.StatusMessage);
                   json.StatusMessage = null;
                }
-               // Clean up the form
-               clearMessageForm();                
-
-               // And show the new comments
-               $('#Conversation').append(json.Data);
-               
-               // Remove any "More" pager links
-               $('#PagerMore').remove();
-               
-               // And scroll to them
-               var target = $('#' + json.MessageID);
-               if (target.offset()) {
-                  $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+               if (json.FormSaved) {
+                  // Clean up the form
+                  clearMessageForm();                
+   
+                  // And show the new comments
+                  $('#Conversation').append(json.Data);
+                  
+                  // Remove any "More" pager links
+                  $('#PagerMore').remove();
+                  
+                  // And scroll to them
+                  var target = $('#' + json.MessageID);
+                  if (target.offset()) {
+                     $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+                  }
+                  inform(json.StatusMessage);
                }
-               inform(json.StatusMessage);
             }
          });
          return false;
@@ -92,15 +96,17 @@ jQuery(document).ready(function($) {
    }
    
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').autocomplete(
-      definition('WebRoot') + '/garden/user/autocomplete/',
-      {
-         minChars: 1,
-         multiple: true,
-         scrollHeight: 220,
-         selectFirst: true
-      }
-   ).autogrow();
+   $('.MultiComplete').livequery(function() {
+      $(this).autocomplete(
+         combinePaths(definition('WebRoot'), 'index.php/garden/user/autocomplete/'),
+         {
+            minChars: 1,
+            multiple: true,
+            scrollHeight: 220,
+            selectFirst: true
+         }
+      ).autogrow();
+   });
    
    // Set up paging
    $('.MorePager').morepager({
@@ -124,7 +130,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('span.Progress').remove();
             $(btn).show();
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             inform(json.StatusMessage);

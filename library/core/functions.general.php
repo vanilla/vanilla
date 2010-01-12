@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 function __autoload($ClassName) {
@@ -53,33 +53,20 @@ function __autoload($ClassName) {
       include_once($LibraryPath);
 }
 
-// Functions relating to data/variable types and type casting
-if (!function_exists('RemoveKeyFromArray')) {
-   function RemoveKeyFromArray($Array, $Key) {
-      if (!is_array($Key))
-         $Key = array($Key);
-
-      $Count = count($Key);
-      for ($i = 0; $i < $Count; $i++) {
-         $KeyIndex = array_keys(array_keys($Array), $Key[$i]);
-         if (count($KeyIndex) > 0) array_splice($Array, $KeyIndex[0], 1);
-      }
-      return $Array;
-   }
-}
-if (!function_exists('Img')) {
-   function Img($Image, $Attributes = '') {
-      if ($Attributes == '')
-         $Attributes = array();
-
-      if (substr($Image, 0, 7) != 'http://' && $Image != '')
-         $Image = Url($Image);
-
-      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
+if (!function_exists('AddActivity')) {
+   /**
+    * A convenience function that allows adding to the activity table with a single line.
+    */
+   function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '', $SendEmail = '') {
+      $ActivityModel = new Gdn_ActivityModel();
+      return $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route, $SendEmail);
    }
 }
 
 if (!function_exists('Anchor')) {
+   /**
+    * Builds and returns an anchor tag.
+    */
    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
          $CssClass = array('class' => $CssClass);
@@ -90,156 +77,81 @@ if (!function_exists('Anchor')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if (substr($Destination, 0, 7) != 'http://' && ($Destination != '' || $ForceAnchor === FALSE))
+      $Prefix = substr($Destination, 0, 7);
+      if (!in_array($Prefix, array('http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Url($Destination);
 
       return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
-if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '') {
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
-   }
-}
-if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $CssClass = '') {
-      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($User->Photo != '') {
-         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$User->Photo).'" alt="'.urlencode($User->Name).'" /></a>';
-      } else {
-         return ''; // Anchor($Name, '/profile/'.Format::Url($Name), $CssClass);
-      }
-   }
-}
-if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
-   }
-}
-
-if (!function_exists('Translate')) {
+if (!function_exists('ArrayCombine')) {
    /**
-	 * Translates a code into the selected locale's definition.
-	 *
-	 * @param string $Code The code related to the language-specific definition.
-	 * @param string $Default The default value to be displayed if the translation code is not found.
-	 * @return string The translated string or $Code if there is no value in $Default.
-	 * @deprecated
-	 * @see Gdn::Translate()
-	 */
-   function Translate($Code, $Default = '') {
-      $Result = Gdn::Translate($Code, $Default);
-      return $Result;
-   }
-}
-
-//if (!function_exists('Config')) {
-//   /**
-//    * Gets a configuration setting.
-//    * @deprecated
-//    * @see Gdn::Config()
-//    */
-//   function Config($Name, $Default = FALSE, $Group = '') {
-//      if(strlen($Group) > 0 && $Group != 'Configuration')
-//         $Result = Gdn::Config($Group . '.' . $Name, $Default);
-//      else
-//         $Result = Gdn::Config($Name, $Default);
-//      
-//      return $Result;
-//   }
-//}
-
-if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '') {
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
-      $Config->Load($Path, 'Save');
-      if (!is_array($Name))
-         $Name = array($Name => $Value);
-      
-      foreach ($Name as $k => $v) {
-         $Config->Set($k, $v);
-      }
-      return $Config->Save($Path);
-   }
-}
-
-if (!function_exists('RemoveFromConfig')) {
-   function RemoveFromConfig($Name) {
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
-      $Config->Load($Path, 'Save');
-      if (!is_array($Name))
-         $Name = array($Name);
-      
-      foreach ($Name as $k) {
-         $Config->Remove($k);
-      }
-      return $Config->Save($Path);
-   }
-}
-
-if (!function_exists('MergeArrays')) {
-   /**
-    * Merge two associative arrays into a single array.
-    *
-    * @param array The "dominant" array, who's values will be chosen over those of the subservient.
-    * @param array The "subservient" array, who's values will be disregarded over those of the dominant.
+    * PHP's array_combine has a limitation that doesn't allow array_combine to
+    * work if either of the arrays are empty.
     */
-   function MergeArrays(&$Dominant, $Subservient) {
-      foreach ($Subservient as $Key => $Value) {
-         if (!array_key_exists($Key, $Dominant)) {
-            // Add the key from the subservient array if it doesn't exist in the
-            // dominant array.
-            $Dominant[$Key] = $Value;
-         } else {
-            // If the key already exists in the dominant array, only continue if
-            // both values are also arrays - because we don't want to overwrite
-            // values in the dominant array with ones from the subservient array.
-            if (is_array($Dominant[$Key]) && is_array($Value)) {
-               $Dominant[$Key] = MergeArrays($Dominant[$Key], $Value);
-            }
-         }
-      }
-      return $Dominant;
+   function ArrayCombine($Array1, $Array2) {
+      if (!is_array($Array1))
+         $Array1 = array();
+         
+      if (!is_array($Array2))
+         $Array2 = array();
+         
+      if (count($Array1) > 0 && count($Array2) > 0)
+         return array_combine($Array1, $Array2);
+      elseif (count($Array1) == 0)
+         return $Array2;
+      else
+         return $Array1;
    }
 }
 
-if (!function_exists('CombinePaths')) {
-   // filesystem input/output functions that deal with loading libraries, application paths, etc.
-   function CombinePaths($Paths, $Delimiter = DS) {
-      if (is_array($Paths)) {
-         $MungedPath = implode($Delimiter, $Paths);
-         $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
-         return str_replace('http:/', 'http://', $MungedPath);
-         /*
-         $Count = count($Paths);
-         for ($i = 0; $i < $Count; ++$i) {
-            $Path = trim($Paths[$i]);
+if (!function_exists('array_fill_keys')) {
+   function array_fill_keys($Keys, $Val) {
+      return array_combine($Keys,array_fill(0,count($Keys),$Val));
+   }
+}
 
-            // Remove $Delimiter from the begining of each path portion
-            $Len = strlen($Path);
-            if ($Len > 0 && substr($Path, 0, 1) == $Delimiter) {
-               $Path = substr($Path, 1);
-               $Len--;
-            }
-
-            // Remove $Delimiter from the end of each path portion
-            if ($Len > 0 && substr($Path, $Len - 1) == $Delimiter) {
-               $Path = substr($Path, 0, $Len - 1);
-               $Len--;
-            }
-
-            $Paths[$i] = $Path;
+if (!function_exists('ArrayKeyExistsI')) {
+   /**
+    * Case-insensitive ArrayKeyExists search.
+    */
+   function ArrayKeyExistsI($Key, $Search) {
+      if (is_array($Search)) {
+         foreach ($Search as $k => $v) {
+            if (strtolower($Key) == strtolower($k))
+               return TRUE;
          }
-         return implode($Delimiter, $Paths);
-         */
-      } else {
-         return $Paths;
       }
+      return FALSE;
+   }
+}
+
+if (!function_exists('ArrayInArray')) {
+   /**
+    * Searches Haystack array for items in Needle array. If FullMatch is TRUE,
+    * all items in Needle must also be in Haystack. If FullMatch is FALSE, only
+    * one-or-more items in Needle must be in Haystack.
+    *
+    * @param array $Needle The array containing items to match to Haystack.
+    * @param array $Haystack The array to search in for Needle items.
+    * @param bool $FullMatch Should all items in Needle be found in Haystack to return TRUE?
+    */
+   function ArrayInArray($Needle, $Haystack, $FullMatch = TRUE) {
+      $Count = count($Needle);
+      $Return = $FullMatch ? TRUE : FALSE;
+      for ($i = 0; $i < $Count; ++$i) {
+         if ($FullMatch === TRUE) {
+            if (in_array($Needle[$i], $Haystack) === FALSE)
+               $Return = FALSE;
+         } else {
+            if (in_array($Needle[$i], $Haystack) === TRUE) {
+               $Return = TRUE;
+               break;
+            }
+         }
+      }
+      return $Return;
    }
 }
 
@@ -285,73 +197,19 @@ if (!function_exists('ArrayValueI')) {
    }
 }
 
-if (!function_exists('InArrayI')) {
-   /**
-    * Case-insensitive version of php's native in_array function.
+if (!function_exists('ArrayValuesToKeys')) {
+   /** Takes an array's values and applies them to a new array as both the keys
+    * and values.
     */
-   function InArrayI($Needle, $Haystack) {
-      $Needle = strtolower($Needle);
-      foreach ($Haystack as $Item) {
-         if (strtolower($Item) == $Needle)
-            return TRUE;
-      }
-      return FALSE;
+   function ArrayValuesToKeys($Array) {
+      return array_combine(array_values($Array), $Array);
    }
 }
 
-if (!function_exists('IsTimestamp')) {
-   function IsTimestamp($Stamp) {
-      return checkdate(
-         @date("m", $Stamp),
-         @date("d", $Stamp),
-         @date("Y", $Stamp)
-      );
-   }
-}
-
-if (!function_exists('TrueStripSlashes')) {
-   if(get_magic_quotes_gpc()) {
-      function TrueStripSlashes($String) {
-         return stripslashes($String);
-      }
-   } else {
-      function TrueStripSlashes($String) {
-         return $String;
-      }
-   }
-}
-
-// Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
-if (!function_exists('Url')) {   
-   function Url($Destination = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-      // Cache the rewrite urls config setting in this object.
-      static $RewriteUrls = NULL;
-      if(is_null($RewriteUrls)) $RewriteUrls = ForceBool(Gdn::Config('Garden.RewriteUrls', FALSE));
-      
-      if (substr($Destination, 0, 7) == 'http://') {
-         return $Destination;
-      } else if ($Destination == '#' || $Destination == '') {
-         if ($WithDomain)
-            return Gdn_Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
-         else
-            return '/'.Gdn_Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
-      } else {
-         $Paths = array();
-         if (!$WithDomain)
-            $Paths[] = '/';
-            
-         $Paths[] = Gdn_Url::WebRoot($WithDomain);
-         if (!$RewriteUrls)
-            $Paths[] = 'index.php';
-            
-         $Paths[] = $Destination;
-         return CombinePaths($Paths, '/');
-      }
-   }
-}
-
-// Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
 if (!function_exists('Asset')) {
+   /**
+    * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
+    */
    function Asset($Destination = '', $WithDomain = FALSE) {
       if (substr($Destination, 0, 7) == 'http://') {
          return $Destination;
@@ -361,30 +219,22 @@ if (!function_exists('Asset')) {
    }
 }
 
-
-if (!function_exists('ForceBool')) {
-   function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
-      if (is_bool($Value)) {
-         return $Value ? $True : $False;
-      } else if (is_numeric($Value)) {
-         return $Value == 0 ? $False : $True;
-      } else if (is_string($Value)) {
-         return strtolower($Value) == 'true' ? $True : $False;
-      } else {
-         return $DefaultValue;
+if (!function_exists('Attribute')) {
+   /**
+    * Takes an attribute (or array of attributes) and formats them in
+    * attribute="value" format.
+    */
+   function Attribute($Name, $Value = '') {
+      $Return = '';
+      if (!is_array($Name)) {
+         $Name = array($Name => $Value);
       }
-   }
-}
-
-if (!function_exists('Redirect')) {
-   function Redirect($Destination) {
-      @ob_end_clean();
-      header("location: ".Url($Destination));
-      // Close any db connections before exit
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
-      // Exit
-      exit();
+      foreach ($Name as $Attribute => $Val) {
+         if ($Val != '') {
+            $Return .= ' '.$Attribute.'="'.$Val.'"';
+         }
+      }
+      return $Return;
    }
 }
 
@@ -408,195 +258,6 @@ if (!function_exists('CalculateNumberOfPages')) {
          $PageCount = 1;
       }
       return $PageCount;
-   }
-}
-
-if (!function_exists('GetPostValue')) {
-   // Return the value for $FieldName from the $_POST collection
-   function GetPostValue($FieldName, $Default = FALSE) {
-      return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
-   }
-}
-
-if (!function_exists('GetIncomingValue')) {
-   function GetIncomingValue($FieldName, $Default = FALSE) {
-      if (array_key_exists($FieldName, $_POST) === TRUE) {
-         $Result = filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
-      } else if (array_key_exists($FieldName, $_GET) === TRUE) {
-         $Result = filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING); //, FILTER_REQUIRE_ARRAY);
-      } else {
-         $Result = $Default;
-      }
-      return $Result;
-   }
-}
-
-if (!function_exists('ArrayValuesToKeys')) {
-   // Takes an array's values and applies them to a new array as both the keys and
-   // values.
-   function ArrayValuesToKeys($Array) {
-      return array_combine(array_values($Array), $Array);
-   }
-}
-
-if (!function_exists('ConsolidateArrayValuesByKey')) {
-   /**
-    * Takes an array of associative arrays (ie. a dataset array), a $Key, and
-    * merges all of the values for that key into a single array, returning it.
-    */
-   function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
-      $Return = array();
-      foreach ($Array as $Index => $AssociativeArray) {
-         if (array_key_exists($Key, $AssociativeArray)) {
-            if($ValueKey === '') {
-               $Return[] = $AssociativeArray[$Key];
-            } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
-               $Return[$AssociativeArray[$Key]] = $AssociativeArray[$ValueKey];
-            } else {
-               $Return[$AssociativeArray[$Key]] = $DefaultValue;
-            }
-         }
-      }
-      return $Return;
-   }
-}
-
-if (!function_exists('Now')) {
-   function Now() {
-      list($usec, $sec) = explode(" ", microtime());
-      return ((float)$usec + (float)$sec);
-   }
-}
-
-if (!function_exists('ArrayInArray')) {
-   /**
-    * Searches Haystack array for items in Needle array. If FullMatch is TRUE,
-    * all items in Needle must also be in Haystack. If FullMatch is FALSE, only
-    * one-or-more items in Needle must be in Haystack.
-    *
-    * @param array The array containing items to match to Haystack.
-    * @param array The array to search in for Needle items.
-    * @param bool Should all items in Needle be found in Haystack to return TRUE?
-    */
-   function ArrayInArray($Needle, $Haystack, $FullMatch = TRUE) {
-      $Count = count($Needle);
-      $Return = $FullMatch ? TRUE : FALSE;
-      for ($i = 0; $i < $Count; ++$i) {
-         if ($FullMatch === TRUE) {
-            if (in_array($Needle[$i], $Haystack) === FALSE)
-               $Return = FALSE;
-         } else {
-            if (in_array($Needle[$i], $Haystack) === TRUE) {
-               $Return = TRUE;
-               break;
-            }
-         }
-      }
-      return $Return;
-   }
-}
-
-if (!function_exists('GetConnectionString')) {
-   function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
-      $HostName = explode(':', $HostName);
-      $Port = count($HostName) == 2 ? $HostName[1] : '';
-      $HostName = $HostName[0];
-      $String = $ServerType.':host='.$HostName;
-      if ($Port != '')
-         $String .= ';port='.$Port;
-      return $String .= ';dbname='.$DatabaseName;
-   }
-}
-
-if (!function_exists('StringIsNullOrEmpty')) {
-   function StringIsNullOrEmpty($String) {
-      return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
-   }
-}
-
-if (!function_exists('RandomString')) {
-   function RandomString($Length) {
-      $Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      $String = '' ;
-      for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % 35;
-        $String .= substr($Characters, $Offset, 1);
-      }
-      return $String;
-   }
-}
-if (!function_exists('SliceString')) {
-   function SliceString($String, $Length) {
-      if (strlen($String) > $Length) {
-         $Return = substr(trim($String), 0, $Length);
-         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . '...';
-      } else {
-         return $String;
-      }
-   }
-}
-
-if (!function_exists('AddActivity')) {
-   /**
-    * A convenience function that allows adding to the activity table with a single line.
-    */
-   function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '') {
-      $ActivityModel = new Gdn_ActivityModel();
-      $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route);
-   }
-}
-
-if (!function_exists('Attribute')) {
-   function Attribute($Name, $Value = '') {
-      $Return = '';
-      if (!is_array($Name)) {
-         $Name = array($Name => $Value);
-      }
-      foreach ($Name as $Attribute => $Val) {
-         if ($Val != '') {
-            $Return .= ' '.$Attribute.'="'.$Val.'"';
-         }
-      }
-      return $Return;
-   }
-}
-
-if (!function_exists('GetApplicationMenus')) {
-   function GetApplicationMenus(&$Menu) {
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $EnabledApplications = $ApplicationManager->EnabledApplications();
-
-      // Get all settings pages from the specified applications:
-      foreach ($EnabledApplications as $ApplicationName => $ApplicationFolder) {
-         $AppController = $ApplicationName.'Controller';
-         // Attempt to include the app controller if it isn't already loaded
-         $ControllerPath = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'controllers' . DS . 'appcontroller.php';
-         if (!class_exists($AppController) && file_exists($ControllerPath))
-            include_once($ControllerPath);
-
-         // Attempt to instantiate the app controller to get the settings pages
-         if (class_exists($AppController)) {
-            $AppController = new $AppController();
-            if (method_exists($AppController, 'GetSettingsPages'))
-               $AppController->GetSettingsPages($Menu);
-
-         }
-      }
-
-      // Get all settings pages from plugins
-      $Plugins = array();
-      $PluginManager = Gdn::Factory('PluginManager');
-      $PluginMenuAdded = FALSE;
-      foreach ($PluginManager->EnabledPlugins as $PluginName => $PluginInfo) {
-         if (array_key_exists('SettingsUrl', $PluginInfo)) {
-            if (!$PluginMenuAdded) {
-               $Menu->AddItem('Plugins', 'Plugins');
-               $PluginMenuAdded = TRUE;
-            }
-            // TODO: DOES A PERMISSION NEED TO APPLY TO THE PLUGIN SETTINGS URL?
-            $Menu->AddLink('Plugins', $PluginName, ArrayValue('SettingsUrl', $PluginInfo, ''));
-         }
-      }
    }
 }
 
@@ -684,66 +345,38 @@ if (!function_exists('CheckRequirements')) {
    }
 }
 
-if (!function_exists('RemoveQuoteSlashes')) {
- 	function RemoveQuoteSlashes($String) {
-		return str_replace("\\\"", '"', $String);
-	}
+if (!function_exists('CombinePaths')) {
+   // filesystem input/output functions that deal with loading libraries, application paths, etc.
+   function CombinePaths($Paths, $Delimiter = DS) {
+      if (is_array($Paths)) {
+         $MungedPath = implode($Delimiter, $Paths);
+         $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
+         return str_replace('http:/', 'http://', $MungedPath);
+      } else {
+         return $Paths;
+      }
+   }
 }
 
-if (!function_exists('GetMentions')) {
-   function GetMentions($String) {
-      $Mentions = array();
-      
-      // This one grabs mentions that start at the beginning of $String
-      preg_match(
-         '/^(@([\d\w_]{1,20}))/si',
-         $String,
-         $Matches
-      );
-      if (count($Matches) == 3)
-         $Mentions[] = $Matches[2];
-      
-      // This one handles all other mentions
-      preg_match_all(
-         '/([\s]+)(@([\d\w_]{3,20}))/si',
-         $String,
-         $Matches
-      );
-      if (count($Matches) == 4) {
-         for ($i = 0; $i < count($Matches[3]); ++$i) {
-            $Mentions[] = $Matches[3][$i];
+if (!function_exists('ConsolidateArrayValuesByKey')) {
+   /**
+    * Takes an array of associative arrays (ie. a dataset array), a $Key, and
+    * merges all of the values for that key into a single array, returning it.
+    */
+   function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
+      $Return = array();
+      foreach ($Array as $Index => $AssociativeArray) {
+         if (array_key_exists($Key, $AssociativeArray)) {
+            if($ValueKey === '') {
+               $Return[] = $AssociativeArray[$Key];
+            } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
+               $Return[$AssociativeArray[$Key]] = $AssociativeArray[$ValueKey];
+            } else {
+               $Return[$AssociativeArray[$Key]] = $DefaultValue;
+            }
          }
       }
-      return array_unique($Mentions);
-   }
-}
-
-// Needed this to fix a bug: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
-if (!function_exists('getallheaders')) {
-   function getallheaders() {
-      foreach($_SERVER as $name => $value)
-          if(substr($name, 0, 5) == 'HTTP_')
-              $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-      return $headers;
-   }
-}
-
-if (!function_exists('ArrayCombine')) {
-   // PHP has a limitation that doesn't allow array_combine to work if either of
-   // the arrays are empty
-   function ArrayCombine($Array1, $Array2) {
-      if (!is_array($Array1))
-         $Array1 = array();
-         
-      if (!is_array($Array2))
-         $Array2 = array();
-         
-      if (count($Array1) > 0 && count($Array2) > 0)
-         return array_combine($Array1, $Array2);
-      elseif (count($Array1) == 0)
-         return $Array2;
-      else
-         return $Array1;
+      return $Return;
    }
 }
 
@@ -769,16 +402,140 @@ if (!function_exists('filter_input')) {
    }
 }
 
+if (!function_exists('ForceBool')) {
+   function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
+      if (is_bool($Value)) {
+         return $Value ? $True : $False;
+      } else if (is_numeric($Value)) {
+         return $Value == 0 ? $False : $True;
+      } else if (is_string($Value)) {
+         return strtolower($Value) == 'true' ? $True : $False;
+      } else {
+         return $DefaultValue;
+      }
+   }
+}
+
+if (!function_exists('getallheaders')) {
+   /**
+    * Needed this to fix a bug:
+    * http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
+    */
+   function getallheaders() {
+      foreach($_SERVER as $name => $value)
+          if(substr($name, 0, 5) == 'HTTP_')
+              $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+      return $headers;
+   }
+}
+
+if (!function_exists('GetConnectionString')) {
+   function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
+      $HostName = explode(':', $HostName);
+      $Port = count($HostName) == 2 ? $HostName[1] : '';
+      $HostName = $HostName[0];
+      $String = $ServerType.':host='.$HostName;
+      if ($Port != '')
+         $String .= ';port='.$Port;
+      return $String .= ';dbname='.$DatabaseName;
+   }
+}
+
+if (!function_exists('GetIncomingValue')) {
+   /**
+    * Grabs $FieldName from either the GET or POST collections (whichever one it
+    * is present in. Checks $_POST first).
+    */
+   function GetIncomingValue($FieldName, $Default = FALSE) {
+      if (array_key_exists($FieldName, $_POST) === TRUE) {
+         $Result = filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
+      } else if (array_key_exists($FieldName, $_GET) === TRUE) {
+         $Result = filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING); //, FILTER_REQUIRE_ARRAY);
+      } else {
+         $Result = $Default;
+      }
+      return $Result;
+   }
+}
+
+if (!function_exists('GetMentions')) {
+   function GetMentions($String) {
+      $Mentions = array();
+      
+      // This one grabs mentions that start at the beginning of $String
+      preg_match(
+         '/^(@([\d\w_-]{1,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 3)
+         $Mentions[] = $Matches[2];
+      
+      // This one handles all other mentions
+      preg_match_all(
+         '/([\s]+)(@([\d\w_-]{1,20}))/si',
+         $String,
+         $Matches
+      );
+      if (count($Matches) == 4) {
+         for ($i = 0; $i < count($Matches[3]); ++$i) {
+            $Mentions[] = $Matches[3][$i];
+         }
+      }
+      return array_unique($Mentions);
+   }
+}
+
+if (!function_exists('GetPostValue')) {
+   /**
+    * Return the value for $FieldName from the $_POST collection.
+    */
+   function GetPostValue($FieldName, $Default = FALSE) {
+      return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
+   }
+}
+
+if (!function_exists('Img')) {
+   /**
+    * Returns an img tag.
+    */
+   function Img($Image, $Attributes = '') {
+      if ($Attributes == '')
+         $Attributes = array();
+
+      if (substr($Image, 0, 7) != 'http://' && $Image != '')
+         $Image = Url($Image);
+
+      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
+   }
+}
+
+if (!function_exists('InArrayI')) {
+   /**
+    * Case-insensitive version of php's native in_array function.
+    */
+   function InArrayI($Needle, $Haystack) {
+      $Needle = strtolower($Needle);
+      foreach ($Haystack as $Item) {
+         if (strtolower($Item) == $Needle)
+            return TRUE;
+      }
+      return FALSE;
+   }
+}
+
+if (!function_exists('IsTimestamp')) {
+   function IsTimestamp($Stamp) {
+      return checkdate(
+         @date("m", $Stamp),
+         @date("d", $Stamp),
+         @date("Y", $Stamp)
+      );
+   }
+}
+
 if (!function_exists('json_encode')) {
    require_once PATH_LIBRARY . DS . 'vendors' . DS . 'JSON' . DS . 'JSON.php';
-   
-   function json_encode($arg) {
-      global $services_json;
-      if (!isset($services_json)) {
-         $services_json = new Services_JSON();
-      }
-      return $services_json->encode($arg);
-   }
    
    function json_decode($arg, $assoc = FALSE) {
       global $services_json;
@@ -791,10 +548,46 @@ if (!function_exists('json_encode')) {
       else
          return $obj;
    }
+   
+   function json_encode($arg) {
+      global $services_json;
+      if (!isset($services_json)) {
+         $services_json = new Services_JSON();
+      }
+      return $services_json->encode($arg);
+   }
 }
-if (!function_exists('array_fill_keys')) {
-   function array_fill_keys($Keys, $Val) {
-      return array_combine($Keys,array_fill(0,count($Keys),$Val));
+
+if (!function_exists('MergeArrays')) {
+   /**
+    * Merge two associative arrays into a single array.
+    *
+    * @param array The "dominant" array, who's values will be chosen over those of the subservient.
+    * @param array The "subservient" array, who's values will be disregarded over those of the dominant.
+    */
+   function MergeArrays(&$Dominant, $Subservient) {
+      foreach ($Subservient as $Key => $Value) {
+         if (!array_key_exists($Key, $Dominant)) {
+            // Add the key from the subservient array if it doesn't exist in the
+            // dominant array.
+            $Dominant[$Key] = $Value;
+         } else {
+            // If the key already exists in the dominant array, only continue if
+            // both values are also arrays - because we don't want to overwrite
+            // values in the dominant array with ones from the subservient array.
+            if (is_array($Dominant[$Key]) && is_array($Value)) {
+               $Dominant[$Key] = MergeArrays($Dominant[$Key], $Value);
+            }
+         }
+      }
+      return $Dominant;
+   }
+}
+
+if (!function_exists('Now')) {
+   function Now() {
+      list($usec, $sec) = explode(" ", microtime());
+      return ((float)$usec + (float)$sec);
    }
 }
 
@@ -814,12 +607,265 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
-if (!function_exists('Glob')) {
-   function Glob($Pattern, $Flags = 0) {
+if (!function_exists('Plural')) {
+   function Plural($Number, $Singular, $Plural) {
+      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
+   }
+}
+
+if (!function_exists('PrefixString')) {
+   /**
+    * Takes a string, and prefixes it with $Prefix unless it is already prefixed that way.
+    *
+    * @param string $Prefix The prefix to use.
+    * @param string $String The string to be prefixed.
+    */
+   function PrefixString($Prefix, $String) {
+      if (substr($String, 0, strlen($Prefix)) != $Prefix) {
+         $String = $Prefix . $String;
+      }
+      return $String;
+   }
+}
+
+if (!function_exists('ProxyRequest')) {
+   /**
+    * Uses curl or fsock to make a request to a remote server. Returns the
+    * response.
+    *
+    * @param string $Url The full url to the page being requested (including http://)
+    * @param array $PostFields The collection of post values to send with the request. Must be in associative array format, or nothing will be sent.
+    */
+   function ProxyRequest($Url, $PostFields = FALSE) {
+      $Response = '';
+      $Query = is_array($PostFields) ? http_build_query($PostFields) : '';
+      
+      if (function_exists('curl_init')) {
+         $Handler = curl_init();
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_HEADER, 0);
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         if ($Query != '') {
+            curl_setopt($Handler, CURLOPT_POST, 1);
+            curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         }
+         $Response = curl_exec($Handler);
+         curl_close($Handler);
+      } else if (function_exists('fsockopen')) {
+         $UrlParts = parse_url($Url);
+         $Host = ArrayValue('host', $UrlParts, '');
+         $Port = ArrayValue('port', $UrlParts, '80');
+         $Path = ArrayValue('path', $UrlParts, '');
+         $Referer = Gdn_Url::WebRoot(TRUE);
+      
+         // Make the request
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         if (!$Pointer)
+            throw new Exception(sprintf(Gdn::Translate('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+         
+         $Header = "GET $Path?$Query HTTP/1.1\r\n" .
+            "Host: $Host\r\n" .
+            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+            "User-Agent: Vanilla/2.0\r\n" .
+            "Accept: */*\r\n" .
+            "Accept-Charset: utf-8;\r\n" .
+            "Referer: $Referer\r\n" .
+            "Connection: close\r\n\r\n";
+         
+         // Send the headers and get the response
+         fputs($Pointer, $Header);
+         while ($Line = fread($Pointer, 4096)) {
+            $Response .= $Line;
+         }
+         @fclose($Pointer);
+         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         return $Response;
+      } else {
+         throw new Exception(Gdn::Translate('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+      }
+      return $Response;
+   }
+}
+
+if (!function_exists('RandomString')) {
+   function RandomString($Length) {
+      $Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      $String = '' ;
+      for ($i = 0; $i < $Length; ++$i) {
+        $Offset = rand() % 35;
+        $String .= substr($Characters, $Offset, 1);
+      }
+      return $String;
+   }
+}
+
+if (!function_exists('Redirect')) {
+   function Redirect($Destination) {
+      // Close any db connections before exit
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
+      // Clear out any previously sent content
+      @ob_end_clean();
+      // re-assign the location header
+      header("location: ".Url($Destination));
+      // Exit
+      exit();
+   }
+}
+
+if (!function_exists('RemoveFromConfig')) {
+   function RemoveFromConfig($Name) {
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Path = PATH_CONF . DS . 'config.php';
+      $Config->Load($Path, 'Save');
+      if (!is_array($Name))
+         $Name = array($Name);
+      
+      foreach ($Name as $k) {
+         $Config->Remove($k);
+      }
+      return $Config->Save($Path);
+   }
+}
+
+// Functions relating to data/variable types and type casting
+if (!function_exists('RemoveKeyFromArray')) {
+   function RemoveKeyFromArray($Array, $Key) {
+      if (!is_array($Key))
+         $Key = array($Key);
+
+      $Count = count($Key);
+      for ($i = 0; $i < $Count; $i++) {
+         $KeyIndex = array_keys(array_keys($Array), $Key[$i]);
+         if (count($KeyIndex) > 0) array_splice($Array, $KeyIndex[0], 1);
+      }
+      return $Array;
+   }
+}
+
+if (!function_exists('RemoveQuoteSlashes')) {
+ 	function RemoveQuoteSlashes($String) {
+		return str_replace("\\\"", '"', $String);
+	}
+}
+
+if (!function_exists('SafeGlob')) {
+   function SafeGlob($Pattern, $Flags = 0) {
       $Return = glob($Pattern, $Flags);
-      if ($Return == FALSE)
+      if (!is_array($Return))
          $Return = array();
          
       return $Return;
+   }
+}
+
+if (!function_exists('SaveToConfig')) {
+   function SaveToConfig($Name, $Value = '') {
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Path = PATH_CONF . DS . 'config.php';
+      $Config->Load($Path, 'Save');
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+      
+      foreach ($Name as $k => $v) {
+         $Config->Set($k, $v);
+      }
+      return $Config->Save($Path);
+   }
+}
+
+if (!function_exists('SliceString')) {
+   function SliceString($String, $Length) {
+      if (strlen($String) > $Length) {
+         $Return = substr(trim($String), 0, $Length);
+         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . '...';
+      } else {
+         return $String;
+      }
+   }
+}
+
+if (!function_exists('StringIsNullOrEmpty')) {
+   function StringIsNullOrEmpty($String) {
+      return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
+   }
+}
+
+if (!function_exists('Translate')) {
+   /**
+	 * Translates a code into the selected locale's definition.
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @deprecated
+	 * @see Gdn::Translate()
+	 */
+   function Translate($Code, $Default = '') {
+      $Result = Gdn::Translate($Code, $Default);
+      return $Result;
+   }
+}
+
+if (!function_exists('TrueStripSlashes')) {
+   if(get_magic_quotes_gpc()) {
+      function TrueStripSlashes($String) {
+         return stripslashes($String);
+      }
+   } else {
+      function TrueStripSlashes($String) {
+         return $String;
+      }
+   }
+}
+
+// Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
+if (!function_exists('Url')) {   
+   function Url($Destination = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
+      // Cache the rewrite urls config setting in this object.
+      static $RewriteUrls = NULL;
+      if(is_null($RewriteUrls)) $RewriteUrls = ForceBool(Gdn::Config('Garden.RewriteUrls', FALSE));
+      
+      $Prefix = substr($Destination, 0, 7);
+      if (in_array($Prefix, array('http://', 'https:/'))) {
+         return $Destination;
+      } else if ($Destination == '#' || $Destination == '') {
+         if ($WithDomain)
+            return Gdn_Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
+         else
+            return '/'.Gdn_Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
+      } else {
+         $Paths = array();
+         if (!$WithDomain)
+            $Paths[] = '/';
+            
+         $Paths[] = Gdn_Url::WebRoot($WithDomain);
+         if (!$RewriteUrls)
+            $Paths[] = 'index.php';
+            
+         $Paths[] = $Destination;
+         return CombinePaths($Paths, '/');
+      }
+   }
+}
+
+if (!function_exists('UserAnchor')) {
+   function UserAnchor($User, $CssClass = '') {
+      if ($CssClass != '')
+         $CssClass = ' class="'.$CssClass.'"';
+
+      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+   }
+}
+
+if (!function_exists('UserPhoto')) {
+   function UserPhoto($User, $CssClass = '') {
+      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
+      if ($User->Photo != '') {
+         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$User->Photo).'" alt="'.urlencode($User->Name).'" /></a>';
+      } else {
+         return '';
+      }
    }
 }

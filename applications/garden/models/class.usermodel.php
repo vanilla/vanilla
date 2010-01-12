@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class Gdn_UserModel extends Gdn_Model {
@@ -42,6 +42,12 @@ class Gdn_UserModel extends Gdn_Model {
                continue;
             
             if(is_numeric($JunctionID) && $JunctionID > 0) {
+               if (!array_key_exists($PermissionName, $Permissions))
+                  $Permissions[$PermissionName] = array();
+                  
+               if (!is_array($Permissions[$PermissionName]))
+                  $Permissions[$PermissionName] = array();
+                  
                $Permissions[$PermissionName][] = $JunctionID;
             } else {
                $Permissions[] = $PermissionName;
@@ -96,7 +102,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
       if (is_array($Like))
-         $this->SQL->Like($Like, '', 'right');
+         $this->SQL->OrLike($Like, '', 'right');
 
       $Data = $this->SQL
          ->BeginWhereGroup()
@@ -134,7 +140,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
 
       if (is_array($Like))
-         $this->SQL->Like($Like, '', 'right');
+         $this->SQL->OrLike($Like, '', 'right');
 
       return $this->SQL
          ->BeginWhereGroup()
@@ -220,6 +226,9 @@ class Gdn_UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
       }
+      
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->FireEvent('BeforeSaveValidation');
 
       $RecordRoleChange = TRUE;
       if ($this->Validate($FormPostValues, $Insert) === TRUE) {
@@ -235,54 +244,65 @@ class Gdn_UserModel extends Gdn_Model {
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          }
-
-         // If the primary key exists in the validated fields and it is a
-         // numeric value greater than zero, update the related database row.
-         if ($UserID > 0) {
-            // If they are changing the username & email, make sure they aren't
-            // already being used (by someone other than this user)
-            if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
-               if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
+         
+         $this->EventArguments['Fields'] = $Fields;
+         $this->FireEvent('BeforeSave');
+         
+         // Check the validation results again in case something was added during the BeforeSave event.
+         if (count($this->Validation->Results()) == 0) {
+            // If the primary key exists in the validated fields and it is a
+            // numeric value greater than zero, update the related database row.
+            if ($UserID > 0) {
+               // If they are changing the username & email, make sure they aren't
+               // already being used (by someone other than this user)
+               if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
+                  if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
+                     return FALSE;
+               }
+   
+               $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
+   
+               // Record activity if the person changed his/her photo
+               $Photo = ArrayValue('Photo', $FormPostValues);
+               if ($Photo !== FALSE)
+                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
+   
+            } else {
+               $RecordRoleChange = FALSE;
+               if (!$this->ValidateUniqueFields($Username, $Email))
                   return FALSE;
+   
+               // Define the other required fields:
+               $Fields['Email'] = $Email;
+   
+               // And insert the new user
+               $UserID = $this->SQL->Insert($this->Name, $Fields);
+   
+               // Make sure that the user is assigned to one or more roles:
+               $SaveRoles = TRUE;
+   
+               // Report that the user was created
+               $Session = Gdn::Session();
+               AddActivity(
+                  $UserID,
+                  'JoinCreated',
+                  Gdn::Translate('Welcome Aboard!'),
+                  $Session->UserID > 0 ? $Session->UserID : ''
+               );
             }
-
-            $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
-
-            // Record activity if the person changed his/her photo
-            $Photo = ArrayValue('Photo', $FormPostValues);
-            if ($Photo !== FALSE)
-               AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
-
+            // Now update the role settings if necessary
+            if ($SaveRoles) {
+               // If no RoleIDs were provided, use the system defaults
+               if (!is_array($RoleIDs))
+                  $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+   
+               $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
+            }
+         
+            $this->EventArguments['UserID'] = $UserID;
+            $this->FireEvent('AfterSave');
          } else {
-            $RecordRoleChange = FALSE;
-            if (!$this->ValidateUniqueFields($Username, $Email))
-               return FALSE;
-
-            // Define the other required fields:
-            $Fields['Email'] = $Email;
-
-            // And insert the new user
-            $UserID = $this->SQL->Insert($this->Name, $Fields);
-
-            // Make sure that the user is assigned to one or more roles:
-            $SaveRoles = TRUE;
-
-            // Report that the user was created
-            $Session = Gdn::Session();
-            AddActivity(
-               $UserID,
-               'JoinCreated',
-               Gdn::Translate('Welcome Aboard!'),
-               $Session->UserID > 0 ? $Session->UserID : ''
-            );
-         }
-         // Now update the role settings if necessary
-         if ($SaveRoles) {
-            // If no RoleIDs were provided, use the system defaults
-            if (!is_array($RoleIDs))
-               $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
-
-            $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
+            $UserID = FALSE;
          }
       } else {
          $UserID = FALSE;
@@ -708,6 +728,9 @@ class Gdn_UserModel extends Gdn_Model {
     * @return object
     */
    public function ValidateCredentials($Email = '', $ID = 0, $Password) {
+      $this->EventArguments['Credentials'] = array('Email'=>$Email, 'ID'=>$ID, 'Password'=>$Password);
+      $this->FireEvent('BeforeValidateCredentials');
+
       if (!$Email && !$ID)
          throw new Exception('The email or id is required');
 
@@ -771,6 +794,9 @@ class Gdn_UserModel extends Gdn_Model {
       return $Valid;
    }
 
+   /**
+    * Approve a membership applicant.
+    */
    public function Approve($UserID, $Email) {
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
@@ -791,16 +817,7 @@ class Gdn_UserModel extends Gdn_Model {
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs);
 
-         // Send out a notification to the user
-         $User = $this->Get($UserID);
-         if ($User) {
-            $Email->Subject(Gdn::Translate('MembershipApprovedSubject'));
-            $Email->Message(sprintf(Gdn::Translate('MembershipApprovedEmail'), $User->Name, Gdn::Authenticator()->SignInUrl()));
-            $Email->To($User->Email);
-            $Email->Send();
-         }
-
-         // Report that the user was approved
+         // Report that the user was approved (this will also notify the user by email)
          $Session = Gdn::Session();
          AddActivity(
             $UserID,
@@ -894,7 +911,7 @@ class Gdn_UserModel extends Gdn_Model {
          ->FirstRow();
 
       // If CountInvitations is null (ie. never been set before) or it is a new month since the DateSetInvitations
-      if (!is_numeric($User->CountInvitations) || Format::Date($User->DateSetInvitations, 'n Y') != Format::Date('', 'n Y')) {
+      if ($User->CountInvitations == '' || is_null($User->DateSetInvitations) || Format::Date($User->DateSetInvitations, 'n Y') != Format::Date('', 'n Y')) {
          // Reset CountInvitations and DateSetInvitations
          $this->SQL->Put(
             $this->Name,
@@ -904,7 +921,7 @@ class Gdn_UserModel extends Gdn_Model {
             ),
             array('UserID' => $UserID)
          );
-
+         return $InviteCount;
       } else {
          // Otherwise return CountInvitations
          return $User->CountInvitations;

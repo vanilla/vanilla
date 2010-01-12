@@ -4,9 +4,9 @@ $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID
 $Editing = isset($this->Comment);
 ?>
 <div id="CommentForm">
+   <h2><?php echo $Editing ? 'Edit Comment' : 'Add Comment'; ?></h2>
    <?php
       echo $this->Form->Open();
-      echo $this->Form->Label($Editing ? 'Edit Comment' : 'Add Comment', 'Body', array('class' => 'Heading'));
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
       echo $this->Form->Button('Post Comment');

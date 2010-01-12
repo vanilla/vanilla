@@ -1,40 +1,26 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class EntryController extends GardenController {
+class EntryController extends Gdn_Controller {
    
    // Make sure the database class is loaded (class.controller.php takes care of this).
    // Note: The User refers to the UserModel because it is being provided by Gdn.
    public $Uses = array('Database', 'Form', 'Session', 'Gdn_UserModel');
    
    public function Index() {
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
-         
-      // Define gender dropdown options (for registration)
-      $this->GenderOptions = array(
-         'm' => Gdn::Translate('Male'),
-         'f' => Gdn::Translate('Female')
-      );
-      $this->InvitationCode = $this->Form->GetValue('InvitationCode');
-      if ($this->_RegistrationView() == 'RegisterCaptcha') {
-         include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
-      }
-      $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-      $this->Render();
+      $this->View = 'signin';
+      $this->SignIn();
    }
    
    public function Handshake() {
-      $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
       
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
@@ -148,8 +134,7 @@ class EntryController extends GardenController {
     * model.
     */
    public function SignIn() {
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
          
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
@@ -194,8 +179,7 @@ class EntryController extends GardenController {
       );
 
       // Make sure that the hour offset for new users gets defined when their account is created
-      if ($this->Head)
-         $this->Head->AddScript('/applications/garden/js/entry.js');
+      $this->AddJsFile('entry.js');
          
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
@@ -407,5 +391,20 @@ class EntryController extends GardenController {
       $IncomingTarget = $this->Form->GetValue('Target', '');
       return $IncomingTarget == '' ? ArrayValueI('DefaultController', $this->Routes) : $IncomingTarget;
    }
+   
+   public function Initialize() {
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('js/library/jquery.livequery.js');
+      $this->AddJsFile('js/library/jquery.form.js');
+      $this->AddJsFile('js/library/jquery.popup.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('js/global.js');
+      
+      $this->AddCssFile('style.css');
+      parent::Initialize();
+   }
+
    
 }

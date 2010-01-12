@@ -1,6 +1,38 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
+   
+   // Set the ClientHour if there is an input looking for it.
+   $('input:hidden[name$=ClientHour]').livequery(function() {
+      var d = new Date();
+      $(this).val(d.getHours());
+   });
+   
+   // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
+   $('a.ForgotPassword').live('click', function() {
+      $('#Form_User_Password').slideToggle('fast');
+      return false;
+   });
+
+   // Grab a definition from hidden inputs in the page
+   definition = function(definition, defaultVal, set) {
+      if (defaultVal == null)
+         defaultVal = definition;
+         
+      var $def = $('#Definitions #' + definition);
+      var def;
+      
+      if(set) {
+         $def.val(defaultVal);
+         def = defaultVal;
+      } else {
+         def = $def.val();
+         if (typeof def == 'undefined' || def == '')
+            def = defaultVal;
+      }
+         
+      return def;
+   }
 
    // Main Menu dropdowns
    if ($.fn.menu)
@@ -12,15 +44,25 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
-   $('a.Popup').popup();
+   if ($.fn.popup)
+      $('a.Popup').popup();
+   
+   // This turns any anchor with the "Popdown" class into an in-page pop-up, but
+   // it does not hijack forms in the popup.
+   if ($.fn.popup)
+      $('a.Popdown').popup({hijackForms: false});
+   
+   // This turns SignInPopup anchors into in-page popups
+   if ($.fn.popup)
+      $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
 
    // Make sure that message dismissalls are ajax'd
-   $('div.DismissMessage a.Dismiss').live('click', function() {
+   $('a.Dismiss').live('click', function() {
       var anchor = this;
-      var container = $(anchor).parents('div.DismissMessage');
-      var transientKey = $('#Definitions #TransientKey').text();
+      var container = $(anchor).parent();
+      var transientKey = definition('TransientKey');
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
-      var webRoot = $('#Definitions #WebRoot').text();
+      var webRoot = definition('WebRoot', '');
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
             $(container).slideUp('fast',function() {
@@ -33,7 +75,8 @@ jQuery(document).ready(function($) {
    // This turns any form into a "post-in-place" form so it is ajaxed to save
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
-   $('.AjaxForm').handleAjaxForm();
+   if ($.fn.handleAjaxForm)
+      $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
    $('div.Messages ul').live('click', function() {
@@ -52,7 +95,7 @@ jQuery(document).ready(function($) {
    });
 
    // If a page loads with a hidden redirect url, go there after a few moments.
-   var RedirectUrl = $('.RedirectUrl').text();
+   var RedirectUrl = definition('RedirectUrl', '');
    if (RedirectUrl != '')
       setTimeout("document.location = '"+RedirectUrl+"';", 2000);
 
@@ -61,10 +104,10 @@ jQuery(document).ready(function($) {
       $("table.Sortable").tableDnD({onDrop: function(table, row) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
-         var transientKey = $('#Definitions #TransientKey').text();
+         var transientKey = definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
-         var webRoot = $('#Definitions #WebRoot').text();
-         $.post(webRoot + "/garden/utility/sort/", data, function(response) {
+         var webRoot = definition('WebRoot', '');
+         $.post(combinePaths(webRoot, '/garden/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 
@@ -90,24 +133,7 @@ jQuery(document).ready(function($) {
       });
    }
 
-   definition = function(definition, defaultVal, set) {
-      if (defaultVal == null)
-         defaultVal = definition;
-         
-      var $def = $('#Definitions #' + definition);
-      var def;
-      
-      if(set) {
-         $def.text(defaultVal);
-         def = defaultVal;
-      } else {
-         def = $def.text();
-         if (def == '')
-            def = defaultVal;
-      }
-         
-      return def;
-   }
+   // Notify the user with a message
    inform = function(message, wrapInfo) {
       if(wrapInfo == undefined) {
          wrapInfo = true;
@@ -121,6 +147,8 @@ jQuery(document).ready(function($) {
             $(message).appendTo('body').show();
       }
    }
+   
+   // Generate a random string of specified length
    generateString = function(length) {
       if (length == null)
          length = 5;
@@ -133,6 +161,17 @@ jQuery(document).ready(function($) {
          string += chars.substring(pos, pos + 1);
       }
       return string;
+   }
+   
+   // Combine two paths and make sure that there is only a single directory concatenator
+   combinePaths = function(path1, path2) {
+      if (path1.substr(-1, 1) == '/')
+         path1 = path1.substr(0, path1.length - 1);
+         
+      if (path2.substring(0, 1) == '/')
+         path2 = path2.substring(1);
+      
+      return path1 + '/' + path2;
    }
 
    processTargets = function(targets) {
@@ -161,7 +200,7 @@ jQuery(document).ready(function($) {
                $target.text(item.Data);
                break;
             case 'Html':
-               $target.hml(item.Data);
+               $target.html(item.Data);
          }
       }
    }
@@ -171,13 +210,18 @@ jQuery(document).ready(function($) {
    $('#Search input.InputBox').val(searchText);
    $('#Search input.InputBox').blur(function() {
       var searchText = definition('Search', 'Search');
-      if ($(this).val() == '')
+      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
          $(this).val(searchText);
    });
    $('#Search input.InputBox').focus(function() {
       var searchText = definition('Search', 'Search');
       if ($(this).val() == searchText)
          $(this).val('');      
+   });
+   
+   // Add a spinner onclick of buttons with this class
+   $('input.SpinOnClick').live('click', function() {
+      $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
 
 });

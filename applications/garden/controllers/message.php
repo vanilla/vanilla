@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -56,10 +56,8 @@ class MessageController extends GardenController {
    }
    
    public function Edit($MessageID = '') {
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/applications/garden/js/messages.js');
-      }
+      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('messages.js');
          
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('garden/message');
@@ -96,13 +94,11 @@ class MessageController extends GardenController {
    public function Index() {
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('garden/message');
-      if ($this->Head) {
-         $this->Head->AddScript('js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/js/library/jquery.tablednd.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->AddScript('/applications/garden/js/messages.js');
-         $this->Head->Title(Translate('Messages'));
-      }
+      $this->AddJsFile('/js/library/jquery.autogrow.js');
+      $this->AddJsFile('/js/library/jquery.tablednd.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('messages.js');
+      $this->Title(Translate('Messages'));
          
       // Load all messages from the db
       $this->MessageData = $this->MessageModel->Get('Sort');

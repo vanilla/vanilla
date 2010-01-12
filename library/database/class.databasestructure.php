@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -17,7 +17,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Database
+ * @namespace Garden.Database
  */
 require_once(dirname(__FILE__).DS.'class.database.php');
 
@@ -139,7 +139,7 @@ abstract class Gdn_DatabaseStructure {
     * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
     * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
     * * TRUE: Nulls are allowed.
-    * * FALSE: Nullas are not allowed.
+    * * FALSE: Nulls are not allowed.
     * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
     * @param string $KeyType What type of key is this column on the table? Options
     * are primary, key, and FALSE (not a key).
@@ -283,7 +283,7 @@ abstract class Gdn_DatabaseStructure {
    public function Table($Name, $CharacterEncoding = '') {
       $this->_TableName = $Name;
       if ($CharacterEncoding == '')
-         $CharacterEncoding = Gdn::Config('Garden.Database.CharacterEncoding', '');
+         $CharacterEncoding = Gdn::Config('Database.CharacterEncoding', '');
 
       $this->_CharacterEncoding = $CharacterEncoding;
       return $this;

@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Popup the error
             $(btn).attr('class', oldClass);
-            $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             // Remove this row if looking at a list of bookmarks

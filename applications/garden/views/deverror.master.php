@@ -88,11 +88,12 @@
                echo "</div>\n";
             }
          }
-
-         if (is_array($Arguments) && count($Arguments) > 0) {
+         
+         if (function_exists('CleanErrorArguments') && is_array($Arguments) && count($Arguments) > 0) {
             echo '<h3><strong>Variables in local scope:</strong></h3>
             <div class="PreContainer">';
             $Odd = FALSE;
+            CleanErrorArguments($Arguments);
             foreach ($Arguments as $Key => $Value) {
                // Don't echo the configuration array as it contains sensitive information
                if (!in_array($Key, array('Config', 'Configuration'))) {
@@ -107,7 +108,7 @@
          ?>
          <h2>Need Help?</h2>
          <p>If you are a user of this website, you can report this message to a website administrator.</p>
-         <p>If you are an administrator of this website, you can get help at the <a href="http://lussumo.com/community/" target="_blank">Lussumo Community Forums</a>.</p>
+         <p>If you are an administrator of this website, you can get help at the <a href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
       </div>
       <div id="MoreInformation">
          <h2>Additional information for support personnel:</h2>

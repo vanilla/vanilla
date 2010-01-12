@@ -9,7 +9,7 @@ $ApplicationInfo['Conversations'] = array(
    'SetupController' => 'setup',
    'Url' => 'http://weconversate.com',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
-   'AuthorUrl' => 'http://lussumo.com',
-   'License' => 'MIT License (http://lussumo.com/license)'
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'License' => 'GPL v2'
 );

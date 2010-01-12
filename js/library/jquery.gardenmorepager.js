@@ -1,10 +1,10 @@
 /* 
  * Garden's jQuery MorePager (1.0.0)
  * by Mark O'Sullivan (www.markosullivan.ca)
- * mark@lussumo.com
+ * mark@vanillaforums.com
  *
  * Copyright (c) 2009 Mark O'Sullivan (www.markosullivan.ca)
- * Licensed under the MIT license. 
+ * Licensed under the GPL v2. 
  *
  *
  * NOTE: This script requires jQuery to work.  Download jQuery at www.jquery.com
@@ -66,11 +66,11 @@
          $.ajax({
             type: "POST",
             url: self.page_source,
-            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&Form/TransientKey='+$('#Definitions #TransientKey').text()+self.extra_pager_data,
+            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&Form/TransientKey='+definition('TransientKey', '')+self.extra_pager_data,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                if (self.pager_in_container == true) {

@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
             data: postValues,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, $('#Definitions #TransportError').html().replace('%s', textStatus));
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
             },
             success: function(json) {
                $('span.Progress').remove();
@@ -70,16 +70,36 @@ jQuery(document).ready(function($) {
    
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
+   
    // Popup the picture form when the link is clicked
    $('li.PictureLink a').popup({hijackForms: false, afterLoad: function() {
-      $('.Popup :input').change(function() {
-         $('.Popup :input').click();
-         $('.Popup .Content').empty();
-         $('.Popup .Body').children().hide().end().append('<div class="Loading">&nbsp;</div>');
-      });
       $('.Popup :submit').hide();
+      $('.Popup :input').change(function() {
+         $('.Popup form').submit();
+         $('.Popup .Body').html('<div class="Loading">&nbsp;</div>');
+      });
    }});
-   
+
+   // Ajax invitation uninvites and send agains if they're in a popup
+   $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
+      var btn = this;
+      var popupId = $('div.Popup').attr('id');
+      $.ajax({
+         type: "GET",
+         url: $(btn).attr('href'),
+         data: { 'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON' },
+         dataType: 'json',
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
+         },
+         success: function(json) {
+            $.popup.reveal({ popupId: popupId }, json);
+         }
+      });
+
+      return false;
+   });
+
    // Thumbnail Cropper
    // Popup the picture form when the link is clicked
    $('li.ThumbnailLink a').popup({hijackForms: false, afterLoad: function() {

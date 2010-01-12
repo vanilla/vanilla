@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -16,8 +16,7 @@ class RoleController extends GardenController {
    public $Uses = array('Database', 'Form', 'Gdn_RoleModel');
    
    public function Add() {
-      if ($this->Head)
-         $this->Head->Title(Translate('Add Role'));
+      $this->Title(Translate('Add Role'));
          
       $this->Permission('Garden.Roles.Manage');
       
@@ -31,8 +30,7 @@ class RoleController extends GardenController {
    }
    
    public function Delete($RoleID = FALSE) {
-      if ($this->Head)
-         $this->Head->Title(Translate('Delete Role'));
+      $this->Title(Translate('Delete Role'));
          
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
@@ -81,8 +79,7 @@ class RoleController extends GardenController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
-      if ($this->Head)
-         $this->Head->AddScript('/js/library/jquery.gardencheckboxgrid.js');
+      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
       
       // Set the model on the form.
       $this->Form->SetModel($this->RoleModel);
@@ -118,11 +115,9 @@ class RoleController extends GardenController {
    public function Index() {
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.tablednd.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->Title(Translate('Roles & Permissions'));
-      }
+      $this->AddJsFile('/js/library/jquery.tablednd.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->Title(Translate('Roles & Permissions'));
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();
    }

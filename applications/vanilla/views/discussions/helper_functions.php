@@ -8,6 +8,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
+   $Sender->EventArguments['Discussion'] = &$Discussion;
 ?>
 <li class="<?php echo $CssClass; ?>">
    <ul class="Discussion">
@@ -77,6 +78,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
          ?></strong>
       </li>
+      <?php
+         $Sender->FireEvent('AfterDiscussionTitle');
+      ?>
       <li class="Meta">
          <?php
             echo '<span>';

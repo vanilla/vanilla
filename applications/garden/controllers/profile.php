@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class ProfileController extends GardenController {
+class ProfileController extends Gdn_Controller {
    
    public $Uses = array('Form', 'Gdn_UserModel', 'Html');
 
@@ -63,19 +63,16 @@ class ProfileController extends GardenController {
       if (!$this->GetUserInfo($UserReference))
          return FALSE;
 
-      if ($this->Head)
-         $this->Head->Title(Format::Text($this->User->Name));
+      $this->Title(Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
          $UserInfoModule = new UserInfoModule($this);
          $UserInfoModule->User = $this->User;
          $UserInfoModule->Roles = $this->Roles;
          $this->AddModule($UserInfoModule);
-         if ($this->Head) {
-            $this->Head->AddScript('/js/library/jquery.jcrop.pack.js');
-            $this->Head->AddScript('/applications/garden/js/profile.js');
-            $this->Head->AddScript('/applications/garden/js/activity.js');
-         }
+         $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+         $this->AddJsFile('profile.js');
+         $this->AddJsFile('activity.js');
          $this->AddProfileTab('Activity');
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = Gdn::Translate('Notifications');
@@ -136,13 +133,23 @@ class ProfileController extends GardenController {
          
          // Update About if necessary
          $ActivityType = 'WallComment';
+         $SendNotification = TRUE;
          if ($Session->UserID == $this->User->UserID) {
+            $SendNotification = FALSE;
             $this->UserModel->SaveAbout($Session->UserID, $Comment);
             $this->User->About = $Comment;
             $this->SetJson('UserData', $this->FetchView('user'));
             $ActivityType = 'AboutUpdate';
          }
-         $NewActivityID = $this->ActivityModel->Add($Session->UserID, $ActivityType, $Comment, $this->User->UserID);
+         $NewActivityID = $this->ActivityModel->Add(
+            $Session->UserID,
+            $ActivityType,
+            $Comment,
+            $this->User->UserID,
+            '',
+            '/profile/'.$this->User->UserID.'/'.Format::Url($this->User->Name),
+            $SendNotification);
+         
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('garden/profile/'.$UserReference);
          } else {
@@ -217,6 +224,7 @@ class ProfileController extends GardenController {
       
       $this->ActivityModel = new Gdn_ActivityModel();
       $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID);
+      $this->SetTabView($Session->UserID, 'Notifications');
       $this->Render();
    }   
    
@@ -339,10 +347,8 @@ class ProfileController extends GardenController {
    
    public function Thumbnail() {
       $this->Permission('Garden.SignIn.Allow');
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.jcrop.pack.js');
-         $this->Head->AddScript('/applications/garden/js/profile.js');
-      }
+      $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+      $this->AddJsFile('profile.js');
             
       $Session = Gdn::Session();
       if (!$Session->IsValid())
@@ -420,9 +426,8 @@ class ProfileController extends GardenController {
          }
       }
       $Session = Gdn::Session();
-      $UserID = $Session->UserID;
-      $this->InvitationCount = $this->UserModel->GetInvitationCount($UserID);
-      $this->InvitationData = $InvitationModel->GetByUserID($UserID);
+      $this->InvitationCount = $this->UserModel->GetInvitationCount($Session->UserID);
+      $this->InvitationData = $InvitationModel->GetByUserID($Session->UserID);
       $this->Render();
    }
    
@@ -437,7 +442,6 @@ class ProfileController extends GardenController {
          } catch (Exception $ex) {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
-            
          if ($this->Form->ErrorCount() == 0)
             $this->StatusMessage = Gdn::Translate('The invitation was sent successfully.');
 
@@ -470,28 +474,36 @@ class ProfileController extends GardenController {
    public function AddSideMenu($CurrentUrl = '') {
       if ($this->User !== FALSE) {
          $SideMenu = new Gdn_SideMenuModule($this);
-         $SideMenu->HtmlId = '';
+         $SideMenu->HtmlId = 'UserOptions';
          $Session = Gdn::Session();
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');
          
-         $EditUrl = $Session->CheckPermission('Garden.Users.Edit') ? '/user/edit/'.$this->User->UserID : '/profile/edit/'.$this->User->UserID;
          if ($this->User->UserID != $ViewingUserID) {
+            // Include user js files for people with edit users permissions
+            if ($Session->CheckPermission('Garden.Users.Edit')) {
+              $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+              $this->AddJsFile('user.js');
+            }
+            
             // Add profile options for everyone
-            $SideMenu->AddLink('Options', 'Change Picture', '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
-            $SideMenu->AddLink('Options', 'Edit Account', $EditUrl, 'Garden.Users.Edit', array('class' => 'Popup'));
-            $SideMenu->AddLink('Options', 'Remove Picture', '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+            if ($this->User->Photo != '')
+               $SideMenu->AddLink('Options', Gdn::Translate('Change Picture'), '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            
+            $SideMenu->AddLink('Options', Gdn::Translate('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
+            if ($this->User->Photo != '')
+               $SideMenu->AddLink('Options', Gdn::Translate('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
          } else {
             // Add profile options for the profile owner
-            $SideMenu->AddLink('Options', 'Change My Picture', '/profile/picture', FALSE, array('class' => 'PictureLink'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
             if ($this->User->Photo != '') {
-               $SideMenu->AddLink('Options', 'Edit My Thumbnail', '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
-               $SideMenu->AddLink('Options', 'Remove My Picture', '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }
-            $SideMenu->AddLink('Options', 'Edit My Account', '/profile/edit', FALSE, array('class' => 'Popup'));
-            $SideMenu->AddLink('Options', 'Change My Password', '/profile/password', FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Gdn::Translate('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', 'My Invitations', '/profile/invitations');
+               $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');
@@ -501,9 +513,20 @@ class ProfileController extends GardenController {
    
    public function Initialize() {
       $this->ModuleSortContainer = 'Profile';
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('js/library/jquery.js');
+      $this->AddJsFile('js/library/jquery.livequery.js');
+      $this->AddJsFile('js/library/jquery.form.js');
+      $this->AddJsFile('js/library/jquery.popup.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('js/global.js');
+      
+      $this->AddCssFile('style.css');
+      $GuestModule = new GuestModule($this);
+      $GuestModule->MessageCode = "It looks like you're new here. If you want to take part in the discussions, click one of these buttons!";
+      $this->AddModule($GuestModule);
       parent::Initialize();
-      // Add a css file for all profile pages
-      $this->AddCssFile('profile.css');
    }
    
    /**
@@ -517,7 +540,7 @@ class ProfileController extends GardenController {
          $TabName = array($TabName => $TabUrl);
       foreach ($TabName as $Name => $Url) {
          if ($Url == '')
-            $Url = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.urlencode($this->User->Name);
+            $Url = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.Format::Url($this->User->Name);
             
          $this->_ProfileTabs[$Name] = $Url;
       }

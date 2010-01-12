@@ -116,10 +116,15 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 		include_once($Gdn_Path);
 		
 	// Include the application's hooks.
-   include(PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'hooks.php');
+   include_once(PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'hooks.php');
 }
 unset($Gdn_EnabledApplications);
 unset($Gdn_Path);
+
+// If there is a hooks file in the theme folder, include it.
+$ThemeHooks = PATH_THEMES . DS . Gdn::Config('Garden.Theme', 'default') . DS . 'hooks.php';
+if (file_exists($ThemeHooks))
+	include_once($ThemeHooks);
 
 // Set up the plugin manager (doing this early so it has fewer classes to
 // examine to determine if they are plugins).

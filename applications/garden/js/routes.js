@@ -4,8 +4,7 @@ jQuery(document).ready(function($) {
    // Pop add/edit route clicks and reload the page contents when finished.
    $('a.AddRoute, a.EditRoute').popup({
       onUnload: function(settings) {
-         var webRoot = $('#Definitions #WebRoot').text();
-         $('#Content').load(webRoot + '/garden/routes?DeliveryType=VIEW');
+         $('#Content').load(combinePaths(definition('WebRoot', ''), '/garden/routes?DeliveryType=VIEW'));
       }   
    });
    

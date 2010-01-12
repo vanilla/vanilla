@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 ?>
 <h1><?php echo Gdn::Translate('Manage Messages'); ?></h1>
-<div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/message/add', 'AddMessage'); ?></div>
+<div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/message/add', 'AddMessage Button'); ?></div>
 <div class="Info"><?php echo Gdn::Translate('Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
 <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
    <thead>
@@ -36,14 +36,7 @@ foreach ($this->MessageData->Result() as $Message) {
          <?php echo Anchor('Delete', '/garden/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage'); ?>
          </div>
       </td>
-      <td class="Alt"><?php
-         if ($Message->CssClass != '')
-            echo '<div class="'.$Message->CssClass.'">';
-
-         echo Format::Text($Message->Content);
-         if ($Message->CssClass != '')
-            echo '</div>';
-      ?></td>
+      <td class="Alt"><?php echo Format::Text($Message->Content); ?></td>
    </tr>
 <?php } ?>
    </tbody>

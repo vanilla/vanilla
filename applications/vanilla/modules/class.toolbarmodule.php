@@ -4,7 +4,7 @@
   TODO: REMOVE - OBSELETE - 2009-02-07
 
 /// <namespace>
-/// Lussumo.Garden.UI
+/// Garden.UI
 /// </namespace>
 
 if (!class_exists('ToolbarModule', FALSE)) {

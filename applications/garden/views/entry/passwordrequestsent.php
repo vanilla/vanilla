@@ -1,7 +1,5 @@
-<?php if (!defined('APPLICATION')) exit();
-
-// Make sure to force this form to post to the correct place in case the view is
-// rendered within another view (ie. /garden/entry/index/):
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo Translate("Reset my password") ?></h1>
-<p><?php echo Translate('A message has been sent to your email address with password reset instructions.'); ?></p>
+<div class="Box">
+   <p><?php echo Translate('A message has been sent to your email address with password reset instructions.'); ?></p>
+</div>

@@ -29,7 +29,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
             $Author->UserID = $Activity->RegardingUserID;
             $Author->Name = $Activity->RegardingName;
             $Author->Photo = '';
-            echo '<span>&gt;</span>'.UserAnchor($Author, 'Name');
+            echo '<span>→</span>'.UserAnchor($Author, 'Name');
          }
          echo Format::Display($Activity->Story);
          echo '<div class="Meta">';

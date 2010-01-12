@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /*
-Copyright 2008, 2009 Mark O'Sullivan
+Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] lussumo [dot] com
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
@@ -16,7 +16,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @version @@GARDEN-VERSION@@
- * @namespace Lussumo.Garden.Core
+ * @namespace Garden.Core
  */
 
 /**
@@ -79,8 +79,8 @@ class Gdn_Url {
       if ($Domain != '' && $Domain !== FALSE) {
          if (substr($Domain, 0, 7) != 'http://')
             $Domain = 'http://'.$Domain;
-         
-         if (substr($Domain, -1) != '/')
+
+         if (substr($Domain, -1, 1) != '/')
             $Domain = $Domain . '/';
       }
       return $Domain;
@@ -161,8 +161,9 @@ class Gdn_Url {
       }
       
       $Return = trim($Return, '/');
-      if(strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
+      if (strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
          $Return = substr($Return, 9);
+         
       $Return = trim($Return, '/');
 
       if ($RemoveSyndication) {
@@ -173,8 +174,13 @@ class Gdn_Url {
             $Return = substr($Return, 5);
       }
 
-      if ($WithWebRoot)
-         $Return = Gdn_Url::WebRoot($WithDomain) . '/' . $Return;
+      if ($WithWebRoot) {
+         $WebRoot = Gdn_Url::WebRoot($WithDomain);
+         if (substr($WebRoot, -1, 1) != '/')
+            $WebRoot .= '/';
+
+         $Return = $WebRoot . $Return;
+      }
 
       return $Return;
    }

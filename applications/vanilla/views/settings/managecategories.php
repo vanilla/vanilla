@@ -5,7 +5,7 @@ $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->Paren
 echo $this->Form->Open();
 ?>
 <h1><?php echo Gdn::Translate('Manage Categories'); ?></h1>
-<div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/categories/add'); ?></div>
+<div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'Button'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
       <tr id="0">
@@ -25,9 +25,9 @@ foreach ($this->CategoryData->Result() as $Category) {
    $CssClass = trim($CssClass);
    ?>
    <tr id="<?php echo $Category->CategoryID; ?>"<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
-      <td class="First"><a href="<?php echo Url('vanilla/categories/edit/'.$Category->CategoryID); ?>"><?php echo $Category->Name; ?></a></td>
+      <td class="First"><a href="<?php echo Url('vanilla/settings/editcategory/'.$Category->CategoryID); ?>"><?php echo $Category->Name; ?></a></td>
       <td class="Alt"><?php echo $Category->Description; ?></td>
-      <td><?php echo Anchor('Delete', 'vanilla/categories/delete/'.$Category->CategoryID); ?></td>
+      <td><?php echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID); ?></td>
    </tr>
 <?php } ?>
    </tbody>

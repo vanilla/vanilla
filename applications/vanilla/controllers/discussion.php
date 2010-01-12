@@ -11,16 +11,14 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $Offset = '', $Limit = '') {
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
-      if ($this->Head) {
-         $this->Head->AddScript('/js/library/jquery.resizable.js');
-         $this->Head->AddScript('/js/library/jquery.ui.packed.js');
-         $this->Head->AddScript('/js/library/jquery.autogrow.js');
-         $this->Head->AddScript('/js/library/jquery.gardenmorepager.js');
-         $this->Head->AddScript('/applications/vanilla/js/options.js');
-         $this->Head->AddScript('/applications/vanilla/js/bookmark.js');
-         $this->Head->AddScript('/applications/vanilla/js/discussion.js');
-         $this->Head->AddScript('/applications/vanilla/js/autosave.js');
-      }
+      $this->AddJsFile('/js/library/jquery.resizable.js');
+      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('/js/library/jquery.autogrow.js');
+      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('options.js');
+      $this->AddJsFile('bookmark.js');
+      $this->AddJsFile('discussion.js');
+      $this->AddJsFile('autosave.js');
       
       // Load the discussion record
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
@@ -36,8 +34,7 @@ class DiscussionController extends VanillaController {
          Redirect('garden/home/filenotfound');
       } else {
          // Setup
-         if ($this->Head)
-            $this->Head->Title(Format::Text($this->Discussion->Name));
+         $this->Title(Format::Text($this->Discussion->Name));
          
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)

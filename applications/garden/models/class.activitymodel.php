@@ -172,7 +172,11 @@ class Gdn_ActivityModel extends Gdn_Model {
             )
          );
          
-         $Email->Send();
+         try {
+            $Email->Send();
+         } catch (Exception $ex) {
+            // Don't do anything with the exception.
+         }
       }
    }
    

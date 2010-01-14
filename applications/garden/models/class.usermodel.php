@@ -815,7 +815,7 @@ class Gdn_UserModel extends Gdn_Model {
          $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
 
          // Wipe out old & insert new roles for this user
-         $this->SaveRoles($UserID, $RoleIDs);
+         $this->SaveRoles($UserID, $RoleIDs, FALSE);
 
          // Send out a notification to the user
          $User = $this->Get($UserID);
@@ -826,7 +826,7 @@ class Gdn_UserModel extends Gdn_Model {
             $Email->Send();
          }
 
-         // Report that the user was approved (do not send duplicate email)
+         // Report that the user was approved
          $Session = Gdn::Session();
          AddActivity(
             $UserID,

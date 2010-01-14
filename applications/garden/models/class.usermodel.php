@@ -817,13 +817,24 @@ class Gdn_UserModel extends Gdn_Model {
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs);
 
-         // Report that the user was approved (this will also notify the user by email)
+         // Send out a notification to the user
+         $User = $this->Get($UserID);
+         if ($User) {
+            $Email->Subject(sprintf(Gdn::Translate('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
+            $Email->Message(sprintf(Gdn::Translate('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
+            $Email->To($User->Email);
+            $Email->Send();
+         }
+
+         // Report that the user was approved (do not send duplicate email)
          $Session = Gdn::Session();
          AddActivity(
             $UserID,
             'JoinApproved',
             Gdn::Translate('Welcome Aboard!'),
-            $Session->UserID
+            $Session->UserID,
+            '',
+            FALSE
          );
       }
       return TRUE;

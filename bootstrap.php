@@ -142,3 +142,6 @@ unset($FactoryOverwriteBak);
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))
 	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php');
+	
+// Include "Render" functions now - this way pluggables and custom confs can override them.
+require_once(PATH_LIBRARY_CORE . DS . 'functions.render.php');

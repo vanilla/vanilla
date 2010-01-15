@@ -97,14 +97,13 @@ class ProfileController extends Gdn_Controller {
       $UserID = is_numeric($UserID) ? $UserID : 0;
       $Session = Gdn::Session();
       if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey)) {
-         if ($UserID != $Session->UserID) {
-            if (!$Session->CheckPermission('Garden.Users.Edit'))
-               $UserID = 0;
-         }
+         if ($UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
+            $UserID = 0;
+
          if ($UserID > 0)
-            $this->UserModel->SaveAbout($Session->UserID, '');
+            $this->UserModel->SaveAbout($UserID, '');
       }
-         
+
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
          Redirect('/profile');
    }

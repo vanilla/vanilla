@@ -6,7 +6,7 @@ $Session = Gdn::Session();
    <?php
       if ($this->User->About != '') {
          echo '<div id="Status">'.Format::Display($this->User->About);
-         if ($Session->UserID == $this->User->UserID && $this->User->About != '')
+         if ($this->User->About != '' && ($Session->UserID == $this->User->UserID || $Session->CheckPermission('Garden.Users.Edit')))
             echo ' - ' . Anchor('Clear', '/profile/clear/'.$Session->TransientKey());
             
          echo '</div>';

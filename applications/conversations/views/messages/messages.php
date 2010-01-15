@@ -18,10 +18,7 @@ foreach ($this->MessageData->Result() as $Message) {
       
    $Class = trim($Class);
    $Format = empty($Message->Format) ? 'Display' : $Message->Format;
-   $Author = new stdClass();
-   $Author->UserID = $Message->InsertUserID;
-   $Author->Name = $Message->InsertName;
-   $Author->Photo = $Message->InsertPhoto;
+   $Author = UserBuilder($Message, 'Insert');
 ?>
 <li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
    <a name="Item_<?php echo $CurrentOffset;?>" class="Item" />

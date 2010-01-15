@@ -58,11 +58,25 @@ if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $CssClass = '') {
       $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
       if ($User->Photo != '') {
+         $PhotoUrl = strtolower(substr($User->Photo, 0, 7)) == 'http://' ? $User->Photo : 'uploads/n'.$User->Photo;
          return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
-            .Img('uploads/n'.$User->Photo, array('alt' => urlencode($User->Name)))
+            .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
             .'</a>';
       } else {
          return '';
       }
+   }
+}
+
+if (!function_exists('UserBuilder')) {
+   function UserBuilder($Object, $UserPrefix = '') {
+      $User = new stdClass();
+      $UserID = $UserPrefix.'UserID';
+      $Name = $UserPrefix.'Name';
+      $Photo = $UserPrefix.'Photo';
+      $User->UserID = $Object->$UserID;
+      $User->Name = $Object->$Name;
+      $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
+		return $User;
    }
 }

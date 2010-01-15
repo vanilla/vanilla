@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class ProfileController extends Gdn_Controller {
    
-   public $Uses = array('Form', 'Gdn_UserModel', 'Html');
+   public $Uses = array('Form', 'Gdn_UserModel');
 
    public $User;
    protected $_TabView;

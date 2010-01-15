@@ -48,6 +48,7 @@ class Gdn_ConversationModel extends Gdn_Model {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
+      $this->FireEvent('BeforeGet');
       return $this->SQL
          ->OrderBy('c.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)

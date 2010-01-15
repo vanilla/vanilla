@@ -134,10 +134,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             ?>
             <ul class="Info<?php echo ($Sender->CurrentReply->InsertUserID == $Session->UserID ? ' Author' : '') ?>">
                <li class="Author"><?php
-                  $Author = new stdClass();
-                  $Author->UserID = $Sender->CurrentReply->InsertUserID;
-                  $Author->Name = $Sender->CurrentReply->InsertName;
-                  $Author->Photo = $Sender->CurrentReply->InsertPhoto;
+                  $Author = UserBuilder($Sender->CurrentReply, 'Insert');
                   echo UserPhoto($Author);
                   echo UserAnchor($Author);
                ?></li>

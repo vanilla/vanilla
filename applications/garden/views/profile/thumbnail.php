@@ -17,24 +17,10 @@ echo $this->Form->Errors();
    <tbody>
       <tr>
          <th>
-            <?php
-            echo $this->Html->Image(
-               'uploads/p'.$this->User->Photo,
-               array(
-                  'id' => 'cropbox'
-               )
-            );
-         ?></th>
+            <?php echo Img('uploads/p'.$this->User->Photo, array('id' => 'cropbox')); ?></th>
          <td>
             <div style="<?php echo 'width:'.$this->ThumbSize.'px;height:'.$this->ThumbSize.'px;'; ?>overflow:hidden;">
-               <?php
-                  echo $this->Html->Image(
-                     'uploads/p'.$this->User->Photo,
-                     array(
-                        'id' => 'preview'
-                     )
-                  );
-               ?>
+               <?php echo Img('uploads/p'.$this->User->Photo, array('id' => 'preview')); ?>
             </div>
          </td>
       </tr>

@@ -24,6 +24,7 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
          
+      $this->FireEvent('BeforeGet');
       return $this->SQL
          ->Select('cm.*')
          ->Select('iu.Name', '', 'InsertName')

@@ -76,6 +76,7 @@ class Gdn_UserModel extends Gdn_Model {
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();
+      $this->FireEvent('BeforeGetActiveUsers');
       return $this
          ->SQL
          ->OrderBy('u.DateLastActive', 'desc')

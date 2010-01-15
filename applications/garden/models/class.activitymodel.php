@@ -55,6 +55,7 @@ class Gdn_ActivityModel extends Gdn_Model {
       if (!$Session->IsValid() || $Session->UserID != $UserID)
          $this->SQL->Where('t.Public', '1');
 
+      $this->FireEvent('BeforeGet');
       return $this->SQL
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
@@ -81,6 +82,7 @@ class Gdn_ActivityModel extends Gdn_Model {
    
    public function GetComments($ActivityIDs) {
       $this->ActivityQuery();
+      $this->FireEvent('BeforeGetComments');
       return $this->SQL
          ->WhereIn('a.CommentActivityID', $ActivityIDs)
          ->OrderBy('a.CommentActivityID', 'desc')

@@ -322,6 +322,49 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
    
+   public function Preferences($UserReference = '') {
+      $Session = Gdn::Session();
+      $this->Permission('Garden.SignIn.Allow');
+      $this->GetUserInfo($UserReference);
+      $UserPrefs = Format::Unserialize($this->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
+
+      // Define the preferences to be managed
+      $this->Preferences = array(
+         'Email Notifications' => array(
+            'Email.WallComment' => Gdn::Translate('Notify me when people write on my wall.'),
+            'Email.ActivityComment' => Gdn::Translate('Notify me when people reply to my wall comments.')
+         )
+      );
+      
+      $this->FireEvent('AfterPreferencesDefined');
+
+      if ($this->User->UserID != $Session->UserID)
+         $this->Permission('Garden.Users.Edit');
+         
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Loop the preferences, setting defaults from the configuration
+         $Defaults = array();
+         foreach ($this->Preferences as $PrefGroup => $Prefs) {
+            foreach ($Prefs as $Pref => $Desc) {
+               $Defaults[$Pref] = ArrayValue($Pref, $UserPrefs, Gdn::Config('Preferences.'.$Pref, '0'));
+            }
+         }
+         $this->Form->SetData($Defaults);
+      } else {
+         // Get, assign, and save the preferences
+         foreach ($this->Preferences as $PrefGroup => $Prefs) {
+            foreach ($Prefs as $Pref => $Desc) {
+               $UserPrefs[$Pref] = $this->Form->GetValue($Pref, '0');
+            }
+         }
+         $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
+         $this->StatusMessage = Translate("Your preferences have been saved.");
+      }
+      $this->Render();
+   }
+   
    public function RemovePicture($UserReference = '', $TransientKey = '') {
       $this->Permission('Garden.SignIn.Allow');
       $Session = Gdn::Session();
@@ -511,6 +554,9 @@ class ProfileController extends Gdn_Controller {
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
+         if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit'))
+            $SideMenu->AddLink('Options', Gdn::Translate('My Preferences'), '/profile/preferences/'.$this->User->UserID, FALSE, array('class' => 'Popup'));
+            
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');

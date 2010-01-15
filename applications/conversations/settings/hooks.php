@@ -24,6 +24,11 @@ class ConversationsHooks implements Gdn_IPlugin {
       }
    }
    
+   public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
+      $Sender->Preferences['Email Notifications']['Email.ConversationMessage'] = Gdn::Translate('Notify me of private messages.');
+      $Sender->Preferences['Email Notifications']['Email.AddedToConversation'] = Gdn::Translate('Notify me when I am added to private conversations.');
+   }
+   
    public function Base_Render_Before(&$Sender) {
       // Add the menu options for conversations
       $Session = Gdn::Session();

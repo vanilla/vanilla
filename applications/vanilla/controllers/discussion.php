@@ -103,7 +103,7 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
-   public function xGetNew($DiscussionID, $LastCommentID) {
+   public function GetNew($DiscussionID, $LastCommentID) {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
       // Check permissions.

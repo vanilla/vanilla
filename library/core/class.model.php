@@ -377,13 +377,11 @@ class Gdn_Model extends Gdn_Pluggable {
 		
 		// Load the existing values
 		$Row = $this->SQL
-			->NoReset() // one time
 			->Select($Column)
 			->From($this->Name)
 			->Where($FieldName, $RowID)
 			->Get()
 			->FirstRow();
-
 		
 		if(!$Row) throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
 		$Values = Format::Unserialize($Row->$Column);
@@ -398,10 +396,11 @@ class Gdn_Model extends Gdn_Pluggable {
 		
 		// Save the values back to the db
 		return $this->SQL
+			->From($this->Name)
+			->Where($FieldName, $RowID)
 			->Set($Column, $Values)
 			->Put();
 	}
-
 }
 
 ?>

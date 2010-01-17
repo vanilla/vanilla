@@ -3,26 +3,27 @@ How to create a theme:
 Part 1: CSS / Design
 ================================================================================
 1. Copy this "default" theme folder and rename it to your new theme name.
-2. Open the "about.php" file and edit the information to reflect your theme.
-3. Grab the style.css file from /applications/garden/design/ folder and copy it
-   into your theme's "design" folder. Do the same for the
-   /applications/vanilla/design/vanilla.css file.
+2. Open the "about.php" file and edit the information to reflect your theme. Be
+   sure to change the array key like this: $ThemeInfo['YourThemeNameHere'].
+3. Create a "design" subfolder and copy /applications/garden/design/style.css 
+   and /applications/vanilla/design/vanilla.css into it.
 4. Go to your Dashboard, Themes, and apply your new theme.
-5. Edit the copied css files to look however you wish!
+5. Edit the copied CSS files to look however you wish!
 
 Other things you should know:
 
- + All non-Vanilla pages should be edited in the global "style.css" file.
-   
- + If you want to edit the look & feel of the garden/administrative screens, you
-   can accomplish it by copying the /applications/garden/design/admin.css file
-   to /themes/yourtheme/design/admin.css and editing it there.
-   /
+ + All non-forum pages should be edited in the global "style.css" file.
+
+ + If you want to edit the look & feel of the administrative screens, also 
+   copy /applications/garden/design/admin.css in step 3. Similarly, you can 
+   copy other CSS files like /applications/vanilla/design/vanillaprofile.css to
+   customize those pages as well.
+
 
 Part 2: HTML / Views
 ================================================================================
-If you don't like the way we've structured our Html, you can edit that too. Our
-pages are made up of two parts:
+If you want to customize the HTML, you can edit that too. 
+Our pages are made up of two parts:
 
  1. Master Views - these represent everything that wraps the main content of the
    page. If all you want to do is add a menu or banner above Vanilla, this is
@@ -31,7 +32,12 @@ pages are made up of two parts:
    /themes/yourtheme/views/default.master.php and edit it there.
    
  2. Views - these represent all of the content in each page. Every application
-   has a "views" folder that contains all of the html for every page. So, for
-   example, if you wanted to edit the html for the discussion list, you could
+   has a "views" folder that contains all of the HTML for every page. So, for
+   example, if you wanted to edit the HTML for the Discussions list, you could
    copy the views from /applications/vanilla/views/discussions to
    /themes/yourtheme/views/discussions and edit them there.
+
+You can avoid naming conflicts between applications' views and specify which 
+app a view is for by optionally adding a subfolder with the app's name in 
+/themes/yourtheme/views/ (e.g.: /themes/yourtheme/views/myapp/) and placing 
+views there rather than directly in the "views" folder.

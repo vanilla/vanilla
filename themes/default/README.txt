@@ -39,5 +39,5 @@ Our pages are made up of two parts:
 
 You can avoid naming conflicts between applications' views and specify which 
 app a view is for by optionally adding a subfolder with the app's name in 
-/themes/yourtheme/views/ (e.g.: /themes/yourtheme/views/myapp/) and placing 
+/themes/yourtheme/views/ (e.g.: /themes/yourtheme/views/appname/) and placing 
 views there rather than directly in the "views" folder.

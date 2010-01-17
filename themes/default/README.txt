@@ -7,8 +7,10 @@ Part 1: CSS / Design
    sure to change the array key like this: $ThemeInfo['YourThemeNameHere'].
 3. Create a "design" subfolder and copy /applications/garden/design/style.css 
    and /applications/vanilla/design/vanilla.css into it.
-4. Go to your Dashboard, Themes, and apply your new theme.
-5. Edit the copied CSS files to look however you wish!
+4. Any background images you want to continue using (like the star png images
+   for bookmarking) should be copied along with their respective stylesheets.
+5. Go to your Dashboard, Themes, and apply your new theme.
+6. Edit the copied CSS files to look however you wish!
 
 Other things you should know:
 

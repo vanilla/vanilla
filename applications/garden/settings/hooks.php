@@ -18,9 +18,13 @@ class GardenHooks implements Gdn_IPlugin {
 
       // Enable theme previewing
       if ($Session->IsValid()) {
-         $PreviewTheme = $Session->GetPreference('PreviewTheme', '');
-         if ($PreviewTheme != '')
-            $Sender->Theme = $PreviewTheme;
+         $PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', '');
+         // echo 'test'.$PreviewThemeFolder;
+         if ($PreviewThemeFolder != '') {
+            $Sender->Theme = $PreviewThemeFolder;
+            $Sender->AddAsset('Content', $Sender->FetchView('previewtheme', 'settingscontroller', 'garden'));
+            $Sender->AddCssFile('previewtheme.css');
+         }
       }
 
       // Add Message Modules (if necessary)

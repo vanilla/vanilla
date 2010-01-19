@@ -355,6 +355,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
    
+   public function ClearCssFiles() {
+      $this->_CssFiles = array();
+   }
+   
    /**
     * Undocumented method.
     *

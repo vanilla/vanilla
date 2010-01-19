@@ -1,10 +1,10 @@
 div.GettingStarted {
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
-   background: #F2FBFF /* Panel Background Color */;
+   background: #E2F4FF /* Panel Background Color */;
    padding: 0 8px 8px;
    margin: 10px 0 20px;
-   border: 1px solid #C0E7F5 /* Panel Inlay Border Color */;
+   border: 1px solid #A5D0E7 /* Panel Inlay Border Color */;
 }
 div.GettingStarted a.Dismiss {
 	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;

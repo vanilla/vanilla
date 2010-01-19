@@ -191,6 +191,10 @@ class ProfileController extends Gdn_Controller {
    public function Edit($UserReference = '') {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference);
+      $Session = Gdn::Session();
+      if ($Session->UserID != $this->User->UserID)
+         $this->Permission('Garden.User.Edit');
+         
       $UserModel = Gdn::UserModel();
       $this->Form->SetModel($UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);

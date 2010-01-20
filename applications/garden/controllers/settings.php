@@ -475,45 +475,34 @@ class SettingsController extends GardenController {
    }
    
    public function PreviewTheme($ThemeFolder = '') {
-      $this->Title(Translate('Theme Preview'));
-         
-      // Clear out all css & js and use the "empty" master view
-      $this->MasterView = 'empty';
-      $this->_CssFiles = array();
-      $this->Head->ClearScripts();
-      // Add jquery, custom css & js
-      $this->AddCssFile('previewtheme.css');
-      $this->AddJsFile('js/library/jquery.js');
-      $this->AddJsFile('previewtheme.js');
-
       $this->Permission('Garden.Themes.Manage');
       $ThemeManager = new Gdn_ThemeManager();
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $this->ThemeName = '';
-      $this->ThemeFolder = $ThemeFolder;
+      $PreviewThemeName = '';
+      $PreviewThemeFolder = $ThemeFolder;
       foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
          if ($ThemeInfo['Folder'] == $ThemeFolder)
-            $this->ThemeName = $ThemeName;
+            $PreviewThemeName = $ThemeName;
       }
       // If we failed to get the requested theme, default back to the one currently enabled
-      if ($this->ThemeName == '') {
+      if ($PreviewThemeName == '') {
          $this->ThemeName = $ThemeManager->EnabledTheme();
          foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-            if ($ThemeName == $this->ThemeName)
-               $this->ThemeFolder = $ThemeInfo['Folder'];
+            if ($ThemeName == $PreviewThemeName)
+               $PreviewThemeFolder = $ThemeInfo['Folder'];
          }
       }
 
       $Session = Gdn::Session();
       $UserModel = Gdn::UserModel();
-      $UserModel->SavePreference($Session->UserID, 'PreviewTheme', $this->ThemeFolder);
-      $this->Render();
+      $UserModel->SavePreference($Session->UserID, array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
+      Redirect('/');
    }
    
    public function CancelPreview() {
       $Session = Gdn::Session();
       $UserModel = Gdn::UserModel();
-      $UserModel->SavePreference($Session->UserID, 'PreviewTheme', '');
+      $UserModel->SavePreference($Session->UserID, array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
       Redirect('settings/themes');
    }
 }

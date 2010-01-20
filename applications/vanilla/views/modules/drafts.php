@@ -12,7 +12,10 @@ if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0) {
          <strong><?php echo Anchor($Draft->Name, $EditUrl); ?></strong>
          <?php echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl, 'DraftCommentLink'); ?>
       </li>
-      <?php } ?>
+      <?php
+      } 
+      ?>
+      <li class="ShowAll"><?php echo Anchor(Gdn::Translate('↳ Show All'), 'drafts'); ?></li>
    </ul>
 </div>
 <?php

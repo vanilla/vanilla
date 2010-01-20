@@ -1,11 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
+
 $Session = Gdn::Session();
+$PreviewThemeName = $Session->GetPreference('PreviewThemeName', 'default');
+$PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', 'default');
 ?>
-<div>
-   <strong>You are previewing the <em><?php echo $this->ThemeName; ?></em> theme.</strong>
-   <div>
-      <?php echo Anchor(Gdn::Translate('Apply'), 'settings/themes/'.$this->ThemeFolder.'/'.$Session->TransientKey(), 'Button'); ?>
-      <?php echo Anchor(Gdn::Translate('Cancel'), 'settings/cancelpreview/', 'Button'); ?>
+<div class="PreviewTheme">
+   <p>You are previewing the <em><?php echo $PreviewThemeName; ?></em> theme.</p>
+   <div class="PreviewButtons">
+      <?php echo Anchor(Gdn::Translate('Apply'), 'settings/themes/'.$PreviewThemeFolder.'/'.$Session->TransientKey(), 'PreviewButton'); ?>
+      <?php echo Anchor(Gdn::Translate('Cancel'), 'settings/cancelpreview/', 'PreviewButton'); ?>
    </div>
 </div>
-<iframe src="<?php echo Url('/'); ?>" />

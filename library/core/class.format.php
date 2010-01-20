@@ -234,6 +234,9 @@ class Format {
             '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
             $Mixed
          );
+         
+         // nl2br
+         $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
          return $Formatter->Format($Mixed);
       }

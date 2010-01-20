@@ -220,10 +220,10 @@ class Gdn_PluginManager {
     */
    public function AvailablePlugins() {
       if (!is_array($this->_AvailablePlugins)) {
-         $PluginInfo = array();
+         $Info = array();
          if ($FolderHandle = opendir(PATH_PLUGINS)) {
             if ($FolderHandle === FALSE)
-               return $PluginInfo;
+               return $Info;
             
             // Loop through subfolders (ie. the actual plugin folders)
             while (($Item = readdir($FolderHandle)) !== FALSE) {
@@ -236,53 +236,47 @@ class Gdn_PluginManager {
                
                foreach($PluginPaths as $i => $PluginFile) {
                   if (file_exists($PluginFile)) {
-                     // echo '<div>'.$PluginFile.'</div>';
                      // Find the $PluginInfo array
-                     $Tokens = token_get_all(implode('', file($PluginFile)));
+                     $Lines = file($PluginFile);
                      $InfoBuffer = FALSE;
                      $ClassBuffer = FALSE;
                      $ClassName = '';
                      $PluginInfoString = '';
-                     foreach ($Tokens as $Key => $Token) {
-                        if (is_array($Token))
-                           $Token = $Token[1];
-                           
-                        if ($Token == '$PluginInfo') {
-                           $InfoBuffer = TRUE;
-                           $PluginInfoString = '';
+                     $PluginInfo = FALSE;
+                     foreach ($Lines as $Line) {
+                        if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+                           $PluginInfoString .= $Line;
+                           $ClassBuffer = TRUE;
+                           $InfoBuffer = FALSE;
                         }
+                        
+                        if (substr(trim($Line), 0, 11) == '$PluginInfo')
+                           $InfoBuffer = TRUE;
                            
                         if ($InfoBuffer)
-                           $PluginInfoString .= $Token;
-                        
-                        if ($Token == ';')
-                           $InfoBuffer = FALSE;
-                        
-                        if ($Token == 'implements') {
-                           $ClassBuffer = FALSE;
-                           $ClassName = trim($ClassName);
-                           break;
-                        }
-      
-                        if ($ClassBuffer)
-                           $ClassName .= $Token;
+                           $PluginInfoString .= $Line;
                            
-                        if ($Token == 'class') {
-                           $ClassBuffer = TRUE;
-                           $ClassName = '';
+                        if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
+                           $Parts = explode(' ', $Line);
+                           if (count($Parts) > 2)
+                              $ClassName = $Parts[1];
+                              
+                           break;
                         }
                         
                      }
+                     unset($Lines);
                      if ($PluginInfoString != '')
-                        eval($PluginInfoString);
-                        
-                     $PluginInfoString = '';
+                        @eval($PluginInfoString);
                         
                      // Define the folder name and assign the class name for the newly added item
-                     foreach ($PluginInfo as $PluginName => $Plugin) {
-                        if (array_key_exists('Folder', $PluginInfo[$PluginName]) === FALSE) {
-                           $PluginInfo[$PluginName]['Folder'] = $Item;
-                           $PluginInfo[$PluginName]['ClassName'] = $ClassName;
+                     if (is_array($PluginInfo)) {
+                        $Info = array_merge($Info, $PluginInfo);
+                        foreach ($Info as $PluginName => $Plugin) {
+                           if (array_key_exists('Folder', $Info[$PluginName]) === FALSE) {
+                              $Info[$PluginName]['Folder'] = $Item;
+                              $Info[$PluginName]['ClassName'] = $ClassName;
+                           }
                         }
                      }
                   }
@@ -290,7 +284,7 @@ class Gdn_PluginManager {
             }
             closedir($FolderHandle);
          }
-         $this->_AvailablePlugins = $PluginInfo;
+         $this->_AvailablePlugins = $Info;
       }
       return $this->_AvailablePlugins;
    }

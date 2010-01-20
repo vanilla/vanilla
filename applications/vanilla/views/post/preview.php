@@ -8,10 +8,7 @@
       <li class="Comment">
          <ul class="Info">
             <li class="Author"><?php
-               $Author = new stdClass();
-               $Author->UserID = $this->Comment->InsertUserID;
-               $Author->Name = $this->Comment->InsertName;
-               $Author->Photo = $this->Comment->InsertPhoto;
+               $Author = UserBuilder($this->Comment, 'Insert');
                echo UserPhoto($Author);
                echo UserAnchor($Author);
             ?></li>

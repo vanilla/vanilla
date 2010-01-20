@@ -55,6 +55,7 @@ class Gdn_ActivityModel extends Gdn_Model {
       if (!$Session->IsValid() || $Session->UserID != $UserID)
          $this->SQL->Where('t.Public', '1');
 
+      $this->FireEvent('BeforeGet');
       return $this->SQL
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
@@ -81,6 +82,7 @@ class Gdn_ActivityModel extends Gdn_Model {
    
    public function GetComments($ActivityIDs) {
       $this->ActivityQuery();
+      $this->FireEvent('BeforeGetComments');
       return $this->SQL
          ->WhereIn('a.CommentActivityID', $ActivityIDs)
          ->OrderBy('a.CommentActivityID', 'desc')
@@ -155,24 +157,32 @@ class Gdn_ActivityModel extends Gdn_Model {
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
          $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
       }
-      $User = $this->SQL->Select('Name, Email')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+      $User = $this->SQL->Select('Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 
       if ($User) {
-         $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
-         $Email = new Gdn_Email();
-         $Email->Subject(sprintf(Gdn::Translate('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-         $Email->To($User->Email, $User->Name);
-         $Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
-         $Email->Message(
-            sprintf(
-               Gdn::Translate($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
-               $ActivityHeadline,
-               Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
-               $Story
-            )
-         );
-         
-         $Email->Send();
+         $Preferences = Format::Unserialize($User->Preferences);
+         $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
+         if ($Preference) {
+            $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
+            $Email = new Gdn_Email();
+            $Email->Subject(sprintf(Gdn::Translate('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
+            $Email->To($User->Email, $User->Name);
+            $Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
+            $Email->Message(
+               sprintf(
+                  Gdn::Translate($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+                  $ActivityHeadline,
+                  Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+                  $Story
+               )
+            );
+            
+            try {
+               $Email->Send();
+            } catch (Exception $ex) {
+               // Don't do anything with the exception.
+            }
+         }
       }
    }
    

@@ -13,6 +13,11 @@ jQuery(document).ready(function($) {
       $('#Form_User_Password').slideToggle('fast');
       return false;
    });
+   
+   if ($.fn.autogrow)
+      $('textarea.Autogrow').livequery(function() {
+         $(this).autogrow();
+      });
 
    // Grab a definition from hidden inputs in the page
    definition = function(definition, defaultVal, set) {
@@ -118,9 +123,7 @@ jQuery(document).ready(function($) {
    $('span.Email').livequery(function() {
       var html = $(this).html();
       var email = this;
-      $(email).find('em').replaceWith('.');
-      $(email).find('strong').replaceWith('@');
-      email = $(email).text();
+      email = $(email).html().replace('<em>dot</em>', '.').replace('<strong>at</strong>', '@');
       $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 

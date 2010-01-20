@@ -63,28 +63,6 @@ if (!function_exists('AddActivity')) {
    }
 }
 
-if (!function_exists('Anchor')) {
-   /**
-    * Builds and returns an anchor tag.
-    */
-   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
-      if (!is_array($CssClass) && $CssClass != '')
-         $CssClass = array('class' => $CssClass);
-
-      if ($Destination == '' && $ForceAnchor === FALSE)
-         return $Text;
-      
-      if ($Attributes == '')
-         $Attributes = array();
-
-      $Prefix = substr($Destination, 0, 7);
-      if (!in_array($Prefix, array('http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
-         $Destination = Url($Destination);
-
-      return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
-   }
-}
-
 if (!function_exists('ArrayCombine')) {
    /**
     * PHP's array_combine has a limitation that doesn't allow array_combine to
@@ -495,21 +473,6 @@ if (!function_exists('GetPostValue')) {
    }
 }
 
-if (!function_exists('Img')) {
-   /**
-    * Returns an img tag.
-    */
-   function Img($Image, $Attributes = '') {
-      if ($Attributes == '')
-         $Attributes = array();
-
-      if (substr($Image, 0, 7) != 'http://' && $Image != '')
-         $Image = Url($Image);
-
-      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
-   }
-}
-
 if (!function_exists('InArrayI')) {
    /**
     * Case-insensitive version of php's native in_array function.
@@ -689,11 +652,11 @@ if (!function_exists('ProxyRequest')) {
 }
 
 if (!function_exists('RandomString')) {
-   function RandomString($Length) {
-      $Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+   function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+      $CharLen = strlen($Characters) - 1;
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % 35;
+        $Offset = rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;
@@ -846,26 +809,6 @@ if (!function_exists('Url')) {
             
          $Paths[] = $Destination;
          return CombinePaths($Paths, '/');
-      }
-   }
-}
-
-if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '') {
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
-
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
-   }
-}
-
-if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $CssClass = '') {
-      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($User->Photo != '') {
-         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'><img src="'.Asset('uploads/n'.$User->Photo).'" alt="'.urlencode($User->Name).'" /></a>';
-      } else {
-         return '';
       }
    }
 }

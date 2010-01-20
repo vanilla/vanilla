@@ -37,7 +37,6 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Categories.Use', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.Home', 'Required');
          
          if ($this->Form->Save() !== FALSE)
@@ -150,7 +149,9 @@ class SettingsController extends Gdn_Controller {
          if ($CategoryID) {               
             $this->StatusMessage = Gdn::Translate('The category was created successfully.');
             $this->RedirectUrl = Url('vanilla/settings/managecategories');
-         }
+         } else {
+				unset($CategoryID);
+			}
       }
       // Get all of the currently selected role/permission combinations for this junction
       $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');

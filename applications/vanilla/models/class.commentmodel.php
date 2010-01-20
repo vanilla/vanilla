@@ -32,6 +32,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
    
    public function Get($DiscussionID, $Limit, $Offset = 0) {
       $this->CommentQuery();
+      $this->FireEvent('BeforeGet');
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
          ->OrderBy('c.DateInserted', 'asc')

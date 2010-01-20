@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class ProfileController extends Gdn_Controller {
    
-   public $Uses = array('Form', 'Gdn_UserModel', 'Html');
+   public $Uses = array('Form', 'Gdn_UserModel');
 
    public $User;
    protected $_TabView;
@@ -93,11 +93,17 @@ class ProfileController extends Gdn_Controller {
       $this->Activity($UserReference);
    }
    
-   public function Clear($TransientKey = '') {
+   public function Clear($UserID = '', $TransientKey = '') {
+      $UserID = is_numeric($UserID) ? $UserID : 0;
       $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey))
-         $this->UserModel->SaveAbout($Session->UserID, '');
-         
+      if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey)) {
+         if ($UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
+            $UserID = 0;
+
+         if ($UserID > 0)
+            $this->UserModel->SaveAbout($UserID, '');
+      }
+
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
          Redirect('/profile');
    }
@@ -185,6 +191,10 @@ class ProfileController extends Gdn_Controller {
    public function Edit($UserReference = '') {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference);
+      $Session = Gdn::Session();
+      if ($Session->UserID != $this->User->UserID)
+         $this->Permission('Garden.User.Edit');
+         
       $UserModel = Gdn::UserModel();
       $this->Form->SetModel($UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
@@ -312,6 +322,49 @@ class ProfileController extends Gdn_Controller {
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0)
             Redirect('garden/profile/'.$UserReference);
+      }
+      $this->Render();
+   }
+   
+   public function Preferences($UserReference = '') {
+      $Session = Gdn::Session();
+      $this->Permission('Garden.SignIn.Allow');
+      $this->GetUserInfo($UserReference);
+      $UserPrefs = Format::Unserialize($this->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
+
+      // Define the preferences to be managed
+      $this->Preferences = array(
+         'Email Notifications' => array(
+            'Email.WallComment' => Gdn::Translate('Notify me when people write on my wall.'),
+            'Email.ActivityComment' => Gdn::Translate('Notify me when people reply to my wall comments.')
+         )
+      );
+      
+      $this->FireEvent('AfterPreferencesDefined');
+
+      if ($this->User->UserID != $Session->UserID)
+         $this->Permission('Garden.Users.Edit');
+         
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Loop the preferences, setting defaults from the configuration
+         $Defaults = array();
+         foreach ($this->Preferences as $PrefGroup => $Prefs) {
+            foreach ($Prefs as $Pref => $Desc) {
+               $Defaults[$Pref] = ArrayValue($Pref, $UserPrefs, Gdn::Config('Preferences.'.$Pref, '0'));
+            }
+         }
+         $this->Form->SetData($Defaults);
+      } else {
+         // Get, assign, and save the preferences
+         foreach ($this->Preferences as $PrefGroup => $Prefs) {
+            foreach ($Prefs as $Pref => $Desc) {
+               $UserPrefs[$Pref] = $this->Form->GetValue($Pref, '0');
+            }
+         }
+         $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
+         $this->StatusMessage = Translate("Your preferences have been saved.");
       }
       $this->Render();
    }
@@ -505,6 +558,9 @@ class ProfileController extends Gdn_Controller {
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
+         if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit'))
+            $SideMenu->AddLink('Options', Gdn::Translate('My Preferences'), '/profile/preferences/'.$this->User->UserID, FALSE, array('class' => 'Popup'));
+            
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');

@@ -17,18 +17,13 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    // If this was a status update or a wall comment, don't bother with activity strings
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
    $ActivityType = $ActivityType[0];
-   $Author = new stdClass();
-   $Author->UserID = $Activity->ActivityUserID;
-   $Author->Name = $Activity->ActivityName;
-   $Author->Photo = $Activity->ActivityPhoto;
+   $Author = UserBuilder($Activity, 'Activity');
    if (in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
       echo UserPhoto($Author, 'Photo');
       echo '<div>';
          echo UserAnchor($Author, 'Name');
          if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
-            $Author->UserID = $Activity->RegardingUserID;
-            $Author->Name = $Activity->RegardingName;
-            $Author->Photo = '';
+            $Author = UserBuilder($Activity, 'Regarding');
             echo '<span>→</span>'.UserAnchor($Author, 'Name');
          }
          echo Format::Display($Activity->Story);
@@ -92,10 +87,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
 }
 
 function WriteActivityComment($Comment, &$Sender, &$Session) {
-   $Author = new stdClass();
-   $Author->UserID = $Comment->ActivityUserID;
-   $Author->Name = $Comment->ActivityName;
-   $Author->Photo = $Comment->ActivityPhoto;
+   $Author = UserBuilder($Comment, 'Activity');
 ?>
 <li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php
    echo $Comment->ActivityType;

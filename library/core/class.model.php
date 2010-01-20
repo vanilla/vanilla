@@ -369,4 +369,38 @@ class Gdn_Model extends Gdn_Pluggable {
          $Fields[$this->UpdateUserID] = $Session->UserID;
    }
 
+	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
+		
+		if (!isset($this->Schema)) $this->DefineSchema();
+		// TODO: need to be sure that $this->PrimaryKey is only one primary key
+		$FieldName = $this->PrimaryKey;
+		
+		// Load the existing values
+		$Row = $this->SQL
+			->Select($Column)
+			->From($this->Name)
+			->Where($FieldName, $RowID)
+			->Get()
+			->FirstRow();
+		
+		if(!$Row) throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+		$Values = Format::Unserialize($Row->$Column);
+		
+		if (is_string($Values) && $Values != '')
+			throw new Exception(Gdn::Translate('Serialized column failed to be unserialized.'));
+		
+		if (!is_array($Values)) $Values = array();
+		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
+
+		$Values = Format::Serialize(array_merge($Values, $Name));
+		
+		// Save the values back to the db
+		return $this->SQL
+			->From($this->Name)
+			->Where($FieldName, $RowID)
+			->Set($Column, $Values)
+			->Put();
+	}
 }
+
+?>

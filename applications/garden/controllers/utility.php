@@ -82,7 +82,6 @@ class UtilityController extends GardenController {
          $this->Render();
    }
    
-   // TODO: REMOVE THIS METHOD - DEBUG PURPOSES ONLY
    public function Structure($AppName = 'garden', $Drop = '0', $Explicit = '0') {
       $this->Permission('Garden.AdminUser.Only');
       $File = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);

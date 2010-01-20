@@ -76,6 +76,7 @@ class Gdn_UserModel extends Gdn_Model {
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();
+      $this->FireEvent('BeforeGetActiveUsers');
       return $this
          ->SQL
          ->OrderBy('u.DateLastActive', 'desc')
@@ -815,15 +816,26 @@ class Gdn_UserModel extends Gdn_Model {
          $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
 
          // Wipe out old & insert new roles for this user
-         $this->SaveRoles($UserID, $RoleIDs);
+         $this->SaveRoles($UserID, $RoleIDs, FALSE);
 
-         // Report that the user was approved (this will also notify the user by email)
+         // Send out a notification to the user
+         $User = $this->Get($UserID);
+         if ($User) {
+            $Email->Subject(sprintf(Gdn::Translate('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
+            $Email->Message(sprintf(Gdn::Translate('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
+            $Email->To($User->Email);
+            $Email->Send();
+         }
+
+         // Report that the user was approved
          $Session = Gdn::Session();
          AddActivity(
             $UserID,
             'JoinApproved',
             Gdn::Translate('Welcome Aboard!'),
-            $Session->UserID
+            $Session->UserID,
+            '',
+            FALSE
          );
       }
       return TRUE;

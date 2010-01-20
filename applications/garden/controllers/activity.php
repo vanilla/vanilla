@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class ActivityController extends Gdn_Controller {
    
-   public $Uses = array('Database', 'Form', 'Gdn_ActivityModel', 'Html');
+   public $Uses = array('Database', 'Form', 'Gdn_ActivityModel');
    
    public function Initialize() {
       $this->Head = new HeadModule($this);
@@ -92,7 +92,6 @@ class ActivityController extends Gdn_Controller {
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
          Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
       } else {
-         $this->Html = new Html();
          // Load the newly added comment
          $this->Comment = $this->ActivityModel->GetID($NewActivityID);
          $this->Comment->ActivityType .= ' Hidden'; // Hide it so jquery can reveal it

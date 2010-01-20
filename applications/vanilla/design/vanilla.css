@@ -121,7 +121,7 @@ ul.DataList li ul li.Title strong a {
    background: none;
 }
 ul.DataList li ul li.Meta {
-   font-family: 'lucida grande',tahoma,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin-left: 5px;
    font-size: 11px;
    color: #80828c /* Meta Label Font Color */;
@@ -251,7 +251,7 @@ body.Discussion #Content h2 span {
 }
 .Preview li ul.Info,
 #Discussion li ul.Info {
-   font-family: 'lucida grande',tahoma,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 11px;
    color: #777 /* Meta Label Font Color */;
    padding: 8px 0 0 8px;
@@ -292,7 +292,7 @@ body.Discussion #Content h2 span {
    font-size: 100%;
 }
 .Body p {
-   font-family: 'lucida grande',tahoma,sans-serif;   
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin: 8px 0;
 }
 .Body blockquote {
@@ -485,24 +485,23 @@ ul.Drafts li ul li.Title a.DraftCommentLink {
 ul.Drafts li ul li.Title a.DeleteDraft {
    float: right;
    width: auto;
-   padding: 4px;
+   padding: 5px;
    margin: 3px 1px 0 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
    font-size: 11px;
    font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
    cursor: pointer;
    line-height: 100%;
 }
 ul.Drafts li ul li.Title a.DeleteDraft:hover {
    color: #333;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #888;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   padding: 4px;
+   text-decoration: none;
 }
-
 
 /* =============================================== Discussion & Comment Forms */
 body.Discussion #CommentForm {

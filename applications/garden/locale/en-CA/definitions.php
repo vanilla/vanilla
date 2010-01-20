@@ -61,6 +61,13 @@ $Definition['EmailInvitation'] = 'Hello!
   %3$s
 
 Have a great day!';
+$Definition['EmailMembershipApproved'] = 'Hello %1$s,
+
+You have been approved for membership. Sign in now at the following link:
+
+  %2$s
+  
+Have a great day!';
 $Definition['EmailWelcome'] = 'Hello %1$s,
 
 %2$s has created an account for you at %3$s. Your login credentials are:

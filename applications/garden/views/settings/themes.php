@@ -29,7 +29,7 @@ printf(
    $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot{.gif,.jpg,.png}", GLOB_BRACE);
    $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
    if ($PreviewImage)
-      echo '<img src="'.Asset('/themes/'.$this->EnabledThemeFolder.'/'.$PreviewImage).'" alt="'.$this->EnabledThemeName.'" height="112" width="150" />';
+      echo Img('/themes/'.$this->EnabledThemeFolder.'/'.$PreviewImage, array('alt' => $this->EnabledThemeName, 'height' => '112', 'width' => '150'));
    
    echo '<h4>';
       echo $ThemeUrl != '' ? Url($this->EnabledThemeName, $ThemeUrl) : $this->EnabledThemeName;
@@ -116,7 +116,7 @@ printf(
                   echo '</h4>';
                   
                   if ($PreviewImage) {
-                     echo Anchor('<img src="'.Asset('/themes/'.$ThemeFolder.'/'.$PreviewImage).'" alt="'.$ThemeName.'" height="112" width="150" />',
+                     echo Anchor(Img('/themes/'.$ThemeFolder.'/'.$PreviewImage, array('alt' => $ThemeName, 'height' => '112', 'width' => '150')),
                         'garden/settings/previewtheme/'.$ThemeFolder,
                         '',
                         array('target' => '_top')

@@ -1,50 +1,45 @@
-/* Begin Typography */
+/* A banner that appears when user is previewing their custom css definitions */
 body {
-   margin: 0;
-   padding: 0;
+   margin-top: 40px !important;
 }
-div {
-   font: 14px 'lucida grande', "Helvetica Neue",Helvetica,arial,sans-serif;
-   padding: 0 12px;
-   background: #464646;
-   border-bottom: 1px solid #333;
-   color: #fff;
-   text-align: right;
-   height: 40px;
-   overflow: hidden;
+body div.PreviewTheme {
+   position: absolute !important;
+   top: 0 !important;
+   left: 0 !important;
+   width: 100% !important;
+   text-align: right !important;
+   height: 40px !important;
+   overflow: hidden !important;
+   background: #464646 !important;
+   border-bottom: 1px solid #333 !important;
 }
-div div {
-   padding: 10px 0 8px;
-   height: auto;
-   border: 0;
+body div.PreviewTheme p {
+   font: 14px 'lucida grande', "Helvetica Neue",Helvetica,arial,sans-serif !important;
+   padding: 11px 11px 0 !important;
+   margin: 0 !important;
+   color: #fff !important;
+   float: left !important;
 }
-strong {
-   padding: 11px 0;
-   display: block;
-   float: left;
-   font-weight: normal;
+body div.PreviewTheme div.PreviewButtons a.PreviewButton,
+body div.PreviewTheme form#Form_Form div input.PreviewButton {
+   cursor: pointer !important;
+   margin: 0 !important;
+   font-family: 'lucida grande', Tahoma, 'Trebuchet MS', Arial, Verdana !important;
+   padding: 4px !important;
+   margin: 6px 8px 0 0 !important;
+   font-size: 12px !important;
+   color: #000 !important;
+   text-decoration: none !important;
+   border: 1px solid #000 !important;
+   text-shadow: 0 1px 0 #fff !important;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8 !important;
+   -moz-border-radius: 3px !important;
+   -webkit-border-radius: 3px !important;
 }
-strong em {
-   font-weight: bold;
-   font-style: normal;
+body div.PreviewTheme div.PreviewButtons a.PreviewButton {
+   padding: 6px !important;
+   margin: 0 0 0 8px !important;
 }
-.Button {
-   cursor: pointer;
-   margin: 0;
-   font-family: 'lucida grande', Tahoma, 'Trebuchet MS', Arial, Verdana;
-   padding: 4px;
-   margin-left: 16px;
-   font-size: 12px;
-   color: #ddd;
-   text-decoration: none;
-   }
-.Button:hover {
-   color: #fff;
-   text-decoration: underline;
-}
-iframe {
-   width: 100%;
-   border: 0;
-   margin: 0;
-   padding: 0;
+body div.PreviewTheme div.PreviewButtons {
+   padding: 8px 8px 0 0;
 }

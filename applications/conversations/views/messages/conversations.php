@@ -16,10 +16,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
 ?>
 <li<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
    <?php
-   $LastAuthor = new stdClass();
-   $LastAuthor->UserID = $Conversation->LastMessageUserID;
-   $LastAuthor->Name = $Conversation->LastMessageName;
-   $LastAuthor->Photo = $Conversation->LastMessagePhoto;
+   $LastAuthor = UserBuilder($Conversation, 'LastMessage');
    echo UserPhoto($LastAuthor, 'Photo');
    ?>
    <div>

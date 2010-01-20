@@ -61,10 +61,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
    <ul class="Info">
       <li class="Author">
          <?php
-         $Author = new stdClass();
-         $Author->UserID = $Comment->InsertUserID;
-         $Author->Name = $Comment->InsertName;
-         $Author->Photo = $Comment->InsertPhoto;
+         $Author = UserBuilder($Comment, 'Insert');
          echo UserPhoto($Author);
          echo UserAnchor($Author);
          ?>

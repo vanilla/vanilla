@@ -45,7 +45,8 @@ $this->RenderAsset('Messages');
                echo $Alt;
             ?>>
                <th><?php
-                  echo UserPhoto($User);
+                  $PhotoUser = UserBuilder($User);
+                  echo UserPhoto($PhotoUser);
                   echo UserAnchor($User);
                ?></th>
                <td class="Alt"><?php echo Format::Date($User->DateLastActive); ?></td>

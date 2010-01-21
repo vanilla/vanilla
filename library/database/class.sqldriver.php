@@ -1092,7 +1092,7 @@ abstract class Gdn_SQLDriver {
     * ie. "user.role_id = role.id"
     * @param string $Join The type of join to be made. Accepted values are:
     * 'inner', 'outer', 'left', 'right', 'left outer', and 'right outer'.
-    * @return Object
+    * @return Gdn_SQLDriver
     */
    public function Join($TableName, $On, $Join = '') {
       $Join = strtolower(trim($Join));
@@ -1137,8 +1137,8 @@ abstract class Gdn_SQLDriver {
     * clause.
     * @param string $Side A string indicating which side of the match to place asterisk operators.
     * Accepted values are left, right, both, none. Default is both.
-    * @param string $Op Either 'like' or 'not like'
-    * clause.
+    * @param string $Op Either 'like' or 'not like' clause.
+    * @return Gdn_SQLDriver
     */
    public function Like($Field, $Match = '', $Side = 'both', $Op = 'like') {
       if (!is_array($Field))

@@ -293,4 +293,8 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 		('Panel Selected Background Color', '#fff'),
 		('Panel Selected Font Color', '#ff0084')");
 	}
+	
+	public function CleanUp() {
+	   Gdn::Structure()->Table('ThemeSetting')->Drop();
+	}
 }

@@ -77,7 +77,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                
                if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName)) {
                   echo '<span>|</span>';
-                  echo Anchor('Remove', '/settings/remove/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey());
+                  echo Anchor('Remove', '/settings/remove/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem');
                }
             ?></td>
             <td class="Alt Info"><?php

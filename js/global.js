@@ -227,7 +227,7 @@ jQuery(document).ready(function($) {
       $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
    
-   // Remove confirmation
+   // Confirmation for item removals
    $('a.RemoveItem').click(function() {
       if (!confirm('Are you sure you would like to remove this item?')) {
          return false;

@@ -17,6 +17,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * location, and instantiate/call them when necessary.
  */
 class Gdn_PluginManager {
+   
+   const ACTION_ENABLE  = 1;
+   const ACTION_DISABLE = 2;
+   const ACTION_REMOVE  = 3;
+   
    /**
     * An associative array of arrays containing information about each
     * enabled plugin. This value is assigned in the garden bootstrap.php.
@@ -313,24 +318,13 @@ class Gdn_PluginManager {
       $RequiredApplications = ArrayValue('RequiredApplications', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
 
-      // 2. Include the plugin, instantiate it, and call it's setup method
+      // 2. Include the plugin, instantiate it, and call its setup method
       $PluginInfo = ArrayValue($PluginName, $AvailablePlugins, FALSE);
       $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
       if ($PluginFolder == '')
          throw new Exception(Gdn::Translate('The plugin folder was not properly defined.'));
-
-      $PluginClassName = ArrayValue('ClassName', $PluginInfo, FALSE);
-      if ($PluginFolder !== FALSE && $PluginClassName !== FALSE && class_exists($PluginClassName) === FALSE) {
-         $this->IncludePlugins(array($PluginName => $PluginFolder));
-         
-         if (class_exists($PluginClassName)) {
-            $Plugin = new $PluginClassName();
-            $Plugin->Setup();
-         }
-      } elseif(class_exists($PluginClassName, FALSE) !== FALSE && $Setup === TRUE) {
-         $Plugin = new $PluginClassName();
-         $Plugin->Setup();
-      }
+      
+      $this->_PluginHook($PluginName, self::ACTION_ENABLE, $Setup);
       
       // 3. If setup succeeded, register any specified permissions
       $PermissionName = ArrayValue('RegisterPermissions', $PluginInfo, FALSE);
@@ -363,15 +357,37 @@ class Gdn_PluginManager {
          }
       }
       
-      // 2. Disable it
+      // 2. Perform necessary hook action
+      $this->_PluginHook($PluginName, self::ACTION_DISABLE, TRUE);
+      
+      // 3. Disable it
       RemoveFromConfig('EnabledPlugins'.'.'.$PluginName);
-         
       unset($this->EnabledPlugins[$PluginName]);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $ApplicationManager->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
+   }
+   
+   /**
+    * Remove the plugin.
+    *
+    * @param string $PluginName 
+    * @return void
+    */
+   public function RemovePlugin($PluginName) {
+      $this->_PluginHook($PluginName, self::ACTION_REMOVE, TRUE);
+   }
+   
+   /**
+    * Remove the plugin folder.
+    *
+    * @param string $PluginFolder 
+    * @return void
+    */
+   private function _RemovePluginFolder($PluginFolder) {
+      Gdn_FileSystem::RemoveFolder(PATH_PLUGINS . DS . $PluginFolder);
    }
    
    /**
@@ -407,5 +423,57 @@ class Gdn_PluginManager {
       }
       
       return $PluginInfo;
+   }
+   
+   /**
+    * Hooks to the varies actions, i.e. enable, disable and remove.
+    *
+    * @param string $PluginName 
+    * @param string $ForAction which action to hook it to, i.e. enable, disable or remove
+    * @param boolean $Callback whether to perform the hook method
+    * @return void
+    */
+   private function _PluginHook($PluginName, $ForAction, $Callback = FALSE) {
+      
+      switch ($ForAction) {
+         case self::ACTION_ENABLE:  $HookMethod = 'Setup'; break;
+         case self::ACTION_DISABLE: $HookMethod = 'OnDisable'; break;
+         case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+      }
+      
+      $PluginInfo      = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
+      $PluginFolder    = ArrayValue('Folder', $PluginInfo, FALSE);
+      $PluginClassName = ArrayValue('ClassName', $PluginInfo, FALSE);
+      
+      if ($ForAction === self::ACTION_REMOVE) {
+         $this->_RemovePluginFolder($PluginFolder);
+      }
+      
+      if ($PluginFolder !== FALSE && $PluginClassName !== FALSE && class_exists($PluginClassName) === FALSE) {
+         if ($ForAction !== self::ACTION_DISABLE) {
+            $this->IncludePlugins(array($PluginName => $PluginFolder));
+         }
+         
+         $this->_PluginCallbackExecution($PluginClassName, $HookMethod);
+      } elseif ($Callback === TRUE) {
+         $this->_PluginCallbackExecution($PluginClassName, $HookMethod);
+      }
+   }
+   
+   /**
+    * Executes the plugin hook action if it exists.
+    *
+    * @param string $PluginClassName 
+    * @param string $HookMethod 
+    * @return void
+    */
+   private function _PluginCallbackExecution($PluginClassName, $HookMethod) {
+      echo $PluginClassName;
+      if (class_exists($PluginClassName)) {
+         $Plugin = new $PluginClassName();
+         if (method_exists($PluginClassName, $HookMethod)) {
+            $Plugin->$HookMethod();
+         }
+      }
    }
 }

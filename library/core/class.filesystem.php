@@ -342,4 +342,24 @@ class Gdn_FileSystem {
          exit();
       }
    }
+   
+   /**
+    * Remove a folder (and all the sub-folders and files).
+    * Taken from http://php.net/manual/en/function.rmdir.php
+    * 
+    * @param string $Dir 
+    * @return void
+    */
+   public static function RemoveFolder($Dir) {
+      $Files = glob($Dir . '*', GLOB_MARK);
+      
+      foreach ($Files as $File) {
+         if (substr($File, -1) == '/')
+            self::RemoveFolder($File);
+         else
+            unlink($File);
+      }
+
+      if (is_dir($Dir)) rmdir($Dir);
+   }
 }

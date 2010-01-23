@@ -468,7 +468,6 @@ class Gdn_PluginManager {
     * @return void
     */
    private function _PluginCallbackExecution($PluginClassName, $HookMethod) {
-      echo $PluginClassName;
       if (class_exists($PluginClassName)) {
          $Plugin = new $PluginClassName();
          if (method_exists($PluginClassName, $HookMethod)) {

@@ -104,6 +104,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       $TargetImage = imagecreatetruecolor($Width, $Height);
       imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
+      imagedestroy($SourceImage);
       
       if ($OutputType == 'gif')
          imagegif($TargetImage, $Target);

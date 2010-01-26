@@ -513,19 +513,36 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          }
       }
       $Data = $this->SQL
-         ->Select('CategoryID')
+         ->Select('CategoryID,InsertUserID')
          ->From('Discussion')
          ->Where('DiscussionID', $DiscussionID)
          ->Get();
       
+      $UserID = FALSE;
       $CategoryID = FALSE;
-      if ($Data->NumRows() > 0)
+      if ($Data->NumRows() > 0) {
+         $UserID = $Data->FirstRow()->InsertUserID;
          $CategoryID = $Data->FirstRow()->CategoryID;
+      }
       
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
+      
+      // Get the user's discussion count
+      $Data = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get();
+      
+      // Save the count to the user table
+      $this->SQL
+         ->Update('User')
+         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
+         ->Where('UserID', $UserID)
+         ->Put();      
       
       return TRUE;
    }

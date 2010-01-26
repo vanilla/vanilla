@@ -123,7 +123,7 @@ jQuery(document).ready(function($) {
    $('span.Email').livequery(function() {
       var html = $(this).html();
       var email = this;
-      email = $(email).html().replace('<em>dot</em>', '.').replace('<strong>at</strong>', '@');
+      email = $(email).html().replace(/<em>dot<\/em>/g, '.').replace(/<strong>at<\/strong>/g, '@');
       $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 

@@ -80,6 +80,8 @@ class SettingsController extends GardenController {
                $Validation = new Gdn_Validation();
                $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+               if ($ApplicationManager->ApplicationHasSetup($ApplicationName))
+                  $ApplicationManager->ApplicationSetup($ApplicationName, $this->ControllerName, $Validation);
             }
             $this->Form->SetValidationResults($Validation->Results());
          }

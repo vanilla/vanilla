@@ -29,12 +29,15 @@ Welcome to the Admin CSS File! Some things you should know:
 #Head {
 	background:#e2f4ff none repeat scroll 0 0;
 	border-bottom:1px solid #FFFFFF;
-	padding: 18px;
+	padding: 10px 18px 18px;
    text-align: right;
 }
 #Head h1 {
+	line-height: 160%;
 	border: 0;
 	float: left;
+	margin: 0;
+	padding: 3px 0 0;
 }
 #Head h1 a {
 	color:#02475a;
@@ -52,6 +55,9 @@ Welcome to the Admin CSS File! Some things you should know:
 	margin: 0 0 0 6px;
 	-moz-border-radius: 3px;
 	vertical-align: middle;
+}
+#Head div.User {
+	padding: 8px 0 0;
 }
 #Head div.User a {
 	margin-left: 20px;

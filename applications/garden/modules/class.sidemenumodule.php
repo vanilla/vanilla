@@ -63,10 +63,10 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
       }
       
       public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
-         if (!array_key_exists($Group, $this->Items))
+         if (!array_key_exists($Group, $this->Items)) {
             $this->Items[$Group] = array();
-
-         $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
+            $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
+         }
       }      
       
       public function AssetTarget() {

@@ -142,13 +142,13 @@ if (!function_exists('ValidateMinimumAge')) {
          $Year = intval(substr($Value, 0, 4));
          $Month = intval(substr($Value, 5, 2));
          $Day = intval(substr($Value, 8));
-         // The minimum age for joining is 16 years before now.
+         // The minimum age for joining is 13 years before now.
          $CurrentDay = date('j');
          $CurrentMonth = date('n');
          $CurrentYear = date('Y');
-         if ($Year + 16 < $CurrentYear
-            || ($Year + 16 == $CurrentYear && $Month < $CurrentMonth)
-            || ($Year + 16 == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
+         if ($Year + 13 < $CurrentYear
+            || ($Year + 13 == $CurrentYear && $Month < $CurrentMonth)
+            || ($Year + 13 == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
             return TRUE;
 
       }

@@ -362,7 +362,14 @@ tr#PagerMore td {
    background: #44c7f4;
    padding: 0;
    text-align: right;
-   height: 50px;
+   /* height: 50px; Added a clearfix instead. */
+}
+div#Search:after {
+   content: ".";
+   display: block;
+   height: 0;
+   clear: both;
+   visibility: hidden;
 }
 body #Head h1 {
    display: block;
@@ -450,11 +457,23 @@ body #Head h1 {
    float: left;
    position: relative;
    display: block;
-   list-style: none outside none;
+   list-style: none;
    padding: 0;
-   margin: 0 10px 0 0;
+   margin: 0 4px 0 0;
    font-weight: bold;
    text-align: left;
+}
+* html #Menu li {
+	display: inline;
+}
+* html #Menu ul  {
+	left: 0;
+	top: 27px;
+}
+* html #Menu ul li  {
+	display: block;
+	height: 1%;
+	width: 85px;
 }
 #Menu li
 #Menu li a,
@@ -497,17 +516,26 @@ body #Head h1 {
    text-decoration: none;
    display: block;
    position: relative;
-   padding: 0 10px;
+   padding: 0 7px;
    white-space: nowrap;
    font-size: 11px;
    height: 28px;
 }
+* html #Menu a  {
+   display: inline;
+   padding: 6px 10px;
+}
+* html #Menu ul li a  {
+   display: block;
+   padding: 3px 10px;
+   width: 85px;
+}
 #Menu ul li {
- display: block;
- float: none;
+	display: block;
+	float: none;
 }
 #Menu ul .Active .First {
- padding-left: 1px;
+	padding-left: 1px;
 }
 #Menu li.NonTab,
 #Menu li.NonTab a {

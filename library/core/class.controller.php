@@ -956,9 +956,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       $ControllerName = $this->ClassName;
       if (substr($ControllerName, -10) == 'Controller')
          $ControllerName = substr($ControllerName, 0, -10); // Strip "Controller" from the body identifier.
+         
       $this->SetData('CssClass', $this->Application.' '.$ControllerName.' '.$this->RequestMethod.' '.$this->CssClass, TRUE);
-      
-      
+     
       // Check to see if there is a handler for this particular extension.
       $ViewHandler = Gdn::Factory('ViewHandler' . strtolower(strrchr($MasterViewPath, '.')));
       if(is_null($ViewHandler)) {

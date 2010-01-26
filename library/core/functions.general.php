@@ -739,10 +739,10 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceString')) {
-   function SliceString($String, $Length) {
+   function SliceString($String, $Length, $Suffix = '...') {
       if (strlen($String) > $Length) {
          $Return = substr(trim($String), 0, $Length);
-         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . '...';
+         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . $Suffix;
       } else {
          return $String;
       }

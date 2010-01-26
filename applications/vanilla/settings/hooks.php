@@ -57,6 +57,16 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Preferences['Email Notifications']['Email.DiscussionMention'] = Gdn::Translate('Notify me when people mention me in discussion titles.');
       $Sender->Preferences['Email Notifications']['Email.CommentMention'] = Gdn::Translate('Notify me when people mention me in comments.');
    }
+	
+	/**
+	 * Add the discussion search to the search.
+	 * @param SearchController $Sender
+	 */
+	public function SearchController_Search_Handler($Sender) {
+		include_once(dirname(__FILE__).DS.'..'.DS.'models'.DS.'class.vanillasearchmodel.php');
+		$SearchModel = new Gdn_VanillaSearchModel();
+		$SearchModel->Search($Sender->SearchModel);
+	}
    
    // Load some information into the BuzzData collection
    public function SettingsController_DashboardData_Handler(&$Sender) {

@@ -10,8 +10,12 @@
 #CssThemes .ColorPicker {
 	border: 2px solid #E2E6EF;
 	cursor: pointer;
-	height: 30px;
-	width: 50px;
+	/*height: 30px;*/
+	/*width: 50px;*/
+	display: block;
+	float: left;
+	margin: 5px;
+	padding: 5px;
 }
 
 #CssThemes .ColorRow input.InputBox {

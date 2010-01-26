@@ -34,7 +34,7 @@ $Construct->Table('Discussion')
    ->Column('UpdateUserID', 'int')
    ->Column('FirstCommentID', 'int', TRUE, 'key')
    ->Column('LastCommentID', 'int', TRUE, 'key')
-   ->Column('Name', 'varchar(100)')
+   ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
    ->Column('CountComments', 'int', '1')
    ->Column('Closed', array('1', '0'), '0')
    ->Column('Announce', array('1', '0'), '0')
@@ -62,7 +62,7 @@ $Construct->Table('Comment')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DeleteUserID', 'int', TRUE)
-   ->Column('Body', 'text')
+   ->Column('Body', 'text', FALSE, 'fulltext')
    ->Column('Format', 'varchar(20)', TRUE)
    ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('DateDeleted', 'datetime', TRUE)
@@ -199,10 +199,3 @@ if ($Drop) {
    // Make sure that User.Permissions is blank so new permissions for users get applied.
    $SQL->Update('User', array('Permissions' => ''))->Put();
 }
-
-// Add the search types for Vanilla.
-$Gdn_Search = Gdn::Factory('SearchModel');
-if(!is_null($Gdn_Search)) {
-   $Gdn_Search->AddTableType('Comment', 'Category');
-}
-unset($Gdn_Search);

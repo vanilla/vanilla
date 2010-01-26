@@ -1,6 +1,3 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php printf(Gdn::Translate("Search results for '%s'"), $this->SearchTerm); ?></h1>
-<?php echo $this->Pager->ToString('less'); ?>
 <ul class="DataList SearchResults">
 <?php
 if ($this->SearchResults->NumRows() > 0) {
@@ -10,7 +7,7 @@ if ($this->SearchResults->NumRows() > 0) {
 		<ul>
 			<li class="Title">
 				<strong><?php echo Anchor(Format::Text($Row->Title), $Row->Url); ?></strong>
-				<?php echo Anchor(Format::Text($Row->Summary), $Row->Url); ?>
+				<?php echo Anchor(Format::Text(SliceString($Row->Summary, 250)), $Row->Url); ?>
 			</li>
 			<li class="Meta">
 				<span><?php printf(Gdn::Translate('Comment by %s'), UserAnchor($Row)); ?></span>
@@ -26,4 +23,5 @@ if ($this->SearchResults->NumRows() > 0) {
 	<li><?php echo Gdn::Translate("Your search returned no results."); ?></li>
 <?php
 }
-$this->Pager->Render();
+?>
+</ul>

@@ -41,7 +41,8 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 	 *
 	 * @var string
 	 */
-	const RegEx = '/(#[0-9a-fA-F]{3,6})(\s*\/\*\s*)([^\*]*?)(\s*\*\/)/';	
+	const RegEx = '/(#[0-9a-fA-F]{3,6})(\s*\/\*\s*)([^\*]*?)(\s*\*\/)/';
+	const RegEx2 = '/#([0-9a-fA-F]{3,6})/';
 	const UrlRegEx = '/(url\s*\([\'"]?)([\w\.]+?)(\.\w+)([\'"]?\s*\)\s*)(\/\*\s*NoFollow\s*\*\/\s*)?/';
 	
 	/// Properties ///
@@ -200,6 +201,120 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
 		$Menu->AddLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
+	}
+	
+	public function PluginController_Colors_Create($Sender) {
+		$Sender->Form = Gdn::Factory('Form');
+		
+		$this->Colors = array();
+		
+		$this->ParseCss(PATH_APPLICATIONS);
+		//$this->ParseCss(PATH_THEMES);
+		
+		asort($this->Colors);
+		$Sender->Colors = $this->Colors;
+		
+		// Add the javascript & css.
+		//$Sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
+		//$Sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
+		$Sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
+		$Sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
+		
+		$Sender->View = dirname(__FILE__).DS.'views'.DS.'colors.php';
+		$Sender->Render();
+	}
+	
+	public function ParseCss($Path) {
+		// Look for all of the css files in the path.
+		$CssPaths = glob($Path.DS.'*.css');
+		if($CssPaths) {
+			foreach($CssPaths as $CssPath) {
+				//echo $CssPath, "<br />\n";
+				$Css = file_get_contents($CssPath);
+				// Process the urls.
+				//$Css = preg_replace_callback(self::UrlRegEx, array($this, '_ApplyUrl'), $Css);
+		
+				// Go through the css and replace its colors with the theme colors.
+				$Css = preg_replace_callback(self::RegEx2, array($this, 'GetColors'), $Css);
+		
+			}
+		}
+		
+		// Look for all of the subdirectories.
+		$Paths = glob($Path.DS.'*', GLOB_ONLYDIR);
+		if($Paths) {
+			foreach($Paths as $Path) {
+				if(in_array(strrchr($Path, DS), array(DS.'vforg', DS.'vfcom')))
+					continue;
+				$this->ParseCss($Path);
+			}
+		}
+	}
+	
+	public function RGB($Color) {
+		return array(hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2)));
+	}
+	
+	public function GetColors($Match) {
+		$Color = strtolower($Match[1]);
+		if(strlen($Color) == 3)
+			$Color = str_repeat(substr($Color, 0, 1), 2).str_repeat(substr($Color, 1, 1), 2).str_repeat(substr($Color, 2, 1), 2);
+		
+		list($H, $S, $V) = $this->RGB2HSB(hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2)));
+		
+		if($S < .2) {
+			$S = 0;
+			$H = 1000;
+		}
+		$H2 = $H / 72.0;
+		
+		$HSV = sprintf('%04d,%04d,%04d', round($H2), $V * 1000, $S * 1000);
+		
+		$this->Colors[$Color] = $HSV;
+		
+		return implode($Match);
+	}
+	
+	function RGB2HSB($R, $G = NULL, $B = NULL) {
+		if(is_null($G)) {
+			list($R, $G, $B) = (array)$R;
+		}
+		
+		$R /= 255;
+		$G /= 255;
+		$B /= 255;
+		
+		$H = $S = $V = 0;
+		$Min = min($R, $G, $B);
+		$Max = max($R, $G, $B);
+		
+		$V = $Max;
+		if($V == 0)
+			return array(1000, $S, $V);
+		
+		$R /= $V;
+		$G /= $V;
+		$B /= $V;
+		$Min = min($R, $G, $B);
+		$Max = max($R, $G, $B);
+		
+		$S = $Max - $Min;
+		if($S == 0)
+			return array(1000, $S, $V);
+			
+		$R = ($R - $Min) / ($Max - $Min);
+		$G = ($G - $Min) / ($Max - $Min);
+		$B = ($B - $Min) / ($Max - $Min);
+			
+		if($Max == $R) {
+			$H = 60 * ($G - $B);
+			if($H < 0) $H += 360;
+		} elseif($Max == $G)
+			$H = 120 + 60 * ($B - $R);
+		else
+			$H = 240 + 60 * ($R - $G);
+		
+		return array($H, $S, $V);
 	}
 	
 	/**

@@ -38,7 +38,7 @@ class SearchController extends Gdn_Controller {
       parent::Initialize();
    }
 
-   public $Uses = array('Database', 'Gdn_SearchModel');
+   public $Uses = array('Database', 'SearchModel');
 	
 	public $Form;
 	
@@ -51,10 +51,14 @@ class SearchController extends Gdn_Controller {
 			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
 		
 		$Search = $this->Form->GetFormValue('Search');
+		$this->FireEvent('Search');
 		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Format::Text($Search), TRUE);
-		$NumResults = $ResultSet->NumRows();
+		if($ResultSet)
+			$NumResults = $ResultSet->NumRows();
+		else
+			$NumResults = 0;
 		if ($NumResults == $Offset + $Limit)
 			$NumResults++;
 		
@@ -72,7 +76,12 @@ class SearchController extends Gdn_Controller {
 		);
 		$this->SetData('Pager', $Pager, TRUE);
 		
-		$this->View = 'results';
+		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+         $this->SetJson('LessRow', $this->Pager->ToString('less'));
+         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+         $this->View = 'results';
+      }
+		
 		$this->Render();
 	}
 }

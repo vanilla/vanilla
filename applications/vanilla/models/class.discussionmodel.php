@@ -9,7 +9,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    }
    
    public function DiscussionQuery() {
-      $Perms = $this->_GetCategoryPermissions();
+      $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
       }
@@ -39,7 +39,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    }
    
    public function DiscussionSummaryQuery() {
-      $Perms = $this->_GetCategoryPermissions();
+      $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
       }
@@ -89,14 +89,14 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
-         } else {
+      } else {
             $this->SQL
                ->Select('0', '', 'WatchUserID')
                ->Select('now()', '', 'DateLastViewed')
                ->Select('0', '', 'Dismissed')
                ->Select('0', '', 'Bookmarked')
                ->Select('0', '', 'CountCommentWatch');
-         }
+      }
       
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -145,7 +145,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    
    protected $_CategoryPermissions = NULL;
    
-   protected function _GetCategoryPermissions() {
+   public function CategoryPermissions($Escape = FALSE) {
       if(is_null($this->_CategoryPermissions)) {
          $Session = Gdn::Session();
          
@@ -161,7 +161,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             $Data = $Data->ResultArray();
             $this->_CategoryPermissions = array();
             foreach($Data as $Row) {
-               $this->_CategoryPermissions[] = $Row['CategoryID'];
+               $this->_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
             }
          }
       }
@@ -175,7 +175,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       if (is_array($Wheres) && count($Wheres) == 0)
          $Wheres = '';
          
-      $Perms = $this->_GetCategoryPermissions();
+      $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);
       }
@@ -502,16 +502,6 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    }
    
    public function Delete($DiscussionID) {
-      $Search = Gdn::Factory('SearchModel');
-      if(!is_null($Search)) {
-         // Get a list of all of the comments in the discussion first.
-         $Data = $this->SQL->Select('CommentID')->From('Comment')->Where('DiscussionID', $DiscussionID)->Get();
-         
-         // Delete the search for each comment.
-         foreach($Data as $Row) {
-            $Search->Delete(array('TableName' => 'Comment', 'PrimaryID' => $Row->CommentID));
-         }
-      }
       $Data = $this->SQL
          ->Select('CategoryID')
          ->From('Discussion')

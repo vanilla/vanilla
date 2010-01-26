@@ -159,7 +159,7 @@ abstract class Gdn_DatabaseStructure {
          $Default = $NullDefault;
       }
       
-      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', FALSE)))
+      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
          $KeyType = FALSE;
 
       $Column = $this->_CreateColumn($Name, $Type, $Null, $Default, $KeyType);

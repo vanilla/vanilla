@@ -290,7 +290,7 @@ abstract class Gdn_SQLDriver {
       
       // Check for a straight literal field expression.
       if(!$EscapeFieldSql && !$EscapeValueSql && is_null($Value))
-         return $Field; // warning: might not be portable across different drivers
+         return substr($Field, 1); // warning: might not be portable across different drivers
       
       $Expr = ''; // final expression which is built up
       $Op = ''; // logical operator
@@ -748,8 +748,12 @@ abstract class Gdn_SQLDriver {
             $Alias = $Field;
 
          // if (in_array(strtolower($Function), array('max', 'min', 'avg', 'sum', 'count')))
-         if ($Function != '')
-            $Field = $Function.'('.$Field.')';
+         if ($Function != '') {
+				if(strpos($Function, '%s') !== FALSE)
+					$Field = sprintf($Function, $Field);
+				else
+					$Field = $Function.'('.$Field.')';
+			}
 
          if ($CaseOptions !== FALSE)
             $Field = 'case ' . $Field . $CaseOptions . ' end';

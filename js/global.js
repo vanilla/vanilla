@@ -226,5 +226,12 @@ jQuery(document).ready(function($) {
    $('input.SpinOnClick').live('click', function() {
       $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
-
+   
+   // Confirmation for item removals
+   $('a.RemoveItem').click(function() {
+      if (!confirm('Are you sure you would like to remove this item?')) {
+         return false;
+      }
+   });
+   
 });

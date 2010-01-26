@@ -375,7 +375,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Check for a match
             if (preg_match('#^'.$Route.'$#', $this->Request)) {
                // Do we have a back-reference?
-               if (strpos($Destination, '$') !== FALSE && strpos($this->Request, '(') !== FALSE)
+               if (strpos($Destination, '$') !== FALSE && strpos($Route, '(') !== FALSE)
                   $Destination = preg_replace('#^'.$Route.'$#', $Destination, $this->Request);
 
                $this->Request = $Destination;

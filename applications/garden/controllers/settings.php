@@ -500,7 +500,7 @@ class SettingsController extends GardenController {
       Redirect('settings/themes');
    }
    
-   public function Remove($Type, $Name, $TransientKey = '') {
+   public function RemoveAddon($Type, $Name, $TransientKey = '') {
       switch ($Type) {
          case SettingsModule::TYPE_APPLICATION:
             $Manager = Gdn::Factory('ApplicationManager');

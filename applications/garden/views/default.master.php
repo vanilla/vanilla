@@ -20,9 +20,9 @@
 							$Name = $Session->User->Name;
 							$CountNotifications = $Session->User->CountNotifications;
 							if (is_numeric($CountNotifications) && $CountNotifications > 0)
-								$Name .= '</a><a href="/profile/notifications"><span>'.$CountNotifications.'</span>';
+								$Name .= '<span>'.$CountNotifications.'</span>';
 								
-							$this->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'));
+							$this->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'), array('class' => 'UserNotifications'));
 							$this->Menu->AddLink('SignOut', Gdn::Translate('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab SignOut'));
 						} else {
 							$this->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab'), array('class' => 'SignInPopup'));

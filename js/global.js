@@ -45,6 +45,12 @@ jQuery(document).ready(function($) {
          showDelay: 0,
          hideDelay: 0
       });
+      
+   // Go to notifications if clicking on a user's notification count
+   $('li.UserNotifications a span').click(function() {
+      document.location = combinePaths(definition('WebRoot', ''), '/profile/notifications');
+      return false;
+   });
    
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the

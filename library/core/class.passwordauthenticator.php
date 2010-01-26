@@ -47,6 +47,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentica
     */
    private $_PermissionModel = null;
    
+   /**
+    * @var Protocol The protocol for authentication urls should either be http or https
+    */
+   private $_Protocol = 'http';
    
    public function __construct() {
       $this->_Identity = Gdn::Factory('Identity');
@@ -179,16 +183,36 @@ class Gdn_PasswordAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentica
 		$this->_Identity->SetIdentity($Value, $Persist);
 	}
    
+   /**
+    * Allows the setting of the authentication protocol method.
+    */
+   public function Protocol($Value) {
+      if (in_array($Value, array('http', 'https')))
+         $this->_Protocol = $Value;
+   }   
+   
    public function RegisterUrl($Redirect = '/') {
-      return sprintf('/entry/register?Target=%s', $Redirect);
+      $Return = sprintf('/entry/register?Target=%s', $Redirect);
+      if ($this->_Protocol == 'https')
+         $Return = str_replace('http:', 'https:', Url($Return, TRUE));
+         
+      return $Return;
 	}
    
    public function SignInUrl($Redirect = '/') {
-      return sprintf('/entry/?Target=%s', $Redirect);
+      $Return = sprintf('/entry/?Target=%s', $Redirect);
+      if ($this->_Protocol == 'https')
+         $Return = str_replace('http:', 'https:', Url($Return, TRUE));
+         
+      return $Return;
    }
 
    public function SignOutUrl() {
-      return '/entry/leave/{Session_TransientKey}';
+      $Return = '/entry/leave/{Session_TransientKey}';
+      if ($this->_Protocol == 'https')
+         $Return = str_replace('http:', 'https:', Url($Return, TRUE));
+         
+      return $Return;
    }
 
 }

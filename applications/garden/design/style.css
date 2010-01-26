@@ -514,7 +514,6 @@ body #Head h1 {
 #Menu a {
    border: 0;
    text-decoration: none;
-   display: block;
    position: relative;
    padding: 0 7px;
    white-space: nowrap;

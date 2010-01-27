@@ -193,7 +193,7 @@ class Gdn_SearchModel extends Gdn_Model {
 		} else {
 			$All = FALSE;
 		}
-		
+		$this->EventArguments['Search'] = $Search; // Do this before FilterKeywords because $Search is passed by reference.
 		$Keywords = $this->FilterKeywords($Search);
 		
 		// Grab the keyword IDs first.
@@ -246,7 +246,6 @@ class Gdn_SearchModel extends Gdn_Model {
 			$this->SQL->WhereIn('kd.KeywordID', $KeywordIDs);
 		}
 		
-		$this->EventArguments['Search'] = $Search;
 		$this->EventArguments['Keywords'] = $Keywords;
 		$this->EventArguments['KeywordIDs'] = $KeywordIDs;
 		$this->FireEvent('AfterBuildSearchQuery');

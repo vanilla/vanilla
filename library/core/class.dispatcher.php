@@ -368,7 +368,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Check for wild-cards
             $Route = str_replace(
                array(':alphanum', ':num'),
-               array('.+', '[0-9]+'),
+               array('([0-9a-zA-Z-_]+)', '([0-9]+)'),
                $Route
             );
 

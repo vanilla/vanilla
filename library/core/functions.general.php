@@ -554,6 +554,24 @@ if (!function_exists('Now')) {
    }
 }
 
+if (!function_exists('ObjectValue')) {
+   /**
+    * Similar to ArrayValue, except it returns the value associated with
+    * $Property in $Object or FALSE if not found. 
+    *
+    * @param string The property to look for in $Object.
+    * @param object The object in which to search for $Property.
+    * @param string The default value to return if the requested property is not found. Default is FALSE.
+    */
+   function ObjectValue($Property, $Object, $Default = FALSE) {
+      $Return = $Default;
+      if (is_object($Object) === TRUE && property_exists($Object, $Property) === TRUE) {
+         $Return = $Object->$Property;
+      }
+      return $Return;
+   }
+}
+
 if (!function_exists('parse_ini_string')) {
    function parse_ini_string ($Ini) {
       $Lines = split("\n", $Ini);

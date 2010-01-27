@@ -337,6 +337,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             } else {
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                // Assign the new DiscussionID to the comment before saving
+               $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
                $CommentID = $CommentModel->Save($FormPostValues);
                // Assign the FirstCommentID to the discussion table
@@ -344,6 +345,12 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                   array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID),
                   array($this->PrimaryKey => $DiscussionID)
                );
+               
+               $this->EventArguments['FormPostValues'] = $FormPostValues;
+               $this->EventArguments['InsertFields'] = $Fields;
+               $this->EventArguments['DiscussionID'] = $DiscussionID;
+               $this->FireEvent('AfterSaveDiscussion');
+               
                // Notify users of mentions
                $DiscussionName = ArrayValue('Name', $Fields, '');
                $Usernames = GetMentions($DiscussionName);

@@ -246,6 +246,11 @@ class Gdn_SearchModel extends Gdn_Model {
 			$this->SQL->WhereIn('kd.KeywordID', $KeywordIDs);
 		}
 		
+		$this->EventArguments['Search'] = $Search;
+		$this->EventArguments['Keywords'] = $Keywords;
+		$this->EventArguments['KeywordIDs'] = $KeywordIDs;
+		$this->FireEvent('AfterBuildSearchQuery');
+		
 		$Result = $this->SQL->Get();
 		$Result->DefaultDatasetType = DATASET_TYPE_ARRAY;
 		return $Result;

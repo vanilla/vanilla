@@ -174,6 +174,8 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
                $this->EventArguments['CommentID'] = $CommentID;
+               // IsNewDiscussion is passed when the first comment for new discussions are created.
+               $this->EventArguments['IsNewDiscussion'] = ArrayValue('IsNewDiscussion', $FormPostValues);
                $this->FireEvent('AfterSaveComment');
                
                // Notify any users who were mentioned in the comment

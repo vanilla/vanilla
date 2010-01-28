@@ -368,14 +368,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Check for wild-cards
             $Route = str_replace(
                array(':alphanum', ':num'),
-               array('.+', '[0-9]+'),
+               array('([0-9a-zA-Z-_]+)', '([0-9]+)'),
                $Route
             );
 
             // Check for a match
             if (preg_match('#^'.$Route.'$#', $this->Request)) {
                // Do we have a back-reference?
-               if (strpos($Destination, '$') !== FALSE && strpos($this->Request, '(') !== FALSE)
+               if (strpos($Destination, '$') !== FALSE && strpos($Route, '(') !== FALSE)
                   $Destination = preg_replace('#^'.$Route.'$#', $Destination, $this->Request);
 
                $this->Request = $Destination;

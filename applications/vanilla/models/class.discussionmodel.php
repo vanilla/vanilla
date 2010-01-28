@@ -337,6 +337,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             } else {
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                // Assign the new DiscussionID to the comment before saving
+               $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
                $CommentID = $CommentModel->Save($FormPostValues);
                // Assign the FirstCommentID to the discussion table
@@ -344,6 +345,12 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                   array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID),
                   array($this->PrimaryKey => $DiscussionID)
                );
+               
+               $this->EventArguments['FormPostValues'] = $FormPostValues;
+               $this->EventArguments['InsertFields'] = $Fields;
+               $this->EventArguments['DiscussionID'] = $DiscussionID;
+               $this->FireEvent('AfterSaveDiscussion');
+               
                // Notify users of mentions
                $DiscussionName = ArrayValue('Name', $Fields, '');
                $Usernames = GetMentions($DiscussionName);
@@ -503,19 +510,36 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
    
    public function Delete($DiscussionID) {
       $Data = $this->SQL
-         ->Select('CategoryID')
+         ->Select('CategoryID,InsertUserID')
          ->From('Discussion')
          ->Where('DiscussionID', $DiscussionID)
          ->Get();
       
+      $UserID = FALSE;
       $CategoryID = FALSE;
-      if ($Data->NumRows() > 0)
+      if ($Data->NumRows() > 0) {
+         $UserID = $Data->FirstRow()->InsertUserID;
          $CategoryID = $Data->FirstRow()->CategoryID;
+      }
       
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
+      
+      // Get the user's discussion count
+      $Data = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get();
+      
+      // Save the count to the user table
+      $this->SQL
+         ->Update('User')
+         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
+         ->Where('UserID', $UserID)
+         ->Put();      
       
       return TRUE;
    }

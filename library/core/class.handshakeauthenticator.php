@@ -206,6 +206,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
       $this->_Identity->SetIdentity($Value, $Persist);
    }
    
+   public function Protocol($Value) {
+      // Does nothing. Protocol for authentication is decided by the customized urls.
+   }
+   
    public function SignInUrl($Redirect = '/') {
       return '/entry/handshake/?Target='.urlencode($Redirect);
    }

@@ -18,6 +18,19 @@ class Gdn_UserModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('User');
    }
+   
+   /**
+    * A convenience method to be called when inserting users (because users
+    * are inserted in various methods depending on registration setups).
+    */
+   protected function _Insert($Fields) {
+      $UserID = $this->SQL->Insert($this->Name, $Fields);
+      // Fire an event for user inserts
+      $this->EventArguments['InsertUserID'] = $UserID;
+      $this->EventArguments['InsertFields'] = $Fields;
+      $this->FireEvent('AfterInsertUser');
+      return $UserID;
+   }
 
    public function UserQuery() {
       $this->SQL->Select('u.*')
@@ -277,7 +290,7 @@ class Gdn_UserModel extends Gdn_Model {
                $Fields['Email'] = $Email;
    
                // And insert the new user
-               $UserID = $this->SQL->Insert($this->Name, $Fields);
+               $UserID = $this->_Insert($Fields);
    
                // Make sure that the user is assigned to one or more roles:
                $SaveRoles = TRUE;
@@ -343,7 +356,7 @@ class Gdn_UserModel extends Gdn_Model {
             $this->SQL->Put($this->Name, $Fields);
          } else {
             // Insert the new user
-            $UserID = $this->SQL->Insert($this->Name, $Fields);
+            $UserID = $this->_Insert($Fields);
             AddActivity(
                $UserID,
                'Join',
@@ -532,7 +545,7 @@ class Gdn_UserModel extends Gdn_Model {
             $Fields['InviteUserID'] = $InviteUserID;
 
          // And insert the new user
-         $UserID = $this->SQL->Insert($this->Name, $Fields);
+         $UserID = $this->_Insert($Fields);
 
          // Associate the new user id with the invitation (so it cannot be used again)
          $this->SQL
@@ -568,7 +581,6 @@ class Gdn_UserModel extends Gdn_Model {
       // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Email', 'Email');
 
-      // TODO: DO I NEED THIS?!?!
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
@@ -590,7 +602,7 @@ class Gdn_UserModel extends Gdn_Model {
          $Fields['Email'] = $Email;
 
          // And insert the new user
-         $UserID = $this->SQL->Insert($this->Name, $Fields);
+         $UserID = $this->_Insert($Fields);
 
          // Now update the role for this user
          $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 4));
@@ -645,7 +657,7 @@ class Gdn_UserModel extends Gdn_Model {
          $Fields['Email'] = $Email;
 
          // And insert the new user
-         $UserID = $this->SQL->Insert($this->Name, $Fields);
+         $UserID = $this->_Insert($Fields);
 
          AddActivity(
             $UserID,
@@ -1181,7 +1193,7 @@ class Gdn_UserModel extends Gdn_Model {
             
          // Insert the new user.
          $this->AddInsertFields($UserData);
-         $UserID = $this->SQL->Insert($this->Name, $UserData);
+         $UserID = $this->_Insert($UserData);
 
          if($UserID) {
             // Save the roles.

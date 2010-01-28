@@ -54,6 +54,11 @@ interface Gdn_IAuthenticator {
    public function SetIdentity($UserID, $Persist = FALSE);
    
    /**
+    * Sets the protocol for authentication (http or https).
+    */
+   public function Protocol($Value);
+   
+   /**
     * Returns the url used to register for an account in the application.
     */
    public function RegisterUrl($Redirect = '/');

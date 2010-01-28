@@ -31,8 +31,7 @@ class SettingsController extends GardenController {
 
       $this->AddJsFile('applications.js');
       $this->Title(Translate('Applications'));
-         
-      $Session = Gdn::Session();
+      
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
       
       $ApplicationManager = new Gdn_ApplicationManager();
@@ -506,5 +505,32 @@ class SettingsController extends GardenController {
       $UserModel = Gdn::UserModel();
       $UserModel->SavePreference($Session->UserID, array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
       Redirect('settings/themes');
+   }
+   
+   public function RemoveAddon($Type, $Name, $TransientKey = '') {
+      switch ($Type) {
+         case SettingsModule::TYPE_APPLICATION:
+            $Manager = Gdn::Factory('ApplicationManager');
+            $Enabled = 'EnabledApplications';
+            $Remove  = 'RemoveApplication';
+         break;
+         case SettingsModule::TYPE_PLUGIN:
+            $Manager = Gdn::Factory('PluginManager');
+            $Enabled = 'EnabledPlugins';
+            $Remove  = 'RemovePlugin';
+         break;
+      }
+      
+      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         try {
+            if (array_key_exists($Name, $Manager->$Enabled) === FALSE) {
+               $Manager->$Remove($Name);
+            }
+         } catch (Exception $e) {
+            $this->Form->AddError(strip_tags($e->getMessage()));
+         }
+      }
+      if ($this->Form->ErrorCount() == 0)
+         Redirect('/settings/plugins');
    }
 }

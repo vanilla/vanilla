@@ -54,6 +54,8 @@ class Gdn_Database {
       if($this->_Connection === FALSE) {
          try {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
+	    if($this->ConnectionOptions[1002]);
+		$this->Query($this->ConnectionOptions[1002]);
          } catch (Exception $ex) {
             trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
          }

@@ -427,16 +427,30 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function DefinitionList() {
       $Session = Gdn::Session();
+      if (!array_key_exists('TransportError', $this->_Definitions))
+         $this->_Definitions['TransportError'] = Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+
+      if (!array_key_exists('TransientKey', $this->_Definitions))
+         $this->_Definitions['TransientKey'] = $Session->TransientKey();
+
+      if (!array_key_exists('WebRoot', $this->_Definitions))
+         $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
+
+      if (!array_key_exists('ConfirmHeading', $this->_Definitions))
+         $this->_Definitions['ConfirmHeading'] = Gdn::Translate('Confirm');
+
+      if (!array_key_exists('ConfirmText', $this->_Definitions))
+         $this->_Definitions['ConfirmText'] = Gdn::Translate('Are you sure you want to do that?');
+
+      if (!array_key_exists('Okay', $this->_Definitions))
+         $this->_Definitions['Okay'] = Gdn::Translate('Okay');
+
+      if (!array_key_exists('Cancel', $this->_Definitions))
+         $this->_Definitions['Cancel'] = Gdn::Translate('Cancel');
+
       $Return = '<!-- Various definitions for Javascript //-->
-         <div id="Definitions" style="display: none;">
-            <input type="hidden" id="TransportError" value="'.Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s').'" />
-            <input type="hidden" id="TransientKey" value="'.$Session->TransientKey().'" />
-            <input type="hidden" id="WebRoot" value="'.Gdn_Url::WebRoot(TRUE).'" />
-            <input type="hidden" id="ConfirmHeading" value="'.Gdn::Translate('Confirm').'" />
-            <input type="hidden" id="ConfirmText" value="'.Gdn::Translate('Are you sure you want to do that?').'" />
-            <input type="hidden" id="Okay" value="'.Gdn::Translate('Okay').'" />
-            <input type="hidden" id="Cancel" value="'.Gdn::Translate('Cancel').'" />
-         ';
+<div id="Definitions" style="display: none;">
+';
 
       foreach ($this->_Definitions as $Term => $Definition) {
          $Return .= '<input type="hidden" id="'.$Term.'" value="'.$Definition.'" />'."\n";

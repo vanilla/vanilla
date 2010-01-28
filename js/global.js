@@ -45,6 +45,12 @@ jQuery(document).ready(function($) {
          showDelay: 0,
          hideDelay: 0
       });
+      
+   // Go to notifications if clicking on a user's notification count
+   $('li.UserNotifications a span').click(function() {
+      document.location = combinePaths(definition('WebRoot', ''), '/profile/notifications');
+      return false;
+   });
    
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
@@ -123,7 +129,7 @@ jQuery(document).ready(function($) {
    $('span.Email').livequery(function() {
       var html = $(this).html();
       var email = this;
-      email = $(email).html().replace('<em>dot</em>', '.').replace('<strong>at</strong>', '@');
+      email = $(email).html().replace(/<em>dot<\/em>/g, '.').replace(/<strong>at<\/strong>/g, '@');
       $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 
@@ -226,5 +232,12 @@ jQuery(document).ready(function($) {
    $('input.SpinOnClick').live('click', function() {
       $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
-
+   
+   // Confirmation for item removals
+   $('a.RemoveItem').click(function() {
+      if (!confirm('Are you sure you would like to remove this item?')) {
+         return false;
+      }
+   });
+   
 });

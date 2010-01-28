@@ -170,11 +170,8 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
                      $Attributes = ArrayValue('Attributes', $Link, array());
                      $AnchorAttributes = ArrayValue('AnchorAttributes', $Link, array());
                      if ($Url !== FALSE) {
-                        $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);
-                        if (substr($Url, 0, 5) != 'http:') {
-                           $Url = Url($Url);
-                           $CurrentLink = $Url == Url($HighlightRoute);
-                        }
+                        $Url = Url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
+                        $CurrentLink = $Url == Url($HighlightRoute);
                         
                         $CssClass = ArrayValue('class', $Attributes, '');
                         if ($CurrentLink)

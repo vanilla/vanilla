@@ -58,6 +58,9 @@ class Gdn_SearchModel extends Gdn_Model {
 			->GetSelect();
 		$Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
 		
+		$this->EventArguments['Search'] = $Search;
+		$this->FireEvent('AfterBuildSearchQuery');
+		
 		$Result = $this->SQL->Query($Sql);
 		return $Result;
 	}

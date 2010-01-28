@@ -1464,6 +1464,9 @@ div.Popup div.Body {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border: 8px solid #555;
+	box-shadow: 0px 0px 10px #333;
+	-moz-box-shadow: 0px 0px 10px #333;
+	-webkit-box-shadow: 0px 0px 10px #333;  
 }
 div.Popup div.Body div.Body {
    border: 0;

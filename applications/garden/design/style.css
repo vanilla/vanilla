@@ -100,9 +100,9 @@ input.DateBox,
 input.InputBox,
 input.SmallInput,
 textarea {
-   font-family: arial;
-   color: #555;
-   font-size: 16px;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   color: #333;
+   font-size: 15px;
    padding: 3px;
    margin: 0;
    width: 250px;
@@ -121,7 +121,6 @@ textarea.TextBox {
 }
 input.SmallInput,
 input.InputBox {
-   font-size: 15px;
    padding: 6px 3px;
 }
 input.SmallInput:focus,
@@ -1536,6 +1535,15 @@ div.Popup form ul li label {
 	font-size:14px;
 	font-weight:bold;
 	margin: 10px 0 0;
+}
+body.Entry form ul li.Gender label.RadioLabel,
+body.Profile #Form_User ul li.Gender label.RadioLabel,
+div.Popup form ul li.Gender label.RadioLabel {
+	display: inline;
+	padding-right: 20px;
+}
+li.Gender {
+	margin-bottom: 10px;
 }
 body.Profile #Form_User ul li label.RadioLabel,
 body.Profile #Form_User ul li label.CheckBoxLabel,

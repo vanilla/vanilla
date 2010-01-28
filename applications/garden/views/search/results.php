@@ -18,10 +18,6 @@ if (method_exists($this->SearchResults, 'NumRows') && $this->SearchResults->NumR
 	</li>
 <?php
 	}
-} else {
-?>
-	<li><?php echo Gdn::Translate("Your search returned no results."); ?></li>
-<?php
 }
 ?>
 </ul>

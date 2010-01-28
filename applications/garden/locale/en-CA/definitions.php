@@ -51,7 +51,6 @@ $Definition['PageDetailsMessage'] = '%1$s to %2$s';
 $Definition['RoleID'] = 'role';
 $Definition['Garden.Registration.DefaultRoles'] = 'default role';
 
-$Definition['DateOfBirth'] = 'Birth date';
 $Definition['RoleID'] = 'role';
 
 $Definition['EmailInvitation'] = 'Hello!

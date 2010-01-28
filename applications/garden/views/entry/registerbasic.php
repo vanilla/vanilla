@@ -36,16 +36,10 @@
             echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.Translate("Passwords don't match").'</span>';
          ?>
       </li>
-      <li>
+      <li class="Gender">
          <?php
             echo $this->Form->Label('Gender', 'Gender');
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
-         ?>
-      </li>
-      <li>
-         <?php
-            echo $this->Form->Label('Birth Date', 'DateOfBirth', array('class' => 'BirthDate'));
-            echo $this->Form->Date('DateOfBirth');
          ?>
       </li>
       <li>

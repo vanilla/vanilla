@@ -9,11 +9,13 @@
 		$Form->Close();
 ?></div>
 
-<h1><?php printf(Gdn::Translate("Search results for '%s'"), $this->SearchTerm); ?></h1>
+<h1><?php
+   printf(Gdn::Translate($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
+?></h1>
 <?php
-echo $this->Pager->ToString('less');
-
-$ViewLocation = $this->FetchViewLocation('results');
-include($ViewLocation);
-
-$this->Pager->Render();
+if ($this->SearchResults->NumRows() > 0) {
+   echo $this->Pager->ToString('less');
+   $ViewLocation = $this->FetchViewLocation('results');
+   include($ViewLocation);
+   $this->Pager->Render();
+}

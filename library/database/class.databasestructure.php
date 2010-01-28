@@ -22,6 +22,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 require_once(dirname(__FILE__).DS.'class.database.php');
 
 abstract class Gdn_DatabaseStructure {
+	/**
+	 * Whether or not to only capture the sql, rather than execute it.
+	 * When this property is true then a property called CapturedSql will be added to this class which is an array of all the Sql statements.
+	 * @var bool
+	 */
+	public $CaptureOnly = FALSE;
 
    /**
     * The name of the class that has been instantiated. Typically this will be
@@ -210,6 +216,23 @@ abstract class Gdn_DatabaseStructure {
       
       return $this;
    }
+	
+	/**
+	 * Send a query to the database and return the result.
+	 * @param string $Sql The sql to execute.
+	 * @return bool Whethor or not the query succeeded.
+	 */
+	public function Query($Sql) {
+		if($this->CaptureOnly) {
+			if(!property_exists($this, 'CapturedSql'))
+				$this->CapturedSql = array();
+			$this->CapturedSql[] = $Sql;
+			return TRUE;
+		} else {
+			$Result = $this->Database->Query($Sql);
+			return $Result;
+		}
+	}
    
    /**
     * Renames a column in $this->Table().

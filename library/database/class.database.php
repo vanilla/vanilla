@@ -113,6 +113,23 @@ class Gdn_Database {
          $this->_InTransaction = !$this->Connection()->commit();
       }
    }
+	
+	/**
+	 * Properly quotes and escapes a expression for an sql string.
+	 * @param mixed $Expr The expression to quote.
+	 * @return string The quoted expression.
+	 */
+	public function QuoteExpression($Expr) {
+		if(is_null($Expr)) {
+			return 'NULL';
+		} elseif(is_string($Expr)) {
+			return '\''.str_replace('\'', '\\\'', $Expr).'\'';
+		} elseif(is_object($Expr)) {
+			return '?OBJECT?';
+		} else {
+			return $Expr;
+		}
+	}
    
    /**
     * Initialize the properties of this object.

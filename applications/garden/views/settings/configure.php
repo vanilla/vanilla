@@ -20,6 +20,13 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->CheckBox('Garden.RewriteUrls', "Use Garden's .htaccess file to rewrite urls");
+         
+         if(!$this->Data['HasModRewrite']) {
+            echo '<div class="Warning">',
+               Translate('Garden.NoModRewrite',
+               'The server configuration for this setting could not be found. If you enable this setting your site may become unavailable.'),
+               '</div>';
+         }
       ?>
    </li>
    <li>

@@ -32,7 +32,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * Drops $this->Table() from the database.
     */
    public function Drop() {
-      return $this->Database->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+      return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
    }
 
    /**
@@ -42,12 +42,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @return boolean
     */
    public function DropColumn($Name) {
-      if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`'))
+      if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`'))
          throw new Exception(Gdn::Translate('Failed to remove the `'.$Name.'` column from the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 
       return TRUE;
    }
-
+	
    /**
     * Renames a column in $this->Table().
     *
@@ -82,7 +82,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Rename the column
       // The syntax for renaming a column is:
       // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
-      if (!$this->Database->Query('alter table `'.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn)))
+      if (!$this->Query('alter table `'.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn)))
          throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
 
       return TRUE;
@@ -98,7 +98,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @return boolean
     */
    public function RenameTable($OldName, $NewName, $UsePrefix = FALSE) {
-      if (!$this->Database->Query('rename table `'.$OldName.'` to `'.$NewName.'`'))
+      if (!$this->Query('rename table `'.$OldName.'` to `'.$NewName.'`'))
          throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
 
       return TRUE;
@@ -119,7 +119,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $SQLString = $SQL->GetSelect();
       }
       
-      $Result = $this->Database->Query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
+      $Result = $this->Query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
       if(!is_null($SQL)) {
          $SQL->Reset();
       }
@@ -131,6 +131,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    protected function _Create() {
       $PrimaryKey = array();
       $UniqueKey = array();
+		$FullTextKey = array();
       $Keys = '';
       $Sql = '';
 
@@ -148,13 +149,18 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $Keys .= ",\nindex `".Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'unique')
             $UniqueKey[] = $ColumnName;
+			elseif ($Column->KeyType == 'fulltext')
+				$FullTextKey[] = $ColumnName;
       }
       // Build primary keys
       if (count($PrimaryKey) > 0)
          $Keys .= ",\nprimary key (`".implode('`, `', $PrimaryKey)."`)";
       // Build unique keys.
       if (count($UniqueKey) > 0)
-         $Keys .= ",\nunique index `".Format::AlphaNumeric('`UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+         $Keys .= ",\nunique index `".Format::AlphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+		// Build full text index.
+		if (count($FullTextKey) > 0)
+			$Keys .= ",\nfulltext index `".Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
 
       $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
          .$Sql
@@ -168,11 +174,81 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $Sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
       }
 
-      $Result = $this->Database->Query($Sql);
+      $Result = $this->Query($Sql);
       $this->_Reset();
       
       return $Result;
    }
+	
+	protected function _IndexSql($Columns, $KeyType = FALSE) {
+		$Result = array();
+		$Keys = array();
+		$Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
+		
+		// Gather the names of the columns.
+		foreach($Columns as $ColumnName => $Column) {
+			if(!$Column->KeyType || ($KeyType && $KeyType != $Column->KeyType))
+				continue;
+			
+			if($Column->KeyType == 'key' || $Column->KeyType == 'index') {
+				$Name = $Prefixes[$Column->KeyType].$this->_TableName.'_'.$ColumnName;
+				$Result[$Name] = $Column->KeyType." $Name (`$ColumnName`)";
+			} else {
+				// This is a multi-column key type so just collect the column name.
+				$Keys[$Column->KeyType][] = $ColumnName;
+			}
+		}
+		
+		// Make the multi-column keys into sql statements.
+		foreach($Keys as $KeyType2 => $Columns) {
+			if($KeyType2 == 'primary') {
+				$Result['PRIMARY'] = 'primary key (`'.implode('`, `', $Columns).'`)';
+			} else {
+				$Name = $Prefixes[$KeyType2].$this->_TableName;
+				$Result[$Name] = "$KeyType2 index $Name (`".implode('`, `', $Columns).'`)';
+			}
+		}
+		
+		return $Result;
+	}
+	
+	protected function _IndexSqlDb() {
+		// We don't want this to be captures so send it directly.
+		$Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
+		
+		$Result = array();	
+		foreach($Data as $Row) {
+			if(array_key_exists($Row->Key_name, $Result)) {
+				$Result[$Row->Key_name] .= ', `'.$Row->Column_name.'`';
+			} else {
+				switch(strtoupper(substr($Row->Key_name, 0, 2))) {
+					case 'PR':
+						$Type = 'primary key';
+						break;
+					case 'FK':
+						$Type = 'key '.$Row->Key_name;
+						break;
+					case 'IX':
+						$Type = 'index '.$Row->Key_name;
+						break;
+					case 'UX':
+						$Type = 'unique index '.$Row->Key_name;
+						break;
+					case 'TX':
+						$Type = 'fulltext index '.$Row->Key_name;
+						break;
+				}
+				$Result[$Row->Key_name] = $Type.' (`'.$Row->Column_name.'`';
+			}
+		}
+		
+		// Cap off the sql.
+		foreach($Result as $Name => $Sql) {
+			$Result[$Name] .= ')';
+		}
+		
+		return $Result;
+	}
 
    /**
     * Modifies $this->Table() with the columns specified with $this->Column().
@@ -196,31 +272,69 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       }
 
       // 2. Add new columns
+		$AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
 
       // array_diff returns values from the first array that aren't present in
       // the second array. In this example, all columns in $this->_Columns that
       // are NOT in the table.
       $NewColumns = array_diff(array_keys($this->_Columns), $ExistingColumns);
       foreach ($NewColumns as $Column) {
-         if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add '.$this->_DefineColumn(ArrayValue($Column, $this->_Columns))))
+         if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add '.$this->_DefineColumn(ArrayValue($Column, $this->_Columns))))
             throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 
          // Add keys if necessary
-         $Col = ArrayValue($Column, $this->_Columns);
-         if ($Col->KeyType == 'primary') {
-            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
-               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         } else if ($Col->KeyType == 'key') {
-            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         } else if ($Col->KeyType == 'index') {
-            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         } else if ($Col->KeyType == 'unique') {
-            if (!$this->Database->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         }
+//         $Col = ArrayValue($Column, $this->_Columns);
+//         if ($Col->KeyType == 'primary') {
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
+//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//         } else if ($Col->KeyType == 'key') {
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//         } else if ($Col->KeyType == 'index') {
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//         } else if ($Col->KeyType == 'unique') {
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//         } else if ($Col->KeyType == 'fulltext') {
+//				if (!$this->Query('alter table `'.$this->DatabasePrefix.$this->_TableName.'` add fulltext index `'.Format::AlphaNumeric('TX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//					throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` fulltext index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//			}
       }
+		
+		$Indexes = $this->_IndexSql($this->_Columns);
+		$IndexesDb = $this->_IndexSqlDb();
+		$IndexSql = array();
+		// Go through the indexes to add or modify.
+		foreach($Indexes as $Name => $Sql) {
+			if(array_key_exists($Name, $IndexesDb)) {
+				if($Indexes[$Name] != $IndexesDb[$Name]) {
+					if($Name == 'PRIMARY')
+						$IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+					else
+						$IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+					$IndexSql[$Name] .= $AlterSqlPrefix."add $Sql;\n";
+				}
+				unset($IndexesDb[$Name]);
+			} else {
+				$IndexSql[$Name] = $AlterSqlPrefix."add $Sql;\n";	
+			}
+		}
+		// Go through the indexes to drop.
+		if($Explicit) {
+			foreach($IndexesDb as $Name => $Sql) {
+				if($Name == 'PRIMARY')
+					$IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+				else
+					$IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+			}
+		}
+		
+		// Modify all of the indexes.
+		foreach($IndexSql as $Name => $Sql) {
+			if(!$this->Query($Sql))
+				throw new Exception(sprintf(Gdn::Translate('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
+		}
 
       $this->_Reset();
       return TRUE;

@@ -114,21 +114,6 @@ class ReplyModel extends Gdn_CommentModel {
             // Report user-comment activity
             $this->RecordActivity($ReplyCommentID, $Session->UserID, $CommentID);
          }
-         
-         // Index the comment.
-         $Search = Gdn::Factory('SearchModel');
-         if(!is_null($Search)) {
-            // Index the discussion.
-            $Document = array(
-               'TableName' => 'Comment',
-               'PrimaryID' => $CommentID,
-               'PermissionJunctionID' => $Discussion->CategoryID,
-               'Title' => $Discussion->Name,
-               'Summary' => $Fields['Body'],
-               'Url' => '/discussion/comment/'.$ReplyCommentID.'/#Comment_'.$CommentID,
-               'InsertUserID' => $Session->UserID);
-            $Search->Index($Document);
-         }
       }
       return $CommentID;
    }

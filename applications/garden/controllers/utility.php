@@ -82,7 +82,7 @@ class UtilityController extends GardenController {
          $this->Render();
    }
    
-   public function Structure($AppName = 'garden', $Drop = '0', $Explicit = '0') {
+   public function Structure($AppName = 'garden', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
       $this->Permission('Garden.AdminUser.Only');
       $File = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
       if (file_exists($File)) {
@@ -90,18 +90,34 @@ class UtilityController extends GardenController {
          $Database = Gdn::Database();
          $Drop = $Drop == '0' ? FALSE : TRUE;
          $Explicit = $Explicit == '0' ? FALSE : TRUE;
-         try {
-            include($File);
+			$CaptureOnly = !($CaptureOnly == '0');
+			
+			$Structure = Gdn::Structure();
+			$Structure->CaptureOnly = $CaptureOnly;
+			
+			$this->SetData('CaptureOnly', $Structure->CaptureOnly);
+			$this->SetData('Drop', $Drop);
+			$this->SetData('Explicit', $Explicit);
+			$this->SetData('ApplicationName', $AppName);
+			$this->SetData('Status', '');
+				
+			try {
+			   include($File);
          } catch (Exception $ex) {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
-         if ($this->Form->ErrorCount() == 0)
-            echo 'Success';
-         else
-            echo $this->Form->Errors();
+			
+			if(property_exists($Structure, 'CapturedSql'))
+				$this->SetData('CapturedSql', (array)$Structure->CapturedSql);
+			else
+				$this->SetData('CapturedSql', array());
+					
+         if ($this->Form->ErrorCount() == 0 && !$CaptureOnly)
+            $this->SetData('Status', 'The structure was successfully executed.');
       }
-      $this->ControllerName = 'home';
-      $this->View = 'filenotfound';
+      //$this->ControllerName = 'home';
+      //$this->View = 'filenotfound';
+		$this->AddCssFile('admin.css');
       $this->Render();
    }
    

@@ -134,138 +134,6 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          ->CountComments;
    }
    
-   /**
-    * Reindex comments for the search.
-    *
-    * @param int $DiscussionID Optional. A discussion ID to index the comments for.
-    */
-   public function Reindex($DiscussionID = NULL, $Max = 250, $Echo = FALSE) {
-      if(!is_null($DiscussionID))
-         $Max = 0;
-         
-      $Search = Gdn::Factory('SearchModel');
-      if(is_null($Search)) {
-         return;
-      }
-      
-      $StartTime = time(TRUE);
-      
-      if($Echo) {
-         echo 'Start Time: ', date('j M Y g:ia'), "\n";
-         
-         // Get a count of all the comments that have to be reindexed.
-         $Count = $this->SQL->GetCount('Comment', !$DiscussionID ? FALSE : array('DiscussionID' => $DiscussionID));
-         if($Max > 0 && $Count > $Max) {
-            $Count = $Max;
-         } elseif($Count == 0) {
-            $Count = 1;
-         }
-         echo 'Comments to reindex: ', number_format($Count), "\n";
-         if($Count >= 1000)
-            $Dec = 2;
-         elseif($Count > 300)
-            $Dec = 1;
-         else
-            $Dec = 0;
-      }
-      
-      // Get all of the comments to reindex.
-      $this->SQL
-         ->Select('d.DiscussionID, d.Name, d.FirstCommentID, d.CategoryID')
-         ->Select('c.CommentID, c.Body, c.InsertUserID, c.DateInserted')
-         ->Select('sd.DocumentID')
-         ->From('Discussion d')
-         ->Join('Comment c', 'c.DiscussionID = d.DiscussionID')
-         ->Join('SearchDocument sd', 'sd.PrimaryID = c.CommentID and sd.TableName = \'Comment\'', 'left');
-         
-      if(!is_null($DiscussionID)) {
-         $this->SQL->Where('d.DiscussionID', $DiscussionID);
-      }
-      if($Max > 0) {
-         $this->SQL->Where('c.Flag', '1')->Limit($Max);
-      }
-      
-      $Data = $this->SQL->Get();
-      if($Max > 0) {
-         $Data = $Data->ResultObject();
-         $CommentIDs = array();
-         foreach($Data as $Row) {
-            $CommentIDs[] = $Row->CommentID;
-         }
-         $this->SQL->Update('Comment', array('Flag' => 2))->WhereIn('CommentID', $CommentIDs)->Put();
-      } else {
-         $Data = $Data->PDOStatement();
-         $Data->setFetchMode(PDO::FETCH_OBJ);
-      }
-      
-      
-      $CurrentIndex = 0;
-      $StartIndexTime = time();
-      foreach($Data as $Row) {
-         // Only index the title with the first comment.
-         if($Row->FirstCommentID == $Row->CommentID)
-            $Keywords = $Row->Name . ' ' . $Row->Body;
-         else
-            $Keywords = $Row->Body;
-         
-         $Document = array(
-            'Title' => $Row->Name,
-            'Summary' => $Row->Body,
-            'TableName' => 'Comment',
-            'PrimaryID' => $Row->CommentID,
-            'PermissionJunctionID' => $Row->CategoryID,
-            'InsertUserID' => $Row->InsertUserID,
-            'DateInserted' => $Row->DateInserted,
-            'Url' => '/discussion/comment/'.$Row->CommentID.'/#Comment_'.$Row->CommentID,
-         );
-         
-         if($Echo)
-            echo $Document['Url'];
-         
-         if(!is_null($Row->DocumentID)) {
-            $Document['DocumentID'] = $Row->DocumentID;
-         }
-         
-         try {
-            $Search->Index($Document, $Keywords);
-            // Update the comment to show it's been indexed.
-            $this->SQL->Update('Comment', array('Flag' => 0))->Where('CommentID', $Row->CommentID)->Put();
-         } catch(Exception $Ex) {
-            echo "Exception\n";
-            $DocumentID = $this->SQL->GetWhere('SearchDocument', array('PrimaryID' => $Row->CommentID, 'TableName' => 'Comment'))->FirstRow()->DocumentID;
-            $this->SQL->Delete('SearchKeywordDocument', array('DocumentID' => $DocumentID));
-            $this->SQL->Delete('SearchDocument', array('DocumentID' => $DocumentID));
-            $this->SQL->Update('Comment', array('Flag' => 3), array('CommentID' => $Row->CommentID));
-            continue;
-         }
-         
-         if($Echo) {
-            // Calculate percent complete.
-            $Percent = $CurrentIndex / $Count;
-            // Calculate time left.
-            $Elapsed = time() - $StartIndexTime;
-            if($Percent != 0) {
-               $TotalTime = $Elapsed / $Percent;
-               $TimeLeft = $TotalTime - $Elapsed;
-            }
-            
-            echo ' (', number_format(100 * $Percent, $Dec)  , '%';
-            if(($CurrentIndex % 10) == 0 && isset($TimeLeft)) {
-               printf(', Elapsed: %s, ~Time Left: %s, Memory: %sb', Format::Timespan(time() - $StartTime), Format::Timespan($TimeLeft), number_format(memory_get_usage()));
-            }
-            echo ")\n";
-         }
-         
-         ++$CurrentIndex;
-      }
-      
-      if($Echo) {
-         echo 'Finish Time: ', date('j M Y g:ia'), "\n";
-         echo 'Total Time: ', Format::Timespan(time() - $StartTime), "\n";
-      }
-   }
-   
-   
    public function Save($FormPostValues) {
       $Session = Gdn::Session();
       
@@ -367,36 +235,6 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                   ->Put();
             }
             
-            // Index the post.
-            $Search = Gdn::Factory('SearchModel');
-            if(!is_null($Search)) {
-               if(array_key_exists('Name', $FormPostValues) && array_key_exists('CategoryID', $FormPostValues)) {
-                  $Title = $FormPostValues['Name'];
-                  $CategoryID = $FormPostValues['CategoryID'];
-               } else {
-                  // Get the name from the discussion.
-                  $Row = $this->SQL
-                     ->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))
-                     ->FirstRow();
-                  if(is_object($Row)) {
-                     $Title = $Row->Name;
-                     $CategoryID = $Row->CategoryID;
-                  }
-               }
-               
-               $Offset = $this->GetOffset($CommentID);
-               
-               // Index the discussion.
-               $Document = array(
-                  'TableName' => 'Comment',
-                  'PrimaryID' => $CommentID,
-                  'PermissionJunctionID' => $CategoryID,
-                  'Title' => $Title,
-                  'Summary' => $FormPostValues['Body'],
-                  'Url' => '/discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
-                  'InsertUserID' => $Session->UserID);
-               $Search->Index($Document, $Offset == 1 ? $Document['Title'] . ' ' . $Document['Summary'] : NULL);
-            }
             $this->UpdateUser($Session->UserID);
          }
       }
@@ -500,12 +338,6 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             $this->FireEvent('DeleteComment');
             // Delete the comment
             $this->SQL->Delete('Comment', array('CommentID' => $CommentID));
-            
-            // Delete the search.
-            $Search = Gdn::Factory('SearchModel');
-            if(!is_null($Search)) {
-               $Search->Delete(array('TableName' => 'Comment', 'PrimaryID' => $CommentID));
-            }
          }
          // Update the user's comment count
          $this->UpdateUser($Data->InsertUserID);

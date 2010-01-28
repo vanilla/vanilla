@@ -122,6 +122,13 @@ class SettingsController extends GardenController {
       $AvailableLocales = $Locale->GetAvailableLocaleSources();
       $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
       
+      // Check to see if mod_rewrit is enabled.
+      if(function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
+         $this->SetData('HasModRewrite', TRUE);
+      } else {
+         $this->SetData('HasModRewrite', FALSE);
+      }
+      
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.

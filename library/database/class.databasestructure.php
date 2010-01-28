@@ -22,6 +22,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 require_once(dirname(__FILE__).DS.'class.database.php');
 
 abstract class Gdn_DatabaseStructure {
+	/**
+	 * Whether or not to only capture the sql, rather than execute it.
+	 * When this property is true then a property called CapturedSql will be added to this class which is an array of all the Sql statements.
+	 * @var bool
+	 */
+	public $CaptureOnly = FALSE;
 
    /**
     * The name of the class that has been instantiated. Typically this will be
@@ -111,6 +117,22 @@ abstract class Gdn_DatabaseStructure {
       $Column->Unsigned = $Unsigned;
       $Column->AutoIncrement = FALSE;
       
+      // Handle enums and sets as types.
+      if(is_array($Type)) {
+         if(count($Type) === 2 && is_array(ArrayValue(1, $Type))) {
+            // The type is specified as the first element in the array.
+            $Column->Type = $Type[0];
+            $Column->Enum = $Type[1];
+         } else {
+            // This is an enum.
+            $Column->Type = 'enum';
+            $Column->Enum = $Type;
+         }
+      } else {
+         $Column->Type = $Type;
+         $Column->Enum = FALSE;
+      }
+      
       return $Column;
    }
    
@@ -119,7 +141,8 @@ abstract class Gdn_DatabaseStructure {
     *
     * @param string $Name The name of the column to create.
     * @param mixed $Type The data type of the column to be created. Types with a length speecifty the length in barackets.
-    * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+    * * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+    * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
     * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
     * * TRUE: Nulls are allowed.
     * * FALSE: Nulls are not allowed.
@@ -142,7 +165,7 @@ abstract class Gdn_DatabaseStructure {
          $Default = $NullDefault;
       }
       
-      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', FALSE)))
+      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
          $KeyType = FALSE;
 
       $Column = $this->_CreateColumn($Name, $Type, $Null, $Default, $KeyType);
@@ -193,6 +216,23 @@ abstract class Gdn_DatabaseStructure {
       
       return $this;
    }
+	
+	/**
+	 * Send a query to the database and return the result.
+	 * @param string $Sql The sql to execute.
+	 * @return bool Whethor or not the query succeeded.
+	 */
+	public function Query($Sql) {
+		if($this->CaptureOnly) {
+			if(!property_exists($this, 'CapturedSql'))
+				$this->CapturedSql = array();
+			$this->CapturedSql[] = $Sql;
+			return TRUE;
+		} else {
+			$Result = $this->Database->Query($Sql);
+			return $Result;
+		}
+	}
    
    /**
     * Renames a column in $this->Table().

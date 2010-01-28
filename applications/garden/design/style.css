@@ -1132,6 +1132,11 @@ ul.DataList li ul li.Meta a {
    color: #2b2d33;
 }
 
+.SearchBox {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
 /* ============================================================= Profile Page */
 body.Profile #Content {
    width: auto;

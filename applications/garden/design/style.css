@@ -1131,10 +1131,16 @@ ul.DataList li ul li.Meta strong {
 ul.DataList li ul li.Meta a {
    color: #2b2d33;
 }
-
-.SearchBox {
-	text-align: center;
+div.SearchBox {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #A5D0E7;
 	margin-bottom: 10px;
+	padding: 8px;
+}
+div.SearchBox input.InputBox {
+	width: 575px;
+	margin-right: 10px;
 }
 
 /* ============================================================= Profile Page */

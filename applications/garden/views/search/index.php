@@ -1,13 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="SearchBox"><?php
+<div class="Box SearchBox"><?php
 	$Form = Gdn::Factory('Form');
 	$Form->InputPrefix = '';
 	echo 
 		$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
-		'<b>', $Form->Label("Search", "Search"), '</b>',
-		$Form->TextBox('Search', array('value' => GetIncomingValue('Search'))),
-		" ",
-		$Form->Button('Go', array('Name' => '')),
+		$Form->TextBox('Search'),
+		$Form->Button('Search', array('Name' => '')),
 		$Form->Close();
 ?></div>
 

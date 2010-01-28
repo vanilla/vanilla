@@ -1,6 +1,6 @@
 <ul class="DataList SearchResults">
 <?php
-if ($this->SearchResults->NumRows() > 0) {
+if (method_exists($this->SearchResults, 'NumRows') && $this->SearchResults->NumRows() > 0) {
 	foreach ($this->SearchResults->ResultObject() as $Row) {
 ?>
 	<li class="Row">

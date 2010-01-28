@@ -931,6 +931,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
             }
          }
+         // Add the favicon
+         $this->Head->SetFavIcon(Url('/themes/'.$this->Theme.'/design/favicon.png', TRUE));
+         
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');
       }

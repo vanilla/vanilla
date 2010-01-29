@@ -267,13 +267,13 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * Returns an update statement for the specified table with the provided
     * $Data.
     *
-    * @param string $Table The name of the table to updated data in.
+    * @param array $Tables The name of the table to updated data in.
     * @param array $Data An associative array of FieldName => Value pairs that should be inserted
     * $Table.
     * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
     * to the where portion of the update statement.
     */
-   public function GetUpdate($Table, $Data, $Where) {
+   public function GetUpdate($Tables, $Data, $Where) {
       if (!is_array($Data))
          trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
 
@@ -282,7 +282,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Sets[] = $Field." = ".$Value;
       }
 
-      $sql = 'update '.$this->FormatTableName($Table);
+      $sql = 'update '.$this->_FromTables($Tables);
 
       if (count($this->_Joins) > 0) {
          $sql .= "\n";
@@ -292,9 +292,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $sql .= implode("\n", $this->_Joins);
       }
 
-      $sql .= " set \n".implode(",\n", $Sets);
+      $sql .= " set \n ".implode(",\n ", $Sets);
       if (is_array($Where) && count($Where) > 0) {
-         $sql .= "\n where ".implode(' ', $Where);
+         $sql .= "\nwhere ".implode("\n ", $Where);
 
          // Close any where groups that were left open.
          for ($i = 0; $i < $this->_OpenWhereGroupCount; ++$i) {

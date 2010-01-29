@@ -53,6 +53,7 @@ Welcome to the Admin CSS File! Some things you should know:
 	border: 1px solid #aedefc;
 	padding: 2px 4px;
 	margin: 0 0 0 6px;
+	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	vertical-align: middle;
 }
@@ -60,7 +61,17 @@ Welcome to the Admin CSS File! Some things you should know:
 	padding: 8px 0 0;
 }
 #Head div.User a {
+	color:#02475a;
+	font-family: 'lucida grande', 'Lucida Sans Unicode';
 	margin-left: 20px;
+}
+#Head div.User a span {
+	background: #c2e7fc;
+	border: 1px solid #aedefc;
+	padding: 0 4px;
+	margin: 0 0 0 6px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
 }
 
 /* ======================================================== Panels / Sidebars */

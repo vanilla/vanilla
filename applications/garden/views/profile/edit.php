@@ -22,7 +22,7 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('ShowEmail', "Allow other members to see your email?", array('value' => '1'));
       ?>
    </li>   
-   <li>
+   <li class="Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))

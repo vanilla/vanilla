@@ -46,6 +46,8 @@ class Gdn_SearchModel extends Gdn_Model {
 		// If there are no searches then return an empty array.
 		if(count($this->_SearchSql) == 0)
 			return NULL;
+		if(trim($Search) == '')
+			return NULL;
 			
 		// Perform the search by unioning all of the sql together.
 		$this->Parameter($Search);

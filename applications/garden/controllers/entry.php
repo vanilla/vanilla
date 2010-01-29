@@ -207,7 +207,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
-         $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
          if (!$this->UserModel->InsertForApproval($this->Form->FormValues()))
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -225,7 +225,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
-         $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
          if (!$this->UserModel->InsertForBasic($this->Form->FormValues())) {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -259,7 +259,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
-         $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
          if (!$this->UserModel->InsertForBasic($this->Form->FormValues())) {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -300,7 +300,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
-         $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
          if (!$this->UserModel->InsertForInvite($this->Form->FormValues())) {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());

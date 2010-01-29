@@ -15,7 +15,7 @@ if ($this->UserData->NumRows() == 0) {
 <table class="CheckColumn">
    <thead>
       <tr>
-         <td><?php echo Gdn::Translate('Approve'); ?></td>
+         <td><?php echo Gdn::Translate('Action'); ?></td>
          <th class="Alt"><?php echo Gdn::Translate('Applicant'); ?></th>
          <th><?php echo Gdn::Translate('Options'); ?></th>
       </tr>

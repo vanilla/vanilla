@@ -1,21 +1,21 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="SearchBox"><?php
+<div class="Box SearchBox"><?php
 	$Form = Gdn::Factory('Form');
 	$Form->InputPrefix = '';
 	echo 
 		$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
-		'<b>', $Form->Label("Search", "Search"), '</b>',
-		$Form->TextBox('Search', array('value' => GetIncomingValue('Search'))),
-		" ",
-		$Form->Button('Go', array('Name' => '')),
+		$Form->TextBox('Search'),
+		$Form->Button('Search', array('Name' => '')),
 		$Form->Close();
 ?></div>
 
-<h1><?php printf(Gdn::Translate("Search results for '%s'"), $this->SearchTerm); ?></h1>
+<h1><?php
+   printf(Gdn::Translate($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
+?></h1>
 <?php
-echo $this->Pager->ToString('less');
-
-$ViewLocation = $this->FetchViewLocation('results');
-include($ViewLocation);
-
-$this->Pager->Render();
+if ($this->SearchResults->NumRows() > 0) {
+   echo $this->Pager->ToString('less');
+   $ViewLocation = $this->FetchViewLocation('results');
+   include($ViewLocation);
+   $this->Pager->Render();
+}

@@ -192,7 +192,11 @@ if (!function_exists('Asset')) {
       if (substr($Destination, 0, 7) == 'http://') {
          return $Destination;
       } else {
-         return CombinePaths(array('/', Gdn_Url::WebRoot($WithDomain), $Destination), '/');
+         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
+         if (!$WithDomain)
+            array_unshift($Parts, '/');
+            
+         return CombinePaths($Parts, '/');
       }
    }
 }

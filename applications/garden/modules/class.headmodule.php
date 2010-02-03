@@ -147,7 +147,7 @@ if (!class_exists('HeadModule', FALSE)) {
                   // If no property was defined, and the tag is found, remove it.
                   unset($this->_Tags[$TagName]);
                } else {
-                  $Count = count($Tags);
+                  $Count = count($Collection);
                   for ($i = 0; $i < $Count; ++$i) {
                      if (array_key_exists($Property, $Collection[$i])
                         && ($Value == '' || $this->_Tags[$TagName][$i][$Property] == $Value)) {

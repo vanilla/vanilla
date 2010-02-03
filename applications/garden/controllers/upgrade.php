@@ -9,9 +9,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Vanilla 1 to Vanilla 2 Importer.
+ * Vanilla 1 to Vanilla 2 Upgrader.
  */
-class ImportController extends GardenController {
+class UpgradeController extends GardenController {
    
    public $Uses = array('Form');
    
@@ -23,7 +23,7 @@ class ImportController extends GardenController {
    public function Index($Step = 0) {
       $this->Permission('Garden.Data.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
       
-      $this->AddJsFile('import.js', 'vanilla');
+      $this->AddJsFile('upgrade.js', 'vanilla');
       
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
@@ -106,9 +106,9 @@ class ImportController extends GardenController {
                // Proceed with the next step
                $this->Message = Gdn::Translate('<strong>1/19</strong> Checking source & destination tables.');
                $this->View = 'index';
-               $this->RedirectUrl = Url('/import/1');
+               $this->RedirectUrl = Url('/upgrade/1');
                if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-                  Redirect('/import/1');
+                  Redirect('/upgrade/1');
             }
          } else {
             $this->Form->SetFormValue('SourcePrefix', $SourcePrefix);
@@ -121,7 +121,7 @@ class ImportController extends GardenController {
          $Construct->DatabasePrefix($DestPrefix);
          
          $this->Message = Gdn::Translate('<strong>2/19</strong> Importing roles.');
-         $this->RedirectUrl = Url('/import/2');
+         $this->RedirectUrl = Url('/upgrade/2');
       } else if ($Step == 2) {
          // 2. Move roles from old database into new one.
          $RoleModel = new Gdn_RoleModel();
@@ -142,7 +142,7 @@ class ImportController extends GardenController {
          }
          
          $this->Message = Gdn::Translate('<strong>3/19</strong> Importing users.');
-         $this->RedirectUrl = Url('/import/3');
+         $this->RedirectUrl = Url('/upgrade/3');
       } else if ($Step == 3) {
          // 3. Import users
          
@@ -176,7 +176,7 @@ class ImportController extends GardenController {
          Gdn::Authenticator()->SetIdentity($NewUserID);
 
          $this->Message = Gdn::Translate('<strong>4/19</strong> Importing role histories.');
-         $this->RedirectUrl = Url('/import/4');
+         $this->RedirectUrl = Url('/upgrade/4');
       } else if ($Step == 4) {
          // 4. Import user role relationships
          $SQL->Delete('UserRole', array('UserID <>' => 0));
@@ -188,7 +188,7 @@ class ImportController extends GardenController {
             on u.RoleID = r.ImportID");
 
          $this->Message = Gdn::Translate('<strong>5/19</strong> Importing user/role relationships.');
-         $this->RedirectUrl = Url('/import/5');
+         $this->RedirectUrl = Url('/upgrade/5');
       } else if ($Step == 5) {
          // 5. Import user role history into activity table
          $Database->Query("insert into ".$DestPrefix."Activity
@@ -200,7 +200,7 @@ class ImportController extends GardenController {
          order by rh.Date asc");
 
          $this->Message = Gdn::Translate('<strong>6/19</strong> Preparing whispers.');
-         $this->RedirectUrl = Url('/import/6');
+         $this->RedirectUrl = Url('/upgrade/6');
       } else if ($Step == 6) {
          // 6. Update the WhisperUserID on all comments that are within whispered discussions
          $Database->Query("update ".$SourcePrefix."Comment c
@@ -218,7 +218,7 @@ class ImportController extends GardenController {
            and c.AuthUserID <> d.AuthUserID");
          
          $this->Message = Gdn::Translate('<strong>7/19</strong> Creating conversations.');
-         $this->RedirectUrl = Url('/import/7');
+         $this->RedirectUrl = Url('/upgrade/7');
       } else if ($Step == 7) {
          // 7. Create conversations
          $Database->Query("insert into ".$DestPrefix."Conversation
@@ -237,7 +237,7 @@ class ImportController extends GardenController {
          where c.ConversationID > c2.ConversationID");
          
          $this->Message = Gdn::Translate('<strong>8/19</strong> Preparing conversations messages.');
-         $this->RedirectUrl = Url('/import/8');
+         $this->RedirectUrl = Url('/upgrade/8');
       } else if ($Step == 8) {
          // 8. Update old comment table with conversation ids
          $Database->Query("update ".$SourcePrefix."Comment cm
@@ -253,7 +253,7 @@ class ImportController extends GardenController {
          set cm.ConversationID = cn.ConversationID");
 
          $this->Message = Gdn::Translate('<strong>9/19</strong> Transforming whispers into conversations.');
-         $this->RedirectUrl = Url('/import/9');
+         $this->RedirectUrl = Url('/upgrade/9');
       } else if ($Step == 9) {
          // 9. Insert whispers as conversation messages
          $Database->Query("insert into ".$DestPrefix."ConversationMessage
@@ -263,7 +263,7 @@ class ImportController extends GardenController {
          where ConversationID > 0");
 
          $this->Message = Gdn::Translate('<strong>10/19</strong> Finalizing conversations.');
-         $this->RedirectUrl = Url('/import/10');
+         $this->RedirectUrl = Url('/upgrade/10');
       } else if ($Step == 10) {
          // 10. Insert the userconversation records so that messages are linked to conversations
          $Database->Query("insert into ".$DestPrefix."UserConversation
@@ -273,7 +273,7 @@ class ImportController extends GardenController {
          group by InsertUserID, ConversationID");
 
          $this->Message = Gdn::Translate('<strong>11/19</strong> Finalizing whisper messages.');
-         $this->RedirectUrl = Url('/import/11');
+         $this->RedirectUrl = Url('/upgrade/11');
       } else if ($Step == 11) {
          // 11. Update the conversation record fields
          $Database->Query("update ".$DestPrefix."Conversation c
@@ -327,7 +327,7 @@ class ImportController extends GardenController {
          set uc.CountMessages = m.CountMessages");
 
          $this->Message = Gdn::Translate('<strong>12/19</strong> Importing discussion categories.');
-         $this->RedirectUrl = Url('/import/12');
+         $this->RedirectUrl = Url('/upgrade/12');
       } else if ($Step == 12) {
          // Delete old categories.
          $SQL->Delete('Category', array('CategoryID <>' => 0));
@@ -339,7 +339,7 @@ class ImportController extends GardenController {
          from ".$SourcePrefix."Category");
 
          $this->Message = Gdn::Translate('<strong>13/19</strong> Importing discussions.');
-         $this->RedirectUrl = Url('/import/13');
+         $this->RedirectUrl = Url('/upgrade/13');
       } else if ($Step == 13) {
          // 13. Import Discussions
          //$Database->Query('alter table '.$SourcePrefix.'Discussion CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci');
@@ -353,7 +353,7 @@ class ImportController extends GardenController {
             and Active = '1'");
 
          $this->Message = Gdn::Translate('<strong>14/19</strong> Importing comments.');
-         $this->RedirectUrl = Url('/import/14');
+         $this->RedirectUrl = Url('/upgrade/14');
       } else if ($Step == 14) {
          // 14. Import Comments
          $Database->Query("insert into ".$DestPrefix."Comment
@@ -364,7 +364,7 @@ class ImportController extends GardenController {
             and Deleted = '0'");
 
          $this->Message = Gdn::Translate('<strong>15/19</strong> Finalizing discussions.');
-         $this->RedirectUrl = Url('/import/15');
+         $this->RedirectUrl = Url('/upgrade/15');
       } else if ($Step == 15) {
          // 15. Update Discussions with first & last comment ids
          $Database->Query("update ".$DestPrefix."Discussion d
@@ -396,7 +396,7 @@ class ImportController extends GardenController {
          set c.CountDiscussions = cc.CountDiscussions");
 
          $this->Message = Gdn::Translate('<strong>16/19</strong> Importing bookmarks & watch data.');
-         $this->RedirectUrl = Url('/import/16');
+         $this->RedirectUrl = Url('/upgrade/16');
       } else if ($Step == 16) {
          // 16. Import UserDiscussion (watch & bookmark data)
          $Database->Query("insert into ".$DestPrefix."UserDiscussion
@@ -411,7 +411,7 @@ class ImportController extends GardenController {
          where od.Active = '1'");
 
          $this->Message = Gdn::Translate('<strong>17/19</strong> Removing import structure.');
-         $this->RedirectUrl = Url('/import/17');
+         $this->RedirectUrl = Url('/upgrade/17');
       } else if ($Step == 17) {
          // 17. Remove temp columns
          $Construct->Table('Role')->DropColumn('ImportID');
@@ -420,7 +420,7 @@ class ImportController extends GardenController {
          $Construct->DatabasePrefix($DestPrefix);
 
          $this->Message = Gdn::Translate('<strong>18/19</strong> Restoring original comment structure.');
-         $this->RedirectUrl = Url('/import/18');
+         $this->RedirectUrl = Url('/upgrade/18');
       } else if ($Step == 18) {
          // 18. remove whisperuserids from old comment table where the entire discussion is whispered
          $Database->Query("update ".$SourcePrefix."Comment c
@@ -430,7 +430,7 @@ class ImportController extends GardenController {
          where d.WhisperUserID > 0");
 
          $this->Message = Gdn::Translate('<strong>19/19</strong> Finished.');
-         $this->RedirectUrl = Url('/import/19');
+         $this->RedirectUrl = Url('/upgrade/19');
       } else if ($Step == 19) {
          // Finished!
          $this->RedirectUrl = 'Finished';
@@ -447,7 +447,7 @@ class ImportController extends GardenController {
    public function OldIndex($Step = 0) {
       $this->Permission('Garden.Data.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
       
-      $this->AddJsFile('import.js', 'vanilla');
+      $this->AddJsFile('upgrade.js', 'vanilla');
       
       $Step = is_numeric($Step) && $Step >= 0 && $Step < 20 ? $Step : '';
       $Database = Gdn::Database();
@@ -529,9 +529,9 @@ class ImportController extends GardenController {
                // Proceed with the next step
                $this->Message = Gdn::Translate('<strong>1/19</strong> Checking source & destination tables.');
                $this->View = 'index';
-               $this->RedirectUrl = Url('/import/1');
+               $this->RedirectUrl = Url('/upgrade/1');
                if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-                  Redirect('/import/1');
+                  Redirect('/upgrade/1');
             }
          }
       } else if ($Step == 1) {
@@ -545,7 +545,7 @@ class ImportController extends GardenController {
          $Construct->DatabasePrefix($DestPrefix);
          
          $this->Message = Gdn::Translate('<strong>2/19</strong> Preparing tables for import.');
-         $this->RedirectUrl = Url('/import/2');
+         $this->RedirectUrl = Url('/upgrade/2');
       } else if ($Step == 2) {
          // 2. Move roles from old database into new one.
          $RoleModel = new Gdn_RoleModel();
@@ -566,7 +566,7 @@ class ImportController extends GardenController {
          }
          
          $this->Message = Gdn::Translate('<strong>3/19</strong> Importing roles.');
-         $this->RedirectUrl = Url('/import/3');
+         $this->RedirectUrl = Url('/upgrade/3');
       } else if ($Step == 3) {
          // 3. Import users
          $Database->Query("insert into ".$DestPrefix."User
@@ -575,7 +575,7 @@ class ImportController extends GardenController {
          from ".$SourcePrefix."User");
 
          $this->Message = Gdn::Translate('<strong>4/19</strong> Importing users.');
-         $this->RedirectUrl = Url('/import/4');
+         $this->RedirectUrl = Url('/upgrade/4');
       } else if ($Step == 4) {
          // 4. Import user role relationships
          $Database->Query("insert into ".$DestPrefix."UserRole
@@ -588,7 +588,7 @@ class ImportController extends GardenController {
             on ou.RoleID = r.ImportID");
 
          $this->Message = Gdn::Translate('<strong>5/19</strong> Importing user/role relationships.');
-         $this->RedirectUrl = Url('/import/5');
+         $this->RedirectUrl = Url('/upgrade/5');
       } else if ($Step == 5) {
          // 5. Import user role history into activity table
          $Database->Query("insert into ".$DestPrefix."Activity
@@ -606,7 +606,7 @@ class ImportController extends GardenController {
          order by rh.Date asc");
 
          $this->Message = Gdn::Translate('<strong>6/19</strong> Importing role histories.');
-         $this->RedirectUrl = Url('/import/6');
+         $this->RedirectUrl = Url('/upgrade/6');
       } else if ($Step == 6) {
          // 6. Update the WhisperUserID on all comments that are within whispered discussions
          $Database->Query("update ".$SourcePrefix."Comment c
@@ -624,7 +624,7 @@ class ImportController extends GardenController {
            and c.AuthUserID <> d.AuthUserID");
          
          $this->Message = Gdn::Translate('<strong>7/19</strong> Preparing whispers.');
-         $this->RedirectUrl = Url('/import/7');
+         $this->RedirectUrl = Url('/upgrade/7');
       } else if ($Step == 7) {
          // 7. Create conversations
          $Database->Query("insert into ".$DestPrefix."Conversation
@@ -643,7 +643,7 @@ class ImportController extends GardenController {
          where c.ConversationID > c2.ConversationID");
          
          $this->Message = Gdn::Translate('<strong>8/19</strong> Creating conversations.');
-         $this->RedirectUrl = Url('/import/8');
+         $this->RedirectUrl = Url('/upgrade/8');
       } else if ($Step == 8) {
          // 8. Update old comment table with conversation ids
          $Database->Query("update ".$SourcePrefix."Comment cm
@@ -659,7 +659,7 @@ class ImportController extends GardenController {
          set cm.ConversationID = cn.ConversationID");
 
          $this->Message = Gdn::Translate('<strong>9/19</strong> Preparing conversations messages.');
-         $this->RedirectUrl = Url('/import/9');
+         $this->RedirectUrl = Url('/upgrade/9');
       } else if ($Step == 9) {
          // 9. Insert whispers as conversation messages
          $Database->Query("insert into ".$DestPrefix."ConversationMessage
@@ -673,7 +673,7 @@ class ImportController extends GardenController {
          where cm.ConversationID > 0");
 
          $this->Message = Gdn::Translate('<strong>10/19</strong> Transforming whispers into conversations.');
-         $this->RedirectUrl = Url('/import/10');
+         $this->RedirectUrl = Url('/upgrade/10');
       } else if ($Step == 10) {
          // 10. Insert the userconversation records so that messages are linked to conversations
          $Database->Query("insert into ".$DestPrefix."UserConversation
@@ -683,7 +683,7 @@ class ImportController extends GardenController {
          group by InsertUserID, ConversationID");
 
          $this->Message = Gdn::Translate('<strong>11/19</strong> Finalizing whisper messages.');
-         $this->RedirectUrl = Url('/import/11');
+         $this->RedirectUrl = Url('/upgrade/11');
       } else if ($Step == 11) {
          // 11. Update the conversation record fields
          $Database->Query("update ".$DestPrefix."Conversation c
@@ -737,7 +737,7 @@ class ImportController extends GardenController {
          set uc.CountMessages = m.CountMessages");
 
          $this->Message = Gdn::Translate('<strong>12/19</strong> Finalizing conversations.');
-         $this->RedirectUrl = Url('/import/12');
+         $this->RedirectUrl = Url('/upgrade/12');
       } else if ($Step == 12) {
          // 12. Import Categories
          $Database->Query("insert into ".$DestPrefix."Category
@@ -746,7 +746,7 @@ class ImportController extends GardenController {
          from ".$SourcePrefix."Category");
 
          $this->Message = Gdn::Translate('<strong>13/19</strong> Importing discussion categories.');
-         $this->RedirectUrl = Url('/import/13');
+         $this->RedirectUrl = Url('/upgrade/13');
       } else if ($Step == 13) {
          // 13. Import Discussions
          $Database->Query("insert into ".$DestPrefix."Discussion
@@ -763,7 +763,7 @@ class ImportController extends GardenController {
             and od.Active = '1'");
 
          $this->Message = Gdn::Translate('<strong>14/19</strong> Importing discussions.');
-         $this->RedirectUrl = Url('/import/14');
+         $this->RedirectUrl = Url('/upgrade/14');
       } else if ($Step == 14) {
          // 14. Import Comments
          $Database->Query("insert into ".$DestPrefix."Comment
@@ -780,7 +780,7 @@ class ImportController extends GardenController {
             and oc.Deleted = '0'");
 
          $this->Message = Gdn::Translate('<strong>15/19</strong> Importing comments.');
-         $this->RedirectUrl = Url('/import/15');
+         $this->RedirectUrl = Url('/upgrade/15');
       } else if ($Step == 15) {
          // 15. Update Discussions with first & last comment ids
          $Database->Query("update ".$DestPrefix."Discussion d
@@ -812,7 +812,7 @@ class ImportController extends GardenController {
          set c.CountDiscussions = cc.CountDiscussions");
 
          $this->Message = Gdn::Translate('<strong>16/19</strong> Finalizing discussions.');
-         $this->RedirectUrl = Url('/import/16');
+         $this->RedirectUrl = Url('/upgrade/16');
       } else if ($Step == 16) {
          // 16. Import UserDiscussion (watch & bookmark data)
          $Database->Query("insert into ".$DestPrefix."UserDiscussion
@@ -831,7 +831,7 @@ class ImportController extends GardenController {
          where od.Active = '1'");
 
          $this->Message = Gdn::Translate('<strong>17/19</strong> Importing bookmarks & watch data.');
-         $this->RedirectUrl = Url('/import/17');
+         $this->RedirectUrl = Url('/upgrade/17');
       } else if ($Step == 17) {
          // 17. Remove temp columns
          $Construct->Table('Role')->DropColumn('ImportID');
@@ -843,7 +843,7 @@ class ImportController extends GardenController {
          $Construct->DatabasePrefix($DestPrefix);
 
          $this->Message = Gdn::Translate('<strong>18/19</strong> Removing import structure.');
-         $this->RedirectUrl = Url('/import/18');
+         $this->RedirectUrl = Url('/upgrade/18');
       } else if ($Step == 18) {
          // 18. remove whisperuserids from old comment table where the entire discussion is whispered
          $Database->Query("update ".$SourcePrefix."Comment c
@@ -853,7 +853,7 @@ class ImportController extends GardenController {
          where d.WhisperUserID > 0");
 
          $this->Message = Gdn::Translate('<strong>19/19</strong> Restoring original comment structure.');
-         $this->RedirectUrl = Url('/import/19');
+         $this->RedirectUrl = Url('/upgrade/19');
       } else if ($Step == 19) {
          // Finished!
          $this->RedirectUrl = 'Finished';

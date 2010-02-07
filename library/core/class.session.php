@@ -229,6 +229,10 @@ class Gdn_Session {
       if ($this->UserID > 0) {
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
+         
+         $UserModel->EventArguments['User'] =& $this->User;
+         $UserModel->FireEvent('AfterGetSession');
+
          if ($this->User) {
             $this->_Permissions = Format::Unserialize($this->User->Permissions);
             $this->_Preferences = Format::Unserialize($this->User->Preferences);

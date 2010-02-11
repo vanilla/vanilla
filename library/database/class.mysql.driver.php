@@ -149,7 +149,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Object->Name = $Field->Field;
          $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
          $Object->Type = $Type;
-         $Object->AllowNull = ($Field->Null == 'NO' ? FALSE : TRUE);
+         $Object->AllowNull = ($Field->Null == 'YES');
          $Object->Default = $Field->Default;
          $Object->Length = $Length;
          $Object->Enum = $Enum;

@@ -80,32 +80,75 @@ class Gdn_PluginManager {
                // Loop through their individual methods looking for event handlers and method overrides.
                if (isset($MethodName[9])) {
                   if (substr($MethodName, -8) == '_handler' || substr($MethodName, -7) == '_before' || substr($MethodName, -6) == '_after') {
-                     // Create a new array of handler class names if it doesn't exist yet.
-                     if (array_key_exists($MethodName, $this->_EventHandlerCollection) === FALSE)
-                        $this->_EventHandlerCollection[$MethodName] = array();
-
-                     // Specify this class as a handler for this method if it hasn't been done yet.
-                     if (in_array($ClassName, $this->_EventHandlerCollection[$MethodName]) === FALSE)
-                        $this->_EventHandlerCollection[$MethodName][] = $ClassName;
+                     $this->RegisterHandler($ClassName, $MethodName);
                   } else if (substr($MethodName, -9) == '_override') {
-                     // Throw an error if this method has already been overridden.
-                     if (array_key_exists($MethodName, $this->_MethodOverrideCollection) === TRUE)
-                        trigger_error(ErrorMessage('Any object method can only be overridden by a single plugin. The "'.$MethodName.'" override has already been assigned by the "'.$this->_MethodOverrideCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
-
-                     // Otherwise, specify this class as the source for the override.
-                     $this->_MethodOverrideCollection[$MethodName] = $ClassName;
+                     $this->RegisterOverride($ClassName, $MethodName);
                   } else if (substr($MethodName, -7) == '_create') {
-                     // Throw an error if this method has already been created.
-                     if (array_key_exists($MethodName, $this->_NewMethodCollection) === TRUE)
-                        trigger_error(ErrorMessage('New object methods must be unique. The new "'.$MethodName.'" method has already been assigned by the "'.$this->_NewMethodCollection[$MethodName].'" plugin. It cannot also be overridden by the "'.$ClassName.'" plugin.', 'PluginManager', 'RegisterPlugins'), E_USER_ERROR);
-
-                     // Otherwise, specify this class as the source for the new method.
-                     $this->_NewMethodCollection[$MethodName] = $ClassName;
+                     $this->RegisterNewMethod($ClassName, $MethodName);
                   }
                }
             }
          }
       }
+   }
+   
+   /**
+    * Registers a plugin method name as a handler.
+    * @param string $HandlerClassName The name of the plugin class that will handle the event.
+    * @param string $HandlerMethodName The name of the plugin method being registered to handle the event.
+    * @param string $EventClassName The name of the class that will fire the event.
+    * @param string $EventName The name of the event that will fire.
+    * @param string $EventHandlerType The type of event handler.
+    */
+   public function RegisterHandler($HandlerClassName, $HandlerMethodName, $EventClassName = '', $EventName = '', $EventHandlerType = '') {
+      $HandlerKey = $HandlerClassName.'.'.$HandlerMethodName;
+      $EventKey = strtolower($EventClassName == '' ? $HandlerMethodName : $EventClassName.'_'.$EventName.'_'.$EventHandlerType);
+
+      // Create a new array of handler class names if it doesn't exist yet.
+      if (array_key_exists($EventKey, $this->_EventHandlerCollection) === FALSE)
+         $this->_EventHandlerCollection[$EventKey] = array();
+
+      // Specify this class as a handler for this method if it hasn't been done yet.
+      if (in_array($HandlerKey, $this->_EventHandlerCollection[$EventKey]) === FALSE)
+         $this->_EventHandlerCollection[$EventKey][] = $HandlerKey;
+   }
+   
+   /**
+    * Registers a plugin override method.
+    * @param string $OverrideClassName The name of the plugin class that will override the existing method.
+    * @param string $OverrideMethodName The name of the plugin method being registered to override the existing method.
+    * @param string $EventClassName The name of the class that will fire the event.
+    * @param string $EventName The name of the event that will fire.
+    */
+   public function RegisterOverride($OverrideClassName, $OverrideMethodName, $EventClassName = '', $EventName = '') {
+      $OverrideKey = $OverrideClassName.'.'.$OverrideMethodName;
+      $EventKey = strtolower($EventClassName == '' ? $OverrideMethodName : $EventClassName.'_'.$EventName.'_Override');
+
+      // Throw an error if this method has already been overridden.
+      if (array_key_exists($EventKey, $this->_MethodOverrideCollection) === TRUE)
+         trigger_error(ErrorMessage('Any object method can only be overridden by a single plugin. The "'.$EventKey.'" override has already been assigned by the "'.$this->_MethodOverrideCollection[$EventKey].'" plugin. It cannot also be overridden by the "'.$OverrideClassName.'" plugin.', 'PluginManager', 'RegisterOverride'), E_USER_ERROR);
+
+      // Otherwise, specify this class as the source for the override.
+      $this->_MethodOverrideCollection[$EventKey] = $OverrideKey;
+   }
+   
+   /**
+    * Registers a plugin new method.
+    * @param string $NewMethodClassName The name of the plugin class that will add a new method.
+    * @param string $NewMethodName The name of the plugin method being added.
+    * @param string $EventClassName The name of the class that will fire the event.
+    * @param string $EventName The name of the event that will fire.
+    */
+   public function RegisterNewMethod($NewMethodClassName, $NewMethodName, $EventClassName = '', $EventName = '') {
+      $NewMethodKey = $NewMethodClassName.'.'.$NewMethodName;
+      $EventKey = strtolower($EventClassName == '' ? $NewMethodName : $EventClassName.'_'.$EventName.'_Create');
+
+      // Throw an error if this method has already been created.
+      if (array_key_exists($EventKey, $this->_NewMethodCollection) === TRUE)
+         trigger_error(ErrorMessage('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', 'PluginManager', 'RegisterNewMethod'), E_USER_ERROR);
+
+      // Otherwise, specify this class as the source for the new method.
+      $this->_NewMethodCollection[$EventKey] = $NewMethodKey;
    }
    
    /**
@@ -120,32 +163,41 @@ class Gdn_PluginManager {
     * @param object The object that fired the event being handled.
     * @param string The name of the class that fired the event being handled.
     * @param string The name of the event being fired.
+    * @param string The type of handler being fired (Handler, Before, After).
     * @return bool True if an event was executed.
     */
-   public function CallEventHandlers(&$Sender, $ClassName, $EventName, $HandlerType = 'Handler') {
+   public function CallEventHandlers(&$Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler') {
       $Return = FALSE;
       
       // Look through $this->_EventHandlerCollection for relevant handlers
-      if ($this->CallEventHandler($Sender, strtolower($ClassName.'_'.$EventName.'_'.$HandlerType)))
+      if ($this->CallEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType))
          $Return = TRUE;
 
-      if ($this->CallEventHandler($Sender, strtolower('Base_'.$EventName.'_'.$HandlerType)))
+      // Look for "Base" (aka any class that has $EventName)
+      if ($this->CallEventHandler($Sender, 'Base', $EventName, $EventHandlerType))
          $Return = TRUE;
+         
       return $Return;
    }
    
-   public function CallEventHandler(&$Sender, $Handler) {
+   public function CallEventHandler(&$Sender, $EventClassName, $EventName, $EventHandlerType) {
       $Return = FALSE;
-      if (array_key_exists($Handler, $this->_EventHandlerCollection)) {
+      $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
+      if (array_key_exists($EventKey, $this->_EventHandlerCollection)) {
          // Loop through the handlers and execute them
-         foreach ($this->_EventHandlerCollection[$Handler] as $PluginName) {
-            if (property_exists($this, $PluginName) === FALSE)
-               $this->$PluginName = new $PluginName();
-            if (array_key_exists($Handler, $Sender->Returns) === FALSE || is_array($Sender->Returns[$Handler]) === FALSE)
-               $Sender->Returns[$Handler] = array();
-            
-            $Sender->Returns[$Handler][strtolower($PluginName)] = $this->$PluginName->$Handler($Sender, $Sender->EventArguments);
-            $Return = TRUE;
+         foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
+            $PluginKeyParts = explode('.', $PluginKey);
+            if (count($PluginKeyParts) == 2) {
+               list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
+               if (property_exists($this, $PluginClassName) === FALSE)
+                  $this->$PluginClassName = new $PluginClassName();
+                  
+               if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
+                  $Sender->Returns[$EventKey] = array();
+               
+               $Sender->Returns[$EventKey][$PluginKey] = $this->$PluginClassName->$PluginEventHandlerName($Sender, $Sender->EventArguments);
+               $Return = TRUE;
+            }
          }
       }
       return $Return;
@@ -163,13 +215,17 @@ class Gdn_PluginManager {
     * @return mixed Return value of overridden method.
     */
    public function CallMethodOverride(&$Sender, $ClassName, $MethodName) {
-      $Return = FALSE;
-      $OverrideMethodName = strtolower($ClassName.'_'.$MethodName.'_Override');
-      $PluginName = $this->_MethodOverrideCollection[$OverrideMethodName];
-      if (property_exists($this, $PluginName) === FALSE)
-         $this->$PluginName = new $PluginName($Sender);
+      $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
+      $OverrideKey = ArrayValue($EventKey, $this->_MethodOverrideCollection, '');
+      $OverrideKeyParts = explode('.', $OverrideKey);
+      if (count($PluginKeyParts) != 2)
+         return FALSE;
+      
+      list($OverrideClassName, $OverrideMethodName) = $OverrideKeyParts;
+      if (property_exists($this, $OverrideClassName) === FALSE)
+         $this->$OverrideClassName = new $OverrideClassName($Sender);
          
-      return $this->$PluginName->$OverrideMethodName($Sender, $Sender->EventArguments);
+      return $this->$OverrideClassName->$OverrideMethodName($Sender, $Sender->EventArguments);
    }
    
    /**
@@ -197,12 +253,18 @@ class Gdn_PluginManager {
     */
    public function CallNewMethod(&$Sender, $ClassName, $MethodName) {
       $Return = FALSE;
-      $NewMethodName = strtolower($ClassName.'_'.$MethodName.'_Create');
-      $PluginName = $this->_NewMethodCollection[$NewMethodName];
-      if (property_exists($this, $PluginName) === FALSE)
-         $this->$PluginName = new $PluginName($Sender);
+      $EventKey = strtolower($ClassName.'_'.$MethodName.'_Create');
+      $NewMethodKey = ArrayValue($EventKey, $this->_NewMethodCollection, '');
+      $NewMethodKeyParts = explode('.', $NewMethodKey);
+      if (count($NewMethodKeyParts) != 2)
+         return FALSE;
+      
+      list($NewMethodClassName, $NewMethodName) = $NewMethodKeyParts;
+
+      if (property_exists($this, $NewMethodClassName) === FALSE)
+         $this->$NewMethodClassName = new $NewMethodClassName($Sender);
          
-      return $this->$PluginName->$NewMethodName($Sender, $Sender->RequestArgs);
+      return $this->$NewMethodClassName->$NewMethodName($Sender, $Sender->RequestArgs);
    }
    
    /**
@@ -418,7 +480,7 @@ class Gdn_PluginManager {
       // Include all of the paths.
       $PluginInfo = array();
       
-      
+      $PluginManager = &$this;
       $Paths = (array)$Paths;
       foreach($Paths as $Path) {
          if(file_exists($Path))

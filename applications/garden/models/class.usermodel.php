@@ -114,17 +114,16 @@ class Gdn_UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
-      if (is_array($Like))
-         $this->SQL->OrLike($Like, '', 'right');
-
-      $Data = $this->SQL
-         ->BeginWhereGroup()
-         ->Where('ur.RoleID is null')
-         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
-         ->EndWhereGroup()
-         ->Get()
-         ->FirstRow();
+         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
+      if (is_array($Like)){
+         $this->SQL
+				->BeginWhereGroup()
+				->OrLike($Like, '', 'right')
+				->EndWhereGroup();
+		}
+		$this->SQL->Where('ur.RoleID is null');
+		
+		$Data =  $this->SQL->Get()->FirstRow();
 
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
@@ -133,17 +132,14 @@ class Gdn_UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
-      if (is_array($Where))
+         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
+		
+		if (is_array($Where)) {
          $this->SQL->Where($Where);
+		}
+		$this->SQL->Where('ur.RoleID is null');
 
-      $Data = $this->SQL
-         ->BeginWhereGroup()
-         ->Where('ur.RoleID is null')
-         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
-         ->EndWhereGroup()
-         ->Get()
-         ->FirstRow();
+      $Data = $this->SQL->Get()->FirstRow();
 
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
@@ -151,17 +147,17 @@ class Gdn_UserModel extends Gdn_Model {
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery();
       $this->SQL
-         ->Join('UserRole ur', 'u.UserID = ur.UserID', 'left');
+         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
 
-      if (is_array($Like))
-         $this->SQL->OrLike($Like, '', 'right');
-
+      if (is_array($Like)) {
+         $this->SQL
+				->BeginWhereGroup()
+				->OrLike($Like, '', 'right')
+				->EndWhereGroup();
+		}
+		
       return $this->SQL
-         ->BeginWhereGroup()
          ->Where('ur.RoleID is null')
-         ->OrWhere('ur.RoleID <>', '4', TRUE, FALSE) // 4 is Applicant RoleID
-         ->EndWhereGroup()
-         ->GroupBy('u.UserID')
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();

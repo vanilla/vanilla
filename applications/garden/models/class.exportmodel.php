@@ -143,7 +143,7 @@ class Gdn_ExportModel {
 			
 			// Loop through the columns in the export structure and grab their values from the row.
 			$ExRow = array();
-			foreach($Structure as $Field) {
+			foreach($Structure as $Field => $Type) {
 				// Get the value of the export.
 				if(array_key_exists($Field, $Row)) {
 					// The column has an exact match in the export.
@@ -195,12 +195,12 @@ class Gdn_ExportModel {
 	public $Prefix = '';
 	
 	protected $_Structures = array(
-		'Category' => array('CategoryID', 'Name', 'Description', 'ParentCategoryID', 'DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID'),
-		'Comment' => array('CommentID', 'DiscussionID', 'DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID', 'Format', 'Body'),
-		'Discussion' => array('DiscussionID', 'Name', 'CategoryID', 'DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID', 'Closed', 'Announce'),
-		'Role' => array('RoleID', 'Name', 'Description'),
-		'User' => array('UserID', 'Name', 'Email', 'Password', 'Gender'),
-		'UserRole' => array('UserID', 'RoleID')
+		'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+		'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
+		'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
+		'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
+		'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
+		'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
 		);
 	/**
 	 * Returns an array of all the expected export tables and expected columns in the exports.

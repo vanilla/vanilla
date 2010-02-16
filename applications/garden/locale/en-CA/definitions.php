@@ -14,9 +14,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @param string The word to format.
  */
-function FormatPossessive($Word) {
-   return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+if (!function_exists('FormatPossessive')) {
+   function FormatPossessive($Word) {
+      return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+   }
 }
+
+if (!function_exists('Plural')) {
+   function Plural($Number, $Singular, $Plural) {
+      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
+   }
+}
+
 
 $Definition['Locale'] = 'en-CA';
 

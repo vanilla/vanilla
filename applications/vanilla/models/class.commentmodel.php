@@ -278,6 +278,15 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             ->Set('CountComments', $Data->CountComments)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
+				
+			// Update the last comment's user ID.
+			$this->SQL
+				->Update('Discussion d')
+				->Update('Comment c')
+				->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE)
+				->Where('d.DiscussionID', $DiscussionID)
+				->Where('c.CommentID', 'd.LastCommentID', FALSE, FALSE);
+			$this->SQL->Put();
       }
    }
    

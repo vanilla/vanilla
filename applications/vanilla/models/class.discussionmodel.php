@@ -20,8 +20,8 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('iu.Name', '', 'FirstName')
          ->Select('iup.Name', '', 'FirstPhoto')
          // ->Select('fc.Body', '', 'FirstBody')
-         ->Select('lc.DateInserted', '', 'LastDate')
-         ->Select('lc.InsertUserID', '', 'LastUserID')
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
          ->Select('lcup.Name', '', 'LastPhoto')
          ->Select('lc.Body', '', 'LastBody')
@@ -31,14 +31,14 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
          ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
          ->Join('Comment lc', 'd.LastCommentID = lc.CommentID') // Last comment
-         ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
+         ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          ->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
    }
    
-   public function DiscussionSummaryQuery() {
+   public function DiscussionSummaryQuery($AdditionalFields = array('FirstComment' => 'fc.Body', 'FirstCommentFormat' => 'fc.Format')) {
       $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
@@ -49,10 +49,10 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          //->Select('iup.Name', '', 'FirstPhoto')
-         ->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
-         ->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
-         ->Select('lc.DateInserted', '', 'LastDate')
-         ->Select('lc.InsertUserID', '', 'LastUserID')
+         //->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
+         //->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
          //->Select('lcup.Name', '', 'LastPhoto')
          //->Select('lc.Body', '', 'LastBody')
@@ -60,18 +60,37 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
-         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
-         ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
+         //->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
+         //->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
+         ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
+			
+		if(is_array($AdditionalFields)) {
+			// Add additional fields to the query.
+			$Tables = array('fc' => array('Comment fc', 'd.FirstCommentID = fc.CommentID'));
+			
+			foreach($AdditionalFields as $Alias => $Field) {
+				// See if a new table needs to be joined to the query.
+				$TableAlias = explode('.', $Field);
+				$TableAlias = $TableAlias[0];
+				if(array_key_exists($TableAlias, $Tables)) {
+					$Join = $Tables[$TableAlias];
+					$this->SQL->Join($Join[0], $Join[1]);
+					unset($Tables[$TableAlias]);
+				}
+				
+				// Select the field.
+				$this->SQL->Select($Field, '', is_numeric($Alias) ? '' : $Alias);
+			}
+		}
          
       $this->FireEvent('AfterDiscussionSummaryQuery');
    }
    
-   public function Get($Offset = '0', $Limit = '', $Wheres = '') {
+   public function Get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = NULL) {
       if ($Limit == '') 
          $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
 
@@ -138,7 +157,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       return $this->SQL
          ->Where('d.Announce', '1')
          ->Where('w.Dismissed is null')
-         ->OrderBy('lc.DateInserted', 'desc')
+         ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
    }
@@ -208,8 +227,8 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('ca.Name', '', 'Category')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
-         ->Select('lc.DateInserted', '', 'LastDate')
-         ->Select('lc.InsertUserID', '', 'LastUserID')
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
          ->From('Discussion d')
          ->Join('Comment c', 'd.FirstCommentID = c.CommentID', 'left')
@@ -342,7 +361,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                $CommentID = $CommentModel->Save($FormPostValues);
                // Assign the FirstCommentID to the discussion table
                $this->SQL->Put($this->Name,
-                  array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID),
+                  array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID, 'LastCommentUserID' => $Session->UserID),
                   array($this->PrimaryKey => $DiscussionID)
                );
                

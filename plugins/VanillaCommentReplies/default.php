@@ -287,7 +287,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             $Sender->Discussion = $Sender->DiscussionModel->GetID($Sender->ReplyComment->DiscussionID);
             $Sender->ControllerName = 'discussion';
             $Sender->View = PATH_PLUGINS.DS.'VanillaCommentReplies'.DS.'views'.DS.'replies.php';
-         } else if ($Sender->_DeliveryType !== DELIVERY_TYPE_ALL) {
+         } else if ($Sender->DeliveryType() !== DELIVERY_TYPE_ALL) {
             // Handle ajax-based errors
             $Sender->StatusMessage = $Sender->Form->Errors();            
          }

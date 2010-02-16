@@ -80,12 +80,16 @@ if (!class_exists('Gdn_SideMenuModule', FALSE)) {
       public function HighlightRoute($Route) {
          $this->_HighlightRoute = $Route;
       }
-
-      /**
-       * Removes all links from a specific group.
-       */
-      public function RemoveLinks($Group) {
-         $this->Links[$Group] = array();
+      
+      public function RemoveLink($Group, $Text) {
+         if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
+            for ($i = 0; $i < count($this->Items[$Group]); $i++) {
+               if ($this->Items[$Group][$i]['Text'] == $Text) {
+                  unset($this->Items[$Group][$i]);
+                  break;
+               }
+            }
+         }
       }
       
       /**

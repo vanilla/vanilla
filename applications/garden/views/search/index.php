@@ -10,10 +10,11 @@
 ?></div>
 
 <h1><?php
-   printf(Gdn::Translate($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
+if ($this->SearchResults)
+	printf(Gdn::Translate($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
 ?></h1>
 <?php
-if ($this->SearchResults->NumRows() > 0) {
+if ($this->SearchResults && $this->SearchResults->NumRows() > 0) {
    echo $this->Pager->ToString('less');
    $ViewLocation = $this->FetchViewLocation('results');
    include($ViewLocation);

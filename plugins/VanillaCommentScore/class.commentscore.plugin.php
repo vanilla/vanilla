@@ -212,7 +212,7 @@ class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
          
       // Add the total score to the comment table.
       $Structure->Table('Comment')
-         ->Column('SumScore', 'int', TRUE)
+         ->Column('Score', 'int', TRUE)
          ->Set(FALSE, FALSE);
    }
 }

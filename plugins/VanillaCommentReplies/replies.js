@@ -78,7 +78,7 @@ jQuery(document).ready(function($) {
    // Hijack reply form button clicks
    $('ul.Replies form input.Button').live('click', function() {
       var button = this;
-      var frm = $(button).parent();
+      var frm = $(button).parents('form');
       var row = $(frm).parents('.ReplyForm');
       var textbox = $(frm).find('textarea');
       

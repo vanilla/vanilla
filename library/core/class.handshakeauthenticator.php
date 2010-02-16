@@ -110,7 +110,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
          if(strlen($Cookie) > 0)
             $Cookie .= '; ';
             
-         $Cookie .= $Key.'='.urlencode($Value);
+         $Cookie .= $Key.'='.base64_encode($Value);
       }
 
       if(strlen($Cookie) > 0)

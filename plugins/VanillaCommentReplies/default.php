@@ -295,29 +295,26 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       $Sender->Render();
    }
    
-   public function CommentModel_AfterCommentQuery_Handler(&$Sender) {
+   public function Gdn_CommentModel_AfterCommentQuery_Handler(&$Sender) {
       $Sender->SQL->Where('c.ReplyCommentID is null');
    }
    
-   public function CommentModel_BeforeGetCount_Handler(&$Sender) {
+   public function Gdn_CommentModel_BeforeGetCount_Handler(&$Sender) {
       $Sender->SQL->Where('ReplyCommentID is null');
    }
    
-   public function CommentModel_BeforeGetOffset_Handler(&$Sender) {
+   public function Gdn_CommentModel_BeforeGetOffset_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    
-   public function CommentModel_BeforeUpdateCommentCount_Handler(&$Sender) {
+   public function Gdn_CommentModel_BeforeUpdateCommentCount_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    
-   public function CommentModel_DeleteComment_Handler(&$Sender) {
+   public function Gdn_CommentModel_DeleteComment_Handler(&$Sender) {
       $CommentID = $Sender->EventArguments['CommentID'];
       $Sender->SQL->Delete('Comment', array('ReplyCommentID' => $CommentID));
    }
-
-
-
    
    public function Setup() {
       $Structure = Gdn::Structure();

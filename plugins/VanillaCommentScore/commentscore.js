@@ -1,7 +1,10 @@
 jQuery(document).ready(function($) {
    
-// Handle bookmark button clicks   
-$('.CommentScore a').click(function() {
+// Handle bookmark button clicks
+// Using live here makes it dead simple to add the click event to any new CommentScore nodes
+// added to the dom. When will this happen? If you create a new comment via AJAX, then new DOM
+// nodes are inserted on the fly.
+$('.CommentScore a').live('click', function() {
    var $btn = $(this);
    
    if($btn.attr('href') == "") {

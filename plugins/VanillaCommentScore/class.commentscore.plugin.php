@@ -71,7 +71,13 @@ class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
       
       echo '</div>';
    }
-   
+
+   // This is necessary for AJAX comments because it appears that they route through
+   // a different controller (the Post Controller).
+   public function PostController_CommentOptions_Handler($Sender) {
+     $this->DiscussionController_CommentOptions_Handler($Sender);
+   }
+
    /**
     * Add or subtract a value from a comment's score.
     * @param DiscussionController $Sender The controller that is implementing this method.

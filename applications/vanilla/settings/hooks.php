@@ -15,7 +15,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Sender->Menu) {
          $DiscussionsHome = '/'.Gdn::Config('Vanilla.Discussions.Home', 'discussions');
-         $Sender->Menu->AddLink(Gdn::Translate('Discussions'), 'Discussions', $DiscussionsHome, FALSE);
+         $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('Discussions'), $DiscussionsHome, FALSE);
          if ($Session->IsValid()) {
             $Bookmarked = Gdn::Translate('My Bookmarks');
             $CountBookmarks = $Session->User->CountBookmarks;
@@ -37,7 +37,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
          }
          if ($Session->IsValid())
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), 'New Discussion', '/post/discussion', FALSE);
+            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('New Discussion'), '/post/discussion', FALSE);
       }
    }
    

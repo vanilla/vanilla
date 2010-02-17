@@ -9,9 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class ImportController extends Gdn_Controller {
-	public $Uses = array('Form', 'Gdn_ImportModel', 'Gdn_ExportModel');
+	public $Uses = array('Form', 'Gdn_ExportModel');
 	
 	public function Export() {
+		set_time_limit(60*2);
 		$Ex = $this->ExportModel;
 		$Ex->PDO(Gdn::Database()->Connection());
 		$Ex->Prefix = Gdn::Database()->DatabasePrefix;
@@ -31,21 +32,33 @@ class ImportController extends Gdn_Controller {
 	}
 	
 	public function Index() {
-		//$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-08 152215.txt.gz';
-		$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-08 152725.txt.gz';
+		set_time_limit(60*5);
+		$Imp = new Gdn_ImportModel();
+		
+		$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-16 200246.txt.gz'; // big db
+		//$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-16 134222.txt.gz'; // small db
 		echo '<pre>';
 		ob_end_flush();
 		$Timer = new GDN_Timer();
+		$Imp->Timer = $Timer;
 		$Timer->Start();
-		$this->ImportModel->SplitFile($Path);
+		$Imp->SplitFile($Path);
 		$Timer->Split('Split Files');
-		$this->ImportModel->DefineTables();
+		$Imp->DefineTables();
 		$Timer->Split('Define Tables');
 		
-		foreach($this->ImportModel->Data['Tables'] as $Table => $TableInfo) {
-			$this->ImportModel->LoadTable($Table, $TableInfo['Path']);
+		foreach($Imp->Data['Tables'] as $Table => $TableInfo) {
+			$Imp->LoadTable($Table, $TableInfo['Path']);
 			$Timer->Split("Load $Table Table");
 		}
+		
+		$Imp->DefineIndexes();
+		$Timer->Split('Define Indexes');
+		
+		$Imp->AssignUserIDs();
+		$Imp->AssignOtherIDs();
+		$Imp->InsertTables();
+		$Imp->UpdateCounts();
 		
 		$Timer->Finish();
 		echo '</pre>';
@@ -85,7 +98,7 @@ class Gdn_Timer {
 				$Span = $Time - $PrevTime;
 				$m = floor($Span / 60);
 				$s = $Span - $m * 60;
-				echo sprintf(' (%d:%02.3f)', $m, $s);
+				echo sprintf(' (%d:%05.2f)', $m, $s);
 			}
 		}
 		echo "\n";

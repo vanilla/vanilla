@@ -63,6 +63,7 @@ $Construct->Table('User')
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('HourOffset', 'int', '0')
+	->Column('Score', 'float', NULL)
 	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
 	->Column('CacheRoleID', 'int', TRUE)
    ->Column('Admin', array('1', '0'), '0')

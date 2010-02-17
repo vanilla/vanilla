@@ -43,6 +43,7 @@ $Construct->Table('Discussion')
    ->Column('DateUpdated', 'datetime')
    ->Column('DateLastComment', 'datetime', NULL, 'index')
 	->Column('LastCommentUserID', 'int', TRUE)
+	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
    
@@ -69,6 +70,7 @@ $Construct->Table('Comment')
    ->Column('DateDeleted', 'datetime', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('Flag', 'tinyint', 0)
+	->Column('Score', 'float', NULL)
    ->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments on a per-user basis.

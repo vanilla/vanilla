@@ -123,7 +123,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
          $this->SQL
             ->BeginWhereGroup()
-            ->Where('d.Announce', '0');
+            ->Where('d.Announce<>', '1');
          
          // Removing this for speed.
          //if ($UserID > 0)

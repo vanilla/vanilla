@@ -592,12 +592,6 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
-if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
-   }
-}
-
 if (!function_exists('PrefixString')) {
    /**
     * Takes a string, and prefixes it with $Prefix unless it is already prefixed that way.

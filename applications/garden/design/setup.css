@@ -3,7 +3,7 @@ div {
    font-family: Arial, Helvetica, Verdana;
 }
 body {
-   background: url('slicesplash.jpg') top center no-repeat #DCF5FE;
+   background: url('slicesplash.jpg') top center no-repeat #C2E7FC;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -22,7 +22,7 @@ a:hover {
    text-decoration: underline;
    }
 div.Title {
-   background:#F2FBFF none repeat scroll 0 0;
+   background:#E2F4FF none repeat scroll 0 0;
    border-bottom:1px solid #FFFFFF;
    padding: 30px 0;
    text-align:left;
@@ -35,7 +35,7 @@ h1 {
    font-size: 180%;
 }
 div.Form {
-   border-top: 1px solid #C0E7F5;
+   border-top: 1px solid #A5D0E7;
    text-align: center;
 }
 div.Form ul {
@@ -126,13 +126,13 @@ form ul li input.InputBox {
    font-size: 110%;
    padding: 8px;
    width: 550px;
-   border: 1px solid #C0E7F5;
-   color: #555 /* Body Text Font Color */;
+   border: 1px solid #ccc;
+   color: #555;
 }
 form ul li input.InputBox:focus {
    color: #000;
    background: #FFFEDE;
-   border: 1px solid #a0c7c5;
+   border: 1px solid #aaa;
 }
 form ul li.Last {
    padding: 12px 0 2px;

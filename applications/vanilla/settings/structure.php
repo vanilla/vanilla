@@ -71,6 +71,7 @@ $Construct->Table('Comment')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
+   ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments on a per-user basis.

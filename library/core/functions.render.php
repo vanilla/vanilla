@@ -80,3 +80,20 @@ if (!function_exists('UserBuilder')) {
 		return $User;
    }
 }
+
+/**
+1. <li<?php echo Alternate()?>>
+Result: <li class="Alt"> and <li>
+2. <li class="<?php echo Alternate('AltA', 'AltB')"?>>
+Result: <li class="AltA"> and <li class="AltB">
+*/
+
+if (!function_exists('Alternate')) {
+   function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
+      static $i = 0;
+      $Value = $i++ % 2 ? $Odd : $Even;
+      if($Value != '' && $Even == '')
+         $Value = ' '.$AttributeName.'="'.$Value.'"';
+      return $Value;
+   }
+}

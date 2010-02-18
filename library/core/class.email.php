@@ -96,15 +96,16 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $SenderName
     * @return Email
     */
-   public function From($SenderEmail = '', $SenderName = '') {
+   public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = False) {
       if ($SenderEmail == '')
          $SenderEmail = Gdn::Config('Garden.Email.SupportAddress', '');
 
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
+      
+      if($bOverrideSender != False) $this->PhpMailer->Sender = $SenderEmail;
+      $this->PhpMailer->SetFrom($SenderEmail, $SenderName);
 
-      $this->PhpMailer->From = $SenderEmail;
-      $this->PhpMailer->FromName = $SenderName;
       return $this;
    }
 
@@ -197,12 +198,15 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $RecipientName The recipient name associated with $RecipientEmail. If $RecipientEmail is
     * an array of email addresses, this value will be ignored.
     */
+   
    public function To($RecipientEmail, $RecipientName = '') {
       if (is_string($RecipientEmail) && StrPos($RecipientEmail, ',') > 0) {
          $RecipientEmail = explode(',', $RecipientEmail);
          $RecipientEmail = array_map('trim', $RecipientEmail);
-      }
-
+         $RecipientName = array_fill(0, Count($RecipientEmail), '');
+      } elseif ($RecipientEmail instanceof Gdn_DataSet) 
+            $RecipientEmail = ConsolidateArrayValuesByKey($RecipientEmail->ResultArray(), 'Email', 'Name', '');
+      
       if (!is_array($RecipientEmail)) {
          // Only allow one address in the "to" field. Append all extras to the "cc" field.
          if (!$this->_IsToSet) {
@@ -214,33 +218,29 @@ class Gdn_Email extends Gdn_Pluggable {
          }
    
          return $this;
-      } else {
-         if ($this->PhpMailer->Mailer == 'smtp' || Gdn::Config('Garden.Email.UseSmtp'))
-            throw new Exception('You cannot address emails to more than one address when using SMTP.');
-         
-         // Need to set return-path, to prevent error: unknown, malformed, or incomplete option -f in mail()
-         if ($this->PhpMailer->Sender == '')
-            $this->PhpMailer->Sender =& $this->PhpMailer->From;
-
-         $this->PhpMailer->SingleTo = True;
-         if (array_key_exists(0, $RecipientEmail)) {
-            if (is_object($RecipientEmail[0]) && property_exists($RecipientEmail[0], 'Email') && property_exists($RecipientEmail[0], 'Name')) {
-               foreach ($RecipientEmail as $Recipient)
-                  $this->PhpMailer->AddAddress($Recipient->Email, $Recipient->Name);
-               
-               return $this;
-            }
-            if (!is_array($RecipientName) || Count($RecipientEmail) != Count($RecipientName))
-               $RecipientName = array_fill(0, Count($RecipientEmail), '');
-
-            $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
-         }
-
-         foreach($RecipientEmail as $Email => $Name)
-            $this->PhpMailer->AddAddress($Email, $Name);
-         
-         return $this;
       }
+      
+      if ($this->PhpMailer->Mailer == 'smtp' || Gdn::Config('Garden.Email.UseSmtp'))
+         throw new Exception('You cannot address emails to more than one address when using SMTP.');
+      
+      $this->PhpMailer->SingleTo = True;
+      
+      if(array_key_exists(0, $RecipientEmail) && is_object($RecipientEmail[0])){
+         $RecipientName = array();
+         $Count = Count($RecipientEmail);
+         for($i = 0; $i < $Count; $i++){
+            $RecipientName[$i] = ObjectValue('Name', $RecipientEmail[$i]);
+            $RecipientEmail[$i] = ObjectValue('Email', $RecipientEmail[$i]);
+         }
+      }
+      
+      if(is_array($RecipientName) && Count($RecipientEmail) == Count($RecipientName))
+         $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
+      
+      foreach($RecipientEmail as $Email => $Name)
+         $this->PhpMailer->AddAddress($Email, $Name);
+      
+      return $this;
    }
    
    public function Charset($Use = ''){

@@ -81,7 +81,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->PhpMailer->ClearAllRecipients();
       $this->PhpMailer->Body = '';
       $this->From();
-      $this->_IsToSet = False;
+      $this->_IsToSet = FALSE;
       $this->MimeType(Gdn::Config('Garden.Email.MimeType', 'text/plain'));
       $this->_MasterView = 'email.master';
       return $this;
@@ -96,14 +96,14 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $SenderName
     * @return Email
     */
-   public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = False) {
+   public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = FALSE) {
       if ($SenderEmail == '')
          $SenderEmail = Gdn::Config('Garden.Email.SupportAddress', '');
 
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
-      if($bOverrideSender != False) $this->PhpMailer->Sender = $SenderEmail;
+      if($bOverrideSender != FALSE) $this->PhpMailer->Sender = $SenderEmail;
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName);
 
       return $this;

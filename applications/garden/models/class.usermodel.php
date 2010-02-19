@@ -1056,7 +1056,7 @@ class Gdn_UserModel extends Gdn_Model {
       // Make sure that changes to the current user become effective immediately.
       $Session = Gdn::Session();
       if ($UserID == $Session->UserID)
-         $Session->SetPreference($Preference, $Value);
+         $Session->SetPreference($Preference, $Value, FALSE);
 
       return $this->SaveToSerializedColumn('Preferences', $UserID, $Preference, $Value);
    }

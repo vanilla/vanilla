@@ -45,8 +45,7 @@ class MessageController extends GardenController {
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
          $Prefs = $Session->GetPreference('DismissedMessages', array());
          $Prefs[] = $MessageID;
-         $UserModel = Gdn::UserModel();
-         $UserModel->SavePreference($Session->UserID, 'DismissedMessages', $Prefs);
+         $Session->SetPreference('DismissedMessages', $Prefs);
       }
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)

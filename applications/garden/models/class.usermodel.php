@@ -778,7 +778,7 @@ class Gdn_UserModel extends Gdn_Model {
    }
 
    /**
-    * Checks to see if FieldValue is unique in FieldName.
+    * Checks to see if $Username and $Email are already in use by another member.
     */
    public function ValidateUniqueFields($Username, $Email, $UserID = '') {
       $Valid = TRUE;
@@ -1156,6 +1156,7 @@ class Gdn_UserModel extends Gdn_Model {
     * @return int The ID of the user.
     */
    public function Synchronize($UniqueID, $Data) {
+      $UserID = 0;
       // Try and get the user based on the uniqueID.
       $this->SQL->Select('ua.UniqueID, ua.UserID as AuthUserID')
          ->Select('u.*');
@@ -1176,7 +1177,7 @@ class Gdn_UserModel extends Gdn_Model {
       
       $User = $this->SQL->Get()->FirstRow();
       
-      if($User === FALSE) {
+      if ($User === FALSE) {
          // Clean the user data.
          $UserData['Name'] = $Data['Name'];
          $UserData['Password'] = '*****';
@@ -1184,17 +1185,21 @@ class Gdn_UserModel extends Gdn_Model {
          $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Data, 'm'), 0, 1));
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Data, 0);
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Data, '');
+         $UserData['CountNotifications'] = 0;
          if ($UserData['DateOfBirth'] == '')
             $UserData['DateOfBirth'] = '1975-09-16';
             
-         // Insert the new user.
-         $this->AddInsertFields($UserData);
-         $UserID = $this->_Insert($UserData);
+         // Make sure there isn't another user with this username.
+         if ($this->ValidateUniqueFields($UserData['Name'], $UserData['Email'])) {
+            // Insert the new user.
+            $this->AddInsertFields($UserData);
+            $UserID = $this->_Insert($UserData);
+         }
 
-         if($UserID) {
+         if ($UserID) {
             // Save the roles.
             $Roles = ArrayValue('Roles', $Data, Gdn::Config('Garden.Registration.DefaultRoles'));
-            $this->SaveRoles($UserID, $Roles);
+            $this->SaveRoles($UserID, $Roles, FALSE);
             // Save the authentication.
             $this->SQL->Insert('UserAuthentication', array('UniqueID' => $UniqueID, 'UserID' => $UserID));
          }
@@ -1245,7 +1250,7 @@ class Gdn_UserModel extends Gdn_Model {
          
          // Update the roles.
          if(array_key_exists('Roles', $Data)) {
-            $this->SaveRoles($UserID, $Data['Roles']);
+            $this->SaveRoles($UserID, $Data['Roles'], FALSE);
          }
       }
       

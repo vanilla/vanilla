@@ -50,7 +50,7 @@ if ($this->Discussion->Closed == '1') {
       ?>
       <div class="CommentOption">
          <?php echo Gdn::Translate('Want to take part in this discussion? Click one of these:'); ?>
-         <?php echo Anchor(Gdn::Translate('Sign In'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button SignInPopup'); ?> 
+         <?php echo Anchor(Gdn::Translate('Sign In'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : '')); ?> 
          <?php
             $Url = Gdn::Authenticator()->RegisterUrl($this->SelfUrl);
             if(!empty($Url))

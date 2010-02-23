@@ -553,8 +553,11 @@ class ProfileController extends Gdn_Controller {
                $SideMenu->AddLink('Options', Gdn::Translate('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
                $SideMenu->AddLink('Options', Gdn::Translate('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }
-            $SideMenu->AddLink('Options', Gdn::Translate('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
-            $SideMenu->AddLink('Options', Gdn::Translate('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
+            // Don't allow account editing if it has been turned off.
+            if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
+               $SideMenu->AddLink('Options', Gdn::Translate('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
+               $SideMenu->AddLink('Options', Gdn::Translate('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
+            }
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }

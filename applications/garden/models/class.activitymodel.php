@@ -150,6 +150,9 @@ class Gdn_ActivityModel extends Gdn_Model {
    
    public function SendNotification($ActivityID, $Story = '') {
       $Activity = $this->GetID($ActivityID);
+      if (!is_object($Activity))
+         return;
+      
       $Story = Format::Text($Story == '' ? $Activity->Story : $Story);
       // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {

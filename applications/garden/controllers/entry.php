@@ -30,7 +30,7 @@ class EntryController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack() === TRUE) {
          $FormValues = $this->Form->FormValues();
-         if($FormValues['Handshake'] == 'NEW') {
+         if (ArrayValue('NewAccount', $FormValues)) {
             // Try and synchronize the user with the new username/email.
             $FormValues['Name'] = $FormValues['NewName'];
             $FormValues['Email'] = $FormValues['NewEmail'];
@@ -39,7 +39,7 @@ class EntryController extends Gdn_Controller {
          } else {
             // Try and sign the user in.
             $Password = new Gdn_PasswordAuthenticator();
-            $UserID = $Password->Authenticate(array('Name' => $FormValues['SignInName'], 'Password' => $FormValues['SignInPassword']));
+            $UserID = $Password->Authenticate(array('Email' => ArrayValue('SignInEmail', $FormValues, ''), 'Password' => ArrayValue('SignInPassword', $FormValues, '')));
             
             if ($UserID < 0) {
                $this->Form->AddError('ErrorPermission');
@@ -50,8 +50,8 @@ class EntryController extends Gdn_Controller {
             if($UserID) {
                $Data = $FormValues;
                $Data['UserID'] = $UserID;
-               $Data['Name'] = $FormValues['SignInName'];
-               $this->UserModel->Synchronize($FormValues['UniqueID'], $Data);
+               $Data['Email'] = ArrayValue('SignInEmail', $FormValues, '');
+               $this->UserModel->Synchronize(ArrayValue('UniqueID', $FormValues, ''), $Data);
             }
          }
          
@@ -85,11 +85,12 @@ class EntryController extends Gdn_Controller {
             Redirect($Target);
          }
          
-         if($Authenticator->State() == Gdn_HandshakeAuthenticator::SignedOut) {
+         if ($Authenticator->State() == Gdn_HandshakeAuthenticator::SignedOut) {
             // Clear out the authentication so it will fetch when we come back here.
             $Authenticator->SetIdentity(NULL);
             // Once signed in, we need to come back here to make sure there was no problem with the handshake.
             $Target = Url('/entry/handshake/?Target='.urlencode($Target), TRUE);
+            // echo $Target;
             // Redirect to the external server to sign in.
             $SignInUrl = $Authenticator->RemoteSignInUrl($Target);
             Redirect($SignInUrl);
@@ -99,20 +100,16 @@ class EntryController extends Gdn_Controller {
          $HandshakeData = $Authenticator->GetHandshakeData();
          
          // Check to see if there is a problem with the handshake.
-         $this->UserModel->ValidateUniqueFields($HandshakeData['Name'], $HandshakeData['Email']);
-         $ValidationResults = $this->UserModel->ValidationResults();
-         $this->Form->SetValidationResults($ValidationResults);
+         // $this->UserModel->ValidateUniqueFields($HandshakeData['Name'], $HandshakeData['Email']);
+         // $ValidationResults = $this->UserModel->ValidationResults();
+         // $this->Form->SetValidationResults($ValidationResults);
          
          // Set the defaults for a new user.
-         if(!array_key_exists('Name', $ValidationResults)) {
-            $this->Form->SetFormValue('NewName', $HandshakeData['Name']);
-         }
-         if(!array_key_exists('Email', $ValidationResults)) {
-            $this->Form->SetFormValue('NewEmail', $HandshakeData['Email']);
-         }
+         $this->Form->SetFormValue('NewName', $HandshakeData['Name']);
+         $this->Form->SetFormValue('NewEmail', $HandshakeData['Email']);
          
          // Set the default for the login.
-         $this->Form->SetFormValue('SignInName', $HandshakeData['Name']);
+         $this->Form->SetFormValue('SignInEmail', $HandshakeData['Email']);
          $this->Form->SetFormValue('Handshake', 'NEW');
          
          // Add the handshake data as hidden fields.

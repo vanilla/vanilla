@@ -25,7 +25,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('lcu.Name', '', 'LastName')
          ->Select('lcup.Name', '', 'LastPhoto')
          ->Select('lc.Body', '', 'LastBody')
-         ->Select("' &bull; ', pc.Name, ca.Name", 'concat_ws', 'Category')
+         ->Select("' → ', pc.Name, ca.Name", 'concat_ws', 'Category')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
@@ -56,7 +56,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('lcu.Name', '', 'LastName')
          //->Select('lcup.Name', '', 'LastPhoto')
          //->Select('lc.Body', '', 'LastBody')
-         ->Select("' &bull; ', pc.Name, ca.Name", 'concat_ws', 'Category')
+         ->Select("' → ', pc.Name, ca.Name", 'concat_ws', 'Category')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo

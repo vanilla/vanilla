@@ -41,7 +41,7 @@ $Construct->Table('Discussion')
    ->Column('Sink', array('1', '0'), '0')
    ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('DateUpdated', 'datetime')
-   ->Column('DateLastComment', 'datetime')
+   ->Column('DateLastComment', 'datetime', NULL, 'index')
    ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
    

@@ -14,6 +14,14 @@ class Gdn_DraftModel extends Gdn_VanillaModel {
          ->From('Draft d');
    }
    
+	/**
+	 * Get the discussion drafts.
+	 * @param int $UserID The user that wrote the drafts.
+	 * @param int $Offset The offset in the result set.
+	 * @param int $Limit The limit in the result set.
+	 * @param int $DiscussionID The discussion the drafts belong to.
+	 * @return Gdn_DataSet
+	 */
    public function Get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

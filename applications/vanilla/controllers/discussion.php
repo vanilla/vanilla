@@ -60,6 +60,11 @@ class DiscussionController extends VanillaController {
          // Load the comments
          $this->SetData('CommentData', $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
 
+			// Load the draft.
+			$DraftModel = new Gdn_DraftModel();
+			$Draft = $DraftModel->Get($Session->UserID, 0, 1, $DiscussionID)->FirstRow('', 'array');
+			$this->SetData('Draft', ArrayValue('Body', $Draft));
+
          // Build a pager
          $PagerFactory = new PagerFactory();
          $this->Pager = $PagerFactory->GetPager('MorePager', $this);
@@ -79,7 +84,7 @@ class DiscussionController extends VanillaController {
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
-      $this->Form->AddHidden('DraftID', '');
+      $this->Form->AddHidden('DraftID', ArrayValue('DraftID', $Draft, ''));
       $this->Form->Action = Url('/vanilla/post/comment/');
       
       // Deliver json data if necessary
@@ -92,9 +97,6 @@ class DiscussionController extends VanillaController {
       // Add Modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData(20, $DiscussionID);
-      $this->AddModule($DraftsModule);
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);

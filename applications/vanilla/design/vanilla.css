@@ -25,7 +25,6 @@ Welcome to the Vanilla CSS File! Some things you should know:
 
 
 /* ======================================================== Panels / Sidebars */
-#Panel a.Bookmark,
 a.NewDiscussion {
    padding: 6px 0;
    display: block;
@@ -44,14 +43,6 @@ a.NewDiscussion:hover {
    background: #11e420 /* Menu Hover Background Color */;
    color: #fff /* Menu Hover Font Color */;
    text-shadow: 0 1px 0 #01c400;
-}
-#Panel a.Bookmark {
-   background: #9f0;
-   color: #fff;
-}
-#Panel a.Bookmark:hover {
-   background: #ff6b39;
-   color: #fff;
 }
 #Panel ul.Discussions {
    border: 0;
@@ -386,7 +377,7 @@ a.Bookmark,
 a.Bookmarking {
    float: right;
    display: block;
-   background: url('star_light.png') center center no-repeat;
+   background: url('star_sprite.png') top center no-repeat;
    height: 22px;
    width: 22px;
    margin: 2px 2px 0 4px;
@@ -396,10 +387,10 @@ a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url('star_yellow.png') center center no-repeat;
+   background: url('star_sprite.png') center center no-repeat;
 }
 a.Bookmarking {
-   background: url('star_blue.png') center center no-repeat;
+   background: url('star_sprite.png') bottom center no-repeat;
 }
 ul.Discussion li.Options {
    float: right;

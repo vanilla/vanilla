@@ -114,7 +114,7 @@ class Gdn_CategoryModel extends Gdn_Model {
    public function GetFull($CategoryID = '') {
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
-         ->Select("' &bull; ', p.Name, c.Name", 'concat_ws', 'Name')
+         ->Select("' → ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1');

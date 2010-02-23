@@ -73,7 +73,6 @@ jQuery(document).ready(function($) {
       var container = $(anchor).parent();
       var transientKey = definition('TransientKey');
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
-      var webRoot = definition('WebRoot', '');
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
             $(container).slideUp('fast',function() {

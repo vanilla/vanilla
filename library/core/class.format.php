@@ -501,14 +501,17 @@ class Format {
    /**
     * Formats a Mysql DateTime string in the specified format.
     *
-    * @param string $MysqlDateTime A string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
+    * @param string $Timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
     * @param string $Format The format string to use. Defaults to the application's default format.
     * For instructions on how the format string works:
     *  http://ca.php.net/manual/en/function.date.php
     * @return string
     */
-   public static function Date($MysqlDateTime = '', $Format = '') {
-      $Timestamp = self::ToTimestamp($MysqlDateTime);
+   public static function Date($Timestamp = '', $Format = '') {
+      // Was a mysqldatetime passed?
+      if (!is_numeric($Timestamp))
+         $Timestamp = self::ToTimestamp($Timestamp);
+         
       if (!$Timestamp)
          $Timestamp = time(); // return '&nbsp;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 

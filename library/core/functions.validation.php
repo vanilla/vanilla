@@ -46,6 +46,9 @@ if (!function_exists('ValidateRequired')) {
       if (is_string($Value))
          return trim($Value) == '' ? FALSE : TRUE;
 
+      if (is_numeric($Value))
+         return TRUE;
+
       return FALSE;
    }
 }

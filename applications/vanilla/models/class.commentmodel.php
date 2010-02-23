@@ -108,6 +108,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
    
    public function GetNew($DiscussionID, $LastCommentID) {
       $this->CommentQuery();      
+      $this->FireEvent('BeforeGetNew');
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
          ->Where('c.CommentID >', $LastCommentID)

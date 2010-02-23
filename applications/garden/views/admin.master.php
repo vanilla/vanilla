@@ -19,8 +19,6 @@
 							
 						echo Anchor($Name, '/profile/'.$Session->User->UserID.'/'.$Session->User->Name);
 						echo Anchor(Gdn::Translate('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
-					} else {
-						echo Anchor(Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl));
 					}
 				?>
          </div>

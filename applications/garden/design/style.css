@@ -796,6 +796,20 @@ body.Entry #Content {
    width: 360px;
    text-align: center;
 }
+body#garden_entry_handshake #Content {
+	width: 720px;
+}
+body#garden_entry_handshake ul.LinkAccount {
+	float: left;
+	width: 330px;
+	margin-right: 29px;
+	border-right: 1px solid #A5D0E7;
+}
+body#garden_entry_handshake div.Info {
+	border: 1px solid #A5D0E7;
+	background: #D3F0FF;
+	color: #02475A;
+}
 body.Entry #Content div.Box {
    background: #E2F4FF;
    -moz-border-radius: 2px;

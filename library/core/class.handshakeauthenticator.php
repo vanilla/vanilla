@@ -110,7 +110,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
          if(strlen($Cookie) > 0)
             $Cookie .= '; ';
             
-         $Cookie .= $Key.'='.base64_encode($Value);
+         $Cookie .= $Key.'='.urlencode($Value);
       }
 
       if(strlen($Cookie) > 0)
@@ -159,11 +159,11 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 
    public function GetIdentity($ForceHandshake = FALSE) {
       // Check to see if the identity has us logged in.
-      if($ForceHandshake === FALSE) {
+      if ($ForceHandshake === FALSE) {
          $Id = $this->_Identity->GetIdentity();
-         if($Id > 0)
+         if ($Id > 0)
             return $Id;
-// DEBUG: add these back in after testing is complete
+// TODO: add these back in after testing is complete
 //         elseif($Id < 0)
 //            return 0; // prevent session from grabbing constantly
       }
@@ -212,6 +212,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
    
    public function SignInUrl($Redirect = '/') {
       return '/entry/handshake/?Target='.urlencode($Redirect);
+      // return sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
    }
    
    public function SignOutUrl() {

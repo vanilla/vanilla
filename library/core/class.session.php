@@ -285,12 +285,17 @@ class Gdn_Session {
     * @param mixed $Value
     * @todo check argument type
     */
-   public function SetPreference($Name, $Value = '') {
+   public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
       if (!is_array($Name))
          $Name = array($Name => $Value);
 
       foreach($Name as $Key => $Val) {
          $this->_Preferences[$Key] = $Val;
+      }
+      
+      if ($SaveToDatabase && $this->UserID > 0) {
+         $UserModel = Gdn::UserModel();
+         $UserModel->SavePreference($this->UserID, $Name);
       }
    }
 

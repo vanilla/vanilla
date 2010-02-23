@@ -460,8 +460,7 @@ class SettingsController extends GardenController {
          try {
             foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
-                  $UserModel = Gdn::UserModel();
-                  $UserModel->SavePreference($Session->UserID, 'PreviewTheme', ''); // Clear out the preview
+                  $Session->SetPreference('PreviewTheme', ''); // Clear out the preview
                   $ThemeManager->EnableTheme($ThemeName);
                }
             }
@@ -495,15 +494,13 @@ class SettingsController extends GardenController {
       }
 
       $Session = Gdn::Session();
-      $UserModel = Gdn::UserModel();
-      $UserModel->SavePreference($Session->UserID, array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
+      $Session->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
       Redirect('/');
    }
    
    public function CancelPreview() {
       $Session = Gdn::Session();
-      $UserModel = Gdn::UserModel();
-      $UserModel->SavePreference($Session->UserID, array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
+      $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
       Redirect('settings/themes');
    }
    

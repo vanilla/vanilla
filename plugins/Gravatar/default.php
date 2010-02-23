@@ -38,6 +38,10 @@ class GravatarPlugin implements Gdn_IPlugin {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
 
+   public function Gdn_CommentModel_BeforeGetNew_Handler(&$Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
+   }
+
    public function Setup() {
       // No setup required.
    }

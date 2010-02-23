@@ -128,6 +128,8 @@ class Gdn_CategoryModel extends Gdn_Model {
    }
 
    public function GetFullByName($CategoryName) {
+      $CategoryName = explode(' → ', $CategoryName);
+      $CategoryName = count($CategoryName) == 2 ? $CategoryName[1] : $CategoryName[0];
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
          ->Select("' → ', p.Name, c.Name", 'concat_ws', 'Name')

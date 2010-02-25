@@ -100,7 +100,7 @@ class Gdn_CategoryModel extends Gdn_Model {
 
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions')
+         ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
          ->From('Category c')
          ->BeginWhereGroup()
          ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View')
@@ -113,7 +113,7 @@ class Gdn_CategoryModel extends Gdn_Model {
    
    public function GetFull($CategoryID = '') {
       $this->SQL
-         ->Select('c.CategoryID, c.Description, c.CountDiscussions')
+         ->Select('c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
          ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
@@ -127,16 +127,14 @@ class Gdn_CategoryModel extends Gdn_Model {
          return $this->SQL->OrderBy('c.Sort')->Get();
    }
 
-   public function GetFullByName($CategoryName) {
-      $CategoryName = explode(' &rarr; ', $CategoryName);
-      $CategoryName = count($CategoryName) == 2 ? $CategoryName[1] : $CategoryName[0];
+   public function GetFullByUrlCode($UrlCode) {
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
          ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')
-         ->Where('c.Name', $CategoryName);
+         ->Where('c.UrlCode', $UrlCode);
          
       $this->SQL->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
          
@@ -222,11 +220,25 @@ class Gdn_CategoryModel extends Gdn_Model {
 
       $CategoryID = ArrayValue('CategoryID', $FormPostValues);
       $NewName = ArrayValue('Name', $FormPostValues, '');
+      $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
       if ($Insert)
          $this->AddInsertFields($FormPostValues);               
 
       $this->AddUpdateFields($FormPostValues);
+      $this->Validation->ApplyRule('UrlCode', 'Required');
+      $this->Validation->ApplyRule('UrlCode', 'UrlString', 'Url code can only contain letters, numbers, underscores and dashes.');
+      
+      // Make sure that the UrlCode is unique among categories.
+      $this->SQL->Select('CategoryID')
+         ->From('Category')
+         ->Where('UrlCode', $UrlCode);
+      
+      if ($CategoryID)
+         $this->SQL->Where('CategoryID <>', $CategoryID);
+      
+      if ($this->SQL->Get()->NumRows())
+         $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
       
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
@@ -282,9 +294,11 @@ class Gdn_CategoryModel extends Gdn_Model {
          }
          
          // Save the permissions
-         $PermissionModel = Gdn::PermissionModel();
-         $Permissions = $PermissionModel->PivotPermissions($FormPostValues['Permission'], array('JunctionID' => $CategoryID));
-         $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+         if ($AllowDiscussions) {
+            $PermissionModel = Gdn::PermissionModel();
+            $Permissions = $PermissionModel->PivotPermissions($FormPostValues['Permission'], array('JunctionID' => $CategoryID));
+            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+         }
          
          // Force the user permissions to refresh.
          $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));

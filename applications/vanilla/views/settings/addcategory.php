@@ -12,6 +12,13 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li>
+      <?php echo $this->Form->Label('Url Code', 'UrlCode'); ?>
+      <div class="Info">
+         <?php echo Gdn::Translate('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
+      </div>
+      <?php echo $this->Form->TextBox('UrlCode'); ?>
+   </li>
+   <li>
       <?php
          echo $this->Form->Label('Description', 'Description');
          echo $this->Form->TextBox('Description', array('MultiLine' => TRUE));

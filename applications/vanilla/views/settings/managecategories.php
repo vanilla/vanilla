@@ -11,7 +11,8 @@ echo $this->Form->Open();
       <tr id="0">
          <th><?php echo Gdn::Translate('Category'); ?></th>
          <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
-         <th><?php echo Gdn::Translate('Options'); ?></th>
+         <th><?php echo Gdn::Translate('Url'); ?></th>
+         <th class="Alt"><?php echo Gdn::Translate('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -27,7 +28,8 @@ foreach ($this->CategoryData->Result() as $Category) {
    <tr id="<?php echo $Category->CategoryID; ?>"<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
       <td class="First"><a href="<?php echo Url('vanilla/settings/editcategory/'.$Category->CategoryID); ?>"><?php echo $Category->Name; ?></a></td>
       <td class="Alt"><?php echo $Category->Description; ?></td>
-      <td><?php echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID); ?></td>
+      <td><?php echo $Category->AllowDiscussions == '1' ? Url('categories/'.$Category->UrlCode.'/') : '&nbsp;'; ?></td>
+      <td class="Alt"><?php echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID); ?></td>
    </tr>
 <?php } ?>
    </tbody>

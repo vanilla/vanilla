@@ -18,7 +18,7 @@ class CategoriesController extends VanillaController {
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
       if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByName(urldecode($CategoryIdentifier));
+         $Category = $this->CategoryModel->GetFullByUrlCode(urldecode($CategoryIdentifier));
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       $this->SetData('Category', $Category, TRUE);

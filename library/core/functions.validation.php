@@ -115,6 +115,14 @@ if (!function_exists('ValidateUsername')) {
       );
    }
 }
+if (!function_exists('ValidateUrlString')) {
+   function ValidateUrlString($Value, $Field = '') {
+      return ValidateRegex(
+         $Value,
+         '/^([\d\w_\-]{3,20})$/si'
+      );
+   }
+}
 
 if (!function_exists('ValidateDate')) {
    function ValidateDate($Value) {

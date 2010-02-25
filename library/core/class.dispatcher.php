@@ -189,8 +189,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
          if (!$PluginManagerHasReplacementMethod && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
             // Check to see if there is an 'x' version of the method.
-            if(method_exists($Controller, 'x'.$ControllerMethod)) {
-               $PluginManagerHasReplacementMethod = TRUE;
+            if (method_exists($Controller, 'x'.$ControllerMethod)) {
+               // $PluginManagerHasReplacementMethod = TRUE;
+               $ControllerMethod = 'x'.$ControllerMethod;
             } else {
                if ($this->_ControllerMethod != '')
                   array_unshift($this->_ControllerMethodArgs, $this->_ControllerMethod);

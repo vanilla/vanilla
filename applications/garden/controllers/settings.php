@@ -163,7 +163,7 @@ class SettingsController extends GardenController {
     * Garden settings dashboard.
     */
    var $RequiredAdminPermissions = array();
-   public function Index() {
+   public function xIndex() {
       $this->AddJsFile('settings.js');
       $this->Title(Translate('Dashboard'));
          
@@ -199,6 +199,22 @@ class SettingsController extends GardenController {
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
       
+      // Check for updates
+      $this->AddUpdateCheck();
+      
+      // Fire an event so other applications can add some data to be displayed
+      $this->FireEvent('DashboardData');
+      $this->Render();
+   }
+   
+   /**
+    * Adds information to the definition list that causes the app to "phone
+    * home" and see if there are upgrades available. Currently added to the
+    * dashboard only.
+    * Nothing renders with this method. It is public so it can be added by
+    * plugins.
+    */
+   public function AddUpdateCheck() {
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.
@@ -256,10 +272,6 @@ class SettingsController extends GardenController {
          // will pick it up and ping the VanillaForums.org server with this info).
          $this->AddDefinition('UpdateChecks', Format::Serialize($UpdateData));
       }
-      
-      // Fire an event so other applications can add some data to be displayed
-      $this->FireEvent('DashboardData');
-      $this->Render();
    }
    
    public function Initialize() {

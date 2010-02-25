@@ -258,7 +258,7 @@ class Gdn_PluginManager {
       $NewMethodKeyParts = explode('.', $NewMethodKey);
       if (count($NewMethodKeyParts) != 2)
          return FALSE;
-      
+
       list($NewMethodClassName, $NewMethodName) = $NewMethodKeyParts;
 
       if (property_exists($this, $NewMethodClassName) === FALSE)

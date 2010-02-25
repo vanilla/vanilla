@@ -38,8 +38,13 @@ class SettingsController extends Gdn_Controller {
 	}
    
    public function Index() {
+      $this->View = 'general';
+      $this->General();
+   }
+   
+   public function General() {
       $this->Permission('Vanilla.Settings.Manage');
-      $this->AddSideMenu('vanilla/settings');
+      $this->AddSideMenu('vanilla/settings/general');
       $this->AddJsFile('settings.js');
       $this->Title(Translate('Forum Settings'));
 

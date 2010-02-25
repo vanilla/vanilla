@@ -645,7 +645,11 @@ table.AltColumns tr.Alt {
 }
 table.AltColumns tr.Parent td,
 table tr.Parent td {
-   background: #ff9;
+   background: #fff;
+}
+table.AltColumns tr.Parent td.Alt,
+table tr.Parent td.Alt {
+	background: #fcfcfc;
 }
 table tr.Child td.First {
    padding-left: 20px;

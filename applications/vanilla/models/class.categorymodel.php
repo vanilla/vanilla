@@ -114,7 +114,7 @@ class Gdn_CategoryModel extends Gdn_Model {
    public function GetFull($CategoryID = '') {
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
-         ->Select("' → ', p.Name, c.Name", 'concat_ws', 'Name')
+         ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1');
@@ -128,11 +128,11 @@ class Gdn_CategoryModel extends Gdn_Model {
    }
 
    public function GetFullByName($CategoryName) {
-      $CategoryName = explode(' → ', $CategoryName);
+      $CategoryName = explode(' &rarr; ', $CategoryName);
       $CategoryName = count($CategoryName) == 2 ? $CategoryName[1] : $CategoryName[0];
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions')
-         ->Select("' → ', p.Name, c.Name", 'concat_ws', 'Name')
+         ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')

@@ -153,6 +153,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Menu->AddLink('Forum', Gdn::Translate('General'), 'vanilla/settings', 'Vanilla.Settings.Manage');
       $Menu->AddLink('Forum', Gdn::Translate('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', Gdn::Translate('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-   }
+		$Menu->AddLink('Forum', Gdn::Translate('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
+	}
    
 }

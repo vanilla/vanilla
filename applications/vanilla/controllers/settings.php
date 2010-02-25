@@ -6,6 +6,36 @@
 class SettingsController extends Gdn_Controller {
    
    public $Uses = array('Database', 'Form', 'Gdn_CategoryModel');
+	
+	public function Advanced() {
+      $this->Permission('Vanilla.Settings.Manage');
+		
+		$Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Vanilla.Archive.Date'
+      ));
+      
+      // Set the model on the form.
+      $this->Form->SetModel($ConfigurationModel);
+      
+      // If seeing the form for the first time...
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+		} else {
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
+			
+			if ($this->Form->Save() !== FALSE)
+            $this->StatusMessage = Translate("Your changes have been saved.");
+		}
+		
+      $this->AddSideMenu('vanilla/settings');
+      $this->AddJsFile('settings.js');
+      $this->Title(Translate('Advanced Forum Settings'));
+		
+		$this->Render();
+	}
    
    public function Index() {
       $this->Permission('Vanilla.Settings.Manage');

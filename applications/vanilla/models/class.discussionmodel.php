@@ -221,7 +221,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
 
    public function GetID($DiscussionID) {
       $Session = Gdn::Session();
-      return $this->SQL
+      $Data = $this->SQL
          ->Select('d.*')
          ->Select('c.Body')
          ->Select('ca.Name', '', 'Category')
@@ -239,6 +239,11 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Where('d.DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow();
+		
+		if(Format::ToTimestamp($Data->DateLastComment) <= Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))) {
+			$Data->Closed = '1';
+		}
+		return $Data;
    }
    
    /**

@@ -119,7 +119,7 @@ if (!function_exists('ValidateUrlString')) {
    function ValidateUrlString($Value, $Field = '') {
       return ValidateRegex(
          $Value,
-         '/^([\d\w_\-]{3,20})$/si'
+         '/^([\d\w_\-]+)$/si'
       );
    }
 }

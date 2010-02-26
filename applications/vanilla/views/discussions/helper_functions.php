@@ -6,7 +6,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
-   $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+   $CountUnreadComments = $Discussion->CountUnreadComments;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
 ?>

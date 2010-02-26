@@ -322,6 +322,16 @@ class Gdn_DataSet implements IteratorAggregate {
 
       return Format::To($this->_ResultObject, $FormatType);
    }
+	
+	public function &ResultReference() {
+		$this->FetchAllRows();
+		switch($this->DefaultDatasetType) {
+			case DATASET_TYPE_ARRAY:
+				return $this->_ResultArray;
+			case DATASET_TYPE_OBJECT:
+				return $this->_ResultObject;
+		}
+	}
 
    /**
     * Returns the requested row index as the requested row type.

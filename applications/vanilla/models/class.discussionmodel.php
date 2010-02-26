@@ -132,11 +132,33 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          $this->SQL->EndWhereGroup();
       }
          
-      return $this->SQL
+      $Data = $this->SQL
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+			
+		$this->AddDiscussionColumns($Data);
+		
+		return $Data;
    }
+	
+	public function AddDiscussionColumns($Data) {
+		// Change discussions based on archiving.
+		$ArchiveTimestamp = Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
+		$Result = &$Data->ResultReference();
+		foreach($Result as &$Discussion) {
+			if(Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
+				$Discussion->Closed = '1';
+				if($Discussion->CountCommentWatch) {
+					$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+				} else {
+					$Discussion->CountUnreadComments = 0;
+				}
+			} else {
+				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+			}
+		}
+	}
    
    public function GetAnnouncements($Wheres = '') {
       $Session = Gdn::Session();
@@ -154,12 +176,15 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
          
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('d.Announce', '1')
          ->Where('w.Dismissed is null')
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+			
+		$this->AddDiscussionColumns($Data);
+		return $Data;
    }
    
    protected $_CategoryPermissions = NULL;

@@ -267,15 +267,19 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')
          ->Select('c.CommentID', 'count', 'CountComments')
+         ->Select('d.Sink')
          ->From('Comment c')
+         ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
          ->Where('c.DiscussionID', $DiscussionID)
+         ->GroupBy('d.Sink')
          ->Get()->FirstRow();
       
       if (!is_null($Data)) {
-         $this->SQL
-            ->Update('Discussion')
-            ->Set('DateLastComment', $Data->DateLastComment)
-            ->Set('LastCommentID', $Data->LastCommentID)
+         $this->SQL->Update('Discussion');
+         if ($Data->Sink == '0')
+            $this->SQL->Set('DateLastComment', $Data->DateLastComment);
+
+         $this->SQL->Set('LastCommentID', $Data->LastCommentID)
             ->Set('CountComments', $Data->CountComments)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();

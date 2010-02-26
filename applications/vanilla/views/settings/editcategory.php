@@ -11,6 +11,15 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Name');
       ?>
    </li>
+   <?php if ($this->Category->AllowDiscussions) { ?>
+   <li>
+      <?php echo $this->Form->Label('Url Code', 'UrlCode'); ?>
+      <div class="Info">
+         <?php echo Gdn::Translate('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
+      </div>
+      <?php echo $this->Form->TextBox('UrlCode'); ?>
+   </li>
+   <?php } ?>
    <li>
       <?php
          echo $this->Form->Label('Description', 'Description');

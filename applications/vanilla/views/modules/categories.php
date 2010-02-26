@@ -22,7 +22,7 @@ if ($this->_CategoryData !== FALSE) {
       if ($CategoryID == $Category->CategoryID)
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Format::Text($Category->Name), '/categories/'.urlencode($Category->Name)); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor(Format::Text(str_replace('&rarr;', '→', $Category->Name)), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
       <?php
    }
       ?>

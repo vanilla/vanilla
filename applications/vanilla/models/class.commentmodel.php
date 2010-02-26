@@ -50,29 +50,35 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             
          if (is_numeric($Discussion->CountCommentWatch)) {
             // Update the watch data
-            $this->SQL->Put(
-               'UserDiscussion',
-               array(
-                  'CountComments' => $CountWatch,
-                  'DateLastViewed' => Format::ToDateTime()
-               ),
-               array(
-                  'UserID' => $Session->UserID,
-                  'DiscussionID' => $Discussion->DiscussionID,
-                  'CountComments <' => $CountWatch
-               )
-            );
+				if($CountWatch != @$Discussion->CountCommentWatch) {
+					// Only update the watch if there are new comments.
+					$this->SQL->Put(
+						'UserDiscussion',
+						array(
+							'CountComments' => $CountWatch,
+							'DateLastViewed' => Format::ToDateTime()
+						),
+						array(
+							'UserID' => $Session->UserID,
+							'DiscussionID' => $Discussion->DiscussionID
+						)
+					);
+				}
          } else {
-            // Insert watch data
-            $this->SQL->Insert(
-               'UserDiscussion',
-               array(
-                  'UserID' => $Session->UserID,
-                  'DiscussionID' => $Discussion->DiscussionID,
-                  'CountComments' => $CountWatch,
-                  'DateLastViewed' => Format::ToDateTime()
-               )
-            );
+				// Make sure the discussion isn't archived.
+				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+				if(!$ArchiveDate || (Format::ToTimestamp($Discussion->DateLastComment) > Format::ToTimestamp($ArchiveDate))) {
+					// Insert watch data
+					$this->SQL->Insert(
+						'UserDiscussion',
+						array(
+							'UserID' => $Session->UserID,
+							'DiscussionID' => $Discussion->DiscussionID,
+							'CountComments' => $CountWatch,
+							'DateLastViewed' => Format::ToDateTime()
+						)
+					);
+				}
          }
       }
    }

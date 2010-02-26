@@ -116,6 +116,8 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                ->Select('0', '', 'Bookmarked')
                ->Select('0', '', 'CountCommentWatch');
       }
+		
+		$this->AddArchiveWhere($this->SQL);
       
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -156,6 +158,22 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
 				}
 			} else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+			}
+		}
+	}
+	
+	/**
+	 * @param Gdn_SQLDriver $Sql
+	 */
+	public function AddArchiveWhere($Sql = NULL) {
+		if(is_null($Sql))
+			$Sql = $this->SQL;
+		
+		$Exclude = Gdn::Config('Vanilla.Archive.Exclude');
+		if($Exclude) {
+			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+			if($ArchiveDate) {
+				$Sql->Where('d.DateLastComment >', $ArchiveDate);
 			}
 		}
 	}
@@ -472,13 +490,41 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
     * @param int The DiscussionID relating to the category we are updating.
     */
    public function UpdateDiscussionCount($CategoryID) {
-      if (is_numeric($CategoryID) && $CategoryID > 0) {
-         $Data = $this->SQL
-            ->Select('DiscussionID', 'count', 'CountDiscussions')
-            ->From('Discussion')
-            ->Where('CategoryID', $CategoryID)
-            ->Get()
-            ->FirstRow();
+		if(strcasecmp($CategoryID, 'All') == 0) {
+			$Exclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+			$Params = array();
+			$Where = '';
+			
+			if($Exclude && $ArchiveDate) {
+				$Where = 'where d.DateLastComment > :ArchiveDate';
+				$Params[':ArchiveDate'] = $ArchiveDate;
+			}
+			
+			// Update all categories.
+			$Sql = "update :_Category c
+left join (
+  select
+    d.CategoryID,
+    count(d.DiscussionID) as CountDiscussions
+  from :_Discussion d
+  $Where
+  group by d.CategoryID
+) d
+  on c.CategoryID = d.CategoryID
+set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
+			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
+			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');
+			
+		} elseif (is_numeric($CategoryID) && $CategoryID > 0) {
+         $this->SQL
+            ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->From('Discussion d')
+            ->Where('d.CategoryID', $CategoryID);
+         
+			$this->AddArchiveWhere();
+			
+			$Data = $this->SQL->Get()->FirstRow();
          $Count = $Data ? $Data->CountDiscussions : 0;
          
          if ($Count >= 0) {

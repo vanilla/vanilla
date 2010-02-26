@@ -13,7 +13,8 @@ class SettingsController extends Gdn_Controller {
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
-         'Vanilla.Archive.Date'
+         'Vanilla.Archive.Date',
+			'Vanilla.Archive.Exclude'
       ));
       
       // Set the model on the form.
@@ -26,8 +27,21 @@ class SettingsController extends Gdn_Controller {
 		} else {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
 			
-			if ($this->Form->Save() !== FALSE)
+			// Grab old config values to check for an update.
+			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
+			$ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+			
+			$Saved = $this->Form->Save();
+			if($Saved) {
+				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+				$ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+				
+				if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
+					$DiscussionModel = new Gdn_DiscussionModel();
+					$DiscussionModel->UpdateDiscussionCount('All');
+				}
             $this->StatusMessage = Translate("Your changes have been saved.");
+			}
 		}
 		
       $this->AddSideMenu('vanilla/settings');

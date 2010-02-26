@@ -13,5 +13,10 @@ echo $this->Form->Errors();
          echo $this->Form->Calendar('Vanilla.Archive.Date');
       ?>
    </li>
+	<li>
+      <?php
+         echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
+      ?>
+   </li>
 </ul>
 <?php echo $this->Form->Close('Save');

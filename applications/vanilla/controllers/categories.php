@@ -47,9 +47,6 @@ class CategoriesController extends VanillaController {
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData();
-      $this->AddModule($DraftsModule);
 
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new Gdn_DiscussionModel();
@@ -120,9 +117,6 @@ class CategoriesController extends VanillaController {
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData();
-      $this->AddModule($DraftsModule);
       
       $this->View = 'all';
       $this->Render();

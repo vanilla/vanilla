@@ -282,6 +282,10 @@ body.Discussion #Content h2 span {
    line-height: 140%;
    font-size: 100%;
 }
+div.Popup .Preview li .Body {
+   -moz-border-radius: 0;
+   -moz-box-shadow: none;
+}
 .Body p {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin: 8px 0;
@@ -599,4 +603,8 @@ a.Cancel {
    font-weight: normal;
    font-size: 95%;
    color: #555 /* Body Text Font Color */;
+}
+span.DraftInfo {
+   color: #80828C;
+   padding: 0 0 0 20px;
 }

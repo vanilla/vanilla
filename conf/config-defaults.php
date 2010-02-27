@@ -88,6 +88,7 @@ $Configuration['Garden']['Theme']                               = 'default';
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Email']['AddedToConversation']   = '1';
+$Configuration['Preferences']['Email']['BookmarkComment']       = '1';
 
 // Begin - HtmlPurifier Settings
 $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;

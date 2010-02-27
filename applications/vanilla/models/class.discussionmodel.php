@@ -143,6 +143,16 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Get();
    }
    
+   // Returns all users who have bookmarked the specified discussion
+   public function GetBookmarkUsers($DiscussionID) {
+      return $this->SQL
+         ->Select('UserID')
+         ->From('UserDiscussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Where('Bookmarked', '1')
+         ->Get();
+   }
+   
    protected $_CategoryPermissions = NULL;
    
    public function CategoryPermissions($Escape = FALSE) {

@@ -167,7 +167,6 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             $DiscussionModel = new Gdn_DiscussionModel();
             $DiscussionID = ArrayValue('DiscussionID', $Fields);
             $Discussion = $DiscussionModel->GetID($DiscussionID);
-            $DiscussionAuthorMentioned = FALSE;
             if ($Insert === FALSE) {
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
@@ -182,13 +181,12 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                // Notify any users who were mentioned in the comment
                $Usernames = GetMentions($Fields['Body']);
                $UserModel = Gdn::UserModel();
-               $DiscussionName = '';
+               $Story = ArrayValue('Body', $Fields, '');
+               $NotifiedUsers = array();
                foreach ($Usernames as $Username) {
                   $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
                   if ($User && $User->UserID != $Session->UserID) {
-                     if ($User->UserID == $Discussion->InsertUserID)
-                        $DiscussionAuthorMentioned = TRUE;
-                        
+                     $NotifiedUsers[] = $User->UserID;   
                      $ActivityModel = new Gdn_ActivityModel();   
                      $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
@@ -199,15 +197,33 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                         'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
                         FALSE
                      );
-                     $Story = ArrayValue('Body', $Fields, '');
+                     $ActivityModel->SendNotification($ActivityID, $Story);
+                  }
+               }
+               
+               // Notify users who have bookmarked the discussion
+               $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
+               foreach ($BookmarkData->Result() as $Bookmark) {
+                  if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID) {
+                     $NotifiedUsers[] = $Bookmark->UserID;
+                     $ActivityModel = new Gdn_ActivityModel();   
+                     $ActivityID = $ActivityModel->Add(
+                        $Session->UserID,
+                        'BookmarkComment',
+                        Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+                        $Bookmark->UserID,
+                        '',
+                        'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
+                        FALSE
+                     );
                      $ActivityModel->SendNotification($ActivityID, $Story);
                   }
                }
             }
             
             // Record user-comment activity
-            if ($Insert === TRUE && $Discussion !== FALSE && $DiscussionAuthorMentioned === FALSE)
-               $this->RecordActivity($Discussion, $Session->UserID, $CommentID); // Only record activity if inserting a comment, not on edit.
+            if ($Insert === TRUE && $Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers))
+               $this->RecordActivity($Discussion, $Session->UserID, $CommentID); 
 
             $this->UpdateCommentCount($DiscussionID);
             

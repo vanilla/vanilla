@@ -191,8 +191,6 @@ class Gdn_RoleModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields();
 
          if ($Insert === FALSE) {
-            $Fields = RemoveKeyFromArray($Fields, 'RoleID');
-            // Don't update the primary key
             $this->Update($Fields, array('RoleID' => $RoleID));
          } else {
             $this->Insert($Fields);

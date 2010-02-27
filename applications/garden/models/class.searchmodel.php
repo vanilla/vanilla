@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class Gdn_SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
-	protected $_Parameter = '';
+	protected $_Parameters = array();
 	
 	protected $_SearchSql = array();
 	
@@ -22,23 +22,19 @@ class Gdn_SearchModel extends Gdn_Model {
 	
 	public function AddMatchSql($Sql, $Columns) {
 		$Param = $this->Parameter();
-		
-		$Sql
-			->Select($Columns, "match(%s) against($Param)", 'Relavence')
-			->Where("match($Columns) against ($Param)", NULL, FALSE, FALSE);
+		$Sql->Select($Columns, "match(%s) against($Param)", 'Relavence');
+		$Param = $this->Parameter();
+		$Sql->Where("match($Columns) against ($Param)", NULL, FALSE, FALSE);
 	}
 	
-	public function Parameter($Search = NULL) {
-		if($Search)
-			$this->_Parameter = $this->SQL->NamedParameter('Search', FALSE, $Search);
-		else
-			$this->_Parameter = $this->SQL->NamedParameter('Search');
-			
-		return $this->_Parameter;
+	public function Parameter() {
+		$Parameter = ':Search'.count($this->_Parameters);
+		$this->_Parameters[$Parameter] = '';
+		return $Parameter;
 	}
 	
 	public function Reset() {
-		$this->_Parameter = '';
+		$this->_Parameters = array();
 		$this->_SearchSql = '';
 	}
 	
@@ -50,20 +46,26 @@ class Gdn_SearchModel extends Gdn_Model {
 			return NULL;
 			
 		// Perform the search by unioning all of the sql together.
-		$this->Parameter($Search);
-		
 		$Sql = $this->SQL
 			->Select()
 			->From('_TBL_ s')
 			->OrderBy('s.Relavence', 'desc')
 			->Limit($Limit, $Offset)
 			->GetSelect();
+		
 		$Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
 		
 		$this->EventArguments['Search'] = $Search;
 		$this->FireEvent('AfterBuildSearchQuery');
 		
-		$Result = $this->SQL->Query($Sql);
+		foreach($this->_Parameters as $Key => $Value) {
+			$this->_Parameters[$Key] = $Search;
+		}
+		
+		$Result = $this->Database->Query($Sql, $this->_Parameters); //$this->SQL->Query($Sql);
+		$this->Reset();
+		$this->SQL->Reset();
+		
 		return $Result;
 	}
 }

@@ -1180,7 +1180,7 @@ class Gdn_UserModel extends Gdn_Model {
       if ($User === FALSE) {
          // Clean the user data.
          $UserData['Name'] = $Data['Name'];
-         $UserData['Password'] = '*****';
+         $UserData['Password'] = RandomString(7);
          $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
          $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Data, 'm'), 0, 1));
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Data, 0);

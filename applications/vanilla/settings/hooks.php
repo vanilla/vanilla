@@ -56,6 +56,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Preferences['Email Notifications']['Email.DiscussionComment'] = Gdn::Translate('Notify me when people comment on my discussions.');
       $Sender->Preferences['Email Notifications']['Email.DiscussionMention'] = Gdn::Translate('Notify me when people mention me in discussion titles.');
       $Sender->Preferences['Email Notifications']['Email.CommentMention'] = Gdn::Translate('Notify me when people mention me in comments.');
+      $Sender->Preferences['Email Notifications']['Email.BookmarkComment'] = Gdn::Translate('Notify me when people comment on my bookmarked discussions.');
    }
 	
 	/**

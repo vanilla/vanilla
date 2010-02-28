@@ -60,11 +60,6 @@ class DiscussionController extends VanillaController {
          // Load the comments
          $this->SetData('CommentData', $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
 
-			// Load the draft.
-			$DraftModel = new Gdn_DraftModel();
-			$Draft = $DraftModel->Get($Session->UserID, 0, 1, $DiscussionID)->FirstRow('', 'array');
-			$this->SetData('Draft', ArrayValue('Body', $Draft));
-
          // Build a pager
          $PagerFactory = new PagerFactory();
          $this->Pager = $PagerFactory->GetPager('MorePager', $this);
@@ -81,11 +76,17 @@ class DiscussionController extends VanillaController {
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
+      $this->Form->Action = Url('/vanilla/post/comment/');
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
-      $this->Form->AddHidden('DraftID', ArrayValue('DraftID', $Draft, ''));
-      $this->Form->Action = Url('/vanilla/post/comment/');
+
+      // Retrieve & apply the draft if there is one:
+      $DraftModel = new Gdn_DraftModel();
+      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      if ($Draft)
+         $this->Form->SetFormValue('Body', $Draft->Body);
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

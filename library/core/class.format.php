@@ -121,7 +121,7 @@ class Format {
       if ($FormatMethod == '')
          return $Mixed;
       
-      if (is_string($Mixed) || is_numeric($Mixed)) {
+      if (is_string($Mixed)) {
          if (method_exists('Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } else if (function_exists($FormatMethod)) {

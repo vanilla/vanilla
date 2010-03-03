@@ -14,8 +14,7 @@ class VanillaHooks implements Gdn_IPlugin {
       // Add menu items.
       $Session = Gdn::Session();
       if ($Sender->Menu) {
-         $DiscussionsHome = '/'.Gdn::Config('Vanilla.Discussions.Home', 'discussions');
-         $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('Discussions'), $DiscussionsHome, FALSE);
+         $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('Discussions'), '/discussions', FALSE);
          if ($Session->IsValid()) {
             $Bookmarked = Gdn::Translate('My Bookmarks');
             $CountBookmarks = $Session->User->CountBookmarks;

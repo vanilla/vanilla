@@ -15,7 +15,6 @@ class SettingsController extends Gdn_Controller {
    public function General() {
       $this->Permission('Vanilla.Settings.Manage');
       $this->AddSideMenu('vanilla/settings/general');
-      $this->AddJsFile('settings.js');
       $this->Title(Translate('Forum Settings'));
 
       $Validation = new Gdn_Validation();
@@ -24,8 +23,7 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
-         'Vanilla.Categories.Use',
-         'Vanilla.Discussions.Home'
+         'Vanilla.Categories.Use'
       ));
       
       // Set the model on the form.
@@ -42,7 +40,6 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.Home', 'Required');
          
          if ($this->Form->Save() !== FALSE)
             $this->StatusMessage = Translate("Your changes have been saved.");

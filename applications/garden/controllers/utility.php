@@ -214,4 +214,22 @@ class UtilityController extends GardenController {
          
       $this->Render();
    }
+
+   public function SetClientHour($ClientHour = '', $TransientKey = '') {
+      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      $Session = Gdn::Session();
+      $Success = FALSE;
+      if (
+			is_numeric($ClientHour)
+			&& $Session->UserID > 0
+         && $Session->ValidateTransientKey($TransientKey)
+      ) {
+         $UserModel = Gdn::UserModel();
+			$HourOffset = $ClientHour - date('G', time());
+			$UserModel->Update(array('HourOffset' => $HourOffset), array('UserID' => $Session->UserID));
+			$Success = TRUE;
+      }
+         
+      $this->Render();
+   }
 }

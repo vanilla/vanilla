@@ -72,6 +72,15 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
+      // Set a definition of the user's current timezone from the db. jQuery
+      // will pick this up, compare to the browser, and update the user's
+      // timezone if necessary.
+      $CurrentUser = Gdn::Session()->User;
+      if (is_object($CurrentUser)) {
+         $ClientHour = $CurrentUser->HourOffset + date('G', time());
+         $this->AddDefinition('SetClientHour', $ClientHour);
+      }
+      
       // Render the controller
       $this->Render();
    }

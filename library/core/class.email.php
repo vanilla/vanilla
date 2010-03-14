@@ -103,7 +103,11 @@ class Gdn_Email extends Gdn_Pluggable {
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
-      if($bOverrideSender != FALSE) $this->PhpMailer->Sender = $SenderEmail;
+      if($bOverrideSender != FALSE){
+         $this->PhpMailer->ClearReplyTos();
+         $this->PhpMailer->Sender = $SenderEmail;
+      }
+         
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName);
 
       return $this;
@@ -203,7 +207,7 @@ class Gdn_Email extends Gdn_Pluggable {
       if (is_string($RecipientEmail) && StrPos($RecipientEmail, ',') > 0) {
          $RecipientEmail = explode(',', $RecipientEmail);
          $RecipientEmail = array_map('trim', $RecipientEmail);
-         $RecipientName = array_fill(0, Count($RecipientEmail), '');
+         $RecipientName = array_fill(0, Count($RecipientEmail), $RecipientName);
       } elseif ($RecipientEmail instanceof Gdn_DataSet) 
             $RecipientEmail = ConsolidateArrayValuesByKey($RecipientEmail->ResultArray(), 'Email', 'Name', '');
       
@@ -234,8 +238,11 @@ class Gdn_Email extends Gdn_Pluggable {
          }
       }
       
-      if(is_array($RecipientName) && Count($RecipientEmail) == Count($RecipientName))
+      $Count = Count($RecipientEmail);
+      if(is_array($RecipientName) && $Count == Count($RecipientName))
          $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
+      else $RecipientEmail = array_combine($RecipientEmail, array_fill(0, $Count, ''));
+
       
       foreach($RecipientEmail as $Email => $Name)
          $this->PhpMailer->AddAddress($Email, $Name);

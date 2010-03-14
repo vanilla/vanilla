@@ -241,8 +241,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $Count = Count($RecipientEmail);
       if(is_array($RecipientName) && $Count == Count($RecipientName))
          $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
-      else $RecipientEmail = array_combine($RecipientEmail, array_fill(0, $Count, ''));
-
+      elseif($RecipientName == '') $RecipientEmail = array_combine($RecipientEmail, array_fill(0, $Count, ''));
       
       foreach($RecipientEmail as $Email => $Name)
          $this->PhpMailer->AddAddress($Email, $Name);

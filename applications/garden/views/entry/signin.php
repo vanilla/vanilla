@@ -33,12 +33,12 @@
             if ($Target != '')
                $Target = '?Target='.$Target;
                
-            echo Anchor('Apply for Membership', '/entry/register'.$Target);
+            echo Anchor(Gdn::Translate('Apply for Membership'), '/entry/register'.$Target);
          ?>
       </li>
       <li>
          <?php
-            echo Anchor('Forgot your password?', '/entry/passwordrequest', 'ForgotPassword');
+            echo Anchor(Gdn::Translate('Forgot your password?'), '/entry/passwordrequest', 'ForgotPassword');
          ?>
       </li>
    </ul>

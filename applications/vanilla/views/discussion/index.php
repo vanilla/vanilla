@@ -62,5 +62,5 @@ if ($this->Discussion->Closed == '1') {
 }
 ?>
 <div class="Back">
-   <?php echo Anchor(Gdn::Translate('Back to Discussions'), '/'.Gdn::Config('Vanilla.Discussions.Home', 'discussions')); ?>
+   <?php echo Anchor(Gdn::Translate('Back to Discussions'), '/discussions'); ?>
 </div>

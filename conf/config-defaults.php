@@ -89,6 +89,11 @@ $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Email']['AddedToConversation']   = '1';
 $Configuration['Preferences']['Email']['BookmarkComment']       = '1';
+$Configuration['Preferences']['Email']['WallComment']           = '0';
+$Configuration['Preferences']['Email']['ActivityComment']       = '0';
+$Configuration['Preferences']['Email']['DiscussionComment']     = '0';
+$Configuration['Preferences']['Email']['DiscussionMention']     = '0';
+$Configuration['Preferences']['Email']['CommentMention']        = '0';
 
 // Begin - HtmlPurifier Settings
 $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;

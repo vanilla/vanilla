@@ -48,7 +48,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
-         //->Select('iup.Name', '', 'FirstPhoto')
+         ->Select('iup.Name', '', 'FirstPhoto')
          ->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
          ->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
          ->Select('lc.DateInserted', '', 'LastDate')
@@ -59,7 +59,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select("' &rarr; ', pc.Name, ca.Name", 'concat_ws', 'Category')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
+         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
          ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
          ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
@@ -496,6 +496,9 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+      $this->EventArguments['Discussion'] = $Discussion;
+      $this->EventArguments['State'] = $State;
+      $this->FireEvent('AfterBookmarkDiscussion');
       return $State == '1' ? TRUE : FALSE;
    }
    

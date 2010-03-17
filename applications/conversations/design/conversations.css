@@ -202,28 +202,38 @@ body.Conversations h2 {
 /* Big Buttons */
 a.ClearConversation,
 a.NewConversation {
-   padding: 6px 0px;
-   display: block;
    text-align: center;
-   font-size: 16px;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 15px;
    font-weight: bold;
+   padding: 8px 0;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0px 0px 10px 0px;
-}
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
 a.ClearConversation:hover,
 a.NewConversation:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
 }
-a.ClearConversation {
-   background: #f06;
-}
-a.ClearConversation:hover {
-   background: #c36;
+a.ClearConversation:focus,
+a.NewConversation:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 
 

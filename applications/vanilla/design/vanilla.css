@@ -26,23 +26,36 @@ Welcome to the Vanilla CSS File! Some things you should know:
 
 /* ======================================================== Panels / Sidebars */
 a.NewDiscussion {
-   padding: 6px 0;
-   display: block;
    text-align: center;
-   font-size: 16px;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 15px;
    font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-   text-shadow: 0 1px 0 #30ACD6;
-}
+   padding: 8px 0;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
 a.NewDiscussion:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-   text-shadow: 0 1px 0 #01c400;
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
+}
+a.NewDiscussion:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 #Panel ul.Discussions {
    border: 0;
@@ -55,6 +68,7 @@ ul.PanelDiscussions li a {
 }
 ul.PanelDiscussions li strong {
    display: block;
+   line-height: 1.5;
 }
 
 
@@ -416,9 +430,13 @@ ul.Options li.Parent strong {
    cursor: pointer;
    line-height: 100%;
 }
+ul.Options li.Parent strong:focus,
 ul.Options li.Parent strong:hover {
    color: #333;
    border: 1px solid #888;
+}
+ul.Options li.Parent strong:focus {
+   background: #eee;
 }
 ul.Options li.Active strong:hover,
 ul.Options li.Active strong {
@@ -455,6 +473,14 @@ ul.Options li.Active a {
 ul.Options li.Active a:hover {
    background: #8d8d8d;
    color: #fff;
+}
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
 }
 
 

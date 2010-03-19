@@ -166,6 +166,15 @@ if ($Drop) {
    // Get the general category so we can assign permissions to it.
    $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
    
+   // Set the initial guest permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 2,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'CategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ));
+   
    // Set the intial member permissions.
    $PermissionModel->Save(array(
       'RoleID' => 8,

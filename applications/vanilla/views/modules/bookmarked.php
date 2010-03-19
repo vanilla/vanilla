@@ -10,8 +10,10 @@ if ($this->_DiscussionData !== FALSE && $this->_DiscussionData->NumRows() > 0) {
       foreach ($this->_DiscussionData->Result() as $Discussion) {
          include($DiscussionView);
       }
+      if ($this->_DiscussionData->NumRows() >= 10) {
       ?>
       <li class="ShowAll"><?php echo Anchor(Gdn::Translate('↳ Show All'), 'discussions/bookmarked'); ?></li>
+      <?php } ?>
    </ul>
 </div>
    <?php

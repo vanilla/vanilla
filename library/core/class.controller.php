@@ -896,18 +896,24 @@ class Gdn_Controller extends Gdn_Pluggable {
                   // A direct path to the file was given.
                   $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
                } else {
-                  $JsGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $JsFile);
+                  $JsGlob = preg_replace('/(.*)(\.js)/', '\1*\2', $JsFile);
                   $AppFolder = $JsInfo['AppFolder'];
                   if ($AppFolder == '')
                      $AppFolder = $this->ApplicationFolder;
    
-                  // JS can come from any of the application folders, or it can come from the global js folder:
+                  // JS can come from a theme, an any of the application folder, or it can come from the global js folder:
                   $JsPaths = array();
-                  // 1. This application folder
+                  if ($this->Theme) {
+                     // 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
+                     $JsPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'js' . DS . $JsGlob;
+                     // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+                     $JsPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'js' . DS . $JsGlob;
+                  }
+                  // 3. This application folder
                   $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsGlob;
-                  // 2. Global JS folder. eg. root/js/
+                  // 4. Global JS folder. eg. root/js/
                   $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsGlob;
-                  // 3. Global JS library folder. eg. root/js/library/
+                  // 5. Global JS library folder. eg. root/js/library/
                   $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsGlob;
                }
 

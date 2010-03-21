@@ -28,5 +28,8 @@ echo $this->Form->Errors();
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
       ?>
    </li>
+   <?php
+      $this->FireEvent('EditMyAccountAfter');
+   ?>
 </ul>
 <?php echo $this->Form->Close('Save');

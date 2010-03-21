@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Translate("Sign in") ?></h1>
+<h1><?php echo Translate('Sign In') ?></h1>
 <div class="Box">
    <?php
    // Make sure to force this form to post to the correct place in case the view is

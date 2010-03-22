@@ -22,6 +22,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 require_once(dirname(__FILE__).DS.'class.database.php');
 
 abstract class Gdn_DatabaseStructure {
+
+	protected $_DatabasePrefix = '';
+
 	/**
 	 * Whether or not to only capture the sql, rather than execute it.
 	 * When this property is true then a property called CapturedSql will be added to this class which is an array of all the Sql statements.

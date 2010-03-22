@@ -1,2 +1,2 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Anchor('Start a New Conversation', '/messages/add', 'NewConversation Popup');
+echo Anchor(Gdn::Translate('Start a New Conversation'), '/messages/add', 'NewConversation Popup');

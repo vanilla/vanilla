@@ -19,7 +19,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('ShowEmail', "Allow other members to see your email?", array('value' => '1'));
+         echo $this->Form->CheckBox('ShowEmail', Gdn::Translate('Allow other members to see your email?'), array('value' => '1'));
       ?>
    </li>   
    <li class="Gender">

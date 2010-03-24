@@ -96,7 +96,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
             echo '</span>';
 
-            echo Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category');
+            echo Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category');
             $Sender->FireEvent('DiscussionMeta');
          ?>
       </li>

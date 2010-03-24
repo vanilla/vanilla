@@ -11,7 +11,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
 }
 ?>
 <div id="DiscussionForm">
-   <h2><?php echo property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'; ?></h2>
+   <h2><?php echo property_exists($this, 'Discussion') ? GDN::Translate('Edit Discussion') : GDN::Translate('Start a New Discussion'); ?></h2>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();

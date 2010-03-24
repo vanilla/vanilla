@@ -84,6 +84,7 @@ $Configuration['Garden']['Thumbnail']['Size']                   = 50;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Activity', 'Conversations', 'User');
 $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Theme']                               = 'default';
+$Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

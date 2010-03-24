@@ -104,12 +104,9 @@ class Gdn_Email extends Gdn_Pluggable {
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
-      if($bOverrideSender != FALSE){
-         $this->PhpMailer->ClearReplyTos();
-         $this->PhpMailer->Sender = $SenderEmail;
-      }
+      if($bOverrideSender != FALSE) $this->PhpMailer->Sender = $SenderEmail;
          
-      $this->PhpMailer->SetFrom($SenderEmail, $SenderName);
+      $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
 
       return $this;
    }

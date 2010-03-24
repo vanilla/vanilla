@@ -218,6 +218,11 @@ class Gdn_Email extends Gdn_Pluggable {
    public function To($RecipientEmail, $RecipientName = '') {
    
       if (Is_String($RecipientEmail)) {
+         if (StrPos($RecipientEmail, ',') > 0) {
+            $RecipientEmail = explode(',', $RecipientEmail);
+            // trim no need, PhpMailer::AddAnAddress() will do it
+            return $this->To($RecipientEmail, $RecipientName);
+         }
          if ($this->PhpMailer->SingleTo) return $this->AddTo($RecipientEmail, $RecipientName);
          if (!$this->_IsToSet){
             $this->_IsToSet = True;

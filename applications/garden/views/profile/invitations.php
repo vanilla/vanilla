@@ -25,7 +25,7 @@ if ($this->InvitationData->NumRows() > 0) {
 <table class="AltRows">
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Invite Code'); ?></th>
+         <th><?php echo Gdn::Translate('Invitation Code'); ?></th>
          <th class="Alt"><?php echo Gdn::Translate('Sent To'); ?></th>
          <th><?php echo Gdn::Translate('On'); ?></th>
          <th class="Alt"><?php echo Gdn::Translate('Status'); ?></th>

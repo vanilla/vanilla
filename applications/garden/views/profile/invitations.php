@@ -46,10 +46,12 @@ foreach ($this->InvitationData->Result('Text') as $Invitation) {
          else
             echo Anchor($Invitation->AcceptedName, '/profile/'.$Invitation->AcceptedUserID);
             
-         echo '<div>'
-            .Anchor('Uninvite', '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
-            .' | '.Anchor('Send Again', '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
-         .'</div>';
+         if ($Invitation->AcceptedName == '') {
+            echo '<div>'
+               .Anchor('Uninvite', '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
+               .' | '.Anchor('Send Again', '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
+            .'</div>';
+         }
       ?></td>
       <td><?php echo Format::Date($Invitation->DateInserted); ?></td>
       <td class="Alt"><?php

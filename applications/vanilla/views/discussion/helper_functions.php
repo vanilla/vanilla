@@ -13,34 +13,34 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       || $Session->CheckPermission('Vanilla.Discussions.Edit', $Sender->Discussion->CategoryID)))
    {
       // User can edit the discussion topic/first comment
-      $Sender->Options .= '<li>'.Anchor('Edit', '/vanilla/post/editdiscussion/'.$Comment->DiscussionID, 'EditDiscussion').'</li>';
+      $Sender->Options .= '<li>'.Anchor(Gdn::Translate('Edit'), '/vanilla/post/editdiscussion/'.$Comment->DiscussionID, 'EditDiscussion').'</li>';
    } else if ($Session->UserID == $Comment->InsertUserID
       || $Session->CheckPermission('Vanilla.Comments.Edit', $Sender->Discussion->CategoryID))
    {
       // User can edit the comment
-      $Sender->Options .= '<li>'.Anchor('Edit', '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment').'</li>';
+      $Sender->Options .= '<li>'.Anchor(Gdn::Translate('Edit'), '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment').'</li>';
    }
    
    if ($IsFirstComment) {
       // Announce discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce', 'vanilla/discussion/announce/'.$Comment->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(Gdn::Translate($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Comment->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</li>';
 
       // Sink discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink', 'vanilla/discussion/sink/'.$Comment->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(Gdn::Translate($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Comment->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</li>';
 
       // Close discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Close', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close', 'vanilla/discussion/close/'.$Comment->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(Gdn::Translate($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Comment->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
       
       // Delete discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor('Delete Discussion', 'vanilla/discussion/delete/'.$Comment->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(Gdn::Translate('Delete Discussion'), 'vanilla/discussion/delete/'.$Comment->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</li>';
    } else {
       // Delete comment
       if ($Session->CheckPermission('Vanilla.Comments.Delete', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor('Delete', 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode($Sender->SelfUrl), 'DeleteComment') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(Gdn::Translate('Delete'), 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode($Sender->SelfUrl), 'DeleteComment') . '</li>';
    }
    
    // Allow plugins to add options

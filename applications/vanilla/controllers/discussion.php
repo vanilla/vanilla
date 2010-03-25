@@ -349,7 +349,7 @@ class DiscussionController extends VanillaController {
       
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
-      $this->SetJson('LinkText', Translate($State ? 'Re-Open' : 'Close'));         
+      $this->SetJson('LinkText', Translate($State ? 'Reopen' : 'Close'));         
       $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
       $this->Render();         
    }

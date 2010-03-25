@@ -4,7 +4,7 @@ $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID
 $Editing = isset($this->Comment);
 ?>
 <div id="CommentForm">
-   <h2><?php echo $Editing ? GDN::Translate('Edit Comment') : GDN::Translate('Add Comment'); ?></h2>
+   <h2><?php echo Gdn::Translate($Editing ? 'Edit Comment' : 'Add Comment'); ?></h2>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();

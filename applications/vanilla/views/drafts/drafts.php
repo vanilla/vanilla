@@ -10,7 +10,7 @@ foreach ($this->DraftData->Result() as $Draft) {
       <ul>
          <li class="Title">
             <?php
-               echo Anchor('Delete', 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'DeleteDraft');
+               echo Anchor(Gdn::Translate('Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'DeleteDraft');
             ?>
             <strong><?php
                echo Anchor($Draft->Name, $EditUrl, 'DraftLink');

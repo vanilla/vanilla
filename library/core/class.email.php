@@ -97,14 +97,14 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $SenderName
     * @return Email
     */
-   public function From($SenderEmail = '', $SenderName = '') {
+   public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = FALSE) {
       if ($SenderEmail == '')
          $SenderEmail = Gdn::Config('Garden.Email.SupportAddress', '');
 
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
-      if($this->PhpMailer->Sender == '') $this->PhpMailer->Sender = $SenderEmail;
+      if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
          
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
 

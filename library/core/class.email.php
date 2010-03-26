@@ -97,14 +97,14 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $SenderName
     * @return Email
     */
-   public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = FALSE) {
+   public function From($SenderEmail = '', $SenderName = '') {
       if ($SenderEmail == '')
          $SenderEmail = Gdn::Config('Garden.Email.SupportAddress', '');
 
       if ($SenderName == '')
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
-      if($bOverrideSender != FALSE) $this->PhpMailer->Sender = $SenderEmail;
+      if($this->PhpMailer->Sender == '') $this->PhpMailer->Sender = $SenderEmail;
          
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
 
@@ -214,15 +214,15 @@ class Gdn_Email extends Gdn_Pluggable {
     */
    public function To($RecipientEmail, $RecipientName = '') {
    
-      if (Is_String($RecipientEmail)) {
-         if (StrPos($RecipientEmail, ',') > 0) {
+      if (is_string($RecipientEmail)) {
+         if (strpos($RecipientEmail, ',') > 0) {
             $RecipientEmail = explode(',', $RecipientEmail);
             // trim no need, PhpMailer::AddAnAddress() will do it
             return $this->To($RecipientEmail, $RecipientName);
          }
          if ($this->PhpMailer->SingleTo) return $this->AddTo($RecipientEmail, $RecipientName);
          if (!$this->_IsToSet){
-            $this->_IsToSet = True;
+            $this->_IsToSet = TRUE;
             $this->AddTo($RecipientEmail, $RecipientName);
          } else
             $this->Cc($RecipientEmail, $RecipientName);
@@ -237,11 +237,11 @@ class Gdn_Email extends Gdn_Pluggable {
          foreach($RecipientEmail->ResultObject() as $Object) $this->To($Object);
          return $this;
         
-      } elseif (Is_Array($RecipientEmail)) {
-         $Count = Count($RecipientEmail);
-         if (!Is_Array($RecipientName)) $RecipientName = array_fill(0, $Count, '');
-         if ($Count == Count($RecipientName)) {
-            $RecipientEmail = Array_Combine($RecipientEmail, $RecipientName);
+      } elseif (is_array($RecipientEmail)) {
+         $Count = count($RecipientEmail);
+         if (!is_array($RecipientName)) $RecipientName = array_fill(0, $Count, '');
+         if ($Count == count($RecipientName)) {
+            $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
             foreach($RecipientEmail as $Email => $Name) $this->To($Email, $Name);
          }else
             trigger_error(ErrorMessage('Size of arrays do not match', 'Email', 'To'), E_USER_ERROR);

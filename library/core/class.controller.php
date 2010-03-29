@@ -448,6 +448,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('Cancel', $this->_Definitions))
          $this->_Definitions['Cancel'] = Gdn::Translate('Cancel');
 
+      if (!array_key_exists('Search', $this->_Definitions))
+         $this->_Definitions['Search'] = Gdn::Translate('Search');
+
       $Return = '<!-- Various definitions for Javascript //-->
 <div id="Definitions" style="display: none;">
 ';

@@ -213,6 +213,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
 
    public function GetID($DiscussionID) {
       $Session = Gdn::Session();
+      $this->FireEvent('BeforeGetID');
       return $this->SQL
          ->Select('d.*')
          ->Select('c.Body')

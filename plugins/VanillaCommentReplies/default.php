@@ -111,7 +111,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       }
       if ($Session->IsValid() && $Sender->Discussion->Closed == '0') {
          echo '<li class="ReplyForm">';
-            echo Anchor('Write a reply', '/vanilla/post/reply/'.$Comment->CommentID, 'ReplyLink Hidden');
+            echo Anchor(Gdn::Translate('Write a reply'), '/vanilla/post/reply/'.$Comment->CommentID, 'ReplyLink Hidden');
             $ReplyForm = Gdn::Factory('Form');
             $ReplyForm->SetModel($this->ReplyModel);
             $ReplyForm->AddHidden('ReplyCommentID', $Comment->CommentID);

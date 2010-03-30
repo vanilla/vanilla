@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+if (Gdn::Config('Garden.Profile.ShowAbout')) {
 ?>
-<div class="Box">
+<div class="Box About">
    <h4><?php echo Gdn::Translate('About'); ?></h4>
    <dl>
       <dt><?php echo Gdn::Translate('Name'); ?></dt>
@@ -32,3 +33,5 @@ $Session = Gdn::Session();
       ?>
    </dl>
 </div>
+<?php
+}

@@ -23,8 +23,8 @@ echo $this->Form->Errors();
       ?>
       <div class="InputButtons">
          <?php
-            echo Anchor('Generate Password', '#', 'GeneratePassword Button');
-            echo Anchor('Reveal Password', '#', 'RevealPassword Button');
+            echo Anchor(Gdn::Translate('Generate Password'), '#', 'GeneratePassword Button');
+            echo Anchor(Gdn::Translate('Reveal Password'), '#', 'RevealPassword Button');
          ?>
       </div>
    </li>
@@ -36,7 +36,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('ShowEmail', 'Email visible to other users');
+         echo $this->Form->CheckBox('ShowEmail', Gdn::Translate('Email visible to other users'));
       ?>
    </li>
    <li>

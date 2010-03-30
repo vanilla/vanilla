@@ -73,7 +73,7 @@ class ProfileController extends Gdn_Controller {
          $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');
          $this->AddJsFile('activity.js');
-         $this->AddProfileTab('Activity');
+         $this->AddProfileTab(Gdn::Translate('Activity'), 'profile/activity');
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = Gdn::Translate('Notifications');
             $CountNotifications = $Session->User->CountNotifications;
@@ -213,7 +213,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->StatusMessage = Translate("Your changes have been saved successfully.");
+            $this->StatusMessage = Gdn::Translate('Your changes have been saved successfully.');
             $this->RedirectUrl = Url('/profile/'.urlencode($User->Name));
          }
       }
@@ -251,7 +251,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          if ($this->Form->Save()) {
-            $this->StatusMessage = Translate("Your password has been changed.");
+            $this->StatusMessage = Gdn::Translate('Your password has been changed.');
             $this->Form->ClearInputs();
          }
       }
@@ -364,7 +364,7 @@ class ProfileController extends Gdn_Controller {
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         $this->StatusMessage = Translate("Your preferences have been saved.");
+         $this->StatusMessage = Gdn::Translate('Your preferences have been saved.');
       }
       $this->Render();
    }
@@ -474,7 +474,7 @@ class ProfileController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack()) {
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
-            $this->StatusMessage = Translate("Your invitation has been sent.");
+            $this->StatusMessage = Gdn::Translate('Your invitation has been sent.');
             $this->Form->ClearInputs();
          }
       }

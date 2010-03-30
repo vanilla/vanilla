@@ -52,7 +52,7 @@ class GardenHooks implements Gdn_IPlugin {
       
       $Menu->AddItem('Add-ons', Gdn::Translate('Add-ons'));
       $Menu->AddLink('Add-ons', Gdn::Translate('Applications'), 'garden/settings/applications', 'Garden.Applications.Manage');
-      $Menu->AddLink('Add-ons', Gdn::Translate('Plugins'), 'garden/settings/plugins', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', Gdn::Translate('Plugins'), 'garden/settings/plugins', 'Garden.Plugins.Manage');
       $Menu->AddLink('Add-ons', Gdn::Translate('Themes'), 'garden/settings/themes', 'Garden.Themes.Manage');
 
       $Menu->AddItem('Users', Gdn::Translate('Users'));

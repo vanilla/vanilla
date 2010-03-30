@@ -58,10 +58,10 @@ class Format {
          $ActivityName = Anchor($ActivityName, '/profile/' . $Activity->ActivityUserID . '/' . $ActivityNameD);
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
       }
-      $Gender = Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
-      $Gender2 = Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
+      $Gender = Gdn::Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
+      $Gender2 = Gdn::Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID))
-         $Gender = $Gender2 = 'your';
+         $Gender = $Gender2 = Gdn::Translate('your');
 
       $IsYou = FALSE;
       if ($ViewingUserID == $Activity->RegardingUserID) {
@@ -85,15 +85,15 @@ class Format {
             $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
             $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
          }
-         $RegardingWall = Anchor('wall', '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
+         $RegardingWall = Anchor(Gdn::Translate('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
       if ($RegardingWall == '')
          $RegardingWall = Gdn::Translate('wall');
 
       if ($Activity->Route == '')
-         $Route = Translate($Activity->RouteCode);
+         $Route = Gdn::Translate($Activity->RouteCode);
       else
-         $Route = Anchor($Activity->RouteCode, $Activity->Route);
+         $Route = Anchor(Gdn::Translate($Activity->RouteCode), $Activity->Route);
 
       /*
         Debug:
@@ -106,7 +106,7 @@ class Format {
       .'/'.$Gender2
       .'/'.$Route
       */
-      return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $Activity->FullHeadline : $Activity->ProfileHeadline, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
+      return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? Gdn::Translate($Activity->FullHeadline) : Gdn::Translate($Activity->ProfileHeadline), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
    }
 
    /**

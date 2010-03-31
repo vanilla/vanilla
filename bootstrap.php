@@ -104,7 +104,9 @@ Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);
 if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	require_once(PATH_LIBRARY_CORE.DS.'class.locale.php');
-	$Gdn_Locale = new Gdn_Locale(Gdn::Config('Garden.Locale', ''), Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
+	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
+	setlocale(LC_ALL, str_replace('-', '_', $CurrentLocale));
+	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
 	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', PATH_LIBRARY_CORE.DS.'class.locale.php', Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
 }

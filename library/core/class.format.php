@@ -524,19 +524,19 @@ class Format {
          // If the timestamp was during the current day
          if (date('Y m d', $Timestamp) == date('Y m d', time())) {
             // Use the time format
-            $Format = Gdn::Config('Garden.DefaultTimeFormat', '');
+            $Format = Gdn::Translate('Date.DefaultTimeFormat', '%l:%M%p');
          } else if (date('Y', $Timestamp) == date('Y', time())) {
             // If the timestamp is the same year, show the month and date
-            $Format = Gdn::Config('Garden.DefaultDayFormat', '');
+            $Format = Gdn::Translate('Date.DefaultDayFormat', '%B %e');
          } else if (date('Y', $Timestamp) != date('Y', time())) {
             // If the timestamp is not the same year, just show the year
-            $Format = Gdn::Config('Garden.DefaultYearFormat', '');
+            $Format = Gdn::Translate('Date.DefaultYearFormat', '%B %Y');
          } else {
             // Otherwise, use the date format
-            $Format = Gdn::Config('Garden.DefaultDateFormat', '');
+            $Format = Gdn::Translate('Date.DefaultFormat', '%B %e, %Y');
          }
       }
-      return date($Format, $Timestamp);
+      return strftime($Format, $Timestamp);
    }
    
    

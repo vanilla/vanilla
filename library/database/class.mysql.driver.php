@@ -178,10 +178,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
       if (strpos($Table, '.') !== FALSE){
          // $Table is aliased here (dbname.tablename tablename)
-         preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches);
-         $DatabaseTable = '`' . str_replace('.', '`.`', $Matches[1]) . '`';
-         $Table = str_replace($Matches[1], $DatabaseTable, $Table);
+         if(preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches)){
+            $DatabaseTable = '`' . str_replace('.', '`.`', $Matches[1]) . '`';
+            $Table = str_replace($Matches[1], $DatabaseTable, $Table);
+         }
       }
+
       return $Table;
    }
    /**

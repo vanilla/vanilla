@@ -14,7 +14,7 @@ if ($AddonUrl != '')
 <?php
 printf(
    Translate('ThemeHelp'),
-   '<span class="Warning">'.PATH_THEMES.'</span>'
+   '<code>'.PATH_THEMES.'</code>'
 );
 ?></div>
 <div class="CurrentTheme">
@@ -176,4 +176,4 @@ printf(
 <?php
 }
 
-printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+printf(Translate('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

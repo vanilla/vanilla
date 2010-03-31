@@ -26,7 +26,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
       <?php
       printf(
          Translate('PluginHelp'),
-         '<span class="Warning">'.PATH_PLUGINS.'</span>'
+         '<code>'.PATH_PLUGINS.'</code>'
       );
       ?>
    </div>
@@ -147,5 +147,5 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
       </tbody>
    </table>
    <?php
-   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+   printf(Translate('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');
    

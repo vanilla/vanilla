@@ -25,7 +25,7 @@ if ($AddonUrl != '')
    <?php
    printf(
       Translate('ApplicationHelp'),
-      '<span class="Warning">'.PATH_APPLICATIONS.'</span>'
+      '<code>'.PATH_APPLICATIONS.'</code>'
    );
    ?>
 </div>
@@ -127,4 +127,4 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    </tbody>
 </table>
 <?php
-   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+   printf(Translate('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

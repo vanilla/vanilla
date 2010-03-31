@@ -3,7 +3,7 @@
 if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0) {
 ?>
 <div class="Box">
-   <h4><?php echo Gdn::Translate('My Drafts'); ?></h4>
+   <h4><?php echo T('My Drafts'); ?></h4>
    <ul class="PanelInfo PanelDiscussions">
       <?php foreach ($this->_DraftData->Result() as $Draft) {
          $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;
@@ -15,7 +15,7 @@ if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0) {
       <?php
       } 
       ?>
-      <li class="ShowAll"><?php echo Anchor(Gdn::Translate('↳ Show All'), 'drafts'); ?></li>
+      <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'drafts'); ?></li>
    </ul>
 </div>
 <?php

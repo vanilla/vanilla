@@ -4,7 +4,7 @@ $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID
 $Editing = isset($this->Comment);
 ?>
 <div id="CommentForm">
-   <h2><?php echo Gdn::Translate($Editing ? 'Edit Comment' : 'Add Comment'); ?></h2>
+   <h2><?php echo T($Editing ? 'Edit Comment' : 'Add Comment'); ?></h2>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
@@ -15,7 +15,7 @@ $Editing = isset($this->Comment);
       
       echo $this->Form->Button('Preview');
       $this->FireEvent('AfterFormButtons');
-      echo Anchor(Gdn::Translate('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
+      echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
       echo $this->Form->Close();
    ?>
 </div>

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo Gdn::Translate('Edit My Account'); ?></h2>
+<h2><?php echo T('Edit My Account'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -19,7 +19,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('ShowEmail', Gdn::Translate('Allow other members to see your email?'), array('value' => '1'));
+         echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
       ?>
    </li>   
    <li class="Gender">

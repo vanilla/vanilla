@@ -142,9 +142,9 @@ class MorePagerModule extends Module {
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
-            $Details = sprintf(Gdn::Translate('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+            $Details = sprintf(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
-            $Details = sprintf(Gdn::Translate('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+            $Details = sprintf(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
          }
       }
       return $Details;
@@ -192,7 +192,7 @@ class MorePagerModule extends Module {
             $NextOffset = $this->Offset + $this->Limit;
 
             $Pager .= Anchor(
-               sprintf(Translate($this->MoreCode), $ActualRecordsLeft),
+               sprintf(T($this->MoreCode), $ActualRecordsLeft),
                sprintf($this->Url, $NextOffset, $this->Limit)
             );
          }
@@ -210,7 +210,7 @@ class MorePagerModule extends Module {
                $PreviousOffset = 0;
                
             $Pager .= Anchor(
-               sprintf(Translate($this->LessCode), $this->Offset),
+               sprintf(T($this->LessCode), $this->Offset),
                sprintf($this->Url, $PreviousOffset, $RecordsBefore)
             );
          }

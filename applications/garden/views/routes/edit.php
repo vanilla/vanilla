@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if ($this->Route !== FALSE)
-      echo Gdn::Translate('Edit Route');
+      echo T('Edit Route');
    else
-      echo Gdn::Translate('Add Route');
+      echo T('Add Route');
 ?></h1>
 <?php
 echo $this->Form->Open();

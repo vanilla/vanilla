@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Gdn::Translate('Recent Activity'); ?></h1>
+<h1><?php echo T('Recent Activity'); ?></h1>
 <?php
 if ($this->ActivityData->NumRows() > 0) {
    echo '<ul class="Activities">';
@@ -7,6 +7,6 @@ if ($this->ActivityData->NumRows() > 0) {
    echo '</ul>';
 } else {
    ?>
-<div class="Info EmptyInfo"><?php echo Gdn::Translate('Not much happening here, yet.'); ?></div>
+<div class="Info EmptyInfo"><?php echo T('Not much happening here, yet.'); ?></div>
    <?php
 }

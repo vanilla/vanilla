@@ -251,7 +251,7 @@ if (!function_exists('CheckRequirements')) {
             if (array_key_exists($RequiredItemName, $EnabledItems) === FALSE) {
                throw new Exception(
                   sprintf(
-                     Gdn::Translate('%1$s requires the %2$s %3$s version %4$s.'),
+                     T('%1$s requires the %2$s %3$s version %4$s.'),
                      $ItemName,
                      $RequiredItemName,
                      $RequiredItemTypeCode,
@@ -299,7 +299,7 @@ if (!function_exists('CheckRequirements')) {
                         if (!version_compare($EnabledVersion, $MatchVersion, $Operator)) {
                            throw new Exception(
                               sprintf(
-                                 Gdn::Translate('%1$s requires the %2$s %3$s version %4$s %5$s'),
+                                 T('%1$s requires the %2$s %3$s version %4$s %5$s'),
                                  $ItemName,
                                  $RequiredItemName,
                                  $RequiredItemTypeCode,
@@ -312,7 +312,7 @@ if (!function_exists('CheckRequirements')) {
                   } else if ($RequiredVersion != '*' && $RequiredVersion != '') {
                      throw new Exception(
                         sprintf(
-                           Gdn::Translate('%1$s requires the %2$s %3$s version %4$s'),
+                           T('%1$s requires the %2$s %3$s version %4$s'),
                            $ItemName,
                            $RequiredItemName,
                            $RequiredItemTypeCode,
@@ -640,7 +640,7 @@ if (!function_exists('ProxyRequest')) {
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
-            throw new Exception(sprintf(Gdn::Translate('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
          
          $Header = "GET $Path?$Query HTTP/1.1\r\n" .
             "Host: $Host\r\n" .
@@ -661,7 +661,7 @@ if (!function_exists('ProxyRequest')) {
          $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
          return $Response;
       } else {
-         throw new Exception(Gdn::Translate('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
       return $Response;
    }
@@ -779,11 +779,10 @@ if (!function_exists('Translate')) {
 	 * @param string $Default The default value to be displayed if the translation code is not found.
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @deprecated
-	 * @see Gdn::Translate()
+	 * @see T()
 	 */
    function Translate($Code, $Default = '') {
-      $Result = Gdn::Translate($Code, $Default);
-      return $Result;
+      return Gdn::Translate($Code, $Default);
    }
 }
 
@@ -794,7 +793,6 @@ if (!function_exists('T')) {
 	 * @param string $Code The code related to the language-specific definition.
 	 * @param string $Default The default value to be displayed if the translation code is not found.
 	 * @return string The translated string or $Code if there is no value in $Default.
-	 * @see Gdn::Translate()
 	 */
    function T($Code, $Default = '') {
       return Gdn::Translate($Code, $Default);

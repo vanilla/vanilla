@@ -383,11 +383,11 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Get()
 			->FirstRow();
 		
-		if(!$Row) throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+		if(!$Row) throw new Exception(T('ErrorRecordNotFound'));
 		$Values = Format::Unserialize($Row->$Column);
 		
 		if (is_string($Values) && $Values != '')
-			throw new Exception(Gdn::Translate('Serialized column failed to be unserialized.'));
+			throw new Exception(T('Serialized column failed to be unserialized.'));
 		
 		if (!is_array($Values)) $Values = array();
 		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)

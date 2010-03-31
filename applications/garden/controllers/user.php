@@ -24,7 +24,7 @@ class UserController extends GardenController {
       );
       $this->AddJsFile('js/library/jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
-      $this->Title(Translate('Users'));
+      $this->Title(T('Users'));
 
       $this->AddSideMenu('garden/user');
 
@@ -87,7 +87,7 @@ class UserController extends GardenController {
    public function Add() {
       $this->Permission('Garden.Users.Add');
       $this->AddJsFile('user.js');
-      $this->Title(Translate('Add User'));
+      $this->Title(T('Add User'));
 
       $this->AddSideMenu('garden/user');
       $UserModel = new Gdn_UserModel();
@@ -104,7 +104,7 @@ class UserController extends GardenController {
          if ($NewUserID !== FALSE) {
             $Password = $this->Form->GetValue('Password', '');
             $UserModel->SendWelcomeEmail($NewUserID, $Password);
-            $this->StatusMessage = Gdn::Translate('The user has been created successfully');
+            $this->StatusMessage = T('The user has been created successfully');
             $this->RedirectUrl = Url('garden/user');
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
@@ -150,7 +150,7 @@ class UserController extends GardenController {
             if ($this->Form->GetValue('Password', '') != '')
                $UserModel->SendPasswordEmail($UserID, $NewPassword);
 
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved successfully.');
+            $this->StatusMessage = T('Your changes have been saved successfully.');
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
       }
@@ -162,7 +162,7 @@ class UserController extends GardenController {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('garden/user/applicants');
       $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
-      $this->Title(Translate('Applicants'));
+      $this->Title(T('Applicants'));
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');
@@ -187,7 +187,7 @@ class UserController extends GardenController {
       if ($Session->ValidateTransientKey($PostBackKey))
       
          if($this->HandleApplicant('Approve', $UserID)) {
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->StatusMessage = T('Your changes have been saved.');
          }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
@@ -202,7 +202,7 @@ class UserController extends GardenController {
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey)) {
          if ($this->HandleApplicant('Decline', $UserID))
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->StatusMessage = T('Your changes have been saved.');
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {

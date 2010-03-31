@@ -73,9 +73,9 @@ class ProfileController extends Gdn_Controller {
          $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');
          $this->AddJsFile('activity.js');
-         $this->AddProfileTab(Gdn::Translate('Activity'), 'profile/activity');
+         $this->AddProfileTab(T('Activity'), 'profile/activity');
          if ($this->User->UserID == $Session->UserID) {
-            $Notifications = Gdn::Translate('Notifications');
+            $Notifications = T('Notifications');
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
                $Notifications .= '<span>'.$CountNotifications.'</span>';
@@ -116,7 +116,7 @@ class ProfileController extends Gdn_Controller {
          $View = $CurrentTab;
          
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL && $this->SyndicationMethod == SYNDICATION_NONE) {
-         $this->AddDefinition('DefaultAbout', Gdn::Translate('Write something about yourself...'));
+         $this->AddDefinition('DefaultAbout', T('Write something about yourself...'));
          $this->View = 'index';
          $this->_TabView = $View;
          $this->_TabController = $Controller;
@@ -201,8 +201,8 @@ class ProfileController extends Gdn_Controller {
       
       // Define gender dropdown options
       $this->GenderOptions = array(
-         'm' => Gdn::Translate('Male'),
-         'f' => Gdn::Translate('Female')
+         'm' => T('Male'),
+         'f' => T('Female')
       );
       
       // If seeing the form for the first time...
@@ -213,7 +213,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved successfully.');
+            $this->StatusMessage = T('Your changes have been saved successfully.');
             $this->RedirectUrl = Url('/profile/'.urlencode($User->Name));
          }
       }
@@ -251,7 +251,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          if ($this->Form->Save()) {
-            $this->StatusMessage = Gdn::Translate('Your password has been changed.');
+            $this->StatusMessage = T('Your password has been changed.');
             $this->Form->ClearInputs();
          }
       }
@@ -337,8 +337,8 @@ class ProfileController extends Gdn_Controller {
       // Define the preferences to be managed
       $this->Preferences = array(
          'Email Notifications' => array(
-            'Email.WallComment' => Gdn::Translate('Notify me when people write on my wall.'),
-            'Email.ActivityComment' => Gdn::Translate('Notify me when people reply to my wall comments.')
+            'Email.WallComment' => T('Notify me when people write on my wall.'),
+            'Email.ActivityComment' => T('Notify me when people reply to my wall comments.')
          )
       );
       
@@ -364,7 +364,7 @@ class ProfileController extends Gdn_Controller {
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         $this->StatusMessage = Gdn::Translate('Your preferences have been saved.');
+         $this->StatusMessage = T('Your preferences have been saved.');
       }
       $this->Render();
    }
@@ -385,7 +385,7 @@ class ProfileController extends Gdn_Controller {
          )
       ) {
          Gdn::UserModel()->RemovePicture($this->User->UserID);
-         $this->StatusMessage = Gdn::Translate('Your picture has been removed.');
+         $this->StatusMessage = T('Your picture has been removed.');
          $RedirectUrl = 'garden/profile/'.urlencode($this->User->Name);
       }
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
@@ -474,7 +474,7 @@ class ProfileController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack()) {
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
-            $this->StatusMessage = Gdn::Translate('Your invitation has been sent.');
+            $this->StatusMessage = T('Your invitation has been sent.');
             $this->Form->ClearInputs();
          }
       }
@@ -496,7 +496,7 @@ class ProfileController extends Gdn_Controller {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = Gdn::Translate('The invitation was sent successfully.');
+            $this->StatusMessage = T('The invitation was sent successfully.');
 
       }
       
@@ -516,7 +516,7 @@ class ProfileController extends Gdn_Controller {
          }
             
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = Gdn::Translate('The invitation was removed successfully.');
+            $this->StatusMessage = T('The invitation was removed successfully.');
 
       }
       
@@ -541,28 +541,28 @@ class ProfileController extends Gdn_Controller {
             
             // Add profile options for everyone
             if ($this->User->Photo != '')
-               $SideMenu->AddLink('Options', Gdn::Translate('Change Picture'), '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
+               $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
             
-            $SideMenu->AddLink('Options', Gdn::Translate('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
             if ($this->User->Photo != '')
-               $SideMenu->AddLink('Options', Gdn::Translate('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
          } else {
             // Add profile options for the profile owner
-            $SideMenu->AddLink('Options', Gdn::Translate('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
+            $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
             if ($this->User->Photo != '') {
-               $SideMenu->AddLink('Options', Gdn::Translate('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
-               $SideMenu->AddLink('Options', Gdn::Translate('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }
             // Don't allow account editing if it has been turned off.
             if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
-               $SideMenu->AddLink('Options', Gdn::Translate('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
-               $SideMenu->AddLink('Options', Gdn::Translate('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
+               $SideMenu->AddLink('Options', T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup'));
+               $SideMenu->AddLink('Options', T('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup'));
             }
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', Gdn::Translate('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
+               $SideMenu->AddLink('Options', T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup'));
          }
          if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit'))
-            $SideMenu->AddLink('Options', Gdn::Translate('My Preferences'), '/profile/preferences/'.$this->User->UserID, FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', T('My Preferences'), '/profile/preferences/'.$this->User->UserID, FALSE, array('class' => 'Popup'));
             
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');

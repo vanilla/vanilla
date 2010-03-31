@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 ?>
-<h2><?php echo Gdn::Translate('Conversations'); ?></h2>
+<h2><?php echo T('Conversations'); ?></h2>
 <?php
 if ($this->ConversationData->NumRows() > 0) {
 ?>
@@ -13,5 +13,5 @@ if ($this->ConversationData->NumRows() > 0) {
 <?php
 echo $this->Pager->ToString();
 } else {
-   echo '<div class="Info EmptyInfo">'.Gdn::Translate('You do not have any conversations.').'</div>';
+   echo '<div class="Info EmptyInfo">'.T('You do not have any conversations.').'</div>';
 }

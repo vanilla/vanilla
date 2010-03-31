@@ -304,12 +304,6 @@ class Gdn {
          $Default = $Code;
          
       return Gdn::Locale()->Translate($Code, $Default);
-      /*
-      if (is_null(self::$_Locale))
-         return $Default;
-      else 
-         return self::$_Locale->Translate($Code, $Default);
-      */
    }
    
    /**

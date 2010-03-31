@@ -34,7 +34,7 @@ class PostController extends VanillaController {
       $this->AddJsFile('js/library/jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
-      $this->Title(Translate('Start a New Discussion'));
+      $this->Title(T('Start a New Discussion'));
       
       if (isset($this->Discussion)) {
          if ($this->Discussion->InsertUserID != $Session->UserID)
@@ -124,7 +124,7 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
+                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Format::Date());
                }
             }
          }
@@ -229,7 +229,7 @@ class PostController extends VanillaController {
                   $this->AddAsset('Content', $this->FetchView('preview'));
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
+                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Format::Date());
                }
             }
          } else {
@@ -288,12 +288,12 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(Gdn::Translate('Draft saved at %s'), Format::Date());
+                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Format::Date());
                }
                // And update the draft count
                $UserModel = Gdn::UserModel();
                $CountDrafts = $UserModel->GetAttribute($Session->UserID, 'CountDrafts', 0);
-               $MyDrafts = Gdn::Translate('My Drafts');
+               $MyDrafts = T('My Drafts');
                if (is_numeric($CountDrafts) && $CountDrafts > 0)
                   $MyDrafts .= '<span>'.$CountDrafts.'</span>';                  
                

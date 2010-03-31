@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo Translate('Preview'); ?></h2>
+<h2><?php echo T('Preview'); ?></h2>
 <div class="Preview">
    <?php if (property_exists($this, 'Discussion')) { ?>
    <h2><?php echo Format::Text($this->Discussion->Name); ?></h2>

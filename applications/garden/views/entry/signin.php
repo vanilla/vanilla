@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Translate('Sign In') ?></h1>
+<h1><?php echo T('Sign In') ?></h1>
 <div class="Box">
    <?php
    // Make sure to force this form to post to the correct place in case the view is
@@ -22,23 +22,23 @@
       </li>
       <li>
          <?php
-            echo $this->Form->CheckBox('RememberMe', Gdn::Translate('Remember me on this computer'), array('value' => '1', 'id' => 'SignInRememberMe'));
+            echo $this->Form->CheckBox('RememberMe', T('Remember me on this computer'), array('value' => '1', 'id' => 'SignInRememberMe'));
          ?>
       </li>
       <li class="Buttons">
          <?php
             echo $this->Form->Button('Sign In →');
-            echo '<span>'.Gdn::Translate('or').'</span>';
+            echo '<span>'.T('or').'</span>';
             $Target = GetIncomingValue('Target', '');
             if ($Target != '')
                $Target = '?Target='.$Target;
                
-            echo Anchor(Gdn::Translate('Apply for Membership'), '/entry/register'.$Target);
+            echo Anchor(T('Apply for Membership'), '/entry/register'.$Target);
          ?>
       </li>
       <li>
          <?php
-            echo Anchor(Gdn::Translate('Forgot your password?'), '/entry/passwordrequest', 'ForgotPassword');
+            echo Anchor(T('Forgot your password?'), '/entry/passwordrequest', 'ForgotPassword');
          ?>
       </li>
    </ul>

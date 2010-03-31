@@ -6,7 +6,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
    <div id="Frame">
       <div id="Head">
-			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.Gdn::Translate('← Visit Site').'</span>', '/'); ?></h1>
+			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.T('← Visit Site').'</span>', '/'); ?></h1>
          <div class="User">
             <?php
 			      $Session = Gdn::Session();
@@ -18,7 +18,7 @@
 							$Name .= '<span>'.$CountNotifications.'</span>';
 							
 						echo Anchor($Name, '/profile/'.$Session->User->UserID.'/'.$Session->User->Name);
-						echo Anchor(Gdn::Translate('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
+						echo Anchor(T('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
 					}
 				?>
          </div>
@@ -29,7 +29,7 @@
       </div>
       <div id="Foot">
 			<div><?php
-				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
+				printf(T('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
 			?></div>
 		</div>
    </div>

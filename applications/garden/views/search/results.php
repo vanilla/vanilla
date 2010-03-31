@@ -10,9 +10,9 @@ if (method_exists($this->SearchResults, 'NumRows') && $this->SearchResults->NumR
 				<?php echo Anchor(Format::Text(SliceString($Row->Summary, 250)), $Row->Url); ?>
 			</li>
 			<li class="Meta">
-				<span><?php printf(Gdn::Translate('Comment by %s'), UserAnchor($Row)); ?></span>
+				<span><?php printf(T('Comment by %s'), UserAnchor($Row)); ?></span>
 				<span><?php echo Format::Date($Row->DateInserted); ?></span>
-				<span><?php echo Anchor(Gdn::Translate('permalink'), $Row->Url); ?></span>
+				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
 			</li>
 		</ul>
 	</li>

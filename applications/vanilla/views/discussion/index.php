@@ -6,7 +6,7 @@ if ($Session->IsValid()) {
       '<span>*</span>',
       '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
       'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-      array('title' => Gdn::Translate($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+      array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
    );
 }
 ?>
@@ -40,7 +40,7 @@ echo $this->Pager->ToString('more');
 if ($this->Discussion->Closed == '1') {
    ?>
    <div class="CommentOption Closed">
-      <?php echo Gdn::Translate('This discussion has been closed.'); ?>
+      <?php echo T('This discussion has been closed.'); ?>
    </div>
    <?php
 } else {
@@ -49,12 +49,12 @@ if ($this->Discussion->Closed == '1') {
    } else {
       ?>
       <div class="CommentOption">
-         <?php echo Gdn::Translate('Want to take part in this discussion? Click one of these:'); ?>
-         <?php echo Anchor(Gdn::Translate('Sign In'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : '')); ?> 
+         <?php echo T('Want to take part in this discussion? Click one of these:'); ?>
+         <?php echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : '')); ?> 
          <?php
             $Url = Gdn::Authenticator()->RegisterUrl($this->SelfUrl);
             if(!empty($Url))
-               echo Anchor(Gdn::Translate('Apply for Membership'), $Url, 'Button');
+               echo Anchor(T('Apply for Membership'), $Url, 'Button');
          ?>
       </div>
       <?php 
@@ -62,5 +62,5 @@ if ($this->Discussion->Closed == '1') {
 }
 ?>
 <div class="Back">
-   <?php echo Anchor(Gdn::Translate('Back to Discussions'), '/discussions'); ?>
+   <?php echo Anchor(T('Back to Discussions'), '/discussions'); ?>
 </div>

@@ -4,7 +4,7 @@ $ShowOptions = TRUE;
 $Alt = '';
 $ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
 ?>
-<h1><?php echo Gdn::Translate('My Drafts'); ?></h1>
+<h1><?php echo T('My Drafts'); ?></h1>
 <?php
 if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('less');
@@ -18,6 +18,6 @@ if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('more');
 } else {
    ?>
-   <div class="Info EmptyInfo"><?php echo Gdn::Translate('You do not have any drafts.'); ?></div>
+   <div class="Info EmptyInfo"><?php echo T('You do not have any drafts.'); ?></div>
    <?php
 }

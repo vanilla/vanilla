@@ -3,21 +3,21 @@
 $Session = Gdn::Session();
 echo $this->Form->Open(array('action' => Url('/garden/user/applicants')));
 ?>
-<h1><?php echo Gdn::Translate('Manage Applicants'); ?></h1>
+<h1><?php echo T('Manage Applicants'); ?></h1>
 <?php
 echo $this->Form->Errors();
 if ($this->UserData->NumRows() == 0) {
    ?>
-<p><?php echo Gdn::Translate('There are currently no applicants.'); ?></p>
+<p><?php echo T('There are currently no applicants.'); ?></p>
    <?php
 } else {
    ?>
 <table class="CheckColumn">
    <thead>
       <tr>
-         <td><?php echo Gdn::Translate('Action'); ?></td>
-         <th class="Alt"><?php echo Gdn::Translate('Applicant'); ?></th>
-         <th><?php echo Gdn::Translate('Options'); ?></th>
+         <td><?php echo T('Action'); ?></td>
+         <th class="Alt"><?php echo T('Applicant'); ?></th>
+         <th><?php echo T('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -28,7 +28,7 @@ if ($this->UserData->NumRows() == 0) {
          <td><?php echo $this->Form->CheckBox('Applicants[]', '', array('value' => $User->UserID)); ?></td>
          <td class="Alt">
             <?php
-            printf(Gdn::Translate('<strong>%1$s</strong> (%2$s) %3$s'), $User->Name, Format::Email($User->Email), Format::Date($User->DateInserted));
+            printf(T('<strong>%1$s</strong> (%2$s) %3$s'), $User->Name, Format::Email($User->Email), Format::Date($User->DateInserted));
             echo '<blockquote>'.$User->DiscoveryText.'</blockquote>';
          ?></td>
          <td><?php

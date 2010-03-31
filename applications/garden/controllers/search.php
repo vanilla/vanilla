@@ -45,7 +45,7 @@ class SearchController extends Gdn_Controller {
 	public function Index($Offset = 0, $Limit = NULL) {
 		$this->AddJsFile('/js/library/jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
-		$this->Title(Translate('Search'));
+		$this->Title(T('Search'));
 
 		if(!is_numeric($Limit))
 			$Limit = Gdn::Config('Garden.Search.PerPage', 20);

@@ -5,7 +5,7 @@
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
       echo $this->Form->Button('Reply');
-      echo Anchor(Gdn::Translate('Cancel'), '/vanilla/discussion/'.$this->ReplyComment->DiscussionID, 'Cancel');
+      echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->ReplyComment->DiscussionID, 'Cancel');
       echo $this->Form->Close();
    ?>
 </div>

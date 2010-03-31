@@ -26,11 +26,11 @@ foreach ($this->ConversationData->Result() as $Conversation) {
       echo '<div class="Meta">';
          echo Format::Date($Conversation->DateLastMessage);
          echo '<span>&bull;</span>';
-         printf(Gdn::Translate(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages);
+         printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages);
          if ($Conversation->CountNewMessages > 0) {
             echo '<span>&bull;</span>';
             echo '<em>';
-            printf(Gdn::Translate('%s new'), $Conversation->CountNewMessages);
+            printf(T('%s new'), $Conversation->CountNewMessages);
             echo '</em>';
          }
       echo '</div>';

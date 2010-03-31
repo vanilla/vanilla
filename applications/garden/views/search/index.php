@@ -11,7 +11,7 @@
 
 <h1><?php
 if ($this->SearchResults)
-	printf(Gdn::Translate($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
+	printf(T($this->SearchResults->NumRows() == 0 ? "No results for '%s'" : "Search results for '%s'"), $this->SearchTerm);
 ?></h1>
 <?php
 if ($this->SearchResults && $this->SearchResults->NumRows() > 0) {

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Gdn::Translate('General Settings'); ?></h1>
+<h1><?php echo T('General Settings'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -23,14 +23,14 @@ echo $this->Form->Errors();
          
          if(!$this->Data['HasModRewrite']) {
             echo '<div class="Warning">',
-               Translate('Garden.NoModRewrite',
+               T('Garden.NoModRewrite',
                'The server configuration for this setting could not be found. If you enable this setting your site may become unavailable.'),
                '</div>';
          }
       ?>
    </li>
    <li>
-      <div class="Info"><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></div>
+      <div class="Info"><?php echo T("Email sent from Garden will be addressed from the following name and address"); ?></div>
    </li>
    <li>
       <?php
@@ -45,7 +45,7 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li>
-      <div class="Info"><?php echo Gdn::Translate('Garden will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'); ?></div>
+      <div class="Info"><?php echo T('Garden will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'); ?></div>
    </li>
    <li>
       <?php

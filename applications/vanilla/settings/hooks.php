@@ -14,36 +14,36 @@ class VanillaHooks implements Gdn_IPlugin {
       // Add menu items.
       $Session = Gdn::Session();
       if ($Sender->Menu) {
-         $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('Discussions'), '/discussions', FALSE);
+         $Sender->Menu->AddLink(T('Discussions'), T('Discussions'), '/discussions', FALSE);
          if ($Session->IsValid()) {
-            $Bookmarked = Gdn::Translate('My Bookmarks');
+            $Bookmarked = T('My Bookmarks');
             $CountBookmarks = $Session->User->CountBookmarks;
             if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
                $Bookmarked .= '<span>'.$CountBookmarks.'</span>';            
             
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$Bookmarked, '/discussions/bookmarked', FALSE, array('class' => 'MyBookmarks'));
-            $MyDiscussions = Gdn::Translate('My Discussions');
+            $Sender->Menu->AddLink(T('Discussions'), '\\'.$Bookmarked, '/discussions/bookmarked', FALSE, array('class' => 'MyBookmarks'));
+            $MyDiscussions = T('My Discussions');
             $CountDiscussions = $Session->User->CountDiscussions;
             if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
                $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';            
 
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$MyDiscussions, '/discussions/mine', FALSE, array('class' => 'MyDiscussions'));
-            $MyDrafts = Gdn::Translate('My Drafts');
+            $Sender->Menu->AddLink(T('Discussions'), '\\'.$MyDiscussions, '/discussions/mine', FALSE, array('class' => 'MyDiscussions'));
+            $MyDrafts = T('My Drafts');
             $CountDrafts = $Session->User->CountDrafts;
             if (is_numeric($CountDrafts) && $CountDrafts > 0)
                $MyDrafts .= '<span>'.$CountDrafts.'</span>';            
 
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), '\\'.$MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
+            $Sender->Menu->AddLink(T('Discussions'), '\\'.$MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
          }
          if ($Session->IsValid())
-            $Sender->Menu->AddLink(Gdn::Translate('Discussions'), Gdn::Translate('New Discussion'), '/post/discussion', FALSE);
+            $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
       }
    }
    
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
          // Add the discussion tab
-         $Sender->AddProfileTab(Gdn::Translate('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
+         $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
          // Add the discussion tab's css
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
          $Sender->AddJsFile('/js/library/jquery.gardenmorepager.js');
@@ -52,10 +52,10 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
-      $Sender->Preferences['Email Notifications']['Email.DiscussionComment'] = Gdn::Translate('Notify me when people comment on my discussions.');
-      $Sender->Preferences['Email Notifications']['Email.DiscussionMention'] = Gdn::Translate('Notify me when people mention me in discussion titles.');
-      $Sender->Preferences['Email Notifications']['Email.CommentMention'] = Gdn::Translate('Notify me when people mention me in comments.');
-      $Sender->Preferences['Email Notifications']['Email.BookmarkComment'] = Gdn::Translate('Notify me when people comment on my bookmarked discussions.');
+      $Sender->Preferences['Email Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
+      $Sender->Preferences['Email Notifications']['Email.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
+      $Sender->Preferences['Email Notifications']['Email.CommentMention'] = T('Notify me when people mention me in comments.');
+      $Sender->Preferences['Email Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
    }
 	
 	/**
@@ -74,21 +74,21 @@ class VanillaHooks implements Gdn_IPlugin {
       // Number of Discussions
       $CountDiscussions = $DiscussionModel->GetCount();
       $Sender->AddDefinition('CountDiscussions', $CountDiscussions);
-      $Sender->BuzzData[Gdn::Translate('Discussions')] = number_format($CountDiscussions);
+      $Sender->BuzzData[T('Discussions')] = number_format($CountDiscussions);
       // Number of New Discussions in the last day
-      $Sender->BuzzData[Translate('New discussions in the last day')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      $Sender->BuzzData[T('New discussions in the last day')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Discussions in the last week
-      $Sender->BuzzData[Translate('New discussions in the last week')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      $Sender->BuzzData[T('New discussions in the last week')] = number_format($DiscussionModel->GetCount(array('d.DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
 
       $CommentModel = new Gdn_CommentModel();
       // Number of Comments
       $CountComments = $CommentModel->GetCountWhere();
       $Sender->AddDefinition('CountComments', $CountComments);
-      $Sender->BuzzData[Gdn::Translate('Comments')] = number_format($CountComments);
+      $Sender->BuzzData[T('Comments')] = number_format($CountComments);
       // Number of New Comments in the last day
-      $Sender->BuzzData[Translate('New comments in the last day')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      $Sender->BuzzData[T('New comments in the last day')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Comments in the last week
-      $Sender->BuzzData[Translate('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      $Sender->BuzzData[T('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
    }
    
    public function ProfileController_Discussions_Create(&$Sender) {
@@ -149,10 +149,10 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Forum', Gdn::Translate('Forum'));
-      $Menu->AddLink('Forum', Gdn::Translate('General'), 'vanilla/settings/general', 'Vanilla.Settings.Manage');
-      $Menu->AddLink('Forum', Gdn::Translate('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
-      $Menu->AddLink('Forum', Gdn::Translate('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+      $Menu->AddItem('Forum', T('Forum'));
+      $Menu->AddLink('Forum', T('General'), 'vanilla/settings/general', 'Vanilla.Settings.Manage');
+      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
    }
    
 }

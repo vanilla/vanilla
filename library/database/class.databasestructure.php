@@ -273,10 +273,10 @@ abstract class Gdn_DatabaseStructure {
    public function Set($Explicit = FALSE, $Drop = FALSE) {
       // Make sure that table and columns have been defined
       if ($this->_TableName == '')
-         throw new Exception(Gdn::Translate('You must specify a table before calling DatabaseStructure::Set()'));
+         throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
 
       if (count($this->_Columns) == 0)
-         throw new Exception(Gdn::Translate('You must provide at least one column before calling DatabaseStructure::Set()'));
+         throw new Exception(T('You must provide at least one column before calling DatabaseStructure::Set()'));
 
       // Be sure to convert names to lowercase before comparing because
       // different operating systems/databases vary on how case-sensitivity is

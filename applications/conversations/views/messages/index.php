@@ -13,7 +13,7 @@ echo $this->Pager->ToString('less');
 </ul>
 <?php echo $this->Pager->ToString(); ?>
 <div id="MessageForm">
-   <h2><?php echo Gdn::Translate('Add Message'); ?></h2>
+   <h2><?php echo T('Add Message'); ?></h2>
    <?php
    echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox'));

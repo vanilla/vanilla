@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo Gdn::Translate('My Invitations'); ?></h2>
+<h2><?php echo T('My Invitations'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 if ($this->InvitationCount > 0) {
-   echo '<div class="Info">'.sprintf(Gdn::Translate('You have %s invitations left for this month.'), $this->InvitationCount).'</div>';
+   echo '<div class="Info">'.sprintf(T('You have %s invitations left for this month.'), $this->InvitationCount).'</div>';
 }
 if ($this->InvitationCount != 0) {
 ?>
-   <div class="Info"><?php echo Gdn::Translate('Enter the email address of the person you would like to invite:'); ?></div>
+   <div class="Info"><?php echo T('Enter the email address of the person you would like to invite:'); ?></div>
 <ul>
    <li>
    <?php
@@ -25,10 +25,10 @@ if ($this->InvitationData->NumRows() > 0) {
 <table class="AltRows">
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Invitation Code'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Sent To'); ?></th>
-         <th><?php echo Gdn::Translate('On'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Status'); ?></th>
+         <th><?php echo T('Invitation Code'); ?></th>
+         <th class="Alt"><?php echo T('Sent To'); ?></th>
+         <th><?php echo T('On'); ?></th>
+         <th class="Alt"><?php echo T('Status'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -48,17 +48,17 @@ foreach ($this->InvitationData->Result('Text') as $Invitation) {
             
          if ($Invitation->AcceptedName == '') {
             echo '<div>'
-               .Anchor(Gdn::Translate('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
-               .' | '.Anchor(Gdn::Translate('Send Again'), '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
+               .Anchor(T('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
+               .' | '.Anchor(T('Send Again'), '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
             .'</div>';
          }
       ?></td>
       <td><?php echo Format::Date($Invitation->DateInserted); ?></td>
       <td class="Alt"><?php
          if ($Invitation->AcceptedName == '') {
-            echo Gdn::Translate('Pending');
+            echo T('Pending');
          } else {
-            echo Gdn::Translate('Accepted');
+            echo T('Accepted');
          }
             
       ?></td>

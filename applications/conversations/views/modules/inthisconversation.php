@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box">
-   <h4><?php echo Gdn::Translate('In this Conversation'); ?></h4>
+   <h4><?php echo T('In this Conversation'); ?></h4>
    <ul class="PanelInfo">
    <?php
    foreach ($this->_UserData->Result() as $User) {

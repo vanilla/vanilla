@@ -47,7 +47,7 @@ class Format {
       }
       
       if ($ViewingUserID == $Activity->ActivityUserID) {
-         $ActivityName = $ActivityNameP = Gdn::Translate('You');
+         $ActivityName = $ActivityNameP = T('You');
       } else {
          $ActivityName = $Activity->ActivityName;
          $ActivityNameP = FormatPossessive($ActivityName);
@@ -58,18 +58,18 @@ class Format {
          $ActivityName = Anchor($ActivityName, '/profile/' . $Activity->ActivityUserID . '/' . $ActivityNameD);
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
       }
-      $Gender = Gdn::Translate($Activity->ActivityGender == 'm' ? 'his' : 'her');
-      $Gender2 = Gdn::Translate($Activity->ActivityGender == 'm' ? 'he' : 'she');
+      $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
+      $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID))
-         $Gender = $Gender2 = Gdn::Translate('your');
+         $Gender = $Gender2 = T('your');
 
       $IsYou = FALSE;
       if ($ViewingUserID == $Activity->RegardingUserID) {
          $IsYou = TRUE;
-         $RegardingName = Gdn::Translate('you');
-         $RegardingNameP = Gdn::Translate('your');
+         $RegardingName = T('you');
+         $RegardingNameP = T('your');
       } else {
-         $RegardingName = $Activity->RegardingName == '' ? Gdn::Translate('somebody') : $Activity->RegardingName;
+         $RegardingName = $Activity->RegardingName == '' ? T('somebody') : $Activity->RegardingName;
          $RegardingNameP = FormatPossessive($RegardingName);
       }
       $RegardingWall = '';
@@ -85,15 +85,15 @@ class Format {
             $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
             $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
          }
-         $RegardingWall = Anchor(Gdn::Translate('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
+         $RegardingWall = Anchor(T('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
       if ($RegardingWall == '')
-         $RegardingWall = Gdn::Translate('wall');
+         $RegardingWall = T('wall');
 
       if ($Activity->Route == '')
-         $Route = Gdn::Translate($Activity->RouteCode);
+         $Route = T($Activity->RouteCode);
       else
-         $Route = Anchor(Gdn::Translate($Activity->RouteCode), $Activity->Route);
+         $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
       /*
         Debug:
@@ -106,7 +106,7 @@ class Format {
       .'/'.$Gender2
       .'/'.$Route
       */
-      return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? Gdn::Translate($Activity->FullHeadline) : Gdn::Translate($Activity->ProfileHeadline), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
+      return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
    }
 
    /**
@@ -524,16 +524,16 @@ class Format {
          // If the timestamp was during the current day
          if (date('Y m d', $Timestamp) == date('Y m d', time())) {
             // Use the time format
-            $Format = Gdn::Translate('Date.DefaultTimeFormat', '%l:%M%p');
+            $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
          } else if (date('Y', $Timestamp) == date('Y', time())) {
             // If the timestamp is the same year, show the month and date
-            $Format = Gdn::Translate('Date.DefaultDayFormat', '%B %e');
+            $Format = T('Date.DefaultDayFormat', '%B %e');
          } else if (date('Y', $Timestamp) != date('Y', time())) {
             // If the timestamp is not the same year, just show the year
-            $Format = Gdn::Translate('Date.DefaultYearFormat', '%B %Y');
+            $Format = T('Date.DefaultYearFormat', '%B %Y');
          } else {
             // Otherwise, use the date format
-            $Format = Gdn::Translate('Date.DefaultFormat', '%B %e, %Y');
+            $Format = T('Date.DefaultFormat', '%B %e, %Y');
          }
       }
       return strftime($Format, $Timestamp);
@@ -611,8 +611,8 @@ class Format {
     * @return string
     */
    public static function Email($Email) {
-      $At = Gdn::Translate('at');
-      $Dot = Gdn::Translate('dot');
+      $At = T('at');
+      $Dot = T('dot');
       return '<span class="Email">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
    }
 

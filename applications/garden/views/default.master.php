@@ -12,9 +12,9 @@
 				
 			      $Session = Gdn::Session();
 					if ($this->Menu) {
-						$this->Menu->AddLink('Dashboard', Gdn::Translate('Dashboard'), '/garden/settings', array('Garden.Settings.Manage'));
-						$this->Menu->AddLink('Dashboard', Gdn::Translate('Users'), '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-						$this->Menu->AddLink('Activity', Gdn::Translate('Activity'), '/activity');
+						$this->Menu->AddLink('Dashboard', T('Dashboard'), '/garden/settings', array('Garden.Settings.Manage'));
+						$this->Menu->AddLink('Dashboard', T('Users'), '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+						$this->Menu->AddLink('Activity', T('Activity'), '/activity');
 			         $Authenticator = Gdn::Authenticator();
 						if ($Session->IsValid()) {
 							$Name = $Session->User->Name;
@@ -23,13 +23,13 @@
 								$Name .= '<span>'.$CountNotifications.'</span>';
 								
 							$this->Menu->AddLink('User', $Name, '/profile/{UserID}/{Username}', array('Garden.SignIn.Allow'), array('class' => 'UserNotifications'));
-							$this->Menu->AddLink('SignOut', Gdn::Translate('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab SignOut'));
+							$this->Menu->AddLink('SignOut', T('Sign Out'), $Authenticator->SignOutUrl(), FALSE, array('class' => 'NonTab SignOut'));
 						} else {
 							$Attribs = array();
 							if (Gdn::Config('Garden.SignIn.Popup'))
 								$Attribs['class'] = 'SignInPopup';
 								
-							$this->Menu->AddLink('Entry', Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab'), $Attribs);
+							$this->Menu->AddLink('Entry', T('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab'), $Attribs);
 						}
 						echo $this->Menu->ToString();
 					}
@@ -51,7 +51,7 @@
       </div>
       <div id="Foot">
 			<div><?php
-				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
+				printf(T('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
 			?></div>
 			<?php $this->RenderAsset('Foot'); ?>
 		</div>

@@ -56,7 +56,7 @@ abstract class Gdn_VanillaModel extends Gdn_Model {
          $this->Validation->AddValidationResult(
             'Body',
             sprintf(
-               Gdn::Translate('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
+               T('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
                $SpamCount,
                $SpamTime,
                $SpamLock

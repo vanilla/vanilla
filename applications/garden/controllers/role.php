@@ -16,7 +16,7 @@ class RoleController extends GardenController {
    public $Uses = array('Database', 'Form', 'Gdn_RoleModel');
    
    public function Add() {
-      $this->Title(Translate('Add Role'));
+      $this->Title(T('Add Role'));
          
       $this->Permission('Garden.Roles.Manage');
       
@@ -30,7 +30,7 @@ class RoleController extends GardenController {
    }
    
    public function Delete($RoleID = FALSE) {
-      $this->Title(Translate('Delete Role'));
+      $this->Title(T('Delete Role'));
          
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
@@ -63,7 +63,7 @@ class RoleController extends GardenController {
             // Go ahead and delete the Role
             $this->RoleModel->Delete($RoleID, $this->Form->GetValue('ReplacementRoleID'));
             $this->RedirectUrl = Url('garden/role');
-            $this->StatusMessage = Gdn::Translate('Deleting role...');
+            $this->StatusMessage = T('Deleting role...');
          }
       }
       $this->Render();
@@ -72,7 +72,7 @@ class RoleController extends GardenController {
    //public $HasJunctionPermissionData;
    public function Edit($RoleID = FALSE) {
       if ($this->Head && $this->Head->Title() == '')
-         $this->Head->Title(Translate('Edit Role'));
+         $this->Head->Title(T('Edit Role'));
          
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('garden/role');
@@ -102,7 +102,7 @@ class RoleController extends GardenController {
          // If the form has been posted back...
          // 2. Save the data (validation occurs within):
          if ($RoleID = $this->Form->Save()) {
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->StatusMessage = T('Your changes have been saved.');
             $this->RedirectUrl = Url('garden/role');
             // Reload the permission data.
             $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
@@ -117,7 +117,7 @@ class RoleController extends GardenController {
       $this->AddSideMenu('garden/role');
       $this->AddJsFile('/js/library/jquery.tablednd.js');
       $this->AddJsFile('/js/library/jquery.ui.packed.js');
-      $this->Title(Translate('Roles & Permissions'));
+      $this->Title(T('Roles & Permissions'));
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();
    }

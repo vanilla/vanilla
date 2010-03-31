@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if (is_object($this->Role))
-      echo Gdn::Translate('Edit Role');
+      echo T('Edit Role');
    else
-      echo Gdn::Translate('Add Role');
+      echo T('Add Role');
 ?></h1>
 <?php
 echo $this->Form->Open();
@@ -26,13 +26,13 @@ echo $this->Form->Errors();
    if (count($this->PermissionData) > 0) {
       if ($this->Role && $this->Role->CanSession != '1') {
          ?>
-         <li><p class="Warning"><?php echo Gdn::Translate('Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'); ?></p></li>
+         <li><p class="Warning"><?php echo T('Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'); ?></p></li>
          <?php
       }
       ?>
       <li>
          <?php
-            echo '<strong>'.Gdn::Translate('Check all permissions that apply to this role:').'</strong>';
+            echo '<strong>'.T('Check all permissions that apply to this role:').'</strong>';
             echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
          ?>
       </li>

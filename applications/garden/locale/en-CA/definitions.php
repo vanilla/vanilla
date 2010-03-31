@@ -22,7 +22,7 @@ if (!function_exists('FormatPossessive')) {
 
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
+      return T($Number == 1 ? $Singular : $Plural);
    }
 }
 

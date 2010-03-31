@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h2>'.Gdn::Translate('Edit My Thumbnail').'</h2>';
+echo '<h2>'.T('Edit My Thumbnail').'</h2>';
 echo $this->Form->Open(array('class' => 'Thumbnail'));
 echo $this->Form->Errors();
 ?>
 <div class="Info"><?php
-   echo Gdn::Translate('Drag around and resize the square below to define your thumbnail icon.');
+   echo T('Drag around and resize the square below to define your thumbnail icon.');
 ?></div>
 <table>
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Original'); ?></th>
-         <td><?php echo Gdn::Translate('Thumbnail'); ?></td>
+         <th><?php echo T('Original'); ?></th>
+         <td><?php echo T('Thumbnail'); ?></td>
       </tr>
    </thead>
    <tbody>

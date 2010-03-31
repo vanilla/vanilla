@@ -154,7 +154,7 @@ class Gdn_ApplicationManager {
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '') {
-         throw new Exception(Gdn::Translate('The application folder was not properly defined.'));
+         throw new Exception(T('The application folder was not properly defined.'));
       } else {
          SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
       }
@@ -177,13 +177,13 @@ class Gdn_ApplicationManager {
       // 1. Check to make sure that this application is allowed to be disabled
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       if (!ArrayValue('AllowDisable', $ApplicationInfo, TRUE))
-         throw new Exception(sprintf(Gdn::Translate('You cannot disable the %s application.'), $ApplicationName));
+         throw new Exception(sprintf(T('You cannot disable the %s application.'), $ApplicationName));
 
       // 2. Check to make sure that no other enabled applications rely on this one
       foreach ($this->EnabledApplications() as $CheckingName => $CheckingInfo) {
          $RequiredApplications = ArrayValue('RequiredApplications', $CheckingInfo, FALSE);
          if (is_array($RequiredApplications) && array_key_exists($ApplicationName, $RequiredApplications) === TRUE) {
-            throw new Exception(sprintf(Gdn::Translate('You cannot disable the %1$s application because the %2$s application requires it in order to function.'), $ApplicationName, $CheckingName));
+            throw new Exception(sprintf(T('You cannot disable the %1$s application because the %2$s application requires it in order to function.'), $ApplicationName, $CheckingName));
          }
       }
 

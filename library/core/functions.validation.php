@@ -82,7 +82,7 @@ if (!function_exists('ValidateConnection')) {
             $DatabasePassword
          );
       } catch (PDOException $Exception) {
-         return sprintf(Gdn::Translate('ValidateConnection'), strip_tags($Exception->getMessage()));
+         return sprintf(T('ValidateConnection'), strip_tags($Exception->getMessage()));
       }
       return TRUE;
    }
@@ -209,7 +209,7 @@ if (!function_exists('ValidateLength')) {
       if ($Diff <= 0) {
          return TRUE;
       } else {
-         return sprintf(Gdn::Translate('ValidateLength'), Translate($Field->Name), $Diff);
+         return sprintf(T('ValidateLength'), T($Field->Name), $Diff);
       }
    }
 }
@@ -235,7 +235,7 @@ if (!function_exists('ValidatePermissionFormat')) {
       $PermissionCount = count($Permission);
       for ($i = 0; $i < $PermissionCount; ++$i) {
          if (count(explode('.', $Permission[$i])) < 3)
-            return sprintf(Gdn::Translate('The following permission did not meet the permission naming requirements and could not be added: %s'), $Permission[$i]);
+            return sprintf(T('The following permission did not meet the permission naming requirements and could not be added: %s'), $Permission[$i]);
 
       }
       return TRUE;

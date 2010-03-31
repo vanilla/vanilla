@@ -11,7 +11,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
 }
 ?>
 <div id="DiscussionForm">
-   <h2><?php echo Gdn::Translate(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h2>
+   <h2><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h2>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
@@ -30,13 +30,13 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       // Note: I need to validate that they have permission in the specified category on the back-end
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
       if ($Session->CheckPermission('Vanilla.Discussions.Announce'))
-         $Options .= '<li>'.$this->Form->CheckBox('Announce', Gdn::Translate('Announce this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Announce', T('Announce this discussion'), array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
-         $Options .= '<li>'.$this->Form->CheckBox('Closed', Gdn::Translate('Close this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close this discussion'), array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
-         $Options .= '<li>'.$this->Form->CheckBox('Sink', Gdn::Translate('Sink this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Sink', T('Sink this discussion'), array('value' => '1')).'</li>';
          
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';
@@ -47,7 +47,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       }
       echo $this->Form->Button('Preview');
       $this->FireEvent('AfterFormButtons');
-      echo Anchor(Gdn::Translate('Cancel'), $CancelUrl, 'Cancel');
+      echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo $this->Form->Close();
    ?>
 </div>

@@ -99,7 +99,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
       $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
       
       if (!$Pointer)
-         throw new Exception(sprintf(Gdn::Translate('Encountered an error when attempting to authenticate handshake (%1$s): [%2$s] %3$s'), $this->AuthenticateUrl, $ErrorNumber, $Error));
+         throw new Exception(sprintf(T('Encountered an error when attempting to authenticate handshake (%1$s): [%2$s] %3$s'), $this->AuthenticateUrl, $ErrorNumber, $Error));
          
       // Get the cookie.
       $Cookie = '';

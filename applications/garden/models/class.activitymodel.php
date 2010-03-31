@@ -168,12 +168,12 @@ class Gdn_ActivityModel extends Gdn_Model {
          if ($Preference) {
             $ActivityHeadline = Format::Text(Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
             $Email = new Gdn_Email();
-            $Email->Subject(sprintf(Gdn::Translate('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
+            $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);
             $Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(
-                  Gdn::Translate($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+                  T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
                   $ActivityHeadline,
                   Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
                   $Story

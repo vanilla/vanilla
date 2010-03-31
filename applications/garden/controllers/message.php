@@ -83,7 +83,7 @@ class MessageController extends GardenController {
             $this->MessageModel->SetMessageCache();
             
             // Redirect
-            $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+            $this->StatusMessage = T('Your changes have been saved.');
             $this->RedirectUrl = Url('garden/message');
          }
       }
@@ -97,7 +97,7 @@ class MessageController extends GardenController {
       $this->AddJsFile('/js/library/jquery.tablednd.js');
       $this->AddJsFile('/js/library/jquery.ui.packed.js');
       $this->AddJsFile('messages.js');
-      $this->Title(Translate('Messages'));
+      $this->Title(T('Messages'));
          
       // Load all messages from the db
       $this->MessageData = $this->MessageModel->Get('Sort');

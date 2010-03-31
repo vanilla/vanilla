@@ -2,14 +2,14 @@
 // Make sure to force this form to post to the correct place in case the view is
 // rendered within another view (ie. /garden/entry/index/):
 ?>
-<h1><?php echo Translate("Sign in") ?></h1>
+<h1><?php echo T("Sign in") ?></h1>
 <div class="Box">
 <?php
 	echo $this->Form->Open(array('Action' => Url('/entry/handshake'), 'id' => 'Form_User_Handshake'));
 	echo $this->Form->Errors();
 	?>
 	<div class="Info"><?php printf(
-		Gdn::Translate('There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'),
+		T('There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'),
 		ArrayValue('Name', $this->Data),
 		ArrayValue('Email', $this->Data)
 	); ?></div>

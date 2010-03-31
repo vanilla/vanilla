@@ -2,7 +2,7 @@
 $ViewLocation = $this->FetchViewLocation('discussions');
 echo $this->Pager->ToString('less');
 ?>
-<h1><?php echo Gdn::Translate('Bookmarked Discussions'); ?></h1>
+<h1><?php echo T('Bookmarked Discussions'); ?></h1>
 <?php
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
@@ -12,7 +12,7 @@ if ($this->DiscussionData->NumRows() > 0) {
 <?php
 } else {
 ?>
-<div class="Info EmptyInfo"><?php echo Gdn::Translate('You do not have any bookmarks.'); ?></div>
+<div class="Info EmptyInfo"><?php echo T('You do not have any bookmarks.'); ?></div>
 <?php
 }
 echo $this->Pager->ToString('more');

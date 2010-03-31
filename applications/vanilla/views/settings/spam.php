@@ -8,50 +8,50 @@ $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('Manage Spam'); ?></h1>
-<div class="Info"><?php echo Gdn::Translate('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></div>
+<h1><?php echo T('Manage Spam'); ?></h1>
+<div class="Info"><?php echo T('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></div>
 <table class="AltColumns">
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Only Allow Each User To Post'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Within'); ?></th>
-         <th><?php echo Gdn::Translate('Or Spamblock For'); ?></th>
+         <th><?php echo T('Only Allow Each User To Post'); ?></th>
+         <th class="Alt"><?php echo T('Within'); ?></th>
+         <th><?php echo T('Or Spamblock For'); ?></th>
       </tr>
    </thead>
    <tbody>
       <tr>
          <td>
             <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamCount', $SpamCount); ?>
-            <?php echo Gdn::Translate('discussion(s)'); ?>
+            <?php echo T('discussion(s)'); ?>
          </td>
          <td class="Alt">
             <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamTime', $SpamTime); ?>
-            <?php echo Gdn::Translate('seconds'); ?>
+            <?php echo T('seconds'); ?>
          </td>
          <td>
             <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamLock', $SpamLock); ?>
-            <?php echo Gdn::Translate('minute(s)'); ?>
+            <?php echo T('minute(s)'); ?>
          </td>
       </tr>
       <tr>
          <td>
             <?php echo $this->Form->DropDown('Vanilla.Comment.SpamCount', $SpamCount); ?>
-            <?php echo Gdn::Translate('comment(s)'); ?>
+            <?php echo T('comment(s)'); ?>
          </td>
          <td class="Alt">
             <?php echo $this->Form->DropDown('Vanilla.Comment.SpamTime', $SpamTime); ?>
-            <?php echo Gdn::Translate('seconds'); ?>
+            <?php echo T('seconds'); ?>
          </td>
          <td>
             <?php echo $this->Form->DropDown('Vanilla.Comment.SpamLock', $SpamLock); ?>
-            <?php echo Gdn::Translate('minute(s)'); ?>
+            <?php echo T('minute(s)'); ?>
          </td>
       </tr>
    </tbody>
 </table>
 <br /><ul>
    <li>
-      <div class="Info"><?php echo Translate("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
+      <div class="Info"><?php echo T("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
    </li>
    <li>
       <?php

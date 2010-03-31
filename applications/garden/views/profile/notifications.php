@@ -5,6 +5,6 @@ if ($this->ActivityData->NumRows() > 0) {
    echo '</ul>';
 } else {
    ?>
-<div class="Info EmptyInfo"><?php echo Gdn::Translate('You do not have any notifications yet.'); ?></div>
+<div class="Info EmptyInfo"><?php echo T('You do not have any notifications yet.'); ?></div>
    <?php
 }

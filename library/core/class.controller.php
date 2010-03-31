@@ -428,7 +428,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DefinitionList() {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
-         $this->_Definitions['TransportError'] = Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+         $this->_Definitions['TransportError'] = T('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
 
       if (!array_key_exists('TransientKey', $this->_Definitions))
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
@@ -437,19 +437,19 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
-         $this->_Definitions['ConfirmHeading'] = Gdn::Translate('Confirm');
+         $this->_Definitions['ConfirmHeading'] = T('Confirm');
 
       if (!array_key_exists('ConfirmText', $this->_Definitions))
-         $this->_Definitions['ConfirmText'] = Gdn::Translate('Are you sure you want to do that?');
+         $this->_Definitions['ConfirmText'] = T('Are you sure you want to do that?');
 
       if (!array_key_exists('Okay', $this->_Definitions))
-         $this->_Definitions['Okay'] = Gdn::Translate('Okay');
+         $this->_Definitions['Okay'] = T('Okay');
 
       if (!array_key_exists('Cancel', $this->_Definitions))
-         $this->_Definitions['Cancel'] = Gdn::Translate('Cancel');
+         $this->_Definitions['Cancel'] = T('Cancel');
 
       if (!array_key_exists('Search', $this->_Definitions))
-         $this->_Definitions['Search'] = Gdn::Translate('Search');
+         $this->_Definitions['Search'] = T('Search');
 
       $Return = '<!-- Various definitions for Javascript //-->
 <div id="Definitions" style="display: none;">

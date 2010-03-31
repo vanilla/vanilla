@@ -12,7 +12,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       && ($Session->UserID == $Activity->InsertUserID
          || $Session->CheckPermission('Garden.Activity.Delete'))
       )
-      echo Anchor('Delete', 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
+      echo Anchor(Gdn::Translate('Delete'), 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
 
    // If this was a status update or a wall comment, don't bother with activity strings
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
@@ -29,7 +29,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          echo Format::Display($Activity->Story);
          echo '<div class="Meta">';
             echo Format::Date($Activity->DateInserted);
-            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
+            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor(Gdn::Translate('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
          echo '</div>';
       echo '</div>';
    } else {
@@ -40,7 +40,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
          echo '<div class="Meta">';
             echo Format::Date($Activity->DateInserted);
-            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor('Comment', '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
+            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor(Gdn::Translate('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
             if ($Activity->Story != '') {
                echo '<div class="Story">';
                   echo $Activity->Story; // story should be cleaned before being saved.
@@ -70,7 +70,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          ?>
          <li class="CommentForm">
          <?php
-            echo Anchor('Write a comment', '/garden/activity/comment/'.$Activity->ActivityID, 'CommentLink');
+            echo Anchor(Gdn::Translate('Write a comment'), '/garden/activity/comment/'.$Activity->ActivityID, 'CommentLink');
             $CommentForm = Gdn::Factory('Form');
             $CommentForm->SetModel($Sender->ActivityModel);
             $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
@@ -100,7 +100,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
       echo Format::Display($Comment->Story);
       echo '<div class="Meta">';
          echo Format::Date($Comment->DateInserted);
-         echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? '<span>&bull;</span>'.Anchor('Delete', 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request())) : '';
+         echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? '<span>&bull;</span>'.Anchor(Gdn::Translate('Delete'), 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request())) : '';
       echo '</div>';
    echo '</div>';
    ?>

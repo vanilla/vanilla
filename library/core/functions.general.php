@@ -787,6 +787,20 @@ if (!function_exists('Translate')) {
    }
 }
 
+if (!function_exists('T')) {
+   /**
+	 * Translates a code into the selected locale's definition.
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @see Gdn::Translate()
+	 */
+   function T($Code, $Default = '') {
+      return Gdn::Translate($Code, $Default);
+   }
+}
+
 if (!function_exists('TrueStripSlashes')) {
    if(get_magic_quotes_gpc()) {
       function TrueStripSlashes($String) {

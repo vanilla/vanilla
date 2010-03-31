@@ -177,13 +177,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function FormatTableName($Table) {
 
       if (strpos($Table, '.') !== FALSE){
-         // $Table is aliased here (dbname.tablename tablename)
          if(preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches)){
             $DatabaseTable = '`' . str_replace('.', '`.`', $Matches[1]) . '`';
             $Table = str_replace($Matches[1], $DatabaseTable, $Table);
-         }
+         }else
+            $Table = '`' . str_replace('.', '`.`', $Table) . '`';
       }
-
       return $Table;
    }
    /**

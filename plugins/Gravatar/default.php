@@ -28,6 +28,11 @@ class GravatarPlugin implements Gdn_IPlugin {
          ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Email', '', 'RegardingEmail');
    }
+	public function Gdn_ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
+      $Sender->SQL
+         ->Select('au.Email', '', 'ActivityEmail')
+         ->Select('ru.Email', '', 'RegardingEmail');
+	}
    public function Gdn_ActivityModel_BeforeGetComments_Handler(&$Sender) {
       $Sender->SQL->Select('au.Email', '', 'ActivityEmail');
    }

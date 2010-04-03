@@ -1,6 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
-
 // Create some variables so that they aren't defined in every loop.
 $ViewLocation = $this->FetchViewLocation('discussions', 'discussions', 'vanilla');
 ?>

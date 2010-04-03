@@ -1,12 +1,35 @@
 <?php if (!defined('APPLICATION')) exit();
 
 function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
+   // If this was a status update or a wall comment, don't bother with activity strings
+   $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
+   $ActivityType = $ActivityType[0];
+   $Author = UserBuilder($Activity, 'Activity');
+   $PhotoAnchor = UserPhoto($Author, 'Photo');
+   $CssClass = 'Item Activity '.$ActivityType;
+   if ($PhotoAnchor != '')
+      $CssClass .= ' HasPhoto';
+   if (in_array($ActivityType, array('WallComment', 'AboutUpdate')))
+      $CssClass .= ' Condensed';
+      
+   $Title = '';
+   $Excerpt = $Activity->Story;
+   if (!in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
+      $Title = '<div class="Title">'.Format::ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
+   } else if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
+      $Title = '<div class="Title">'
+         .UserAnchor($Author, 'Title Name')
+         .' <span>→</span> '
+         .UserAnchor($Author, 'Name')
+         .'</div>';
+      $Excerpt = Format::Display($Excerpt);
+   } else {
+      $Title = UserAnchor($Author, 'Title Name');
+      $Excerpt = Format::Display($Excerpt);
+   }
    ?>
-<li id="Activity_<?php echo $Activity->ActivityID; ?>" class="Activity<?php
-   echo ' ' . $Activity->ActivityType;
-   if ($Activity->ActivityPhoto != '' && $Activity->ShowIcon == '1')
-      echo ' HasPhoto';
-?>"><?php
+<li id="Activity_<?php echo $Activity->ActivityID; ?>" class="<?php echo $CssClass; ?>">
+   <?php
    if (
       $Session->IsValid()
       && ($Session->UserID == $Activity->InsertUserID
@@ -14,41 +37,20 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       )
       echo Anchor(T('Delete'), 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
 
-   // If this was a status update or a wall comment, don't bother with activity strings
-   $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
-   $ActivityType = $ActivityType[0];
-   $Author = UserBuilder($Activity, 'Activity');
-   if (in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
-      echo UserPhoto($Author, 'Photo');
-      echo '<div>';
-         echo UserAnchor($Author, 'Name');
-         if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
-            $Author = UserBuilder($Activity, 'Regarding');
-            echo '<span>→</span>'.UserAnchor($Author, 'Name');
-         }
-         echo Format::Display($Activity->Story);
-         echo '<div class="Meta">';
-            echo Format::Date($Activity->DateInserted);
-            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor(T('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
-         echo '</div>';
-      echo '</div>';
-   } else {
-      if ($Activity->ShowIcon == '1')
-         echo UserPhoto($Author, 'Photo');
-
-      echo '<div>';
-         echo Format::ActivityHeadline($Activity, $Sender->ProfileUserID);
-         echo '<div class="Meta">';
-            echo Format::Date($Activity->DateInserted);
-            echo $Activity->AllowComments == '1' && $Session->IsValid() ? '<span>&bull;</span>'.Anchor(T('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption') : '';
-            if ($Activity->Story != '') {
-               echo '<div class="Story">';
-                  echo $Activity->Story; // story should be cleaned before being saved.
-               echo '</div>';
-            }
-         echo '</div>';
-      echo '</div>';
-   }
+   echo $PhotoAnchor;
+   ?>
+   <div class="ItemContent Activity">
+      <?php echo $Title; ?>
+      <div class="Excerpt"><?php echo $Excerpt; ?></div>
+      <div class="Meta">
+         <span class="DateCreated"><?php echo Format::Date($Activity->DateInserted); ?></span>
+         <?php
+         if ($Activity->AllowComments == '1' && $Session->IsValid())
+            echo '<span class="AddComment">'.Anchor(T('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
+         ?>
+      </div>
+   </div>
+   <?php
    if ($Activity->AllowComments == '1') {
       // If there are comments, show them
       $FoundComments = FALSE;
@@ -56,7 +58,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          foreach ($Sender->CommentData->Result() as $Comment) {
             if (is_object($Comment) && $Comment->CommentActivityID == $Activity->ActivityID) {
                if ($FoundComments == FALSE)
-                  echo '<ul class="Comments">';
+                  echo '<ul class="DataList ActivityComments">';
                   
                $FoundComments = TRUE;
                WriteActivityComment($Comment, $Sender, $Session);
@@ -64,7 +66,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          }
       }
       if ($FoundComments == FALSE)
-         echo '<ul class="Comments Hidden">';
+         echo '<ul class="DataList ActivityComments Hidden">';
 
       if ($Session->IsValid()) {
          ?>
@@ -88,22 +90,25 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
 
 function WriteActivityComment($Comment, &$Sender, &$Session) {
    $Author = UserBuilder($Comment, 'Activity');
+   $PhotoAnchor = UserPhoto($Author, 'Photo');
+   $CssClass = 'Item ActivityComment Condensed '.$Comment->ActivityType;
+   if ($PhotoAnchor != '')
+      $CssClass .= ' HasPhoto';
+   
 ?>
-<li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php
-   echo $Comment->ActivityType;
-   if ($Comment->ActivityPhoto != '')
-      echo ' HasPhoto';
-?>"><?php
-   echo UserPhoto($Author, 'Photo');
-   echo '<div>';
-      echo UserAnchor($Author, 'Name');
-      echo Format::Display($Comment->Story);
-      echo '<div class="Meta">';
-         echo Format::Date($Comment->DateInserted);
-         echo $Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete') ? '<span>&bull;</span>'.Anchor(T('Delete'), 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request())) : '';
-      echo '</div>';
-   echo '</div>';
-   ?>
+<li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php echo $CssClass; ?>">
+   <?php echo $PhotoAnchor; ?>
+   <div class="ItemContent ActivityComment">
+      <?php echo UserAnchor($Author, 'Title Name'); ?>
+      <div class="Excerpt"><?php echo Format::Display($Comment->Story); ?></div>
+      <div class="Meta">
+         <span class="DateCreated"><?php echo Format::Date($Comment->DateInserted); ?></span>
+         <?php
+            if ($Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete'))
+               echo Anchor(T('Delete'), 'garden/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'DeleteComment');
+         ?>
+      </div>
+   </div>
 </li>
 <?php
 }

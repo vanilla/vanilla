@@ -1,11 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
+include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $Session = Gdn::Session();
 $ShowOptions = TRUE;
 $Alt = '';
 $ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
-?>
-<h1><?php echo T('My Drafts'); ?></h1>
-<?php
+WriteFilterTabs($this);
 if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('less');
 ?>
@@ -18,6 +17,6 @@ if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('more');
 } else {
    ?>
-   <div class="Info EmptyInfo"><?php echo T('You do not have any drafts.'); ?></div>
+   <div class="Empty"><?php echo T('You do not have any drafts.'); ?></div>
    <?php
 }

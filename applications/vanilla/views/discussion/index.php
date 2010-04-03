@@ -10,18 +10,23 @@ if ($Session->IsValid()) {
    );
 }
 ?>
-<h2><?php
-   if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
-      echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Format::Url($this->Discussion->Category));
-      echo '<span>&bull;</span>';
-   }
-   echo Format::Text($this->Discussion->Name);
-?></h2>
+<div class="Tabs HeadingTabs DiscussionTabs">
+   <ul>
+      <li><?php
+         if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Format::Url($this->Discussion->Category));
+         } else {
+            echo Anchor(T('All Discussions'), 'discussions');
+         }
+      ?></li>
+   </ul>
+   <div class="SubTab"><?php echo Format::Text($this->Discussion->Name); ?></div>
+</div>
 <?php
    echo $this->Pager->ToString('less');
    echo $this->RenderAsset('DiscussionBefore');
 ?>
-<ul id="Discussion">
+<ul class="MessageList Discussion">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
@@ -60,7 +65,3 @@ if ($this->Discussion->Closed == '1') {
       <?php 
    }
 }
-?>
-<div class="Back">
-   <?php echo Anchor(T('Back to Discussions'), '/discussions'); ?>
-</div>

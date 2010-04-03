@@ -15,26 +15,6 @@ class VanillaHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Sender->Menu) {
          $Sender->Menu->AddLink(T('Discussions'), T('Discussions'), '/discussions', FALSE);
-         if ($Session->IsValid()) {
-            $Bookmarked = T('My Bookmarks');
-            $CountBookmarks = $Session->User->CountBookmarks;
-            if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
-               $Bookmarked .= '<span>'.$CountBookmarks.'</span>';            
-            
-            $Sender->Menu->AddLink(T('Discussions'), '\\'.$Bookmarked, '/discussions/bookmarked', FALSE, array('class' => 'MyBookmarks'));
-            $MyDiscussions = T('My Discussions');
-            $CountDiscussions = $Session->User->CountDiscussions;
-            if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
-               $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';            
-
-            $Sender->Menu->AddLink(T('Discussions'), '\\'.$MyDiscussions, '/discussions/mine', FALSE, array('class' => 'MyDiscussions'));
-            $MyDrafts = T('My Drafts');
-            $CountDrafts = $Session->User->CountDrafts;
-            if (is_numeric($CountDrafts) && $CountDrafts > 0)
-               $MyDrafts .= '<span>'.$CountDrafts.'</span>';            
-
-            $Sender->Menu->AddLink(T('Discussions'), '\\'.$MyDrafts, '/drafts', FALSE, array('class' => 'MyDrafts'));
-         }
          if ($Session->IsValid())
             $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
       }

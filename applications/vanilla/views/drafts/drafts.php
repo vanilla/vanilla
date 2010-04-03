@@ -6,20 +6,14 @@ foreach ($this->DraftData->Result() as $Draft) {
    $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    ?>
-   <li class="<?php echo 'DiscussionRow Draft'.$Alt; ?>">
-      <ul>
-         <li class="Title">
-            <?php
-               echo Anchor(T('Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'DeleteDraft');
-            ?>
-            <strong><?php
-               echo Anchor($Draft->Name, $EditUrl, 'DraftLink');
-            ?></strong>
-            <?php
-               echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl);
-            ?>
-         </li>
-      </ul>
+   <li class="Item Draft<?php echo $Alt; ?>">
+      <?php echo Anchor(T('Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?>
+      <div class="ItemContent">
+         <?php echo Anchor($Draft->Name, $EditUrl, 'Title DraftLink'); ?>
+         <div class="Excerpt"><?php
+            echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl);
+         ?></div>
+      </div>
    </li>
    <?php
 }

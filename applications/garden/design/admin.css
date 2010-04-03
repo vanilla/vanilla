@@ -13,162 +13,37 @@ Welcome to the Admin CSS File! Some things you should know:
    + User/*
 
 3. This file is broken down into the following sections:
-   + Line 30:     Header
-   + Line 49:     Panels / Sidebars
-   + Line 126:    General Styles & Typography
-   + Line 449:    Forms
-   + Line 713:    Main Menu
-   + Line 746:    Dashboard
-   + Line 812:    DataList (Search Results)
-   + Line 821:    User Search Page
-   + Line 875:    Footer
+   + General Styles & Typography
+   + Forms
+   + Header
+   + Panels / Sidebars
+   + Dashboard
+   + User Search Page
+   + Splash Information Page
+   + Popups
+   + Legal
+   + Themes
+   + Footer
 */
    
 
-/* =================================================================== Header */
-#Head {
-	background:#e2f4ff none repeat scroll 0 0;
-	border-bottom:1px solid #FFFFFF;
-	padding: 10px 18px 18px;
-   text-align: right;
-}
-#Head h1 {
-	line-height: 160%;
-	border: 0;
-	float: left;
-	margin: 0;
-	padding: 3px 0 0;
-}
-#Head h1 a {
-	color:#02475a;
-	font-size:160%;
-	text-shadow: #fff 0 1px 0;
-}
-#Head h1 a span {
-	font-family: 'lucida grande', 'Lucida Sans Unicode';
-	font-size: 40%;
-	text-shadow: none;
-	font-weight: normal;
-	background: #c2e7fc;
-	border: 1px solid #aedefc;
-	padding: 2px 4px;
-	margin: 0 0 0 6px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	vertical-align: middle;
-}
-#Head div.User {
-	padding: 8px 0 0;
-}
-#Head div.User a {
-	color:#02475a;
-	font-family: 'lucida grande', 'Lucida Sans Unicode';
-	margin-left: 20px;
-}
-#Head div.User a span {
-	background: #c2e7fc;
-	border: 1px solid #aedefc;
-	padding: 0 4px;
-	margin: 0 0 0 6px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-}
-
-/* ======================================================== Panels / Sidebars */
-#Panel {
-	margin: 15px;
-   width: 150px;
-   float: left;
-}
-div.Box {
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #d3f0ff;
-   color: #999;
-   padding: 6px 0;
-   margin: 0 0 10px 0;
-	border: 1px solid #a5d0e7;
-}
-div.Box h4 {
-   font-size: 110%;
-   color: #076C8E;
-	text-shadow: #fff 0 1px 0;
-   font-weight: bold;
-   margin: 0;
-   padding: 0 6px;
-}
-div.Box dl {
-   border-bottom: 1px solid #aedefc  /* Panel Inlay Border Color */;
-   background: #f0fbff /* Panel Inlay Background Color */;
-   padding: 3px;
-   font-size: 90%;
-   overflow: hidden;
-}
-div.Box dl dt {
-   float: left;
-   width: 80px;
-   color: #2786C2 /* Panel Font Color */;
-}
-div.Box dl dd {
-   margin-left: 80px;
-}
-div.Box p {
-   font-size: 100%;
-   padding: 0 0 4px;
-   color: #555 /* Body Text Font Color */;
-}
-ul.PanelInfo {
-	margin-bottom: 6px;
-}
-ul.PanelInfo li {
-   padding: 2px 0;
-   font-family: tahoma;
-   font-size: 80%;
-}
-ul.PanelInfo li a {
-	padding: 0 8px;
-   font-size: 120%;
-	display: block;
-}
-ul.PanelInfo li.HighlightButton {
-	background: #ff5;
-}
-ul.PanelInfo li.Active {
-   background: #fff;
-}
-#Panel a.PanelButton {
-   padding: 6px 0;
-   display: block;
-   text-align: center;
-   font-size: 16px;
-   font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-}
-#Panel a.PanelButton:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-}
 
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
-   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 75%;
+	line-height: 1.7;
    margin: 0;
    padding: 0;
    font-size: small;
    background: #ffffff;
-	background: #c2e7fc url(slicesplash.jpg) no-repeat scroll center top;
+	background: #c2e7fc url('slicesplash.jpg') no-repeat scroll center top;
 }
 #Body {
 	border-top:1px solid #a5d0e7;
 }
 #Content {
-	font-family: "Lucida Grande", 'Lucida Sans Unicode',Verdana,Arial,"Bitstream Vera Sans",sans-serif;
    margin: 15px 15px 15px 180px;
 }
 .Hidden {
@@ -184,18 +59,17 @@ body {
 	text-align: right;
 }
 h1, h2, h3, h4, h5, h6 {
-   color: #000 /* Body Heading Font Color */;
+   color: #000;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
 }
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
-	font-family: "Lucida Grande",'Lucida Sans Unicode',Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 }
 p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 code {
    -moz-border-radius: 2px;
@@ -233,11 +107,11 @@ a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #2786c2  /* Body Link Font Color */;
+   color: #2786c2;
 }
 a:hover {
    text-decoration: none;
-   color: #ff0084 /* Body Hover Font Color */;
+   color: #ff0084;
 }
 input.DateBox,
 input.InputBox,
@@ -292,10 +166,9 @@ select.Year {
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 11px;
    padding: 4px;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -321,7 +194,6 @@ input.Button {
 .Button:focus {
    background: #eee;
 }
-
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -526,7 +398,7 @@ form ul li {
    margin-bottom: 10px;
    padding: 0;
    font-size: 12px;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
 }
 form ul li label {
    color: #000;
@@ -602,7 +474,7 @@ table tr.Last th {
 table th,
 table td {
    font-weight: normal;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
    padding: 6px;
 }
 form ul li table label {
@@ -641,24 +513,24 @@ table tbody td.Info span {
 }
 table tbody td.Info strong {
    font-weight: bold;
-   color: #000 /* Body Default Font Color */;
+   color: #000;
 }
 table thead th {
    font-weight: bold;
    font-size: 13px;
    /* line-height: 100%; This made the headings on checkbox lists highlight incorrectly. */
-   color: #000 /* Body Heading Font Color */;
+   color: #000;
 }
 table input.Button {
    margin: 0px;
 }
 table.AltRows tr.Alt th,
 table.AltRows tr.Alt td {
-   background: #d3f0ff /* Body Alt Background Color */;
+   background: #d3f0ff;
 }
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-   background: #d3f0ff /* Body Alt Background Color */;
+   background: #d3f0ff;
 }
 table.AltColumns tr.Alt {
    background: none;
@@ -690,14 +562,14 @@ table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-   background: #ffd /* Discussion New Background Color */;
-   color: #000 /* Body Default Font Color */;
+   background: #ffd;
+   color: #000;
 }
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td {
-   background: #d3f0ff /* Body Background Color */;
+   background: #d3f0ff;
 }
 
 /* CheckBoxGrid */
@@ -754,7 +626,7 @@ table.AltColumns tr.Disabled td {
 }
 .CheckBoxGrid th.Alt,
 .CheckBoxGrid td.Alt {
-   background: #d3f0ff  /* Body Alt Background Color */;
+   background: #d3f0ff;
 }
 /* CheckColumn */
 .CheckColumn thead td a {
@@ -784,6 +656,133 @@ table.AltColumns tr.Disabled td {
    width: auto;
    font-weight: normal;
    padding: 0px 0px 0px 0px;
+}
+
+/* =================================================================== Header */
+#Head {
+	background:#e2f4ff none repeat scroll 0 0;
+	border-bottom:1px solid #FFFFFF;
+	padding: 10px 18px 18px;
+   text-align: right;
+}
+#Head h1 {
+	line-height: 160%;
+	border: 0;
+	float: left;
+	margin: 0;
+	padding: 3px 0 0;
+}
+#Head h1 a {
+	color:#02475a;
+	font-size:160%;
+	text-shadow: #fff 0 1px 0;
+}
+#Head h1 a span {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	font-size: 40%;
+	text-shadow: none;
+	font-weight: normal;
+	background: #c2e7fc;
+	border: 1px solid #aedefc;
+	padding: 2px 4px;
+	margin: 0 0 0 6px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	vertical-align: middle;
+}
+#Head div.User {
+	padding: 8px 0 0;
+}
+#Head div.User a {
+	color:#02475a;
+	margin-left: 20px;
+}
+#Head div.User a span {
+	background: #c2e7fc;
+	border: 1px solid #aedefc;
+	padding: 0 4px;
+	margin: 0 0 0 6px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+
+/* ======================================================== Panels / Sidebars */
+#Panel {
+	margin: 15px;
+   width: 150px;
+   float: left;
+}
+div.Box {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #d3f0ff;
+   color: #999;
+   padding: 6px 0;
+   margin: 0 0 10px 0;
+	border: 1px solid #a5d0e7;
+}
+div.Box h4 {
+   font-size: 110%;
+   color: #076C8E;
+	text-shadow: #fff 0 1px 0;
+   font-weight: bold;
+   margin: 0;
+   padding: 0 6px;
+}
+div.Box dl {
+   border-bottom: 1px solid #aedefc;
+   background: #f0fbff;
+   padding: 3px;
+   font-size: 90%;
+   overflow: hidden;
+}
+div.Box dl dt {
+   float: left;
+   width: 80px;
+   color: #2786C2;
+}
+div.Box dl dd {
+   margin-left: 80px;
+}
+div.Box p {
+   font-size: 100%;
+   padding: 0 0 4px;
+   color: #555;
+}
+ul.PanelInfo {
+	margin-bottom: 6px;
+}
+ul.PanelInfo li {
+   padding: 2px 0;
+   font-size: 80%;
+}
+ul.PanelInfo li a {
+	padding: 0 8px;
+   font-size: 120%;
+	display: block;
+}
+ul.PanelInfo li.HighlightButton {
+	background: #ff5;
+}
+ul.PanelInfo li.Active {
+   background: #fff;
+}
+#Panel a.PanelButton {
+   padding: 6px 0;
+   display: block;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #44c7f4;
+   color: #fff;
+   text-decoration: none;
+   margin: 0 0 10px 0;
+}
+#Panel a.PanelButton:hover {
+   background: #11e420;
+   color: #fff;
 }
 
 /* ================================================= Dashboard Customizations */
@@ -852,7 +851,6 @@ div.Popup div.Messages {
    left: auto;
    z-index: auto;
 	margin: 10px 0 !important;
-	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Popup div.Warning {
 	margin: 10px 0 0;
@@ -899,7 +897,7 @@ div.Popup div.Body {
   max-width: 500px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
-  border: 8px solid #555 /* Body Text Font Color */;
+  border: 8px solid #555;
 }
 div.Popup div.Body div.Body {
    border: 0;
@@ -932,10 +930,8 @@ div.Popup h3 {
 }
 div.Popup p {
 	padding: 6px 10px 10px;
-	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Popup small {
-	font-family: 'lucida grande','Lucida Sans Unicode';
 	font-size: 80%;
 }
 div.Popup form p {
@@ -988,9 +984,6 @@ div.Legal li {
 }
 div.Legal strong {
 	font-weight: bold;
-}
-div.Legal * {
-	font-family: 'lucida grande','Lucida Sans Unicode';
 }
 div.Legal em {
 	font-style: italic;

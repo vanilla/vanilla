@@ -1,14 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
+include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $ViewLocation = $this->FetchViewLocation('discussions');
+WriteFilterTabs($this);
 if ($this->DiscussionData->NumRows() > 0) {
+echo $this->Pager->ToString('less');
 ?>
-<h1><?php echo T('My Discussions'); ?></h1>
-<?php echo $this->Pager->ToString('less'); ?>
 <ul class="DataList Discussions Mine">
    <?php include($ViewLocation); ?>
 </ul>
 <?php
 echo $this->Pager->ToString('more');
 } else {
-   echo '<p>'.T('You have not started any discussions.').'</p>';
+   echo '<div class="Empty">'.T('You have not started any discussions.').'</div>';
 }

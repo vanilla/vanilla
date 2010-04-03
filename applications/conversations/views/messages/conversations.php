@@ -3,38 +3,28 @@ $Session = Gdn::Session();
 $Alt = FALSE;
 foreach ($this->ConversationData->Result() as $Conversation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
-   $Class = $Alt ? 'Alt' : '';
-   if ($Conversation->CountNewMessages > 0)
-      $Class .= ' New';
-      
-   if ($Conversation->LastMessagePhoto != '')
-      $Class .= ' HasPhoto';
-      
-   $Class = trim($Class);
-   $Name = $Session->UserID == $Conversation->LastMessageUserID ? 'You' : $Conversation->LastMessageName;
+   $LastAuthor = UserBuilder($Conversation, 'LastMessage');
+   $LastPhoto = UserPhoto($LastAuthor, 'Photo');
+   $CssClass = 'Item';
+   $CssClass .= $Alt ? ' Alt' : '';
+   $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
+   $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
 ?>
-<li<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <?php
-   $LastAuthor = UserBuilder($Conversation, 'LastMessage');
-   echo UserPhoto($LastAuthor, 'Photo');
-   ?>
-   <div>
-      <?php
-      echo UserAnchor($LastAuthor, 'Name');
-      echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message');
-      echo '<div class="Meta">';
-         echo Format::Date($Conversation->DateLastMessage);
-         echo '<span>&bull;</span>';
-         printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages);
+<li class="<?php echo $CssClass; ?>">
+   <?php echo $LastPhoto; ?>
+   <div class="ItemContent Conversation">
+      <?php echo UserAnchor($LastAuthor, 'Name Title'); ?>
+      <div class="Excerpt"><?php echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
+      <div class="Meta">
+         <span><?php echo Format::Date($Conversation->DateLastMessage); ?></span>
+         <span><?php printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages); ?></span>
+         <?php
          if ($Conversation->CountNewMessages > 0) {
-            echo '<span>&bull;</span>';
-            echo '<em>';
-            printf(T('%s new'), $Conversation->CountNewMessages);
-            echo '</em>';
+            echo '<strong>'.sprintf(T('%s new'), $Conversation->CountNewMessages).'</strong>';
          }
-      echo '</div>';
-      ?>
+         ?>
+      </div>
    </div>
 </li>
 <?php

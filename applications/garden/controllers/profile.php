@@ -73,7 +73,10 @@ class ProfileController extends Gdn_Controller {
          $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');
          $this->AddJsFile('activity.js');
-         $this->AddProfileTab(T('Activity'), 'profile/activity');
+         $ActivityUrl = 'profile/activity/';
+         if ($this->User->UserID != $Session->UserID)
+            $ActivityUrl .= $this->User->UserID.'/'.urlencode($this->User->Name);
+         $this->AddProfileTab(T('Activity'), $ActivityUrl);
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
             $CountNotifications = $Session->User->CountNotifications;

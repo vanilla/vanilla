@@ -6,7 +6,8 @@ $CurrentOffset = $this->Offset;
 foreach ($this->MessageData->Result() as $Message) {
    $CurrentOffset++;
    $Alt = $Alt == TRUE ? FALSE : TRUE;
-   $Class = $Alt ? 'Alt' : '';
+   $Class = 'Item';
+   $Class .= $Alt ? ' Alt' : '';
    if ($this->Conversation->DateLastViewed < $Message->DateInserted)
       $Class .= ' New';
    
@@ -21,13 +22,17 @@ foreach ($this->MessageData->Result() as $Message) {
    $Author = UserBuilder($Message, 'Insert');
 ?>
 <li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <a name="Item_<?php echo $CurrentOffset;?>" class="Item" />
-   <?php echo UserPhoto($Author, 'Photo'); ?>
-   <div>
-      <?php
-         echo UserAnchor($Author, 'Name');
-         echo Format::Date($Message->DateInserted);
-      ?>
+   <div class="ConversationMessage">
+      <div class="Meta">
+         <span class="Author">
+            <?php
+            echo UserPhoto($Author, 'Photo');
+            echo UserAnchor($Author, 'Name');
+            ?>
+         </span>
+         <span class="DateCreated"><?php echo Format::Date($Message->DateInserted); ?></span>
+         <span class="ItemLink"><a name="Item_<?php echo $CurrentOffset;?>" class="Item"></a></span>
+      </div>
       <div class="Message"><?php echo Format::To($Message->Body, $Format); ?></div>
    </div>
 </li>

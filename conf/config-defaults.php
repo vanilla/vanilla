@@ -99,6 +99,7 @@ $Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . D
 $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 
 // Modules
+$Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
 $Configuration['Modules']['Garden']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');

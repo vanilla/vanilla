@@ -3,7 +3,7 @@
 echo $this->Form->Open();
 ?>
 <div class="Title">
-   <h1><?php echo T("Fill out this form and you'll be tasting Vanilla in moments!"); ?></h1>
+   <h1><?php echo T("Set up a fresh installation of Vanilla."); ?></h1>
 </div>
 <div class="Form">
    <?php echo $this->Form->Errors(); ?>
@@ -42,7 +42,7 @@ echo $this->Form->Open();
       <li class="Warning">
          <div>
          <?php
-            echo T('Yes, the following information can be changed later if you want.');
+            echo T('Yes, the following information can be changed later.');
          ?>
          </div>
       </li>
@@ -78,7 +78,7 @@ echo $this->Form->Open();
       </li>
    </ul>
    <div class="Button">
-      <?php echo $this->Form->Button('Continue &raquo;'); ?>
+      <?php echo $this->Form->Button('Continue →'); ?>
    </div>
 </div>
 <?php

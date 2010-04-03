@@ -3,18 +3,18 @@
 if (method_exists($this->SearchResults, 'NumRows') && $this->SearchResults->NumRows() > 0) {
 	foreach ($this->SearchResults->ResultObject() as $Row) {
 ?>
-	<li class="Row">
-		<ul>
-			<li class="Title">
-				<strong><?php echo Anchor(Format::Text($Row->Title), $Row->Url); ?></strong>
-				<?php echo Anchor(Format::Text(SliceString($Row->Summary, 250)), $Row->Url); ?>
-			</li>
-			<li class="Meta">
+	<li class="Item">
+		<div class="ItemContent">
+			<?php echo Anchor(Format::Text($Row->Title), $Row->Url, 'Title'); ?>
+			<div class="Excerpt"><?php
+				echo Anchor(Format::Text(SliceString($Row->Summary, 250)), $Row->Url);
+			?></div>
+			<div class="Meta">
 				<span><?php printf(T('Comment by %s'), UserAnchor($Row)); ?></span>
 				<span><?php echo Format::Date($Row->DateInserted); ?></span>
 				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
-			</li>
-		</ul>
+			</div>
+		</div>
 	</li>
 <?php
 	}

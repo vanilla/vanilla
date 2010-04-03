@@ -72,6 +72,7 @@ class Gdn_ActivityModel extends Gdn_Model {
    
    public function GetNotifications($UserID, $Offset = '0', $Limit = '50') {
       $this->ActivityQuery();
+      $this->FireEvent('BeforeGetNotifications');
       return $this->SQL
          ->Where('RegardingUserID', $UserID)
          ->Where('t.Notify', '1')

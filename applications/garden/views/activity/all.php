@@ -1,12 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T('Recent Activity'); ?></h1>
+<div class="Tabs ActivityTabs">
+   <ul>
+      <li class="Active"><?php echo Anchor(T('Recent Activity'), 'activity'); ?></li>
+   </ul>
+</div>
 <?php
 if ($this->ActivityData->NumRows() > 0) {
-   echo '<ul class="Activities">';
+   echo '<ul class="DataList Activities">';
    include($this->FetchViewLocation('activities', 'activity', 'garden'));
    echo '</ul>';
 } else {
    ?>
-<div class="Info EmptyInfo"><?php echo T('Not much happening here, yet.'); ?></div>
+<div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div>
    <?php
 }

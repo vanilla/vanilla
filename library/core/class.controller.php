@@ -493,7 +493,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $ViewHandler = Gdn::Factory('ViewHandler' . strtolower(strrchr($ViewPath, '.')));
       
       $ViewContents = '';
-
       ob_start();
       if(is_null($ViewHandler)) {   
          // Parse the view and place it into the asset container if it was found.
@@ -707,6 +706,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function xRender($View = '', $ControllerName = '', $ApplicationFolder = '', $AssetName = 'Content') {
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
+
+      // If there were uncontrolled errors above the json data, wipe them out
+      // before fetching it (otherwise the json will not be properly parsed
+      // by javascript).
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
+         ob_clean(); 
 
       // Send headers to the browser
       $this->SendHeaders();

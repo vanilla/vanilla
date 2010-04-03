@@ -44,24 +44,19 @@ echo $this->Pager->ToString('more');
 // Write out the comment form
 if ($this->Discussion->Closed == '1') {
    ?>
-   <div class="CommentOption Closed">
-      <?php echo T('This discussion has been closed.'); ?>
+   <div class="Foot Closed">
+      <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
+      <?php echo Anchor(T('← All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
-   <?php
+<?php
+} else if ($Session->IsValid()) { 
+   echo $this->FetchView('comment', 'post');
 } else {
-   if ($Session->IsValid()) {
-      echo $this->FetchView('comment', 'post');
-   } else {
-      ?>
-      <div class="CommentOption">
-         <?php echo T('Want to take part in this discussion? Click one of these:'); ?>
-         <?php echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'Button'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : '')); ?> 
-         <?php
-            $Url = Gdn::Authenticator()->RegisterUrl($this->SelfUrl);
-            if(!empty($Url))
-               echo Anchor(T('Apply for Membership'), $Url, 'Button');
-         ?>
-      </div>
-      <?php 
-   }
+?>
+   <div class="Foot">
+      <?php
+      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'TabLink'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+      ?> 
+   </div>
+   <?php 
 }

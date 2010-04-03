@@ -95,7 +95,7 @@ class MorePagerModule extends Module {
 
    public function __construct(&$Sender = '') {
       $this->ClientID = '';
-      $this->CssClass = 'MorePager';
+      $this->CssClass = 'MorePager Foot';
       $this->Offset = 0;
       $this->Limit = 30;
       $this->TotalRecords = 0;

@@ -35,10 +35,12 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       && ($Session->UserID == $Activity->InsertUserID
          || $Session->CheckPermission('Garden.Activity.Delete'))
       )
-      echo Anchor(T('Delete'), 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete');
+      echo '<div class="OptionButton">'.Anchor(T('Delete'), 'garden/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete').'</div>';
 
-   echo $PhotoAnchor;
+   if ($PhotoAnchor != '') {
    ?>
+   <div class="Photo"><?php echo $PhotoAnchor; ?></div>
+   <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
       <div class="Excerpt"><?php echo $Excerpt; ?></div>
@@ -97,7 +99,9 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
    
 ?>
 <li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php echo $CssClass; ?>">
-   <?php echo $PhotoAnchor; ?>
+   <?php if ($PhotoAnchor != '') { ?>
+   <div class="Photo"><?php echo $PhotoAnchor; ?></div>
+   <?php } ?>
    <div class="ItemContent ActivityComment">
       <?php echo UserAnchor($Author, 'Title Name'); ?>
       <div class="Excerpt"><?php echo Format::Display($Comment->Story); ?></div>

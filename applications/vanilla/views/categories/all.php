@@ -16,7 +16,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>
    </ul>
    <?php if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) { ?>
-   <div class="More"><?php echo Anchor('More Discussions', '/categories/'.$Category->UrlCode); ?></div>
+   <div class="Foot"><?php echo Anchor('More Discussions', '/categories/'.$Category->UrlCode, 'TabLink'); ?></div>
    <?php } ?>
    <?php }
    }

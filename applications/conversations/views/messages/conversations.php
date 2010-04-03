@@ -12,7 +12,9 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <?php echo $LastPhoto; ?>
+   <?php if ($LastPhoto != '') { ?>
+   <div class="Photo"><?php echo $LastPhoto; ?></div>
+   <?php } ?>
    <div class="ItemContent Conversation">
       <?php echo UserAnchor($LastAuthor, 'Name Title'); ?>
       <div class="Excerpt"><?php echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>

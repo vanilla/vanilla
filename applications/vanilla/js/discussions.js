@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
          $(row).removeClass('Active');            
       });
    });
-   
+
    // Set up paging
    if ($.morepager)
       $('.MorePager').livequery(function() {

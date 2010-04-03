@@ -114,7 +114,6 @@ textarea.TextBox {
    width: 500px;
    height: 100px;
    min-height: 100px;
-   max-height: 500px;
 }
 #Popup textarea.TextBox {
    width: 465px;
@@ -138,6 +137,7 @@ select {
    margin: 0;
    padding: 3px;
    }
+a.Button,
 .Button {
    cursor: pointer;
    margin: 0;
@@ -294,33 +294,18 @@ a.Close {
 a.Close:hover {
 	color: #333;
 }
-/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
-.MorePager {
-   list-style: none;
-   margin: 1px 0 0;
-   padding: 3px 6px;
-   text-align: right;
-   background: #e9f9ff;
-   }
-.MorePager a {
-   font-size: 13px;
-   font-weight: bold;
-   text-align: right;
-}
-.MorePager a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
-}
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-top-left-radius: 2px;
    margin-bottom: 1px;
+	text-align: left;
 }
-tr#PagerMore td {
-   border: 0;
-   text-align: right;
+div.MorePager a.Loading {
+	border: 0 !important;
+   padding: 0 20px !important;
+   background: url('images/progress.gif') center center no-repeat !important;
 }
 #PagerMore {
    margin-bottom: 1px;
@@ -996,21 +981,23 @@ ul.DataList li {
    border: 0;
    padding: 0;
 }
-ul.DataList li.HasPhoto div.ItemContent {
-	margin-left: 53px;
-	width: 587px;
+ul.DataList div.Options {
+	width: 100px;
+   float: right;
+}
+ul.DataList div.OptionButton {
+	float: right;
+	*padding: 7px 0; /* IE 7 Fix */
 }
 ul.DataList a.Title {
    display: block;
    margin: 0;
-   max-width: 598px;
    font-size: 14px;
    font-weight: bold;
 }
 ul.DataList div.Title {
    display: block;
    margin: 0;
-   max-width: 598px;
 }
 ul.DataList div.Title a {
    font-size: 120%;
@@ -1046,12 +1033,33 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta a {
    color: #2b2d33;
 }
+ul.DataList a.Delete {
+   width: auto;
+   padding: 0 5px;
+   margin: 0 1px 0 0;
+   font-size: 11px;
+   font-weight: normal;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 1;
+}
+ul.DataList a.Delete:hover {
+	padding: 4px;
+   color: #333;
+   border: 1px solid #888;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+}
+ul.DataList a.Delete:focus {
+   background: #f8f8f8;
+}
 /* Condensed datalists make the main link & excerpt inline. */
-ul.DataList a.Photo {
+ul.DataList div.Photo {
 	float: left;
 	padding: 0 10px 0 0;
 }
-ul.DataList a.Photo img {
+ul.DataList div.Photo img {
 	display: block;
 	height: 43px;
 	width: 43px;
@@ -1073,28 +1081,6 @@ li.Condensed div.Excerpt,
 ul.Condensed div.Excerpt a,
 li.Condensed div.Excerpt a {
 	display: inline;
-}
-ul.DataList a.Delete {
-   float: right;
-   width: auto;
-   padding: 5px;
-   margin: 0 1px 0 0;
-   font-size: 11px;
-   font-weight: normal;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   color: #555;
-   cursor: pointer;
-   line-height: 100%;
-}
-ul.DataList a.Delete:hover {
-	padding: 4px;
-   color: #333;
-   border: 1px solid #888;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
-}
-ul.DataList a.Delete:focus {
-   background: #f8f8f8;
 }
 
 /* =============================================================== Activities */
@@ -1120,6 +1106,7 @@ ul.Activities div.Excerpt {
 ul.Activities li.Condensed div.Excerpt {
 	color: #000;
 	font-size: 13px;
+	padding: 0 0 0 4px;
 }
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
@@ -1136,6 +1123,13 @@ ul.Activities div.Excerpt img {
 ul.Activities ul.DataList {
 	margin-left: 50px;
 	width: 400px;
+}
+ul.Activities div.ItemContent {
+	width: 631px;
+}
+ul.Activities li.HasPhoto div.ItemContent {
+	margin-left: 53px;
+	width: 578px;
 }
 ul.Activities li.Item li.HasPhoto div.ItemContent {
 	width: auto;
@@ -1157,7 +1151,7 @@ ul.Activities ul.DataList .HasPhoto div.Meta {
 	padding: 2px 0 0;
 	line-height: 1;
 }
-ul.Activities ul.DataList a.Photo img {
+ul.Activities ul.DataList div.Photo img {
 	height: 32px;
 	width: 32px;
 }
@@ -1272,6 +1266,29 @@ ul.MessageList div.Message ol li {
 ul.MessageList div.Message ul li {
   list-style: disc ! important;
 }
+
+/* The "Foot" is at the bottom of the #Content section. Used for more results
+links, sign in buttons, etc */
+.Foot {
+	border-bottom: 1px solid #caf0fe;
+   padding: 6px;
+   background: #e9f9ff;
+   text-align: right;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   }
+.Foot a.TabLink {
+	margin-left: 10px;
+}
+.Foot .Note {
+	line-height: 2.6;
+	float: left;
+	padding: 0 0 0 8px;
+	font-weight: bold;
+}
+
 
 /* ============================================================= Profile Page */
 body.Profile #Content {
@@ -1439,6 +1456,16 @@ div.Tabs li {
    display: inline;
    margin: 0;
 }
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
 div.Tabs li a,
 div.Tabs li a:link,
 div.Tabs li a:hover,
@@ -1456,9 +1483,12 @@ div.Tabs li a:visited {
    padding: 5px 10px;
 	line-height: 2.6;
 }
+div.MorePager a:hover,
+a.TabLink:hover,
 div.Tabs li a:hover {
    background: #f3fcff;
 }
+a.Active,
 div.Tabs li.Active a {
    background: #fff;
    color: #454545;
@@ -1497,7 +1527,7 @@ div.HeadingTabs div.SubTab {
 	line-height: 2.4;
 }
 div.SearchTabs input.InputBox {
-	width: 570px;
+	width: 560px;
 	margin-right: 10px;
 }
 
@@ -1754,9 +1784,7 @@ div.Legal strong {
    color: #aaa;
 }
 #Foot div {
-	width: 960px;
-	border-top: 1px solid #ddd;
 	padding: 6px 0;
-	margin: 20px auto 0;
+	margin: 20px 0 0;
 	text-align: left;
 }

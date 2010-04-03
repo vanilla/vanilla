@@ -80,24 +80,6 @@ h1 span {
 body.Categories h1 a {
    color: #000;
 }
-/* Note: This "More" style is custom to the categories page. It appears like
-  the MorePager listed above, but it is just a link to a different page. */
-.More {
-   list-style: none;
-   margin: 1px 0 20px;
-   padding: 3px 6px;
-   text-align: right;
-   background: #e9f9ff;
-   }
-.More a {
-   font-size: 13px;
-   font-weight: bold;
-   text-align: right;
-}
-.More a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
-}
 
 
 /* ================================================================= Comments */
@@ -125,42 +107,13 @@ div.Popup ul.Preview li.Comment {
 div.Popup ul.Preview li.Comment div.Body {
    min-height: 53px;
 }
-/* Note: CommentOption is presented to the user in place of the add comment form
-   when they don't have a valid session. */
-.CommentOption {
-   margin: 1px 0 0;
-   padding: 3px 6px;
-   background: #e9f9ff;
-   color: #555;
-}
-/* Note: Back appears the same as MorePager... */
-.Back {
-   margin: 1px 0 6px;
-   padding: 3px 6px;
-   background: #e9f9ff;
-   text-align: left;
-   -moz-border-radius-bottomright: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   }
-.Back a {
-   color: #2786C2;
-   font-size: 12px;
-   font-weight: normal;
-   text-align: right;
-}
-.Back a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
-}
 /*
   Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
   css for these is in /applications/garden/design/menu.css. Override them here.
 */
 a.Bookmark,
 a.Bookmarking {
-   float: right;
+	float: right;
    display: block;
    background: url('images/star_sprite.png') top center no-repeat;
    height: 22px;
@@ -189,11 +142,16 @@ ul.Discussions div.ItemContent,
 ul.Drafts div.ItemContent {
    margin: 0 0 0 5px;
 }
+ul.Drafts div.ItemContent a.Title,
+ul.Discussions div.ItemContent a.Title {
+	max-width: 580px;
+}
 
 /* =============================================== Discussion & Comment Forms */
 body.Discussion #CommentForm {
    background: #e9f9ff;
    padding: 8px;
+	border-bottom: 1px solid #caf0fe;
 }
 div.Popup #CommentForm {
    background: none;

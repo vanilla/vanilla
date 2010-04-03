@@ -38,7 +38,7 @@ body {
    padding: 0;
    font-size: small;
    background: #ffffff;
-	background: #c2e7fc url('slicesplash.jpg') no-repeat scroll center top;
+	background: #c2e7fc url('images/slicesplash.jpg') no-repeat scroll center top;
 }
 #Body {
 	border-top:1px solid #a5d0e7;
@@ -168,7 +168,7 @@ select.Year {
    margin: 0;
    font-size: 11px;
    padding: 4px;
-   background: url('buttonbg.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -197,15 +197,15 @@ input.Button {
 .Loading {
    height: 100px;
    padding: 0 20px;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 .AfterButtonLoading {
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
    padding: 0 20px;
 }
 .Progress {
    padding: 10px 40px 10px 0;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
@@ -610,7 +610,7 @@ table.AltColumns tr.Disabled td {
    padding: 0;
 }
 .CheckBoxGrid tbody th a span.Parent {
-   background: url('parent_divider.gif') center right no-repeat;
+   background: url('images/parent_divider.gif') center right no-repeat;
    padding: 6px 10px 6px 0;
    margin: 0 6px 0 0;
 }
@@ -828,9 +828,12 @@ ul.PanelInfo li.Active {
 	color:#02455B;
 	font-size:300%;
 	text-shadow:0 1px 0 #FFFFFF;
-	padding: 20px 0 0;
+	padding: 10px 0 0;
+	margin: 0;
+	line-height: 1;
 }
 .SplashInfo p {
+	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 	text-align: center;
 	border-bottom: 1px solid #fff;
 	margin: 0;

@@ -183,11 +183,17 @@ body.add #Content {
 a.Cancel {
    margin-left: 20px;
 }
-div.Popup #ConversationForm {
+div.Popup #ConversationForm form {
 	background: none;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
-	padding: 0;
+	padding: 10px;
+}
+div.Popup #ConversationForm h2 {
+	color: #fff;
+	font-size: 120%;
+	font-weight: bold;
+	padding: 6px 9px 4px;	
 }
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {

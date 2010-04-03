@@ -79,7 +79,6 @@ function WriteFilterTabs(&$Sender) {
       <?php
    }
    ?>
-
 </div>
    <?php
 }
@@ -89,12 +88,16 @@ function WriteFilterTabs(&$Sender) {
  */
 function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
+      echo '<div class="Options">';
       // Bookmark link
+      $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
-         '<span>*</span>',
+         '<span class="Star">'
+            .Img('applications/garden/design/images/pixel.png', array('alt' => $Title))
+         .'</span>',
          '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-         array('title' => T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+         array('title' => $Title)
       );
       
       $Sender->Options = '';
@@ -128,14 +131,15 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       
       if ($Sender->Options != '') {
       ?>
-      <ul class="Options">
-         <li>
-            <strong><?php echo T('Options'); ?></strong>
-            <ul>
-               <?php echo $Sender->Options; ?>
-            </ul>
-         </li>
-      </ul>
+         <ul class="Options">
+            <li>
+               <strong><?php echo T('Options'); ?></strong>
+               <ul>
+                  <?php echo $Sender->Options; ?>
+               </ul>
+            </li>
+         </ul>
+      </div>
       <?php
       }
    }

@@ -117,7 +117,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -164,7 +163,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,

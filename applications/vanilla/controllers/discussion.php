@@ -145,6 +145,9 @@ class DiscussionController extends VanillaController {
    public function Comment($CommentID) {
       // Get the discussionID
       $Comment = $this->CommentModel->GetID($CommentID);
+      if (!$Comment)
+         Redirect('garden/home/filenotfound');
+         
       $DiscussionID = $Comment->DiscussionID;
       
       // Figure out how many comments are before this one

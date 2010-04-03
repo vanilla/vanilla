@@ -1784,7 +1784,8 @@ div.Legal strong {
    color: #aaa;
 }
 #Foot div {
+	width: 960px;
 	padding: 6px 0;
-	margin: 20px 0 0;
+	margin: 20px auto 0;
 	text-align: left;
 }

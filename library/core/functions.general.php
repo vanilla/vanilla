@@ -220,6 +220,19 @@ if (!function_exists('Attribute')) {
    }
 }
 
+if (!function_exists('C')) {
+   /**
+    * Retrieves a configuration setting.
+    * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+    * @param mixed $Default The result to return if the configuration setting is not found.
+    * @return mixed The configuration setting.
+    * @see Gdn::Config()
+    */
+   function C($Name = FALSE, $Default = FALSE) {
+      return Gdn::Config($Name, $Default);
+   }
+}
+
 if (!function_exists('CalculateNumberOfPages')) {
    /**
     * Based on the total number of items and the number of items per page,
@@ -771,6 +784,20 @@ if (!function_exists('StringIsNullOrEmpty')) {
    }
 }
 
+if (!function_exists('T')) {
+   /**
+	 * Translates a code into the selected locale's definition.
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @see Gdn::Translate()
+	 */
+   function T($Code, $Default = '') {
+      return Gdn::Translate($Code, $Default);
+   }
+}
+
 if (!function_exists('Translate')) {
    /**
 	 * Translates a code into the selected locale's definition.
@@ -779,22 +806,9 @@ if (!function_exists('Translate')) {
 	 * @param string $Default The default value to be displayed if the translation code is not found.
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @deprecated
-	 * @see T()
+	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
-      return Gdn::Translate($Code, $Default);
-   }
-}
-
-if (!function_exists('T')) {
-   /**
-	 * Translates a code into the selected locale's definition.
-	 *
-	 * @param string $Code The code related to the language-specific definition.
-	 * @param string $Default The default value to be displayed if the translation code is not found.
-	 * @return string The translated string or $Code if there is no value in $Default.
-	 */
-   function T($Code, $Default = '') {
       return Gdn::Translate($Code, $Default);
    }
 }

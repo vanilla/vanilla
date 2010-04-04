@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
-$DiscussionData = $this->DiscussionData;
-$this->DiscussionData = $this->AnnounceData;
 $HasAnnouncements = $this->AnnounceData && $this->AnnounceData->NumRows() > 0;
+$DiscussionData = $this->DiscussionData;
+if ($HasAnnouncements)
+   $this->DiscussionData = $this->AnnounceData;
+
 WriteFilterTabs($this);
 if ($this->DiscussionData->NumRows() > 0) {
 ?>

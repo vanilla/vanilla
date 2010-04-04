@@ -17,10 +17,11 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    if (!in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
       $Title = '<div class="Title">'.Format::ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
    } else if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
+      $RegardingUser = UserBuilder($Activity, 'Regarding');
       $Title = '<div class="Title">'
          .UserAnchor($Author, 'Title Name')
          .' <span>→</span> '
-         .UserAnchor($Author, 'Name')
+         .UserAnchor($RegardingUser, 'Name')
          .'</div>';
       $Excerpt = Format::Display($Excerpt);
    } else {

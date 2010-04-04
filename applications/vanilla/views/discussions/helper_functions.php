@@ -142,8 +142,8 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
                </ul>
             </li>
          </ul>
-      </div>
       <?php
       }
+      echo '</div>';
    }
 }

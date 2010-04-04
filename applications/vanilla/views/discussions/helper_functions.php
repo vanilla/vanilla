@@ -17,6 +17,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <?php echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
+         <?php if ($Discussion->Announce == '1') { ?>
+         <span class="Announcement"><?php echo T('Announcement'); ?></span>
+         <?php } ?>
          <span><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
             if ($CountUnreadComments > 0 && $Session->IsValid())

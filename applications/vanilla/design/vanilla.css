@@ -37,9 +37,6 @@ ul.PanelDiscussions li strong {
 body.Discussions h1 {
    margin: 0;
 }
-ul.Announcements {
-   margin: 0 0 20px;
-}
 /* Note: The Vanilla Discussion List has the following classes applied to
   individual list elements and can be styled:
   + Bookmarked: the user has bookmarked that topic
@@ -60,6 +57,10 @@ ul.DataList li.Mine div.Meta a.Category {
 }
 ul.DataList li.New div.Meta a.Category {
    background: #ffe;
+}
+ul.DataList div.Meta span.Announcement {
+   color: #e00;
+   font-weight: bold;
 }
 
 /* =============================================================== Categories */

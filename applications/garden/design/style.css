@@ -90,7 +90,7 @@ a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #2786c2;
+   color: #1e79a7;
 }
 a:hover {
    text-decoration: none;
@@ -106,7 +106,7 @@ textarea {
    padding: 3px;
    margin: 0;
    width: 250px;
-   border: 1px solid #ccc;
+   border: 1px solid #aaa;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -143,7 +143,7 @@ a.Button,
    margin: 0;
    font-size: 11px;
    padding: 4px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -346,7 +346,7 @@ div.MorePager a.Loading {
 
 /* =================================================================== Header */
 #Head {
-   background: #44c7f4;
+   background: #38abe3;
    padding: 0;
    text-align: right;
 }
@@ -369,7 +369,7 @@ body #Head h1 {
 #Head h1 a span {
    font-size: 24px;
    color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;   
+   text-shadow:0 1px 0 #2595ba;   
 }
 #Head h1 a:hover span {
    color:#f3fcff;
@@ -400,8 +400,8 @@ body #Head h1 {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #cfecff;
+   color: #1e79a7;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -603,7 +603,7 @@ ul.Options li.Parent strong {
    margin: 3px 4px 0 0;
    font-size: 10px;
    font-weight: normal;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -677,14 +677,14 @@ ul#Menu {
 }
 #Menu ul,
 #Menu li.Active {
-   background: #44c7f4;
+   background: #38abe3;
 }
 #Menu a,
 #Menu li.Active a {
    color: #fff;
 }
 #Menu a:hover {
-   background: #28bcef;
+   background: #2595cb;
 }
 #Menu a:hover,
 #Menu li.NonTab a:hover {
@@ -707,8 +707,8 @@ ul#Menu {
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff;
-   color: #999;
+   background: #cfecff;
+   color: #888;
    padding: 6px 10px;
    margin: 0 0 10px;
 	box-shadow: 0px 0px 2px #999;
@@ -717,15 +717,15 @@ div.Box {
 }
 div.Box h4 {
    font-size: 110%;
-   color: #2786c2;
+   color: #1e79a7;
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
 }
 div.Box dl {
-   border-top: 1px solid #caf0fe;
-   border-bottom: 1px solid #caf0fe;
-   background: #F5FCFF;
+   border-top: 1px solid #abdafb;
+   border-bottom: 1px solid #abdafb;
+   background: #e3f4ff;
    padding: 3px;
    overflow: hidden;
 }
@@ -743,12 +743,12 @@ div.Box p {
    color: #555;
 }
 ul.PanelActivity {
-   border-top: 1px solid #caf0fe;
+   border-top: 1px solid #abdafb;
 	border-bottom: 0;
 }
 ul.PanelActivity li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #e3f4ff;
+   border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
 	color: #555;
 }
@@ -769,13 +769,13 @@ ul.PanelActivity li div.Story {
 	font-size: 85%;
 }
 ul.PanelInfo li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #e3f4ff;
+   border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
    text-align: right;
 }
 ul.PanelInfo {
-   border-top: 1px solid #caf0fe;
+   border-top: 1px solid #abdafb;
 	border-bottom: 0;
 }
 ul.PanelInfo li strong {
@@ -811,7 +811,7 @@ ul.PanelInfo li.Active {
    border-bottom: 1px solid #a3e6ff;
 }
 ul.PanelInfo li.Active a {
-   color: #2786C2;
+   color: #1e79a7;
 }
 ul.PanelActivity li.ShowAll,
 ul.PanelInfo li.ShowAll {
@@ -821,7 +821,7 @@ ul.PanelInfo li.ShowAll {
 	background: none;
 }
 body.Profile ul.PanelInfo {
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #abdafb;
 }
 body.Profile ul.PanelInfo li {
 	border-bottom: 0;
@@ -838,7 +838,7 @@ a.BigButton {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -879,7 +879,7 @@ body.Entry #Content {
 body#garden_entry_handshake #Content {
 	width: 720px;
 }
-body#garden_entry_handshake ul.LinkAccount {
+body#garden_entry_handshake ul.NewAccount {
 	float: left;
 	width: 330px;
 	margin-right: 29px;
@@ -891,10 +891,10 @@ body#garden_entry_handshake div.Info {
 	color: #02475A;
 }
 body.Entry #Content div.Box {
-   background: #E2F4FF;
+   background: #c4e1ff;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	border: 1px solid #A5D0E7;
+	border: 0;
 	margin: 0;
 	padding: 0;
 }
@@ -903,11 +903,16 @@ body.Entry p {
 	padding: 0 10px;
 	margin: 10px 0 10px;
 }
-body.Entry p.Leaving {
-	margin-left: 43px;
-   background: url('images/progress.gif') left center no-repeat;
-   padding-left: 50px;
+body#garden_entry_leave p {
+	margin: 0;
+   padding: 20px 10px;
 }
+body#garden_entry_leave p.Leaving {
+   background: url('images/progress.gif') left center no-repeat;
+	margin: 0 0 0 14px;
+   padding: 20px 0 20px 50px;
+}
+
 body.Entry #Content h1 {
    border: none;
    color: #02475A;
@@ -917,13 +922,22 @@ body.Entry #Content h1 {
 	margin: 0;
 	text-align: left;
 }
+body#garden_entry_handshake #Content h2 {
+   border: none;
+   color: #02475A;
+   font-size:140%;
+   font-weight:bold;
+   padding: 6px 0;
+	margin: 0;
+	text-align: left;
+}
 body.Entry #Content form {
 	text-align: left;
 	padding: 10px 30px 20px;
 }
 body.Entry form ul li label {
 	font-size: 14px;
-	color: #555;
+	color: #474747;
 	font-weight: bold;
 	padding: 6px 0 0;
 	display: block;
@@ -975,7 +989,7 @@ div.Empty {
 ul.DataList li.Item {
    margin: 0;
    padding: 4px 0;
-   border-bottom: 1px solid #dbe3e6;
+   border-bottom: 1px solid #bec8cc;
 }
 ul.DataList li {
    border: 0;
@@ -1005,7 +1019,7 @@ ul.DataList div.Title a {
 }
 ul.DataList div.Meta {
    font-size: 11px;
-   color: #80828c;
+   color: #70727c;
 }
 ul.DataList div.Excerpt {
    font-size: 12px;
@@ -1025,7 +1039,7 @@ ul.DataList div.Meta strong {
    margin-right: 12px;
 }
 ul.DataList div.Meta strong {
-   background: #ff0;
+   background: #fffc00;
    padding: 2px 4px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -1049,7 +1063,7 @@ ul.DataList a.Delete:hover {
 	padding: 4px;
    color: #333;
    border: 1px solid #888;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
 }
 ul.DataList a.Delete:focus {
    background: #f8f8f8;
@@ -1110,7 +1124,7 @@ ul.Activities li.Condensed div.Excerpt {
 }
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
-   color: #2786c2;
+   color: #1e79a7;
 }
 ul.Activities div.Excerpt a:hover,
 ul.Activities div.Meta a:hover {
@@ -1270,9 +1284,9 @@ ul.MessageList div.Message ul li {
 /* The "Foot" is at the bottom of the #Content section. Used for more results
 links, sign in buttons, etc */
 .Foot {
-	border-bottom: 1px solid #caf0fe;
+	border-bottom: 1px solid #abdafb;
    padding: 6px;
-   background: #e9f9ff;
+   background: #cfecff;
    text-align: right;
    -moz-border-radius-bottomright: 2px;
    -moz-border-radius-bottomleft: 2px;
@@ -1315,7 +1329,7 @@ ul.SideMenu li ul {
    background: none;
 }
 ul.SideMenu li ul li {
-   border-bottom: 1px solid #dbe3e6;
+   border-bottom: 1px solid #bec8cc;
 }
 ul.SideMenu li ul li a {
    padding: 0 8px;
@@ -1323,7 +1337,7 @@ ul.SideMenu li ul li a {
 }
 ul.SideMenu li ul li a:hover {
    text-decoration: none;
-   background: #e9f9ff;
+   background: #cfecff;
 }
 div.User {
    line-height: 150%;
@@ -1343,7 +1357,7 @@ div.User h1 {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
-   background: #e9f9ff;
+   background: #cfecff;
    margin: 0;
    padding: 8px 8px 0;
    color: #999;
@@ -1371,7 +1385,7 @@ div.User form {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
-   background: #e9f9ff;
+   background: #cfecff;
    padding: 8px 8px 0;
 }
 div.User form input.InputBox {
@@ -1433,7 +1447,7 @@ form.Activity textarea {
 #Form_Invitation table.AltRows tr.Alt td,
 #Form_Invitation table.AltColumns th.Alt,
 #Form_Invitation table.AltColumns td.Alt {
-   background: #E9F9FF;
+   background: #cfecff;
 }
 #Form_Invitation table.AltColumns tr.Alt {
    background: none;
@@ -1447,10 +1461,10 @@ body.Profile ul.Notifications {
 /* ================================================================= Tab Menu */
 div.Tabs {
 	display: block;
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #abdafb;
    padding: 8px;
    margin: 0;
-   background: #e9f9ff;
+   background: #cfecff;
 }
 div.Tabs li {
    display: inline;
@@ -1472,13 +1486,13 @@ div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
    margin: 0;
-   border: 1px solid #caf0fe;
+   border: 1px solid #abdafb;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-   background: #daf4fd;
+   background: #bbe2f7;
    display: inline;
    font-weight: bold;
-   color: #2786C2;
+   color: #1e79a7;
    text-decoration: none;
    padding: 5px 10px;
 	line-height: 2.6;
@@ -1491,7 +1505,7 @@ div.Tabs li a:hover {
 a.Active,
 div.Tabs li.Active a {
    background: #fff;
-   color: #454545;
+   color: #474747;
 }
 div.Tabs li a span {
    line-height: 1;
@@ -1500,7 +1514,7 @@ div.Tabs li a span {
    -webkit-border-radius: 3px;
    -moz-border-radius: 3px;
    font-weight: normal;
-   background: #2786C2;
+   background: #1e79a7;
    color: #eaf4fd;
    margin: 0 0 0 4px;
 }
@@ -1663,15 +1677,15 @@ div.Popup h2 {
 	font-weight:bold;
 	margin-bottom: 0;
 	color: #fff;
-	background: #44C7F4;
+	background: #38abe3;
 	border-bottom: 1px solid #3DB9E5;
 	padding: 6px 9px 4px;
 }
 div.Popup .Footer {
-  background: #E9F9FF;
+  background: #cfecff;
   text-align: right;
   padding: 2px 6px 0 0;
-  border-top:1px solid #CAF0FE;
+  border-top:1px solid #abdafb;
   -moz-border-radius-bottomleft: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-bottom-left-radius: 5px;

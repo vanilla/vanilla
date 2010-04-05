@@ -98,7 +98,7 @@ body.Conversations h2 {
   margin: 0;
 }
 ul.Conversations li.New {
-  background: #ffd;
+  background: #fffec1;
 }
 ul.Conversations li.Active {
   cursor: pointer;
@@ -148,8 +148,8 @@ body.add #Content {
 }
 #ConversationForm form {
 	-moz-border-radius:2px 2px 2px 2px;
-	background:none repeat scroll 0 0 #E2F4FF;
-	border:1px solid #A5D0E7;
+	background:none repeat scroll 0 0 #c4e1ff;
+	border:1px solid #7caccb;
 	margin:0;
 	padding:20px;
 	text-align: right;

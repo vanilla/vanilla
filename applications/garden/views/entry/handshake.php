@@ -13,24 +13,8 @@
 		ArrayValue('Name', $this->Data),
 		ArrayValue('Email', $this->Data)
 	); ?></div>
-	<ul class="LinkAccount">
-		<li>
-			<?php
-				echo $this->Form->Label('Email', 'SignInEmail');
-				echo $this->Form->TextBox('SignInEmail');
-			?>
-		</li>
-		<li>
-			<?php
-				echo $this->Form->Label('Password', 'SignInPassword');
-				echo $this->Form->Input('SignInPassword', 'password');
-			?>
-		</li>
-		<li>
-			<?php echo $this->Form->Button('Link Existing Account →', array('Name' => 'User/LinkAccount')); ?>
-		</li>
-	</ul>
 	<ul class="NewAccount">
+		<li><h2><?php echo T('✔ Give me a new account'); ?></h2></li>
 		<li>
 			<?php
 				echo $this->Form->Label('Username', 'NewName');
@@ -44,7 +28,25 @@
 			?>
 		</li>
 		<li>
-			<?php echo $this->Form->Button('Create New Account →', array('Name' => 'User/NewAccount')); ?>
+			<?php echo $this->Form->Button('Create New Account', array('Name' => 'User/NewAccount')); ?>
+		</li>
+	</ul>
+	<ul class="LinkAccount">
+		<li><h2><?php echo T('⇄ Link my existing account'); ?></h2></li>
+		<li>
+			<?php
+				echo $this->Form->Label('Email', 'SignInEmail');
+				echo $this->Form->TextBox('SignInEmail');
+			?>
+		</li>
+		<li>
+			<?php
+				echo $this->Form->Label('Password', 'SignInPassword');
+				echo $this->Form->Input('SignInPassword', 'password');
+			?>
+		</li>
+		<li>
+			<?php echo $this->Form->Button('Link Existing Account', array('Name' => 'User/LinkAccount')); ?>
 		</li>
 	</ul>
 	<?php echo $this->Form->Close();?>

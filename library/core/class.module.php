@@ -24,7 +24,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Base module object
  * @package Garden
  */
-class Module extends Gdn_Pluggable implements Gdn_IModule {
+class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
 
 
    /**

@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param string The line number the error was raised at.
  * @param string An array of every variable that existed in the scope the error was triggered in.
  */
-function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
+function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that have a @ before them (ie. @function();)
    if (error_reporting() == 0)
       return FALSE;
@@ -30,7 +30,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    $SenderMessage = $Message;
    $SenderObject = 'PHP';
-   $SenderMethod = 'ErrorHandler';
+   $SenderMethod = 'Gdn_ErrorHandler';
    $SenderCode = FALSE;
    $MessageInfo = explode('|', $Message);
    $MessageCount = count($MessageInfo);
@@ -299,4 +299,4 @@ if (!function_exists('CleanErrorArguments')) {
 }
 
 // Set up Garden to handle php errors
-set_error_handler('ErrorHandler', E_ALL);
+set_error_handler('Gdn_ErrorHandler', E_ALL);

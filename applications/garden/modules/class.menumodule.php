@@ -17,7 +17,7 @@ if (!class_exists('Gdn_MenuModule', FALSE)) {
     * Manages the items in the page menu and eventually returns the menu as a
     * string with ToString();
     */
-   class Gdn_MenuModule extends Module {
+   class Gdn_MenuModule extends Gdn_Module {
       
       /**
        * An array of menu items.

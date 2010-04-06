@@ -15,7 +15,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Renders a user's photo (if they've uploaded one).
  */
-class UserPhotoModule extends Module {
+class UserPhotoModule extends Gdn_Module {
    
    public $User;
    

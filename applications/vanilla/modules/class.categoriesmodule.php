@@ -7,7 +7,7 @@
 /**
  * Renders the discussion categories.
  */
-class CategoriesModule extends Module {
+class CategoriesModule extends Gdn_Module {
    
    protected $_CategoryData;
    

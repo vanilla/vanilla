@@ -15,7 +15,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Renders the "New Conversation" button.
  */
-class NewConversationModule extends Module {
+class NewConversationModule extends Gdn_Module {
 
    public function AssetTarget() {
       return 'Panel';

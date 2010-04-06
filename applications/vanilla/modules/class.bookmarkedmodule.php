@@ -7,7 +7,7 @@
 /**
  * Renders recently active bookmarked discussions
  */
-class BookmarkedModule extends Module {
+class BookmarkedModule extends Gdn_Module {
    
    protected $_DiscussionData;
    

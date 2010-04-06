@@ -15,7 +15,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Builds a pager control related to a dataset.
  */
-class PagerModule extends Module {
+class PagerModule extends Gdn_Module {
 
    /**
     * The id applied to the div tag that contains the pager.

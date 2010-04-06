@@ -9,7 +9,7 @@
 /**
  * Varies functions related to Settings
  */
-class SettingsModule extends Module {
+class SettingsModule extends Gdn_Module {
    
    const TYPE_APPLICATION = 'application';
    const TYPE_PLUGIN      = 'plugin';

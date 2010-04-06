@@ -15,7 +15,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Renders the "Clear Conversation History" button.
  */
-class ClearHistoryModule extends Module {
+class ClearHistoryModule extends Gdn_Module {
    
    protected $ConversationID;
    

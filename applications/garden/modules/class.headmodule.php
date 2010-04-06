@@ -17,7 +17,7 @@ if (!class_exists('HeadModule', FALSE)) {
     * Manages collections of items to be placed between the <HEAD> tags of the
     * page.
     */
-   class HeadModule extends Module {
+   class HeadModule extends Gdn_Module {
       
       /**
        * A collection of tags to be placed in the head.

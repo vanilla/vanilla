@@ -8,7 +8,7 @@
  * Renders user drafts. If rendered within a discussion, it only shows drafts
  * related to that discussion.
  */
-class DraftsModule extends Module {
+class DraftsModule extends Gdn_Module {
    
    protected $_DraftData;
    public $Form;

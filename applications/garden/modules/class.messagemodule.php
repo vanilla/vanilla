@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class Gdn_MessageModule extends Module {
+class Gdn_MessageModule extends Gdn_Module {
 
    protected $_Message;
 

@@ -7,7 +7,7 @@
 /**
  * Renders the 5 most recent activities for use in a side panel.
  */
-class RecentActivityModule extends Module {
+class RecentActivityModule extends Gdn_Module {
    
    protected $_ActivityData;
    public $Form;

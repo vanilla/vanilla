@@ -281,7 +281,7 @@ jQuery(document).ready(function($) {
          
          $.ajax({
             type: "POST",
-            url: combinePaths(definition('WebRoot', ''), '/discussion/getnew/' + discussionID + '/' + lastCommentID),
+            url: combinePaths(definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {

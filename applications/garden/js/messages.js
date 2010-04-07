@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
    
    $('a.AddMessage, a.EditMessage').popup({
       onUnload: function(settings) {
-         $('#Content').load(combinePaths(definition('WebRoot', ''), '/garden/message?DeliveryType=VIEW'));
+         $('#Content').load(combinePaths(definition('WebRoot', ''), 'index.php/garden/message?DeliveryType=VIEW'));
       }   
    });
    

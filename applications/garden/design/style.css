@@ -1393,7 +1393,7 @@ div.User h1 {
    padding: 0;
    line-height: 1;
 }
-#Status a {
+#Status a.Change {
    text-transform: lowercase;
    font-size: 11px;
    text-decoration: none;

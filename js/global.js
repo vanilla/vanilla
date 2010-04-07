@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            combinePaths(definition('WebRoot', ''), '/utility/setclienthour/'+d.getHours()+'/'+definition('TransientKey')),
+            combinePaths(definition('WebRoot', ''), 'index.php/utility/setclienthour/'+d.getHours()+'/'+definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -59,7 +59,7 @@ jQuery(document).ready(function($) {
       
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = combinePaths(definition('WebRoot', ''), '/profile/notifications');
+      document.location = combinePaths(definition('UrlRoot', ''), '/profile/notifications');
       return false;
    });
    
@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
          var transientKey = definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = definition('WebRoot', '');
-         $.post(combinePaths(webRoot, '/garden/utility/sort/'), data, function(response) {
+         $.post(combinePaths(webRoot, 'index.php/garden/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 

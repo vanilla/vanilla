@@ -436,6 +436,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('WebRoot', $this->_Definitions))
          $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
 
+      if (!array_key_exists('UrlRoot', $this->_Definitions))
+         $this->_Definitions['UrlRoot'] = substr(Url(' '), 0, -2);
+
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
 

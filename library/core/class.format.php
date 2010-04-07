@@ -524,7 +524,7 @@ class Format {
          // If the timestamp was during the current day
          if (date('Y m d', $Timestamp) == date('Y m d', time())) {
             // Use the time format
-            $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
+            $Format = T('Date.DefaultTimeFormat', '%I:%M%p');
          } else if (date('Y', $Timestamp) == date('Y', time())) {
             // If the timestamp is the same year, show the month and date
             $Format = T('Date.DefaultDayFormat', '%B %e');
@@ -536,7 +536,9 @@ class Format {
             $Format = T('Date.DefaultFormat', '%B %e, %Y');
          }
       }
-      return strftime($Format, $Timestamp);
+
+      // Emulate %l (not supported on windows)
+      return ltrim(strftime($Format, $Timestamp), '0');
    }
    
    

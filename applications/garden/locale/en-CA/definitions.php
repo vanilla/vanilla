@@ -122,6 +122,6 @@ $Definition['AddonProblems'] = "<h2>Problems?</h2><p>If something goes wrong wit
 $Definition['Date.DefaultFormat'] = '%B %e, %Y';
 $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultYearFormat'] = '%B %Y';
-$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
+$Definition['Date.DefaultTimeFormat'] = '%I:%M%p';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

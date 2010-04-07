@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
 
       $.ajax({
          type: "POST",
-         url: combinePaths(webroot, 'garden/utility/updateproxy'),
+         url: combinePaths(webroot, 'index.php/garden/utility/updateproxy'),
          data: data,
          dataType: 'json',
          success: function(json) {
@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
                // Save the message
                $.ajax({
                   type: "POST",
-                  url: combinePaths(webroot, 'garden/utility/updateresponse'),
+                  url: combinePaths(webroot, 'index.php/garden/utility/updateresponse'),
                   data: 'Messages='+json.messages+'&Response='+json.response+'&TransientKey='+definition('TransientKey'),
                   success: function() {
                      // After the responses have been saved, re-fill the
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
                      // messages to be displayed)
                      if (json.messages != '')
                         $('#Content').load(
-                           combinePaths(webroot, 'garden/settings/index'),
+                           combinePaths(webroot, 'index.php/garden/settings/index'),
                            'DeliveryType=ASSET&DeliveryMethod=XHTML'
                         );
                   }

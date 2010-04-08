@@ -201,6 +201,7 @@ class GardenSetupController extends GardenController {
                'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'Garden.Messages.Cache' => 'arr:["Garden\/Settings\/Index"]', // Make sure that the "welcome" message is cached for viewing
+               'Garden.Errors.MasterView' => 'error.master.php', // Now that the applicatino is installed, select a more user friendly error page
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
             );

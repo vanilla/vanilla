@@ -81,8 +81,9 @@ class SettingsController extends GardenController {
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
                if ($ApplicationManager->ApplicationHasSetup($ApplicationName))
                   $ApplicationManager->ApplicationSetup($ApplicationName, $this->ControllerName, $Validation);
+               $this->Form->SetValidationResults($Validation->Results());
             }
-            $this->Form->SetValidationResults($Validation->Results());
+            
          }
          if ($this->Form->ErrorCount() == 0)
             Redirect('settings/applications');

@@ -452,6 +452,7 @@ class Gdn_Validation {
          // If this field has rules to be enforced...
          if (array_key_exists($FieldName, $this->_FieldRules) && is_array($this->_FieldRules[$FieldName])) {
             // Enforce them...
+            $this->_FieldRules[$FieldName] = array_values($this->_FieldRules[$FieldName]);
             $RuleCount = count($this->_FieldRules[$FieldName]);
             for($i = 0; $i < $RuleCount; ++$i) {
                $RuleName = $this->_FieldRules[$FieldName][$i];

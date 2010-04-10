@@ -1134,10 +1134,8 @@ class Gdn_Form {
       // Only retrieve values from the form collection if this is a postback.
       if ($this->IsPostBack()) {
          $Return = $this->GetFormValue($FieldName, $Default);
-      } else if (is_array($this->_DataArray) && array_key_exists($FieldName, $this->_DataArray)) {
-         $Return = $this->_DataArray[$FieldName];
       } else {
-         $Return = $Default;
+         $Return = ArrayValue($FieldName, $this->_DataArray, $Default);
       }
       return $Return;
    }
@@ -1166,7 +1164,7 @@ class Gdn_Form {
       2009-01-10 - $_GET should not dictate a "post" back.
       return count($_POST) > 0 ? TRUE : FALSE;
       
-      2009-03-31 - switching back to "get" dicating a postback
+      2009-03-31 - switching back to "get" dictating a postback
       */
       $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
       return count($FormCollection) > 0 || (is_array($this->_FormValues) && count($this->_FormValues) > 0) ? TRUE : FALSE;

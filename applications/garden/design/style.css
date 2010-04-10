@@ -173,6 +173,10 @@ input.Button {
    padding: 10px 40px 10px 0;
    background: url('images/progress.gif') center center no-repeat;
 }
+.TinyProgress {
+	padding: 10px 40px 10px 0;
+	background: url('images/progress_sm.gif') center center no-repeat;
+}
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
 div.Messages {
@@ -1238,14 +1242,23 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
+div.Preview {
+	text-align: left;
+	background: #E3F4FF;
+	padding: 1px 8px;
+	margin: 4px 0 8px;
+}
+div.Preview div.Message,
 ul.MessageList div.Message {
    clear: both;
    line-height: 140%;
    font-size: 100%;
 }
+div.Preview div.Message p,
 ul.MessageList div.Message p {
    margin: 8px 0;
 }
+div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
@@ -1253,6 +1266,8 @@ ul.MessageList div.Message blockquote {
    margin: 4px 0;
    background: #ffc;
 }
+div.Preview div.Message code,
+div.Preview div.Message pre,
 ul.MessageList div.Message code,
 ul.MessageList div.Message pre {
    display: block;
@@ -1264,19 +1279,25 @@ ul.MessageList div.Message pre {
    font-family: monospace;
    overflow: auto;
 }
+div.Preview div.Message strong,
 ul.MessageList div.Message strong {
    font-weight: bold;
 }
+div.Preview div.Message em,
 ul.MessageList div.Message em {
    font-style: oblique;
 }
+div.Preview div.Message ul,
+div.Preview div.Message ol,
 ul.MessageList div.Message ul,
 ul.MessageList div.Message ol {
    margin-left: 3em ! important;
 }
+div.Preview div.Message ol li,
 ul.MessageList div.Message ol li {
   list-style: decimal ! important;
 }
+div.Preview div.Message ul li,
 ul.MessageList div.Message ul li {
   list-style: disc ! important;
 }
@@ -1459,6 +1480,10 @@ body.Profile ul.Notifications {
 
 
 /* ================================================================= Tab Menu */
+div.MessageForm {
+	text-align: right;
+}
+div.MessageForm,
 div.Tabs {
 	display: block;
    border-bottom: 1px solid #abdafb;
@@ -1466,10 +1491,24 @@ div.Tabs {
    margin: 0;
    background: #cfecff;
 }
+div.MessageForm div.Tabs {
+	padding: 0;
+	border: 0;
+	background: none;
+	text-align: left;
+}
+div.MessageForm div.Tabs ul {
+	display: inline;
+}
 div.Tabs li {
    display: inline;
    margin: 0;
 }
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
 div.MorePager a,
 div.MorePager a:link,
 div.MorePager a:hover,
@@ -1497,7 +1536,15 @@ div.Tabs li a:visited {
    padding: 5px 10px;
 	line-height: 2.6;
 }
-div.MorePager a:hover,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited {
+	line-height: 1.2;
+}
+div.MessageForm a.Cancel:hover,
+div.MorePager li a:hover,
 a.TabLink:hover,
 div.Tabs li a:hover {
    background: #f3fcff;

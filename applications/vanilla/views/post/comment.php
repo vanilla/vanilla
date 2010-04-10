@@ -3,19 +3,32 @@ $Session = Gdn::Session();
 $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? TRUE : FALSE;
 $Editing = isset($this->Comment);
 ?>
-<div id="CommentForm">
-   <h2><?php echo T($Editing ? 'Edit Comment' : 'Add Comment'); ?></h2>
+<div class="MessageForm CommentForm">
+   <?php if (!$Editing) { ?>
+   <div class="Tabs CommentTabs">
+      <ul>
+         <li class="Active"><?php echo Anchor(T('Write Comment'), '#', 'WriteButton'); ?></li>
+         <?php
+         if (!$Editing)
+            echo '<li>'.Anchor(T('Preview'), '#', 'PreviewButton')."</li>\n";
+         
+         if ($NewOrDraft)
+            echo '<li>'.Anchor(T('Save Draft'), '#', 'DraftButton')."</li>\n";
+   
+         $this->FireEvent('AfterCommentTabs');
+         ?>
+      </ul>
+   </div>
    <?php
-      echo $this->Form->Open();
-      echo $this->Form->Errors();
-      echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
-      echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
-      if ($NewOrDraft)
-         echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
-      
-      echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
-      $this->FireEvent('AfterFormButtons');
-      echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
-      echo $this->Form->Close();
+   } else {
+      $this->Form->SetFormValue('Body', $this->Comment->Body);
+   }
+   echo $this->Form->Open();
+   echo $this->Form->Errors();
+   echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
+   echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
+   echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', array('class' => 'Button CommentButton'));
+   $this->FireEvent('AfterFormButtons');
+   echo $this->Form->Close();
    ?>
 </div>

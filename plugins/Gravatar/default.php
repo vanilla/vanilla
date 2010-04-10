@@ -69,7 +69,7 @@ if (!function_exists('UserBuilder')) {
       if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = 'http://www.gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))
-            .'&default='.urlencode(Url(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+            .'&default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
             .'&size='.Gdn::Config('Garden.Thumbnail.Width', 40);
       }
 		return $User;

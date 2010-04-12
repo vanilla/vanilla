@@ -30,7 +30,7 @@ class SettingsController extends GardenController {
       $this->AddSideMenu('garden/settings/applications');
 
       $this->AddJsFile('applications.js');
-      $this->Title(Translate('Applications'));
+      $this->Title(T('Applications'));
       
       $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
       
@@ -97,7 +97,7 @@ class SettingsController extends GardenController {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('garden/settings/configure');
       $this->AddJsFile('email.js');
-      $this->Title(Translate('General Settings'));
+      $this->Title(T('General Settings'));
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -152,7 +152,7 @@ class SettingsController extends GardenController {
          }
          
          if ($this->Form->Save() !== FALSE) {
-            $this->StatusMessage = Translate("Your settings have been saved.");
+            $this->StatusMessage = T("Your settings have been saved.");
          }
       }
       
@@ -165,7 +165,7 @@ class SettingsController extends GardenController {
    var $RequiredAdminPermissions = array();
    public function xIndex() {
       $this->AddJsFile('settings.js');
-      $this->Title(Translate('Dashboard'));
+      $this->Title(T('Dashboard'));
          
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -190,11 +190,11 @@ class SettingsController extends GardenController {
       // Get the number of users in the database
       $CountUsers = $UserModel->GetCountLike();
       $this->AddDefinition('CountUsers', $CountUsers);
-      $this->BuzzData[Translate('Users')] = number_format($CountUsers);
+      $this->BuzzData[T('Users')] = number_format($CountUsers);
       // Get the number of new users in the last day
-      $this->BuzzData[Translate('New users in the last day')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      $this->BuzzData[T('New users in the last day')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
       // Get the number of new users in the last week
-      $this->BuzzData[Translate('New users in the last week')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      $this->BuzzData[T('New users in the last week')] = number_format($UserModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
       
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
@@ -281,7 +281,7 @@ class SettingsController extends GardenController {
    }
    
    public function Plugins($Filter = '', $TransientKey = '') {
-      $this->Title(Translate('Plugins'));
+      $this->Title(T('Plugins'));
          
       $Session = Gdn::Session();
       $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
@@ -347,7 +347,7 @@ class SettingsController extends GardenController {
       $this->AddSideMenu('garden/settings/registration');
       
       $this->AddJsFile('registration.js');
-      $this->Title(Translate('Registration'));
+      $this->Title(T('Registration'));
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
@@ -385,19 +385,19 @@ class SettingsController extends GardenController {
 
       // Options for how many invitations a role can send out per month.
       $this->InvitationOptions = array(
-         '0' => Gdn::Translate('None'),
+         '0' => T('None'),
          '1' => '1',
          '2' => '2',
          '5' => '5',
-         '-1' => Gdn::Translate('Unlimited')
+         '-1' => T('Unlimited')
       );
       
       // Options for when invitations should expire.
       $this->InviteExpirationOptions = array(
-        '-1 week' => Gdn::Translate('1 week after being sent'),
-        '-2 weeks' => Gdn::Translate('2 weeks after being sent'),
-        '-1 month' => Gdn::Translate('1 month after being sent'),
-        'FALSE' => Gdn::Translate('never')
+        '-1 week' => T('1 week after being sent'),
+        '-2 weeks' => T('2 weeks after being sent'),
+        '-1 month' => T('1 month after being sent'),
+        'FALSE' => T('never')
       );
       
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -416,7 +416,7 @@ class SettingsController extends GardenController {
          
          // Save!
          if ($this->Form->Save() !== FALSE) {
-            $this->StatusMessage = Translate("Your settings have been saved.");
+            $this->StatusMessage = T("Your settings have been saved.");
             if ($RedirectUrl != '')
                $this->RedirectUrl = $RedirectUrl;
          }
@@ -429,7 +429,7 @@ class SettingsController extends GardenController {
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
-      $this->Title(Translate('Themes'));
+      $this->Title(T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('garden/settings/themes');

@@ -22,7 +22,7 @@ if (!function_exists('FormatPossessive')) {
 
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return Gdn::Translate($Number == 1 ? $Singular : $Plural);
+      return T($Number == 1 ? $Singular : $Plural);
    }
 }
 
@@ -119,5 +119,9 @@ $Definition['PluginHelp'] = "Plugins allow you to add functionality to your site
 $Definition['ApplicationHelp'] = "Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.";
 $Definition['ThemeHelp'] = "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";
 $Definition['AddonProblems'] = "<h2>Problems?</h2><p>If something goes wrong with an addon and you can't use your site, you can disable them manually by editing:</p>%s";
+$Definition['Date.DefaultFormat'] = '%B %e, %Y';
+$Definition['Date.DefaultDayFormat'] = '%B %e';
+$Definition['Date.DefaultYearFormat'] = '%B %Y';
+$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

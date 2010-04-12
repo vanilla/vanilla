@@ -275,7 +275,7 @@ class Gdn_UserModel extends Gdn_Model {
                // Record activity if the person changed his/her photo
                $Photo = ArrayValue('Photo', $FormPostValues);
                if ($Photo !== FALSE)
-                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.Gdn::Translate('Thumbnail').'" />');
+                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.T('Thumbnail').'" />');
    
             } else {
                $RecordRoleChange = FALSE;
@@ -296,7 +296,7 @@ class Gdn_UserModel extends Gdn_Model {
                AddActivity(
                   $UserID,
                   'JoinCreated',
-                  Gdn::Translate('Welcome Aboard!'),
+                  T('Welcome Aboard!'),
                   $Session->UserID > 0 ? $Session->UserID : ''
                );
             }
@@ -356,7 +356,7 @@ class Gdn_UserModel extends Gdn_Model {
             AddActivity(
                $UserID,
                'Join',
-               Gdn::Translate('Welcome to Vanilla!')
+               T('Welcome to Vanilla!')
             );
          }
          $this->SaveRoles($UserID, array(16), FALSE);
@@ -451,7 +451,7 @@ class Gdn_UserModel extends Gdn_Model {
          $NewCount = count($NewRoles);
          $Story = '';
          if ($RemovedCount > 0 && $NewCount > 0) {
-            $Story = sprintf(Gdn::Translate('%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'),
+            $Story = sprintf(T('%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'),
                $User->Name,
                implode(', ', $RemovedRoles),
                Plural($RemovedCount, 'role', 'roles'),
@@ -459,13 +459,13 @@ class Gdn_UserModel extends Gdn_Model {
                Plural($NewCount, 'role', 'roles')
             );
          } else if ($RemovedCount > 0) {
-            $Story = sprintf(Gdn::Translate('%1$s was removed from the %2$s %3$s.'),
+            $Story = sprintf(T('%1$s was removed from the %2$s %3$s.'),
                $User->Name,
                implode(', ', $RemovedRoles),
                Plural($RemovedCount, 'role', 'roles')
             );
          } else if ($NewCount > 0) {
-            $Story = sprintf(Gdn::Translate('%1$s was added to the %2$s %3$s.'),
+            $Story = sprintf(T('%1$s was added to the %2$s %3$s.'),
                $User->Name,
                implode(', ', $NewRoles),
                Plural($NewCount, 'role', 'roles')
@@ -554,7 +554,7 @@ class Gdn_UserModel extends Gdn_Model {
          AddActivity(
             $UserID,
             'JoinInvite',
-            Gdn::Translate('Welcome Aboard!'),
+            T('Welcome Aboard!'),
             $InviteUserID
          );
 
@@ -658,7 +658,7 @@ class Gdn_UserModel extends Gdn_Model {
          AddActivity(
             $UserID,
             'Join',
-            Gdn::Translate('Welcome Aboard!')
+            T('Welcome Aboard!')
          );
 
          // Now update the role settings if necessary
@@ -810,7 +810,7 @@ class Gdn_UserModel extends Gdn_Model {
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
-         throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+         throw new Exception(T('ErrorRecordNotFound'));
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
@@ -829,8 +829,8 @@ class Gdn_UserModel extends Gdn_Model {
          // Send out a notification to the user
          $User = $this->Get($UserID);
          if ($User) {
-            $Email->Subject(sprintf(Gdn::Translate('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
-            $Email->Message(sprintf(Gdn::Translate('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
+            $Email->Subject(sprintf(T('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
+            $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
             $Email->To($User->Email);
             $Email->Send();
          }
@@ -840,7 +840,7 @@ class Gdn_UserModel extends Gdn_Model {
          AddActivity(
             $UserID,
             'JoinApproved',
-            Gdn::Translate('Welcome Aboard!'),
+            T('Welcome Aboard!'),
             $Session->UserID,
             '',
             FALSE
@@ -853,7 +853,7 @@ class Gdn_UserModel extends Gdn_Model {
       // Make sure the user is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
-         throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+         throw new Exception(T('ErrorRecordNotFound'));
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
@@ -1023,12 +1023,12 @@ class Gdn_UserModel extends Gdn_Model {
          ->FirstRow();
 
       if (!$UserData)
-         throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+         throw new Exception(T('ErrorRecordNotFound'));
 
       $Values = Format::Unserialize($UserData->$Column);
       // Throw an exception if the field was not empty but is also not an object or array
       if (is_string($Values) && $Values != '')
-         throw new Exception(Gdn::Translate('Serialized column failed to be unserialized.'));
+         throw new Exception(T('Serialized column failed to be unserialized.'));
 
       if (!is_array($Values))
          $Values = array();
@@ -1108,12 +1108,12 @@ class Gdn_UserModel extends Gdn_Model {
       $User = $this->Get($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
-      $Email->Subject(sprintf(Gdn::Translate('[%s] Welcome Aboard!'), $AppTitle));
+      $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
       $Email->From($Sender->Email, $Sender->Name);
       $Email->Message(
          sprintf(
-            Gdn::Translate('EmailWelcome'),
+            T('EmailWelcome'),
             $User->Name,
             $Sender->Name,
             $AppTitle,
@@ -1131,12 +1131,12 @@ class Gdn_UserModel extends Gdn_Model {
       $User = $this->Get($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
-      $Email->Subject(sprintf(Gdn::Translate('[%s] Password Reset'), $AppTitle));
+      $Email->Subject(sprintf(T('[%s] Password Reset'), $AppTitle));
       $Email->To($User->Email);
       $Email->From($Sender->Email, $Sender->Name);
       $Email->Message(
          sprintf(
-            Gdn::Translate('EmailPassword'),
+            T('EmailPassword'),
             $User->Name,
             $Sender->Name,
             $AppTitle,
@@ -1270,12 +1270,12 @@ class Gdn_UserModel extends Gdn_Model {
       $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
-      $Email->Subject(sprintf(Gdn::Translate('[%s] Password Reset Request'), $AppTitle));
+      $Email->Subject(sprintf(T('[%s] Password Reset Request'), $AppTitle));
       $Email->To($User->Email);
       $Email->From(Gdn::Config('Garden.Support.Email'), Gdn::Config('Garden.Support.Name'));
       $Email->Message(
          sprintf(
-            Gdn::Translate('PasswordRequest'),
+            T('PasswordRequest'),
             $User->Name,
             $AppTitle,
             Url('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey, TRUE)

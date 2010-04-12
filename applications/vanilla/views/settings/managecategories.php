@@ -4,15 +4,15 @@ $FirstRow = $this->CategoryData->FirstRow();
 $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->ParentCategoryID > 0) ? ' HasParents' : '';
 echo $this->Form->Open();
 ?>
-<h1><?php echo Gdn::Translate('Manage Categories'); ?></h1>
+<h1><?php echo T('Manage Categories'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'Button'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
       <tr id="0">
-         <th><?php echo Gdn::Translate('Category'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
-         <th><?php echo Gdn::Translate('Url'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Options'); ?></th>
+         <th><?php echo T('Category'); ?></th>
+         <th class="Alt"><?php echo T('Description'); ?></th>
+         <th><?php echo T('Url'); ?></th>
+         <th class="Alt"><?php echo T('Options'); ?></th>
       </tr>
    </thead>
    <tbody>

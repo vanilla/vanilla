@@ -1,15 +1,11 @@
 @import url('reset.css');
-
-
-/* ============================================== General Styles & Typography */
 body {
    color: #000;
    font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
    margin: 0;
    padding: 0;
    font-size: small;
-   background: #ffffff;
-	background: #c2e6fc url(slicesplash.jpg) no-repeat scroll center top;
+	background: #c2e6fc url('images/slicesplash.jpg') no-repeat scroll center top;
 }
 .SplashInfo {
 	margin: 80px 0;

@@ -175,12 +175,16 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * @param string $Table The name of the table name to format.
     */
    public function FormatTableName($Table) {
-      if (strpos($Table, '.') !== FALSE)
-         $Table = '`' . str_replace('.', '`.`', $Table) . '`';
 
+      if (strpos($Table, '.') !== FALSE){
+         if(preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches)){
+            $DatabaseTable = '`' . str_replace('.', '`.`', $Matches[1]) . '`';
+            $Table = str_replace($Matches[1], $DatabaseTable, $Table);
+         }else
+            $Table = '`' . str_replace('.', '`.`', $Table) . '`';
+      }
       return $Table;
    }
-
    /**
     * Returns a delete statement for the specified table and the supplied
     * conditions.

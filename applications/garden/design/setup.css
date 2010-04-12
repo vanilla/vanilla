@@ -1,9 +1,6 @@
-body,
-div {
-   font-family: Arial, Helvetica, Verdana;
-}
 body {
-   background: url('slicesplash.jpg') top center no-repeat #C2E7FC;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   background: url('images/slicesplash.jpg') top center no-repeat #C2E7FC;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -28,6 +25,7 @@ div.Title {
    text-align:left;
 }
 h1 {
+   font-family: Arial, Helvetica, Verdana;
    color: #02455B;
    width: 568px;
    margin: 0 auto;
@@ -69,7 +67,7 @@ div.Errors {
 }
 .ImportProgress {
    padding-left: 40px;
-   background: url('progress.gif') left center no-repeat;
+   background: url('images/progress.gif') left center no-repeat;
 }
 .ImportProgress strong {
    background: #ff9;
@@ -81,11 +79,11 @@ div.Errors {
 }
 .Loading {
    height: 100px;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 .Progress {
    padding: 10px 40px 10px 0px;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 .Hidden {
    display: none;
@@ -118,7 +116,7 @@ form ul li label {
    font-weight: bold;
    display: block;
    padding: 8px 0 0;
-   font-size: 120%;
+   font-size: 110%;
    }
 form ul li input.InputBox {
    -moz-border-radius: 4px;
@@ -153,7 +151,7 @@ input.Button {
    font-size: 25px;
    text-shadow:0 1px 0 #FFFFFF;   
    color: #073C5E;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;

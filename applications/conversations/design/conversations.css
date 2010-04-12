@@ -7,10 +7,10 @@ Welcome to the Conversations CSS File! Some things you should know:
    + Messages/*
 
 2. This file is broken down into the following sections:
-   + Line 17:     Autocomplete Definitions
-   + Line 84:     General Conversations Definitions
-   + Line 200:    Add Message Form
-   + Line 223:    New Conversation Form
+   + Autocomplete Definitions
+   + General Conversations Definitions
+   + Add Message Form
+   + New Conversation Form
 */
    
    
@@ -76,8 +76,11 @@ div.AddPeople h4 {
 }
 #Panel input.InputBox,
 div.AddPeople textarea.MultiComplete {
-  width: 225px;
+  width: 228px;
   margin-bottom: 2px;
+}
+div.AddPeople form div {
+	text-align: right;
 }
 
 
@@ -94,136 +97,18 @@ h2.NewConversation a {
 body.Conversations h2 {
   margin: 0;
 }
-#Conversations li {
-	font-family: 'lucida grande';
-	border-bottom: 1px solid #eee;
-	padding: 6px;
-	color: #888;
+ul.Conversations li.New {
+  background: #fffec1;
 }
-#Conversations li.New {
-  background: #ffd;
-}
-#Conversations li.Active {
+ul.Conversations li.Active {
   cursor: pointer;
   background: #ffe;
 }
-#Conversations li a.Photo,
-#Conversation li a.Photo {
-  float: left;
-  padding: 0 10px 0 0;
+ul.Conversations li.HasPhoto {
+	padding: 4px 5px;
 }
-#Conversation li a.Photo img,
-#Conversations li a.Photo img {
-  height: 43px;
-  width: 43px;
-}
-#Conversations li a.Name {
-  font-size: 110%;
-  font-weight: bold;
-  padding: 0 10px 0 0;
-}
-#Conversations li a.Message {
-  float: none;
-  color: #000;
-}
-#Conversations div.Meta {
-  font-size: 90%;
-  line-height: 1;
-  padding: 4px 0;
-}
-#Conversations div.Meta span {
-  font-size: 8px;
-  padding: 0 8px;
-}
-#Conversations div.Meta em {
-  background: #fffa22;
-  color: #000;
-  padding: 0 3px;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-}
-#Conversation li {
-	font-family: 'lucida grande';
-  border-bottom: 1px solid #eee;
-  padding: 6px;
-  color: #888;
-  font-size: 90%;
-}
-#Conversation li a.Name {
-  font-weight: bold;
-  font-size: 120%;
-  margin-right: 10px;
-}
-#Conversation li div span {
-  font-size: 8px;
-  padding: 0 8px;
-}
-#Conversation li.HasPhoto div {
-  padding: 0 0 0 53px;
-}
-#Conversation li.HasPhoto div div {
-  padding: 0;
-}
-#Conversation li div.Message {
-  font-size: 110%;
-  color: #000;
-}
-#Conversation div.Message p {
-   font-family: 'lucida grande';   
-   margin: 8px 0;
-}
-#Conversation  blockquote {
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   padding: 4px 16px;
-   margin: 4px 0;
-   background: #ffc;
-}
-#Conversation  code,
-#Conversation  pre {
-   display: block;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #ff9;
-   padding: 4px 8px;
-   white-space: pre;
-   font-family: monospace;
-   overflow: auto;
-}
-#Conversation  strong {
-   font-weight: bold;
-}
-#Conversation  em {
-   font-style: oblique;
-}
-#ConversationForm {
-	margin-bottom: 6px;
-}
-/* Big Buttons */
-a.ClearConversation,
-a.NewConversation {
-   padding: 6px 0px;
-   display: block;
-   text-align: center;
-   font-size: 16px;
-   font-weight: bold;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0px 0px 10px 0px;
-}
-a.ClearConversation:hover,
-a.NewConversation:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-}
-a.ClearConversation {
-   background: #f06;
-}
-a.ClearConversation:hover {
-   background: #c36;
+ul.Conversations div.ItemContent {
+   margin:0 0 0 5px;
 }
 
 
@@ -243,8 +128,11 @@ a.ClearConversation:hover {
   font-weight: bold;
   border: 0;
 }
+#MessageForm form div {
+	text-align: right;
+}
 #MessageForm textarea {
-  width: 654px;
+  width: 655px;
   height: 100px;
   min-height: 100px;
   margin-bottom: 2px;
@@ -258,40 +146,54 @@ body.add #Panel {
 body.add #Content {
    width: auto;
 }
-#ConversationForm {
-   border: 0px;
-   background: #daf4fd;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   padding: 8px 10px 10px;
+#ConversationForm form {
+	-moz-border-radius:2px 2px 2px 2px;
+	background:none repeat scroll 0 0 #c4e1ff;
+	border:1px solid #7caccb;
+	margin:0;
+	padding:20px;
+	text-align: right;
 }
 #ConversationForm h2 {
-  margin: 0 0 8px 0;
+	color:#02475A;
+	font-size:140%;
+	font-weight:bold;
+	margin:0;
+	padding:6px;
+	text-align: left;
+	border: 0;
 }
-#conversations_messages_add #ConversationForm h2 {
-  border: 0;
-  color:#2786C2;
-  font-size: 120%;
+#ConversationForm label {
+	display: block;
+	text-align: left;
+	color:#666666;
+	font-size:14px;
+	font-weight:bold;	
 }
 #ConversationForm textarea.MultiComplete {
-  width: 930px;
+  width: 910px;
 }
 #ConversationForm .TextBox {
-   width: 930px;
+   width: 910px;
    height: 100px;
    min-height: 100px;
    margin: 8px 0 6px;
 	padding: 0;
-	max-height: 300px;
 }
 a.Cancel {
    margin-left: 20px;
 }
-div.Popup #ConversationForm {
+div.Popup #ConversationForm form {
 	background: none;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
-	padding: 0;
+	padding: 10px;
+}
+div.Popup #ConversationForm h2 {
+	color: #fff;
+	font-size: 120%;
+	font-weight: bold;
+	padding: 6px 9px 4px;	
 }
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {

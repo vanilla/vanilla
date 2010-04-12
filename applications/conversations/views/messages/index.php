@@ -1,11 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
-<h2><?php echo $this->Participants; ?></h2>
+<div class="Tabs HeadingTabs ConversationTabs">
+   <ul>
+      <li><?php echo Anchor(T('All Conversations'), '/messages/all'); ?></li>
+   </ul>
+   <div class="SubTab"><?php echo $this->Participants; ?></div>
+</div>
 <?php
 echo $this->Pager->ToString('less');
 ?>
-<ul id="Conversation">
+<ul class="MessageList Conversation">
    <?php
    $MessagesViewLocation = $this->FetchViewLocation('messages');
    include($MessagesViewLocation);
@@ -13,7 +18,7 @@ echo $this->Pager->ToString('less');
 </ul>
 <?php echo $this->Pager->ToString(); ?>
 <div id="MessageForm">
-   <h2><?php echo Gdn::Translate('Add Message'); ?></h2>
+   <h2><?php echo T('Add Message'); ?></h2>
    <?php
    echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox'));

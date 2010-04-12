@@ -3,7 +3,7 @@
 echo $this->Form->Open();
 ?>
 <div class="Title">
-   <h1><?php echo Translate("Problems"); ?></h1>
+   <h1><?php echo T("Problems"); ?></h1>
 </div>
 <div class="Form">
    <?php echo $this->Form->Errors(); ?>

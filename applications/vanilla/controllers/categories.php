@@ -101,7 +101,7 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('discussions.js');
       $this->AddJsFile('options.js');
-      $this->Title(Translate('All Categories'));
+      $this->Title(T('All Categories'));
          
       $this->DiscussionsPerCategory = Gdn::Config('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new Gdn_DiscussionModel();

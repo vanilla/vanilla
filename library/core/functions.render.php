@@ -8,6 +8,25 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+/**
+* 1. <li<?php echo Alternate()?>>
+* Result: <li class="Alt"> and <li>
+* 2. <li class="<?php echo Alternate('AltA', 'AltB')"?>>
+* Result: <li class="AltA"> and <li class="AltB">
+*/
+if (!function_exists('Alternate')) {
+   function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
+      static $i = 0;
+      $Value = $i++ % 2 ? $Odd : $Even;
+      if($Value != '' && $Even == '')
+         $Value = ' '.$AttributeName.'="'.$Value.'"';
+      return $Value;
+   }
+}
+
+/**
+ * Writes an anchor tag
+ */
 if (!function_exists('Anchor')) {
    /**
     * Builds and returns an anchor tag.
@@ -30,6 +49,20 @@ if (!function_exists('Anchor')) {
    }
 }
 
+/**
+ * English "possessive" formatting.
+ * This can be overridden in language definition files like:
+ * /applications/garden/locale/en-US/definitions.php.
+ */
+if (!function_exists('FormatPossessive')) {
+   function FormatPossessive($Word) {
+      return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+   }
+}
+
+/**
+ * Writes an Img tag.
+ */
 if (!function_exists('Img')) {
    /**
     * Returns an img tag.
@@ -45,6 +78,20 @@ if (!function_exists('Img')) {
    }
 }
 
+/**
+ * English "plural" formatting.
+ * This can be overridden in language definition files like:
+ * /applications/garden/locale/en-US/definitions.php.
+ */
+if (!function_exists('Plural')) {
+   function Plural($Number, $Singular, $Plural) {
+      return T($Number == 1 ? $Singular : $Plural);
+   }
+}
+
+/**
+ * Takes a user object, and writes out an achor of the user's name to the user's profile.
+ */
 if (!function_exists('UserAnchor')) {
    function UserAnchor($User, $CssClass = '') {
       if ($CssClass != '')
@@ -54,20 +101,11 @@ if (!function_exists('UserAnchor')) {
    }
 }
 
-if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $CssClass = '') {
-      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($User->Photo != '') {
-         $PhotoUrl = strtolower(substr($User->Photo, 0, 7)) == 'http://' ? $User->Photo : 'uploads/n'.$User->Photo;
-         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
-            .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
-            .'</a>';
-      } else {
-         return '';
-      }
-   }
-}
-
+/**
+ * Takes an object & prefix value, and converts it to a user object that can be
+ * used by UserAnchor() && UserPhoto() to write out anchors to the user's
+ * profile. The object must have the following fields: UserID, Name, Photo.
+ */
 if (!function_exists('UserBuilder')) {
    function UserBuilder($Object, $UserPrefix = '') {
       $User = new stdClass();
@@ -82,18 +120,18 @@ if (!function_exists('UserBuilder')) {
 }
 
 /**
-1. <li<?php echo Alternate()?>>
-Result: <li class="Alt"> and <li>
-2. <li class="<?php echo Alternate('AltA', 'AltB')"?>>
-Result: <li class="AltA"> and <li class="AltB">
-*/
-
-if (!function_exists('Alternate')) {
-   function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
-      static $i = 0;
-      $Value = $i++ % 2 ? $Odd : $Even;
-      if($Value != '' && $Even == '')
-         $Value = ' '.$AttributeName.'="'.$Value.'"';
-      return $Value;
+ * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
+ */
+if (!function_exists('UserPhoto')) {
+   function UserPhoto($User, $CssClass = '') {
+      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
+      if ($User->Photo != '') {
+         $PhotoUrl = strtolower(substr($User->Photo, 0, 7)) == 'http://' ? $User->Photo : 'uploads/n'.$User->Photo;
+         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
+            .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
+            .'</a>';
+      } else {
+         return '';
+      }
    }
 }

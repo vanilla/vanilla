@@ -142,14 +142,24 @@ class PagerModule extends Module {
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
-            $Details = sprintf(Gdn::Translate('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+            $Details = sprintf(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
-            $Details = sprintf(Gdn::Translate('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+            $Details = sprintf(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
          }
       }
       return $Details;
    }
    
+   /**
+    * Whether or not this is the first page of the pager.
+    *
+    * @return bool True if this is the first page.
+    */
+   public function FirstPage() {
+      $Result = $this->Offset == 0;
+      return $Result;
+   }
+
    /**
     * Whether or not this is the last page of the pager.
     *
@@ -180,8 +190,8 @@ class PagerModule extends Module {
 
       // $Pager = '<span>TotalRecords: '.$this->TotalRecords.'; Limit: '.$this->Limit.'; Offset: '.$this->Offset.'; PageCount: '.$PageCount.'</span>';
       $Pager = '';
-      $PreviousText = Gdn::Translate($this->LessCode);
-      $NextText = Gdn::Translate($this->MoreCode);
+      $PreviousText = T($this->LessCode);
+      $NextText = T($this->MoreCode);
       
       if ($CurrentPage == 1) {
          $Pager = '<span class="Previous">'.$PreviousText.'</span>';

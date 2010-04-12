@@ -3,7 +3,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('Add Category'); ?></h1>
+<h1><?php echo T('Add Category'); ?></h1>
 <ul>
    <li>
       <?php
@@ -14,7 +14,7 @@ echo $this->Form->Errors();
    <li>
       <?php echo $this->Form->Label('Url Code', 'UrlCode'); ?>
       <div class="Info">
-         <?php echo Gdn::Translate('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
+         <?php echo T('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
       </div>
       <?php echo $this->Form->TextBox('UrlCode'); ?>
    </li>
@@ -31,7 +31,7 @@ echo $this->Form->Errors();
    </li>
    <li id="Permissions">
       <?php
-         echo Gdn::Translate('Check all permissions that apply for each role');
+         echo T('Check all permissions that apply for each role');
          echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
       ?>
    </li>

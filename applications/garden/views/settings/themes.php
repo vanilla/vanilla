@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
-<h1><?php echo Gdn::Translate('Manage Themes'); ?></h1>
+<h1><?php echo T('Manage Themes'); ?></h1>
 <?php
 if ($AddonUrl != '')
    echo '<div class="FilterMenu">',
@@ -13,12 +13,12 @@ if ($AddonUrl != '')
 <div class="Info">
 <?php
 printf(
-   Translate('ThemeHelp'),
-   '<span class="Warning">'.PATH_THEMES.'</span>'
+   T('ThemeHelp'),
+   '<code>'.PATH_THEMES.'</code>'
 );
 ?></div>
 <div class="CurrentTheme">
-   <h3><?php echo Gdn::Translate('Current Theme'); ?></h3>
+   <h3><?php echo T('Current Theme'); ?></h3>
    <?php
    $Version = ArrayValue('Version', $this->EnabledTheme, '');
    $ThemeUrl = ArrayValue('Url', $this->EnabledTheme, '');
@@ -34,7 +34,7 @@ printf(
    echo '<h4>';
       echo $ThemeUrl != '' ? Url($this->EnabledThemeName, $ThemeUrl) : $this->EnabledThemeName;
       if ($Version != '')
-         echo '<span class="Version">'.sprintf(Translate('version %s'), $Version).'</span>';
+         echo '<span class="Version">'.sprintf(T('version %s'), $Version).'</span>';
          
       if ($Author != '')
          echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
@@ -44,14 +44,14 @@ printf(
    
    $RequiredApplications = ArrayValue('RequiredApplications', $this->EnabledTheme, FALSE);
    if (is_array($RequiredApplications)) {
-      echo '<div class="Requirements">'.Translate('Requires: ');
+      echo '<div class="Requirements">'.T('Requires: ');
 
       $i = 0;
       if ($i > 0)
          echo ', ';
       
       foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
-         printf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+         printf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
          ++$i;
       }
       echo '</div>';
@@ -60,7 +60,7 @@ printf(
    if ($Upgrade) {
       echo '<div class="Alert">';
       echo Url(
-            sprintf(Gdn::Translate('%1$s version %2$s is available.'), $this->EnabledThemeName, $NewVersion),
+            sprintf(T('%1$s version %2$s is available.'), $this->EnabledThemeName, $NewVersion),
             CombinePaths(array($AddonUrl, 'find', urlencode($this->EnabledThemeName)), '/')
          );
       echo '</div>';
@@ -69,7 +69,7 @@ printf(
 </div>
 <?php if (count($this->AvailableThemes) > 1) { ?>
 <div class="BrowseThemes">
-   <h3><?php echo Gdn::Translate('Other Themes'); ?></h3>
+   <h3><?php echo T('Other Themes'); ?></h3>
    <table class="SelectionGrid Themes">
       <tbody>
    <?php
@@ -108,7 +108,7 @@ printf(
                   echo '<h4>';
                      echo $ThemeUrl != '' ? Url($ThemeName, $ThemeUrl) : $ThemeName;
                      if ($Version != '')
-                        $Info = sprintf(Translate('Version %s'), $Version);
+                        $Info = sprintf(T('Version %s'), $Version);
                         
                      if ($Author != '')
                         $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
@@ -135,7 +135,7 @@ printf(
                   $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
                      echo '<dl>
-                        <dt>'.Translate('Requires').'</dt>
+                        <dt>'.T('Requires').'</dt>
                         <dd>';
 
                      $i = 0;
@@ -143,7 +143,7 @@ printf(
                         if ($i > 0)
                            echo ', ';
                            
-                        printf(Gdn::Translate('%1$s %2$s'), $RequiredApplication, $VersionInfo);
+                        printf(T('%1$s %2$s'), $RequiredApplication, $VersionInfo);
                         ++$i;
                      }
                      echo '</dl>';
@@ -152,7 +152,7 @@ printf(
                   if ($Upgrade) {
                      echo '<div class="Alert">';
                      echo Anchor(
-                           sprintf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
+                           sprintf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
                            CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')
                         );
                      echo '</div>';
@@ -176,4 +176,4 @@ printf(
 <?php
 }
 
-printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

@@ -16,7 +16,8 @@ foreach ($this->_ProfileTabs as $TabCode => $TabUrl) {
       $SortOrder[] = $TabCode;
 }
 ?>
-<ul class="Tabs">
+<div class="Tabs ProfileTabs">
+   <ul>
    <?php
    // Get sorted tabs
    foreach ($SortOrder as $TabCode) {
@@ -26,4 +27,5 @@ foreach ($this->_ProfileTabs as $TabCode => $TabUrl) {
 
    }
    ?>
-</ul>
+   </ul>
+</div>

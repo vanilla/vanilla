@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
             $(this).hide();
             this.style.visibility = 'hidden';
             // Only hide the "options" link if it's container is not class "Active"
-            if (!$(this).parents('li.DiscussionRow').hasClass('Active')) {
+            if (!$(this).parents('li.Item ').hasClass('Active')) {
                $(this).parents('ul.Options').hide();
             }
          }
@@ -43,11 +43,11 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+/*   
    // 2. Bookmark/Unbookmark discussion
    $('a.BookmarkDiscussion').livequery('click', function() {
       var btn = this;
-      var row = $(btn).parents('li.DiscussionRow');
+      var row = $(btn).parents('li.Item');
       
       $.ajax({
          type: "POST",
@@ -74,11 +74,11 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+*/   
    // 3. Announce discussion
    $('a.AnnounceDiscussion').livequery('click', function() {
       var btn = this;
-      var row = $(btn).parents('li.DiscussionRow');
+      var row = $(btn).parents('li.Item');
       $.ajax({
          type: "POST",
          url: $(btn).attr('href'),
@@ -101,7 +101,7 @@ jQuery(document).ready(function($) {
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.DiscussionRow');
+         var row = $(sender).parents('li.Item');
          if (json.State)
             $(row).addClass('Sink');
          else
@@ -117,7 +117,7 @@ jQuery(document).ready(function($) {
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.DiscussionRow');
+         var row = $(sender).parents('li.Item');
          if (json.State)
             $(row).addClass('Close');
          else
@@ -134,7 +134,7 @@ jQuery(document).ready(function($) {
       followConfirm: false,
       deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.DiscussionRow');
+         var row = $(sender).parents('li.Item');
          if (json.ErrorMessage) {
             $.popup({}, json.ErrorMessage);
          } else {

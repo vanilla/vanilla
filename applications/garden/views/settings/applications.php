@@ -3,18 +3,18 @@ $Session = Gdn::Session();
 $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
-<h1><?php echo Gdn::Translate('Manage Applications'); ?></h1>
+<h1><?php echo T('Manage Applications'); ?></h1>
 <?php
 // Build a filter menu for applications
 $AppCount = count($this->AvailableApplications);
 $EnabledCount = count($this->EnabledApplications);
 $DisabledCount = $AppCount - $EnabledCount;
 echo '<div class="FilterMenu">',
-   $this->Filter == '' ? '<strong>'.Translate('All').'</strong>' : Anchor('All', '/settings/applications/'),
+   $this->Filter == '' ? '<strong>'.T('All').'</strong>' : Anchor('All', '/settings/applications/'),
    ' ('.$AppCount.') <span>|</span> ',
-   $this->Filter == 'enabled' ? '<strong>'.Translate('Enabled').'</strong>' : Anchor('Enabled', '/settings/applications/enabled'),
+   $this->Filter == 'enabled' ? '<strong>'.T('Enabled').'</strong>' : Anchor('Enabled', '/settings/applications/enabled'),
    ' ('.$EnabledCount.') <span>|</span> ',
-   $this->Filter == 'disabled' ? '<strong>'.Translate('Disabled').'</strong>' : Anchor('Disabled', '/settings/applications/disabled'),
+   $this->Filter == 'disabled' ? '<strong>'.T('Disabled').'</strong>' : Anchor('Disabled', '/settings/applications/disabled'),
    ' ('.$DisabledCount.')';
    
 if ($AddonUrl != '')
@@ -24,16 +24,16 @@ if ($AddonUrl != '')
 <div class="Info">
    <?php
    printf(
-      Translate('ApplicationHelp'),
-      '<span class="Warning">'.PATH_APPLICATIONS.'</span>'
+      T('ApplicationHelp'),
+      '<code>'.PATH_APPLICATIONS.'</code>'
    );
    ?>
 </div>
 <table class="AltRows">
    <thead>
       <tr>
-         <th><?php echo Gdn::Translate('Application'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
+         <th><?php echo T('Application'); ?></th>
+         <th class="Alt"><?php echo T('Description'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -75,13 +75,13 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             $RequiredApplications = ArrayValue('RequiredApplications', $AppInfo, FALSE);
             $Info = '';
             if ($Version != '')
-               $Info = sprintf(Translate('Version %s'), $Version);
+               $Info = sprintf(T('Version %s'), $Version);
                
             if (is_array($RequiredApplications)) {
                if ($Info != '')
                   $Info .= '<span>|</span>';
 
-               $Info .= Translate('Requires: ');
+               $Info .= T('Requires: ');
             }
                
             $i = 0;
@@ -90,7 +90,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
                   $Info .= ', ';
                
                foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
-                  $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                  $Info .= sprintf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
                   ++$i;
                }
             }
@@ -116,7 +116,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             <td colspan="2"><div class="Alert"><a href="<?php
                echo CombinePaths(array($AddonUrl, 'find', urlencode($AppName)), '/');
             ?>"><?php
-               printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+               printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
             ?></a></div></td>
          </tr>
       <?php
@@ -127,4 +127,4 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    </tbody>
 </table>
 <?php
-   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+   printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

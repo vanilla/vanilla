@@ -3,18 +3,18 @@ $Session = Gdn::Session();
 $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
 $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
 ?>
-   <h1><?php echo Gdn::Translate('Manage Plugins'); ?></h1>
+   <h1><?php echo T('Manage Plugins'); ?></h1>
    <?php
    // Build a filter menu for plugins
    $PluginCount = count($this->AvailablePlugins);
    $EnabledCount = count($this->EnabledPlugins);
    $DisabledCount = $PluginCount - $EnabledCount;
    echo '<div class="FilterMenu">',
-      $this->Filter == '' ? '<strong>'.Translate('All').'</strong>' : Anchor('All', '/settings/plugins/'),
+      $this->Filter == '' ? '<strong>'.T('All').'</strong>' : Anchor('All', '/settings/plugins/'),
       ' ('.$PluginCount.') <span>|</span> ',
-      $this->Filter == 'enabled' ? '<strong>'.Translate('Enabled').'</strong>' : Anchor('Enabled', '/settings/plugins/enabled'),
+      $this->Filter == 'enabled' ? '<strong>'.T('Enabled').'</strong>' : Anchor('Enabled', '/settings/plugins/enabled'),
       ' ('.$EnabledCount.') <span>|</span> ',
-      $this->Filter == 'disabled' ? '<strong>'.Translate('Disabled').'</strong>' : Anchor('Disabled', '/settings/plugins/disabled'),
+      $this->Filter == 'disabled' ? '<strong>'.T('Disabled').'</strong>' : Anchor('Disabled', '/settings/plugins/disabled'),
       ' ('.$DisabledCount.')';
       
    if ($AddonUrl != '')
@@ -25,8 +25,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
    <div class="Info">
       <?php
       printf(
-         Translate('PluginHelp'),
-         '<span class="Warning">'.PATH_PLUGINS.'</span>'
+         T('PluginHelp'),
+         '<code>'.PATH_PLUGINS.'</code>'
       );
       ?>
    </div>
@@ -36,8 +36,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
    <table class="AltRows">
       <thead>
          <tr>
-            <th><?php echo Gdn::Translate('Plugin'); ?></th>
-            <th><?php echo Gdn::Translate('Description'); ?></th>
+            <th><?php echo T('Plugin'); ?></th>
+            <th><?php echo T('Description'); ?></th>
          </tr>
       </thead>
       <tbody>
@@ -85,13 +85,13 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                $RequiredPlugins = ArrayValue('RequiredPlugins', $PluginInfo, FALSE);
                $Info = '';
                if ($Version != '')
-                  $Info = sprintf(Translate('Version %s'), $Version);
+                  $Info = sprintf(T('Version %s'), $Version);
                   
                if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
                   if ($Info != '')
                      $Info .= '<span>|</span>';
 
-                  $Info .= Translate('Requires: ');
+                  $Info .= T('Requires: ');
                }
                   
                $i = 0;
@@ -100,7 +100,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                      $Info .= ', ';
                   
                   foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
-                     $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                     $Info .= sprintf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
                      ++$i;
                   }
                }
@@ -110,7 +110,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                      if ($i > 0)
                         $Info .= ', ';
                         
-                     $Info .= sprintf(Gdn::Translate('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
+                     $Info .= sprintf(T('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
                      ++$i;
                   }
                }
@@ -136,7 +136,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
                <td colspan="2"><div class="Alert"><a href="<?php
                   echo CombinePaths(array($AddonUrl, 'find', urlencode($PluginName)), '/');
                ?>"><?php
-                  printf(Gdn::Translate('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+                  printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
                ?></a></div></td>
             </tr>
          <?php
@@ -147,5 +147,5 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
       </tbody>
    </table>
    <?php
-   printf(Translate('AddonProblems'), '<p class="Warning">'.PATH_CONF.DS.'config.php'.'</p>');
+   printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');
    

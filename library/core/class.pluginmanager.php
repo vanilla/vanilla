@@ -384,7 +384,7 @@ class Gdn_PluginManager {
       $PluginInfo = ArrayValue($PluginName, $AvailablePlugins, FALSE);
       $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
       if ($PluginFolder == '')
-         throw new Exception(Gdn::Translate('The plugin folder was not properly defined.'));
+         throw new Exception(T('The plugin folder was not properly defined.'));
       
       $this->_PluginHook($PluginName, self::ACTION_ENABLE, $Setup);
       
@@ -415,7 +415,7 @@ class Gdn_PluginManager {
       foreach ($this->EnabledPlugins as $CheckingName => $CheckingInfo) {
          $RequiredPlugins = ArrayValue('RequiredPlugins', $CheckingInfo, FALSE);
          if (is_array($RequiredPlugins) && array_key_exists($PluginName, $RequiredPlugins) === TRUE) {
-            throw new Exception(sprintf(Gdn::Translate('You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'), $PluginName, $CheckingName));
+            throw new Exception(sprintf(T('You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'), $PluginName, $CheckingName));
          }
       }
       

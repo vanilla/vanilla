@@ -2,13 +2,13 @@
 
 echo $this->Form->Open();
 ?>
-<h1><?php echo Gdn::Translate('Manage Roles & Permissions'); ?></h1>
+<h1><?php echo T('Manage Roles & Permissions'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Add Role', 'garden/role/add', 'Button'); ?></div>
 <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
    <thead>
       <tr id="0">
-         <th><?php echo Gdn::Translate('Role'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
+         <th><?php echo T('Role'); ?></th>
+         <th class="Alt"><?php echo T('Description'); ?></th>
       </tr>
    </thead>
    <tbody>

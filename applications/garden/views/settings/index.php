@@ -2,7 +2,7 @@
 $this->RenderAsset('Messages');
 ?>
 <div class="Column Column1">
-   <h1><?php echo Gdn::Translate("What's the Buzz?"); ?></h1>
+   <h1><?php echo T("What's the Buzz?"); ?></h1>
    <table id="Buzz" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
       <tbody>
          <?php
@@ -25,13 +25,13 @@ $this->RenderAsset('Messages');
    </table>
 </div>
 <div class="Column Column2">
-   <h1><?php echo Gdn::Translate('Recently Active Users'); ?></h1>
+   <h1><?php echo T('Recently Active Users'); ?></h1>
    <table id="RecentUsers" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
       <!--
       <thead>
          <tr>
-            <th><?php echo Gdn::Translate('User'); ?></th>
-            <th class="Alt"><?php echo Gdn::Translate('Last Active'); ?></th>
+            <th><?php echo T('User'); ?></th>
+            <th class="Alt"><?php echo T('Last Active'); ?></th>
          </tr>
       </thead>
       -->

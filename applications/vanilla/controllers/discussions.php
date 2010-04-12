@@ -23,7 +23,7 @@ class DiscussionsController extends VanillaController {
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
          $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
-         $this->Head->Title(Translate('All Discussions'));
+         $this->Head->Title(T('All Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -98,7 +98,7 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->Title(Translate('My Bookmarks'));
+      $this->Title(T('My Bookmarks'));
 
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
@@ -117,7 +117,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -147,7 +146,7 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
       $this->AddJsFile('options.js');
-      $this->Title(Translate('My Discussions'));
+      $this->Title(T('My Discussions'));
 
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -164,7 +163,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,

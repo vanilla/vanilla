@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
    $('form.Activity textarea').setMaxChars(1000);
    
    // Hide activity deletes and hijack their clicks to confirm
-   $('ul.Activities li a.Delete').popup({
+   $('ul.Activities a.Delete, ul.Activities a.DeleteComment').popup({
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
@@ -25,12 +25,11 @@ jQuery(document).ready(function($) {
       });
    });
 
-
 /* Comments */
 
    // Hide/reveal the comments when the comment link is clicked
    $('a.CommentOption').live('click', function() {
-      var comments = $(this).parents('li.Activity').find('ul.Comments');
+      var comments = $(this).parents('li.Activity').find('ul.ActivityComments');
       comments.toggle();
       comments.find('a.CommentLink').click();
       return false;
@@ -70,7 +69,7 @@ jQuery(document).ready(function($) {
    });
    
    // Hijack comment form button clicks
-   $('ul.Comments form input.Button').live('click', function() {
+   $('ul.ActivityComments form input.Button').live('click', function() {
       var button = this;
       var frm = $(button).parents('form');
       var row = $(frm).parents('li.CommentForm');
@@ -96,7 +95,7 @@ jQuery(document).ready(function($) {
                $(row).before(json.Data);         
                textbox.val('').blur();
                // Make sure that hidden items appear
-               $('ul.Comments li.Hidden').slideDown('fast');
+               $('ul.ActivityComments li.Hidden').slideDown('fast');
             }
          }
       });

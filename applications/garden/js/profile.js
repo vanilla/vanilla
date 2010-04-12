@@ -2,10 +2,10 @@
 jQuery(document).ready(function($) {
    
    // Load tab content on tab-click
-   $('ul.Tabs li a').click(function() {
-      $('ul.Tabs li').removeAttr('class');
+   $('.Tabs li a').click(function() {
+      $('.Tabs li').removeAttr('class');
       $(this).parent('li').attr('class', 'Active');
-      var tabs = $('ul.Tabs');
+      var tabs = $('div.Tabs');
       tabs.nextAll().remove();
       tabs.after('<div class="Loading">&nbsp;</div>');
       $.post(this.href, {'DeliveryType': 'VIEW'}, function(data) {

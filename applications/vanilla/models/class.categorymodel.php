@@ -21,7 +21,7 @@ class Gdn_CategoryModel extends Gdn_Model {
          || !property_exists($Category, 'Name')
          || $Category->CategoryID <= 0
       ) {
-         throw new Exception(Gdn::Translate('Invalid category for deletion.'));
+         throw new Exception(T('Invalid category for deletion.'));
       } else {
          // Remove permissions.
          $PermissionModel = Gdn::PermissionModel();

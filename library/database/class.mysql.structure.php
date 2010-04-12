@@ -43,7 +43,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function DropColumn($Name) {
       if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`'))
-         throw new Exception(Gdn::Translate('Failed to remove the `'.$Name.'` column from the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         throw new Exception(T('Failed to remove the `'.$Name.'` column from the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 
       return TRUE;
    }
@@ -73,17 +73,17 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
       // Make sure that one column, or the other exists
       if (!$OldColumn && !$NewColumn)
-         throw new Exception(Gdn::Translate('The `'.$OldName.'` column does not exist.'));
+         throw new Exception(T('The `'.$OldName.'` column does not exist.'));
 
       // Make sure the new column name isn't already taken
       if ($OldColumn && $NewColumn)
-         throw new Exception(Gdn::Translate('You cannot rename the `'.$OldName.'` column to `'.$NewName.'` because that column already exists.'));
+         throw new Exception(T('You cannot rename the `'.$OldName.'` column to `'.$NewName.'` because that column already exists.'));
 
       // Rename the column
       // The syntax for renaming a column is:
       // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
       if (!$this->Query('alter table `'.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn)))
-         throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+         throw new Exception(T('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
 
       return TRUE;
    }
@@ -99,7 +99,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function RenameTable($OldName, $NewName, $UsePrefix = FALSE) {
       if (!$this->Query('rename table `'.$OldName.'` to `'.$NewName.'`'))
-         throw new Exception(Gdn::Translate('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+         throw new Exception(T('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
 
       return TRUE;
    }
@@ -280,25 +280,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $NewColumns = array_diff(array_keys($this->_Columns), $ExistingColumns);
       foreach ($NewColumns as $Column) {
          if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add '.$this->_DefineColumn(ArrayValue($Column, $this->_Columns))))
-            throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+            throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 
          // Add keys if necessary
 //         $Col = ArrayValue($Column, $this->_Columns);
 //         if ($Col->KeyType == 'primary') {
 //            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
-//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//               throw new Exception(T('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'key') {
 //            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//               throw new Exception(T('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'index') {
 //            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//               throw new Exception(T('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'unique') {
 //            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//               throw new Exception(T('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'fulltext') {
 //				if (!$this->Query('alter table `'.$this->DatabasePrefix.$this->_TableName.'` add fulltext index `'.Format::AlphaNumeric('TX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//					throw new Exception(Gdn::Translate('Failed to add the `'.$Column.'` fulltext index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+//					throw new Exception(T('Failed to add the `'.$Column.'` fulltext index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //			}
       }
 		
@@ -333,7 +333,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 		// Modify all of the indexes.
 		foreach($IndexSql as $Name => $Sql) {
 			if(!$this->Query($Sql))
-				throw new Exception(sprintf(Gdn::Translate('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
+				throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
 		}
 
       $this->_Reset();
@@ -348,7 +348,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    protected function _DefineColumn($Column) {
       if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'char', 'varchar', 'varbinary', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
-         throw new Exception(Gdn::Translate('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
+         throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;
       if ($Column->Length != '') {

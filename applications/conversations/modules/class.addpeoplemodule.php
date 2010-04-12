@@ -43,7 +43,7 @@ class AddPeopleModule extends Module {
          // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
          //    Redirect('/messages/'.$this->Conversation->ConversationID);
             
-         $Sender->StatusMessage = Gdn::Translate('Your changes were saved.');
+         $Sender->StatusMessage = T('Your changes were saved.');
          $Sender->RedirectUrl = Url('/messages/'.$this->Conversation->ConversationID);
       }
       $this->_ApplicationFolder = $Sender->Application;

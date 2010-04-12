@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Translate("Reset my password") ?></h1>
+<h1><?php echo T("Reset my password") ?></h1>
 <div class="Box">
    <?php
    echo $this->Form->Open();

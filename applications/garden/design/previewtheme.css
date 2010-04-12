@@ -24,7 +24,6 @@ body div.PreviewTheme div.PreviewButtons a.PreviewButton,
 body div.PreviewTheme form#Form_Form div input.PreviewButton {
    cursor: pointer !important;
    margin: 0 !important;
-   font-family: 'lucida grande', Tahoma, 'Trebuchet MS', Arial, Verdana !important;
    padding: 4px !important;
    margin: 6px 8px 0 0 !important;
    font-size: 12px !important;
@@ -32,7 +31,7 @@ body div.PreviewTheme form#Form_Form div input.PreviewButton {
    text-decoration: none !important;
    border: 1px solid #000 !important;
    text-shadow: 0 1px 0 #fff !important;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8 !important;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8 !important;
    -moz-border-radius: 3px !important;
    -webkit-border-radius: 3px !important;
 }

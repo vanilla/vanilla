@@ -286,7 +286,7 @@ class PermissionModel extends Gdn_Model {
             ->Select('*')
             ->From('Permission')
             ->Limit(1)
-            ->Get()->FirstRow('', DATASET_TYPE_ARRAY);
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
             
          unset($Cols['RoleID'], $Cols['JunctionTable'], $Cols['JunctionColumn'], $Cols['JunctionID']);
          
@@ -303,7 +303,7 @@ class PermissionModel extends Gdn_Model {
    
    public function PivotPermissions($Data, $Overrides = NULL) {
       // Get all of the columns in the permissions table.
-      $Schema = $this->SQL->Get('Permission', '', '', 1)->FirstRow('', DATASET_TYPE_ARRAY);
+      $Schema = $this->SQL->Get('Permission', '', '', 1)->FirstRow(DATASET_TYPE_ARRAY);
       foreach($Schema as $Key => $Value) {
          if(strpos($Key, '.') !== FALSE)
             $Schema[$Key] = 0;

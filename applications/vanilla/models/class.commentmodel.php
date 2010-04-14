@@ -75,7 +75,7 @@ class CommentModel extends VanillaModel {
          } else {
 				// Make sure the discussion isn't archived.
 				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
-				if(!$ArchiveDate || (Format::ToTimestamp($Discussion->DateLastComment) > Format::ToTimestamp($ArchiveDate))) {
+				if(!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
 					// Insert watch data
 					$this->SQL->Insert(
 						'UserDiscussion',
@@ -84,10 +84,11 @@ class CommentModel extends VanillaModel {
 							'DiscussionID' => $Discussion->DiscussionID,
 							'CountComments' => $CountWatch,
                   'DateLastViewed' => Gdn_Format::ToDateTime()
-               )
-            );
-         }
-      }
+						)
+					);
+				}
+			}
+		}
    }
 
    public function GetCount($DiscussionID) {

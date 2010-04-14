@@ -46,6 +46,8 @@ class Gdn_DataSet implements IteratorAggregate {
     * @var int Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
     */
 	protected $_DatasetType = DATASET_TYPE_OBJECT;
+	
+	protected $_EOF = FALSE;
 
    /**
     * Contains a PDOStatement object returned by a PDO query. FALSE by default.
@@ -113,7 +115,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $DatasetType The format in which the result should be returned: object or array.
     * It will fill a different array depending on which type is specified.
     */
-   public function FetchAllRows($DatasetType = FALSE) {
+   protected function _FetchAllRows($DatasetType = FALSE) {
       $this->DatasetType($DatasetType);
 			
 		if(!is_null($this->_Result))
@@ -135,10 +137,24 @@ class Gdn_DataSet implements IteratorAggregate {
    public function &FirstRow($DatasetType = FALSE) {
 		$Result = &$this->Result($DatasetType);
       if(count($Result) == 0)
-         return FALSE;
+         return $this->_EOF;
 
       return $Result[0];
    }
+	
+	/**
+	 * Format the resultset with the given method.
+	 *
+	 * @param string $FormatMethod The method to use with Gdn_Format::To().
+	 * @return Gdn_Dataset $this pointer for chaining.
+	 */
+	public function Format($FormatMethod) {
+		$Result = &$this->Result();
+		foreach($Result as $Index => $Value) {
+			$Result[$Index] = Gdn_Format::To($Value, $FormatMethod);
+		}
+		return $this;
+	}
 
    /**
     * Free's the result resource referenced by $this->_PDOStatement.
@@ -166,7 +182,7 @@ class Gdn_DataSet implements IteratorAggregate {
    public function &LastRow($DatasetType = FALSE) {
       $Result = &$this->Result($DatasetType);
       if (count($Result) == 0)
-         return FALSE;
+         return $this->_EOF;
 
       return $Result[count($Result) - 1];
    }
@@ -182,7 +198,7 @@ class Gdn_DataSet implements IteratorAggregate {
 		
       if(isset($Result[$this->_Cursor]))
          return $Result[$this->_Cursor];
-      return FALSE;
+      return $this->_EOF;
    }
 
    /**
@@ -213,7 +229,7 @@ class Gdn_DataSet implements IteratorAggregate {
       if (isset($Result[$this->_Cursor])) {
          return $Result[$this->_Cursor];
       }
-      return FALSE;
+      return $this->_EOF;
    }
 
    /**
@@ -225,10 +241,8 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>FALSE</b>: The current value of the DatasetType property will be used.
     */
    public function &Result($DatasetType = FALSE) {
-      if($RowType === FALSE) $RowType = $this->DefaultDatasetType;
-		
 		if(is_null($this->_Result))
-			$this->FetchAllRows($DatasetType);
+			$this->_FetchAllRows($DatasetType);
 			
 		return $this->_Result;
    }
@@ -259,7 +273,7 @@ class Gdn_DataSet implements IteratorAggregate {
 		$Result = &$this->Result();
       if(isset($Result[$RowIndex]))
 			return $Result[$RowIndex];
-      return FALSE;
+      return $this->_EOF;
    }
 
    /**

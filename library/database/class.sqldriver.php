@@ -1736,7 +1736,7 @@ abstract class Gdn_SQLDriver {
     */
    public function Version() {
       $Query = $this->Query($this->FetchVersionSql());
-      return $Query->Row('version');
+      return $Query->Value('version');
    }
    
    /**

@@ -155,10 +155,10 @@ class DiscussionModel extends VanillaModel {
 	
 	public function AddDiscussionColumns($Data) {
 		// Change discussions based on archiving.
-		$ArchiveTimestamp = Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
-		$Result = &$Data->ResultReference();
+		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
+		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
-			if(Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
+			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
 				if($Discussion->CountCommentWatch) {
 					$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
@@ -303,7 +303,7 @@ class DiscussionModel extends VanillaModel {
          ->Get()
          ->FirstRow();
 		
-		if(Format::ToTimestamp($Data->DateLastComment) <= Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))) {
+		if(Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))) {
 			$Data->Closed = '1';
 		}
 		return $Data;

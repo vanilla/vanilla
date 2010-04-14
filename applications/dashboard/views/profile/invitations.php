@@ -35,7 +35,7 @@ if ($this->InvitationData->NumRows() > 0) {
 <?php
 $Session = Gdn::Session();
 $Alt = FALSE;
-foreach ($this->InvitationData->Result('Text') as $Invitation) {
+foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
 ?>
    <tr<?php echo ($Alt ? ' class="Alt"' : ''); ?>>

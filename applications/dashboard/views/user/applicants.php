@@ -22,7 +22,7 @@ if ($this->UserData->NumRows() == 0) {
    </thead>
    <tbody>
    <?php
-   foreach ($this->UserData->Result('Text') as $User) {
+   foreach ($this->UserData->Format('Text')->Result() as $User) {
    ?>
       <tr>
          <td><?php echo $this->Form->CheckBox('Applicants[]', '', array('value' => $User->UserID)); ?></td>

@@ -78,8 +78,8 @@ class UserController extends DashboardController {
       $Q = GetIncomingValue('q');
       $UserModel = new UserModel();
       $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
-      foreach ($Data->Result('Text') as $User) {
-         echo $User->Name.'|'.$User->UserID."\n";
+      foreach ($Data->Result() as $User) {
+         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
       }
       $this->Render();
    }

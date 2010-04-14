@@ -138,10 +138,10 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
                   echo UserPhoto($Author);
                   echo UserAnchor($Author);
                ?></li>
-               <li class="Created"><?php echo Format::Date($Sender->CurrentReply->DateInserted); ?></li>
+               <li class="Created"><?php echo Gdn_Format::Date($Sender->CurrentReply->DateInserted); ?></li>
                <li class="Permalink"><?php echo Anchor(T('Permalink'), '/discussion/comment/'.(isset($Sender->CurrentComment) ? $Sender->CurrentComment->CommentID : $Sender->ReplyCommentID).'/#Comment_'.$Sender->CurrentReply->CommentID, T('Permalink')); ?></li>
             </ul>
-            <div class="Body"><?php echo Format::To($Sender->CurrentReply->Body, $Sender->CurrentReply->Format); ?></div>
+            <div class="Body"><?php echo Gdn_Format::To($Sender->CurrentReply->Body, $Sender->CurrentReply->Format); ?></div>
          </li>
       <?php
    }
@@ -271,7 +271,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             // Redirect if this is not an ajax request
             if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
                $Discussion = $ReplyModel->GetDiscussion($CommentID);
-               Redirect('/vanilla/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).'#Comment_'.$CommentID);
+               Redirect('/vanilla/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'#Comment_'.$CommentID);
             }
             
             // Load all new replies that the user hasn't seen yet
@@ -295,23 +295,23 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       $Sender->Render();
    }
    
-   public function Gdn_CommentModel_AfterCommentQuery_Handler(&$Sender) {
+   public function CommentModel_AfterCommentQuery_Handler(&$Sender) {
       $Sender->SQL->Where('c.ReplyCommentID is null');
    }
    
-   public function Gdn_CommentModel_BeforeGetCount_Handler(&$Sender) {
+   public function CommentModel_BeforeGetCount_Handler(&$Sender) {
       $Sender->SQL->Where('ReplyCommentID is null');
    }
    
-   public function Gdn_CommentModel_BeforeGetOffset_Handler(&$Sender) {
+   public function CommentModel_BeforeGetOffset_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    
-   public function Gdn_CommentModel_BeforeUpdateCommentCount_Handler(&$Sender) {
+   public function CommentModel_BeforeUpdateCommentCount_Handler(&$Sender) {
       $Sender->SQL->Where('c2.ReplyCommentID is null');
    }
    
-   public function Gdn_CommentModel_DeleteComment_Handler(&$Sender) {
+   public function CommentModel_DeleteComment_Handler(&$Sender) {
       $CommentID = $Sender->EventArguments['CommentID'];
       $Sender->SQL->Delete('Comment', array('ReplyCommentID' => $CommentID));
    }

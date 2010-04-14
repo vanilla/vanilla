@@ -30,10 +30,10 @@ foreach ($this->MessageData->Result() as $Message) {
             echo UserAnchor($Author, 'Name');
             ?>
          </span>
-         <span class="DateCreated"><?php echo Format::Date($Message->DateInserted); ?></span>
+         <span class="DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
          <span class="ItemLink"><a name="Item_<?php echo $CurrentOffset;?>" class="Item"></a></span>
       </div>
-      <div class="Message"><?php echo Format::To($Message->Body, $Format); ?></div>
+      <div class="Message"><?php echo Gdn_Format::To($Message->Body, $Format); ?></div>
    </div>
 </li>
 <?php }

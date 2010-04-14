@@ -9,13 +9,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Garden.Modules
- */
-
-/**
  * Renders a form that allows people to be added to conversations.
  */
-class AddPeopleModule extends Module {
+class AddPeopleModule extends Gdn_Module {
 
    public $Conversation;
    public $Form;

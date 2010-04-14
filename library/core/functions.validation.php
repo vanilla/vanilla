@@ -92,7 +92,7 @@ if (!function_exists('ValidateOldPassword')) {
    function ValidateOldPassword($Value, $Field, $FormPostedValues) {
       $OldPassword = ArrayValue('OldPassword', $FormPostedValues, '');
       $Session = Gdn::Session();
-      $UserModel = new Gdn_UserModel();
+      $UserModel = new UserModel();
       $UserID = $Session->UserID;
       return (bool) $UserModel->ValidateCredentials(
          '', $UserID, $OldPassword);

@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class Gdn_ConversationMessageModel extends Gdn_Model {
+class ConversationMessageModel extends Gdn_Model {
    /**
     * Class constructor.
     */
@@ -106,7 +106,7 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
          // Update the conversation's DateUpdated field
          $this->SQL
             ->Update('Conversation')
-            ->Set('DateUpdated', Format::ToDateTime())
+            ->Set('DateUpdated', Gdn_Format::ToDateTime())
             ->Set('UpdateUserID', $Session->UserID)
             ->Where('ConversationID', $ConversationID)
             ->Put();
@@ -151,7 +151,7 @@ class Gdn_ConversationMessageModel extends Gdn_Model {
             ->GroupBy('c.UserID')
             ->Get();
       
-         $ActivityModel = new Gdn_ActivityModel();
+         $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
             // Update the CountUnreadConversations count on each user related to the discussion.
             $this->SQL

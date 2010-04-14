@@ -10,7 +10,7 @@ if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0) {
       ?>
       <li>
          <strong><?php echo Anchor($Draft->Name, $EditUrl); ?></strong>
-         <?php echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl, 'DraftCommentLink'); ?>
+         <?php echo Anchor(SliceString(Gdn_Format::Text($Draft->Body), 200), $EditUrl, 'DraftCommentLink'); ?>
       </li>
       <?php
       } 

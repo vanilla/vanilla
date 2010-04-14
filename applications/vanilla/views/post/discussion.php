@@ -4,7 +4,7 @@ $CancelUrl = '/vanilla/discussions';
 if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
    foreach ($this->CategoryData->Result() as $Cat) {
       if ($Cat->CategoryID == $this->CategoryID) {
-         $CancelUrl = '/vanilla/discussions/0/'.$Cat->CategoryID.'/'.Format::Url($Cat->Name);
+         $CancelUrl = '/vanilla/discussions/0/'.$Cat->CategoryID.'/'.Gdn_Format::Url($Cat->Name);
          break;
       }      
    }

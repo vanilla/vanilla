@@ -14,7 +14,7 @@ if ($this->_CategoryData !== FALSE) {
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
       <?php
    foreach ($this->_CategoryData->Result() as $Category) {
       ?>
@@ -22,7 +22,7 @@ if ($this->_CategoryData !== FALSE) {
       if ($CategoryID == $Category->CategoryID)
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Format::Text(str_replace('&rarr;', '→', $Category->Name)), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor(Gdn_Format::Text(str_replace('&rarr;', '→', $Category->Name)), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
       <?php
    }
       ?>

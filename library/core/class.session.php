@@ -234,17 +234,17 @@ class Gdn_Session {
          $UserModel->FireEvent('AfterGetSession');
 
          if ($this->User) {
-            $this->_Permissions = Format::Unserialize($this->User->Permissions);
-            $this->_Preferences = Format::Unserialize($this->User->Preferences);
-            $this->_Attributes = Format::Unserialize($this->User->Attributes);
+            $this->_Permissions = Gdn_Format::Unserialize($this->User->Permissions);
+            $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
+            $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
             $this->_TransientKey = is_array($this->_Attributes) ? ArrayValue('TransientKey', $this->_Attributes) : FALSE;
             if ($this->_TransientKey === FALSE)
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
                
             // If the user hasn't been active in the session-time, update their date last active
             $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
-            if (Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
-               $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Format::ToDateTime()));
+            if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
+               $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Gdn_Format::ToDateTime()));
 
          } else {
             $this->UserID = 0;
@@ -254,7 +254,7 @@ class Gdn_Session {
       }
       // Load guest permissions if necessary
       if ($this->UserID == 0)
-         $this->_Permissions = Format::Unserialize($UserModel->DefinePermissions(0));
+         $this->_Permissions = Gdn_Format::Unserialize($UserModel->DefinePermissions(0));
    }
 
 

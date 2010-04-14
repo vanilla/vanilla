@@ -3,7 +3,7 @@
 ?>
 <li id="<?php echo 'Bookmark_'.$Discussion->DiscussionID; ?>">
    <strong><?php
-      echo Anchor($Discussion->Name, '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+      echo Anchor($Discussion->Name, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
    ?></strong>
    <div class="Meta">
       <?php
@@ -15,7 +15,7 @@
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;
          $Last->Name = $Discussion->LastName;
-         echo '<span>'.Format::Date($Discussion->LastDate).' '.UserAnchor($Last).'</span>';
+         echo '<span>'.Gdn_Format::Date($Discussion->LastDate).' '.UserAnchor($Last).'</span>';
       ?>
    </div>
 </li>

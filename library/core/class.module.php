@@ -24,7 +24,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Base module object
  * @package Garden
  */
-class Module extends Gdn_Pluggable implements Gdn_IModule {
+class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
 
 
    /**
@@ -62,7 +62,7 @@ class Module extends Gdn_Pluggable implements Gdn_IModule {
          $this->_ApplicationFolder = $Sender->Application;
          $this->_ThemeFolder = $Sender->Theme;
       } else {
-         $this->_ApplicationFolder = 'garden';
+         $this->_ApplicationFolder = 'dashboard';
          $this->_ThemeFolder = Gdn::Config('Garden.Theme');
       }
       if (is_object($Sender))
@@ -137,8 +137,8 @@ class Module extends Gdn_Pluggable implements Gdn_IModule {
       }
       // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
       $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View . '.php'));
-      // 4. Garden default. eg. /path/to/application/garden/views/modules/
-      $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'garden', 'views', 'modules', $View . '.php'));
+      // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
+      $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View . '.php'));
 
       $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
       if ($ViewPath === FALSE)

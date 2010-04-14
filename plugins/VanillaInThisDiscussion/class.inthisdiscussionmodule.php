@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Renders a list of users who are taking part in a particular discussion.
  */
-class InThisDiscussionModule extends Module {
+class InThisDiscussionModule extends Gdn_Module {
    
    protected $_UserData;
    
@@ -54,7 +54,7 @@ class InThisDiscussionModule extends Module {
                   echo UserAnchor($User, 'UserLink');
                ?></strong>
                <?php
-                  echo Format::Date($User->DateLastActive);
+                  echo Gdn_Format::Date($User->DateLastActive);
                ?>
             </li>
             <?php

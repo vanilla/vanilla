@@ -9,10 +9,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 function __autoload($ClassName) {
-   // echo $ClassName;
    if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
       return true;
+
    if(!class_exists('Gdn_FileSystem', FALSE))
+      return false;
+
+   if(!class_exists('Gdn', FALSE))
       return false;
    
    if(substr($ClassName, 0, 4) === 'Gdn_')
@@ -58,7 +61,7 @@ if (!function_exists('AddActivity')) {
     * A convenience function that allows adding to the activity table with a single line.
     */
    function AddActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '', $SendEmail = '') {
-      $ActivityModel = new Gdn_ActivityModel();
+      $ActivityModel = new ActivityModel();
       return $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route, $SendEmail);
    }
 }
@@ -524,7 +527,7 @@ if (!function_exists('json_encode')) {
       }
       $obj = $services_json->decode($arg);
       if ($assoc)
-         return Format::ObjectAsArray($obj);
+         return Gdn_Format::ObjectAsArray($obj);
       else
          return $obj;
    }

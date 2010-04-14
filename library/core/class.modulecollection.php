@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /** 
  * A module that contains other modules.
  */
-class Gdn_ModuleCollection extends Module {
+class Gdn_ModuleCollection extends Gdn_Module {
    /// PROPERTIES ///
    public $Items = array();
    

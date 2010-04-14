@@ -41,10 +41,10 @@ jQuery(document).ready(function($) {
          var transientKey = definition('TransientKey');
          var tableId = $($.tableDnD.currentTable).attr('id');
          var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&DeliveryType=VIEW&Form/TransientKey=' + transientKey;
-         $.post(combinePaths(webRoot, '/vanilla/settings/sortcategories/'), data, function(response) {
+         $.post(combinePaths(webRoot, 'index.php/vanilla/settings/sortcategories/'), data, function(response) {
             if (response == 'TRUE') {
                // Reload the page content...
-               $.get(webRoot + '/vanilla/settings/managecategories/?DeliveryType=VIEW', function(data){
+               $.get(combinePaths(webRoot, '/index.php/vanilla/settings/managecategories/?DeliveryType=VIEW'), function(data){
                   $('#Content form').remove();
                   $('#Content').append(data);
                   $('table.Sortable tbody tr td').effect("highlight", {}, 1000);

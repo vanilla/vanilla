@@ -24,7 +24,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    /**
     * An array of folders within the application that are OK to search through
     * for controllers. This property is filled by the applications array
-    * located in /conf/applications.php and included in /garden/bootstrap.php
+    * located in /conf/applications.php and included in /bootstrap.php
     *
     * @var array
     */
@@ -33,7 +33,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    /**
     * An associative array of ApplicationName => ApplicationFolder. This
     * property is filled by the applications array located in
-    * /conf/applications.php and included in /garden/bootstrap.php
+    * /conf/applications.php and included in /bootstrap.php
     *
     * @var array
     */
@@ -248,7 +248,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-            trigger_error(ErrorMessage('Controller method missing: '.$this->_ControllerName.'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
+            trigger_error(ErrorMessage('Controller method missing: '.$this->ControllerName().'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
          }
       }
 
@@ -441,13 +441,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    private function _FetchController($ThrowErrorOnFailure = FALSE) {
       $ControllerWhiteList = $this->EnabledApplicationFolders();
+      $AppControllerName = $this->_ApplicationFolder.'Controller';
       // Don't include it if it's already been included
       if (!class_exists($this->ControllerName())) {
          $PathParts = array('controllers');
          if ($this->_ControllerFolder != '')
             $PathParts[] = $this->_ControllerFolder;
 
-         $PathParts[] = strtolower($this->_ControllerName).'.php';
+         $PathParts[] = 'class.'.strtolower($this->_ControllerName).'controller.php';
          $ControllerFileName = CombinePaths($PathParts);
 
          // Force the mapping to search in the app folder if it was in the request
@@ -463,10 +464,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // application to search in for a view file).
             $this->_ApplicationFolder = explode(DS, str_replace(PATH_APPLICATIONS . DS, '', $ControllerPath));
             $this->_ApplicationFolder = $this->_ApplicationFolder[0];
+            $AppControllerName = $this->_ApplicationFolder.'Controller';
 
             // Load the application's master controller
-            if (!class_exists($this->_ApplicationFolder.'Controller'))
-               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'appcontroller.php')));
+            if (!class_exists($AppControllerName))
+               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($AppControllerName).'.php')));
 
             // Now load the library (no need to check for existence - couldn't
             // have made it here if it didn't exist).
@@ -480,9 +482,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             } else {
                // Return a 404 message
                list($this->_ApplicationFolder, $this->_ControllerName, $this->_ControllerMethod) = explode('/', $this->Routes['Default404']);
-               $ControllerFileName = CombinePaths(array('controllers', strtolower($this->_ControllerName) . '.php'));
+               $ControllerFileName = CombinePaths(array('controllers', 'class.' . strtolower($this->_ControllerName) . 'controller.php'));
                $ControllerPath = Gdn_FileSystem::FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
-               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'appcontroller.php')));
+               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($AppControllerName).'.php')));
                include($ControllerPath);
             }
          }

@@ -145,7 +145,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Length = '';
          }
 
-         $Object = new Gdn_ShellClass();
+         $Object = new stdClass();
          $Object->Name = $Field->Field;
          $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
          $Object->Type = $Type;

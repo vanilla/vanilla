@@ -59,8 +59,18 @@ ul.DataList li.New div.Meta a.Category {
    background: #fffed7;
 }
 ul.DataList div.Meta span.Announcement {
-   color: #e00;
+	background: #e00;
+	color: #fff;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
    font-weight: bold;
+}
+ul.DataList div.Meta span.Closed {
+	background: #555;
+   color: #ffffff;
+   font-weight: bold;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
 }
 
 /* =============================================================== Categories */
@@ -90,24 +100,6 @@ body.Discussion #Content {
 ul.Discussion {
    margin-bottom: 1px;
 }
-div.Popup li.Comment {
-	border-bottom: 0;
-}
-div.Popup .Preview {
-   margin: 4px 10px;
-}
-div.Popup .Preview h2 {
-   background: none;
-   border-bottom: 1px solid #bbb;
-   color: #000;
-   margin: 0 0 8px;
-}
-div.Popup ul.Preview li.Comment {
-   padding: 0;
-}
-div.Popup ul.Preview li.Comment div.Body {
-   min-height: 53px;
-}
 /*
   Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
   css for these is in /applications/garden/design/menu.css. Override them here.
@@ -136,9 +128,6 @@ body.Discussion a.Bookmark {
 }
 
 /* =================================================================== Drafts */
-body.Drafts h1 {
-   margin: 0;
-}
 ul.Discussions div.ItemContent,
 ul.Drafts div.ItemContent {
    margin: 0 0 0 5px;
@@ -149,37 +138,18 @@ ul.Discussions div.ItemContent a.Title {
 }
 
 /* =============================================== Discussion & Comment Forms */
-body.Discussion #CommentForm {
-   background: #cfecff;
-   padding: 8px;
-	border-bottom: 1px solid #caf0fe;
-}
-div.Popup #CommentForm {
-   background: none;
-   border: 0;
-   padding: 0;
-}
-#CommentForm h3 {
-   font-size: 115%;
-   color: #2786C2;
-   font-weight: bold;
-}
-div.Popup #CommentForm h3 {
-   color: #000;
-}
-#CommentForm textarea {
-   width: 650px;
+
+div.CommentForm textarea {
+   width: 656px;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
-div.Popup #CommentForm textarea {
-   width: 470px;
-   max-height: 500px;
-}
-#CommentForm input.Button,
-#DiscussionForm input.Button {
-   margin-right: 6px;
+div.Comment div.CommentForm {
+	background: none;
+	padding: 6px 4px;
+	border: 0;
+	clear: left;
 }
 #DiscussionForm label {
    font-size: 14px;
@@ -192,7 +162,6 @@ body.Post #Panel {
 body.Post #Content {
    width: auto;
 }
-body.Post #CommentForm h2,
 #DiscussionForm h2 {
    border: none;
    color: #02475A;
@@ -201,7 +170,6 @@ body.Post #CommentForm h2,
    margin: 0;
    padding: 6px;
 }
-body.Post #CommentForm form,
 #DiscussionForm form {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -210,18 +178,6 @@ body.Post #CommentForm form,
    margin: 0;
    padding: 20px;
 }
-body.Discussion #Content #CommentForm h2 {
-   font-size: 120%;
-   color: #1E79A7;
-   border-bottom: 0;
-   line-height: 1;
-   padding: 0;
-   margin: 0 0 4px;
-}
-body.Discussion div.Popup #CommentForm textarea {
-   margin-top: 10px;
-}
-body.Post #CommentForm textarea,
 #DiscussionForm textarea {
    width: 910px;
    height: 100px;
@@ -239,8 +195,8 @@ body.Post #CommentForm textarea,
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
 }
-a.Cancel {
-   margin-left: 20px;
+div.CommentForm a.Cancel {
+   float: left;
 }
 #DiscussionForm ul {
    margin: 0 0 20px;
@@ -254,8 +210,4 @@ a.Cancel {
    font-weight: normal;
    font-size: 95%;
    color: #555;
-}
-input.DiscussionButton,
-input.CommentButton {
-	float: right;
 }

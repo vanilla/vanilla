@@ -24,7 +24,7 @@ class Gdn_PluginManager {
    
    /**
     * An associative array of arrays containing information about each
-    * enabled plugin. This value is assigned in the garden bootstrap.php.
+    * enabled plugin. This value is assigned in the bootstrap.php.
     */
    public $EnabledPlugins = array();
 

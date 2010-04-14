@@ -88,6 +88,16 @@ class Gdn_ThemeManager {
          SaveToConfig('Garden.Theme', $ThemeFolder);
       }
       
+      // If there is a hooks file, include it and run the setup method.
+      $HooksFile = PATH_THEMES . DS . $ThemeFolder . DS . 'hooks.php';
+      if (file_exists($HooksFile)) {
+         include($HooksFile);
+         if (class_exists('ThemeHooks')) {
+            $ThemeHooks = new Gdn_ThemeHooks();
+            $ThemeHooks->Setup();
+         }
+      }
+      
       return TRUE;
    }
 }

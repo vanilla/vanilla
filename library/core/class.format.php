@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-class Format {
+class Gdn_Format {
 
    /**
     * The ActivityType table has some special sprintf search/replace values in the
@@ -122,12 +122,12 @@ class Format {
          return $Mixed;
       
       if (is_string($Mixed)) {
-         if (method_exists('Format', $FormatMethod)) {
+         if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } else if (function_exists($FormatMethod)) {
             $Mixed = $FormatMethod($Mixed);
          } else {
-            $Mixed = Format::Text($Mixed);
+            $Mixed = Gdn_Format::Text($Mixed);
          }
       } else if (is_array($Mixed)) {
          foreach($Mixed as $Key => $Val) {
@@ -467,7 +467,7 @@ class Format {
     * array of $Array[Property] => Value sets.
     *
     * @param array $Array An array to be converted to object.
-    * @return Gdn_ShellClass
+    * @return stdClass
     *
     * @todo could be just "return (object) $Array;"?
     */
@@ -475,7 +475,7 @@ class Format {
       if (!is_array($Array))
          return $Array;
 
-      $Return = new Gdn_ShellClass();
+      $Return = new stdClass();
       foreach($Array as $Property => $Value) {
          $Return->$Property = $Value;
       }
@@ -536,6 +536,13 @@ class Format {
             $Format = T('Date.DefaultFormat', '%B %e, %Y');
          }
       }
+
+      // Emulate %l and %e for Windows
+      if (strpos($Format, '%l') !== false)
+          $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
+      if (strpos($Format, '%e') !== false)
+          $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
+
       return strftime($Format, $Timestamp);
    }
    

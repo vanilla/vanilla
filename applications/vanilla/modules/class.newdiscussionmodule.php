@@ -7,7 +7,7 @@
 /**
  * Renders the "Start a New Discussion" button.
  */
-class NewDiscussionModule extends Module {
+class NewDiscussionModule extends Gdn_Module {
 
    public function AssetTarget() {
       return 'Panel';

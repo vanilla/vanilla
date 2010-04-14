@@ -29,31 +29,48 @@ jQuery(document).ready(function($) {
    if (draftId == '')
       cancelButton.hide();
       
-   cancelButton.live('click', function() {
-      clearCommentForm(this);
-      return false;      
-   });
-   
    // Reveal it if they start typing a comment
-   $('#CommentForm textarea').keydown(function() {
+   $('div.CommentForm textarea').keydown(function() {
       $('a.Cancel:hidden').show();
    });
    
-   // Hijack comment form button clicks
-   $('#CommentForm :submit').livequery('click', function() {
+   // Reveal the textarea and hide previews.
+   $('a.WriteButton, a.Cancel').livequery('click', function() {
+      resetCommentForm();
+      if ($(this).hasClass('Cancel'))
+         clearCommentForm(this);
+         
+      return false;
+   });
    
+   // Hijack comment form button clicks
+   $('div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
-      var frm = $(btn).parents('form').get(0);
+      var parent = $(btn).parents('div.CommentForm');
+      var frm = $(parent).find('form');
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
       var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
-      var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
-      var draft = $(btn).attr('name') == $('#Form_SaveDraft').attr('name') ? true : false;
-      
+      var type = 'Post';
+      var preview = $(btn).hasClass('PreviewButton');
+      if (preview) {
+         type = 'Preview';
+         // If there is already a preview showing, kill processing.
+         if ($('div.Preview').length > 0 || jQuery.trim($(textbox).val()) == '')
+            return false;
+      }
+      var draft = $(btn).hasClass('DraftButton');
+      if (draft) {
+         type = 'Draft';
+         // Don't save draft if string is empty
+         if (jQuery.trim($(textbox).val()) == '')
+            return false;
+      }
+
       // Post the form, and append the results to #Discussion, and erase the textbox
       var postValues = $(frm).serialize();
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
-      postValues += '&'+btn.name+'='+btn.value;
+      postValues += '&Type='+type;
       var discussionID = $(frm).find('[name$=DiscussionID]');
       var prefix = discussionID.attr('name').replace('DiscussionID', '');
       var discussionID = discussionID.val();
@@ -63,8 +80,10 @@ jQuery(document).ready(function($) {
       var lastCommentID = $(lastComment).attr('id').replace('Comment_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
-      $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');            
+      $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&nbsp;</span>');
+      // Also add a spinner for comments being edited
+      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
       $.ajax({
          type: "POST",
          url: action,
@@ -72,8 +91,8 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
-            //$('.Popup,.Overlay').remove();
-            //$.popup({}, definition('TransportError').replace('%s', textStatus));
+            $('.Popup,.Overlay').remove();
+            $.popup({}, definition('TransportError').replace('%s', textStatus));
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -100,12 +119,15 @@ jQuery(document).ready(function($) {
                $(frm).prepend(json.StatusMessage);
                json.StatusMessage = null;
             } else if (preview) {
-               // Pop up the new preview.
-               $.popup({}, json.Data);
+               $(parent).find('li.Active').removeClass('Active');
+               $(btn).parents('li').addClass('Active');
+               $(frm).find('textarea').after(json.Data);
+               $(frm).find('textarea').hide();
                
             } else if (!draft) {
                // Clean up the form
-               clearCommentForm();                
+               resetCommentForm();
+               clearCommentForm($('a.Cancel'));
 
                // If editing an existing comment, replace the appropriate row
                var existingCommentRow = $('#Comment_' + commentID);
@@ -126,21 +148,32 @@ jQuery(document).ready(function($) {
                $(this).trigger('CommentAdded');
                
                // And scroll to them
-               var target = $('ul.Discussion #Comment_' + json.CommentID);
-               if (target.offset())
-                  $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+               /*
+                  var target = $('ul.Discussion #Comment_' + json.CommentID);
+                  if (target.offset())
+                     $('html,body').animate({scrollTop: target.offset().top}, 'fast');
+               */
 
             }
             inform(json.StatusMessage);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
-            $('span.Progress').remove();
+            $('span.TinyProgress').remove();
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
       return false;
    });
+   
+   function resetCommentForm() {
+      var parent = $('div.CommentForm');
+      $(parent).find('li.Active').removeClass('Active');
+      $('a.WriteButton').parents('li').addClass('Active');
+      $(parent).find('div.Preview').remove();
+      $(parent).find('textarea').show();
+      $('span.TinyProgress').remove();
+   }
 
    // Utility function to clear out the comment form
    function clearCommentForm(cancelButton) {
@@ -148,7 +181,7 @@ jQuery(document).ready(function($) {
          $(cancelButton).hide();
       
       $('.Popup,.Overlay').remove();
-      var frm = $('#CommentForm');
+      var frm = $('div.CommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
       // Erase any drafts
@@ -170,32 +203,54 @@ jQuery(document).ready(function($) {
    // Set up paging
    if ($.morepager)
       $('.MorePager').morepager({
-         pageContainerSelector: '#Discussion',
+         pageContainerSelector: 'ul.Discussion',
          afterPageLoaded: function() { $(this).trigger('CommentPagingComplete'); }
       });
       
    // Autosave comments
    $('#Form_SaveDraft').livequery(function() {
       var btn = this;
-      $('#CommentForm textarea').autosave({ button: btn });
+      $('div.CommentForm textarea').autosave({ button: btn });
    });
 
 
 /* Options */
 
    // Edit comment
-   $('a.EditComment').popup({
-      afterLoad: function() {
-         $('.Popup .Button:last').hide();
-      },
-      afterSuccess: function(settings, response) {
-         var btn = settings.sender;
-         var row = $(btn).parents('li.Comment');
-         $(row).after(response.Data);
-         $(row).remove();
-         // Let listeners know that the comment was edited.
-         $(this).trigger('CommentEdited');
+   $('a.EditComment').livequery('click', function() {
+      var btn = this;
+      var parent = $(btn).parents('div.Comment');
+      var msg = $(parent).find('div.Message');
+      $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      if ($(msg).is(':visible')) {
+         $.ajax({
+            type: "POST",
+            url: $(btn).attr('href'),
+            data: 'DeliveryType=VIEW&DeliveryMethod=JSON',
+            dataType: 'json',
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               // Remove any old popups
+               $('.Popup,.Overlay').remove();
+               $.popup({}, definition('TransportError').replace('%s', textStatus));
+            },
+            success: function(json) {
+               $(msg).after(json.Data);
+               $(msg).hide();
+               $(parent).find('span.TinyProgress').remove();
+            }
+         });
+      } else {
+         $(parent).find('div.CommentForm').remove();
+         $(parent).find('span.TinyProgress').remove();
+         $(msg).show();
       }
+      return false;
+   });
+   // Reveal the original message when cancelling an in-place edit.
+   $('ul.Discussion div.Comment a.Cancel').livequery('click', function() {
+      var btn = this;
+      $(btn).parents('div.Comment').find('div.Message').show();
+      $(btn).parents('div.CommentForm').remove();
    });
 
    // Delete comment
@@ -226,7 +281,7 @@ jQuery(document).ready(function($) {
          
          $.ajax({
             type: "POST",
-            url: combinePaths(definition('WebRoot', ''), '/discussion/getnew/' + discussionID + '/' + lastCommentID),
+            url: combinePaths(definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {

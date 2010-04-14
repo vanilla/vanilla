@@ -109,7 +109,7 @@ class Gdn_Form {
          $EndYear = date('Y');
       }
 
-      $Months = array_map('Translate',
+      $Months = array_map('T',
          explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec'));
 
       $Days = array();

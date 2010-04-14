@@ -180,7 +180,7 @@ input.Button {
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
 div.Messages {
-   text-align: center;
+   text-align: center !important;
    position: fixed;
    top: 0;
    left: 0;
@@ -995,6 +995,9 @@ ul.DataList li.Item {
    margin: 0;
    padding: 4px 0;
    border-bottom: 1px solid #bec8cc;
+}
+ul.DataList li.Item li.Item {
+   border-bottom: none;
 }
 ul.DataList li {
    border: 0;

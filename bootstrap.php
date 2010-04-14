@@ -128,7 +128,8 @@ unset($Gdn_Path);
 unset($Hooks_Path);
 
 // If there is a hooks file in the theme folder, include it.
-$ThemeHooks = PATH_THEMES . DS . Gdn::Config('Garden.Theme', 'default') . DS . 'class.hooks.php';
+$ThemeName = C('Garden.Theme', 'default');
+$ThemeHooks = PATH_THEMES . DS . $ThemeName . DS . 'class.' . strtolower($ThemeName) . 'themehooks.php';
 if (file_exists($ThemeHooks))
 	include_once($ThemeHooks);
 

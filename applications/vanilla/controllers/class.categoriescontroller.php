@@ -39,6 +39,7 @@ class CategoriesController extends VanillaController {
       if ($this->Head) {
          $this->Head->Title($Category->Name);
          $this->AddJsFile('discussions.js');
+         $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
          $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
          $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
@@ -108,6 +109,7 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('discussions.js');
+      $this->AddJsFile('bookmark.js');
       $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
          

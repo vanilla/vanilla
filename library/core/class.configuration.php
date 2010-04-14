@@ -421,7 +421,7 @@ class Gdn_Configuration {
             }
          } else {
             // If $Value is not an associative array, just write it like a simple array definition.
-            $FormattedValue = array_map(array('Format', 'ArrayValueForPhp'), $Value);
+            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
             $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
          }
       } else if (is_bool($Value)) {

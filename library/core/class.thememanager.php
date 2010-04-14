@@ -89,11 +89,12 @@ class Gdn_ThemeManager {
       }
       
       // If there is a hooks file, include it and run the setup method.
-      $HooksFile = PATH_THEMES . DS . $ThemeFolder . DS . 'hooks.php';
+      $ClassName = $ThemeFolder . 'ThemeHooks';
+      $HooksFile = PATH_THEMES . DS . $ThemeFolder . DS . 'class.' . strtolower($ClassName) . '.php';
       if (file_exists($HooksFile)) {
          include($HooksFile);
-         if (class_exists('ThemeHooks')) {
-            $ThemeHooks = new Gdn_ThemeHooks();
+         if (class_exists($ClassName)) {
+            $ThemeHooks = new $ClassName();
             $ThemeHooks->Setup();
          }
       }

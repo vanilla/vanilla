@@ -43,39 +43,8 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-/*   
-   // 2. Bookmark/Unbookmark discussion
-   $('a.BookmarkDiscussion').livequery('click', function() {
-      var btn = this;
-      var row = $(btn).parents('li.Item');
-      
-      $.ajax({
-         type: "POST",
-         url: $(btn).attr('href'),
-         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
-         },
-         success: function(json) {
-            if (json.State)
-               $(row).addClass('Bookmarked');
-            else
-               $(row).removeClass('Bookmarked');
-               
-            if (json.LinkText)
-               $(btn).text(json.LinkText);
-            
-            if (json.BookmarkSum) {
-               $('#Toolbar li.Bookmarks a').text(json.BookmarkSum);
-               $('#Toolbar li.Bookmarks').effect('highlight', {}, 1000);
-            }
-         }
-      });
-      return false;
-   });
-*/   
-   // 3. Announce discussion
+
+   // 2. Announce discussion
    $('a.AnnounceDiscussion').livequery('click', function() {
       var btn = this;
       var row = $(btn).parents('li.Item');
@@ -96,7 +65,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    
-   // 4. Sink discussion
+   // 3. Sink discussion
    $('a.SinkDiscussion').popup({
       confirm: true,
       followConfirm: false,
@@ -112,7 +81,7 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // 5. Close discussion
+   // 4. Close discussion
    $('a.CloseDiscussion').popup({
       confirm: true,
       followConfirm: false,
@@ -128,7 +97,7 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // 6. Delete discussion
+   // 5. Delete discussion
    $('a.DeleteDiscussion, a.DeleteDraft').popup({
       confirm: true,
       followConfirm: false,

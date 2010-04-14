@@ -5,7 +5,7 @@ Part 1: CSS / Design
 1. Copy this "default" theme folder and rename it to your new theme name.
 2. Open the "about.php" file and edit the information to reflect your theme. Be
    sure to change the array key like this: $ThemeInfo['YourThemeNameHere'].
-3. Create a "design" subfolder and copy /applications/garden/design/style.css 
+3. Create a "design" subfolder and copy /applications/dashboard/design/style.css 
    and /applications/vanilla/design/vanilla.css into it.
 4. Any background images you want to continue using (like the star png images
    for bookmarking) should be copied along with their respective stylesheets.
@@ -17,7 +17,7 @@ Other things you should know:
  + All non-forum pages should be edited in the global "style.css" file.
 
  + If you want to edit the look & feel of the administrative screens, also 
-   copy /applications/garden/design/admin.css in step 3. Similarly, you can 
+   copy /applications/dashboard/design/admin.css in step 3. Similarly, you can 
    copy other CSS files like /applications/vanilla/design/vanillaprofile.css to
    customize those pages as well.
 
@@ -30,7 +30,7 @@ Our pages are made up of two parts:
  1. Master Views - these represent everything that wraps the main content of the
    page. If all you want to do is add a menu or banner above Vanilla, this is
    all you need to alter. To do so, copy the default master view from
-   /applications/garden/views/default.master.php to
+   /applications/dashboard/views/default.master.php to
    /themes/yourtheme/views/default.master.php and edit it there.
    
  2. Views - these represent all of the content in each page. Every application

@@ -1,6 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+*/
 
-class Gdn_CommentModel extends Gdn_VanillaModel {
+class CommentModel extends VanillaModel {
    /**
     * Class constructor.
     */
@@ -54,7 +62,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                'UserDiscussion',
                array(
                   'CountComments' => $CountWatch,
-                  'DateLastViewed' => Format::ToDateTime()
+                  'DateLastViewed' => Gdn_Format::ToDateTime()
                ),
                array(
                   'UserID' => $Session->UserID,
@@ -70,7 +78,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                   'UserID' => $Session->UserID,
                   'DiscussionID' => $Discussion->DiscussionID,
                   'CountComments' => $CountWatch,
-                  'DateLastViewed' => Format::ToDateTime()
+                  'DateLastViewed' => Gdn_Format::ToDateTime()
                )
             );
          }
@@ -164,7 +172,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
             $Fields = $this->Validation->SchemaValidationFields();
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
             
-            $DiscussionModel = new Gdn_DiscussionModel();
+            $DiscussionModel = new DiscussionModel();
             $DiscussionID = ArrayValue('DiscussionID', $Fields);
             $Discussion = $DiscussionModel->GetID($DiscussionID);
             if ($Insert === FALSE) {
@@ -187,11 +195,11 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                   $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
                   if ($User && $User->UserID != $Session->UserID) {
                      $NotifiedUsers[] = $User->UserID;   
-                     $ActivityModel = new Gdn_ActivityModel();   
+                     $ActivityModel = new ActivityModel();   
                      $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
                         'CommentMention',
-                        Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+                        Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                         $User->UserID,
                         '',
                         'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
@@ -206,11 +214,11 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
                foreach ($BookmarkData->Result() as $Bookmark) {
                   if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID) {
                      $NotifiedUsers[] = $Bookmark->UserID;
-                     $ActivityModel = new Gdn_ActivityModel();   
+                     $ActivityModel = new ActivityModel();   
                      $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
                         'BookmarkComment',
-                        Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+                        Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                         $Bookmark->UserID,
                         '',
                         'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
@@ -264,7 +272,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          AddActivity(
             $ActivityUserID,
             'DiscussionComment',
-            Anchor(Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+            Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
             $Discussion->InsertUserID,
             'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID
          );
@@ -335,7 +343,7 @@ class Gdn_CommentModel extends Gdn_VanillaModel {
          
       if ($Data) {
          if ($Data->FirstCommentID == $CommentID) {
-            $DiscussionModel = new Gdn_DiscussionModel();
+            $DiscussionModel = new DiscussionModel();
             $DiscussionModel->Delete($Data->DiscussionID);
          } else {
             // If this is the last comment, get the one before and update the LastCommentID field

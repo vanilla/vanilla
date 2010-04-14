@@ -17,9 +17,9 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    <?php } ?>
    <div class="ItemContent Conversation">
       <?php echo UserAnchor($LastAuthor, 'Name Title'); ?>
-      <div class="Excerpt"><?php echo Anchor(SliceString(Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
+      <div class="Excerpt"><?php echo Anchor(SliceString(Gdn_Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
       <div class="Meta">
-         <span><?php echo Format::Date($Conversation->DateLastMessage); ?></span>
+         <span><?php echo Gdn_Format::Date($Conversation->DateLastMessage); ?></span>
          <span><?php printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages); ?></span>
          <?php
          if ($Conversation->CountNewMessages > 0) {

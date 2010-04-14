@@ -40,7 +40,6 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.module.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.modulecollection.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.schema.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.session.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.shell.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.url.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.validation.php');
 
@@ -72,9 +71,9 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
-// Redirect to the setup screen if Garden hasn't been installed yet.
+// Redirect to the setup screen if Dashboard hasn't been installed yet.
 if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'gardensetup') === FALSE) {
-   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/garden/gardensetup'), '/'));
+   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/gardensetup'), '/'));
    exit();
 }
 
@@ -110,21 +109,26 @@ if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', PATH_LIBRARY_CORE.DS.'class.locale.php', Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
 }
+
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	// Include the application's bootstrap.
-	$Gdn_Path = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'bootstrap.php';
+	$Gdn_Path = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'bootstrap.php';
 	if(file_exists($Gdn_Path))
 		include_once($Gdn_Path);
 		
 	// Include the application's hooks.
-   include_once(PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'hooks.php');
+	$Hooks_Path = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'class.hooks.php';
+   if (file_exists($Hooks_Path))
+		include_once($Hooks_Path);
 }
+
 unset($Gdn_EnabledApplications);
 unset($Gdn_Path);
+unset($Hooks_Path);
 
 // If there is a hooks file in the theme folder, include it.
-$ThemeHooks = PATH_THEMES . DS . Gdn::Config('Garden.Theme', 'default') . DS . 'hooks.php';
+$ThemeHooks = PATH_THEMES . DS . Gdn::Config('Garden.Theme', 'default') . DS . 'class.hooks.php';
 if (file_exists($ThemeHooks))
 	include_once($ThemeHooks);
 

@@ -90,7 +90,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentica
 
 
    /**
-    * @param Gdn_UserModel $UserModel
+    * @param UserModel $UserModel
     */
    public function SetUserModel($UserModel) {
       $this->_UserModel = $UserModel;

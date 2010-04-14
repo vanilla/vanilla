@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
          var transientKey = definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = definition('WebRoot', '');
-         $.post(combinePaths(webRoot, 'index.php/garden/utility/sort/'), data, function(response) {
+         $.post(combinePaths(webRoot, 'index.php/dashboard/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 

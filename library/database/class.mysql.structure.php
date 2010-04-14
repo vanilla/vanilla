@@ -144,9 +144,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          if ($Column->KeyType == 'primary')
             $PrimaryKey[] = $ColumnName;
          elseif ($Column->KeyType == 'key')
-            $Keys .= ",\nkey `".Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'index')
-            $Keys .= ",\nindex `".Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'unique')
             $UniqueKey[] = $ColumnName;
 			elseif ($Column->KeyType == 'fulltext')
@@ -157,10 +157,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $Keys .= ",\nprimary key (`".implode('`, `', $PrimaryKey)."`)";
       // Build unique keys.
       if (count($UniqueKey) > 0)
-         $Keys .= ",\nunique index `".Format::AlphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+         $Keys .= ",\nunique index `".Gdn_Format::AlphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
 		// Build full text index.
 		if (count($FullTextKey) > 0)
-			$Keys .= ",\nfulltext index `".Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+			$Keys .= ",\nfulltext index `".Gdn_Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
 
       $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
          .$Sql
@@ -288,16 +288,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 //            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
 //               throw new Exception(T('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'key') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
 //               throw new Exception(T('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'index') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
 //               throw new Exception(T('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'unique') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Gdn_Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
 //               throw new Exception(T('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //         } else if ($Col->KeyType == 'fulltext') {
-//				if (!$this->Query('alter table `'.$this->DatabasePrefix.$this->_TableName.'` add fulltext index `'.Format::AlphaNumeric('TX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
+//				if (!$this->Query('alter table `'.$this->DatabasePrefix.$this->_TableName.'` add fulltext index `'.Gdn_Format::AlphaNumeric('TX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
 //					throw new Exception(T('Failed to add the `'.$Column.'` fulltext index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 //			}
       }

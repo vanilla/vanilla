@@ -1,6 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+*/
 
-class Gdn_DiscussionModel extends Gdn_VanillaModel {
+class DiscussionModel extends VanillaModel {
    /**
     * Class constructor.
     */
@@ -261,7 +269,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          $this->SQL
             ->Update('UserDiscussion')
             ->Set('CountComments', $CountComments)
-            ->Set('DateLastViewed', Format::ToDateTime())
+            ->Set('DateLastViewed', Gdn_Format::ToDateTime())
             ->Set('Dismissed', '1')
             ->Where('DiscussionID', $DiscussionID)
             ->Where('UserID', $UserID)
@@ -273,7 +281,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                'UserID' => $UserID,
                'DiscussionID' => $DiscussionID,
                'CountComments' => $CountComments,
-               'DateLastViewed' => Format::ToDateTime(),
+               'DateLastViewed' => Gdn_Format::ToDateTime(),
                'Dismissed' => '1'
             )
          );
@@ -308,7 +316,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
-         $FormPostValues['DateLastComment'] = Format::ToDateTime();
+         $FormPostValues['DateLastComment'] = Gdn_Format::ToDateTime();
       }
       // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
       $this->AddUpdateFields($FormPostValues);
@@ -375,7 +383,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                         'DiscussionMention',
                         '',
                         $Session->UserID,
-                        '/discussion/'.$DiscussionID.'/'.Format::Url($DiscussionName)
+                        '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)
                      );
                   }
                }
@@ -410,7 +418,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
       AddActivity(
          $UserID,
          'NewDiscussion',
-         Anchor(Format::Text($DiscussionName), 'vanilla/discussion/'.$DiscussionID.'/'.Format::Url($DiscussionName))
+         Anchor(Gdn_Format::Text($DiscussionName), 'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
       );
       
       // Get the user's discussion count
@@ -486,7 +494,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
                'UserID' => $UserID,
                'DiscussionID' => $DiscussionID,
                'CountComments' => 0,
-               'DateLastViewed' => Format::ToDateTime(),
+               'DateLastViewed' => Gdn_Format::ToDateTime(),
                'Bookmarked' => '1'
             ));
       } else {

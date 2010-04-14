@@ -59,8 +59,18 @@ ul.DataList li.New div.Meta a.Category {
    background: #fffed7;
 }
 ul.DataList div.Meta span.Announcement {
-   color: #e00;
+	background: #e00;
+	color: #fff;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
    font-weight: bold;
+}
+ul.DataList div.Meta span.Closed {
+	background: #555;
+   color: #ffffff;
+   font-weight: bold;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
 }
 
 /* =============================================================== Categories */

@@ -97,10 +97,10 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
             }
          }
             
-         // Look for CSS in the garden design folder.
-         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $MasterViewCss;
-         // Look for Master View in the garden view folder.
-         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'views' . DS . $MasterViewName;
+         // Look for CSS in the dashboard design folder.
+         $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
+         // Look for Master View in the dashboard view folder.
+         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
          
          $CssPath = FALSE;
          $Count = count($CssPaths);
@@ -286,7 +286,7 @@ if (!function_exists('CleanErrorArguments')) {
                $Var[$Key] = 'SECURITY';
             } else {
                if (is_object($Value)) {
-                  $Value = Format::ObjectAsArray($Value);
+                  $Value = Gdn_Format::ObjectAsArray($Value);
                   $Var[$Key] = $Value;
                }
                   

@@ -5,7 +5,7 @@
 // values for configuration settings.
 $Configuration = array();
 
-$Configuration['EnabledApplications']['Garden'] = 'garden';
+$Configuration['EnabledApplications']['Dashboard']             = 'dashboard';
 
 $Configuration['Database']['Engine']                           = 'MySQL';
 $Configuration['Database']['Host']                             = 'dbhost';
@@ -52,7 +52,7 @@ $Configuration['Garden']['Registration']['DefaultRoles']        = array('8'); //
 $Configuration['Garden']['Registration']['ApplicantRoleID']     = 4; // The "Applicant" RoleID.
 $Configuration['Garden']['Registration']['InviteExpiration']    = '-1 week'; // The time before now that an invitation expires. ie. If an invitation was sent within the last week, it is still valid. This value will be plugged directly into strtotime()
 $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
-$Configuration['Garden']['TermsOfService']                      = '/garden/home/termsofservice'; // The url to the terms of service.
+$Configuration['Garden']['TermsOfService']                      = '/dashboard/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';
 $Configuration['Garden']['Email']['SmtpUser']                   = '';
@@ -100,11 +100,11 @@ $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
-$Configuration['Modules']['Garden']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
-$Configuration['Modules']['Conversations']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Vanilla']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Garden']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Conversations']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
 
 // Routes
 $Configuration['Routes']['DefaultController'] = 'home';
-$Configuration['Routes']['Default404'] = 'garden/home/filenotfound';
-$Configuration['Routes']['DefaultPermission'] = 'garden/home/permission';
+$Configuration['Routes']['Default404'] = 'dashboard/home/filenotfound';
+$Configuration['Routes']['DefaultPermission'] = 'dashboard/home/permission';

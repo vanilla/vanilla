@@ -84,7 +84,7 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplications() {
       if (!is_array($this->_EnabledApplications)) {
-         $EnabledApplications = Gdn::Config('EnabledApplications', array('Garden' => 'garden'));
+         $EnabledApplications = Gdn::Config('EnabledApplications', array('Dashboard' => 'dashboard'));
          // Add some information about the applications to the array.
          foreach($EnabledApplications as $Name => $Folder) {
             $EnabledApplications[$Name] = array('Folder' => $Folder);
@@ -125,7 +125,7 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplicationFolders() {
       $EnabledApplications = Gdn::Config('EnabledApplications', array());
-      $EnabledApplications['Garden'] = 'garden';
+      $EnabledApplications['Dashboard'] = 'dashboard';
       return array_values($EnabledApplications);
    }
 

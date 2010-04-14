@@ -13,11 +13,11 @@ Usage:
 
 (1)----Make a menu like this:
 <ul id="Menu">
-   <li><a href="/garden/people/entry/signin" >Sign In</a></li>
-   <li><a href="/garden/people/users" >People</a>
+   <li><a href="/dashboard/people/entry/signin" >Sign In</a></li>
+   <li><a href="/dashboard/people/users" >People</a>
       <ul>
-         <li><a href="/garden/people/user/add" >Add New</a></li>
-         <li><a href="/garden/people/settings" >Settings</a></li>
+         <li><a href="/dashboard/people/user/add" >Add New</a></li>
+         <li><a href="/dashboard/people/settings" >Settings</a></li>
       </ul>
    </li>
 </ul>

@@ -40,7 +40,7 @@ class GettingStartedPlugin implements Gdn_IPlugin {
          
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStarted">'
-            .Anchor('×', '/garden/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
+            .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
    ."<p>Here's how to get started:</p>"
    .'<ul>
       <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Define how users register for your forum'), '/settings/registration').'</li>

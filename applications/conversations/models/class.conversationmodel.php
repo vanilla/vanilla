@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class Gdn_ConversationModel extends Gdn_Model {
+class ConversationModel extends Gdn_Model {
    /**
     * Class constructor.
     */
@@ -152,13 +152,13 @@ class Gdn_ConversationModel extends Gdn_Model {
          $Data = $this->SQL
             ->Select('ConversationID')
             ->From('Conversation')
-            ->Where('Contributors', Format::Serialize($RecipientUserIDs))
+            ->Where('Contributors', Gdn_Format::Serialize($RecipientUserIDs))
             ->Get();
          
          if ($Data->NumRows() > 0) {
             $ConversationID = $Data->FirstRow()->ConversationID;
          } else {
-            $Fields['Contributors'] = Format::Serialize($RecipientUserIDs);
+            $Fields['Contributors'] = Gdn_Format::Serialize($RecipientUserIDs);
             $ConversationID = $this->SQL->Insert($this->Name, $Fields);
          }
             
@@ -211,8 +211,8 @@ class Gdn_ConversationModel extends Gdn_Model {
       $this->SQL->Update('UserConversation')
          ->Set('CountNewMessages', 0)
          ->Set('CountMessages', 0)
-         ->Set('DateLastViewed', Format::ToDateTime())
-         ->Set('DateCleared', Format::ToDateTime())
+         ->Set('DateLastViewed', Gdn_Format::ToDateTime())
+         ->Set('DateCleared', Gdn_Format::ToDateTime())
          ->Where('ConversationID', $ConversationID)
          ->Where('UserID', $ClearingUserID)
          ->Put();
@@ -224,7 +224,7 @@ class Gdn_ConversationModel extends Gdn_Model {
    public function MarkRead($ConversationID, $ReadingUserID) {
       $this->SQL->Update('UserConversation')
          ->Set('CountNewMessages', 0)
-         ->Set('DateLastViewed', Format::ToDateTime())
+         ->Set('DateLastViewed', Gdn_Format::ToDateTime())
          ->Where('ConversationID', $ConversationID)
          ->Where('UserID', $ReadingUserID)
          ->Put();
@@ -302,7 +302,7 @@ class Gdn_ConversationModel extends Gdn_Model {
          sort($Contributors);
          $this->SQL
             ->Update('Conversation')
-            ->Set('Contributors', Format::Serialize($Contributors))
+            ->Set('Contributors', Gdn_Format::Serialize($Contributors))
             ->Where('ConversationID', $ConversationID)
             ->Put();
          

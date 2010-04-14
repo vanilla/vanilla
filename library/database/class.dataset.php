@@ -162,7 +162,7 @@ class Gdn_DataSet implements IteratorAggregate {
       if (count($Result) == 0)
          return FALSE;
 
-      return Format::To($Result[0], $FormatType);
+      return Gdn_Format::To($Result[0], $FormatType);
    }
 
    /**
@@ -198,7 +198,7 @@ class Gdn_DataSet implements IteratorAggregate {
       if (count($Result) == 0)
          return FALSE;
 
-      return Format::To($Result[count($Result)-1], $FormatType);
+      return Gdn_Format::To($Result[count($Result)-1], $FormatType);
    }
 
    /**
@@ -214,7 +214,7 @@ class Gdn_DataSet implements IteratorAggregate {
       $Result = $this->Result('', $RowType);
       ++$this->_Cursor;
       if (isset($Result[$this->_Cursor])) {
-         return Format::To($Result[$this->_Cursor], $FormatType);
+         return Gdn_Format::To($Result[$this->_Cursor], $FormatType);
       }
       return FALSE;
    }
@@ -259,7 +259,7 @@ class Gdn_DataSet implements IteratorAggregate {
       $Result = $this->Result('', $RowType);
       --$this->_Cursor;
       if (isset($Result[$this->_Cursor])) {
-         return Format::To($Result[$this->_Cursor], $FormatType);
+         return Gdn_Format::To($Result[$this->_Cursor], $FormatType);
       }
       return FALSE;
    }
@@ -292,7 +292,7 @@ class Gdn_DataSet implements IteratorAggregate {
       if ($this->_PDOStatementFetched === TRUE) {
          if ($this->_ResultArrayFetched === FALSE) {
             foreach ($this->_ResultObject as $Object) {
-               $this->_ResultArray[] = Format::ObjectAsArray($Object);
+               $this->_ResultArray[] = Gdn_Format::ObjectAsArray($Object);
             }
          }
       } else {
@@ -300,7 +300,7 @@ class Gdn_DataSet implements IteratorAggregate {
       }
       $this->_ResultArrayFetched = TRUE;
 
-      return Format::To($this->_ResultArray, $FormatType);
+      return Gdn_Format::To($this->_ResultArray, $FormatType);
    }
 
    /**
@@ -312,7 +312,7 @@ class Gdn_DataSet implements IteratorAggregate {
       if ($this->_PDOStatementFetched === TRUE) {
          if ($this->_ResultObjectFetched === FALSE) {
             foreach ($this->_ResultArray as $Array) {
-               $this->_ResultObject[] = Format::ArrayAsObject($Array);
+               $this->_ResultObject[] = Gdn_Format::ArrayAsObject($Array);
             }
          }
       } else {
@@ -320,7 +320,7 @@ class Gdn_DataSet implements IteratorAggregate {
       }
       $this->_ResultObjectFetched = TRUE;
 
-      return Format::To($this->_ResultObject, $FormatType);
+      return Gdn_Format::To($this->_ResultObject, $FormatType);
    }
 
    /**
@@ -338,7 +338,7 @@ class Gdn_DataSet implements IteratorAggregate {
          return $Result;
 
       if (isset($Result[$RowIndex])) {
-         return Format::To($Result[$RowIndex], $FormatType);
+         return Gdn_Format::To($Result[$RowIndex], $FormatType);
       }
 
       return FALSE;

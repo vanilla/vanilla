@@ -69,8 +69,8 @@ class Gdn_Locale extends Gdn_Pluggable {
     *
     * @param string $LocaleName The name of the locale to load. Locale definitions are kept in each
     * application's locale folder. For example:
-    *  /garden/locale/$LocaleName.php
-    *  /people/locale/$LocaleName.php
+    *  /dashboard/locale/$LocaleName.php
+    *  /vanilla/locale/$LocaleName.php
     * @param array $ApplicationWhiteList An array of application folders that are safe to examine for locale
     *  definitions.
     * @param array $PluginWhiteList An array of plugin folders that are safe to examine for locale
@@ -109,7 +109,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          $FileContents[] = "<?php if (!defined('APPLICATION')) exit();";
          $Count = count($LocaleSources);
          for($i = 0; $i < $Count; ++$i) {
-            $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . Format::ArrayValueForPhp($LocaleSources[$i]) . "';";
+            $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . Gdn_Format::ArrayValueForPhp($LocaleSources[$i]) . "';";
          }
          // Add the config locale if it exists
          $ConfigLocale = PATH_CONF . DS . 'locale.php';
@@ -207,7 +207,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @return array
     */
    public function GetAvailableLocaleSources() {
-      return Gdn_FileSystem::Folders(PATH_APPLICATIONS . DS . 'garden' . DS . 'locale');
+      return Gdn_FileSystem::Folders(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'locale');
    }
 
 

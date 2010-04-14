@@ -54,7 +54,7 @@ class InThisDiscussionModule extends Gdn_Module {
                   echo UserAnchor($User, 'UserLink');
                ?></strong>
                <?php
-                  echo Format::Date($User->DateLastActive);
+                  echo Gdn_Format::Date($User->DateLastActive);
                ?>
             </li>
             <?php

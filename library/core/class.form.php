@@ -1076,7 +1076,7 @@ class Gdn_Form {
       $ID = $FieldName;
       if (substr($ID, -2) == '[]') $ID = substr($ID, 0, -2);
 
-      $ID = $this->IDPrefix . Format::AlphaNumeric(str_replace('.', '-dot-', $ID));
+      $ID = $this->IDPrefix . Gdn_Format::AlphaNumeric(str_replace('.', '-dot-', $ID));
       $tmp = $ID;
       $i = 1;
       if ($ForceUniqueID === TRUE) {
@@ -1281,7 +1281,7 @@ class Gdn_Form {
                
          } else {
             // Otherwise assume it is an object representation of a data row.
-            $this->_DataArray = Format::ObjectAsArray($Data);
+            $this->_DataArray = Gdn_Format::ObjectAsArray($Data);
          }
       } else if (is_array($Data)) {
          $this->_DataArray = $Data;
@@ -1556,6 +1556,6 @@ class Gdn_Form {
     */
    protected function _ValueAttribute($FieldName, $Attributes) {
       // Value from $Attributes overrides the datasource and the postback.
-      return ' value="' . Format::Form(ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
+      return ' value="' . Gdn_Format::Form(ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
    }
 }

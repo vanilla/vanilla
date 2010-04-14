@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * A "reply" is essentially a comment that has a value in
  * Comment.ReplyCommentID other than NULL.
  */
-class ReplyModel extends Gdn_CommentModel {
+class ReplyModel extends CommentModel {
    
    public function ReplyQuery() {
       return $this->SQL
@@ -176,7 +176,7 @@ class ReplyModel extends Gdn_CommentModel {
    
    public function RecordActivity($ReplyCommentID, $ActivityUserID, $CommentID) {
       // Get the author of the discussion
-      $CommentModel = new Gdn_CommentModel();
+      $CommentModel = new CommentModel();
       $Comment = $CommentModel->GetID($ReplyCommentID);
       if ($ActivityUserID != $Comment->InsertUserID)
          AddActivity(

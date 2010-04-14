@@ -19,7 +19,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
          </span>
          <span class="DateCreated">
             <?php
-            echo Format::Date($Comment->DateInserted);
+            echo Gdn_Format::Date($Comment->DateInserted);
             ?>
          </span>
          <span class="Permalink">
@@ -28,7 +28,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
          <?php WriteOptionList($Comment, $Sender, $Session); ?>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
-      <div class="Message"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
+      <div class="Message"><?php echo Gdn_Format::To($Comment->Body, $Comment->Format); ?></div>
       <?php $Sender->FireEvent('AfterCommentBody'); ?>
    </div>
 </li>

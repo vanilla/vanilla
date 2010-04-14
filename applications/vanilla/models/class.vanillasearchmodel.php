@@ -8,14 +8,14 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class Gdn_VanillaSearchModel extends Gdn_Model {
+class VanillaSearchModel extends Gdn_Model {
 	/// PROPERTIES /// 
 	
 	protected $_DiscussionModel = FALSE;
 	/**
 	 * Get/set the category model.
-	 * @param Gdn_DiscussionModel $Value The value to set.
-	 * @return Gdn_DiscussionModel
+	 * @param DiscussionModel $Value The value to set.
+	 * @return DiscussionModel
 	 */
 	public function DiscussionModel($Value = FALSE) {
 		if($Value !== FALSE) {
@@ -23,7 +23,7 @@ class Gdn_VanillaSearchModel extends Gdn_Model {
 		}
 		if($this->_DiscussionModel === FALSE) {
 			require_once(dirname(__FILE__).DS.'class.discussionmodel.php');
-			$this->_DiscussionModel = new Gdn_DiscussionModel();
+			$this->_DiscussionModel = new DiscussionModel();
 		}
 		return $this->_DiscussionModel;
 	}
@@ -76,7 +76,7 @@ class Gdn_VanillaSearchModel extends Gdn_Model {
 	
 	/**
 	 * Add the searches for vanilla to the search model.
-	 * @param Gdn_SearchModel $SearchModel
+	 * @param SearchModel $SearchModel
 	 */
 	public function Search($SearchModel) {
 		$SearchModel->AddSearch($this->DiscussionSql($SearchModel));

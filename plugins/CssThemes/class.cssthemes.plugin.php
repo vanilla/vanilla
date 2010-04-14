@@ -18,7 +18,7 @@ $PluginInfo['CssThemes'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
-   'SettingsUrl' => '/garden/plugin/cssthemes', // Url of the plugin's settings page.
+   'SettingsUrl' => '/dashboard/plugin/cssthemes', // Url of the plugin's settings page.
    'SettingsPermission' => 'Garden.Themes.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -31,7 +31,7 @@ Gdn::FactoryOverwrite($tmp);
 unset($tmp);
 
 
-class Gdn_CssThemes implements Gdn_IPlugin {
+class CssThemes implements Gdn_IPlugin {
 	/// Constants ///
 	/**
 	 * The Regex to capture themeable colors.

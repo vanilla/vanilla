@@ -84,16 +84,13 @@ class Gdn {
     * @see Gdn_Factory::Factory()
     */
    public static function Factory($Alias = FALSE) {
-      if($Alias === FALSE) {
+      if ($Alias === FALSE)
          return self::$_Factory;
-      }
       
       // Get the arguments to pass to the factory.
       $Args = func_get_args();
       array_shift($Args);
-      
-      $Result = self::$_Factory->Factory($Alias, $Args);
-      return $Result;
+      return self::$_Factory->Factory($Alias, $Args);
    }
    
    /**
@@ -253,7 +250,7 @@ class Gdn {
    /**
     * Geth the permission model for the application.
     *
-    * @return Gdn_PermissionModel
+    * @return PermissionModel
     */
    public static function PermissionModel() {
       return self::Factory(self::AliasPermissionModel);
@@ -309,11 +306,10 @@ class Gdn {
    /**
     * Get a reference to the user model.
     * 
-    * @return Gdn_User
+    * @return UserModel
     */
    public static function UserModel() {
-      $Result = self::Factory(self::AliasUserModel);
-      return $Result;
+      return self::Factory(self::AliasUserModel);
    }
    
    /**
@@ -323,7 +319,7 @@ class Gdn {
     * @param boolean $Override whether to override the property if it is already set.
     */
    public static function SetFactory($Factory, $Override = TRUE) {
-      if($Override || is_null(self::$_Factory))
+      if ($Override || is_null(self::$_Factory))
          self::$_Factory = $Factory;
    }
 }

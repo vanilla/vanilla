@@ -9,10 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Garden.Modules
- */
-
-/**
  * Renders the "Clear Conversation History" button.
  */
 class ClearHistoryModule extends Gdn_Module {

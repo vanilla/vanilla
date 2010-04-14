@@ -24,6 +24,19 @@ class Gdn_ImportModel {
 	
 	public $Data = array();
 	
+	public $ImportPath = '';
+	
+	public $Steps = array(
+		1 => 'SplitImportFile',
+		2 => 'DefineTables',
+		3 => 'LoadTables',
+		4 => 'DefineIndexes',
+		5 => 'AssignUserIDs',
+		6 => 'AssignOtherIDs',
+		7 => 'InsertTables',
+		8 => 'UpdateCounts'
+		);
+	
 	public $Structures = array(
 		'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
 		'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
@@ -270,6 +283,21 @@ ignore 1 lines";
 	}
 	
 	/**
+	 * Run the step in the import.
+	 * @param int $Step the step to run.
+	 * @return mixed Whether the step succeeded or an array of information.
+	 */
+	public function RunStep($Step = 1) {
+		if($Step > count($this->Steps)) {
+			return 'COMPLETE';
+		}
+		$Method = $this->Steps[$Step];
+		$Result = call_user_method($Method, $this);
+		
+		return $Result;
+	}
+	
+	/**
 	 * Run a query, replacing database prefixes.
 	 * @param string $Sql The sql to execute.
 	 *  - :_z will be replaced by the import prefix.
@@ -291,7 +319,8 @@ ignore 1 lines";
 		return $Result;
 	}
 
-	public function SplitFile($Path) {
+	public function SplitImportFile() {
+		$Path = $this->ImportPath;
 		$Tables = array();
 		
 		// Open the import file.

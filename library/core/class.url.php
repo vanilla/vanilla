@@ -157,7 +157,6 @@ class Gdn_Url {
          if ($PhpSelf && $ScriptName) {
             $Return = substr($PhpSelf, strlen($ScriptName));
          }
-
       }
       
       $Return = trim($Return, '/');

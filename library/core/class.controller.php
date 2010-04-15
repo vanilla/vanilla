@@ -853,7 +853,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                
                if(strpos($CssFile, '/') !== FALSE) {
                   // A direct path to the file was given.
-                  $CssPaths = array(PATH_ROOT.str_replace('/', DS, $CssFile));
+                  $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
                } else {
                   $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];
@@ -891,11 +891,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
                
                if ($CssPath !== FALSE) {
-                  $CssPath = str_replace(
-                     array(PATH_ROOT, DS),
-                     array('', '/'),
-                     $CssPath
-                  );
+                  $CssPath = substr($CssPath, strlen(PATH_ROOT));
+                  $CssPath = str_replace(DS, '/', $CssPath);
                   $this->Head->AddCss($CssPath, 'screen');
                }
             }

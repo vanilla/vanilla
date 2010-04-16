@@ -1491,7 +1491,7 @@ div.MessageForm,
 div.Tabs {
 	display: block;
    border-bottom: 1px solid #abdafb;
-   padding: 8px;
+   padding: 5px 8px;
    margin: 0;
    background: #cfecff;
 }
@@ -1860,4 +1860,366 @@ div.Legal strong {
 	padding: 6px 0;
 	margin: 20px auto 0;
 	text-align: left;
+}
+
+
+
+/* ================================ Vanilla ================================= */
+
+#Panel ul.Discussions {
+   border: 0;
+}
+ul.PanelDiscussions li {
+   text-align: left;
+}
+ul.PanelDiscussions li a {
+   float: none;
+}
+ul.PanelDiscussions li strong {
+   display: block;
+   line-height: 1.5;
+}
+
+/* ============================================================== Discussions */
+
+/* Note: The Vanilla Discussion List has the following classes applied to
+  individual list elements and can be styled:
+  + Bookmarked: the user has bookmarked that topic
+  + Announcement: the discussion has been announced
+  + Mine: the user created the discussion
+  + New: there are new comments since the last viewed the discussion
+*/
+.Mine { background: #e3f4ff; }
+li.New { background: #fffec1; }
+ul.DataList div.Meta a.Category {
+   background: #fafafa;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList li.Mine div.Meta a.Category {
+   background: #eff7ff;
+}
+ul.DataList li.New div.Meta a.Category {
+   background: #fffed7;
+}
+ul.DataList div.Meta span.Announcement {
+	background: #e00;
+	color: #fff;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
+   font-weight: bold;
+}
+ul.DataList div.Meta span.Closed {
+	background: #555;
+   color: #ffffff;
+   font-weight: bold;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
+}
+
+
+/* ================================================================= Comments */
+body.Discussion #Content {
+   margin-bottom: 20px;
+}
+ul.Discussion {
+   margin-bottom: 1px;
+}
+/*
+  Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
+  css for these is in /applications/garden/design/menu.css. Override them here.
+*/
+a.Bookmark,
+a.Bookmarking {
+	float: right;
+   display: block;
+   background: url('images/star_sprite.png') top center no-repeat;
+   height: 22px;
+   width: 22px;
+   margin: 2px 4px 0 4px;
+}
+a.Bookmark span,
+a.Bookmarking span {
+   display: none;
+}
+a.Bookmarked {
+   background: url('images/star_sprite.png') center center no-repeat;
+}
+a.Bookmarking {
+   background: url('images/star_sprite.png') bottom center no-repeat;
+}
+body.Discussion a.Bookmark {
+	margin: 13px 8px;
+}
+
+/* =================================================================== Drafts */
+ul.Discussions div.ItemContent,
+ul.Drafts div.ItemContent {
+   margin: 0 0 0 5px;
+}
+ul.Drafts div.ItemContent a.Title,
+ul.Discussions div.ItemContent a.Title {
+	max-width: 580px;
+}
+
+/* =============================================== Discussion & Comment Forms */
+
+div.CommentForm textarea {
+   width: 656px;
+   height: 100px;
+   min-height: 100px;
+   margin: 0 0 6px;
+}
+div.Comment div.CommentForm {
+	background: none;
+	padding: 6px 4px;
+	border: 0;
+	clear: left;
+}
+#DiscussionForm label {
+   font-size: 14px;
+   font-weight: bold;
+   color: #666;
+}
+body.Post #Panel {
+   display: none;
+}
+body.Post #Content {
+   width: auto;
+}
+#DiscussionForm h2 {
+   border: none;
+   color: #02475A;
+   font-size: 140%;
+   font-weight: bold;
+   margin: 0;
+   padding: 6px;
+}
+#DiscussionForm form {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #c4e1ff none repeat scroll 0 0;
+   border: 1px solid #7caccb;
+   margin: 0;
+   padding: 20px;
+}
+#DiscussionForm textarea {
+   width: 910px;
+   height: 100px;
+   min-height: 100px;
+   max-height: 400px;
+   margin: 0 0 6px;
+}
+#DiscussionForm input.InputBox {
+   width: 910px;
+   margin-bottom: 10px;
+}
+#DiscussionForm div.Category {
+   padding: 0 0 10px;   
+}
+#DiscussionForm div.Category label {
+   padding: 0 8px 0 0;
+}
+div.CommentForm a.Cancel {
+   float: left;
+}
+#DiscussionForm ul {
+   margin: 0 0 20px;
+}
+#DiscussionForm ul.PostOptions li {
+   display: inline;
+   padding: 0 8px 0 0;
+}
+#DiscussionForm ul.PostOptions label {
+   display: inline;
+   font-weight: normal;
+   font-size: 95%;
+   color: #555;
+}
+
+/* ============================== Conversations ============================= */
+textarea.MultiComplete {
+   height: 20px;
+   padding: 3px 0;
+   width: 400px;
+   text-align: left;
+}
+.ac_results {
+   padding: 0;
+   border: 1px solid #bbb;
+   border-top: 0;
+   background-color: white;
+   overflow: hidden;
+   z-index: 99999;
+}
+.ac_results ul {
+   width: 100%;
+   list-style-position: outside;
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+.ac_results li {
+   margin: 0;
+   padding: 5px;
+   cursor: default;
+   display: block;
+   /* 
+   if width will be 100% horizontal scrollbar will apear 
+   when scroll mode will be used
+   */
+   /*width: 100%;*/
+   font-size: 12px;
+   /* 
+   it is very important, if line-height not setted or setted 
+   in relative units scroll will be broken in firefox
+   */
+   line-height: 16px;
+   overflow: hidden;
+   border-bottom: 1px solid #bbb;
+   text-align: left;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   font-weight: bold;
+   background: #daf4fd;
+}
+.ac_over strong {
+   font-weight: bold;
+   background: #2ab0de;
+}
+.ac_over {
+   background: #44c7f4;
+   color: #fff;
+}
+div.AddPeople h4 {
+  border-bottom: 0px;
+}
+#Panel input.InputBox,
+div.AddPeople textarea.MultiComplete {
+  width: 228px;
+  margin-bottom: 2px;
+}
+div.AddPeople form div {
+	text-align: right;
+}
+
+
+/* ============================================================ Conversations */
+fieldset {
+  padding: 0px !important;
+}
+h2.NewConversation {
+  float: right;
+}
+h2.NewConversation a {
+  font-weight: bold;
+}
+body.Conversations h2 {
+  margin: 0;
+}
+ul.Conversations li.New {
+  background: #fffec1;
+}
+ul.Conversations li.Active {
+  cursor: pointer;
+  background: #ffe;
+}
+ul.Conversations li.HasPhoto {
+	padding: 4px 5px;
+}
+ul.Conversations div.ItemContent {
+   margin:0 0 0 5px;
+}
+
+
+/* ========================================================= Add Message Form */
+#MessageForm {
+	background: #E9F9FF;
+	padding: 4px 8px 8px;
+	margin: 1px 0 0;
+  -moz-border-radius-bottomleft: 2px;
+  -moz-border-radius-bottomright: 2px;
+  -webkit-border-bottom-left-radius: 2px;
+  -webkit-border-bottom-right-radius: 2px;
+}
+#MessageForm h2 {
+  font-size: 115%;
+  color: #2786C2;
+  font-weight: bold;
+  border: 0;
+}
+#MessageForm form div {
+	text-align: right;
+}
+#MessageForm textarea {
+  width: 655px;
+  height: 100px;
+  min-height: 100px;
+  margin-bottom: 2px;
+}
+
+
+/* ==================================================== New Conversation Form */
+body.add #Panel {
+   display: none;
+}
+body.add #Content {
+   width: auto;
+}
+#ConversationForm form {
+	-moz-border-radius:2px 2px 2px 2px;
+	background:none repeat scroll 0 0 #c4e1ff;
+	border:1px solid #7caccb;
+	margin:0;
+	padding:20px;
+	text-align: right;
+}
+#ConversationForm h2 {
+	color:#02475A;
+	font-size:140%;
+	font-weight:bold;
+	margin:0;
+	padding:6px;
+	text-align: left;
+	border: 0;
+}
+#ConversationForm label {
+	display: block;
+	text-align: left;
+	color:#666666;
+	font-size:14px;
+	font-weight:bold;	
+}
+#ConversationForm textarea.MultiComplete {
+  width: 910px;
+}
+#ConversationForm .TextBox {
+   width: 910px;
+   height: 100px;
+   min-height: 100px;
+   margin: 8px 0 6px;
+	padding: 0;
+}
+body.Conversations a.Cancel {
+   margin-left: 20px;
+}
+div.Popup #ConversationForm form {
+	background: none;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	padding: 10px;
+}
+div.Popup #ConversationForm h2 {
+	color: #fff;
+	font-size: 120%;
+	font-weight: bold;
+	padding: 6px 9px 4px;	
+}
+div.Popup #ConversationForm textarea.MultiComplete,
+div.Popup #ConversationForm .TextBox {
+	width: 478px;
 }

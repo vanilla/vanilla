@@ -93,6 +93,23 @@ if (!function_exists('array_fill_keys')) {
    }
 }
 
+if (!function_exists('ArrayHasValue')) {
+   /**
+    * Searches $Array (and all arrays it contains) for $Value.
+    */ 
+   function ArrayHasValue($Array, $Value) {
+      if (in_array($Value, $Array)) {
+         return TRUE;
+      } else {
+         foreach ($Array as $k => $v) {
+            if (is_array($v))
+               return ArrayHasValue($v, $Value);
+         }
+         return FALSE;
+      }
+   }
+}
+
 if (!function_exists('ArrayKeyExistsI')) {
    /**
     * Case-insensitive ArrayKeyExists search.

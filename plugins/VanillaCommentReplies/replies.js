@@ -98,7 +98,7 @@ jQuery(document).ready(function($) {
          data: postValues,
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             $('.ReplyForm .Errors').remove();

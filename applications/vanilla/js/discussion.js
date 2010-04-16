@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
             $('.Popup,.Overlay').remove();
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -231,7 +231,7 @@ jQuery(document).ready(function($) {
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Remove any old popups
                $('.Popup,.Overlay').remove();
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
                $(msg).after(json.Data);
@@ -286,7 +286,7 @@ jQuery(document).ready(function($) {
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {               
                if(json.Data && json.LastCommentID) {

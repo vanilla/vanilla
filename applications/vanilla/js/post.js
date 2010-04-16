@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
             // Remove any old popups
             $('.Popup').remove();
             // Add new popup with error
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft
@@ -89,7 +89,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('.Popup').remove();
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             // Remove any old popups if not saving as a draft

@@ -1806,6 +1806,13 @@ div.SignInPopup div.Box {
 	background: none;
 	border: 0;
 }
+/* Serious Ajax Error Styles */
+div.AjaxError {
+	white-space: pre;
+	overflow: auto;
+	padding: 10px;
+}
+
 
 /* ==================================================================== Legal */
 div.Legal h3 {

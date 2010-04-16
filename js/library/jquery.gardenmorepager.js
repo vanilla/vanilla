@@ -70,7 +70,7 @@
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
                if (self.pager_in_container == true) {

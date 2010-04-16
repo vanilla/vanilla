@@ -293,7 +293,7 @@ class Gdn_FileSystem {
          $Size = filesize($File);
          $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($Name == '') {
-            $Name = pathinfo($File, PATHINFO_FILENAME);
+            $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
          } else {
             $Name .= '.'.$Extension;
          }

@@ -226,7 +226,7 @@ class Gdn_ApplicationManager {
       if (!$SetupController)
          return TRUE;
 
-      include(CombinePaths(array(PATH_APPLICATIONS, $AppFolder, 'controllers', $SetupController.'.php')));
+      include(CombinePaths(array(PATH_APPLICATIONS, $AppFolder, 'controllers', 'class.'.$SetupController.'controller.php')));
       $SetupControllerName = $SetupController.'Controller';
       $SetupController = new $SetupControllerName();
       $SetupController->GetImports();

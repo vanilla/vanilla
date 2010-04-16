@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                $('.Popup').remove();
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
                // Remove any old errors from the form
@@ -112,7 +112,7 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('span.Progress').remove();
             $(btn).show();
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             inform(json.StatusMessage);

@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
             url: checkUrl,
             dataType: 'text',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(text) {
                if (text == 'TRUE')

@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
             data: postValues,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
                $('span.Progress').remove();
@@ -90,7 +90,7 @@ jQuery(document).ready(function($) {
          data: { 'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON' },
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             $.popup.reveal({ popupId: popupId }, json);

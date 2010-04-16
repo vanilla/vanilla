@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
          data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             // Is this the last item in the announcements list?
@@ -54,7 +54,7 @@ jQuery(document).ready(function($) {
          data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             inform(json.StatusMessage);

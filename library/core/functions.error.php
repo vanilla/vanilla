@@ -137,7 +137,7 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    if ($DeliveryType != DELIVERY_TYPE_ALL) {
       // This is an ajax request, so dump an error that is more eye-friendly in the debugger
-      echo 'FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();\n\"".$SenderMessage."\"\n";
+      echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<div class=\"AjaxError\">\"".$SenderMessage."\"\n";
       if ($SenderCode != '')
          echo htmlentities($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
          
@@ -170,6 +170,7 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
             ,"\n";
          }
       }
+      echo '</div>';
    } else {
       // If the master view wasn't found, assume a panic state and dump the error.
       if ($Master === FALSE) {

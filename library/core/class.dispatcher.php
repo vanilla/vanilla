@@ -441,7 +441,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    private function _FetchController($ThrowErrorOnFailure = FALSE) {
       $ControllerWhiteList = $this->EnabledApplicationFolders();
-      $AppControllerName = $this->_ApplicationFolder.'Controller';
       // Don't include it if it's already been included
       if (!class_exists($this->ControllerName())) {
          $PathParts = array('controllers');
@@ -451,11 +450,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $PathParts[] = 'class.'.strtolower($this->_ControllerName).'controller.php';
          $ControllerFileName = CombinePaths($PathParts);
 
-         // Force the mapping to search in the app folder if it was in the request
-         if ($this->_ApplicationFolder != '' && InArrayI($this->_ApplicationFolder, $ControllerWhiteList)) {
-            // Limit the white list to the specified application folder
+         // Limit the white list to the specified application folder if it was in the request
+         if ($this->_ApplicationFolder != '' && InArrayI($this->_ApplicationFolder, $ControllerWhiteList))
             $ControllerWhiteList = array($this->_ApplicationFolder);
-         }
 
          $ControllerPath = Gdn_FileSystem::FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
          if ($ControllerPath !== FALSE) {
@@ -464,11 +461,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // application to search in for a view file).
             $this->_ApplicationFolder = explode(DS, str_replace(PATH_APPLICATIONS . DS, '', $ControllerPath));
             $this->_ApplicationFolder = $this->_ApplicationFolder[0];
-            $AppControllerName = $this->_ApplicationFolder.'Controller';
+            $AppControllerName = strtolower($this->_ApplicationFolder).'Controller';
 
             // Load the application's master controller
             if (!class_exists($AppControllerName))
-               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($AppControllerName).'.php')));
+               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($this->_ApplicationFolder).'controller.php')));
 
             // Now load the library (no need to check for existence - couldn't
             // have made it here if it didn't exist).
@@ -484,7 +481,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                list($this->_ApplicationFolder, $this->_ControllerName, $this->_ControllerMethod) = explode('/', $this->Routes['Default404']);
                $ControllerFileName = CombinePaths(array('controllers', 'class.' . strtolower($this->_ControllerName) . 'controller.php'));
                $ControllerPath = Gdn_FileSystem::FindByMapping('controller_mappings.php', 'Controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
-               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($AppControllerName).'.php')));
+               $this->_ApplicationFolder = explode(DS, str_replace(PATH_APPLICATIONS . DS, '', $ControllerPath));
+               $this->_ApplicationFolder = $this->_ApplicationFolder[0];
+               include(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($this->_ApplicationFolder).'controller.php')));
                include($ControllerPath);
             }
          }
@@ -493,7 +492,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          return TRUE;
       }
    }
-
+   
    /**
     * An internal method used to map parts of the request to various properties
     * of this object that represent the controller, controller method, and

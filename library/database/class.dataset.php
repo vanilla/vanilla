@@ -192,7 +192,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     * @param string $DatasetType The format in which the result should be returned: object or array.
     */
-   public function &NextRow($DatasetType) {
+   public function &NextRow($DatasetType = FALSE	) {
       $Result = &$this->Result($DatasetType);
       ++$this->_Cursor;
 		
@@ -212,9 +212,10 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * Returns the number of rows in the DataSet.
     *
+    * @param string $DatasetType The format in which the result should be returned: object or array.
     */
-   public function NumRows() {
-		$Result = count($this->Result());
+   public function NumRows($DatasetType = FALSE) {
+		$Result = count($this->Result($DatasetType));
 		return $Result;
    }
 

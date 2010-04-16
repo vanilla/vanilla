@@ -43,8 +43,8 @@ class ProfileController extends Gdn_Controller {
          Redirect('dashboard/home/filenotfound');
       } else {
          $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
-         if ($this->RoleData !== FALSE && $this->RoleData->NumRows() > 0) 
-            $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'Name');
+         if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
+            $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
       }
       
       // Make sure the userphoto module gets added to the page
@@ -172,7 +172,7 @@ class ProfileController extends Gdn_Controller {
          $this->ProfileUserID = $this->User->UserID;
          $this->ActivityData = $this->ActivityModel->Get($this->User->UserID);
          if ($this->ActivityData->NumRows() > 0) {
-            $ActivityData = $this->ActivityData->ResultArray();
+            $ActivityData = $this->ActivityData->Result();
             $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
             $LastActivity = $this->ActivityData->FirstRow();
             $LastModifiedDate = Gdn_Format::ToTimestamp($this->User->DateUpdated);

@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
    
    // Generate password
    $('a.GeneratePassword').live('click', function() {
-      var passwd = generateString(7);
+      var passwd = gdn.generateString(7);
       $(':password').val(passwd);
       $('#Form_ShowPassword').val(passwd);
       return false;

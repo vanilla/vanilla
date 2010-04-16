@@ -5,8 +5,8 @@ jQuery(document).ready(function($) {
    $('#Register input[name=User/Name], body.register input[name=User/Name]').blur(function() {
       var name = $(this).val();
       if (name != '') {
-         var checkUrl = combinePaths(
-            definition('WebRoot', ''),
+         var checkUrl = gdn.combinePaths(
+            gdn.definition('WebRoot', ''),
             'index.php/dashboard/utility/usernameavailable/'+encodeURIComponent(name)
          );
          $.ajax({

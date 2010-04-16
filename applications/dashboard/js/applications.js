@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             if (json.FormSaved == true) {
-               inform(json.StatusMessage);
+               gdn.inform(json.StatusMessage);
                if (json.RedirectUrl) {
                   setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                } else {

@@ -135,7 +135,7 @@ jQuery(document).ready(function($) {
                   existingCommentRow.after(json.Data).remove();
                   $('#Comment_' + commentID).effect("highlight", {}, "slow");
                } else {   
-                  definition('LastCommentID', commentID, true);
+                  gdn.definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
                   $(json.Data).appendTo('ul.Discussion')
                      .effect("highlight", {}, "slow");
@@ -155,7 +155,7 @@ jQuery(document).ready(function($) {
                */
 
             }
-            inform(json.StatusMessage);
+            gdn.inform(json.StatusMessage);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
@@ -189,7 +189,7 @@ jQuery(document).ready(function($) {
       if (draftInp.val() != '')
          $.ajax({
             type: "POST",
-            url: combinePaths(definition('WebRoot'), 'index.php/vanilla/drafts/delete/'+draftInp.val()+'/'+definition('TransientKey')),
+            url: gdn.combinePaths(gdn.definition('WebRoot'), 'index.php/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
             data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
             dataType: 'json'
          });         
@@ -274,14 +274,14 @@ jQuery(document).ready(function($) {
          return;
    
       setTimeout(function() {
-         discussionID = definition('DiscussionID', 0);
-         lastCommentID = definition('LastCommentID', 0);
+         discussionID = gdn.definition('DiscussionID', 0);
+         lastCommentID = gdn.definition('LastCommentID', 0);
          if(lastCommentID <= 0)
             return;
          
          $.ajax({
             type: "POST",
-            url: combinePaths(definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
+            url: gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -290,12 +290,12 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {               
                if(json.Data && json.LastCommentID) {
-                  definition('LastCommentID', json.LastCommentID, true);
+                  gdn.definition('LastCommentID', json.LastCommentID, true);
                   $current = $("#Discussion").contents();
                   $(json.Data).appendTo("#Discussion")
                      .effect("highlight", {}, "slow");
                }
-               processTargets(json.Targets);
+               gdn.processTargets(json.Targets);
                
                getNewTimeout();
             }
@@ -304,6 +304,6 @@ jQuery(document).ready(function($) {
    }
    
    // Load new comments like a chat.
-   autoRefresh = definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
+   autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
    getNewTimeout();
 });

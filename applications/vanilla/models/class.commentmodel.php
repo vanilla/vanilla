@@ -58,31 +58,37 @@ class CommentModel extends VanillaModel {
             
          if (is_numeric($Discussion->CountCommentWatch)) {
             // Update the watch data
-            $this->SQL->Put(
-               'UserDiscussion',
-               array(
-                  'CountComments' => $CountWatch,
+				if($CountWatch != @$Discussion->CountCommentWatch) {
+					// Only update the watch if there are new comments.
+					$this->SQL->Put(
+						'UserDiscussion',
+						array(
+							'CountComments' => $CountWatch,
                   'DateLastViewed' => Gdn_Format::ToDateTime()
-               ),
-               array(
-                  'UserID' => $Session->UserID,
-                  'DiscussionID' => $Discussion->DiscussionID,
-                  'CountComments <' => $CountWatch
-               )
-            );
+						),
+						array(
+							'UserID' => $Session->UserID,
+							'DiscussionID' => $Discussion->DiscussionID
+						)
+					);
+				}
          } else {
-            // Insert watch data
-            $this->SQL->Insert(
-               'UserDiscussion',
-               array(
-                  'UserID' => $Session->UserID,
-                  'DiscussionID' => $Discussion->DiscussionID,
-                  'CountComments' => $CountWatch,
+				// Make sure the discussion isn't archived.
+				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+				if(!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
+					// Insert watch data
+					$this->SQL->Insert(
+						'UserDiscussion',
+						array(
+							'UserID' => $Session->UserID,
+							'DiscussionID' => $Discussion->DiscussionID,
+							'CountComments' => $CountWatch,
                   'DateLastViewed' => Gdn_Format::ToDateTime()
-               )
-            );
-         }
-      }
+						)
+					);
+				}
+			}
+		}
    }
 
    public function GetCount($DiscussionID) {
@@ -307,6 +313,15 @@ class CommentModel extends VanillaModel {
             ->Set('CountComments', $Data->CountComments)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
+				
+			// Update the last comment's user ID.
+			$this->SQL
+				->Update('Discussion d')
+				->Update('Comment c')
+				->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE)
+				->Where('d.DiscussionID', $DiscussionID)
+				->Where('c.CommentID', 'd.LastCommentID', FALSE, FALSE);
+			$this->SQL->Put();
       }
    }
    

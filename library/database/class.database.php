@@ -204,7 +204,11 @@ class Gdn_Database {
     * @param string $Sql A string of SQL to be executed.
     * @param array $InputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
     */
-   public function Query($Sql, $InputParameters = NULL) {
+   public function Query($Sql, $InputParameters = NULL, $Event = '') {
+		if($Event) {
+			// TODO: Raise an event so the query can be overridden.
+		}
+		
       if ($Sql == '')
          trigger_error(ErrorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
 
@@ -212,7 +216,7 @@ class Gdn_Database {
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
          // Make sure other unbufferred queries are not open
          if (is_object($this->_CurrentResultSet)) {
-            $this->_CurrentResultSet->FetchAllRows();
+            $this->_CurrentResultSet->Result();
             $this->_CurrentResultSet->FreePDOStatement(FALSE);
          }
 

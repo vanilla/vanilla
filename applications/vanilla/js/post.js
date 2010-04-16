@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
             // Assign the comment id to the form if it was defined
             if (json.CommentID != null && json.CommentID != '') {
                $(inpCommentID).val(json.CommentID);
-               definition('LastCommentID', json.CommentID, true);
+               gdn.definition('LastCommentID', json.CommentID, true);
             }
                
             if (json.DraftID != null && json.DraftID != '')
@@ -56,7 +56,7 @@ jQuery(document).ready(function($) {
                // Redirect to the discussion
                document.location = json.DiscussionUrl;
             }
-            inform(json.StatusMessage);
+            gdn.inform(json.StatusMessage);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
@@ -117,7 +117,7 @@ jQuery(document).ready(function($) {
                // Redirect to the new discussion
                document.location = json.RedirectUrl;
             }
-            inform(json.StatusMessage);
+            gdn.inform(json.StatusMessage);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.

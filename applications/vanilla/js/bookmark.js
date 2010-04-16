@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
             }
             $('a.MyBookmarks').html(json.MenuLink);
             // Add/remove the bookmark from the side menu.
-            processTargets(json.Targets);
+            gdn.processTargets(json.Targets);
          }
       });
       return false;

@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
-                  inform(json.StatusMessage);
+                  gdn.inform(json.StatusMessage);
                }
             }
          });
@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
    // Enable multicomplete on selected inputs
    $('.MultiComplete').livequery(function() {
       $(this).autocomplete(
-         combinePaths(definition('WebRoot'), 'index.php/dashboard/user/autocomplete/'),
+         gdn.combinePaths(gdn.definition('WebRoot'), 'index.php/dashboard/user/autocomplete/'),
          {
             minChars: 1,
             multiple: true,
@@ -115,7 +115,7 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
-            inform(json.StatusMessage);
+            gdn.inform(json.StatusMessage);
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
          }

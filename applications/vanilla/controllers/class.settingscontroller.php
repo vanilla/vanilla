@@ -15,6 +15,50 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SettingsController extends Gdn_Controller {
    
    public $Uses = array('Database', 'Form', 'CategoryModel');
+	
+	public function Advanced() {
+      $this->Permission('Vanilla.Settings.Manage');
+		
+		$Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Vanilla.Archive.Date',
+			'Vanilla.Archive.Exclude'
+      ));
+      
+      // Set the model on the form.
+      $this->Form->SetModel($ConfigurationModel);
+      
+      // If seeing the form for the first time...
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+		} else {
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
+			
+			// Grab old config values to check for an update.
+			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
+			$ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+			
+			$Saved = $this->Form->Save();
+			if($Saved) {
+				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+				$ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+				
+				if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
+					$DiscussionModel = new Gdn_DiscussionModel();
+					$DiscussionModel->UpdateDiscussionCount('All');
+				}
+            $this->StatusMessage = Translate("Your changes have been saved.");
+			}
+		}
+		
+      $this->AddSideMenu('vanilla/settings');
+      $this->AddJsFile('settings.js');
+      $this->Title(Translate('Advanced Forum Settings'));
+		
+		$this->Render();
+	}
    
    public function Index() {
       $this->View = 'general';

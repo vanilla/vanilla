@@ -134,7 +134,7 @@ class ExportModel {
 		$EscapeReplace = array(self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE);
 		
 		// Write the column header.
-		fwrite($fp, implode(self::DELIM, $Structure).self::NEWLINE);
+		fwrite($fp, implode(self::DELIM, array_keys($Structure)).self::NEWLINE);
 		
 		// Loop through the data and write it to the file.
 		foreach($Data as $Row) {

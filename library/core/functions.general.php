@@ -381,7 +381,15 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
-         if (array_key_exists($Key, $AssociativeArray)) {
+			if(is_object($AssociativeArray)) {
+				if($ValueKey === '') {
+					$Return[] = $AssociativeArray->$Key;
+				} elseif(property_exists($AssociativeArray, $ValueKey)) {
+					$Return[$AssociativeArray[$Key]] = $AssociativeArray->$ValueKey;
+				} else {
+					$Return[$AssociativeArray->$Key] = $DefaultValue;
+				}
+			} elseif (array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
@@ -508,6 +516,26 @@ if (!function_exists('GetPostValue')) {
    function GetPostValue($FieldName, $Default = FALSE) {
       return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
    }
+}
+
+if (!function_exists('GetValue')) {
+	/**
+	 * Return the value from an associative array or an object.
+	 *
+	 * @param string $Key The key or property name of the value.
+	 * @param mixed $Collection The array or object to search.
+	 * @param mixed $Default The value to return if the key does not exist.
+	 * @return mixed The value from the array or object.
+	 */
+	function GetValue($Key, $Collection, $Default = FALSE) {
+		$Result = $Default;
+		if(is_array($Collection) && array_key_exists($Key, $Collection))
+			$Result = $Collection[$Key];
+		elseif(is_object($Collection) && property_exists($Collection, $Key))
+			$Result = $Collection->$Key;
+			
+      return $Result;
+	}
 }
 
 if (!function_exists('InArrayI')) {
@@ -802,6 +830,23 @@ if (!function_exists('StringIsNullOrEmpty')) {
    function StringIsNullOrEmpty($String) {
       return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
    }
+}
+
+
+if (!function_exists('SetValue')) {
+	/**
+	 * Set the value on an object/array.
+	 *
+	 * @param string $Needle The key or property name of the value.
+	 * @param mixed $Haystack The array or object to set.
+	 * @param mixed $Value The value to set.
+	 */
+	function SetValue($Key, $Collection, $Value) {
+		if(is_array($Collection))
+			$Collection[$Key] = $Value;
+		elseif(is_object($Collection))
+			$Collection->$Key = $Value;
+	}
 }
 
 if (!function_exists('T')) {

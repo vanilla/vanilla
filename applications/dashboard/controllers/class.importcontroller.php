@@ -8,10 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class ImportController extends Gdn_Controller {
+class ImportController extends GardenController {
 	public $Uses = array('Form', 'ImportModel', 'ExportModel');
 	
 	public function Export() {
+		return;
+	
+		set_time_limit(60*2);
 		$Ex = $this->ExportModel;
 		$Ex->PDO(Gdn::Database()->Connection());
 		$Ex->Prefix = Gdn::Database()->DatabasePrefix;
@@ -31,24 +34,76 @@ class ImportController extends Gdn_Controller {
 	}
 	
 	public function Index() {
-		//$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-08 152215.txt.gz';
-		$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-08 152725.txt.gz';
-		echo '<pre>';
-		ob_end_flush();
+		$this->Permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
 		$Timer = new Gdn_Timer();
-		$Timer->Start();
-		$this->ImportModel->SplitFile($Path);
-		$Timer->Split('Split Files');
-		$this->ImportModel->DefineTables();
-		$Timer->Split('Define Tables');
 		
-		foreach($this->ImportModel->Data['Tables'] as $Table => $TableInfo) {
-			$this->ImportModel->LoadTable($Table, $TableInfo['Path']);
-			$Timer->Split("Load $Table Table");
+		$Session = Gdn::Session();
+      if (!$Session->IsValid())
+         $this->Form->AddError('You must be authenticated in order to use this form.');
+			
+		// Determine the current step.
+		$CurrentStep = Gdn::Config('Garden.Import.CurrentStep', 0);
+		
+		if($CurrentStep < 1) {
+			// Check to see if there is a file.
+			$ImportPath = Gdn::Config('Garden.Import.ImportPath');
+			if($ImportPath && file_exists($ImportPath)) {
+				$CurrentStep = 1;
+			} elseif ($this->Form->AuthenticatedPostBack() === TRUE) {
+				$Upload = new Gdn_Upload();
+				$TmpFile = $Upload->ValidateUpload('ImportFile');
+				if($TmpFile) {
+					$Extension = pathinfo($_FILES['ImportFile']['name'], PATHINFO_EXTENSION);
+					$TargetFolder = PATH_ROOT . DS . 'uploads' . DS . 'import';
+					if(!file_exists($TargetFolder)) {
+						mkdir($TargetFolder, 0777, TRUE);
+					}
+					$ImportPath = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads' . DS . 'import', $Extension);
+					$Upload->SaveAs($TmpFile, $ImportPath);
+					$CurrentStep = 1;
+					SaveToConfig(array(
+						'Garden.Import.CurrentStep' => $CurrentStep,
+						'Garden.Import.ImportPath' => $ImportPath));
+				} else {
+					$this->Form->AddError('%s is required.', 'Import File');
+				}
+			}
 		}
 		
-		$Timer->Finish();
-		echo '</pre>';
+		$Imp = new Gdn_ImportModel();
+		$this->SetData('Steps', $Imp->Steps);
+		
+		if($CurrentStep >= 1) {
+			$this->View = 'Steps';
+			
+			$Imp->ImportPath = Gdn::Config('Garden.Import.ImportPath');
+			$Result = $Imp->RunStep($CurrentStep);
+			
+			if($Result === TRUE) {
+				$CurrentStep++;
+				SaveToConfig('Garden.Import.CurrentStep', $CurrentStep);
+			} elseif($Result === 'COMPLETE') {
+				
+			} elseif(is_array($Result)) {
+				SaveToConfig(array(
+					'Garden.Import.CurrentStep', $CurrentStep,
+					'Garden.Import.CurrentStepData', ArrayValue('Data', $Result)));
+				$this->SetData('CurrentStepMessage', ArrayValue('Message', $Result));
+			}
+		}
+		
+		$this->SetData('CurrentStep', $CurrentStep);
+		
+		$this->Render();
+		
+		//set_time_limit(60*5);
+		//$Imp = new Gdn_ImportModel();
+		//
+		//$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-16 200246.txt.gz'; // big db
+		////$Path = PATH_ROOT.DS.'uploads'.DS.'export 2010-02-16 134222.txt.gz'; // small db
+		//echo '<pre>';
+		//ob_end_flush();
+		//
 	}
 }
 
@@ -85,7 +140,7 @@ class Gdn_Timer {
 				$Span = $Time - $PrevTime;
 				$m = floor($Span / 60);
 				$s = $Span - $m * 60;
-				echo sprintf(' (%d:%02.3f)', $m, $s);
+				echo sprintf(' (%d:%05.2f)', $m, $s);
 			}
 		}
 		echo "\n";

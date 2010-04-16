@@ -56,7 +56,7 @@ class CategoriesController extends VanillaController {
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-
+   
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);

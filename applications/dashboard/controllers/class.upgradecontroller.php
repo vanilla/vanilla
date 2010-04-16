@@ -147,7 +147,7 @@ class UpgradeController extends DashboardController {
          // 3. Import users
          
          // Grab the current admin user.
-         $AdminUser = $SQL->GetWhere('User', array('Admin' => 1))->FirstRow('', DATASET_TYPE_ARRAY);
+         $AdminUser = $SQL->GetWhere('User', array('Admin' => 1))->FirstRow(DATASET_TYPE_ARRAY);
          // Delete the users.
          $SQL->Delete('User', array('UserID <>' => 0)); // where kludge
          
@@ -157,7 +157,7 @@ class UpgradeController extends DashboardController {
          from ".$SourcePrefix."User");
          
          // Check to see if there is an existing user in the database that should now be root.
-         $User = $SQL->GetWhere('User', array('Name' => $AdminUser['Name']))->FirstRow('', DATASET_TYPE_ARRAY);
+         $User = $SQL->GetWhere('User', array('Name' => $AdminUser['Name']))->FirstRow(DATASET_TYPE_ARRAY);
          if(is_array($User)) {
             $NewUserID = $User['UserID'];
             $SQL->Put(

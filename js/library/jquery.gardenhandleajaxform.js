@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
             },
             success: function(json, status, $frm) {
                if (json.FormSaved == true) {
-                  inform(json.StatusMessage);
+                  gdn.inform(json.StatusMessage);
                   if (json.RedirectUrl) {
                      setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                   } else if(json.DeliveryType == 'ASSET') {
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
                   if(json.Target) {
                      $(json.Target).html(json.Data);
                   } else if(json.DeliveryType == 'MESSAGE') {
-                     inform(json.Data, false);
+                     gdn.inform(json.Data, false);
                      $frm.find('span.Progress').remove();
                   } else {
                      $frm.parents($(handle).selector).html(json.Data);

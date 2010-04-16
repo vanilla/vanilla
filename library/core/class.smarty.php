@@ -44,7 +44,7 @@ class Gdn_Smarty {
       // Make sure that any datasets use arrays instead of objects.
       foreach($Controller->Data as $Key => $Value) {
          if($Value instanceof Gdn_DataSet) {
-            $Value->DefaultDatasetType = DATASET_TYPE_ARRAY;
+            $Value->DatasetType(DATASET_TYPE_ARRAY);
          }
       }
       

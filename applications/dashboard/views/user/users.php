@@ -4,8 +4,7 @@ if (!isset($EditUser)) {
    $Session = Gdn::Session();
    $EditUser = $Session->CheckPermission('Garden.Users.Edit');
 }
-   
-foreach ($this->UserData->Result('Text') as $User) {
+foreach ($this->UserData->Format('Text')->Result() as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>

@@ -847,6 +847,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
+            if (ArrayHasValue($this->_CssFiles, 'style.css'))
+               $this->AddCssFile('custom.css');
+               
+            if (ArrayHasValue($this->_CssFiles, 'admin.css'))
+               $this->AddCssFile('customadmin.css');
+            
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
@@ -864,8 +870,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                   $CssPaths = array();
                   if ($this->Theme) {
                      // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-                     // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+                     // $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                     // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
                      $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
                   }
                   // 3. Application default. eg. root/applications/app_name/design/

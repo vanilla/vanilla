@@ -209,7 +209,7 @@ input.Button {
 }
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
-div.Messages {
+div.Information {
    text-align: center;
    position: fixed;
    top: 10px;
@@ -222,7 +222,7 @@ div.Messages {
    display: block;
    width: 100%;
 }
-* html div.Messages {
+* html div.Information {
   position: absolute;
   width: 100%;/*IE5.5*/
   top: 0;
@@ -254,12 +254,23 @@ div.Messages ul li {
 	font-size: 120%;
 }
 div.Errors ul {
+	display: block;
    background: #d50a0a !important;
    border: 1px solid #a00 !important;
 }
 div.Errors ul li {
    color: #fff !important;
 }
+div.Errors pre {
+	overflow: auto;
+	font-size: 90%;
+	font-family: monospace;
+	color: #333;
+	background: #ffd;
+	padding: 4px;
+	line-height: 1.3;
+}
+
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .DismissMessage {
@@ -1018,10 +1029,12 @@ div.Popup div.Legal {
 
 
 /* =================================================================== Themes */
-body.themes #Content img {
+div.CurrentTheme img,
+div.BrowseThemes img {
 	border: 1px solid #777;
 }
-body.themes h3 {
+div.CurrentTheme h3,
+div.BrowseThemes h3 {
 	padding: 0 0 10px;
 }
 .CurrentTheme img {

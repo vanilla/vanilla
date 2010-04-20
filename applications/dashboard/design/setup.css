@@ -20,9 +20,24 @@ a:hover {
    }
 div.Title {
    background:#E2F4FF none repeat scroll 0 0;
-   border-bottom:1px solid #FFFFFF;
-   padding: 30px 0;
-   text-align:left;
+   border-top: 1px solid #A5D0E7;
+   border-bottom: 1px solid #A5D0E7;
+	margin: 50px 0;
+	padding: 38px 0 4px;
+}
+div.Title h1 {
+	text-align: left;
+	width: 600px;
+	margin: 0 auto;
+}
+div.Title img {
+	top: 20px;
+	position: absolute;
+}
+div.Title p {
+	padding: 0 0 0 270px;
+	margin: 0;
+	font-size: 22px;
 }
 h1 {
    font-family: Arial, Helvetica, Verdana;
@@ -33,13 +48,12 @@ h1 {
    font-size: 180%;
 }
 div.Form {
-   border-top: 1px solid #A5D0E7;
    text-align: center;
 }
 div.Form ul {
    width: 568px;
    margin: 0 auto;
-   padding: 40px 0;
+   padding: 0 0 40px;
    }
 div.Form div.Errors ul {
    padding: 0;
@@ -109,14 +123,19 @@ form ul li.Warning {
    font-size: 17px;
 }
 form ul li.Warning div {
-   font-size: 90%;
+   font-size: 14px;
+	line-height: 1.6;
+	color: #000;
+	text-shadow: none;
    padding: 16px 0 8px;
 }
 form ul li label {
+   font-family: Arial, Helvetica, Verdana;
    font-weight: bold;
    display: block;
    padding: 8px 0 0;
    font-size: 110%;
+	color: #02455B;
    }
 form ul li input.InputBox {
    -moz-border-radius: 4px;
@@ -144,18 +163,21 @@ div.Button {
 }
 div.Button a,
 input.Button {
-   font-family: arial, helvetica, verdana;
    cursor: pointer;
+   font-family: arial, helvetica, verdana;
+   font-size: 25px;
+   font-weight: bold;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
    margin: 0;
    padding: 3px 10px;
-   font-size: 25px;
-   text-shadow:0 1px 0 #FFFFFF;   
-   color: #073C5E;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
-   border: 1px solid #bbb;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   font-weight: bold;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 div.Button a {
    padding: 4px 8px;
@@ -163,31 +185,14 @@ div.Button a {
 div.Button a:hover,
 input.Button:hover {
    text-decoration: none;
-   color: #333 !important;
-   border: 1px solid #888;
+   color: #111;
+   border: 1px solid #666;
 }
-
+div.Button a:focus,
+input.Button:focus {
+   background: #eee;
+}
 /* readme.html */
-body.ReadMe div.Title {
-   border-top: 1px solid #A5D0E7;
-   border-bottom: 1px solid #A5D0E7;
-	margin: 50px 0;
-	padding: 38px 0 4px;
-}
-body.ReadMe div.Title h1 {
-	text-align: left;
-	width: 600px;
-	margin: 0 auto;
-}
-body.ReadMe div.Title img {
-	top: 20px;
-	position: absolute;
-}
-body.ReadMe div.Title p {
-	padding: 0 0 0 270px;
-	margin: 0;
-	font-size: 22px;
-}
 div.Info {
 	text-align: left;
 	width: 568px;

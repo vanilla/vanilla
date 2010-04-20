@@ -674,44 +674,70 @@ if (!function_exists('ProxyRequest')) {
     * response.
     *
     * @param string $Url The full url to the page being requested (including http://)
-    * @param array $PostFields The collection of post values to send with the request. Must be in associative array format, or nothing will be sent.
     */
-   function ProxyRequest($Url, $PostFields = FALSE) {
+   function ProxyRequest($Url) {
+      $UrlParts = parse_url($Url);
+      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Host = GetValue('host', $UrlParts, '');
+      $Port = GetValue('port', $UrlParts, '80');
+      $Path = GetValue('path', $UrlParts, '');
+      $Query = GetValue('query', $UrlParts, '');
+      // Get the cookie.
+      $Cookie = '';
+      foreach($_COOKIE as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+         
+         if(strlen($Cookie) > 0)
+            $Cookie .= '; ';
+            
+         $Cookie .= $Key.'='.urlencode($Value);
+      }
+
       $Response = '';
-      $Query = is_array($PostFields) ? http_build_query($PostFields) : '';
-      
       if (function_exists('curl_init')) {
+         $Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         if ($Cookie != '')
+            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+            
          if ($Query != '') {
             curl_setopt($Handler, CURLOPT_POST, 1);
             curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          }
          $Response = curl_exec($Handler);
+         if ($Response == FALSE)
+            $Response = curl_error($Handler);
+            
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
-         $UrlParts = parse_url($Url);
-         $Host = ArrayValue('host', $UrlParts, '');
-         $Port = ArrayValue('port', $UrlParts, '80');
-         $Path = ArrayValue('path', $UrlParts, '');
          $Referer = Gdn_Url::WebRoot(TRUE);
       
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+   
+         if(strlen($Cookie) > 0)
+            $Cookie = "Cookie: $Cookie\r\n";
          
-         $Header = "GET $Path?$Query HTTP/1.1\r\n" .
-            "Host: $Host\r\n" .
+         $Header = "GET $Path?$Query HTTP/1.1\r\n"
+            ."Host: $Host\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-            "User-Agent: Vanilla/2.0\r\n" .
-            "Accept: */*\r\n" .
-            "Accept-Charset: utf-8;\r\n" .
-            "Referer: $Referer\r\n" .
-            "Connection: close\r\n\r\n";
+            ."User-Agent: Vanilla/2.0\r\n"
+            ."Accept: */*\r\n"
+            ."Accept-Charset: utf-8;\r\n"
+            ."Referer: $Referer\r\n"
+            ."Connection: close\r\n";
+            
+         if ($Cookie != '')
+            $Header .= $Cookie;
+         
+         $Header .= "\r\n";
          
          // Send the headers and get the response
          fputs($Pointer, $Header);

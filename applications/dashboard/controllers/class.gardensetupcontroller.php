@@ -69,7 +69,7 @@ class GardenSetupController extends DashboardController {
             $AppName = $AppNames[$AppKey];
             $Validation = new Gdn_Validation();
             $this->ApplicationManager->RegisterPermissions($AppName, $Validation);
-            if ($this->ApplicationManager->ApplicationSetup($AppName, $this, $Validation)) {
+            if ($this->ApplicationManager->ApplicationSetup($AppName, $Validation)) {
                ++$CurrentStep;
                Redirect('/dashboard/gardensetup/'.$CurrentStep);
             }

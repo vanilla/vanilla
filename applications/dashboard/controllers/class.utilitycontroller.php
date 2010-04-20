@@ -136,11 +136,8 @@ class UtilityController extends DashboardController {
          }
       }
       
-      echo ProxyRequest(
-         Gdn::Config('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update'),
-         $Fields = FALSE
-      );
-      
+		$UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
+      echo ProxyRequest($UpdateCheckUrl.'?'.http_build_query($Fields));
       $Database = Gdn::Database();
       $Database->CloseConnection();
    }

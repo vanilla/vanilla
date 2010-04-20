@@ -17,6 +17,7 @@ printf(
    '<code>'.PATH_THEMES.'</code>'
 );
 ?></div>
+<?php echo $this->Form->Errors(); ?>
 <div class="CurrentTheme">
    <h3><?php echo T('Current Theme'); ?></h3>
    <?php
@@ -175,5 +176,3 @@ printf(
 </div>
 <?php
 }
-
-printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

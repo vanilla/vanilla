@@ -150,19 +150,26 @@ class Gdn_ApplicationManager {
     * @todo Document EnableApplication() method.
     */
    public function EnableApplication($ApplicationName, $Validation) {
+      $this->TestApplication($ApplicationName, $Validation);
+      $ApplicationFolder = ArrayValue('Folder', ArrayValue($ApplicationName, $this->AvailableApplications(), array()), '');
+      SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
+      return TRUE;
+   }
+
+   public function TestApplication($ApplicationName, &$Validation) {
       // Add the application to the $EnabledApplications array in conf/applications.php
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
-      if ($ApplicationFolder == '') {
+      if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-      } else {
-         SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
-      }
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $PluginManager = Gdn::Factory('PluginManager');
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+      
+      if ($this->ApplicationHasSetup($ApplicationName))
+         $this->ApplicationSetup($ApplicationName, $Validation);
 
       return TRUE;
    }
@@ -216,18 +223,19 @@ class Gdn_ApplicationManager {
     * Call the applications setup method.
     *
     * @param string $ApplicationName Undocumented variable.
-    * @param string $SenderController Undocumented variable.
     * @todo Document ApplicationSetup() method.
     */
-   public function ApplicationSetup($ApplicationName, $SenderController, $Validation, $ForceReturn = FALSE) {
+   public function ApplicationSetup($ApplicationName, $Validation, $ForceReturn = FALSE) {
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       $SetupController = ArrayValue('SetupController', $ApplicationInfo);
       $AppFolder = ArrayValue('Folder', $ApplicationInfo, strtolower($ApplicationName));
       if (!$SetupController)
          return TRUE;
 
-      include(CombinePaths(array(PATH_APPLICATIONS, $AppFolder, 'controllers', 'class.'.$SetupController.'controller.php')));
       $SetupControllerName = $SetupController.'Controller';
+      if (!class_exists($SetupControllerName))
+         include(CombinePaths(array(PATH_APPLICATIONS, $AppFolder, 'controllers', 'class.'.$SetupController.'controller.php')));
+         
       $SetupController = new $SetupControllerName();
       $SetupController->GetImports();
       $SetupController->ApplicationFolder = $AppFolder;
@@ -242,22 +250,17 @@ class Gdn_ApplicationManager {
          } else {
             $View = $SetupController->FetchView();
    
-            if ($DeliveryType === DELIVERY_TYPE_ALL) {
-               $SenderController->AddAsset('Content', $View);
-               $SenderController->RenderMaster();
+            if ($SetupController->Form->AuthenticatedPostBack()) {
+               // If the form has been posted back, send json
+               $SetupController->SetJson('FormSaved', $SetupController->Form->ErrorCount() > 0 ? FALSE : TRUE);
+               $SetupController->SetJson('Data', $View);
+               $SetupController->SetJson('StatusMessage', $SetupController->StatusMessage);
+               $SetupController->SetJson('RedirectUrl', $SetupController->RedirectUrl);
+               $Database = Gdn::Database();
+               $Database->CloseConnection();
+               exit(json_encode($SetupController->GetJson()));
             } else {
-               if ($SetupController->Form->AuthenticatedPostBack()) {
-                  // If the form has been posted back, send json
-                  $SetupController->SetJson('FormSaved', $SetupController->Form->ErrorCount() > 0 ? FALSE : TRUE);
-                  $SetupController->SetJson('Data', $View);
-                  $SetupController->SetJson('StatusMessage', $SetupController->StatusMessage);
-                  $SetupController->SetJson('RedirectUrl', $SetupController->RedirectUrl);
-                  $Database = Gdn::Database();
-                  $Database->CloseConnection();
-                  exit(json_encode($SetupController->GetJson()));
-               } else {
-                  exit($View);
-               }
+               exit($View);
             }
          }
          return FALSE;

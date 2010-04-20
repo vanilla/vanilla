@@ -30,9 +30,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
       );
       ?>
    </div>
-   <?php   
-   echo $this->Form->Errors();
-   ?>
+   <?php echo $this->Form->Errors(); ?>
    <table class="AltRows">
       <thead>
          <tr>
@@ -146,6 +144,4 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
    ?>
       </tbody>
    </table>
-   <?php
-   printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');
    

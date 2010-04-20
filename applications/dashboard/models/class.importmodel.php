@@ -25,6 +25,8 @@ class ImportModel {
 	public $Data = array();
 	
 	public $ImportPath = '';
+
+	public $MaxStepTime = 10000;
 	
 	public $Steps = array(
 		1 => 'SplitImportFile',
@@ -49,7 +51,7 @@ class ImportModel {
 	/**
 	 * @var Gdn_Timer
 	 */
-	public $Timer;
+	public $Timer = NULL;
 	
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
@@ -74,8 +76,9 @@ where i._NewID is null and i2.UserID is null";
 		$MinID = $this->Query('select min(UserID) as MinID from :_zUser where _NewID is null')->Value('MinID', NULL);
 		
 		if(is_null($MinID)) {
-			$this->Timer->Split('No more IDs to update');
-			return;
+			//$this->Timer->Split('No more IDs to update');
+			// No more IDs to update.
+			return TRUE;
 		}
 		
 		$IDInc = $MaxID - $MinID + self::ID_PADDING;
@@ -95,6 +98,8 @@ where i._NewID is null
 set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
 where i._NewID is null";
 		$this->Query($Sql);
+		
+		return TRUE;
 	}
 	
 	public function AssignOtherIDs() {
@@ -102,6 +107,8 @@ where i._NewID is null";
 		$this->_AssignIDs('Category', 'CategoryID', 'Name');
 		$this->_AssignIDs('Discussion');
 		$this->_AssignIDs('Comment');
+		
+		return TRUE;
 	}
 	
 	protected function _AssignIDs($TableName, $PrimaryKey = NULL, $SecondaryKey = NULL) {
@@ -125,8 +132,9 @@ set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
 		$MinID = $this->Query("select min($PrimaryKey) as MinID from :_z$TableName where _NewID is null")->Value('MinID', NULL);
 		
 		if(is_null($MinID)) {
-			$this->Timer->Split('No more IDs to update');
-			return;
+			//$this->Timer->Split('No more IDs to update');
+			// No more IDs to update.
+			return TRUE;
 		}
 		if($MaxID == 0)
 			$IDInc = 0;
@@ -158,6 +166,7 @@ where i._NewID is null";
 			
 			$St->Set(TRUE, TRUE);
 		}
+		return TRUE;
 	}
 	
 	public function DefineIndexes() {
@@ -181,28 +190,47 @@ where i._NewID is null";
 			if(count($St->Columns()) > 0)
 				$St->Set();
 		}
+		return TRUE;
 	}
 	
 	public function InsertTables() {
+		$InsertedCount = 0;
+		
 		foreach($this->Structures as $TableName => $Columns) {
-			switch($TableName) {
-				case 'UserRole':
-					$Sql = "insert :_UserRole ( UserID, RoleID )
-select zUserID._NewID, zRoleID._NewID
-from :_zUserRole i
-left join :_zUser zUserID
-  on i.UserID = zUserID.UserID
-left join :_zRole zRoleID
-  on i.RoleID = zRoleID.RoleID
-left join :_UserRole ur
-	on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
-where i.UserID <> 0 and ur.UserID is null";
-					$this->Query($Sql);
+			if(GetValue('Inserted', GetValue($TableName, $this->Data['Tables'], array()))) {
+				$InsertedCount++;
+			} else {
+				$this->Data['CurrentStepMessage'] = $TableName;
+				
+				switch($TableName) {
+					case 'UserRole':
+						$Sql = "insert :_UserRole ( UserID, RoleID )
+	select zUserID._NewID, zRoleID._NewID
+	from :_zUserRole i
+	left join :_zUser zUserID
+	  on i.UserID = zUserID.UserID
+	left join :_zRole zRoleID
+	  on i.RoleID = zRoleID.RoleID
+	left join :_UserRole ur
+		on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
+	where i.UserID <> 0 and ur.UserID is null";
+						$this->Query($Sql);
+						break;
+					default:
+						$this->_InsertTable($TableName);
+				}
+				
+				$this->Data['Tables'][$TableName]['Inserted'] = TRUE;
+				// Make sure the loading isn't taking too long.
+				if($this->Timer->ElapsedTime() > $this->MaxStepTime)
 					break;
-				default:
-					$this->_InsertTable($TableName);
 			}
 		}
+		
+		$Result = $InsertedCount == count($this->Structures);
+		if($Result)
+			$this->Data['CurrentStepMessage'] = '';
+		return $Result;
 	}
 	
 	protected function _InsertTable($TableName) {
@@ -240,6 +268,10 @@ where i.UserID <> 0 and ur.UserID is null";
 				$Select[] = "i.$Column";
 			}
 		}
+		// Add the original table to prevent duplicates.
+		$PK = $TableName.'ID';
+		$From .= "\nleft join :_$TableName o0\n  on i._NewID = o0.$PK";
+		$Where .= " and o0.$PK is null";
 		
 		// Build the sql statement.
 		$Sql = $Insert
@@ -248,6 +280,27 @@ where i.UserID <> 0 and ur.UserID is null";
 			.$Where;
 			
 		$this->Query($Sql);
+	}
+	
+	public function LoadTables() {
+		$LoadedCount = 0;
+		foreach($this->Data['Tables'] as $Table => $TableInfo) {
+			if(GetValue('Loaded', $TableInfo)) {
+				$LoadedCount++;
+			} else {
+				$this->Data['CurrentStepMessage'] = $Table;
+				$this->LoadTable($Table, $TableInfo['Path']);
+				$this->Data['Tables'][$Table]['Loaded'] = TRUE;
+				$LoadedCount++;
+			}
+			// Make sure the loading isn't taking too long.
+			if($this->Timer->ElapsedTime() > $this->MaxStepTime)
+				break;
+		}
+		$Result = $LoadedCount >= count($this->Data['Tables']);
+		if($Result)
+			$this->Data['CurrentStepMessage'] = '';
+		return $Result;
 	}
 	
 	public function LoadTable($Tablename, $Path) {
@@ -268,6 +321,7 @@ lines terminated by '\\n'
 ignore 1 lines";
 		
 		$this->Query($Sql);
+		return TRUE;
 	}
 	
 	public function ParseInfoLine($Line) {
@@ -291,8 +345,17 @@ ignore 1 lines";
 		if($Step > count($this->Steps)) {
 			return 'COMPLETE';
 		}
+		if(!$this->Timer) {
+			$NewTimer = TRUE;
+			$this->Timer = new Gdn_Timer();
+			$this->Timer->Start('');
+		}
+		
 		$Method = $this->Steps[$Step];
 		$Result = call_user_method($Method, $this);
+		
+		if(isset($NewTimer))
+			$this->Timer->Finish('');
 		
 		return $Result;
 	}
@@ -314,7 +377,7 @@ ignore 1 lines";
 		// Execute the query.
 		$Result = $Db->Query($Sql, $Parameters);
 		
-		$this->Timer->Split('Sql: '. str_replace("\n", "\n     ", $Sql));
+		//$this->Timer->Split('Sql: '. str_replace("\n", "\n     ", $Sql));
 		
 		return $Result;
 	}
@@ -334,9 +397,7 @@ ignore 1 lines";
 		}
 		$Header = $this->ParseInfoLine($Header);
 		
-		while(!feof($fpin)) {
-			$Line = fgets($fpin);
-			
+		while(($Line = fgets($fpin)) !== FALSE) {
 			if($Line == "\n") {
 				if($fpout) {
 					// We are in a table so close it off.
@@ -364,24 +425,37 @@ ignore 1 lines";
 		if($fpout)
 			gzclose($fpout);
 		$this->Data['Tables'] = $Tables;
+		
+		return TRUE;
 	}
 	
 	public function UpdateCounts() {
-		$Sql = "update :_Discussion d set
+		$StepSql = array(
+			"update :_Discussion d set
 FirstCommentID = (select min(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)";
-		$this->Query($Sql);
-		
-		$Sql = "update :_Discussion d
+DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+
+			"update :_Discussion d
 join :_Comment c
   on d.LastCommentID = c.CommentID
-set d.LastCommentUserID = c.InsertUserID";
-		$this->Query($Sql);
+set d.LastCommentUserID = c.InsertUserID",
+
+			"update :_Category c set
+c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 		
-		$Sql = "update :_Category c set
-c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)";
-		$this->Query($Sql);
+		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
+		for($i = $CurrentSubstep; $i < count($StepSql); $i++) {
+			$Sql = $StepSql[$i];
+			$this->Query($Sql);
+			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+				$this->Data['CurrentSubstep'] = $i + 1;
+				return FALSE;
+			}
+		}
+		if(isset($this->Data['CurrentSubstep']))
+			unset($this->Data['CurrentSubstep']);
+		return TRUE;
 	}
 }

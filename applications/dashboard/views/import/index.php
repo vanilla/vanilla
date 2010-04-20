@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+$this->AddSideMenu();
+?>
 <h2><?php echo T('Import'); ?></h2>
 <?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));

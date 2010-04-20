@@ -163,11 +163,8 @@ if (!function_exists('ArrayValue')) {
     * @param string The default value to return if the requested value is not found. Default is FALSE.
     */
    function ArrayValue($Needle, $Haystack, $Default = FALSE) {
-      $Return = $Default;
-      if (is_array($Haystack) === TRUE && array_key_exists($Needle, $Haystack) === TRUE) {
-         $Return = $Haystack[$Needle];
-      }
-      return $Return;
+      $Result = GetValue($Needle, $Haystack, $Default);
+		return $Result;
    }
 }
 
@@ -616,24 +613,6 @@ if (!function_exists('Now')) {
    function Now() {
       list($usec, $sec) = explode(" ", microtime());
       return ((float)$usec + (float)$sec);
-   }
-}
-
-if (!function_exists('ObjectValue')) {
-   /**
-    * Similar to ArrayValue, except it returns the value associated with
-    * $Property in $Object or FALSE if not found. 
-    *
-    * @param string The property to look for in $Object.
-    * @param object The object in which to search for $Property.
-    * @param string The default value to return if the requested property is not found. Default is FALSE.
-    */
-   function ObjectValue($Property, $Object, $Default = FALSE) {
-      $Return = $Default;
-      if (is_object($Object) === TRUE && property_exists($Object, $Property) === TRUE) {
-         $Return = $Object->$Property;
-      }
-      return $Return;
    }
 }
 

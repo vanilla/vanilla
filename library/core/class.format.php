@@ -408,37 +408,42 @@ class Gdn_Format {
 
 
    /**
-    * Takes any variable and serializes it in Json format.
+    * Takes any variable and serializes it.
     *
-    * @param mixed $Mixed An object, array, or string to be formatted.
-    * @return string
+    * @param mixed $Mixed An object, array, or string to be serialized.
+    * @return string The serialized version of the string.
     */
    public static function Serialize($Mixed) {
-      if (is_object($Mixed))
-         return 'obj:' . json_encode($Mixed);
-      else if (is_array($Mixed))
-         return 'arr:' . json_encode($Mixed);
-      else
-         return $Mixed;
+		if(is_array($Mixed) || is_object($Mixed)
+			|| (is_string($Mixed) && (substr_compare('a:', $Mixed, 0, 2) === 0 || substr_compare('O:', $Mixed, 0, 2) === 0
+				|| substr_compare('arr:', $Mixed, 0, 4) === 0 || substr_compare('obj:', $Mixed, 0, 4) === 0))) {
+			$Result = serialize($Mixed);
+		} else {
+			$Result = $Mixed;
+		}
+		return $Result;
    }
 
 
    /**
-    * Takes a Json serialized variable and unserializes it back into it's
+    * Takes a serialized variable and unserializes it back into it's
     * original state.
     *
-    * @param string $SerializedString A JSON string to be unserialized.
+    * @param string $SerializedString A json or php serialized string to be unserialized.
     * @return mixed
     */
    public static function Unserialize($SerializedString) {
-      if (is_string($SerializedString)) {
-         if (strpos($SerializedString, 'obj:') === 0) {
-            return json_decode(substr($SerializedString, 4));
-         } else if (strpos($SerializedString, 'arr:') === 0) {
-            return json_decode(substr($SerializedString, 4), TRUE);
-         }
+		$Result = $SerializedString;
+		
+      if(is_string($SerializedString)) {
+			if(substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0)
+				$Result = unserialize($SerializedString);
+			elseif(substr_compare('obj:', $SerializedString, 0, 4) === 0)
+            $Result = json_decode(substr($SerializedString, 4), FALSE);
+         elseif(substr_compare('arr:', $SerializedString, 0, 4) === 0)
+            $Result = json_decode(substr($SerializedString, 4), TRUE);
       }
-      return $SerializedString;
+      return $Result;
    }
 
 

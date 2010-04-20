@@ -163,11 +163,8 @@ if (!function_exists('ArrayValue')) {
     * @param string The default value to return if the requested value is not found. Default is FALSE.
     */
    function ArrayValue($Needle, $Haystack, $Default = FALSE) {
-      $Return = $Default;
-      if (is_array($Haystack) === TRUE && array_key_exists($Needle, $Haystack) === TRUE) {
-         $Return = $Haystack[$Needle];
-      }
-      return $Return;
+      $Result = GetValue($Needle, $Haystack, $Default);
+		return $Result;
    }
 }
 

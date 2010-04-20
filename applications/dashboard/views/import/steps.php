@@ -8,9 +8,11 @@
 		echo '<li ', ($CurrentStep > $Number ? 'class="Complete"' : ''), '>',
 			T('Garden.Import.Steps.'.$Name);
 		
-		$Message = GetValue('CurrentStepMessage', $this->Data);
-		if($Message)
-			echo '<div>', $Message, '</div>';
+		if($Number == $CurrentStep) {
+			$Message = GetValue('CurrentStepMessage', $this->Data);
+			if($Message)
+				echo '<div>', $Message, '</div>';
+		}
 			
 		echo '</li>';
 	}

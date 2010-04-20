@@ -430,23 +430,32 @@ ignore 1 lines";
 	}
 	
 	public function UpdateCounts() {
-		$Sql = "update :_Discussion d set
+		$StepSql = array(
+			"update :_Discussion d set
 FirstCommentID = (select min(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)";
-		$this->Query($Sql);
-		
-		$Sql = "update :_Discussion d
+DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+
+			"update :_Discussion d
 join :_Comment c
   on d.LastCommentID = c.CommentID
-set d.LastCommentUserID = c.InsertUserID";
-		$this->Query($Sql);
+set d.LastCommentUserID = c.InsertUserID",
+
+			"update :_Category c set
+c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 		
-		$Sql = "update :_Category c set
-c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)";
-		$this->Query($Sql);
-		
+		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
+		for($i = $CurrentSubstep; $i < count($StepSql); $i++) {
+			$Sql = $StepSql[$i];
+			$this->Query($Sql);
+			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+				$this->Data['CurrentSubstep'] = $i + 1;
+				return FALSE;
+			}
+		}
+		if(isset($this->Data['CurrentSubstep']))
+			unset($this->Data['CurrentSubstep']);
 		return TRUE;
 	}
 }

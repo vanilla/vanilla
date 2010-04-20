@@ -34,7 +34,10 @@ class DashboardController extends Gdn_Controller {
       parent::Initialize();
    }
    
-   public function AddSideMenu($CurrentUrl) {
+   public function AddSideMenu($CurrentUrl = FALSE) {
+		if(!$CurrentUrl)
+			$CurrentUrl = strtolower($this->SelfUrl);
+		
       // Only add to the assets if this is not a view-only request
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
          $SideMenu = new SideMenuModule($this);

@@ -49,7 +49,8 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', T('General'), 'dashboard/settings/configure', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
       $Menu->AddLink('Site Settings', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
-      
+      $Menu->AddLink('Site Settings', T('Import'), 'dashboard/import', 'Garden.Import');
+		
       $Menu->AddItem('Add-ons', T('Add-ons'));
       $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
@@ -61,5 +62,6 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
       if (Gdn::Config('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+		
    }
 }

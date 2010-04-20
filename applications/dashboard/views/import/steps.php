@@ -6,8 +6,13 @@
 	$CurrentStep = $this->Data['CurrentStep'];
 	foreach($this->Data['Steps'] as $Number => $Name) {
 		echo '<li ', ($CurrentStep > $Number ? 'class="Complete"' : ''), '>',
-			T('Garden.Import.Steps.'.$Name),
-			'</li>';
+			T('Garden.Import.Steps.'.$Name);
+		
+		$Message = GetValue('CurrentStepMessage', $this->Data);
+		if($Message)
+			echo '<div>', $Message, '</div>';
+			
+		echo '</li>';
 	}
 ?>
 </ol>

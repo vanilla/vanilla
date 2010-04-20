@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class ImportController extends GardenController {
+class ImportController extends DashboardController {
 	public $Uses = array('Form', 'ImportModel', 'ExportModel');
 	
 	public function Export() {
@@ -70,29 +70,37 @@ class ImportController extends GardenController {
 			}
 		}
 		
-		$Imp = new Gdn_ImportModel();
+		$Imp = new ImportModel();
 		$this->SetData('Steps', $Imp->Steps);
 		
 		if($CurrentStep >= 1) {
 			$this->View = 'Steps';
 			
-			$Imp->ImportPath = Gdn::Config('Garden.Import.ImportPath');
+			$Imp->ImportPath = C('Garden.Import.ImportPath');
+			$Data = C('Garden.Import.CurrentStepData');
+			if($Data)
+				$Imp->Data = $Data;
+				
 			$Result = $Imp->RunStep($CurrentStep);
 			
 			if($Result === TRUE) {
 				$CurrentStep++;
-				SaveToConfig('Garden.Import.CurrentStep', $CurrentStep);
 			} elseif($Result === 'COMPLETE') {
 				
-			} elseif(is_array($Result)) {
+			} /*elseif(is_array($Result)) {
 				SaveToConfig(array(
-					'Garden.Import.CurrentStep', $CurrentStep,
-					'Garden.Import.CurrentStepData', ArrayValue('Data', $Result)));
+					'Garden.Import.CurrentStep' => $CurrentStep,
+					'Garden.Import.CurrentStepData' => ArrayValue('Data', $Result)));
 				$this->SetData('CurrentStepMessage', ArrayValue('Message', $Result));
-			}
+			}*/
 		}
 		
+		SaveToConfig(array(
+			'Garden.Import.CurrentStep' => $CurrentStep,
+			'Garden.Import.CurrentStepData' => $Imp->Data));
+		
 		$this->SetData('CurrentStep', $CurrentStep);
+		$this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
 		
 		$this->Render();
 		
@@ -112,30 +120,39 @@ class Gdn_Timer {
 	public $FinishTime;
 	public $SplitTime;
 	
-	public function Start($Message = 'Started') {
-		$this->StarTime = microtime(TRUE);
-		$this->SplitTime = $this->StarTime;
+	public function ElapsedTime() {
+		return $this->FinishTime - $this->StartTime;
+	}
+	
+	public function Finish($Message = '') {
+		$this->FinishTime = microtime(TRUE);
+		if($Message)
+			$this->Write($Message, $this->FinishTime, $this->StartTime);
+	}
+	
+	public function Start($Message = '') {
+		$this->StartTime = microtime(TRUE);
+		$this->SplitTime = $this->StartTime;
 		$this->FinishTime = NULL;
 		
-		$this->Write($Message, $this->StarTime);
+		if($Message)
+			$this->Write($Message, $this->StartTime);
 	}
 	
-	public function Finish($Message = 'Finished') {
-		$this->FinishTime = microtime(TRUE);
-		
-		$this->Write($Message, $this->FinishTime, $this->StarTime);
-	}
-	
-	public function Split($Message = 'Split') {
+	public function Split($Message = '') {
 		$PrevSplit = $this->SplitTime;
 		$this->SplitTime = microtime(TRUE);
-		$this->Write($Message, $this->SplitTime, $PrevSplit);
+		if($Message);
+			$this->Write($Message, $this->SplitTime, $PrevSplit);
 	}
 	
 	public function Write($Message, $Time = NULL, $PrevTime = NULL) {
-		echo $Message;
+		if($Message)
+			echo $Message;
 		if(!is_null($Time)) {
-			echo ': ', date('Y-m-d H:i:s', $Time);
+			if($Message)
+				echo ': ';
+			echo date('Y-m-d H:i:s', $Time);
 			if(!is_null($PrevTime)) {
 				$Span = $Time - $PrevTime;
 				$m = floor($Span / 60);

@@ -25,6 +25,8 @@ class ImportModel {
 	public $Data = array();
 	
 	public $ImportPath = '';
+
+	public $MaxStepTime = 10000;
 	
 	public $Steps = array(
 		1 => 'SplitImportFile',
@@ -49,7 +51,7 @@ class ImportModel {
 	/**
 	 * @var Gdn_Timer
 	 */
-	public $Timer;
+	public $Timer = NULL;
 	
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
@@ -158,6 +160,7 @@ where i._NewID is null";
 			
 			$St->Set(TRUE, TRUE);
 		}
+		return TRUE;
 	}
 	
 	public function DefineIndexes() {
@@ -250,6 +253,28 @@ where i.UserID <> 0 and ur.UserID is null";
 		$this->Query($Sql);
 	}
 	
+	public function LoadTables() {
+		$LoadedCount = 0;
+		foreach($this->Data['Tables'] as $Table => $TableInfo) {
+			if(GetValue('Loaded', $TableInfo)) {
+				$LoadedCount++;
+			} else {
+				$this->Data['CurrentStepMessage'] = $Table;
+				$this->LoadTable($Table, $TableInfo['Path']);
+				$this->Data['Tables'][$Table]['Loaded'] = TRUE;
+				$LoadedCount++;
+			}
+			// Make sure the loading isn't taking too long.
+			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+				break;
+			}
+		}
+		$Result = $LoadedCount >= count($this->Data['Tables']);
+		if($Result)
+			$this->Data['CurrentStepMessage'] = '';
+		return $Result;
+	}
+	
 	public function LoadTable($Tablename, $Path) {
 		if(!array_key_exists($Tablename, $this->Structures))
 			throw new Exception("The table \"$Tablename\" is not a valid import table.");
@@ -268,6 +293,7 @@ lines terminated by '\\n'
 ignore 1 lines";
 		
 		$this->Query($Sql);
+		return TRUE;
 	}
 	
 	public function ParseInfoLine($Line) {
@@ -291,8 +317,17 @@ ignore 1 lines";
 		if($Step > count($this->Steps)) {
 			return 'COMPLETE';
 		}
+		if(!$this->Timer) {
+			$NewTimer = TRUE;
+			$this->Timer = new Gdn_Timer();
+			$this->Timer->Start('');
+		}
+		
 		$Method = $this->Steps[$Step];
 		$Result = call_user_method($Method, $this);
+		
+		if(isset($NewTimer))
+			$this->Timer->Finish('');
 		
 		return $Result;
 	}
@@ -334,9 +369,7 @@ ignore 1 lines";
 		}
 		$Header = $this->ParseInfoLine($Header);
 		
-		while(!feof($fpin)) {
-			$Line = fgets($fpin);
-			
+		while(($Line = fgets($fpin)) !== FALSE) {
 			if($Line == "\n") {
 				if($fpout) {
 					// We are in a table so close it off.
@@ -364,6 +397,8 @@ ignore 1 lines";
 		if($fpout)
 			gzclose($fpout);
 		$this->Data['Tables'] = $Tables;
+		
+		return TRUE;
 	}
 	
 	public function UpdateCounts() {
@@ -383,5 +418,7 @@ set d.LastCommentUserID = c.InsertUserID";
 		$Sql = "update :_Category c set
 c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)";
 		$this->Query($Sql);
+		
+		return TRUE;
 	}
 }

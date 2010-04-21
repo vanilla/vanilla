@@ -194,31 +194,38 @@ class SetupController extends DashboardController {
    
    private function _CheckPrerequisites() {
       // Make sure we are running at least PHP 5.1
-      if (version_compare(phpversion(), '5.1.0') < 0)
-         $this->Form->AddError("You are running PHP version ".phpversion().". Vanilla requires PHP 5.1.0 or greater, so you'll need to upgrade PHP before you can continue.");
+      if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0)
+         $this->Form->AddError("You are running <b>PHP version ".phpversion()."</b>. Vanilla requires PHP ".ENVIRONMENT_PHP_VERSION." or greater, so you'll need to upgrade PHP before you can continue.<code><span>Upgrade PHP to</span> v".ENVIRONMENT_PHP_VERSION."</code>");
 
       // Make sure PDO is available
       if (!class_exists('PDO'))
-         $this->Form->AddError('You must have PDO enabled in PHP in order for Vanilla to connect to your database.');
+         $this->Form->AddError('You must have <b>PDO enabled</b> in PHP in order for Vanilla to connect to your database.<code><span>Enable</span> PHP PDO</code>');
 
       if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
-         $this->Form->AddError('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.');
+         $this->Form->AddError('You must have the <b>MySQL driver for PDO</b> enabled in order for Vanilla to connect to your database.<code><span>Install</span> PDO_Mysql</code>');
 
       // Make sure that the correct filesystem permissions are in place
-      $ConfigFile = PATH_CONF . DS . 'config.php';
-      if (!file_exists($ConfigFile))
-         file_put_contents($ConfigFile, '');
+      
+      // Make sure the config folder is writeable
+      if (!is_readable(PATH_CONF) || !is_writable(PATH_CONF))
+         $this->Form->AddError('Your <b>configuration folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.PATH_CONF.'</code>');
+      else {
+         $ConfigFile = PATH_CONF . DS . 'config.php';
+         if (!file_exists($ConfigFile))
+            file_put_contents($ConfigFile, '');
          
-      if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
-         $this->Form->AddError('Your configuration file does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code>'.$ConfigFile.'</code>');
-
+         // Make sure the config file is writeable
+         if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
+            $this->Form->AddError('Your <b>configuration file</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code><span>Fix permissions</span> '.$ConfigFile.'</code>');
+      }
+      
       $UploadsFolder = PATH_ROOT . DS . 'uploads';
       if (!is_readable($UploadsFolder) || !is_writable($UploadsFolder))
-         $this->Form->AddError('Your uploads folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code>'.$UploadsFolder.'</code>');
+         $this->Form->AddError('Your <b>uploads folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.$UploadsFolder.'</code>');
 
       // Make sure the cache folder is writeable
       if (!is_readable(PATH_CACHE) || !is_writable(PATH_CACHE)) {
-         $this->Form->AddError('Your cache folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code>'.PATH_CACHE.'</code>');
+         $this->Form->AddError('Your <b>cache folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code><span>Fix permissions</span> '.PATH_CACHE.'</code>');
       } else {
          if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');

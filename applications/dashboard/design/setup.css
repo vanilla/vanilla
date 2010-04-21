@@ -1,6 +1,6 @@
 body {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-   background: url('images/slicesplash.jpg') top center no-repeat #C2E7FC;
+   background: url('images/splash-glow.jpg') top center no-repeat #C7E6FB;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -20,25 +20,35 @@ a:hover {
    }
 div.Title {
    background:#E2F4FF none repeat scroll 0 0;
-   border-top: 1px solid #A5D0E7;
-   border-bottom: 1px solid #A5D0E7;
-	margin: 50px 0;
-	padding: 38px 0 4px;
+   background: url('images/shine.jpg') top center no-repeat #43AAE4;
+   border-bottom: 1px solid #3395CD;
+	margin-bottom: 50px;
 }
-div.Title h1 {
+div.Title div.Center {
+   width: 960px;
+   margin: 0px auto;
+   height: 60px;
+   position: relative;
+}
+div.Title div.Center div.Logo {
+   float: left;
+   width: 199px;
+   position: absolute;
+   left: 150px;
+   top: 15px;
+}
+div.Title div.Center div.PageName h1 {
 	text-align: left;
 	width: 600px;
 	margin: 0 auto;
-}
-div.Title img {
-	top: 20px;
+	padding-top: 30px;
+	text-shadow: none;
+	color: #43AAE4;
 	position: absolute;
+	top: 40px;
+	left: 360px;
 }
-div.Title p {
-	padding: 0 0 0 270px;
-	margin: 0;
-	font-size: 22px;
-}
+
 h1 {
    font-family: Arial, Helvetica, Verdana;
    color: #02455B;
@@ -51,15 +61,15 @@ div.Form {
    text-align: center;
 }
 div.Form ul {
-   width: 568px;
+   width: 600px;
    margin: 0 auto;
    padding: 0 0 40px;
-   }
+}
 div.Form div.Errors ul {
    padding: 0;
+   list-style-type: decimal;
 }
 div.Errors {
-   background: #d00;
    padding: 20px 8px !important;
    margin: 0 0 10px;
    border-bottom: 1px solid #C0E7F5;
@@ -68,16 +78,37 @@ div.Errors {
    padding: 4px 0 !important;
    border: 0px !important;
    margin: 0px !important;
-   color: #fff !important;
+   margin-bottom: 10px !important;
+   color: #4184d3 !important;
    font-size: 16px;
    line-height: 150%;
-   text-shadow: #900 0 1px 0;
+   text-shadow: none;
 }
 .Errors li a {
-   color: #ff0;
+   color: white;
+   border-bottom: 1px dotted white;
+   text-decoration: none;
+}
+.Errors li b {
+   color: #38abff;
+   font-weight: normal;
 }
 .Errors li a:hover {
-   color: #ff0 !important;
+   color: #38abff !important;
+   border-color: #ff0;
+}
+.Errors li code {
+   color: #38abff;
+   display: block;
+   margin-top: 4px;
+   padding: 4px 10px;
+   background-color: #fdfbff;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+.Errors li code span {
+   color: #d00;
+   display: none;
 }
 .ImportProgress {
    padding-left: 40px;

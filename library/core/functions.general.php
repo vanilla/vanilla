@@ -14,6 +14,9 @@ function __autoload($ClassName) {
 
    if(!class_exists('Gdn_FileSystem', FALSE))
       return false;
+      
+   if(!class_exists('Gdn_FileCache', FALSE))
+      return false;
 
    if(!class_exists('Gdn', FALSE))
       return false;
@@ -32,12 +35,11 @@ function __autoload($ClassName) {
 
    // If this is a model, look in the models folder(s)
    if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping(
-         'library_mappings.php',
-         'Library',
+         'library',
          PATH_LIBRARY,
          array(
             'core',
@@ -50,7 +52,7 @@ function __autoload($ClassName) {
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);

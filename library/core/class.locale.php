@@ -84,7 +84,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if(!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
       if(!is_array($PluginWhiteList)) $PluginWhiteList = array();
 
-      Gdn_FileCache::PrepareCache('locale', 'locale_mappings.php');
+      Gdn_FileCache::PrepareCache('locale');
       if ($ForceRemapping === TRUE || !Gdn_FileCache::CacheReady('locale')) {
          $LocaleSources = array();
          // Get application-based locale definition files
@@ -101,7 +101,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          $FileContents = array();
          $Count = count($LocaleSources);
          for($i = 0; $i < $Count; ++$i) {
-            $FileContents[$SafeLocaleName][] = Format::ArrayValueForPhp($LocaleSources[$i]);
+            $FileContents[$SafeLocaleName][] = Gdn_Format::ArrayValueForPhp($LocaleSources[$i]);
          }
          // Add the config locale if it exists
          $ConfigLocale = PATH_CONF . DS . 'locale.php';

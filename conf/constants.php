@@ -43,3 +43,6 @@ define('DATASET_TYPE_OBJECT', 'object');
 define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
+
+// Environment
+define('ENVIRONMENT_PHP_VERSION','5.2.0');

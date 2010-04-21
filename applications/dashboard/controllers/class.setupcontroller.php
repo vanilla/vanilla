@@ -11,9 +11,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Dashboard Setup Controller
  */
-class GardenSetupController extends DashboardController {
+class SetupController extends DashboardController {
    
-   public $Uses = array('Form', 'ApplicationManager', 'Database');
+   public $Uses = array('Form', 'Database');
    
    public function Initialize() {
       $this->Head = new HeadModule($this);
@@ -25,73 +25,57 @@ class GardenSetupController extends DashboardController {
     * collected from each application's application controller and all plugin's
     * definitions.
     */
-   public function Index($CurrentStep = 1) {
+   public function Index() {
+      $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
       if ($Installed)
-         trigger_error(ErrorMessage('Garden has already been installed.', 'GardenSetupController', 'Index'));
+         trigger_error(ErrorMessage('Vanilla has already been installed.', 'SetupController', 'Index'));
          
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';
-         $this->Render();
       } else {
-         $AvailableApplications = $this->ApplicationManager->AvailableApplications();
-         $SetupApplications = array();
-         foreach ($AvailableApplications as $AppName => $AppInfo) {
-            if (ArrayValue('SetupController', $AppInfo)) {
-               $SetupApplications[$AppName] = $AppInfo;
-            }
-         }
-         $TotalSteps = count($SetupApplications) + 2;
+         $this->View = 'configure';
+         $ApplicationManager = new Gdn_ApplicationManager();
+         $AvailableApplications = $ApplicationManager->AvailableApplications();
+         $TotalSteps = count($AvailableApplications) + 2;
          
          // Need to go through all of the setups for each application. Garden,
-         // Step 1: Garden Setup
-         // Step N: Other Application Setups
-         // Final Step: Complete
-         if ($CurrentStep == 1) {
-            $this->View = 'configure';
-            if (!$this->Configure() || !$this->Form->IsPostBack()) {
-               $this->Render();
-            } else {
-               ++$CurrentStep;
-               Redirect('/dashboard/gardensetup/'.$CurrentStep);
-            }
-         }
-         
-         if ($CurrentStep > 1 && $CurrentStep < $TotalSteps) {
+         if ($this->Configure() && $this->Form->IsPostBack()) {
+            // Make sure to reload the values that were just saved to the config file
+            // $Config = Gdn::Factory(Gdn::AliasConfig);
+            // $Config->Load(PATH_CONF.DS.'config.php', 'Use');
+            // unset($Config);
+
             // Step through the available applications, enabling each of them
-            $AppFolders = ConsolidateArrayValuesByKey($SetupApplications, 'Folder');
-            $AppNames = array_keys($SetupApplications);
-            $AppKey = $CurrentStep - 2;
-            $AppFolder = $AppFolders[$AppKey];
-            $AppName = $AppNames[$AppKey];
-            $Validation = new Gdn_Validation();
-            $this->ApplicationManager->RegisterPermissions($AppName, $Validation);
-            if ($this->ApplicationManager->ApplicationSetup($AppName, $Validation)) {
-               ++$CurrentStep;
-               Redirect('/dashboard/gardensetup/'.$CurrentStep);
+            $AppNames = array_keys($AvailableApplications);
+            try {
+               foreach ($AvailableApplications as $AppName => $AppInfo) {
+                  if (strtolower($AppName) != 'dashboard') {
+                     $Validation = new Gdn_Validation();
+                     $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                     $ApplicationManager->EnableApplication($AppName, $Validation);
+                  }
+               }
+            } catch (Exception $ex) {
+               $this->Form->AddError(strip_tags($ex->getMessage()));
             }
-         }
-         
-         if ($CurrentStep == $TotalSteps) {
-            // Save a variable so that the application knows it has been installed.
-            SaveToConfig('Garden.Installed', TRUE);
-            
-            /*
-            $Database = Gdn::Database();
-            $DbTables = $Database->SQL()->FetchTables();
-            if (in_array('LUM_User', $DbTables) === TRUE) {
-               // If there are vanilla 1 tables to import, prompt the user with that screen
-               $this->Render();
-            } else {
-               // Otherwise just redirect them to the dashboard
-            */
+            if ($this->Form->ErrorCount() == 0) {
+               // Save a variable so that the application knows it has been installed.
+               // Now that the application is installed, select a more user friendly error page.
+               SaveToConfig(array(
+                  'Garden.Installed' => TRUE,
+                  'Garden.Errors.MasterView' => 'error.master.php'
+               ));
+               
+               // Go to the dashboard
                Redirect('/settings');
-            // }
+            }
          }
       }
+      $this->Render();
    }
    
    /**
@@ -194,17 +178,15 @@ class GardenSetupController extends DashboardController {
             // Assign some extra settings to the configuration file if everything succeeded.
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
-            $Save = array(
+            SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'),
                'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE,
                'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
-               'Garden.Errors.MasterView' => 'error.master.php', // Now that the application is installed, select a more user friendly error page
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
-            );
-            SaveToConfig($Save);
+            ));
          }
       }
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
@@ -259,6 +241,5 @@ class GardenSetupController extends DashboardController {
       }
       
       Redirect('/settings');
-      
    }
 }

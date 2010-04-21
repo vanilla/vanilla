@@ -8,7 +8,7 @@ echo $this->Form->Open();
 <div class="Form">
    <?php echo $this->Form->Errors(); ?>
    <div class="Button">
-      <?php echo Anchor('Try Again', '/dashboard/gardensetup'); ?>
+      <?php echo Anchor('Try Again', '/dashboard/setup'); ?>
    </div>
 </div>
 <?php

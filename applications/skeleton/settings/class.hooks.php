@@ -9,14 +9,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 
-/*
 class SkeletonHooks implements Gdn_IPlugin {
    public function Controller_Event_Handler($Sender) {
       // Do something
    }
    
    public function Setup() {
-      // No need for anything here...
+      // Got Setup?
    }
 }
-*/

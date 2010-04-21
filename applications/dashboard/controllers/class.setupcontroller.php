@@ -40,15 +40,9 @@ class SetupController extends DashboardController {
          $this->View = 'configure';
          $ApplicationManager = new Gdn_ApplicationManager();
          $AvailableApplications = $ApplicationManager->AvailableApplications();
-         $TotalSteps = count($AvailableApplications) + 2;
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Make sure to reload the values that were just saved to the config file
-            // $Config = Gdn::Factory(Gdn::AliasConfig);
-            // $Config->Load(PATH_CONF.DS.'config.php', 'Use');
-            // unset($Config);
-
             // Step through the available applications, enabling each of them
             $AppNames = array_keys($AvailableApplications);
             try {

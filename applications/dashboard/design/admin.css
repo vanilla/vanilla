@@ -163,10 +163,13 @@ select.Day,
 select.Year {
    margin-left: 4px;
 }
-.Button {
+a.SmallButton,
+a.Button,
+input.Button {
    cursor: pointer;
    margin: 0;
-   font-size: 11px;
+   font-weight: bold;
+	font-size: 16px;
    padding: 4px;
    background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
@@ -178,20 +181,22 @@ select.Year {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
 }
-.FilterMenu a.Button {
-   font-weight: bold;
-	font-size: 13px;	
+a.Button {
+	padding: 5px 7px;
 }
-input.Button {
-   font-weight: bold;
-	font-size: 16px;
+a.SmallButton {
+	padding: 4px;
+	font-size: 12px;
 }
-.FilterMenu a.Button:hover,
-.Button:hover {
+a.SmallButton:hover,
+a.Button:hover,
+input.Button:hover {
    color: #111;
    border: 1px solid #666;
 }
-.Button:focus {
+a.SmallButton:focus,
+a.Button:focus,
+input.Button:focus {
    background: #eee;
 }
 .Loading {

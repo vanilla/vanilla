@@ -88,13 +88,14 @@ if (!function_exists('ArrayCombine')) {
          return $Array1;
    }
 }
-
+/*
+ We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {
    function array_fill_keys($Keys, $Val) {
       return array_combine($Keys,array_fill(0,count($Keys),$Val));
    }
 }
-
+*/
 if (!function_exists('ArrayHasValue')) {
    /**
     * Searches $Array (and all arrays it contains) for $Value.
@@ -402,6 +403,8 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    }
 }
 
+/*
+ We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('filter_input')) {
    if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
    if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
@@ -423,6 +426,7 @@ if (!function_exists('filter_input')) {
       return $Value;     
    }
 }
+*/
 
 if (!function_exists('ForceBool')) {
    function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
@@ -440,8 +444,9 @@ if (!function_exists('ForceBool')) {
 
 if (!function_exists('getallheaders')) {
    /**
-    * Needed this to fix a bug:
-    * http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
+    * If PHP isn't running as an apache module, getallheaders doesn't exist in
+    * some systems.
+    * Ref: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
     */
    function getallheaders() {
       foreach($_SERVER as $name => $value)
@@ -561,30 +566,6 @@ if (!function_exists('IsTimestamp')) {
    }
 }
 
-if (!function_exists('json_encode')) {
-   require_once PATH_LIBRARY . DS . 'vendors' . DS . 'JSON' . DS . 'JSON.php';
-   
-   function json_decode($arg, $assoc = FALSE) {
-      global $services_json;
-      if (!isset($services_json)) {
-         $services_json = new Services_JSON();
-      }
-      $obj = $services_json->decode($arg);
-      if ($assoc)
-         return Gdn_Format::ObjectAsArray($obj);
-      else
-         return $obj;
-   }
-   
-   function json_encode($arg) {
-      global $services_json;
-      if (!isset($services_json)) {
-         $services_json = new Services_JSON();
-      }
-      return $services_json->encode($arg);
-   }
-}
-
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.
@@ -619,6 +600,10 @@ if (!function_exists('Now')) {
 }
 
 if (!function_exists('parse_ini_string')) {
+   /**
+    * parse_ini_string not supported until PHP 5.3.0, and we currently support
+    * PHP 5.2.0.
+    */
    function parse_ini_string ($Ini) {
       $Lines = split("\n", $Ini);
       $Result = array();

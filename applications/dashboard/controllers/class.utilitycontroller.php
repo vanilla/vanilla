@@ -79,42 +79,57 @@ class UtilityController extends DashboardController {
          $this->Render();
    }
    
-   public function Structure($AppName = 'dashboard', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
+   public function Structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
       $this->Permission('Garden.AdminUser.Only');
-      $File = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
-      if (file_exists($File)) {
-         $Validation = new Gdn_Validation();
-         $Database = Gdn::Database();
-         $Drop = $Drop == '0' ? FALSE : TRUE;
-         $Explicit = $Explicit == '0' ? FALSE : TRUE;
-			$CaptureOnly = !($CaptureOnly == '0');
-			
-			$Structure = Gdn::Structure();
-			$Structure->CaptureOnly = $CaptureOnly;
-			
-			$this->SetData('CaptureOnly', $Structure->CaptureOnly);
-			$this->SetData('Drop', $Drop);
-			$this->SetData('Explicit', $Explicit);
-			$this->SetData('ApplicationName', $AppName);
-			$this->SetData('Status', '');
-				
-			try {
-			   include($File);
-         } catch (Exception $ex) {
-            $this->Form->AddError(strip_tags($ex->getMessage()));
-         }
-			
-			if(property_exists($Structure, 'CapturedSql'))
-				$this->SetData('CapturedSql', (array)$Structure->CapturedSql);
-			else
-				$this->SetData('CapturedSql', array());
-					
-         if ($this->Form->ErrorCount() == 0 && !$CaptureOnly)
-            $this->SetData('Status', 'The structure was successfully executed.');
+      $Files = array();
+      $AppName = $AppName == '' ? 'all': $AppName;
+      if ($AppName == 'all') {
+			// Load all application structure files.
+			$ApplicationManager = new Gdn_ApplicationManager();
+			$Apps = $ApplicationManager->EnabledApplications();
+			$AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+			foreach ($AppNames as $AppName) {
+				$Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
+			}
+			$AppName = 'all';
+      } else {
+			 // Load that specific application structure file.
+         $Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
       }
-      //$this->ControllerName = 'home';
-      //$this->View = 'filenotfound';
-		$this->AddCssFile('admin.css');
+      $Validation = new Gdn_Validation();
+      $Database = Gdn::Database();
+      $Drop = $Drop == '0' ? FALSE : TRUE;
+      $Explicit = $Explicit == '0' ? FALSE : TRUE;
+      $CaptureOnly = !($CaptureOnly == '0');
+      $Structure = Gdn::Structure();
+      $Structure->CaptureOnly = $CaptureOnly;
+      $this->SetData('CaptureOnly', $Structure->CaptureOnly);
+      $this->SetData('Drop', $Drop);
+      $this->SetData('Explicit', $Explicit);
+      $this->SetData('ApplicationName', $AppName);
+      $this->SetData('Status', '');
+      $FoundStructureFile = FALSE;
+      foreach ($Files as $File) {
+         if (file_exists($File)) {
+			   $FoundStructureFile = TRUE;
+			   try {
+			      include($File);
+			   } catch (Exception $ex) {
+			      $this->Form->AddError(strip_tags($ex->getMessage()));
+			   }
+			}
+			if (property_exists($Structure, 'CapturedSql'))
+			   $this->SetData('CapturedSql', (array)$Structure->CapturedSql);
+			else
+			   $this->SetData('CapturedSql', array());
+      }
+      if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
+         $this->SetData('Status', 'The structure was successfully executed.');
+      elseif ($CaptureOnly && $FoundStructureFile)
+			$this->SetData('Status', 'The following structure changes are required for your database.');
+
+		$this->AddSideMenu('dashboard/settings/configure');
+      $this->AddCssFile('admin.css');
       $this->Render();
    }
    

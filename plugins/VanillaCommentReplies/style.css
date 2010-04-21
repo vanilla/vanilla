@@ -6,7 +6,7 @@ li.Reply a.DeleteReply {
    font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
    font-size: 10px;
    font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('../../applications/dashboard/design/images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;

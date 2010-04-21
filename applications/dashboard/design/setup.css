@@ -202,7 +202,7 @@ input.Button {
 	text-shadow: 0 1px 0 #fff;
    margin: 0;
    padding: 3px 10px;
-   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #999;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;

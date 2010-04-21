@@ -1,27 +1,32 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1>Database Structure</h1>
+<h1>Database Structure Upgrades</h1>
+<div class="Info"><?php echo T($this->Data['Status']); ?></div>
 <?php
-if($this->Data['Status']) {
-	echo '<div class="Info">', $this->Data['Status'], '</div>';
-}
 
 if(array_key_exists('CapturedSql', $this->Data)) {
 	$CapturedSql = (array)$this->Data['CapturedSql'];
+	$Url = 'dashboard/utility/structure/'.$this->Data['ApplicationName'].'/0/'.(int)$this->Data['Drop'].'/'.(int)$this->Data['Explicit'];
 	
 	if(count($CapturedSql) > 0) {
-		echo '<div class="Info"><pre>', "\n";
-	
-		foreach($this->Data['CapturedSql'] as $Sql) {
-			echo $Sql, "\n\n";
-		}
-	
-		echo '</pre></div>';
-		$Url = Url('dashboard/utility/structure/'.$this->Data['ApplicationName'].'/0/'.(int)$this->Data['Drop'].'/'.(int)$this->Data['Explicit']);
-		echo "<a href='$Url'>Click here to make this change.</a>";
-	} elseif($this->Data['CaptureOnly']) {
-		echo '<div class="Info">The database structure does not have to be updated.</div>';
-		$Url = Url('dashboard/utility/structure/'.$this->Data['ApplicationName'].'/0/'.(int)$this->Data['Drop'].'/'.(int)$this->Data['Explicit']);
-		echo "<a href='$Url'>Run the structure script anyway.</a>";
+	?>
+		<table class="AltRows">
+			<tbody>
+				<?php
+				$Alt = TRUE;
+				foreach($this->Data['CapturedSql'] as $Sql) {
+					$Alt = $Alt == TRUE ? FALSE : TRUE;
+				?>
+				<tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
+					<td><pre><?php echo $Sql; ?></pre></td>
+				</tr>
+				<?php } ?>
+			</tbody>
+		</table>
+		<?php
+	} else if($this->Data['CaptureOnly']) {
+		?>
+		<div class="Info"><?php echo T('There are no database structure changes required. There may, however, be data changes.'); ?></div>
+		<?php
 	}
+	echo Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;'));
 }
-?>

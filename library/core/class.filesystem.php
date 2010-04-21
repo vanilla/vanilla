@@ -262,6 +262,16 @@ class Gdn_FileSystem {
     * @param string $FileContents The contents of the file being saved.
     */
    public static function SaveFile($FileName, $FileContents) {
+   
+      // Check that the folder exists and is writable
+      $DirName = dirname($FileName);
+      $FileBaseName = basename($FileName);
+      if (!is_dir($DirName))
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.',$FileBaseName,$DirName));
+         
+      if (!is_writable($DirName))
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
+         
       file_put_contents($FileName, $FileContents);
       return TRUE;
    }

@@ -21,11 +21,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
@@ -83,16 +78,14 @@ class Gdn_Locale extends Gdn_Pluggable {
     *  automatically force a remapping.
     */
    public function Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
-      $LocaleMappings = PATH_CACHE . DS . 'locale_mappings.php';
       $SafeLocaleName = preg_replace('/([^\w\d_-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
       $LocaleSources = array();
       
       if(!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
       if(!is_array($PluginWhiteList)) $PluginWhiteList = array();
 
-      if ($ForceRemapping === FALSE && file_exists($LocaleMappings)) {
-         include ($LocaleMappings);
-      } else {
+      Gdn_FileCache::PrepareCache('locale', 'locale_mappings.php');
+      if ($ForceRemapping === TRUE || !Gdn_FileCache::CacheReady('locale')) {
          $LocaleSources = array();
          // Get application-based locale definition files
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
@@ -106,17 +99,16 @@ class Gdn_Locale extends Gdn_Pluggable {
             
          // Save the mappings
          $FileContents = array();
-         $FileContents[] = "<?php if (!defined('APPLICATION')) exit();";
          $Count = count($LocaleSources);
          for($i = 0; $i < $Count; ++$i) {
-            $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . Format::ArrayValueForPhp($LocaleSources[$i]) . "';";
+            $FileContents[$SafeLocaleName][] = Format::ArrayValueForPhp($LocaleSources[$i]);
          }
          // Add the config locale if it exists
          $ConfigLocale = PATH_CONF . DS . 'locale.php';
          if (file_exists($ConfigLocale))
-            $FileContents[] = "\$LocaleSources['" . $SafeLocaleName . "'][] = '" . $ConfigLocale . "';";
-            
-         Gdn_FileSystem::SaveFile($LocaleMappings, implode("\n", $FileContents));
+            $FileContents[$SafeLocaleName][] = $ConfigLocale;
+         
+         Gdn_FileCache::Import('locale', $FileContents);
       }
 
       // Set up defaults

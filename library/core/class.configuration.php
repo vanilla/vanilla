@@ -390,7 +390,7 @@ class Gdn_Configuration {
       //Gdn_FileSystem::SaveFile($File, $FileContents);
       
       // Call the built in method to remove the dependancy to an external object.
-      file_put_contents($File, $FileContents);
+      //file_put_contents($File, $FileContents);
 
       // Clear out the save data array
       $this->_SaveData = array();

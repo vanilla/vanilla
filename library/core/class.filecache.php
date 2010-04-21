@@ -125,7 +125,6 @@ class Gdn_FileCache {
       if (!array_key_exists($CacheName,self::$_Caches)) 
          return FALSE;
       
-      echo "Caching {$CacheName}/{$CacheKey} = {$CacheContents}\n";
       // Set and save cache data to memory and disk
       self::$_Caches[$CacheName]['cache'][$CacheKey] = $CacheContents;
       if ($CacheWrite === TRUE)
@@ -184,9 +183,6 @@ class Gdn_FileCache {
          return FALSE;
       
       $FileName = self::$_Caches[$CacheName]['ondisk'];
-      
-      echo "Saving cache for {$CacheName}\n";
-      print_r(self::$_Caches[$CacheName]['cache']);
       
       $CacheContents = "<?php if (!defined('APPLICATION')) exit();\n".
                         "Gdn_FileCache::PrepareCache('{$CacheName}',";

@@ -463,7 +463,7 @@ class SettingsController extends DashboardController {
       $this->Title(T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
-      $this->AddSideMenu('garden/settings/themes');
+      $this->AddSideMenu('dashboard/settings/themes');
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();

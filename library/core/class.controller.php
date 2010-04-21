@@ -32,7 +32,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    /**
     * The name of the application folder that this controller can be found in
-    * (ie. vanilla, garden, etc).
+    * (ie. vanilla, dashboard, etc).
     *
     * @var string
     */

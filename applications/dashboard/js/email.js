@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
    
    // Hide/reveal the smtp options when the UseSmtp checkbox is un/checked.
-   $('#Form_Dashboard-dot-Email-dot-UseSmtp').click(function() {
+   $('#Form_Garden-dot-Email-dot-UseSmtp').click(function() {
       if ($(this).attr('checked')) {
          $('#SmtpOptions').slideDown('fast');
       } else {
@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
       }
    });
    // Hide onload if unchecked   
-   if ($('#Form_Dashboard-dot-Email-dot-UseSmtp').attr('checked')) {
+   if ($('#Form_Garden-dot-Email-dot-UseSmtp').attr('checked')) {
       $('#SmtpOptions').show();
    } else {
       $('#SmtpOptions').hide();

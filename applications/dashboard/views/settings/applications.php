@@ -29,6 +29,7 @@ if ($AddonUrl != '')
    );
    ?>
 </div>
+<?php echo $this->Form->Errors(); ?>
 <table class="AltRows">
    <thead>
       <tr>

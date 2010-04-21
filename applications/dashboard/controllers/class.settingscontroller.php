@@ -76,10 +76,15 @@ class SettingsController extends DashboardController {
                $this->Form->AddError(strip_tags($e->getMessage()));
             }
             if ($this->Form->ErrorCount() == 0) {
-               $Validation = new Gdn_Validation();
-               $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
-               $ApplicationManager->EnableApplication($ApplicationName, $Validation);
-               $this->Form->SetValidationResults($Validation->Results());
+               $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Application/'.$ApplicationName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
+               if ($Test != 'Success') {
+                  $this->Form->AddError(sprintf(T('The application could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
+               } else {
+                  $Validation = new Gdn_Validation();
+                  $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
+                  $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+                  $this->Form->SetValidationResults($Validation->Results());
+               }
             }
             
          }
@@ -327,7 +332,6 @@ class SettingsController extends DashboardController {
             } else {
                // Check to see if there are any fatal errors when the plugin is included:
                $Session = Gdn::Session();
-               
                $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Plugin/'.$PluginName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
                if ($Test != 'Success') {
                   $this->Form->AddError(sprintf(T('The plugin could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
@@ -446,7 +450,6 @@ class SettingsController extends DashboardController {
       $AddonManager = Gdn::Factory($AddonManagerName);
       if ($AddonName != '') {
          $Validation = new Gdn_Validation();
-         
          $AddonManager->$TestMethod($AddonName, $Validation);
       }
 

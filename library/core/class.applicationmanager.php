@@ -171,7 +171,7 @@ class Gdn_ApplicationManager {
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
       if (!class_exists($Hooks)) {
-         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'class.'.$ApplicationName.'.php';
+         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'class.hooks.php';
          if (file_exists($HooksFile))
             include($HooksFile);
       }

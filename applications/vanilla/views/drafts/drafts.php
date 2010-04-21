@@ -11,7 +11,7 @@ foreach ($this->DraftData->Result() as $Draft) {
       <div class="ItemContent">
          <?php echo Anchor($Draft->Name, $EditUrl, 'Title DraftLink'); ?>
          <div class="Excerpt"><?php
-            echo Anchor(SliceString(Format::Text($Draft->Body), 200), $EditUrl);
+            echo Anchor(SliceString(Gdn_Format::Text($Draft->Body), 200), $EditUrl);
          ?></div>
       </div>
    </li>

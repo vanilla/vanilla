@@ -36,11 +36,11 @@ class GettingStartedPlugin implements Gdn_IPlugin {
 
       // Add messages & their css on dashboard
       if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-         $Sender->AddCssFile(DS.'plugins'.DS.'GettingStarted'.DS.'style.css');
+         $Sender->AddCssFile('plugins/GettingStarted/style.css');
          
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStarted">'
-            .Anchor('×', '/garden/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
+            .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
    ."<p>Here's how to get started:</p>"
    .'<ul>
       <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Define how users register for your forum'), '/settings/registration').'</li>

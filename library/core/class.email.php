@@ -229,8 +229,8 @@ class Gdn_Email extends Gdn_Pluggable {
          return $this;
          
       } elseif ($RecipientEmail instanceof stdClass) {
-         $RecipientName = ObjectValue('Name', $RecipientEmail);
-         $RecipientEmail = ObjectValue('Email', $RecipientEmail);
+         $RecipientName = GetValue('Name', $RecipientEmail);
+         $RecipientEmail = GetValue('Email', $RecipientEmail);
          return $this->To($RecipientEmail, $RecipientName);
       
       } elseif ($RecipientEmail instanceof Gdn_DataSet) {

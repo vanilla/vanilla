@@ -84,7 +84,7 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplications() {
       if (!is_array($this->_EnabledApplications)) {
-         $EnabledApplications = Gdn::Config('EnabledApplications', array('Garden' => 'garden'));
+         $EnabledApplications = Gdn::Config('EnabledApplications', array('Dashboard' => 'dashboard'));
          // Add some information about the applications to the array.
          foreach($EnabledApplications as $Name => $Folder) {
             $EnabledApplications[$Name] = array('Folder' => $Folder);
@@ -125,7 +125,7 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplicationFolders() {
       $EnabledApplications = Gdn::Config('EnabledApplications', array());
-      $EnabledApplications['Garden'] = 'garden';
+      $EnabledApplications['Dashboard'] = 'dashboard';
       return array_values($EnabledApplications);
    }
 
@@ -150,19 +150,35 @@ class Gdn_ApplicationManager {
     * @todo Document EnableApplication() method.
     */
    public function EnableApplication($ApplicationName, $Validation) {
+      $this->TestApplication($ApplicationName, $Validation);
+      $ApplicationFolder = ArrayValue('Folder', ArrayValue($ApplicationName, $this->AvailableApplications(), array()), '');
+      SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
+      return TRUE;
+   }
+
+   public function TestApplication($ApplicationName, &$Validation) {
       // Add the application to the $EnabledApplications array in conf/applications.php
       $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
-      if ($ApplicationFolder == '') {
+      if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-      } else {
-         SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
-      }
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $PluginManager = Gdn::Factory('PluginManager');
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+      
+      // Call the application's setup method
+      $Hooks = $ApplicationName.'Hooks';
+      if (!class_exists($Hooks)) {
+         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'class.hooks.php';
+         if (file_exists($HooksFile))
+            include($HooksFile);
+      }
+      if (class_exists($Hooks)) {
+         $Hooks = new $Hooks();
+         $Hooks->Setup();
+      }
 
       return TRUE;
    }
@@ -210,71 +226,5 @@ class Gdn_ApplicationManager {
          $PermissionModel = Gdn::PermissionModel();
          $PermissionModel->Define($PermissionName);
       }
-   }
-
-   /**
-    * Call the applications setup method.
-    *
-    * @param string $ApplicationName Undocumented variable.
-    * @param string $SenderController Undocumented variable.
-    * @todo Document ApplicationSetup() method.
-    */
-   public function ApplicationSetup($ApplicationName, $SenderController, $Validation, $ForceReturn = FALSE) {
-      $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
-      $SetupController = ArrayValue('SetupController', $ApplicationInfo);
-      $AppFolder = ArrayValue('Folder', $ApplicationInfo, strtolower($ApplicationName));
-      if (!$SetupController)
-         return TRUE;
-
-      include(CombinePaths(array(PATH_APPLICATIONS, $AppFolder, 'controllers', $SetupController.'.php')));
-      $SetupControllerName = $SetupController.'Controller';
-      $SetupController = new $SetupControllerName();
-      $SetupController->GetImports();
-      $SetupController->ApplicationFolder = $AppFolder;
-      $SetupController->View = 'index';
-      $DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
-      $SetupFormPosted = $SetupController->Form->GetValue('Posted') == '1' ? TRUE : FALSE;
-      $SetupController->Form->AddHidden('Posted', '1');
-      // if (!$SetupFormPosted || !$SetupController->Index()) {
-      if (!$SetupController->Index()) {
-         if ($ForceReturn === TRUE) {
-            return FALSE;
-         } else {
-            $View = $SetupController->FetchView();
-   
-            if ($DeliveryType === DELIVERY_TYPE_ALL) {
-               $SenderController->AddAsset('Content', $View);
-               $SenderController->RenderMaster();
-            } else {
-               if ($SetupController->Form->AuthenticatedPostBack()) {
-                  // If the form has been posted back, send json
-                  $SetupController->SetJson('FormSaved', $SetupController->Form->ErrorCount() > 0 ? FALSE : TRUE);
-                  $SetupController->SetJson('Data', $View);
-                  $SetupController->SetJson('StatusMessage', $SetupController->StatusMessage);
-                  $SetupController->SetJson('RedirectUrl', $SetupController->RedirectUrl);
-                  $Database = Gdn::Database();
-                  $Database->CloseConnection();
-                  exit(json_encode($SetupController->GetJson()));
-               } else {
-                  exit($View);
-               }
-            }
-         }
-         return FALSE;
-      } else {
-         $this->EnableApplication($ApplicationName, $Validation);
-         return TRUE;
-      }
-   }
-
-   /**
-    * Undocumented method.
-    *
-    * @param string $ApplicationName Undocumented variable.
-    * @todo Document ApplicationHasSetup() method.
-    */
-   public function ApplicationHasSetup($ApplicationName) {
-      $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());
-      return ArrayValue('SetupController', $ApplicationInfo) === FALSE ? FALSE : TRUE;
    }
 }

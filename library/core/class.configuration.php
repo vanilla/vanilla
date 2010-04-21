@@ -132,7 +132,7 @@ class Gdn_Configuration {
       }
       
       if(is_string($Value))
-         $Result = Format::Unserialize($Value);
+         $Result = Gdn_Format::Unserialize($Value);
       else
          $Result = $Value;
          
@@ -168,8 +168,8 @@ class Gdn_Configuration {
          if($i == $KeyCount - 1) {   
             // If we are on the last iteration of the key, then set the value.
             if($KeyExists === FALSE || $Overwrite === TRUE) {
-               $Array[$Key] = Format::Serialize($Value);
-               $SaveArray[$Key] = Format::Serialize($Value);
+               $Array[$Key] = Gdn_Format::Serialize($Value);
+               $SaveArray[$Key] = Gdn_Format::Serialize($Value);
             }
          } else {
             // Otherwise, traverse the array
@@ -376,7 +376,7 @@ class Gdn_Configuration {
          $Session = Gdn::Session();
          $User = $Session->UserID > 0 && is_object($Session->User) ? $Session->User->Name : 'Unknown';
          $NewLines[] = '';
-         $NewLines[] = '// Last edited by '.$User.' '.Format::ToDateTime();
+         $NewLines[] = '// Last edited by '.$User.' '.Gdn_Format::ToDateTime();
       }
 
       $FileContents = FALSE;
@@ -421,7 +421,7 @@ class Gdn_Configuration {
             }
          } else {
             // If $Value is not an associative array, just write it like a simple array definition.
-            $FormattedValue = array_map(array('Format', 'ArrayValueForPhp'), $Value);
+            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
             $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
          }
       } else if (is_bool($Value)) {
@@ -430,9 +430,9 @@ class Gdn_Configuration {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
          if (strpos($Value, "'") !== FALSE) {
-            $Array[] = $Prefix .= ' = "'.Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
+            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
          } else {
-            $Array[] = $Prefix .= " = '".Format::ArrayValueForPhp($Value)."';";
+            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
          }
       }
    }

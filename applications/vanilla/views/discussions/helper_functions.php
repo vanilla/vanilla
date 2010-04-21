@@ -6,7 +6,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
-   $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
+   $CountUnreadComments = $Discussion->CountUnreadComments;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Last = UserBuilder($Discussion, 'Last');
@@ -14,18 +14,21 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 <li class="<?php echo $CssClass; ?>">
    <?php WriteOptions($Discussion, $Sender, $Session); ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php if ($Discussion->Announce == '1') { ?>
          <span class="Announcement"><?php echo T('Announcement'); ?></span>
+         <?php } ?>
+         <?php if ($Discussion->Closed == '1') { ?>
+         <span class="Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
          <span><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
             if ($CountUnreadComments > 0 && $Session->IsValid())
                echo '<strong>',sprintf(T('%s new'), $CountUnreadComments),'</strong>';
          ?>
-         <span><?php printf(T('Most recent by %1$s %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate)); ?></span>
+         <span><?php printf(T('Most recent by %1$s %2$s'), UserAnchor($Last), Gdn_Format::Date($Discussion->LastDate)); ?></span>
          <span><?php echo Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'); ?></span>
          <?php $Sender->FireEvent('DiscussionMeta'); ?>
       </div>
@@ -96,7 +99,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
          '<span class="Star">'
-            .Img('applications/garden/design/images/pixel.png', array('alt' => $Title))
+            .Img('applications/dashboard/design/images/pixel.png', array('alt' => $Title))
          .'</span>',
          '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),

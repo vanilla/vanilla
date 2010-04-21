@@ -8,7 +8,7 @@
  * Renders user drafts. If rendered within a discussion, it only shows drafts
  * related to that discussion.
  */
-class DraftsModule extends Module {
+class DraftsModule extends Gdn_Module {
    
    protected $_DraftData;
    public $Form;
@@ -21,7 +21,7 @@ class DraftsModule extends Module {
    public function GetData($Limit = 20, $DiscussionID = '') {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
-         $DraftModel = new Gdn_DraftModel();
+         $DraftModel = new DraftModel();
          $this->_DraftData = $DraftModel->Get($Session->UserID, 0, $Limit, $DiscussionID);
       }
       $this->Form = $this->_Sender->Form;

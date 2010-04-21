@@ -19,11 +19,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
-class PagerFactory {
+class Gdn_PagerFactory {
 
    public function GetPager($PagerType, $Sender) {
-      if (substr($PagerType, -6) != 'Module')
-         $PagerType .= 'Module';
+      $PagerType = $PagerType.'Module';
          
       if (!class_exists($PagerType))
          __autoload($PagerType);

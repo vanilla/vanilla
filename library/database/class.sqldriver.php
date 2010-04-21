@@ -984,9 +984,9 @@ abstract class Gdn_SQLDriver {
    public function History($UpdateFields = TRUE, $InsertFields = FALSE) {
       $UserID = Gdn::Session()->UserID;
       if($InsertFields)
-         $this->Set('DateInserted', Format::ToDateTime())->Set('InsertUserID', $UserID);
+         $this->Set('DateInserted', Gdn_Format::ToDateTime())->Set('InsertUserID', $UserID);
       if($UpdateFields)
-         $this->Set('DateUpdated', Format::ToDateTime())->Set('UpdateUserID', $UserID);
+         $this->Set('DateUpdated', Gdn_Format::ToDateTime())->Set('UpdateUserID', $UserID);
       return $this;
    }
 
@@ -1632,7 +1632,7 @@ abstract class Gdn_SQLDriver {
     * existing one.
     */
    public function Set($Field, $Value = '', $EscapeString = TRUE, $CreateNewNamedParameter = TRUE) {
-      $Field = Format::ObjectAsArray($Field);
+      $Field = Gdn_Format::ObjectAsArray($Field);
 
       if (!is_array($Field))
          $Field = array($Field => $Value);
@@ -1736,7 +1736,7 @@ abstract class Gdn_SQLDriver {
     */
    public function Version() {
       $Query = $this->Query($this->FetchVersionSql());
-      return $Query->Row('version');
+      return $Query->Value('version');
    }
    
    /**

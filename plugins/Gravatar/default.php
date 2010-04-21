@@ -14,36 +14,36 @@ class GravatarPlugin implements Gdn_IPlugin {
    
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.
-   public function Gdn_AddonCommentModel_BeforeGet_Handler(&$Sender) {
+   public function AddonCommentModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
-   public function Gdn_ConversationModel_BeforeGet_Handler(&$Sender) {
+   public function ConversationModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail');
    }
-   public function Gdn_ConversationMessageModel_BeforeGet_Handler(&$Sender) {
+   public function ConversationMessageModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
-   public function Gdn_ActivityModel_BeforeGet_Handler(&$Sender) {
+   public function ActivityModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Email', '', 'RegardingEmail');
    }
-	public function Gdn_ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
+	public function ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Email', '', 'RegardingEmail');
 	}
-   public function Gdn_ActivityModel_BeforeGetComments_Handler(&$Sender) {
+   public function ActivityModel_BeforeGetComments_Handler(&$Sender) {
       $Sender->SQL->Select('au.Email', '', 'ActivityEmail');
    }
-   public function Gdn_UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
+   public function UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
       $Sender->SQL->Select('u.Email');
    }
-   public function Gdn_CommentModel_BeforeGet_Handler(&$Sender) {
+   public function CommentModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
 
-   public function Gdn_CommentModel_BeforeGetNew_Handler(&$Sender) {
+   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
 
@@ -69,7 +69,7 @@ if (!function_exists('UserBuilder')) {
       if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = 'http://www.gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))
-            .'&default='.urlencode(Url(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+            .'&default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
             .'&size='.Gdn::Config('Garden.Thumbnail.Width', 40);
       }
 		return $User;

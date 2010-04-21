@@ -37,14 +37,14 @@ class Gdn_Smarty {
       $Smarty->assign('ControllerName', $ControllerName);
       
       // Get an ID for the body.
-      $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Format::AlphaNumeric(strtolower($Controller->RequestMethod)));
+      $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::AlphaNumeric(strtolower($Controller->RequestMethod)));
       $Smarty->assign('BodyIdentifier', $BodyIdentifier);
       $Smarty->assign('Config', Gdn::Config());
       
       // Make sure that any datasets use arrays instead of objects.
       foreach($Controller->Data as $Key => $Value) {
          if($Value instanceof Gdn_DataSet) {
-            $Value->DefaultDatasetType = DATASET_TYPE_ARRAY;
+            $Value->DatasetType(DATASET_TYPE_ARRAY);
          }
       }
       

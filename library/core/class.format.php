@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-class Format {
+class Gdn_Format {
 
    /**
     * The ActivityType table has some special sprintf search/replace values in the
@@ -122,12 +122,12 @@ class Format {
          return $Mixed;
       
       if (is_string($Mixed)) {
-         if (method_exists('Format', $FormatMethod)) {
+         if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } else if (function_exists($FormatMethod)) {
             $Mixed = $FormatMethod($Mixed);
          } else {
-            $Mixed = Format::Text($Mixed);
+            $Mixed = Gdn_Format::Text($Mixed);
          }
       } else if (is_array($Mixed)) {
          foreach($Mixed as $Key => $Val) {
@@ -408,37 +408,42 @@ class Format {
 
 
    /**
-    * Takes any variable and serializes it in Json format.
+    * Takes any variable and serializes it.
     *
-    * @param mixed $Mixed An object, array, or string to be formatted.
-    * @return string
+    * @param mixed $Mixed An object, array, or string to be serialized.
+    * @return string The serialized version of the string.
     */
    public static function Serialize($Mixed) {
-      if (is_object($Mixed))
-         return 'obj:' . json_encode($Mixed);
-      else if (is_array($Mixed))
-         return 'arr:' . json_encode($Mixed);
-      else
-         return $Mixed;
+		if(is_array($Mixed) || is_object($Mixed)
+			|| (is_string($Mixed) && (substr_compare('a:', $Mixed, 0, 2) === 0 || substr_compare('O:', $Mixed, 0, 2) === 0
+				|| substr_compare('arr:', $Mixed, 0, 4) === 0 || substr_compare('obj:', $Mixed, 0, 4) === 0))) {
+			$Result = serialize($Mixed);
+		} else {
+			$Result = $Mixed;
+		}
+		return $Result;
    }
 
 
    /**
-    * Takes a Json serialized variable and unserializes it back into it's
+    * Takes a serialized variable and unserializes it back into it's
     * original state.
     *
-    * @param string $SerializedString A JSON string to be unserialized.
+    * @param string $SerializedString A json or php serialized string to be unserialized.
     * @return mixed
     */
    public static function Unserialize($SerializedString) {
-      if (is_string($SerializedString)) {
-         if (strpos($SerializedString, 'obj:') === 0) {
-            return json_decode(substr($SerializedString, 4));
-         } else if (strpos($SerializedString, 'arr:') === 0) {
-            return json_decode(substr($SerializedString, 4), TRUE);
-         }
+		$Result = $SerializedString;
+		
+      if(is_string($SerializedString)) {
+			if(substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0)
+				$Result = unserialize($SerializedString);
+			elseif(substr_compare('obj:', $SerializedString, 0, 4) === 0)
+            $Result = json_decode(substr($SerializedString, 4), FALSE);
+         elseif(substr_compare('arr:', $SerializedString, 0, 4) === 0)
+            $Result = json_decode(substr($SerializedString, 4), TRUE);
       }
-      return $SerializedString;
+      return $Result;
    }
 
 
@@ -467,7 +472,7 @@ class Format {
     * array of $Array[Property] => Value sets.
     *
     * @param array $Array An array to be converted to object.
-    * @return Gdn_ShellClass
+    * @return stdClass
     *
     * @todo could be just "return (object) $Array;"?
     */
@@ -475,7 +480,7 @@ class Format {
       if (!is_array($Array))
          return $Array;
 
-      $Return = new Gdn_ShellClass();
+      $Return = new stdClass();
       foreach($Array as $Property => $Value) {
          $Return->$Property = $Value;
       }
@@ -536,6 +541,13 @@ class Format {
             $Format = T('Date.DefaultFormat', '%B %e, %Y');
          }
       }
+
+      // Emulate %l and %e for Windows
+      if (strpos($Format, '%l') !== false)
+          $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
+      if (strpos($Format, '%e') !== false)
+          $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
+
       return strftime($Format, $Timestamp);
    }
    
@@ -560,13 +572,13 @@ class Format {
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (preg_match('/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/', $DateTime, $Matches)) {
+      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];
-         $Hour = $Matches[4];
-         $Minute = $Matches[5];
-         $Second = $Matches[6];
+         $Hour = ArrayValue(4, $Matches, 0);
+         $Minute = ArrayValue(5, $Matches, 0);
+         $Second = ArrayValue(6, $Matches, 0);
          return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
       } elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $DateTime, $Matches)) {
          $Year = $Matches[1];

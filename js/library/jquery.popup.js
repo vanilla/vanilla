@@ -48,12 +48,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                 data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON' },
                 dataType: 'json',
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                   $.popup({}, definition('TransportError').replace('%s', textStatus));
+                   $.popup({}, XMLHttpRequest.responseText);
                 },
                 success: function(json) {
                   $.popup.close(settings);
                   settings.afterConfirm(json, settings.sender);
-                  inform(json.StatusMessage);
+                  gdn.inform(json.StatusMessage);
                   if (json.RedirectUrl)
                     setTimeout("document.location='" + json.RedirectUrl + "';", 300);
 
@@ -159,10 +159,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         return $.popup.close(settings);
       });
     } else {
-      $('#'+settings.popupId+' .Content h1').text(definition('ConfirmHeading', 'Confirm'));
-      $('#'+settings.popupId+' .Content p').text(definition('ConfirmText', 'Are you sure you want to do that?'));
-      $('#'+settings.popupId+' .Okay').val(definition('Okay', 'Okay'));
-      $('#'+settings.popupId+' .Cancel').val(definition('Cancel', 'Cancel')).click(function() {
+      $('#'+settings.popupId+' .Content h1').text(gdn.definition('ConfirmHeading', 'Confirm'));
+      $('#'+settings.popupId+' .Content p').text(gdn.definition('ConfirmText', 'Are you sure you want to do that?'));
+      $('#'+settings.popupId+' .Okay').val(gdn.definition('Okay', 'Okay'));
+      $('#'+settings.popupId+' .Cancel').val(gdn.definition('Cancel', 'Cancel')).click(function() {
         $.popup.close(settings);
       });
     }
@@ -191,7 +191,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $('#'+settings.popupId+' .Content').append(data);
     } else {
       if (json.StatusMessage)
-         inform(json.StatusMessage);
+         gdn.inform(json.StatusMessage);
 
       formSaved = json['FormSaved'];
       data = json['Data'];
@@ -220,7 +220,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         },  
         success: function(json) {
           if (json.StatusMessage)
-             inform(json.StatusMessage);
+             gdn.inform(json.StatusMessage);
 
           if (json.FormSaved == true) {
 

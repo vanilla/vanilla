@@ -25,7 +25,7 @@ $Construct->Table('Category')
    ->Set($Explicit, $Drop);
 
 if ($Drop)
-   $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'General', 'Description' => 'General discussions', 'Sort' => '1'));
+   $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'Description' => 'General discussions', 'Sort' => '1'));
 
 // Construct the discussion table.
 $Construct->Table('Discussion')
@@ -33,16 +33,18 @@ $Construct->Table('Discussion')
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
-   ->Column('FirstCommentID', 'int', TRUE, 'key')
-   ->Column('LastCommentID', 'int', TRUE, 'key')
+   ->Column('FirstCommentID', 'int', TRUE)
+   ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
    ->Column('CountComments', 'int', '1')
    ->Column('Closed', array('1', '0'), '0')
    ->Column('Announce', array('1', '0'), '0')
    ->Column('Sink', array('1', '0'), '0')
-   ->Column('DateInserted', 'datetime', NULL, 'key')
+   ->Column('DateInserted', 'datetime', NULL)
    ->Column('DateUpdated', 'datetime')
    ->Column('DateLastComment', 'datetime', NULL, 'index')
+	->Column('LastCommentUserID', 'int', TRUE)
+	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
    
@@ -58,19 +60,20 @@ $Construct->Table('UserDiscussion')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')
-   ->PrimaryKey('CommentID')
-   ->Column('DiscussionID', 'int', FALSE, 'key')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('UpdateUserID', 'int', TRUE)
-   ->Column('DeleteUserID', 'int', TRUE)
-   ->Column('Body', 'text', FALSE, 'fulltext')
-   ->Column('Format', 'varchar(20)', TRUE)
-   ->Column('DateInserted', 'datetime', NULL, 'key')
-   ->Column('DateDeleted', 'datetime', TRUE)
-   ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('Flag', 'tinyint', 0)
-   ->Column('Attributes', 'text', TRUE)
-   ->Set($Explicit, $Drop);
+	->PrimaryKey('CommentID')
+	->Column('DiscussionID', 'int', FALSE, 'key')
+	->Column('InsertUserID', 'int', TRUE, 'key')
+	->Column('UpdateUserID', 'int', TRUE)
+	->Column('DeleteUserID', 'int', TRUE)
+	->Column('Body', 'text', FALSE, 'fulltext')
+	->Column('Format', 'varchar(20)', TRUE)
+	->Column('DateInserted', 'datetime', NULL, 'key')
+	->Column('DateDeleted', 'datetime', TRUE)
+	->Column('DateUpdated', 'datetime', TRUE)
+	->Column('Flag', 'tinyint', 0)
+	->Column('Score', 'float', NULL)
+	->Column('Attributes', 'text', TRUE)
+	->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments on a per-user basis.
 $Construct->Table('CommentWatch')

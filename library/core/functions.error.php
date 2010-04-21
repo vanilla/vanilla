@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param string The line number the error was raised at.
  * @param string An array of every variable that existed in the scope the error was triggered in.
  */
-function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
+function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that have a @ before them (ie. @function();)
    if (error_reporting() == 0)
       return FALSE;
@@ -30,7 +30,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    $SenderMessage = $Message;
    $SenderObject = 'PHP';
-   $SenderMethod = 'ErrorHandler';
+   $SenderMethod = 'Gdn_ErrorHandler';
    $SenderCode = FALSE;
    $MessageInfo = explode('|', $Message);
    $MessageCount = count($MessageInfo);
@@ -97,10 +97,10 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
             }
          }
             
-         // Look for CSS in the garden design folder.
-         $CssPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'design' . DS . $MasterViewCss;
-         // Look for Master View in the garden view folder.
-         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'garden' . DS . 'views' . DS . $MasterViewName;
+         // Look for CSS in the dashboard design folder.
+         $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
+         // Look for Master View in the dashboard view folder.
+         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
          
          $CssPath = FALSE;
          $Count = count($CssPaths);
@@ -137,7 +137,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    
    if ($DeliveryType != DELIVERY_TYPE_ALL) {
       // This is an ajax request, so dump an error that is more eye-friendly in the debugger
-      echo 'FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();\n\"".$SenderMessage."\"\n";
+      echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<div class=\"AjaxError\">\"".$SenderMessage."\"\n";
       if ($SenderCode != '')
          echo htmlentities($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
          
@@ -170,6 +170,7 @@ function ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
             ,"\n";
          }
       }
+      echo '</div>';
    } else {
       // If the master view wasn't found, assume a panic state and dump the error.
       if ($Master === FALSE) {
@@ -286,7 +287,7 @@ if (!function_exists('CleanErrorArguments')) {
                $Var[$Key] = 'SECURITY';
             } else {
                if (is_object($Value)) {
-                  $Value = Format::ObjectAsArray($Value);
+                  $Value = Gdn_Format::ObjectAsArray($Value);
                   $Var[$Key] = $Value;
                }
                   
@@ -299,4 +300,4 @@ if (!function_exists('CleanErrorArguments')) {
 }
 
 // Set up Garden to handle php errors
-set_error_handler('ErrorHandler', E_ALL);
+set_error_handler('Gdn_ErrorHandler', E_ALL);

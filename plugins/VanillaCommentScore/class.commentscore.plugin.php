@@ -18,14 +18,14 @@ $PluginInfo['VanillaCommentScore'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => array('Plugins.Vanilla.CommentScore.Single', 'Plugins.Vanilla.CommentScore.Unlimited'),
-   //'SettingsUrl' => '/garden/plugin/metadata', // Url of the plugin's settings page.
+   //'SettingsUrl' => '/dashboard/plugin/metadata', // Url of the plugin's settings page.
    //'SettingsPermission' => 'Plugins.MetaData.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://toddburry.com'
 );
 
-class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
+class VanillaCommentScorePlugin implements Gdn_IPlugin {
    
    public function DiscussionController_Render_Before($Sender) {
       $Sender->AddCssFile('/plugins/VanillaCommentScore/commentscore.css');
@@ -112,7 +112,7 @@ class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
             $SQL
                ->Update('UserComment')
                ->Set('Score', $UserScore)
-               ->Set('DateUpdated', Format::ToDateTime())
+               ->Set('DateUpdated', Gdn_Format::ToDateTime())
                ->Set('UpdateUserID', $Session->UserID)
                ->Where('UserID', $Session->UserID)
                ->Where('CommentID', $CommentID)
@@ -124,9 +124,9 @@ class Gdn_VanillaCommentScorePlugin implements Gdn_IPlugin {
                'CommentID' => $CommentID,
                'UserID' => $Session->UserID,
                'Score'=> $UserScore,
-               'DateInserted' => Format::ToDateTime(),
+               'DateInserted' => Gdn_Format::ToDateTime(),
                'InsertUserID' => $Session->UserID,
-               'DateUpdated' => Format::ToDateTime(),
+               'DateUpdated' => Gdn_Format::ToDateTime(),
                'UpdateUserID' => $Session->UserID)
                );
          }

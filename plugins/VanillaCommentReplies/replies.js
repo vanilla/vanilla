@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
                }
    
                // Add a link to reveal hidden replies
-               var text = (rowCount > 3) ? definition('Replies').replace('%s', rowCount - 2) : definition('Reply');
+               var text = (rowCount > 3) ? gdn.definition('Replies').replace('%s', rowCount - 2) : gdn.definition('Reply');
                $(children[0]).after('<li class="Reply Reveal"><a href="#">' + text + '</a></li>');
                
                // bind to the click event of the anchor and re-reveal the replies when it is clicked
@@ -98,7 +98,7 @@ jQuery(document).ready(function($) {
          data: postValues,
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
             $('.ReplyForm .Errors').remove();
@@ -107,7 +107,7 @@ jQuery(document).ready(function($) {
                   $(row).prepend(json.StatusMessage);
                }
             } else {
-               definition('LastCommentID', json.CommentID, true);
+               gdn.definition('LastCommentID', json.CommentID, true);
                $(row).before(json.Data);
                $(row).parents('.Comment').find('ul.Info li.ReplyCount a').text(json.Replies);
                textbox.val('').blur();

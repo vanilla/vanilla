@@ -82,12 +82,14 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 
    public function DeAuthenticate() {
       $this->_Identity->SetIdentity(NULL);
+      // Redirect to the external signout url
+      Redirect($this->RemoteSignOutUrl());
    }
    
    public function GetHandshakeData() {
       if(is_array($this->_HandshakeData))
          return $this->_HandshakeData;
-      
+      /*
       $UrlParts = parse_url($this->AuthenticateUrl);
       $Host = $UrlParts['host'];
       $Port = ArrayValue('port', $UrlParts, '80');
@@ -115,19 +117,19 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 
       if(strlen($Cookie) > 0)
          $Cookie = "Cookie: $Cookie\r\n";
-         
+      */
       
-      $Header = "GET $Path?$Query HTTP/1.1\r\n" .
-         "Host: $Host\r\n" .
+      //$Header = "GET $Path?$Query HTTP/1.1\r\n" .
+      //   "Host: $Host\r\n" .
          // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
          // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-         "User-Agent: Vanilla/2.0\r\n" .
-         "Accept: */*\r\n" .
-         "Accept-Charset: utf-8;\r\n" .
-         "Referer: $Referer\r\n" .
-         "Connection: close\r\n" .
-         $Cookie."\r\n\r\n";
-         
+      //   "User-Agent: Vanilla/2.0\r\n" .
+      //   "Accept: */*\r\n" .
+      //   "Accept-Charset: utf-8;\r\n" .
+      //   "Referer: $Referer\r\n" .
+      //   "Connection: close\r\n" .
+      //   $Cookie."\r\n\r\n";
+      /*   
       // Send the necessary headers to get the file
       fputs($Pointer, $Header);
 // echo '<br /><textarea style="height: 400px; width: 700px;">'.$Header.'</textarea>';
@@ -143,7 +145,6 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
 // exit();
 // Remove response headers
       $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
-      
       switch($this->Encoding) {
          case 'json':
             $Result = json_decode($Response, TRUE);
@@ -153,8 +154,16 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
             $Result = parse_ini_string($Response);
             break;
       }
-      $this->_HandshakeData = $Result;
-      return $Result;
+      */
+      
+      // Check for data in the cookie
+      $QuickIn = Gdn_Format::Unserialize(stripslashes(ArrayValue('QuickIn', $_COOKIE)));
+      // Not found? Check in the url
+      if (!is_array($QuickIn))
+         $QuickIn = Gdn_Format::Unserialize(stripslashes(ArrayValue('QuickIn', $_GET)));
+      
+      $this->_HandshakeData = $QuickIn;
+      return is_array($this->_HandshakeData) ? $this->_HandshakeData : array();
    }
 
    public function GetIdentity($ForceHandshake = FALSE) {
@@ -163,19 +172,18 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
          $Id = $this->_Identity->GetIdentity();
          if ($Id > 0)
             return $Id;
-// TODO: add these back in after testing is complete
-//         elseif($Id < 0)
-//            return 0; // prevent session from grabbing constantly
       }
       
       // Get the handshake data to authenticate.
       $Data = $this->GetHandshakeData();
+      // var_dump($Data);
+      // die();
       
       // Fire an event in case people want to do something based on the data returned from the external system.
       $this->EventArguments['HandshakeData'] = $Data;
       $this->FireEvent('AfterGetHandshakeData');
       
-      if(!array_key_exists('UniqueID', $Data)) {
+      if (!array_key_exists('UniqueID', $Data)) {
          // There was some problem getting the userID.
          // The user was probably signed out on the handshake system.
          $this->_Identity->SetIdentity(self::SignedOut, FALSE);
@@ -184,10 +192,14 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
       
       $UserModel = Gdn::UserModel();
       $UserID = $UserModel->Synchronize($Data['UniqueID'], $Data);
-      if($UserID)
+      if ($UserID) {
          $this->_Identity->SetIdentity($UserID, FALSE);
-      else
+         // Wipe the QuickIn cookie
+         setcookie('QuickIn', ' ', time() - 3600, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
+         unset($_COOKIE['QuickIn']);
+      } else {
          $this->_Identity->SetIdentity(self::HandshakeError, FALSE);
+      }
       
       return $UserID;
    }
@@ -198,7 +210,13 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
    }
    
    public function RemoteSignInUrl($Redirect = '/') {
-      $Url = sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
+      return sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
+   }
+
+   public function RemoteSignOutUrl() {
+      $Session = Gdn::Session();
+      $Url = sprintf($this->_SignOutUrl, urlencode(Gdn_Url::Request()));
+      $Url = str_replace('{Session_TransientKey}', $Session->TransientKey(), $Url);
       return $Url;
    }
    
@@ -211,15 +229,13 @@ class Gdn_HandshakeAuthenticator extends Gdn_Pluggable implements Gdn_IAuthentic
    }
    
    public function SignInUrl($Redirect = '/') {
-      return '/entry/handshake/?Target='.urlencode($Redirect);
-      // return sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
+      // return '/entry/handshake/?Target='.urlencode($Redirect);
+      return sprintf($this->_SignInUrl, urlencode(Url($Redirect, TRUE)));
    }
    
    public function SignOutUrl() {
       $Session = Gdn::Session();
-      $Url = sprintf($this->_SignOutUrl, urlencode(Gdn_Url::Request()));
-      $Url = str_replace('{Session_TransientKey}', $Session->TransientKey(), $Url);
-      return $Url;
+      return '/entry/leave/'.$Session->TransientKey();
    }
    
    public function State() {

@@ -109,7 +109,7 @@ class Gdn_Form {
          $EndYear = date('Y');
       }
 
-      $Months = array_map('Translate',
+      $Months = array_map('T',
          explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec'));
 
       $Days = array();
@@ -1076,7 +1076,7 @@ class Gdn_Form {
       $ID = $FieldName;
       if (substr($ID, -2) == '[]') $ID = substr($ID, 0, -2);
 
-      $ID = $this->IDPrefix . Format::AlphaNumeric(str_replace('.', '-dot-', $ID));
+      $ID = $this->IDPrefix . Gdn_Format::AlphaNumeric(str_replace('.', '-dot-', $ID));
       $tmp = $ID;
       $i = 1;
       if ($ForceUniqueID === TRUE) {
@@ -1134,10 +1134,8 @@ class Gdn_Form {
       // Only retrieve values from the form collection if this is a postback.
       if ($this->IsPostBack()) {
          $Return = $this->GetFormValue($FieldName, $Default);
-      } else if (is_array($this->_DataArray) && array_key_exists($FieldName, $this->_DataArray)) {
-         $Return = $this->_DataArray[$FieldName];
       } else {
-         $Return = $Default;
+         $Return = ArrayValue($FieldName, $this->_DataArray, $Default);
       }
       return $Return;
    }
@@ -1166,7 +1164,7 @@ class Gdn_Form {
       2009-01-10 - $_GET should not dictate a "post" back.
       return count($_POST) > 0 ? TRUE : FALSE;
       
-      2009-03-31 - switching back to "get" dicating a postback
+      2009-03-31 - switching back to "get" dictating a postback
       */
       $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
       return count($FormCollection) > 0 || (is_array($this->_FormValues) && count($this->_FormValues) > 0) ? TRUE : FALSE;
@@ -1283,7 +1281,7 @@ class Gdn_Form {
                
          } else {
             // Otherwise assume it is an object representation of a data row.
-            $this->_DataArray = Format::ObjectAsArray($Data);
+            $this->_DataArray = Gdn_Format::ObjectAsArray($Data);
          }
       } else if (is_array($Data)) {
          $this->_DataArray = $Data;
@@ -1558,6 +1556,6 @@ class Gdn_Form {
     */
    protected function _ValueAttribute($FieldName, $Attributes) {
       // Value from $Attributes overrides the datasource and the postback.
-      return ' value="' . Format::Form(ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
+      return ' value="' . Gdn_Format::Form(ArrayValueI('value', $Attributes, $this->GetValue($FieldName))) . '"';
    }
 }

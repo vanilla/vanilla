@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            combinePaths(definition('WebRoot', ''), '/utility/setclienthour/'+d.getHours()+'/'+definition('TransientKey')),
+            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -29,9 +29,11 @@ jQuery(document).ready(function($) {
       $('textarea.Autogrow').livequery(function() {
          $(this).autogrow();
       });
+		
+	gdn = { };
 
    // Grab a definition from hidden inputs in the page
-   definition = function(definition, defaultVal, set) {
+   gdn.definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
          
@@ -59,7 +61,7 @@ jQuery(document).ready(function($) {
       
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = combinePaths(definition('WebRoot', ''), '/profile/notifications');
+      document.location = gdn.combinePaths(gdn.definition('UrlRoot', ''), '/profile/notifications');
       return false;
    });
    
@@ -82,7 +84,7 @@ jQuery(document).ready(function($) {
    $('a.Dismiss').live('click', function() {
       var anchor = this;
       var container = $(anchor).parent();
-      var transientKey = definition('TransientKey');
+      var transientKey = gdn.definition('TransientKey');
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
@@ -116,7 +118,7 @@ jQuery(document).ready(function($) {
    });
 
    // If a page loads with a hidden redirect url, go there after a few moments.
-   var RedirectUrl = definition('RedirectUrl', '');
+   var RedirectUrl = gdn.definition('RedirectUrl', '');
    if (RedirectUrl != '')
       setTimeout("document.location = '"+RedirectUrl+"';", 2000);
 
@@ -125,10 +127,10 @@ jQuery(document).ready(function($) {
       $("table.Sortable").tableDnD({onDrop: function(table, row) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
-         var transientKey = definition('TransientKey');
+         var transientKey = gdn.definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
-         var webRoot = definition('WebRoot', '');
-         $.post(combinePaths(webRoot, '/garden/utility/sort/'), data, function(response) {
+         var webRoot = gdn.definition('WebRoot', '');
+         $.post(gdn.combinePaths(webRoot, 'index.php/dashboard/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 
@@ -153,7 +155,7 @@ jQuery(document).ready(function($) {
    }
 
    // Notify the user with a message
-   inform = function(message, wrapInfo) {
+   gdn.inform = function(message, wrapInfo) {
       if(wrapInfo == undefined) {
          wrapInfo = true;
       }
@@ -168,7 +170,7 @@ jQuery(document).ready(function($) {
    }
    
    // Generate a random string of specified length
-   generateString = function(length) {
+   gdn.generateString = function(length) {
       if (length == null)
          length = 5;
          
@@ -183,7 +185,7 @@ jQuery(document).ready(function($) {
    }
    
    // Combine two paths and make sure that there is only a single directory concatenator
-   combinePaths = function(path1, path2) {
+   gdn.combinePaths = function(path1, path2) {
       if (path1.substr(-1, 1) == '/')
          path1 = path1.substr(0, path1.length - 1);
          
@@ -193,7 +195,7 @@ jQuery(document).ready(function($) {
       return path1 + '/' + path2;
    }
 
-   processTargets = function(targets) {
+   gdn.processTargets = function(targets) {
       if(!targets || !targets.length)
          return;
       for(i = 0; i < targets.length; i++) {
@@ -225,15 +227,15 @@ jQuery(document).ready(function($) {
    }
 
    // Fill the search input with "search" if empty and blurred
-   var searchText = definition('Search', 'Search');
+   var searchText = gdn.definition('Search', 'Search');
    $('#Search input.InputBox').val(searchText);
    $('#Search input.InputBox').blur(function() {
-      var searchText = definition('Search', 'Search');
+      var searchText = gdn.definition('Search', 'Search');
       if (typeof $(this).val() == 'undefined' || $(this).val() == '')
          $(this).val(searchText);
    });
    $('#Search input.InputBox').focus(function() {
-      var searchText = definition('Search', 'Search');
+      var searchText = gdn.definition('Search', 'Search');
       if ($(this).val() == searchText)
          $(this).val('');      
    });

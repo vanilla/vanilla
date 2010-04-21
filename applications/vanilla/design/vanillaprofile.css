@@ -1,9 +1,0 @@
-/* Add some custom css to the profile page so discussions appear properly when
-viewed on the profile discussions tab. */
-body.Search h1 {
-   margin:0;
-}
-li.New { background: #ffd /* Discussion New Background Color */; }
-ul.Discussions div.ItemContent {
-   margin:0 0 0 5px;
-}

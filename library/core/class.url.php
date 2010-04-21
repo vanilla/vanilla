@@ -133,8 +133,47 @@ class Gdn_Url {
     */
    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Return = '';
-      // TODO: Test this on various platforms/browsers. Very breakable.
+		
+		// Get the variables from the request required to parse the request.
+		$RequestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI'];
+		
+		$ScriptName = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_ENV['SCRIPT_NAME'];
+		if(PHP_SAPI === 'cgi' && isset($_ENV['SCRIPT_URL']))
+			$ScriptName = $_ENV['SCRIPT_URL'];
+		
+		// Figure out the folder from the script name.
+		$Match = array();
+		if(preg_match('/^(.*?)(\/index.php)?$/i', $ScriptName, $Match))
+			$Folder = $Match[1];
+		else
+			$Folder = '';
+			
+		// Get the parts of the method call from the request uri.
+		$Match = array();
+		if(preg_match('/^'.str_replace('/', '\/', $Folder).'(?:\/index.php)?\/?(.*?)\/?(?:[#?].*)?$/i', $RequestUri, $Match))
+			$Result = $Match[1];
+		else
+			$Result = '';
+			
+		if ($RemoveSyndication) {
+         $Prefix = strtolower(substr($Result, 0, strpos($Result, '/')));
+         if ($Prefix == 'rss')
+            $Result = substr($Result, 4);
+         else if ($Prefix == 'atom')
+            $Result = substr($Result, 5);
+      }
 
+      if ($WithWebRoot) {
+         $WebRoot = Gdn_Url::WebRoot($WithDomain);
+         if (substr($WebRoot, -1, 1) != '/')
+            $WebRoot .= '/';
+
+         $Result = $WebRoot . $Result;
+      }
+		
+		return $Result;
+		
+		/*
       // Try PATH_INFO
       $Request = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : @getenv('PATH_INFO');
       if ($Request) {
@@ -157,7 +196,6 @@ class Gdn_Url {
          if ($PhpSelf && $ScriptName) {
             $Return = substr($PhpSelf, strlen($ScriptName));
          }
-
       }
       
       $Return = trim($Return, '/');
@@ -183,5 +221,6 @@ class Gdn_Url {
       }
 
       return $Return;
+		*/
    }
 }

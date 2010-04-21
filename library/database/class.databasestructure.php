@@ -54,6 +54,14 @@ abstract class Gdn_DatabaseStructure {
     * @var array
     */
    protected $_Columns;
+	
+	/**
+	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
+	 * @return array
+	 */
+	public function Columns() {
+		return $this->_Columns;
+	}
 
    /**
     * The instance of the database singleton.

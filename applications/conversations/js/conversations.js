@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the garden/profile controller.
+// This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
    
    $('a.ClearConversation').popup({
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                $('.Popup').remove();
-               $.popup({}, definition('TransportError').replace('%s', textStatus));
+               $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
                // Remove any old errors from the form
@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
-                  inform(json.StatusMessage);
+                  gdn.inform(json.StatusMessage);
                }
             }
          });
@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
    // Enable multicomplete on selected inputs
    $('.MultiComplete').livequery(function() {
       $(this).autocomplete(
-         combinePaths(definition('WebRoot'), 'index.php/garden/user/autocomplete/'),
+         gdn.combinePaths(gdn.definition('WebRoot'), 'index.php/dashboard/user/autocomplete/'),
          {
             minChars: 1,
             multiple: true,
@@ -112,10 +112,10 @@ jQuery(document).ready(function($) {
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('span.Progress').remove();
             $(btn).show();
-            $.popup({}, definition('TransportError').replace('%s', textStatus));
+            $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
-            inform(json.StatusMessage);
+            gdn.inform(json.StatusMessage);
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
          }

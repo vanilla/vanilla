@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
             onEndDrag: function() {
                // Save the user's preference.
                // var height = $('#CommentForm textarea').height();
-               // $.get(combinePaths(definition('WebRoot', ''), '/garden/utility/set/preference/CommentBoxHeight/'+ height + '/' + definition('TransientKey', '') + '/?DeliveryType=BOOL'));
+               // $.get(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/dashboard/utility/set/preference/CommentBoxHeight/'+ height + '/' + gdn.definition('TransientKey', '') + '/?DeliveryType=BOOL'));
             }
          });
       }

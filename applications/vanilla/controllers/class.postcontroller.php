@@ -15,6 +15,11 @@ class PostController extends VanillaController {
    
    public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
+   public function Index() {
+      $this->View = 'discussion';
+      $this->Discussion();
+   }
+   
    /**
     * Create a discussion.
     *

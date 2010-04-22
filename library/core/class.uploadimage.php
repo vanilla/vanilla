@@ -13,10 +13,34 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_UploadImage extends Gdn_Upload {
 
+   public static function CanUploadImages() {
+      // Check that we have the necessary tools to allow image uploading
+      
+      // Is the Uploads directory available and correctly permissioned?
+      if (!Gdn_Upload::CanUpload())
+         return FALSE;
+      
+      // Do we have GD?
+      if (!function_exists('gd_info'))
+         return FALSE;
+      
+      $GdInfo = gd_info();
+      // Do we have a good version of GD?
+      $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
+      if ($GdVersion < 2)
+         return FALSE;
+      
+      return TRUE;
+   }
+
    /**
     * Validates the uploaded image. Returns the temporary name of the uploaded file.
     */
    public function ValidateUpload($InputName) {
+   
+      if (!function_exists('gd_info'))
+         throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+   
       // Make sure that all standard file upload checks are performed.
       $TmpFileName = parent::ValidateUpload($InputName);
       
@@ -43,6 +67,11 @@ class Gdn_UploadImage extends Gdn_Upload {
     */
    public static function SaveImageAs($Source, $Target, $Height = '', $Width = '', $Crop = FALSE, $OutputType = 'jpg', $ImageQuality = 75) {
       // Make sure type, height & width are properly defined
+      
+      if (!function_exists('gd_info'))
+         throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+      $GdInfo = gd_info();
+      
       $Size = getimagesize($Source);
       list($WidthSource, $HeightSource, $Type) = $Size;
       if ($Height == '' || !is_numeric($Height))
@@ -87,25 +116,36 @@ class Gdn_UploadImage extends Gdn_Upload {
          $Width = $WidthSource;
       }
 
+      // Create GD image from the provided file, but first check if we have the necessary tools
+      $SourceImage = FALSE;
       switch ($Type) {
          case 1:
-            $SourceImage = imagecreatefromgif($Source);
+            if ($GdInfo['GIF Read Support'] || $GdInfo['GIF Write Support'])
+               $SourceImage = imagecreatefromgif($Source);
             break;
          case 2:
-            $SourceImage = imagecreatefromjpeg($Source);
+            if ($GdInfo['JPG Support'] || $GdInfo['JPEG Support'])
+               $SourceImage = imagecreatefromjpeg($Source);
             break;
          case 3:
-            $SourceImage = imagecreatefrompng($Source);
-            break;
-         default:
-            throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
+            if ($GdInfo['PNG Support'])
+               $SourceImage = imagecreatefrompng($Source);
             break;
       }
       
-      $TargetImage = imagecreatetruecolor($Width, $Height);
+      if (!$SourceImage)
+         throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
+      
+      // Create a new image from the raw source
+      if (function_exists('imagecreatetruecolor'))
+         $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
+      else
+         $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
+         
       imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
       imagedestroy($SourceImage);
       
+      // No need to check these, if we get here then whichever function we need will be available
       if ($OutputType == 'gif')
          imagegif($TargetImage, $Target);
       else if ($OutputType == 'png')

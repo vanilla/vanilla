@@ -4,7 +4,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass = 'Item';
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
    $CssClass .= $Alt.' ';
-   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->IsAnnounce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CountUnreadComments = $Discussion->CountUnreadComments;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
@@ -17,7 +17,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <?php echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
-         <?php if ($Discussion->Announce == '1') { ?>
+         <?php if ($Discussion->IsAnnounce == '1') { ?>
          <span class="Announcement"><?php echo T('Announcement'); ?></span>
          <?php } ?>
          <?php if ($Discussion->Closed == '1') { ?>

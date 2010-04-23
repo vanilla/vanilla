@@ -1896,7 +1896,7 @@ class HTMLPurifier_ConfigSchema {
      * Unserializes the default ConfigSchema.
      */
     public static function makeFromSerial() {
-        return unserialize(file_get_contents(HTMLPURIFIER_PREFIX . '/HTMLPurifier/ConfigSchema/schema.ser'));
+       return unserialize(file_get_contents(HTMLPURIFIER_PREFIX . '/HTMLPurifier/ConfigSchema/schema.ser'));
     }
 
     /**

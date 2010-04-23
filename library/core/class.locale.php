@@ -103,6 +103,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          for($i = 0; $i < $Count; ++$i) {
             $FileContents[$SafeLocaleName][] = Gdn_Format::ArrayValueForPhp($LocaleSources[$i]);
          }
+         
          // Add the config locale if it exists
          $ConfigLocale = PATH_CONF . DS . 'locale.php';
          if (file_exists($ConfigLocale))
@@ -117,16 +118,19 @@ class Gdn_Locale extends Gdn_Pluggable {
 
       // Now set the locale name and import all of the sources.
       $this->_Locale = $LocaleName;
-      if (!array_key_exists($SafeLocaleName, $LocaleSources))
-         $LocaleSources[$SafeLocaleName] = array();
+      $LocaleSources = Gdn_FileCache::GetCache('locale',$SafeLocaleName);
+      if (is_null($SafeLocaleName))
+         $LocaleSources = array();
 
-      $Count = count($LocaleSources[$SafeLocaleName]);
+      $ConfLocaleOverride = PATH_CONF . DS . 'locale.php';
+      $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
-         @include ($LocaleSources[$SafeLocaleName][$i]);
+         if ($ConfLocaleOverride != $LocaleSources[$i]) // Don't double include the conf override file... and make sure it comes last
+            @include_once($LocaleSources[$i]);
       }
 
       // Also load any custom defined definitions from the conf directory
-      @include (PATH_CONF . DS . 'locale.php');
+      @include_once($ConfLocaleOverride);
 
       // All of the included files should have contained
       // $Definition['Code'] = 'Definition'; assignments. The overwrote each

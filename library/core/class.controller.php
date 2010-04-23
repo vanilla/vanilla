@@ -384,6 +384,20 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * Removes a JS file from the collection.
+    *
+    * @param string $FileName The CSS file to search for.
+    */
+   public function RemoveJsFile($FileName) {
+      foreach ($this->_JsFiles as $Key => $FileInfo) {
+         if ($FileInfo['FileName'] == $FileName) {
+            unset($this->_JsFiles[$Key]);
+            return;
+         }
+      }
+   }
+
+   /**
     * Adds the specified module to the specified asset target. If no asset
     * target is defined, it will use the asset target defined by the module's
     * AssetTarget method.
@@ -781,7 +795,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Add definitions to the page
             if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset($AssetName, $this->DefinitionList());
+               $this->AddAsset('Foot', $this->DefinitionList());
 
             // Render
             $this->RenderMaster();

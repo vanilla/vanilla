@@ -31,7 +31,7 @@ Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).D
 Gdn::FactoryOverwrite($tmp);
 unset($tmp);
 
-class DebuggerPlugin implements Gdn_IPlugin {
+class DebuggerPlugin extends Gdn_Plugin {
    // Specifying "Base" as the class name allows us to make the method get called for every
    // class that implements a base class's method. For example, Base_Render_After
    // would allow all controllers that call Controller.Render() to have that method

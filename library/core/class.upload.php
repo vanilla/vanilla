@@ -29,6 +29,24 @@ class Gdn_Upload {
       $this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
    }
    
+   public static function CanUpload($UploadPath=NULL) {
+      if (is_null($UploadPath))
+         $UploadPath = PATH_UPLOADS;
+      
+      if (ini_get('file_uploads') != 1)
+         return FALSE;
+      
+      if (!is_dir($UploadPath)) 
+         @mkdir($UploadPath);
+         if (!is_dir($UploadPath))
+            return FALSE;
+      
+      if (!is_writable($UploadPath) || !is_readable($UploadPath)) 
+         return FALSE;
+         
+      return TRUE;
+   }
+   
    /**
     * Adds an extension (or array of extensions) to the array of allowed file
     * extensions.

@@ -2010,7 +2010,6 @@ body.Post #Content {
    width: 910px;
    height: 100px;
    min-height: 100px;
-   max-height: 400px;
    margin: 0 0 6px;
 }
 #DiscussionForm input.InputBox {

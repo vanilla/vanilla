@@ -10,7 +10,7 @@ $PluginInfo['GettingStarted'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
-class GettingStartedPlugin implements Gdn_IPlugin {
+class GettingStartedPlugin extends Gdn_Plugin {
 
 /*
    This plugin should:

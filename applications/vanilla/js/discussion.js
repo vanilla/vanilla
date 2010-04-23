@@ -208,7 +208,7 @@ jQuery(document).ready(function($) {
       });
       
    // Autosave comments
-   $('#Form_SaveDraft').livequery(function() {
+   $('a.DraftButton').livequery(function() {
       var btn = this;
       $('div.CommentForm textarea').autosave({ button: btn });
    });

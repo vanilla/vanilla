@@ -23,7 +23,7 @@ require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 
-class HTMLPurifierPlugin implements Gdn_IPlugin {
+class HTMLPurifierPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
 		$HPConfig = HTMLPurifier_Config::createDefault();

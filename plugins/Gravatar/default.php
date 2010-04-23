@@ -10,7 +10,7 @@ $PluginInfo['Gravatar'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
-class GravatarPlugin implements Gdn_IPlugin {
+class GravatarPlugin extends Gdn_Plugin {
    
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.

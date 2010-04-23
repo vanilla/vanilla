@@ -30,7 +30,7 @@ Gdn::FactoryInstall(
    FALSE
 );
 
-class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
+class VanillaCommentRepliesPlugin extends Gdn_Plugin {
    
    public $ReplyModel;
    
@@ -248,7 +248,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
     * Add a Reply method to Vanilla's Post controller
     */
    public function PostController_Reply_Create(&$Sender, $EventArguments = '') {
-      $Sender->View = PATH_PLUGINS.DS.'VanillaCommentReplies'.DS.'views'.DS.'vanilla_post_reply.php';
+      $Sender->View = $this->GetView('vanilla_post_reply.php');
       $ReplyCommentID = 0;
       if (is_array($EventArguments) && array_key_exists(0, $EventArguments))
          $ReplyCommentID = is_numeric($EventArguments[0]) ? $EventArguments[0] : 0;
@@ -286,7 +286,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             $Sender->SetJson('CommentID', $CommentID);
             $Sender->Discussion = $Sender->DiscussionModel->GetID($Sender->ReplyComment->DiscussionID);
             $Sender->ControllerName = 'discussion';
-            $Sender->View = PATH_PLUGINS.DS.'VanillaCommentReplies'.DS.'views'.DS.'replies.php';
+            $Sender->View = $this->GetView('replies.php');
          } else if ($Sender->DeliveryType() !== DELIVERY_TYPE_ALL) {
             // Handle ajax-based errors
             $Sender->StatusMessage = $Sender->Form->Errors();            

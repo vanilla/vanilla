@@ -21,17 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-
-/**
- * A simple interface that all plugins must follow. Aside from the Setup
- * method, this is used more to identify plugins than to enforce structure upon
- * them.
- *
- * @package Garden
- * @todo Could it include a Disable and Uninstall method? (from damien)
- */
 interface Gdn_IPlugin {
-
 
    /**
     * This method can be used to ensure that any setup components of a plugin have been set up before the
@@ -47,4 +37,12 @@ interface Gdn_IPlugin {
     * @return boolean
     */
    public function Setup();
+   
+   /**
+    * These methods are invoked if present, but are not required and will be silently ignored
+    * if they do not exist.
+    */
+    
+   // public function OnDisable() - Called as the plugin is disabled
+   // public function CleanUp()   - Called as the plugin is removed
 }

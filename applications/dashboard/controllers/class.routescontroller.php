@@ -55,7 +55,7 @@ class RoutesController extends DashboardController {
       if (!$this->Form->AuthenticatedPostBack()) {
          // Apply the config settings to the form.
          if ($this->Route !== FALSE)
-            $this->Form->SetData(array('Route' => $this->Route, 'Target' => $Routes[$this->Route]));
+            $this->Form->SetData(array('Route' => $this->_DecodeRouteKey($this->Route), 'Target' => $Routes[$this->Route]));
       } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Route', 'Required');
@@ -67,7 +67,7 @@ class RoutesController extends DashboardController {
             $FormPostValues['Route'] = $this->Route;
             
          if ($ConfigurationModel->Validate($FormPostValues)) {
-            SaveToConfig('Routes'.'.'.ArrayValue('Route', $FormPostValues), ArrayValue('Target', $FormPostValues));
+            SaveToConfig('Routes.'.$this->_EncodeRouteKey(ArrayValue('Route', $FormPostValues)), ArrayValue('Target', $FormPostValues));
             $this->StatusMessage = T("The route was saved successfully.");
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
                $this->RedirectUrl = Url('dashboard/routes');
@@ -110,5 +110,13 @@ class RoutesController extends DashboardController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
-   }   
+   }
+   
+   protected function _EncodeRouteKey($Key) {
+      return substr($Key, 0, 7) == 'Default' ? $Key : base64_encode($Key);
+   }
+   
+   protected function _DecodeRouteKey($Key) {
+      return substr($Key, 0, 7) == 'Default' ? $Key : base64_decode($Key);
+   }
 }

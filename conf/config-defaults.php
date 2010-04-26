@@ -96,6 +96,8 @@ $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;
 $Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
 $Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . DS . 'HtmlPurifier';
 $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
+$Configuration['HtmlPurifier']['Filter']['Vimeo']               = TRUE;
+$Configuration['HtmlPurifier']['Attr']['EnableID']              = TRUE;
 
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');

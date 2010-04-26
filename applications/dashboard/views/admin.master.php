@@ -31,6 +31,7 @@
 			<div><?php
 				printf(T('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
 			?></div>
+			<?php $this->RenderAsset('Foot'); ?>
 		</div>
    </div>
 	<?php $this->FireEvent('AfterBody'); ?>

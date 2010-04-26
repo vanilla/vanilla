@@ -36,7 +36,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       && ($Session->UserID == $Activity->InsertUserID
          || $Session->CheckPermission('Garden.Activity.Delete'))
       )
-      echo '<div class="OptionButton">'.Anchor(T('Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'Delete').'</div>';
+      echo '<div class="OptionButton">'.Anchor(T('Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
 
    if ($PhotoAnchor != '') {
    ?>

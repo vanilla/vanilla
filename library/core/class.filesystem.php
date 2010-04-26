@@ -171,14 +171,13 @@ class Gdn_FileSystem {
    }
 
    /**
-    * Searches in the specified mapping file for $LibraryName. If a mapping is
+    * Searches in the specified mapping cache for $LibraryName. If a mapping is
     * found, it returns it. If not, it searches through the application
     * directories $Depth levels deep looking for $LibraryName. Returns FALSE
     * if not found.
     *
     * @param string $MappingsFileName The name of the mappings file to look in for library mappings. These
     * files are contained in the application's /cache folder.
-    * @param string $MappingsArrayName The variable name of the array in the mappings file that contains the mappings.
     * @param string $SourceFolders The path to the folders that should be considered the "root" of this search.
     * @param mixed $FolderWhiteList A white-list array of sub-folders within $SourceFolder in which the
     * search can be performed. If FALSE is specified instead, the search will
@@ -186,24 +185,17 @@ class Gdn_FileSystem {
     * @param string $LibraryName The name of the library to search for. This is a valid file name.
     * ie. "class.database.php"
     */
-   public static function FindByMapping($MappingsFileName, $MappingsArrayName, $SourceFolders, $FolderWhiteList, $LibraryName) {
+   public static function FindByMapping($MappingCacheName, $SourceFolders, $FolderWhiteList, $LibraryName) {
+
       // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
-      if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1)
+      if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1)
          $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
          
       $LibraryKey = str_replace('.', '__', $LibraryName);
-         
-      $MappingsFile = PATH_CACHE . DS . $MappingsFileName;
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-
-      $Mappings = Gdn::Config($MappingsArrayName, NULL);
-      if(is_null($Mappings)) {   
-         $Config->Load($MappingsFile, 'Use', $MappingsArrayName);
-         $Mappings = Gdn::Config($MappingsArrayName, array());
-      }
-      $LibraryPath = ArrayValue($LibraryKey, $Mappings, FALSE);
-
-      if ($LibraryPath === FALSE) {
+      Gdn_FileCache::PrepareCache($MappingCacheName);
+      $LibraryPath = Gdn_FileCache::GetCache($MappingCacheName, $LibraryKey);
+      
+      if ($LibraryPath === NULL) {
          // $LibraryName wasn't contained in the mappings array.
          // I need to look through the folders in this application for the requested file.
          // Once I find it, I need to save the mapping so we don't have to search for it again.
@@ -217,11 +209,7 @@ class Gdn_FileSystem {
 
          // If the controller was found
          if($LibraryPath !== FALSE) {
-            $Config = Gdn::Factory(Gdn::AliasConfig);
-            // Save the mapping
-            $Config->Load($MappingsFile, 'Save', $MappingsArrayName);
-            $Config->Set($MappingsArrayName.'.'.$LibraryKey, $LibraryPath);
-            $Config->Save($MappingsFile, $MappingsArrayName);
+            Gdn_FileCache::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
          }
       }
       return $LibraryPath;
@@ -262,6 +250,16 @@ class Gdn_FileSystem {
     * @param string $FileContents The contents of the file being saved.
     */
    public static function SaveFile($FileName, $FileContents) {
+   
+      // Check that the folder exists and is writable
+      $DirName = dirname($FileName);
+      $FileBaseName = basename($FileName);
+      if (!is_dir($DirName))
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.',$FileBaseName,$DirName));
+         
+      if (!is_writable($DirName))
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
+         
       file_put_contents($FileName, $FileContents);
       return TRUE;
    }

@@ -14,6 +14,9 @@ function __autoload($ClassName) {
 
    if(!class_exists('Gdn_FileSystem', FALSE))
       return false;
+      
+   if(!class_exists('Gdn_FileCache', FALSE))
+      return false;
 
    if(!class_exists('Gdn', FALSE))
       return false;
@@ -32,12 +35,11 @@ function __autoload($ClassName) {
 
    // If this is a model, look in the models folder(s)
    if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping(
-         'library_mappings.php',
-         'Library',
+         'library',
          PATH_LIBRARY,
          array(
             'core',
@@ -50,7 +52,7 @@ function __autoload($ClassName) {
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library_mappings.php', 'Library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
@@ -86,13 +88,14 @@ if (!function_exists('ArrayCombine')) {
          return $Array1;
    }
 }
-
+/*
+ We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {
    function array_fill_keys($Keys, $Val) {
       return array_combine($Keys,array_fill(0,count($Keys),$Val));
    }
 }
-
+*/
 if (!function_exists('ArrayHasValue')) {
    /**
     * Searches $Array (and all arrays it contains) for $Value.
@@ -400,6 +403,8 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    }
 }
 
+/*
+ We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('filter_input')) {
    if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
    if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
@@ -421,6 +426,7 @@ if (!function_exists('filter_input')) {
       return $Value;     
    }
 }
+*/
 
 if (!function_exists('ForceBool')) {
    function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
@@ -438,8 +444,9 @@ if (!function_exists('ForceBool')) {
 
 if (!function_exists('getallheaders')) {
    /**
-    * Needed this to fix a bug:
-    * http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
+    * If PHP isn't running as an apache module, getallheaders doesn't exist in
+    * some systems.
+    * Ref: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
     */
    function getallheaders() {
       foreach($_SERVER as $name => $value)
@@ -559,30 +566,6 @@ if (!function_exists('IsTimestamp')) {
    }
 }
 
-if (!function_exists('json_encode')) {
-   require_once PATH_LIBRARY . DS . 'vendors' . DS . 'JSON' . DS . 'JSON.php';
-   
-   function json_decode($arg, $assoc = FALSE) {
-      global $services_json;
-      if (!isset($services_json)) {
-         $services_json = new Services_JSON();
-      }
-      $obj = $services_json->decode($arg);
-      if ($assoc)
-         return Gdn_Format::ObjectAsArray($obj);
-      else
-         return $obj;
-   }
-   
-   function json_encode($arg) {
-      global $services_json;
-      if (!isset($services_json)) {
-         $services_json = new Services_JSON();
-      }
-      return $services_json->encode($arg);
-   }
-}
-
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.
@@ -617,6 +600,10 @@ if (!function_exists('Now')) {
 }
 
 if (!function_exists('parse_ini_string')) {
+   /**
+    * parse_ini_string not supported until PHP 5.3.0, and we currently support
+    * PHP 5.2.0.
+    */
    function parse_ini_string ($Ini) {
       $Lines = split("\n", $Ini);
       $Result = array();
@@ -653,44 +640,70 @@ if (!function_exists('ProxyRequest')) {
     * response.
     *
     * @param string $Url The full url to the page being requested (including http://)
-    * @param array $PostFields The collection of post values to send with the request. Must be in associative array format, or nothing will be sent.
     */
-   function ProxyRequest($Url, $PostFields = FALSE) {
+   function ProxyRequest($Url) {
+      $UrlParts = parse_url($Url);
+      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Host = GetValue('host', $UrlParts, '');
+      $Port = GetValue('port', $UrlParts, '80');
+      $Path = GetValue('path', $UrlParts, '');
+      $Query = GetValue('query', $UrlParts, '');
+      // Get the cookie.
+      $Cookie = '';
+      foreach($_COOKIE as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+         
+         if(strlen($Cookie) > 0)
+            $Cookie .= '; ';
+            
+         $Cookie .= $Key.'='.urlencode($Value);
+      }
+
       $Response = '';
-      $Query = is_array($PostFields) ? http_build_query($PostFields) : '';
-      
       if (function_exists('curl_init')) {
+         $Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         if ($Cookie != '')
+            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+            
          if ($Query != '') {
             curl_setopt($Handler, CURLOPT_POST, 1);
             curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          }
          $Response = curl_exec($Handler);
+         if ($Response == FALSE)
+            $Response = curl_error($Handler);
+            
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
-         $UrlParts = parse_url($Url);
-         $Host = ArrayValue('host', $UrlParts, '');
-         $Port = ArrayValue('port', $UrlParts, '80');
-         $Path = ArrayValue('path', $UrlParts, '');
          $Referer = Gdn_Url::WebRoot(TRUE);
       
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+   
+         if(strlen($Cookie) > 0)
+            $Cookie = "Cookie: $Cookie\r\n";
          
-         $Header = "GET $Path?$Query HTTP/1.1\r\n" .
-            "Host: $Host\r\n" .
+         $Header = "GET $Path?$Query HTTP/1.1\r\n"
+            ."Host: $Host\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-            "User-Agent: Vanilla/2.0\r\n" .
-            "Accept: */*\r\n" .
-            "Accept-Charset: utf-8;\r\n" .
-            "Referer: $Referer\r\n" .
-            "Connection: close\r\n\r\n";
+            ."User-Agent: Vanilla/2.0\r\n"
+            ."Accept: */*\r\n"
+            ."Accept-Charset: utf-8;\r\n"
+            ."Referer: $Referer\r\n"
+            ."Connection: close\r\n";
+            
+         if ($Cookie != '')
+            $Header .= $Cookie;
+         
+         $Header .= "\r\n";
          
          // Send the headers and get the response
          fputs($Pointer, $Header);

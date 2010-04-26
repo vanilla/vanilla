@@ -17,6 +17,7 @@ printf(
    '<code>'.PATH_THEMES.'</code>'
 );
 ?></div>
+<?php echo $this->Form->Errors(); ?>
 <div class="CurrentTheme">
    <h3><?php echo T('Current Theme'); ?></h3>
    <?php
@@ -124,8 +125,8 @@ printf(
                   }
 
                   echo '<div class="Buttons">';
-                  echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'Button', array('target' => '_top'));
-                  echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'Button', array('target' => '_top'));
+                  echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton', array('target' => '_top'));
+                  echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton', array('target' => '_top'));
                   echo '</div>';
 
                   $Description = ArrayValue('Description', $ThemeInfo);
@@ -175,5 +176,3 @@ printf(
 </div>
 <?php
 }
-
-printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

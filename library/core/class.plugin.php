@@ -8,13 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+/**
+ * A simple framework that all plugins should extend. Aside from the implementation of
+ * Gdn_IPlugin, this class provides some convenience methods to make plugin development
+ * easier and faster.
+ *
+ * @author Tim Gunter
+ * @package Garden
+ * @version @@GARDEN-VERSION@@
+ * @namespace Garden.Core
+ */
+abstract class Gdn_Plugin implements Gdn_IPlugin {
 
-class SkeletonHooks implements Gdn_IPlugin {
-   public function Controller_Event_Handler($Sender) {
-      // Do something
+   public function GetView($ViewName) {
+      $PluginName = substr(get_class($this),-6);
+      $PluginDirectory = PATH_PLUGINS.DS.$PluginName.DS.'views';
+      return $PluginDirectory.DS.$ViewName;
    }
-   
-   public function Setup() {
-      // Got Setup?
-   }
+
 }

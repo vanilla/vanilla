@@ -29,6 +29,7 @@ if ($AddonUrl != '')
    );
    ?>
 </div>
+<?php echo $this->Form->Errors(); ?>
 <table class="AltRows">
    <thead>
       <tr>
@@ -126,5 +127,3 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
 ?>
    </tbody>
 </table>
-<?php
-   printf(T('AddonProblems'), '<code>'.PATH_CONF.DS.'config.php'.'</code>');

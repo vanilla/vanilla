@@ -23,7 +23,7 @@ foreach ($this->Routes as $Route => $Target) {
 ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td class="Info">
-         <strong><?php echo $Route; ?></strong>
+         <strong><?php echo $this->_DecodeRouteKey($Route); ?></strong>
          <div>
          <?php
          echo Anchor('Edit', '/dashboard/routes/edit/'.$i, 'EditRoute');

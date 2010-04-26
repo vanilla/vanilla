@@ -31,7 +31,7 @@ Gdn::FactoryOverwrite($tmp);
 unset($tmp);
 
 
-class CssThemes implements Gdn_IPlugin {
+class CssThemes extends Gdn_Plugin {
 	/// Constants ///
 	/**
 	 * The Regex to capture themeable colors.
@@ -220,7 +220,7 @@ class CssThemes implements Gdn_IPlugin {
 		$Sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
 		$Sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
 		
-		$Sender->View = dirname(__FILE__).DS.'views'.DS.'colors.php';
+		$Sender->View = $this->GetView('colors.php');
 		$Sender->Render();
 	}
 	
@@ -362,7 +362,7 @@ class CssThemes implements Gdn_IPlugin {
 		// Add the side module.
       $Sender->AddSideMenu('/plugin/cssthemes');
 		
-		$Sender->View = dirname(__FILE__).DS.'views'.DS.'cssthemes.php';
+		$Sender->View = $this->GetView('cssthemes.php');
 		$Sender->Render();
 	}
 	
@@ -371,13 +371,13 @@ class CssThemes implements Gdn_IPlugin {
 		
 		// Setup the theme table.
 		$St = Gdn::Structure();
-		$St->Table('ThemeSetting')
+		$St->Table('bThemeSetting')
 			->Column('Name', 'varchar(50)', FALSE, 'primary')
 			->Column('Setting', 'varchar(50)')
 			->Set(FALSE, FALSE);
 			
 		// Insert default values.
-		$St->Database->Query('insert '.$St->Database->DatabasePrefix.'ThemeSetting (Name, Setting) values '.
+		$St->Database->Query('insert '.$St->Database->DatabasePrefix.'bThemeSetting (Name, Setting) values '.
 		"('Banner Background Color', '#44c7f4'),
 		('Banner Font Color', '#fff'),
 		('Banner Font Shadow Color', '#30ACD6'),
@@ -410,6 +410,6 @@ class CssThemes implements Gdn_IPlugin {
 	}
 	
 	public function CleanUp() {
-	   Gdn::Structure()->Table('ThemeSetting')->Drop();
+	   Gdn::Structure()->Table('bThemeSetting')->Drop();
 	}
 }

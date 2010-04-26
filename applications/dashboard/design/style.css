@@ -143,7 +143,7 @@ a.Button,
    margin: 0;
    font-size: 11px;
    padding: 4px;
-   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -608,7 +608,7 @@ ul.Options li.Parent strong {
    margin: 3px 4px 0 0;
    font-size: 10px;
    font-weight: normal;
-   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -786,7 +786,6 @@ ul.PanelInfo {
 ul.PanelInfo li strong {
    font-weight: normal;
    text-align: left;
-   margin-right: 12px;
    font-weight: normal;
 }
 ul.PanelInfo li a {
@@ -843,7 +842,7 @@ a.BigButton {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -1071,7 +1070,7 @@ ul.DataList a.Delete:hover {
 	padding: 4px;
    color: #333;
    border: 1px solid #888;
-   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
 }
 ul.DataList a.Delete:focus {
    background: #f8f8f8;
@@ -1168,6 +1167,9 @@ ul.Activities ul.DataList div.Title a,
 ul.Activities ul.DataList div.Excerpt p {
 	font-size: 13px;
 	line-height: 1;
+}
+ul.HasPhoto div.Meta {
+	padding-left: 49px;
 }
 ul.Activities ul.DataList .HasPhoto div.Meta {
 	padding: 2px 0 0;
@@ -2008,7 +2010,6 @@ body.Post #Content {
    width: 910px;
    height: 100px;
    min-height: 100px;
-   max-height: 400px;
    margin: 0 0 6px;
 }
 #DiscussionForm input.InputBox {

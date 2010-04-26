@@ -76,12 +76,15 @@ class SettingsController extends DashboardController {
                $this->Form->AddError(strip_tags($e->getMessage()));
             }
             if ($this->Form->ErrorCount() == 0) {
-               $Validation = new Gdn_Validation();
-               $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
-               $ApplicationManager->EnableApplication($ApplicationName, $Validation);
-               if ($ApplicationManager->ApplicationHasSetup($ApplicationName))
-                  $ApplicationManager->ApplicationSetup($ApplicationName, $this->ControllerName, $Validation);
-               $this->Form->SetValidationResults($Validation->Results());
+               $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Application/'.$ApplicationName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
+               if ($Test != 'Success') {
+                  $this->Form->AddError(sprintf(T('The application could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
+               } else {
+                  $Validation = new Gdn_Validation();
+                  $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
+                  $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+                  $this->Form->SetValidationResults($Validation->Results());
+               }
             }
             
          }
@@ -327,9 +330,16 @@ class SettingsController extends DashboardController {
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                $PluginManager->DisablePlugin($PluginName);
             } else {
-               $Validation = new Gdn_Validation();
-               if (!$PluginManager->EnablePlugin($PluginName, $Validation))
-                  $this->Form->SetValidationResults($Validation->Results());
+               // Check to see if there are any fatal errors when the plugin is included:
+               $Session = Gdn::Session();
+               $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Plugin/'.$PluginName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
+               if ($Test != 'Success') {
+                  $this->Form->AddError(sprintf(T('The plugin could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
+               } else {
+                  $Validation = new Gdn_Validation();
+                  if (!$PluginManager->EnablePlugin($PluginName, $Validation))
+                     $this->Form->SetValidationResults($Validation->Results());
+               }
             }
          } catch (Exception $e) {
             $this->Form->AddError(strip_tags($e->getMessage()));
@@ -425,6 +435,26 @@ class SettingsController extends DashboardController {
       
       $this->Render();
    }
+   
+   /**
+    * Test and addon to see if there are any fatal errors during install.
+    */
+   public function TestAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
+      if (!in_array($AddonType, array('Plugin', 'Application', 'Theme')))
+         $AddonType = 'Plugin';
+         
+      $Session = Gdn::Session();
+      $AddonName = $Session->ValidateTransientKey($TransientKey) ? $AddonName : '';
+      $AddonManagerName = $AddonType.'Manager';
+      $TestMethod = 'Test'.$AddonType;
+      $AddonManager = Gdn::Factory($AddonManagerName);
+      if ($AddonName != '') {
+         $Validation = new Gdn_Validation();
+         $AddonManager->$TestMethod($AddonName, $Validation);
+      }
+
+      echo 'Success';
+   }
 
    /**
     * Theme management screen.
@@ -433,7 +463,7 @@ class SettingsController extends DashboardController {
       $this->Title(T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
-      $this->AddSideMenu('garden/settings/themes');
+      $this->AddSideMenu('dashboard/settings/themes');
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
@@ -474,7 +504,12 @@ class SettingsController extends DashboardController {
             foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
                   $Session->SetPreference('PreviewTheme', ''); // Clear out the preview
-                  $ThemeManager->EnableTheme($ThemeName);
+                  $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Theme/'.$ThemeName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
+                  if ($Test != 'Success') {
+                     $this->Form->AddError(sprintf(T('The theme could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
+                  } else {
+                     $ThemeManager->EnableTheme($ThemeName);
+                  }
                }
             }
          } catch (Exception $e) {
@@ -505,10 +540,18 @@ class SettingsController extends DashboardController {
                $PreviewThemeFolder = $ThemeInfo['Folder'];
          }
       }
-
+      
+      // Check for errors
       $Session = Gdn::Session();
-      $Session->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
-      Redirect('/');
+      $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Theme/'.$ThemeName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
+      if ($Test != 'Success') {
+         $this->Form->AddError(sprintf(T('The theme could not be previewed because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
+         $this->View = 'themes';
+         $this->Themes();
+      } else {
+         $Session->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
+         Redirect('/');
+      }
    }
    
    public function CancelPreview() {

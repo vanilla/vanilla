@@ -9,9 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class VanillaHooks implements Gdn_IPlugin {
-   public function Setup() {
-      return TRUE;
-   }
    
    public function UserModel_SessionQuery_Handler(&$Sender) {
       // Add some extra fields to the session query
@@ -141,7 +138,24 @@ class VanillaHooks implements Gdn_IPlugin {
       $Menu->AddLink('Forum', T('General'), 'vanilla/settings/general', 'Vanilla.Settings.Manage');
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-		$Menu->AddLink('Forum', Gdn::Translate('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
-	}
+      $Menu->AddLink('Forum', Gdn::Translate('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
+   }
    
+   public function Setup() {
+      $Database = Gdn::Database();
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
+      $Explicit = TRUE;
+      $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
+      include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'structure.php');
+      
+      $ApplicationInfo = array();
+      include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));
+      $Version = ArrayValue('Version', ArrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
+      $Save = array(
+	 'Vanilla.Version' => $Version,
+	 'Routes.DefaultController' => 'discussions'
+      );
+      SaveToConfig($Save);
+   }
 }

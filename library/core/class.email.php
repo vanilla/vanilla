@@ -131,10 +131,14 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Message($Message) {
+   
+      // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::Text()
+      // which, untreated, would result in &#039; in the message in place of single quotes.
+   
       if ($this->PhpMailer->ContentType == 'text/html') {
-         $this->PhpMailer->MsgHTML($Message);
+         $this->PhpMailer->MsgHTML(htmlspecialchars_decode($Message,ENT_QUOTES));
       } else {
-         $this->PhpMailer->Body = $Message;
+         $this->PhpMailer->Body = htmlspecialchars_decode($Message,ENT_QUOTES);
       }
       return $this;
    }

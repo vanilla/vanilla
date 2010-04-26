@@ -266,6 +266,17 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          $this->Form->AddError('You must be authenticated in order to use this form.');
+      
+      $ImageManipOk = FALSE;
+      if (function_exists('gd_info')) {
+         $GdInfo = gd_info();
+         $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
+         if ($GdVersion < 2)
+            throw new Exception(sprintf(T("This installation of GD is too old (v%s). Vanilla requires at least version 2 or compatible."),$GdVersion));
+      }
+      else {
+         throw new Exception(sprintf(T("Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.")));
+      }
          
       $this->GetUserInfo($UserReference);
       $this->Form->SetModel($this->UserModel);
@@ -535,6 +546,9 @@ class ProfileController extends Gdn_Controller {
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');
          
+         // Check that we have the necessary tools to allow image uploading
+         $AllowImages = Gdn_UploadImage::CanUploadImages();
+         
          if ($this->User->UserID != $ViewingUserID) {
             // Include user js files for people with edit users permissions
             if ($Session->CheckPermission('Garden.Users.Edit')) {
@@ -543,16 +557,18 @@ class ProfileController extends Gdn_Controller {
             }
             
             // Add profile options for everyone
-            if ($this->User->Photo != '')
+            if ($this->User->Photo != '' && $AllowImages)
                $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'PictureLink'));
             
             $SideMenu->AddLink('Options', T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
-            if ($this->User->Photo != '')
+            if ($this->User->Photo != '' && $AllowImages)
                $SideMenu->AddLink('Options', T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Garden.User.Edit', array('class' => 'RemovePictureLink'));
          } else {
             // Add profile options for the profile owner
-            $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
-            if ($this->User->Photo != '') {
+            if ($AllowImages)
+               $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
+               
+            if ($this->User->Photo != '' && $AllowImages) {
                $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
                $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }

@@ -25,7 +25,7 @@ $PluginInfo['VanillaCommentScore'] = array(
    'AuthorUrl' => 'http://toddburry.com'
 );
 
-class VanillaCommentScorePlugin implements Gdn_IPlugin {
+class VanillaCommentScorePlugin extends Gdn_Plugin {
    
    public function DiscussionController_Render_Before($Sender) {
       $Sender->AddCssFile('/plugins/VanillaCommentScore/commentscore.css');

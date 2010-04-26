@@ -163,10 +163,13 @@ select.Day,
 select.Year {
    margin-left: 4px;
 }
-.Button {
+a.SmallButton,
+a.Button,
+input.Button {
    cursor: pointer;
    margin: 0;
-   font-size: 11px;
+   font-weight: bold;
+	font-size: 16px;
    padding: 4px;
    background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
@@ -178,20 +181,22 @@ select.Year {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
 }
-.FilterMenu a.Button {
-   font-weight: bold;
-	font-size: 13px;	
+a.Button {
+	padding: 5px 7px;
 }
-input.Button {
-   font-weight: bold;
-	font-size: 16px;
+a.SmallButton {
+	padding: 4px;
+	font-size: 12px;
 }
-.FilterMenu a.Button:hover,
-.Button:hover {
+a.SmallButton:hover,
+a.Button:hover,
+input.Button:hover {
    color: #111;
    border: 1px solid #666;
 }
-.Button:focus {
+a.SmallButton:focus,
+a.Button:focus,
+input.Button:focus {
    background: #eee;
 }
 .Loading {
@@ -209,7 +214,7 @@ input.Button {
 }
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
-div.Messages {
+div.Information {
    text-align: center;
    position: fixed;
    top: 10px;
@@ -222,7 +227,7 @@ div.Messages {
    display: block;
    width: 100%;
 }
-* html div.Messages {
+* html div.Information {
   position: absolute;
   width: 100%;/*IE5.5*/
   top: 0;
@@ -254,12 +259,23 @@ div.Messages ul li {
 	font-size: 120%;
 }
 div.Errors ul {
+	display: block;
    background: #d50a0a !important;
    border: 1px solid #a00 !important;
 }
 div.Errors ul li {
    color: #fff !important;
 }
+div.Errors pre {
+	overflow: auto;
+	font-size: 90%;
+	font-family: monospace;
+	color: #333;
+	background: #ffd;
+	padding: 4px;
+	line-height: 1.3;
+}
+
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .DismissMessage {
@@ -1018,10 +1034,12 @@ div.Popup div.Legal {
 
 
 /* =================================================================== Themes */
-body.themes #Content img {
+div.CurrentTheme img,
+div.BrowseThemes img {
 	border: 1px solid #777;
 }
-body.themes h3 {
+div.CurrentTheme h3,
+div.BrowseThemes h3 {
 	padding: 0 0 10px;
 }
 .CurrentTheme img {

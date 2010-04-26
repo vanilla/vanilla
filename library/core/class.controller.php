@@ -32,7 +32,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    /**
     * The name of the application folder that this controller can be found in
-    * (ie. vanilla, garden, etc).
+    * (ie. vanilla, dashboard, etc).
     *
     * @var string
     */
@@ -381,6 +381,20 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddJsFile($FileName, $AppFolder = '') {
       $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
+   }
+
+   /**
+    * Removes a JS file from the collection.
+    *
+    * @param string $FileName The CSS file to search for.
+    */
+   public function RemoveJsFile($FileName) {
+      foreach ($this->_JsFiles as $Key => $FileInfo) {
+         if ($FileInfo['FileName'] == $FileName) {
+            unset($this->_JsFiles[$Key]);
+            return;
+         }
+      }
    }
 
    /**
@@ -781,7 +795,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Add definitions to the page
             if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset($AssetName, $this->DefinitionList());
+               $this->AddAsset('Foot', $this->DefinitionList());
 
             // Render
             $this->RenderMaster();
@@ -872,12 +886,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
                      // $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
                      // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
-                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssGlob;
+                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
                   }
                   // 3. Application default. eg. root/applications/app_name/design/
-                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
                   // 4. Garden default. eg. root/applications/dashboard/design/
-                  $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssGlob;
+                  $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }
 
                // Find the first file that matches the path.

@@ -37,9 +37,9 @@ $Construct->Table('Discussion')
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
    ->Column('CountComments', 'int', '1')
-   ->Column('Closed', array('1', '0'), '0')
-   ->Column('Announce', array('1', '0'), '0')
-   ->Column('Sink', array('1', '0'), '0')
+   ->Column('Closed', 'tinyint(1)', '0')
+   ->Column('Announce', 'tinyint(1)', '0')
+   ->Column('Sink', 'tinyint(1)', '0')
    ->Column('DateInserted', 'datetime', NULL)
    ->Column('DateUpdated', 'datetime')
    ->Column('DateLastComment', 'datetime', NULL, 'index')
@@ -55,8 +55,8 @@ $Construct->Table('UserDiscussion')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime')
-   ->Column('Dismissed', 'varchar(1)', TRUE) // Relates to dismissed announcements
-   ->Column('Bookmarked', 'varchar(1)', TRUE)
+   ->Column('Dismissed', 'tinyint(1)', TRUE) // Relates to dismissed announcements
+   ->Column('Bookmarked', 'tinyint(1)', TRUE)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')

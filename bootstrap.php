@@ -34,6 +34,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.format.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.model.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.module.php');
@@ -72,8 +73,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
-if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'gardensetup') === FALSE) {
-   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/gardensetup'), '/'));
+if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
+   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/setup'), '/'));
    exit();
 }
 
@@ -98,6 +99,8 @@ Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
 // Application manager.
 Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
+// Theme manager
+Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);

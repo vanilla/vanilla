@@ -135,6 +135,6 @@ class CategoriesController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
-         $this->Menu->HighlightRoute('/garden/settings');
+         $this->Menu->HighlightRoute('/dashboard/settings');
    }      
 }

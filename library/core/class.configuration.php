@@ -173,11 +173,9 @@ class Gdn_Configuration {
             }
          } else {
             // Otherwise, traverse the array
-            
             if($KeyExists === FALSE) {
                $Array[$Key] = array();
                $SaveArray[$Key] = array();
-               
             }
             $Array =& $Array[$Key];
             $SaveArray =& $SaveArray[$Key];

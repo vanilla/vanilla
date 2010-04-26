@@ -116,6 +116,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('(d.Announce & !w.Dismissed)','','IsAnnounce')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
             $this->SQL
@@ -131,6 +132,10 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
+/*
+
+      // REMOVED TO FIX ANNOUNCEMENT ORDERING / PAGING
+
       if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
          $this->SQL
             ->BeginWhereGroup()
@@ -142,8 +147,10 @@ class DiscussionModel extends VanillaModel {
             
          $this->SQL->EndWhereGroup();
       }
+*/
          
       $Data = $this->SQL
+         ->OrderBy('IsAnnounce', 'desc')
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
@@ -446,10 +453,10 @@ class DiscussionModel extends VanillaModel {
                   $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
                   if ($User && $User->UserID != $Session->UserID) {
                      AddActivity(
-                        $User->UserID,
+                        $Session->UserID,
                         'DiscussionMention',
                         '',
-                        $Session->UserID,
+                        $User->UserID,
                         '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)
                      );
                   }

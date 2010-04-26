@@ -8,7 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-
 // Define the plugin:
 $PluginInfo['VanillaInThisDiscussion'] = array(
    'Name' => 'In This Discussion',
@@ -23,7 +22,8 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
    'SettingsPermission' => FALSE
 );
 
-class VanillaInThisDiscussionPlugin implements Gdn_IPlugin {
+class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
+
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
       include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
       $InThisDiscussionModule = new InThisDiscussionModule($Sender);

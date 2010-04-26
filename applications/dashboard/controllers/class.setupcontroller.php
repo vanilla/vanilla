@@ -11,9 +11,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Dashboard Setup Controller
  */
-class GardenSetupController extends DashboardController {
+class SetupController extends DashboardController {
    
-   public $Uses = array('Form', 'ApplicationManager', 'Database');
+   public $Uses = array('Form', 'Database');
    
    public function Initialize() {
       $this->Head = new HeadModule($this);
@@ -25,73 +25,51 @@ class GardenSetupController extends DashboardController {
     * collected from each application's application controller and all plugin's
     * definitions.
     */
-   public function Index($CurrentStep = 1) {
+   public function Index() {
+      $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
       if ($Installed)
-         trigger_error(ErrorMessage('Garden has already been installed.', 'GardenSetupController', 'Index'));
+         trigger_error(ErrorMessage('Vanilla has already been installed.', 'SetupController', 'Index'));
          
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';
-         $this->Render();
       } else {
-         $AvailableApplications = $this->ApplicationManager->AvailableApplications();
-         $SetupApplications = array();
-         foreach ($AvailableApplications as $AppName => $AppInfo) {
-            if (ArrayValue('SetupController', $AppInfo)) {
-               $SetupApplications[$AppName] = $AppInfo;
-            }
-         }
-         $TotalSteps = count($SetupApplications) + 2;
+         $this->View = 'configure';
+         $ApplicationManager = new Gdn_ApplicationManager();
+         $AvailableApplications = $ApplicationManager->AvailableApplications();
          
          // Need to go through all of the setups for each application. Garden,
-         // Step 1: Garden Setup
-         // Step N: Other Application Setups
-         // Final Step: Complete
-         if ($CurrentStep == 1) {
-            $this->View = 'configure';
-            if (!$this->Configure() || !$this->Form->IsPostBack()) {
-               $this->Render();
-            } else {
-               ++$CurrentStep;
-               Redirect('/dashboard/gardensetup/'.$CurrentStep);
-            }
-         }
-         
-         if ($CurrentStep > 1 && $CurrentStep < $TotalSteps) {
+         if ($this->Configure() && $this->Form->IsPostBack()) {
             // Step through the available applications, enabling each of them
-            $AppFolders = ConsolidateArrayValuesByKey($SetupApplications, 'Folder');
-            $AppNames = array_keys($SetupApplications);
-            $AppKey = $CurrentStep - 2;
-            $AppFolder = $AppFolders[$AppKey];
-            $AppName = $AppNames[$AppKey];
-            $Validation = new Gdn_Validation();
-            $this->ApplicationManager->RegisterPermissions($AppName, $Validation);
-            if ($this->ApplicationManager->ApplicationSetup($AppName, $this, $Validation)) {
-               ++$CurrentStep;
-               Redirect('/dashboard/gardensetup/'.$CurrentStep);
+            $AppNames = array_keys($AvailableApplications);
+            try {
+               foreach ($AvailableApplications as $AppName => $AppInfo) {
+                  if (strtolower($AppName) != 'dashboard') {
+                     $Validation = new Gdn_Validation();
+                     $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                     $ApplicationManager->EnableApplication($AppName, $Validation);
+                  }
+               }
+            } catch (Exception $ex) {
+               $this->Form->AddError(strip_tags($ex->getMessage()));
             }
-         }
-         
-         if ($CurrentStep == $TotalSteps) {
-            // Save a variable so that the application knows it has been installed.
-            SaveToConfig('Garden.Installed', TRUE);
-            
-            /*
-            $Database = Gdn::Database();
-            $DbTables = $Database->SQL()->FetchTables();
-            if (in_array('LUM_User', $DbTables) === TRUE) {
-               // If there are vanilla 1 tables to import, prompt the user with that screen
-               $this->Render();
-            } else {
-               // Otherwise just redirect them to the dashboard
-            */
+            if ($this->Form->ErrorCount() == 0) {
+               // Save a variable so that the application knows it has been installed.
+               // Now that the application is installed, select a more user friendly error page.
+               SaveToConfig(array(
+                  'Garden.Installed' => TRUE,
+                  'Garden.Errors.MasterView' => 'error.master.php'
+               ));
+               
+               // Go to the dashboard
                Redirect('/settings');
-            // }
+            }
          }
       }
+      $this->Render();
    }
    
    /**
@@ -194,17 +172,15 @@ class GardenSetupController extends DashboardController {
             // Assign some extra settings to the configuration file if everything succeeded.
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
-            $Save = array(
+            SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'),
                'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE,
                'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
-               'Garden.Errors.MasterView' => 'error.master.php', // Now that the application is installed, select a more user friendly error page
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
-            );
-            SaveToConfig($Save);
+            ));
          }
       }
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
@@ -212,31 +188,38 @@ class GardenSetupController extends DashboardController {
    
    private function _CheckPrerequisites() {
       // Make sure we are running at least PHP 5.1
-      if (version_compare(phpversion(), '5.1.0') < 0)
-         $this->Form->AddError("You are running PHP version ".phpversion().". Vanilla requires PHP 5.1.0 or greater, so you'll need to upgrade PHP before you can continue.");
+      if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0)
+         $this->Form->AddError("You are running <b>PHP version ".phpversion()."</b>. Vanilla requires PHP ".ENVIRONMENT_PHP_VERSION." or greater, so you'll need to upgrade PHP before you can continue.<code><span>Upgrade PHP to</span> v".ENVIRONMENT_PHP_VERSION."</code>");
 
       // Make sure PDO is available
       if (!class_exists('PDO'))
-         $this->Form->AddError('You must have PDO enabled in PHP in order for Vanilla to connect to your database.');
+         $this->Form->AddError('You must have <b>PDO enabled</b> in PHP in order for Vanilla to connect to your database.<code><span>Enable</span> PHP PDO</code>');
 
       if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
-         $this->Form->AddError('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.');
+         $this->Form->AddError('You must have the <b>MySQL driver for PDO</b> enabled in order for Vanilla to connect to your database.<code><span>Install</span> PDO_Mysql</code>');
 
       // Make sure that the correct filesystem permissions are in place
-      $ConfigFile = PATH_CONF . DS . 'config.php';
-      if (!file_exists($ConfigFile))
-         file_put_contents($ConfigFile, '');
+      
+      // Make sure the config folder is writeable
+      if (!is_readable(PATH_CONF) || !is_writable(PATH_CONF))
+         $this->Form->AddError('Your <b>configuration folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.PATH_CONF.'</code>');
+      else {
+         $ConfigFile = PATH_CONF . DS . 'config.php';
+         if (!file_exists($ConfigFile))
+            file_put_contents($ConfigFile, '');
          
-      if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
-         $this->Form->AddError('Your configuration file does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code>'.$ConfigFile.'</code>');
-
+         // Make sure the config file is writeable
+         if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
+            $this->Form->AddError('Your <b>configuration file</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code><span>Fix permissions</span> '.$ConfigFile.'</code>');
+      }
+      
       $UploadsFolder = PATH_ROOT . DS . 'uploads';
       if (!is_readable($UploadsFolder) || !is_writable($UploadsFolder))
-         $this->Form->AddError('Your uploads folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code>'.$UploadsFolder.'</code>');
+         $this->Form->AddError('Your <b>uploads folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.$UploadsFolder.'</code>');
 
       // Make sure the cache folder is writeable
       if (!is_readable(PATH_CACHE) || !is_writable(PATH_CACHE)) {
-         $this->Form->AddError('Your cache folder does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code>'.PATH_CACHE.'</code>');
+         $this->Form->AddError('Your <b>cache folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code><span>Fix permissions</span> '.PATH_CACHE.'</code>');
       } else {
          if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
@@ -259,6 +242,5 @@ class GardenSetupController extends DashboardController {
       }
       
       Redirect('/settings');
-      
    }
 }

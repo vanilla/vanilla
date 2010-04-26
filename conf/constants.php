@@ -10,6 +10,7 @@ define('PATH_LIBRARY', PATH_ROOT . DS . 'library');
 define('PATH_PLUGINS', PATH_ROOT . DS . 'plugins');
 define('PATH_THEMES', PATH_ROOT . DS . 'themes');
 define('PATH_DATABASE_CONF', PATH_CONF . DS . 'database.php');
+define('PATH_UPLOADS', PATH_ROOT . DS . 'uploads');
 
 // Delivery type enumerators:
 define('DELIVERY_TYPE_ALL', 'ALL'); // Deliver an entire page
@@ -43,3 +44,6 @@ define('DATASET_TYPE_OBJECT', 'object');
 define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
+
+// Environment
+define('ENVIRONMENT_PHP_VERSION','5.2.0');

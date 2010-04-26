@@ -61,7 +61,7 @@ jQuery(document).ready(function($) {
       // Get the last comment id on the page
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
-      var lastCommentID = $(lastComment).attr('id').replace('Comment_', '');
+      var lastCommentID = $(lastComment).attr('id').replace('Comment_', '').replace('Discussion_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');            
@@ -93,8 +93,12 @@ jQuery(document).ready(function($) {
             if (json.DraftID != null && json.DraftID != '')
                $(inpDraftID).val(json.DraftID);
                
-            if (json.MyDrafts != null)
+            if (json.MyDrafts != null) {
+               if (json.CountDrafts != null && json.CountDrafts > 0)
+                  json.MyDrafts += '<span>'+json.CountDrafts+'</span>';
+                  
                $('ul#Menu li.MyDrafts a').html(json.MyDrafts);
+            }
 
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
@@ -130,14 +134,6 @@ jQuery(document).ready(function($) {
                
                // Let listeners know that the comment was added.
                $(this).trigger('CommentAdded');
-               
-               // And scroll to them
-               /*
-                  var target = $('ul.Discussion #Comment_' + json.CommentID);
-                  if (target.offset())
-                     $('html,body').animate({scrollTop: target.offset().top}, 'fast');
-               */
-
             }
             gdn.inform(json.StatusMessage);
          },

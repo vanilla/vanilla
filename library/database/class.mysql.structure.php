@@ -257,51 +257,43 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * defined with $this->Column().
     */
    protected function _Modify($Explicit = FALSE) {
-      // Get the columns from the table
-      $ExistingColumns = $this->Database->SQL()->FetchColumns($this->_DatabasePrefix.$this->_TableName);
+		// Returns an array of schema data objects for each field in the specified
+		// table. The returned array of objects contains the following properties:
+		// Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
+		$ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
 
       // 1. Remove any unnecessary columns if this is an explicit modification
       if ($Explicit) {
          // array_diff returns values from the first array that aren't present
          // in the second array. In this example, all columns currently in the
          // table that are NOT in $this->_Columns.
-         $RemoveColumns = array_diff($ExistingColumns, array_keys($this->_Columns));
+         $RemoveColumns = array_diff(array_keys($ExistingColumns), array_keys($this->_Columns));
          foreach ($RemoveColumns as $Column) {
             $this->DropColumn($Column);
          }
       }
 
-      // 2. Add new columns
+      // 2. Add new columns & modify existing ones
 		$AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
 
       // array_diff returns values from the first array that aren't present in
       // the second array. In this example, all columns in $this->_Columns that
       // are NOT in the table.
-      $NewColumns = array_diff(array_keys($this->_Columns), $ExistingColumns);
-      foreach ($NewColumns as $Column) {
-         if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add '.$this->_DefineColumn(ArrayValue($Column, $this->_Columns))))
-            throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+      foreach ($this->_Columns as $ColumnName => $Column) {
+			if (!array_key_exists($ColumnName, $ExistingColumns)) {
 
-         // Add keys if necessary
-//         $Col = ArrayValue($Column, $this->_Columns);
-//         if ($Col->KeyType == 'primary') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add primary key using btree(`'.$Column.'`)'))
-//               throw new Exception(T('Failed to add the `'.$Column.'` primary key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-//         } else if ($Col->KeyType == 'key') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(T('Failed to add the `'.$Column.'` key to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-//         } else if ($Col->KeyType == 'index') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add index `'.Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(T('Failed to add the `'.$Column.'` index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-//         } else if ($Col->KeyType == 'unique') {
-//            if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` add unique index `'.Gdn_Format::AlphaNumeric('`UX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//               throw new Exception(T('Failed to add the `'.$Column.'` unique index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-//         } else if ($Col->KeyType == 'fulltext') {
-//				if (!$this->Query('alter table `'.$this->DatabasePrefix.$this->_TableName.'` add fulltext index `'.Gdn_Format::AlphaNumeric('TX_'.$this->_TableName.'_'.$Column).'` (`'.$Column.'`)'))
-//					throw new Exception(T('Failed to add the `'.$Column.'` fulltext index to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-//			}
+				// This column name is not in the existing column collection, so add the column
+				if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+					throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+			} else if ($Column->Type != $ExistingColumns[$ColumnName]->Type) {
+
+				// The existing & new column types do not match, so modify the column
+				if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+					throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+			}
       }
 		
+		// 3. Update Indexes
 		$Indexes = $this->_IndexSql($this->_Columns);
 		$IndexesDb = $this->_IndexSqlDb();
 		$IndexSql = array();

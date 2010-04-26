@@ -70,8 +70,8 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       if (!function_exists('gd_info'))
          throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
-      $GdInfo = gd_info();
-      
+         
+      $GdInfo = gd_info();      
       $Size = getimagesize($Source);
       list($WidthSource, $HeightSource, $Type) = $Size;
       if ($Height == '' || !is_numeric($Height))
@@ -120,15 +120,15 @@ class Gdn_UploadImage extends Gdn_Upload {
       $SourceImage = FALSE;
       switch ($Type) {
          case 1:
-            if ($GdInfo['GIF Read Support'] || $GdInfo['GIF Write Support'])
+            if (GetValue('GIF Read Support', $GdInfo) || GetValue('GIF Write Support', $GdInfo))
                $SourceImage = imagecreatefromgif($Source);
             break;
          case 2:
-            if ($GdInfo['JPG Support'] || $GdInfo['JPEG Support'])
+            if (GetValue('JPG Support', $GdInfo) || GetValue('JPEG Support', $GdInfo))
                $SourceImage = imagecreatefromjpeg($Source);
             break;
          case 3:
-            if ($GdInfo['PNG Support'])
+            if (GetValue('PNG Support', $GdInfo))
                $SourceImage = imagecreatefrompng($Source);
             break;
       }

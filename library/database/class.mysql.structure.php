@@ -347,7 +347,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'char', 'varchar', 'varbinary', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
          throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

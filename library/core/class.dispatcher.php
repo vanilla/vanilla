@@ -147,7 +147,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    
       if ($Request !== NULL && is_a($Request,'Gdn_Request'))
          Gdn::Request()->Import($Request);
-         
+      
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest();
       

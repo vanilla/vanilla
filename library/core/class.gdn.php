@@ -21,10 +21,12 @@ class Gdn {
    const AliasSession = 'Session';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
+   const AliasRequest = 'Request';
 
    const FactoryInstance = 'Instance';
    const FactoryPrototype = 'Prototype';
    const FactorySingleton = 'Singleton';
+   const FactoryRealSingleton = 'RealSingleton';
    
    /// PROPERTIES ///
    
@@ -248,12 +250,25 @@ class Gdn {
    }
    
    /**
-    * Geth the permission model for the application.
+    * Get the permission model for the application.
     *
     * @return PermissionModel
     */
    public static function PermissionModel() {
       return self::Factory(self::AliasPermissionModel);
+   }
+   
+   /**
+    * Get the current request object
+    *
+    * @return Gdn_Request
+    */
+   public static function Request($NewRequest=NULL) {
+      $Request = self::Factory(self::AliasRequest);
+      if (!is_null($NewRequest))
+         $Request->Import($NewRequest);
+      
+      return $Request;
    }
    
    /**

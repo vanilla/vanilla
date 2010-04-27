@@ -33,7 +33,7 @@ class CategoriesController extends VanillaController {
       
       if ($Category === FALSE)
          return $this->All();
-
+      
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
@@ -42,7 +42,7 @@ class CategoriesController extends VanillaController {
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
          $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
-         $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
+         $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

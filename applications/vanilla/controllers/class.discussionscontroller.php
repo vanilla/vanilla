@@ -30,7 +30,7 @@ class DiscussionsController extends VanillaController {
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
-         $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
+         $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
          $this->Head->Title(T('All Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)

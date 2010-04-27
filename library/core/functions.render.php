@@ -56,6 +56,9 @@ if (!function_exists('Anchor')) {
  */
 if (!function_exists('FormatPossessive')) {
    function FormatPossessive($Word) {
+		if(function_exists('FormatPossessiveCustom'))
+			return FormatPossesiveCustom($Word);
+			
       return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
    }
 }

@@ -12,8 +12,6 @@ class ImportController extends DashboardController {
 	public $Uses = array('Form', 'ImportModel', 'ExportModel');
 	
 	public function Export() {
-		return;
-	
 		set_time_limit(60*2);
 		$Ex = $this->ExportModel;
 		$Ex->PDO(Gdn::Database()->Connection());
@@ -33,7 +31,7 @@ class ImportController extends DashboardController {
 		$Ex->EndExport();
 	}
 	
-	public function Index() {
+	public function Index($Action = '') {
 		$this->Permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
 		$Timer = new Gdn_Timer();
 		
@@ -64,6 +62,9 @@ class ImportController extends DashboardController {
 					SaveToConfig(array(
 						'Garden.Import.CurrentStep' => $CurrentStep,
 						'Garden.Import.ImportPath' => $ImportPath));
+					
+					
+					Redirect('dashboard/import/go');
 				} else {
 					$this->Form->AddError('%s is required.', 'Import File');
 				}
@@ -74,25 +75,30 @@ class ImportController extends DashboardController {
 		$this->SetData('Steps', $Imp->Steps);
 		
 		if($CurrentStep >= 1) {
-			$this->View = 'Steps';
-			
-			$Imp->ImportPath = C('Garden.Import.ImportPath');
 			$Data = C('Garden.Import.CurrentStepData');
 			if($Data)
 				$Imp->Data = $Data;
+					
+			if(strcasecmp($Action, 'go') == 0) {
+				$this->View = 'Steps';
 				
-			$Result = $Imp->RunStep($CurrentStep);
-			
-			if($Result === TRUE) {
-				$CurrentStep++;
-			} elseif($Result === 'COMPLETE') {
+				$Imp->ImportPath = C('Garden.Import.ImportPath');
+					
+				$Result = $Imp->RunStep($CurrentStep);
 				
-			} /*elseif(is_array($Result)) {
-				SaveToConfig(array(
-					'Garden.Import.CurrentStep' => $CurrentStep,
-					'Garden.Import.CurrentStepData' => ArrayValue('Data', $Result)));
-				$this->SetData('CurrentStepMessage', ArrayValue('Message', $Result));
-			}*/
+				if($Result === TRUE) {
+					$CurrentStep++;
+				} elseif($Result === 'COMPLETE') {
+					
+				} /*elseif(is_array($Result)) {
+					SaveToConfig(array(
+						'Garden.Import.CurrentStep' => $CurrentStep,
+						'Garden.Import.CurrentStepData' => ArrayValue('Data', $Result)));
+					$this->SetData('CurrentStepMessage', ArrayValue('Message', $Result));
+				}*/
+			} else {
+				$this->View = 'Continue';
+			}
 		}
 		
 		SaveToConfig(array(

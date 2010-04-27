@@ -88,6 +88,7 @@ class DiscussionsController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddCssFile('vanilla.css');
       $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+		$this->FireEvent('AfterInitialize');
    }
    
    public function Bookmarked($Offset = '0') {

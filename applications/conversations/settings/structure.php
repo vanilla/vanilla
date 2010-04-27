@@ -44,7 +44,7 @@ $Construct->Table('UserConversation')
    ->Column('LastMessageID', 'int', NULL, 'key') // The last message posted by a user other than this one, unless this user is the only person who has added a message
    ->Column('DateLastViewed', 'datetime', NULL)
    ->Column('DateCleared', 'datetime', NULL)
-   ->Column('Bookmarked', array('1', '0'), '0')
+   ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
    
 // Contains messages for each conversation, as well as who inserted the message
@@ -80,3 +80,12 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumR
    
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'AddedToConversation', 'FullHeadline' => '%1$s added you to a %8$s.', 'ProfileHeadline' => '%1$s added  you to a %8$s.', 'RouteCode' => 'conversation', 'Notify' => '1', 'Public' => '0'));
+
+/*
+   Apr 26th, 2010
+   Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
+   For some reason mysql makes 0's "2" during this change. Change them back to "0".
+*/
+if (!$Construct->CaptureOnly) {
+	$SQL->Query("update GDN_UserConversation set Bookmarked = '0' where Bookmarked = '2'");
+}

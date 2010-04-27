@@ -36,15 +36,14 @@ class VanillaSearchModel extends Gdn_Model {
          $this->SQL->WhereIn('d.CategoryID', $Perms, FALSE);
       }
 		
-		$SearchModel->AddMatchSql($this->SQL, 'd.Name');
+		$SearchModel->AddMatchSql($this->SQL, 'd.Name, d.Body');
 		
 		$this->SQL
-			->Select('d.DiscussionID as PrimaryID, d.Name as Title, c.Body as Summary')
+			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary')
 			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
 			->Select('d.DateInserted')
 			->Select('d.InsertUserID as UserID, u.Name')
 			->From('Discussion d')
-			->Join('Comment c', 'd.FirstCommentID = c.CommentID')
 			->Join('User u', 'd.InsertUserID = u.UserID');
 		
 		$Result = $this->SQL->GetSelect();

@@ -307,6 +307,8 @@ class PostController extends VanillaController {
                // And update the draft count
                $UserModel = Gdn::UserModel();
                $CountDrafts = $UserModel->GetAttribute($Session->UserID, 'CountDrafts', 0);
+               $this->SetJson('MyDrafts', T('My Drafts'));
+               $this->SetJson('CountDrafts', $CountDrafts);
             }
          }
       }

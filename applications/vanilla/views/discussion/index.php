@@ -1,5 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+if (!function_exists('WriteComment'))
+   include($this->FetchViewLocation('helper_functions', 'discussion'));
+
 if ($Session->IsValid()) {
    // Bookmark link
    echo Anchor(
@@ -27,7 +30,10 @@ if ($Session->IsValid()) {
    echo $this->RenderAsset('DiscussionBefore');
 ?>
 <ul class="MessageList Discussion">
-   <?php echo $this->FetchView('comments'); ?>
+   <?php
+   echo WriteComment($this->Discussion, $this, $Session, $this->Offset);
+   echo $this->FetchView('comments');
+   ?>
 </ul>
 <?php
 

@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
                   $(btn).addClass('Bookmarked');
                   
             }
-            $('a.MyBookmarks').html(json.MenuLink);
+            $('a.MyBookmarks').html(json.MenuText+'<span>'+json.CountBookmarks+'</span>');
             // Add/remove the bookmark from the side menu.
             gdn.processTargets(json.Targets);
          }

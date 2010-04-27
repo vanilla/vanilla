@@ -21,7 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 abstract class Gdn_Plugin implements Gdn_IPlugin {
 
    public function GetView($ViewName) {
-      $PluginName = substr(get_class($this),-6);
+      $PluginName = substr(get_class($this),0,-6);
       $PluginDirectory = PATH_PLUGINS.DS.$PluginName.DS.'views';
       return $PluginDirectory.DS.$ViewName;
    }

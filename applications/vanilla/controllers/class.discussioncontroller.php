@@ -220,14 +220,11 @@ class DiscussionController extends VanillaController {
          Redirect($Target);
       }
       
-      $MyBookmarks = T('My Bookmarks');
-      if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
-         $MyBookmarks .= '<span>'.$CountBookmarks.'</span>';            
-
       $this->SetJson('State', $State);
+      $this->SetJson('CountBookmarks', $CountBookmarks);
       $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
       $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
-      $this->SetJson('MenuLink', $MyBookmarks);
+      $this->SetJson('MenuText', T('My Bookmarks'));
       
       $Targets = array();
       if($State) {

@@ -23,11 +23,11 @@ class DiscussionModel extends VanillaModel {
       }
       
       $this->SQL
-         ->Select('d.InsertUserID', '', 'FirstUserID')
-         ->Select('d.DateInserted', '', 'FirstDate')
-         ->Select('iu.Name', '', 'FirstName')
-         ->Select('iup.Name', '', 'FirstPhoto')
-         // ->Select('fc.Body', '', 'FirstBody')
+         ->Select('d.InsertUserID')
+         ->Select('d.DateInserted', '', 'InsertDate')
+         ->Select('iu.Name', '', 'InsertName')
+         ->Select('iup.Name', '', 'InsertPhoto')
+         ->Select('d.Body')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -37,8 +37,6 @@ class DiscussionModel extends VanillaModel {
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID') // First comment
-         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID') // Last comment
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          ->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
@@ -46,7 +44,7 @@ class DiscussionModel extends VanillaModel {
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
    }
    
-   public function DiscussionSummaryQuery($AdditionalFields = array('FirstComment' => 'fc.Body', 'FirstCommentFormat' => 'fc.Format')) {
+   public function DiscussionSummaryQuery($AdditionalFields = array()) {
       $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
@@ -57,8 +55,8 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          ->Select('iup.Name', '', 'FirstPhoto')
-         //->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
-         //->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
+         ->Select('d.Body') // <-- Need these for rss!
+         ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -69,7 +67,6 @@ class DiscussionModel extends VanillaModel {
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         //->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
          //->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
@@ -79,7 +76,7 @@ class DiscussionModel extends VanillaModel {
 			
 		if(is_array($AdditionalFields)) {
 			// Add additional fields to the query.
-			$Tables = array('fc' => array('Comment fc', 'd.FirstCommentID = fc.CommentID'));
+			// $Tables = array('fc' => array('Comment fc', 'd.FirstCommentID = fc.CommentID'));
 			
 			foreach($AdditionalFields as $Alias => $Field) {
 				// See if a new table needs to be joined to the query.
@@ -124,7 +121,8 @@ class DiscussionModel extends VanillaModel {
                ->Select('now()', '', 'DateLastViewed')
                ->Select('0', '', 'Dismissed')
                ->Select('0', '', 'Bookmarked')
-               ->Select('0', '', 'CountCommentWatch');
+               ->Select('0', '', 'CountCommentWatch')
+					->Select('d.Announce','','IsAnnounce');
       }
 		
 		$this->AddArchiveWhere($this->SQL);
@@ -293,17 +291,17 @@ class DiscussionModel extends VanillaModel {
       $this->FireEvent('BeforeGetID');
       $Data = $this->SQL
          ->Select('d.*')
-         ->Select('c.Body')
          ->Select('ca.Name', '', 'Category')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
+			->Select('iu.Name', '', 'InsertName')
          ->From('Discussion d')
-         ->Join('Comment c', 'd.FirstCommentID = c.CommentID', 'left')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
+			->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // Insert user
          ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->Where('d.DiscussionID', $DiscussionID)
@@ -362,20 +360,18 @@ class DiscussionModel extends VanillaModel {
       }
    }
    
-   public function Save($FormPostValues, $CommentModel) {
+   public function Save($FormPostValues) {
       $Session = Gdn::Session();
       
       // Define the primary key in this model's table.
       $this->DefineSchema();
-      $CommentModel->DefineSchema();
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
-      $CommentModel->Validation->ApplyRule('Body', 'Required');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
-         $CommentModel->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
-         $CommentModel->Validation->ApplyRule('Body', 'Length');
+         $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
+         $this->Validation->ApplyRule('Body', 'Length');
       }      
       
       // Get the DiscussionID from the form so we know if we are inserting or updating.
@@ -406,10 +402,7 @@ class DiscussionModel extends VanillaModel {
          unset($FormPostValues['Sink']);
          
       // Validate the form posted values
-      if (
-         $this->Validate($FormPostValues, $Insert)
-         && $CommentModel->Validate($FormPostValues)
-      ) {
+      if ($this->Validate($FormPostValues, $Insert)) {
          // If the post is new and it validates, make sure the user isn't spamming
          if (!$Insert || !$this->CheckForSpam('Discussion')) {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
@@ -418,28 +411,11 @@ class DiscussionModel extends VanillaModel {
             $Discussion = FALSE;
             if ($DiscussionID > 0) {
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
-            
-               // Get the CommentID from the discussion table before saving
-               $FormPostValues['CommentID'] = $this->SQL
-                  ->Select('FirstCommentID')
-                  ->From('Discussion')
-                  ->Where('DiscussionID', $DiscussionID)
-                  ->Get()
-                  ->FirstRow()
-                  ->FirstCommentID;
-               $CommentModel->Save($FormPostValues);
             } else {
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
-               $CommentID = $CommentModel->Save($FormPostValues);
-               // Assign the FirstCommentID to the discussion table
-               $this->SQL->Put($this->Name,
-                  array('FirstCommentID' => $CommentID, 'LastCommentID' => $CommentID, 'LastCommentUserID' => $Session->UserID),
-                  array($this->PrimaryKey => $DiscussionID)
-               );
-               
                $this->EventArguments['FormPostValues'] = $FormPostValues;
                $this->EventArguments['InsertFields'] = $Fields;
                $this->EventArguments['DiscussionID'] = $DiscussionID;
@@ -475,13 +451,6 @@ class DiscussionModel extends VanillaModel {
                $CategoryID = $Data->FirstRow()->CategoryID;
 
             $this->UpdateDiscussionCount($CategoryID);
-         }
-      } else {
-         // Make sure that all of the validation results from both validations are present for view by the form
-         foreach ($CommentModel->ValidationResults() as $FieldName => $Results) {
-            foreach ($Results as $Result) {
-               $this->Validation->AddValidationResult($FieldName, $Result);
-            }
          }
       }
       return $DiscussionID;

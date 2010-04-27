@@ -23,8 +23,8 @@ $Construct->Table('Role')
    ->Column('Name', 'varchar(100)')
    ->Column('Description', 'varchar(200)', TRUE)
    ->Column('Sort', 'int', TRUE)
-   ->Column('Deletable', array('1', '0'), '1')
-   ->Column('CanSession', array('1', '0'), '1')
+   ->Column('Deletable', 'tinyint(1)', '1')
+   ->Column('CanSession', 'tinyint(1)', '1')
    ->Set($Explicit, $Drop);
 
 // Define some roles.
@@ -46,7 +46,7 @@ $Construct->Table('User')
    ->Column('Password', 'varbinary(34)')
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)')
-   ->Column('ShowEmail', array('1', '0'), '0')
+   ->Column('ShowEmail', 'tinyint(1)', '0')
    ->Column('Gender', array('m', 'f'), 'm')
    ->Column('CountVisits', 'int', '0')
    ->Column('CountInvitations', 'int', '0')
@@ -66,7 +66,7 @@ $Construct->Table('User')
 	->Column('Score', 'float', NULL)
 	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
 	->Column('CacheRoleID', 'int', TRUE)
-   ->Column('Admin', array('1', '0'), '0')
+   ->Column('Admin', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 // UserRole Table
@@ -169,13 +169,13 @@ $Construct->Table('Invitation')
 $Construct->Table('ActivityType')
 	->PrimaryKey('ActivityTypeID')
    ->Column('Name', 'varchar(20)')
-   ->Column('AllowComments', array('1', '0'), '0')
-   ->Column('ShowIcon', array('1', '0'), '0')
+   ->Column('AllowComments', 'tinyint(1)', '0')
+   ->Column('ShowIcon', 'tinyint(1)', '0')
    ->Column('ProfileHeadline', 'varchar(255)')
    ->Column('FullHeadline', 'varchar(255)')
    ->Column('RouteCode', 'varchar(255)', TRUE)
-   ->Column('Notify', array('1', '0'), '0') // Add to RegardingUserID's notification list?
-   ->Column('Public', array('1', '0'), '1') // Should everyone be able to see this, or just the RegardingUserID?
+   ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
+   ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
 
 // Insert some activity types
@@ -228,8 +228,8 @@ $Construct->Table('Message')
 	->PrimaryKey('MessageID')
    ->Column('Content', 'text')
    ->Column('Format', 'varchar(20)', TRUE)
-   ->Column('AllowDismiss', array('1', '0'), '1')
-   ->Column('Enabled', array('1', '0'), '1')
+   ->Column('AllowDismiss', 'tinyint(1)', '1')
+   ->Column('Enabled', 'tinyint(1)', '1')
    ->Column('Application', 'varchar(255)', TRUE)
    ->Column('Controller', 'varchar(255)', TRUE)
    ->Column('Method', 'varchar(255)', TRUE)
@@ -237,3 +237,25 @@ $Construct->Table('Message')
 	->Column('CssClass', 'varchar(20)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Set($Explicit, $Drop);
+	
+/*
+   Apr 26th, 2010
+   Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
+   For some reason mysql makes 0's "2" during this change. Change them back to "0".
+*/
+if (!$Construct->CaptureOnly) {
+	$SQL->Query("update GDN_Role set Deletable = '0' where Deletable = '2'");
+	$SQL->Query("update GDN_Role set CanSession = '0' where CanSession = '2'");
+
+	$SQL->Query("update GDN_User set ShowEmail = '0' where ShowEmail = '2'");
+	$SQL->Query("update GDN_User set Admin = '0' where Admin = '2'");
+
+	$SQL->Query("update GDN_ActivityType set AllowComments = '0' where AllowComments = '2'");
+	$SQL->Query("update GDN_ActivityType set ShowIcon = '0' where ShowIcon = '2'");
+	$SQL->Query("update GDN_ActivityType set Notify = '0' where Notify = '2'");
+	$SQL->Query("update GDN_ActivityType set Public = '0' where Public = '2'");
+
+	$SQL->Query("update GDN_Message set AllowDismiss = '0' where AllowDismiss = '2'");
+	$SQL->Query("update GDN_Message set Enabled = '0' where Enabled = '2'");
+}
+	

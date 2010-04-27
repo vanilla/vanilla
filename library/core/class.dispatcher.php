@@ -119,6 +119,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * Class constructor.
     */
    public function __construct() {
+      parent::__construct();
       $this->_EnabledApplicationFolders = array();
       $this->Request = '';
       $this->Routes = array();
@@ -142,13 +143,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * Analyzes the supplied query string and decides how to dispatch the
     * request.
     */
-   public function Dispatch() {
+   public function Dispatch($Request=NULL) {
+   
+      if ($Request !== NULL && is_a($Request,'Gdn_Request'))
+         Gdn::Request()->Import($Request);
+         
+      $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest();
+      
+/*
+      echo "<br />Gdn::Request thinks: ".Gdn::Request()->Request();
+      echo "<br />Gdn::Request also suggests: output=".Gdn::Request()->Output().", outfile=".Gdn::Request()->Outfile();
 
-      //echo '<br />App folder: '.$this->_ApplicationFolder;
-      //echo '<br />Controller folder: '.$this->_ControllerFolder;
-      //echo '<br />ControllerName: '.$this->_ControllerName;
-      //echo '<br />ControllerMethod: '.$this->_ControllerMethod;
+      echo '<br />Request: '.$this->Request;      
+      echo '<br />App folder: '.$this->_ApplicationFolder;
+      echo '<br />Controller folder: '.$this->_ControllerFolder;
+      echo '<br />ControllerName: '.$this->_ControllerName;
+      echo '<br />ControllerMethod: '.$this->_ControllerMethod;
+*/
 
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {
@@ -184,6 +196,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
+         
          // Take enabled plugins into account, as well
          $PluginManager = Gdn::Factory('PluginManager');
          $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
@@ -336,24 +349,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-
-      // Retrieve and parse the request
-      if ($this->Request == '') {
-         $this->Request = Gdn_Url::Request();
-         $Prefix = strtolower(substr($this->Request, 0, strpos($this->Request, '/')));
-         switch ($Prefix) {
-            case 'rss':
-               $this->_SyndicationMethod = SYNDICATION_RSS;
-               $this->Request = substr($this->Request, 4);
-               break;
-            case 'atom':
-               $this->_SyndicationMethod = SYNDICATION_ATOM;
-               $this->Request = substr($this->Request, 5);
-               break;
-            default:
-               $this->_SyndicationMethod = SYNDICATION_NONE;
-               break;
-         }
+      
+      $this->Request = Gdn::Request()->Request();
+      
+      switch (Gdn::Request()->Output()) {
+         case 'rss':
+            $this->_SyndicationMethod = SYNDICATION_RSS;
+            break;
+         case 'atom':
+            $this->_SyndicationMethod = SYNDICATION_ATOM;
+            break;
+         case 'default':
+         default:
+            $this->_SyndicationMethod = SYNDICATION_NONE;
+            break;
       }
 
       if ($this->Request == '')

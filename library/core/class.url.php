@@ -36,29 +36,13 @@ class Gdn_Url {
     * @return string
     */
    public static function WebRoot($WithDomain = FALSE) {
-      static $WebRoot = NULL;
-      if(is_null($WebRoot)) {
-         // Attempt to get the webroot from the configuration array
-         $WebRoot = Gdn::Config('Garden.WebRoot');
-
-         // Attempt to get the webroot from the server
-         if ($WebRoot === FALSE) {
-            $WebRoot = explode('/', ArrayValue('PHP_SELF', $_SERVER, ''));
-            // Look for index.php to figure out where the web root is.
-            $Key = array_search('index.php', $WebRoot);
-            if($Key !== FALSE) {
-               $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
-            } else {
-               $WebRoot = '';
-            }
-         }
-      }
+      $WebRoot = Gdn::Request()->WebRoot();
       
       if (is_string($WebRoot) && $WebRoot != '') {
          // Strip forward slashes from the beginning of webroot
-         return ($WithDomain ? Gdn_Url::Domain() : '') . preg_replace('/(^\/+)/', '', $WebRoot);
+         return ($WithDomain ? Gdn::Request()->Domain() : '') . preg_replace('/(^\/+)/', '', $WebRoot);
       } else {
-         return $WithDomain ? Gdn_Url::Domain() : '';
+         return $WithDomain ? Gdn::Request()->Domain() : '';
       }
    }
 
@@ -94,9 +78,7 @@ class Gdn_Url {
     * @return string
     */
    public static function Host() {
-      $Host = '';
-      if (isset($_SERVER['HTTP_HOST']))
-         $Host = $_SERVER['HTTP_HOST'];
+      $Host = Gdn::Request()->RequestHost();
 
       return $Host;
    }
@@ -109,7 +91,8 @@ class Gdn_Url {
     * @return string
     */
    public static function QueryString() {
-      $Return = '';
+      /*
+$Return = '';
       if (is_array($_GET)) {
          foreach($_GET as $Key => $Value) {
             if ($Return != '')
@@ -118,6 +101,8 @@ class Gdn_Url {
             $Return .= urlencode($Key) . '=' . urlencode($Value);
          }
       }
+*/
+      $Return = http_build_query(Gdn::Request()->ExportData(Gdn_Request::INPUT_GET));
       return $Return;
    }
 
@@ -132,7 +117,11 @@ class Gdn_Url {
     * @return string
     */
    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-      $Return = '';
+   
+      return (($WithWebRoot) ? self::WebRoot($WithDomain) : '').Gdn::Request()->Request();
+   
+      /*
+$Return = '';
 		
 		// Get the variables from the request required to parse the request.
 		$RequestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI'];
@@ -172,55 +161,6 @@ class Gdn_Url {
       }
 		
 		return $Result;
-		
-		/*
-      // Try PATH_INFO
-      $Request = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : @getenv('PATH_INFO');
-      if ($Request) {
-         $Return = $Request;
-      }
-
-      // Try ORIG_PATH_INFO
-      if (!$Return) {
-         $Request = (isset($_SERVER['ORIG_PATH_INFO'])) ? $_SERVER['ORIG_PATH_INFO'] : @getenv('ORIG_PATH_INFO');
-         if ($Request != '') {
-            $Return = $Request;
-         }
-
-      }
-      // Try with PHP_SELF
-      if (!$Return) {
-         $PhpSelf = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : @getenv('PHP_SELF');
-         $ScriptName = (isset($_SERVER['SCRIPT_NAME'])) ? $_SERVER['SCRIPT_NAME'] : @getenv('SCRIPT_NAME');
-         
-         if ($PhpSelf && $ScriptName) {
-            $Return = substr($PhpSelf, strlen($ScriptName));
-         }
-      }
-      
-      $Return = trim($Return, '/');
-      if (strcasecmp(substr($Return, 0, 9), 'index.php') == 0)
-         $Return = substr($Return, 9);
-         
-      $Return = trim($Return, '/');
-
-      if ($RemoveSyndication) {
-         $Prefix = strtolower(substr($Return, 0, strpos($Return, '/')));
-         if ($Prefix == 'rss')
-            $Return = substr($Return, 4);
-         else if ($Prefix == 'atom')
-            $Return = substr($Return, 5);
-      }
-
-      if ($WithWebRoot) {
-         $WebRoot = Gdn_Url::WebRoot($WithDomain);
-         if (substr($WebRoot, -1, 1) != '/')
-            $WebRoot .= '/';
-
-         $Return = $WebRoot . $Return;
-      }
-
-      return $Return;
-		*/
+*/
    }
 }

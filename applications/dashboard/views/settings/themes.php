@@ -27,9 +27,9 @@ printf(
    $AuthorUrl = ArrayValue('AuthorUrl', $this->EnabledTheme, '');   
    $NewVersion = ArrayValue('NewVersion', $this->EnabledTheme, '');
    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-   $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot{.gif,.jpg,.png}", GLOB_BRACE);
+   $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot.*");
    $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
-   if ($PreviewImage)
+   if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
       echo Img('/themes/'.$this->EnabledThemeFolder.'/'.$PreviewImage, array('alt' => $this->EnabledThemeName, 'height' => '112', 'width' => '150'));
    
    echo '<h4>';
@@ -88,9 +88,10 @@ printf(
          $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
          $NewVersion = ArrayValue('NewVersion', $ThemeInfo, '');
          $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-         $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot{.gif,.jpg,.png}", GLOB_BRACE);
+         $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot.*", GLOB_BRACE);
          $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
-            
+         if($PreviewImage && !in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
+				$PreviewImage = FALSE;
          $Col++;
          if ($Col == 1) {
             $ColClass = 'FirstCol';

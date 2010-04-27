@@ -12,6 +12,7 @@ class EntryController extends Gdn_Controller {
    
    // Make sure the database class is loaded (class.controller.php takes care of this).
    public $Uses = array('Database', 'Form', 'UserModel');
+	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
    
    public function Index() {
       $this->View = 'signin';
@@ -202,7 +203,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -221,7 +222,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -255,7 +256,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -296,7 +297,7 @@ class EntryController extends Gdn_Controller {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');

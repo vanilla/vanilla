@@ -190,7 +190,7 @@ class Gdn_Database {
             if(empty($Port)) {
                $Dsn = sprintf('host=%s;dbname=%s;', $Host, $Dbname);
             } else {
-               $Dsn = sprintf('host=%s;port=%s;dbname=$s;', $Host, $Port, $Dbname);
+               $Dsn = sprintf('host=%s;port=%s;dbname=%s;', $Host, $Port, $Dbname);
             }
          }
       }

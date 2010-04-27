@@ -270,11 +270,8 @@ class Gdn_Request {
       /**
        * Resolve final request to send to dispatcher
        */
-      
       // Get the dispatch string from the URI
-      $Subject = array_pop(explode(' ',str_ireplace($this->RequestFolder(),' ',$this->RequestURI())));
-      $Match = array();
-      if (preg_match('/^\/?(.*?)\/?(?:[#?].*)?$/i', $Subject, $Match))
+      if (preg_match('/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:\/index.php)?\/?(.*?)\/?(?:[#?].*)?$/i', $this->RequestURI(), $Match))
          $this->Request($Match[1]);
       else
          $this->Request('');

@@ -17,7 +17,7 @@ class DiscussionController extends VanillaController {
    public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
    public $CategoryID;
    
-   public function Index($DiscussionID = '', $Offset = '', $Limit = '') {
+   public function Index($DiscussionID = '', $DiscussionStub='', $Offset = '', $Limit = '') {
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
       $this->AddJsFile('/js/library/jquery.resizable.js');
@@ -79,7 +79,7 @@ class DiscussionController extends VanillaController {
             $this->Offset,
             $Limit,
             $this->Discussion->CountComments,
-            'vanilla/discussion/'.$DiscussionID.'/%1$s/%2$s/'.Gdn_Format::Url($this->Discussion->Name)
+            'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
          );
       }
       

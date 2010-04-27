@@ -25,9 +25,10 @@ class UserPhotoModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (is_object($this->User))
-         return parent::ToString();
-
-      return '';
+      $Session = Gdn::Session();
+		if ($Session->IsValid())
+			return parent::ToString();
+			
+		return '';
    }
 }

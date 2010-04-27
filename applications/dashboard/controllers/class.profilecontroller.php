@@ -12,6 +12,8 @@ class ProfileController extends Gdn_Controller {
    
    public $Uses = array('Form', 'UserModel');
 
+	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
+
    public $User;
    protected $_TabView;
    protected $_TabController;
@@ -213,7 +215,7 @@ class ProfileController extends Gdn_Controller {
          // Get the user data for the requested $UserID and put it into the form.
          $this->Form->SetData($this->User);
       } else {
-         $UserModel->Validation->ApplyRule('Name', 'Username', 'Username can only contain letters, numbers, and underscores.');
+         $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
             $this->StatusMessage = T('Your changes have been saved successfully.');

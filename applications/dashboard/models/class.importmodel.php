@@ -28,6 +28,8 @@ class ImportModel {
 
 	public $MaxStepTime = 10000;
 	
+	public $Overwrite = 'Overwrite';
+	
 	public $Steps = array(
 		1 => 'SplitImportFile',
 		2 => 'DefineTables',
@@ -42,7 +44,7 @@ class ImportModel {
 	public $Structures = array(
 		'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
 		'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-		'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
+		'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
 		'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
 		'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
 		'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
@@ -430,21 +432,50 @@ ignore 1 lines";
 	}
 	
 	public function UpdateCounts() {
+		// Define the necessary SQL.
 		$StepSql = array(
+			// Set basic counts.
 			"update :_Discussion d set
-FirstCommentID = (select min(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
 DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+			
+			// Set the body of the first comment when the forum doesn't put it in the discussion.
+			"update :_Discussion d
+inner join :_Comment c
+  on c.DiscussionID = d.DiscussionID
+inner join (
+  select min(c2.CommentID) as CommentID
+  from :_Comment c2
+  group by c2.DiscussionID
+) c2
+  on c.CommentID = c2.CommentID
+set
+  d.Body = c.Body,
+  d.Format = c.Format,
+  d.FirstCommentID = c.CommentID,
+where d.Body is null",
 
+			// Remove the first comment.
+			"delete :_Comment c
+from :_Comment c
+inner join :_Discussion d
+  on d.FirstCommentID = c.CommentID",
+
+			// Set the last comment user.
 			"update :_Discussion d
 join :_Comment c
   on d.LastCommentID = c.CommentID
 set d.LastCommentUserID = c.InsertUserID",
 
+			// Set the category counts.
 			"update :_Category c set
 c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 		
+		// Add the FirstCommentID to the discussion table.
+		Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);
+		
+		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($StepSql); $i++) {
 			$Sql = $StepSql[$i];
@@ -456,6 +487,9 @@ c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.C
 		}
 		if(isset($this->Data['CurrentSubstep']))
 			unset($this->Data['CurrentSubstep']);
+		
+		// Remove the FirstCommentID from the discussion table.
+		Gdn::Structure()->Table('Discussion')->DropColumn('FirstCommentID');
 		return TRUE;
 	}
 }

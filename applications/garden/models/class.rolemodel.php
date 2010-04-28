@@ -36,7 +36,7 @@ class Gdn_RoleModel extends Gdn_Model {
             $this->SQL->Insert('Role', $Values);
          } else {
             // Update the role.
-            $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID));
+            $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID))->Put();
          }
       }
       

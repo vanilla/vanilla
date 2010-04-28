@@ -5,9 +5,11 @@ if (!function_exists('WriteDiscussion'))
 
 	
 $Alt = '';
-foreach ($this->AnnounceData->Result() as $Discussion) {
-   $Alt = $Alt == ' Alt' ? '' : ' Alt';
-   WriteDiscussion($Discussion, $this, $Session, $Alt);
+if (property_exists($this, 'AnnounceData')) {
+	foreach ($this->AnnounceData->Result() as $Discussion) {
+		$Alt = $Alt == ' Alt' ? '' : ' Alt';
+		WriteDiscussion($Discussion, $this, $Session, $Alt);
+	}
 }
 
 $Alt = '';

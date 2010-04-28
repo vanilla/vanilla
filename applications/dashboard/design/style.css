@@ -1046,8 +1046,8 @@ ul.DataList div.Meta strong {
    margin-right: 12px;
 }
 ul.DataList div.Meta strong {
-   background: #fffc00;
-   padding: 2px 4px;
+   background: #ffff00;
+   padding: 1px 4px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -1892,7 +1892,7 @@ ul.PanelDiscussions li strong {
   + New: there are new comments since the last viewed the discussion
 */
 .Mine { background: #e3f4ff; }
-li.New { background: #fffec1; }
+/* li.New { background: #fffec1; } */
 ul.DataList div.Meta a.Category {
    background: #fafafa;
    padding: 2px 4px;
@@ -1902,21 +1902,23 @@ ul.DataList div.Meta a.Category {
 ul.DataList li.Mine div.Meta a.Category {
    background: #eff7ff;
 }
+/*
 ul.DataList li.New div.Meta a.Category {
    background: #fffed7;
 }
+*/
 ul.DataList div.Meta span.Announcement {
-	background: #e00;
-	color: #fff;
-	padding: 2px 4px;
+	background: #777777;
+	color: #ffffff;
+	padding: 1px 4px;
 	-moz-border-radius: 2px;
    font-weight: bold;
 }
 ul.DataList div.Meta span.Closed {
-	background: #555;
+	background: #555555;
    color: #ffffff;
    font-weight: bold;
-	padding: 2px 4px;
+	padding: 1px 4px;
 	-moz-border-radius: 2px;
 }
 

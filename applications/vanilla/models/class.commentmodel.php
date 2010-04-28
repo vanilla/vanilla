@@ -310,7 +310,7 @@ class CommentModel extends VanillaModel {
             $this->SQL->Set('DateLastComment', $Data->DateLastComment);
 
          $this->SQL->Set('LastCommentID', $Data->LastCommentID)
-            ->Set('CountComments', $Data->CountComments)
+            ->Set('CountComments', $Data->CountComments + 1)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
 				

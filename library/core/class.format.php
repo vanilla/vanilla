@@ -207,6 +207,20 @@ class Gdn_Format {
             $Mixed
          );
          
+         // Mentions & Hashes
+         $Mixed = Gdn_Format::Mentions($Mixed);
+         
+         // nl2br
+         $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+
+         return $Formatter->Format($Mixed);
+      }
+   }
+   
+   public static function Mentions($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Mentions');
+      } else {         
          // Handle @mentions
          // This one grabs mentions that start at the beginning of $Mixed
          $Mixed = preg_replace(
@@ -234,11 +248,7 @@ class Gdn_Format {
             '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
             $Mixed
          );
-         
-         // nl2br
-         $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
-
-         return $Formatter->Format($Mixed);
+         return $Mixed;
       }
    }
 
@@ -250,50 +260,76 @@ class Gdn_Format {
     */
    public static function BBCode($Mixed) {
       if (!is_string($Mixed)) {
-         return self::To($Mixed, 'Html');
+         return self::To($Mixed, 'BBCode');
       } else {         
-		$Mixed = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed);
-		$Mixed = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed);
-		$Mixed = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed);
-		$Mixed = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed);
-		$Mixed = preg_replace("#\[quote=('(.*?)',(.*?))\](.*?)\[/quote\]#si",'<p><cite>\\2</cite> napisał:</p><blockquote>\\4</blockquote>',$Mixed);
-		$Mixed = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed);
-		$Mixed = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed);
-		$Mixed = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed);
-		$Mixed = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed);
-		$Mixed = preg_replace("#\[url=(.*?)\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed);
-		$Mixed = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed);
-		$Mixed = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed);
-		$Mixed = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed);
-		$Mixed = preg_replace("#\[img=(.*?)\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed);
-		$Mixed = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed);
-		$Mixed = preg_replace("#\[color=(.*?)\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed);
-		$Mixed = preg_replace("#\[size=(.*?)\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed);
-		
-         // Handle @mentions
-         // This one grabs mentions that start at the beginning of $Mixed
-         $Mixed = preg_replace(
-            '/^(@([\d\w_]{1,20}))/si',
-            Anchor('\\1', '/profile/\\2'),
-            $Mixed
-         );
-         
-         // This one handles all other mentions
-         $Mixed = preg_replace(
-            '/([\s]+)(@([\d\w_]{3,20}))/si',
-            '\\1'.Anchor('\\2', '/profile/\\3'),
-            $Mixed
-         );
-		 
-		 $Formatter = Gdn::Factory('HtmlFormatter');
-         if(is_null($Formatter)) {
-            return $Mixed;
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if (is_null($Formatter)) {
+            return Gdn_Format::Display($Mixed);
+         } else {
+            $Mixed = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed);
+            $Mixed = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed);
+            $Mixed = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed);
+            $Mixed = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed);
+            $Mixed = preg_replace("#\[quote=('(.*?)',(.*?))\](.*?)\[/quote\]#si",'<p><cite>\\2</cite> napisał:</p><blockquote>\\4</blockquote>',$Mixed);
+            $Mixed = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed);
+            $Mixed = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed);
+            $Mixed = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed);
+            $Mixed = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed);
+            $Mixed = preg_replace("#\[url=(.*?)\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed);
+            $Mixed = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed);
+            $Mixed = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed);
+            $Mixed = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed);
+            $Mixed = preg_replace("#\[img=(.*?)\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed);
+            $Mixed = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed);
+            $Mixed = preg_replace("#\[color=(.*?)\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed);
+            $Mixed = preg_replace("#\[size=(.*?)\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed);
+            $Mixed = Gdn_Format::Mentions($Mixed);
+            return $Formatter->Format($Mixed);
+         }         
+      }
+   }
+   
+   /**
+    * Format a string from of "Deleted" content (comment, message, etc).
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function Deleted($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Deleted');
+      } else {         
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if (is_null($Formatter)) {
+            return Gdn_Format::Display($Mixed);
          } else {
             return $Formatter->Format($Mixed);
          }
       }
    }
    
+   /**
+    * Format a string using Markdown syntax. Also purifies the output html.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function Markdown($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Markdown');
+      } else {         
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if (is_null($Formatter)) {
+            return Gdn_Format::Display($Mixed);
+         } else {
+            require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
+            $Mixed = Markdown($Mixed);
+            $Mixed = Gdn_Format::Mentions($Mixed);
+            return $Formatter->Format($Mixed);
+         }
+      }
+   }
+
    public static function Wiki($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');

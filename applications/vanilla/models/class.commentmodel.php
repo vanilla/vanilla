@@ -58,7 +58,7 @@ class CommentModel extends VanillaModel {
             
          if (is_numeric($Discussion->CountCommentWatch)) {
             // Update the watch data
-				if($CountWatch != @$Discussion->CountCommentWatch) {
+				if($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch) {
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',

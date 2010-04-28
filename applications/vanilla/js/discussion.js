@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
    
    // Reveal the textarea and hide previews.
    $('a.WriteButton, a.Cancel').livequery('click', function() {
-      resetCommentForm();
+      resetCommentForm(this);
       if ($(this).hasClass('Cancel'))
          clearCommentForm(this);
          
@@ -114,8 +114,8 @@ jQuery(document).ready(function($) {
                
             } else if (!draft) {
                // Clean up the form
-               resetCommentForm();
-               clearCommentForm($('a.Cancel'));
+               resetCommentForm(btn);
+               clearCommentForm(btn);
 
                // If editing an existing comment, replace the appropriate row
                var existingCommentRow = $('#Comment_' + commentID);
@@ -146,8 +146,8 @@ jQuery(document).ready(function($) {
       return false;
    });
    
-   function resetCommentForm() {
-      var parent = $('div.CommentForm');
+   function resetCommentForm(sender) {
+      var parent = $(sender).parents('div.CommentForm');
       $(parent).find('li.Active').removeClass('Active');
       $('a.WriteButton').parents('li').addClass('Active');
       $(parent).find('div.Preview').remove();
@@ -156,12 +156,12 @@ jQuery(document).ready(function($) {
    }
 
    // Utility function to clear out the comment form
-   function clearCommentForm(cancelButton) {
-      if (cancelButton != null)
-         $(cancelButton).hide();
+   function clearCommentForm(sender) {
+      if (sender != null && $(sender).hasClass('Cancel'))
+         $(sender).hide();
       
       $('.Popup,.Overlay').remove();
-      var frm = $('div.CommentForm');
+      var frm = $(sender).parents('div.CommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
       // Erase any drafts

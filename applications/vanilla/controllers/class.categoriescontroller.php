@@ -64,16 +64,7 @@ class CategoriesController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', $this->CategoryID);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
-         
-      $TmpLimit = $Limit;
-      $AnnounceData = FALSE;
-      if ($Offset == 0) {
-         $AnnounceData = $DiscussionModel->GetAnnouncements($Wheres);
-         $TmpLimit = $Limit - $AnnounceData->NumRows();
-      }
-      $this->SetData('AnnounceData', $AnnounceData, TRUE);
-      
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $TmpLimit, $Wheres), TRUE);
+      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();

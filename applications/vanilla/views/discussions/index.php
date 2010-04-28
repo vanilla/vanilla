@@ -1,9 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
-$DiscussionData = $this->DiscussionData;
 
 WriteFilterTabs($this);
-if ($this->DiscussionData->NumRows() > 0) {
+if ($this->DiscussionData->NumRows() > 0 || $this->AnnounceData->NumRows() > 0) {
 ?>
 <ul class="DataList Discussions">
    <?php

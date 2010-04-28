@@ -79,12 +79,14 @@ class UserModel extends Gdn_Model {
       return $Permissions;
    }
 
-   public function Get($UserReference) {
+   public function Get($UserID) {
       $this->UserQuery();
-      if (is_numeric($UserReference))
-         return $this->SQL->Where('u.UserID', $UserReference)->Get()->FirstRow();
-      else
-         return $this->SQL->Where('u.Name', $UserReference)->Get()->FirstRow();
+      return $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow();
+   }
+   
+   public function GetByUsername($Username) {
+      $this->UserQuery();
+      return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }
 
    public function GetActiveUsers($Limit = 5) {

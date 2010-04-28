@@ -119,9 +119,11 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function ProfileController_Discussions_Create(&$Sender) {
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
-      $Offset = ArrayValue(1, $Sender->RequestArgs, 0);
+		$Username = ArrayValue(1, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
-      $Sender->SetTabView($UserReference, 'Discussions', 'Profile', 'Discussions', 'Vanilla');
+		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
       
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)
@@ -144,7 +146,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'profile/discussions/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+         'profile/discussions/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
       );
       
       // Deliver json data if necessary

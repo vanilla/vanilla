@@ -59,6 +59,9 @@ if (!$Construct->CaptureOnly) {
 	set GDN_Discussion.Body = GDN_Comment.Body,
 		GDN_Discussion.Format = GDN_Comment.Format
 	where GDN_Discussion.FirstCommentID = GDN_Comment.CommentID');
+
+	// Update lastcommentid & firstcommentid
+	$SQL->Query('update GDN_Discussion set LastCommentID = null where LastCommentID = FirstCommentID');
 	
 	$SQL->Query('delete GDN_Comment
 	from GDN_Comment inner join GDN_Discussion

@@ -144,11 +144,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    public function Dispatch() {
       $this->_AnalyzeRequest();
-
-      //echo '<br />App folder: '.$this->_ApplicationFolder;
-      //echo '<br />Controller folder: '.$this->_ControllerFolder;
-      //echo '<br />ControllerName: '.$this->_ControllerName;
-      //echo '<br />ControllerMethod: '.$this->_ControllerMethod;
+      
+      /*
+      echo '<br />App folder: '.$this->_ApplicationFolder;
+      echo '<br />Controller folder: '.$this->_ControllerFolder;
+      echo '<br />ControllerName: '.$this->_ControllerName;
+      echo '<br />ControllerMethod: '.$this->_ControllerMethod;
+      */
 
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {

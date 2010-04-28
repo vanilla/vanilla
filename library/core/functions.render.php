@@ -135,3 +135,11 @@ if (!function_exists('UserPhoto')) {
       }
    }
 }
+/**
+ * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
+ */
+if (!function_exists('Wrap')) {
+   function Wrap($String, $Tag = 'span') {
+      return '<'.$Tag.'>'.$String.'</'.$Tag.'>';
+   }
+}

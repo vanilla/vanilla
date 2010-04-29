@@ -47,6 +47,6 @@ function _SpacifyCamelCase($Str) {
 <?php
 	if(array_key_exists($CurrentStep, $this->Data['Steps'])) {
 		echo '<div>',
-			Anchor(T('Continue'), '#', 'Button'),
+			Anchor(T('Continue'), strtolower($this->Application).'/import/go', 'Button'),
 			'</div>';
 	}

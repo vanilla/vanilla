@@ -47,8 +47,9 @@ class ImportModel {
 		3 => 'LoadUserTable',
 		4 => 'AuthenticateAdminUser',
 		5 => 'InsertUserTable',
-		6 => 'InsertTables',
-		7 => 'UpdateCounts'
+		6 => 'Delete OverwriteTables',
+		7 => 'InsertTables',
+		8 => 'UpdateCounts'
 		);
 	
 	public $Structures = array(
@@ -164,18 +165,18 @@ where i._NewID is null";
 	}
 	
 	public function AuthenticateAdminUser() {
-		$OverwriteUsername = GetValue('OverwriteUsername', $this->Data);
+		$OverwriteEmail = GetValue('OverwriteEmail', $this->Data);
 		$OverwritePassword = GetValue('OverwritePassword', $this->Data);
 		
-		$Data = Gdn::SQL()->GetWhere('zUser', array('Name' => $OverwriteUsername));
+		$Data = Gdn::SQL()->GetWhere('zUser', array('Email' => $OverwriteEmail));
 		if($Data->NumRows() == 0) {
 			return FALSE;
 		} else {
-			// TODO: Make sure the user authenticates.
-			$Header = $this->GetImportHeader();
-			$Source = GetValue('Source', $Header);
+			$Data = $Data->FirstRow();
+			$PasswordHash = Gdn_PasswordHash();
+			$Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
 			
-			return TRUE;
+			return $Result;
 		}
 	}
 	
@@ -243,7 +244,7 @@ where i._NewID is null";
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
-							 'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'UserAuthentication',
+							 'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Role', 'UserAuthentication',
 							 'UserConversation', 'UserDiscussion', 'UserRole');
 		
 		// Execute the SQL.
@@ -292,6 +293,15 @@ where i._NewID is null";
 		return $Header;
 	}
 	
+	public function GetPasswordHashMethod() {
+		$Source = GetValue('Source', $this->GetImportHeader());
+		if(!$Source)
+			return 'Unknown';
+		if(substr_compare('Vanilla', $Source, 0, 7, FALSE))
+			return 'Vanilla';
+		return 'Unknown';
+	}
+	
 	public function InsertTables() {
 		$InsertedCount = 0;
 		
@@ -332,7 +342,7 @@ where i._NewID is null";
 		return $Result;
 	}
 	
-	protected function _InsertTable($TableName) {
+	protected function _InsertTable($TableName, $Sets = array()) {
 		if(!array_key_exists($TableName, $this->Data['Tables']))
 			return;
 		
@@ -340,7 +350,7 @@ where i._NewID is null";
 		
 		// Build the column insert list.
 		$Insert = "insert :_$TableName (\n  "
-			.implode(",\n  ", array_keys($Structure))
+			.implode(",\n  ", array_keys(array_merge($Structure, $Sets)))
 			."\n)";
 		$From = "from :_z$TableName i";
 		$Where = '';
@@ -377,6 +387,11 @@ where i._NewID is null";
 			$Where .= " and o0.$PK is null";
 		}
 		
+		// Add the sets to the select list.
+		foreach($Sets as $Field => $Value) {
+			$Select[] = Gdn::Database()->Connection()->quote($Value).' as '.$Field;
+		}
+		
 		// Build the sql statement.
 		$Sql = $Insert
 			."\nselect\n  ".implode(",\n  ", $Select)
@@ -391,18 +406,28 @@ where i._NewID is null";
 		$this->Query('truncate table :_User');
 		
 		// Load the new user table.
-		$UserTableInfo &= $this->Data['Tables']['User'];
-		$this->LoadTable('User', $UserTableInfo['Path']);
-		$UserTableInfo['Loaded'] = TRUE;
+		$UserTableInfo =& $this->Data['Tables']['User'];
+		$this->_InsertTable('User', array('HashMethod' => $this->GetPasswordHashMethod()));
+		$UserTableInfo['Inserted'] = TRUE;
 		
 		// Set the admin user flag.
-		$AdminUsername = GetValue('OverwriteUsername', $this->Data);
-		$this->Query('update :_User set Admin = 1 where Name = :Username', array(':Username' => $AdminUsername));
+		$AdminEmail = GetValue('OverwriteEmail', $this->Data);
+		$this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
 		
 		// Authenticate the admin user as the current user.
 		$Auth = new Gdn_PasswordAuthenticator();
 		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword')));
 		Gdn::Session()->Start($Auth);
+		
+		return TRUE;
+	}
+	
+	public function LoadUserTable() {
+		$UserTableInfo =& $this->Data['Tables']['User'];
+		$this->LoadTable('User', $UserTableInfo['Path']);
+		$UserTableInfo['Loaded'] = TRUE;
+		
+		return TRUE;
 	}
 	
 	public function LoadState() {
@@ -453,16 +478,16 @@ ignore 1 lines";
 		return TRUE;
 	}
 	
-	public function Overwrite($Overwrite = '', $Username = '', $Password = '') {
-		if($Overwrite = '')
+	public function Overwrite($Overwrite = '', $Email = '', $Password = '') {
+		if($Overwrite == '')
 			return GetValue('Overwrite', $this->Data);
 		$this->Data['Overwrite'] = $Overwrite;
-		if(strcasecmp($Overwrite, 'Overwrite')) {
-			$this->Data['OverwriteUsername'] = $Username;
+		if(strcasecmp($Overwrite, 'Overwrite') == 0) {
+			$this->Data['OverwriteEmail'] = $Email;
 			$this->Data['OverwritePassword'] = $Password;
 		} else {
-			if(isset($this->Data['OverwriteUsername']))
-				unset($this->Data['OverwriteUsername']);
+			if(isset($this->Data['OverwriteEmail']))
+				unset($this->Data['OverwriteEmail']);
 			if(isset($this->Data['OverwritePassword']))
 				unset($this->Data['OverwritePassword']);
 		}

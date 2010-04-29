@@ -27,8 +27,8 @@ echo $this->Form->Errors();
 		T('Garden.Import.Overwrite.Desciption', 'This option will delete all of the user and discussion data in this forum. You must choose a new admin user from the import data below.'),
 		'</div>';
 		
-		echo $this->Form->Label('Username', 'Username'),
-			$this->Form->TextBox('Username');
+		echo $this->Form->Label('Email', 'Email'),
+			$this->Form->TextBox('Email');
 		
 		echo $this->Form->Label('Password', 'Password'),
 			$this->Form->Input('Password', 'password');

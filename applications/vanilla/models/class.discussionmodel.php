@@ -15,7 +15,7 @@ class DiscussionModel extends VanillaModel {
    public function __construct() {
       parent::__construct('Discussion');
    }
-   
+   /*
    public function DiscussionQuery() {
       $Perms = $this->CategoryPermissions();
       if($Perms !== TRUE) {
@@ -43,6 +43,7 @@ class DiscussionModel extends VanillaModel {
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
    }
+   */
    
    public function DiscussionSummaryQuery($AdditionalFields = array()) {
       $Perms = $this->CategoryPermissions();
@@ -113,7 +114,6 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
-            ->Select('(d.Announce & !w.Dismissed)','','IsAnnounce')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
             $this->SQL
@@ -129,26 +129,12 @@ class DiscussionModel extends VanillaModel {
       
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
+			
+		// If not looking at discussions filtered by bookmarks or user, filter announcements out.
+		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+			$this->SQL->Where('d.Announce<>', '1');
       
-/*
-
-      // REMOVED TO FIX ANNOUNCEMENT ORDERING / PAGING
-
-      if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
-         $this->SQL
-            ->BeginWhereGroup()
-            ->Where('d.Announce<>', '1');
-         
-         // Removing this for speed.
-         //if ($UserID > 0)
-            //$this->SQL->OrWhere('w.Dismissed', '1');
-            
-         $this->SQL->EndWhereGroup();
-      }
-*/
-         
       $Data = $this->SQL
-         ->OrderBy('IsAnnounce', 'desc')
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
@@ -191,7 +177,7 @@ class DiscussionModel extends VanillaModel {
 			}
 		}
 	}
-   
+
    public function GetAnnouncements($Wheres = '') {
       $Session = Gdn::Session();
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
@@ -210,7 +196,9 @@ class DiscussionModel extends VanillaModel {
          
       $Data = $this->SQL
          ->Where('d.Announce', '1')
+			->BeginWhereGroup()
          ->Where('w.Dismissed is null')
+         ->OrWhere('w.Dismissed', '0')
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
@@ -298,11 +286,13 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
 			->Select('iu.Name', '', 'InsertName')
+			->Select('iup.Name', '', 'InsertPhoto')
          ->From('Discussion d')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
 			->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // Insert user
-         ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
+			->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
+			->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->Where('d.DiscussionID', $DiscussionID)
          ->Get()

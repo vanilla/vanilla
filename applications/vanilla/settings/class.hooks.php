@@ -15,6 +15,47 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
    }
    
+	// Remove data when deleting a user
+   public function UserModel_BeforeDeleteUser_Handler($Sender) {
+      $UserID = GetValue('UserID', $Sender->EventArguments);
+      $Options = GetValue('Options', $Sender->EventArguments, array());
+      $Options = is_array($Options) ? $Options : array();
+
+		$Sender->SQL->Delete('UserDiscussion', array('UserID' => $UserID));
+		$Sender->SQL->Delete('Draft', array('InsertUserID' => $UserID));
+      
+      $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
+      if ($DeleteMethod == 'delete') {
+         $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
+      } else if ($DeleteMethod == 'wipe') {
+			$Sender->SQL->From('Comment')
+				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+				->Delete('Comment c', array('d.InsertUserID' => $UserID));
+
+         $Sender->SQL->Update('Comment')
+            ->Set('Body', T('The user and all related content has been deleted.'))
+            ->Set('Format', 'Deleted')
+            ->Where('InsertUserID', $UserID)
+            ->Put();
+      } else {
+         // Leave comments
+      }
+		$Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
+
+      // Remove the user's profile information related to this application
+      $Sender->SQL->Update('User')
+         ->Set(array(
+				'CountDiscussions' => 0,
+				'CountUnreadDiscussions' => 0,
+				'CountComments' => 0,
+				'CountDrafts' => 0,
+				'CountBookmarks' => 0
+			))
+         ->Where('UserID', $UserID)
+         ->Put();
+
+   }
+
    public function Base_Render_Before(&$Sender) {
       // Add menu items.
       $Session = Gdn::Session();
@@ -78,9 +119,11 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function ProfileController_Discussions_Create(&$Sender) {
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
-      $Offset = ArrayValue(1, $Sender->RequestArgs, 0);
+		$Username = ArrayValue(1, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
-      $Sender->SetTabView($UserReference, 'Discussions', 'Profile', 'Discussions', 'Vanilla');
+		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
       
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)
@@ -103,7 +146,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'profile/discussions/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+         'profile/discussions/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
       );
       
       // Deliver json data if necessary

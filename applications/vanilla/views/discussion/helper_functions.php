@@ -79,7 +79,7 @@ function WriteOptionList($Object, $Sender, $Session) {
       // And if this is just another comment in the discussion ...
       
       // Can the user edit the comment?
-      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Comments.Edit', $CategoryID))
+      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Comments.Edit', $Sender->Discussion->CategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').'</span>';
 
       // Can the user delete the comment?

@@ -9,9 +9,37 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 class ConversationsHooks implements Gdn_IPlugin {
    
-   public function UserModel_SessionQuery_Handler(&$Sender) {
+   public function UserModel_SessionQuery_Handler($Sender) {
       // Add some extra fields to the session query
       $Sender->SQL->Select('u.CountUnreadConversations');
+   }
+   
+   // Remove data when deleting a user
+   public function UserModel_BeforeDeleteUser_Handler($Sender) {
+      $UserID = GetValue('UserID', $Sender->EventArguments);
+      $Options = GetValue('Options', $Sender->EventArguments, array());
+      $Options = is_array($Options) ? $Options : array();
+      
+      $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
+      if ($DeleteMethod == 'delete') {
+         $Sender->SQL->Delete('Conversation', array('InsertUserID' => $UserID));
+         $Sender->SQL->Delete('Conversation', array('UpdateUserID' => $UserID));
+         $Sender->SQL->Delete('UserConversation', array('UserID' => $UserID));
+         $Sender->SQL->Delete('ConversationMessage', array('InsertUserID' => $UserID));
+      } else if ($DeleteMethod == 'wipe') {
+         $Sender->SQL->Update('ConversationMessage')
+            ->Set('Body', T('The user and all related content has been deleted.'))
+            ->Set('Format', 'Deleted')
+            ->Where('InsertUserID', $UserID)
+            ->Put();
+      } else {
+         // Leave conversation messages
+      }
+      // Remove the user's profile information related to this application
+      $Sender->SQL->Update('User')
+         ->Set('CountUnreadConversations', 0)
+         ->Where('UserID', $UserID)
+         ->Put();
    }
    
    public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {

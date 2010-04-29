@@ -72,6 +72,9 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
+// Default request
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
+
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
 if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
    header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/setup'), '/'));
@@ -79,8 +82,6 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup'
 }
 
 /// Install some of the services.
-// Default request
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
 // Default database.
 Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
 // Database drivers.

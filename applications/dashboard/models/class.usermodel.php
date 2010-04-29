@@ -79,12 +79,14 @@ class UserModel extends Gdn_Model {
       return $Permissions;
    }
 
-   public function Get($UserReference) {
+   public function Get($UserID) {
       $this->UserQuery();
-      if (is_numeric($UserReference))
-         return $this->SQL->Where('u.UserID', $UserReference)->Get()->FirstRow();
-      else
-         return $this->SQL->Where('u.Name', $UserReference)->Get()->FirstRow();
+      return $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow();
+   }
+   
+   public function GetByUsername($Username) {
+      $this->UserQuery();
+      return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }
 
    public function GetActiveUsers($Limit = 5) {
@@ -846,6 +848,68 @@ class UserModel extends Gdn_Model {
             FALSE
          );
       }
+      return TRUE;
+   }
+
+   public function Delete($UserID, $Options = array()) {
+      // Fire an event so applications can remove their associated user data.
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Options'] = $Options;
+      $this->FireEvent('BeforeDeleteUser');
+
+      // Remove photos
+      $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
+      foreach ($PhotoData->Result() as $Photo) {
+         @unlink(PATH_UPLOADS.DS.$Photo->Name);
+      }
+      $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
+      
+      // Remove invitations
+      $this->SQL->Delete('Invitation', array('InsertUserID' => $UserID));
+      $this->SQL->Delete('Invitation', array('AcceptedUserID' => $UserID));
+      
+      // Remove activities
+      $this->SQL->Delete('Activity', array('ActivityUserID' => $UserID));
+      $this->SQL->Delete('Activity', array('RegardingUserID' => $UserID));
+      
+      // Remove shared authentications
+      $this->SQL->Delete('UserAuthentication', array('UserID' => $UserID));
+
+      // Remove role associations
+      $this->SQL->Delete('UserRole', array('UserID' => $UserID));
+
+      // Remove the user's information
+      $this->SQL->Update('User')
+         ->Set(array(
+            'Name' => '[Deleted User]',
+            'PhotoID' => 'null',
+            'Password' => RandomString('10'),
+            'About' => '',
+            'Email' => 'user_'.$UserID.'@deleted.email',
+            'ShowEmail' => '0',
+            'Gender' => 'm',
+            'CountVisits' => 0,
+            'CountInvitations' => 0,
+            'CountNotifications' => 0,
+            'InviteUserID' => null,
+            'DiscoveryText' => '',
+            'Preferences' => null,
+            'Permissions' => null,
+            'Attributes' => null,
+            'DateSetInvitations' => null,
+            'DateOfBirth' => null,
+            'DateFirstVisit' => null,
+            'DateLastActive' => null,
+            'DateInserted' => '1975-09-16 00:00:00',
+            'DateUpdated' => null,
+            'HourOffset' => '0',
+            'Score' => null,
+            'CacheRoleID' => null,
+            'Admin' => 0
+            ))
+         ->Where('UserID', $UserID)
+         ->Put();
+
       return TRUE;
    }
 

@@ -298,7 +298,10 @@ class DiscussionModel extends VanillaModel {
          ->Get()
          ->FirstRow();
 		
-		if(Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))) {
+		if (
+			$Data
+			&& Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))
+		) {
 			$Data->Closed = '1';
 		}
 		return $Data;

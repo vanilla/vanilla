@@ -157,6 +157,8 @@ jQuery(document).ready(function($) {
 
    // Utility function to clear out the comment form
    function clearCommentForm(sender) {
+      var container = $(sender).parents('li.Editing');
+      $(container).removeClass('Editing');
       if (sender != null && $(sender).hasClass('Cancel'))
          $(sender).hide();
       
@@ -199,6 +201,8 @@ jQuery(document).ready(function($) {
    // Edit comment
    $('a.EditComment').livequery('click', function() {
       var btn = this;
+      var container = $(btn).parents('li.Comment');
+      $(container).addClass('Editing');
       var parent = $(btn).parents('div.Comment');
       var msg = $(parent).find('div.Message');
       $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');

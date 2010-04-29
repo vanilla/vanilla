@@ -63,44 +63,54 @@ class Gdn_Upload {
    /**
     * Validates the uploaded file. Returns the temporary name of the uploaded file.
     */
-   public function ValidateUpload($InputName) {
-      if (
-         !array_key_exists($InputName, $_FILES)
-         || !is_uploaded_file($_FILES[$InputName]['tmp_name'])
-      ) throw new Exception(T('The file failed to upload.'));
-      
-      switch ($_FILES[$InputName]['error']) {
-         case 1:
-         case 2:
-            throw new Exception(T('The file is too large to be uploaded to this application.'));
-            break;
-         case 3:
-         case 4:
-            throw new Exception(T('The file failed to upload.'));
-            break;
-         case 6:
-            throw new Exception(T('The temporary upload folder has not been configured.'));
-            break;
-         case 7:
-            throw new Exception(T('Failed to write the file to disk.'));
-            break;
-         case 8:
-            throw new Exception(T('The upload was stopped by extension.'));
-            break;
-      }
+   public function ValidateUpload($InputName, $ThrowException = TRUE) {
+      $Ex = FALSE;
+		if(!array_key_exists($InputName, $_FILES) || !is_uploaded_file($_FILES[$InputName]['tmp_name']))
+			$Ex = T('The file failed to upload.');
+      else {
+			switch ($_FILES[$InputName]['error']) {
+			   case 1:
+			   case 2:
+			      $Ex = T('The file is too large to be uploaded to this application.');
+			      break;
+				case 3:
+				case 4:
+				  $Ex = T('The file failed to upload.');
+				  break;
+				case 6:
+					$Ex = T('The temporary upload folder has not been configured.');
+					break;
+				case 7:
+					$Ex = T('Failed to write the file to disk.');
+					break;
+				case 8:
+					$Ex = T('The upload was stopped by extension.');
+					break;
+		  }
+		}
       
       // Check the maxfilesize again just in case the value was spoofed in the form.
-      if (filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize)
-         throw new Exception(T('The file is too large to be uploaded to this application.'));
-      
-      // Make sure that the file extension is allowed
-      $Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
-      if (!InArrayI($Extension, $this->_AllowedFileExtensions))
-         throw new Exception(sprintf(T('You cannot upload files with this extension (%s).'), $Extension));
+      if ($Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize)
+         $Ex = T('The file is too large to be uploaded to this application.');
+      else {
+			// Make sure that the file extension is allowed
+			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
+			if (!InArrayI($Extension, $this->_AllowedFileExtensions))
+			   $Ex = sprintf(T('You cannot upload files with this extension (%s).'), $Extension);
+		}
 
-      // If all validations were successful, return the tmp name/location of the file.
-      $this->_UploadedFile = $_FILES[$InputName];
-      return $this->_UploadedFile['tmp_name'];
+		if($Ex) {
+			if($ThrowException) {
+				throw new Exception($Ex);
+			} else {
+				$this->Exception = $Ex;
+				return FALSE;
+			}
+		} else {
+			// If all validations were successful, return the tmp name/location of the file.
+			$this->_UploadedFile = $_FILES[$InputName];
+			return $this->_UploadedFile['tmp_name'];
+		}
    }
    
    public function GetUploadedFileName() {

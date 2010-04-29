@@ -8,6 +8,24 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+class Gdn_ErrorException extends ErrorException {
+
+   private $Context;
+   
+   public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
+      parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
+      $this->Context = $Context;
+   }
+   
+   public function getContext() {
+      return $this->Context;
+   }
+
+}
+
+function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
+   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+}
 
 /**
  * A custom error handler that displays much more, very useful information when
@@ -19,213 +37,225 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param string The line number the error was raised at.
  * @param string An array of every variable that existed in the scope the error was triggered in.
  */
-function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-   // Ignore errors that have a @ before them (ie. @function();)
-   if (error_reporting() == 0)
-      return FALSE;
-   
-   // Clean the output buffer in case an error was encountered in-page.
-   @ob_end_clean();
-   header('Content-Type: text/html; charset=utf-8');
-   
-   $SenderMessage = $Message;
-   $SenderObject = 'PHP';
-   $SenderMethod = 'Gdn_ErrorHandler';
-   $SenderCode = FALSE;
-   $MessageInfo = explode('|', $Message);
-   $MessageCount = count($MessageInfo);
-   if ($MessageCount == 4)
-      list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
-   else if ($MessageCount == 3)
-      list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
-   
-   $SenderMessage = strip_tags($SenderMessage);
-   
-   $Master = FALSE;  // The parsed master view
-   $CssPath = FALSE; // The web-path to the css file
-   $ErrorLines = FALSE; // The lines near the error's line #
-   $DeliveryType = DELIVERY_TYPE_ALL;
-   if (array_key_exists('DeliveryType', $_POST)) {
-      $DeliveryType = $_POST['DeliveryType'];
-   } else if (array_key_exists('DeliveryType', $_GET)) {
-      $DeliveryType = $_GET['DeliveryType'];
-   }
-
-   // Make sure all of the required custom functions and variables are defined.
-   $PanicError = FALSE; // Should we just dump a message and forget about the master view?
-   if (!defined('DS')) $PanicError = TRUE;
-   if (!defined('PATH_ROOT')) $PanicError = TRUE;
-   if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
-   if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-   $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
-   
-   // Try and rollback a database transaction.
-   if(class_exists('Gdn', FALSE)) {
-      $Database = Gdn::Database();
-      if(is_object($Database))
-         $Database->RollbackTransaction();
-   }
-
-   if ($PanicError === FALSE) {
-      // See if we can get the file that caused the error
-      if (is_string($File) && is_numeric($ErrorNumber))
-         $ErrorLines = @file($File);
-         
-      // If this error was encountered during an ajax request, don't bother gettting the css or theme files
-      if ($DeliveryType == DELIVERY_TYPE_ALL) {
-         $CssPaths = array(); // Potential places where the css can be found in the filesystem.
-         $MasterViewPaths = array();
-         $MasterViewName = 'error.master.php';
-         $MasterViewCss = 'error.css';
-            
-         if(class_exists('Gdn', FALSE)) {
-            $CurrentTheme = ''; // The currently selected theme
-            $CurrentTheme = Gdn::Config('Garden.Theme', '');
-            $MasterViewName = Gdn::Config('Garden.Errors.MasterView', $MasterViewName);
-            $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
-            if ($MasterViewCss == '')
-               $MasterViewCss = 'error';
-            
-            $MasterViewCss .= '.css';
+function Gdn_ExceptionHandler($ErrorException) {
+   try {
+      $ErrorNumber = $ErrorException->getCode();
+      $Message = $ErrorException->getMessage();
+      $File = $ErrorException->getFile();
+      $Line = $ErrorException->getLine();
+      $Arguments = $ErrorException->getContext();
       
-            if ($CurrentTheme != '') {
-               // Look for CSS in the theme folder:
-               $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . $MasterViewCss;
-               
-               // Look for Master View in the theme folder:
-               $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . $MasterViewName;
-            }
-         }
+      // Ignore errors that have a @ before them (ie. @function();)
+      if (error_reporting() == 0)
+         return FALSE;
+      
+      // Clean the output buffer in case an error was encountered in-page.
+      @ob_end_clean();
+      header('Content-Type: text/html; charset=utf-8');
+      
+      $SenderMessage = $Message;
+      $SenderObject = 'PHP';
+      $SenderMethod = 'Gdn_ErrorHandler';
+      $SenderCode = FALSE;
+      $MessageInfo = explode('|', $Message);
+      $MessageCount = count($MessageInfo);
+      if ($MessageCount == 4)
+         list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
+      else if ($MessageCount == 3)
+         list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+      
+      $SenderMessage = strip_tags($SenderMessage);
+      
+      $Master = FALSE;  // The parsed master view
+      $CssPath = FALSE; // The web-path to the css file
+      $ErrorLines = FALSE; // The lines near the error's line #
+      $DeliveryType = DELIVERY_TYPE_ALL;
+      if (array_key_exists('DeliveryType', $_POST)) {
+         $DeliveryType = $_POST['DeliveryType'];
+      } else if (array_key_exists('DeliveryType', $_GET)) {
+         $DeliveryType = $_GET['DeliveryType'];
+      }
+   
+      // Make sure all of the required custom functions and variables are defined.
+      $PanicError = FALSE; // Should we just dump a message and forget about the master view?
+      if (!defined('DS')) $PanicError = TRUE;
+      if (!defined('PATH_ROOT')) $PanicError = TRUE;
+      if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
+      if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
+      $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
+      
+      // Try and rollback a database transaction.
+      if(class_exists('Gdn', FALSE)) {
+         $Database = Gdn::Database();
+         if(is_object($Database))
+            $Database->RollbackTransaction();
+      }
+   
+      if ($PanicError === FALSE) {
+         // See if we can get the file that caused the error
+         if (is_string($File) && is_numeric($ErrorNumber))
+            $ErrorLines = @file($File);
             
-         // Look for CSS in the dashboard design folder.
-         $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
-         // Look for Master View in the dashboard view folder.
-         $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
-         
-         $CssPath = FALSE;
-         $Count = count($CssPaths);
-         for ($i = 0; $i < $Count; ++$i) {
-            if (file_exists($CssPaths[$i])) {
-               $CssPath = $CssPaths[$i];
-               break;
-            }
-         }
-         if ($CssPath !== FALSE) {
-            $CssPath = str_replace(
-               array(PATH_ROOT, DS),
-               array('', '/'),
-               $CssPath
-            );
-            $CssPath = ($WebRoot == '' ? '' : '/'. $WebRoot) . $CssPath;
-         }
-   
-         $MasterViewPath = FALSE;
-         $Count = count($MasterViewPaths);
-         for ($i = 0; $i < $Count; ++$i) {
-            if (file_exists($MasterViewPaths[$i])) {
-               $MasterViewPath = $MasterViewPaths[$i];
-               break;
-            }
-         }
-   
-         if ($MasterViewPath !== FALSE) {
-            include($MasterViewPath);
-            $Master = TRUE;
-         }
-      }
-   }
-   
-   if ($DeliveryType != DELIVERY_TYPE_ALL) {
-      // This is an ajax request, so dump an error that is more eye-friendly in the debugger
-      echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<div class=\"AjaxError\">\"".$SenderMessage."\"\n";
-      if ($SenderCode != '')
-         echo htmlentities($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
-         
-      if (is_array($ErrorLines) && $Line > -1)
-         echo "LOCATION: ",$File,"\n";
-         
-      $LineCount = count($ErrorLines);
-      $Padding = strlen($Line+5);
-      for ($i = 0; $i < $LineCount; ++$i) {
-         if ($i > $Line-6 && $i < $Line+4) {
-            if ($i == $Line - 1)
-               echo '>>';
+         // If this error was encountered during an ajax request, don't bother gettting the css or theme files
+         if ($DeliveryType == DELIVERY_TYPE_ALL) {
+            $CssPaths = array(); // Potential places where the css can be found in the filesystem.
+            $MasterViewPaths = array();
+            $MasterViewName = 'error.master.php';
+            $MasterViewCss = 'error.css';
                
-            echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), $ErrorLines[$i]),"\n";
-         }
-      }
-      $Backtrace = debug_backtrace();
-      if (is_array($Backtrace)) {
-         echo "BACKTRACE:\n";
-         $BacktraceCount = count($Backtrace);
-         for ($i = 0; $i < $BacktraceCount; ++$i) {
-            if (array_key_exists('file', $Backtrace[$i])) {
-               $File = $Backtrace[$i]['file'].' '
-               .$Backtrace[$i]['line'];
+            if(class_exists('Gdn', FALSE)) {
+               $CurrentTheme = ''; // The currently selected theme
+               $CurrentTheme = Gdn::Config('Garden.Theme', '');
+               $MasterViewName = Gdn::Config('Garden.Errors.MasterView', $MasterViewName);
+               $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
+               if ($MasterViewCss == '')
+                  $MasterViewCss = 'error';
+               
+               $MasterViewCss .= '.css';
+         
+               if ($CurrentTheme != '') {
+                  // Look for CSS in the theme folder:
+                  $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . $MasterViewCss;
+                  
+                  // Look for Master View in the theme folder:
+                  $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . $MasterViewName;
+               }
             }
-            echo '['.$File.']' , ' '
-               ,array_key_exists('class', $Backtrace[$i]) ? $Backtrace[$i]['class'] : 'PHP'
-               ,array_key_exists('type', $Backtrace[$i]) ? $Backtrace[$i]['type'] : '::'
-               ,$Backtrace[$i]['function'],'();'
-            ,"\n";
+               
+            // Look for CSS in the dashboard design folder.
+            $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
+            // Look for Master View in the dashboard view folder.
+            $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
+            
+            $CssPath = FALSE;
+            $Count = count($CssPaths);
+            for ($i = 0; $i < $Count; ++$i) {
+               if (file_exists($CssPaths[$i])) {
+                  $CssPath = $CssPaths[$i];
+                  break;
+               }
+            }
+            if ($CssPath !== FALSE) {
+               $CssPath = str_replace(
+                  array(PATH_ROOT, DS),
+                  array('', '/'),
+                  $CssPath
+               );
+               $CssPath = ($WebRoot == '' ? '' : '/'. $WebRoot) . $CssPath;
+            }
+      
+            $MasterViewPath = FALSE;
+            $Count = count($MasterViewPaths);
+            for ($i = 0; $i < $Count; ++$i) {
+               if (file_exists($MasterViewPaths[$i])) {
+                  $MasterViewPath = $MasterViewPaths[$i];
+                  break;
+               }
+            }
+      
+            if ($MasterViewPath !== FALSE) {
+               include($MasterViewPath);
+               $Master = TRUE;
+            }
          }
       }
-      echo '</div>';
-   } else {
-      // If the master view wasn't found, assume a panic state and dump the error.
-      if ($Master === FALSE) {
-         echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
-<head>
-   <title>Fatal Error</title>
-</head>
-<body>
-   <h1>Fatal Error in ',$SenderObject,'.',$SenderMethod,'();</h1>
-   <h2>',$SenderMessage,"</h2>\n";
-
-   if ($SenderCode != '')
-      echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
-
-   if (is_array($ErrorLines) && $Line > -1) {
-      echo '<h3><strong>The error occurred on or near:</strong> ',$File,'</h3>
-      <pre>';
+      
+      if ($DeliveryType != DELIVERY_TYPE_ALL) {
+         // This is an ajax request, so dump an error that is more eye-friendly in the debugger
+         echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<div class=\"AjaxError\">\"".$SenderMessage."\"\n";
+         if ($SenderCode != '')
+            echo htmlentities($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
+            
+         if (is_array($ErrorLines) && $Line > -1)
+            echo "LOCATION: ",$File,"\n";
+            
          $LineCount = count($ErrorLines);
-         $Padding = strlen($Line+4);
+         $Padding = strlen($Line+5);
          for ($i = 0; $i < $LineCount; ++$i) {
             if ($i > $Line-6 && $i < $Line+4) {
-               echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i], ENT_COMPAT, 'UTF-8');
+               if ($i == $Line - 1)
+                  echo '>>';
+                  
+               echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), $ErrorLines[$i]),"\n";
             }
          }
-      echo "</pre>\n";
-   }
-
-   echo '<h2>Need Help?</h2>
-   <p>If you are a user of this website, you can report this message to a website administrator.</p>
-   <p>If you are an administrator of this website, you can get help at the <a href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
-   <h2>Additional information for support personnel:</h2>
-   <ul>
-      <li><strong>Application:</strong> ',APPLICATION,'</li>
-      <li><strong>Application Version:</strong> ',APPLICATION_VERSION,'</li>
-      <li><strong>PHP Version:</strong> ',PHP_VERSION,'</li>
-      <li><strong>Operating System:</strong> ',PHP_OS,"</li>\n";
-
-      if (array_key_exists('HTTP_REFERER', $_SERVER))
-         echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
-
-      if (array_key_exists('HTTP_USER_AGENT', $_SERVER))
-         echo '<li><strong>User Agent:</strong> ',$_SERVER['HTTP_USER_AGENT'],"</li>\n";
-
-      if (array_key_exists('REQUEST_URI', $_SERVER))
-         echo '<li><strong>Request Uri:</strong> ',$_SERVER['REQUEST_URI'],"</li>\n";
-   echo '</ul>
-</body>
-</html>';
-      }
-   }
+         $Backtrace = debug_backtrace();
+         if (is_array($Backtrace)) {
+            echo "BACKTRACE:\n";
+            $BacktraceCount = count($Backtrace);
+            for ($i = 0; $i < $BacktraceCount; ++$i) {
+               if (array_key_exists('file', $Backtrace[$i])) {
+                  $File = $Backtrace[$i]['file'].' '
+                  .$Backtrace[$i]['line'];
+               }
+               echo '['.$File.']' , ' '
+                  ,array_key_exists('class', $Backtrace[$i]) ? $Backtrace[$i]['class'] : 'PHP'
+                  ,array_key_exists('type', $Backtrace[$i]) ? $Backtrace[$i]['type'] : '::'
+                  ,$Backtrace[$i]['function'],'();'
+               ,"\n";
+            }
+         }
+         echo '</div>';
+      } else {
+         // If the master view wasn't found, assume a panic state and dump the error.
+         if ($Master === FALSE) {
+            echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
+   <head>
+      <title>Fatal Error</title>
+   </head>
+   <body>
+      <h1>Fatal Error in ',$SenderObject,'.',$SenderMethod,'();</h1>
+      <h2>',$SenderMessage,"</h2>\n";
    
-   // Attempt to log an error message no matter what.
-   LogMessage($File, $Line, $SenderObject, $SenderMethod, $SenderMessage, $SenderCode);
-   exit();
+      if ($SenderCode != '')
+         echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
+   
+      if (is_array($ErrorLines) && $Line > -1) {
+         echo '<h3><strong>The error occurred on or near:</strong> ',$File,'</h3>
+         <pre>';
+            $LineCount = count($ErrorLines);
+            $Padding = strlen($Line+4);
+            for ($i = 0; $i < $LineCount; ++$i) {
+               if ($i > $Line-6 && $i < $Line+4) {
+                  echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i], ENT_COMPAT, 'UTF-8');
+               }
+            }
+         echo "</pre>\n";
+      }
+   
+      echo '<h2>Need Help?</h2>
+      <p>If you are a user of this website, you can report this message to a website administrator.</p>
+      <p>If you are an administrator of this website, you can get help at the <a href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
+      <h2>Additional information for support personnel:</h2>
+      <ul>
+         <li><strong>Application:</strong> ',APPLICATION,'</li>
+         <li><strong>Application Version:</strong> ',APPLICATION_VERSION,'</li>
+         <li><strong>PHP Version:</strong> ',PHP_VERSION,'</li>
+         <li><strong>Operating System:</strong> ',PHP_OS,"</li>\n";
+   
+         if (array_key_exists('HTTP_REFERER', $_SERVER))
+            echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
+   
+         if (array_key_exists('HTTP_USER_AGENT', $_SERVER))
+            echo '<li><strong>User Agent:</strong> ',$_SERVER['HTTP_USER_AGENT'],"</li>\n";
+   
+         if (array_key_exists('REQUEST_URI', $_SERVER))
+            echo '<li><strong>Request Uri:</strong> ',$_SERVER['REQUEST_URI'],"</li>\n";
+      echo '</ul>
+   </body>
+   </html>';
+         }
+      }
+      
+      // Attempt to log an error message no matter what.
+      LogMessage($File, $Line, $SenderObject, $SenderMethod, $SenderMessage, $SenderCode);
+   }
+   catch (Exception $e)
+   {
+      print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
+      exit();
+   }
 }
 
 if (!function_exists('ErrorMessage')) {
@@ -301,3 +331,4 @@ if (!function_exists('CleanErrorArguments')) {
 
 // Set up Garden to handle php errors
 set_error_handler('Gdn_ErrorHandler', E_ALL);
+set_exception_handler('Gdn_ExceptionHandler');

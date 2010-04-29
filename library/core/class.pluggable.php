@@ -119,7 +119,7 @@ abstract class Gdn_Pluggable {
     */
    public function FireEvent($EventName) {
       // Look to the PluginManager to see if there are related event handlers
-      $PluginManager = Gdn::Factory('PluginManager');
+      $PluginManager = Gdn::Factory(Gdn::AliasPluginManager);
 
       // Call any related event handlers
       $PluginManager->CallEventHandlers($this, $this->ClassName, $EventName);

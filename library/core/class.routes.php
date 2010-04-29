@@ -47,7 +47,6 @@ class Gdn_Routes {
       $Key = $this->_EncodeRouteKey($Route);
       SaveToConfig('Routes.'.$Key.'.0', $Destination);
       SaveToConfig('Routes.'.$Key.'.1', $Type);
-      
       $this->_LoadRoutes();
    }
    
@@ -115,7 +114,7 @@ class Gdn_Routes {
    private function _ParseRoute($Destination) {
    
       // If Destination is a short array
-      if (is_array($Destination) && sizeof($Destination == 1))
+      if (is_array($Destination) && sizeof($Destination) == 1)
          $Destination = $Destination[0];
    
       // If Destination is a simple string...

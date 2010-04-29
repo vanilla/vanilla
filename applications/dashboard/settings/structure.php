@@ -67,6 +67,7 @@ $Construct->Table('User')
 	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
 	->Column('CacheRoleID', 'int', TRUE)
    ->Column('Admin', 'tinyint(1)', '0')
+   ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 // UserRole Table

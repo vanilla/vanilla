@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T('Delete User'); ?></h1>
+<h1><?php printf(T('Delete User: %s'), UserAnchor($this->User)); ?></h1>
 <table class="Label AltRows">
    <thead>
       <tr>

@@ -303,7 +303,7 @@ class Gdn_Format {
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            return $Formatter->Format($Mixed);
+            return $Formatter->Format(Wrap($Mixed, 'div', ' class="Deleted"'));
          }
       }
    }

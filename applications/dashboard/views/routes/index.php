@@ -12,29 +12,35 @@ $Session = Gdn::Session();
       <tr>
          <th><?php echo T('Route'); ?></th>
          <th class="Alt"><?php echo T('Target'); ?></th>
+         <th class="Alt"><?php echo T('Type'); ?></th>
       </tr>
    </thead>
    <tbody>
 <?php
 $i = 0;
 $Alt = FALSE;
-foreach ($this->Routes as $Route => $Target) {
+foreach ($this->MyRoutes as $Route => $RouteData) {
    $Alt = !$Alt;
+   
+   $Target = $RouteData['Destination'];
+   $RouteType = T($this->Routes->RouteTypes[$RouteData['Type']]);
+   $Reserved = $RouteData['Reserved'];
 ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td class="Info">
-         <strong><?php echo $this->_DecodeRouteKey($Route); ?></strong>
+         <strong><?php echo $Route; ?></strong>
          <div>
          <?php
-         echo Anchor('Edit', '/dashboard/routes/edit/'.$i, 'EditRoute');
-         if (!in_array($Route, $this->ReservedRoutes)) {
+         echo Anchor('Edit', '/dashboard/routes/edit/'.$RouteData['Key'], 'EditRoute');
+         if (!$Reserved) {
             echo '<span>|</span>';
-            echo Anchor('Delete', '/routes/delete/'.$i.'/'.$Session->TransientKey(), 'DeleteRoute');
+            echo Anchor('Delete', '/routes/delete/'.$RouteData['Key'].'/'.$Session->TransientKey(), 'DeleteRoute');
          }
          ?>
          </div>
       </td>
       <td class="Alt"><?php echo $Target; ?></td>
+      <td class="Alt"><?php echo $RouteType; ?></td>
    </tr>
 <?php
    ++$i;

@@ -212,6 +212,25 @@ class UserController extends DashboardController {
       }
    }
 
+   public function Delete($UserID = '', $Method = '') {
+      $this->Permission('Garden.Users.Delete');
+      $this->AddSideMenu('dashboard/user');
+
+      $UserModel = new UserModel();
+      $this->User = $UserModel->Get($UserID);
+      $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
+      $this->Method = $Method;
+      if ($Method != '')
+         $this->View = 'deleteconfirm';
+         
+      if ($this->Form->AuthenticatedPostBack() && $Method != '') {
+         $UserModel->Delete($UserID, array('DeleteMethod' => $Method));
+         $this->View = 'deletecomplete';
+      }
+
+      $this->Render();
+   }
+
    private function HandleApplicant($Action, $UserID) {
       $this->Permission('Garden.Users.Approve');
       //$this->_DeliveryType = DELIVERY_TYPE_BOOL;

@@ -4,11 +4,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass = 'Item';
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
    $CssClass .= $Alt.' ';
-   $CssClass .= $Discussion->IsAnnounce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CountUnreadComments = $Discussion->CountUnreadComments;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
+   $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
 ?>
 <li class="<?php echo $CssClass; ?>">
@@ -17,7 +18,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <?php echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
-         <?php if ($Discussion->IsAnnounce == '1') { ?>
+         <?php if ($Discussion->Announce == '1') { ?>
          <span class="Announcement"><?php echo T('Announcement'); ?></span>
          <?php } ?>
          <?php if ($Discussion->Closed == '1') { ?>
@@ -28,7 +29,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             if ($CountUnreadComments > 0 && $Session->IsValid())
                echo '<strong>',sprintf(T('%s new'), $CountUnreadComments),'</strong>';
          ?>
-         <span><?php printf(T('Most recent by %1$s %2$s'), UserAnchor($Last), Gdn_Format::Date($Discussion->LastDate)); ?></span>
+         <span><?php
+            if ($Discussion->LastCommentID != '')
+               printf(T('Most recent by %1$s %2$s'), UserAnchor($Last), Gdn_Format::Date($Discussion->LastDate));
+            else
+               printf(T('Started by %1$s %2$s'), UserAnchor($First), Gdn_Format::Date($Discussion->FirstDate));
+         ?></span>
          <span><?php echo Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'); ?></span>
          <?php $Sender->FireEvent('DiscussionMeta'); ?>
       </div>

@@ -229,7 +229,7 @@ class PostController extends VanillaController {
                
                // If the comment was not a draft
                if (!$Draft) {
-                  // Redirect redirect to the new comment
+                  // Redirect to the new comment
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
                   Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
                } elseif ($Preview) {

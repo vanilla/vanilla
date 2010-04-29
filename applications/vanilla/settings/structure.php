@@ -59,10 +59,26 @@ if (!$Construct->CaptureOnly) {
 	set GDN_Discussion.Body = GDN_Comment.Body,
 		GDN_Discussion.Format = GDN_Comment.Format
 	where GDN_Discussion.FirstCommentID = GDN_Comment.CommentID');
+
+	// Update lastcommentid & firstcommentid
+	$SQL->Query('update GDN_Discussion set LastCommentID = null where LastCommentID = FirstCommentID');
 	
 	$SQL->Query('delete GDN_Comment
 	from GDN_Comment inner join GDN_Discussion
 	where GDN_Comment.CommentID = GDN_Discussion.FirstCommentID');
+	
+	$SQL->Query('update GDN_Discussion d
+	inner join GDN_Comment c
+		on c.DiscussionID = d.DiscussionID
+	inner join (
+		select max(c2.CommentID) as CommentID
+		from GDN_Comment c2
+		group by c2.DiscussionID
+	) c2
+	on c.CommentID = c2.CommentID
+	set d.LastCommentID = c.CommentID,
+		d.LastCommentUserID = c.InsertUserID
+	where d.LastCommentUserID is null');
 	
 	/*
 	  	Apr 26th, 2010

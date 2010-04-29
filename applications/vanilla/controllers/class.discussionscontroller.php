@@ -48,8 +48,9 @@ class DiscussionsController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
+		$this->SetData('AnnounceData', $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE, TRUE);
+      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit), TRUE);		
       $this->SetJson('Loading', $Offset . ' to ' . $Limit);
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit), TRUE);
 
       // Build a pager.
       $PagerFactory = new Gdn_PagerFactory();

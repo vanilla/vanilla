@@ -39,6 +39,11 @@ class GravatarPlugin extends Gdn_Plugin {
    public function UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
       $Sender->SQL->Select('u.Email');
    }
+	
+	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
+		$Sender->SQL->Select('iu.Email', '', 'InsertEmail');
+	}
+	
    public function CommentModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }

@@ -90,9 +90,9 @@ class Gdn_Upload {
 		}
       
       // Check the maxfilesize again just in case the value was spoofed in the form.
-      if ($Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize)
+      if (!$Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize)
          $Ex = T('The file is too large to be uploaded to this application.');
-      else {
+      elseif(!$Ex) {
 			// Make sure that the file extension is allowed
 			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
 			if (!InArrayI($Extension, $this->_AllowedFileExtensions))

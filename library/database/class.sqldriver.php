@@ -842,6 +842,7 @@ abstract class Gdn_SQLDriver {
     * @param string $OrderDirection The direction of the sort.
     * @param int    $Limit The number of records to limit the query to.
     * @param int    $PageNumber The offset where the query results should begin.
+    * @return Gdn_DataSet The data returned by the query.
     */
    public function GetWhere($Table = '', $Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
       if ($Table != '') {

@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
                $(parent).slideUp('fast', function() { $(this).remove(); });
             } else if ($(parent).length > 0) {
                // Remove the affected row
-               $(btn).parents('.DiscussionRow').slideUp('fast', function() { $(this).remove(); });
+               $(btn).parents('li.Item').slideUp('fast', function() { $(this).remove(); });
             } else {
                // Otherwise just change the class & title on the anchor
                $(btn).attr('title', json.AnchorTitle);
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
                   $(btn).addClass('Bookmarked');
                   
             }
-            $('ul#Menu li.MyBookmarks a').html(json.MenuLink);
+            $('a.MyBookmarks').html(json.MenuLink);
             // Add/remove the bookmark from the side menu.
             processTargets(json.Targets);
          }

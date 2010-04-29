@@ -54,10 +54,6 @@ $Configuration['Garden']['Registration']['ApplicantRoleID']     = 4; // The "App
 $Configuration['Garden']['Registration']['InviteExpiration']    = '-1 week'; // The time before now that an invitation expires. ie. If an invitation was sent within the last week, it is still valid. This value will be plugged directly into strtotime()
 $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
 $Configuration['Garden']['TermsOfService']                      = '/garden/home/termsofservice'; // The url to the terms of service.
-$Configuration['Garden']['DefaultDateFormat']                   = 'F j, Y';
-$Configuration['Garden']['DefaultDayFormat']                    = 'F j';
-$Configuration['Garden']['DefaultYearFormat']                   = 'F Y';
-$Configuration['Garden']['DefaultTimeFormat']                   = 'g:ia';
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';
 $Configuration['Garden']['Email']['SmtpUser']                   = '';
@@ -84,10 +80,17 @@ $Configuration['Garden']['Thumbnail']['Size']                   = 50;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Activity', 'Conversations', 'User');
 $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Theme']                               = 'default';
+$Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Email']['AddedToConversation']   = '1';
+$Configuration['Preferences']['Email']['BookmarkComment']       = '1';
+$Configuration['Preferences']['Email']['WallComment']           = '0';
+$Configuration['Preferences']['Email']['ActivityComment']       = '0';
+$Configuration['Preferences']['Email']['DiscussionComment']     = '0';
+$Configuration['Preferences']['Email']['DiscussionMention']     = '0';
+$Configuration['Preferences']['Email']['CommentMention']        = '0';
 
 // Begin - HtmlPurifier Settings
 $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;
@@ -96,6 +99,7 @@ $Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . D
 $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 
 // Modules
+$Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');
 $Configuration['Modules']['Garden']['Content'] = array('Gdn_MessageModule', 'Notices', 'Content', 'Ads');

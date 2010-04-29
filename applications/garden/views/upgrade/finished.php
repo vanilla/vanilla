@@ -2,7 +2,7 @@
 
 <div class="Title">
    <h1><span>Vanilla</span></h1>
-   <h2><?php echo Gdn::Translate("Import Complete!"); ?></h2>
+   <h2><?php echo T("Import Complete!"); ?></h2>
 </div>
 <form>
    <ul>

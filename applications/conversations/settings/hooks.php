@@ -19,27 +19,27 @@ class ConversationsHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
          $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', sprintf(Gdn::Translate('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name);
+         $SideMenu->AddLink('Options', sprintf(T('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name);
          $Sender->EventArguments['SideMenu'] = $SideMenu;
       }
    }
    
    public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
-      $Sender->Preferences['Email Notifications']['Email.ConversationMessage'] = Gdn::Translate('Notify me of private messages.');
-      $Sender->Preferences['Email Notifications']['Email.AddedToConversation'] = Gdn::Translate('Notify me when I am added to private conversations.');
+      $Sender->Preferences['Email Notifications']['Email.ConversationMessage'] = T('Notify me of private messages.');
+      $Sender->Preferences['Email Notifications']['Email.AddedToConversation'] = T('Notify me when I am added to private conversations.');
    }
    
    public function Base_Render_Before(&$Sender) {
       // Add the menu options for conversations
       $Session = Gdn::Session();
       if ($Sender->Menu && $Session->IsValid()) {
-         $Inbox = Gdn::Translate('Inbox');
+         $Inbox = T('Inbox');
          $CountUnreadConversations = $Session->User->CountUnreadConversations;
          if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
             $Inbox .= '<span>'.$CountUnreadConversations.'</span>';
             
          $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', FALSE);
-         $Sender->Menu->AddLink('Conversations', Gdn::Translate('New Conversation'), '/messages/add', FALSE);
+         $Sender->Menu->AddLink('Conversations', T('New Conversation'), '/messages/add', FALSE);
       }
    }
    
@@ -49,21 +49,21 @@ class ConversationsHooks implements Gdn_IPlugin {
       // Number of Conversations
       $CountConversations = $ConversationModel->GetCountWhere();
       $Sender->AddDefinition('CountConversations', $CountConversations);
-      $Sender->BuzzData[Translate('Conversations')] = number_format($CountConversations);
+      $Sender->BuzzData[T('Conversations')] = number_format($CountConversations);
       // Number of New Conversations in the last day
-      $Sender->BuzzData[Translate('New conversations in the last day')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      $Sender->BuzzData[T('New conversations in the last day')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Conversations in the last week
-      $Sender->BuzzData[Translate('New conversations in the last week')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      $Sender->BuzzData[T('New conversations in the last week')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
 
       $ConversationMessageModel = new Gdn_ConversationMessageModel();
       // Number of Messages
       $CountMessages = $ConversationMessageModel->GetCountWhere();
       $Sender->AddDefinition('CountConversationMessages', $CountMessages);
-      $Sender->BuzzData[Translate('Conversation Messages')] = number_format($CountMessages);
+      $Sender->BuzzData[T('Conversation Messages')] = number_format($CountMessages);
       // Number of New Messages in the last day
-      $Sender->BuzzData[Translate('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
+      $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Messages in the last week
-      $Sender->BuzzData[Translate('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
+      $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Format::ToDateTime(strtotime('-1 week')))));
    }   
    
    public function Setup() {

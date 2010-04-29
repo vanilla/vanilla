@@ -34,11 +34,11 @@ if (!defined('APPLICATION'))
  * <b>Usage</b>:
  * <code>
  * $Locale = Gdn::Locale()
- * $String = Gdn::Translate('Some Code', 'Default Text');
+ * $String = T('Some Code', 'Default Text');
  * </code>
  *
  * @see Gdn::Locale()
- * @see Gdn::Translate()
+ * @see T()
  */
 class Gdn_Locale extends Gdn_Pluggable {
 

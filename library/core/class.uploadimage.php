@@ -23,7 +23,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       // Now perform image-specific checks
       $Size = getimagesize($TmpFileName);
       if ($Size === FALSE)
-         throw new Exception(Gdn::Translate('The uploaded file was not an image.'));
+         throw new Exception(T('The uploaded file was not an image.'));
       
       return $TmpFileName;
    }
@@ -98,7 +98,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             $SourceImage = imagecreatefrompng($Source);
             break;
          default:
-            throw new Exception(sprintf(Gdn::Translate('You cannot save images of this type (%s).'), $Type));
+            throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
             break;
       }
       

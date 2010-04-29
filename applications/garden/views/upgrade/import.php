@@ -4,7 +4,7 @@ echo $this->Form->Open();
 ?>
 <div class="Title">
    <h1><span>Vanilla</span></h1>
-   <h2><?php echo Gdn::Translate("Vanilla 1 to Vanilla 2 Import"); ?></h2>
+   <h2><?php echo T("Vanilla 1 to Vanilla 2 Import"); ?></h2>
 </div>
 <?php
 echo $this->Form->Errors();
@@ -13,7 +13,7 @@ echo $this->Form->Errors();
    <li class="Warning">
       <div>
       <?php
-         echo Gdn::Translate('A little more info before we grab your old discussions...');
+         echo T('A little more info before we grab your old discussions...');
       ?>
       </div>
    </li>

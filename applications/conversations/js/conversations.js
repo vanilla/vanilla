@@ -10,24 +10,6 @@ jQuery(document).ready(function($) {
       $(this).autogrow();
    });
    
-   // Make the entire row clickable on the conversation list.
-   $.fn.hoverRow = function() {
-      return this.each(function() {
-         var row = this;
-         var anchor = $(row).find('a.Message');
-         if (anchor.length > 0) {
-            $(row).hover(function() {
-               $(row).addClass('Active');
-            }, function() {
-               $(row).removeClass('Active');            
-            }).click(function() {
-               document.location = $(anchor).attr('href');
-            });
-         }
-      });
-   }   
-   $('#Conversations li').hoverRow();
-   
    // Hijack "add message" clicks and handle via ajax...
    $.fn.handleMessageForm = function() {
       this.click(function() {
@@ -40,7 +22,7 @@ jQuery(document).ready(function($) {
          postValues += '&'+button.name+'='+button.value;
          var prefix = textbox.attr('name').replace('Message', '');
          // Get the last message id on the page
-         var messages = $('#Conversation li');
+         var messages = $('ul.Conversation li');
          var lastMessage = $(messages).get(messages.length - 1);
          var lastMessageID = $(lastMessage).attr('id');
          postValues += '&' + prefix + 'LastMessageID=' + lastMessageID;
@@ -66,7 +48,7 @@ jQuery(document).ready(function($) {
                   clearMessageForm();                
    
                   // And show the new comments
-                  $('#Conversation').append(json.Data);
+                  $('ul.Conversation').append(json.Data);
                   
                   // Remove any "More" pager links
                   $('#PagerMore').remove();
@@ -110,7 +92,7 @@ jQuery(document).ready(function($) {
    
    // Set up paging
    $('.MorePager').morepager({
-      pageContainerSelector: '#Conversations, #Conversation'
+      pageContainerSelector: 'ul.Conversations, ul.Conversation'
    });
    
    $('#Form_AddPeople :submit').click(function() {

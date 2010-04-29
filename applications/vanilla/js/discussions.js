@@ -2,10 +2,10 @@ jQuery(document).ready(function($) {
    
    // Show drafts delete button on hover
    // Show options on each row (if present)
-   $('.DiscussionRow').livequery(function() {
+   $('li.Item').livequery(function() {
       var row = this;
       var opts = $(row).find('ul.Options');
-      var btn = $(row).find('a.DeleteDraft');
+      var btn = $(row).find('a.Delete');
       $(opts).hide();
       $(btn).hide();
       $(row).hover(function() {
@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
          $(row).removeClass('Active');            
       });
    });
-   
+
    // Set up paging
    if ($.morepager)
       $('.MorePager').livequery(function() {

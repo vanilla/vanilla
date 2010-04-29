@@ -24,7 +24,12 @@ jQuery(document).ready(function($) {
       });
 
    // Hijack the "Cancel" button on the comment form
-   $('a.Cancel').hide().live('click', function() {
+   var cancelButton = $('a.Cancel');
+   var draftId = $('#Form_DraftID').val();
+   if (draftId == '')
+      cancelButton.hide();
+      
+   cancelButton.live('click', function() {
       clearCommentForm(this);
       return false;      
    });
@@ -53,7 +58,7 @@ jQuery(document).ready(function($) {
       var prefix = discussionID.attr('name').replace('DiscussionID', '');
       var discussionID = discussionID.val();
       // Get the last comment id on the page
-      var comments = $('#Discussion li.Comment');
+      var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id').replace('Comment_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
@@ -110,7 +115,7 @@ jQuery(document).ready(function($) {
                } else {   
                   definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
-                  $(json.Data).appendTo('#Discussion')
+                  $(json.Data).appendTo('ul.Discussion')
                      .effect("highlight", {}, "slow");
                }
                
@@ -121,7 +126,7 @@ jQuery(document).ready(function($) {
                $(this).trigger('CommentAdded');
                
                // And scroll to them
-               var target = $('#Discussion #Comment_' + json.CommentID);
+               var target = $('ul.Discussion #Comment_' + json.CommentID);
                if (target.offset())
                   $('html,body').animate({scrollTop: target.offset().top}, 'fast');
 
@@ -141,12 +146,22 @@ jQuery(document).ready(function($) {
    function clearCommentForm(cancelButton) {
       if (cancelButton != null)
          $(cancelButton).hide();
-         
+      
       $('.Popup,.Overlay').remove();
       var frm = $('#CommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
-      frm.find('input:hidden[name$=DraftID]').val('');
+      // Erase any drafts
+      var draftInp = frm.find('input:hidden[name$=DraftID]');
+      if (draftInp.val() != '')
+         $.ajax({
+            type: "POST",
+            url: combinePaths(definition('WebRoot'), 'index.php/vanilla/drafts/delete/'+draftInp.val()+'/'+definition('TransientKey')),
+            data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
+            dataType: 'json'
+         });         
+         
+      draftInp.val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
       $(frm).trigger('clearCommentForm');

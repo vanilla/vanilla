@@ -83,7 +83,7 @@ class Gdn_ThemeManager {
       // 5. Set the theme
       $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
       if ($ThemeFolder == '') {
-         throw new Exception(Gdn::Translate('The theme folder was not properly defined.'));
+         throw new Exception(T('The theme folder was not properly defined.'));
       } else {
          SaveToConfig('Garden.Theme', $ThemeFolder);
       }

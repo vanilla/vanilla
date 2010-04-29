@@ -130,6 +130,10 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionMention'))->NumRow
 if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
 
+// People commenting on user's bookmarked discussions
+if ($SQL->GetWhere('ActivityType', array('Name' => 'BookmarkComment'))->NumRows() == 0)
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0'));
+
 if ($Drop) {
    $PermissionModel = Gdn::PermissionModel();
    $PermissionModel->Database = $Database;
@@ -161,6 +165,15 @@ if ($Drop) {
    
    // Get the general category so we can assign permissions to it.
    $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
+   
+   // Set the initial guest permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 2,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'CategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ));
    
    // Set the intial member permissions.
    $PermissionModel->Save(array(

@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
-<h1><?php echo Gdn::Translate('Manage Messages'); ?></h1>
+<h1><?php echo T('Manage Messages'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Add Message', 'garden/message/add', 'AddMessage Button'); ?></div>
-<div class="Info"><?php echo Gdn::Translate('Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
+<div class="Info"><?php echo T('Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
 <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
    <thead>
       <tr id="0">
-         <th><?php echo Gdn::Translate('Location'); ?></th>
-         <th class="Alt"><?php echo Gdn::Translate('Message'); ?></th>
+         <th><?php echo T('Location'); ?></th>
+         <th class="Alt"><?php echo T('Message'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -24,7 +24,7 @@ foreach ($this->MessageData->Result() as $Message) {
    ?>">
       <td class="Info nowrap"><?php
          printf(
-            Gdn::Translate('%1$s on %2$s'),
+            T('%1$s on %2$s'),
             ArrayValue($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
             ArrayValue($Message->Location, $this->_GetLocationData(), 'Custom Page')
          );

@@ -86,7 +86,7 @@ class MessagesController extends ConversationsController {
     * Show all conversations for the currently authenticated user.
     */
    public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
-      $this->Title(Translate('Conversations'));
+      $this->Title(T('Conversations'));
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       if (!is_numeric($this->Offset) || $this->Offset < 0)
@@ -159,7 +159,7 @@ class MessagesController extends ConversationsController {
       if (is_numeric($ConversationID) && $ConversationID > 0 && $Session->IsValid())
          $this->ConversationModel->Clear($ConversationID, $Session->UserID);
          
-      $this->StatusMessage = Gdn::Translate('The conversation has been cleared.');
+      $this->StatusMessage = T('The conversation has been cleared.');
       $this->RedirectUrl = Url('/messages/all');
       $this->Render();
    }
@@ -220,11 +220,11 @@ class MessagesController extends ConversationsController {
       $this->Participants = '';
       // Who is in the conversation?
       if ($this->RecipientData->NumRows() == 1) {
-         $this->Participants = Gdn::Translate('Just you!');
+         $this->Participants = T('Just you!');
       } else if ($this->RecipientData->NumRows() == 2) {
          foreach ($this->RecipientData->Result() as $User) {
             if ($User->UserID != $Session->UserID)
-               $this->Participants = sprintf(Gdn::Translate('%s and you'), UserAnchor($User));
+               $this->Participants = sprintf(T('%s and you'), UserAnchor($User));
          }
       } else {
          $Users = array();
@@ -232,7 +232,7 @@ class MessagesController extends ConversationsController {
             if ($User->UserID != $Session->UserID)
                $Users[] = UserAnchor($User);
          }
-         $this->Participants = sprintf(Gdn::Translate('%s, and you'), implode(', ', $Users));
+         $this->Participants = sprintf(T('%s, and you'), implode(', ', $Users));
       }
       
       $this->Title(strip_tags($this->Participants));

@@ -171,8 +171,8 @@ class EntryController extends Gdn_Controller {
 
       // Define gender dropdown options
       $this->GenderOptions = array(
-         'm' => Gdn::Translate('Male'),
-         'f' => Gdn::Translate('Female')
+         'm' => T('Male'),
+         'f' => T('Female')
       );
 
       // Make sure that the hour offset for new users gets defined when their account is created
@@ -364,7 +364,7 @@ class EntryController extends Gdn_Controller {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
             $Authenticator = Gdn::Authenticator();
             $Authenticator->Authenticate(array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
-            $this->StatusMessage = Gdn::Translate('Password saved. Signing you in now...');
+            $this->StatusMessage = T('Password saved. Signing you in now...');
             $this->RedirectUrl = Url('/');
          }
       }

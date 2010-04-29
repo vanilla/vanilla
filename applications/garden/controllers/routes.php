@@ -20,7 +20,7 @@ class RoutesController extends GardenController {
       $this->Permission('Garden.Routes.Manage');
       $this->AddSideMenu('garden/routes');
       $this->AddJsFile('routes.js');
-      $this->Title(Translate('Routes'));
+      $this->Title(T('Routes'));
          
       // Load all routes from conf
       $this->Routes = Gdn::Config('Routes', array());
@@ -68,7 +68,7 @@ class RoutesController extends GardenController {
             
          if ($ConfigurationModel->Validate($FormPostValues)) {
             SaveToConfig('Routes'.'.'.ArrayValue('Route', $FormPostValues), ArrayValue('Target', $FormPostValues));
-            $this->StatusMessage = Translate("The route was saved successfully.");
+            $this->StatusMessage = T("The route was saved successfully.");
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
                $this->RedirectUrl = Url('garden/routes');
          } else {

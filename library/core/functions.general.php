@@ -220,6 +220,19 @@ if (!function_exists('Attribute')) {
    }
 }
 
+if (!function_exists('C')) {
+   /**
+    * Retrieves a configuration setting.
+    * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+    * @param mixed $Default The result to return if the configuration setting is not found.
+    * @return mixed The configuration setting.
+    * @see Gdn::Config()
+    */
+   function C($Name = FALSE, $Default = FALSE) {
+      return Gdn::Config($Name, $Default);
+   }
+}
+
 if (!function_exists('CalculateNumberOfPages')) {
    /**
     * Based on the total number of items and the number of items per page,
@@ -251,7 +264,7 @@ if (!function_exists('CheckRequirements')) {
             if (array_key_exists($RequiredItemName, $EnabledItems) === FALSE) {
                throw new Exception(
                   sprintf(
-                     Gdn::Translate('%1$s requires the %2$s %3$s version %4$s.'),
+                     T('%1$s requires the %2$s %3$s version %4$s.'),
                      $ItemName,
                      $RequiredItemName,
                      $RequiredItemTypeCode,
@@ -299,7 +312,7 @@ if (!function_exists('CheckRequirements')) {
                         if (!version_compare($EnabledVersion, $MatchVersion, $Operator)) {
                            throw new Exception(
                               sprintf(
-                                 Gdn::Translate('%1$s requires the %2$s %3$s version %4$s %5$s'),
+                                 T('%1$s requires the %2$s %3$s version %4$s %5$s'),
                                  $ItemName,
                                  $RequiredItemName,
                                  $RequiredItemTypeCode,
@@ -312,7 +325,7 @@ if (!function_exists('CheckRequirements')) {
                   } else if ($RequiredVersion != '*' && $RequiredVersion != '') {
                      throw new Exception(
                         sprintf(
-                           Gdn::Translate('%1$s requires the %2$s %3$s version %4$s'),
+                           T('%1$s requires the %2$s %3$s version %4$s'),
                            $ItemName,
                            $RequiredItemName,
                            $RequiredItemTypeCode,
@@ -640,7 +653,7 @@ if (!function_exists('ProxyRequest')) {
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
-            throw new Exception(sprintf(Gdn::Translate('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
          
          $Header = "GET $Path?$Query HTTP/1.1\r\n" .
             "Host: $Host\r\n" .
@@ -661,7 +674,7 @@ if (!function_exists('ProxyRequest')) {
          $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
          return $Response;
       } else {
-         throw new Exception(Gdn::Translate('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
       return $Response;
    }
@@ -755,19 +768,30 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceString')) {
-   function SliceString($String, $Length, $Suffix = '...') {
-      if (strlen($String) > $Length) {
-         $Return = substr(trim($String), 0, $Length);
-         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . $Suffix;
-      } else {
-         return $String;
-      }
+   function SliceString($String, $Length, $Suffix = '…') {
+	static $Charset;
+	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
    }
 }
 
 if (!function_exists('StringIsNullOrEmpty')) {
    function StringIsNullOrEmpty($String) {
       return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
+   }
+}
+
+if (!function_exists('T')) {
+   /**
+	 * Translates a code into the selected locale's definition.
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @see Gdn::Translate()
+	 */
+   function T($Code, $Default = '') {
+      return Gdn::Translate($Code, $Default);
    }
 }
 
@@ -782,8 +806,7 @@ if (!function_exists('Translate')) {
 	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
-      $Result = Gdn::Translate($Code, $Default);
-      return $Result;
+      return Gdn::Translate($Code, $Default);
    }
 }
 

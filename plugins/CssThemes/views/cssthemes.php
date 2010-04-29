@@ -23,7 +23,7 @@ foreach($this->Data["ThemeSettings"] as $Row) {
 	}
 ?>
 	<tr class="ColorRow">
-		<td><?php echo Gdn::Translate($Name); ?></td>
+		<td><?php echo T($Name); ?></td>
 		<td>
 			<div class="ColorPicker" style="background-color: <?php echo $Row['Setting']; ?>">
 				&nbsp;

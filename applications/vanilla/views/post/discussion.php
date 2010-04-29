@@ -11,7 +11,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
 }
 ?>
 <div id="DiscussionForm">
-   <h2><?php echo property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'; ?></h2>
+   <h2><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h2>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
@@ -30,24 +30,24 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       // Note: I need to validate that they have permission in the specified category on the back-end
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
       if ($Session->CheckPermission('Vanilla.Discussions.Announce'))
-         $Options .= '<li>'.$this->Form->CheckBox('Announce', GDN::Translate('Announce this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Announce', T('Announce this discussion'), array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
-         $Options .= '<li>'.$this->Form->CheckBox('Closed', GDN::Translate('Close this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close this discussion'), array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
-         $Options .= '<li>'.$this->Form->CheckBox('Sink', GDN::Translate('Sink this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Sink', T('Sink this discussion'), array('value' => '1')).'</li>';
          
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';
 
-      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion');
+      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
-         echo $this->Form->Button('Save Draft');
+         echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
       }
-      echo $this->Form->Button('Preview');
+      echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
       $this->FireEvent('AfterFormButtons');
-      echo Anchor(Gdn::Translate('Cancel'), $CancelUrl, 'Cancel');
+      echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo $this->Form->Close();
    ?>
 </div>

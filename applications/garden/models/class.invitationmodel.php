@@ -99,7 +99,7 @@ class Gdn_InvitationModel extends Gdn_Model {
          try {
             $this->Send($InvitationID);
          } catch (Exception $ex) {
-            $this->Validation->AddValidationResult('Email', sprintf(Gdn::Translate('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
+            $this->Validation->AddValidationResult('Email', sprintf(T('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
             return FALSE;
          }
          return TRUE;
@@ -111,20 +111,20 @@ class Gdn_InvitationModel extends Gdn_Model {
       $Invitation = $this->GetByInvitationID($InvitationID);
       $Session = Gdn::Session();
       if ($Invitation === FALSE) {
-         throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+         throw new Exception(T('ErrorRecordNotFound'));
       } else if ($Session->UserID != $Invitation->SenderUserID) {
-         throw new Exception(Gdn::Translate('ErrorPermission'));
+         throw new Exception(T('ErrorPermission'));
       } else {
          // Some information for the email
          $RegistrationUrl = CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'entry', 'register', $Invitation->Code), '/');
          $AppTitle = Gdn::Config('Garden.Title');
          $Email = new Gdn_Email();
-         $Email->Subject(sprintf(Gdn::Translate('[%s] Invitation'), $AppTitle));
+         $Email->Subject(sprintf(T('[%s] Invitation'), $AppTitle));
          $Email->To($Invitation->Email);
          $Email->From($Invitation->SenderEmail, $Invitation->SenderName);
          $Email->Message(
             sprintf(
-               Gdn::Translate('EmailInvitation'),
+               T('EmailInvitation'),
                $Invitation->SenderName,
                $AppTitle,
                $RegistrationUrl
@@ -143,15 +143,15 @@ class Gdn_InvitationModel extends Gdn_Model {
       
       // Does the invitation exist?
       if ($Invitation === FALSE)
-         throw new Exception(Gdn::Translate('ErrorRecordNotFound'));
+         throw new Exception(T('ErrorRecordNotFound'));
       
       // Does this user own the invitation?
       if ($UserID != $Invitation->SenderUserID)
-         throw new Exception(Gdn::Translate('ErrorPermission'));
+         throw new Exception(T('ErrorPermission'));
       
       // Has the invitation been accepted?
       if ($Invitation->AcceptedUserID > 0)
-         throw new Exception(Gdn::Translate('You cannot remove an invitation that has been accepted.'));
+         throw new Exception(T('You cannot remove an invitation that has been accepted.'));
       
       // Delete it
       $this->SQL->Delete($this->Name, array('InvitationID' => $InvitationID));

@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Gdn::Translate('User Registration Settings'); ?></h1>
+<h1><?php echo T('User Registration Settings'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <ul>
    <li id="RegistrationMethods">
-      <div class="Info"><?php echo Gdn::Translate('Choose the registration method for new users:'); ?></div>
+      <div class="Info"><?php echo T('Choose the registration method for new users:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
-               <th><?php echo Gdn::Translate('Method'); ?></th>
-               <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
+               <th><?php echo T('Method'); ?></th>
+               <th class="Alt"><?php echo T('Description'); ?></th>
             </tr>
          </thead>
          <tbody>
@@ -32,7 +32,7 @@ echo $this->Form->Errors();
                   <th><?php
                      echo $this->Form->Radio('Garden.Registration.Method', $Method, array('value' => $Method));
                   ?></th>
-                  <td class="Alt"><?php echo Translate($Description); ?></td>
+                  <td class="Alt"><?php echo T($Description); ?></td>
                </tr>
                <?php
             }
@@ -41,25 +41,25 @@ echo $this->Form->Errors();
       </table>
    </li>
    <li id="NewUserRoles">
-      <div class="Info"><?php echo Gdn::Translate('Check all roles that should be applied to new/approved users:'); ?></div>
+      <div class="Info"><?php echo T('Check all roles that should be applied to new/approved users:'); ?></div>
       <?php echo $this->Form->CheckBoxList('Garden.Registration.DefaultRoles', $this->RoleData, $this->ExistingRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
    <li id="CaptchaSettings">
-      <div class="Info"><?php echo Gdn::Translate('In order to use Captcha on your registration forms, you will need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
+      <div class="Info"><?php echo T('In order to use Captcha on your registration forms, you will need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
-               <th><?php echo Gdn::Translate('Key Type'); ?></th>
-               <th class="Alt"><?php echo Gdn::Translate('Key Value'); ?></th>
+               <th><?php echo T('Key Type'); ?></th>
+               <th class="Alt"><?php echo T('Key Value'); ?></th>
             </tr>
          </thead>
          <tbody>
             <tr class="Alt">
-               <th><?php echo Gdn::Translate('Public Key'); ?></th>
+               <th><?php echo T('Public Key'); ?></th>
                <td class="Alt"><?php echo $this->Form->TextBox('Garden.Registration.CaptchaPublicKey'); ?></td>
             </tr>
             <tr>
-               <th><?php echo Gdn::Translate('Private Key'); ?></th>
+               <th><?php echo T('Private Key'); ?></th>
                <td class="Alt"><?php echo $this->Form->TextBox('Garden.Registration.CaptchaPrivateKey'); ?></td>
             </tr>
          </tbody>
@@ -72,12 +72,12 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li id="InvitationSettings">
-      <div class="Info"><?php echo Gdn::Translate('Choose who can send out invitations to new members:'); ?></div>
+      <div class="Info"><?php echo T('Choose who can send out invitations to new members:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
-               <th><?php echo Gdn::Translate('Role'); ?></th>
-               <th class="Alt"><?php echo Gdn::Translate('Invitations per month'); ?></th>
+               <th><?php echo T('Role'); ?></th>
+               <th class="Alt"><?php echo T('Invitations per month'); ?></th>
             </tr>
          </thead>
          <tbody>

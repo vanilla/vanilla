@@ -64,8 +64,8 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
          }
          if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
             // Add some definitions for javascript
-            $Sender->AddDefinition('Reply', Gdn::Translate('Show 1 more reply...'));
-            $Sender->AddDefinition('Replies', Gdn::Translate('Show %s more replies...'));
+            $Sender->AddDefinition('Reply', T('Show 1 more reply...'));
+            $Sender->AddDefinition('Replies', T('Show %s more replies...'));
          }
       }
    }
@@ -89,8 +89,8 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
          if ($Sender->Discussion->Closed == '1')
             $ReplyText = '&nbsp;';
             
-         $ReplyText = $Comment->CountReplies > 0 ? sprintf(Gdn::Translate(Plural($Comment->CountReplies, '%s Reply', '%s Replies')), $Comment->CountReplies) : $ReplyText;
-         echo $Sender->Discussion->Closed == '1' ? Gdn::Translate($ReplyText) : Anchor(Gdn::Translate($ReplyText), '/post/reply/'.$Comment->CommentID, "ReplyLink");
+         $ReplyText = $Comment->CountReplies > 0 ? sprintf(T(Plural($Comment->CountReplies, '%s Reply', '%s Replies')), $Comment->CountReplies) : $ReplyText;
+         echo $Sender->Discussion->Closed == '1' ? T($ReplyText) : Anchor(T($ReplyText), '/post/reply/'.$Comment->CommentID, "ReplyLink");
          ?>
       </li>
       <?php
@@ -111,7 +111,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
       }
       if ($Session->IsValid() && $Sender->Discussion->Closed == '0') {
          echo '<li class="ReplyForm">';
-            echo Anchor('Write a reply', '/vanilla/post/reply/'.$Comment->CommentID, 'ReplyLink Hidden');
+            echo Anchor(T('Write a reply'), '/vanilla/post/reply/'.$Comment->CommentID, 'ReplyLink Hidden');
             $ReplyForm = Gdn::Factory('Form');
             $ReplyForm->SetModel($this->ReplyModel);
             $ReplyForm->AddHidden('ReplyCommentID', $Comment->CommentID);
@@ -129,7 +129,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             <?php
             // Delete comment
             if ($Session->CheckPermission('Vanilla.Comments.Delete', $Sender->Discussion->CategoryID))
-               echo Anchor(Gdn::Translate('Delete'), 'vanilla/discussion/deletecomment/'.$Sender->CurrentReply->CommentID.'/'.$Session->TransientKey(), 'DeleteReply');
+               echo Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Sender->CurrentReply->CommentID.'/'.$Session->TransientKey(), 'DeleteReply');
          
             ?>
             <ul class="Info<?php echo ($Sender->CurrentReply->InsertUserID == $Session->UserID ? ' Author' : '') ?>">
@@ -139,7 +139,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
                   echo UserAnchor($Author);
                ?></li>
                <li class="Created"><?php echo Format::Date($Sender->CurrentReply->DateInserted); ?></li>
-               <li class="Permalink"><?php echo Anchor(Gdn::Translate('Permalink'), '/discussion/comment/'.(isset($Sender->CurrentComment) ? $Sender->CurrentComment->CommentID : $Sender->ReplyCommentID).'/#Comment_'.$Sender->CurrentReply->CommentID, Gdn::Translate('Permalink')); ?></li>
+               <li class="Permalink"><?php echo Anchor(T('Permalink'), '/discussion/comment/'.(isset($Sender->CurrentComment) ? $Sender->CurrentComment->CommentID : $Sender->ReplyCommentID).'/#Comment_'.$Sender->CurrentReply->CommentID, T('Permalink')); ?></li>
             </ul>
             <div class="Body"><?php echo Format::To($Sender->CurrentReply->Body, $Sender->CurrentReply->Format); ?></div>
          </li>
@@ -282,7 +282,7 @@ class VanillaCommentRepliesPlugin implements Gdn_IPlugin {
             $Sender->ReplyData = $ReplyModel->GetNew($ReplyCommentID, $LastCommentID);
             $Sender->CurrentReply = is_object($Sender->ReplyData) ? $Sender->ReplyData->NextRow() : FALSE;
             $Replies = $Sender->ReplyComment->CountReplies + 1;
-            $Sender->SetJson('Replies', sprintf(Translate(Plural($Replies, '%s Reply', '%s Replies')), $Replies));
+            $Sender->SetJson('Replies', sprintf(T(Plural($Replies, '%s Reply', '%s Replies')), $Replies));
             $Sender->SetJson('CommentID', $CommentID);
             $Sender->Discussion = $Sender->DiscussionModel->GetID($Sender->ReplyComment->DiscussionID);
             $Sender->ControllerName = 'discussion';

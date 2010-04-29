@@ -4,28 +4,29 @@ Welcome to the Generic Style CSS File! Some things you should know:
 
 1. The reset.css file imported above breaks all elements down to a base style.
 
-2. This file is included on all front-end/user-facing pages. Individual
-   applications can override this file in their own custom files
-   (ie. vanilla.css or conversations.css).
+2. This file is included on all front-end/user-facing pages. Applications can
+   override this file in their own custom files (ie. vanilla.css or
+   conversations.css).
 
 3. This file is broken down into the following sections:
-   + Line 24:     General Styles & Typography
-   + Line 325:    Header
-   + Line 556:    Main Menu
-   + Line 591:    Panels / Sidebars
-   + Line 782:    Activities
-   + Line 971:    Profile Page
-   + Line 1072:   Profile Tab Menu
-   + Line 1194:   Thumbnail Cropper
-   + Line 1244:   Footer
+   + General Styles & Typography
+   + Header
+   + Main Menu
+   + Panels / Sidebars
+   + Activities
+   + Profile Page
+   + Profile Tab Menu
+   + Thumbnail Cropper
+   + Footer
 */
    
    
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
-   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 75%;
+	line-height: 1.7em;
    background: #fff;
    margin: 0;
    padding: 0;
@@ -66,7 +67,6 @@ h1, h2, h3, h4, h5, h6 {
 p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 h1, h2 {
    border-bottom:1px solid #bbb;
@@ -90,7 +90,7 @@ a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #2786c2;
+   color: #1e79a7;
 }
 a:hover {
    text-decoration: none;
@@ -106,7 +106,7 @@ textarea {
    padding: 3px;
    margin: 0;
    width: 250px;
-   border: 1px solid #ccc;
+   border: 1px solid #aaa;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -114,7 +114,6 @@ textarea.TextBox {
    width: 500px;
    height: 100px;
    min-height: 100px;
-   max-height: 500px;
 }
 #Popup textarea.TextBox {
    width: 465px;
@@ -138,18 +137,21 @@ select {
    margin: 0;
    padding: 3px;
    }
+a.Button,
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 11px;
    padding: 4px;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
    }
 input.Button {
 	font-size: 14px;
@@ -159,14 +161,17 @@ input.Button {
    color: #111;
    border: 1px solid #666;
 }
+.Button:focus {
+   background: #eee;
+}
 .Loading {
    height: 100px;
    padding: 0 20px;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 .Progress {
    padding: 10px 40px 10px 0;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
@@ -182,7 +187,6 @@ div.Messages {
    font-size: 12px;
    display: block;
    width: 100%;
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;	
 }
 * html div.Messages {
   position: absolute;
@@ -207,6 +211,9 @@ div.Messages ul {
    display:inline-block;
    zoom:1;
    *display:inline;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
 }
 div.Messages ul li {
    text-align: left !important;
@@ -255,9 +262,6 @@ div.Info {
    padding: 6px;
    margin: 0 0 10px;
 }
-div.EmptyInfo {
-   margin: 10px 0;
-}
 /* Note: The MessageModule (in /applications/garden/modules) wraps all messages
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
@@ -290,33 +294,18 @@ a.Close {
 a.Close:hover {
 	color: #333;
 }
-/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
-.MorePager {
-   list-style: none;
-   margin: 1px 0 0;
-   padding: 3px 6px;
-   text-align: right;
-   background: #e9f9ff;
-   }
-.MorePager a {
-   font-size: 13px;
-   font-weight: bold;
-   text-align: right;
-}
-.MorePager a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
-}
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-top-left-radius: 2px;
    margin-bottom: 1px;
+	text-align: left;
 }
-tr#PagerMore td {
-   border: 0;
-   text-align: right;
+div.MorePager a.Loading {
+	border: 0 !important;
+   padding: 0 20px !important;
+   background: url('images/progress.gif') center center no-repeat !important;
 }
 #PagerMore {
    margin-bottom: 1px;
@@ -342,7 +331,6 @@ tr#PagerMore td {
 .NumberedPager span.Next,
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 16px;
 	line-height: 10px;
 }
@@ -358,10 +346,9 @@ tr#PagerMore td {
 
 /* =================================================================== Header */
 #Head {
-   background: #44c7f4;
+   background: #38abe3;
    padding: 0;
    text-align: right;
-   /* height: 50px; Added a clearfix instead. */
 }
 div#Search:after {
    content: ".";
@@ -382,7 +369,7 @@ body #Head h1 {
 #Head h1 a span {
    font-size: 24px;
    color:#E4F7FE;
-   text-shadow:0 1px 0 #30ACD6;   
+   text-shadow:0 1px 0 #2595ba;   
 }
 #Head h1 a:hover span {
    color:#f3fcff;
@@ -413,8 +400,8 @@ body #Head h1 {
    border: 0;
    width: 38px;
    height: 26px;
-   background: #E9F9FF;
-   color: #2786C2;
+   background: #cfecff;
+   color: #1e79a7;
    padding: 3px 0 4px;
    margin: 0;
    -moz-border-radius: 0;
@@ -423,9 +410,9 @@ body #Head h1 {
    -moz-border-radius-bottomright: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
-}
-#Menu * {
-   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+  	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;     	
 }
 #Menu {
    height: 28px;
@@ -574,7 +561,7 @@ ul.Options ul {
    position: absolute;
 }
 ul.Options li {
-   float: left;
+   float: right;
    position: relative;
    display: block;
    list-style: none outside none;
@@ -610,6 +597,68 @@ ul.Options ul li {
    display: block;
    float: none;
 }
+ul.Options li.Parent strong {
+   display: block;
+   padding: 4px;
+   margin: 3px 4px 0 0;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Options li.Parent strong:focus,
+ul.Options li.Parent strong:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+ul.Options li.Parent strong:focus {
+   background: #eee;
+}
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong {
+   color: #fff;
+   background: #9c9c9c !important;
+   border: 1px solid #9c9c9c;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+}
+ul.Options li.Active {
+   background: none;
+}
+ul.Options li.Active ul {
+   border: 1px solid #9c9c9c;
+   background: #fafafa;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+ul.Options li.Active ul li a {
+   background: none;
+}
+ul.Options li.Active a {
+   background: #efefef;
+   color: #595959;
+}
+ul.Options li.Active a:hover {
+   background: #8d8d8d;
+   color: #fff;
+}
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
+}
 .Center {
    text-align: center;
 }
@@ -628,14 +677,14 @@ ul#Menu {
 }
 #Menu ul,
 #Menu li.Active {
-   background: #44c7f4;
+   background: #38abe3;
 }
 #Menu a,
 #Menu li.Active a {
    color: #fff;
 }
 #Menu a:hover {
-   background: #28bcef;
+   background: #2595cb;
 }
 #Menu a:hover,
 #Menu li.NonTab a:hover {
@@ -658,26 +707,27 @@ ul#Menu {
 div.Box {
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
-   background: #e9f9ff;
-   color: #999;
+   background: #cfecff;
+   color: #888;
    padding: 6px 10px;
    margin: 0 0 10px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 div.Box h4 {
    font-size: 110%;
-   color: #2786c2;
+   color: #1e79a7;
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
-   /* border-bottom: 1px solid #caf0fe; <-- This caused a 2px underline where it was above PanelInfo */
 }
 div.Box dl {
-   border-top: 1px solid #caf0fe;
-   border-bottom: 1px solid #caf0fe;
-   background: #F5FCFF;
+   border-top: 1px solid #abdafb;
+   border-bottom: 1px solid #abdafb;
+   background: #e3f4ff;
    padding: 3px;
    overflow: hidden;
-   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;	
 }
 div.Box dl dt {
    float: left;
@@ -693,14 +743,13 @@ div.Box p {
    color: #555;
 }
 ul.PanelActivity {
-   border-top: 1px solid #caf0fe;
+   border-top: 1px solid #abdafb;
 	border-bottom: 0;
 }
 ul.PanelActivity li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #e3f4ff;
+   border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
-   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	color: #555;
 }
 ul.PanelActivity span {
@@ -720,14 +769,13 @@ ul.PanelActivity li div.Story {
 	font-size: 85%;
 }
 ul.PanelInfo li {
-   background: #f5fcff;
-   border-bottom: 1px solid #caf0fe;
+   background: #e3f4ff;
+   border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
-   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
    text-align: right;
 }
 ul.PanelInfo {
-   border-top: 1px solid #caf0fe;
+   border-top: 1px solid #abdafb;
 	border-bottom: 0;
 }
 ul.PanelInfo li strong {
@@ -740,7 +788,7 @@ ul.PanelInfo li a {
    float: left;
 }
 ul.PanelInfo div.Meta {
-   font-size: 90%;
+   font-size: 11px;
 }
 ul.PanelInfo div.Meta span,
 ul.PanelInfo div.Meta strong {
@@ -751,18 +799,19 @@ ul.PanelInfo div.Meta span a {
 }
 ul.PanelInfo div.Meta strong {
    font-weight: normal;
-	font-size: 100%;
    display: inline;
-   color: #80828C;
-   background: #ff6;
-   padding: 0 2px;
+   padding: 1px 3px;
+	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: #FFFF00;
+	padding:2px 4px;
 }
 ul.PanelInfo li.Active {
    background: #fff;
    border-bottom: 1px solid #a3e6ff;
 }
 ul.PanelInfo li.Active a {
-   color: #2786C2;
+   color: #1e79a7;
 }
 ul.PanelActivity li.ShowAll,
 ul.PanelInfo li.ShowAll {
@@ -772,7 +821,7 @@ ul.PanelInfo li.ShowAll {
 	background: none;
 }
 body.Profile ul.PanelInfo {
-   border-bottom: 1px solid #caf0fe;
+   border-bottom: 1px solid #abdafb;
 }
 body.Profile ul.PanelInfo li {
 	border-bottom: 0;
@@ -780,6 +829,37 @@ body.Profile ul.PanelInfo li {
 }
 body.Profile ul.PanelInfo li a {
    float: none;
+}
+a.BigButton {
+   text-align: center;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-size: 15px;
+   font-weight: bold;
+   padding: 8px 0;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
+a.BigButton:hover {
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
+}
+a.BigButton:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 
 
@@ -799,7 +879,7 @@ body.Entry #Content {
 body#garden_entry_handshake #Content {
 	width: 720px;
 }
-body#garden_entry_handshake ul.LinkAccount {
+body#garden_entry_handshake ul.NewAccount {
 	float: left;
 	width: 330px;
 	margin-right: 29px;
@@ -811,10 +891,10 @@ body#garden_entry_handshake div.Info {
 	color: #02475A;
 }
 body.Entry #Content div.Box {
-   background: #E2F4FF;
+   background: #c4e1ff;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	border: 1px solid #A5D0E7;
+	border: 0;
 	margin: 0;
 	padding: 0;
 }
@@ -823,11 +903,16 @@ body.Entry p {
 	padding: 0 10px;
 	margin: 10px 0 10px;
 }
-body.Entry p.Leaving {
-	margin-left: 43px;
-   background: url('progress.gif') left center no-repeat;
-   padding-left: 50px;
+body#garden_entry_leave p {
+	margin: 0;
+   padding: 20px 10px;
 }
+body#garden_entry_leave p.Leaving {
+   background: url('images/progress.gif') left center no-repeat;
+	margin: 0 0 0 14px;
+   padding: 20px 0 20px 50px;
+}
+
 body.Entry #Content h1 {
    border: none;
    color: #02475A;
@@ -837,13 +922,22 @@ body.Entry #Content h1 {
 	margin: 0;
 	text-align: left;
 }
+body#garden_entry_handshake #Content h2 {
+   border: none;
+   color: #02475A;
+   font-size:140%;
+   font-weight:bold;
+   padding: 6px 0;
+	margin: 0;
+	text-align: left;
+}
 body.Entry #Content form {
 	text-align: left;
 	padding: 10px 30px 20px;
 }
 body.Entry form ul li label {
 	font-size: 14px;
-	color: #555;
+	color: #474747;
 	font-weight: bold;
 	padding: 6px 0 0;
 	display: block;
@@ -887,58 +981,75 @@ body.Entry #Content #Form_User_Password {
 	padding: 0;
 }
 
-
-/* =============================================================== Activities */
-body.Activity h1 {
+/* ================================================ DataList (Search Results) */
+/* Note: DataList is used in search results, vanilla discussions & drafts */
+div.Empty {
+   margin: 10px 0;
+}
+ul.DataList li.Item {
    margin: 0;
+   padding: 4px 0;
+   border-bottom: 1px solid #bec8cc;
 }
-ul.Activities {
-	margin-bottom: 6px;
-}
-ul.Activities li {
-   border-bottom: 1px solid #ddd;
-   padding: 8px 0 6px;
-   color: #454545;
-   clear: left;
-}
-ul.Activities div span {
-   padding: 0 6px 0 0;
-}
-ul.Activities li a.Photo {
-   float: left;
-}
-ul.Activities li img {
-   margin: 0;
+ul.DataList li {
    border: 0;
-   height: 40px;
-   width: 40px;
-}
-ul.Activities li.ActivityComment img {
-   height: 32px;
-   width: 32px;
-}
-ul.Activities li h3 {
-   display: inline;
    padding: 0;
-   font-size: 100%;
-   font-weight: normal;
 }
-ul.Activities li h3 em {
-   font-weight: normal;
-   font-style: normal;
-   color: #33afda;
-   font-size: 10px;
-   margin: 0 10px;
-}
-ul.Activities li h3 a.CommentOption {
-   font-size: 10px;
-   font-weight: normal;
-}
-ul.Activities li a.Delete {
-	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+ul.DataList div.Options {
+	width: 100px;
    float: right;
+}
+ul.DataList div.OptionButton {
+	float: right;
+	*padding: 7px 0; /* IE 7 Fix */
+}
+ul.DataList a.Title {
+   display: block;
+   margin: 0;
+   font-size: 14px;
+   font-weight: bold;
+}
+ul.DataList div.Title {
+   display: block;
+   margin: 0;
+}
+ul.DataList div.Title a {
+   font-size: 120%;
+   font-weight: bold;
+}
+ul.DataList div.Meta {
+   font-size: 11px;
+   color: #70727c;
+}
+ul.DataList div.Excerpt {
+   font-size: 12px;
+	line-height: 1.4;
+}
+ul.DataList div.Excerpt a {
+   color: #333;
+	display: block;
+}
+ul.DataList div.Excerpt p {
+	display: inline;
+	padding: 0;
+}
+ul.DataList div.Meta span,
+ul.DataList div.Meta span a,
+ul.DataList div.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList div.Meta strong {
+   background: #fffc00;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList div.Meta a {
+   color: #2b2d33;
+}
+ul.DataList a.Delete {
    width: auto;
-   padding: 5px;
+   padding: 0 5px;
    margin: 0 1px 0 0;
    font-size: 11px;
    font-weight: normal;
@@ -946,112 +1057,121 @@ ul.Activities li a.Delete {
    -webkit-border-radius: 2px;
    color: #555;
    cursor: pointer;
-   line-height: 100%;
+   line-height: 1;
 }
-ul.Activities li a.Delete:hover {
+ul.DataList a.Delete:hover {
 	padding: 4px;
    color: #333;
    border: 1px solid #888;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg2.png') repeat-x center left #f8f8f8;
 }
-ul.Activities li div.Story {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 4px 6px;
-   line-height: 130%;
-   color: #2b3033;
-   display: block;
-	font-size: 110%;
+ul.DataList a.Delete:focus {
+   background: #f8f8f8;
 }
-ul.Activities li.PictureChange div.Story {
-	border: 0;
-   background: none;
-   margin: 4px 0 0;
-   padding: 0 8px;
+/* Condensed datalists make the main link & excerpt inline. */
+ul.DataList div.Photo {
+	float: left;
+	padding: 0 10px 0 0;
 }
-ul.Activities li div.Story blockquote {
-   margin: 2px 0 0;
-   padding: 0;
-   background: none;
-	border: 0;
-   color: #999;
+ul.DataList div.Photo img {
+	display: block;
+	height: 43px;
+	width: 43px;
+	overflow: hidden;
 }
-ul.Activities li div.Story img {
-   height: auto;
-   width: auto;
-   background: #fff;
-   padding: 2px;
-   border: 1px solid #ccc;
-   float: none;
-   margin: 0 4px 0 0;
+ul.Condensed li,
+li.Condensed {
+	clear: left;
 }
-ul.Activities ul.Comments {
-   background: #fff;
-   margin: 0 0 0 46px;
-   padding: 1px 0 0;
-   list-style: none;
-   font-size: 85%;
-   clear: left;
+ul.Condensed a.Title,
+li.Condensed a.Title,
+ul.Condensed div.Title,
+li.Condensed div.Title {
+	display: inline;
+	padding: 0;
 }
-ul.Activities ul.Comments li {
-   background: #e9f9ff /* Panel Background Color */;
-   margin-bottom: 1px;
-   border-bottom: 0;
-   padding: 6px;
-   line-height: 1;
-}
-ul.Activities * {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-}
-ul.Activities li.HasPhoto div {
-   margin-left: 46px;
-}
-ul.Activities li.HasPhoto ul.Comments div {
-   margin: 0;
-}
-ul.Activities ul.Comments li.HasPhoto div {
-   margin-left: 40px;
-}
-ul.Activities a.Name,
-ul.Activities a.Photo {
-   font-weight: bold;
-   padding-right: 6px;
-}
-ul.Activities p {
-   display: inline;
-   margin: 0;
-   line-height: 1.4;
-}
-ul.Activities div.Meta {
-   line-height: 1;
-   color: #888;
-   padding: 4px 0 0 6px;
-  	margin: 0 !important;
-   font-size: 80%;
+ul.Condensed div.Excerpt,
+li.Condensed div.Excerpt,
+ul.Condensed div.Excerpt a,
+li.Condensed div.Excerpt a {
 	display: inline;
 }
-ul.Activities li.AboutUpdate div.Meta,
-ul.Activities li.WallComment div.Meta,
-ul.Activities ul.Comments div.Meta {
-   display: block;
-   padding: 4px 0 4px;
+
+/* =============================================================== Activities */
+
+body.Activity h1 {
+   margin: 0;
 }
+body.Profile ul.Activities {
+   margin-top: 10px;
+   border-top: 1px solid #ddd;
+}
+ul.Activities li.HasPhoto div.Title {
+	padding: 0;
+}
+ul.Activities a.Title,
+ul.Activities div.Title,
+ul.Activities div.Title a {
+	font-size: 14px;
+}
+ul.Activities div.Excerpt {
+	color: #80828C;
+}
+ul.Activities li.Condensed div.Excerpt {
+	color: #000;
+	font-size: 13px;
+	padding: 0 0 0 4px;
+}
+ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
-   font-weight: normal;
+   color: #1e79a7;
 }
-ul.Activities div.Meta span {
-   padding: 0 6px;
-   font-size: 8px;
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover {
+   color: #ff0084;
 }
-ul.Activities ul.Comments li.CommentForm {
-   clear: left;
-   padding: 8px;
+ul.Activities div.Excerpt img {
+	padding: 2px;
+	border: 1px solid #999;
 }
-ul.Activities ul.Comments li.CommentForm a.CommentLink,
-ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
+ul.Activities ul.DataList {
+	margin-left: 50px;
+	width: 400px;
+}
+ul.Activities div.ItemContent {
+	width: 631px;
+}
+ul.Activities li.HasPhoto div.ItemContent {
+	margin-left: 53px;
+	width: 578px;
+}
+ul.Activities li.Item li.HasPhoto div.ItemContent {
+	width: auto;
+	margin-left: 42px;
+}
+ul.Activities ul.DataList li {
+	background: #D7E7FF;
+	margin-bottom: 2px;
+	padding: 6px;
+}
+ul.Activities ul.DataList a.Title,
+ul.Activities ul.DataList div.Title,
+ul.Activities ul.DataList div.Title a,
+ul.Activities ul.DataList div.Excerpt p {
+	font-size: 13px;
+	line-height: 1;
+}
+ul.Activities ul.DataList .HasPhoto div.Meta {
+	padding: 2px 0 0;
+	line-height: 1;
+}
+ul.Activities ul.DataList div.Photo img {
+	height: 32px;
+	width: 32px;
+}
+ul.Activities a.CommentLink,
+ul.Activities a.CommentLink:hover {
+	font-size: 12px;
    cursor: text;
    background: #fff;
    color: #bbb !important;
@@ -1062,99 +1182,127 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    line-height: 100%;
    font-weight: normal;
 }
+ul.Activities li.CommentForm form div {
+	text-align: right;
+}
 ul.Activities li.CommentForm textarea.TextBox {
-   width: 610px;
+   width: 380px;
 	min-height: 40px;
    height: 40px;
    margin-bottom: 2px;
 	font-size: 12px;
 }
-body.Profile ul.Activities {
-   margin-top: 10px;
-   border-top: 1px solid #ddd;
-}
-div.EmptyInfo {
-   margin: 10px;
-}
-ul.Notifications {
-   margin-top: 0;
-   border: 0;
+ul.Activities li.CommentForm input.Button {
+	font-size: 12px;
+	box-shadow: 0 0 1px #999;
+	-moz-box-shadow: 0 0 1px #999;
+	-webkit-box-shadow: 0 0 1px #999;  
 }
 
-/* ================================================ DataList (Search Results) */
-body.Search h1 {
-   margin:0;
-}
-ul.DataList li {
-   margin: 0;
-   padding: 0 0 4px 0;
-   border-bottom: 1px solid #dbe3e6;
-}
-ul.DataList li li {
-   border: 0;
-   padding: 0;
-}
-ul.DataList,
-ul.DataList li ul {
+
+/* ============================================================== MessageList */
+/* used for lists of message-based content (discussion comments, private
+conversation messages, etc). */
+
+ul.MessageList,
+ul.MessageList li {
    list-style: none;
    margin: 0;
    padding: 0;
 }
-ul.DataList li ul li.Title a {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 2px 8px;
-   line-height: 130%;
-   color: #2b3033;
-   font-size: 105%;
-   display: block;
+ul.MessageList li.Item {
+   border-bottom: 1px solid #ddd;
+	padding: 4px;
 }
-ul.DataList li ul li.Title strong {
-	display: block;
-   padding: 6px 0 0 6px;
-   margin: 0;
-   font-size: 110%;
+ul.MessageList div.Meta {
+   font-size: 11px;
+   color: #777;
+}
+ul.MessageList div.Meta span.Author img {
+   height: 40px;
+   width: 40px;
+   border: 0;
+   margin: 0 10px 0 0;
+   float: left;
+   overflow: hidden;
+   background: #eee;
+}
+ul.MessageList div.Meta span {
+   line-height: 2.5;
+   padding-left: 10px;
+}
+ul.MessageList div.Meta span.Author {
+	padding: 0;
+}
+ul.MessageList div.Meta span.Author a {
+   font-size: 15px;
    font-weight: bold;
 }
-ul.DataList li ul li.Title strong a {
-   display: inline;
-   border: 0;
-   padding: 0;
-   margin: 0;
-   color: #2d7bb2 /* Body Link Font Color */;
-   background: none;
+ul.MessageList div.Message {
+   clear: both;
+   line-height: 140%;
+   font-size: 100%;
 }
-ul.DataList li ul li.Meta {
-   margin-left: 5px;
-   font-size: 80%;
-   color: #80828c /* Meta Label Font Color */;
+ul.MessageList div.Message p {
+   margin: 8px 0;
 }
-ul.DataList li ul li.Meta span,
-ul.DataList li ul li.Meta span a,
-ul.DataList li ul li.Meta strong {
-   margin-right: 12px;
+ul.MessageList div.Message blockquote {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 4px 16px;
+   margin: 4px 0;
+   background: #ffc;
 }
-ul.DataList li ul li.Meta strong {
-   background: #ff0;
-   padding: 0 2px;
+ul.MessageList div.Message code,
+ul.MessageList div.Message pre {
+   display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+   white-space: pre;
+   font-family: monospace;
+   overflow: auto;
 }
-ul.DataList li ul li.Meta a {
-   color: #2b2d33;
+ul.MessageList div.Message strong {
+   font-weight: bold;
 }
-div.SearchBox {
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border: 1px solid #A5D0E7;
-	margin-bottom: 10px;
-	padding: 8px;
+ul.MessageList div.Message em {
+   font-style: oblique;
 }
-div.SearchBox input.InputBox {
-	width: 575px;
-	margin-right: 10px;
+ul.MessageList div.Message ul,
+ul.MessageList div.Message ol {
+   margin-left: 3em ! important;
 }
+ul.MessageList div.Message ol li {
+  list-style: decimal ! important;
+}
+ul.MessageList div.Message ul li {
+  list-style: disc ! important;
+}
+
+/* The "Foot" is at the bottom of the #Content section. Used for more results
+links, sign in buttons, etc */
+.Foot {
+	border-bottom: 1px solid #abdafb;
+   padding: 6px;
+   background: #cfecff;
+   text-align: right;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   }
+.Foot a.TabLink {
+	margin-left: 10px;
+}
+.Foot .Note {
+	line-height: 2.6;
+	float: left;
+	padding: 0 0 0 8px;
+	font-weight: bold;
+}
+
 
 /* ============================================================= Profile Page */
 body.Profile #Content {
@@ -1181,7 +1329,7 @@ ul.SideMenu li ul {
    background: none;
 }
 ul.SideMenu li ul li {
-   border-bottom: 1px solid #dbe3e6 /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #bec8cc;
 }
 ul.SideMenu li ul li a {
    padding: 0 8px;
@@ -1189,7 +1337,7 @@ ul.SideMenu li ul li a {
 }
 ul.SideMenu li ul li a:hover {
    text-decoration: none;
-   background: #e9f9ff /* Panel Hover Font Color */;
+   background: #cfecff;
 }
 div.User {
    line-height: 150%;
@@ -1209,7 +1357,7 @@ div.User h1 {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
-   background: #e9f9ff;
+   background: #cfecff;
    margin: 0;
    padding: 8px 8px 0;
    color: #999;
@@ -1237,7 +1385,7 @@ div.User form {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
-   background: #e9f9ff;
+   background: #cfecff;
    padding: 8px 8px 0;
 }
 div.User form input.InputBox {
@@ -1247,13 +1395,13 @@ div.User form input.InputBox {
 form.Activity {
    display: block;
    padding: 10px 10px 0 10px;
+	text-align: right;
 }
 form.Activity textarea {
    width: 660px;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
-   max-height: 300px;
 }
 /* Invitations Form */
 #Form_Invitation table {
@@ -1274,7 +1422,7 @@ form.Activity textarea {
 #Form_Invitation table th,
 #Form_Invitation table td {
    font-weight: normal;
-   color: #555 /* Body Text Font Color */;
+   color: #555;
    padding: 6px;
 }
 #Form_Invitation table thead th,
@@ -1299,78 +1447,102 @@ form.Activity textarea {
 #Form_Invitation table.AltRows tr.Alt td,
 #Form_Invitation table.AltColumns th.Alt,
 #Form_Invitation table.AltColumns td.Alt {
-   background: #E9F9FF;
+   background: #cfecff;
 }
 #Form_Invitation table.AltColumns tr.Alt {
    background: none;
 }
+body.Profile ul.Notifications {
+	border-top: 0;
+	margin-top: 0;
+}
 
 
-/* ========================================================= Profile Tab Menu */
-ul.Tabs,
-ul.Tabs li {
-   float: none;
-   display: inline;
-   border-bottom: 0;
-}
-ul.Tabs {
-   clear: left;
-   display: block;
-   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   padding: 10px 0 0 10px;
+/* ================================================================= Tab Menu */
+div.Tabs {
+	display: block;
+   border-bottom: 1px solid #abdafb;
+   padding: 8px;
    margin: 0;
-   background: #e9f9ff /* Panel Background Color */;
+   background: #cfecff;
 }
-ul.Tabs li {
-   padding: 5px 0;
-   margin: 0;
-   line-height: 24px;
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
-   -webkit-border-top-left-radius: 3px;
-   -webkit-border-top-right-radius: 3px;
-}
-ul.Tabs li.Active {
-   border: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   border-bottom: 0;
-   background: #fff /* Panel Selected Background Color */;
-}
-ul.Tabs li a,
-ul.Tabs li a:link,
-ul.Tabs li a:hover,
-ul.Tabs li a:active,
-ul.Tabs li a:visited {
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
-   -webkit-border-top-left-radius: 3px;
-   -webkit-border-top-right-radius: 3px;
+div.Tabs li {
    display: inline;
-   background: #daf4fd /* Panel Inlay Background Color */;
+   margin: 0;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: 1px solid #abdafb;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #bbe2f7;
+   display: inline;
    font-weight: bold;
-   color: #2786C2 /* Panel Inlay Font Color */ !important;
+   color: #1e79a7;
    text-decoration: none;
-   padding: 5px 10px 4px 10px;
-   margin: 1px 0 0;
+   padding: 5px 10px;
+	line-height: 2.6;
 }
-ul.Tabs li a:hover {
-   background: #f3fcff /* Panel Inlay Background Color */;
+div.MorePager a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #f3fcff;
 }
-ul.Tabs li.Active a {
-   background: #fff /* Panel Selected Background Color */ !important;
-   color: #454545 /* Panel Selected Font Color */ !important;
-   text-decoration: none;
-   padding: 5px 10px 4px 10px;
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #474747;
 }
-ul.Tabs li a span {
+div.Tabs li a span {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;
    -webkit-border-radius: 3px;
    -moz-border-radius: 3px;
    font-weight: normal;
-   background: #2786C2;
+   background: #1e79a7;
    color: #eaf4fd;
    margin: 0 0 0 4px;
+}
+div.Tabs div.SubTab {
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	background: #f3fcff;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+}
+div.HeadingTabs {
+	padding: 8px 8px 8px 12px;
+}
+div.HeadingTabs ul {
+	display: inline;
+	float: right;
+}
+div.HeadingTabs div.SubTab {
+	font-size: 14px;
+	display: inline;
+	font-weight: bold;
+	background: none;
+	padding: 0;
+	line-height: 2.4;
+}
+div.SearchTabs input.InputBox {
+	width: 560px;
+	margin-right: 10px;
 }
 
 
@@ -1393,7 +1565,7 @@ form.Thumbnail table tr td {
 .jcrop-vline, .jcrop-hline {
    font-size: 0;
    position: absolute;
-   background: white url('jcrop.gif') top left repeat;
+   background: white url('images/jcrop.gif') top left repeat;
 }
 .jcrop-vline { height: 100%; width: 1px !important; }
 .jcrop-hline { width: 100%; height: 1px !important; }
@@ -1505,16 +1677,15 @@ div.Popup h2 {
 	font-weight:bold;
 	margin-bottom: 0;
 	color: #fff;
-	background: #44C7F4;
+	background: #38abe3;
 	border-bottom: 1px solid #3DB9E5;
-	text-shadow: none;
 	padding: 6px 9px 4px;
 }
 div.Popup .Footer {
-  background: #E9F9FF;
+  background: #cfecff;
   text-align: right;
   padding: 2px 6px 0 0;
-  border-top:1px solid #CAF0FE;
+  border-top:1px solid #abdafb;
   -moz-border-radius-bottomleft: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-bottom-left-radius: 5px;
@@ -1528,14 +1699,10 @@ div.Popup h3 {
 div.Popup p {
 	padding: 6px 10px 10px;
 }
-div.Popup div.Legal * {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-}
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 11px;
 }
 div.Popup form p {
@@ -1632,9 +1799,7 @@ div.Legal strong {
 }
 #Foot div {
 	width: 960px;
-	border-top: 1px solid #ddd;
 	padding: 6px 0;
 	margin: 20px auto 0;
-   font-family: 'lucida grande','Lucida Sans Unicode','helvetica neue',helvetica,arial,sans-serif;
 	text-align: left;
 }

@@ -8,13 +8,13 @@ if ($this->_CategoryData !== FALSE) {
    }
    ?>
 <div class="Box">
-   <h4><?php echo Gdn::Translate('Categories'); ?></h4>
+   <h4><?php echo T('Categories'); ?></h4>
    <ul class="PanelInfo">
       <li<?php
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Format::Text(Gdn::Translate('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor(Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
       <?php
    foreach ($this->_CategoryData->Result() as $Category) {
       ?>

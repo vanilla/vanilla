@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
    if (is_object($this->User))
-      echo Gdn::Translate('Edit User');
+      echo T('Edit User');
    else
-      echo Gdn::Translate('Add User');
+      echo T('Add User');
 ?></h1>
 <?php
 echo $this->Form->Open(array('class' => 'User'));
@@ -23,8 +23,8 @@ echo $this->Form->Errors();
       ?>
       <div class="InputButtons">
          <?php
-            echo Anchor('Generate Password', '#', 'GeneratePassword Button');
-            echo Anchor('Reveal Password', '#', 'RevealPassword Button');
+            echo Anchor(T('Generate Password'), '#', 'GeneratePassword Button');
+            echo Anchor(T('Reveal Password'), '#', 'RevealPassword Button');
          ?>
       </div>
    </li>
@@ -36,11 +36,11 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('ShowEmail', 'Email visible to other users');
+         echo $this->Form->CheckBox('ShowEmail', T('Email visible to other users'));
       ?>
    </li>
    <li>
-      <strong><?php echo Gdn::Translate('Check all roles that apply to this user:'); ?></strong>
+      <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
       <?php echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
 </ul>

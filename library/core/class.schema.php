@@ -81,11 +81,11 @@ class Gdn_Schema {
       if (!is_array($this->_Schema))
          $this->_Schema = array();
          
-      $Field = FALSE;
+      $Result = FALSE;
       if ($this->FieldExists($this->CurrentTable, $Field) === TRUE)
-         $Field = $this->_Schema[$this->CurrentTable][$FieldName];
+         $Result = $this->_Schema[$this->CurrentTable][$Field];
          
-      return $Field;
+      return $Result;
    }
    
    /**

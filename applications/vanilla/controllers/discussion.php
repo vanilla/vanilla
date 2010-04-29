@@ -76,11 +76,17 @@ class DiscussionController extends VanillaController {
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
+      $this->Form->Action = Url('/vanilla/post/comment/');
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
-      $this->Form->AddHidden('DraftID', '');
-      $this->Form->Action = Url('/vanilla/post/comment/');
+
+      // Retrieve & apply the draft if there is one:
+      $DraftModel = new Gdn_DraftModel();
+      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      if ($Draft)
+         $this->Form->SetFormValue('Body', $Draft->Body);
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -92,9 +98,6 @@ class DiscussionController extends VanillaController {
       // Add Modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData(20, $DiscussionID);
-      $this->AddModule($DraftsModule);
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
@@ -142,6 +145,9 @@ class DiscussionController extends VanillaController {
    public function Comment($CommentID) {
       // Get the discussionID
       $Comment = $this->CommentModel->GetID($CommentID);
+      if (!$Comment)
+         Redirect('garden/home/filenotfound');
+         
       $DiscussionID = $Comment->DiscussionID;
       
       // Figure out how many comments are before this one
@@ -205,13 +211,13 @@ class DiscussionController extends VanillaController {
          Redirect($Target);
       }
       
-      $MyBookmarks = Gdn::Translate('My Bookmarks');
+      $MyBookmarks = T('My Bookmarks');
       if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
          $MyBookmarks .= '<span>'.$CountBookmarks.'</span>';            
 
       $this->SetJson('State', $State);
-      $this->SetJson('ButtonLink', Gdn::Translate($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
-      $this->SetJson('AnchorTitle', Gdn::Translate($State ? 'Unbookmark' : 'Bookmark'));
+      $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
+      $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
       $this->SetJson('MenuLink', $MyBookmarks);
       
       $Targets = array();
@@ -273,7 +279,7 @@ class DiscussionController extends VanillaController {
          Redirect('/vanilla/discussions');
          
       $this->RedirectUrl = Url('/vanilla/discussions');
-      $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+      $this->StatusMessage = T('Your changes have been saved.');
       $this->Render();         
    }
 
@@ -309,8 +315,8 @@ class DiscussionController extends VanillaController {
          
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
-      $this->SetJson('LinkText', Translate($State ? 'Unsink' : 'Sink'));         
-      $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+      $this->SetJson('LinkText', T($State ? 'Unsink' : 'Sink'));         
+      $this->StatusMessage = T('Your changes have been saved.');
       $this->Render();         
    }
 
@@ -346,8 +352,8 @@ class DiscussionController extends VanillaController {
       
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
-      $this->SetJson('LinkText', Translate($State ? 'Re-Open' : 'Close'));         
-      $this->StatusMessage = Gdn::Translate('Your changes have been saved.');
+      $this->SetJson('LinkText', T($State ? 'Reopen' : 'Close'));         
+      $this->StatusMessage = T('Your changes have been saved.');
       $this->Render();         
    }
 

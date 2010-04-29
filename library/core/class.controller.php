@@ -428,7 +428,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DefinitionList() {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
-         $this->_Definitions['TransportError'] = Gdn::Translate('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+         $this->_Definitions['TransportError'] = T('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
 
       if (!array_key_exists('TransientKey', $this->_Definitions))
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
@@ -437,16 +437,19 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
-         $this->_Definitions['ConfirmHeading'] = Gdn::Translate('Confirm');
+         $this->_Definitions['ConfirmHeading'] = T('Confirm');
 
       if (!array_key_exists('ConfirmText', $this->_Definitions))
-         $this->_Definitions['ConfirmText'] = Gdn::Translate('Are you sure you want to do that?');
+         $this->_Definitions['ConfirmText'] = T('Are you sure you want to do that?');
 
       if (!array_key_exists('Okay', $this->_Definitions))
-         $this->_Definitions['Okay'] = Gdn::Translate('Okay');
+         $this->_Definitions['Okay'] = T('Okay');
 
       if (!array_key_exists('Cancel', $this->_Definitions))
-         $this->_Definitions['Cancel'] = Gdn::Translate('Cancel');
+         $this->_Definitions['Cancel'] = T('Cancel');
+
+      if (!array_key_exists('Search', $this->_Definitions))
+         $this->_Definitions['Search'] = T('Search');
 
       $Return = '<!-- Various definitions for Javascript //-->
 <div id="Definitions" style="display: none;">
@@ -490,7 +493,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $ViewHandler = Gdn::Factory('ViewHandler' . strtolower(strrchr($ViewPath, '.')));
       
       $ViewContents = '';
-
       ob_start();
       if(is_null($ViewHandler)) {   
          // Parse the view and place it into the asset container if it was found.
@@ -705,6 +707,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
 
+      // If there were uncontrolled errors above the json data, wipe them out
+      // before fetching it (otherwise the json will not be properly parsed
+      // by javascript).
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
+         ob_clean(); 
+
       // Send headers to the browser
       $this->SendHeaders();
 
@@ -896,19 +904,24 @@ class Gdn_Controller extends Gdn_Pluggable {
                   // A direct path to the file was given.
                   $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
                } else {
-                  $JsGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $JsFile);
                   $AppFolder = $JsInfo['AppFolder'];
                   if ($AppFolder == '')
                      $AppFolder = $this->ApplicationFolder;
    
-                  // JS can come from any of the application folders, or it can come from the global js folder:
+                  // JS can come from a theme, an any of the application folder, or it can come from the global js folder:
                   $JsPaths = array();
-                  // 1. This application folder
-                  $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsGlob;
-                  // 2. Global JS folder. eg. root/js/
-                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsGlob;
-                  // 3. Global JS library folder. eg. root/js/library/
-                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsGlob;
+                  if ($this->Theme) {
+                     // 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
+                     $JsPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'js' . DS . $JsFile;
+                     // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+                     $JsPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'js' . DS . $JsFile;
+                  }
+                  // 3. This application folder
+                  $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsFile;
+                  // 4. Global JS folder. eg. root/js/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsFile;
+                  // 5. Global JS library folder. eg. root/js/library/
+                  $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsFile;
                }
 
                // Find the first file that matches the path.

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <div id="ConversationForm">
-   <h2><?php echo Translate('Start a New Conversation'); ?></h2>
+   <h2><?php echo T('Start a New Conversation'); ?></h2>
    <?php
    echo $this->Form->Open();
    echo $this->Form->Errors();

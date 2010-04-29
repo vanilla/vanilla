@@ -3,28 +3,28 @@ $Session = Gdn::Session();
 $EditUser = $Session->CheckPermission('Garden.Users.Edit');
 echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
-<h1><?php echo Gdn::Translate('Manage Users'); ?></h1>
+<h1><?php echo T('Manage Users'); ?></h1>
 <div class="FilterMenu">
-   <?php echo Anchor('Add User', 'garden/user/add', 'Popup Button'); ?>
+   <?php echo Anchor(T('Add User'), 'garden/user/add', 'Popup Button'); ?>
 </div>
 <div class="Info">
    <?php
       echo $this->Form->Errors();
       echo $this->Form->TextBox('Keywords');
-      echo $this->Form->Button('Go');
-      printf(Gdn::Translate('%s user(s) found.'), $this->Pager->TotalRecords);
+      echo $this->Form->Button(T('Go'));
+      printf(T('%s user(s) found.'), $this->Pager->TotalRecords);
       
    ?>
 </div>
 <table id="Users" class="AltColumns">
    <thead>
       <tr>
-         <th>Username</th>
-         <th class="Alt">Email</th>
-         <th>First Visit</th>
-         <th class="Alt">Last Visit</th>
+         <th><?php echo T('Username'); ?></th>
+         <th class="Alt"><?php echo T('Email'); ?></th>
+         <th><?php echo T('First Visit'); ?></th>
+         <th class="Alt"><?php echo T('Last Visit'); ?></th>
          <?php if ($EditUser) { ?>
-            <th>Options</th>
+            <th><?php echo T('Options'); ?></th>
          <?php } ?>
       </tr>
    </thead>

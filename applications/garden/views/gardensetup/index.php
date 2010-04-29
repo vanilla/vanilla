@@ -3,7 +3,7 @@
 echo $this->Form->Open();
 ?>
 <div class="Title">
-   <h1><?php echo Gdn::Translate("Vanilla is installed!"); ?></h1>
+   <h1><?php echo T("Vanilla is installed!"); ?></h1>
 </div>
 <div class="Form">
    <ul>

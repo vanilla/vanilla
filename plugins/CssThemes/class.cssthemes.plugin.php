@@ -350,7 +350,7 @@ class Gdn_CssThemes implements Gdn_IPlugin {
 			}
 			
 			$Sender->SetData('ThemeSettings', $Data);
-			$Sender->StatusMessage = Gdn::Translate('Your changes have been saved.');
+			$Sender->StatusMessage = T('Your changes have been saved.');
 		}
 		
 		// Add the javascript & css.

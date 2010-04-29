@@ -23,7 +23,7 @@ class DiscussionsController extends VanillaController {
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
          $this->Head->AddRss('/rss/'.$this->SelfUrl, $this->Head->Title());
-         $this->Head->Title(Translate('All Discussions'));
+         $this->Head->Title(T('All Discussions'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -34,9 +34,6 @@ class DiscussionsController extends VanillaController {
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData();
-      $this->AddModule($DraftsModule);
 
       $this->SetData('Category', FALSE, TRUE);
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
@@ -75,6 +72,15 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
+      // Set a definition of the user's current timezone from the db. jQuery
+      // will pick this up, compare to the browser, and update the user's
+      // timezone if necessary.
+      $CurrentUser = Gdn::Session()->User;
+      if (is_object($CurrentUser)) {
+         $ClientHour = $CurrentUser->HourOffset + date('G', time());
+         $this->AddDefinition('SetClientHour', $ClientHour);
+      }
+      
       // Render the controller
       $this->Render();
    }
@@ -92,7 +98,7 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->Title(Translate('My Bookmarks'));
+      $this->Title(T('My Bookmarks'));
 
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
@@ -111,7 +117,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -130,9 +135,6 @@ class DiscussionsController extends VanillaController {
       // Add Modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData();
-      $this->AddModule($DraftsModule);
       
       $this->Render();
    }
@@ -144,7 +146,7 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
       $this->AddJsFile('options.js');
-      $this->Title(Translate('My Discussions'));
+      $this->Title(T('My Discussions'));
 
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -161,7 +163,6 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
-      $this->Pager->Wrapper = '<li %1$s>%2$s</li>';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
@@ -183,9 +184,6 @@ class DiscussionsController extends VanillaController {
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-      $DraftsModule = new DraftsModule($this);
-      $DraftsModule->GetData();
-      $this->AddModule($DraftsModule);
       
       // Render the controller
       $this->Render();

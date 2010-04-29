@@ -53,7 +53,7 @@ class Gdn_Form {
       $Return = '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($ButtonCode, $Attributes);
       $Return .= $this->_NameAttribute($ButtonCode, $Attributes);
-      $Return .= ' value="' . Translate($ButtonCode) . '"';
+      $Return .= ' value="' . T($ButtonCode) . '"';
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= " />\n";
       return $Return;
@@ -113,13 +113,13 @@ class Gdn_Form {
          explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec'));
 
       $Days = array();
-      $Days[] = Gdn::Translate('Day');
+      $Days[] = T('Day');
       for($i = 1; $i < 32; ++$i) {
          $Days[] = $i;
       }
 
       $Years = array();
-      $Years[0] = Gdn::Translate('Year');
+      $Years[0] = T('Year');
       for($i = $EndYear; $i >= $StartYear; --$i) {
          $Years[$i] = $i;
       }
@@ -373,12 +373,12 @@ class Gdn_Form {
       
       $Result = '<table class="CheckBoxGrid">';
       // Append the header.
-      $Result .= '<thead><tr><th>'.Gdn::Translate($GroupName).'</th>';
+      $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
       $Alt = TRUE;
       foreach($Columns as $ColumnName => $X) {
          $Result .=
             '<td'.($Alt ? ' class="Alt"' : '').'>'
-            . Gdn::Translate($ColumnName)
+            . T($ColumnName)
             . '</td>';
             
          $Alt = !$Alt;
@@ -393,9 +393,9 @@ class Gdn_Form {
          // If the row name is still seperated by dots then put those in spans.
          $RowNames = explode('.', $RowName);
          for($i = 0; $i < count($RowNames) - 1; ++$i) {
-            $Result .= '<span class="Parent">'.Gdn::Translate($RowNames[$i]).'</span>';
+            $Result .= '<span class="Parent">'.T($RowNames[$i]).'</span>';
          }
-         $Result .= Gdn::Translate($RowNames[count($RowNames) - 1]).'</th>';
+         $Result .= T($RowNames[count($RowNames) - 1]).'</th>';
          // Append the columns within the rows.
          $Alt = TRUE;
          foreach($Columns as $ColumnName => $Y) {
@@ -425,7 +425,7 @@ class Gdn_Form {
     * Returns a checkbox table.
     *
     * @param string $GroupName The name of the checkbox table (the text that appears in the top-left
-    * cell of the table). This value will be passed through the Translate()
+    * cell of the table). This value will be passed through the T()
     * function before render.
     *
     * @param array $Group An array of $PermissionName => $CheckBoxXhtml to be rendered within the
@@ -456,7 +456,7 @@ class Gdn_Form {
             $RowName = $Rows[$j];
 
             if ($j == 0) $Headings .= '<td' . ($Alt == 0 ? ' class="Alt"' : '') .
-                '>' . Translate($ColName) . '</td>';
+                '>' . T($ColName) . '</td>';
 
             if (array_key_exists($RowName, $Group[$ColName])) {
                $Cells .= '<td' . ($Alt == 0 ? ' class="Alt"' : '') .
@@ -467,7 +467,7 @@ class Gdn_Form {
                    '>&nbsp;</td>';
             }
          }
-         if ($Headings != '') $Return .= "<thead><tr><th>" . Translate($GroupName) . "</th>" .
+         if ($Headings != '') $Return .= "<thead><tr><th>" . T($GroupName) . "</th>" .
              $Headings . "</tr></thead>\r\n<tbody>";
 
          $aRowName = explode('.', $RowName);
@@ -476,11 +476,11 @@ class Gdn_Form {
             $RowName = '';
             for($i = 0; $i < $RowNameCount; ++$i) {
                if ($i < $RowNameCount - 1) $RowName .= '<span class="Parent">' .
-                   Translate($aRowName[$i]) . '</span>';
-               else $RowName .= Translate($aRowName[$i]);
+                   T($aRowName[$i]) . '</span>';
+               else $RowName .= T($aRowName[$i]);
             }
          } else {
-            $RowName = Translate($RowName);
+            $RowName = T($RowName);
          }
          $Return .= '<tr><th>' . $RowName . '</th>' . $Cells . "</tr>\r\n";
          $Headings = '';
@@ -661,8 +661,8 @@ class Gdn_Form {
             $Count = count($Problems);
             for($i = 0; $i < $Count; ++$i) {
                $Return .= '<li>' . sprintf(
-                  Translate($Problems[$i]),
-                  Translate($FieldName)) . "</li>\n";
+                  T($Problems[$i]),
+                  T($FieldName)) . "</li>\n";
             }
          }
          $Return .= "</ul>\n</div>\n";
@@ -723,9 +723,9 @@ class Gdn_Form {
     */
    public function Label($TranslationCode, $FieldName = '', $Attributes = FALSE) {
       if ($FieldName == '')
-         return '<label'.$this->_AttributesToString($Attributes).'>' . Translate($TranslationCode) . "</label>\r\n";
+         return '<label'.$this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\r\n";
       else
-         return '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) . '"'.$this->_AttributesToString($Attributes).'>' . Translate($TranslationCode) . "</label>\r\n";
+         return '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) . '"'.$this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\r\n";
    }
 
    /// <param name="DataObject" type="object">

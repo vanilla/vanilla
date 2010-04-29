@@ -48,7 +48,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
-         //->Select('iup.Name', '', 'FirstPhoto')
+         ->Select('iup.Name', '', 'FirstPhoto')
          ->Select('fc.Body', '', 'FirstComment') // <-- Need these for rss!
          ->Select('fc.Format', '', 'FirstCommentFormat') // <-- Need these for rss!
          ->Select('lc.DateInserted', '', 'LastDate')
@@ -57,9 +57,10 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          //->Select('lcup.Name', '', 'LastPhoto')
          //->Select('lc.Body', '', 'LastBody')
          ->Select("' &rarr; ', pc.Name, ca.Name", 'concat_ws', 'Category')
+         ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         //->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
+         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
          ->Join('Comment fc', 'd.FirstCommentID = fc.CommentID', 'left') // First comment
          ->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
@@ -143,6 +144,16 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
          ->Get();
    }
    
+   // Returns all users who have bookmarked the specified discussion
+   public function GetBookmarkUsers($DiscussionID) {
+      return $this->SQL
+         ->Select('UserID')
+         ->From('UserDiscussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Where('Bookmarked', '1')
+         ->Get();
+   }
+   
    protected $_CategoryPermissions = NULL;
    
    public function CategoryPermissions($Escape = FALSE) {
@@ -202,6 +213,7 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
 
    public function GetID($DiscussionID) {
       $Session = Gdn::Session();
+      $this->FireEvent('BeforeGetID');
       return $this->SQL
          ->Select('d.*')
          ->Select('c.Body')
@@ -486,6 +498,9 @@ class Gdn_DiscussionModel extends Gdn_VanillaModel {
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+      $this->EventArguments['Discussion'] = $Discussion;
+      $this->EventArguments['State'] = $State;
+      $this->FireEvent('AfterBookmarkDiscussion');
       return $State == '1' ? TRUE : FALSE;
    }
    

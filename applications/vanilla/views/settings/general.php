@@ -2,7 +2,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('Forum Settings'); ?></h1>
+<h1><?php echo T('Forum Settings'); ?></h1>
 <ul>
    <li>
       <?php
@@ -30,17 +30,5 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('Vanilla.Categories.Use', 'Use categories to organize discussions');
       ?>
    </li>
-   <li>
-      <?php
-         echo $this->Form->Label('Forum Home Screen', 'Vanilla.Home');
-         echo $this->Form->RadioList(
-            'Vanilla.Discussions.Home',
-            array(
-               'discussions' => Gdn::Translate('Discussions'),
-               'categories' => Gdn::Translate('Categories')
-            ),
-            array('TextField' => 'Code', 'ValueField' => 'Code'));
-      ?>
-   </li>   
 </ul>
 <?php echo $this->Form->Close('Save');

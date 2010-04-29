@@ -1,34 +1,37 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+if (Gdn::Config('Garden.Profile.ShowAbout')) {
 ?>
-<div class="Box">
-   <h4><?php echo Gdn::Translate('About'); ?></h4>
+<div class="Box About">
+   <h4><?php echo T('About'); ?></h4>
    <dl>
-      <dt><?php echo Gdn::Translate('Name'); ?></dt>
+      <dt><?php echo T('Name'); ?></dt>
       <dd><?php echo $this->User->Name; ?></dd>
       <?php               
       if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {
-         echo '<dt>'.Gdn::Translate('Email').'</dt>
+         echo '<dt>'.T('Email').'</dt>
          <dd>'.Format::Email($this->User->Email).'</dd>';
       }
       ?>
-      <dt><?php echo Gdn::Translate('Joined'); ?></dt>
+      <dt><?php echo T('Joined'); ?></dt>
       <dd><?php echo Format::Date($this->User->DateFirstVisit); ?></dd>
-      <dt><?php echo Gdn::Translate('Visits'); ?></dt>
+      <dt><?php echo T('Visits'); ?></dt>
       <dd><?php echo $this->User->CountVisits; ?></dd>
-      <dt><?php echo Gdn::Translate('Last Active'); ?></dt>
+      <dt><?php echo T('Last Active'); ?></dt>
       <dd><?php echo Format::Date($this->User->DateLastActive); ?></dd>
-      <dt><?php echo Gdn::Translate('Roles'); ?></dt>
+      <dt><?php echo T('Roles'); ?></dt>
       <dd><?php echo implode(', ', $this->Roles); ?></dd>
       <?php               
       if ($this->User->InviteUserID > 0) {
          $Inviter = new stdClass();
          $Inviter->UserID = $this->User->InviteUserID;
          $Inviter->Name = $this->User->InviteName;
-         echo '<dt>'.Gdn::Translate('Invited by').'</dt>
+         echo '<dt>'.T('Invited by').'</dt>
          <dd>'.UserAnchor($Inviter).'</dd>';
       }
       $this->FireEvent('OnBasicInfo');
       ?>
    </dl>
 </div>
+<?php
+}

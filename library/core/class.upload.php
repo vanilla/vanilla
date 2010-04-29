@@ -49,36 +49,36 @@ class Gdn_Upload {
       if (
          !array_key_exists($InputName, $_FILES)
          || !is_uploaded_file($_FILES[$InputName]['tmp_name'])
-      ) throw new Exception(Gdn::Translate('The file failed to upload.'));
+      ) throw new Exception(T('The file failed to upload.'));
       
       switch ($_FILES[$InputName]['error']) {
          case 1:
          case 2:
-            throw new Exception(Gdn::Translate('The file is too large to be uploaded to this application.'));
+            throw new Exception(T('The file is too large to be uploaded to this application.'));
             break;
          case 3:
          case 4:
-            throw new Exception(Gdn::Translate('The file failed to upload.'));
+            throw new Exception(T('The file failed to upload.'));
             break;
          case 6:
-            throw new Exception(Gdn::Translate('The temporary upload folder has not been configured.'));
+            throw new Exception(T('The temporary upload folder has not been configured.'));
             break;
          case 7:
-            throw new Exception(Gdn::Translate('Failed to write the file to disk.'));
+            throw new Exception(T('Failed to write the file to disk.'));
             break;
          case 8:
-            throw new Exception(Gdn::Translate('The upload was stopped by extension.'));
+            throw new Exception(T('The upload was stopped by extension.'));
             break;
       }
       
       // Check the maxfilesize again just in case the value was spoofed in the form.
       if (filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize)
-         throw new Exception(Gdn::Translate('The file is too large to be uploaded to this application.'));
+         throw new Exception(T('The file is too large to be uploaded to this application.'));
       
       // Make sure that the file extension is allowed
       $Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
       if (!InArrayI($Extension, $this->_AllowedFileExtensions))
-         throw new Exception(sprintf(Gdn::Translate('You cannot upload files with this extension (%s).'), $Extension));
+         throw new Exception(sprintf(T('You cannot upload files with this extension (%s).'), $Extension));
 
       // If all validations were successful, return the tmp name/location of the file.
       $this->_UploadedFile = $_FILES[$InputName];
@@ -99,7 +99,7 @@ class Gdn_Upload {
    
    public function SaveAs($Source, $Target) {
       if (!move_uploaded_file($Source, $Target))
-         throw new Exception(sprintf(Gdn::Translate('Failed to move uploaded file to target destination (%s).'), $Target));
+         throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
    }
    
 }

@@ -7,6 +7,17 @@ jQuery(document).ready(function($) {
       var d = new Date();
       $(this).val(d.getHours());
    });
+
+   // Ajax/Save the ClientHour if it is different from the value in the db.
+   $('input:hidden[id$=SetClientHour]').livequery(function() {
+      var d = new Date();
+      if (d.getHours() != $(this).val()) {
+         $.post(
+            combinePaths(definition('WebRoot', ''), '/utility/setclienthour/'+d.getHours()+'/'+definition('TransientKey')),
+            'DeliveryType=BOOL'
+         );
+      }
+   });
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {

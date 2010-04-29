@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="RecentActivity" class="Box">
-   <h4><?php echo Gdn::Translate('Recent Activity'); ?></h4>
+   <h4><?php echo T('Recent Activity'); ?></h4>
    <ul class="PanelActivity">
       <?php
       foreach ($this->_ActivityData->Result() as $Activity) {
@@ -29,6 +29,6 @@
          echo '</li>';
       }
       ?>
-      <li class="ShowAll"><?php echo Anchor(Gdn::Translate('↳ Show All'), 'activity'); ?></li>
+      <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'activity'); ?></li>
    </ul>
 </div>

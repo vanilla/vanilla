@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Translates a string.
  *
- * @see Gdn::Translate()
+ * @see T()
  */
 function smarty_modifier_translate($Code, $Default = '') {
-	return Gdn::Translate($Code, $Default);	
+	return T($Code, $Default);	
 }

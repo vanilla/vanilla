@@ -11,20 +11,30 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_ErrorException extends ErrorException {
 
    private $Context;
+   private $StackTrace;
    
-   public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
+   public function __construct($Message, $ErrorNumber, $File, $Line, $Context, $StackTrace) {
       parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
       $this->Context = $Context;
+      $this->StackTrace = $StackTrace;
    }
    
    public function getContext() {
       return $this->Context;
    }
+   
+   public function getStackTrace() {
+      return $this->StackTrace;
+   }
 
 }
 
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+   // Ignore errors that have a @ before them (ie. @function();)
+   if (error_reporting() == 0)
+      return FALSE;
+         
+   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, debug_backtrace());
 }
 
 /**
@@ -44,10 +54,7 @@ function Gdn_ExceptionHandler($ErrorException) {
       $File = $ErrorException->getFile();
       $Line = $ErrorException->getLine();
       $Arguments = $ErrorException->getContext();
-      
-      // Ignore errors that have a @ before them (ie. @function();)
-      if (error_reporting() == 0)
-         return FALSE;
+      $Backtrace = $ErrorException->getStackTrace();
       
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
@@ -179,7 +186,7 @@ function Gdn_ExceptionHandler($ErrorException) {
                echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), $ErrorLines[$i]),"\n";
             }
          }
-         $Backtrace = debug_backtrace();
+
          if (is_array($Backtrace)) {
             echo "BACKTRACE:\n";
             $BacktraceCount = count($Backtrace);

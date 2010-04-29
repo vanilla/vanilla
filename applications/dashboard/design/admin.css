@@ -18,7 +18,7 @@ Welcome to the Admin CSS File! Some things you should know:
    + Header
    + Panels / Sidebars
    + Dashboard
-   + User Search Page
+   + User Pages
    + Splash Information Page
    + Popups
    + Legal
@@ -822,12 +822,16 @@ ul.PanelInfo li.Active {
 }
 
 
-/* ========================================================= User Search Page */
+/* =============================================================== User Pages */
 #dashboard_user_index div.Info .InputBox {
    margin-right: 6px;
 }
 #dashboard_user_index div.Info .Button {
    margin-right: 20px;
+}
+#Form_User a.SmallButton {
+	line-height: 3;
+	margin-right: 6px;
 }
 
 

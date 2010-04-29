@@ -92,8 +92,8 @@ class UserModel extends Gdn_Model {
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();
       $this->FireEvent('BeforeGetActiveUsers');
-      return $this
-         ->SQL
+      return $this->SQL
+         ->Where('u.Deleted', 0)
          ->OrderBy('u.DateLastActive', 'desc')
          ->Limit($Limit, 0)
          ->Get();
@@ -123,7 +123,9 @@ class UserModel extends Gdn_Model {
 				->OrLike($Like, '', 'right')
 				->EndWhereGroup();
 		}
-		$this->SQL->Where('ur.RoleID is null');
+		$this->SQL
+         ->Where('u.Deleted', 0)
+         ->Where('ur.RoleID is null');
 		
 		$Data =  $this->SQL->Get()->FirstRow();
 
@@ -136,12 +138,14 @@ class UserModel extends Gdn_Model {
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
 		
-		if (is_array($Where)) {
+		if (is_array($Where))
          $this->SQL->Where($Where);
-		}
-		$this->SQL->Where('ur.RoleID is null');
 
-      $Data = $this->SQL->Get()->FirstRow();
+		$Data = $this->SQL
+         ->Where('u.Deleted', 0)
+         ->Where('ur.RoleID is null')
+         ->Get()
+         ->FirstRow();
 
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
@@ -159,6 +163,7 @@ class UserModel extends Gdn_Model {
 		}
 		
       return $this->SQL
+         ->Where('u.Deleted', 0)
          ->Where('ur.RoleID is null')
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
@@ -179,6 +184,8 @@ class UserModel extends Gdn_Model {
          ->Select('p.Name', '', 'Photo')
          ->From('User u')
          ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
+         // Removing this for now. Will break existing installs because you need to have a session to be authenticated to run the structure changes.
+         // ->Where('u.Deleted', 0)
          ->Where('u.UserID', $UserID);
          
       if(is_array($this->SessionColumns)) {
@@ -920,7 +927,7 @@ class UserModel extends Gdn_Model {
             'DiscoveryText' => '',
             'Preferences' => null,
             'Permissions' => null,
-            'Attributes' => null,
+            'Attributes' => Gdn_Format::Serialize(array('State' => 'Deleted')),
             'DateSetInvitations' => null,
             'DateOfBirth' => null,
             'DateFirstVisit' => null,
@@ -930,7 +937,8 @@ class UserModel extends Gdn_Model {
             'HourOffset' => '0',
             'Score' => null,
             'CacheRoleID' => null,
-            'Admin' => 0
+            'Admin' => 0,
+            'Deleted' => 1
             ))
          ->Where('UserID', $UserID)
          ->Put();

@@ -14,8 +14,8 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Route Expression', 'Route');
          $Attributes = array();
-         if (in_array($this->Route, $this->ReservedRoutes)) {
-            $Attributes['value'] = $this->Route;
+         if ($this->Route['Reserved']) {
+            //$Attributes['value'] = $this->Route;
             $Attributes['disabled'] = 'disabled';
          }
          
@@ -26,6 +26,12 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Target', 'Target');
          echo $this->Form->TextBox('Target');
+      ?>
+   </li>
+   <li>
+      <?php
+         echo $this->Form->Label('Type', 'Route Type');
+         echo $this->Form->DropDown('Type', $this->Routes->GetRouteTypes());
       ?>
    </li>
 </ul>

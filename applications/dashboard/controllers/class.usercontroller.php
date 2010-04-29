@@ -34,9 +34,8 @@ class UserController extends DashboardController {
       $Offset = is_numeric($Offset) ? $Offset : 0;
       if (!$Keywords) {
          $Keywords = $this->Form->GetFormValue('Keywords');
-         if ($Keywords) {
+         if ($Keywords)
             $Offset = 0;
-         }
       }
 
       // Put the Keyword back in the form
@@ -121,6 +120,7 @@ class UserController extends DashboardController {
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
       $this->AddJsFile('user.js');
+      $this->Title(T('Edit User'));
 
       $this->AddSideMenu('dashboard/user');
 
@@ -215,6 +215,7 @@ class UserController extends DashboardController {
    public function Delete($UserID = '', $Method = '') {
       $this->Permission('Garden.Users.Delete');
       $this->AddSideMenu('dashboard/user');
+      $this->Title(T('Delete User'));
 
       $UserModel = new UserModel();
       $this->User = $UserModel->Get($UserID);

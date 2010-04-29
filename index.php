@@ -35,7 +35,6 @@ $EnabledApplications = Gdn::Config('EnabledApplications');
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
-$Dispatcher->Routes = Gdn::Config('Routes');
 
 // Process the request.
 $Dispatcher->Dispatch();

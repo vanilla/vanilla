@@ -47,8 +47,8 @@ echo $this->Form->Errors();
       ?>
       <div class="InputButtons">
          <?php
-            echo Anchor(T('Generate Password'), '#', 'GeneratePassword Button');
-            echo Anchor(T('Reveal Password'), '#', 'RevealPassword Button');
+            echo Anchor(T('Generate Password'), '#', 'GeneratePassword Button SmallButton');
+            echo Anchor(T('Reveal Password'), '#', 'RevealPassword Button SmallButton');
          ?>
       </div>
    </li>

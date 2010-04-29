@@ -18,10 +18,13 @@ class Gdn {
    const AliasDispatcher = 'Dispatcher';
    const AliasLocale = 'Locale';
    const AliasPermissionModel = 'PermissionModel';
+   const AliasRequest = 'Request';
+   const AliasRoutes = 'Routes';
    const AliasSession = 'Session';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
-   const AliasRequest = 'Request';
+
+   const AliasPluginManager = 'PluginManager';
 
    const FactoryInstance = 'Instance';
    const FactoryPrototype = 'Prototype';

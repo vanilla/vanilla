@@ -50,26 +50,30 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 
 function WriteOptionList($Object, $Sender, $Session) {
    $Sender->Options = '';
+	$CategoryID = GetValue('CategoryID', $Object);
+	if(!$CategoryID && property_exists($Sender, 'Discussion'))
+		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
+		
    // Show discussion options if this is the discussion / first comment
    if ($Sender->EventArguments['Type'] == 'Discussion') {
       // Can the user edit the discussion?
-      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Discussions.Edit', $Object->CategoryID))
+      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Discussions.Edit', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').'</span>';
          
       // Can the user announce?
-      if ($Session->CheckPermission('Vanilla.Discussions.Announce', $Sender->Discussion->CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Announce', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</span>';
 
       // Can the user sink?
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink', $Sender->Discussion->CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Sink', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</span>';
 
       // Can the user close?
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', $Sender->Discussion->CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Close', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</span>';
       
       // Can the user delete?
-      if ($Session->CheckPermission('Vanilla.Discussions.Delete', $Sender->Discussion->CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Delete', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Delete Discussion'), 'vanilla/discussion/delete/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</span>';
    } else {
       // And if this is just another comment in the discussion ...
@@ -79,7 +83,7 @@ function WriteOptionList($Object, $Sender, $Session) {
          $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').'</span>';
 
       // Can the user delete the comment?
-      if ($Session->CheckPermission('Vanilla.Comments.Delete', $Sender->Discussion->CategoryID))
+      if ($Session->CheckPermission('Vanilla.Comments.Delete', $CategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode($Sender->SelfUrl), 'DeleteComment') . '</span>';
    }
    

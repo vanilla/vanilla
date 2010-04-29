@@ -25,6 +25,7 @@ class Gdn_CookieIdentity {
    public $CookieDomain;
    public $CookieHashMethod;
    public $CookieSalt;
+   public $VolatileMarker;
    
    public function __contruct($Config = NULL) {
       $this->Init($Config);
@@ -42,6 +43,7 @@ class Gdn_CookieIdentity {
       $this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
       $this->CookieHashMethod = ArrayValue('HashMethod', $Config, $DefaultConfig['HashMethod']);
       $this->CookieSalt = ArrayValue('Salt', $Config, $DefaultConfig['Salt']);
+      $this->VolatileMarker = $this->CookieName.'-Volatile';
    }
    
    /**
@@ -78,6 +80,34 @@ class Gdn_CookieIdentity {
          return 0;
 
       return $UserID;
+   }
+   
+   public function HasVolatileMarker($CheckUserID) {
+      $HasMarker = $this->CheckVolatileMarker($CheckUserID);
+      if (!$HasMarker)
+         $this->SetVolatileMarker($CheckUserID);
+      
+      return $HasMarker;
+   }
+   
+   public function CheckVolatileMarker($CheckUserID) {
+      if (empty($_COOKIE[$this->VolatileMarker]))
+         return FALSE;
+
+      list($UserID, $Expiration, $HMAC) = explode('|', $_COOKIE[$this->VolatileMarker]);
+      if ($Expiration < time())
+         return FALSE;
+
+      $Key = $this->_Hash($UserID . $Expiration);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
+
+      if ($HMAC != $Hash)
+         return FALSE;
+
+      if ($UserID != $CheckUserID)
+         return FALSE;
+
+      return TRUE;
    }
    
    /**
@@ -149,6 +179,26 @@ class Gdn_CookieIdentity {
 
       // Create the cookie.
       setcookie($this->CookieName, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain);
+      $this->SetVolatileMarker($UserID);
+   }
+   
+   public function SetVolatileMarker($UserID) {
+      if(is_null($UserID))
+         return;
+      
+      
+      // Note: 172800 is 60*60*24*2 or 2 days
+      $Expiration = time() + 172800;
+      // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
+      $Expire = 0;
+
+      // Create the cookie contents
+      $Key = $this->_Hash($UserID . $Expiration);
+      $Hash = $this->_HashHMAC($this->CookieHashMethod, $UserID . $Expiration, $Key);
+      $CookieContents = $UserID . '|' . $Expiration . '|' . $Hash . '|' . time();
+
+      // Create the cookie.
+      setcookie($this->VolatileMarker, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain);
    }
    
 }

@@ -15,6 +15,8 @@ class SetupController extends DashboardController {
    
    public $Uses = array('Form', 'Database');
    
+	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
+	
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
@@ -150,7 +152,7 @@ class SetupController extends DashboardController {
             // Create the administrative user
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
-            $UserModel->Validation->ApplyRule('Name', 'Username', 'Admin username can only contain letters, numbers, and underscores.');
+            $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
             $UserModel->Validation->ApplyRule('Password', 'Required');
             $UserModel->Validation->ApplyRule('Password', 'Match');
             

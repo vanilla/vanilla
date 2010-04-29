@@ -1201,7 +1201,7 @@ abstract class Gdn_SQLDriver {
       }
       
       // Map the alias to the alias mapping array
-      $TableString = trim(preg_replace('/\w+as\w+/i', ' ', $TableString));
+      $TableString = trim(preg_replace('/\s+as\s+/i', ' ', $TableString));
       $Alias = strrchr($TableString, " ");
       $TableName = substr($TableString, 0, strlen($TableString) - strlen($Alias));
    

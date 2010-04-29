@@ -79,6 +79,8 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup'
 }
 
 /// Install some of the services.
+// Default request
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
 // Default database.
 Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
 // Database drivers.

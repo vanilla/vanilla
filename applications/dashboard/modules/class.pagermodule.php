@@ -203,7 +203,7 @@ class PagerModule extends Gdn_Module {
          for ($i = 0; $i < $PageCount ; $i++) {
             $Offset = $this->Limit * $i;
             if ($Offset == 0) $Offset = '';
-            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit));
+            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
          }
       } else if ($FirstPage <= 3) {
          // We're on a page that is before the first elipsis (ie. 1 2 3 4 5 6 7 ... 81)

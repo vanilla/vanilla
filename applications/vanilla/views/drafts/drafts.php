@@ -3,7 +3,14 @@ $Session = Gdn::Session();
 $ShowOptions = TRUE;
 $Alt = '';
 foreach ($this->DraftData->Result() as $Draft) {
-   $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;
+	$Offset = GetValue('CountComments', $Draft, 0);
+	if($Offset > C('Vanilla.Comments.PerPage', 50)) {
+		$Offset -= C('Vanilla.Comments.PerPage', 50);
+	} else {
+		$Offset = 0;
+	}
+	
+   $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/discussion/'.$Draft->DiscussionID.'/'.$Offset.'/#Form_Comment';
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    ?>
    <li class="Item Draft<?php echo $Alt; ?>">

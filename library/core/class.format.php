@@ -409,7 +409,8 @@ class Gdn_Format {
          $Mixed = utf8_decode($Mixed);
          $Mixed = preg_replace('/-+/', '-', str_replace(' ', '-', trim(preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
          $Mixed = utf8_encode($Mixed);
-         return strtolower($Mixed);
+         $Mixed = urlencode(strtolower($Mixed));
+			return $Mixed;
       }
    }
 

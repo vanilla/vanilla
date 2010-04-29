@@ -22,15 +22,15 @@ class ImportModel {
 	const TABLE_PREFIX = 'z';
 	const QUOTE = '"';
 	
+	public $CurrentStep = 0;
+	
 	public $Data = array();
 	
 	public $ImportPath = '';
 
 	public $MaxStepTime = 10000;
 	
-	public $Overwrite = 'Overwrite';
-	
-	public $Steps = array(
+	protected $_MergeSteps = array(
 		1 => 'SplitImportFile',
 		2 => 'DefineTables',
 		3 => 'LoadTables',
@@ -39,6 +39,16 @@ class ImportModel {
 		6 => 'AssignOtherIDs',
 		7 => 'InsertTables',
 		8 => 'UpdateCounts'
+		);
+	
+	protected $_OverwriteSteps = array(
+		1 => 'SplitImportFile',
+		2 => 'DefineTables',
+		3 => 'LoadUserTable',
+		4 => 'AuthenticateAdminUser',
+		5 => 'InsertUserTable',
+		6 => 'InsertTables',
+		7 => 'UpdateCounts'
 		);
 	
 	public $Structures = array(
@@ -54,6 +64,10 @@ class ImportModel {
 	 * @var Gdn_Timer
 	 */
 	public $Timer = NULL;
+	
+	public function __construct($ImportPath = '') {
+		$this->ImportPath = $ImportPath;
+	}
 	
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
@@ -149,6 +163,22 @@ where i._NewID is null";
 		$this->Query($Sql);
 	}
 	
+	public function AuthenticateAdminUser() {
+		$OverwriteUsername = GetValue('OverwriteUsername', $this->Data);
+		$OverwritePassword = GetValue('OverwritePassword', $this->Data);
+		
+		$Data = Gdn::SQL()->GetWhere('zUser', array('Name' => $OverwriteUsername));
+		if($Data->NumRows() == 0) {
+			return FALSE;
+		} else {
+			// TODO: Make sure the user authenticates.
+			$Header = $this->GetImportHeader();
+			$Source = GetValue('Source', $Header);
+			
+			return TRUE;
+		}
+	}
+	
 	public function DefineTables() {
 		$St = Gdn::Structure();
 		
@@ -193,6 +223,73 @@ where i._NewID is null";
 				$St->Set();
 		}
 		return TRUE;
+	}
+	
+	public function DeleteFiles() {
+		foreach(GetValue('Tables', $this->Data, array()) as $Table => $TableInfo) {
+			$Path = GetValue('Path', $TableInfo, '');
+			if(file_exists($Path))
+				unlink($Path);
+		}
+		
+		// Delete the import file.
+		if($this->ImportPath && file_exists($this->ImportPath)) {
+			unlink($this->ImportPath);
+		}
+	}
+	
+	/**
+	 * Remove the data from the appropriate tables when we are overwriting the forum.
+	 */
+	public function DeleteOverwriteTables() {
+		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
+							 'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'UserAuthentication',
+							 'UserConversation', 'UserDiscussion', 'UserRole');
+		
+		// Execute the SQL.
+		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
+		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
+			$Table = $Tables[i];
+			$Sql = "truncate table :_$Table";
+			$this->Query($Sql);
+			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+				// The step's taken too long. Save the state and return.
+				$this->Data['CurrentSubstep'] = $i + 1;
+				return FALSE;
+			}
+		}
+		if(isset($this->Data['CurrentSubstep']))
+			unset($this->Data['CurrentSubstep']);
+		
+		return TRUE;
+	}
+	
+	public function DeleteState() {
+		RemoveFromConfig('Garden.Import');
+	}
+	
+	public function GetImportHeader($fpin = NULL) {
+		$Header = GetValue('Header', $this->Data);
+		if($Header)
+			return $Header;
+		
+		if(is_null($fpin)) {
+			if(!$this->ImportPath)
+				return array();
+			$fpin = gzopen($this->ImportPath, 'rb');
+			$fpopened = TRUE;
+		}
+		
+		$Header = fgets($fpin);
+		if(!$Header || strlen($Header) < 7 || substr_compare('Vanilla', $Header, 0, 7) != 0) {
+			if(isset($fpopened))
+				fclose($fpin);
+			throw new Exception('The import file is not in the correct format.');
+		}
+		$Header = $this->ParseInfoLine($Header);
+		if(isset($fpopened))
+				fclose($fpin);
+		return $Header;
 	}
 	
 	public function InsertTables() {
@@ -251,7 +348,10 @@ where i._NewID is null";
 		// Build the select list for the insert.
 		$Select = array();
 		foreach($Structure as $Column => $Type) {
-			if($Column == $TableName.'ID') {
+			if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
+				// The data goes in raw.
+				$Select[] = 'i.$Column';
+			} elseif($Column == $TableName.'ID') {
 				// This is the primary key.
 				$Select[] = "i._NewID as $Column";
 				$Where = "\nwhere i._Action = 'Insert'";
@@ -271,9 +371,11 @@ where i._NewID is null";
 			}
 		}
 		// Add the original table to prevent duplicates.
-		$PK = $TableName.'ID';
-		$From .= "\nleft join :_$TableName o0\n  on i._NewID = o0.$PK";
-		$Where .= " and o0.$PK is null";
+		if(strcasecmp($this->Overwrite(), 'Overwrite') != 0) {
+			$PK = $TableName.'ID';
+			$From .= "\nleft join :_$TableName o0\n  on i._NewID = o0.$PK";
+			$Where .= " and o0.$PK is null";
+		}
 		
 		// Build the sql statement.
 		$Sql = $Insert
@@ -282,6 +384,31 @@ where i._NewID is null";
 			.$Where;
 			
 		$this->Query($Sql);
+	}
+	
+	public function InsertUserTable() {
+		// Delete the current user table.
+		$this->Query('truncate table :_User');
+		
+		// Load the new user table.
+		$UserTableInfo &= $this->Data['Tables']['User'];
+		$this->LoadTable('User', $UserTableInfo['Path']);
+		$UserTableInfo['Loaded'] = TRUE;
+		
+		// Set the admin user flag.
+		$AdminUsername = GetValue('OverwriteUsername', $this->Data);
+		$this->Query('update :_User set Admin = 1 where Name = :Username', array(':Username' => $AdminUsername));
+		
+		// Authenticate the admin user as the current user.
+		$Auth = new Gdn_PasswordAuthenticator();
+		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword')));
+		Gdn::Session()->Start($Auth);
+	}
+	
+	public function LoadState() {
+		$this->CurrentStep = C('Garden.Import.CurrentStep', 0);
+		$this->Data = C('Garden.Import.CurrentStepData', array());
+		$this->ImportPath = C('Garden.Import.ImportPath', '');
 	}
 	
 	public function LoadTables() {
@@ -326,6 +453,21 @@ ignore 1 lines";
 		return TRUE;
 	}
 	
+	public function Overwrite($Overwrite = '', $Username = '', $Password = '') {
+		if($Overwrite = '')
+			return GetValue('Overwrite', $this->Data);
+		$this->Data['Overwrite'] = $Overwrite;
+		if(strcasecmp($Overwrite, 'Overwrite')) {
+			$this->Data['OverwriteUsername'] = $Username;
+			$this->Data['OverwritePassword'] = $Password;
+		} else {
+			if(isset($this->Data['OverwriteUsername']))
+				unset($this->Data['OverwriteUsername']);
+			if(isset($this->Data['OverwritePassword']))
+				unset($this->Data['OverwritePassword']);
+		}
+	}
+	
 	public function ParseInfoLine($Line) {
 		$Info = explode(',', $Line);
 		$Result = array();
@@ -344,7 +486,8 @@ ignore 1 lines";
 	 * @return mixed Whether the step succeeded or an array of information.
 	 */
 	public function RunStep($Step = 1) {
-		if($Step > count($this->Steps)) {
+		$Steps = $this->Steps();
+		if($Step > count($Steps)) {
 			return 'COMPLETE';
 		}
 		if(!$this->Timer) {
@@ -353,7 +496,7 @@ ignore 1 lines";
 			$this->Timer->Start('');
 		}
 		
-		$Method = $this->Steps[$Step];
+		$Method = $Steps[$Step];
 		$Result = call_user_method($Method, $this);
 		
 		if(isset($NewTimer))
@@ -383,6 +526,13 @@ ignore 1 lines";
 		
 		return $Result;
 	}
+	
+	public function SaveState() {
+		SaveToConfig(array(
+			'Garden.Import.CurrentStep' => $this->CurrentStep,
+			'Garden.Import.CurrentStepData' => $this->Data,
+			'Garden.Import.ImportPath' => $this->ImportPath));
+	}
 
 	public function SplitImportFile() {
 		$Path = $this->ImportPath;
@@ -393,11 +543,12 @@ ignore 1 lines";
 		$fpout = NULL;
 		
 		// Make sure it has the proper header.
-		$Header = fgets($fpin);
-		if(!$Header || strlen($Header) < 7 || substr_compare('Vanilla', $Header, 0, 7) != 0) {
-			throw new Exception('The import file is not in the correct format.');
+		try {
+			$Header = $this->GetImportHeader($fpin);
+		} catch(Exception $Ex) {
+			fclose($fpin);
+			throw $Ex;
 		}
-		$Header = $this->ParseInfoLine($Header);
 		
 		while(($Line = fgets($fpin)) !== FALSE) {
 			if($Line == "\n") {
@@ -431,6 +582,13 @@ ignore 1 lines";
 		return TRUE;
 	}
 	
+	public function Steps() {
+		if(strcasecmp($this->Overwrite(), 'Overwrite') == 0)
+			return $this->_OverwriteSteps;
+		else
+			return $this->_MergeSteps;
+	}
+	
 	public function UpdateCounts() {
 		// Define the necessary SQL.
 		$StepSql = array(
@@ -453,7 +611,7 @@ inner join (
 set
   d.Body = c.Body,
   d.Format = c.Format,
-  d.FirstCommentID = c.CommentID,
+  d.FirstCommentID = c.CommentID
 where d.Body is null",
 
 			// Remove the first comment.

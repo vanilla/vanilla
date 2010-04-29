@@ -13,7 +13,12 @@ echo $this->Form->Errors();
 <ul>
 	<li>
 		<p><?php echo T('Select the file to import.'); ?></p>
-		<?php echo $this->Form->Input('ImportFile', 'file'); ?>
+		<?php
+			echo $this->Form->Input('ImportFile', 'file');
+			$OriginalFilename = GetValue('OriginalFilename', $this->Data);
+			if($OriginalFilename)
+				echo ' (', htmlentities($OriginalFilename), ')';
+		?>
 	</li>
 	<li>
 		<?php
@@ -22,11 +27,11 @@ echo $this->Form->Errors();
 		T('Garden.Import.Overwrite.Desciption', 'This option will delete all of the user and discussion data in this forum. You must choose a new admin user from the import data below.'),
 		'</div>';
 		
-		echo $this->Form->Label('Username', 'OverwriteAdminUsername'),
+		echo $this->Form->Label('Username', 'Username'),
 			$this->Form->TextBox('Username');
 		
-		echo $this->Form->Label('Password', 'OverwriteAdminPassword'),
-			$this->Form->Input('ImportPassword', 'password');
+		echo $this->Form->Label('Password', 'Password'),
+			$this->Form->Input('Password', 'password');
 		?>
 	</li>
 	<li>
@@ -40,4 +45,4 @@ echo $this->Form->Errors();
 		?>
 	</li>
 </ul>
-<?php echo $this->Form->Close('Start Import');
+<?php echo $this->Form->Close('Upload');

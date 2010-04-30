@@ -198,7 +198,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
       
       if (!$this->Form->AuthenticatedPostBack()) {
-         $this->Form->SetData(array('AllowDiscussions' => '1')); // Checked by default
+         $this->Form->SetData(array('AllowDiscussions' => '1')); // unchecked by default
       } else {
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {               
@@ -264,12 +264,14 @@ class SettingsController extends Gdn_Controller {
             // 3. The category being deleted does not allow discussions, and it
             // does contain other categories, and there are replacement parent
             // categories available, and one is not selected.
+				/*
             if ($this->Category->AllowDiscussions == '0'
                && $this->OtherCategories->NumRows() > 0
                && !$ReplacementCategory) {
                if ($this->CategoryModel->GetWhere(array('ParentCategoryID' => $CategoryID))->NumRows() > 0)
                   $this->Form->AddError('You must select a replacement category in order to remove this category.');
             }
+				*/
             
             if ($this->Form->ErrorCount() == 0) {
                // Go ahead and delete the category
@@ -330,7 +332,7 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('jquery.tablednd.js');
       $this->AddJsFile('jquery.ui.packed.js');
       $this->Title(T('Categories'));
-      $this->CategoryData = $this->CategoryModel->Get('Sort');
+      $this->CategoryData = $this->CategoryModel->GetAll('Sort');
       $this->Render();
    }
    

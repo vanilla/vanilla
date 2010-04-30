@@ -88,6 +88,10 @@ class UserModel extends Gdn_Model {
       $this->UserQuery();
       return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }
+	public function GetByEmail($Email) {
+      $this->UserQuery();
+      return $this->SQL->Where('u.Email', $Email)->Get()->FirstRow();
+   }
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();

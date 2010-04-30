@@ -72,17 +72,6 @@ class UserController extends DashboardController {
       $this->Render();
    }
 
-   public function AutoComplete() {
-      $this->DeliveryType(DELIVERY_TYPE_NONE);
-      $Q = GetIncomingValue('q');
-      $UserModel = new UserModel();
-      $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
-      foreach ($Data->Result() as $User) {
-         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
-      }
-      $this->Render();
-   }
-
    public function Add() {
       $this->Permission('Garden.Users.Add');
       $this->AddJsFile('user.js');
@@ -111,7 +100,57 @@ class UserController extends DashboardController {
 
       $this->Render();
    }
+	
+	public function Applicants() {
+      $this->Permission('Garden.Users.Approve');
+      $this->AddSideMenu('dashboard/user/applicants');
+      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
+      $this->Title(T('Applicants'));
 
+      if ($this->Form->AuthenticatedPostBack() === TRUE) {
+         $Action = $this->Form->GetValue('Submit');
+         $Applicants = $this->Form->GetValue('Applicants');
+         $ApplicantCount = is_array($Applicants) ? count($Applicants) : 0;
+         if ($ApplicantCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
+            $Session = Gdn::Session();
+            for ($i = 0; $i < $ApplicantCount; ++$i) {
+               $this->HandleApplicant($Action, $Applicants[$i]);
+            }
+         }
+      }
+      $UserModel = Gdn::UserModel();
+      $this->UserData = $UserModel->GetApplicants();
+      $this->View = 'applicants';
+      $this->Render();
+   }
+
+	public function Approve($UserID = '', $PostBackKey = '') {
+      $this->Permission('Garden.Users.Approve');
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($PostBackKey))
+      
+         if($this->HandleApplicant('Approve', $UserID)) {
+            $this->StatusMessage = T('Your changes have been saved.');
+         }
+
+      if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
+         return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
+      } else {
+         $this->Applicants();
+      }
+   }
+	
+   public function AutoComplete() {
+      $this->DeliveryType(DELIVERY_TYPE_NONE);
+      $Q = GetIncomingValue('q');
+      $UserModel = new UserModel();
+      $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
+      foreach ($Data->Result() as $User) {
+         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
+      }
+      $this->Render();
+   }
+	
    public function Browse($Offset = FALSE, $Keywords = '') {
       $this->View = 'index';
       $this->Index($Offset, $Keywords);
@@ -158,44 +197,19 @@ class UserController extends DashboardController {
       $this->Render();
    }
 
-   public function Applicants() {
-      $this->Permission('Garden.Users.Approve');
-      $this->AddSideMenu('dashboard/user/applicants');
-      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
-      $this->Title(T('Applicants'));
-
-      if ($this->Form->AuthenticatedPostBack() === TRUE) {
-         $Action = $this->Form->GetValue('Submit');
-         $Applicants = $this->Form->GetValue('Applicants');
-         $ApplicantCount = is_array($Applicants) ? count($Applicants) : 0;
-         if ($ApplicantCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
-            $Session = Gdn::Session();
-            for ($i = 0; $i < $ApplicantCount; ++$i) {
-               $this->HandleApplicant($Action, $Applicants[$i]);
-            }
-         }
+	public function EmailAvailable($Email = '') {
+		$this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      $Available = TRUE;
+      if ($Email != '') {
+         $UserModel = Gdn::UserModel();
+         if ($UserModel->GetByEmail($Email))
+            $Available = FALSE;
       }
-      $UserModel = Gdn::UserModel();
-      $this->UserData = $UserModel->GetApplicants();
-      $this->View = 'applicants';
+      if (!$Available)
+         $this->Form->AddError(sprintf(T('%s unavailable'), T('Email')));
+         
       $this->Render();
-   }
-
-   public function Approve($UserID = '', $PostBackKey = '') {
-      $this->Permission('Garden.Users.Approve');
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($PostBackKey))
-      
-         if($this->HandleApplicant('Approve', $UserID)) {
-            $this->StatusMessage = T('Your changes have been saved.');
-         }
-
-      if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-         return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
-      } else {
-         $this->Applicants();
-      }
-   }
+	}
 
    public function Decline($UserID = '', $PostBackKey = '') {
       $this->Permission('Garden.Users.Approve');
@@ -257,10 +271,23 @@ class UserController extends DashboardController {
       }
    }
 
-
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
+   }
+	
+	public function UsernameAvailable($Name = '') {
+      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      $Available = TRUE;
+      if ($Name != '') {
+         $UserModel = Gdn::UserModel();
+         if ($UserModel->GetByUsername($Name))
+            $Available = FALSE;
+      }
+      if (!$Available)
+         $this->Form->AddError(sprintf(T('%s unavailable'), T('Name')));
+         
+      $this->Render();
    }
 }

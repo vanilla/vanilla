@@ -16,6 +16,7 @@
          <?php
             echo $this->Form->Label('Email', 'Email');
             echo $this->Form->TextBox('Email');
+				echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
       <li>

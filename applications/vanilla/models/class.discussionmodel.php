@@ -133,6 +133,8 @@ class DiscussionModel extends VanillaModel {
 		// If not looking at discussions filtered by bookmarks or user, filter announcements out.
 		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
 			$this->SQL->Where('d.Announce<>', '1');
+			
+		$this->FireEvent('BeforeGet');
       
       $Data = $this->SQL
          ->OrderBy('d.DateLastComment', 'desc')

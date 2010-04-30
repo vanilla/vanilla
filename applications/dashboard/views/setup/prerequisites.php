@@ -3,10 +3,10 @@
 echo $this->Form->Open();
 ?>
 <div class="Title">
-   <div class="Center">
-      <div class="Logo"><img src="/applications/dashboard/design/images/vanilla_light.png" /></div>
-      <div class="PageName"><h1><?php echo T("PREREQUISITE CHECKLIST"); ?></h1></div>
-   </div>
+   <h1>
+      <?php echo Img('applications/dashboard/design/images/vanilla_logo.png', array('alt' => 'Vanilla')); ?>
+      <p><?php echo T('Version 2 Installer'); ?></p>
+   </h1>
 </div>
 <div class="Form">
    <?php

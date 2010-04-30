@@ -3,14 +3,14 @@ jQuery(document).ready(function($) {
    // Hide/reveal the permissions grids when the AllowDiscussions checkbox is un/checked.
    $('[name=Category/AllowDiscussions]').click(function() {
       if ($(this).attr('checked'))
-         $('#Permissions').slideDown('fast');
+         $('#Permissions,#UrlCode').slideUp('fast');
       else
-         $('#Permissions').slideUp('fast');
+         $('#Permissions,#UrlCode').slideDown('fast');
    });
    // Categories->Add() && Categories->Edit()
    // Hide onload if unchecked   
-   if (!$('[name=Category/AllowDiscussions]').attr('checked'))
-      $('#Permissions').hide();
+   if ($('[name=Category/AllowDiscussions]').attr('checked'))
+      $('#Permissions,#UrlCode').hide();
    
    // Categories->Delete()
    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.

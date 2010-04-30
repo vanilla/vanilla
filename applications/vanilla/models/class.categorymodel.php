@@ -106,6 +106,9 @@ class CategoryModel extends Gdn_Model {
       return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow();
    }
 
+   /**
+    * Applies permissions.
+    */
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->SQL
          ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
@@ -119,6 +122,18 @@ class CategoryModel extends Gdn_Model {
       return $this->SQL->Get();
    }
    
+   /**
+    * Does not apply permissions (for administrators).
+    */
+   public function GetAll($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $this->SQL
+         ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
+         ->From('Category c')
+         ->OrderBy('Sort', 'asc');
+         
+      return $this->SQL->Get();
+   }
+
    public function GetFull($CategoryID = '') {
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
@@ -229,24 +244,28 @@ class CategoryModel extends Gdn_Model {
       $CategoryID = ArrayValue('CategoryID', $FormPostValues);
       $NewName = ArrayValue('Name', $FormPostValues, '');
       $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
+      $AllowDiscussions = ArrayValue('AllowDiscussions', $FormPostValues, '');
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
       if ($Insert)
          $this->AddInsertFields($FormPostValues);               
 
       $this->AddUpdateFields($FormPostValues);
-      $this->Validation->ApplyRule('UrlCode', 'Required');
-      $this->Validation->ApplyRule('UrlCode', 'UrlString', 'Url code can only contain letters, numbers, underscores and dashes.');
+      if ($AllowDiscussions == '1') {
+         $this->Validation->ApplyRule('UrlCode', 'Required');
+         $this->Validation->ApplyRule('UrlCode', 'UrlString', 'Url code can only contain letters, numbers, underscores and dashes.');
       
-      // Make sure that the UrlCode is unique among categories.
-      $this->SQL->Select('CategoryID')
-         ->From('Category')
-         ->Where('UrlCode', $UrlCode);
-      
-      if ($CategoryID)
-         $this->SQL->Where('CategoryID <>', $CategoryID);
-      
-      if ($this->SQL->Get()->NumRows())
-         $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+         // Make sure that the UrlCode is unique among categories.
+         $this->SQL->Select('CategoryID')
+            ->From('Category')
+            ->Where('UrlCode', $UrlCode);
+         
+         if ($CategoryID)
+            $this->SQL->Where('CategoryID <>', $CategoryID);
+         
+         if ($this->SQL->Get()->NumRows())
+            $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            
+      }
       
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {

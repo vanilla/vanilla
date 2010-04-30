@@ -14,6 +14,7 @@ jQuery(document).ready(function($) {
    $.fn.handleMessageForm = function() {
       this.click(function() {
          var button = this;
+         $(button).attr('disabled', 'disabled');
          var frm = $(button).parents('form').get(0);
          var textbox = $(frm).find('textarea');
          // Post the form, and append the results to #Discussion, and erase the textbox
@@ -26,13 +27,14 @@ jQuery(document).ready(function($) {
          var lastMessage = $(messages).get(messages.length - 1);
          var lastMessageID = $(lastMessage).attr('id');
          postValues += '&' + prefix + 'LastMessageID=' + lastMessageID;
+         $(button).before('<span class="TinyProgress">&nbsp;</span>');
          $.ajax({
             type: "POST",
             url: $(frm).attr('action'),
             data: postValues,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $('.Popup').remove();
+               $('div.Popup').remove();
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
@@ -60,6 +62,11 @@ jQuery(document).ready(function($) {
                   }
                   gdn.inform(json.StatusMessage);
                }
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+               // Remove any spinners, and re-enable buttons.
+               $('span.TinyProgress').remove();
+               $(frm).find(':submit').removeAttr("disabled");
             }
          });
          return false;
@@ -70,7 +77,7 @@ jQuery(document).ready(function($) {
    
    // Utility function to clear out the message form
    function clearMessageForm() {
-      $('.Popup').remove();
+      $('div.Popup').remove();
       var frm = $('#Form_ConversationMessage');
       frm.find('textarea').val('');
       frm.find('div.Errors').remove();

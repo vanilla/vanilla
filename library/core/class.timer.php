@@ -17,7 +17,11 @@ class Gdn_Timer {
 	public $SplitTime;
 	
 	public function ElapsedTime() {
-		return $this->FinishTime - $this->StartTime;
+		if(is_null($FinishTime))
+			$Result = microtime(TRUE) - $this->StartTime;
+		else
+			$Result = $this->FinishTime - $this->StartTime;
+		return $Result;
 	}
 	
 	public function Finish($Message = '') {

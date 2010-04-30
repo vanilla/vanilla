@@ -69,7 +69,7 @@ function Gdn_ExceptionHandler($ErrorException) {
       $Master = FALSE;  // The parsed master view
       $CssPath = FALSE; // The web-path to the css file
       $ErrorLines = FALSE; // The lines near the error's line #
-      $DeliveryType = DELIVERY_TYPE_ALL;
+      $DeliveryType = defined('DELIVERY_TYPE_ALL') ? DELIVERY_TYPE_ALL : 'ALL';
       if (array_key_exists('DeliveryType', $_POST)) {
          $DeliveryType = $_POST['DeliveryType'];
       } else if (array_key_exists('DeliveryType', $_GET)) {

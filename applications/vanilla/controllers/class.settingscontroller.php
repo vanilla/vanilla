@@ -188,7 +188,6 @@ class SettingsController extends Gdn_Controller {
       $RoleModel = new RoleModel();
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
-      
       $this->AddJsFile('categories.js');
       $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
       $this->Title(T('Add Category'));
@@ -198,8 +197,10 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
       
       if (!$this->Form->AuthenticatedPostBack()) {
-         $this->Form->SetData(array('AllowDiscussions' => '1')); // unchecked by default
+			$this->Form->AddHidden('CodeIsDefined', '0');
       } else {
+			$IsParent = $this->Form->GetFormValue('IsParent', '0');
+			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {               
             $this->StatusMessage = T('The category was created successfully.');

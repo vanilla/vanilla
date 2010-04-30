@@ -8,7 +8,7 @@ echo $this->Form->Errors();
    <li>
       <div class="Info"><?php echo T('<strong>Parent categories</strong> allow you to organize your categories. Parent categories can only contain categories. <strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'); ?></div>
       <?php
-         echo $this->Form->CheckBox('AllowDiscussions', 'Make this a parent category', array('value' => '0'));
+         echo $this->Form->CheckBox('IsParent', 'Make this a parent category', array('value' => '1'));
       ?>
    </li>
    <li>

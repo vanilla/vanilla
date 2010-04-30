@@ -259,7 +259,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-            trigger_error(ErrorMessage('Controller method missing: '.$this->ControllerName().'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
+         
+            $NotFoundRoute = $this->Routes->GetRoute('Default404');
+            $Request = Gdn_Request::CreateFromURI($NotFoundRoute['Destination']);
+            Gdn::Request()->Import($Request);
+            return $this->Dispatch();
+            
          }
       }
 

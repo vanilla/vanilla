@@ -11,20 +11,31 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_ErrorException extends ErrorException {
 
    private $Context;
+   private $Backtrace;
    
-   public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
+   public function __construct($Message, $ErrorNumber, $File, $Line, $Context, $Backtrace) {
       parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
       $this->Context = $Context;
+      $this->Backtrace = $Backtrace;
    }
    
    public function getContext() {
       return $this->Context;
    }
+   
+   public function getBacktrace() {
+      return $this->Backtrace;
+   }
 
 }
 
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+   // Ignore errors that have a @ before them (ie. @function();)
+   if (error_reporting() == 0)
+      return FALSE;
+   
+   $Backtrace = debug_backtrace();
+   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
 }
 
 /**
@@ -44,10 +55,7 @@ function Gdn_ExceptionHandler($ErrorException) {
       $File = $ErrorException->getFile();
       $Line = $ErrorException->getLine();
       $Arguments = $ErrorException->getContext();
-      
-      // Ignore errors that have a @ before them (ie. @function();)
-      if (error_reporting() == 0)
-         return FALSE;
+      $Backtrace = $ErrorException->getBacktrace();
       
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
@@ -57,6 +65,7 @@ function Gdn_ExceptionHandler($ErrorException) {
       $SenderObject = 'PHP';
       $SenderMethod = 'Gdn_ErrorHandler';
       $SenderCode = FALSE;
+      $SenderTrace = $Backtrace;
       $MessageInfo = explode('|', $Message);
       $MessageCount = count($MessageInfo);
       if ($MessageCount == 4)
@@ -179,7 +188,7 @@ function Gdn_ExceptionHandler($ErrorException) {
                echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), $ErrorLines[$i]),"\n";
             }
          }
-         $Backtrace = debug_backtrace();
+
          if (is_array($Backtrace)) {
             echo "BACKTRACE:\n";
             $BacktraceCount = count($Backtrace);

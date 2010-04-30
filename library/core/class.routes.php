@@ -46,9 +46,7 @@ class Gdn_Routes {
    public function SetRoute($Route, $Destination, $Type) {
       $Key = $this->_EncodeRouteKey($Route);
       SaveToConfig('Routes.'.$Key.'.0', $Destination);
-      die("Setting [{$Route}] -> $Destination (Step 2)\n");
       SaveToConfig('Routes.'.$Key.'.1', $Type);
-      
       $this->_LoadRoutes();
    }
    
@@ -114,11 +112,16 @@ class Gdn_Routes {
    }
    
    private function _ParseRoute($Destination) {
+   
+      // If Destination is a short array
+      if (is_array($Destination) && sizeof($Destination) == 1)
+         $Destination = $Destination[0];
+   
       // If Destination is a simple string...
       if (!is_array($Destination))
          $Destination = $this->_FormatRoute($Destination, 'Internal');
       
-      // If Destination is an array with no keys...
+      // If Destination is an array with no named keys...
       if (!array_key_exists('Destination', $Destination))
          $Destination = $this->_FormatRoute($Destination[0], $Destination[1]);
             
@@ -133,11 +136,11 @@ class Gdn_Routes {
    }
    
    protected function _EncodeRouteKey($Key) {
-      return in_array($Key,$this->ReservedRoutes) ? $Key : base64_encode($Key);
+      return str_replace('/','_',in_array($Key,$this->ReservedRoutes) ? $Key : base64_encode($Key));
    }
    
    protected function _DecodeRouteKey($Key) {
-      return in_array($Key,$this->ReservedRoutes) ? $Key : base64_decode($Key);
+      return in_array($Key,$this->ReservedRoutes) ? $Key : base64_decode(str_replace('_','/',$Key));
    }
 
 }

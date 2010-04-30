@@ -432,7 +432,7 @@ class Gdn_Validation {
     * @param boolean $Insert A boolean value indicating if the posted fields are to be inserted or
     *  updated. If being inserted, the schema's required field rules will be
     *  enforced.
-    * @return unknown
+    * @return boolean Whether or not the validation was successful.
     */
    public function Validate($PostedFields, $Insert = FALSE) {
       $this->DefineValidationFields($PostedFields, $this->_Schema, $Insert);

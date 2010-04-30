@@ -118,7 +118,7 @@ $Return = '';
     */
    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
    
-      return (($WithWebRoot) ? self::WebRoot($WithDomain) : '').Gdn::Request()->Request();
+      return (($WithWebRoot) ? self::WebRoot($WithDomain).'/' : '').Gdn::Request()->Request();
    
       /*
 $Return = '';

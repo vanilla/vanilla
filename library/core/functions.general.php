@@ -918,13 +918,10 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceString')) {
-   function SliceString($String, $Length, $Suffix = '...') {
-      if (strlen($String) > $Length) {
-         $Return = substr(trim($String), 0, $Length);
-         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . $Suffix;
-      } else {
-         return $String;
-      }
+   function SliceString($String, $Length, $Suffix = '…') {
+	static $Charset;
+	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
    }
 }
 

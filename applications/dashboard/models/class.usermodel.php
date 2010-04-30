@@ -88,6 +88,10 @@ class UserModel extends Gdn_Model {
       $this->UserQuery();
       return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }
+	public function GetByEmail($Email) {
+      $this->UserQuery();
+      return $this->SQL->Where('u.Email', $Email)->Get()->FirstRow();
+   }
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();
@@ -752,29 +756,54 @@ class UserModel extends Gdn_Model {
       if (!$Email && !$ID)
          throw new Exception('The email or id is required');
 
-      $this->SQL->Select('UserID, Attributes, Admin, Password, CacheRoleID')
-         ->From('User');
-
-      if ($ID) {
-         $this->SQL->Where('UserID', $ID);
-      } else {
-         if (strpos($Email, '@') > 0) {
-            $this->SQL->Where('Email', $Email);
-         } else {
-            $this->SQL->Where('Name', $Email);
-         }
-      }
-
-      $DataSet = $this->SQL->Get();
+		try {
+			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted')
+				->From('User');
+	
+			if ($ID) {
+				$this->SQL->Where('UserID', $ID);
+			} else {
+				if (strpos($Email, '@') > 0) {
+					$this->SQL->Where('Email', $Email);
+				} else {
+					$this->SQL->Where('Name', $Email);
+				}
+			}
+	
+			$DataSet = $this->SQL->Get();
+		} catch(Exception $Ex) {
+			// Try getting the user information without the new fields.
+			$this->SQL->Select('UserID, Attributes, Admin, Password')
+				->From('User');
+	
+			if ($ID) {
+				$this->SQL->Where('UserID', $ID);
+			} else {
+				if (strpos($Email, '@') > 0) {
+					$this->SQL->Where('Email', $Email);
+				} else {
+					$this->SQL->Where('Name', $Email);
+				}
+			}
+	
+			$DataSet = $this->SQL->Get();
+		}
+		
       if ($DataSet->NumRows() < 1)
          return FALSE;
 
       $UserData = $DataSet->FirstRow();
+		// Check for a deleted user.
+		if(GetValue('Deleted', $UserData))
+			return FALSE;
+		
+		
       $PasswordHash = new Gdn_PasswordHash();
-      if (!$PasswordHash->CheckPassword($Password, $UserData->Password))
+		$HashMethod = GetValue('HashMethod', $UserData);
+      if(!$PasswordHash->CheckPassword($Password, $UserData->Password, $HashMethod))
          return FALSE;
 
-      if ($PasswordHash->Weak) {
+      if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
          $PasswordHash = new Gdn_PasswordHash();
          $this->SQL->Update('User')
             ->Set('Password', $PasswordHash->HashPassword($Password))

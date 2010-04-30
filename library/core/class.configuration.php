@@ -424,9 +424,11 @@ class Gdn_Configuration {
             $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
             $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
          }
-      } else if (is_bool($Value)) {
+      } elseif (is_int($Value)) {
+			$Array[] = $Prefix .= ' = '.$Value.';';
+		} elseif (is_bool($Value)) {
          $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
-      } else if (in_array($Value, array('TRUE', 'FALSE'))) {
+      } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
          if (strpos($Value, "'") !== FALSE) {

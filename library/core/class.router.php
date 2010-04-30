@@ -42,7 +42,7 @@ class Gdn_Router {
       $Route = $this->MatchRoute($Request);
       
       if ($Route !== FALSE)
-         return $Route['FinalDestination'];
+         return isset($Route['FinalDestination']) ? $Route['FinalDestination'] : $Route['Destination'];
       
       return FALSE;
    }
@@ -91,6 +91,7 @@ class Gdn_Router {
          if (preg_match('#^'.$Route.'$#', $Request)) {
             // Route matched!
             $Final = $this->GetRoute($Route);
+            $Final['FinalDestination'] = $Final['Destination'];
             
             // Do we have a back-reference?
             if (strpos($Final['Destination'], '$') !== FALSE && strpos($Final['Route'], '(') !== FALSE) {

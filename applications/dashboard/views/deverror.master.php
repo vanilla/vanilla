@@ -40,7 +40,7 @@
             
          }
 
-         $Backtrace = debug_backtrace();
+         $Backtrace = $SenderTrace;
          if (is_array($Backtrace)) {
             echo '<h3><strong>Backtrace:</strong></h3>
             <div class="PreContainer">';

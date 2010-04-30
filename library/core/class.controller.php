@@ -153,15 +153,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $RequestMethod;
 
    /**
-    * An array of routes and where they should be redirected to (assigned to
-    * the dispatcher in the main bootstrap, and then assigned by reference
-    * from the dispatcher.
-    *
-    * @var array
-    */
-   public $Routes;
-
-   /**
     * The requested url to this controller.
     *
     * @var string
@@ -294,7 +285,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->RedirectUrl = '';
       $this->RequestMethod = '';
       $this->RequestArgs = FALSE;
-      $this->Routes = array();
       $this->SelfUrl = '';
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
@@ -1039,7 +1029,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!$Session->IsValid()) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {
-          Redirect($this->Routes['DefaultPermission']);
+           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
         }
       }
 

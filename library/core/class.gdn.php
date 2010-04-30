@@ -19,7 +19,7 @@ class Gdn {
    const AliasLocale = 'Locale';
    const AliasPermissionModel = 'PermissionModel';
    const AliasRequest = 'Request';
-   const AliasRoutes = 'Routes';
+   const AliasRouter = 'Router';
    const AliasSession = 'Session';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
@@ -272,6 +272,15 @@ class Gdn {
          $Request->Import($NewRequest);
       
       return $Request;
+   }
+   
+   /**
+    * Get the router object
+    *
+    * @return Gdn_Router
+    */
+   public static function Router() {
+      return self::Factory(self::AliasRouter);
    }
    
    /**

@@ -390,7 +390,7 @@ class EntryController extends Gdn_Controller {
    
    private function RedirectTo() {
       $IncomingTarget = $this->Form->GetValue('Target', '');
-      return $IncomingTarget == '' ? ArrayValueI('DefaultController', $this->Routes) : $IncomingTarget;
+      return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
    }
    
    public function Initialize() {

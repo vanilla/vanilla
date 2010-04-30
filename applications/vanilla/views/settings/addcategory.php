@@ -6,12 +6,18 @@ echo $this->Form->Errors();
 <h1><?php echo T('Add Category'); ?></h1>
 <ul>
    <li>
+      <div class="Info"><?php echo T('<strong>Parent categories</strong> allow you to organize your categories. Parent categories can only contain categories. <strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'); ?></div>
+      <?php
+         echo $this->Form->CheckBox('AllowDiscussions', 'Make this a parent category', array('value' => '0'));
+      ?>
+   </li>
+   <li>
       <?php
          echo $this->Form->Label('Category', 'Name');
          echo $this->Form->TextBox('Name');
       ?>
    </li>
-   <li>
+   <li id="UrlCode">
       <?php echo $this->Form->Label('Url Code', 'UrlCode'); ?>
       <div class="Info">
          <?php echo T('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
@@ -22,11 +28,6 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Description', 'Description');
          echo $this->Form->TextBox('Description', array('MultiLine' => TRUE));
-      ?>
-   </li>
-   <li>
-      <?php
-         echo $this->Form->CheckBox('AllowDiscussions', 'Allow discussions to be posted in this category', array('value' => '1'));
       ?>
    </li>
    <li id="Permissions">

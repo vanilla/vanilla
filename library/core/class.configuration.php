@@ -160,9 +160,11 @@ class Gdn_Configuration {
       $KeyCount = count($Keys);
 
       $Array =& $this->_Data;
+      
       $SaveArray =& $this->_SaveData;
       for ($i = 0; $i < $KeyCount; ++$i) {
          $Key = $Keys[$i];
+         if (!is_array($Array)) $Array = array();
          $KeyExists = array_key_exists($Key, $Array);
 
          if($i == $KeyCount - 1) {   

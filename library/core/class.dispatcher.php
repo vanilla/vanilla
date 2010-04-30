@@ -47,13 +47,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public $Request;
 
    /**
-    * A reference to the Gdn_Routes object for managing (getting, setting, matching) routes
-    *
-    * @var object
-    */
-   public $Routes;
-
-   /**
     * The name of the application folder that contains the controller that has
     * been requested.
     *
@@ -121,7 +114,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       parent::__construct();
       $this->_EnabledApplicationFolders = array();
       $this->Request = '';
-      $this->Routes = Gdn::Factory(Gdn::AliasRoutes);
       $this->_ApplicationFolder = '';
       $this->_AssetCollection = array();
       $this->_ControllerFolder = '';
@@ -187,9 +179,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          foreach($this->_PropertyCollection as $Name => $Mixed) {
             $Controller->$Name = $Mixed;
          }
-
-         // Pass in the routes
-         $Controller->Routes = $this->Routes;
 
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
@@ -259,7 +248,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-            trigger_error(ErrorMessage('Controller method missing: '.$this->ControllerName().'.'.$ControllerMethod.'();', 'Dispatcher', 'Dispatch'), E_USER_ERROR);
+         
+            $Request = Gdn_Request::CreateFromURI(Gdn::Router()->GetDestination('Destination'));
+            Gdn::Request()->Import($Request);
+            return $this->Dispatch();
+            
          }
       }
 
@@ -365,40 +358,36 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       if ($this->Request == '')
       {
-         $DefaultController = $this->Routes->GetRoute('DefaultController');
+         $DefaultController = Gdn::Router()->GetRoute('DefaultController');
          $this->Request = $DefaultController['Destination'];
       }
 
       // Check for re-routing
-      $MatchRoute = $this->Routes->MatchRoute($this->Request);
+      $MatchRoute = Gdn::Router()->MatchRoute($this->Request);
       
       // We have a route. Take action.
       if ($MatchRoute !== FALSE) {
-         // Do we have a back-reference?
-         if (strpos($MatchRoute['Destination'], '$') !== FALSE && strpos($MatchRoute['Route'], '(') !== FALSE)
-            $MatchRoute['Destination'] = preg_replace('#^'.$MatchRoute['Route'].'$#', $MatchRoute['Destination'], $this->Request);
-         
          switch ($MatchRoute['Type']) {
             case 'Internal':
-               $this->Request = $MatchRoute['Destination'];
+               $this->Request = $MatchRoute['FinalDestination'];
                break;
             
             case 'Temporary':
                Header( "HTTP/1.1 302 Moved Temporarily" );
-               Header( "Location: ".$MatchRoute['Destination'] ); 
+               Header( "Location: ".$MatchRoute['FinalDestination'] ); 
                exit();
                break;
             
             case 'Permanent':
                Header( "HTTP/1.1 301 Moved Permanently" );
-               Header( "Location: ".$MatchRoute['Destination'] );
+               Header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
             
             case 'NotFound':
                //die(print_r($MatchRoute,true));
                Header( "HTTP/1.1 404 Not Found" );
-               $this->Request = $MatchRoute['Destination'];
+               $this->Request = $MatchRoute['FinalDestination'];
                break;
          }
       }
@@ -496,7 +485,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             if (ForceBool(Gdn::Config('Garden.Debug'))) {
                trigger_error(ErrorMessage('Controller not found: '.$this->ControllerName(), 'Dispatcher', '_FetchController'), E_USER_ERROR);
             } else {
-               $MissingRoute = $this->Routes->GetRoute('Default404');
+               $MissingRoute = Gdn::Router()->GetRoute('Default404');
             
                // Return a 404 message
                list($this->_ApplicationFolder, $this->_ControllerName, $this->_ControllerMethod) = explode('/', $MissingRoute['Destination']);

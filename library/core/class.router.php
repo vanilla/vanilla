@@ -1,6 +1,6 @@
 <?php
 
-class Gdn_Routes {
+class Gdn_Router {
 
    public $Routes;
    public $ReservedRoutes;
@@ -36,6 +36,15 @@ class Gdn_Routes {
          'TypeLocale'   => T($this->RouteTypes[$this->Routes[$Route]['Type']])
       ));
 
+   }
+   
+   public function GetDestination($Request) {
+      $Route = $this->MatchRoute($Request);
+      
+      if ($Route !== FALSE)
+         return $Route['FinalDestination'];
+      
+      return FALSE;
    }
    
    /**
@@ -81,8 +90,14 @@ class Gdn_Routes {
          // Check for a match
          if (preg_match('#^'.$Route.'$#', $Request)) {
             // Route matched!
+            $Final = $this->GetRoute($Route);
             
-            return $this->GetRoute($Route);
+            // Do we have a back-reference?
+            if (strpos($Final['Destination'], '$') !== FALSE && strpos($Final['Route'], '(') !== FALSE) {
+               $Final['FinalDestination'] = preg_replace('#^'.$Final['Route'].'$#', $Final['Destination'], $Request);
+            }
+               
+            return $Final;
          }
       }
       

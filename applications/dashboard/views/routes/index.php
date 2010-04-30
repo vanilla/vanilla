@@ -23,7 +23,7 @@ foreach ($this->MyRoutes as $Route => $RouteData) {
    $Alt = !$Alt;
    
    $Target = $RouteData['Destination'];
-   $RouteType = T($this->Routes->RouteTypes[$RouteData['Type']]);
+   $RouteType = T(Gdn::Router()->RouteTypes[$RouteData['Type']]);
    $Reserved = $RouteData['Reserved'];
 ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>

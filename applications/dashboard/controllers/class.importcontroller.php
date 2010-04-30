@@ -52,8 +52,10 @@ class ImportController extends DashboardController {
 			if($Result === TRUE) {
 				$Imp->CurrentStep++;
 			} elseif($Result === 'COMPLETE') {
-				
-			} /*elseif(is_array($Result)) {
+				$this->SetJson('Complete', TRUE);
+			}
+			
+			/*elseif(is_array($Result)) {
 				SaveToConfig(array(
 					'Garden.Import.CurrentStep' => $CurrentStep,
 					'Garden.Import.CurrentStepData' => ArrayValue('Data', $Result)));
@@ -65,6 +67,7 @@ class ImportController extends DashboardController {
 		$this->SetData('CurrentStep', $Imp->CurrentStep);
 		$this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
 	
+		$this->AddJsFile('import.js');
 		$this->Render();
 	}
 	

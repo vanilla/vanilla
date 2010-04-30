@@ -28,7 +28,7 @@ class ImportModel {
 	
 	public $ImportPath = '';
 
-	public $MaxStepTime = 10000;
+	public $MaxStepTime = 1000;
 	
 	protected $_MergeSteps = array(
 		1 => 'SplitImportFile',
@@ -47,9 +47,10 @@ class ImportModel {
 		3 => 'LoadUserTable',
 		4 => 'AuthenticateAdminUser',
 		5 => 'InsertUserTable',
-		6 => 'Delete OverwriteTables',
-		7 => 'InsertTables',
-		8 => 'UpdateCounts'
+		6 => 'LoadTables',
+		7 => 'DeleteOverwriteTables',
+		8 => 'InsertTables',
+		9 => 'UpdateCounts'
 		);
 	
 	public $Structures = array(
@@ -173,7 +174,7 @@ where i._NewID is null";
 			return FALSE;
 		} else {
 			$Data = $Data->FirstRow();
-			$PasswordHash = Gdn_PasswordHash();
+			$PasswordHash = new Gdn_PasswordHash();
 			$Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
 			
 			return $Result;
@@ -250,7 +251,7 @@ where i._NewID is null";
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
-			$Table = $Tables[i];
+			$Table = $Tables[$i];
 			$Sql = "truncate table :_$Table";
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
@@ -297,14 +298,15 @@ where i._NewID is null";
 		$Source = GetValue('Source', $this->GetImportHeader());
 		if(!$Source)
 			return 'Unknown';
-		if(substr_compare('Vanilla', $Source, 0, 7, FALSE))
+		if(substr_compare('Vanilla', $Source, 0, 7, FALSE) == 0)
 			return 'Vanilla';
 		return 'Unknown';
 	}
 	
 	public function InsertTables() {
 		$InsertedCount = 0;
-		
+		$Timer = new Gdn_Timer();
+		$Timer->Start();
 		foreach($this->Structures as $TableName => $Columns) {
 			if(GetValue('Inserted', GetValue($TableName, $this->Data['Tables'], array()))) {
 				$InsertedCount++;
@@ -313,25 +315,30 @@ where i._NewID is null";
 				
 				switch($TableName) {
 					case 'UserRole':
-						$Sql = "insert :_UserRole ( UserID, RoleID )
-	select zUserID._NewID, zRoleID._NewID
-	from :_zUserRole i
-	left join :_zUser zUserID
-	  on i.UserID = zUserID.UserID
-	left join :_zRole zRoleID
-	  on i.RoleID = zRoleID.RoleID
-	left join :_UserRole ur
-		on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
-	where i.UserID <> 0 and ur.UserID is null";
-						$this->Query($Sql);
+						if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
+							$this->_InsertTable($TableName);
+						} else {
+							$Sql = "insert :_UserRole ( UserID, RoleID )
+		select zUserID._NewID, zRoleID._NewID
+		from :_zUserRole i
+		left join :_zUser zUserID
+		  on i.UserID = zUserID.UserID
+		left join :_zRole zRoleID
+		  on i.RoleID = zRoleID.RoleID
+		left join :_UserRole ur
+			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
+		where i.UserID <> 0 and ur.UserID is null";
+							$this->Query($Sql);
+						}
 						break;
 					default:
 						$this->_InsertTable($TableName);
 				}
 				
 				$this->Data['Tables'][$TableName]['Inserted'] = TRUE;
+				$InsertedCount++;
 				// Make sure the loading isn't taking too long.
-				if($this->Timer->ElapsedTime() > $this->MaxStepTime)
+				if($Timer->ElapsedTime() > $this->MaxStepTime)
 					break;
 			}
 		}
@@ -360,7 +367,7 @@ where i._NewID is null";
 		foreach($Structure as $Column => $Type) {
 			if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
 				// The data goes in raw.
-				$Select[] = 'i.$Column';
+				$Select[] = "i.$Column";
 			} elseif($Column == $TableName.'ID') {
 				// This is the primary key.
 				$Select[] = "i._NewID as $Column";
@@ -416,7 +423,7 @@ where i._NewID is null";
 		
 		// Authenticate the admin user as the current user.
 		$Auth = new Gdn_PasswordAuthenticator();
-		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword')));
+		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
 		Gdn::Session()->Start($Auth);
 		
 		return TRUE;

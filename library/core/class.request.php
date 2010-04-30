@@ -39,7 +39,8 @@ class Gdn_Request {
          'WebRoot'            => '',
          'Domain'             => ''
       );
-      $this->_Environment  = $this->_LoadEnvironment();
+      $this->_Environment = array();
+      $this->_LoadEnvironment();
    }
    
    public static function CreateFromEnvironment() {
@@ -80,7 +81,8 @@ class Gdn_Request {
    }
    
    public function RequestURI($URI=NULL) {
-      return $this->_Environment('REQUEST_URI', $URI);
+      $DecodedURI = !is_null($URI) ? urldecode($URI) : $URI;
+      return $this->_Environment('REQUEST_URI', $DecodedURI);
    }
    
    public function RequestHost($Host=NULL) {
@@ -149,7 +151,6 @@ class Gdn_Request {
    public function WebRoot($WebRoot=NULL) {
       return $this->_Resolved('WebRoot', $WebRoot);
    }
-   
 
    /**
     * Returns the domain from the current url. ie. "http://localhost/" in
@@ -236,17 +237,14 @@ class Gdn_Request {
     * @return array associative array of condensed environment variables
     */
    private function _LoadEnvironment() {
-   
-      $Environment = array();
       
-      $Environment['REQUEST_HOST']        = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-      $Environment['REQUEST_METHOD']      = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE';
-      $Environment['REQUEST_URI']         = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI'];
-      $Environment['REQUEST_SCRIPT']      = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_ENV['SCRIPT_NAME'];
+      $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
+      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
+      $this->RequestURI(      isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI']);
+      $this->RequestScript(   isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_ENV['SCRIPT_NAME']);
+      
       if (PHP_SAPI === 'cgi' && isset($_ENV['SCRIPT_URL']))
-         $Environment['REQUEST_SCRIPT'] = $_ENV['SCRIPT_URL'];
-         
-      return $Environment;
+         $this->RequestScript($_ENV['SCRIPT_URL']);
    }
    
    /**

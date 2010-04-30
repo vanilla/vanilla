@@ -772,6 +772,8 @@ class UserModel extends Gdn_Model {
 	
 			$DataSet = $this->SQL->Get();
 		} catch(Exception $Ex) {
+         $this->SQL->Reset();
+         
 			// Try getting the user information without the new fields.
 			$this->SQL->Select('UserID, Attributes, Admin, Password')
 				->From('User');

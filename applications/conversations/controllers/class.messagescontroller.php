@@ -32,7 +32,7 @@ class MessagesController extends ConversationsController {
          $UserModel = new UserModel();
          foreach ($To as $Name) {
             if (trim($Name) != '') {
-               $User = $UserModel->Get(trim($Name));
+               $User = $UserModel->GetByUsername(trim($Name));
                if (is_object($User))
                   $RecipientUserIDs[] = $User->UserID;
             }

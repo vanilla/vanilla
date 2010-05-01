@@ -57,14 +57,16 @@ $FactoryOverwriteBak = Gdn::FactoryOverwrite(FALSE);
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
-// Default request object
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
-
 /// Configuration Defaults.
 $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 
 // Load the custom configurations so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+
+header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
+
+// Default request object
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
 
 /// Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());

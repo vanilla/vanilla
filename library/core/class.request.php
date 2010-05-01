@@ -310,7 +310,7 @@ class Gdn_Request {
       
       if (is_string($WebRoot) && $WebRoot != '') {
          // Strip forward slashes from the beginning of webroot
-         $ResolvedWebRoot = preg_replace('/(^\/+)/', '', $WebRoot);
+         $ResolvedWebRoot = trim($WebRoot,'/').'/';
       } else {
          $ResolvedWebRoot = '';
       }

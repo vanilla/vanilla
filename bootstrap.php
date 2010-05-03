@@ -80,7 +80,7 @@ unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
 if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/setup'), '/'));
+   header('location: '.Gdn::Request()->WebPath(TRUE, TRUE).'dashboard/setup');
    exit();
 }
 

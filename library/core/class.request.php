@@ -28,9 +28,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_Request {
 
    // Todd: All of these property names are really unclear.
-   private $_Params; // Todd: If this is a container for superglobals maybe it should be called $Suprtglobals.
-   private $_Environment; // Todd: Can we get rid of this and just reference in the Server property?
-   private $_Resolved; // Todd: This seems like it should be named Uri
+   protected $_Parameters;
+   protected $_Environment;
+   protected $_Resolved;
 
    // Data types, in order of precedence, lowest meaning highest priority
    // Todd: I'd rather these be string constants with 'Custom', 'Get', 'Post', etc.
@@ -43,7 +43,7 @@ class Gdn_Request {
    const INPUT_ENV      = 5;
 
    private function __construct() {
-      $this->_Params       = array();
+      $this->_Parameters       = array();
       $this->_Resolved     = array(
             'Request'            => '',
             'Output'             => 'default',
@@ -59,13 +59,12 @@ class Gdn_Request {
    public static function CreateFromEnvironment() {
       $Request = new Gdn_Request();
 
-      $Request->_AutoAttachRelevantData();
+      $Request->_AttachSuperglobals();
 
       return $Request->_Parse();
    }
 
-   // Todd: Allow $Method = '' for specifying Index method?
-   public static function CreateFromControllerMethod($Controller, $Method, $Params=NULL, $ImportEnvironmentData=FALSE) {
+   public static function CreateFromControllerMethod($Controller, $Method='Index', $Params=NULL, $ImportEnvironmentData=FALSE) {
       $URI = $Controller."/".$Method;
       return self::CreateFromURI($URI, $Params, $ImportEnvironmentData);
    }
@@ -77,7 +76,7 @@ class Gdn_Request {
       $Request = new Gdn_Request();
 
       if ($ImportEnvironmentData !== FALSE)
-         $this->_AutoAttachRelevantData();
+         $this->_AttachSuperglobals();
 
       $Request->RequestURI($URI);
 
@@ -86,14 +85,13 @@ class Gdn_Request {
 
       return $Request->_Parse();
    }
+   
+   protected function _Environment($Key, $KeyValue=NULL) {
+      if ($KeyValue !== NULL)
+         $this->_Environment[$Key] = $KeyValue;
 
-   // Todd: Rename $Aspect to $Key, $AspectValue to $Value
-   private function _Environment($Aspect, $AspectValue=NULL) {
-      if ($AspectValue !== NULL)
-         $this->_Environment[$Aspect] = $AspectValue;
-
-      if (array_key_exists($Aspect, $this->_Environment))
-         return $this->_Environment[$Aspect];
+      if (array_key_exists($Key, $this->_Environment))
+         return $this->_Environment[$Key];
 
       return NULL;
    }
@@ -124,12 +122,12 @@ class Gdn_Request {
    }
 
    // Todd: Really unclear method. Use $Key, $Value.
-   private function _Resolved($Aspect, $AspectValue=NULL) {
-      if ($AspectValue !== NULL)
-         $this->_Resolved[$Aspect] = $AspectValue;
+   protected function _Resolved($Key, $Value=NULL) {
+      if ($Value !== NULL)
+         $this->_Resolved[$Key] = $Value;
 
-      if (array_key_exists($Aspect, $this->_Resolved))
-         return $this->_Resolved[$Aspect];
+      if (array_key_exists($Key, $this->_Resolved))
+         return $this->_Resolved[$Key];
 
       return NULL;
    }
@@ -215,7 +213,7 @@ class Gdn_Request {
     * @return void
     */
    public function AttachData($ParamsType, $ParamsData) {
-      $this->_Params[$ParamsType] = $ParamsData;
+      $this->_Parameters[$ParamsType] = $ParamsData;
    }
 
    /**
@@ -227,7 +225,7 @@ class Gdn_Request {
    // Todd: Put an array_key_exists.
    //  - Method name
    public function DetachData($ParamsType) {
-      unset($this->_Params[$ParamsType]);
+      unset($this->_Parameters[$ParamsType]);
    }
 
    /**
@@ -237,23 +235,19 @@ class Gdn_Request {
     * @return array
     */
    public function ExportData($ParamsType) {
-      if (!isset($this->_Params[$ParamsType]))
+      if (!isset($this->_Parameters[$ParamsType]))
          return array();
 
-      return $this->_Params[$ParamsType];
+      return $this->_Parameters[$ParamsType];
    }
 
    /**
+    * Attach the superglobal environment data to the request
     *
-    *
-    *
+    * @return void
     */
-   // Todd: What is relevant data? Think about AttachSuperglobals().
-   //  - Auto before a member tells me it's a boolean to turn on some automatic process.
-   //  - Always make protected, not private.
-   //  - Need the other superglobals.
-   private function _AutoAttachRelevantData() {
-      // Web request. Attach GET and POST data.
+   protected function _AttachSuperglobals() {
+      // Web request. Attach GET, POST and SERVER data.
       if ($this->_Environment['REQUEST_METHOD'] != 'CONSOLE') {
          $this->AttachData(self::INPUT_SERVER, $_SERVER);
          $this->AttachData(self::INPUT_GET, $_GET);
@@ -271,12 +265,11 @@ class Gdn_Request {
     * @param mixed $Default value to return if parameter not found
     * @return mixed
     */
-   // Todd: Rename to GetValue to match our GetValue convenience function.
-   public function Parameter($ParameterName,$Default=FALSE) {
+   public function GetValue($ParameterName,$Default=FALSE) {
       for ($i=1; $i <= 5; $i++) {
-         if (!array_key_exists($i, $this->_Params)) continue;
-         if (array_key_exists($ParameterName, $this->_Params[$i]))
-            return filter_var($this->_Params[$i][$ParameterName],FILTER_SANITIZE_STRING);
+         if (!array_key_exists($i, $this->_Parameters)) continue;
+         if (array_key_exists($ParameterName, $this->_Parameters[$i]))
+            return filter_var($this->_Parameters[$i][$ParameterName],FILTER_SANITIZE_STRING);
       }
       return $Default;
    }
@@ -286,7 +279,7 @@ class Gdn_Request {
     *
     * @return array associative array of condensed environment variables
     */
-   private function _LoadEnvironment() {
+   protected function _LoadEnvironment() {
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
@@ -302,7 +295,7 @@ class Gdn_Request {
     *
     * @return Gdn_Request
     */
-   private function _Parse() {
+   protected function _Parse() {
 
       /**
        * Resolve Request Folder
@@ -319,7 +312,8 @@ class Gdn_Request {
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      if (preg_match('/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:\/index.php)?\/?(.*?)\/?(?:[#?].*)?$/i', $this->RequestURI(), $Match))
+      $Expression = '/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:index.php)?\/?(.*?)\/?(?:[#?].*)?$/i';
+      if (preg_match($Expression, trim($this->RequestURI(),'/'), $Match))
          $this->Request($Match[1]);
       else
          $this->Request('');
@@ -394,7 +388,7 @@ class Gdn_Request {
       // Import Environment
       $this->_Environment = $NewRequest->Export('Environment');
       // Import Params
-      $this->_Params = $NewRequest->Export('Params');
+      $this->_Parameters = $NewRequest->Export('Params');
 
       // Todd: This should only return this object if you envision a chaining scenario.
       //  - Since _Parse is protected chaining is impossible outside of the object.
@@ -405,7 +399,7 @@ class Gdn_Request {
    public function Export($Export) {
       switch ($Export) {
          case 'Environment':  return $this->_Environment;
-         case 'Params':       return $this->_Params;
+         case 'Params':       return $this->_Parameters;
          case 'Resolved':     return $this->_Resolved;
          default:             return NULL;
       }

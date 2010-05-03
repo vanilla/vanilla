@@ -182,7 +182,7 @@ class SetupController extends DashboardController {
                $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
                $Results = ProxyHead($Query);
                $CanRewrite = FALSE;
-               if (ArrayValue('StatusCode',$Results,404) == 200 && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
+               if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
                   $CanRewrite = TRUE;
                }
             } catch (Exception $e) {

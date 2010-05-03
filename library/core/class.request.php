@@ -27,10 +27,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 //  - I think we still need to give access to the superglobals. Even though we want to use a subset of them plugin developers might need them.
 class Gdn_Request {
 
-   // Todd: All of these property names are really unclear.
-   protected $_Parameters;
-   protected $_Environment;
-   protected $_Resolved;
+   protected $_Parameters;    // Request parameters, either from superglobals or from a custom array of key/value pairs
+   protected $_Environment;   // Raw environment variables, unparsed
+   protected $_Resolved;      // Resolved/parsed request information
 
    // Data types, in order of precedence, lowest meaning highest priority
    // Todd: I'd rather these be string constants with 'Custom', 'Get', 'Post', etc.
@@ -177,19 +176,21 @@ class Gdn_Request {
       return $this->_Resolved('WebRoot', $WebRoot);
    }
    
-   public function WebPath($WithDomain = FALSE, $TrailingSlash = TRUE) {
+   public function WebPath($WithDomain = FALSE, $PreserveTrailingSlash = TRUE) {
       $Parts = array();
-      if ($WithDomain) 
+      
+      if ($WithDomain)
          $Parts[] = $this->Domain();
          
       $Parts[] = $this->WebRoot();
       
-      if (Gdn::Config('Garden.RewriteUrls') === FALSE)
+      if (Gdn::Config('Garden.RewriteUrls', FALSE) === FALSE)
          $Parts[] = $this->RequestScript().'/';
-         
+      
       $Path = implode('', $Parts);
-      if (!$TrailingSlash)
-         $Path = trim($Path, '/');
+      $Path = trim($Path, '/');
+      if ($PreserveTrailingSlash)
+         $Path = $Path.'/';
          
       return $Path;
    }
@@ -303,16 +304,16 @@ class Gdn_Request {
 
       // Get the folder from the script name.
       $Match = array();
-      if (preg_match('/^(.*?)(index.php)?$/i', $this->RequestScript(), $Match))
-         $this->RequestFolder($Match[1]);
-      else
-         $this->RequestFolder('');
+      $ScriptName = basename($this->RequestScript());
+      $Folder = substr($this->RequestScript(),0,0-strlen($ScriptName));
+      $this->RequestFolder($Folder);
+      $this->RequestScript($ScriptName);
 
       /**
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      $Expression = '/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:index.php)?\/?(.*?)\/?(?:[#?].*)?$/i';
+      $Expression = '/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:'.$this->RequestScript().')?\/?(.*?)\/?(?:[#?].*)?$/i';
       if (preg_match($Expression, trim($this->RequestURI(),'/'), $Match))
          $this->Request($Match[1]);
       else

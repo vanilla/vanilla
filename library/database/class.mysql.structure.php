@@ -47,7 +47,26 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
       return TRUE;
    }
-	
+   
+   public function Engine($Engine, $CheckAvailability=TRUE) {
+      $Engine = strtolower($Engine);
+      
+      if ($CheckAvailability) {
+         $EngineList = $this->Query("SHOW ENGINES;");
+         $ViableEngines = array();
+         while ($StorageEngine = $EngineList->Value('Engine', FALSE)) {
+            $EngineName = strtolower($StorageEngine);
+            $ViableEngines[$EngineName] = TRUE;
+         }
+         
+         if (!array_key_exists($Engine, $ViableEngines))
+            return $this;
+      }
+      
+      $this->_TableStorageEngine = $Engine;
+      return $this;
+   }
+   
    /**
     * Renames a column in $this->Table().
     *
@@ -131,7 +150,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    protected function _Create() {
       $PrimaryKey = array();
       $UniqueKey = array();
-		$FullTextKey = array();
+      $FullTextKey = array();
       $Keys = '';
       $Sql = '';
 
@@ -149,8 +168,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
          elseif ($Column->KeyType == 'unique')
             $UniqueKey[] = $ColumnName;
-			elseif ($Column->KeyType == 'fulltext')
-				$FullTextKey[] = $ColumnName;
+         elseif ($Column->KeyType == 'fulltext')
+            $FullTextKey[] = $ColumnName;
       }
       // Build primary keys
       if (count($PrimaryKey) > 0)
@@ -158,14 +177,17 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Build unique keys.
       if (count($UniqueKey) > 0)
          $Keys .= ",\nunique index `".Gdn_Format::AlphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
-		// Build full text index.
-		if (count($FullTextKey) > 0)
-			$Keys .= ",\nfulltext index `".Gdn_Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+      // Build full text index.
+      if (count($FullTextKey) > 0)
+         $Keys .= ",\nfulltext index `".Gdn_Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
 
       $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
          .$Sql
          .$Keys
       ."\n)";
+      
+      if (!is_null($this->_TableStorageEngine))
+         $Sql .= ' TYPE='.$this->_TableStorageEngine;
 
       if ($this->_CharacterEncoding !== FALSE && $this->_CharacterEncoding != '')
          $Sql .= ' default character set '.$this->_CharacterEncoding;
@@ -173,82 +195,84 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if (array_key_exists('Collate', $this->Database->ExtendedProperties)) {
          $Sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
       }
+      
+      $Sql .= ';';
 
       $Result = $this->Query($Sql);
       $this->_Reset();
       
       return $Result;
    }
-	
-	protected function _IndexSql($Columns, $KeyType = FALSE) {
-		$Result = array();
-		$Keys = array();
-		$Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
-		
-		// Gather the names of the columns.
-		foreach($Columns as $ColumnName => $Column) {
-			if(!$Column->KeyType || ($KeyType && $KeyType != $Column->KeyType))
-				continue;
-			
-			if($Column->KeyType == 'key' || $Column->KeyType == 'index') {
-				$Name = $Prefixes[$Column->KeyType].$this->_TableName.'_'.$ColumnName;
-				$Result[$Name] = $Column->KeyType." $Name (`$ColumnName`)";
-			} else {
-				// This is a multi-column key type so just collect the column name.
-				$Keys[$Column->KeyType][] = $ColumnName;
-			}
-		}
-		
-		// Make the multi-column keys into sql statements.
-		foreach($Keys as $KeyType2 => $Columns) {
-			if($KeyType2 == 'primary') {
-				$Result['PRIMARY'] = 'primary key (`'.implode('`, `', $Columns).'`)';
-			} else {
-				$Name = $Prefixes[$KeyType2].$this->_TableName;
-				$Result[$Name] = "$KeyType2 index $Name (`".implode('`, `', $Columns).'`)';
-			}
-		}
-		
-		return $Result;
-	}
-	
-	protected function _IndexSqlDb() {
-		// We don't want this to be captures so send it directly.
-		$Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
-		
-		$Result = array();	
-		foreach($Data as $Row) {
-			if(array_key_exists($Row->Key_name, $Result)) {
-				$Result[$Row->Key_name] .= ', `'.$Row->Column_name.'`';
-			} else {
-				switch(strtoupper(substr($Row->Key_name, 0, 2))) {
-					case 'PR':
-						$Type = 'primary key';
-						break;
-					case 'FK':
-						$Type = 'key '.$Row->Key_name;
-						break;
-					case 'IX':
-						$Type = 'index '.$Row->Key_name;
-						break;
-					case 'UX':
-						$Type = 'unique index '.$Row->Key_name;
-						break;
-					case 'TX':
-						$Type = 'fulltext index '.$Row->Key_name;
-						break;
-				}
-				$Result[$Row->Key_name] = $Type.' (`'.$Row->Column_name.'`';
-			}
-		}
-		
-		// Cap off the sql.
-		foreach($Result as $Name => $Sql) {
-			$Result[$Name] .= ')';
-		}
-		
-		return $Result;
-	}
+   
+   protected function _IndexSql($Columns, $KeyType = FALSE) {
+      $Result = array();
+      $Keys = array();
+      $Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
+      
+      // Gather the names of the columns.
+      foreach($Columns as $ColumnName => $Column) {
+         if(!$Column->KeyType || ($KeyType && $KeyType != $Column->KeyType))
+            continue;
+         
+         if($Column->KeyType == 'key' || $Column->KeyType == 'index') {
+            $Name = $Prefixes[$Column->KeyType].$this->_TableName.'_'.$ColumnName;
+            $Result[$Name] = $Column->KeyType." $Name (`$ColumnName`)";
+         } else {
+            // This is a multi-column key type so just collect the column name.
+            $Keys[$Column->KeyType][] = $ColumnName;
+         }
+      }
+      
+      // Make the multi-column keys into sql statements.
+      foreach($Keys as $KeyType2 => $Columns) {
+         if($KeyType2 == 'primary') {
+            $Result['PRIMARY'] = 'primary key (`'.implode('`, `', $Columns).'`)';
+         } else {
+            $Name = $Prefixes[$KeyType2].$this->_TableName;
+            $Result[$Name] = "$KeyType2 index $Name (`".implode('`, `', $Columns).'`)';
+         }
+      }
+      
+      return $Result;
+   }
+   
+   protected function _IndexSqlDb() {
+      // We don't want this to be captures so send it directly.
+      $Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
+      
+      $Result = array();   
+      foreach($Data as $Row) {
+         if(array_key_exists($Row->Key_name, $Result)) {
+            $Result[$Row->Key_name] .= ', `'.$Row->Column_name.'`';
+         } else {
+            switch(strtoupper(substr($Row->Key_name, 0, 2))) {
+               case 'PR':
+                  $Type = 'primary key';
+                  break;
+               case 'FK':
+                  $Type = 'key '.$Row->Key_name;
+                  break;
+               case 'IX':
+                  $Type = 'index '.$Row->Key_name;
+                  break;
+               case 'UX':
+                  $Type = 'unique index '.$Row->Key_name;
+                  break;
+               case 'TX':
+                  $Type = 'fulltext index '.$Row->Key_name;
+                  break;
+            }
+            $Result[$Row->Key_name] = $Type.' (`'.$Row->Column_name.'`';
+         }
+      }
+      
+      // Cap off the sql.
+      foreach($Result as $Name => $Sql) {
+         $Result[$Name] .= ')';
+      }
+      
+      return $Result;
+   }
 
    /**
     * Modifies $this->Table() with the columns specified with $this->Column().
@@ -257,10 +281,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * defined with $this->Column().
     */
    protected function _Modify($Explicit = FALSE) {
-		// Returns an array of schema data objects for each field in the specified
-		// table. The returned array of objects contains the following properties:
-		// Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
-		$ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+      // Returns an array of schema data objects for each field in the specified
+      // table. The returned array of objects contains the following properties:
+      // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
+      $ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
 
       // 1. Remove any unnecessary columns if this is an explicit modification
       if ($Explicit) {
@@ -273,60 +297,70 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          }
       }
 
-      // 2. Add new columns & modify existing ones
-		$AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
+      // Prepare the alter query
+      $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
+      
+      // 2. Alter the table storage engine
+      if (!is_null($this->_TableStorageEngine))
+      {
+         $EngineQuery = $AlterSqlPrefix.' ENGINE = '.$this->_TableStorageEngine;
+         if (!$this->Query($EngineQuery))
+            throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+      }
+      
+      // 3. Add new columns & modify existing ones
 
       // array_diff returns values from the first array that aren't present in
       // the second array. In this example, all columns in $this->_Columns that
       // are NOT in the table.
       foreach ($this->_Columns as $ColumnName => $Column) {
-			if (!array_key_exists($ColumnName, $ExistingColumns)) {
+         if (!array_key_exists($ColumnName, $ExistingColumns)) {
 
-				// This column name is not in the existing column collection, so add the column
-				if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-					throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-			} else if ($Column->Type != $ExistingColumns[$ColumnName]->Type) {
+            // This column name is not in the existing column collection, so add the column
+            if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+               throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         } else if ($Column->Type != $ExistingColumns[$ColumnName]->Type) {
 
-				// The existing & new column types do not match, so modify the column
-				if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-					throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-			}
+            // The existing & new column types do not match, so modify the column
+            if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+               throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         }
       }
-		
-		// 3. Update Indexes
-		$Indexes = $this->_IndexSql($this->_Columns);
-		$IndexesDb = $this->_IndexSqlDb();
-		$IndexSql = array();
-		// Go through the indexes to add or modify.
-		foreach($Indexes as $Name => $Sql) {
-			if(array_key_exists($Name, $IndexesDb)) {
-				if($Indexes[$Name] != $IndexesDb[$Name]) {
-					if($Name == 'PRIMARY')
-						$IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
-					else
-						$IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
-					$IndexSql[$Name] .= $AlterSqlPrefix."add $Sql;\n";
-				}
-				unset($IndexesDb[$Name]);
-			} else {
-				$IndexSql[$Name] = $AlterSqlPrefix."add $Sql;\n";	
-			}
-		}
-		// Go through the indexes to drop.
-		if($Explicit) {
-			foreach($IndexesDb as $Name => $Sql) {
-				if($Name == 'PRIMARY')
-					$IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
-				else
-					$IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
-			}
-		}
-		
-		// Modify all of the indexes.
-		foreach($IndexSql as $Name => $Sql) {
-			if(!$this->Query($Sql))
-				throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
-		}
+      
+      // 4. Update Indexes
+      $Indexes = $this->_IndexSql($this->_Columns);
+      $IndexesDb = $this->_IndexSqlDb();
+      $IndexSql = array();
+      // Go through the indexes to add or modify.
+      foreach($Indexes as $Name => $Sql) {
+         if(array_key_exists($Name, $IndexesDb)) {
+            if($Indexes[$Name] != $IndexesDb[$Name]) {
+               if($Name == 'PRIMARY')
+                  $IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+               else
+                  $IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+               $IndexSql[$Name] .= $AlterSqlPrefix."add $Sql;\n";
+            }
+            unset($IndexesDb[$Name]);
+         } else {
+            $IndexSql[$Name] = $AlterSqlPrefix."add $Sql;\n";   
+         }
+      }
+      // Go through the indexes to drop.
+      if($Explicit) {
+         foreach($IndexesDb as $Name => $Sql) {
+            if($Name == 'PRIMARY')
+               $IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+            else
+               $IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+         }
+      }
+      
+      // Modify all of the indexes.
+      foreach($IndexSql as $Name => $Sql) {
+         if(!$this->Query($Sql))
+            throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
+      }
 
       $this->_Reset();
       return TRUE;

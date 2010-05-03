@@ -48,6 +48,7 @@ $Construct->Table('Discussion')
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
+   ->Engine('MyISAM')
    ->Set($Explicit, $Drop);
    
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
@@ -75,6 +76,7 @@ $Construct->Table('Comment')
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
+	->Engine('MyISAM')
 	->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments on a per-user basis.

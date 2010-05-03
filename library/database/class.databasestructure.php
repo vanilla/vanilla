@@ -76,6 +76,8 @@ abstract class Gdn_DatabaseStructure {
     * @var string
     */
    protected $_TableName;
+   
+   protected $_TableStorageEngine;
 
    /**
     * The constructor for this class. Automatically fills $this->ClassName.
@@ -92,8 +94,7 @@ abstract class Gdn_DatabaseStructure {
       
       $this->DatabasePrefix($this->Database->DatabasePrefix);
       
-      $this->_TableName = '';
-      $this->_Columns = array();
+      $this->_Reset();
    }
    
    protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
@@ -211,6 +212,10 @@ abstract class Gdn_DatabaseStructure {
     */
    public function DropColumn($Name) {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'DropColumn'), E_USER_ERROR);
+   }
+
+   public function Engine($Engine, $CheckAvailability=TRUE) {
+      trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
    }
 
    /**
@@ -358,5 +363,6 @@ abstract class Gdn_DatabaseStructure {
       $this->_CharacterEncoding = '';
       $this->_Columns = array();
       $this->_TableName = '';
+      $this->_TableStorageEngine = NULL;
    }
 }

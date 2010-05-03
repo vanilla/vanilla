@@ -111,8 +111,8 @@ class SetupController extends DashboardController {
             // Apply the validation results to the form(s)
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          } else {
-            $Host = Gdn_Url::Host();
-            $Domain = Gdn_Url::Domain();
+            $Host = array_shift(explode(':',Gdn::Request()->RequestHost()));
+            $Domain = Gdn::Request()->Domain();
 
             // Set up cookies now so that the user can be signed in.
             $ConfigurationFormValues['Garden.Cookie.Salt'] = RandomString(10);

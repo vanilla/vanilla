@@ -90,7 +90,8 @@ class Gdn_Request {
    }
    
    public function RequestScript($ScriptName=NULL) {
-      return $this->_Environment('REQUEST_SCRIPT', $ScriptName);
+      $FixedScriptName = !is_null($ScriptName) ? trim($ScriptName, '/') : $ScriptName;
+      return $this->_Environment('REQUEST_SCRIPT', $FixedScriptName);
    }
    
    public function RequestMethod($Method=NULL) {
@@ -150,6 +151,23 @@ class Gdn_Request {
     */
    public function WebRoot($WebRoot=NULL) {
       return $this->_Resolved('WebRoot', $WebRoot);
+   }
+   
+   public function WebPath($WithDomain = FALSE, $TrailingSlash = TRUE) {
+      $Parts = array();
+      if ($WithDomain) 
+         $Parts[] = $this->Domain();
+         
+      $Parts[] = $this->WebRoot();
+      
+      if (Gdn::Config('Garden.RewriteUrls') === FALSE)
+         $Parts[] = $this->RequestScript().'/';
+         
+      $Path = implode('', $Parts);
+      if (!$TrailingSlash)
+         $Path = trim($Path, '/');
+         
+      return $Path;
    }
 
    /**
@@ -260,7 +278,7 @@ class Gdn_Request {
    
       // Get the folder from the script name.
       $Match = array();
-      if (preg_match('/^(.*?)(\/index.php)?$/i', $this->RequestScript(), $Match))
+      if (preg_match('/^(.*?)(index.php)?$/i', $this->RequestScript(), $Match))
          $this->RequestFolder($Match[1]);
       else
          $this->RequestFolder('');
@@ -330,8 +348,7 @@ class Gdn_Request {
          if (substr($Domain, 0, 7) != 'http://')
             $Domain = 'http://'.$Domain;
 
-         if (substr($Domain, -1, 1) != '/')
-            $Domain = $Domain . '/';
+         $Domain = trim($Domain, '/').'/';
       }
       $this->Domain($Domain);
       

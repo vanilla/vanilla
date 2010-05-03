@@ -8,7 +8,12 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Username', 'Name');
-         echo $this->Form->TextBox('Name');
+         $Attributes = array();
+         
+         if (!$this->CanEditUsername) {
+            $Attributes['disabled'] = 'disabled';
+         }
+         echo $this->Form->TextBox('Name', $Attributes);
       ?>
    </li>
    <li>

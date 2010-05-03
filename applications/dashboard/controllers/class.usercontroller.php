@@ -162,6 +162,10 @@ class UserController extends DashboardController {
       $this->Title(T('Edit User'));
 
       $this->AddSideMenu('dashboard/user');
+      
+      $this->CanEditUsername = TRUE;
+      $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
+      $this->CanEditUsername = $this->CanEditUsername | Gdn::Session()->CheckPermission('Garden.Users.Edit');
 
       $RoleModel = new Gdn_Model('Role');
       $this->RoleData = $RoleModel->Get();
@@ -179,6 +183,9 @@ class UserController extends DashboardController {
          $this->Form->SetData($this->User);
          $this->UserRoleData = $UserModel->GetRoles($UserID);
       } else {
+         if (!$this->CanEditUsername)
+            $this->Form->SetFormValue("Name", $this->User->Name);
+            
          // If a new password was specified, add it to the form's collection
          $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
          $NewPassword = $this->Form->GetValue('NewPassword', '');

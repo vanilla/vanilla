@@ -595,6 +595,9 @@ class ProfileController extends Gdn_Controller {
     * retrieve the current user from the session.
     */
    public function GetUserInfo($UserReference = '', $Username = '') {
+      if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
+         Redirect('dashboard/home/permission');
+         
       $this->Roles = array();
       if ($UserReference == '') {
          $this->User = $this->UserModel->Get(Gdn::Session()->UserID);

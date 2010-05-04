@@ -138,8 +138,7 @@ jQuery(document).ready(function($) {
    // Format email addresses
    $('span.Email').livequery(function() {
       var html = $(this).html();
-      var email = this;
-      email = $(email).html().replace(/<em>dot<\/em>/g, '.').replace(/<strong>at<\/strong>/g, '@');
+      var email = $(this).html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
       $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 

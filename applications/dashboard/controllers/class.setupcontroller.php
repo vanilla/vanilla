@@ -32,10 +32,11 @@ class SetupController extends DashboardController {
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
       $Config = Gdn::Factory(Gdn::AliasConfig);
+      
       $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
       if ($Installed)
          trigger_error(ErrorMessage('Vanilla has already been installed.', 'SetupController', 'Index'));
-         
+      
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';
       } else {
@@ -110,8 +111,8 @@ class SetupController extends DashboardController {
             // Apply the validation results to the form(s)
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          } else {
-            $Host = Gdn_Url::Host();
-            $Domain = Gdn_Url::Domain();
+            $Host = array_shift(explode(':',Gdn::Request()->RequestHost()));
+            $Domain = Gdn::Request()->Domain();
 
             // Set up cookies now so that the user can be signed in.
             $ConfigurationFormValues['Garden.Cookie.Salt'] = RandomString(10);
@@ -174,10 +175,25 @@ class SetupController extends DashboardController {
             // Assign some extra settings to the configuration file if everything succeeded.
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
+            
+            // Detect rewrite abilities
+            try
+            {
+               $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
+               $Results = ProxyHead($Query);
+               $CanRewrite = FALSE;
+               if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
+                  $CanRewrite = TRUE;
+               }
+            } catch (Exception $e) {
+               // cURL and fsockopen arent supported... guess?
+               $CanRewrite = (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE;
+            }
+      
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'),
                'Garden.WebRoot' => Gdn_Url::WebRoot(),
-               'Garden.RewriteUrls' => (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE,
+               'Garden.RewriteUrls' => $CanRewrite,
                'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled

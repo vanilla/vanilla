@@ -32,7 +32,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
 
 require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.routes.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
@@ -63,6 +63,11 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 // Load the custom configurations so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
+header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
+
+// Default request object
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
+
 /// Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
@@ -73,12 +78,9 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
-// Default request
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
-
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
 if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   header('location: '.CombinePaths(array(Gdn_Url::WebRoot(TRUE), 'index.php/dashboard/setup'), '/'));
+   header('location: '.Gdn::Request()->WebPath(TRUE, TRUE).'dashboard/setup');
    exit();
 }
 
@@ -97,7 +99,7 @@ $AuthType = Gdn::Config('Garden.Authenticator.Type', 'Password');
 Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthType.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthType).'authenticator.php', Gdn::FactorySingleton, array('Garden.Authenticator'));
 Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php');
 // Dispatcher.
-Gdn::FactoryInstall(Gdn::AliasRoutes, 'Gdn_Routes', PATH_LIBRARY_CORE.DS.'class.routes.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router', PATH_LIBRARY_CORE.DS.'class.router.php', Gdn::FactorySingleton);
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton);
 // Smarty Templating Engine
 Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6.25'.DS.'libs'.DS.'Smarty.class.php', Gdn::FactorySingleton);

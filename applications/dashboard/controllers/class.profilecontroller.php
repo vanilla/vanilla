@@ -130,8 +130,13 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       if ($Session->UserID != $this->User->UserID)
          $this->Permission('Garden.User.Edit');
+      
+      $this->CanEditUsername = TRUE;
+      $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
+      $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
+      $User = $UserModel->Get($this->User->UserID);
       $this->Form->SetModel($UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -146,6 +151,9 @@ class ProfileController extends Gdn_Controller {
          // Get the user data for the requested $UserID and put it into the form.
          $this->Form->SetData($this->User);
       } else {
+         if (!$this->CanEditUsername)
+            $this->Form->SetFormValue("Name", $User->Name);
+            
          $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);

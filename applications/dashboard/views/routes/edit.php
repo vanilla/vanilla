@@ -31,7 +31,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Type', 'Route Type');
-         echo $this->Form->DropDown('Type', $this->Routes->GetRouteTypes());
+         echo $this->Form->DropDown('Type', Gdn::Router()->GetRouteTypes());
       ?>
    </li>
 </ul>

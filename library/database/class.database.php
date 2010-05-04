@@ -40,7 +40,7 @@ class Gdn_Database {
    private $_CurrentResultSet;
    
    /** @var PDO The connectio to the database. */
-   protected $_Connection = FALSE;
+   protected $_Connection = NULL;
    
    
    protected $_SQL = NULL;
@@ -51,7 +51,7 @@ class Gdn_Database {
     * @return PDO The connection to the database.
     */
    public function Connection() {
-      if($this->_Connection === FALSE) {
+      if(!is_object($this->_Connection)) {
          try {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
 	    if($this->ConnectionOptions[1002])
@@ -101,9 +101,9 @@ class Gdn_Database {
    }
    
    public function CloseConnection() {
-      if (Gdn::Config('Database.PersistentConnection') !== TRUE) {
+      if (!Gdn::Config('Database.PersistentConnection')) {
          $this->CommitTransaction();
-         $this->_Connection = null;
+         $this->_Connection = NULL;
       }
    }
    

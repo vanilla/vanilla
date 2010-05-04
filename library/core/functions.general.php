@@ -634,6 +634,116 @@ if (!function_exists('PrefixString')) {
    }
 }
 
+if (!function_exists('ProxyHead')) {
+   
+   function ProxyHead($Url, $Headers=array()) {
+      $UrlParts = parse_url($Url);
+      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Host = GetValue('host', $UrlParts, '');
+      $Port = GetValue('port', $UrlParts, '80');
+      $Path = GetValue('path', $UrlParts, '');
+      $Query = GetValue('query', $UrlParts, '');
+      
+      // Get the cookie.
+      $Cookie = array('Cookie'      => '');
+      foreach($_COOKIE as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+         
+         if(strlen($Cookie['Cookie']) > 0)
+            $Cookie['Cookie'] .= '; ';
+            
+         $Cookie['Cookie'] .= $Key.'='.urlencode($Value);
+      }
+      
+      $Response = '';
+      if (function_exists('curl_init')) {
+         $Url = $Scheme.'://'.$Host.$Path;
+         $Handler = curl_init();
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_HEADER, 1);
+         curl_setopt($Handler, CURLOPT_NOBODY, 1);
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         curl_setopt($Handler, CURLOPT_HTTPHEADER, $Headers);
+         
+         if (strlen($Cookie['Cookie']))
+            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie['Cookie']);
+            
+         if ($Query != '') {
+            curl_setopt($Handler, CURLOPT_POST, 1);
+            curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         }
+         $Response = curl_exec($Handler);
+         if ($Response == FALSE)
+            $Response = curl_error($Handler);
+            
+         curl_close($Handler);
+      } else if (function_exists('fsockopen')) {
+         $Referer = Gdn::Request()->WebRoot();
+      
+         // Make the request
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         if (!$Pointer)
+            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+         
+         $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
+         
+         $Header = array(
+            'Host'            => $Host,
+            'User-Agent'      => 'Vanilla/2.0',
+            'Accept'          => '*/*',
+            'Accept-Charset'  => 'utf-8',
+            'Referer'         => $Referer,
+            'Connection'      => 'close'
+         );
+         
+         if (strlen($Cookie['Cookie']))
+            $Header = array_merge($Header, $Cookie);
+            
+         $Header = array_merge($Header, $Headers);
+         
+         $HeaderString = "";
+         foreach ($Header as $HeaderName => $HeaderValue) {
+            $HeaderString .= "{$HeaderName}: {$HeaderValue}\r\n";
+         }
+         $HeaderString .= "\r\n";
+                  
+         // Send the headers and get the response
+         fputs($Pointer, $Request);
+         fputs($Pointer, $HeaderString);
+         while ($Line = fread($Pointer, 4096)) {
+            $Response .= $Line;
+         }
+         @fclose($Pointer);
+         $Response = trim($Response);
+
+      } else {
+         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+      }
+      
+      $ResponseLines = explode("\n",trim($Response));
+      $Status = array_shift($ResponseLines);
+      $Response = array();
+      $Response['HTTP'] = trim($Status);
+      
+      /* get the numeric statuc code. 
+       * - trim off excess edge whitespace, 
+       * - split on spaces, 
+       * - get the 2nd element (as a single element array), 
+       * - pop the first (only) element off it... 
+       * - return that.
+       */
+      $Response['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      foreach ($ResponseLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Response[array_shift($Line)] = implode(':',$Line);
+      }
+      
+      return $Response;
+   }
+
+}
+
 if (!function_exists('ProxyRequest')) {
    /**
     * Uses curl or fsock to make a request to a remote server. Returns the
@@ -808,13 +918,10 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceString')) {
-   function SliceString($String, $Length, $Suffix = '...') {
-      if (strlen($String) > $Length) {
-         $Return = substr(trim($String), 0, $Length);
-         return substr($Return, 0, strlen($Return) - strpos(strrev($Return), ' ')) . $Suffix;
-      } else {
-         return $String;
-      }
+   function SliceString($String, $Length, $Suffix = '…') {
+	static $Charset;
+	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
    }
 }
 

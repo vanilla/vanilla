@@ -54,8 +54,25 @@ class Gdn_PasswordHash extends PasswordHash {
     * @param string $StoredHash
     * @return boolean
     */
-   function CheckPassword($Password, $StoredHash) {
-      $this->Weak = FALSE;
+   function CheckPassword($Password, $StoredHash, $Method = FALSE) {
+      $Result = FALSE;
+		switch(strtolower($Method)) {
+			case 'vbulletin':
+				$Salt = trim(substr($StoredHash, -3, 3));
+				$VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - 3);
+				$VbHash = md5(md5($Password).$Salt);
+				$Result = $VbHash == $VbStoredHash;
+				break;
+			case 'vanilla':
+			default:
+				$Result = $this->CheckVanilla($Password, $StoredHash);
+		}
+		
+		return $Result;
+   }
+	
+	function CheckVanilla($Password, $StoredHash) {
+		$this->Weak = FALSE;
       if (!isset($StoredHash[0]))
          return FALSE;
       
@@ -68,5 +85,5 @@ class Gdn_PasswordHash extends PasswordHash {
          return TRUE;
       }
       return FALSE;
-   }
+	}
 }

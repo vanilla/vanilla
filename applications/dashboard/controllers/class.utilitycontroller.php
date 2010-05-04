@@ -209,20 +209,6 @@ class UtilityController extends DashboardController {
          SaveToConfig($Save);
       }
    }
-   
-   public function UsernameAvailable($Name = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Available = TRUE;
-      if ($Name != '') {
-         $UserModel = Gdn::UserModel();
-         if ($UserModel->Get($Name))
-            $Available = FALSE;
-      }
-      if (!$Available)
-         $this->Form->AddError('Username unavailable');
-         
-      $this->Render();
-   }
 
    public function SetClientHour($ClientHour = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;

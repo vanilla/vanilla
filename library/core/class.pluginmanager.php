@@ -264,7 +264,7 @@ class Gdn_PluginManager {
       if (property_exists($this, $NewMethodClassName) === FALSE)
          $this->$NewMethodClassName = new $NewMethodClassName($Sender);
          
-      return $this->$NewMethodClassName->$NewMethodName($Sender, $Sender->RequestArgs);
+      return $this->$NewMethodClassName->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
    }
    
    /**

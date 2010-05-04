@@ -14,7 +14,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class RoutesController extends DashboardController {
    
    public $Uses = array('Form');
-   public $Routes;
    
    public function Index() {
       $this->Permission('Garden.Routes.Manage');
@@ -22,7 +21,7 @@ class RoutesController extends DashboardController {
       $this->AddJsFile('routes.js');
       $this->Title(T('Routes'));
       
-      $this->MyRoutes = $this->Routes->Routes;
+      $this->MyRoutes = Gdn::Router()->Routes;
       $this->Render();
    }
    
@@ -36,7 +35,7 @@ class RoutesController extends DashboardController {
    public function Edit($RouteIndex = FALSE) {
       $this->Permission('Garden.Routes.Manage');
       $this->AddSideMenu('dashboard/routes');
-      $this->Route = $this->Routes->GetRoute($RouteIndex);
+      $this->Route = Gdn::Router()->GetRoute($RouteIndex);
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -75,9 +74,9 @@ class RoutesController extends DashboardController {
             
             // 
             if ($this->Route !== FALSE && $NewRouteName != $this->Route['Route'])
-               $this->Routes->DeleteRoute($this->Route['Route']);
+               Gdn::Router()->DeleteRoute($this->Route['Route']);
          
-            $this->Routes->SetRoute(
+            Gdn::Router()->SetRoute(
                $NewRouteName,
                ArrayValue('Target', $FormPostValues),
                ArrayValue('Type', $FormPostValues)
@@ -101,7 +100,7 @@ class RoutesController extends DashboardController {
       
       // If seeing the form for the first time...
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey))
-         $this->Routes->DeleteRoute($RouteIndex);
+         Gdn::Router()->DeleteRoute($RouteIndex);
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect('dashboard/routes');
@@ -114,8 +113,6 @@ class RoutesController extends DashboardController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
-         
-      $this->Routes = Gdn::Factory(Gdn::AliasRoutes);
    }
 
 }

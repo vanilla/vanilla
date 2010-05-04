@@ -105,7 +105,7 @@ jQuery(document).ready(function($) {
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();
-      $(btn).after('<span class="Progress">&nbsp;</span>');
+      $(btn).before('<span class="TinyProgress">&nbsp;</span>');
       
       var frm = $(btn).parents('form');
       var textbox = $(frm).find('textarea');

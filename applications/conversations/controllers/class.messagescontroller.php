@@ -176,8 +176,6 @@ class MessagesController extends ConversationsController {
    
    /**
     * Shows all uncleared messages within a conversation for the viewing user
-    *
-    * @todo ENFORCE PERMISSIONS SO THAT PEOPLE CAN'T READ OTHER PEOPLE'S MESSAGES
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
       $this->Offset = $Offset;

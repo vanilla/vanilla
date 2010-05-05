@@ -133,7 +133,8 @@ class Gdn_Request {
    public function __call($Method, $Args) {
       $Matches = array();
       if (preg_match('/^(Request)(.*)$/',$Method,$Matches)) {
-         return $this->_EnvironmentElement(strtoupper($Matches[2]),$Args[0]);
+         $PassedArg = (is_array($Args) ? $Args[0] : NULL);
+         return $this->_EnvironmentElement(strtoupper($Matches[2]),$PassedArg);
       }
       else {
          trigger_error("Call to unknown method 'Gdn_Request->{$Method}'");

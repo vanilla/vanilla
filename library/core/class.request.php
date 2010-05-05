@@ -133,7 +133,7 @@ class Gdn_Request {
    public function __call($Method, $Args) {
       $Matches = array();
       if (preg_match('/^(Request)(.*)$/',$Method,$Matches)) {
-         $PassedArg = (is_array($Args) ? $Args[0] : NULL);
+         $PassedArg = (is_array($Args) && sizeof($Args)) ? $Args[0] : NULL;
          return $this->_EnvironmentElement(strtoupper($Matches[2]),$PassedArg);
       }
       else {

@@ -66,7 +66,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
 
 // Default request object
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'CreateFromEnvironment');
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
+Gdn::Request()->FromEnvironment();
 
 /// Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());

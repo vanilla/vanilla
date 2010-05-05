@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo T('My Preferences'); ?></h2>
+<h2><?php echo Gdn::Session()->UserID == $this->User->UserID ? T('My Preferences') : T('Edit Preferences'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();

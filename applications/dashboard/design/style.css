@@ -1620,6 +1620,9 @@ form.Thumbnail table td {
 form.Thumbnail table tr td {
    vertical-align: top;
 }
+form.Thumbnail table tr th {
+	padding-right: 10px;
+}
 .jcropper-holder {
    border: 1px black solid;
 }

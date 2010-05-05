@@ -34,7 +34,7 @@ class SettingsModule extends Gdn_Module {
                $ApplicationInfo   = ArrayValue($Name, $ApplicationManager->AvailableApplications(), array());
                $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
                
-               $IsRemovable = is_writable(PATH_APPLICATIONS . DS . $ApplicationFolder);
+               $IsRemovable = IsWritable(PATH_APPLICATIONS . DS . $ApplicationFolder);
             }
          break;
          case self::TYPE_PLUGIN:
@@ -44,7 +44,7 @@ class SettingsModule extends Gdn_Module {
                $PluginInfo   = ArrayValue($Name, $PluginManager->AvailablePlugins(), FALSE);
                $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
                
-               $IsRemovable = is_writable(PATH_PLUGINS . DS . $PluginFolder);
+               $IsRemovable = IsWritable(PATH_PLUGINS . DS . $PluginFolder);
             }
          break;
          case self::TYPE_THEME:

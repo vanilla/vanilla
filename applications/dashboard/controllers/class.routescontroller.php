@@ -70,9 +70,7 @@ class RoutesController extends DashboardController {
             
          if ($ConfigurationModel->Validate($FormPostValues)) {
             $NewRouteName = ArrayValue('Route', $FormPostValues);
-            //die("SAVE NEW ROUTE [{$NewRouteName}] (used to be called {$this->Route['Route']})");
-            
-            // 
+
             if ($this->Route !== FALSE && $NewRouteName != $this->Route['Route'])
                Gdn::Router()->DeleteRoute($this->Route['Route']);
          

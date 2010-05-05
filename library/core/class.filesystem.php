@@ -257,7 +257,7 @@ class Gdn_FileSystem {
       if (!is_dir($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.',$FileBaseName,$DirName));
          
-      if (!is_writable($DirName))
+      if (!IsWritable($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
          
       file_put_contents($FileName, $FileContents);

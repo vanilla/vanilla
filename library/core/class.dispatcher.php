@@ -137,14 +137,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function Dispatch($Request=NULL) {
    
       if ($Request !== NULL && is_a($Request,'Gdn_Request'))
-         Gdn::Request()->Import($Request);
+         Gdn::Request()->FromImport($Request);
       
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest();
       
       /*
-      echo "<br />Gdn::Request thinks: ".Gdn::Request()->Request();
-      echo "<br />Gdn::Request also suggests: output=".Gdn::Request()->Output().", outfile=".Gdn::Request()->Outfile();
+      echo "<br />Gdn::Request thinks: ".Gdn::Request()->Path();
+      echo "<br />Gdn::Request also suggests: output=".Gdn::Request()->OutputFormat().", filename=".Gdn::Request()->Filename();
       echo '<br />Request: '.$this->Request;      
       echo '<br />App folder: '.$this->_ApplicationFolder;
       echo '<br />Controller folder: '.$this->_ControllerFolder;
@@ -249,8 +249,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          } else {
          
-            $Request = Gdn_Request::CreateFromURI(Gdn::Router()->GetDestination('Destination'));
-            Gdn::Request()->Import($Request);
+            Gdn::Request()->WithURI(Gdn::Router()->GetDestination('Default404'));
             return $this->Dispatch();
             
          }
@@ -341,9 +340,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
       
-      $this->Request = Gdn::Request()->Request();
+      $this->Request = Gdn::Request()->Path();
 
-      switch (Gdn::Request()->Output()) {
+      switch (Gdn::Request()->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
             break;
@@ -385,7 +384,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
             
             case 'NotFound':
-               //die(print_r($MatchRoute,true));
                Header( "HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;

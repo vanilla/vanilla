@@ -12,273 +12,267 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
+ * @method string RequestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
+ * @method string RequestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
+ * @method string RequestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
+ * @method string RequestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
+ * @method string RequestFolder($URI = NULL) Get/Set the Request script's Folder.
+ *
  * @author Tim Gunter
  * @package Garden
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-
-// Todd: Some global changes.
-//  - Make all private members protected.
-//  - Put members in the following group order: constants, properties, constructor, methods.
-//  - Put members in alphabetical order within their groups.
-//  - Document everything in the /library/* folders right away.
-//  - You seem to be using a lot of similar sounding verbs which is confusing (ex. Attach, Load, Import).
-//  - I think we still need to give access to the superglobals. Even though we want to use a subset of them plugin developers might need them.
 class Gdn_Request {
 
-   protected $_Parameters;    // Request parameters, either from superglobals or from a custom array of key/value pairs
-   protected $_Environment;   // Raw environment variables, unparsed
-   protected $_Resolved;      // Resolved/parsed request information
-
-   // Data types, in order of precedence, lowest meaning highest priority
-   // Todd: I'd rather these be string constants with 'Custom', 'Get', 'Post', etc.
-   //  - Set the priority in the accessor method.
-   //  - Need other superglobals.
-   const INPUT_CUSTOM   = 1;
-   const INPUT_GET      = 2;
-   const INPUT_POST     = 3;
-   const INPUT_SERVER   = 4;
-   const INPUT_ENV      = 5;
+   const INPUT_CUSTOM   = "custom";
+   const INPUT_ENV      = "env";
+   const INPUT_FILES    = "files";
+   const INPUT_GET      = "get";
+   const INPUT_POST     = "post";
+   const INPUT_SERVER   = "server";
+   
+   protected $_HaveParsedRequest = FALSE; // Bool, signifies whether or not _ParseRequest has been called yet.
+   protected $_Environment;               // Raw environment variables, unparsed
+   protected $_ParsedRequest;             // Resolved/parsed request information
+   protected $_Parsing = FALSE;
+   protected $_RequestArguments;          // Request data/parameters, either from superglobals or from a custom array of key/value pairs
 
    private function __construct() {
-      $this->_Parameters       = array();
-      $this->_Resolved     = array(
-            'Request'            => '',
-            'Output'             => 'default',
-            'Outfile'            => 'default',
+      $this->_Environment = array();
+      $this->_RequestArguments       = array();
+      $this->_ParsedRequest     = array(
+            'Path'               => '',
+            'OutputFormat'       => 'default',
+            'Filename'           => 'default',
             'WebRoot'            => '',
             'Domain'             => ''
       );
-      $this->_Environment = array();
+
       $this->_LoadEnvironment();
    }
 
-   // Todd: CreateFromSuperglobals would be more consistent with PHP.
-   public static function CreateFromEnvironment() {
-      $Request = new Gdn_Request();
-
-      $Request->_AttachSuperglobals();
-
-      return $Request->_Parse();
-   }
-
-   public static function CreateFromControllerMethod($Controller, $Method='Index', $Params=NULL, $ImportEnvironmentData=FALSE) {
-      $URI = $Controller."/".$Method;
-      return self::CreateFromURI($URI, $Params, $ImportEnvironmentData);
-   }
-
-   // Todd: This should work with a URI being taken right from $_SERVER['REQUEST_URI']
-   //  - Can we get rid of $ImportEnvironmentData parameter?
-   //  - Always put a spaceon either side of operators. (ex. $Params = NULL)
-   public static function CreateFromURI($URI, $Params=NULL, $ImportEnvironmentData=FALSE) {
-      $Request = new Gdn_Request();
-
-      if ($ImportEnvironmentData !== FALSE)
-         $this->_AttachSuperglobals();
-
-      $Request->RequestURI($URI);
-
-      if (!is_null($Params) && is_array($Params)) // Todd: Pretty sure is_null isn't necessary
-         $Request->AttachData(self::INPUT_CUSTOM, $Params);
-
-      return $Request->_Parse();
+   /**
+    * Generic chainable object creation method.
+    * 
+    * This creates a new Gdn_Request object, loaded with the current Environment $_SERVER and $_ENV superglobal imports, such
+    * as REQUEST_URI, SCRIPT_NAME, etc. The intended usage is for additional setter methods to be chained 
+    * onto this call in order to fully set up the object.
+    *
+    * @flow chain
+    * @return Gdn_Request
+    */
+   public static function Create() {
+      return new Gdn_Request();
    }
    
-   protected function _Environment($Key, $KeyValue=NULL) {
-      if ($KeyValue !== NULL)
-         $this->_Environment[$Key] = $KeyValue;
+   /**
+    * Gets/Sets the domain from the current url. e.g. "http://localhost/" in
+    * "http://localhost/this/that/garden/index.php/controller/action/"
+    *
+    * @param $Domain optional value to set
+    * @return string | NULL
+    */
+   public function Domain($Domain = NULL) {
+      return $this->_ParsedRequestElement('Domain', $Domain);
+   }
+
+   /**
+    * Accessor method for unparsed request environment data, such as the REQUEST_URI, SCRIPT_NAME,
+    * HTTP_HOST and REQUEST_METHOD keys in $_SERVER.
+    *
+    * A second argument can be supplied, which causes the value of the specified key to be changed
+    * to that of the second parameter itself.
+    *
+    * Currently recognized keys (and their relation to $_SERVER) are:
+    *  - URI      -> REQUEST_URI
+    *  - SCRIPT   -> SCRIPT_NAME
+    *  - HOST     -> HTTP_HOST
+    *  - METHOD   -> REQUEST_METHOD
+    *  - FOLDER   -> none. this is extracted from SCRIPT_NAME and only available after _ParseRequest()
+    *
+    * @param $Key Key to retrieve or set.
+    * @param $Value Value of $Key key to set.
+    * @return string | NULL
+    */
+   protected function _EnvironmentElement($Key, $Value=NULL) {
+      $Key = strtoupper($Key);
+      if ($Value !== NULL)
+      {
+         $this->_HaveParsedRequest = FALSE;
+         
+         switch ($Key) {
+            case 'URI':
+               $Value = !is_null($Value) ? urldecode($Value) : $Value;
+               break;
+            case 'SCRIPT':
+               $Value = !is_null($Value) ? trim($Value, '/') : $Value;
+               break;
+            case 'HOST':
+            case 'METHOD':
+            case 'FOLDER':
+            default:
+               // Do nothing special for these
+            break;
+         }
+         
+         $this->_Environment[$Key] = $Value;
+      }
 
       if (array_key_exists($Key, $this->_Environment))
          return $this->_Environment[$Key];
 
       return NULL;
    }
-
-   public function RequestURI($URI=NULL) {
-      $DecodedURI = !is_null($URI) ? urldecode($URI) : $URI;
-      return $this->_Environment('REQUEST_URI', $DecodedURI);
-   }
-
-   // Todd: Think whether the following Request* methods are really necessary.
-   //  - I'm pretty sure this data is only used to parse the $_SERVER variables.
-   //  - We don't want to have method bloat.
-   public function RequestHost($Host=NULL) {
-      return $this->_Environment('REQUEST_HOST', $Host);
-   }
-
-   public function RequestScript($ScriptName=NULL) {
-      $FixedScriptName = !is_null($ScriptName) ? trim($ScriptName, '/') : $ScriptName;
-      return $this->_Environment('REQUEST_SCRIPT', $FixedScriptName);
-   }
-
-   public function RequestMethod($Method=NULL) {
-      return $this->_Environment('REQUEST_METHOD', $Method);
-   }
-
-   public function RequestFolder($Folder=NULL) {
-      return $this->_Environment('REQUEST_FOLDER', $Folder);
-   }
-
-   // Todd: Really unclear method. Use $Key, $Value.
-   protected function _Resolved($Key, $Value=NULL) {
-      if ($Value !== NULL)
-         $this->_Resolved[$Key] = $Value;
-
-      if (array_key_exists($Key, $this->_Resolved))
-         return $this->_Resolved[$Key];
-
-      return NULL;
+   
+   /**
+    * Convenience method for accessing unparsed environment data via Request(ELEMENT) method calls.
+    *
+    * @return string
+    */
+   public function __call($Method, $Args) {
+      $Matches = array();
+      if (preg_match('/^(Request)(.*)$/',$Method,$Matches)) {
+         $PassedArg = (is_array($Args) && sizeof($Args)) ? $Args[0] : NULL;
+         return $this->_EnvironmentElement(strtoupper($Matches[2]),$PassedArg);
+      }
+      else {
+         trigger_error("Call to unknown method 'Gdn_Request->{$Method}'");
+      }
    }
 
    /**
-    * Gets/Sets the Output format, typically 'default' .
+    * This method allows requests to export their internal data.
     *
-    * @param $Output optional value to set
-    * @return string
+    * Mostly used in conjunction with FromImport()
+    *
+    * @param $Export Data group to export
+    * @return mixed
     */
-   // Todd: Maybe call this OutputFormat()
-   //  - Document the types of possible output or at least have a few examples.
-   public function Output($Output=NULL) {
-      $Output = (!is_null($Output)) ? strtolower($Output) : $Output;
-      return $this->_Resolved('Output', $Output);
+   public function Export($Export) {
+      switch ($Export) {
+         case 'Environment':  return $this->_Environment;
+         case 'Arguments':    return $this->_RequestArguments;
+         case 'Parsed':       return $this->_ParsedRequest;
+         default:             return NULL;
+      }
    }
-
+   
    /**
     * Gets/Sets the optional filename (ContentDisposition) of the output.
     *
-    * @param $OutFile optional value to set
+    * As with the case above (OutputFormat), this value depends heavily on there being a filename
+    * at the end of the URI. In the example above, Filename() would return 'cashflow2009.pdf'.
+    *
+    * @param $Filename Optional Filename to set.
     * @return string
     */
-   // Todd: Call this Filename.
-   public function Outfile($Outfile=NULL) {
-      return $this->_Resolved('Outfile', $Outfile);
+   public function Filename($Filename = NULL) {
+      return $this->_ParsedRequestElement('Filename', $Filename);
    }
 
    /**
-    * Gets/Sets the final request to be sent to the dispatcher.
+    * Chainable lazy Environment Bootstrap
     *
-    * @param $Request optional value to set
-    * @return string
-    */
-   // Call this Path()
-   public function Request($Request=NULL) {
-      return $this->_Resolved('Request', $Request);
-   }
-
-   /**
-    * Gets/Sets the path to the application's dispatcher.
+    * Convenience method allowing quick setup of the default request state... from the current environment.
     *
-    * @param $WebRoot optional value to set
-    * @return string
+    * @flow chain
+    * @return Gdn_Request
     */
-   public function WebRoot($WebRoot=NULL) {
-      return $this->_Resolved('WebRoot', $WebRoot);
+   public function FromEnvironment() {
+      $this->WithURI()
+         ->WithArgs(self::INPUT_GET, self::INPUT_POST, self::INPUT_SERVER, self::INPUT_FILES);
+         
+      return $this;
    }
    
-   public function WebPath($WithDomain = FALSE, $PreserveTrailingSlash = TRUE) {
-      $Parts = array();
-      
-      if ($WithDomain)
-         $Parts[] = $this->Domain();
-         
-      $Parts[] = $this->WebRoot();
-      
-      if (Gdn::Config('Garden.RewriteUrls', FALSE) === FALSE)
-         $Parts[] = $this->RequestScript().'/';
-      
-      $Path = implode('', $Parts);
-      $Path = trim($Path, '/');
-      if ($PreserveTrailingSlash)
-         $Path = $Path.'/';
-         
-      return $Path;
-   }
-
    /**
-    * Returns the domain from the current url. ie. "http://localhost/" in
-    * "http://localhost/this/that/garden/index.php/controller/action/"
+    * Chainable Request Importer
     *
-    * @param $Domain optional value to set
-    * @return string
+    * This method allows one method to import the raw information of another request
+    * 
+    * @param $NewRequest New Request from which to import environment and arguments.
+    * @flow chain
+    * @return Gdn_Request
     */
-   public function Domain($Domain=NULL) {
-      return $this->_Resolved('Domain', $Domain);
+   public function FromImport($NewRequest) {
+      // Import Environment
+      $this->_Environment = $NewRequest->Export('Environment');
+      // Import Arguments
+      $this->_RequestArguments = $NewRequest->Export('Arguments');
+      
+      $this->_HaveParsedRequest = FALSE;
+      $this->_Parsing = FALSE;
+      return $this;
    }
-
+   
    /**
-    * Attach an array of parameters to the request.
+    * Export an entire dataset (effectively, one of the superglobals) from the request arguments list
     *
-    * @param int $ParamsType type of data to import. One of (self::INPUT_CUSTOM, self::INPUT_GET, self::INPUT_POST)
-    * @param array $ParamsData data array to import
-    * @return void
-    */
-   public function AttachData($ParamsType, $ParamsData) {
-      $this->_Parameters[$ParamsType] = $ParamsData;
-   }
-
-   /**
-    * Detach a dataset from the request
-    *
-    * @param int $ParamsType type of data to detach. One of (self::INPUT_CUSTOM, self::INPUT_GET, self::INPUT_POST)
-    * @return void
-    */
-   // Todd: Put an array_key_exists.
-   //  - Method name
-   public function DetachData($ParamsType) {
-      unset($this->_Parameters[$ParamsType]);
-   }
-
-   /**
-    * Export a named dataset from the request
-    *
-    * @param int $ParamsType type of data to export. One of (self::INPUT_CUSTOM, self::INPUT_GET, self::INPUT_POST)
+    * @param int $ParamType Type of data to export. One of the self::INPUT_* constants
     * @return array
     */
-   public function ExportData($ParamsType) {
-      if (!isset($this->_Parameters[$ParamsType]))
+   public function GetRequestArguments($ParamType) {
+      if (!isset($this->_RequestArguments[$ParamType]))
          return array();
 
-      return $this->_Parameters[$ParamsType];
+      return $this->_RequestArguments[$ParamType];
    }
 
    /**
-    * Attach the superglobal environment data to the request
+    * Search the currently attached data arrays for the requested argument (in order) and
+    * return the first match. Return $Default if not found.
     *
-    * @return void
-    */
-   protected function _AttachSuperglobals() {
-      // Web request. Attach GET, POST and SERVER data.
-      if ($this->_Environment['REQUEST_METHOD'] != 'CONSOLE') {
-         $this->AttachData(self::INPUT_SERVER, $_SERVER);
-         $this->AttachData(self::INPUT_GET, $_GET);
-         $this->AttachData(self::INPUT_POST, $_POST);
-      } else {
-         $this->AttachData(self::INPUT_ENV, $_ENV);
-      }
-   }
-
-   /**
-    * Search the currently attached data arrays for the requested parameter and
-    * return it. Return $Default of not found.
-    *
-    * @param string $ParameterName name of the parameter to retrieve
-    * @param mixed $Default value to return if parameter not found
+    * @param string $Key Name of the request argument to retrieve.
+    * @param mixed $Default Value to return if argument not found.
     * @return mixed
     */
-   public function GetValue($ParameterName,$Default=FALSE) {
-      for ($i=1; $i <= 5; $i++) {
-         if (!array_key_exists($i, $this->_Parameters)) continue;
-         if (array_key_exists($ParameterName, $this->_Parameters[$i]))
-            return filter_var($this->_Parameters[$i][$ParameterName],FILTER_SANITIZE_STRING);
+   public function GetValue($Key, $Default = FALSE) {
+      $QueryOrder = array(
+         self::INPUT_CUSTOM,
+         self::INPUT_GET,
+         self::INPUT_POST,
+         self::INPUT_FILES,
+         self::INPUT_SERVER,
+         self::INPUT_ENV
+      );
+      $NumDataTypes = sizeof($QueryOrder);
+      
+      for ($i=0; $i <= $NumDataTypes; $i++) {
+         $DataType = $QueryOrder[$i];
+         if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
+         if (array_key_exists($Key, $this->_RequestArguments[$DataType]))
+            return filter_var($this->_RequestArguments[$DataType][$Key], FILTER_SANITIZE_STRING);
       }
       return $Default;
    }
-
+   
+   /**
+    * Search one of the currently attached data arrays for the requested argument and return its value
+    * or $Default if not found.
+    *
+    * @param $ParamType Which request argument array to query for this value. One of the self::INPUT_* constants
+    * @param $Key Name of the request argument to retrieve.
+    * @param $Default Value to return if argument not found.
+    * @return mixed
+    */
+   public function GetValueFrom($ParamType, $Key, $Default = FALSE) {
+      $DataType = strtolower($DataType);
+      
+      if (array_key_exists($DataType, $this->_RequestArguments) && array_key_exists($Key, $this->_RequestArguments[$DataType]))
+         return filter_var($this->_RequestArguments[$DataType][$Key], FILTER_SANITIZE_STRING);
+         
+      return $Default;
+   }
+   
    /**
     * Load the basics of the current environment
     *
-    * @return array associative array of condensed environment variables
+    * The purpose of this method is to consolidate all the various environment information into one
+    * array under a set of common names, thereby removing the tedium of figuring out which superglobal 
+    * and key combination contain the requested information each time it is needed.
+    * 
+    * @return void
     */
    protected function _LoadEnvironment() {
 
@@ -290,13 +284,40 @@ class Gdn_Request {
       if (PHP_SAPI === 'cgi' && isset($_ENV['SCRIPT_URL']))
          $this->RequestScript($_ENV['SCRIPT_URL']);
    }
-
+   
    /**
-    * Parse the Environment data into the Resolved array.
+    * Gets/Sets the Output format
     *
-    * @return Gdn_Request
+    * This method sets the OutputFormat that the dispatcher will look at when determining
+    * how to serve the request to the browser. Currently, the handled values are:
+    *  - default        -> typical html response
+    *  - rss            -> rss formatted
+    *  - atom           -> atom formatted
+    *
+    * If the request ends with a filename, such as in the case of:
+    *    http://www.forum.com/vanilla/index.php/discussion/345897/attachment/234/download/cashflow2009.pdf
+    * then this method will return the filetype (in this case 'pdf').
+    *
+    * @param $OutputFormat Optional OutputFormat to set.
+    * @return string | NULL
     */
-   protected function _Parse() {
+   public function OutputFormat($OutputFormat = NULL) {
+      $OutputFormat = (!is_null($OutputFormat)) ? strtolower($OutputFormat) : $OutputFormat;
+      return $this->_ParsedRequestElement('OutputFormat', $OutputFormat);
+   }
+   
+   /**
+    * Parse the Environment data into the ParsedRequest array.
+    *
+    * This method analyzes the Request environment and produces the ParsedRequest array which
+    * contains the Path and OutputFormat keys. These are used by the Dispatcher to decide which 
+    * controller and method to invoke.
+    *
+    * @return void
+    */
+   protected function _ParseRequest() {
+
+      $this->_Parsing = TRUE;
 
       /**
        * Resolve Request Folder
@@ -304,32 +325,32 @@ class Gdn_Request {
 
       // Get the folder from the script name.
       $Match = array();
-      $ScriptName = basename($this->RequestScript());
-      $Folder = substr($this->RequestScript(),0,0-strlen($ScriptName));
-      $this->RequestFolder($Folder);
-      $this->RequestScript($ScriptName);
+      $ScriptName = basename($this->_EnvironmentElement('Script'));
+      $Folder = substr($this->_EnvironmentElement('Script'),0,0-strlen($ScriptName));
+      $this->_EnvironmentElement('Folder', $Folder);
+      $this->_EnvironmentElement('Script', $ScriptName);
 
       /**
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      $Expression = '/^'.str_replace('/', '\/', $this->RequestFolder()).'(?:'.$this->RequestScript().')?\/?(.*?)\/?(?:[#?].*)?$/i';
-      if (preg_match($Expression, trim($this->RequestURI(),'/'), $Match))
-         $this->Request($Match[1]);
+      $Expression = '/^'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).'(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
+      if (preg_match($Expression, trim($this->_EnvironmentElement('URI'),'/'), $Match))
+         $this->Path($Match[1]);
       else
-         $this->Request('');
+         $this->Path('');
 
       /**
        * Resolve optional output modifying file extensions (rss, json, etc)
        */
 
-      $UrlParts = explode('/', $this->Request());
+      $UrlParts = explode('/', $this->Path());
       $LastParam = array_pop(array_slice($UrlParts, -1, 1));
       $Match = array();
-      if (preg_match('/^([^.]+)\.([^.]+)$/', $LastParam,$Match)) {
-         $this->Output($Match[2]);
-         $this->Outfile($Match[0]);
-         $this->Request(implode('/',array_slice($UrlParts, 0, -1)));
+      if (preg_match('/^([^.]+)\.([^.]+)$/', $LastParam, $Match)) {
+         $this->OutputFormat($Match[2]);
+         $this->Filename($Match[0]);
+         $this->Path(implode('/',array_slice($UrlParts, 0, -1)));
       }
 
       /**
@@ -377,33 +398,207 @@ class Gdn_Request {
          $Domain = trim($Domain, '/').'/';
       }
       $this->Domain($Domain);
+      
+      $this->_Parsing = FALSE;
+      $this->_HaveParsedRequest = TRUE;
+   }
+   
+   /**
+    * Accessor method for parsed request data, such as the final 'controller/method' string,
+    * as well as the resolved output format such as 'rss' or 'default'.
+    *
+    * A second argument can be supplied, which causes the value of the specified key to be changed
+    * to that of the second parameter itself.
+    *
+    * @param $Key element key to retrieve or set
+    * @param $Value value of $Key key to set
+    * @return string | NULL
+    */
+   protected function _ParsedRequestElement($Key, $Value=NULL) {
+      // Lazily parse if not already parsed
+      if (!$this->_HaveParsedRequest && !$this->_Parsing)
+         $this->_ParseRequest();
+         
+      if ($Value !== NULL)
+         $this->_ParsedRequest[$Key] = $Value;
 
+      if (array_key_exists($Key, $this->_ParsedRequest))
+         return $this->_ParsedRequest[$Key];
+
+      return NULL;
+   }
+   
+   /**
+    * Gets/Sets the final path to be sent to the dispatcher.
+    *
+    * @param $Path Optional Path to set
+    * @return string | NULL
+    */
+   public function Path($Path = NULL) {
+      return $this->_ParsedRequestElement('Path', $Path);
+   }
+   
+   /**
+    * Attach an array of request arguments to the request.
+    *
+    * @param int $ParamsType type of data to import. One of the self::INPUT_* constants
+    * @param array $ParamsData optional data array to import if ParamsType is INPUT_CUSTOM
+    * @return void
+    */
+   protected function _SetRequestArguments($ParamsType, $ParamsData = NULL) {
+      switch ($ParamsType) {
+         case self::INPUT_GET:
+            $ArgumentData = $_GET;
+            break;
+            
+         case self::INPUT_POST:
+            $ArgumentData = $_POST;
+            break;
+            
+         case self::INPUT_SERVER:
+            $ArgumentData = $_SERVER;
+            break;
+            
+         case self::INPUT_FILES:
+            $ArgumentData = $_FILES;
+            break;
+            
+         case self::INPUT_ENV:
+            $ArgumentData = $_ENV;
+            break;
+            
+         case self::INPUT_CUSTOM:
+            $ArgumentData = is_array($ParamsData) ? $ParamsData : array();
+            break;
+      
+      }
+      $this->_RequestArguments[$ParamsType] = $ArgumentData;
+   }
+   
+   /**
+    * Detach a dataset from the request
+    *
+    * @param int $ParamsType type of data to remove. One of the self::INPUT_* constants
+    * @return void
+    */
+   public function _UnsetRequestArguments($ParamsType) {
+      unset($this->_RequestArguments[$ParamsType]);
+   }
+   
+   /**
+    * This method allows safe creation of URLs that need to reference the application itself
+    *
+    * Taking the server's RewriteUrls ability into account, and using information from the 
+    * actual Request data, this method can construct a trustworthy URL that will point to 
+    * Garden's dispatcher. Examples: 
+    *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php/
+    *    - Default port, rewrites                     http://www.forum.com/
+    *    - Custom port, rewrites                      http://www.forum.com:8080/index.php/
+    *
+    * @param $WithDomain set to false to create a relative URL
+    * @param $PreserveTrailingSlash set to false to strip trailing slash
+    * @return string
+    */
+   public function WebPath($WithDomain = TRUE, $PreserveTrailingSlash = TRUE) {
+      $Parts = array();
+      
+      if ($WithDomain)
+         $Parts[] = $this->Domain();
+         
+      $Parts[] = $this->WebRoot();
+      
+      if (Gdn::Config('Garden.RewriteUrls', FALSE) === FALSE)
+         $Parts[] = $this->_EnvironmentElement('Script').'/';
+      
+      $Path = implode('', $Parts);
+      $Path = trim($Path, '/');
+      if ($PreserveTrailingSlash)
+         $Path = $Path.'/';
+         
+      return $Path;
+   }
+   
+   /**
+    * Gets/Sets the relative path to the application's dispatcher.
+    *
+    * @param $WebRoot Optional Webroot to set
+    * @return string
+    */
+   public function WebRoot($WebRoot = NULL) {
+      return $this->_ParsedRequestElement('WebRoot', $WebRoot);
+   }
+   
+   /**
+    * Chainable Superglobal arguments setter
+    * 
+    * This method expects a variable number of parameters, each of which need to be a defined INPUT_* 
+    * constant, and will interpret these as superglobal references. These constants each refer to a 
+    * specific PHP superglobal and including them here causes their data to be imported into the request 
+    * object.
+    *
+    * @param self::INPUT_*
+    * @flow chain
+    * @return Gdn_Request
+    */
+   public function WithArgs() {
+      $ArgAliasList = func_get_args();
+      if (count($ArgAliasList))
+         foreach ($ArgAliasList as $ArgAlias) {
+            $this->_SetRequestArguments(strtolower($ArgAlias));
+         }
+         
       return $this;
    }
-
-   // Todd: I'm noticing that you could have made this a CreateFromRequest() method.
-   // - Or you could have made the other ones ImportFrom*() methods.
-   // - Not sure if there is a good reason to have some as creators and some as setters.
-   // - Possibly think of chaining setters? (ex. $Request = Gdn_Request::Create()->FromURI('/dashboard/settings');)
-   public function Import($NewRequest) {
-      // Import Environment
-      $this->_Environment = $NewRequest->Export('Environment');
-      // Import Params
-      $this->_Parameters = $NewRequest->Export('Params');
-
-      // Todd: This should only return this object if you envision a chaining scenario.
-      //  - Since _Parse is protected chaining is impossible outside of the object.
-      //  - Would also prefer all chaining methods to end with return $this; Too much chaining makes debugging a pain.
-      return $this->_Parse();
+   
+   /**
+    * Chainable Custom arguments setter
+    *
+    * The request object allows for a custom array of data (that does not come from the request
+    * itself) to be attached in front of the other request superglobals and transparently override 
+    * their values when they are requested via GetValue(). This method sets that data.
+    *
+    * @param $CustomArgs key/value array of custom request argument data.
+    * @flow chain
+    * @return Gdn_Request
+    */
+   public function WithCustomArgs($CustomArgs) {
+      $this->_AttachRequestArguments(self::INPUT_CUSTOM, $CustomArgs);
+      return $this;
    }
-
-   public function Export($Export) {
-      switch ($Export) {
-         case 'Environment':  return $this->_Environment;
-         case 'Params':       return $this->_Parameters;
-         case 'Resolved':     return $this->_Resolved;
-         default:             return NULL;
+   
+   /**
+    * Chainable URI Setter, source is a controller + method + args list
+    *
+    * @param $Controller Gdn_Controller Object or string controller name.
+    * @param $Method Optional name of the method to call. Omit or NULL for default (Index).
+    * @param $Args Optional argument list to forward to the method. Omit for none.
+    * @flow chain
+    * @return Gdn_Request
+    */
+   public function WithControllerMethod($Controller, $Method = NULL, $Args = array()) {
+      if (is_a($Controller, 'Gdn_Controller')) {
+         // Convert object to string
+         $Matches = array();
+         preg_match('/^(.*)Controller$/',get_class($Controller),$Matches);
+         $Controller = $Matches[1];
       }
+      
+      $Method = is_null($Method) ? 'index' : $Method;
+      $Path = trim(implode('/',array_merge(array($Controller,$Method),$Args)),'/');
+      $this->_EnvironmentElement('URI', $Path);
+      return $this;
+   }
+   
+   /**
+    * Chainable URI Setter, source is a simple string
+    * 
+    * @param $URI optional URI to set as as replacement for the REQUEST_URI superglobal value
+    * @flow chain
+    * @return Gdn_Request
+    */
+   public function WithURI($URI = NULL) {
+      $this->_EnvironmentElement('URI',$URI);
+      return $this;
    }
 
 }

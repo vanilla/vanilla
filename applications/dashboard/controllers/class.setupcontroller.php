@@ -102,12 +102,44 @@ class SetupController extends DashboardController {
          $this->Form->SetData($ConfigurationModel->Data);
       } else {         
          // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->AddRule('Connection', 'function:ValidateConnection');
-         $ConfigurationModel->Validation->ApplyRule('Database.Name', 'Connection');
+         $ConfigurationModel->Validation->ApplyRule('Database.Name', 'Required', 'You must specify the name of the database in which you want to set up Vanilla.');
+			
+         // Let's make some user-friendly custom errors for database problems
+         $DatabaseHost = $this->Form->GetFormValue('Database.Host', '~~Invalid~~');
+         $DatabaseName = $this->Form->GetFormValue('Database.Name', '~~Invalid~~');
+         $DatabaseUser = $this->Form->GetFormValue('Database.User', '~~Invalid~~');
+         $DatabasePassword = $this->Form->GetFormValue('Database.Password', '~~Invalid~~');
+         $ConnectionString = GetConnectionString($DatabaseName, $DatabaseHost);
+         try {
+            $Connection = new PDO(
+               $ConnectionString,
+               $DatabaseUser,
+               $DatabasePassword
+            );
+         } catch (PDOException $Exception) {
+            switch ($Exception->getCode()) {
+               case 1044:
+                  $this->Form->AddError(T('The database user you specified does not have permission to access the database. The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                  break;
+               case 1045:
+                  $this->Form->AddError(T('Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                  break;
+               case 1049:
+                  $this->Form->AddError(T('It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                  break;
+               case 2005:
+                  $this->Form->AddError(T("Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"), strip_tags($Exception->getMessage()));
+                  break;
+               default:
+                  $this->Form->AddError(sprintf(T('ValidateConnection'), strip_tags($Exception->getMessage())));
+               break;
+            }
+         }
+			
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          
          $ConfigurationFormValues = $this->Form->FormValues();
-         if ($ConfigurationModel->Validate($ConfigurationFormValues) !== TRUE) {
+         if ($ConfigurationModel->Validate($ConfigurationFormValues) !== TRUE || $this->Form->ErrorCount() > 0) {
             // Apply the validation results to the form(s)
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          } else {
@@ -146,7 +178,7 @@ class SetupController extends DashboardController {
             } catch (Exception $ex) {
                $this->Form->AddError(strip_tags($ex->getMessage()));
             }
-            
+         
             if ($this->Form->ErrorCount() > 0)
                return FALSE;
 
@@ -154,7 +186,8 @@ class SetupController extends DashboardController {
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
             $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-            $UserModel->Validation->ApplyRule('Password', 'Required');
+            $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
+            $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
             
             if (!$UserModel->SaveAdminUser($ConfigurationFormValues)) {
@@ -207,43 +240,58 @@ class SetupController extends DashboardController {
    private function _CheckPrerequisites() {
       // Make sure we are running at least PHP 5.1
       if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0)
-         $this->Form->AddError("You are running <b>PHP version ".phpversion()."</b>. Vanilla requires PHP ".ENVIRONMENT_PHP_VERSION." or greater, so you'll need to upgrade PHP before you can continue.<code><span>Upgrade PHP to</span> v".ENVIRONMENT_PHP_VERSION."</code>");
+         $this->Form->AddError(sprintf(T('You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'), phpversion(), ENVIRONMENT_PHP_VERSION));
 
       // Make sure PDO is available
       if (!class_exists('PDO'))
-         $this->Form->AddError('You must have <b>PDO enabled</b> in PHP in order for Vanilla to connect to your database.<code><span>Enable</span> PHP PDO</code>');
+         $this->Form->AddError(T('You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'));
 
       if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
-         $this->Form->AddError('You must have the <b>MySQL driver for PDO</b> enabled in order for Vanilla to connect to your database.<code><span>Install</span> PDO_Mysql</code>');
+         $this->Form->AddError(T('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'));
 
       // Make sure that the correct filesystem permissions are in place
+		$PermissionProblem = FALSE;
+		$PermissionHelp = ' <p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>
+<pre>chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'conf')).'
+chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'cache')).'
+chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
       
       // Make sure the config folder is writeable
-      if (!is_readable(PATH_CONF) || !is_writable(PATH_CONF))
-         $this->Form->AddError('Your <b>configuration folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.PATH_CONF.'</code>');
-      else {
+      if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF)) {
+         $this->Form->AddError(T('Your configuration folder does not have the correct permissions. PHP needs to be able to read and write to this folder.'));
+			$PermissionProblem = TRUE;
+      } else {
          $ConfigFile = PATH_CONF . DS . 'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          
          // Make sure the config file is writeable
-         if (!is_readable($ConfigFile) || !is_writable($ConfigFile))
-            $this->Form->AddError('Your <b>configuration file</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this file: <code><span>Fix permissions</span> '.$ConfigFile.'</code>');
+         if (!is_readable($ConfigFile) || !IsWritable($ConfigFile)) {
+            $this->Form->AddError(sprintf(T('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
+				$PermissionProblem = TRUE;
+         }
       }
       
       $UploadsFolder = PATH_ROOT . DS . 'uploads';
-      if (!is_readable($UploadsFolder) || !is_writable($UploadsFolder))
-         $this->Form->AddError('Your <b>uploads folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder: <code><span>Fix permissions</span> '.$UploadsFolder.'</code>');
+      if (!is_readable($UploadsFolder) || !IsWritable($UploadsFolder)) {
+         $this->Form->AddError(sprintf(T('Your uploads folder does not have the correct permissions. PHP needs to be able to read and write to this folder: <code>%s</code>'), $UploadsFolder));
+         $PermissionProblem = TRUE;
+      }
 
       // Make sure the cache folder is writeable
-      if (!is_readable(PATH_CACHE) || !is_writable(PATH_CACHE)) {
-         $this->Form->AddError('Your <b>cache folder</b> does not have the correct permissions. PHP needs to be able to <a href="http://vanillaforums.org/docs/FilePermissions/">read and write</a> to this folder and all the files within it: <code><span>Fix permissions</span> '.PATH_CACHE.'</code>');
+      if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE)) {
+         $this->Form->AddError(sprintf(T('Your cache folder does not have the correct permissions. PHP needs to be able to read and write to this folder and all the files within: <code>%s</code>'), PATH_CACHE));
+         $PermissionProblem = TRUE;
       } else {
          if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');
       }
+		
+		if ($PermissionProblem)
+			$this->Form->AddError($PermissionHelp);
+			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }
    

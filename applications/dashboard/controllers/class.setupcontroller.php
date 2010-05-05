@@ -210,8 +210,7 @@ class SetupController extends DashboardController {
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
             
             // Detect rewrite abilities
-            try
-            {
+            try {
                $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
                $Results = ProxyHead($Query);
                $CanRewrite = FALSE;
@@ -224,7 +223,7 @@ class SetupController extends DashboardController {
             }
       
             SaveToConfig(array(
-               'Garden.Version' => ArrayValue('Version', ArrayValue('Garden', $ApplicationInfo, array()), 'Undefined'),
+               'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
                'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => $CanRewrite,
                'Garden.Domain' => $Domain,

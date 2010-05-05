@@ -76,9 +76,6 @@ class DiscussionModel extends VanillaModel {
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
 			
 		if(is_array($AdditionalFields)) {
-			// Add additional fields to the query.
-			// $Tables = array('fc' => array('Comment fc', 'd.FirstCommentID = fc.CommentID'));
-			
 			foreach($AdditionalFields as $Alias => $Field) {
 				// See if a new table needs to be joined to the query.
 				$TableAlias = explode('.', $Field);
@@ -408,6 +405,7 @@ class DiscussionModel extends VanillaModel {
             if ($DiscussionID > 0) {
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
             } else {
+					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;
@@ -528,6 +526,20 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          }
       }
    }
+	
+	/**
+	 * Set the bookmark count for the specified user. Returns the bookmark count.
+	 */
+	public function SetBookmarkCount($UserID) {
+		$Count = $this->BookmarkCount($UserID);
+      $this->SQL
+         ->Update('User')
+         ->Set('CountBookmarks', $Count)
+         ->Where('UserID', $UserID)
+         ->Put();
+		
+		return $Count;
+	}
    
    /**
     * Announces (or unannounces) a discussion. Returns the value that was set.
@@ -598,7 +610,13 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
       return 0;
    }
    
+	/**
+	 * Delete a discussion. Update and/or delete all related data.
+	 */
    public function Delete($DiscussionID) {
+		// Retrieve the users who have bookmarked this discussion.
+		$BookmarkData = $this->GetBookmarkUsers($DiscussionID);
+
       $Data = $this->SQL
          ->Select('CategoryID,InsertUserID')
          ->From('Discussion')
@@ -615,6 +633,7 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
+		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
       // Get the user's discussion count
@@ -629,8 +648,13 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          ->Update('User')
          ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
          ->Where('UserID', $UserID)
-         ->Put();      
-      
+         ->Put();
+
+		// Update bookmark counts for users who had bookmarked this discussion
+		foreach ($BookmarkData->Result() as $User) {
+			$this->SetBookmarkCount($User->UserID);
+		}
+			
       return TRUE;
    }
 }

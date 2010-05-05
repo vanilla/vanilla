@@ -203,16 +203,8 @@ class DiscussionController extends VanillaController {
       $Discussion = NULL;
       $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
 
-      $CountBookmarks = $this->DiscussionModel->BookmarkCount($Session->UserID);
-      
       // Update the user's bookmark count
-      $SQL = Gdn::SQL();
-      
-      $SQL
-         ->Update('User')
-         ->Set('CountBookmarks', $CountBookmarks)
-         ->Where('UserID', $Session->UserID)
-         ->Put();
+      $CountBookmarks = $this->DiscussionModel->SetBookmarkCount($Session->UserID);
       
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
@@ -387,14 +379,13 @@ class DiscussionController extends VanillaController {
       }
       
       // Redirect
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions');
-         Redirect($Target);
-      }
+      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+         Redirect(GetIncomingValue('Target', '/discussions'));
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
+      $this->RedirectUrl = GetIncomingValue('Target', Url('/vanilla/discussions'));
       $this->Render();         
    }
 

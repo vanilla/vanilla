@@ -72,6 +72,20 @@ div.Errors {
    line-height: 150%;
    text-shadow: #900 0 1px 0;
 }
+.Errors li pre,
+.Errors li code {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #b00;
+	background: #c00;
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	display: block;
+	text-shadow: none;
+	font-size: 13px;
+	font-weight: normal;
+	font-family: monospace;
+}
 .Errors li a {
    color: #ffff00;
 	text-decoration: underline;

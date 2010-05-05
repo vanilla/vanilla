@@ -118,14 +118,17 @@ class SetupController extends DashboardController {
             );
          } catch (PDOException $Exception) {
             switch ($Exception->getCode()) {
+               case 1044:
+                  $this->Form->AddError(T('The database user you specified does not have permission to access the database. The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                  break;
                case 1045:
-                  $this->Form->AddError(T('Failed to connect to the database with the username and password you entered. Did you mistype them? Does the user have permission to access this database? The database reported: <br /><code>%s</code>'), strip_tags($Exception->getMessage()));
+                  $this->Form->AddError(T('Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
                   break;
                case 1049:
-                  $this->Form->AddError(T('It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <br /><code>%s</code>'), strip_tags($Exception->getMessage()));
+                  $this->Form->AddError(T('It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
                   break;
                case 2005:
-                  $this->Form->AddError(T("Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <br /><code>%s</code>"), strip_tags($Exception->getMessage()));
+                  $this->Form->AddError(T("Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"), strip_tags($Exception->getMessage()));
                   break;
                default:
                   $this->Form->AddError(sprintf(T('ValidateConnection'), strip_tags($Exception->getMessage())));
@@ -183,7 +186,8 @@ class SetupController extends DashboardController {
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
             $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-            $UserModel->Validation->ApplyRule('Password', 'Required');
+            $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
+            $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
             
             if (!$UserModel->SaveAdminUser($ConfigurationFormValues)) {
@@ -247,8 +251,8 @@ class SetupController extends DashboardController {
 
       // Make sure that the correct filesystem permissions are in place
 		$PermissionProblem = FALSE;
-		$PermissionHelp = ' <p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p> <pre>
-chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'conf')).'
+		$PermissionHelp = ' <p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>
+<pre>chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'conf')).'
 chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'cache')).'
 chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
       

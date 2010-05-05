@@ -104,12 +104,12 @@ class Gdn_Upload {
 	public function ValidateUpload($InputName, $ThrowException = TRUE) {
 		$Ex = FALSE;
 
-		if(!array_key_exists($InputName, $_FILES) || !is_uploaded_file($_FILES[$InputName]['tmp_name'])) {
+		if(!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
 			// Check the content length to see if we exceeded the max post size.
-			$ConentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
+			$ContentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
 			$MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
-			if($ContentLength > $MaxPostsize) {
-				$Ex = sprintf(T('The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
+			if($ContentLength > $MaxPostSize) {
+				$Ex = sprintf(T('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
 			}
 
 			$Ex = T('The file failed to upload.');
@@ -118,8 +118,7 @@ class Gdn_Upload {
 				case 1:
 				case 2:
 					$MaxFileSize = self::UnformatFileSize(ini_get('upload_max_filesize'));
-					echo $MaxFileSize;
-					$Ex = sprintf(T('The file is larger than the server\'s maximum file size. (%s)'), self::FormatFileSize($MaxFileSize));
+					$Ex = sprintf(T('Gdn_Upload.Error.PhpMaxFileSize', 'The file is larger than the server\'s maximum file size. (%s)'), self::FormatFileSize($MaxFileSize));
 					break;
 				case 3:
 				case 4:
@@ -141,8 +140,7 @@ class Gdn_Upload {
 
 		// Check the maxfilesize again just in case the value was spoofed in the form.
 		if (!$Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
-			echo $this->_MaxFileSize;
-			$Ex = sprintf(T('The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
+			$Ex = sprintf(T('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
 		} elseif(!$Ex) {
 			// Make sure that the file extension is allowed.
 			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);

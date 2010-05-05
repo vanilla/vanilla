@@ -1230,7 +1230,7 @@ ul.MessageList li {
 }
 ul.MessageList li.Item {
    border-bottom: 1px solid #ddd;
-	padding: 4px;
+	padding: 10px 4px 4px 10px;
 }
 ul.MessageList div.Meta {
    font-size: 11px;
@@ -1261,6 +1261,9 @@ div.Preview {
 	background: #E3F4FF;
 	padding: 1px 8px;
 	margin: 4px 0 8px;
+}
+div.Popup div.Preview {
+	margin: 0;
 }
 div.Preview div.Message,
 ul.MessageList div.Message {
@@ -1968,7 +1971,7 @@ body.Discussion a.Bookmark {
 /* =================================================================== Drafts */
 ul.Discussions div.ItemContent,
 ul.Drafts div.ItemContent {
-   margin: 0 0 0 5px;
+   margin: 0 0 0 9px;
 }
 ul.Drafts div.ItemContent a.Title,
 ul.Discussions div.ItemContent a.Title {

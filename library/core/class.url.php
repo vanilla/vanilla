@@ -89,7 +89,7 @@ class Gdn_Url {
     * @return string
     */
    public static function QueryString() {
-      return http_build_query(Gdn::Request()->ExportData(Gdn_Request::INPUT_GET));
+      return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
    }
 
 
@@ -103,6 +103,6 @@ class Gdn_Url {
     * @return string
     */
    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-      return (($WithWebRoot) ? self::WebRoot($WithDomain).'/' : '').Gdn::Request()->Request();
+      return (($WithWebRoot) ? self::WebRoot($WithDomain).'/' : '').Gdn::Request()->Path();
    }
 }

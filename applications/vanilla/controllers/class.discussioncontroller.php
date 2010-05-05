@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+5<?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -115,7 +115,7 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
-   public function GetNew($DiscussionID, $LastCommentID) {
+   public function GetNew($DiscussionID, $LastCommentID = 0) {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
       // Check permissions.

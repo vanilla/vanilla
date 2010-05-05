@@ -52,9 +52,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Engine = strtolower($Engine);
       
       if ($CheckAvailability) {
-         $EngineList = $this->Query("SHOW ENGINES;");
+         $EngineList = $this->Database->Query("SHOW ENGINES;");
          $ViableEngines = array();
-         while ($StorageEngine = $EngineList->Value('Engine', FALSE)) {
+         while ($EngineList && $StorageEngine = $EngineList->Value('Engine', FALSE)) {
             $EngineName = strtolower($StorageEngine);
             $ViableEngines[$EngineName] = TRUE;
          }

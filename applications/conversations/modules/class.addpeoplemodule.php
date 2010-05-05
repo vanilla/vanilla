@@ -30,7 +30,7 @@ class AddPeopleModule extends Gdn_Module {
          $UserModel = Gdn::Factory("UserModel");
          foreach ($NewRecipients as $Name) {
             if (trim($Name) != '') {
-               $User = $UserModel->Get(trim($Name));
+               $User = $UserModel->GetByUsername(trim($Name));
                if (is_object($User))
                   $NewRecipientUserIDs[] = $User->UserID;
             }

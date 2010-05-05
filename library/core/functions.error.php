@@ -304,13 +304,14 @@ if (!function_exists('LogMessage')) {
             $Log = "[Garden] $File, $Line, $Object.$Method()";
             if ($Message <> '') $Log .= ", $Message";
             if ($Code <> '') $Log .= ", $Code";
-            $Log .= "\n";
              
             // Fail silently (there could be permission issues on badly set up servers).
             $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
             if ($ErrorLogFile == '') {
                @error_log($Log);
             } else {
+               $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+               $Log = "$Date: $Log\n";
                @error_log($Log, 3, $ErrorLogFile);
             }
          }

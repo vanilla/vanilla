@@ -41,7 +41,7 @@ class Gdn_Upload {
          if (!is_dir($UploadPath))
             return FALSE;
       
-      if (!is_writable($UploadPath) || !is_readable($UploadPath)) 
+      if (!IsWritable($UploadPath) || !is_readable($UploadPath)) 
          return FALSE;
          
       return TRUE;

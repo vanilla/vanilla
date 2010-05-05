@@ -241,7 +241,7 @@ jQuery(document).ready(function($) {
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {
-      $(this).after('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
+      $(this).before('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
    });
    
    // Confirmation for item removals

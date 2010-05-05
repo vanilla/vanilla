@@ -84,7 +84,8 @@ if (!class_exists('HeadModule', FALSE)) {
          if (!array_key_exists($Tag, $this->_Tags))
             $this->_Tags[$Tag] = array();
          
-         if (is_array($Properties))
+         // Make sure this item has not already been added.
+         if (is_array($Properties) && !in_array($Properties, $this->_Tags[$Tag]))
             $this->_Tags[$Tag][] = $Properties;
       }
       

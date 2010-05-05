@@ -198,7 +198,7 @@ class CommentModel extends VanillaModel {
                $Story = ArrayValue('Body', $Fields, '');
                $NotifiedUsers = array();
                foreach ($Usernames as $Username) {
-                  $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
+                  $User = $UserModel->GetByUsername($Username);
                   if ($User && $User->UserID != $Session->UserID) {
                      $NotifiedUsers[] = $User->UserID;   
                      $ActivityModel = new ActivityModel();   

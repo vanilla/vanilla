@@ -17,7 +17,7 @@ if ($Session->IsValid()) {
    <ul>
       <li><?php
          if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
-            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Gdn_Format::Url($this->Discussion->Category));
+            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
          } else {
             echo Anchor(T('All Discussions'), 'discussions');
          }

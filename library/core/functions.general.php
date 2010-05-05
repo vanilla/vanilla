@@ -566,6 +566,36 @@ if (!function_exists('IsTimestamp')) {
    }
 }
 
+if (!function_exists('IsWritable')) {
+   /**
+    * PHP's native is_writable() function fails to correctly determine write
+    * capabilities on some systems (Windows), and in our tests it returned TRUE
+    * despite not being able to create subfolders within the folder being
+    * checked. Our version truly verifies permissions by performing file-write
+    * tests.
+    */
+   function IsWritable($Path) {
+      if ($Path{strlen($Path) - 1} == DS) {
+         // Recursively return a temporary file path
+         return IsWritable($Path . uniqid(mt_rand()) . '.tmp');
+      } elseif (is_dir($Path)) {
+         return IsWritable($Path . '/' . uniqid(mt_rand()) . '.tmp');
+      }
+      // Check tmp file for read/write capabilities
+      $KeepPath = file_exists($Path);
+      $File = @fopen($Path, 'a');
+      if ($File === FALSE)
+         return FALSE;
+      
+      fclose($File);
+      
+      if (!$KeepPath)
+         unlink($Path);
+      
+      return TRUE;
+   }
+}
+
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.

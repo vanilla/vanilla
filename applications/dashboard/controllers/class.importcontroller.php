@@ -84,8 +84,9 @@ class ImportController extends DashboardController {
 			// Check to see if there is a file.
 			$ImportPath = Gdn::Config('Garden.Import.ImportPath');
 			$Validation = new Gdn_Validation();
+
 			
-			if ($this->Form->AuthenticatedPostBack() === TRUE) {
+			if (strcasecmp(Gdn::Request()->RequestMethod(), 'post') == 0) {
 				$Upload = new Gdn_Upload();
 				$Validation = new Gdn_Validation();
 				

@@ -257,10 +257,10 @@ class Gdn_Request {
     * @return mixed
     */
    public function GetValueFrom($ParamType, $Key, $Default = FALSE) {
-      $DataType = strtolower($DataType);
+      $ParamType = strtolower($ParamType);
       
-      if (array_key_exists($DataType, $this->_RequestArguments) && array_key_exists($Key, $this->_RequestArguments[$DataType]))
-         return filter_var($this->_RequestArguments[$DataType][$Key], FILTER_SANITIZE_STRING);
+      if (array_key_exists($ParamType, $this->_RequestArguments) && array_key_exists($Key, $this->_RequestArguments[$ParamType]))
+         return filter_var($this->_RequestArguments[$ParamType][$Key], FILTER_SANITIZE_STRING);
          
       return $Default;
    }

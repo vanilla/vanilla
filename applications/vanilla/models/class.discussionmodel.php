@@ -282,6 +282,7 @@ class DiscussionModel extends VanillaModel {
       $Data = $this->SQL
          ->Select('d.*')
          ->Select('ca.Name', '', 'Category')
+         ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Select('d.DateLastComment', '', 'LastDate')
@@ -421,7 +422,7 @@ class DiscussionModel extends VanillaModel {
                $Usernames = GetMentions($DiscussionName);
                $UserModel = Gdn::UserModel();
                foreach ($Usernames as $Username) {
-                  $User = $UserModel->GetWhere(array('Name' => $Username))->FirstRow();
+                  $User = $UserModel->GetByUsername($Username);
                   if ($User && $User->UserID != $Session->UserID) {
                      AddActivity(
                         $Session->UserID,

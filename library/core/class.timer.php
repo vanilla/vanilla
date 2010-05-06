@@ -17,7 +17,7 @@ class Gdn_Timer {
 	public $SplitTime;
 	
 	public function ElapsedTime() {
-		if(is_null($FinishTime))
+		if(is_null($this->FinishTime))
 			$Result = microtime(TRUE) - $this->StartTime;
 		else
 			$Result = $this->FinishTime - $this->StartTime;

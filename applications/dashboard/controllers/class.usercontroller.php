@@ -128,7 +128,6 @@ class UserController extends DashboardController {
       $this->Permission('Garden.Users.Approve');
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey))
-      
          if($this->HandleApplicant('Approve', $UserID)) {
             $this->StatusMessage = T('Your changes have been saved.');
          }

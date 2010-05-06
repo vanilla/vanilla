@@ -4,6 +4,7 @@ $this->AddSideMenu();
 <style> .Complete { text-decoration: line-through; }</style>
 <h2><?php echo T('Import'); ?></h2>
 <?php
+echo $this->Form->Errors();
 $CurrentStep = GetValue('CurrentStep', $this->Data, 0);
 $Steps = GetValue('Steps', $this->Data, array());
 
@@ -46,7 +47,7 @@ function _SpacifyCamelCase($Str) {
 </ol>
 <?php
 	if(array_key_exists($CurrentStep, $this->Data['Steps'])) {
-		echo '<div>',
+		echo '<noscript><div>',
 			Anchor(T('Continue'), strtolower($this->Application).'/import/go', 'Button'),
-			'</div>';
+			'</div></noscript>';
 	}

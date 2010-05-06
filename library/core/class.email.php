@@ -55,7 +55,9 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Bcc($RecipientEmail, $RecipientName = '') {
+      ob_flush(); ob_start();
       $this->PhpMailer->AddBCC($RecipientEmail, $RecipientName);
+      ob_end_clean();
       return $this;
    }
    
@@ -68,7 +70,9 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Cc($RecipientEmail, $RecipientName = '') {
+      ob_flush(); ob_start();
       $this->PhpMailer->AddCC($RecipientEmail, $RecipientName);
+      ob_end_clean();
       return $this;
    }
 
@@ -105,9 +109,10 @@ class Gdn_Email extends Gdn_Pluggable {
          $SenderName = Gdn::Config('Garden.Email.SupportName', '');
       
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
-         
+      
+      ob_flush(); ob_start();
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
-
+      ob_end_clean();
       return $this;
    }
 
@@ -189,7 +194,7 @@ class Gdn_Email extends Gdn_Pluggable {
       if (!$this->PhpMailer->Send()) {
          throw new Exception($this->PhpMailer->ErrorInfo);
       }
-
+      
       return true;
    }
    
@@ -205,7 +210,9 @@ class Gdn_Email extends Gdn_Pluggable {
 
    
    public function AddTo($RecipientEmail, $RecipientName = ''){
+      ob_flush(); ob_start();
       $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
+      ob_end_clean();
       return $this;
    }
    
@@ -217,7 +224,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * an array of email addresses, this value will be ignored.
     */
    public function To($RecipientEmail, $RecipientName = '') {
-   
+
       if (is_string($RecipientEmail)) {
          if (strpos($RecipientEmail, ',') > 0) {
             $RecipientEmail = explode(',', $RecipientEmail);

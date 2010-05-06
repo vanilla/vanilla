@@ -869,19 +869,21 @@ class UserModel extends Gdn_Model {
          // Send out a notification to the user
          $User = $this->Get($UserID);
          if ($User) {
+/*
             $Email->Subject(sprintf(T('[%1$s] Membership Approved'), Gdn::Config('Garden.Title')));
             $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
             $Email->To($User->Email);
             $Email->Send();
+*/
          }
 
          // Report that the user was approved
          $Session = Gdn::Session();
          AddActivity(
-            $UserID,
+            $Session->UserID,
             'JoinApproved',
             T('Welcome Aboard!'),
-            $Session->UserID,
+            $UserID,
             '',
             FALSE
          );

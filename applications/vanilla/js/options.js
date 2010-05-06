@@ -108,14 +108,16 @@ jQuery(document).ready(function($) {
             $.popup({}, json.ErrorMessage);
          } else {
             // Is this the last item in the list?
+            /*
             if ($(row).parent().children().length == 1) {
                // Remove the entire list
                $(row).parent().slideUp('fast', function() { $(this).remove(); });
                $(row).parent().prev().slideUp('fast', function() { $(this).remove(); });
             } else {
-               // Remove the affected row
-               $(row).slideUp('fast', function() { $(this).remove(); });
-            }
+            */
+            // Remove the affected row
+            $(row).slideUp('fast', function() { $(this).remove(); });
+            // }
          }
       }
    });

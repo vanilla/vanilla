@@ -119,7 +119,7 @@ class SetupController extends DashboardController {
          } catch (PDOException $Exception) {
             switch ($Exception->getCode()) {
                case 1044:
-                  $this->Form->AddError(T('The database user you specified does not have permission to access the database. The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                  $this->Form->AddError(T('The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
                   break;
                case 1045:
                   $this->Form->AddError(T('Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));

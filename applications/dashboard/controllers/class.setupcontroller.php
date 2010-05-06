@@ -189,6 +189,7 @@ class SetupController extends DashboardController {
             $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
             $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
+            $UserModel->Validation->ApplyRule('Email', 'Email');
             
             if (!$UserModel->SaveAdminUser($ConfigurationFormValues)) {
                $this->Form->SetValidationResults($UserModel->ValidationResults());

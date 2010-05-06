@@ -4,7 +4,7 @@
  */
 $ApplicationInfo['Conversations'] = array(
    'Description' => "An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.",
-   'Version' => '1.0',
+   'Version' => APPLICATION_VERSION,
    'SetupController' => 'setup',
    'Url' => 'http://weconversate.com',
    'Author' => "Mark O'Sullivan",

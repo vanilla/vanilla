@@ -63,6 +63,7 @@ $Definition['Garden.Title'] = 'Application title';
 $Definition['Garden.Email.SupportName'] = 'Support name';
 $Definition['Garden.Email.SupportAddress'] = 'Support email';
 $Definition['UrlCode'] = 'Url code';
+$Definition['OldPassword'] = 'Old password';
 
 $Definition['RoleID'] = 'role';
 

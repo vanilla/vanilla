@@ -67,7 +67,7 @@ if (!class_exists('HeadModule', FALSE)) {
          $this->AddTag('link', array(
             'rel' => 'alternate',
             'type' => 'application/rss+xml',
-            'title' => $Title,
+            'title' => Gdn_Format::Text($Title),
             'href' => Asset($HRef)
          ));
       }
@@ -199,7 +199,7 @@ if (!class_exists('HeadModule', FALSE)) {
    
       public function ToString() {
          $Head = array();
-         $Head[] = '<title>'.$this->Title().'</title>';
+         $Head[] = '<title>'.Gdn_Format::Text($this->Title()).'</title>';
             
          // Make sure that css loads before js (for jquery)
          ksort($this->_Tags); // "link" comes before "script"

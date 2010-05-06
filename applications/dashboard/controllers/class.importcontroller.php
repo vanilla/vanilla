@@ -24,9 +24,14 @@ class ImportController extends DashboardController {
 		$Ex->ExportTable('User', 'select * from :_User'); // ":_" will be replace by database prefix
 		$Ex->ExportTable('Role', 'select * from :_Role');
 		$Ex->ExportTable('UserRole', 'select * from :_UserRole');
+
 		$Ex->ExportTable('Category', 'select * from :_Category');
 		$Ex->ExportTable('Discussion', 'select * from :_Discussion');
 		$Ex->ExportTable('Comment', 'select * from :_Comment');
+
+		$Ex->ExportTable('Conversation', 'select * from :_Conversation');
+		$Ex->ExportTable('UserConversation', 'select * from :_UserConversation');
+		$Ex->ExportTable('ConversationMessage', 'select * from :_ConversationMessage');
 		
 		$Ex->EndExport();
 	}
@@ -64,6 +69,8 @@ class ImportController extends DashboardController {
 		}
 		
 		$Imp->SaveState();
+		$this->Form = new Gdn_Form();
+		$this->Form->SetValidationResults($Imp->Validation->Results());
 		$this->SetData('CurrentStep', $Imp->CurrentStep);
 		$this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
 	

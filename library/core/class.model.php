@@ -42,7 +42,7 @@ class Gdn_Model extends Gdn_Pluggable {
    /**
     * An object representation of the current working dataset.
     *
-    * @var object
+    * @var Gdn_DataSet
     */
    public $Data;
 
@@ -135,7 +135,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * object. By default, this object only enforces maxlength, data types, and
     * required fields (defined when $this->DefineSchema() is called).
     *
-    * @var object
+    * @var Gdn_Validation
     */
    public $Validation;
 

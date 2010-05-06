@@ -41,6 +41,10 @@ class HomeController extends Gdn_Controller {
    public function FileNotFound() {
       $this->Render();
    }
+   
+   public function UpdateMode() {
+      $this->Render();
+   }
 
    public function Deleted() {
       $this->Render();

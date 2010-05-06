@@ -108,6 +108,7 @@ class Gdn_Request {
             case 'SCRIPT':
                $Value = !is_null($Value) ? trim($Value, '/') : $Value;
                break;
+            case 'SCHEME':
             case 'HOST':
             case 'METHOD':
             case 'FOLDER':

@@ -136,6 +136,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    public function Dispatch($Request=NULL) {
    
+      if (Gdn::Config('Garden.UpdateMode', FALSE)) {
+         if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
+            // Updatemode, and this user is not root admin
+            Gdn::Request()->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
+         }
+      }
+   
       if ($Request !== NULL && is_a($Request,'Gdn_Request'))
          Gdn::Request()->FromImport($Request);
       

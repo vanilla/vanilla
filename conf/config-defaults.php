@@ -111,3 +111,4 @@ $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', '
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['Default404'] = 'dashboard/home/filenotfound';
 $Configuration['Routes']['DefaultPermission'] = 'dashboard/home/permission';
+$Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';

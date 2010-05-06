@@ -59,6 +59,9 @@ $Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';
 $Definition['PageDetailsMessage'] = '%1$s to %2$s';
 $Definition['RoleID'] = 'role';
 $Definition['Garden.Registration.DefaultRoles'] = 'default role';
+$Definition['Garden.Title'] = 'Application title';
+$Definition['Garden.Email.SupportName'] = 'Support name';
+$Definition['Garden.Email.SupportAddress'] = 'Support email';
 
 $Definition['RoleID'] = 'role';
 

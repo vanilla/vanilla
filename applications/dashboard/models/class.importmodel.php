@@ -25,10 +25,6 @@ class ImportModel {
 	public $CurrentStep = 0;
 	
 	public $Data = array();
-
-	protected $_FirstSteps = array(
-		1 => 'SplitImportFile',
-		2 => 'CheckImportFile');
 	
 	public $ImportPath = '';
 
@@ -186,11 +182,6 @@ where i._NewID is null";
 			
 			return $Result;
 		}
-	}
-
-	public function CheckImportFile() {
-		// Make sure all the necessary tables are there.
-
 	}
 	
 	public function DefineTables() {

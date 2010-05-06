@@ -4,7 +4,7 @@
  */
 $ApplicationInfo['Dashboard'] = array(
    'Description' => "Garden is a php-based web platform, and \"Dashboard\" is the core Garden application that handles user, role, permission, plugin, theme, and application management.",
-   'Version' => '1.0',
+   'Version' => APPLICATION_VERSION,
    'RegisterPermissions' => FALSE,
    'AllowDisable' => FALSE, // Dashboard should never get disabled once it has been installed.
    'Url' => 'http://vanillaforums.org',

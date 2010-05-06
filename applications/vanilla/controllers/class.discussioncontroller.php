@@ -1,4 +1,4 @@
-5<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.

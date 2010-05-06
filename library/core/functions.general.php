@@ -666,7 +666,10 @@ if (!function_exists('PrefixString')) {
 
 if (!function_exists('ProxyHead')) {
    
-   function ProxyHead($Url, $Headers=array()) {
+   function ProxyHead($Url, $Headers=array(), $Timeout = FALSE) {
+		if(!$Timeout)
+			$Timeout = ini_get("default_socket_timeout");
+
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
       $Host = GetValue('host', $UrlParts, '');
@@ -690,6 +693,7 @@ if (!function_exists('ProxyHead')) {
       if (function_exists('curl_init')) {
          $Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
+			curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_NOBODY, 1);
@@ -712,7 +716,7 @@ if (!function_exists('ProxyHead')) {
          $Referer = Gdn::Request()->WebRoot();
       
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
          

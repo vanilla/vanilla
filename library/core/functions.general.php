@@ -668,7 +668,7 @@ if (!function_exists('ProxyHead')) {
    
    function ProxyHead($Url, $Headers=array(), $Timeout = FALSE) {
 		if(!$Timeout)
-			$Timeout = ini_get("default_socket_timeout");
+			$Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -785,7 +785,10 @@ if (!function_exists('ProxyRequest')) {
     *
     * @param string $Url The full url to the page being requested (including http://)
     */
-   function ProxyRequest($Url) {
+   function ProxyRequest($Url, $Timeout = FALSE) {
+		if(!$Timeout)
+			$Timeout = C('Garden.SocketTimeout', 1.0);
+
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
       $Host = GetValue('host', $UrlParts, '');

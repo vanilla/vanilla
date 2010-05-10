@@ -114,8 +114,8 @@ class ImportModel extends Gdn_Model {
          	and u.UserID is null";
 		$this->Query($Sql);
 
-		// There still might be users that have an overlapping usernames which must be changed.
-		// Append a random suffic to the new username.
+		// There still might be users that have overlapping usernames which must be changed.
+		// Append a random suffix to the new username.
 		$Sql = "update :_zUser i
          set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
          where i._NewID is null";

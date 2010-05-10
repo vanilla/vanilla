@@ -61,6 +61,7 @@ class ImportModel extends Gdn_Model {
    	'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
    	'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
    	'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
+   	'UserMeta' => array('UserID' => 'int', 'MetaKey' => 'varchar(255)', 'MetaValue' => 'text'),
    	'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
 	);
 

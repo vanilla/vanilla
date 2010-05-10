@@ -9,8 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Object for importing files created with ExportModel.
- * @see ImportModel
+ * Object for importing files created with VanillaPorter.
  */
 class ImportModel extends Gdn_Model {
 	const COMMENT = '//';
@@ -31,38 +30,38 @@ class ImportModel extends Gdn_Model {
 	public $MaxStepTime = 3;
 
 	protected $_MergeSteps = array(
-	1 => 'SplitImportFile',
-	2 => 'DefineTables',
-	3 => 'LoadTables',
-	4 => 'DefineIndexes',
-	5 => 'AssignUserIDs',
-	6 => 'AssignOtherIDs',
-	7 => 'InsertTables',
-	8 => 'UpdateCounts'
+   	1 => 'SplitImportFile',
+   	2 => 'DefineTables',
+   	3 => 'LoadTables',
+   	4 => 'DefineIndexes',
+   	5 => 'AssignUserIDs',
+   	6 => 'AssignOtherIDs',
+   	7 => 'InsertTables',
+   	8 => 'UpdateCounts'
 	);
 
 	protected $_OverwriteSteps = array(
-	1 => 'SplitImportFile',
-	2 => 'DefineTables',
-	3 => 'LoadUserTable',
-	4 => 'AuthenticateAdminUser',
-	5 => 'InsertUserTable',
-	6 => 'LoadTables',
-	7 => 'DeleteOverwriteTables',
-	8 => 'InsertTables',
-	9 => 'UpdateCounts'
-	);
+   	1 => 'SplitImportFile',
+   	2 => 'DefineTables',
+   	3 => 'LoadUserTable',
+   	4 => 'AuthenticateAdminUser',
+   	5 => 'InsertUserTable',
+   	6 => 'LoadTables',
+   	7 => 'DeleteOverwriteTables',
+   	8 => 'InsertTables',
+   	9 => 'UpdateCounts'
+   );
 
 	public $Structures = array(
-	'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-	'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-	'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-	'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
-	'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
-	'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
-	'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-	'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
-	'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
+   	'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+   	'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
+   	'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+   	'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
+   	'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
+   	'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
+   	'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
+   	'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
+   	'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
 	);
 
 	/**
@@ -78,19 +77,19 @@ class ImportModel extends Gdn_Model {
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
 		$Sql = "update :_zUser i
-join :_User u
-  on i.Email = u.Email
-set i._NewID = u.UserID, i._Action = 'Update'";
+         join :_User u
+           on i.Email = u.Email
+         set i._NewID = u.UserID, i._Action = 'Update'";
 		$this->Query($Sql);
 
 		// Assign user IDs of name matches.
 		$Sql = "update :_zUser i
-join :_User u
-	on i.Name = u.Name
-left join :_zUser i2
-	on i2._NewID = u.UserID /* make sure no duplicates */
-set i._NewID = u.UserID, i._Action = 'Update'
-where i._NewID is null and i2.UserID is null";
+         join :_User u
+         	on i.Name = u.Name
+         left join :_zUser i2
+         	on i2._NewID = u.UserID /* make sure no duplicates */
+         set i._NewID = u.UserID, i._Action = 'Update'
+         where i._NewID is null and i2.UserID is null";
 		$this->Query($Sql);
 
 		// Get the max UserID so we can increment new users.
@@ -107,18 +106,18 @@ where i._NewID is null and i2.UserID is null";
 
 		// Update the users to insert.
 		$Sql = "update :_zUser i
-left join :_User u
-	on u.Name = i.Name /* make sure no duplicates */
-set i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
-where i._NewID is null
-	and u.UserID is null";
+         left join :_User u
+         	on u.Name = i.Name /* make sure no duplicates */
+         set i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
+         where i._NewID is null
+         	and u.UserID is null";
 		$this->Query($Sql);
 
 		// There still might be users that have an overlapping usernames which must be changed.
 		// Append a random suffic to the new username.
 		$Sql = "update :_zUser i
-set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
-where i._NewID is null";
+         set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
+         where i._NewID is null";
 		$this->Query($Sql);
 
 		return TRUE;
@@ -143,9 +142,9 @@ where i._NewID is null";
 		// Assign existing IDs.
 		if($SecondaryKey) {
 			$Sql = "update :_z$TableName i
-join :_$TableName t
-  on t.$SecondaryKey = i.$SecondaryKey
-set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
+            join :_$TableName t
+              on t.$SecondaryKey = i.$SecondaryKey
+            set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
 			$this->Query($Sql);
 		}
 
@@ -164,8 +163,8 @@ set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
 			$IDInc = $MaxID - $MinID + self::ID_PADDING;
 
 		$Sql = "update :_z$TableName i
-set i._NewID = i.$PrimaryKey + $IDInc, i._Action = 'Insert'
-where i._NewID is null";
+         set i._NewID = i.$PrimaryKey + $IDInc, i._Action = 'Insert'
+         where i._NewID is null";
 		$this->Query($Sql);
 	}
 
@@ -253,8 +252,8 @@ where i._NewID is null";
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
-		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Role', 'UserAuthentication',
-		'UserConversation', 'UserDiscussion', 'UserRole');
+   		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Role', 'UserAuthentication',
+   		'UserConversation', 'UserDiscussion', 'UserRole');
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
@@ -327,15 +326,15 @@ where i._NewID is null";
 							$this->_InsertTable($TableName);
 						} else {
 							$Sql = "insert :_UserRole ( UserID, RoleID )
-		select zUserID._NewID, zRoleID._NewID
-		from :_zUserRole i
-		left join :_zUser zUserID
-		  on i.UserID = zUserID.UserID
-		left join :_zRole zRoleID
-		  on i.RoleID = zRoleID.RoleID
-		left join :_UserRole ur
-			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
-		where i.UserID <> 0 and ur.UserID is null";
+                  		select zUserID._NewID, zRoleID._NewID
+                  		from :_zUserRole i
+                  		left join :_zUser zUserID
+                  		  on i.UserID = zUserID.UserID
+                  		left join :_zRole zRoleID
+                  		  on i.RoleID = zRoleID.RoleID
+                  		left join :_UserRole ur
+                  			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
+                  		where i.UserID <> 0 and ur.UserID is null";
 							$this->Query($Sql);
 						}
 						break;
@@ -482,12 +481,12 @@ where i._NewID is null";
 		Gdn::Database()->Query("truncate table $Tablename;");
 
 		$Sql = "load data infile $Path into table $Tablename
-character set utf8
-columns terminated by ','
-optionally enclosed by '\"'
-escaped by '\\\\'
-lines terminated by '\\n'
-ignore 1 lines";
+         character set utf8
+         columns terminated by ','
+         optionally enclosed by '\"'
+         escaped by '\\\\'
+         lines terminated by '\\n'
+         ignore 1 lines";
 
 		$this->Query($Sql);
 		return TRUE;
@@ -634,41 +633,41 @@ ignore 1 lines";
 		$StepSql = array(
 		// Set basic counts.
 		"update :_Discussion d set
-LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+      LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
+      CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
+      DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
 
 		// Set the body of the first comment when the forum doesn't put it in the discussion.
 		"update :_Discussion d
-inner join :_Comment c
-  on c.DiscussionID = d.DiscussionID
-inner join (
-  select min(c2.CommentID) as CommentID
-  from :_Comment c2
-  group by c2.DiscussionID
-) c2
-  on c.CommentID = c2.CommentID
-set
-  d.Body = c.Body,
-  d.Format = c.Format,
-  d.FirstCommentID = c.CommentID
-where d.Body is null",
+      inner join :_Comment c
+        on c.DiscussionID = d.DiscussionID
+      inner join (
+        select min(c2.CommentID) as CommentID
+        from :_Comment c2
+        group by c2.DiscussionID
+      ) c2
+        on c.CommentID = c2.CommentID
+      set
+        d.Body = c.Body,
+        d.Format = c.Format,
+        d.FirstCommentID = c.CommentID
+      where d.Body is null",
 
 		// Remove the first comment.
 		"delete :_Comment c
-from :_Comment c
-inner join :_Discussion d
-  on d.FirstCommentID = c.CommentID",
+      from :_Comment c
+      inner join :_Discussion d
+        on d.FirstCommentID = c.CommentID",
 
 		// Set the last comment user.
 		"update :_Discussion d
-join :_Comment c
-  on d.LastCommentID = c.CommentID
-set d.LastCommentUserID = c.InsertUserID",
+      join :_Comment c
+        on d.LastCommentID = c.CommentID
+      set d.LastCommentUserID = c.InsertUserID",
 
 		// Set the category counts.
 		"update :_Category c set
-c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
+      c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 
 		// Add the FirstCommentID to the discussion table.
 		Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);

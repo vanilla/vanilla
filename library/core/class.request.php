@@ -541,7 +541,12 @@ class Gdn_Request {
     * @return string
     */
    public function WebRoot($WebRoot = NULL) {
-      return $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $WebRootFromConfig = Gdn::Config('Garden.WebRoot');
+      if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
+         $Path = str_replace($WebRootFromConfig,'',$Path);
+      }
+      return $Path;
    }
    
    /**

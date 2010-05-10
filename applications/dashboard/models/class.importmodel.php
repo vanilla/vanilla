@@ -284,7 +284,7 @@ class ImportModel extends Gdn_Model {
 			return $Header;
 
 		if(is_null($fpin)) {
-			if(!$this->ImportPath)
+			if(!$this->ImportPath || !file_exists($this->ImportPath))
 				return array();
 			$fpin = gzopen($this->ImportPath, 'rb');
 			$fpopened = TRUE;

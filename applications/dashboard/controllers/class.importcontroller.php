@@ -145,6 +145,9 @@ class ImportController extends DashboardController {
 			$this->View = 'Info';
 		}
 		
+		if(!file_exists($Imp->ImportPath))
+         $Imp->DeleteState();
+		
 		$this->SetData('Header', $Imp->GetImportHeader());
 		$this->SetData('ImportPath', $Imp->ImportPath);
 		$this->SetData('OriginalFilename', GetValue('OriginalFilename', $Imp->Data));

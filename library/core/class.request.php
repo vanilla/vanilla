@@ -543,8 +543,10 @@ class Gdn_Request {
    public function WebRoot($WebRoot = NULL) {
       $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
       $WebRootFromConfig = Gdn::Config('Garden.WebRoot');
+      $RemoveWebRootConfig = Gdn::Config('Garden.WebRoot.StripFromUrls');
       if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
-         $Path = str_replace($WebRootFromConfig,'',$Path);
+         if ($RemoveWebRootConfig)
+            $Path = str_replace($WebRootFromConfig,'',$Path);
       }
       return $Path;
    }

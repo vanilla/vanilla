@@ -316,6 +316,7 @@ class Gdn_Request {
          
          if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
             $this->RequestFolder(ltrim($Folder,'/'));
+            break;
          }
       }
    }

@@ -262,14 +262,18 @@ class Gdn {
    }
    
    /**
-    * Get the current request object
+    * Get or set the current request object
     *
-    * @return Gdn_Request
+    * @return mixed The new request or null to just get the request.
     */
-   public static function Request($NewRequest=NULL) {
+   public static function Request($NewRequest = NULL) {
       $Request = self::Factory(self::AliasRequest);
-      if (!is_null($NewRequest))
-         $Request->Import($NewRequest);
+      if (!is_null($NewRequest)) {
+			if(is_string($NewRequest))
+				$Request->WithURI($NewRequest);
+			elseif(is_object($NewRequest))
+				$Request->FromImport($NewRequest);
+		}
       
       return $Request;
    }

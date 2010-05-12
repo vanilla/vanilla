@@ -350,7 +350,7 @@ class Gdn_Request {
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      $Expression = '/^'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).'(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
+      $Expression = '/^(?:'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).')?(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
       if (preg_match($Expression, trim($this->_EnvironmentElement('URI'),'/'), $Match))
          $this->Path($Match[1]);
       else

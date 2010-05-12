@@ -355,6 +355,9 @@ class SettingsController extends DashboardController {
     */
    public function Registration($RedirectUrl = '') {
       $this->Permission('Garden.Registration.Manage');
+		$Foo = C('Garden.Registration.Manage', TRUE);
+		if(!C('Garden.Registration.Manage', TRUE))
+			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('dashboard/settings/registration');
       
       $this->AddJsFile('registration.js');

@@ -268,7 +268,7 @@ class Gdn_Request {
    protected function _LoadEnvironment() {
    
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
-      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.WebRoot.StripFromUrls', FALSE));
+      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
@@ -318,7 +318,6 @@ class Gdn_Request {
             $this->RequestFolder(ltrim($Folder,'/'));
          }
       }
-         
    }
    
    /**

@@ -1035,7 +1035,6 @@ class Gdn_Controller extends Gdn_Pluggable {
            Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
         }
       }
-
    }
 
    /**

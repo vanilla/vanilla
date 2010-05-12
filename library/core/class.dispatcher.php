@@ -131,11 +131,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
 
    /**
-    * Analyzes the supplied query string and decides how to dispatch the
-    * request.
+    * Analyzes the supplied query string and decides how to dispatch the request.
     */
-   public function Dispatch($Request=NULL) {
-   
+   public function Dispatch($Request = NULL) {
       if (Gdn::Config('Garden.UpdateMode', FALSE)) {
          if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
             // Updatemode, and this user is not root admin
@@ -143,8 +141,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          }
       }
    
-      if ($Request !== NULL && is_a($Request,'Gdn_Request'))
-         Gdn::Request()->FromImport($Request);
+      if ($Request !== NULL)
+         Gdn::Request($Request);
       
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest();
@@ -255,10 +253,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-         
             Gdn::Request()->WithURI(Gdn::Router()->GetDestination('Default404'));
             return $this->Dispatch();
-            
          }
       }
 

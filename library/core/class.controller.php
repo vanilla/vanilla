@@ -771,7 +771,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Make sure the database connection is closed before exiting.
          $Database = Gdn::Database();
          $Database->CloseConnection();
-         exit(json_encode($this->_Json));
+			$this->_Json['Data'] = utf8_encode($this->_Json['Data']);
+			$Result = json_encode($this->_Json);
+         exit($Result);
       } else {
          if ($this->StatusMessage != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');

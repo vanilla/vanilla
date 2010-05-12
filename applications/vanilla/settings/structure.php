@@ -141,35 +141,35 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows()
 if ($SQL->GetWhere('ActivityType', array('Name' => 'BookmarkComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0'));
 
+$PermissionModel = Gdn::PermissionModel();
+$PermissionModel->Database = $Database;
+$PermissionModel->SQL = $SQL;
+
+// Define some global vanilla permissions.
+$PermissionModel->Define(array(
+	'Vanilla.Settings.Manage',
+	'Vanilla.Categories.Manage',
+	'Vanilla.Spam.Manage'
+	));
+
+// Define some permissions for the Vanilla categories.
+$PermissionModel->Define(array(
+	'Vanilla.Discussions.View' => 1,
+	'Vanilla.Discussions.Add' => 1,
+	'Vanilla.Discussions.Edit' => 0,
+	'Vanilla.Discussions.Announce' => 0,
+	'Vanilla.Discussions.Sink' => 0,
+	'Vanilla.Discussions.Close' => 0,
+	'Vanilla.Discussions.Delete' => 0,
+	'Vanilla.Comments.Add' => 1,
+	'Vanilla.Comments.Edit' => 0,
+	'Vanilla.Comments.Delete' => 0),
+	'tinyint',
+	'Category',
+	'CategoryID'
+	);
+
 if ($Drop) {
-   $PermissionModel = Gdn::PermissionModel();
-   $PermissionModel->Database = $Database;
-   $PermissionModel->SQL = $SQL;
-   
-   // Define some global vanilla permissions.
-   $PermissionModel->Define(array(
-      'Vanilla.Settings.Manage',
-      'Vanilla.Categories.Manage',
-      'Vanilla.Spam.Manage'
-      ));
-   
-   // Define some permissions for the Vanilla categories.
-   $PermissionModel->Define(array(
-      'Vanilla.Discussions.View',
-      'Vanilla.Discussions.Add',
-      'Vanilla.Discussions.Edit',
-      'Vanilla.Discussions.Announce',
-      'Vanilla.Discussions.Sink',
-      'Vanilla.Discussions.Close',
-      'Vanilla.Discussions.Delete',
-      'Vanilla.Comments.Add',
-      'Vanilla.Comments.Edit',
-      'Vanilla.Comments.Delete'),
-      'tinyint',
-      'Category',
-      'CategoryID'
-      );
-   
    // Get the general category so we can assign permissions to it.
    $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
    
@@ -180,7 +180,7 @@ if ($Drop) {
       'JunctionColumn' => 'CategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
-      ));
+      ), TRUE);
    
    // Set the intial member permissions.
    $PermissionModel->Save(array(
@@ -191,7 +191,7 @@ if ($Drop) {
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1
-      ));
+      ), TRUE);
       
    // Set the initial administrator permissions.
    $PermissionModel->Save(array(
@@ -199,7 +199,7 @@ if ($Drop) {
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
-      ));
+      ), TRUE);
    
    $PermissionModel->Save(array(
       'RoleID' => 16,
@@ -216,7 +216,7 @@ if ($Drop) {
       'Vanilla.Comments.Add' => 1,
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
-      ));
+      ), TRUE);
    
    // Make sure that User.Permissions is blank so new permissions for users get applied.
    $SQL->Update('User', array('Permissions' => ''))->Put();
@@ -274,6 +274,31 @@ if (!$Construct->CaptureOnly) {
 	$SQL->Query("update GDN_Draft set Closed = '0' where Closed = '2'");
 	$SQL->Query("update GDN_Draft set Announce = '0' where Announce = '2'");
 	$SQL->Query("update GDN_Draft set Sink = '0' where Sink = '2'");
+
+	/*
+	    May 12th, 2010
+		 Added ability to disable category-level permissions. Update global permissions in case this option is in effect.
+	 */
+	$SQL->Query("update gdn_Permission p2
+		inner join gdn_Category c
+		 on c.CategoryID = p2.JunctionID
+			 and p2.JunctionTable = 'Category'
+		   and c.Name = 'General'
+		inner join gdn_Permission p
+		  on p.RoleID = p2.RoleID
+			 and p.JunctionTable is null
+		set
+			p.`Vanilla.Discussions.Add` = p2.`Vanilla.Discussions.Add`,
+			p.`Vanilla.Discussions.Edit` = p2.`Vanilla.Discussions.Edit`,
+			p.`Vanilla.Discussions.Announce` = p2.`Vanilla.Discussions.Announce`,
+			p.`Vanilla.Discussions.Sink` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.Close` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.Delete` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.View` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Add` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Edit` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Delete` = p2.`Vanilla.Discussions.Sink`
+		where p.RoleID <> 0;");
 }
 
 // This is the final structure of the discussion table after removed & updated columns

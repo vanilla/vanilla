@@ -29,6 +29,7 @@ $Configuration['Garden']['Locale']                              = 'en-CA';
 $Configuration['Garden']['Title']                               = 'Vanilla 2';
 $Configuration['Garden']['Domain']                              = '';
 $Configuration['Garden']['WebRoot']                             = FALSE;
+$Configuration['Garden']['WebRoot']['StripFromUrls']            = FALSE;
 $Configuration['Garden']['Debug']                               = FALSE;
 $Configuration['Garden']['RewriteUrls']                         = FALSE;
 $Configuration['Garden']['Session']['Length']                   = '15 minutes';

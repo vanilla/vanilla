@@ -98,19 +98,26 @@ class Gdn_Session {
     * @param mixed $Permission The permission (or array of permissions) to check.
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-    * @return boolean
+    * @param string $JunctionTable The name of the junction table for a junction permission.
+	 * @param in $JunctionID The ID of the junction permission.
+	 * * @return boolean
     */
-   public function CheckPermission($Permission, $JunctionID = '', $FullMatch = TRUE) {
+   public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User) && $this->User->Admin == '1')
          return TRUE;
       
       $Permissions = $this->GetPermissions();      
-      if (is_numeric($JunctionID) && $JunctionID > 0) {
+      if(is_numeric($JunctionID) && $JunctionID > 0 && !C('Garden.Permissions.Disabled'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
-               if (!$this->CheckPermission($PermissionName, $JunctionID))
-                  return FALSE;
+               if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
+						if(!$FullMatch)
+							return TRUE;
+					} else {
+						if($FullMatch)
+							return FALSE;
+					}
             }
             return TRUE;
          } else {

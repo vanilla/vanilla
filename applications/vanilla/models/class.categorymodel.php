@@ -114,7 +114,7 @@ class CategoryModel extends Gdn_Model {
          ->Select('c.ParentCategoryID, c.CategoryID, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
          ->From('Category c')
          ->BeginWhereGroup()
-         ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View')
+         ->Permission('Vanilla.Discussions.View', 'c', 'CategoryID')
          ->EndWhereGroup()
          ->OrWhere('AllowDiscussions', '0')
          ->OrderBy('Sort', 'asc');
@@ -142,7 +142,7 @@ class CategoryModel extends Gdn_Model {
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1');
          
-      $this->SQL->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
+      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'CategoryID');
 
       if (is_numeric($CategoryID) && $CategoryID > 0)
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
@@ -159,7 +159,7 @@ class CategoryModel extends Gdn_Model {
          ->Where('c.AllowDiscussions', '1')
          ->Where('c.UrlCode', $UrlCode);
          
-      $this->SQL->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
+      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'CategoryID');
          
       return $this->SQL
          ->Get()
@@ -323,7 +323,7 @@ class CategoryModel extends Gdn_Model {
          // Save the permissions
          if ($AllowDiscussions) {
             $PermissionModel = Gdn::PermissionModel();
-            $Permissions = $PermissionModel->PivotPermissions($FormPostValues['Permission'], array('JunctionID' => $CategoryID));
+            $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
             $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
          }
          

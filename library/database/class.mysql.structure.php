@@ -301,11 +301,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
       
       // 2. Alter the table storage engine
-      if (!is_null($this->_TableStorageEngine))
-      {
-         $EngineQuery = $AlterSqlPrefix.' ENGINE = '.$this->_TableStorageEngine;
-         if (!$this->Query($EngineQuery))
-            throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+      if(!is_null($this->_TableStorageEngine)) {
+			$CurrentEngine = $this->Database->Query("show table status where name = '".$this->_DatabasePrefix.$this->_TableName."'")->Value('Engine');
+
+			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
+				$EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
+				if (!$this->Query($EngineQuery))
+					throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+			}
       }
       
       // 3. Add new columns & modify existing ones

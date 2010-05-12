@@ -209,9 +209,10 @@ class SettingsController extends Gdn_Controller {
 				unset($CategoryID);
 			}
       }
-      // Get all of the currently selected role/permission combinations for this junction
-      $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
-      $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+		// Get all of the currently selected role/permission combinations for this junction.
+		$Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+		$Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+	
       $this->SetData('PermissionData', $Permissions, TRUE);
       
       $this->Render();      

@@ -184,7 +184,7 @@ class SettingsController extends DashboardController {
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Approve';
       $this->FireEvent('DefineAdminPermissions');
-      $this->Permission($this->RequiredAdminPermissions, '', FALSE);
+      $this->Permission($this->RequiredAdminPermissions, FALSE);
       $this->AddSideMenu('dashboard/settings');
 
       $UserModel = Gdn::UserModel();

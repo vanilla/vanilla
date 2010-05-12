@@ -1016,16 +1016,17 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
    
    /**
-    * Checks that the user has the specified permissions. If the user does not,
-    * they are redirected to the DefaultPermission route.
+    * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
     * @param mixed $Permission A permission or array of permission names required to access this resource.
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-    */
-   public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
+	 * @param string $JunctionTable The name of the junction table for a junction permission.
+	 * @param in $JunctionID The ID of the junction permission.
+	 */
+   public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       $Session = Gdn::Session();
 
       // TODO: Make this work with different delivery types.
-      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
+      if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid()) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {

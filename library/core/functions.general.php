@@ -977,7 +977,7 @@ if (!function_exists('SetValue')) {
 	 * @param mixed $Haystack The array or object to set.
 	 * @param mixed $Value The value to set.
 	 */
-	function SetValue($Key, $Collection, $Value) {
+	function SetValue($Key, &$Collection, $Value) {
 		if(is_array($Collection))
 			$Collection[$Key] = $Value;
 		elseif(is_object($Collection))

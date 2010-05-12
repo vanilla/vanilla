@@ -69,7 +69,6 @@ class RoleController extends DashboardController {
       $this->Render();
    }
    
-   //public $HasJunctionPermissionData;
    public function Edit($RoleID = FALSE) {
       if ($this->Head && $this->Head->Title() == '')
          $this->Head->Title(T('Edit Role'));
@@ -89,9 +88,6 @@ class RoleController extends DashboardController {
       
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
       
-      // Load all permissions based on enabled applications and plugins
-      //$this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
-
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.

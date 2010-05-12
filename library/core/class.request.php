@@ -39,17 +39,7 @@ class Gdn_Request {
    protected $_RequestArguments;          // Request data/parameters, either from superglobals or from a custom array of key/value pairs
 
    private function __construct() {
-      $this->_Environment = array();
-      $this->_RequestArguments       = array();
-      $this->_ParsedRequest     = array(
-            'Path'               => '',
-            'OutputFormat'       => 'default',
-            'Filename'           => 'default',
-            'WebRoot'            => '',
-            'Domain'             => ''
-      );
-
-      $this->_LoadEnvironment();
+      $this->Reset();
    }
 
    /**
@@ -279,7 +269,20 @@ class Gdn_Request {
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
-      $this->RequestURI(      isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI']);
+      
+      $SetURI = FALSE;
+      if (isset($_SERVER['REQUEST_URI'])) {
+         $this->RequestURI($_SERVER['REQUEST_URI']);
+         $SetURI = TRUE;
+      }
+      
+      if (isset($_SERVER['REDIRECT_URL'])) {
+         $this->RequestURI($_SERVER['REDIRECT_URL']);
+         $SetURI = TRUE;
+      }
+      
+      if (!$SetURI)
+         $this->RequestURI($_ENV['REQUEST_URI']);
 
       $PossibleScriptNames = array();
       if (isset($_SERVER['SCRIPT_NAME']))
@@ -303,8 +306,9 @@ class Gdn_Request {
          $Folder = substr($ScriptName,0,0-strlen($Script));
          $TrimFolder = trim($Folder,'/');
          $TrimURI = trim($this->RequestURI(),'/');
+         $TrimScript = trim($Script,'/');
          
-         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
+         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder) || stristr($TrimURI, $TrimScript)) {
             $this->RequestFolder(ltrim($Folder,'/'));
             $this->RequestScript($Script);
          }
@@ -454,6 +458,19 @@ class Gdn_Request {
       return $this->_ParsedRequestElement('Path', $Path);
    }
    
+   public function Reset() {
+      $this->_Environment        = array();
+      $this->_RequestArguments   = array();
+      $this->_ParsedRequest      = array(
+            'Path'               => '',
+            'OutputFormat'       => 'default',
+            'Filename'           => 'default',
+            'WebRoot'            => '',
+            'Domain'             => ''
+      );
+      $this->_LoadEnvironment();
+   }
+   
    /**
     * Attach an array of request arguments to the request.
     *
@@ -530,7 +547,7 @@ class Gdn_Request {
       $Path = trim($Path, '/');
       if ($PreserveTrailingSlash)
          $Path = $Path.'/';
-         
+      
       return $Path;
    }
    
@@ -543,6 +560,7 @@ class Gdn_Request {
    public function WebRoot($WebRoot = NULL) {
       $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
       $WebRootFromConfig = Gdn::Config('Garden.WebRoot');
+
       $RemoveWebRootConfig = Gdn::Config('Garden.WebRoot.StripFromUrls');
       if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
          if ($RemoveWebRootConfig)

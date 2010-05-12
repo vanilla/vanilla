@@ -392,7 +392,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
          }
       }
-
+   
       $Parts = explode('/', $this->Request);
       $Length = count($Parts);
       if ($Length == 1 || $FolderDepth <= 0) {

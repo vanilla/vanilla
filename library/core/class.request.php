@@ -280,10 +280,36 @@ class Gdn_Request {
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
       $this->RequestURI(      isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI']);
-      $this->RequestScript(   isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_ENV['SCRIPT_NAME']);
+
+      $PossibleScriptNames = array();
+      if (isset($_SERVER['SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_SERVER['SCRIPT_NAME'];
+
+      if (isset($_ENV['SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_ENV['SCRIPT_NAME'];
 
       if (PHP_SAPI === 'cgi' && isset($_ENV['SCRIPT_URL']))
-         $this->RequestScript($_ENV['SCRIPT_URL']);
+         $PossibleScriptNames[] = $_ENV['SCRIPT_URL'];
+      
+      if (isset($_SERVER['SCRIPT_FILENAME']))
+         $PossibleScriptNames[] = $_SERVER['SCRIPT_FILENAME'];
+         
+      if (isset($_SERVER['ORIG_SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
+      
+      foreach ($PossibleScriptNames as $ScriptName) {
+         
+         $Script = basename($ScriptName);
+         $Folder = substr($ScriptName,0,0-strlen($Script));
+         $TrimFolder = trim($Folder,'/');
+         $TrimURI = trim($this->RequestURI(),'/');
+         
+         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
+            $this->RequestFolder(ltrim($Folder,'/'));
+            $this->RequestScript($Script);
+         }
+      }
+         
    }
    
    /**
@@ -319,17 +345,6 @@ class Gdn_Request {
    protected function _ParseRequest() {
 
       $this->_Parsing = TRUE;
-
-      /**
-       * Resolve Request Folder
-       */
-
-      // Get the folder from the script name.
-      $Match = array();
-      $ScriptName = basename($this->_EnvironmentElement('Script'));
-      $Folder = substr($this->_EnvironmentElement('Script'),0,0-strlen($ScriptName));
-      $this->_EnvironmentElement('Folder', $Folder);
-      $this->_EnvironmentElement('Script', $ScriptName);
 
       /**
        * Resolve final request to send to dispatcher
@@ -526,7 +541,12 @@ class Gdn_Request {
     * @return string
     */
    public function WebRoot($WebRoot = NULL) {
-      return $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $WebRootFromConfig = Gdn::Config('Garden.WebRoot');
+      if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
+         $Path = str_replace($WebRootFromConfig,'',$Path);
+      }
+      return $Path;
    }
    
    /**

@@ -266,6 +266,9 @@ class Gdn_Request {
     * @return void
     */
    protected function _LoadEnvironment() {
+   
+      $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
+      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.WebRoot.StripFromUrls', FALSE));
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
@@ -300,17 +303,19 @@ class Gdn_Request {
       if (isset($_SERVER['ORIG_SCRIPT_NAME']))
          $PossibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
       
+      $this->RequestFolder('');
       foreach ($PossibleScriptNames as $ScriptName) {
          
          $Script = basename($ScriptName);
+         $this->RequestScript($Script);
+         
          $Folder = substr($ScriptName,0,0-strlen($Script));
          $TrimFolder = trim($Folder,'/');
          $TrimURI = trim($this->RequestURI(),'/');
          $TrimScript = trim($Script,'/');
          
-         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder) || stristr($TrimURI, $TrimScript)) {
+         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
             $this->RequestFolder(ltrim($Folder,'/'));
-            $this->RequestScript($Script);
          }
       }
          
@@ -378,7 +383,7 @@ class Gdn_Request {
        */
 
       // Attempt to get the webroot from the configuration array
-      $WebRoot = Gdn::Config('Garden.WebRoot');
+      $WebRoot = $this->_EnvironmentElement('ConfigWebRoot');
 
       // Attempt to get the webroot from the server
       if ($WebRoot === FALSE || $WebRoot == '') {
@@ -559,9 +564,9 @@ class Gdn_Request {
     */
    public function WebRoot($WebRoot = NULL) {
       $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
-      $WebRootFromConfig = Gdn::Config('Garden.WebRoot');
+      $WebRootFromConfig = $this->_EnvironmentElement('ConfigWebRoot');
 
-      $RemoveWebRootConfig = Gdn::Config('Garden.WebRoot.StripFromUrls');
+      $RemoveWebRootConfig = $this->_EnvironmentElement('ConfigStripUrls');
       if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
          if ($RemoveWebRootConfig)
             $Path = str_replace($WebRootFromConfig,'',$Path);

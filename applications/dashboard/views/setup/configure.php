@@ -81,7 +81,7 @@ echo $this->Form->Open();
       </li>
    </ul>
    <div class="Button">
-      <?php echo $this->Form->Button('Continue →'); ?>
+      <?php echo $this->Form->Button('Continue &rarr;'); ?>
    </div>
 </div>
 <?php

@@ -6,7 +6,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
    <div id="Frame">
       <div id="Head">
-			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.T('← Visit Site').'</span>', '/'); ?></h1>
+			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.T('Visit Site', '&larr; Visit Site').'</span>', '/'); ?></h1>
          <div class="User">
             <?php
 			      $Session = Gdn::Session();

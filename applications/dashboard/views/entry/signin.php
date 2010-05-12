@@ -27,7 +27,7 @@
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Sign In →');
+            echo $this->Form->Button('Sign In &rarr;');
             echo '<span>'.T('or').'</span>';
             $Target = GetIncomingValue('Target', '');
             if ($Target != '')
@@ -55,7 +55,7 @@
       </li>
       <li>
          <?php
-            echo $this->Form->Button('Request a new password →');
+            echo $this->Form->Button('Request a new password &rarr;');
          ?>
       </li>
    </ul>

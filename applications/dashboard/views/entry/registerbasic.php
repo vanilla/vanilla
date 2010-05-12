@@ -50,7 +50,7 @@
          ?>
       </li>
       <li>
-         <?php echo $this->Form->Close('Sign Up →'); ?>
+         <?php echo $this->Form->Close('Sign Up &rarr;'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

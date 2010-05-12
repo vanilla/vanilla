@@ -56,7 +56,7 @@
          ?>
       </li>
       <li>
-         <?php echo $this->Form->Button('Sign Up →'); ?>
+         <?php echo $this->Form->Button('Sign Up &rarr;'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

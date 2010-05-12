@@ -33,7 +33,8 @@ class Gdn_Router {
       //return $this->Routes[$Route];
 
       return array_merge($this->Routes[$Route],array(
-         'TypeLocale'   => T($this->RouteTypes[$this->Routes[$Route]['Type']])
+         'TypeLocale'         => T($this->RouteTypes[$this->Routes[$Route]['Type']]),
+         'FinalDestination'   => $this->Routes[$Route]['Destination']
       ));
 
    }

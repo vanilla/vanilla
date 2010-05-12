@@ -255,7 +255,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-         
+            
             Gdn::Request()->WithURI(Gdn::Router()->GetDestination('Default404'));
             return $this->Dispatch();
             
@@ -348,7 +348,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethodArgs = array();
       
       $this->Request = Gdn::Request()->Path();
-
+      
       switch (Gdn::Request()->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
@@ -396,7 +396,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
          }
       }
-
+   
       $Parts = explode('/', $this->Request);
       $Length = count($Parts);
       if ($Length == 1 || $FolderDepth <= 0) {

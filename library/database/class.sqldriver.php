@@ -1439,16 +1439,17 @@ abstract class Gdn_SQLDriver {
    }
    
    /**
-    * Joins the query to a permission junction table and limits the results
-    * accordingly.
+    * Joins the query to a permission junction table and limits the results accordingly.
     *
-    * @param string $JunctionTable The table to join to (ie. Category)
-    * @param string $JunctionColumn The primary key column name of $JunctionTable (ie. CategoryID).
-    * @param mixed $Permissions The permission name (or array of names) to use when limiting the query.
+    * @param mixed $Permission The permission name (or array of names) to use when limiting the query.
+    * @param string $ForeignAlias The alias of the table to join to (ie. Category).
+    * @param string $ForeignColumn The primary key column name of $JunctionTable (ie. CategoryID).
+	 * @param string $JunctionTable
+	 * @param string $JunctionColumn
     */
-   public function Permission($JunctionTableAlias, $JunctionColumn, $Permissions) {
+   public function Permission($Permission, $ForeignAlias, $ForeignColumn, $JunctionTable = '', $JunctionColumn = '') {
       $PermissionModel = Gdn::PermissionModel();
-      $PermissionModel->SQLPermission($this, $JunctionTableAlias, $JunctionColumn, $Permissions);
+      $PermissionModel->SQLPermission($this, $Permission, $ForeignAlias, $ForeignColumn, $JunctionTable, $JunctionColumn);
   
       return $this;
    }

@@ -199,7 +199,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Sql .= ';';
 
       $Result = $this->Query($Sql);
-      $this->_Reset();
+      $this->Reset();
       
       return $Result;
    }
@@ -322,11 +322,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // This column name is not in the existing column collection, so add the column
             if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
                throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         } else if ($Column->Type != $ExistingColumns[$ColumnName]->Type) {
+         } else {
+				$ExistingColumn = $ExistingColumns[$ColumnName];	
+				if ($Column->Type != $ExistingColumn->Type || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
 
-            // The existing & new column types do not match, so modify the column
-            if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-               throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+					// The existing & new column types do not match, so modify the column
+					if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+						throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+				}
          }
       }
       
@@ -365,7 +368,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
       }
 
-      $this->_Reset();
+      $this->Reset();
       return TRUE;
    }
 
@@ -376,7 +379,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
          throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

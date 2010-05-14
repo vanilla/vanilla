@@ -138,10 +138,15 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       foreach ($DataSet->Result() as $Field) {
          $Type = $Field->Type;
          $Length = '';
+			$Precision = '';
          $Parentheses = strpos($Type, '(');
          if ($Parentheses !== FALSE) {
-            $Length = substr($Type, $Parentheses + 1, -1);
-            $Type = substr($Type, 0, $Parentheses);
+				$LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
+				$Length = trim($LengthParts[0]);
+				if(count($LengthParts) > 1)
+					$Precision = trim($LengthParts[1]);
+				
+				$Type = substr($Type, 0, $Parentheses);
          }
          $Enum = '';
          if ($Type == 'enum') {
@@ -157,7 +162,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Object->AllowNull = ($Field->Null == 'YES');
          $Object->Default = $Field->Default;
          $Object->Length = $Length;
+			$Object->Precision = $Precision;
          $Object->Enum = $Enum;
+			$Object->KeyType = NULL; // give placeholder so it can be defined again.
          $Object->AutoIncrement = strpos($Field->Extra, 'auto_increment') === FALSE ? FALSE : TRUE;
          $Schema[$Field->Field] = $Object;
       }

@@ -10,22 +10,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class Gdn_ErrorException extends ErrorException {
 
-   private $Context;
-   private $Backtrace;
+   protected $_Context;
    
    public function __construct($Message, $ErrorNumber, $File, $Line, $Context, $Backtrace) {
       parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
-      $this->Context = $Context;
-      $this->Backtrace = $Backtrace;
+      $this->_Context = $Context;
    }
    
    public function getContext() {
-      return $this->Context;
+      return $this->_Context;
    }
    
-   public function getBacktrace() {
-      return $this->Backtrace;
-   }
+//   public function getTrace() {
+//      return $this->Backtrace;
+//   }
 
 }
 
@@ -41,21 +39,19 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
 /**
  * A custom error handler that displays much more, very useful information when
  * errors are encountered in Garden.
- *
- * @param int The level of the error raised.
- * @param string The error message.
- * @param string The filename that the error was raised in.
- * @param string The line number the error was raised at.
- * @param string An array of every variable that existed in the scope the error was triggered in.
+ *	@param Exception $Exception The exception that was thrown.
  */
-function Gdn_ExceptionHandler($ErrorException) {
+function Gdn_ExceptionHandler($Exception) {
    try {
-      $ErrorNumber = $ErrorException->getCode();
-      $Message = $ErrorException->getMessage();
-      $File = $ErrorException->getFile();
-      $Line = $ErrorException->getLine();
-      $Arguments = $ErrorException->getContext();
-      $Backtrace = $ErrorException->getBacktrace();
+      $ErrorNumber = $Exception->getCode();
+      $Message = $Exception->getMessage();
+      $File = $Exception->getFile();
+      $Line = $Exception->getLine();
+		if(method_exists($Exception, 'getContext'))
+			$Arguments = $Exception->getContext();
+		else
+			$Arguments = '';
+      $Backtrace = $Exception->getTrace();
       
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();

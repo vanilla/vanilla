@@ -472,8 +472,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns a platform-specific query to fetch table names.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->Database->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchTableSql'), E_USER_ERROR);
@@ -481,8 +483,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns an array containing table names in the database.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTables($LimitToPrefix = FALSE) {
       $Sql = $this->FetchTableSql($LimitToPrefix);

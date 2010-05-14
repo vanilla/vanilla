@@ -107,13 +107,18 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
    /**
     * Returns a platform-specific query to fetch table names.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->Database->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
       $Sql = "show tables";
-      if ($LimitToPrefix !== FALSE && $this->Database->DatabasePrefix != '')
+
+      if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '')
          $Sql .= " like ".$this->Connection()->quote($this->Database->DatabasePrefix.'%');
+		elseif (is_string($LimitToPrefix) && $LimitToPrefix)
+			$Sql .= " like ".$this->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
 
       return $Sql;
    }

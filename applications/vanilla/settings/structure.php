@@ -228,63 +228,65 @@ Apr 26th, 2010
 Removed FirstComment from GDN_Discussion and moved it into the discussion table.
 */
 if (!$Construct->CaptureOnly) {
-	$SQL->Query('update GDN_Discussion, GDN_Comment
-	set GDN_Discussion.Body = GDN_Comment.Body,
-		GDN_Discussion.Format = GDN_Comment.Format
-	where GDN_Discussion.FirstCommentID = GDN_Comment.CommentID');
+	$Prefix = $SQL->Database->DatabasePrefix;
+
+	$SQL->Query("update {$Prefix}Discussion, {$Prefix}Comment
+	set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
+		{$Prefix}Discussion.Format = {$Prefix}Comment.Format
+	where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
 
 	// Update lastcommentid & firstcommentid
-	$SQL->Query('update GDN_Discussion set LastCommentID = null where LastCommentID = FirstCommentID');
+	$SQL->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
 	
-	$SQL->Query('delete GDN_Comment
-	from GDN_Comment inner join GDN_Discussion
-	where GDN_Comment.CommentID = GDN_Discussion.FirstCommentID');
+	$SQL->Query("delete {$Prefix}Comment
+	from {$Prefix}Comment inner join {$Prefix}Discussion
+	where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
 	
-	$SQL->Query('update GDN_Discussion d
-	inner join GDN_Comment c
+	$SQL->Query("update {$Prefix}Discussion d
+	inner join {$Prefix}Comment c
 		on c.DiscussionID = d.DiscussionID
 	inner join (
 		select max(c2.CommentID) as CommentID
-		from GDN_Comment c2
+		from {$Prefix}Comment c2
 		group by c2.DiscussionID
 	) c2
 	on c.CommentID = c2.CommentID
 	set d.LastCommentID = c.CommentID,
 		d.LastCommentUserID = c.InsertUserID
-	where d.LastCommentUserID is null');
+	where d.LastCommentUserID is null");
 	
 	/*
 	  	Apr 26th, 2010
 	  	Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
 	  	For some reason mysql makes 0's "2" during this change. Change them back to "0".
 	*/
-	$SQL->Query("update GDN_Category set AllowDiscussions = '0' where AllowDiscussions = '2'");
+	$SQL->Query("update {$Prefix}Category set AllowDiscussions = '0' where AllowDiscussions = '2'");
 
-	$SQL->Query("update GDN_Discussion set Closed = '0' where Closed = '2'");
-	$SQL->Query("update GDN_Discussion set Announce = '0' where Announce = '2'");
-	$SQL->Query("update GDN_Discussion set Sink = '0' where Sink = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Closed = '0' where Closed = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Announce = '0' where Announce = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Sink = '0' where Sink = '2'");
 
-	$SQL->Query("update GDN_UserDiscussion set Dismissed = '0' where Dismissed = '2'");
-	$SQL->Query("update GDN_UserDiscussion set Dismissed = '0' where Dismissed is null");
-	$SQL->Query("update GDN_UserDiscussion set Bookmarked = '0' where Bookmarked = '2'");
-	$SQL->Query("update GDN_UserDiscussion set Bookmarked = '0' where Bookmarked is null");
+	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed = '2'");
+	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed is null");
+	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked = '2'");
+	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked is null");
 
-	$SQL->Query("update GDN_Comment set Flag = '0' where Flag = '2'");
+	$SQL->Query("update {$Prefix}Comment set Flag = '0' where Flag = '2'");
 
-	$SQL->Query("update GDN_Draft set Closed = '0' where Closed = '2'");
-	$SQL->Query("update GDN_Draft set Announce = '0' where Announce = '2'");
-	$SQL->Query("update GDN_Draft set Sink = '0' where Sink = '2'");
+	$SQL->Query("update {$Prefix}Draft set Closed = '0' where Closed = '2'");
+	$SQL->Query("update {$Prefix}Draft set Announce = '0' where Announce = '2'");
+	$SQL->Query("update {$Prefix}Draft set Sink = '0' where Sink = '2'");
 
 	/*
 	    May 12th, 2010
 		 Added ability to disable category-level permissions. Update global permissions in case this option is in effect.
 	 */
-	$SQL->Query("update gdn_Permission p2
-		inner join gdn_Category c
+	$SQL->Query("update {$Prefix}Permission p2
+		inner join {$Prefix}Category c
 		 on c.CategoryID = p2.JunctionID
 			 and p2.JunctionTable = 'Category'
 		   and c.Name = 'General'
-		inner join gdn_Permission p
+		inner join {$Prefix}Permission p
 		  on p.RoleID = p2.RoleID
 			 and p.JunctionTable is null
 		set

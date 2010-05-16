@@ -268,14 +268,17 @@ class ImportModel extends Gdn_Model {
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
-   		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Role', 'UserAuthentication',
+   		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
    		'UserConversation', 'UserDiscussion', 'UserRole');
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
 			$Table = $Tables[$i];
-			$Sql = "truncate table :_$Table";
+			if($Table == 'Permission')
+				$Sql = "delete from :_$Table where RoleID <> 0";
+			else
+				$Sql = "truncate table :_$Table";
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
 				// The step's taken too long. Save the state and return.

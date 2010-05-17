@@ -47,17 +47,17 @@ class DashboardHooks implements Gdn_IPlugin {
 
       $Menu->AddItem('Site Settings', T('Site Settings'));
       $Menu->AddLink('Site Settings', T('General'), 'dashboard/settings/configure', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
       $Menu->AddLink('Site Settings', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
+      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
       $Menu->AddLink('Site Settings', T('Import'), 'dashboard/import', 'Garden.Import');
 		
       $Menu->AddItem('Add-ons', T('Add-ons'));
-      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
-      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
       $Menu->AddLink('Add-ons', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
+      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
 
-      $Menu->AddItem('Users', T('Users'));
-      $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+		$Menu->AddItem('Users', T('Users'));
+		$Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
       $Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
       $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
       if (Gdn::Config('Garden.Registration.Method') == 'Approval')

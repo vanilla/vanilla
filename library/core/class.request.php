@@ -39,17 +39,7 @@ class Gdn_Request {
    protected $_RequestArguments;          // Request data/parameters, either from superglobals or from a custom array of key/value pairs
 
    private function __construct() {
-      $this->_Environment = array();
-      $this->_RequestArguments       = array();
-      $this->_ParsedRequest     = array(
-            'Path'               => '',
-            'OutputFormat'       => 'default',
-            'Filename'           => 'default',
-            'WebRoot'            => '',
-            'Domain'             => ''
-      );
-
-      $this->_LoadEnvironment();
+      $this->Reset();
    }
 
    /**
@@ -97,8 +87,7 @@ class Gdn_Request {
     */
    protected function _EnvironmentElement($Key, $Value=NULL) {
       $Key = strtoupper($Key);
-      if ($Value !== NULL)
-      {
+      if ($Value !== NULL) {
          $this->_HaveParsedRequest = FALSE;
          
          switch ($Key) {
@@ -276,14 +265,59 @@ class Gdn_Request {
     * @return void
     */
    protected function _LoadEnvironment() {
+   
+      $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
+      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
-      $this->RequestURI(      isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_ENV['REQUEST_URI']);
-      $this->RequestScript(   isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_ENV['SCRIPT_NAME']);
+      
+      $SetURI = FALSE;
+      if (isset($_SERVER['REQUEST_URI'])) {
+         $this->RequestURI($_SERVER['REQUEST_URI']);
+         $SetURI = TRUE;
+      }
+      
+      if (isset($_SERVER['REDIRECT_URL'])) {
+         $this->RequestURI($_SERVER['REDIRECT_URL']);
+         $SetURI = TRUE;
+      }
+      
+      if (!$SetURI)
+         $this->RequestURI($_ENV['REQUEST_URI']);
+
+      $PossibleScriptNames = array();
+      if (isset($_SERVER['SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_SERVER['SCRIPT_NAME'];
+
+      if (isset($_ENV['SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_ENV['SCRIPT_NAME'];
 
       if (PHP_SAPI === 'cgi' && isset($_ENV['SCRIPT_URL']))
-         $this->RequestScript($_ENV['SCRIPT_URL']);
+         $PossibleScriptNames[] = $_ENV['SCRIPT_URL'];
+      
+      if (isset($_SERVER['SCRIPT_FILENAME']))
+         $PossibleScriptNames[] = $_SERVER['SCRIPT_FILENAME'];
+         
+      if (isset($_SERVER['ORIG_SCRIPT_NAME']))
+         $PossibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
+      
+      $this->RequestFolder('');
+      foreach ($PossibleScriptNames as $ScriptName) {
+         
+         $Script = basename($ScriptName);
+         $this->RequestScript($Script);
+         
+         $Folder = substr($ScriptName,0,0-strlen($Script));
+         $TrimFolder = trim($Folder,'/');
+         $TrimURI = trim($this->RequestURI(),'/');
+         $TrimScript = trim($Script,'/');
+         
+         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
+            $this->RequestFolder(ltrim($Folder,'/'));
+            break;
+         }
+      }
    }
    
    /**
@@ -321,22 +355,11 @@ class Gdn_Request {
       $this->_Parsing = TRUE;
 
       /**
-       * Resolve Request Folder
-       */
-
-      // Get the folder from the script name.
-      $Match = array();
-      $ScriptName = basename($this->_EnvironmentElement('Script'));
-      $Folder = substr($this->_EnvironmentElement('Script'),0,0-strlen($ScriptName));
-      $this->_EnvironmentElement('Folder', $Folder);
-      $this->_EnvironmentElement('Script', $ScriptName);
-
-      /**
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      $Expression = '/^'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).'(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
-      if (preg_match($Expression, trim($this->_EnvironmentElement('URI'),'/'), $Match))
+      $Expression = '/^(?:\/?'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).')?(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
+      if (preg_match($Expression, $this->_EnvironmentElement('URI'), $Match))
          $this->Path($Match[1]);
       else
          $this->Path('');
@@ -359,7 +382,7 @@ class Gdn_Request {
        */
 
       // Attempt to get the webroot from the configuration array
-      $WebRoot = Gdn::Config('Garden.WebRoot');
+      $WebRoot = $this->_EnvironmentElement('ConfigWebRoot');
 
       // Attempt to get the webroot from the server
       if ($WebRoot === FALSE || $WebRoot == '') {
@@ -439,6 +462,19 @@ class Gdn_Request {
       return $this->_ParsedRequestElement('Path', $Path);
    }
    
+   public function Reset() {
+      $this->_Environment        = array();
+      $this->_RequestArguments   = array();
+      $this->_ParsedRequest      = array(
+            'Path'               => '',
+            'OutputFormat'       => 'default',
+            'Filename'           => 'default',
+            'WebRoot'            => '',
+            'Domain'             => ''
+      );
+      $this->_LoadEnvironment();
+   }
+   
    /**
     * Attach an array of request arguments to the request.
     *
@@ -515,7 +551,7 @@ class Gdn_Request {
       $Path = trim($Path, '/');
       if ($PreserveTrailingSlash)
          $Path = $Path.'/';
-         
+      
       return $Path;
    }
    
@@ -526,7 +562,15 @@ class Gdn_Request {
     * @return string
     */
    public function WebRoot($WebRoot = NULL) {
-      return $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $WebRootFromConfig = $this->_EnvironmentElement('ConfigWebRoot');
+
+      $RemoveWebRootConfig = $this->_EnvironmentElement('ConfigStripUrls');
+      if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
+         if ($RemoveWebRootConfig)
+            $Path = str_replace($WebRootFromConfig,'',$Path);
+      }
+      return $Path;
    }
    
    /**

@@ -118,6 +118,9 @@
             <li><strong>PHP Version:</strong> <?php echo PHP_VERSION ?></li>
             <li><strong>Operating System:</strong> <?php echo PHP_OS ?></li>
             <?php
+               if (array_key_exists('SERVER_SOFTWARE', $_SERVER))
+                  echo '<li><strong>Server Software:</strong> ',$_SERVER['SERVER_SOFTWARE'],"</li>\n";
+            
                if (array_key_exists('HTTP_REFERER', $_SERVER))
                   echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
       

@@ -199,7 +199,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Sql .= ';';
 
       $Result = $this->Query($Sql);
-      $this->_Reset();
+      $this->Reset();
       
       return $Result;
    }
@@ -301,11 +301,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
       
       // 2. Alter the table storage engine
-      if (!is_null($this->_TableStorageEngine))
-      {
-         $EngineQuery = $AlterSqlPrefix.' ENGINE = '.$this->_TableStorageEngine;
-         if (!$this->Query($EngineQuery))
-            throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+      if(!is_null($this->_TableStorageEngine)) {
+			$CurrentEngine = $this->Database->Query("show table status where name = '".$this->_DatabasePrefix.$this->_TableName."'")->Value('Engine');
+
+			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
+				$EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
+				if (!$this->Query($EngineQuery))
+					throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+			}
       }
       
       // 3. Add new columns & modify existing ones
@@ -319,11 +322,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // This column name is not in the existing column collection, so add the column
             if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
                throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
-         } else if ($Column->Type != $ExistingColumns[$ColumnName]->Type) {
+         } else {
+				$ExistingColumn = $ExistingColumns[$ColumnName];	
+				if ($Column->Type != $ExistingColumn->Type || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
 
-            // The existing & new column types do not match, so modify the column
-            if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-               throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+					// The existing & new column types do not match, so modify the column
+					if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+						throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+				}
          }
       }
       
@@ -362,7 +368,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
       }
 
-      $this->_Reset();
+      $this->Reset();
       return TRUE;
    }
 
@@ -373,7 +379,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'text', 'decimal', 'float', 'double', 'enum')))
          throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

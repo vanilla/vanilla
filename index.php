@@ -16,8 +16,8 @@ ini_set('track_errors', 1);
 ob_start();
 
 // 1. Define the constants we need to get going.
-define('APPLICATION', 'Garden');
-define('APPLICATION_VERSION', '1.0');
+define('APPLICATION', 'Vanilla');
+define('APPLICATION_VERSION', '2.0 rc1');
 
 define('DS', DIRECTORY_SEPARATOR);
 define('PATH_ROOT', dirname(__FILE__));

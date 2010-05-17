@@ -205,7 +205,7 @@ class SettingsController extends DashboardController {
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Approve';
       $this->FireEvent('DefineAdminPermissions');
-      $this->Permission($this->RequiredAdminPermissions, '', FALSE);
+      $this->Permission($this->RequiredAdminPermissions, FALSE);
       $this->AddSideMenu('dashboard/settings');
 
       $UserModel = Gdn::UserModel();
@@ -370,6 +370,9 @@ class SettingsController extends DashboardController {
     */
    public function Registration($RedirectUrl = '') {
       $this->Permission('Garden.Registration.Manage');
+		$Foo = C('Garden.Registration.Manage', TRUE);
+		if(!C('Garden.Registration.Manage', TRUE))
+			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('dashboard/settings/registration');
       
       $this->AddJsFile('registration.js');

@@ -94,7 +94,7 @@ abstract class Gdn_DatabaseStructure {
       
       $this->DatabasePrefix($this->Database->DatabasePrefix);
       
-      $this->_Reset();
+      $this->Reset();
    }
    
    protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
@@ -185,6 +185,35 @@ abstract class Gdn_DatabaseStructure {
       return $this;
    }
 
+	/** Return the definition string for a column.
+	 * @param mixed $Column The column to get the type string from.
+	 *  - <b>object</b>: The column as returned by the database schema. The properties looked at are Type, Length, and Precision.
+	 *  - <b>string</b<: The name of the column currently in this structure.
+	 * * @return string The type definition string.
+	 */
+	public function ColumnTypeString($Column) {
+		if(is_string($Column))
+			$Column = $this->_Columns[$Column];
+		
+		$Type = GetValue('Type', $Column);
+		$Length = GetValue('Length', $Column);
+		$Precision = GetValue('Precision', $Column);
+
+		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'int', 'float', 'double')))
+			$Length = NULL;
+
+		if($Type && $Length && $Precision)
+			$Result = "$Type($Length, $Precision)";
+		elseif($Type && $Length)
+			$Result = "$Type($Length)";
+		elseif($Type)
+			$Result = $Type;
+		else
+			$Result = 'int';
+
+		return $Result;
+	}
+
    /**
     * Gets and/or sets the database prefix.
     *
@@ -217,6 +246,20 @@ abstract class Gdn_DatabaseStructure {
    public function Engine($Engine, $CheckAvailability=TRUE) {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
    }
+
+	/** Load the schema for this table from the database.
+	 * @param string $TableName The name of the table to get or blank to get the schema for the current table.
+	 * @return Gdn_DatabaseStructure $this
+	 */
+	public function Get($TableName = '') {
+		if($TableName)
+			$this->Table($TableName);
+
+		$Columns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+		$this->_Columns = $Columns;
+
+		return $this;
+	}
 
    /**
     * Defines a primary key column on a table.
@@ -319,7 +362,10 @@ abstract class Gdn_DatabaseStructure {
     * @param string $Name The name of the table.
     * @param string $CharacterEncoding The default character encoding to specify for this table.
     */
-   public function Table($Name, $CharacterEncoding = '') {
+   public function Table($Name = '', $CharacterEncoding = '') {
+		if(!$Name)
+			return $this->_TableName;
+		
       $this->_TableName = $Name;
       if ($CharacterEncoding == '')
          $CharacterEncoding = Gdn::Config('Database.CharacterEncoding', '');
@@ -356,13 +402,15 @@ abstract class Gdn_DatabaseStructure {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Modify'), E_USER_ERROR);
    }
 
-   /**
-    * @todo Undocumented method.
+   /** Reset the internal state of this object so that it can be reused.
+    * @return Gdn_DatabaseStructure $this
     */
-   protected function _Reset() {
+   public function Reset() {
       $this->_CharacterEncoding = '';
       $this->_Columns = array();
       $this->_TableName = '';
       $this->_TableStorageEngine = NULL;
+
+		return $this;
    }
 }

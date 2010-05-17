@@ -14,6 +14,8 @@ jQuery(document).ready(function($) {
 				}
 			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if(textStatus == "timeout")
+					return;
 				// Remove any old popups
 				$('.Popup').remove();
 				// Add new popup with error

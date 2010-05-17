@@ -9,8 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Object for importing files created with ExportModel.
- * @see ImportModel
+ * Object for importing files created with VanillaPorter.
  */
 class ImportModel extends Gdn_Model {
 	const COMMENT = '//';
@@ -31,42 +30,30 @@ class ImportModel extends Gdn_Model {
 	public $MaxStepTime = 3;
 
 	protected $_MergeSteps = array(
-	1 => 'SplitImportFile',
-	2 => 'DefineTables',
-	3 => 'LoadTables',
-	4 => 'DefineIndexes',
-	5 => 'AssignUserIDs',
-	6 => 'AssignOtherIDs',
-	7 => 'InsertTables',
-	8 => 'UpdateCounts'
+   	1 => 'ProcessImportFile',
+   	2 => 'DefineTables',
+   	3 => 'LoadTables',
+   	4 => 'DefineIndexes',
+   	5 => 'AssignUserIDs',
+   	6 => 'AssignOtherIDs',
+   	7 => 'InsertTables',
+   	8 => 'UpdateCounts'
 	);
 
 	protected $_OverwriteSteps = array(
-	1 => 'SplitImportFile',
-	2 => 'DefineTables',
-	3 => 'LoadUserTable',
-	4 => 'AuthenticateAdminUser',
-	5 => 'InsertUserTable',
-	6 => 'LoadTables',
-	7 => 'DeleteOverwriteTables',
-	8 => 'InsertTables',
-	9 => 'UpdateCounts'
-	);
-
-	public $Structures = array(
-	'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-	'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-	'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-	'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
-	'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
-	'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
-	'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-	'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
-	'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
-	);
+   	1 => 'ProcessImportFile',
+   	2 => 'DefineTables',
+   	3 => 'LoadUserTable',
+   	4 => 'AuthenticateAdminUser',
+   	5 => 'InsertUserTable',
+   	6 => 'LoadTables',
+   	7 => 'DeleteOverwriteTables',
+   	8 => 'InsertTables',
+   	9 => 'UpdateCounts'
+   );
 
 	/**
-	 * @var Gdn_Timer
+	 * @var Gdn_Timer Used for timing various long running methods to break them up into pieces.
 	 */
 	public $Timer = NULL;
 
@@ -78,19 +65,19 @@ class ImportModel extends Gdn_Model {
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
 		$Sql = "update :_zUser i
-join :_User u
-  on i.Email = u.Email
-set i._NewID = u.UserID, i._Action = 'Update'";
+         join :_User u
+           on i.Email = u.Email
+         set i._NewID = u.UserID, i._Action = 'Update'";
 		$this->Query($Sql);
 
 		// Assign user IDs of name matches.
 		$Sql = "update :_zUser i
-join :_User u
-	on i.Name = u.Name
-left join :_zUser i2
-	on i2._NewID = u.UserID /* make sure no duplicates */
-set i._NewID = u.UserID, i._Action = 'Update'
-where i._NewID is null and i2.UserID is null";
+         join :_User u
+         	on i.Name = u.Name
+         left join :_zUser i2
+         	on i2._NewID = u.UserID /* make sure no duplicates */
+         set i._NewID = u.UserID, i._Action = 'Update'
+         where i._NewID is null and i2.UserID is null";
 		$this->Query($Sql);
 
 		// Get the max UserID so we can increment new users.
@@ -107,18 +94,18 @@ where i._NewID is null and i2.UserID is null";
 
 		// Update the users to insert.
 		$Sql = "update :_zUser i
-left join :_User u
-	on u.Name = i.Name /* make sure no duplicates */
-set i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
-where i._NewID is null
-	and u.UserID is null";
+         left join :_User u
+         	on u.Name = i.Name /* make sure no duplicates */
+         set i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
+         where i._NewID is null
+         	and u.UserID is null";
 		$this->Query($Sql);
 
-		// There still might be users that have an overlapping usernames which must be changed.
-		// Append a random suffic to the new username.
+		// There still might be users that have overlapping usernames which must be changed.
+		// Append a random suffix to the new username.
 		$Sql = "update :_zUser i
-set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
-where i._NewID is null";
+         set i.Name = concat(i.Name, convert(floor(1000 + rand() * 8999), char)), i._NewID = i.UserID + $IDInc, i._Action = 'Insert'
+         where i._NewID is null";
 		$this->Query($Sql);
 
 		return TRUE;
@@ -134,7 +121,7 @@ where i._NewID is null";
 	}
 
 	protected function _AssignIDs($TableName, $PrimaryKey = NULL, $SecondaryKey = NULL) {
-		if(!array_key_exists($TableName, $this->Data['Tables']))
+		if(!array_key_exists($TableName, $this->Tables()))
 			return;
 
 		if(!$PrimaryKey)
@@ -143,9 +130,9 @@ where i._NewID is null";
 		// Assign existing IDs.
 		if($SecondaryKey) {
 			$Sql = "update :_z$TableName i
-join :_$TableName t
-  on t.$SecondaryKey = i.$SecondaryKey
-set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
+            join :_$TableName t
+              on t.$SecondaryKey = i.$SecondaryKey
+            set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
 			$this->Query($Sql);
 		}
 
@@ -164,8 +151,8 @@ set i._NewID = t.$PrimaryKey, i._Action = 'Update'";
 			$IDInc = $MaxID - $MinID + self::ID_PADDING;
 
 		$Sql = "update :_z$TableName i
-set i._NewID = i.$PrimaryKey + $IDInc, i._Action = 'Insert'
-where i._NewID is null";
+         set i._NewID = i.$PrimaryKey + $IDInc, i._Action = 'Insert'
+         where i._NewID is null";
 		$this->Query($Sql);
 	}
 
@@ -191,22 +178,50 @@ where i._NewID is null";
 
 	public function DefineTables() {
 		$St = Gdn::Structure();
+		$DestStructure = clone $St;
 
-		foreach($this->Structures as $Table => $Columns) {
+		$Tables =& $this->Tables();
+
+		foreach($Tables as $Table => $TableInfo) {
+			$Columns = $TableInfo['Columns'];
 			$St->Table(self::TABLE_PREFIX.$Table);
+			// Get the structure from the destination database to match types.
+			try {
+				$DestStructure->Reset()->Get($Table);
+			} catch(Exception $Ex) {
+				// Trying to import into a non-existant table.
+				$Tables[$Table]['Skip'] = TRUE;
+				continue;
+			}
+			$DestColumns = $DestStructure->Columns();
+			$DestModified = FALSE;
 
 			foreach($Columns as $Name => $Type) {
-				$St->Column($Name, $Type, NULL);
+				if(array_key_exists($Name, $DestColumns))
+					$StructureType = $DestStructure->ColumnTypeString($DestColumns[$Name]);
+				else {
+					$StructureType = $Type;
+
+					if(!$StructureType)
+						$StructureType = 'int';
+
+					// This is a new column so it needs to be added to the destination table too.
+					$DestStructure->Column($Name, $StructureType, NULL);
+					$DestModified = TRUE;
+				}
+
+				$St->Column($Name, $StructureType, NULL);
 			}
 			// Add a new ID column.
 			if(array_key_exists($Table.'ID', $Columns)) {
 				$St
-				->Column('_NewID', $Columns[$Table.'ID'], NULL)
+				->Column('_NewID', $DestStructure->ColumnTypeString($Table.'ID'), NULL)
 				->Column('_Action', array('Insert', 'Update'));
-
 			}
 
 			$St->Set(TRUE, TRUE);
+			if($DestModified)
+				$DestStructure->Set();
 		}
 		return TRUE;
 	}
@@ -214,7 +229,7 @@ where i._NewID is null";
 	public function DefineIndexes() {
 		$St = Gdn::Structure();
 
-		foreach($this->Structures as $Table => $Columns) {
+		foreach($this->Tables() as $Table => $TableInfo) {
 			$St->Table(self::TABLE_PREFIX.$Table);
 
 			// Check to index the primary key.
@@ -243,7 +258,7 @@ where i._NewID is null";
 		}
 
 		// Delete the import file.
-		if($this->ImportPath && file_exists($this->ImportPath)) {
+		if(GetValue('FileUploaded', $this->Data) && $this->ImportPath && file_exists($this->ImportPath)) {
 			unlink($this->ImportPath);
 		}
 	}
@@ -253,14 +268,17 @@ where i._NewID is null";
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
-		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Role', 'UserAuthentication',
-		'UserConversation', 'UserDiscussion', 'UserRole');
+   		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
+   		'UserConversation', 'UserDiscussion', 'UserRole');
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
 			$Table = $Tables[$i];
-			$Sql = "truncate table :_$Table";
+			if($Table == 'Permission')
+				$Sql = "delete from :_$Table where RoleID <> 0";
+			else
+				$Sql = "truncate table :_$Table";
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
 				// The step's taken too long. Save the state and return.
@@ -284,7 +302,7 @@ where i._NewID is null";
 			return $Header;
 
 		if(is_null($fpin)) {
-			if(!$this->ImportPath)
+			if(!$this->ImportPath || !file_exists($this->ImportPath))
 				return array();
 			$fpin = gzopen($this->ImportPath, 'rb');
 			$fpopened = TRUE;
@@ -308,6 +326,8 @@ where i._NewID is null";
 			return 'Unknown';
 		if(substr_compare('Vanilla', $Source, 0, 7, FALSE) == 0)
 			return 'Vanilla';
+		if(substr_compare('vBulletin', $Source, 0,  9, FALSE) == 0)
+			return 'vBulletin';
 		return 'Unknown';
 	}
 
@@ -315,8 +335,9 @@ where i._NewID is null";
 		$InsertedCount = 0;
 		$Timer = new Gdn_Timer();
 		$Timer->Start();
-		foreach($this->Structures as $TableName => $Columns) {
-			if(GetValue('Inserted', GetValue($TableName, $this->Data['Tables'], array()))) {
+		$Tables = $this->Tables();
+		foreach($Tables as $TableName => $Columns) {
+			if(GetValue('Inserted', GetValue($TableName, $Tables, array())) || GetValue('Skip', GetValue($TableName, $Tables, array()))) {
 				$InsertedCount++;
 			} else {
 				$this->Data['CurrentStepMessage'] = $TableName;
@@ -327,15 +348,15 @@ where i._NewID is null";
 							$this->_InsertTable($TableName);
 						} else {
 							$Sql = "insert :_UserRole ( UserID, RoleID )
-		select zUserID._NewID, zRoleID._NewID
-		from :_zUserRole i
-		left join :_zUser zUserID
-		  on i.UserID = zUserID.UserID
-		left join :_zRole zRoleID
-		  on i.RoleID = zRoleID.RoleID
-		left join :_UserRole ur
-			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
-		where i.UserID <> 0 and ur.UserID is null";
+                  		select zUserID._NewID, zRoleID._NewID
+                  		from :_zUserRole i
+                  		left join :_zUser zUserID
+                  		  on i.UserID = zUserID.UserID
+                  		left join :_zRole zRoleID
+                  		  on i.RoleID = zRoleID.RoleID
+                  		left join :_UserRole ur
+                  			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
+                  		where i.UserID <> 0 and ur.UserID is null";
 							$this->Query($Sql);
 						}
 						break;
@@ -343,7 +364,7 @@ where i._NewID is null";
 						$this->_InsertTable($TableName);
 				}
 
-				$this->Data['Tables'][$TableName]['Inserted'] = TRUE;
+				$Tables[$TableName]['Inserted'] = TRUE;
 				$InsertedCount++;
 				// Make sure the loading isn't taking too long.
 				if($Timer->ElapsedTime() > $this->MaxStepTime)
@@ -351,28 +372,29 @@ where i._NewID is null";
 			}
 		}
 
-		$Result = $InsertedCount == count($this->Structures);
+		$Result = $InsertedCount == count($this->Tables());
 		if($Result)
 			$this->Data['CurrentStepMessage'] = '';
 		return $Result;
 	}
 
 	protected function _InsertTable($TableName, $Sets = array()) {
-		if(!array_key_exists($TableName, $this->Data['Tables']))
+		if(!array_key_exists($TableName, $this->Tables()))
 			return;
 
-		$Structure = $this->Structures[$TableName];
+		$TableInfo = $this->Tables($TableName);
+		$Columns = $TableInfo['Columns'];
 
 		// Build the column insert list.
 		$Insert = "insert :_$TableName (\n  "
-		.implode(",\n  ", array_keys(array_merge($Structure, $Sets)))
+		.implode(",\n  ", array_keys(array_merge($Columns, $Sets)))
 		."\n)";
 		$From = "from :_z$TableName i";
 		$Where = '';
 
 		// Build the select list for the insert.
 		$Select = array();
-		foreach($Structure as $Column => $Type) {
+		foreach($Columns as $Column => $X) {
 			if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
 				// The data goes in raw.
 				$Select[] = "i.$Column";
@@ -382,7 +404,7 @@ where i._NewID is null";
 				$Where = "\nwhere i._Action = 'Insert'";
 			} elseif(substr_compare($Column, 'ID', -2, 2) == 0) {
 				// This is an ID field. Check for a join.
-				foreach($this->Structures as $StructureTableName => $StructureColumns) {
+				foreach($this->Tables() as $StructureTableName => $TableInfo) {
 					$PK = $StructureTableName.'ID';
 					if(strlen($Column) >= strlen($PK) && substr_compare($Column, $PK, -strlen($PK), strlen($PK)) == 0) {
 						// This table joins and must update it's ID.
@@ -396,11 +418,21 @@ where i._NewID is null";
 			}
 		}
 		// Add the original table to prevent duplicates.
-		if(strcasecmp($this->Overwrite(), 'Overwrite') != 0) {
-			$PK = $TableName.'ID';
-			$From .= "\nleft join :_$TableName o0\n  on i._NewID = o0.$PK";
-			$Where .= " and o0.$PK is null";
+		$PK = $TableName.'ID';
+		if(array_key_exists($PK, $Columns)) {
+		if(strcasecmp($this->Overwrite(), 'Overwrite') == 0)
+				$PK2 = $PK;
+			else
+				$PK2 = '_NewID';
+
+			$From .= "\nleft join :_$TableName o0\n  on o0.$PK = i.$PK2";
+			if($Where)
+				$Where .=  "\n  and ";
+			else
+				$Where = "\nwhere ";
+			$Where .= "o0.$PK is null";
 		}
+		//}
 
 		// Add the sets to the select list.
 		foreach($Sets as $Field => $Value) {
@@ -454,8 +486,9 @@ where i._NewID is null";
 	public function LoadTables() {
 		$LoadedCount = 0;
 		foreach($this->Data['Tables'] as $Table => $TableInfo) {
-			if(GetValue('Loaded', $TableInfo)) {
+			if(GetValue('Loaded', $TableInfo) || GetValue('Skip', $TableInfo)) {
 				$LoadedCount++;
+				continue;
 			} else {
 				$this->Data['CurrentStepMessage'] = $Table;
 				$this->LoadTable($Table, $TableInfo['Path']);
@@ -473,21 +506,18 @@ where i._NewID is null";
 	}
 
 	public function LoadTable($Tablename, $Path) {
-		if(!array_key_exists($Tablename, $this->Structures))
-			throw new Exception("The table \"$Tablename\" is not a valid import table.");
-
 		$Path = Gdn::Database()->Connection()->quote($Path);
 		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
 
 		Gdn::Database()->Query("truncate table $Tablename;");
 
 		$Sql = "load data infile $Path into table $Tablename
-character set utf8
-columns terminated by ','
-optionally enclosed by '\"'
-escaped by '\\\\'
-lines terminated by '\\n'
-ignore 1 lines";
+         character set utf8
+         columns terminated by ','
+         optionally enclosed by '\"'
+         escaped by '\\\\'
+         lines terminated by '\\n'
+         ignore 1 lines";
 
 		$this->Query($Sql);
 		return TRUE;
@@ -515,9 +545,67 @@ ignore 1 lines";
 			$PropVal = explode(':', $Item);
 			if(array_key_exists(1, $PropVal))
 				$Result[trim($PropVal[0])] = trim($PropVal[1]);
+			else
+				$Result[trim($Item)] = '';
 		}
 
 		return $Result;
+	}
+	
+	public function ProcessImportFile() {
+		$Path = $this->ImportPath;
+		$Tables = array();
+
+		// Open the import file.
+		$fpin = gzopen($Path, 'rb');
+		$fpout = NULL;
+
+		// Make sure it has the proper header.
+		try {
+			$Header = $this->GetImportHeader($fpin);
+		} catch(Exception $Ex) {
+			fclose($fpin);
+			throw $Ex;
+		}
+
+		while(($Line = fgets($fpin)) !== FALSE) {
+			if($Line == "\n") {
+				if($fpout) {
+					// We are in a table so close it off.
+					fclose($fpout);
+					$fpout = 0;
+				}
+			} elseif($fpout) {
+				// We are in a table so dump the line.
+				fputs($fpout, $Line);
+			} elseif(substr_compare(self::COMMENT, $Line, 0, strlen(self::COMMENT)) == 0) {
+				// This is a comment line so do nothing.
+			} else {
+				// This is the start of a table.
+				$TableInfo = $this->ParseInfoLine($Line);
+				$Table = $TableInfo['Table'];
+				$Path = dirname($Path).DS.$Table.'.txt';
+				$fpout = fopen($Path, 'wb');
+
+				$TableInfo['Path'] = $Path;
+				unset($TableInfo['Table']);
+
+				// Get the column headers from the next line.
+				if(($Line = fgets($fpin)) !== FALSE) {
+					fputs($fpout, $Line);
+					$Columns = $this->ParseInfoLine($Line);
+					$TableInfo['Columns'] = $Columns;
+
+					$Tables[$Table] = $TableInfo;
+				}
+			}
+		}
+		gzclose($fpin);
+		if($fpout)
+			gzclose($fpout);
+		$this->Data['Tables'] = $Tables;
+
+		return TRUE;
 	}
 
 	/**
@@ -574,54 +662,6 @@ ignore 1 lines";
 		'Garden.Import.ImportPath' => $this->ImportPath));
 	}
 
-	public function SplitImportFile() {
-		$Path = $this->ImportPath;
-		$Tables = array();
-
-		// Open the import file.
-		$fpin = gzopen($Path, 'rb');
-		$fpout = NULL;
-
-		// Make sure it has the proper header.
-		try {
-			$Header = $this->GetImportHeader($fpin);
-		} catch(Exception $Ex) {
-			fclose($fpin);
-			throw $Ex;
-		}
-
-		while(($Line = fgets($fpin)) !== FALSE) {
-			if($Line == "\n") {
-				if($fpout) {
-					// We are in a table so close it off.
-					fclose($fpout);
-					$fpout = 0;
-				}
-			} elseif($fpout) {
-				// We are in a table so dump the line.
-				fputs($fpout, $Line);
-			} elseif(substr_compare(self::COMMENT, $Line, 0, strlen(self::COMMENT)) == 0) {
-				// This is a comment line so do nothing.
-			} else {
-				// This is the start of a table.
-				$TableInfo = $this->ParseInfoLine($Line);
-				$Table = $TableInfo['Table'];
-				$Path = dirname($Path).DS.$Table.'.txt';
-				$fpout = fopen($Path, 'wb');
-
-				$TableInfo['Path'] = $Path;
-				unset($TableInfo['Table']);
-				$Tables[$Table] = $TableInfo;
-			}
-		}
-		gzclose($fpin);
-		if($fpout)
-			gzclose($fpout);
-		$this->Data['Tables'] = $Tables;
-
-		return TRUE;
-	}
-
 	public function Steps() {
 		if(strcasecmp($this->Overwrite(), 'Overwrite') == 0)
 			return $this->_OverwriteSteps;
@@ -629,46 +669,53 @@ ignore 1 lines";
 			return $this->_MergeSteps;
 	}
 
+	public function &Tables($TableName = '') {
+		if($TableName)
+			return $this->Data['Tables'][$TableName];
+		else
+			return $this->Data['Tables'];
+	}
+
 	public function UpdateCounts() {
 		// Define the necessary SQL.
 		$StepSql = array(
 		// Set basic counts.
 		"update :_Discussion d set
-LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+      LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
+      CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
+      DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
 
 		// Set the body of the first comment when the forum doesn't put it in the discussion.
 		"update :_Discussion d
-inner join :_Comment c
-  on c.DiscussionID = d.DiscussionID
-inner join (
-  select min(c2.CommentID) as CommentID
-  from :_Comment c2
-  group by c2.DiscussionID
-) c2
-  on c.CommentID = c2.CommentID
-set
-  d.Body = c.Body,
-  d.Format = c.Format,
-  d.FirstCommentID = c.CommentID
-where d.Body is null",
+      inner join :_Comment c
+        on c.DiscussionID = d.DiscussionID
+      inner join (
+        select min(c2.CommentID) as CommentID
+        from :_Comment c2
+        group by c2.DiscussionID
+      ) c2
+        on c.CommentID = c2.CommentID
+      set
+        d.Body = c.Body,
+        d.Format = c.Format,
+        d.FirstCommentID = c.CommentID
+      where d.Body is null",
 
 		// Remove the first comment.
 		"delete :_Comment c
-from :_Comment c
-inner join :_Discussion d
-  on d.FirstCommentID = c.CommentID",
+      from :_Comment c
+      inner join :_Discussion d
+        on d.FirstCommentID = c.CommentID",
 
 		// Set the last comment user.
 		"update :_Discussion d
-join :_Comment c
-  on d.LastCommentID = c.CommentID
-set d.LastCommentUserID = c.InsertUserID",
+      join :_Comment c
+        on d.LastCommentID = c.CommentID
+      set d.LastCommentUserID = c.InsertUserID",
 
 		// Set the category counts.
 		"update :_Category c set
-c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
+      c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 
 		// Add the FirstCommentID to the discussion table.
 		Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);

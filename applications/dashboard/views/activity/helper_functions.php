@@ -20,7 +20,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       $RegardingUser = UserBuilder($Activity, 'Regarding');
       $Title = '<div class="Title">'
          .UserAnchor($Author, 'Title Name')
-         .' <span>→</span> '
+         .' <span>&rarr;</span> '
          .UserAnchor($RegardingUser, 'Name')
          .'</div>';
       $Excerpt = Gdn_Format::Display($Excerpt);

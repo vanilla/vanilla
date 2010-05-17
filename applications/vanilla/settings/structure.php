@@ -141,35 +141,35 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows()
 if ($SQL->GetWhere('ActivityType', array('Name' => 'BookmarkComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0'));
 
+$PermissionModel = Gdn::PermissionModel();
+$PermissionModel->Database = $Database;
+$PermissionModel->SQL = $SQL;
+
+// Define some global vanilla permissions.
+$PermissionModel->Define(array(
+	'Vanilla.Settings.Manage',
+	'Vanilla.Categories.Manage',
+	'Vanilla.Spam.Manage'
+	));
+
+// Define some permissions for the Vanilla categories.
+$PermissionModel->Define(array(
+	'Vanilla.Discussions.View' => 1,
+	'Vanilla.Discussions.Add' => 1,
+	'Vanilla.Discussions.Edit' => 0,
+	'Vanilla.Discussions.Announce' => 0,
+	'Vanilla.Discussions.Sink' => 0,
+	'Vanilla.Discussions.Close' => 0,
+	'Vanilla.Discussions.Delete' => 0,
+	'Vanilla.Comments.Add' => 1,
+	'Vanilla.Comments.Edit' => 0,
+	'Vanilla.Comments.Delete' => 0),
+	'tinyint',
+	'Category',
+	'CategoryID'
+	);
+
 if ($Drop) {
-   $PermissionModel = Gdn::PermissionModel();
-   $PermissionModel->Database = $Database;
-   $PermissionModel->SQL = $SQL;
-   
-   // Define some global vanilla permissions.
-   $PermissionModel->Define(array(
-      'Vanilla.Settings.Manage',
-      'Vanilla.Categories.Manage',
-      'Vanilla.Spam.Manage'
-      ));
-   
-   // Define some permissions for the Vanilla categories.
-   $PermissionModel->Define(array(
-      'Vanilla.Discussions.View',
-      'Vanilla.Discussions.Add',
-      'Vanilla.Discussions.Edit',
-      'Vanilla.Discussions.Announce',
-      'Vanilla.Discussions.Sink',
-      'Vanilla.Discussions.Close',
-      'Vanilla.Discussions.Delete',
-      'Vanilla.Comments.Add',
-      'Vanilla.Comments.Edit',
-      'Vanilla.Comments.Delete'),
-      'tinyint',
-      'Category',
-      'CategoryID'
-      );
-   
    // Get the general category so we can assign permissions to it.
    $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
    
@@ -180,7 +180,7 @@ if ($Drop) {
       'JunctionColumn' => 'CategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
-      ));
+      ), TRUE);
    
    // Set the intial member permissions.
    $PermissionModel->Save(array(
@@ -191,7 +191,7 @@ if ($Drop) {
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1
-      ));
+      ), TRUE);
       
    // Set the initial administrator permissions.
    $PermissionModel->Save(array(
@@ -199,7 +199,7 @@ if ($Drop) {
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
-      ));
+      ), TRUE);
    
    $PermissionModel->Save(array(
       'RoleID' => 16,
@@ -216,7 +216,7 @@ if ($Drop) {
       'Vanilla.Comments.Add' => 1,
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
-      ));
+      ), TRUE);
    
    // Make sure that User.Permissions is blank so new permissions for users get applied.
    $SQL->Update('User', array('Permissions' => ''))->Put();
@@ -228,52 +228,79 @@ Apr 26th, 2010
 Removed FirstComment from GDN_Discussion and moved it into the discussion table.
 */
 if (!$Construct->CaptureOnly) {
-	$SQL->Query('update GDN_Discussion, GDN_Comment
-	set GDN_Discussion.Body = GDN_Comment.Body,
-		GDN_Discussion.Format = GDN_Comment.Format
-	where GDN_Discussion.FirstCommentID = GDN_Comment.CommentID');
+	$Prefix = $SQL->Database->DatabasePrefix;
+
+	$SQL->Query("update {$Prefix}Discussion, {$Prefix}Comment
+	set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
+		{$Prefix}Discussion.Format = {$Prefix}Comment.Format
+	where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
 
 	// Update lastcommentid & firstcommentid
-	$SQL->Query('update GDN_Discussion set LastCommentID = null where LastCommentID = FirstCommentID');
+	$SQL->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
 	
-	$SQL->Query('delete GDN_Comment
-	from GDN_Comment inner join GDN_Discussion
-	where GDN_Comment.CommentID = GDN_Discussion.FirstCommentID');
+	$SQL->Query("delete {$Prefix}Comment
+	from {$Prefix}Comment inner join {$Prefix}Discussion
+	where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
 	
-	$SQL->Query('update GDN_Discussion d
-	inner join GDN_Comment c
+	$SQL->Query("update {$Prefix}Discussion d
+	inner join {$Prefix}Comment c
 		on c.DiscussionID = d.DiscussionID
 	inner join (
 		select max(c2.CommentID) as CommentID
-		from GDN_Comment c2
+		from {$Prefix}Comment c2
 		group by c2.DiscussionID
 	) c2
 	on c.CommentID = c2.CommentID
 	set d.LastCommentID = c.CommentID,
 		d.LastCommentUserID = c.InsertUserID
-	where d.LastCommentUserID is null');
+	where d.LastCommentUserID is null");
 	
 	/*
 	  	Apr 26th, 2010
 	  	Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
 	  	For some reason mysql makes 0's "2" during this change. Change them back to "0".
 	*/
-	$SQL->Query("update GDN_Category set AllowDiscussions = '0' where AllowDiscussions = '2'");
+	$SQL->Query("update {$Prefix}Category set AllowDiscussions = '0' where AllowDiscussions = '2'");
 
-	$SQL->Query("update GDN_Discussion set Closed = '0' where Closed = '2'");
-	$SQL->Query("update GDN_Discussion set Announce = '0' where Announce = '2'");
-	$SQL->Query("update GDN_Discussion set Sink = '0' where Sink = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Closed = '0' where Closed = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Announce = '0' where Announce = '2'");
+	$SQL->Query("update {$Prefix}Discussion set Sink = '0' where Sink = '2'");
 
-	$SQL->Query("update GDN_UserDiscussion set Dismissed = '0' where Dismissed = '2'");
-	$SQL->Query("update GDN_UserDiscussion set Dismissed = '0' where Dismissed is null");
-	$SQL->Query("update GDN_UserDiscussion set Bookmarked = '0' where Bookmarked = '2'");
-	$SQL->Query("update GDN_UserDiscussion set Bookmarked = '0' where Bookmarked is null");
+	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed = '2'");
+	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed is null");
+	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked = '2'");
+	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked is null");
 
-	$SQL->Query("update GDN_Comment set Flag = '0' where Flag = '2'");
+	$SQL->Query("update {$Prefix}Comment set Flag = '0' where Flag = '2'");
 
-	$SQL->Query("update GDN_Draft set Closed = '0' where Closed = '2'");
-	$SQL->Query("update GDN_Draft set Announce = '0' where Announce = '2'");
-	$SQL->Query("update GDN_Draft set Sink = '0' where Sink = '2'");
+	$SQL->Query("update {$Prefix}Draft set Closed = '0' where Closed = '2'");
+	$SQL->Query("update {$Prefix}Draft set Announce = '0' where Announce = '2'");
+	$SQL->Query("update {$Prefix}Draft set Sink = '0' where Sink = '2'");
+
+	/*
+	    May 12th, 2010
+		 Added ability to disable category-level permissions. Update global permissions in case this option is in effect.
+	 */
+	$SQL->Query("update {$Prefix}Permission p2
+		inner join {$Prefix}Category c
+		 on c.CategoryID = p2.JunctionID
+			 and p2.JunctionTable = 'Category'
+		   and c.Name = 'General'
+		inner join {$Prefix}Permission p
+		  on p.RoleID = p2.RoleID
+			 and p.JunctionTable is null
+		set
+			p.`Vanilla.Discussions.Add` = p2.`Vanilla.Discussions.Add`,
+			p.`Vanilla.Discussions.Edit` = p2.`Vanilla.Discussions.Edit`,
+			p.`Vanilla.Discussions.Announce` = p2.`Vanilla.Discussions.Announce`,
+			p.`Vanilla.Discussions.Sink` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.Close` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.Delete` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Discussions.View` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Add` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Edit` = p2.`Vanilla.Discussions.Sink`,
+			p.`Vanilla.Comments.Delete` = p2.`Vanilla.Discussions.Sink`
+		where p.RoleID <> 0;");
 }
 
 // This is the final structure of the discussion table after removed & updated columns

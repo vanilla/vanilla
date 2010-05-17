@@ -109,6 +109,7 @@ class ImportController extends DashboardController {
 					$Upload->SaveAs($TmpFile, $ImportPath);
 					$Imp->ImportPath = $ImportPath;
 					$Imp->Data['OriginalFilename'] = basename($Filename);
+					$Imp->Data['FileUploaded'] = TRUE;
 					
 				} elseif(!$Imp->ImportPath) {
 					// There was no file uploaded this request or before.
@@ -130,20 +131,23 @@ class ImportController extends DashboardController {
 					$this->Form->SetValidationResults($Validation->Results());
 				}
 			} else {
-				// Search for an existing file that was uploaded by the web admin.
-				$ImportPaths = SafeGlob(PATH_ROOT.DS.'uploads'.DS.'import'.DS.'import.*');
-				if($ImportPaths) {
-					$ImportPath = $ImportPaths[0];
-					if(in_array(pathinfo($ImportPath, PATHINFO_EXTENSION), array('gz', 'txt'))) {
-						$Imp->ImportPath = $ImportPath;
-						$Imp->Data['OriginalFilename'] = basename($ImportPath);
-					}
-				}
+				// TODO: Search for an existing file that was uploaded by the web admin.
+//				$ImportPaths = SafeGlob(PATH_ROOT.DS.'uploads'.DS.'export *');
+//				if($ImportPaths) {
+//					$ImportPath = $ImportPaths[0];
+//					if(in_array(pathinfo($ImportPath, PATHINFO_EXTENSION), array('gz', 'txt'))) {
+//						$Imp->ImportPath = $ImportPath;
+//						$Imp->Data['OriginalFilename'] = basename($ImportPath);
+//					}
+//				}
 			}
 			$Imp->SaveState();
 		} else {
 			$this->View = 'Info';
 		}
+		
+		if(!file_exists($Imp->ImportPath))
+         $Imp->DeleteState();
 		
 		$this->SetData('Header', $Imp->GetImportHeader());
 		$this->SetData('ImportPath', $Imp->ImportPath);

@@ -49,7 +49,7 @@ if ($this->Discussion->Closed == '1') {
    ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-      <?php echo Anchor(T('← All Discussions'), 'discussions', 'TabLink'); ?>
+      <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
 <?php
 } else if ($Session->IsValid()) { 

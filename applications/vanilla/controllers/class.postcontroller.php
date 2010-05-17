@@ -51,7 +51,7 @@ class PostController extends VanillaController {
       
       if (isset($this->Discussion)) {
          if ($this->Discussion->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Discussions.Edit', $this->Discussion->CategoryID);
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
       } else {
          $this->Permission('Vanilla.Discussions.Add');
@@ -77,16 +77,16 @@ class PostController extends VanillaController {
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
             // Check category permissions
-            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', $this->CategoryID))
+            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', $this->CategoryID))
+            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', $this->CategoryID))
+            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', $this->CategoryID))
+            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
 
             if ($this->Form->ErrorCount() == 0) {
@@ -191,10 +191,10 @@ class PostController extends VanillaController {
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if ($Editing) {
          if ($this->Comment->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Comments.Edit', $Discussion->CategoryID);
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {
-         $this->Permission('Vanilla.Comments.Add', $Discussion->CategoryID);
+         $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->CategoryID);
       }
 
       if ($this->Form->AuthenticatedPostBack() === FALSE) {

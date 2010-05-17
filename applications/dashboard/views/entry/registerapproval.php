@@ -56,7 +56,7 @@
          ?>
       </li>
       <li>
-         <?php echo $this->Form->Button('Apply →'); ?>
+         <?php echo $this->Form->Button('Apply &rarr;'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

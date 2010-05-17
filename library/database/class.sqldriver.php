@@ -472,8 +472,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns a platform-specific query to fetch table names.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->Database->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchTableSql'), E_USER_ERROR);
@@ -481,8 +483,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns an array containing table names in the database.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTables($LimitToPrefix = FALSE) {
       $Sql = $this->FetchTableSql($LimitToPrefix);
@@ -1439,16 +1443,17 @@ abstract class Gdn_SQLDriver {
    }
    
    /**
-    * Joins the query to a permission junction table and limits the results
-    * accordingly.
+    * Joins the query to a permission junction table and limits the results accordingly.
     *
-    * @param string $JunctionTable The table to join to (ie. Category)
-    * @param string $JunctionColumn The primary key column name of $JunctionTable (ie. CategoryID).
-    * @param mixed $Permissions The permission name (or array of names) to use when limiting the query.
+    * @param mixed $Permission The permission name (or array of names) to use when limiting the query.
+    * @param string $ForeignAlias The alias of the table to join to (ie. Category).
+    * @param string $ForeignColumn The primary key column name of $JunctionTable (ie. CategoryID).
+	 * @param string $JunctionTable
+	 * @param string $JunctionColumn
     */
-   public function Permission($JunctionTableAlias, $JunctionColumn, $Permissions) {
+   public function Permission($Permission, $ForeignAlias, $ForeignColumn, $JunctionTable = '', $JunctionColumn = '') {
       $PermissionModel = Gdn::PermissionModel();
-      $PermissionModel->SQLPermission($this, $JunctionTableAlias, $JunctionColumn, $Permissions);
+      $PermissionModel->SQLPermission($this, $Permission, $ForeignAlias, $ForeignColumn, $JunctionTable, $JunctionColumn);
   
       return $this;
    }

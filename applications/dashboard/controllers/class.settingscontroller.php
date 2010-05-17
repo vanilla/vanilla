@@ -20,6 +20,7 @@ class SettingsController extends DashboardController {
     * Application management screen.
     */
    public function Applications($Filter = '', $TransientKey = '') {
+      $this->AddJsFile('addons.js');
       $Session = Gdn::Session();
       $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
@@ -76,15 +77,10 @@ class SettingsController extends DashboardController {
                $this->Form->AddError(strip_tags($e->getMessage()));
             }
             if ($this->Form->ErrorCount() == 0) {
-               $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Application/'.$ApplicationName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
-               if ($Test != 'Success') {
-                  $this->Form->AddError(sprintf(T('The application could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
-               } else {
-                  $Validation = new Gdn_Validation();
-                  $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
-                  $ApplicationManager->EnableApplication($ApplicationName, $Validation);
-                  $this->Form->SetValidationResults($Validation->Results());
-               }
+               $Validation = new Gdn_Validation();
+               $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
+               $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+               $this->Form->SetValidationResults($Validation->Results());
             }
             
          }
@@ -126,7 +122,7 @@ class SettingsController extends DashboardController {
       $AvailableLocales = $Locale->GetAvailableLocaleSources();
       $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
       
-      // Check to see if mod_rewrit is enabled.
+      // Check to see if mod_rewrite is enabled.
       if(function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
          $this->SetData('HasModRewrite', TRUE);
       } else {
@@ -156,6 +152,31 @@ class SettingsController extends DashboardController {
          }
          
          if ($this->Form->Save() !== FALSE) {
+            $Upload = new Gdn_Upload();
+            try {
+               // Validate the upload
+               $TmpImage = $Upload->ValidateUpload('Logo', FALSE);
+               if ($TmpImage) {
+                  // Generate the target image name
+                  $TargetImage = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads');
+                  $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+                  
+                  // Delete any previously uploaded images
+                  @unlink(PATH_ROOT . DS . C('Garden.Logo', ''));
+                  
+                  // Save the uploaded image
+                  $Upload->SaveAs(
+                     $TmpImage,
+                     PATH_ROOT . DS . 'uploads' . DS . $ImageBaseName
+                  );
+               }
+            } catch (Exception $ex) {
+               $this->Form->AddError($ex->getMessage());
+            }
+            // If there were no errors, save the path to the logo in the config
+            if ($this->Form->ErrorCount() == 0 && $Upload->GetUploadedFileName() != '')
+               SaveToConfig('Garden.Logo', 'uploads' . DS . $ImageBaseName);
+            
             $this->StatusMessage = T("Your settings have been saved.");
          }
       }
@@ -285,6 +306,7 @@ class SettingsController extends DashboardController {
    }
    
    public function Plugins($Filter = '', $TransientKey = '') {
+      $this->AddJsFile('addons.js');
       $this->Title(T('Plugins'));
          
       $Session = Gdn::Session();
@@ -330,16 +352,9 @@ class SettingsController extends DashboardController {
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                $PluginManager->DisablePlugin($PluginName);
             } else {
-               // Check to see if there are any fatal errors when the plugin is included:
-               $Session = Gdn::Session();
-               $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Plugin/'.$PluginName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
-               if ($Test != 'Success') {
-                  $this->Form->AddError(sprintf(T('The plugin could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
-               } else {
-                  $Validation = new Gdn_Validation();
-                  if (!$PluginManager->EnablePlugin($PluginName, $Validation))
-                     $this->Form->SetValidationResults($Validation->Results());
-               }
+               $Validation = new Gdn_Validation();
+               if (!$PluginManager->EnablePlugin($PluginName, $Validation))
+                  $this->Form->SetValidationResults($Validation->Results());
             }
          } catch (Exception $e) {
             $this->Form->AddError(strip_tags($e->getMessage()));
@@ -460,6 +475,7 @@ class SettingsController extends DashboardController {
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
+      $this->AddJsFile('addons.js');
       $this->Title(T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
@@ -504,12 +520,7 @@ class SettingsController extends DashboardController {
             foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
                   $Session->SetPreference('PreviewTheme', ''); // Clear out the preview
-                  $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Theme/'.$ThemeName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
-                  if ($Test != 'Success') {
-                     $this->Form->AddError(sprintf(T('The theme could not be enabled because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
-                  } else {
-                     $ThemeManager->EnableTheme($ThemeName);
-                  }
+                  $ThemeManager->EnableTheme($ThemeName);
                }
             }
          } catch (Exception $e) {
@@ -561,20 +572,23 @@ class SettingsController extends DashboardController {
    }
    
    public function RemoveAddon($Type, $Name, $TransientKey = '') {
+      $RequiredPermission = 'Undefined';
       switch ($Type) {
          case SettingsModule::TYPE_APPLICATION:
             $Manager = Gdn::Factory('ApplicationManager');
             $Enabled = 'EnabledApplications';
             $Remove  = 'RemoveApplication';
+            $RequiredPermission = 'Garden.Applications.Manage';
          break;
          case SettingsModule::TYPE_PLUGIN:
             $Manager = Gdn::Factory('PluginManager');
             $Enabled = 'EnabledPlugins';
             $Remove  = 'RemovePlugin';
+            $RequiredPermission = 'Garden.Plugins.Manage';
          break;
       }
       
-      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
          try {
             if (array_key_exists($Name, $Manager->$Enabled) === FALSE) {
                $Manager->$Remove($Name);
@@ -585,5 +599,16 @@ class SettingsController extends DashboardController {
       }
       if ($this->Form->ErrorCount() == 0)
          Redirect('/settings/plugins');
+   }
+   
+   public function RemoveLogo($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+         $Logo = C('Garden.Logo', '');
+         RemoveFromConfig('Garden.Logo');
+         @unlink(PATH_ROOT . DS . $Logo);
+      }
+
+      Redirect('/settings/configure');
    }
 }

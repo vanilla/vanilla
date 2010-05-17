@@ -30,6 +30,11 @@ if ($AddonUrl != '')
    ?>
 </div>
 <?php echo $this->Form->Errors(); ?>
+<div class="Messages Errors TestAddonErrors Hidden">
+   <ul>
+      <li><?php echo T('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
+   </ul>
+</div>
 <table class="AltRows">
    <thead>
       <tr>
@@ -62,9 +67,11 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php
+            $ToggleText = array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable';
             echo Anchor(
-               array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable',
-               '/settings/applications/'.$AppName.'/'.$Session->TransientKey()
+               T($ToggleText),
+               '/settings/applications/'.$AppName.'/'.$Session->TransientKey(),
+               $ToggleText.'Addon'
             );
             
             if ($SettingsUrl != '') {

@@ -135,6 +135,8 @@ class PostController extends VanillaController {
                   } else {
                      $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   }
+                  $this->EventArguments['Discussion'] = $Discussion;
+                  $this->FireEvent('AfterDiscussionSave');
                } else {
                   // If this was a draft save, notify the user about the save
                   $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());

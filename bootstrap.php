@@ -15,7 +15,7 @@ if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.DS.'themes');
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')
-   date_default_timezone_set('Canada/Saskatchewan');
+   date_default_timezone_set('America/Montreal');
 
 /// Include the error handler.
 require_once(PATH_LIBRARY_CORE . DS . 'functions.error.php');

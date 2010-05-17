@@ -956,7 +956,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
          // Add the favicon
-         $this->Head->SetFavIcon(Asset('themes/'.$this->Theme.'/design/'.Gdn::Config('Garden.FavIcon', 'favicon.png')));
+         $this->Head->SetFavIcon(C('Garden.FavIcon', Asset('themes/'.$this->Theme.'/design/favicon.png')));
          
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');

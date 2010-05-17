@@ -36,7 +36,8 @@ $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Dele
 $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
 $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
 $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
-$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
+$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators can administer user-generated content in the application.'));
+$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
 
 // User Table
 $Construct->Table('User')
@@ -129,6 +130,12 @@ $PermissionModel->Save(array(
 	'Garden.Signin.Allow' => 1
 	));
 
+// Set initial moderator permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 32,
+	'Garden.Signin.Allow' => 1
+	));
+
 // Set initial admininstrator permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 16,
@@ -147,7 +154,6 @@ $PermissionModel->Save(array(
 	'Garden.Users.Approve' => 1,
 	'Garden.Activity.Delete' => 1
 	));
-
 
 // Photo Table
 $Construct->Table('Photo')

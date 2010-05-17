@@ -522,7 +522,7 @@ class SettingsController extends DashboardController {
          try {
             foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
-                  $Session->SetPreference('PreviewTheme', ''); // Clear out the preview
+                  $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
                   $ThemeManager->EnableTheme($ThemeName);
                }
             }
@@ -555,17 +555,8 @@ class SettingsController extends DashboardController {
          }
       }
       
-      // Check for errors
-      $Session = Gdn::Session();
-      $Test = ProxyRequest(Url('/dashboard/settings/testaddon/Theme/'.$ThemeName.'/'.$Session->TransientKey().'?DeliveryType=JSON', TRUE));
-      if ($Test != 'Success') {
-         $this->Form->AddError(sprintf(T('The theme could not be previewed because it generated a fatal error: <pre>%s</pre>'), strip_tags($Test)));
-         $this->View = 'themes';
-         $this->Themes();
-      } else {
-         $Session->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
-         Redirect('/');
-      }
+      Gdn::Session()->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
+      Redirect('/');
    }
    
    public function CancelPreview() {

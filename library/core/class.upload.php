@@ -104,7 +104,7 @@ class Gdn_Upload {
 	public function ValidateUpload($InputName, $ThrowException = TRUE) {
 		$Ex = FALSE;
 
-		if(!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
+		if (!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
 			// Check the content length to see if we exceeded the max post size.
 			$ContentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
 			$MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
@@ -163,10 +163,19 @@ class Gdn_Upload {
 	}
 
 	public function GetUploadedFileName() {
-		return $this->_UploadedFile['name'];
+		return GetValue('name', $this->_UploadedFile);
 	}
 
-	public function GenerateTargetName($TargetFolder, $Extension) {
+	public function GetUploadedFileExtension() {
+		$Name = $this->_UploadedFile['name'];
+		$Info = pathinfo($Name);
+		return GetValue('extension', $Info, '');
+	}
+
+	public function GenerateTargetName($TargetFolder, $Extension = '') {
+		if ($Extension == '')
+			$Extension = $this->GetUploadedFileExtension();
+
 		$Name = RandomString(12);
 		while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
 			$Name = RandomString(12);

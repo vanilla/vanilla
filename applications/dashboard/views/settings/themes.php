@@ -18,6 +18,11 @@ printf(
 );
 ?></div>
 <?php echo $this->Form->Errors(); ?>
+<div class="Messages Errors TestAddonErrors Hidden">
+   <ul>
+      <li><?php echo T('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
+   </ul>
+</div>
 <div class="CurrentTheme">
    <h3><?php echo T('Current Theme'); ?></h3>
    <?php
@@ -126,8 +131,8 @@ printf(
                   }
 
                   echo '<div class="Buttons">';
-                  echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton', array('target' => '_top'));
-                  echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton', array('target' => '_top'));
+                  echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon', array('target' => '_top'));
+                  echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
                   echo '</div>';
 
                   $Description = ArrayValue('Description', $ThemeInfo);

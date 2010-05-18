@@ -81,6 +81,13 @@ $Construct->Table('UserRole')
 // Assign the guest user to the guest role
 $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
 
+// User Meta Table
+$Construct->Table('UserMeta')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('Name', 'varchar(255)', FALSE, 'primary')
+   ->Column('Value', 'text', TRUE)
+   ->Set($Explicit, $Drop);
+
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
 	->Column('UniqueID', 'varchar(30)', FALSE, 'primary')

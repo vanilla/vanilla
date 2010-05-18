@@ -27,7 +27,7 @@ class ImportModel extends Gdn_Model {
 
 	public $ImportPath = '';
 
-	public $MaxStepTime = 3;
+	public $MaxStepTime = 1; // seconds
 
 	protected $_MergeSteps = array(
    	1 => 'ProcessImportFile',
@@ -228,19 +228,27 @@ class ImportModel extends Gdn_Model {
 
 	public function DefineIndexes() {
 		$St = Gdn::Structure();
+      $DestStructure = clone Gdn::Structure();
 
 		foreach($this->Tables() as $Table => $TableInfo) {
+         if(GetValue('Skip', $TableInfo))
+            continue;
+         
 			$St->Table(self::TABLE_PREFIX.$Table);
+         $Columns = $TableInfo['Columns'];
+
+         $DestStructure->Reset()->Get($Table);
+         $DestColumns = $DestStructure->Columns();
 
 			// Check to index the primary key.
 			$Col = $Table.'ID';
 			if(array_key_exists($Col, $Columns))
-				$St->Column($Col, $Columns[$Col], NULL, 'index');
+				$St->Column($Col, $Columns[$Col] ? $Columns[$Col] : $DestStructure->ColumnTypeString($Col), NULL, 'index');
 
 			if($Table == 'User') {
 				$St
-				->Column('Name', $Columns['Name'], NULL, 'index')
-				->Column('Email', $Columns['Email'], NULL, 'index')
+				->Column('Name', $DestStructure->ColumnTypeString('Name'), NULL, 'index')
+				->Column('Email', $DestStructure->ColumnTypeString('Email'), NULL, 'index')
 				->Column('_NewID', 'int', NULL, 'index');
 			}
 
@@ -269,12 +277,14 @@ class ImportModel extends Gdn_Model {
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
    		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
-   		'UserConversation', 'UserDiscussion', 'UserRole');
+   		'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
 			$Table = $Tables[$i];
+         $this->Data['CurrentStepMessage'] = $Table;
+         
 			if($Table == 'Permission')
 				$Sql = "delete from :_$Table where RoleID <> 0";
 			else
@@ -289,6 +299,7 @@ class ImportModel extends Gdn_Model {
 		if(isset($this->Data['CurrentSubstep']))
 			unset($this->Data['CurrentSubstep']);
 
+		$this->Data['CurrentStepMessage'] = '';
 		return TRUE;
 	}
 
@@ -335,34 +346,60 @@ class ImportModel extends Gdn_Model {
 		$InsertedCount = 0;
 		$Timer = new Gdn_Timer();
 		$Timer->Start();
-		$Tables = $this->Tables();
-		foreach($Tables as $TableName => $Columns) {
-			if(GetValue('Inserted', GetValue($TableName, $Tables, array())) || GetValue('Skip', GetValue($TableName, $Tables, array()))) {
+		$Tables =& $this->Tables();
+		foreach($Tables as $TableName => $TableInfo) {
+			if(GetValue('Inserted', $TableInfo) || GetValue('Skip', $TableInfo)) {
 				$InsertedCount++;
 			} else {
 				$this->Data['CurrentStepMessage'] = $TableName;
 
-				switch($TableName) {
-					case 'UserRole':
-						if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
-							$this->_InsertTable($TableName);
-						} else {
-							$Sql = "insert :_UserRole ( UserID, RoleID )
-                  		select zUserID._NewID, zRoleID._NewID
-                  		from :_zUserRole i
-                  		left join :_zUser zUserID
-                  		  on i.UserID = zUserID.UserID
-                  		left join :_zRole zRoleID
-                  		  on i.RoleID = zRoleID.RoleID
-                  		left join :_UserRole ur
-                  			on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
-                  		where i.UserID <> 0 and ur.UserID is null";
-							$this->Query($Sql);
-						}
-						break;
-					default:
-						$this->_InsertTable($TableName);
-				}
+            if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
+               $this->_InsertTable($TableName);
+            } else {
+               switch($TableName) {
+                  case 'UserDiscussion':
+                     $Sql = "insert :_UserDiscussion ( UserID, DiscussionID, DateLastViewed, Bookmarked )
+                        select zUserID._NewID, zDiscussionID._NewID, max(i.DateLastViewed) as DateLastViewed, max(i.Bookmarked) as Bookmarked
+                        from :_zUserDiscussion i
+                        left join :_zUser zUserID
+                          on i.UserID = zUserID.UserID
+                        left join :_zDiscussion zDiscussionID
+                          on i.DiscussionID = zDiscussionID.DiscussionID
+                        left join :_UserDiscussion ud
+                          on ud.UserID = zUserID._NewID and ud.DiscussionID = zDiscussionID._NewID
+                        where ud.UserID is null
+                        group by zUserID._NewID, zDiscussionID._NewID";
+                     $this->Query($Sql);
+                     break;
+                  case 'UserMeta':
+                     $Sql = "insert :_UserMeta ( UserID, Name, Value )
+                           select zUserID._NewID, i.Name, max(i.Value) as Value
+                           from :_zUserMeta i
+                           left join GDN_zUser zUserID
+                             on i.UserID = zUserID.UserID
+                           left join :_UserMeta um
+                             on zUserID._NewID = um.UserID and i.Name = um.Name
+                           where um.UserID is null
+                           group by zUserID._NewID, i.Name";
+                     $this->Query($Sql);
+                     break;
+                  case 'UserRole':
+                     $Sql = "insert :_UserRole ( UserID, RoleID )
+                           select distinct zUserID._NewID, zRoleID._NewID
+                           from :_zUserRole i
+                           left join :_zUser zUserID
+                             on i.UserID = zUserID.UserID
+                           left join :_zRole zRoleID
+                             on i.RoleID = zRoleID.RoleID
+                           left join :_UserRole ur
+                              on zUserID._NewID = ur.UserID and zRoleID._NewID = ur.RoleID
+                           where i.UserID <> 0 and ur.UserID is null";
+                     $this->Query($Sql);
+                     break;
+                  default:
+                     $this->_InsertTable($TableName);
+               }
+            }
 
 				$Tables[$TableName]['Inserted'] = TRUE;
 				$InsertedCount++;
@@ -625,7 +662,7 @@ class ImportModel extends Gdn_Model {
 		}
 
 		$Method = $Steps[$Step];
-		$Result = call_user_method($Method, $this);
+		$Result = call_user_func(array($this, $Method));
 
 		if(isset($NewTimer))
 			$this->Timer->Finish('');
@@ -680,13 +717,15 @@ class ImportModel extends Gdn_Model {
 		// Define the necessary SQL.
 		$StepSql = array(
 		// Set basic counts.
+      'Basic Discussion Counts' =>
 		"update :_Discussion d set
       LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
       CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
       DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
 
 		// Set the body of the first comment when the forum doesn't put it in the discussion.
-		"update :_Discussion d
+		'Discussion Bodies' =>
+      "update :_Discussion d
       inner join :_Comment c
         on c.DiscussionID = d.DiscussionID
       inner join (
@@ -702,18 +741,21 @@ class ImportModel extends Gdn_Model {
       where d.Body is null",
 
 		// Remove the first comment.
-		"delete :_Comment c
+		'FirstComment' =>
+      "delete :_Comment c
       from :_Comment c
       inner join :_Discussion d
         on d.FirstCommentID = c.CommentID",
 
 		// Set the last comment user.
+      'LastCommentUserID' =>
 		"update :_Discussion d
       join :_Comment c
         on d.LastCommentID = c.CommentID
       set d.LastCommentUserID = c.InsertUserID",
 
 		// Set the category counts.
+      'Category Counts' =>
 		"update :_Category c set
       c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
 
@@ -722,8 +764,10 @@ class ImportModel extends Gdn_Model {
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
-		for($i = $CurrentSubstep; $i < count($StepSql); $i++) {
-			$Sql = $StepSql[$i];
+      $Keys = array_keys($StepSql);
+      for($i = $CurrentSubstep; $i < count($Keys); $i++) {
+         $this->Data['CurrentStepMessage'] = $Keys[$i];
+			$Sql = $StepSql[$Keys[$i]];
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
 				$this->Data['CurrentSubstep'] = $i + 1;
@@ -735,6 +779,7 @@ class ImportModel extends Gdn_Model {
 
 		// Remove the FirstCommentID from the discussion table.
 		Gdn::Structure()->Table('Discussion')->DropColumn('FirstCommentID');
-		return TRUE;
+		$this->Data['CurrentStepMessage'] = '';
+      return TRUE;
 	}
 }

@@ -269,27 +269,27 @@ class Gdn_Format {
 				try {
 					$Mixed2 = $Mixed;
 					$Mixed2 = str_replace("\n", '<br />', $Mixed2);
-					
-					$Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
-					$Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
-					$Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
-					$Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
-					$Mixed2 = preg_replace("#\[quote=[\"']?(.*?)[\"']?\](.*?)\[/quote\]#si",'<p><cite>\\1</cite>:</p><blockquote>\\2</blockquote>',$Mixed2);
-					$Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
-					$Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
-					$Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
-					$Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed2);
-					$Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed2);
-					$Mixed2 = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed2);
-					$Mixed2 = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed2);
-					$Mixed2 = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed2);
-					$Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed2);
-					$Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed2);
-					$Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed2);
-					$Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed2);
-					$Mixed2 = Gdn_Format::Mentions($Mixed2);
+
+               $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
+               $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
+               $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
+               $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote=[\"']?(.*?)[\"']?\](.*?)\[/quote\]#si",'<p><cite>\\1</cite>:</p><blockquote>\\2</blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
+               $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
+               $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed2);
+               $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed2);
+               $Mixed2 = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed2);
+               $Mixed2 = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed2);
+               $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed2);
+               $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed2);
+               $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed2);
+               $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed2);
+               $Mixed2 = preg_replace('#\[/?left\]#si', '', $Mixed2);
+               $Mixed2 = Gdn_Format::Mentions($Mixed2);
 					$Result = $Formatter->Format($Mixed2);
-					//$Result .= "<pre>$Mixed</pre>";
 					return $Result;
 				} catch(Exception $Ex) {
 					return self::Display($Mixed);

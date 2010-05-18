@@ -25,7 +25,7 @@ class Gdn_Upload {
 	}
 
 	public function Clear() {
-		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', '1M'));
+		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
 		$this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
 	}
 
@@ -110,9 +110,9 @@ class Gdn_Upload {
 			$MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
 			if($ContentLength > $MaxPostSize) {
 				$Ex = sprintf(T('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
-			}
-
-			$Ex = T('The file failed to upload.');
+			} else {
+            $Ex = T('The file failed to upload.');
+         }
 		} else {
 			switch ($_FILES[$InputName]['error']) {
 				case 1:
@@ -139,7 +139,7 @@ class Gdn_Upload {
 		$Foo = self::FormatFileSize($this->_MaxFileSize);
 
 		// Check the maxfilesize again just in case the value was spoofed in the form.
-		if (!$Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
+		if (!$Ex && $this->_MaxFileSize > 0 && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
 			$Ex = sprintf(T('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
 		} elseif(!$Ex) {
 			// Make sure that the file extension is allowed.

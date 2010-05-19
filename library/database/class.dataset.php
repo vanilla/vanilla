@@ -98,8 +98,19 @@ class Gdn_DataSet implements IteratorAggregate {
 	public function DatasetType($DatasetType = FALSE) {
 		if($DatasetType !== FALSE) {
 			// Make sure the type isn't changed if the result is already fetched.
-			if(!is_null($this->_Result)) {
-				throw new Exception('Cannot change DatasetType after the result has been fetched.');
+			if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
+            // Loop through the dataset and switch the types.
+               $Result =& $this->_Result;
+            foreach($Result as $Index => $Row) {
+               switch($DatasetType) {
+                  case DATASET_TYPE_ARRAY:
+                     $Result[$Index] = (array)$Row;
+                     break;
+                  case DATASET_TYPE_OBJECT:
+                     $Result[$Index] = (object)$Row;
+                     break;
+               }
+            }
 			}
 			
 			$this->_DatasetType = $DatasetType;

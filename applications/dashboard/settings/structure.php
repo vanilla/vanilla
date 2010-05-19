@@ -21,7 +21,7 @@ $Construct = $Database->Structure();
 $Construct->Table('Role')
 	->Column('RoleID', 'int', FALSE, 'primary')
    ->Column('Name', 'varchar(100)')
-   ->Column('Description', 'varchar(200)', TRUE)
+   ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Column('Deletable', 'tinyint(1)', '1')
    ->Column('CanSession', 'tinyint(1)', '1')

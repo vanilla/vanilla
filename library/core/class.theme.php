@@ -23,10 +23,9 @@ class Gdn_Theme {
    /**
     * Renders the banner logo, or just the banner title if the logo is not defined.
     */
-   public static function Logo($DefaultTitle = 'Vanilla') {
+   public static function Logo() {
       $Logo = C('Garden.Logo');
-      $Title = C('Garden.Title', $DefaultTitle);
+      $Title = C('Garden.Title', 'Title');
       echo $Logo ? Img($Logo, array('alt' => $Title)) : $Title;
-   }
-   
+   }   
 }

@@ -82,7 +82,10 @@ class Gdn_ThemeManager {
       } else {
          SaveToConfig('Garden.Theme', $ThemeFolder);
       }
-      
+
+      // Tell the locale cache to refresh itself.
+      $ApplicationManager = new Gdn_ApplicationManager();
+      Gdn::Locale()->Refresh();
       return TRUE;
    }
    

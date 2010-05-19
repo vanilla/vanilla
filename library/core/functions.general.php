@@ -1081,22 +1081,20 @@ if (!function_exists('Url')) {
       $Prefix = substr($Destination, 0, 7);
       if (in_array($Prefix, array('http://', 'https:/'))) {
          return $Destination;
-      } else if ($Destination == '#' || $Destination == '') {
-         if ($WithDomain)
-            return Gdn_Url::Request(TRUE, TRUE, $RemoveSyndication).$Destination;
-         else
-            return '/'.Gdn_Url::Request(TRUE, FALSE, $RemoveSyndication).$Destination;
-      } else {
-         $Paths = array();
-         if (!$WithDomain)
-            $Paths[] = '/';
-            
-         $Paths[] = Gdn_Url::WebRoot($WithDomain);
-         if (!$RewriteUrls)
-            $Paths[] = 'index.php';
-            
-         $Paths[] = $Destination;
-         return CombinePaths($Paths, '/');
       }
+      if ($Destination == '#' || $Destination == '') {
+         $Destination = Gdn_Url::Request(FALSE, FALSE, $RemoveSyndication).$Destination;
+      }
+
+      $Paths = array();
+      if (!$WithDomain)
+         $Paths[] = '/';
+
+      $Paths[] = Gdn_Url::WebRoot($WithDomain);
+      if (!$RewriteUrls)
+         $Paths[] = 'index.php';
+
+      $Paths[] = $Destination;
+      return CombinePaths($Paths, '/');
    }
 }

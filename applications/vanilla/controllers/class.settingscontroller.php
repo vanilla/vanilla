@@ -22,6 +22,10 @@ class SettingsController extends Gdn_Controller {
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
+         'Vanilla.Discussions.PerPage',
+         'Vanilla.Comments.AutoRefresh',
+         'Vanilla.Comments.PerPage',
+         'Vanilla.Categories.Use',
          'Vanilla.Archive.Date',
 			'Vanilla.Archive.Exclude'
       ));
@@ -34,6 +38,12 @@ class SettingsController extends Gdn_Controller {
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
 		} else {
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
 			
 			// Grab old config values to check for an update.
@@ -63,43 +73,6 @@ class SettingsController extends Gdn_Controller {
    public function Index() {
       $this->View = 'general';
       $this->General();
-   }
-   
-   public function General() {
-      $this->Permission('Vanilla.Settings.Manage');
-      $this->AddSideMenu('vanilla/settings/general');
-      $this->Title(T('Forum Settings'));
-
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
-         'Vanilla.Discussions.PerPage',
-         'Vanilla.Comments.AutoRefresh',
-         'Vanilla.Comments.PerPage',
-         'Vanilla.Categories.Use'
-      ));
-      
-      // Set the model on the form.
-      $this->Form->SetModel($ConfigurationModel);
-      
-      // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Apply the config settings to the form.
-         $this->Form->SetData($ConfigurationModel->Data);
-      } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
-         
-         if ($this->Form->Save() !== FALSE)
-            $this->StatusMessage = T("Your changes have been saved.");
-
-      }
-      
-      $this->Render();
    }
    
    public function Initialize() {

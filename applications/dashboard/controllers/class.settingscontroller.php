@@ -91,43 +91,19 @@ class SettingsController extends DashboardController {
    }
    
    /**
-    * Garden management screen.
+    * Banner management screen.
     */
-   public function Configure() {
+   public function Banner() {
       $this->Permission('Garden.Settings.Manage');
-      $this->AddSideMenu('dashboard/settings/configure');
-      $this->AddJsFile('email.js');
-      $this->Title(T('General Settings'));
+      $this->AddSideMenu('dashboard/settings/banner');
+      $this->Title(T('Banner'));
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
-         'Garden.Locale',
-         'Garden.Title',
-         'Garden.RewriteUrls',
-         'Garden.Email.SupportName',
-         'Garden.Email.SupportAddress',
-         'Garden.Email.UseSmtp',
-         'Garden.Email.SmtpHost',
-         'Garden.Email.SmtpUser',
-         'Garden.Email.SmtpPassword',
-         'Garden.Email.SmtpPort'
-      ));
+      $ConfigurationModel->SetField(array('Garden.Title'));
       
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
-      
-      // Load the locales for the locale dropdown
-      $Locale = Gdn::Locale();
-      $AvailableLocales = $Locale->GetAvailableLocaleSources();
-      $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
-      
-      // Check to see if mod_rewrite is enabled.
-      if(function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
-         $this->SetData('HasModRewrite', TRUE);
-      } else {
-         $this->SetData('HasModRewrite', FALSE);
-      }
       
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -135,21 +111,7 @@ class SettingsController extends DashboardController {
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
          // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Locale', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.RewriteUrls', 'Boolean');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
-         
-         // If changing locale, redefine locale sources:
-         $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
-         if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
-            $ApplicationManager = new Gdn_ApplicationManager();
-            $PluginManager = Gdn::Factory('PluginManager');
-            $Locale = Gdn::Locale();
-            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
-         }
          
          if ($this->Form->Save() !== FALSE) {
             $Upload = new Gdn_Upload();
@@ -184,6 +146,65 @@ class SettingsController extends DashboardController {
       $this->Render();      
    }      
    
+   /**
+    * Outgoing Email management screen.
+    */
+   public function Email() {
+      $this->Permission('Garden.Settings.Manage');
+      $this->AddSideMenu('dashboard/settings/email');
+      $this->AddJsFile('email.js');
+      $this->Title(T('Outgoing Email'));
+      
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Garden.Email.SupportName',
+         'Garden.Email.SupportAddress',
+         'Garden.Email.UseSmtp',
+         'Garden.Email.SmtpHost',
+         'Garden.Email.SmtpUser',
+         'Garden.Email.SmtpPassword',
+         'Garden.Email.SmtpPort'
+      ));
+      
+      // Set the model on the form.
+      $this->Form->SetModel($ConfigurationModel);
+      
+      // Load the locales for the locale dropdown
+      $Locale = Gdn::Locale();
+      $AvailableLocales = $Locale->GetAvailableLocaleSources();
+      $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
+      
+      // If seeing the form for the first time...
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+      } else {
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
+         
+         // If changing locale, redefine locale sources:
+         /*
+         $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
+         if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
+            $ApplicationManager = new Gdn_ApplicationManager();
+            $PluginManager = Gdn::Factory('PluginManager');
+            $Locale = Gdn::Locale();
+            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+         }
+         */
+         
+         if ($this->Form->Save() !== FALSE)
+            $this->StatusMessage = T("Your settings have been saved.");
+
+      }
+      
+      $this->Render();      
+   }      
+
    /**
     * Garden settings dashboard.
     */
@@ -489,10 +510,7 @@ class SettingsController extends DashboardController {
       $this->AvailableThemes = $ThemeManager->AvailableThemes();
       $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
       $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
-      $Name = array_keys($this->EnabledTheme);
-      $Name = ArrayValue(0, $Name, 'undefined');
-      $this->EnabledTheme = ArrayValue($Name, $this->EnabledTheme);
-      $this->EnabledThemeName = ArrayValue('Name', $this->EnabledTheme, $Name);
+      $this->EnabledThemeName = GetValue('Name', $this->EnabledTheme, GetValue('Folder', $this->EnabledTheme, ''));
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file

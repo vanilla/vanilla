@@ -373,7 +373,7 @@ class Gdn_PluginManager {
       
       // Required Themes
       $ThemeManager = new Gdn_ThemeManager();
-      $EnabledThemes = $ThemeManager->EnabledThemeInfo();
+      $EnabledThemes = $ThemeManager->EnabledThemeInfo(TRUE);
       $RequiredThemes = ArrayValue('RequiredTheme', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       

@@ -10,20 +10,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 
 /**
- * Takes a route and prepends the web root (expects "/controller/action/params" as $Destination).
- * 
- * @param array The parameters passed into the function.
- * The parameters that can be passed to this function are as follows.
- * - <b>dest</b>: The destination of the url.
- * - <b>domain</b>: Whether or not to add the domain to the url.
- * - <b>removeSyndication</b>: Whether or not to remove any syndication from the url.
+ * A placeholder for future menu items.
+ *
+ * @param array The parameters passed into the function. This currently takes no parameters.
  * @param Smarty The smarty object rendering the template.
- * @return The url.
+ * @return
  */
-function smarty_function_url($Params, &$Smarty) {
-	$Destination = ArrayValue('dest', $Params, '');
-	$WithDomain = ArrayValue('domain', $Params, FALSE);
-	$RemoveSyndication = ArrayValue('removeSyndication', $Params, FALSE);
-	$Result = Url($Destination, $WithDomain, $RemoveSyndication);
-	return $Result;
+function smarty_function_custom_menu($Params, &$Smarty) {
+   
 }
+

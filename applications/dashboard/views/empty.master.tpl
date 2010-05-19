@@ -3,7 +3,7 @@
 <head>
 	{asset name='Head'}
 </head>
-<body id="{$BodyIdentifier|escape}" class="{$CssClass|escape}">
+<body id="{$BodyID}" class="{$BodyClass}">
 {asset name='Content'}
 </body>
 </html>

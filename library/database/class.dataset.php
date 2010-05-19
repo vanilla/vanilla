@@ -57,33 +57,28 @@ class Gdn_DataSet implements IteratorAggregate {
     * @var object
     */
    private $_PDOStatement;
-
-   /**
-    * A boolean value indicating if the PDOStatement's result set has been fetched.
-    *
-    * @var boolean
-    */
-   private $_PDOStatementFetched;
 	
 	/**
 	 * An array of either objects or associative arrays with the data in this dataset.
 	 * @var array
 	 */
-	protected $_Result = NULL;
+	protected $_Result;
 
    /**
     * @todo Undocumented method.
     */
    public function __construct() {
       // Set defaults
-      $this->Connection = FALSE;
+      $this->Connection = NULL;
       $this->_Cursor = -1;
-      $this->_PDOStatement = FALSE;
-      $this->_PDOStatementFetched = FALSE;
-      $this->_ResultObject = array();
-      $this->_ResultObjectFetched = FALSE;
-      $this->_ResultArray = array();
-      $this->_ResultArrayFetched = FALSE;
+      $this->_PDOStatement = NULL;
+      $this->_Result = NULL;
+   }
+
+   /** Clean sensitive data out of the object. */
+   public function Clean() {
+      $this->Connection = NULL;
+      $this->_PDOStatement = NULL;
    }
 
    /**
@@ -297,7 +292,7 @@ class Gdn_DataSet implements IteratorAggregate {
    public function ImportDataset($Resultset) {
       if (is_array($Resultset) && array_key_exists(0, $Resultset)) {
          $this->_Cursor = -1;
-         $this->_PDOStatement = FALSE;
+         $this->_PDOStatement = NULL;
          $FirstRow = $Resultset[0];
 			
          if (is_array($FirstRow))

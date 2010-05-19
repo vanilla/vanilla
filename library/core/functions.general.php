@@ -1073,17 +1073,17 @@ if (!function_exists('TrueStripSlashes')) {
 
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
 if (!function_exists('Url')) {   
-   function Url($Destination = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
+   function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       // Cache the rewrite urls config setting in this object.
       static $RewriteUrls = NULL;
       if(is_null($RewriteUrls)) $RewriteUrls = ForceBool(Gdn::Config('Garden.RewriteUrls', FALSE));
       
-      $Prefix = substr($Destination, 0, 7);
+      $Prefix = substr($Path, 0, 7);
       if (in_array($Prefix, array('http://', 'https:/'))) {
-         return $Destination;
+         return $Path;
       }
-      if ($Destination == '#' || $Destination == '') {
-         $Destination = Gdn_Url::Request(FALSE, FALSE, $RemoveSyndication).$Destination;
+      if ($Path == '#' || $Path == '') {
+         $Path = Gdn_Url::Request(FALSE, FALSE, $RemoveSyndication).$Path;
       }
 
       $Paths = array();
@@ -1094,7 +1094,7 @@ if (!function_exists('Url')) {
       if (!$RewriteUrls)
          $Paths[] = 'index.php';
 
-      $Paths[] = $Destination;
+      $Paths[] = $Path;
       return CombinePaths($Paths, '/');
    }
 }

@@ -10,17 +10,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 
 /**
- * Takes a route and prepends the web root (expects "/controller/action/params" as $Destination).
+ * Takes a route and prepends the web root (expects "/controller/action/params" as $Path).
  *
  * @param array The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
- * - <b>dest</b>: The destination of the url.
+ * - <b>path</b>: The relative path for the url. There are some special paths that can be used to return "intelligent" links:
+ *    - <b>signinout</b>: This will return a signin/signout url that will toggle depending on whether or not the user is already signed in. When this path is given the text is automaticall set.
  * - <b>withdomain</b>: Whether or not to add the domain to the url.
+ * - <b>text</b>: Html text to be put inside an anchor. If this value is set then an html <a></a> is returned rather than just a url.
+ * - <b>id, class, etc.></b>: When an anchor is generated then any other attributes are passed through and will be written in the resulting tag.
  * @param Smarty The smarty object rendering the template.
  * @return The url.
  */
 function smarty_function_link($Params, &$Smarty) {
-   $Destination = GetValue('url', $Params, '', TRUE);
+   $Path = GetValue('path', $Params, '', TRUE);
    $WithDomain = GetValue('withdomain', $Params, FALSE, TRUE);
    $RemoveSyndication = GetValue('removeSyndication', $Params, FALSE, TRUE);
    $Text = GetValue('text', $Params, '', TRUE);
@@ -31,30 +34,27 @@ function smarty_function_link($Params, &$Smarty) {
    $Authenticator = Gdn::Authenticator();
 
    // Use some logic to expan special urls.
-   switch(strtolower($Destination)) {
-      case "signin":
-      case "signout":
+   switch(strtolower($Path)) {
       case "signinout":
-      case "entry/leave":
          // The destination is the signin/signout toggle link.
          if ($Session->IsValid()) {
             if(!$Text && !$NoTag)
                $Text = T('Sign Out');
-            $Destination = $Authenticator->SignOutUrl();
+            $Path = $Authenticator->SignOutUrl();
             $Class = ConcatSep(' ', $Class, 'SignOut');
          } else {
             if(!$Text && !$NoTag)
                $Text = T('Sign In');
             $Attribs = array();
 
-            $Destination = $Authenticator->SignInUrl('');
+            $Path = $Authenticator->SignInUrl('');
             if (Gdn::Config('Garden.SignIn.Popup'))
                $Class = ConcatSep(' ', $Class, 'SignInPopup');
          }
          break;
    }
 
-   $Url = Url($Destination, $WithDomain, $RemoveSyndication);
+   $Url = Url($Path, $WithDomain, $RemoveSyndication);
    $Url = str_replace('{Session_TransientKey}', $Session->TransientKey(), $Url);
 
    if(!$Text)

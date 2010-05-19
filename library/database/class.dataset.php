@@ -57,33 +57,28 @@ class Gdn_DataSet implements IteratorAggregate {
     * @var object
     */
    private $_PDOStatement;
-
-   /**
-    * A boolean value indicating if the PDOStatement's result set has been fetched.
-    *
-    * @var boolean
-    */
-   private $_PDOStatementFetched;
 	
 	/**
 	 * An array of either objects or associative arrays with the data in this dataset.
 	 * @var array
 	 */
-	protected $_Result = NULL;
+	protected $_Result;
 
    /**
     * @todo Undocumented method.
     */
    public function __construct() {
       // Set defaults
-      $this->Connection = FALSE;
+      $this->Connection = NULL;
       $this->_Cursor = -1;
-      $this->_PDOStatement = FALSE;
-      $this->_PDOStatementFetched = FALSE;
-      $this->_ResultObject = array();
-      $this->_ResultObjectFetched = FALSE;
-      $this->_ResultArray = array();
-      $this->_ResultArrayFetched = FALSE;
+      $this->_PDOStatement = NULL;
+      $this->_Result = NULL;
+   }
+
+   /** Clean sensitive data out of the object. */
+   public function Clean() {
+      $this->Connection = NULL;
+      $this->_PDOStatement = NULL;
    }
 
    /**
@@ -98,8 +93,19 @@ class Gdn_DataSet implements IteratorAggregate {
 	public function DatasetType($DatasetType = FALSE) {
 		if($DatasetType !== FALSE) {
 			// Make sure the type isn't changed if the result is already fetched.
-			if(!is_null($this->_Result)) {
-				throw new Exception('Cannot change DatasetType after the result has been fetched.');
+			if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
+            // Loop through the dataset and switch the types.
+               $Result =& $this->_Result;
+            foreach($Result as $Index => $Row) {
+               switch($DatasetType) {
+                  case DATASET_TYPE_ARRAY:
+                     $Result[$Index] = (array)$Row;
+                     break;
+                  case DATASET_TYPE_OBJECT:
+                     $Result[$Index] = (object)$Row;
+                     break;
+               }
+            }
 			}
 			
 			$this->_DatasetType = $DatasetType;
@@ -286,7 +292,7 @@ class Gdn_DataSet implements IteratorAggregate {
    public function ImportDataset($Resultset) {
       if (is_array($Resultset) && array_key_exists(0, $Resultset)) {
          $this->_Cursor = -1;
-         $this->_PDOStatement = FALSE;
+         $this->_PDOStatement = NULL;
          $FirstRow = $Resultset[0];
 			
          if (is_array($FirstRow))

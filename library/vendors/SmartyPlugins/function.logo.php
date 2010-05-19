@@ -8,9 +8,15 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-function smarty_function_anchor($Params, &$Smarty) {
-	$Text = ArrayValue('text', $Params, '');
-	$Destination = ArrayValue('destination', $Params, '');
-	$CssClass = ArrayValue('class', $Params, '');
-	return Anchor($Text, $Destination, $CssClass);
+
+/**
+ * Writes the site logo to the page.
+ *
+ * @param array The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty The smarty object rendering the template.
+ * @return The url.
+ */
+function smarty_function_logo($Params, &$Smarty) {
+   $Result = Gdn_Theme::Logo('Title');
+	return $Result;
 }

@@ -8,24 +8,23 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/**
- * Utility class that helps to render theme elements.
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-class Gdn_Theme {
 
-   /**
-    * Renders the banner logo, or just the banner title if the logo is not defined.
-    */
-   public static function Logo() {
-      $Logo = C('Garden.Logo');
-      $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img($Logo, array('alt' => $Title)) : $Title;
-   }   
+/**
+ * Writes the search box to the page.
+ *
+ * @param array The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty The smarty object rendering the template.
+ * @return The url.
+ */
+function smarty_block_permission($Params, $Content, &$Smarty, &$Repeat) {
+   // only output on the closing tag
+    if(!$Repeat){
+        if (isset($Content)) {
+           $Require = GetValue('require', $Params);
+           $HasPermission = Gdn::Session()->CheckPermission($Require);
+           if($HasPermission)
+              return $Content;
+        }
+    }
 }
+

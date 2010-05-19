@@ -59,6 +59,20 @@ class Gdn_Locale extends Gdn_Pluggable {
       parent::__construct();
    }
 
+   public function Refresh() {
+      $LocalName = $this->Current();
+
+      $ApplicationManager = Gdn::Factory('ApplicationManager');
+      $ApplicationWhiteList = $ApplicationManager->EnabledApplicationFolders();
+
+      $PluginManager = Gdn::Factory('PluginManager');
+      $PluginWhiteList = $PluginManager->EnabledPluginFolders();
+
+      $ForceRemapping = TRUE;
+
+      $this->Set($LocalName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+   }
+
    /**
     * Defines and loads the locale.
     *
@@ -96,6 +110,14 @@ class Gdn_Locale extends Gdn_Pluggable {
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+
+         // Get theme-based locale definition files.
+         $Theme = C('Garden.Theme');
+         if($Theme) {
+            $ThemeLocalePath = PATH_THEMES."/$Theme/locale/$LocaleName.php";
+            if(file_exists($ThemeLocalePath))
+               $LocaleSources[] = $ThemeLocalePath;
+         }
             
          // Save the mappings
          $FileContents = array();
@@ -167,6 +189,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public function Translate($Code, $Default = '') {
       $this->EventArguments['Code'] = $Code;
+      $this->EventArguments['Default'] = $Default;
       $this->FireEvent('BeforeTranslate');
       if (array_key_exists($Code, $this->_Definition)) {
          return $this->_Definition[$Code];

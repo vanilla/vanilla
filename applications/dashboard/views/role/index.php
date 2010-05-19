@@ -30,6 +30,7 @@ foreach ($this->RoleData->Result() as $Role) {
             echo Anchor('Delete', '/role/delete/'.$Role->RoleID, 'Popup');
             }
             ?>
+         </div>
       </td>
       <td class="Alt"><?php echo $Role->Description; ?></td>
    </tr>

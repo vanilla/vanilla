@@ -31,10 +31,10 @@ class Gdn_Smarty {
 
       // Get a friendly name for the controller.
       $ControllerName = get_class($Controller);
-      if(preg_match('/^(?:Gdn_)?(.*?)(?:Controller)?$/', $ControllerName, $Matches)) {
-         $ControllerName = $Matches[1];
-      }
-      $Smarty->assign('ControllerName', $ControllerName);
+//      if(preg_match('/^(?:Gdn_)?(.*?)(?:Controller)?$/', $ControllerName, $Matches)) {
+//         $ControllerName = $Matches[1];
+//      }
+//      $Smarty->assign('ControllerName', $ControllerName);
 
       // Get an ID for the body.
       $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::AlphaNumeric(strtolower($Controller->RequestMethod)));
@@ -55,20 +55,29 @@ class Gdn_Smarty {
             'CountNotifications' => 0,
             'SignedIn' => FALSE);*/
       }
-      $Smarty->assign_by_ref('User', $User);
+      $Smarty->assign('User', $User);
 
       // Make sure that any datasets use arrays instead of objects.
       foreach($Controller->Data as $Key => $Value) {
          if($Value instanceof Gdn_DataSet) {
             $Value->DatasetType(DATASET_TYPE_ARRAY);
+            $Value->Clean();
          }
       }
-      
+     
       $Controller->Data['BodyClass'] = GetValue('CssClass', $Controller->Data, '', TRUE);
 
-      $Smarty->assign($Controller->Data);
-      $Smarty->assign('Controller', $Controller);
+      //$Smarty->assign('Assets', (array)$Controller->Assets);
+      $Smarty->assign('Path', Gdn::Request()->Path());
 
+      // Assigign the controller data last so the controllers override any default data.
+      $Smarty->assign($Controller->Data);
+
+      $Smarty->Controller = $Controller; // for smarty plugins
+      $Smarty->security = TRUE;
+      $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
+         array('CheckPermission', 'GetValue', 'SetValue', 'Url'));
+      $Smarty->secure_dir = array($Path);
       $Smarty->display($Path);
    }
 

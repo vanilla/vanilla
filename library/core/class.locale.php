@@ -147,12 +147,13 @@ class Gdn_Locale extends Gdn_Pluggable {
       $ConfLocaleOverride = PATH_CONF . DS . 'locale.php';
       $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
-         if ($ConfLocaleOverride != $LocaleSources[$i]) // Don't double include the conf override file... and make sure it comes last
-            @include_once($LocaleSources[$i]);
+         if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last
+            include_once($LocaleSources[$i]);
       }
 
       // Also load any custom defined definitions from the conf directory
-      @include_once($ConfLocaleOverride);
+      if (file_exists($ConfLocaleOverride))
+         include_once($ConfLocaleOverride);
 
       // All of the included files should have contained
       // $Definition['Code'] = 'Definition'; assignments. The overwrote each

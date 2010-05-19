@@ -313,4 +313,9 @@ class MessagesController extends ConversationsController {
       $this->View = 'All';
       $this->All($Offset, $Limit, TRUE);
    }
+
+   public function Inbox($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
+      $this->View = 'All';
+      $this->All($Offset, $Limit, $BookmarkedOnly);
+   }
 }

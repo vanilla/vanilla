@@ -276,6 +276,13 @@ if (!function_exists('CalculateNumberOfPages')) {
    }
 }
 
+if (!function_exists('CheckPermission')) {
+   function CheckPermission($PermissionName) {
+      $Result = Gdn::Session()->CheckPermission($PermissionName);
+      return $Result;
+   }
+}
+
 if (!function_exists('CheckRequirements')) {
    function CheckRequirements($ItemName, $RequiredItems, $EnabledItems, $RequiredItemTypeCode) {
       // 1. Make sure that $RequiredItems are present
@@ -370,6 +377,37 @@ if (!function_exists('CombinePaths')) {
       } else {
          return $Paths;
       }
+   }
+}
+
+if (!function_exists('ConcatSep')) {
+   /** Concatenate a string to another string with a seperator.
+    *
+    * @param string $Sep The seperator string to use between the concatenated strings.
+    * @param string $Str1 The first string in the concatenation chain.
+    * @param mixed $Str2 The second string in the concatenation chain.
+    *  - This parameter can be an array in which case all of its elements will be concatenated.
+    *  - If this parameter is a string then the function will look for more arguments to concatenate.
+    * @return string
+    */
+   function ConcatSep($Sep, $Str1, $Str2) {
+      if(is_array($Str2)) {
+         $Strings = array_merge((array)$Str1, $Str2);
+      } else {
+         $Strings = func_get_args();
+         array_shift($Strings);
+      }
+
+      $Result = '';
+      foreach($Strings as $String) {
+         if($String)
+            continue;
+
+         if($Result)
+            $Result .= $Sep;
+         $Result .= $String;
+      }
+      return $Result;
    }
 }
 
@@ -529,14 +567,20 @@ if (!function_exists('GetValue')) {
 	 * @param string $Key The key or property name of the value.
 	 * @param mixed $Collection The array or object to search.
 	 * @param mixed $Default The value to return if the key does not exist.
+    * @param bool $Remove Whether or not to remove the item from the collection.
 	 * @return mixed The value from the array or object.
 	 */
-	function GetValue($Key, $Collection, $Default = FALSE) {
+	function GetValue($Key, &$Collection, $Default = FALSE, $Remove = FALSE) {
 		$Result = $Default;
-		if(is_array($Collection) && array_key_exists($Key, $Collection))
+		if(is_array($Collection) && array_key_exists($Key, $Collection)) {
 			$Result = $Collection[$Key];
-		elseif(is_object($Collection) && property_exists($Collection, $Key))
+         if($Remove)
+            unset($Collection[$Key]);
+		} elseif(is_object($Collection) && property_exists($Collection, $Key)) {
 			$Result = $Collection->$Key;
+         if($Remove)
+            unset($Collection->$Key);
+      }
 			
       return $Result;
 	}

@@ -19,7 +19,7 @@ ob_start();
 define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.0 rc1');
 
-define('DS', DIRECTORY_SEPARATOR);
+define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
 
 // 2. Include the header.

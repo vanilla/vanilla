@@ -209,6 +209,7 @@ if (!function_exists('Asset')) {
     * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
     */
    function Asset($Destination = '', $WithDomain = FALSE) {
+      $Destination = str_replace('\\', '/', $Destination);
       if (substr($Destination, 0, 7) == 'http://') {
          return $Destination;
       } else {

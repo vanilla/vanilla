@@ -20,7 +20,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return The url.
  */
 function smarty_function_link($Params, &$Smarty) {
-   $Destination = GetValue('dest', $Params, '', TRUE);
+   $Destination = GetValue('url', $Params, '', TRUE);
    $WithDomain = GetValue('withdomain', $Params, FALSE, TRUE);
    $RemoveSyndication = GetValue('removeSyndication', $Params, FALSE, TRUE);
    $Text = GetValue('text', $Params, '', TRUE);
@@ -47,7 +47,7 @@ function smarty_function_link($Params, &$Smarty) {
                $Text = T('Sign In');
             $Attribs = array();
 
-            $Destination = $Authenticator->SignInUrl('.'); // TODO: Add proper self url
+            $Destination = $Authenticator->SignInUrl('');
             if (Gdn::Config('Garden.SignIn.Popup'))
                $Class = ConcatSep(' ', $Class, 'SignInPopup');
          }

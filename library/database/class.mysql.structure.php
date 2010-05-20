@@ -324,7 +324,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
          } else {
 				$ExistingColumn = $ExistingColumns[$ColumnName];	
-				if ($Column->Type != $ExistingColumn->Type || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
+				if ($Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
 
 					// The existing & new column types do not match, so modify the column
 					if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))

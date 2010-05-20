@@ -91,7 +91,7 @@ $Construct->Table('UserMeta')
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
 	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
-	->Column('ProviderKey', 'varcahr(64)', FALSE, 'primary')
+	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
 	

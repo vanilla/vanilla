@@ -139,7 +139,7 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.RewriteUrls', 'Boolean');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
+         //$ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
          
          // If changing locale, redefine locale sources:

@@ -214,8 +214,12 @@ class Gdn_CookieIdentity {
       
       if (is_null($CookieSalt))
          $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
-
-      list($HashKey, $HMAC, $Time, $UserID, $Expiration) = explode('|', $_COOKIE[$CookieName]);
+      
+      $CookieData = explode('|', $_COOKIE[$CookieName]);
+      if (count($CookieData) < 5)
+         return FALSE;
+         
+      list($HashKey, $HMAC, $Time, $UserID, $Expiration) = $CookieData;
       if ($Expiration < time() && $Expiration != 0)
          return FALSE;
 

@@ -228,7 +228,7 @@ class Gdn_Request {
       );
       $NumDataTypes = sizeof($QueryOrder);
       
-      for ($i=0; $i <= $NumDataTypes; $i++) {
+      for ($i=0; $i < $NumDataTypes; $i++) {
          $DataType = $QueryOrder[$i];
          if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
          if (array_key_exists($Key, $this->_RequestArguments[$DataType]))
@@ -385,7 +385,7 @@ class Gdn_Request {
       $WebRoot = $this->_EnvironmentElement('ConfigWebRoot');
 
       // Attempt to get the webroot from the server
-      if ($WebRoot === FALSE || $WebRoot == '') {
+      if ($WebRoot) {
          $WebRoot = explode('/', ArrayValue('PHP_SELF', $_SERVER, ''));
 
          // Look for index.php to figure out where the web root is.

@@ -25,12 +25,12 @@ require_once(PATH_LIBRARY_CORE . DS . 'functions.error.php');
 require_once(PATH_LIBRARY_CORE . DS . 'functions.general.php');
 require_once(PATH_LIBRARY_CORE . DS . 'functions.validation.php');
 
-require_once(PATH_LIBRARY_CORE . DS . 'interface.iauthenticator.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.iplugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
 
 require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.authenticator.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
@@ -96,9 +96,9 @@ Gdn::FactoryInstall('Form', 'Gdn_Form', PATH_LIBRARY.DS.'core'.DS.'class.form.ph
 
 // Identity, Authenticator & Session.
 Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');
-$AuthType = Gdn::Config('Garden.Authenticator.Type', 'Password');
-Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_'.$AuthType.'Authenticator', PATH_LIBRARY_CORE.DS.'class.'.strtolower($AuthType).'authenticator.php', Gdn::FactorySingleton, array('Garden.Authenticator'));
 Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php');
+Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth', PATH_LIBRARY_CORE.DS.'class.auth.php', Gdn::FactorySingleton);
+
 // Dispatcher.
 Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router', PATH_LIBRARY_CORE.DS.'class.router.php', Gdn::FactorySingleton);
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton);
@@ -156,6 +156,8 @@ unset($PluginInfo);
 
 Gdn::FactoryOverwrite($FactoryOverwriteBak);
 unset($FactoryOverwriteBak);
+
+Gdn::Authenticator()->StartAuthenticator();
 
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))

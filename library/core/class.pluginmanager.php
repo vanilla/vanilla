@@ -516,6 +516,7 @@ class Gdn_PluginManager {
          case self::ACTION_ENABLE:  $HookMethod = 'Setup'; break;
          case self::ACTION_DISABLE: $HookMethod = 'OnDisable'; break;
          case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+         case self::ACTION_ONLOAD:  $HookMethod = 'OnLoad'; break;
       }
       
       $PluginInfo      = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);

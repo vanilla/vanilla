@@ -51,16 +51,16 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     * @param int $ClientHour The current hour (24 hour format) of the client.
     */
    public function Authenticate() {
-   
+      
       if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) return Gdn_Authenticator::AUTH_INSUFFICIENT;
-   
+      
       $Email = $this->GetValue('Email');
       $Password = $this->GetValue('Password');
       $PersistentSession = $this->GetValue('RememberMe');
       $ClientHour = $this->GetValue('ClientHour');
 
       $UserID = 0;
-
+   
       // Retrieve matching username/password values
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);

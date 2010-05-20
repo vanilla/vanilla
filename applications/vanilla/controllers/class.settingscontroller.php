@@ -55,7 +55,7 @@ class SettingsController extends Gdn_Controller {
 		
       $this->AddSideMenu('vanilla/settings/advanced');
       $this->AddJsFile('settings.js');
-      $this->Title(Translate('Advanced Forum Settings'));
+      $this->Title(T('Advanced Forum Settings'));
 		
 		$this->Render();
 	}

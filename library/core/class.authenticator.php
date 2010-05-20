@@ -103,8 +103,12 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       return $this->_DataSourceType;
    }
    
-   public function FetchData($DataSource) {
+   public function FetchData($DataSource, $DirectSupplied = array()) {
       $this->_DataSource = $DataSource;
+      
+      if ($DataSource == $this)
+         foreach ($this->_DataHooks as $DataTarget => $DataHook)
+            $this->_DataHooks[$DataTarget]['value'] = ArrayValue($DataTarget, $DirectSupplied);
       
       if (sizeof($this->_DataHooks))
          foreach ($this->_DataHooks as $DataTarget => $DataHook)

@@ -220,6 +220,7 @@ class Gdn_Session {
     * @param Gdn_Authenticator $Authenticator The authenticator used to identify the user making the request.
     */
    public function Start() {
+      if (!Gdn::Config('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = Gdn::Authenticator()->GetIdentity();

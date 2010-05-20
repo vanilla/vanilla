@@ -1266,6 +1266,9 @@ class Gdn_Form {
     * @return int
     */
    public function ValidateModel() {
+      if (!method_exists($this->_Model, 'DefineSchema'))
+         return 0;
+      
       $this->_Model->DefineSchema();
       if ($this->_Model->Validation->Validate($this->FormValues()) === FALSE) $this->_ValidationResults = $this->_Model->ValidationResults();
 

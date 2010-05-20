@@ -195,12 +195,9 @@ class SetupController extends DashboardController {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
                // The user has been created successfully, so sign in now
-               $Authenticator = Gdn::Authenticator();
-               $AuthUserID = $Authenticator->Authenticate(array(
-                  'Email' => $this->Form->GetValue('Email'),
-                  'Password' => $this->Form->GetValue('Password'),
-                  'RememberMe' => TRUE)
-               );
+               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+               $Authenticator->FetchData($this->Form);
+               $AuthUserID = $Authenticator->Authenticate();
             }
             
             if ($this->Form->ErrorCount() > 0)

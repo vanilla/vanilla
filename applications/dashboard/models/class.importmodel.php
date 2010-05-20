@@ -24,6 +24,8 @@ class ImportModel extends Gdn_Model {
 	public $CurrentStep = 0;
 
 	public $Data = array();
+   
+   public $ErrorType = '';
 
 	public $ImportPath = '';
 
@@ -172,6 +174,7 @@ class ImportModel extends Gdn_Model {
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
+         $this->ErrorType = 'Credentials';
 		}
 		return $Result;
 	}
@@ -184,6 +187,10 @@ class ImportModel extends Gdn_Model {
 
 		foreach($Tables as $Table => $TableInfo) {
 			$Columns = $TableInfo['Columns'];
+         if(!is_array($Columns) || count($Columns) == 0)
+            throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.', $Table)));
+
+
 			$St->Table(self::TABLE_PREFIX.$Table);
 			// Get the structure from the destination database to match types.
 			try {
@@ -197,6 +204,9 @@ class ImportModel extends Gdn_Model {
 			$DestModified = FALSE;
 
 			foreach($Columns as $Name => $Type) {
+            if(!$Name)
+               throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.'), $Table));
+
 				if(array_key_exists($Name, $DestColumns))
 					$StructureType = $DestStructure->ColumnTypeString($DestColumns[$Name]);
 				else {
@@ -219,9 +229,14 @@ class ImportModel extends Gdn_Model {
 				->Column('_Action', array('Insert', 'Update'));
 			}
 
-			$St->Set(TRUE, TRUE);
-			if($DestModified)
-				$DestStructure->Set();
+         try {
+            $St->Set(TRUE, TRUE);
+            if($DestModified)
+               $DestStructure->Set();
+         } catch(Exception $Ex) {
+            // Since these exceptions are likely caused by a faulty import file they should be considered user exceptions.
+            throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table.'), $Table), $Ex);
+         }
 		}
 		return TRUE;
 	}
@@ -307,6 +322,23 @@ class ImportModel extends Gdn_Model {
 		RemoveFromConfig('Garden.Import');
 	}
 
+   public function FromPost($Post) {
+      if(isset($Post['Overwrite']))
+         $this->Data['Overwrite'] = $Post['Overwrite'];
+      if(isset($Post['Email']))
+         $this->Data['OverwriteEmail'] = $Post['Email'];
+      if(isset($Post['Password'])) {
+         $this->Data['OverwritePassword'] = $Post['Password'];
+      }
+   }
+
+   public function ToPost(&$Post) {
+      $D = $this->Data;
+      $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
+      $Post['Email'] = GetValue('OverwriteEmail', $D, '');
+      $Post['Password'] = GetValue('OverwritePassword', $D, '');
+   }
+
 	public function GetImportHeader($fpin = NULL) {
 		$Header = GetValue('Header', $this->Data);
 		if($Header)
@@ -323,7 +355,7 @@ class ImportModel extends Gdn_Model {
 		if(!$Header || strlen($Header) < 7 || substr_compare('Vanilla', $Header, 0, 7) != 0) {
 			if(isset($fpopened))
 				fclose($fpin);
-			throw new Exception('The import file is not in the correct format.');
+			throw new Gdn_UserException(T('The import file is not in the correct format.'));
 		}
 		$Header = $this->ParseInfoLine($Header);
 		if(isset($fpopened))
@@ -354,7 +386,7 @@ class ImportModel extends Gdn_Model {
 				$this->Data['CurrentStepMessage'] = $TableName;
 
             if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
-               $this->_InsertTable($TableName);
+               $RowCount = $this->_InsertTable($TableName);
             } else {
                switch($TableName) {
                   case 'UserDiscussion':
@@ -397,11 +429,13 @@ class ImportModel extends Gdn_Model {
                      $this->Query($Sql);
                      break;
                   default:
-                     $this->_InsertTable($TableName);
+                     $RowCount = $this->_InsertTable($TableName);
                }
             }
 
 				$Tables[$TableName]['Inserted'] = TRUE;
+            if(isset($RowCount))
+               $Tables[$TableName]['RowCount'] = $RowCount;
 				$InsertedCount++;
 				// Make sure the loading isn't taking too long.
 				if($Timer->ElapsedTime() > $this->MaxStepTime)
@@ -419,7 +453,7 @@ class ImportModel extends Gdn_Model {
 		if(!array_key_exists($TableName, $this->Tables()))
 			return;
 
-		$TableInfo = $this->Tables($TableName);
+		$TableInfo =& $this->Tables($TableName);
 		$Columns = $TableInfo['Columns'];
 
 		// Build the column insert list.
@@ -482,7 +516,14 @@ class ImportModel extends Gdn_Model {
 		."\n".$From
 		.$Where;
 
-		$this->Query($Sql);
+		//$this->Query($Sql);
+
+		$RowCount = $this->Query($Sql);
+      if(is_numeric($RowCount) && $RowCount > 0) {
+         return (int)$RowCount;
+      } else {
+         return FALSE;
+      }
 	}
 
 	public function InsertUserTable() {
@@ -557,6 +598,7 @@ class ImportModel extends Gdn_Model {
          ignore 1 lines";
 
 		$this->Query($Sql);
+
 		return TRUE;
 	}
 
@@ -605,6 +647,7 @@ class ImportModel extends Gdn_Model {
 			throw $Ex;
 		}
 
+      $RowCount = 0;
 		while(($Line = fgets($fpin)) !== FALSE) {
 			if($Line == "\n") {
 				if($fpout) {
@@ -651,6 +694,10 @@ class ImportModel extends Gdn_Model {
 	 * @return mixed Whether the step succeeded or an array of information.
 	 */
 	public function RunStep($Step = 1) {
+      $Started = $this->Stat('Started');
+      if($Started === NULL)
+         $this->Stat('Started', microtime(TRUE), 'time');
+
 		$Steps = $this->Steps();
 		if($Step > count($Steps)) {
 			return 'COMPLETE';
@@ -664,8 +711,14 @@ class ImportModel extends Gdn_Model {
 		$Method = $Steps[$Step];
 		$Result = call_user_func(array($this, $Method));
 
+      $ElapsedTime = $this->Timer->ElapsedTime();
+      $this->Stat('Time Spent on Import', $ElapsedTime, 'add');
+
 		if(isset($NewTimer))
 			$this->Timer->Finish('');
+
+      if($Result && !array_key_exists($Step + 1, $this->Steps()))
+         $this->Stat('Finished', microtime(TRUE), 'time');
 
 		return $Result;
 	}
@@ -698,6 +751,30 @@ class ImportModel extends Gdn_Model {
 		'Garden.Import.CurrentStepData' => $this->Data,
 		'Garden.Import.ImportPath' => $this->ImportPath));
 	}
+
+   public function Stat($Key, $Value = NULL, $Op = 'set') {
+      if(!isset($this->Data['Stats']))
+         $this->Data['Stats'] = array();
+
+      $Stats =& $this->Data['Stats'];
+
+      if($Value !== NULL) {
+         switch(strtolower($Op)) {
+            case 'add':
+               $Value += GetValue($Key, $Stats, 0);
+               $Stats[$Key] = $Value;
+               break;
+            case 'set':
+               $Stats[$Key] = $Value;
+               break;
+            case 'time':
+               $Stats[$Key] = date('Y-m-d H:i:s', $Value);
+         }
+         return $Stats[$Key];
+      } else {
+         return GetValue($Key, $Stats, NULL);
+      }
+   }
 
 	public function Steps() {
 		if(strcasecmp($this->Overwrite(), 'Overwrite') == 0)

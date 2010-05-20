@@ -513,22 +513,22 @@ class Gdn_Request {
    public function _UnsetRequestArguments($ParamsType) {
       unset($this->_RequestArguments[$ParamsType]);
    }
-   
+
    /**
     * This method allows safe creation of URLs that need to reference the application itself
     *
-    * Taking the server's RewriteUrls ability into account, and using information from the 
-    * actual Request data, this method can construct a trustworthy URL that will point to 
-    * Garden's dispatcher. Examples: 
+    * Taking the server's RewriteUrls ability into account, and using information from the
+    * actual Request data, this method can construct a trustworthy URL that will point to
+    * Garden's dispatcher. Examples:
     *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php/
     *    - Default port, rewrites                     http://www.forum.com/
     *    - Custom port, rewrites                      http://www.forum.com:8080/index.php/
     *
-    * @param $WithDomain set to false to create a relative URL
-    * @param $PreserveTrailingSlash set to false to strip trailing slash
+    * @param sring $Path of the controller method.
+    * @param bool $WithDomain set to false to create a relative URL
     * @return string
     */
-   public function WebPath($WithDomain = TRUE, $PreserveTrailingSlash = TRUE) {
+   public function Url($Path, $WithDomain = FALSE) {
       $Parts = array();
       
       if ($WithDomain)
@@ -536,15 +536,13 @@ class Gdn_Request {
          
       $Parts[] = $this->WebRoot();
       
-      if (Gdn::Config('Garden.RewriteUrls', FALSE) === FALSE)
-         $Parts[] = $this->_EnvironmentElement('Script').'/';
+      if (!Gdn::Config('Garden.RewriteUrls'))
+         $Parts[] = $this->_EnvironmentElement('Script');
       
-      $Path = implode('', $Parts);
-      $Path = trim($Path, '/');
-      if ($PreserveTrailingSlash)
-         $Path = $Path.'/';
+      $Parts[] = trim($Path, '/');
       
-      return $Path;
+      $Result = implode('/', $Parts);
+      return $Result;
    }
    
    /**

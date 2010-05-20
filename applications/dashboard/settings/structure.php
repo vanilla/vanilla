@@ -90,10 +90,38 @@ $Construct->Table('UserMeta')
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('UniqueID', 'varchar(30)', FALSE, 'primary')
+	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
+	->Column('ProviderKey', 'varcahr(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
+	
+$Construct->Table('UserAuthenticationProvider')
+   ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
+   ->Column('URL', 'varchar(255)', FALSE)
+   ->Column('AssociationSecret', 'text', FALSE)
+   ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
+   ->Column('RegistrationUrl', 'varchar(255)', TRUE)
+   ->Column('SignInUrl', 'varchar(255)', TRUE)
+   ->Column('SignOutUrl', 'varchar(255)', TRUE)
+   ->Set($Explicit, $Drop);
 
+$Construct->Table('UserAuthenticationNonce')
+   ->Column('Nonce', 'varchar(200)', FALSE, 'primary')
+   ->Column('Token', 'varchar(64)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('UserAuthenticationToken')
+   ->Column('Token', 'varchar(64)', FALSE, 'primary')
+   ->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('ForeignUserKey', 'varchar(255)', TRUE)
+   ->Column('TokenSecret', 'varchar(64)', FALSE)
+   ->Column('TokenType', array('request', 'access'), FALSE)
+   ->Column('Authorized', 'tinyint(1)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Column('Lifetime', 'int', FALSE)
+   ->Set($Explicit, $Drop);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();

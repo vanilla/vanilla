@@ -859,6 +859,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (ArrayHasValue($this->_CssFiles, 'admin.css'))
                $this->AddCssFile('customadmin.css');
             
+            $this->EventArguments['CssFiles'] = &$this->_CssFiles;
+            $this->FireEvent('BeforeAddCss');
+
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
@@ -990,10 +993,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          }
       }
+      
+      $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
+      $this->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === FALSE)
          trigger_error(ErrorMessage('Could not find master view:'.$this->MasterView.'.master*', $this->ClassName, '_FetchController'), E_USER_ERROR);
-      
       
       /// A unique identifier that can be used in the body tag of the master view if needed.
       $ControllerName = $this->ClassName;

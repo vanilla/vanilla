@@ -2,25 +2,11 @@
 $Session = Gdn::Session();
 $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
-?>
-<h1><?php echo T('Manage Applications'); ?></h1>
-<?php
-// Build a filter menu for applications
 $AppCount = count($this->AvailableApplications);
 $EnabledCount = count($this->EnabledApplications);
 $DisabledCount = $AppCount - $EnabledCount;
-echo '<div class="FilterMenu">',
-   $this->Filter == '' ? '<strong>'.T('All').'</strong>' : Anchor('All', '/settings/applications/'),
-   ' ('.$AppCount.') <span>|</span> ',
-   $this->Filter == 'enabled' ? '<strong>'.T('Enabled').'</strong>' : Anchor('Enabled', '/settings/applications/enabled'),
-   ' ('.$EnabledCount.') <span>|</span> ',
-   $this->Filter == 'disabled' ? '<strong>'.T('Disabled').'</strong>' : Anchor('Disabled', '/settings/applications/disabled'),
-   ' ('.$DisabledCount.')';
-   
-if ($AddonUrl != '')
-   echo ' <span>|</span> '.Anchor('Get More Applications', $AddonUrl);
 ?>
-</div>
+<h1><?php echo T('Manage Applications'); ?></h1>
 <div class="Info">
    <?php
    printf(
@@ -28,6 +14,17 @@ if ($AddonUrl != '')
       '<code>'.PATH_APPLICATIONS.'</code>'
    );
    ?>
+</div>
+<div class="Tabs FilterTabs">
+   <ul>
+      <li<?php echo $this->Filter == '' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($AppCount)), 'settings/applications/'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/applications/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/applications/disabled'); ?></li>
+      <?php
+      if ($AddonUrl != '')
+         echo Wrap(Anchor('Get More Applications', $AddonUrl), 'li');
+      ?>
+   </ul>
 </div>
 <?php echo $this->Form->Errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">

@@ -408,9 +408,9 @@ tr#PagerMore td {
 #PagerMore {
    margin-bottom: 1px;
 }
-/* Note: FilterMenu is used on most administrative dashboard screens to help
-   organize information being managed on screen. For example: applications and
-   plugins. */
+/* Note: Tabs are used on administrative dashboard screens to help organize
+  information being managed on screen. For example: applications and plugins.
+*/
 .FilterMenu {
    color: #aaa;
    padding: 0 0 10px;
@@ -422,6 +422,52 @@ tr#PagerMore td {
 .FilterMenu span {
    color: #999;
    padding: 0 4px;
+}
+div.Tabs {
+	display: block;
+   border-bottom: 1px solid #abdafb;
+   padding: 5px 8px;
+   margin: 0;
+   background: #cfecff;
+}
+div.Tabs li {
+   display: inline;
+   margin: 0;
+}
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: 1px solid #abdafb;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #bbe2f7;
+   display: inline;
+   font-weight: bold;
+   color: #1e79a7;
+   text-decoration: none;
+   padding: 5px 10px;
+	line-height: 2.6;
+}
+div.Tabs li a:hover {
+   background: #f3fcff;
+}
+div.Tabs li.Active a {
+   background: #fff;
+   color: #474747;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+   background: #1e79a7;
+   color: #eaf4fd;
+   margin: 0 0 0 4px;
 }
 
 
@@ -817,9 +863,22 @@ ul.PanelInfo li a {
 	padding: 0 8px;
    font-size: 120%;
 	display: block;
+   position: relative;
 }
-ul.PanelInfo li.HighlightButton {
-	background: #ff5;
+span.New {
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;  
+   position: absolute;
+   top: 3px;
+   right: -4px;
+   padding: 0 4px;
+   background: #ff0;
+   color: #000;
+   font-size: 9px;
+   font-weight: bold;
 }
 ul.PanelInfo li.Active {
    background: url('images/arrow.png') center left no-repeat #ffffff;

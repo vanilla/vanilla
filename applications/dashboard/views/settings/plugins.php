@@ -2,26 +2,11 @@
 $Session = Gdn::Session();
 $UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
 $AddonUrl = Gdn::Config('Garden.AddonUrl', '');
-?>
-<h1><?php echo T('Manage Plugins'); ?></h1>
-<?php
-// Build a filter menu for plugins
 $PluginCount = count($this->AvailablePlugins);
 $EnabledCount = count($this->EnabledPlugins);
 $DisabledCount = $PluginCount - $EnabledCount;
-echo '<div class="FilterMenu">',
-   $this->Filter == '' ? '<strong>'.T('All').'</strong>' : Anchor('All', '/settings/plugins/'),
-   ' ('.$PluginCount.') <span>|</span> ',
-   $this->Filter == 'enabled' ? '<strong>'.T('Enabled').'</strong>' : Anchor('Enabled', '/settings/plugins/enabled'),
-   ' ('.$EnabledCount.') <span>|</span> ',
-   $this->Filter == 'disabled' ? '<strong>'.T('Disabled').'</strong>' : Anchor('Disabled', '/settings/plugins/disabled'),
-   ' ('.$DisabledCount.')';
-   
-if ($AddonUrl != '')
-   echo ' <span>|</span> '.Anchor('Get More Plugins', $AddonUrl);
-   
 ?>
-</div>
+<h1><?php echo T('Manage Plugins'); ?></h1>
 <div class="Info">
    <?php
    printf(
@@ -29,6 +14,17 @@ if ($AddonUrl != '')
       '<code>'.PATH_PLUGINS.'</code>'
    );
    ?>
+</div>
+<div class="Tabs FilterTabs">
+   <ul>
+      <li<?php echo $this->Filter == '' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
+      <?php
+      if ($AddonUrl != '')
+         echo Wrap(Anchor('Get More Plugins', $AddonUrl), 'li');
+      ?>
+   </ul>
 </div>
 <?php echo $this->Form->Errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">

@@ -11,6 +11,11 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Banner Title', 'Garden.Title');
+         echo Wrap(
+               T('The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'),
+               'div',
+               array('class' => 'Info')
+            );
          echo $this->Form->TextBox('Garden.Title');
       ?>
    </li>

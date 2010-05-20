@@ -81,7 +81,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
          if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
             for ($i = 0; $i < count($this->Items[$Group]); $i++) {
                if ($this->Items[$Group][$i]['Text'] == $Text) {
-                  array_slice($this->Items[$Group], $i, 1);
+                  unset($this->Items[$Group][$i]);
+                  array_merge($this->Items[$Group]);
                   break;
                }
             }

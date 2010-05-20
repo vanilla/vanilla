@@ -47,6 +47,7 @@ printf(
    
    echo '</h4>';
    echo '<div class="Description">'.GetValue('Description', $this->EnabledTheme, '').'</div>';
+	$this->FireEvent('AfterCurrentTheme');
    
    $RequiredApplications = GetValue('RequiredApplications', $this->EnabledTheme, FALSE);
    if (is_array($RequiredApplications)) {

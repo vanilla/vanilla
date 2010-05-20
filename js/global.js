@@ -102,8 +102,8 @@ jQuery(document).ready(function($) {
       $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
-   $('div.Messages ul').live('click', function() {
-      $(this).parents('div.Messages').fadeOut('fast', function() {
+   $('div.Messages').live('click', function() {
+      $(this).fadeOut('fast', function() {
          $(this).remove();
       });
    });

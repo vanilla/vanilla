@@ -160,7 +160,7 @@ class RoleModel extends Gdn_Model {
       $this->SQL->BeginWhereGroup();
       $PermissionCount = count($Permission);
       for ($i = 0; $i < $PermissionCount; ++$i) {
-         $this->SQL->OrWhere('per.`'.$Permission[$i].'`', 1);
+         $this->SQL->Where('per.`'.$Permission[$i].'`', 1);
       }
       $this->SQL->EndWhereGroup();
       return $this->SQL->Get();

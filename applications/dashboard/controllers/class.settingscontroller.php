@@ -402,7 +402,13 @@ class SettingsController extends DashboardController {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Registration.Method', 'Garden.Registration.DefaultRoles', 'Garden.Registration.CaptchaPrivateKey', 'Garden.Registration.CaptchaPublicKey', 'Garden.Registration.InviteExpiration'));
+      $ConfigurationModel->SetField(array(
+         'Garden.Registration.Method',
+         // 'Garden.Registration.DefaultRoles',
+         'Garden.Registration.CaptchaPrivateKey',
+         'Garden.Registration.CaptchaPublicKey',
+         'Garden.Registration.InviteExpiration'
+      ));
       
       // Set the model on the forms.
       $this->Form->SetModel($ConfigurationModel);
@@ -412,9 +418,9 @@ class SettingsController extends DashboardController {
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
       
       // Get the currently selected default roles
-      $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
-      if (is_array($this->ExistingRoleData) === FALSE)
-         $this->ExistingRoleData = array();
+      // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
+      // if (is_array($this->ExistingRoleData) === FALSE)
+      //    $this->ExistingRoleData = array();
          
       // Get currently selected InvitationOptions
       $this->ExistingRoleInvitations = Gdn::Config('Garden.Registration.InviteRoles');
@@ -426,11 +432,11 @@ class SettingsController extends DashboardController {
       
       // Registration methods.
       $this->RegistrationMethods = array(
-         'Closed' => "Registration is closed.",
-         'Basic' => "The applicants are granted access immediately.",
-         'Captcha' => "The applicants must copy the text from a captcha image, proving that they are not a robot.",
-         'Approval' => "The applicants must be approved by an administrator before they are granted access.",
-         'Invitation' => "Existing members send out invitations to new members. Any person who receives an invitation is granted access immediately. Invitations are permission-based (defined below). Monthly invitations are NOT cumulative."
+         // 'Closed' => "Registration is closed.",
+         // 'Basic' => "The applicants are granted access immediately.",
+         'Captcha' => "New users fill out a simple form and are granted access immediately.",
+         'Approval' => "New users are reviewed and approved by an administrator (that's you!).",
+         'Invitation' => "Existing members send invitations to new members."
       );
 
       // Options for how many invitations a role can send out per month.
@@ -455,8 +461,8 @@ class SettingsController extends DashboardController {
       } else {   
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
-         if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
-            $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
+         // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
+         //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
          
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');

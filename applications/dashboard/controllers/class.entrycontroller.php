@@ -211,10 +211,8 @@ class EntryController extends Gdn_Controller {
          } else {
             // The user has been created successfully, so sign in now
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE)
-            );
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -248,10 +246,8 @@ class EntryController extends Gdn_Controller {
          } else {
             // The user has been created successfully, so sign in now
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE)
-            );
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -286,9 +282,8 @@ class EntryController extends Gdn_Controller {
          } else {
             // The user has been created successfully, so sign in now
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE));
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -345,7 +340,9 @@ class EntryController extends Gdn_Controller {
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $Authenticator->Authenticate(array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
+            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
+            $AuthUserID = $Authenticator->Authenticate();
+
             $this->StatusMessage = T('Password saved. Signing you in now...');
             $this->RedirectUrl = Url('/');
          }

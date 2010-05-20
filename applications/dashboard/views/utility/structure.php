@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1>Database Structure Upgrades</h1>
-<div class="Info"><?php echo T($this->Data['Status']); ?></div>
 <?php
+if($this->Data['Status'])
+   echo '<div class="Info">', T($this->Data['Status']), '</div>';
 
 if(array_key_exists('CapturedSql', $this->Data)) {
 	$CapturedSql = (array)$this->Data['CapturedSql'];
@@ -9,6 +10,7 @@ if(array_key_exists('CapturedSql', $this->Data)) {
 	
 	if(count($CapturedSql) > 0) {
 	?>
+   <div class="Info"><?php echo T('The following structure changes are required for your database.'); ?></div>
 		<table class="AltRows">
 			<tbody>
 				<?php
@@ -28,5 +30,7 @@ if(array_key_exists('CapturedSql', $this->Data)) {
 		<div class="Info"><?php echo T('There are no database structure changes required. There may, however, be data changes.'); ?></div>
 		<?php
 	}
-	echo Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;'));
+	echo Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;')),
+      ' ',
+      Anchor(T('Rescan'), 'dashboard/utility/structure/all', 'Button', array('style' => 'font-size: 16px;'));
 }

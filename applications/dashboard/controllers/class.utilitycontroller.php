@@ -125,8 +125,6 @@ class UtilityController extends DashboardController {
       }
       if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
          $this->SetData('Status', 'The structure was successfully executed.');
-      elseif ($CaptureOnly && $FoundStructureFile)
-			$this->SetData('Status', 'The following structure changes are required for your database.');
 
 		$this->AddSideMenu('dashboard/settings/configure');
       $this->AddCssFile('admin.css');

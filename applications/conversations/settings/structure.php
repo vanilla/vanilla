@@ -52,11 +52,11 @@ $Construct->Table('UserConversation')
 // they have been sent.
 $Construct->Table('ConversationMessage')
    ->PrimaryKey('MessageID')
-   ->Column('ConversationID', 'int')
+   ->Column('ConversationID', 'int', FALSE, 'key')
    ->Column('Body', 'text')
    ->Column('Format', 'varchar(20)', NULL)
-   ->Column('InsertUserID', 'int', NULL, 'key')
-   ->Column('DateInserted', 'datetime', FALSE, 'key')
+   ->Column('InsertUserID', 'int', NULL)
+   ->Column('DateInserted', 'datetime', FALSE)
    ->Set($Explicit, $Drop);
    
 // Add extra columns to user table for tracking discussions, comments & replies

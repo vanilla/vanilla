@@ -82,6 +82,8 @@ $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
+$Configuration['Garden']['Roles']['Manage']                     = TRUE;
+$Configuration['Garden']['VanillaUrl']                          = 'http://vanillaforums.org';
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

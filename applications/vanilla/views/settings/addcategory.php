@@ -6,7 +6,10 @@ echo $this->Form->Errors();
 <h1><?php echo T('Add Category'); ?></h1>
 <ul>
    <li>
-      <div class="Info"><?php echo T('<strong>Parent categories</strong> allow you to organize your categories. Parent categories can only contain categories. <strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'); ?></div>
+      <div class="Info"><?php
+         echo Wrap(T('<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'), 'div');
+         echo Wrap(T('<strong>Parent categories</strong> allow you to organize your categories. Parent categories can only contain categories.'), 'div');
+      ?></div>
       <?php
          echo $this->Form->CheckBox('IsParent', 'Make this a parent category', array('value' => '1'));
       ?>

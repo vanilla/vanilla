@@ -63,6 +63,12 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
+if (!function_exists('HoverHelp')) {
+   function HoverHelp($String, $Help) {
+      return Wrap($String.Wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
+   }
+}
+
 /**
  * Writes an Img tag.
  */

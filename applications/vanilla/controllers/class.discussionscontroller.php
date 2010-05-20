@@ -29,6 +29,7 @@ class DiscussionsController extends VanillaController {
       if ($this->Head) {
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
+			$this->AddJsFile('js/library/jquery.menu.js');
          $this->AddJsFile('options.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
          $this->Head->Title(T('All Discussions'));

@@ -23,7 +23,7 @@ class GuestModule extends Gdn_Module {
    public function ToString() {
       $Session = Gdn::Session();
       if (!$Session->IsValid()) {
-         return T($this->MessageCode, $this->MessageDefault);
+         return parent::ToString();
       }
 
       return '';

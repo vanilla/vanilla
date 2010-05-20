@@ -8,25 +8,14 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/**
- * The application controller for Vanilla.
- */
-class VanillaController extends Gdn_Controller {
-   
-   public function Initialize() {
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('js/library/jquery.js');
-      $this->AddJsFile('js/library/jquery.livequery.js');
-      $this->AddJsFile('js/library/jquery.form.js');
-      $this->AddJsFile('js/library/jquery.popup.js');
-      // $this->AddJsFile('js/library/jquery.menu.js');
-      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('js/global.js');
-      
-      $this->AddCssFile('style.css');
-      $GuestModule = new GuestModule($this);
-      $this->AddModule($GuestModule);
-      parent::Initialize();
-   }
 
+/**
+ * Writes the site logo to the page.
+ *
+ * @param array The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty The smarty object rendering the template.
+ * @return The url.
+ */
+function smarty_function_vanillaurl($Params, &$Smarty) {
+   return C('Garden.VanillaUrl');
 }

@@ -7,7 +7,7 @@ foreach ($this->UserData->Format('Text')->Result() as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-      <td><?php echo UserAnchor($User); ?></td>
+      <td><strong><?php echo UserAnchor($User); ?></strong></td>
       <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
       <td><?php echo Gdn_Format::Date($User->DateFirstVisit); ?></td>
       <td class="Alt"><?php echo Gdn_Format::Date($User->DateLastActive); ?></td>

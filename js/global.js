@@ -53,12 +53,14 @@ jQuery(document).ready(function($) {
    }
 
    // Main Menu dropdowns
+	/*
    if ($.fn.menu)
       $('#Menu').menu({
          showDelay: 0,
          hideDelay: 0
       });
-      
+	*/
+	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
       document.location = gdn.combinePaths(gdn.definition('UrlRoot', ''), '/profile/notifications');
@@ -102,8 +104,8 @@ jQuery(document).ready(function($) {
       $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
-   $('div.Messages ul').live('click', function() {
-      $(this).parents('div.Messages').fadeOut('fast', function() {
+   $('div.Messages').live('click', function() {
+      $(this).fadeOut('fast', function() {
          $(this).remove();
       });
    });
@@ -116,6 +118,16 @@ jQuery(document).ready(function($) {
          });
       }, 3000);
    });
+	
+	// Show hoverhelp on hover
+	$('.HoverHelp').hover(
+		function() {
+			$(this).find('.Help').show();
+		},
+		function() {
+			$(this).find('.Help').hide();
+		}
+	);
 
    // If a page loads with a hidden redirect url, go there after a few moments.
    var RedirectUrl = gdn.definition('RedirectUrl', '');

@@ -26,11 +26,11 @@ printf(
 <div class="CurrentTheme">
    <h3><?php echo T('Current Theme'); ?></h3>
    <?php
-   $Version = ArrayValue('Version', $this->EnabledTheme, '');
-   $ThemeUrl = ArrayValue('Url', $this->EnabledTheme, '');
-   $Author = ArrayValue('Author', $this->EnabledTheme, '');
-   $AuthorUrl = ArrayValue('AuthorUrl', $this->EnabledTheme, '');   
-   $NewVersion = ArrayValue('NewVersion', $this->EnabledTheme, '');
+   $Version = GetValue('Version', $this->EnabledTheme, '');
+   $ThemeUrl = GetValue('Url', $this->EnabledTheme, '');
+   $Author = GetValue('Author', $this->EnabledTheme, '');
+   $AuthorUrl = GetValue('AuthorUrl', $this->EnabledTheme, '');   
+   $NewVersion = GetValue('NewVersion', $this->EnabledTheme, '');
    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
    $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot.*");
    $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
@@ -46,9 +46,10 @@ printf(
          echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
    
    echo '</h4>';
-   echo '<div class="Description">'.ArrayValue('Description', $this->EnabledTheme, '').'</div>';
+   echo '<div class="Description">'.GetValue('Description', $this->EnabledTheme, '').'</div>';
+	$this->FireEvent('AfterCurrentTheme');
    
-   $RequiredApplications = ArrayValue('RequiredApplications', $this->EnabledTheme, FALSE);
+   $RequiredApplications = GetValue('RequiredApplications', $this->EnabledTheme, FALSE);
    if (is_array($RequiredApplications)) {
       echo '<div class="Requirements">'.T('Requires: ');
 
@@ -83,15 +84,15 @@ printf(
    $Cols = 3;
    $Col = 0;
    foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-      $ScreenName = ArrayValue('Name', $ThemeInfo, $ThemeName);
-      $ThemeFolder = ArrayValue('Folder', $ThemeInfo, '');
+      $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
+      $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
       $Active = $ThemeFolder == $this->EnabledThemeFolder;
       if (!$Active) {
-         $Version = ArrayValue('Version', $ThemeInfo, '');
-         $ThemeUrl = ArrayValue('Url', $ThemeInfo, '');
-         $Author = ArrayValue('Author', $ThemeInfo, '');
-         $AuthorUrl = ArrayValue('AuthorUrl', $ThemeInfo, '');   
-         $NewVersion = ArrayValue('NewVersion', $ThemeInfo, '');
+         $Version = GetValue('Version', $ThemeInfo, '');
+         $ThemeUrl = GetValue('Url', $ThemeInfo, '');
+         $Author = GetValue('Author', $ThemeInfo, '');
+         $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');   
+         $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
          $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
          $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot.*", GLOB_BRACE);
          $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
@@ -113,7 +114,7 @@ printf(
             <td class="<?php echo $ColClass; ?>">
                <?php
                   echo '<h4>';
-                     echo $ThemeUrl != '' ? Url($ThemeName, $ThemeUrl) : $ThemeName;
+                     echo $ThemeUrl != '' ? Url($ScreenName, $ThemeUrl) : $ScreenName;
                      if ($Version != '')
                         $Info = sprintf(T('Version %s'), $Version);
                         
@@ -123,7 +124,7 @@ printf(
                   echo '</h4>';
                   
                   if ($PreviewImage) {
-                     echo Anchor(Img('/themes/'.$ThemeFolder.'/'.$PreviewImage, array('alt' => $ThemeName, 'height' => '112', 'width' => '150')),
+                     echo Anchor(Img('/themes/'.$ThemeFolder.'/'.$PreviewImage, array('alt' => $ScreenName, 'height' => '112', 'width' => '150')),
                         'dashboard/settings/previewtheme/'.$ThemeFolder,
                         '',
                         array('target' => '_top')
@@ -135,11 +136,11 @@ printf(
                   echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
                   echo '</div>';
 
-                  $Description = ArrayValue('Description', $ThemeInfo);
+                  $Description = GetValue('Description', $ThemeInfo);
                   if ($Description)
                      echo '<em>'.$Description.'</em>';
                      
-                  $RequiredApplications = ArrayValue('RequiredApplications', $ThemeInfo, FALSE);
+                  $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
                      echo '<dl>
                         <dt>'.T('Requires').'</dt>
@@ -164,8 +165,6 @@ printf(
                         );
                      echo '</div>';
                   }
-
-
                ?>
             </td>
             <?php

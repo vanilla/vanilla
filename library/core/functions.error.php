@@ -20,17 +20,12 @@ class Gdn_ErrorException extends ErrorException {
    public function getContext() {
       return $this->_Context;
    }
-   
-//   public function getTrace() {
-//      return $this->Backtrace;
-//   }
-
 }
 
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    $ErrorReporting = error_reporting();
    // Ignore errors that are below the current error reporting level.
-   if (!($ErorrReporting & $ErrorNumber))
+   if (!($ErrorReporting & $ErrorNumber))
       return FALSE;
    
    $Backtrace = debug_backtrace();

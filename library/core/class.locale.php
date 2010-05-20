@@ -185,13 +185,15 @@ class Gdn_Locale extends Gdn_Pluggable {
     * Translates a code into the selected locale's definition.
     *
     * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
     * @param string $Default The default value to be displayed if the translation code is not found.
     * @return string
     */
    public function Translate($Code, $Default = '') {
-      $this->EventArguments['Code'] = $Code;
-      $this->EventArguments['Default'] = $Default;
-      $this->FireEvent('BeforeTranslate');
+      // Codes that begin with @ are considered literals.
+      if(substr_compare('@', $Code, 0, 1) == 0)
+         return substr($Code, 1);
+
       if (array_key_exists($Code, $this->_Definition)) {
          return $this->_Definition[$Code];
       } else {

@@ -1035,6 +1035,7 @@ if (!function_exists('T')) {
 	 * Translates a code into the selected locale's definition.
 	 *
 	 * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
 	 * @param string $Default The default value to be displayed if the translation code is not found.
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @see Gdn::Translate()
@@ -1049,12 +1050,14 @@ if (!function_exists('Translate')) {
 	 * Translates a code into the selected locale's definition.
 	 *
 	 * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
 	 * @param string $Default The default value to be displayed if the translation code is not found.
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @deprecated
 	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
+      trigger_error('Translate() is depricated. Use T() instead.', E_USER_DEPRECATED);
       return Gdn::Translate($Code, $Default);
    }
 }

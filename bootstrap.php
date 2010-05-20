@@ -15,7 +15,7 @@ if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.DS.'themes');
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')
-   date_default_timezone_set('Canada/Saskatchewan');
+   date_default_timezone_set('America/Montreal');
 
 /// Include the error handler.
 require_once(PATH_LIBRARY_CORE . DS . 'functions.error.php');
@@ -81,7 +81,7 @@ unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
 if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   header('location: '.Gdn::Request()->WebPath(TRUE, TRUE).'dashboard/setup');
+   header('location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
 

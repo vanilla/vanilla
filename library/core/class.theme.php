@@ -9,24 +9,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Renders the "You should register or sign in" panel box.
+ * Utility class that helps to render theme elements.
+ *
+ * @author Mark O'Sullivan
+ * @copyright 2009 Mark O'Sullivan
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @version @@GARDEN-VERSION@@
+ * @namespace Garden.Core
  */
-class GuestModule extends Gdn_Module {
-   
-   public $MessageCode = 'GuestModule.Message';
-   public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
-   
-   public function ToString() {
-      $Session = Gdn::Session();
-      if (!$Session->IsValid()) {
-         return T($this->MessageCode, $this->MessageDefault);
-      }
+class Gdn_Theme {
 
-      return '';
+   /**
+    * Renders the banner logo, or just the banner title if the logo is not defined.
+    */
+   public static function Logo() {
+      $Logo = C('Garden.Logo');
+      $Title = C('Garden.Title', 'Title');
+      echo $Logo ? Img($Logo, array('alt' => $Title)) : $Title;
    }   
-
 }

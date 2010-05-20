@@ -59,6 +59,20 @@ class Gdn_Locale extends Gdn_Pluggable {
       parent::__construct();
    }
 
+   public function Refresh() {
+      $LocalName = $this->Current();
+
+      $ApplicationManager = Gdn::Factory('ApplicationManager');
+      $ApplicationWhiteList = $ApplicationManager->EnabledApplicationFolders();
+
+      $PluginManager = Gdn::Factory('PluginManager');
+      $PluginWhiteList = $PluginManager->EnabledPluginFolders();
+
+      $ForceRemapping = TRUE;
+
+      $this->Set($LocalName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+   }
+
    /**
     * Defines and loads the locale.
     *
@@ -96,6 +110,14 @@ class Gdn_Locale extends Gdn_Pluggable {
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+
+         // Get theme-based locale definition files.
+         $Theme = C('Garden.Theme');
+         if($Theme) {
+            $ThemeLocalePath = PATH_THEMES."/$Theme/locale/$LocaleName.php";
+            if(file_exists($ThemeLocalePath))
+               $LocaleSources[] = $ThemeLocalePath;
+         }
             
          // Save the mappings
          $FileContents = array();
@@ -125,12 +147,13 @@ class Gdn_Locale extends Gdn_Pluggable {
       $ConfLocaleOverride = PATH_CONF . DS . 'locale.php';
       $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
-         if ($ConfLocaleOverride != $LocaleSources[$i]) // Don't double include the conf override file... and make sure it comes last
-            @include_once($LocaleSources[$i]);
+         if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last
+            include_once($LocaleSources[$i]);
       }
 
       // Also load any custom defined definitions from the conf directory
-      @include_once($ConfLocaleOverride);
+      if (file_exists($ConfLocaleOverride))
+         include_once($ConfLocaleOverride);
 
       // All of the included files should have contained
       // $Definition['Code'] = 'Definition'; assignments. The overwrote each
@@ -162,12 +185,15 @@ class Gdn_Locale extends Gdn_Pluggable {
     * Translates a code into the selected locale's definition.
     *
     * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
     * @param string $Default The default value to be displayed if the translation code is not found.
     * @return string
     */
    public function Translate($Code, $Default = '') {
-      $this->EventArguments['Code'] = $Code;
-      $this->FireEvent('BeforeTranslate');
+      // Codes that begin with @ are considered literals.
+      if(substr_compare('@', $Code, 0, 1) == 0)
+         return substr($Code, 1);
+
       if (array_key_exists($Code, $this->_Definition)) {
          return $this->_Definition[$Code];
       } else {

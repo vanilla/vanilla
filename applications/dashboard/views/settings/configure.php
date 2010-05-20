@@ -1,7 +1,10 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
+
+?>
 <h1><?php echo T('General Settings'); ?></h1>
 <?php
-echo $this->Form->Open();
+echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
 <ul>
@@ -13,7 +16,33 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Application Title', 'Garden.Title');
+         echo $this->Form->Label('Banner Logo', 'Garden.Logo');
+         $Logo = C('Garden.Logo');
+         if ($Logo) {
+            echo Wrap(
+               Img($Logo),
+               'div'
+            );
+            echo Wrap(Anchor('Remove Banner Logo', '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+            echo Wrap(
+               T('Browse for a new banner logo if you would like to change it:'),
+               'div',
+               array('class' => 'Info')
+            );
+         } else {
+            echo Wrap(
+               T('The banner logo appears at the top of your forum.'),
+               'div',
+               array('class' => 'Info')
+            );
+         }
+         
+         echo $this->Form->Input('Logo', 'file');
+      ?>
+   </li>
+   <li>
+      <?php
+         echo $this->Form->Label('Banner Title', 'Garden.Title');
          echo $this->Form->TextBox('Garden.Title');
       ?>
    </li>

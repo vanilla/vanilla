@@ -33,7 +33,6 @@ class SearchController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddCssFile('menu.css');
       $GuestModule = new GuestModule($this);
-      $GuestModule->MessageCode = "It looks like you're new here. If you want to take part in the discussions, click one of these buttons!";
       $this->AddModule($GuestModule);
       parent::Initialize();
    }

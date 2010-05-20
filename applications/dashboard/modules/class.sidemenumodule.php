@@ -142,6 +142,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
                $ItemCount = 0;
                $LinkCount = 0;
                $OpenGroup = FALSE;
+               $GroupIsActive = FALSE;
+               $GroupAnchor = '';
                $Group = '';
                foreach ($Links as $Key => $Link) {
                   $CurrentLink = FALSE;
@@ -171,8 +173,13 @@ if (!class_exists('SideMenuModule', FALSE)) {
                      if ($Url !== FALSE) {
                         $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);
                         if (substr($Url, 0, 5) != 'http:') {
+                           if ($GroupAnchor == '')
+                              $GroupAnchor = $Url;
+                              
                            $Url = Url($Url);
                            $CurrentLink = $Url == Url($HighlightRoute);
+                           if ($CurrentLink && !$GroupIsActive) 
+                              $GroupIsActive = TRUE;
                         }
                         
                         $CssClass = ArrayValue('class', $Attributes, '');
@@ -181,15 +188,19 @@ if (!class_exists('SideMenuModule', FALSE)) {
                            
                         $Group .= '<li'.Attribute($Attributes).'><a href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
-                     } else {
-                        if ($Text != '')
-                           $Group .= '<h4>'.$Text.'</h4>';
                      }
                      ++$ItemCount;
                   }
                }
-               if ($OpenGroup === TRUE)
+               if ($OpenGroup === TRUE) {
                   $Group .= "</li>\r\n</ul>\r\n";
+                  $Attributes = array();
+                  if ($GroupIsActive)
+                     $Attributes['class'] = 'Active';
+                     
+                  if ($GroupName != '')
+                     $Group = Wrap(Wrap(($GroupAnchor == '' ? $GroupName : Anchor($GroupName, $GroupAnchor)), 'h4', $Attributes).$Group, 'div', array('class' => 'Box Group'));
+               }
 
 
                if ($Group != '' && $LinkCount > 0) {
@@ -198,7 +209,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
 
             }
             if ($Menu != '')
-               $Menu = '<div'.($this->HtmlId == '' ? '' : ' id="'.$this->HtmlId.'"').' class="Box'.($this->CssClass != '' ? ' '.$this->CssClass : '').'">'.$Menu.'</div>';
+               $Menu = '<div'.($this->HtmlId == '' ? '' : ' id="'.$this->HtmlId.'"').' class="'.($this->CssClass != '' ? $this->CssClass : '').'">'.$Menu.'</div>';
          }
          return $Menu;
       }

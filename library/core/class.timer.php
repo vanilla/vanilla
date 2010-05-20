@@ -29,6 +29,12 @@ class Gdn_Timer {
 		if($Message)
 			$this->Write($Message, $this->FinishTime, $this->StartTime);
 	}
+   
+   public static function FormatElapsed($Span) {
+      $m = floor($Span / 60);
+      $s = $Span - $m * 60;
+      return sprintf('%d:%05.2f', $m, $s);
+   }
 	
 	public function Start($Message = '') {
 		$this->StartTime = microtime(TRUE);
@@ -62,4 +68,5 @@ class Gdn_Timer {
 		}
 		echo "\n";
 	}
+
 }

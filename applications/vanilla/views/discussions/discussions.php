@@ -5,7 +5,7 @@ if (!function_exists('WriteDiscussion'))
 
 	
 $Alt = '';
-if (property_exists($this, 'AnnounceData')) {
+if (property_exists($this, 'AnnounceData') && is_object($this->AnnounceData)) {
 	foreach ($this->AnnounceData->Result() as $Discussion) {
 		$Alt = $Alt == ' Alt' ? '' : ' Alt';
 		WriteDiscussion($Discussion, $this, $Session, $Alt);

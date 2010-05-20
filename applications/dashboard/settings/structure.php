@@ -21,7 +21,7 @@ $Construct = $Database->Structure();
 $Construct->Table('Role')
 	->Column('RoleID', 'int', FALSE, 'primary')
    ->Column('Name', 'varchar(100)')
-   ->Column('Description', 'varchar(200)', TRUE)
+   ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Column('Deletable', 'tinyint(1)', '1')
    ->Column('CanSession', 'tinyint(1)', '1')
@@ -36,14 +36,15 @@ $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Dele
 $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
 $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
 $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
-$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
+$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators can administer user-generated content in the application.'));
+$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
 
 // User Table
 $Construct->Table('User')
 	->PrimaryKey('UserID')
    ->Column('PhotoID', 'int', TRUE, 'key')
    ->Column('Name', 'varchar(20)', FALSE, 'key')
-   ->Column('Password', 'varbinary(34)')
+   ->Column('Password', 'varbinary(50)')
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)')
@@ -79,6 +80,13 @@ $Construct->Table('UserRole')
 	
 // Assign the guest user to the guest role
 $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
+
+// User Meta Table
+$Construct->Table('UserMeta')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('Name', 'varchar(255)', FALSE, 'primary')
+   ->Column('Value', 'text', TRUE)
+   ->Set($Explicit, $Drop);
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
@@ -129,6 +137,12 @@ $PermissionModel->Save(array(
 	'Garden.Signin.Allow' => 1
 	));
 
+// Set initial moderator permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 32,
+	'Garden.Signin.Allow' => 1
+	));
+
 // Set initial admininstrator permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 16,
@@ -147,7 +161,6 @@ $PermissionModel->Save(array(
 	'Garden.Users.Approve' => 1,
 	'Garden.Activity.Delete' => 1
 	));
-
 
 // Photo Table
 $Construct->Table('Photo')

@@ -809,6 +809,7 @@ class UserModel extends Gdn_Model {
          $PasswordHash = new Gdn_PasswordHash();
          $this->SQL->Update('User')
             ->Set('Password', $PasswordHash->HashPassword($Password))
+				->Set('HashMethod', 'Vanilla')
             ->Where('UserID', $UserData->UserID)
             ->Put();
       }

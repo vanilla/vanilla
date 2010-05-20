@@ -8,25 +8,23 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+
 /**
- * Renders the "You should register or sign in" panel box.
+ * Writes the search box to the page.
+ *
+ * @param array The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty The smarty object rendering the template.
+ * @return The url.
  */
-class GuestModule extends Gdn_Module {
-   
-   public $MessageCode = 'GuestModule.Message';
-   public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
-   
-   public function ToString() {
-      $Session = Gdn::Session();
-      if (!$Session->IsValid()) {
-         return T($this->MessageCode, $this->MessageDefault);
-      }
+function smarty_function_searchbox($Params, &$Smarty) {
+   $Form = Gdn::Factory('Form');
+   $Form->InputPrefix = '';
+   $Result =
+      $Form->Open(array('action' => Url('/search'), 'method' => 'get')).
+      $Form->TextBox('Search').
+      $Form->Button('Go', array('Name' => '')).
+      $Form->Close();
 
-      return '';
-   }   
-
+   return $Result;
 }
+

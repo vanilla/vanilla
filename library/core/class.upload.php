@@ -25,7 +25,7 @@ class Gdn_Upload {
 	}
 
 	public function Clear() {
-		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', '1M'));
+		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
 		$this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
 	}
 
@@ -104,15 +104,15 @@ class Gdn_Upload {
 	public function ValidateUpload($InputName, $ThrowException = TRUE) {
 		$Ex = FALSE;
 
-		if(!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
+		if (!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
 			// Check the content length to see if we exceeded the max post size.
 			$ContentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
 			$MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
 			if($ContentLength > $MaxPostSize) {
 				$Ex = sprintf(T('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
-			}
-
-			$Ex = T('The file failed to upload.');
+			} else {
+            $Ex = T('The file failed to upload.');
+         }
 		} else {
 			switch ($_FILES[$InputName]['error']) {
 				case 1:
@@ -139,7 +139,7 @@ class Gdn_Upload {
 		$Foo = self::FormatFileSize($this->_MaxFileSize);
 
 		// Check the maxfilesize again just in case the value was spoofed in the form.
-		if (!$Ex && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
+		if (!$Ex && $this->_MaxFileSize > 0 && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
 			$Ex = sprintf(T('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
 		} elseif(!$Ex) {
 			// Make sure that the file extension is allowed.
@@ -150,7 +150,7 @@ class Gdn_Upload {
 
 		if($Ex) {
 			if($ThrowException) {
-				throw new Gdn_ApplicationException($Ex);
+				throw new Gdn_UserException($Ex);
 			} else {
 				$this->Exception = $Ex;
 				return FALSE;
@@ -163,10 +163,19 @@ class Gdn_Upload {
 	}
 
 	public function GetUploadedFileName() {
-		return $this->_UploadedFile['name'];
+		return GetValue('name', $this->_UploadedFile);
 	}
 
-	public function GenerateTargetName($TargetFolder, $Extension) {
+	public function GetUploadedFileExtension() {
+		$Name = $this->_UploadedFile['name'];
+		$Info = pathinfo($Name);
+		return GetValue('extension', $Info, '');
+	}
+
+	public function GenerateTargetName($TargetFolder, $Extension = '') {
+		if ($Extension == '')
+			$Extension = $this->GetUploadedFileExtension();
+
 		$Name = RandomString(12);
 		while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
 			$Name = RandomString(12);

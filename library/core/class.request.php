@@ -351,7 +351,6 @@ class Gdn_Request {
     * @return void
     */
    protected function _ParseRequest() {
-
       $this->_Parsing = TRUE;
 
       /**
@@ -382,28 +381,21 @@ class Gdn_Request {
        */
 
       // Attempt to get the webroot from the configuration array
-      $WebRoot = $this->_EnvironmentElement('ConfigWebRoot');
+      $WebRoot = (string)$this->_EnvironmentElement('ConfigWebRoot');
 
       // Attempt to get the webroot from the server
-      if ($WebRoot) {
+      if (!$WebRoot) {
          $WebRoot = explode('/', ArrayValue('PHP_SELF', $_SERVER, ''));
 
          // Look for index.php to figure out where the web root is.
          $Key = array_search('index.php', $WebRoot);
          if ($Key !== FALSE) {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
-         } else {
-            $WebRoot = '';
          }
       }
 
-      if (is_string($WebRoot) && $WebRoot != '') {
-         // Strip forward slashes from the beginning of webroot
-         $ResolvedWebRoot = trim($WebRoot,'/').'/';
-      } else {
-         $ResolvedWebRoot = '';
-      }
-      $this->WebRoot($ResolvedWebRoot);
+      $ParsedWebRoot = trim($WebRoot,'/');
+      $this->WebRoot($ParsedWebRoot);
 
       /**
        * Resolve Domain
@@ -419,7 +411,7 @@ class Gdn_Request {
          if (substr($Domain, 0, 7) != 'http://')
             $Domain = 'http://'.$Domain;
 
-         $Domain = trim($Domain, '/').'/';
+         $Domain = trim($Domain, '/');
       }
       $this->Domain($Domain);
       
@@ -438,7 +430,7 @@ class Gdn_Request {
     * @param $Value value of $Key key to set
     * @return string | NULL
     */
-   protected function _ParsedRequestElement($Key, $Value=NULL) {
+   protected function _ParsedRequestElement($Key, $Value = NULL) {
       // Lazily parse if not already parsed
       if (!$this->_HaveParsedRequest && !$this->_Parsing)
          $this->_ParseRequest();
@@ -521,22 +513,22 @@ class Gdn_Request {
    public function _UnsetRequestArguments($ParamsType) {
       unset($this->_RequestArguments[$ParamsType]);
    }
-   
+
    /**
     * This method allows safe creation of URLs that need to reference the application itself
     *
-    * Taking the server's RewriteUrls ability into account, and using information from the 
-    * actual Request data, this method can construct a trustworthy URL that will point to 
-    * Garden's dispatcher. Examples: 
+    * Taking the server's RewriteUrls ability into account, and using information from the
+    * actual Request data, this method can construct a trustworthy URL that will point to
+    * Garden's dispatcher. Examples:
     *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php/
     *    - Default port, rewrites                     http://www.forum.com/
     *    - Custom port, rewrites                      http://www.forum.com:8080/index.php/
     *
-    * @param $WithDomain set to false to create a relative URL
-    * @param $PreserveTrailingSlash set to false to strip trailing slash
+    * @param sring $Path of the controller method.
+    * @param bool $WithDomain set to false to create a relative URL
     * @return string
     */
-   public function WebPath($WithDomain = TRUE, $PreserveTrailingSlash = TRUE) {
+   public function Url($Path, $WithDomain = FALSE) {
       $Parts = array();
       
       if ($WithDomain)
@@ -544,15 +536,13 @@ class Gdn_Request {
          
       $Parts[] = $this->WebRoot();
       
-      if (Gdn::Config('Garden.RewriteUrls', FALSE) === FALSE)
-         $Parts[] = $this->_EnvironmentElement('Script').'/';
+      if (!Gdn::Config('Garden.RewriteUrls'))
+         $Parts[] = $this->_EnvironmentElement('Script');
       
-      $Path = implode('', $Parts);
-      $Path = trim($Path, '/');
-      if ($PreserveTrailingSlash)
-         $Path = $Path.'/';
+      $Parts[] = trim($Path, '/');
       
-      return $Path;
+      $Result = implode('/', $Parts);
+      return $Result;
    }
    
    /**
@@ -562,13 +552,12 @@ class Gdn_Request {
     * @return string
     */
    public function WebRoot($WebRoot = NULL) {
-      $Path = $this->_ParsedRequestElement('WebRoot', $WebRoot);
+      $Path = (string)$this->_ParsedRequestElement('WebRoot', $WebRoot);
       $WebRootFromConfig = $this->_EnvironmentElement('ConfigWebRoot');
 
       $RemoveWebRootConfig = $this->_EnvironmentElement('ConfigStripUrls');
-      if (!empty($WebRootFromConfig) && !is_null($WebRootFromConfig) && $WebRootFromConfig !== FALSE) {
-         if ($RemoveWebRootConfig)
-            $Path = str_replace($WebRootFromConfig,'',$Path);
+      if ($WebRootFromConfig && $RemoveWebRootConfig) {
+         $Path = str_replace($WebRootFromConfig, '', $Path);
       }
       return $Path;
    }

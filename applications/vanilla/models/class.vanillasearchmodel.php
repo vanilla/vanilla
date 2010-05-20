@@ -44,7 +44,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('d.DateInserted')
 			->Select('d.InsertUserID as UserID, u.Name')
 			->From('Discussion d')
-			->Join('User u', 'd.InsertUserID = u.UserID');
+			->Join('User u', 'd.InsertUserID = u.UserID', 'left');
 		
 		$Result = $this->SQL->GetSelect();
 		$this->SQL->Reset();
@@ -66,7 +66,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('c.InsertUserID, u.Name')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-			->Join('User u', 'u.UserID = d.InsertUserID');
+			->Join('User u', 'u.UserID = d.InsertUserID', 'left');
 		
 		$Result = $this->SQL->GetSelect();
 		$this->SQL->Reset();

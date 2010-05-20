@@ -81,7 +81,7 @@ class ImportController extends DashboardController {
          $Imp->SaveState();
          $this->Form->SetValidationResults($Imp->Validation->Results());
          
-         $this->SetData('Stats', GetValue('Stats', $Imp->Data));
+         $this->SetData('Stats', GetValue('Stats', $Imp->Data, array()));
          $this->SetData('CurrentStep', $Imp->CurrentStep);
          $this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
          $this->SetData('ErrorType', GetValue('ErrorType', $Imp));
@@ -164,7 +164,7 @@ class ImportController extends DashboardController {
 
       try {
          $this->SetData('Header', $Imp->GetImportHeader());
-         $this->SetData('Stats', GetValue('Stats', $Imp->Data));
+         $this->SetData('Stats', GetValue('Stats', $Imp->Data, array()));
          $this->SetData('ImportPath', $Imp->ImportPath);
          $this->SetData('OriginalFilename', GetValue('OriginalFilename', $Imp->Data));
          $this->SetData('CurrentStep', $Imp->CurrentStep);

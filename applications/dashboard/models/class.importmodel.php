@@ -694,6 +694,10 @@ class ImportModel extends Gdn_Model {
 	 * @return mixed Whether the step succeeded or an array of information.
 	 */
 	public function RunStep($Step = 1) {
+      $Started = $this->Stat('Started');
+      if($Started === NULL)
+         $this->Stat('Started', microtime(TRUE), 'time');
+
 		$Steps = $this->Steps();
 		if($Step > count($Steps)) {
 			return 'COMPLETE';
@@ -708,10 +712,13 @@ class ImportModel extends Gdn_Model {
 		$Result = call_user_func(array($this, $Method));
 
       $ElapsedTime = $this->Timer->ElapsedTime();
-      $this->Stat('Time Importing', $ElapsedTime, 'add');
+      $this->Stat('Time Spent on Import', $ElapsedTime, 'add');
 
 		if(isset($NewTimer))
 			$this->Timer->Finish('');
+
+      if($Result && !array_key_exists($Step + 1, $this->Steps()))
+         $this->Stat('Finished', microtime(TRUE), 'time');
 
 		return $Result;
 	}

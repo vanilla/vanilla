@@ -150,7 +150,7 @@ class Gdn_Upload {
 
 		if($Ex) {
 			if($ThrowException) {
-				throw new Gdn_ApplicationException($Ex);
+				throw new Gdn_UserException($Ex);
 			} else {
 				$this->Exception = $Ex;
 				return FALSE;

@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
 				// Refresh the view.
 				$('#Content').html(json.Data);
 				// Go to the next step.
-				if(!json.Complete) {
+				if(!json.Complete && !json.Error) {
 					refreshSteps();
 				}
 			},

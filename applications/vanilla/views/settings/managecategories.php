@@ -5,13 +5,14 @@ $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->Paren
 echo $this->Form->Open();
 ?>
 <h1><?php echo T('Manage Categories'); ?></h1>
+<div class="Info"><?php echo T('Categories are used to help organize discussions.'); ?></div>
 <div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'SmallButton'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
       <tr id="0">
          <th><?php echo T('Category'); ?></th>
          <th class="Alt"><?php echo T('Description'); ?></th>
-         <th><?php echo T('Url'); ?></th>
+         <th><?php echo HoverHelp(T('Url'), T('A url-friendly version of the category name for better SEO.')); ?></th>
          <th class="Alt"><?php echo T('Options'); ?></th>
       </tr>
    </thead>

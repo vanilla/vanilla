@@ -278,6 +278,9 @@ class ImportModel extends Gdn_Model {
 			$Path = GetValue('Path', $TableInfo, '');
 			if(file_exists($Path))
 				unlink($Path);
+
+         // Drop the import table.
+         $this->Query("drop table :_z$Table");
 		}
 
 		// Delete the import file.
@@ -332,6 +335,37 @@ class ImportModel extends Gdn_Model {
       }
    }
 
+   public function GetCountSQL(
+      $Aggregate, // count, max, min, etc.
+      $ParentTable, $ChildTable, 
+      $ParentColumnName = '', $ChildColumnName = '',
+      $ParentJoinColumn = '', $ChildJoinColumn = '') {
+
+      if(!$ParentColumnName) {
+         switch(strtolower($Aggregate)) {
+            case 'count': $ParentColumnName = "Count{$ChildTable}s"; break;
+            case 'max': $ParentColumnName = "Last{$ChildTable}ID"; break;
+            case 'min': $ParentColumnName = "First{$ChildTable}ID"; break;
+            case 'sum': $ParentColumnName = "Sum{$ChildTable}s"; break;
+         }
+      }
+
+      if(!$ChildColumnName)
+         $ChildColumnName = $ChildTable.'ID';
+
+      if(!$ParentJoinColumn)
+         $ParentJoinColumn = $ParentTable.'ID';
+      if(!$ChildJoinColumn)
+         $ChildJoinColumn = $ParentJoinColumn;
+
+      $Result = "update :_$ParentTable p
+                  set p.$ParentColumnName = (
+                     select $Aggregate(c.$ChildColumnName)
+                     from :_$ChildTable c
+                     where p.$ParentJoinColumn = c.$ChildJoinColumn)";
+      return $Result;
+   }
+
    public function ToPost(&$Post) {
       $D = $this->Data;
       $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
@@ -373,6 +407,23 @@ class ImportModel extends Gdn_Model {
 			return 'vBulletin';
 		return 'Unknown';
 	}
+
+   /** Checks to see of a table and/or column exists in the import data.
+    *
+    * @param string $Tablename The name of the table to check for.
+    * @param string $Columnname
+    * @return bool
+    */
+   public function ImportExists($Table, $Column = '') {
+      if(!array_key_exists('Tables', $this->Data) || !array_key_exists($Table, $this->Data['Tables']))
+         return false;
+      if(!$Column)
+         return TRUE;
+      $Tables = $this->Data['Tables'];
+      if(!array_key_exists('Columns', $Tables) || !array_key_exists($Column, $Tables['Columns']));
+         return FALSE;
+      return TRUE;
+   }
 
 	public function InsertTables() {
 		$InsertedCount = 0;
@@ -792,58 +843,58 @@ class ImportModel extends Gdn_Model {
 
 	public function UpdateCounts() {
 		// Define the necessary SQL.
-		$StepSql = array(
-		// Set basic counts.
-      'Basic Discussion Counts' =>
-		"update :_Discussion d set
-      LastCommentID = (select max(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-      CountComments = (select count(c.CommentID) from :_Comment c where c.DiscussionID = d.DiscussionID),
-      DateLastComment = (select max(c.DateInserted) from :_Comment c where c.DiscussionID = d.DiscussionID)",
+		$Sql = array();
 
-		// Set the body of the first comment when the forum doesn't put it in the discussion.
-		'Discussion Bodies' =>
-      "update :_Discussion d
-      inner join :_Comment c
-        on c.DiscussionID = d.DiscussionID
-      inner join (
-        select min(c2.CommentID) as CommentID
-        from :_Comment c2
-        group by c2.DiscussionID
-      ) c2
-        on c.CommentID = c2.CommentID
-      set
-        d.Body = c.Body,
-        d.Format = c.Format,
-        d.FirstCommentID = c.CommentID
-      where d.Body is null",
+      $Sql['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
+      $Sql['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
+      $Sql['Discussion.DateLastComment'] = "update :_Discussion d
+      join :_Comment c
+         on d.LastCommentID = c.CommentID
+      set d.DateLastComment = c.DateInserted";
 
-		// Remove the first comment.
-		'FirstComment' =>
-      "delete :_Comment c
+      $Sql['Discussion.LastCommentUseID'] = "update :_Discussion d
+      join :_Comment c
+         on d.LastCommentID = c.CommentID
+      set d.LastCommentUserID = c.InsertUserID";
+
+
+      if (!$this->ImportExists('Table', 'Body')) {
+         // Update the body of the discussion if it isn't there.
+         $Sql['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'DateLastComment', 'CommentID');
+
+         $Sql['Discussion.Body'] = "update :_Discussion d
+         join :_Comment c
+            on d.FirstCommentID = c.CommentID
+         set d.Body = c.Body, d.Format = c.Format";
+
+         $Sql['Comment.FirstComment.Delete'] = "delete :_Comment c
       from :_Comment c
       inner join :_Discussion d
-        on d.FirstCommentID = c.CommentID",
+        on d.FirstCommentID = c.CommentID";
+      }
 
-		// Set the last comment user.
-      'LastCommentUserID' =>
-		"update :_Discussion d
-      join :_Comment c
-        on d.LastCommentID = c.CommentID
-      set d.LastCommentUserID = c.InsertUserID",
+      $Sql['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
 
-		// Set the category counts.
-      'Category Counts' =>
-		"update :_Category c set
-      c.CountDiscussions = (select count(d.DiscussionID) from :_Discussion d where d.CategoryID = c.CategoryID)");
+      if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage'))
+         $Sql['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage');
 
-		// Add the FirstCommentID to the discussion table.
-		Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);
+
+      // User counts.
+
+
+
+      // The updates start here.
+		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
+
+      if($CurrentSubstep == 0) {
+         // Add the FirstCommentID to the discussion table.
+         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);
+      }
 
 		// Execute the SQL.
-		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
       $Keys = array_keys($StepSql);
       for($i = $CurrentSubstep; $i < count($Keys); $i++) {
-         $this->Data['CurrentStepMessage'] = $Keys[$i];
+         $this->Data['CurrentStepMessage'] = $CurrentSubstep.' of '.count($Keys);
 			$Sql = $StepSql[$Keys[$i]];
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {

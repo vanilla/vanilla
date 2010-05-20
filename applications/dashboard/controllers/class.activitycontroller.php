@@ -18,7 +18,7 @@ class ActivityController extends Gdn_Controller {
       $this->AddJsFile('js/library/jquery.livequery.js');
       $this->AddJsFile('js/library/jquery.form.js');
       $this->AddJsFile('js/library/jquery.popup.js');
-      $this->AddJsFile('js/library/jquery.menu.js');
+      // $this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
       $this->AddJsFile('js/global.js');
       

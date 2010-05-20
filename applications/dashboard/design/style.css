@@ -431,25 +431,12 @@ body #Head h1 {
    height: 28px;
    padding: 0;
 }
-#Menu,
-#Menu ul {
+#Menu {
    margin: 0;
    padding: 0;
 }
 #Menu ul {
-   position: absolute;
-   visibility: hidden;
-   z-index: 100;
-   -moz-border-radius-bottomleft: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-}
-#Menu li ul li.First {
-   margin-top: 2px;
-}
-#Menu li ul li.Last {
-   padding-bottom: 2px;
+	display: none;
 }
 #Menu li {
    line-height: 27px;
@@ -465,51 +452,6 @@ body #Head h1 {
 * html #Menu li {
 	display: inline;
 }
-* html #Menu ul  {
-	left: 0;
-	top: 27px;
-}
-* html #Menu ul li  {
-	display: block;
-	height: 1%;
-	width: 85px;
-}
-#Menu li
-#Menu li a,
-#Menu li a:hover,
-#Menu li.Active,
-#Menu li.Active a,
-#Menu li.Active a:hover {
-   -moz-border-radius-topleft: 2px;
-   -moz-border-radius-topright: 2px;
-   -webkit-border-top-left-radius: 2px;
-   -webkit-border-top-right-radius: 2px;
-}
-#Menu li ul li,
-#Menu li ul li a,
-#Menu li ul li a:hover,
-#Menu li.Active ul li,
-#Menu li.Active ul li a,
-#Menu li.Active ul li a:hover {
-   -moz-border-radius-topleft: 0;
-   -moz-border-radius-topright: 0;
-   -webkit-border-top-left-radius: 0;
-   -webkit-border-top-right-radius: 0;
-}
-#Menu li ul li.Last a {
-   -moz-border-radius-bottomleft: 1px;
-   -moz-border-radius-bottomright: 1px;
-   -webkit-border-bottom-left-radius: 1px;
-   -webkit-border-bottom-right-radius: 1px;
-}
-#Menu li ul li {
-   margin: 0;
-   line-height: 22px;
-   font-weight: normal;
-}
-#Menu li ul li a {
-   height: auto;
-}
 #Menu a {
    border: 0;
    text-decoration: none;
@@ -523,18 +465,6 @@ body #Head h1 {
 * html #Menu a  {
    display: inline;
    padding: 6px 10px;
-}
-* html #Menu ul li a  {
-   display: block;
-   padding: 3px 10px;
-   width: 85px;
-}
-#Menu ul li {
-	display: block;
-	float: none;
-}
-#Menu ul .Active .First {
-	padding-left: 1px;
 }
 #Menu li.NonTab,
 #Menu li.NonTab a {

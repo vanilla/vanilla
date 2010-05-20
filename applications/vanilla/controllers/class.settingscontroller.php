@@ -65,7 +65,7 @@ class SettingsController extends Gdn_Controller {
 		
       $this->AddSideMenu('vanilla/settings/advanced');
       $this->AddJsFile('settings.js');
-      $this->Title(Translate('Advanced Forum Settings'));
+      $this->Title(T('Advanced Forum Settings'));
 		
 		$this->Render();
 	}
@@ -85,7 +85,7 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
-         $this->AddJsFile('jquery.menu.js');
+         // $this->AddJsFile('jquery.menu.js');
          $this->AddCssFile('style.css');
       } else {
          $this->AddCssFile('admin.css');

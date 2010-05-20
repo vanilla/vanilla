@@ -61,8 +61,8 @@ class VanillaHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Sender->Menu) {
          $Sender->Menu->AddLink(T('Discussions'), T('Discussions'), '/discussions', FALSE);
-         if ($Session->IsValid())
-            $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
+         // if ($Session->IsValid())
+         //   $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
       }
    }
    

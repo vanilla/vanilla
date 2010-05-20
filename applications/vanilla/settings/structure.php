@@ -57,9 +57,10 @@ $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
    ->Column('CountComments', 'int', '0')
-   ->Column('DateLastViewed', 'datetime')
-   ->Column('Dismissed', 'tinyint(1)', '0') // Relates to dismissed announcements
-   ->Column('Bookmarked', 'tinyint(1)', '0')
+   ->Column('DateLastViewed', 'datetime', NULL) // null signals never
+   ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
+   ->Column('Bookmarked', 'tinyint(1)', '0');
+$Construct
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')

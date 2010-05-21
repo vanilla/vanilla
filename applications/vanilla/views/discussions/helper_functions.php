@@ -35,7 +35,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
          <?php } ?>
          <span><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
-            if ($CountUnreadComments > 0 || $CountUnreadComments == '' && $Session->IsValid())
+            if ($CountUnreadComments > 0 || $CountUnreadComments === '' && $Session->IsValid())
                echo '<strong>',trim(sprintf(T('%s new'), $CountUnreadComments)),'</strong>';
          ?>
          <span><?php

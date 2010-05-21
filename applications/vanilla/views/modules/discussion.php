@@ -19,7 +19,7 @@
             }
          }
 
-         if ($CountUnreadComments > 0 || $CountUnreadComments == '')
+         if ($CountUnreadComments > 0 || $CountUnreadComments === '')
             echo '<strong>'.trim(sprintf('%s new', $CountUnreadComments)).'</strong>';
             
          $Last = new stdClass();

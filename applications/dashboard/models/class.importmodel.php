@@ -434,7 +434,7 @@ class ImportModel extends Gdn_Model {
 			if(GetValue('Inserted', $TableInfo) || GetValue('Skip', $TableInfo)) {
 				$InsertedCount++;
 			} else {
-				$this->Data['CurrentStepMessage'] = $TableName;
+				$this->Data['CurrentStepMessage'] = sprintf(T('%s of %s'), $InsertedCount, count($Tables));
 
             if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
                $RowCount = $this->_InsertTable($TableName);
@@ -841,43 +841,77 @@ class ImportModel extends Gdn_Model {
 			return $this->Data['Tables'];
 	}
 
-	public function UpdateCounts() {
-		// Define the necessary SQL.
-		$Sql = array();
+   public function UpdateCounts() {
+      // Define the necessary SQL.
+      $Sqls = array();
 
-      $Sql['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
-      $Sql['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
-      $Sql['Discussion.DateLastComment'] = "update :_Discussion d
-      join :_Comment c
-         on d.LastCommentID = c.CommentID
-      set d.DateLastComment = c.DateInserted";
+      if(!$this->ImportExists('Discussion', 'CountComments'))
+         $Sqls['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
+      if(!$this->ImportExists('Discussion', 'LastCommentID'))
+         $Sqls['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
+      if(!$this->ImportExists('Discussion', 'DateLastComment')) {
+         $Sqls['Discussion.DateLastComment'] = "update :_Discussion d
+         join :_Comment c
+            on d.LastCommentID = c.CommentID
+         set d.DateLastComment = c.DateInserted";
+      }
 
-      $Sql['Discussion.LastCommentUseID'] = "update :_Discussion d
-      join :_Comment c
-         on d.LastCommentID = c.CommentID
-      set d.LastCommentUserID = c.InsertUserID";
-
+      if(!$this->ImportExists('Discussion', 'LastCommentUserID')) {
+         $Sqls['Discussion.LastCommentUseID'] = "update :_Discussion d
+         join :_Comment c
+            on d.LastCommentID = c.CommentID
+         set d.LastCommentUserID = c.InsertUserID";
+      }
 
       if (!$this->ImportExists('Table', 'Body')) {
          // Update the body of the discussion if it isn't there.
-         $Sql['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'DateLastComment', 'CommentID');
+         $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'DateLastComment', 'CommentID');
 
-         $Sql['Discussion.Body'] = "update :_Discussion d
+         $Sqls['Discussion.Body'] = "update :_Discussion d
          join :_Comment c
             on d.FirstCommentID = c.CommentID
          set d.Body = c.Body, d.Format = c.Format";
 
-         $Sql['Comment.FirstComment.Delete'] = "delete :_Comment c
-      from :_Comment c
-      inner join :_Discussion d
-        on d.FirstCommentID = c.CommentID";
+         $Sqls['Comment.FirstComment.Delete'] = "delete :_Comment c
+         from :_Comment c
+         inner join :_Discussion d
+           on d.FirstCommentID = c.CommentID";
       }
 
-      $Sql['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
+      $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
 
-      if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage'))
-         $Sql['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage');
+      if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
+         $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
 
+         if($this->ImportExists('UserConversation')) {
+            if(!$this->ImportExists('UserConversation', 'LastMessageID')) {
+               if($this->ImportExists('UserConversation', 'DateLastViewed')) {
+                  // Get the value from the DateLastViewed.
+                  $Sqls['UserConversation.LastMessageID'] = 
+                     "update :_UserConversation uc
+                     set LastMessageID = (
+                       select max(MessageID)
+                       from :_ConversationMessage m
+                       where m.ConversationID = uc.ConversationID
+                         and m.DateInserted >= uc.DateLastViewed)";
+               } else {
+                  // Get the value from the conversation.
+                  $Sqls['UserConversation.LastMessageID'] = 
+                     "update :_UserConversation uc
+                     join :_Conversation c
+                       on c.ConversationID = uc.ConversationID
+                     set uc.LastMessageID = c.FirstMessageID,
+                        uc.DateLastViewed = c.DateInserted";
+               }
+            } elseif(!$this->ImportExists('UserConversation', 'DateLastViewed')) {
+               $Sqls['UserConversation.DateLastViewed'] =
+                     "update :_UserConversation uc
+                     join :_Conversation c
+                       on c.ConversationID = uc.ConversationID
+                     set uc.DateInserted = c.DateInserted";
+            }
+         }
+      }
 
       // User counts.
 
@@ -892,10 +926,10 @@ class ImportModel extends Gdn_Model {
       }
 
 		// Execute the SQL.
-      $Keys = array_keys($StepSql);
+      $Keys = array_keys($Sqls);
       for($i = $CurrentSubstep; $i < count($Keys); $i++) {
-         $this->Data['CurrentStepMessage'] = $CurrentSubstep.' of '.count($Keys);
-			$Sql = $StepSql[$Keys[$i]];
+         $this->Data['CurrentStepMessage'] = sprintf(T('%s of %s'), $CurrentSubstep + 1, count($Keys));
+			$Sql = $Sqls[$Keys[$i]];
 			$this->Query($Sql);
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
 				$this->Data['CurrentSubstep'] = $i + 1;

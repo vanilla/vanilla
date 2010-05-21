@@ -27,8 +27,10 @@ if($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
 
       if($Number == $CurrentStep) {
          $Message = GetValue('CurrentStepMessage', $this->Data);
+         echo '<div><span class="Progress" />';
          if($Message)
-            echo '<div>', $Message, '</div>';
+            echo Wrap($Message, 'span');
+         echo '</div>';
          $ErrorType = $this->Data['ErrorType'];
          if($ErrorType) {
             $ViewLocation = $this->FetchViewLocation(strtolower($ErrorType), 'import', 'dashboard');

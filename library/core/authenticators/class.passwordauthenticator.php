@@ -52,7 +52,8 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     */
    public function Authenticate() {
       
-      if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) return Gdn_Authenticator::AUTH_INSUFFICIENT;
+      if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) 
+         return Gdn_Authenticator::AUTH_INSUFFICIENT;
       
       $Email = $this->GetValue('Email');
       $Password = $this->GetValue('Password');
@@ -95,10 +96,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
    public function CurrentStep() {
       // Was data submitted through the form already?
       if ($this->_DataSource->IsPostBack() === TRUE) {
-         // Where there any errors?
-         if ($this->_DataSource->ValidateModel() == 0) {
-            return $this->_CheckHookedFields();
-         }
+         return $this->_CheckHookedFields();
       }
       
       return Gdn_Authenticator::MODE_GATHER;

@@ -943,8 +943,17 @@ class Gdn_Form {
    public function AddError($Error, $FieldName = '') {
       if(is_string($Error))
          $ErrorCode = $Error;
-      elseif(is_a($Error, 'Exception'))
-         $ErrorCode = '@'.$Error->getMessage();
+      elseif(is_a($Error, 'Exception')) {
+         if(defined('DEBUG')) {
+            $ErrorCode = '@<pre>'.
+               $Error->getMessage()."\n".
+               $Error->getFile().' Line '.$Error->getLine()."\n".
+               $Error->getTraceAsString().
+               '</pre>';
+         } else {
+            $ErrorCode = '@'.strip_tags($Error->getMessage());
+         }
+      }
       
       if ($FieldName == '') $FieldName = '<General Error>';
 

@@ -140,25 +140,28 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Length = '';
 			$Precision = '';
          $Parentheses = strpos($Type, '(');
+         $Enum = '';
+
          if ($Parentheses !== FALSE) {
 				$LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
-				$Length = trim($LengthParts[0]);
-				if(count($LengthParts) > 1)
-					$Precision = trim($LengthParts[1]);
-				
-				$Type = substr($Type, 0, $Parentheses);
-         }
-         $Enum = '';
-         if ($Type == 'enum') {
-            $Enum = str_replace("'", '', $Length);
-            $Enum = explode(',', $Enum);
-            $Length = '';
+            $Type = substr($Type, 0, $Parentheses);
+
+            if (strcasecmp($Type, 'enum') == 0) {
+               $Enum = array();
+               foreach($LengthParts as $Value)
+                  $Enum[] = trim($Value, "'");
+            } else {
+               $Length = trim($LengthParts[0]);
+               if(count($LengthParts) > 1)
+                  $Precision = trim($LengthParts[1]);
+            }
          }
 
          $Object = new stdClass();
          $Object->Name = $Field->Field;
          $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
          $Object->Type = $Type;
+         $Object->Type2 = $Field->Type;
          $Object->AllowNull = ($Field->Null == 'YES');
          $Object->Default = $Field->Default;
          $Object->Length = $Length;

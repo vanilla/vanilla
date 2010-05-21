@@ -374,6 +374,44 @@ abstract class Gdn_DatabaseStructure {
       return $this;
    }
 
+   /** Gets an arrya of type names allowed in the structure.
+    * @param string $Class The class of types to get. Valid values are:
+    *  - <b>int</b>: Integer types.
+    *  - <b>float</b>: Floating point types.
+    *  - <b>decimal</b>: Precise decimal types.
+    *  - <b>numeric</b>: float, int and decimal.
+    *  - <b>string</b>: String types.
+    *  - <b>date</b>: Date types.
+    *  - <b>length</b>: Types that have a length.
+    *  - <b>precision</b>: Types that have a precision.
+    *  - <b>other</b>: Types that don't fit into any other category on their own.
+    *  - <b>all</b>: All recognized types.
+    */
+   public function Types($Class = 'all') {
+      $Date = array('datetime', 'date');
+      $Decimal = array('decimal');
+      $Float = array('float', 'double');
+      $Int = array('int', 'tinyint', 'smallint', 'bigint');
+      $String = array('varchar', 'char', 'text');
+      $Length = array('varbinary');
+      $Other = array('enum');
+
+      switch(strtolower($Class)) {
+         case 'date': return $Date;
+         case 'decimal': return $Decimal;
+         case 'float': return $Float;
+         case 'int': return $Int;
+         case 'string': return $String;
+         case 'other': return array_merge($Length, $Other);
+
+         case 'numeric': return array_merge($Foat, $Int, $Decimal);
+         case 'length': return array_merge($String, $Length);
+         case 'precision': return $Decimal;
+         default: return array();
+      }
+   }
+
+
    /**
     * Specifies the name of the view to create or modify.
     *

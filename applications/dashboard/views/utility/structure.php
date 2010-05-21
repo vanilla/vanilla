@@ -1,6 +1,8 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<h1>Database Structure Upgrades</h1>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+echo Wrap(T($this->Data('Title')), 'h1');
+
+echo $this->Form->Errors();
+
 if($this->Data['Status'])
    echo '<div class="Info">', T($this->Data['Status']), '</div>';
 

@@ -14,157 +14,135 @@ class EntryController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'UserModel');
 	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
    
-   public function Index() {
-      $this->View = 'signin';
-      $this->SignIn();
-   }
-   
-   public function Handshake() {
-      $this->AddJsFile('entry.js');
+   public function Auth($AuthenticationSchemeAlias = 'default') {
+      try {
+         $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
+      } catch (Exception $e) {
+         $Authenticator = Gdn::Authenticator()->AuthenticateWith('default');
+      }
       
+      // Set up controller
+      $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
-      
-      $Target = GetIncomingValue('Target', '/');
-      
-      if ($this->Form->IsPostBack() === TRUE) {
-         $FormValues = $this->Form->FormValues();
-         if (ArrayValue('NewAccount', $FormValues)) {
-            // Try and synchronize the user with the new username/email.
-            $FormValues['Name'] = $FormValues['NewName'];
-            $FormValues['Email'] = $FormValues['NewEmail'];
-            $UserID = $this->UserModel->Synchronize($FormValues['UniqueID'], $FormValues);
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-         } else {
-            // Try and sign the user in.
-            $Password = new Gdn_PasswordAuthenticator();
-            $UserID = $Password->Authenticate(array('Email' => ArrayValue('SignInEmail', $FormValues, ''), 'Password' => ArrayValue('SignInPassword', $FormValues, '')));
-            
-            if ($UserID < 0) {
-               $this->Form->AddError('ErrorPermission');
-            } else if ($UserID == 0) {
-               $this->Form->AddError('ErrorCredentials');
-            }
-            
-            if($UserID) {
-               $Data = $FormValues;
-               $Data['UserID'] = $UserID;
-               $Data['Email'] = ArrayValue('SignInEmail', $FormValues, '');
-               $this->UserModel->Synchronize(ArrayValue('UniqueID', $FormValues, ''), $Data);
-            }
-         }
+      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
+   
+      // Import authenticator data source
+      switch ($Authenticator->DataSourceType()) {
+         case Gdn_Authenticator::DATA_FORM:
+            $Authenticator->FetchData($this->Form);
+         break;
          
-         if($UserID) {
-            $Authenticator = Gdn::Authenticator();
-            // The user has been created successfully, so sign in now
-            $AuthUserID = $Authenticator->Authenticate(array('UserID' => $UserID));
+         case Gdn_Authenticator::DATA_REQUEST:
+            $Authenticator->FetchData(Gdn::Request());
+         break;
+      }
+      
+      // By default, just render the view
+      $Reaction = Gdn_Authenticator::REACT_RENDER;
+      
+      // Where are we in the process? Still need to gather (render view) or are we validating?
+      $AuthenticationStep = $Authenticator->CurrentStep();
+      switch ($AuthenticationStep) {
+      
+         // User is already logged in
+         case Gdn_Authenticator::MODE_REPEAT:
+         
+            $Reaction = $Authenticator->RepeatResponse();
             
-            /// ... and redirect them appropriately
-            $Route = $this->RedirectTo();
+         // Not enough information to perform authentication, render input form
+         case Gdn_Authenticator::MODE_GATHER:
+            $this->AddJsFile('entry.js');
+            $Reaction = $Authenticator->LoginResponse();
+         break;
+         
+         // All information is present, authenticate
+         case Gdn_Authenticator::MODE_VALIDATE:
+            
+            // Attempt to authenticate...
+            $AuthenticationResponse = $Authenticator->Authenticate();
+            switch ($AuthenticationResponse) {
+               case Gdn_Authenticator::AUTH_PERMISSION:
+                  $this->Form->AddError('ErrorPermission');
+               break;
+               
+               case Gdn_Authenticator::AUTH_DENIED:
+                  $this->Form->AddError('ErrorCredentials');
+               break;
+               
+               case Gdn_Authenticator::AUTH_INSUFFICIENT:
+                  // Unable to comply with auth request, more information is needed from user.
+                  $this->Form->AddError('ErrorInsufficient');
+               break;
+               
+               case Gdn_Authenticator::AUTH_PARTIAL:
+                  // Partial auth completed.
+                  $Reaction = $Authenticator->PartialResponse();
+               break;
+               
+               case Gdn_Authenticator::AUTH_SUCCESS:
+               default:
+                  // Full auth completed.
+                  $UserID = $AuthenticationResponse;
+                  $Reaction = $Authenticator->SuccessResponse();
+            }
+         break;
+      }
+      
+      // AddActivity($AuthenticatedUserID, 'SignIn');
+      switch ($Reaction) {
+      
+         case Gdn_Authenticator::REACT_RENDER:
+            // Do nothing (render the view)
+         break;
+      
+         case Gdn_Authenticator::REACT_EXIT:
+            exit();
+         break;
+      
+         case Gdn_Authenticator::REACT_REMOTE:
+            // Render the view, but set the delivery type to VIEW
+            $this->_DeliveryType= DELIVERY_TYPE_VIEW;
+         break;
+         
+         case Gdn_Authenticator::REACT_REDIRECT:
+         default:
+         
+            if (is_string($Reaction))
+               $Route = $Reaction;
+            else
+               $Route = $this->RedirectTo();
+            
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
             } else {
                if ($Route !== FALSE)
                   Redirect($Route);
+               else
+                  Redirect('DefaultController');
             }
-         } else {
-            // Add the hidden inputs back into the form.
-            foreach($FormValues as $Key => $Value) {
-               if(in_array($Key, array('UniqueID', 'DateOfBirth', 'HourOffset', 'Gender', 'Name', 'Email')))
-                  $this->Form->AddHidden($Key, $Value);
-            }
-         }
-      } else {
-         // Clear out the authentication and try and get the authentication again.
-         $Authenticator = Gdn::Authenticator();
-         $Authenticator->SetIdentity(NULL);
-         $Id = $Authenticator->GetIdentity(TRUE);
-         if ($Id > 0) {
-            // The user is signed in so we can just go back to the homepage.
-            Redirect($Target);
-         }
-         /*
-         if ($Authenticator->State() == Gdn_HandshakeAuthenticator::SignedOut) {
-            // Clear out the authentication so it will fetch when we come back here.
-            $Authenticator->SetIdentity(NULL);
-
-            // Once signed in, we need to come back here to make sure there was no problem with the handshake.
-            $Target = Url('/entry/handshake/?Target='.urlencode($Target), TRUE);
-            // echo $Target;
-            // Redirect to the external server to sign in.
-            $SignInUrl = $Authenticator->RemoteSignInUrl($Target);
-            Redirect($SignInUrl);
-         }
-         */
-         
-         // There was a handshake error so we need to allow the user to fix the problems.
-         $HandshakeData = $Authenticator->GetHandshakeData();
-         
-         // Check to see if there is a problem with the handshake.
-         // $this->UserModel->ValidateUniqueFields($HandshakeData['Name'], $HandshakeData['Email']);
-         // $ValidationResults = $this->UserModel->ValidationResults();
-         // $this->Form->SetValidationResults($ValidationResults);
-         $Name = ArrayValue('Name', $HandshakeData);
-         $Email = ArrayValue('Email', $HandshakeData);
-         
-         // Set the defaults for a new user.
-         $this->Form->SetFormValue('NewName', $Name);
-         $this->Form->SetFormValue('NewEmail', $Email);
-         
-         // Set the default for the login.
-         $this->Form->SetFormValue('SignInEmail', $Email);
-         $this->Form->SetFormValue('Handshake', 'NEW');
-         
-         // Add the handshake data as hidden fields.
-         foreach($HandshakeData as $Key => $Value) {
-            $this->Form->AddHidden($Key, $Value);
-         }
-         
+         break;
       }
-      
-      $this->SetData('Name', ArrayValue('Name', $this->Form->HiddenInputs));
-      $this->SetData('Email', ArrayValue('Email', $this->Form->HiddenInputs));
       
       $this->Render();
    }
-
+   
+   public function Callback($AuthenticationSchemeAlias) {
+      // Handle generic auth requests here
+      $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
+   }
+   
+   public function Index() {
+      $this->Auth();
+   }
+   
    /**
     * This is a good example of how to use the form, model, and validator to
     * validate a form that does use the model, but doesn't save data to the
     * model.
     */
    public function SignIn() {
-      $this->AddJsFile('entry.js');
-         
-      $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-      // If the form has been posted back...
-      if ($this->Form->IsPostBack() === TRUE) {
-         // If there were no errors...
-         if ($this->Form->ValidateModel() == 0) {
-            // Attempt to authenticate...
-            $Authenticator = Gdn::Authenticator();
-            $AuthenticatedUserID = $Authenticator->Authenticate($this->Form->FormValues());
-
-            if ($AuthenticatedUserID < 0) {
-               $this->Form->AddError('ErrorPermission');
-            } else if ($AuthenticatedUserID == 0) {
-               $this->Form->AddError('ErrorCredentials');
-            } else {
-               // AddActivity($AuthenticatedUserID, 'SignIn');
-               $Route = $this->RedirectTo();
-               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                  $this->RedirectUrl = Url($Route);
-               } else {
-                  if ($Route !== FALSE)
-                     Redirect($Route);
-               }
-            }
-         }
-      }
-      $this->Render();
+      $this->Auth('password');
    }
    
    /**
@@ -232,11 +210,9 @@ class EntryController extends Gdn_Controller {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
          } else {
             // The user has been created successfully, so sign in now
-            $Authenticator = Gdn::Authenticator();
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE)
-            );
+            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -269,11 +245,9 @@ class EntryController extends Gdn_Controller {
             }
          } else {
             // The user has been created successfully, so sign in now
-            $Authenticator = Gdn::Authenticator();
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE)
-            );
+            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -307,10 +281,9 @@ class EntryController extends Gdn_Controller {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
          } else {
             // The user has been created successfully, so sign in now
-            $Authenticator = Gdn::Authenticator();
-            $AuthUserID = $Authenticator->Authenticate($this->Form->GetValue('Name'),
-               $this->Form->GetValue('Password'),
-               $this->Form->GetValue('RememberMe', FALSE));
+            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+            $Authenticator->FetchData($this->Form);
+            $AuthUserID = $Authenticator->Authenticate();
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -366,8 +339,10 @@ class EntryController extends Gdn_Controller {
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
-            $Authenticator = Gdn::Authenticator();
-            $Authenticator->Authenticate(array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
+            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
+            $AuthUserID = $Authenticator->Authenticate();
+
             $this->StatusMessage = T('Password saved. Signing you in now...');
             $this->RedirectUrl = Url('/');
          }
@@ -375,12 +350,18 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
 
-   public function Leave($TransientKey = '') {
+   public function Leave($TransientKey = '', $AuthenticationSchemeAlias = 'default') {
+   
+      try {
+         $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
+      } catch (Exception $e) {
+         $Authenticator = Gdn::Authenticator()->AuthenticateWith('default');
+      }
+   
       // Only sign the user out if this is an authenticated postback!
       $Session = Gdn::Session();
       $this->Leaving = FALSE;
       if ($Session->ValidateTransientKey($TransientKey)) {
-         $Authenticator = Gdn::Authenticator();
          $Authenticator->DeAuthenticate();
          $this->Leaving = TRUE;
          $this->RedirectUrl = Url('/entry');
@@ -388,9 +369,9 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
    
-   private function RedirectTo() {
+   public function RedirectTo() {
       $IncomingTarget = $this->Form->GetValue('Target', '');
-      return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
+      return $IncomingTarget == '' ? 'DefaultController' : $IncomingTarget;
    }
    
    public function Initialize() {
@@ -399,7 +380,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('js/library/jquery.livequery.js');
       $this->AddJsFile('js/library/jquery.form.js');
       $this->AddJsFile('js/library/jquery.popup.js');
-      $this->AddJsFile('js/library/jquery.menu.js');
+      // $this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
       $this->AddJsFile('js/global.js');
       

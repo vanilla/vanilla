@@ -228,7 +228,7 @@ class Gdn_Request {
       );
       $NumDataTypes = sizeof($QueryOrder);
       
-      for ($i=0; $i <= $NumDataTypes; $i++) {
+      for ($i=0; $i < $NumDataTypes; $i++) {
          $DataType = $QueryOrder[$i];
          if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
          if (array_key_exists($Key, $this->_RequestArguments[$DataType]))

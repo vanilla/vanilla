@@ -373,7 +373,7 @@ class Gdn_PluginManager {
       
       // Required Themes
       $ThemeManager = new Gdn_ThemeManager();
-      $EnabledThemes = $ThemeManager->EnabledThemeInfo();
+      $EnabledThemes = $ThemeManager->EnabledThemeInfo(TRUE);
       $RequiredThemes = ArrayValue('RequiredTheme', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       
@@ -516,6 +516,7 @@ class Gdn_PluginManager {
          case self::ACTION_ENABLE:  $HookMethod = 'Setup'; break;
          case self::ACTION_DISABLE: $HookMethod = 'OnDisable'; break;
          case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+         case self::ACTION_ONLOAD:  $HookMethod = 'OnLoad'; break;
       }
       
       $PluginInfo      = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);

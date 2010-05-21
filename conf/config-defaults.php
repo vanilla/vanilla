@@ -38,11 +38,11 @@ $Configuration['Garden']['Cookie']['Name']                      = 'Vanilla';
 $Configuration['Garden']['Cookie']['Path']                      = '/';
 $Configuration['Garden']['Cookie']['Domain']                    = '';
 $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 or sha1
-$Configuration['Garden']['Authenticator']['Type']               = 'Password'; // Types include 'Password' and 'Handshake'
-$Configuration['Garden']['Authenticator']['Encoding']           = 'ini';
-$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register/?Target=%s';
-$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin/?Target=%s';
-$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}';
+$Configuration['Garden']['Authenticator']['DefaultScheme']      = 'password'; // Types include 'Password', 'Handshake', 'Openid'
+$Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register?Target=%2$s';
+$Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
+$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/{Session_TransientKey}/%1$s';
+$Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';
 $Configuration['Garden']['Errors']['MasterView']                = 'deverror.master.php'; // Used at installation time and you should use it too view when debugging
@@ -82,6 +82,8 @@ $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
+$Configuration['Garden']['Roles']['Manage']                     = TRUE;
+$Configuration['Garden']['VanillaUrl']                          = 'http://vanillaforums.org';
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

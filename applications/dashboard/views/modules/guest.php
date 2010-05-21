@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box GuestBox">
    <h4><?php echo T('Howdy, Stranger!'); ?></h4>
-   <p><?php echo T($this->MessageCode); ?></p>
+   <p><?php echo T($this->MessageCode, $this->MessageDefault); ?></p>
    <p>
       <?php echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->_Sender->SelfUrl), 'Button'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : '')); ?> 
       <?php

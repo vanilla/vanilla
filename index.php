@@ -25,10 +25,6 @@ define('PATH_ROOT', dirname(__FILE__));
 // 2. Include the header.
 require_once(PATH_ROOT.DS.'bootstrap.php');
 
-// 3. Start the application.
-if (substr(Gdn::Request()->Path(),0,15) != 'dashboard/setup')
-   Gdn::Session()->Start(Gdn::Authenticator());
-
 $Dispatcher = Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::Config('EnabledApplications');

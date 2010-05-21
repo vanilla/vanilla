@@ -1268,7 +1268,6 @@ class Gdn_Form {
    public function ValidateModel() {
       $this->_Model->DefineSchema();
       if ($this->_Model->Validation->Validate($this->FormValues()) === FALSE) $this->_ValidationResults = $this->_Model->ValidationResults();
-
       return $this->ErrorCount();
    }
 

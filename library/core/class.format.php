@@ -673,5 +673,37 @@ class Gdn_Format {
       $Dot = T('dot');
       return '<span class="Email">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
    }
+   
+   public static function VanillaSprintf($PlaceholderString, $ReplaceWith) {
+      // Set replacement array inside callback
+      Gdn_Format::VanillaSprintfCallback(NULL, $ReplaceWith);  
+      
+      $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', array('Gdn_Format', 'VanillaSprintfCallback'), $PlaceholderString);
+      
+      // Cleanup replacement list
+      Gdn_Format::VanillaSprintfCallback(NULL, array());
+      
+      return $FinalString;
+   }
+   
+   protected static function VanillaSprintfCallback($Match, $InternalReplacementList = FALSE) {
+      static $InternalReplacement = array();
+      
+      if (is_array($InternalReplacementList)) {
+         $InternalReplacement = $InternalReplacementList;
+      } else {
+         $MatchStr = $Match[2];
+         $Format = (count($SplitMatch = explode(':',$MatchStr)) > 1) ? $SplitMatch[1] : FALSE;
+         
+         if (array_key_exists($MatchStr, $InternalReplacement)) {
+            if ($Format) {
+               // TODO: Apply format
+            }
+            return $InternalReplacement[$MatchStr];
+         }
+
+         return $Match[1];
+      }
+   }
 
 }

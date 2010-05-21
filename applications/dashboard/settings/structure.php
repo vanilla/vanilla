@@ -32,12 +32,12 @@ $Construct->Table('Role')
 $RoleModel = Gdn::Factory('RoleModel');
 $RoleModel->Database = $Database;
 $RoleModel->SQL = $SQL;
-$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Ex-members who do not have permission to sign in.'));
-$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
-$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
-$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
-$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators can administer user-generated content in the application.'));
-$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
+$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
+$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
+$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
+$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
+$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
 
 // User Table
 $Construct->Table('User')
@@ -80,6 +80,8 @@ $Construct->Table('UserRole')
 	
 // Assign the guest user to the guest role
 $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
+// Assign the admin user to admin role
+$SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
 
 // User Meta Table
 $Construct->Table('UserMeta')
@@ -90,10 +92,38 @@ $Construct->Table('UserMeta')
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('UniqueID', 'varchar(30)', FALSE, 'primary')
+	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
+	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
+	
+$Construct->Table('UserAuthenticationProvider')
+   ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
+   ->Column('URL', 'varchar(255)', FALSE)
+   ->Column('AssociationSecret', 'text', FALSE)
+   ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
+   ->Column('RegistrationUrl', 'varchar(255)', TRUE)
+   ->Column('SignInUrl', 'varchar(255)', TRUE)
+   ->Column('SignOutUrl', 'varchar(255)', TRUE)
+   ->Set($Explicit, $Drop);
 
+$Construct->Table('UserAuthenticationNonce')
+   ->Column('Nonce', 'varchar(200)', FALSE, 'primary')
+   ->Column('Token', 'varchar(64)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('UserAuthenticationToken')
+   ->Column('Token', 'varchar(64)', FALSE, 'primary')
+   ->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('ForeignUserKey', 'varchar(255)', TRUE)
+   ->Column('TokenSecret', 'varchar(64)', FALSE)
+   ->Column('TokenType', array('request', 'access'), FALSE)
+   ->Column('Authorized', 'tinyint(1)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Column('Lifetime', 'int', FALSE)
+   ->Set($Explicit, $Drop);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();

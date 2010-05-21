@@ -195,12 +195,9 @@ class SetupController extends DashboardController {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
                // The user has been created successfully, so sign in now
-               $Authenticator = Gdn::Authenticator();
-               $AuthUserID = $Authenticator->Authenticate(array(
-                  'Email' => $this->Form->GetValue('Email'),
-                  'Password' => $this->Form->GetValue('Password'),
-                  'RememberMe' => TRUE)
-               );
+               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+               $Authenticator->FetchData($this->Form);
+               $AuthUserID = $Authenticator->Authenticate();
             }
             
             if ($this->Form->ErrorCount() > 0)
@@ -212,7 +209,7 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             try {
-               $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
+               $Query = Gdn::Request()->Url("entry", TRUE);
                $Results = ProxyHead($Query, array(), 1);
                $CanRewrite = FALSE;
                if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {

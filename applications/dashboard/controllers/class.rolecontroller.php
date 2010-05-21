@@ -109,8 +109,7 @@ class RoleController extends DashboardController {
    }
       
    public function Index() {
-		if(!$this->_Permission())
-			return;
+		$this->Permission('Garden.Roles.Manage');
 
       $this->AddSideMenu('dashboard/role');
       $this->AddJsFile('/js/library/jquery.tablednd.js');
@@ -129,7 +128,7 @@ class RoleController extends DashboardController {
 	protected function _Permission() {
       $this->Permission('Garden.Roles.Manage');
 		if(!C('Garden.Roles.Manage', TRUE)) {
-			Gdn::Dispatcher()->Dispatch('Default404');
+			Gdn::Dispatcher()->Dispatch('DefaultPermission');
 			return FALSE;
 		}
 		return TRUE;

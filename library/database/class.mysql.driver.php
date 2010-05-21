@@ -116,11 +116,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       $Sql = "show tables";
 
       if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '')
-         $Sql .= " like ".$this->Connection()->quote($this->Database->DatabasePrefix.'%');
+         $Sql .= " like ".$this->Database->Connection()->quote($this->Database->DatabasePrefix.'%');
 		elseif (is_string($LimitToPrefix) && $LimitToPrefix)
-			$Sql .= " like ".$this->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
+			$Sql .= " like ".$this->Database->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
 
       return $Sql;
+      echo "<pre>$Sql</pre>";
    }
 
    /**

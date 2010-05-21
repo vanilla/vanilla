@@ -287,7 +287,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Returns an array of schema data objects for each field in the specified
       // table. The returned array of objects contains the following properties:
       // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
-      $ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+      $ExistingColumns = $this->ExistingColumns();
 
       // 1. Remove any unnecessary columns if this is an explicit modification
       if ($Explicit) {

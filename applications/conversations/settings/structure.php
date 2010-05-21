@@ -30,6 +30,7 @@ $Construct->Table('Conversation')
    ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
+   ->Column('CountComments', 'int')
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are
@@ -40,11 +41,12 @@ $Construct->Table('UserConversation')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('ConversationID', 'int', FALSE, 'primary')
    ->Column('CountNewMessages', 'int', 0) // # of unread messages
-   ->Column('CountMessages', 'int', 0) // # of uncleared messages
+   ->Column('CountMessages', 'int', 0) // # of read messages
    ->Column('LastMessageID', 'int', NULL, 'key') // The last message posted by a user other than this one, unless this user is the only person who has added a message
    ->Column('DateLastViewed', 'datetime', NULL)
    ->Column('DateCleared', 'datetime', NULL)
    ->Column('Bookmarked', 'tinyint(1)', '0')
+   ->Column('Deleted', 'tinyint(1)', '0') // User deleted this conversation
    ->Set($Explicit, $Drop);
    
 // Contains messages for each conversation, as well as who inserted the message
@@ -80,12 +82,3 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumR
    
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'AddedToConversation', 'FullHeadline' => '%1$s added you to a %8$s.', 'ProfileHeadline' => '%1$s added  you to a %8$s.', 'RouteCode' => 'conversation', 'Notify' => '1', 'Public' => '0'));
-
-/*
-   Apr 26th, 2010
-   Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
-   For some reason mysql makes 0's "2" during this change. Change them back to "0".
-*/
-if (!$Construct->CaptureOnly) {
-	$SQL->Query("update GDN_UserConversation set Bookmarked = '0' where Bookmarked = '2'");
-}

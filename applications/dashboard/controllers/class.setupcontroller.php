@@ -57,7 +57,7 @@ class SetupController extends DashboardController {
                   }
                }
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
             if ($this->Form->ErrorCount() == 0) {
                // Save a variable so that the application knows it has been installed.
@@ -176,7 +176,7 @@ class SetupController extends DashboardController {
             try {
                include(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'structure.php');
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
          
             if ($this->Form->ErrorCount() > 0)

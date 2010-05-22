@@ -191,9 +191,13 @@ class Gdn_Form {
       $Return = '';
       // If the form hasn't been posted back, use the provided $ValueDataSet
       if ($this->IsPostBack() === FALSE) {
-         $CheckedValues = $ValueDataSet;
-         if (is_object($ValueDataSet)) $CheckedValues = ConsolidateArrayValuesByKey(
-            $ValueDataSet->ResultArray(), $FieldName);
+         if ($ValueDataSet === NULL) {
+            $CheckedValues = $this->GetValue($FieldName);
+         } else {
+            $CheckedValues = $ValueDataSet;
+            if (is_object($ValueDataSet))
+               $CheckedValues = ConsolidateArrayValuesByKey($ValueDataSet->ResultArray(), $FieldName);
+         }
       } else {
          $CheckedValues = $this->GetFormValue($FieldName, array());
       }

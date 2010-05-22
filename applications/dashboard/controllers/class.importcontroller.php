@@ -179,8 +179,11 @@ class ImportController extends DashboardController {
 
       // Delete the individual table files.
       $Imp = new ImportModel();
-      $Imp->LoadState();
-      $Imp->DeleteFiles();
+      try {
+         $Imp->LoadState();
+         $Imp->DeleteFiles();
+      } catch(Exception $Ex) {
+      }
       $Imp->DeleteState();
 
       Redirect(strtolower($this->Application).'/import');

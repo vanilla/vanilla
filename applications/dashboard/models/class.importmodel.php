@@ -235,7 +235,7 @@ class ImportModel extends Gdn_Model {
                $DestStructure->Set();
          } catch(Exception $Ex) {
             // Since these exceptions are likely caused by a faulty import file they should be considered user exceptions.
-            throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table.'), $Table), $Ex);
+            throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table.'), $Table)); //, $Ex);
          }
 		}
 		return TRUE;
@@ -274,13 +274,14 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function DeleteFiles() {
+      $St = Gdn::Structure();
 		foreach(GetValue('Tables', $this->Data, array()) as $Table => $TableInfo) {
 			$Path = GetValue('Path', $TableInfo, '');
 			if(file_exists($Path))
 				unlink($Path);
 
          // Drop the import table.
-         $this->Query("drop table :_z$Table");
+         $St->Table("z$Table")->Drop();
 		}
 
 		// Delete the import file.
@@ -886,7 +887,7 @@ class ImportModel extends Gdn_Model {
          if(!$this->ImportExists('Conversation', 'CountMessages'))
             $Sqls['Conversation.CountMessages'] = $this->GetCountSQL('count', 'Conversation', 'ConversationMessage', 'CountMessages', 'MessageID');
          if(!$this->ImportExists('Conversation', 'LastMessageID'))
-            $Sqls['Conversation.LastMessageID'] = $this->GetCountSQL('max', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
+            $Sqls['Conversation.LastMessageID'] = $this->GetCountSQL('max', 'Conversation', 'ConversationMessage', 'LastMessageID', 'MessageID');
 
          if($this->ImportExists('UserConversation')) {
             if(!$this->ImportExists('UserConversation', 'LastMessageID')) {
@@ -901,18 +902,22 @@ class ImportModel extends Gdn_Model {
                          and m.DateInserted >= uc.DateLastViewed)";
                } else {
                   // Get the value from the conversation.
+                  // In this case just mark all of the messages read.
                   $Sqls['UserConversation.LastMessageID'] = 
                      "update :_UserConversation uc
                      join :_Conversation c
                        on c.ConversationID = uc.ConversationID
-                     set uc.LastMessageID = c.FirstMessageID";
+                     set uc.CountReadMessages = c.CountMessages,
+                       uc.LastMessageID = c.LastMessageID";
                }
             } elseif(!$this->ImportExists('UserConversation', 'DateLastViewed')) {
+               // We have the last message so grab the date from that.
                $Sqls['UserConversation.DateLastViewed'] =
                      "update :_UserConversation uc
-                     join :_Conversation c
-                       on c.ConversationID = uc.ConversationID
-                     set uc.DateInserted = c.DateInserted";
+                     join :_ConversationMessage m
+                       on m.ConversationID = uc.ConversationID
+                         and m.MessageID = uc.LastMessageID
+                     set uc.DateLastViewed = m.DateInserted";
             }
          }
       }

@@ -250,7 +250,7 @@ if ($Drop) {
 
 /*
 Apr 26th, 2010
-Removed FirstComment from GDN_Discussion and moved it into the discussion table.
+Removed FirstComment from :_Discussion and moved it into the discussion table.
 */
 if (!$Construct->CaptureOnly) {
 	$Prefix = $SQL->Database->DatabasePrefix;

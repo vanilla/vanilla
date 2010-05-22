@@ -459,7 +459,7 @@ class ImportModel extends Gdn_Model {
                      $Sql = "insert :_UserMeta ( UserID, Name, Value )
                            select zUserID._NewID, i.Name, max(i.Value) as Value
                            from :_zUserMeta i
-                           left join GDN_zUser zUserID
+                           left join :_zUser zUserID
                              on i.UserID = zUserID.UserID
                            left join :_UserMeta um
                              on zUserID._NewID = um.UserID and i.Name = um.Name

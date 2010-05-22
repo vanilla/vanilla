@@ -493,6 +493,19 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       return $this->_DeliveryType;
    }
+   
+   /**
+    * Returns the requested delivery method of the controller if $Default is not
+    * provided. Sets and returns the delivery method otherwise.
+    *
+    * @param string $Default One of the DELIVERY_METHOD_* constants.
+    */
+   public function DeliveryMethod($Default = '') {
+      if ($Default != '')
+         $this->_DeliveryMethod = $Default;
+
+      return $this->_DeliveryMethod;
+   }
 
    /**
     * Fetches the contents of a view into a string and returns it. Returns

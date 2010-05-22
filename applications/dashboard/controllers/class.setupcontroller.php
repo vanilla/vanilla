@@ -57,15 +57,16 @@ class SetupController extends DashboardController {
                   }
                }
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
             if ($this->Form->ErrorCount() == 0) {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
-               SaveToConfig(array(
-                  'Garden.Installed' => TRUE,
-                  'Garden.Errors.MasterView' => 'error.master.php'
-               ));
+               $Config = array('Garden.Installed' => TRUE);
+               if(!defined('DEBUG'))
+                  $Config['Garden.Errors.MasterView'] = 'error.master.php';
+
+               SaveToConfig($Config);
                
                // Go to the dashboard
                Redirect('/settings');
@@ -176,7 +177,7 @@ class SetupController extends DashboardController {
             try {
                include(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'structure.php');
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
          
             if ($this->Form->ErrorCount() > 0)
@@ -209,7 +210,7 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             try {
-               $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
+               $Query = Gdn::Request()->Url("entry", TRUE);
                $Results = ProxyHead($Query, array(), 1);
                $CanRewrite = FALSE;
                if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {

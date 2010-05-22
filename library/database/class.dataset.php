@@ -318,19 +318,29 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * Advances to the next row and returns the value rom a column.
     *
-    * @param string $ColumnName The name of the column to get the value from.
+    * @param mixed $ColumnName The name of the column to get the value from.
+    *  - <b>string</b>: The argument represents the column name.
+    *  - <b>array</b>: The argument is an array of column/default pairs.
     * @param string $DefaultValue The value to return if there is no data.
     * @return mixed The value from the column or $DefaultValue.
     */
    public function Value($ColumnName, $DefaultValue = NULL) {
-      if($Row = $this->NextRow()) {
-			if(is_object($Row))
-				if(property_exists($Row, $ColumnName))
-					return $Row->$ColumnName;
-			elseif(is_array($Row))
-				if(array_key_exists($ColumnName, $Row))
-					return $Row[$ColumnName];
-		}
-		return $DefaultValue;
+      if (is_string($ColumnName))
+         $Columns = array($ColumnName => $DefaultValue);
+      else
+         $Columns = $ColumnName;
+
+      $Result = array();
+      if (($Row = $this->Row($this->_Cursor >= 0 ? $this->_Cursor : 0)) != $this->_EOF) {
+         foreach($Columns as $ColumnName => $DefaultValue) {
+            $Result[$ColumnName] = GetValue($ColumnName, $Row, $DefaultValue);
+         }
+      }
+
+      $Result = array_values($Columns);
+      if(count($Result) == 1)
+         return array_shift($Result);
+      else
+         return $Result;
    }
 }

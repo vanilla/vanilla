@@ -943,8 +943,17 @@ class Gdn_Form {
    public function AddError($Error, $FieldName = '') {
       if(is_string($Error))
          $ErrorCode = $Error;
-      elseif(is_a($Error, 'Exception'))
-         $ErrorCode = '@'.$Error->getMessage();
+      elseif(is_a($Error, 'Exception')) {
+         if(defined('DEBUG')) {
+            $ErrorCode = '@<pre>'.
+               $Error->getMessage()."\n".
+               $Error->getFile().' Line '.$Error->getLine()."\n".
+               $Error->getTraceAsString().
+               '</pre>';
+         } else {
+            $ErrorCode = '@'.strip_tags($Error->getMessage());
+         }
+      }
       
       if ($FieldName == '') $FieldName = '<General Error>';
 
@@ -1266,12 +1275,8 @@ class Gdn_Form {
     * @return int
     */
    public function ValidateModel() {
-      if (!method_exists($this->_Model, 'DefineSchema'))
-         return 0;
-      
       $this->_Model->DefineSchema();
       if ($this->_Model->Validation->Validate($this->FormValues()) === FALSE) $this->_ValidationResults = $this->_Model->ValidationResults();
-
       return $this->ErrorCount();
    }
 

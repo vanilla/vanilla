@@ -191,8 +191,10 @@ if (!class_exists('HeadModule', FALSE)) {
          if ($Title != '')
             $this->_Title = $Title;
             
-         if ($this->_Title == '')
-            $this->_Title = Gdn::Config('Garden.Title', '');
+         if ($this->_Title == '') {
+            $Subtitle = GetValueR('Data.Title', $this->_Sender, '');
+            $this->_Title = ConcatSep(' - ', $Subtitle, C('Garden.Title'));
+         }
             
          return $this->_Title;
       }

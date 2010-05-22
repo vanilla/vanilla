@@ -424,6 +424,18 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->FireEvent('AfterAddModule');
    }
 
+   /** Get a value out of the controller's data array.
+    *
+    * @param string $Path The path to the data.
+    * @param mixed $Default The default value if the data array doesn't contain the path.
+    * @return mixed
+    * @see GetValueR()
+    */
+   public function Data($Path, $Default = '' ) {
+      $Result = GetValueR($Path, $this->Data, $Default);
+      return $Result;
+   }
+
    /**
     * Undocumented method.
     *

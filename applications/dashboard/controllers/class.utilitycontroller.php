@@ -114,8 +114,8 @@ class UtilityController extends DashboardController {
 			   $FoundStructureFile = TRUE;
 			   try {
 			      include($File);
-			   } catch (Exception $ex) {
-			      $this->Form->AddError(strip_tags($ex->getMessage()));
+			   } catch (Exception $Ex) {
+			      $this->Form->AddError($Ex);
 			   }
 			}
 			if (property_exists($Structure, 'CapturedSql'))
@@ -125,11 +125,10 @@ class UtilityController extends DashboardController {
       }
       if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
          $this->SetData('Status', 'The structure was successfully executed.');
-      elseif ($CaptureOnly && $FoundStructureFile)
-			$this->SetData('Status', 'The following structure changes are required for your database.');
 
 		$this->AddSideMenu('dashboard/settings/configure');
       $this->AddCssFile('admin.css');
+      $this->SetData('Title', T('Database Structure Upgrades'));
       $this->Render();
    }
    

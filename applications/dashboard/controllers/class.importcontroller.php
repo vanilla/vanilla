@@ -67,8 +67,6 @@ class ImportController extends DashboardController {
                $Imp->CurrentStep++;
             } elseif($Result === 'COMPLETE') {
                $this->SetJson('Complete', TRUE);
-            } else {
-               $this->SetJson('Error', TRUE);
             }
 
             /*elseif(is_array($Result)) {

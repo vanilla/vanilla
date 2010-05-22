@@ -16,7 +16,7 @@ Please review the information below and click <b>Start Import</b> to begin the i
    if(count($Steps) > 0 && !array_key_exists($CurrentStep, $Steps)) {
       // The import is complete.
       $Complete = TRUE;
-      // The import is in process.
+      // The import is complete.
       echo '<div class="Info">',
          T('Garden.Import.Complete.Description', 'You have successfully completed an import.
    Click <b>Finished</b> when you are ready.'),

@@ -592,7 +592,7 @@ class ImportModel extends Gdn_Model {
 
 		// Authenticate the admin user as the current user.
 		$Auth = new Gdn_PasswordAuthenticator();
-		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
+		$Auth->Authenticate(GetValue('OverwriteEmail', $this->Data), GetValue('OverwritePassword', $this->Data));
 		Gdn::Session()->Start($Auth);
 
 		return TRUE;
@@ -883,6 +883,11 @@ class ImportModel extends Gdn_Model {
       if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
          $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
 
+         if(!$this->ImportExists('Conversation', 'CountMessages'))
+            $Sqls['Conversation.CountMessages'] = $this->GetCountSQL('count', 'Conversation', 'ConversationMessage', 'CountMessages', 'MessageID');
+         if(!$this->ImportExists('Conversation', 'LastMessageID'))
+            $Sqls['Conversation.LastMessageID'] = $this->GetCountSQL('max', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
+
          if($this->ImportExists('UserConversation')) {
             if(!$this->ImportExists('UserConversation', 'LastMessageID')) {
                if($this->ImportExists('UserConversation', 'DateLastViewed')) {
@@ -900,8 +905,7 @@ class ImportModel extends Gdn_Model {
                      "update :_UserConversation uc
                      join :_Conversation c
                        on c.ConversationID = uc.ConversationID
-                     set uc.LastMessageID = c.FirstMessageID,
-                        uc.DateLastViewed = c.DateInserted";
+                     set uc.LastMessageID = c.FirstMessageID";
                }
             } elseif(!$this->ImportExists('UserConversation', 'DateLastViewed')) {
                $Sqls['UserConversation.DateLastViewed'] =
@@ -914,7 +918,6 @@ class ImportModel extends Gdn_Model {
       }
 
       // User counts.
-
 
 
       // The updates start here.

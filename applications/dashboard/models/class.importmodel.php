@@ -540,9 +540,10 @@ class ImportModel extends Gdn_Model {
 		$this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
 
 		// Authenticate the admin user as the current user.
-		$Auth = new Gdn_PasswordAuthenticator();
-		$Auth->Authenticate(array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
-		Gdn::Session()->Start($Auth);
+		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');
+		$PasswordAuth->FetchData($Authenticator, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
+		$PasswordAuth->Authenticate();
+		Gdn::Session()->Start();
 
 		return TRUE;
 	}

@@ -1158,8 +1158,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Title The value to pass to $this->Head->Title().
     */
    public function Title($Title) {
-      if ($this->Head)
-         $this->Head->Title($Title);
+      $this->SetData('Title', $Title);
+//      if ($this->Head)
+//         $this->Head->Title($Title);
    }
    
    /**

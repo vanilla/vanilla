@@ -6,7 +6,7 @@ Garden is free software: you can redistribute it and/or modify it under the term
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+ */
 
 if (!isset($Drop))
    $Drop = FALSE;
@@ -16,13 +16,19 @@ if (!isset($Explicit))
    
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
+$Px = $Database->DatabasePrefix;
 
 // Contains all conversations. A conversation takes place between X number of
 // ppl. This table keeps track of the unique id of the conversation, the person
 // who started the conversation (and when), and the last person to contribute to
 // the conversation (and when).
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Conversation')
+$Construct->Table('Conversation');
+
+$UpdateCountMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountMessages');
+$UpdateLastMessageID = $Construct->TableExists() && !$Construct->ColumnExists('LastMessageID');
+
+$Construct
    ->PrimaryKey('ConversationID')
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
@@ -30,18 +36,20 @@ $Construct->Table('Conversation')
    ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
-   ->Column('CountComments', 'int')
+   ->Column('CountMessages', 'int')
+   ->Column('LastMessageID', 'int')
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are
 // taking part in the conversation. It also keeps DateCleared, which is a
 // per-user date relating to when each users last cleared the conversation
 // history, and 
-$Construct->Table('UserConversation')
+$Construct->Table('UserConversation');
+
+$Construct
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('ConversationID', 'int', FALSE, 'primary')
-   ->Column('CountNewMessages', 'int', 0) // # of unread messages
-   ->Column('CountMessages', 'int', 0) // # of read messages
+   ->Column('CountReadMessages', 'int', 0) // # of read messages
    ->Column('LastMessageID', 'int', NULL, 'key') // The last message posted by a user other than this one, unless this user is the only person who has added a message
    ->Column('DateLastViewed', 'datetime', NULL)
    ->Column('DateCleared', 'datetime', NULL)
@@ -60,6 +68,25 @@ $Construct->Table('ConversationMessage')
    ->Column('InsertUserID', 'int', NULL)
    ->Column('DateInserted', 'datetime', FALSE)
    ->Set($Explicit, $Drop);
+
+if($UpdateCountMessages) {
+   // Calculate the count column.
+   $UpSql = "update {$Px}Conversation c
+set CountMessages = (
+   select count(MessageID)
+   from {$Px}ConversationMessage m
+   where c.ConversationID = m.ConversationID)";
+   $Construct->Query($UpSql);
+}
+if($UpdateLastMessageID) {
+   // Calculate the count column.
+   $UpSql = "update {$Px}Conversation c
+set LastMessageID = (
+   select max(MessageID)
+   from {$Px}ConversationMessage m
+   where c.ConversationID = m.ConversationID)";
+   $Construct->Query($UpSql);
+}
    
 // Add extra columns to user table for tracking discussions, comments & replies
 $Construct->Table('User')

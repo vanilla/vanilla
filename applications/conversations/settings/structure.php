@@ -90,7 +90,7 @@ set LastMessageID = (
    
 // Add extra columns to user table for tracking discussions, comments & replies
 $Construct->Table('User')
-   ->Column('CountUnreadConversations', 'int', 0)
+   ->Column('CountUnreadConversations', 'int', NULL)
    ->Set(FALSE, FALSE);
    
 // Insert some activity types

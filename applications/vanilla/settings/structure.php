@@ -89,11 +89,11 @@ $Construct->Table('CommentWatch')
    
 // Add extra columns to user table for tracking discussions & comments
 $Construct->Table('User')
-   ->Column('CountDiscussions', 'int', '0')
-   ->Column('CountUnreadDiscussions', 'int', '0')
-   ->Column('CountComments', 'int', '0')
-   ->Column('CountDrafts', 'int', '0')
-   ->Column('CountBookmarks', 'int', '0')
+   ->Column('CountDiscussions', 'int', NULL)
+   ->Column('CountUnreadDiscussions', 'int', NULL)
+   ->Column('CountComments', 'int', NULL)
+   ->Column('CountDrafts', 'int', NULL)
+   ->Column('CountBookmarks', 'int', NULL)
    ->Set();
 
 $Construct->Table('Draft')

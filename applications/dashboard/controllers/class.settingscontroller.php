@@ -391,7 +391,6 @@ class SettingsController extends DashboardController {
     */
    public function Registration($RedirectUrl = '') {
       $this->Permission('Garden.Registration.Manage');
-		$Foo = C('Garden.Registration.Manage', TRUE);
 		if(!C('Garden.Registration.Manage', TRUE))
 			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('dashboard/settings/registration');
@@ -403,7 +402,7 @@ class SettingsController extends DashboardController {
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
-         'Garden.Registration.Method',
+         'Garden.Registration.Method' => 'Captcha',
          // 'Garden.Registration.DefaultRoles',
          'Garden.Registration.CaptchaPrivateKey',
          'Garden.Registration.CaptchaPublicKey',
@@ -478,6 +477,42 @@ class SettingsController extends DashboardController {
          }
       }
       
+      $this->Render();
+   }
+
+   public function RegistrationRoles() {
+      $this->Permission('Garden.Registration.Manage');
+//		if(!C('Garden.Registration.Manage', TRUE))
+//			return Gdn::Dispatcher()->Dispatch('Default404');
+      $this->AddSideMenu('');
+
+      $this->Title(T('Registration Roles'));
+
+      // Load roles for dropdowns.
+      $RoleModel = new RoleModel();
+      $this->SetData('RoleData', $RoleModel->Get());
+
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Get a list of default member roles from the config.
+         $DefaultRoles = C('Garden.Registration.DefaultRoles');
+         $this->Form->SetValue('DefaultRoles', $DefaultRoles);
+
+         // Get the guest roles.
+         $GuestRolesData = $RoleModel->GetByUserID(0);
+         $GuestRoles = ConsolidateArrayValuesByKey($GuestRolesData, 'RoleID');
+         $this->Form->SetValue('GuestRoles', $GuestRoles);
+
+      } else {
+         $DefaultRoles = $this->Form->GetFormValue('DefaultRoles');
+         SaveToConfig('Garden.Registration.DefaultRoles', $DefaultRoles);
+         
+         $GuestRoles = $this->Form->GetFormValue('GuestRoles');
+         $UserModel = new UserModel();
+         $UserModel->SaveRoles(0, $GuestRoles, FALSE);
+
+         $this->StatusMessage = T("Saved");
+      }
+
       $this->Render();
    }
    

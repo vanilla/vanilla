@@ -81,14 +81,20 @@ class Gdn_ConfigurationModel {
       if (is_array($FieldName) === FALSE)
          $FieldName = array($FieldName);
 
-      $Count = count($FieldName);
-      for ($i = 0; $i < $Count; ++$i) {
-         if($this->Name == 'Configuration')
-            $Name = $FieldName[$i];
+      foreach($FieldName as $Index => $Value) {
+         if(is_numeric($Index)) {
+            $NameKey = $Value;
+            $Default = '';
+         } else {
+            $NameKey = $Index;
+            $Default = $Value;
+         }
+         if($this->Name != 'Configuration')
+            $Name = $NameKey;
          else
-            $Name = $this->Name.'.'.$FieldName[$i];
-            
-         $this->Data[$FieldName[$i]] = $Config->Get($Name, '');
+            $Name = $this->Name.'.'.$NameKey;
+
+         $this->Data[$NameKey] = $Config->Get($Name, $Default);
       }
    }
 

@@ -82,7 +82,7 @@
                      $Replacement = "$1'".htmlentities($Parameter, ENT_COMPAT, 'UTF-8')."'$3$4";
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
-                  echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>',$Query,'; <small>',number_format($QueryTimes[$Key], 6),'s</small></pre>';
+                  echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>',$Query,'; <small>',@number_format($QueryTimes[$Key], 6),'s</small></pre>';
                   $Odd = $Odd == TRUE ? FALSE : TRUE;
                }
                echo "</div>\n";

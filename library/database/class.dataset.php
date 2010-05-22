@@ -331,7 +331,8 @@ class Gdn_DataSet implements IteratorAggregate {
          $Columns = $ColumnName;
 
       $Result = array();
-      if (($Row = $this->Row($this->_Cursor >= 0 ? $this->_Cursor : 0)) != $this->_EOF) {
+      $Row = $this->Row($this->_Cursor > 0 ? $this->_Cursor : 0);
+      if ($Row != $this->_EOF) {
          foreach($Columns as $ColumnName => $DefaultValue) {
             $Result[$ColumnName] = GetValue($ColumnName, $Row, $DefaultValue);
          }

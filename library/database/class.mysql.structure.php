@@ -32,7 +32,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * Drops $this->Table() from the database.
     */
    public function Drop() {
-      return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+      if($this->TableExists())
+         return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
    }
 
    /**

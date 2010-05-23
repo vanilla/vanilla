@@ -298,6 +298,9 @@ class ImportModel extends Gdn_Model {
    		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
    		'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
+      // Delete the default role setting.
+      SaveToConfig('Garden.Registration.DefaultRoles', array());
+
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {

@@ -357,15 +357,28 @@ class Gdn_Request {
    protected function _ParseRequest() {
       $this->_Parsing = TRUE;
 
+      // Look for the path as the first get key.
+      $Get = $this->_RequestArguments[self::INPUT_GET];
+      if(is_array($Get)) {
+         $Value = reset($Get);
+         $Path = key($Get);
+         if($Value !== '')
+            $Path = FALSE;
+      }
+
       /**
        * Resolve final request to send to dispatcher
        */
       // Get the dispatch string from the URI
-      $Expression = '/^(?:\/?'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).')?(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
-      if (preg_match($Expression, $this->_EnvironmentElement('URI'), $Match))
-         $this->Path($Match[1]);
-      else
-         $this->Path('');
+      if($Path !== FALSE) {
+         $this->Path(trim($Path, '/'));
+      } else {
+         $Expression = '/^(?:\/?'.str_replace('/', '\/', $this->_EnvironmentElement('Folder')).')?(?:'.$this->_EnvironmentElement('Script').')?\/?(.*?)\/?(?:[#?].*)?$/i';
+         if (preg_match($Expression, $this->_EnvironmentElement('URI'), $Match))
+            $this->Path($Match[1]);
+         else
+            $this->Path('');
+      }
 
       /**
        * Resolve optional output modifying file extensions (rss, json, etc)

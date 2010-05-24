@@ -271,7 +271,7 @@ class Gdn_Request {
    protected function _LoadEnvironment() {
    
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
-      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
+      $this->_EnvironmentElement('ConfigStrips', Gdn::Config('Garden.StripWebRoot', FALSE));
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
@@ -546,19 +546,23 @@ class Gdn_Request {
     * @return string
     */
    public function Url($Path, $WithDomain = FALSE) {
-      $Parts = array();
-      
       if ($WithDomain)
-         $Parts[] = $this->Domain();
-         
-      $Parts[] = $this->WebRoot();
+         $Result = $this->Domain().'/'.$this->WebRoot();
+      else
+         $Result = '/'.$this->WebRoot();
+
+      if($Path == '')
+         $Path = $this->Path();
+      $Path = trim($Path, '/');
       
       if (!Gdn::Config('Garden.RewriteUrls'))
-         $Parts[] = $this->_EnvironmentElement('Script');
+         if ($Path == '')
+            $Result .= '/'.$this->_EnvironmentElement('Script');
+         else
+            $Result .= '/'.$this->_EnvironmentElement('Script').'?'.$Path;
+      else
+         $Result .= '/'.trim($Path, '/');
       
-      $Parts[] = trim($Path, '/');
-      
-      $Result = implode('/', $Parts);
       return $Result;
    }
    

@@ -463,7 +463,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<input type="hidden" id="'.$Term.'" value="'.$Definition.'" />'."\n";
+         $Return .= '<input type="hidden" id="'.$Term.'" value="'.Gdn_Format::Form($Definition).'" />'."\n";
       }
 
       return $Return .'</div>';

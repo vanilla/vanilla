@@ -169,8 +169,6 @@ class ImportModel extends Gdn_Model {
 			$Data = $Data->FirstRow();
 			$PasswordHash = new Gdn_PasswordHash();
 			$Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
-
-			$Result;
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));

@@ -401,7 +401,7 @@ if (!function_exists('ConcatSep')) {
 
       $Result = '';
       foreach($Strings as $String) {
-         if($String)
+         if(!$String)
             continue;
 
          if($Result)
@@ -585,6 +585,35 @@ if (!function_exists('GetValue')) {
 			
       return $Result;
 	}
+}
+
+if (!function_exists('GetValueR')) {
+   /**
+	 * Return the value from an associative array or an object.
+    * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used to recursivly traverse the collection.
+	 *
+	 * @param string $Key The key or property name of the value.
+	 * @param mixed $Collection The array or object to search.
+	 * @param mixed $Default The value to return if the key does not exist.
+	 * @return mixed The value from the array or object.
+	 */
+   function GetValueR($Key, &$Collection, $Default = FALSE) {
+      $Path = explode('.', $Key);
+
+      $Value = $Collection;
+      for($i = 0; $i < count($Path); ++$i) {
+         $SubKey = $Path[$i];
+
+         if(is_array($Value) && isset($Value[$SubKey])) {
+            $Value = $Value[$SubKey];
+         } elseif(is_object($Value) && isset($Value->$SubKey)) {
+            $Value = $Value->$SubKey;
+         } else {
+            return $Default;
+         }
+      }
+      return $Value;
+   }
 }
 
 if (!function_exists('InArrayI')) {

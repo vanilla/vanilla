@@ -24,7 +24,8 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
          echo '</div>';
       }
       echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
-      
+
+      echo "<div class=\"PostFormControlPanel\">\n";
       $Options = '';
       // If the user has any of the following permissions (regardless of junction), show the options
       // Note: I need to validate that they have permission in the specified category on the back-end
@@ -41,6 +42,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';
 
+      $this->FireEvent('BeforeFormButtons');
       echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
          echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
@@ -48,6 +50,7 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+      echo "</div>\n";
       echo $this->Form->Close();
    ?>
 </div>

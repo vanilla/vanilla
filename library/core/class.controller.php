@@ -424,6 +424,18 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->FireEvent('AfterAddModule');
    }
 
+   /** Get a value out of the controller's data array.
+    *
+    * @param string $Path The path to the data.
+    * @param mixed $Default The default value if the data array doesn't contain the path.
+    * @return mixed
+    * @see GetValueR()
+    */
+   public function Data($Path, $Default = '' ) {
+      $Result = GetValueR($Path, $this->Data, $Default);
+      return $Result;
+   }
+
    /**
     * Undocumented method.
     *
@@ -480,6 +492,19 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_DeliveryType = $Default;
 
       return $this->_DeliveryType;
+   }
+   
+   /**
+    * Returns the requested delivery method of the controller if $Default is not
+    * provided. Sets and returns the delivery method otherwise.
+    *
+    * @param string $Default One of the DELIVERY_METHOD_* constants.
+    */
+   public function DeliveryMethod($Default = '') {
+      if ($Default != '')
+         $this->_DeliveryMethod = $Default;
+
+      return $this->_DeliveryMethod;
    }
 
    /**
@@ -1133,8 +1158,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Title The value to pass to $this->Head->Title().
     */
    public function Title($Title) {
-      if ($this->Head)
-         $this->Head->Title($Title);
+      $this->SetData('Title', $Title);
+//      if ($this->Head)
+//         $this->Head->Title($Title);
    }
    
    /**

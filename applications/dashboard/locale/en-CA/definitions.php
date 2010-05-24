@@ -128,5 +128,6 @@ $Definition['Date.DefaultFormat'] = '%B %e, %Y';
 $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
+$Definition['Saved'] = 'Your changes have been saved.';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

@@ -23,11 +23,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
-
-if (!defined('APPLICATION'))
-   exit();
-
-
 /**
  * Represents, enforces integrity, and aids in the management of: data. This
  * generic model can be instantiated (with the table name it is intended to

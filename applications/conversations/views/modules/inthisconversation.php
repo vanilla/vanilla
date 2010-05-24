@@ -4,16 +4,18 @@
    <ul class="PanelInfo">
    <?php
    foreach ($this->_UserData->Result() as $User) {
-      ?>
-      <li>
-         <strong><?php
-            echo UserAnchor($User, 'UserLink');
-         ?></strong>
-         <?php
-            echo Gdn_Format::Date($User->DateLastActive);
-         ?>
-      </li>
-      <?php
+      if($User->Deleted)
+         echo '<li class="Deleted">';
+      else
+         echo '<li>';
+
+      echo Wrap(UserAnchor($User, 'UserLink'), 'strong',
+         $User->Deleted ?
+         array('title' => sprintf(T('%s deleted this conversation.'), $User->Name))
+         : '');
+      echo Gdn_Format::Date($User->DateLastActive);
+
+      echo '</li>';
    }
    ?>
    </ul>

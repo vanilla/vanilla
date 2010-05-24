@@ -234,6 +234,9 @@ div.Errors ul li {
    color: #fff !important;
    background: #d50a0a !important;
 }
+.Conversations .Deleted {
+   text-decoration: line-through;
+}
 div.Deleted {
 	background: #f5f5f5;
 	border: 1px solid #dddddd;

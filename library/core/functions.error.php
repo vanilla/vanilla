@@ -25,9 +25,9 @@ class Gdn_ErrorException extends ErrorException {
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    $ErrorReporting = error_reporting();
    // Ignore errors that are below the current error reporting level.
-   if (!($ErrorReporting & $ErrorNumber))
+   if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
       return FALSE;
-   
+
    $Backtrace = debug_backtrace();
    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
 }

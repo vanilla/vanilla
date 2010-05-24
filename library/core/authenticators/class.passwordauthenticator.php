@@ -50,14 +50,18 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     * @param boolean $PersistentSession Should the user's session remain persistent across visits?
     * @param int $ClientHour The current hour (24 hour format) of the client.
     */
-   public function Authenticate() {
-      
-      if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) return Gdn_Authenticator::AUTH_INSUFFICIENT;
-      
-      $Email = $this->GetValue('Email');
-      $Password = $this->GetValue('Password');
-      $PersistentSession = $this->GetValue('RememberMe');
-      $ClientHour = $this->GetValue('ClientHour');
+   public function Authenticate($Email = '', $Password = '') {
+      if(!$Email || !$Password) {
+         if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE)
+            return Gdn_Authenticator::AUTH_INSUFFICIENT;
+         $Email = $this->GetValue('Email');
+         $Password = $this->GetValue('Password');
+         $PersistentSession = $this->GetValue('RememberMe');
+         $ClientHour = $this->GetValue('ClientHour');
+      } else {
+         $PersistentSession = FALSE;
+         $ClientHour = 0;
+      }
 
       $UserID = 0;
    
@@ -95,10 +99,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
    public function CurrentStep() {
       // Was data submitted through the form already?
       if ($this->_DataSource->IsPostBack() === TRUE) {
-         // Where there any errors?
-         if ($this->_DataSource->ValidateModel() == 0) {
-            return $this->_CheckHookedFields();
-         }
+         return $this->_CheckHookedFields();
       }
       
       return Gdn_Authenticator::MODE_GATHER;

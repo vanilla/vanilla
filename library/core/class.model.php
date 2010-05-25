@@ -323,6 +323,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @todo add doc
     */
    public function Validate($FormPostValues, $Insert = FALSE) {
+      $this->DefineSchema();
       return $this->Validation->Validate($FormPostValues, $Insert);
    }
 

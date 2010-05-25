@@ -95,7 +95,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
    
    public function CurrentStep() {
       // Was data submitted through the form already?
-      if ($this->_DataSource->IsPostBack() === TRUE) {
+      if ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === TRUE) {
          return $this->_CheckHookedFields();
       }
       

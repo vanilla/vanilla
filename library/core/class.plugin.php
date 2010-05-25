@@ -36,9 +36,13 @@ abstract class Gdn_Plugin implements Gdn_IPlugin {
       );
       $RequiredFilename = implode(DS, $PathParts);
       if ($IncludeFile && file_exists($RequiredFilename))
-         require_once($RequiredFilename);
+         include($RequiredFilename);
             
       return $RequiredFilename;
+   }
+   
+   public function GetWebResource($Filename) {
+      return '/'.$this->GetResource($Filename, FALSE, FALSE);
    }
 
 }

@@ -338,6 +338,18 @@ class Gdn_Format {
          }
       }
    }
+   
+   public static function Bytes2String($Bytes, $Precision = 2) {
+      $Units = array('B', 'KB', 'MB', 'GB', 'TB');
+      
+      $Bytes = max($Bytes, 0);
+      $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
+      $Pow = min($Pow, count($Units) - 1);
+      
+      $Bytes /= pow(1024, $Pow);
+      
+      return round($Bytes, $Precision) . ' ' . $Units[$Pow]; 
+   }
 
    public static function Wiki($Mixed) {
       if (!is_string($Mixed)) {

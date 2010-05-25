@@ -130,13 +130,14 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->EventArguments['Discussion'] = $Discussion;
+                  $this->FireEvent('AfterDiscussionSave');
+                  
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                      Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   } else {
                      $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   }
-                  $this->EventArguments['Discussion'] = $Discussion;
-                  $this->FireEvent('AfterDiscussionSave');
                } else {
                   // If this was a draft save, notify the user about the save
                   $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
@@ -217,6 +218,14 @@ class PostController extends VanillaController {
             $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
          } else if (!$Preview) {
             $CommentID = $this->CommentModel->Save($FormValues);
+            
+            $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $Comment = $this->CommentModel->GetID($CommentID);
+            
+            $this->EventArguments['Discussion'] = $Discussion;
+            $this->EventArguments['Comment'] = $Comment;
+            $this->FireEvent('AfterCommentSave');
+            
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());
             if ($CommentID > 0 && $DraftID > 0)
                $this->DraftModel->Delete($DraftID);

@@ -249,9 +249,13 @@ class Gdn_Request {
    public function GetValueFrom($ParamType, $Key, $Default = FALSE) {
       $ParamType = strtolower($ParamType);
       
-      if (array_key_exists($ParamType, $this->_RequestArguments) && array_key_exists($Key, $this->_RequestArguments[$ParamType]))
-         return filter_var($this->_RequestArguments[$ParamType][$Key], FILTER_SANITIZE_STRING);
-         
+      if (array_key_exists($ParamType, $this->_RequestArguments) && array_key_exists($Key, $this->_RequestArguments[$ParamType])) {
+         $Val = $this->_RequestArguments[$ParamType][$Key];
+         if (is_array($Val) || is_object($Val))
+            return $Val;
+         else
+            return filter_var($Val, FILTER_SANITIZE_STRING);
+      }
       return $Default;
    }
    

@@ -32,7 +32,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * Drops $this->Table() from the database.
     */
    public function Drop() {
-      return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+      if($this->TableExists())
+         return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
    }
 
    /**
@@ -281,10 +282,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * defined with $this->Column().
     */
    protected function _Modify($Explicit = FALSE) {
+      $Px = $this->_DatabasePrefix;
+      $AdditionalSql = array(); // statements executed at the end
+
       // Returns an array of schema data objects for each field in the specified
       // table. The returned array of objects contains the following properties:
       // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
-      $ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+      $ExistingColumns = $this->ExistingColumns();
 
       // 1. Remove any unnecessary columns if this is an explicit modification
       if ($Explicit) {
@@ -323,12 +327,30 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
                throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
          } else {
-				$ExistingColumn = $ExistingColumns[$ColumnName];	
-				if ($Column->Type != $ExistingColumn->Type || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
-
-					// The existing & new column types do not match, so modify the column
+				$ExistingColumn = $ExistingColumns[$ColumnName];
+            
+				if ($Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
+               // The existing & new column types do not match, so modify the column
 					if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
 						throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+
+               // Check for a modification from an enum to an int.
+               if(strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->Types('int'))) {
+                  $Sql = "update `$Px{$this->_TableName}` set `$ColumnName` = case `$ColumnName`";
+                  foreach($ExistingColumn->Enum as $Index => $NewValue) {
+                     $OldValue = $Index + 1;
+                     
+                     if(!is_numeric($NewValue))
+                        continue;
+                     $NewValue = (int)$NewValue;
+
+                     $Sql .= " when $OldValue then $NewValue";
+                  }
+                  $Sql .= " else `$ColumnName` end";
+                  $Description = "Update {$this->_TableName}.$ColumnName enum values to {$Column->Type}";
+                  $AdditionalSql[$Description] = $Sql;
+
+               }
 				}
          }
       }
@@ -366,6 +388,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       foreach($IndexSql as $Name => $Sql) {
          if(!$this->Query($Sql))
             throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
+      }
+
+      // Run any additional Sql.
+      foreach($AdditionalSql as $Description => $Sql) {
+         if(!$this->Query($Sql))
+            throw new Exception("Error modifying table: $Description.");
       }
 
       $this->Reset();

@@ -57,9 +57,10 @@ $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
    ->Column('CountComments', 'int', '0')
-   ->Column('DateLastViewed', 'datetime')
-   ->Column('Dismissed', 'tinyint(1)', '0') // Relates to dismissed announcements
-   ->Column('Bookmarked', 'tinyint(1)', '0')
+   ->Column('DateLastViewed', 'datetime', NULL) // null signals never
+   ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
+   ->Column('Bookmarked', 'tinyint(1)', '0');
+$Construct
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')
@@ -88,11 +89,11 @@ $Construct->Table('CommentWatch')
    
 // Add extra columns to user table for tracking discussions & comments
 $Construct->Table('User')
-   ->Column('CountDiscussions', 'int', '0')
-   ->Column('CountUnreadDiscussions', 'int', '0')
-   ->Column('CountComments', 'int', '0')
-   ->Column('CountDrafts', 'int', '0')
-   ->Column('CountBookmarks', 'int', '0')
+   ->Column('CountDiscussions', 'int', NULL)
+   ->Column('CountUnreadDiscussions', 'int', NULL)
+   ->Column('CountComments', 'int', NULL)
+   ->Column('CountDrafts', 'int', NULL)
+   ->Column('CountBookmarks', 'int', NULL)
    ->Set();
 
 $Construct->Table('Draft')
@@ -249,7 +250,7 @@ if ($Drop) {
 
 /*
 Apr 26th, 2010
-Removed FirstComment from GDN_Discussion and moved it into the discussion table.
+Removed FirstComment from :_Discussion and moved it into the discussion table.
 */
 if (!$Construct->CaptureOnly) {
 	$Prefix = $SQL->Database->DatabasePrefix;
@@ -278,28 +279,6 @@ if (!$Construct->CaptureOnly) {
 	set d.LastCommentID = c.CommentID,
 		d.LastCommentUserID = c.InsertUserID
 	where d.LastCommentUserID is null");
-	
-	/*
-	  	Apr 26th, 2010
-	  	Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
-	  	For some reason mysql makes 0's "2" during this change. Change them back to "0".
-	*/
-	$SQL->Query("update {$Prefix}Category set AllowDiscussions = '0' where AllowDiscussions = '2'");
-
-	$SQL->Query("update {$Prefix}Discussion set Closed = '0' where Closed = '2'");
-	$SQL->Query("update {$Prefix}Discussion set Announce = '0' where Announce = '2'");
-	$SQL->Query("update {$Prefix}Discussion set Sink = '0' where Sink = '2'");
-
-	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed = '2'");
-	$SQL->Query("update {$Prefix}UserDiscussion set Dismissed = '0' where Dismissed is null");
-	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked = '2'");
-	$SQL->Query("update {$Prefix}UserDiscussion set Bookmarked = '0' where Bookmarked is null");
-
-	$SQL->Query("update {$Prefix}Comment set Flag = '0' where Flag = '2'");
-
-	$SQL->Query("update {$Prefix}Draft set Closed = '0' where Closed = '2'");
-	$SQL->Query("update {$Prefix}Draft set Announce = '0' where Announce = '2'");
-	$SQL->Query("update {$Prefix}Draft set Sink = '0' where Sink = '2'");
 
 	/*
 	    May 12th, 2010

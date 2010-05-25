@@ -536,15 +536,29 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
     */
    public function BookmarkDiscussion($DiscussionID, $UserID, &$Discussion = NULL) {
       $State = '1';
-      $Discussion = $this->GetID($DiscussionID);
-      if ($Discussion->CountCommentWatch == '') {
+
+      $Discussion = $this->SQL
+         ->Select('d.*')
+         ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+         ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
+         ->Select('lcu.Name', '', 'LastName')
+         ->From('Discussion d')
+         ->Join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = $UserID", 'left')
+			->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
+         ->Where('d.DiscussionID', $DiscussionID)
+         ->Get()
+         ->FirstRow();
+
+
+      if ($Discussion->WatchUserID == '') {
          $this->SQL
             ->Insert('UserDiscussion', array(
                'UserID' => $UserID,
                'DiscussionID' => $DiscussionID,
-               'CountComments' => 0,
-               'DateLastViewed' => Gdn_Format::ToDateTime(),
-               'Bookmarked' => '1'
+               'Bookmarked' => $State
             ));
       } else {
          $State = ($Discussion->Bookmarked == '1' ? '0' : '1');

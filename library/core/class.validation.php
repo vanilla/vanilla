@@ -510,7 +510,7 @@ class Gdn_Validation {
 
       if(is_array($FieldName)) {
          $ValidationResults = $FieldName;
-         $this->_ValidationResults = array_merge($this->_Validation, $ValidationResults);
+         $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
       } else {
          if (!array_key_exists($FieldName, $this->_ValidationResults))
             $this->_ValidationResults[$FieldName] = array();

@@ -594,7 +594,7 @@ class ImportModel extends Gdn_Model {
 
 		// Authenticate the admin user as the current user.
 		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');
-		$PasswordAuth->FetchData($Authenticator, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
+		$PasswordAuth->FetchData($PasswordAuth, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
 		$PasswordAuth->Authenticate();
 		Gdn::Session()->Start();
 

@@ -95,14 +95,14 @@ class Gdn_DataSet implements IteratorAggregate {
 			// Make sure the type isn't changed if the result is already fetched.
 			if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
             // Loop through the dataset and switch the types.
-               $Result =& $this->_Result;
-            foreach($Result as $Index => $Row) {
+            $Count = count($this->_Result);
+            for($Index = 0; $Index < $Count; $Index++) {
                switch($DatasetType) {
                   case DATASET_TYPE_ARRAY:
-                     $Result[$Index] = (array)$Row;
+                     $this->_Result[$Index] = (array)$this->_Result[$Index];
                      break;
                   case DATASET_TYPE_OBJECT:
-                     $Result[$Index] = (object)$Row;
+                     $this->_Result[$Index] = (object)$this->_Result[$Index];
                      break;
                }
             }
@@ -122,10 +122,11 @@ class Gdn_DataSet implements IteratorAggregate {
     * It will fill a different array depending on which type is specified.
     */
    protected function _FetchAllRows($DatasetType = FALSE) {
-      $this->DatasetType($DatasetType);
-			
 		if(!is_null($this->_Result))
 			return;
+
+      if($DatasetType)
+         $this->_DatasetType = $DatasetType;
 		
 		$Result = array();
 		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
@@ -314,6 +315,38 @@ class Gdn_DataSet implements IteratorAggregate {
       else
          $this->_PDOStatement = $PDOStatement;
    }
+
+   /**
+    * Advances to the next row and returns the value rom a column.
+    *
+    * @param string $ColumnName The name of the column to get the value from.
+    * @param string $DefaultValue The value to return if there is no data.
+    * @return mixed The value from the column or $DefaultValue.
+    */
+   public function Value($ColumnName, $DefaultValue = NULL) {
+      if($Row = $this->NextRow()) {
+         if(is_array($ColumnName)) {
+            $Result = array();
+            foreach($ColumnName as $Name => $Default) {
+               if(is_object($Row) && property_exists($Row, $Name))
+                     return $Row->$Name;
+               elseif(is_array($Row) && array_key_exists($Name, $Row))
+                     return $Row[$Name];
+               else
+                  $Result[] = $Default;
+            }
+            return $Result;
+         } else {
+            if(is_object($Row) && property_exists($Row, $ColumnName))
+                  return $Row->$ColumnName;
+            elseif(is_array($Row) && array_key_exists($ColumnName, $Row))
+                  return $Row[$ColumnName];
+         }
+		}
+      if(is_array($ColumnName))
+         return array_values($ColumnName);
+		return $DefaultValue;
+   }
    
    /**
     * Advances to the next row and returns the value rom a column.
@@ -324,38 +357,38 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $DefaultValue The value to return if there is no data.
     * @return mixed The value from the column or $DefaultValue.
     */
-   public function Value($ColumnName, $DefaultValue = NULL) {
-      if (is_string($ColumnName))
-         $Columns = array($ColumnName => $DefaultValue);
-      else
-         $Columns = $ColumnName;
-
-
-      $this->_FetchAllRows();
-
-      $Rows = $this->_Result;
-      if(array_key_exists($this->_Cursor, $Rows))
-         $Row = $Rows[$this->_Cursor];
-      elseif(array_key_exists(0, $Rows))
-         $Row = $Rows[0];
-      else
-         $Row = array();
-
-
-      $Result = array();
-      foreach($Columns as $ColumnName2 => $DefaultValue2) {
-         if(is_array($Row) && array_key_exists($ColumnName2, $Row))
-            $Result[] = $Row[$ColumnName2];
-         elseif(is_object($Row) && property_exists($Row, $ColumnName2))
-            $Result[] = $Row->$ColumnName2;
-         else
-            $Result[] = $DefaultValue2;
-      }
-
-      //$Result = array_values($Columns);
-      if(count($Result) == 1)
-         return $Result[0];
-      else
-         return $Result;
-   }
+//   public function Value($ColumnName, $DefaultValue = NULL) {
+//      if (is_string($ColumnName))
+//         $Columns = array($ColumnName => $DefaultValue);
+//      else
+//         $Columns = $ColumnName;
+//
+//
+//      $this->_FetchAllRows(FALSE);
+//
+//      $Rows = $this->_Result;
+//      if(array_key_exists($this->_Cursor, $Rows))
+//         $Row = $Rows[$this->_Cursor];
+//      elseif(array_key_exists(0, $Rows))
+//         $Row = $Rows[0];
+//      else
+//         $Row = array();
+//
+//
+//      $Result = array();
+//      foreach($Columns as $ColumnName2 => $DefaultValue2) {
+//         if(is_array($Row) && array_key_exists($ColumnName2, $Row))
+//            $Result[] = $Row[$ColumnName2];
+//         elseif(is_object($Row) && property_exists($Row, $ColumnName2))
+//            $Result[] = $Row->$ColumnName2;
+//         else
+//            $Result[] = $DefaultValue2;
+//      }
+//
+//      //$Result = array_values($Columns);
+//      if(count($Result) == 1)
+//         return $Result[0];
+//      else
+//         return $Result;
+//   }
 }

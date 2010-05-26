@@ -238,7 +238,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    }
    
    protected function _IndexSqlDb() {
-      // We don't want this to be captures so send it directly.
+      // We don't want this to be captured so send it directly.
       $Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
       
       $Result = array();   
@@ -262,6 +262,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                case 'TX':
                   $Type = 'fulltext index '.$Row->Key_name;
                   break;
+               default:
+                  throw new Exception("Unknown key name '{$Row->Key_name}' for {$this->_TableName}");
             }
             $Result[$Row->Key_name] = $Type.' (`'.$Row->Column_name.'`';
          }

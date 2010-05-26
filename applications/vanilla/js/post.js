@@ -53,6 +53,7 @@ jQuery(document).ready(function($) {
                // Pop up the new preview.
                $.popup({}, json.Data);
             } else if (!draft && json.DiscussionUrl != null) {
+               $(frm).triggerHandler('complete');
                // Redirect to the discussion
                document.location = json.DiscussionUrl;
             }
@@ -64,6 +65,7 @@ jQuery(document).ready(function($) {
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
+      $(frm).triggerHandler('submit');
       return false;
    });
    
@@ -114,6 +116,7 @@ jQuery(document).ready(function($) {
                $.popup({}, json.Data);
                
             } else if (!draft) {
+               $(frm).triggerHandler('complete');
                // Redirect to the new discussion
                document.location = json.RedirectUrl;
             }
@@ -125,6 +128,7 @@ jQuery(document).ready(function($) {
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
+      $(frm).triggerHandler('submit');
       return false;
    });
    

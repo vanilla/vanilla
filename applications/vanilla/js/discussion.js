@@ -134,6 +134,7 @@ jQuery(document).ready(function($) {
                
                // Let listeners know that the comment was added.
                $(this).trigger('CommentAdded');
+               $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);
          },
@@ -143,6 +144,7 @@ jQuery(document).ready(function($) {
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
+      frm.triggerHandler('submit');
       return false;
    });
    

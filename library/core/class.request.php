@@ -551,22 +551,26 @@ class Gdn_Request {
     * @return string
     */
    public function Url($Path, $WithDomain = FALSE) {
-      if ($WithDomain)
-         $Result = $this->Domain().'/'.$this->WebRoot();
-      else
-         $Result = '/'.$this->WebRoot();
+      $Parts = array();
+
+      if ($WithDomain) {
+         $Parts[] = $this->Domain();
+      } else
+         $Parts[] = '';
+
+      if($this->WebRoot() != '')
+         $Parts[] = $this->WebRoot();
 
       if($Path == '')
          $Path = $this->Path();
-      $Path = trim($Path, '/');
+      
+      $Parts[] = trim($Path, '/');
+
       
       if (!Gdn::Config('Garden.RewriteUrls'))
-         if ($Path == '')
-            $Result .= '/'.$this->_EnvironmentElement('Script');
-         else
-            $Result .= '/'.$this->_EnvironmentElement('Script').'?'.$Path;
-      else
-         $Result .= '/'.trim($Path, '/');
+         $Parts[] = $this->_EnvironmentElement('Script').'?';
+
+      $Result = implode('/', $Parts);
       
       return $Result;
    }

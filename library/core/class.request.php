@@ -551,6 +551,9 @@ class Gdn_Request {
     * @return string
     */
    public function Url($Path, $WithDomain = FALSE) {
+      if (strpos($Path, '://') !== FALSE)
+         return $Path;
+
       $Parts = array();
 
       if ($WithDomain) {
@@ -558,17 +561,18 @@ class Gdn_Request {
       } else
          $Parts[] = '';
 
-      if($this->WebRoot() != '')
+      if ($this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
+
+
+      if (!Gdn::Config('Garden.RewriteUrls')) {
+         $Parts[] = $this->_EnvironmentElement('Script').'?';
+         $Path = str_replace('?', '&', $Path);
+      }
 
       if($Path == '')
          $Path = $this->Path();
-      
       $Parts[] = trim($Path, '/');
-
-      
-      if (!Gdn::Config('Garden.RewriteUrls'))
-         $Parts[] = $this->_EnvironmentElement('Script').'?';
 
       $Result = implode('/', $Parts);
       

@@ -231,8 +231,13 @@ class Gdn_Request {
       for ($i=0; $i < $NumDataTypes; $i++) {
          $DataType = $QueryOrder[$i];
          if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
-         if (array_key_exists($Key, $this->_RequestArguments[$DataType]))
-            return filter_var($this->_RequestArguments[$DataType][$Key], FILTER_SANITIZE_STRING);
+         if (array_key_exists($Key, $this->_RequestArguments[$DataType])) {
+            $Data = $this->_RequestArguments[$DataType][$Key];
+            if (is_array($Data) || is_object($Data))
+               return $Data;
+            else
+               return filter_var($Data, FILTER_SANITIZE_STRING);
+         }
       }
       return $Default;
    }

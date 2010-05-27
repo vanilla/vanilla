@@ -1059,6 +1059,7 @@ if (!function_exists('SetValue')) {
 	}
 }
 
+
 if (!function_exists('T')) {
    /**
 	 * Translates a code into the selected locale's definition.
@@ -1072,6 +1073,22 @@ if (!function_exists('T')) {
    function T($Code, $Default = '') {
       return Gdn::Translate($Code, $Default);
    }
+}
+
+if (!function_exists('TouchValue')) {
+	/**
+	 * Set the value on an object/array if it doesn't already exist.
+	 *
+	 * @param string $Key The key or property name of the value.
+	 * @param mixed $Collection The array or object to set.
+	 * @param mixed $Default The value to set.
+	 */
+	function TouchValue($Key, &$Collection, $Default) {
+		if(is_array($Collection) && !array_key_exists($Key, $Collection))
+			$Collection[$Key] = $Default;
+		elseif(is_object($Collection) && !property_exists($Collection, $Key))
+			$Collection->$Key = $Default;
+	}
 }
 
 if (!function_exists('Translate')) {

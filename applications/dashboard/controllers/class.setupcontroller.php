@@ -223,9 +223,9 @@ class SetupController extends DashboardController {
       
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               'Garden.WebRoot' => Gdn_Url::WebRoot(),
+               //'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => $CanRewrite,
-               'Garden.Domain' => $Domain,
+               //'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed

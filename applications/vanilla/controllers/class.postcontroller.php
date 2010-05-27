@@ -130,13 +130,14 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->EventArguments['Discussion'] = $Discussion;
+                  $this->FireEvent('AfterDiscussionSave');
+                  
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                      Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   } else {
                      $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   }
-                  $this->EventArguments['Discussion'] = $Discussion;
-                  $this->FireEvent('AfterDiscussionSave');
                } else {
                   // If this was a draft save, notify the user about the save
                   $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
@@ -217,6 +218,14 @@ class PostController extends VanillaController {
             $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
          } else if (!$Preview) {
             $CommentID = $this->CommentModel->Save($FormValues);
+            
+            $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $Comment = $this->CommentModel->GetID($CommentID);
+            
+            $this->EventArguments['Discussion'] = $Discussion;
+            $this->EventArguments['Comment'] = $Comment;
+            $this->FireEvent('AfterCommentSave');
+            
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());
             if ($CommentID > 0 && $DraftID > 0)
                $this->DraftModel->Delete($DraftID);
@@ -272,8 +281,8 @@ class PostController extends VanillaController {
                   // If adding a comment 
                   if ($Editing) {
                      // Just reload the comment in question
-                     $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                     $this->CommentData = $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1);
+                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($CommentID);
+                     $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1), true);
                      // Load the discussion
                      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
@@ -286,11 +295,11 @@ class PostController extends VanillaController {
                      $LastCommentID = $this->Form->GetFormValue('LastCommentID');
                      if (!is_numeric($LastCommentID))
                         $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
-                        
+                     
                      // Make sure the view knows the current offset
-                     $this->Offset = $this->CommentModel->GetOffset($LastCommentID);
+                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
                      // Make sure to load all new comments since the page was last loaded by this user
-                     $this->CommentData = $this->CommentModel->GetNew($DiscussionID, $LastCommentID);
+                     $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), true);
                      // Load the discussion
                      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
@@ -314,6 +323,12 @@ class PostController extends VanillaController {
             }
          }
       }
+      
+      if (property_exists($this,'Discussion'))
+         $this->EventData['Discussion'] = $this->Discussion;
+      if (property_exists($this,'Comment'))
+         $this->EventData['Discussion'] = $this->Comment;
+         
       $this->FireEvent('BeforeCommentRender');
       $this->Render();
    }

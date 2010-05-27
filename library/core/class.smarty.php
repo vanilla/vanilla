@@ -67,7 +67,7 @@ class Gdn_Smarty {
      
       $Controller->Data['BodyClass'] = GetValue('CssClass', $Controller->Data, '', TRUE);
 
-      //$Smarty->assign('Assets', (array)$Controller->Assets);
+      $Smarty->assign('Assets', (array)$Controller->Assets);
       $Smarty->assign('Path', Gdn::Request()->Path());
 
       // Assigign the controller data last so the controllers override any default data.

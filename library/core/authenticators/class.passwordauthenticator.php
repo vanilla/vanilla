@@ -68,7 +68,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       // Retrieve matching username/password values
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-      if ($UserData !== False) {
+      if ($UserData !== FALSE) {
          // Get ID
          $UserID = $UserData->UserID;
 
@@ -98,7 +98,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
    
    public function CurrentStep() {
       // Was data submitted through the form already?
-      if ($this->_DataSource->IsPostBack() === TRUE) {
+      if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === TRUE)) {
          return $this->_CheckHookedFields();
       }
       

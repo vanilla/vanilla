@@ -29,16 +29,27 @@ abstract class Gdn_Plugin implements Gdn_IPlugin {
    // Get the path to a file within the plugin's folder (and optionally include it)
    public function GetResource($Filename, $IncludeFile = FALSE, $AbsolutePath = TRUE) {
       $PluginName = substr(get_class($this),0,-6);
+      
       $PathParts = array(
-         ($AbsolutePath) ? PATH_PLUGINS : 'plugins',
          $PluginName,
          $Filename
       );
+         
+      array_unshift($PathParts, ($AbsolutePath) ? PATH_PLUGINS : 'plugins');
+      
       $RequiredFilename = implode(DS, $PathParts);
       if ($IncludeFile && file_exists($RequiredFilename))
-         require_once($RequiredFilename);
+         include($RequiredFilename);
             
       return $RequiredFilename;
+   }
+   
+   public function GetWebResource($Filename) {
+      $WebResource = $this->GetResource($Filename, FALSE, FALSE);
+      
+      if (Gdn::Request()->WebRoot())
+         $WebResource = Gdn::Request()->WebRoot().'/'.$WebResource;
+      return '/'.$WebResource;
    }
 
 }

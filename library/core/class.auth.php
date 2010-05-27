@@ -118,7 +118,7 @@ class Gdn_Auth extends Gdn_Pluggable {
     * @return PermissionModel
     */
    public function GetPermissionModel() {
-      if ($this->_PermissionModel === null) {
+      if ($this->_PermissionModel === NULL) {
          $this->_PermissionModel = Gdn::PermissionModel();
       }
       return $this->_PermissionModel;
@@ -128,7 +128,7 @@ class Gdn_Auth extends Gdn_Pluggable {
     * @return UserModel
     */
    public function GetUserModel() {
-      if ($this->_UserModel === null) {
+      if ($this->_UserModel === NULL) {
          $this->_UserModel = Gdn::UserModel();
       }
       return $this->_UserModel;

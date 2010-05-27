@@ -987,7 +987,8 @@ abstract class Gdn_SQLDriver {
    }
    
    public function History($UpdateFields = TRUE, $InsertFields = FALSE) {
-      $UserID = Gdn::Session()->UserID;
+      $UserID = GetValueR('User.UserID', Gdn::Session(), Gdn::Session()->UserID);
+
       if($InsertFields)
          $this->Set('DateInserted', Gdn_Format::ToDateTime())->Set('InsertUserID', $UserID);
       if($UpdateFields)

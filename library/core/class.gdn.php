@@ -262,9 +262,9 @@ class Gdn {
    }
    
    /**
-    * Get or set the current request object
-    *
-    * @return mixed The new request or null to just get the request.
+    * Get or set the current request object.
+    * @param Gdn_Rewuest $NewRequest The new request or null to just get the request.
+    * @return Gdn_Request
     */
    public static function Request($NewRequest = NULL) {
       $Request = self::Factory(self::AliasRequest);

@@ -220,7 +220,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $Return = $Authenticator->GetURL($URLType);
 
       if (!$Return)
-         $Return = sprintf(Gdn::Config('Garden.Authenticator.'.$URLType, 'Frabjous'), $AuthenticationScheme, $Redirect);
+         $Return = sprintf(Gdn::Config('Garden.Authenticator.'.$URLType), $AuthenticationScheme, $Redirect);
       
       $Return = $this->ReplaceAuthPlaceholders($Return);
       if ($this->Protocol() == 'https')

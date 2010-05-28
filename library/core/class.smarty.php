@@ -46,8 +46,8 @@ class Gdn_Smarty {
       if($Session->IsValid()) {
          $User = array(
             'Name' => $Session->User->Name,
-            'CountNotifications' => GetValue('CountNotifications', $Session->User->CountNotifications),
-            'CountUnreadConversations' => GetValue('CountUnreadConversations', $Session->User, 0),
+            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User->CountNotifications, 0),
+            'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
       } else {
          $User = FALSE; /*array(
@@ -60,8 +60,9 @@ class Gdn_Smarty {
       // Make sure that any datasets use arrays instead of objects.
       foreach($Controller->Data as $Key => $Value) {
          if($Value instanceof Gdn_DataSet) {
-            $Value->DatasetType(DATASET_TYPE_ARRAY);
-            $Value->Clean();
+            $Controller->Data[$Key] = $Value->ResultArray();
+         } elseif($Value instanceof stdClass) {
+            $Controller->Data[$Key] = (array)$Value;
          }
       }
      

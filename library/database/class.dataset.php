@@ -29,7 +29,7 @@ class Gdn_DataSet implements IteratorAggregate {
     * This property is passed by reference from the Database object. Do not
     * manipulate or assign anything to this property!
     *
-    * @var resource
+    * @var PDO
     */
    public $Connection;
 
@@ -75,10 +75,14 @@ class Gdn_DataSet implements IteratorAggregate {
       $this->_Result = NULL;
    }
 
+   public function  __destruct() {
+      $this->FreePDOStatement(TRUE);
+   }
+
    /** Clean sensitive data out of the object. */
    public function Clean() {
       $this->Connection = NULL;
-      $this->_PDOStatement = NULL;
+      $this->FreePDOStatement(TRUE);
    }
 
    /**
@@ -134,6 +138,7 @@ class Gdn_DataSet implements IteratorAggregate {
 			$Result[] = $Row;
 		}
 		$this->_Result = $Result;
+      $this->FreePDOStatement(TRUE);
    }
 
    /**
@@ -249,8 +254,10 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>FALSE</b>: The current value of the DatasetType property will be used.
     */
    public function &Result($DatasetType = FALSE) {
-		if(is_null($this->_Result))
-			$this->_FetchAllRows($DatasetType);
+		$this->DatasetType($DatasetType);
+      if(is_null($this->_Result))
+			$this->_FetchAllRows();
+
 			
 		return $this->_Result;
    }

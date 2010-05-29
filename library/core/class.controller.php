@@ -20,6 +20,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
+/**
+ * @method void Render() Render the controller's view.
+ */
 class Gdn_Controller extends Gdn_Pluggable {
 
    /**

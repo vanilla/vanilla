@@ -176,6 +176,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
          $this->PhpMailer->Host = $SmtpHost;
          $this->PhpMailer->Port = $SmtpPort;
+         $this->PhpMailer->SMTPSecure = Gdn::Config('Garden.Email.SmtpSecurity', '');
          $this->PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
          $this->PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
          if(!empty($Username))

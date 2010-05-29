@@ -526,6 +526,13 @@ class Gdn_Request {
       $this->_RequestArguments[$ParamsType] = $ArgumentData;
    }
    
+   public function SetValueOn($ParamType, $ParamName, $ParamValue) {
+      if (!isset($this->_RequestArguments[$ParamType]))
+         $this->_RequestArguments[$ParamType] = array();
+         
+      $this->_RequestArguments[$ParamType][$ParamName] = $ParamValue;
+   }
+   
    /**
     * Detach a dataset from the request
     *
@@ -642,6 +649,11 @@ class Gdn_Request {
       $Method = is_null($Method) ? 'index' : $Method;
       $Path = trim(implode('/',array_merge(array($Controller,$Method),$Args)),'/');
       $this->_EnvironmentElement('URI', $Path);
+      return $this;
+   }
+   
+   public function WithDeliveryType($DeliveryType) {
+      $this->SetValueOn(self::INPUT_GET, 'DeliveryType', $DeliveryType);
       return $this;
    }
    

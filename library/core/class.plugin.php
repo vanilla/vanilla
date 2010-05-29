@@ -18,7 +18,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-abstract class Gdn_Plugin implements Gdn_IPlugin {
+abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
 
    public function GetView($ViewName) {
       $PluginName = substr(get_class($this),0,-6);
@@ -50,6 +50,21 @@ abstract class Gdn_Plugin implements Gdn_IPlugin {
       if (Gdn::Request()->WebRoot())
          $WebResource = Gdn::Request()->WebRoot().'/'.$WebResource;
       return '/'.$WebResource;
+   }
+   
+   public function Dispatch(&$Sender, $RequestArgs = array()) {
+      $ControllerMethod = 'Controller_Index';
+      if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
+         list($MethodName) = $Sender->RequestArgs;
+         $TestControllerMethod = 'Controller_'.$MethodName;
+         if (method_exists($this, $TestControllerMethod))
+            $ControllerMethod = $TestControllerMethod;
+      }
+      
+      if (method_exists($this, $ControllerMethod)) {
+         $Sender->Plugin = $this;
+         return call_user_func(array($this,$ControllerMethod),$Sender);
+      }
    }
 
 }

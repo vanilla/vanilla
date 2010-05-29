@@ -9,7 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Report and track all errors.
-error_reporting(E_ALL);
+if(defined('DEBUG'))
+   error_reporting(E_ALL);
+else
+   error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
@@ -34,3 +37,4 @@ $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // Process the request.
 $Dispatcher->Dispatch();
+$Dispatcher->Cleanup();

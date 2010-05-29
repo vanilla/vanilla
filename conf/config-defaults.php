@@ -59,6 +59,7 @@ $Configuration['Garden']['Email']['SmtpHost']                   = '';
 $Configuration['Garden']['Email']['SmtpUser']                   = '';
 $Configuration['Garden']['Email']['SmtpPassword']               = '';
 $Configuration['Garden']['Email']['SmtpPort']                   = '25';
+$Configuration['Garden']['Email']['SmtpSecurity']               = ''; // ssl/tsl
 $Configuration['Garden']['Email']['MimeType']                   = 'text/plain';
 $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';

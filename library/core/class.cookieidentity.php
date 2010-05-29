@@ -53,7 +53,7 @@ class Gdn_CookieIdentity {
     */
    protected function _ClearIdentity() {
       // Destroy the cookie.
-      $this->DeleteCookie($this->CookieName);
+      $this->_DeleteCookie($this->CookieName);
    }
    
    /**
@@ -67,7 +67,7 @@ class Gdn_CookieIdentity {
       if (!is_null($this->UserID))
          return $this->UserID;
          
-      if (!self::CheckCookie($this->CookieName)) return 0;
+      if (!$this->_CheckCookie($this->CookieName)) return 0;
       
       list($UserID, $Expiration) = $this->GetCookiePayload($this->CookieName);
       
@@ -86,7 +86,7 @@ class Gdn_CookieIdentity {
    }
    
    public function CheckVolatileMarker($CheckUserID) {
-      if (!self::CheckCookie($this->VolatileMarker)) return FALSE;
+      if (!$this->_CheckCookie($this->VolatileMarker)) return FALSE;
       
       list($UserID, $Expiration) = $this->GetCookiePayload($this->CookieName);
       
@@ -159,7 +159,7 @@ class Gdn_CookieIdentity {
 
       // Create the cookie.
       $KeyData = $UserID.$Expiration;
-      self::SetCookie($this->CookieName, $KeyData, array($UserID, $Expiration), $Expire);
+      $this->_SetCookie($this->CookieName, $KeyData, array($UserID, $Expiration), $Expire);
       $this->SetVolatileMarker($UserID);
    }
    
@@ -173,7 +173,11 @@ class Gdn_CookieIdentity {
       $Expire = 0;
       
       $KeyData = $UserID.$Expiration;
-      self::SetCookie($this->VolatileMarker, $KeyData, array($UserID, $Expiration), $Expire);
+      $this->_SetCookie($this->VolatileMarker, $KeyData, array($UserID, $Expiration), $Expire);
+   }
+   
+   protected function _SetCookie($CookieName, $KeyData, $CookieContents, $Expire) {
+      self::SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
    }
    
    public static function SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {
@@ -203,6 +207,10 @@ class Gdn_CookieIdentity {
 
       // Create the cookie.
       setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain);
+   }
+   
+   protected function _CheckCookie($CookieName) {
+      return self::CheckCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
    }
    
    public static function CheckCookie($CookieName, $CookieHashMethod = NULL, $CookieSalt = NULL) {
@@ -245,10 +253,18 @@ class Gdn_CookieIdentity {
       return $Payload;
    }
    
-   public static function DeleteCookie($CookieName) {
+   protected function _DeleteCookie($CookieName) {
+      self::DeleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
+   }
+   
+   public static function DeleteCookie($CookieName, $Path = NULL, $Domain = NULL) {
 
-      $Path = Gdn::Config('Garden.Cookie.Path');
-      $Domain = Gdn::Config('Garden.Cookie.Domain');
+      if (is_null($Path))
+         $Path = Gdn::Config('Garden.Cookie.Path');
+
+      if (is_null($Domain))
+         $Domain = Gdn::Config('Garden.Cookie.Domain');
+         
       setcookie($CookieName, 'deleted', 0, $Path, $Domain);
       setcookie($CookieName, FALSE, 0, $Path, $Domain);
    }

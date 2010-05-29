@@ -23,6 +23,7 @@ class Gdn {
    const AliasSession = 'Session';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
+   const AliasSlice = 'Slice';
 
    const AliasPluginManager = 'PluginManager';
 
@@ -296,6 +297,11 @@ class Gdn {
       if(is_null(self::$_Session))
          self::$_Session = self::Factory(self::AliasSession);
       return self::$_Session;
+   }
+   
+   public static function Slice($Slice) {
+      $Result = self::Factory(self::AliasSlice);
+      return $Result->Execute($Slice);
    }
    
    /**

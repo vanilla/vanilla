@@ -20,6 +20,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
+/**
+ * @method void Render() Render the controller's view.
+ */
 class Gdn_Controller extends Gdn_Pluggable {
 
    /**
@@ -151,6 +154,13 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $RequestMethod;
+   
+   /**
+    * Reference to the Request object that spawned this controller
+    * 
+    * @var Gdn_Request
+    */
+   public $Request;
 
    /**
     * The requested url to this controller.
@@ -285,6 +295,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->RedirectUrl = '';
       $this->RequestMethod = '';
       $this->RequestArgs = FALSE;
+      $this->Request = FALSE;
       $this->SelfUrl = '';
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
@@ -293,8 +304,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_CssFiles = array();
       $this->_JsFiles = array();
       $this->_Definitions = array();
-      $this->_DeliveryMethod = GetIncomingValue('DeliveryMethod', DELIVERY_METHOD_XHTML);
-      $this->_DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
+      $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
+      $this->_DeliveryType = DELIVERY_TYPE_ALL;
       $this->_Json = array();
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
@@ -618,7 +629,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
       if ($ViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find a `'.$View.'` view for the `'.$ControllerName.'` controller in the `'.$ApplicationFolder.'` application.', $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
 
       return $ViewPath;
    }
@@ -1023,13 +1034,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find master view:'.$this->MasterView.'.master*', $this->ClassName, '_FetchController'), E_USER_ERROR);
+         trigger_error(ErrorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'), E_USER_ERROR);
       
       /// A unique identifier that can be used in the body tag of the master view if needed.
       $ControllerName = $this->ClassName;
       // Strip "Controller" from the body identifier.
       if (substr($ControllerName, -10) == 'Controller')
-         $ControllerName = substr($ControllerName, 0, -10); 
+         $ControllerName = substr($ControllerName, 0, -10);
          
       // Strip "Gdn_" from the body identifier.
       if (substr($ControllerName, 0, 4) == 'Gdn_')

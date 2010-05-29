@@ -67,7 +67,8 @@ class DiscussionController extends VanillaController {
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
          
          // Load the comments
-         $this->SetData('CommentData', $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
+         $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset);
+         $this->SetData('Comments', $this->CommentData);
 
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();

@@ -626,7 +626,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
       if ($ViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find a `'.$View.'` view for the `'.$ControllerName.'` controller in the `'.$ApplicationFolder.'` application.', $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
 
       return $ViewPath;
    }
@@ -1031,13 +1031,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find master view:'.$this->MasterView.'.master*', $this->ClassName, '_FetchController'), E_USER_ERROR);
+         trigger_error(ErrorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'), E_USER_ERROR);
       
       /// A unique identifier that can be used in the body tag of the master view if needed.
       $ControllerName = $this->ClassName;
       // Strip "Controller" from the body identifier.
       if (substr($ControllerName, -10) == 'Controller')
-         $ControllerName = substr($ControllerName, 0, -10); 
+         $ControllerName = substr($ControllerName, 0, -10);
          
       // Strip "Gdn_" from the body identifier.
       if (substr($ControllerName, 0, 4) == 'Gdn_')

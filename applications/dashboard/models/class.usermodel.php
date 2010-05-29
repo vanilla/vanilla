@@ -182,7 +182,13 @@ class UserModel extends Gdn_Model {
          ->Get();
    }
 
-   public function GetSession($UserID) {
+   public function GetSession($UserID, $Refresh = FALSE) {
+      static $UserCache = array();
+
+      if(!$Refresh && array_key_exists($UserID, $UserCache)) {
+         return $UserCache[$UserID];
+      }
+
       $this->SQL
          ->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
          ->Select('p.Name', '', 'Photo')
@@ -204,6 +210,8 @@ class UserModel extends Gdn_Model {
 
       if ($User && $User->Permissions == '')
          $User->Permissions = $this->DefinePermissions($UserID);
+
+      $UserCache[$UserID] = $User;
 
       return $User;
    }
@@ -380,7 +388,7 @@ class UserModel extends Gdn_Model {
    public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
       if(is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
-         $RoleNames = preg_split('/\s*,\s*/', $RoleNames);
+         $RoleNames = preg_split('/\s*,\s*/', $RoleIDs);
          $RoleIDs = $this->SQL
             ->Select('r.RoleID')
             ->From('Role r')

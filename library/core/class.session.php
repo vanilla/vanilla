@@ -217,13 +217,13 @@ class Gdn_Session {
    /**
     * Authenticates the user with the provided Authenticator class.
     *
-    * @param Gdn_Authenticator $Authenticator The authenticator used to identify the user making the request.
+    * @param int $UserID The UserID to start the session with.
     */
-   public function Start() {
+   public function Start($UserID = FALSE) {
       if (!Gdn::Config('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
-      $this->UserID = Gdn::Authenticator()->GetIdentity();
+      $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
       $this->User = FALSE;
 
       // Now retrieve user information

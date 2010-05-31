@@ -769,6 +769,7 @@ if (!function_exists('ProxyHead')) {
          $Handler = curl_init();
 			curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_NOBODY, 1);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
@@ -883,9 +884,11 @@ if (!function_exists('ProxyRequest')) {
 
       $Response = '';
       if (function_exists('curl_init')) {
+         
          $Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')

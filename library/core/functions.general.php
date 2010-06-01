@@ -967,6 +967,12 @@ if (!function_exists('Redirect')) {
    }
 }
 
+if (!function_exists('RemoteIP')) {
+   function RemoteIP() {
+      return GetValue('REMOTE_ADDR', $_SERVER, 'undefined');
+   }
+}
+
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);

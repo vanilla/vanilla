@@ -987,7 +987,10 @@ if (!function_exists('RemoveFromConfig')) {
       foreach ($Name as $k) {
          $Config->Remove($k);
       }
-      return $Config->Save($Path);
+      $Result = $Config->Save($Path);
+      if ($Result)
+         $Config->Load($Path, 'Use');
+      return $Result;
    }
 }
 

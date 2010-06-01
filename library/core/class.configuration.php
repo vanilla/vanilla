@@ -194,44 +194,57 @@ class Gdn_Configuration {
     * @todo This method may have to be recursive to remove empty arrays.
     */
    public function Remove($Name) {
+   
+      // The full merged config
       if(!is_array($this->_Data))
          return FALSE;
 
+      // The local override config
       if(!is_array($this->_SaveData))
          $this->_SaveData = array();
-
+      
       $Found = FALSE;
-      $Keys = explode('.', $Name);
-      $KeyCount = count($Keys);
+      $KeyParts = explode('.', $Name);
+      $KeyPartsCount = count($KeyParts);
 
-      $Array =& $this->_Data;
-      $SaveArray =& $this->_SaveData;
-      for($i = 0; $i < $KeyCount; ++$i) {
-         $Key = $Keys[$i];
+      $DataMergedConfig =& $this->_Data;
+      $DataLocalConfig =& $this->_SaveData;
+
+      for ($i = 0; $i < $KeyPartsCount; ++$i) {
          
-         if(array_key_exists($Key, $Array)) {
-            $SaveArrayKeyExists = !is_null($SaveArray) && array_key_exists($Key, $SaveArray);
-            
-            if($i == $KeyCount - 1) {
+         $Key = $KeyParts[$i];
+         
+         // Key will always be in here if it is anywhere at all
+         if (array_key_exists($Key, $DataMergedConfig)) {
+
+            // Does the key exist in the override file?
+            $LocalKeyExists = is_array($DataLocalConfig) && array_key_exists($Key, $DataLocalConfig);
+            if ($i == ($KeyPartsCount - 1)) {
                // We are at the setting, so unset it.
                $Found = TRUE;
-               unset($Array[$Key]);
-               if($SaveArrayKeyExists)
-                  unset($SaveArray[$Key]);
+               unset($DataMergedConfig[$Key]);
+               
+               // Only try to unset the local key if it exists
+               if ($LocalKeyExists)
+                  unset($DataLocalConfig[$Key]);
             } else {
                // Traverse the arrays.
-               $Array =& $Array[$Key];
-               if($SaveArrayKeyExists)
-                  $SaveArray =& $SaveArray[$Key];
+               $DataMergedConfig =& $DataMergedConfig[$Key];
+               
+               // Only try to traverse the local array if the key exists...
+               if ($LocalKeyExists)
+                  $DataLocalConfig =& $DataLocalConfig[$Key];
+               // ..otherwise, if its empty, unset it. Else just leave it alone.
                else
-                  $SaveArray = null;
+                  if (!sizeof($DataLocalConfig))
+                     $DataLocalConfig = null;
             }
          } else {
             $Found = FALSE;
             break;
          }
       }
-
+      
       return $Found;
    }
 

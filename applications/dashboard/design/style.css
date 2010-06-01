@@ -1925,10 +1925,14 @@ div.CommentForm textarea {
    margin: 0 0 6px;
 }
 div.Comment div.CommentForm {
+	width: 652px;
 	background: none;
 	padding: 6px 4px;
 	border: 0;
 	clear: left;
+}
+div.Comment div.CommentForm textarea {
+	width: 643px;	
 }
 #DiscussionForm label {
    font-size: 14px;

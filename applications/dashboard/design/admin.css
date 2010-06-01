@@ -509,6 +509,9 @@ form ul li label {
    font-size: 14px;
 	font-weight: bold;
    }
+form ul li span {
+	display: block;
+}
 body.Messages div.Popup form ul li label {
    width: 100px;
 }

@@ -14,8 +14,15 @@ jQuery(document).ready(function($) {
       cancelButton.hide();
       
    // Reveal it if they start typing a comment
-   $('div.CommentForm textarea').keydown(function() {
+   $('div.CommentForm textarea').focus(function() {
       $('a.Cancel:hidden').show();
+   });
+   
+   // Hide it if they leave the area without typing
+   $('div.CommentForm textarea').blur(function(ev) {
+      var Comment = $(ev.target).val();
+      if (!Comment || Comment == '')
+         $('a.Cancel').hide();
    });
    
    // Reveal the textarea and hide previews.
@@ -134,6 +141,7 @@ jQuery(document).ready(function($) {
                
                // Let listeners know that the comment was added.
                $(this).trigger('CommentAdded');
+               $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);
          },
@@ -143,6 +151,7 @@ jQuery(document).ready(function($) {
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
+      frm.triggerHandler('submit');
       return false;
    });
    

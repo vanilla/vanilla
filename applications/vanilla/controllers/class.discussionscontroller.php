@@ -49,8 +49,10 @@ class DiscussionsController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
-		$this->SetData('AnnounceData', $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE, TRUE);
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit), TRUE);		
+      $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
+		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
+      $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Offset . ' to ' . $Limit);
 
       // Build a pager.
@@ -109,7 +111,9 @@ class DiscussionsController extends VanillaController {
       $Wheres = array('w.Bookmarked' => '1', 'w.UserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
       $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
+      $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
+      $this->SetData('CountDiscussions', $CountDiscussions);
       $this->Category = FALSE;
       
       // Build a pager
@@ -155,7 +159,8 @@ class DiscussionsController extends VanillaController {
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
+      $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
+      $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $this->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
       
       // Build a pager

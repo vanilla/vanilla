@@ -23,6 +23,7 @@ class Gdn {
    const AliasSession = 'Session';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
+   const AliasSlice = 'Slice';
 
    const AliasPluginManager = 'PluginManager';
 
@@ -262,9 +263,9 @@ class Gdn {
    }
    
    /**
-    * Get or set the current request object
-    *
-    * @return mixed The new request or null to just get the request.
+    * Get or set the current request object.
+    * @param Gdn_Rewuest $NewRequest The new request or null to just get the request.
+    * @return Gdn_Request
     */
    public static function Request($NewRequest = NULL) {
       $Request = self::Factory(self::AliasRequest);
@@ -296,6 +297,11 @@ class Gdn {
       if(is_null(self::$_Session))
          self::$_Session = self::Factory(self::AliasSession);
       return self::$_Session;
+   }
+   
+   public static function Slice($Slice) {
+      $Result = self::Factory(self::AliasSlice);
+      return $Result->Execute($Slice);
    }
    
    /**

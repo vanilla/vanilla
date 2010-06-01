@@ -264,6 +264,14 @@ class Gdn_Request {
       return $Default;
    }
    
+   public function Host($Hostname = NULL) {
+      return $this->RequestHost($Hostname);
+   }
+   
+   public function Scheme($Scheme = NULL) {
+      return $this->RequestScheme($Scheme);
+   }
+   
    /**
     * Load the basics of the current environment
     *
@@ -280,6 +288,11 @@ class Gdn_Request {
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
+      
+      if (!is_array($_SERVER))
+         $this->RequestScheme('console');
+      else
+         $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
       
       $SetURI = FALSE;
       if (isset($_SERVER['REQUEST_URI'])) {
@@ -414,11 +427,11 @@ class Gdn_Request {
       $Domain = Gdn::Config('Garden.Domain', '');
 
       if ($Domain === FALSE || $Domain == '')
-         $Domain = ArrayValue('HTTP_HOST', $_SERVER, '');
+         $Domain = $this->Host();
 
       if ($Domain != '' && $Domain !== FALSE) {
-         if (substr($Domain, 0, 7) != 'http://')
-            $Domain = 'http://'.$Domain;
+         if (!stristr($Domain,'://'))
+            $Domain = $this->Scheme().'://'.$Domain;
 
          $Domain = trim($Domain, '/');
       }
@@ -511,6 +524,13 @@ class Gdn_Request {
       
       }
       $this->_RequestArguments[$ParamsType] = $ArgumentData;
+   }
+   
+   public function SetValueOn($ParamType, $ParamName, $ParamValue) {
+      if (!isset($this->_RequestArguments[$ParamType]))
+         $this->_RequestArguments[$ParamType] = array();
+         
+      $this->_RequestArguments[$ParamType][$ParamName] = $ParamValue;
    }
    
    /**
@@ -629,6 +649,11 @@ class Gdn_Request {
       $Method = is_null($Method) ? 'index' : $Method;
       $Path = trim(implode('/',array_merge(array($Controller,$Method),$Args)),'/');
       $this->_EnvironmentElement('URI', $Path);
+      return $this;
+   }
+   
+   public function WithDeliveryType($DeliveryType) {
+      $this->SetValueOn(self::INPUT_GET, 'DeliveryType', $DeliveryType);
       return $this;
    }
    

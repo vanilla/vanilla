@@ -281,8 +281,8 @@ class PostController extends VanillaController {
                   // If adding a comment 
                   if ($Editing) {
                      // Just reload the comment in question
-                     $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                     $this->CommentData = $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1);
+                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($CommentID);
+                     $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1), true);
                      // Load the discussion
                      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
@@ -295,11 +295,11 @@ class PostController extends VanillaController {
                      $LastCommentID = $this->Form->GetFormValue('LastCommentID');
                      if (!is_numeric($LastCommentID))
                         $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
-                        
+                     
                      // Make sure the view knows the current offset
-                     $this->Offset = $this->CommentModel->GetOffset($LastCommentID);
+                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
                      // Make sure to load all new comments since the page was last loaded by this user
-                     $this->CommentData = $this->CommentModel->GetNew($DiscussionID, $LastCommentID);
+                     $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), true);
                      // Load the discussion
                      $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
@@ -323,6 +323,12 @@ class PostController extends VanillaController {
             }
          }
       }
+      
+      if (property_exists($this,'Discussion'))
+         $this->EventData['Discussion'] = $this->Discussion;
+      if (property_exists($this,'Comment'))
+         $this->EventData['Discussion'] = $this->Comment;
+         
       $this->FireEvent('BeforeCommentRender');
       $this->Render();
    }

@@ -55,7 +55,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Bcc($RecipientEmail, $RecipientName = '') {
-      ob_flush(); ob_start();
+      ob_start();
       $this->PhpMailer->AddBCC($RecipientEmail, $RecipientName);
       ob_end_clean();
       return $this;
@@ -70,7 +70,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Cc($RecipientEmail, $RecipientName = '') {
-      ob_flush(); ob_start();
+      ob_start();
       $this->PhpMailer->AddCC($RecipientEmail, $RecipientName);
       ob_end_clean();
       return $this;
@@ -110,7 +110,7 @@ class Gdn_Email extends Gdn_Pluggable {
       
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
       
-      ob_flush(); ob_start();
+      ob_start();
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
       ob_end_clean();
       return $this;
@@ -176,6 +176,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
          $this->PhpMailer->Host = $SmtpHost;
          $this->PhpMailer->Port = $SmtpPort;
+         $this->PhpMailer->SMTPSecure = Gdn::Config('Garden.Email.SmtpSecurity', '');
          $this->PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
          $this->PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
          if(!empty($Username))
@@ -210,7 +211,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
    
    public function AddTo($RecipientEmail, $RecipientName = ''){
-      ob_flush(); ob_start();
+      ob_start();
       $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
       ob_end_clean();
       return $this;

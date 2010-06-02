@@ -322,18 +322,27 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // array_diff returns values from the first array that aren't present in
       // the second array. In this example, all columns in $this->_Columns that
       // are NOT in the table.
+      $PrevColumnName = FALSE;
       foreach ($this->_Columns as $ColumnName => $Column) {
          if (!array_key_exists($ColumnName, $ExistingColumns)) {
 
             // This column name is not in the existing column collection, so add the column
-            if (!$this->Query($AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+            $AddColumnSql = $AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
+            if($PrevColumnName !== FALSE)
+               $AddColumnSql .= " after `$PrevColumnName`";
+
+            if (!$this->Query($AddColumnSql))
                throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
          } else {
 				$ExistingColumn = $ExistingColumns[$ColumnName];
+
+            $ExistingColumnDef = $this->_DefineColumn($ExistingColumn);
+            $ColumnDef = $this->_DefineColumn($Column);
+            $Comment = "/* Existing: $ExistingColumnDef, New: $ColumnDef */\n";
             
-				if ($Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
+				if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
                // The existing & new column types do not match, so modify the column
-					if (!$this->Query($AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+					if (!$this->Query($Comment.$AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
 						throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
 
                // Check for a modification from an enum to an int.
@@ -355,6 +364,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                }
 				}
          }
+         $PrevColumnName = $ColumnName;
       }
       
       // 4. Update Indexes
@@ -413,7 +423,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;
-      if ($Column->Length != '') {
+      
+      $LengthTypes = $this->Types('length');
+      if ($Column->Length != '' && in_array(strtolower($Column->Type), $LengthTypes)) {
          if($Column->Precision != '')
             $Return .= '('.$Column->Length.', '.$Column->Precision.')';
          else
@@ -429,7 +441,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if (!$Column->AllowNull)
          $Return .= ' not null';
 
-      if (!is_null($Column->Default))
+      if (!is_null($Column->Default) && strcasecmp($Column->Type, 'timestamp') != 0)
          $Return .= " default ".self::_QuoteValue($Column->Default);
 
       if ($Column->AutoIncrement)

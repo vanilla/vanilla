@@ -284,8 +284,7 @@ jQuery(document).ready(function($) {
             success: function(json) {               
                if(json.Data && json.LastCommentID) {
                   gdn.definition('LastCommentID', json.LastCommentID, true);
-                  $current = $("#Discussion").contents();
-                  $(json.Data).appendTo("#Discussion")
+                  $(json.Data).appendTo("ul.Discussion")
                      .effect("highlight", {}, "slow");
                }
                gdn.processTargets(json.Targets);

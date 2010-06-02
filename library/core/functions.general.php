@@ -1120,7 +1120,7 @@ if (!function_exists('Translate')) {
 	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
-      trigger_error('Translate() is depricated. Use T() instead.', E_USER_DEPRECATED);
+      trigger_error('Translate() is deprecated. Use T() instead.', E_USER_DEPRECATED);
       return Gdn::Translate($Code, $Default);
    }
 }

@@ -59,7 +59,7 @@ class SettingsController extends Gdn_Controller {
 					$DiscussionModel = new Gdn_DiscussionModel();
 					$DiscussionModel->UpdateDiscussionCount('All');
 				}
-            $this->StatusMessage = Translate("Your changes have been saved.");
+            $this->StatusMessage = T("Your changes have been saved.");
 			}
 		}
 		

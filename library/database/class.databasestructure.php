@@ -350,32 +350,31 @@ abstract class Gdn_DatabaseStructure {
     */
    public function Set($Explicit = FALSE, $Drop = FALSE) {
       try {
-      
          // Make sure that table and columns have been defined
          if ($this->_TableName == '')
             throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
-   
+
          if (count($this->_Columns) == 0)
             throw new Exception(T('You must provide at least one column before calling DatabaseStructure::Set()'));
-   
+
          if ($this->TableExists()) {
             if ($Drop) {
                // Drop the table.
                $this->Drop();
-   
+
                // And re-create it.
                return $this->_Create();
             }
-   
+
             // If the table already exists, go into modify mode.
             return $this->_Modify($Explicit, $Drop);
          } else {
             // If it doesn't already exist, go into create mode.
             return $this->_Create();
          }
-      } catch (Exception $e) {
+      } catch (Exception $Ex) {
          $this->Reset();
-         throw $e;
+         throw $Ex;
       }
    }
 
@@ -451,7 +450,7 @@ abstract class Gdn_DatabaseStructure {
          case 'other': return array_merge($Length, $Other);
 
          case 'numeric': return array_merge($Foat, $Int, $Decimal);
-         case 'length': return array_merge($String, $Length);
+         case 'length': return array_merge($String, $Length, $Decimal);
          case 'precision': return $Decimal;
          default: return array();
       }

@@ -263,7 +263,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                   $Type = 'fulltext index '.$Row->Key_name;
                   break;
                default:
-                  throw new Exception("Unknown key name '{$Row->Key_name}' for {$this->_TableName}");
+                  // Try and guess the index type.
+                  if(strcasecmp($Row->Index_type, 'fulltext') == 0)
+                     $Type = 'fulltext index '.$Row->Key_name;
+                  elseif($Row->Non_unique)
+                     $Type = 'index '.$Row->Key_name;
+                  else
+                     $Type = 'unique index '.$Row->Key_name;
+
+                  break;
             }
             $Result[$Row->Key_name] = $Type.' (`'.$Row->Column_name.'`';
          }

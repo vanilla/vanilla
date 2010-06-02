@@ -103,7 +103,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * related to this model. This object is defined and populated with
     * $this->DefineSchema().
     *
-    * @var object
+    * @var Gdn_Schema
     */
    public $Schema;
    

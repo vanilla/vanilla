@@ -237,7 +237,12 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function Update($Fields, $Where = FALSE, $Limit = FALSE) {
       $Result = FALSE;
-      if ($this->Validate($Fields)) {
+      // primary key (always included in $Where when updating) might be "required"
+      $AllFields = $Fields;
+      if (is_array($Where))
+         $AllFields = array_merge($Fields, $Where); 
+         
+      if ($this->Validate($AllFields)) {
          $this->AddUpdateFields($Fields);
          $Result = $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
       }

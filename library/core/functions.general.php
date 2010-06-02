@@ -769,6 +769,7 @@ if (!function_exists('ProxyHead')) {
          $Handler = curl_init();
 			curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_NOBODY, 1);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
@@ -883,9 +884,11 @@ if (!function_exists('ProxyRequest')) {
 
       $Response = '';
       if (function_exists('curl_init')) {
+         
          $Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')
@@ -967,6 +970,12 @@ if (!function_exists('Redirect')) {
    }
 }
 
+if (!function_exists('RemoteIP')) {
+   function RemoteIP() {
+      return GetValue('REMOTE_ADDR', $_SERVER, 'undefined');
+   }
+}
+
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
@@ -978,7 +987,10 @@ if (!function_exists('RemoveFromConfig')) {
       foreach ($Name as $k) {
          $Config->Remove($k);
       }
-      return $Config->Save($Path);
+      $Result = $Config->Save($Path);
+      if ($Result)
+         $Config->Load($Path, 'Use');
+      return $Result;
    }
 }
 
@@ -1030,9 +1042,14 @@ if (!function_exists('SaveToConfig')) {
 
 if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
-	static $Charset;
-	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
-	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
+      if (function_exists('mb_strimwidth')) {
+      	static $Charset;
+      	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+      	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
+      } else {
+         $Trim = trim($String, 0, $Length);
+         return $Trim . ((strlen($Trim) != strlen($String)) ? $Suffix: ''); 
+      }
    }
 }
 

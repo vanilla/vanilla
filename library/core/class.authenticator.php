@@ -147,6 +147,10 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       }
    }
    
+   public function RequireLogoutTransientKey() {
+      return TRUE;
+   }
+   
    public function GetAuthenticationSchemeAlias() {
       $StipSuffix = str_replace('Gdn_','',__CLASS__);
       $ClassName = str_replace('Gdn_','',get_class($this));

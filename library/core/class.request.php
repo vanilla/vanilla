@@ -657,6 +657,13 @@ class Gdn_Request {
       return $this;
    }
    
+   public function WithRoute($Route) {
+      $ParsedURI = Gdn::Router()->GetDestination($Route);
+      if ($ParsedURI)
+         $this->_EnvironmentElement('URI',$ParsedURI);
+      return $this;
+   }
+   
    /**
     * Chainable URI Setter, source is a simple string
     * 

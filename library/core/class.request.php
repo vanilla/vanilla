@@ -376,7 +376,7 @@ class Gdn_Request {
       $this->_Parsing = TRUE;
 
       // Look for the path as the first get key.
-      $Get = $this->_RequestArguments[self::INPUT_GET];
+      $Get = $this->GetRequestArguments(self::INPUT_GET);
       if(is_array($Get)) {
          $Value = reset($Get);
          $Path = key($Get);

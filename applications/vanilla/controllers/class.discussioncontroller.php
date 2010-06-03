@@ -73,7 +73,7 @@ class DiscussionController extends VanillaController {
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $ActualResponses);
          
          // Load the comments
-         $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset);
+         $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
          $this->SetData('Comments', $this->CommentData);
 
          // Build a pager

@@ -59,7 +59,7 @@ class SettingsController extends Gdn_Controller {
 					$DiscussionModel = new Gdn_DiscussionModel();
 					$DiscussionModel->UpdateDiscussionCount('All');
 				}
-            $this->StatusMessage = Translate("Your changes have been saved.");
+            $this->StatusMessage = T("Your changes have been saved.");
 			}
 		}
 		
@@ -308,6 +308,18 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('jquery.ui.packed.js');
       $this->Title(T('Categories'));
       $this->CategoryData = $this->CategoryModel->GetAll('Sort');
+      
+      // Enable/Disable Categories
+      if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
+         $Toggle = GetValue(0, $this->RequestArgs, '');
+         if ($Toggle == 'enable') {
+            SaveToConfig('Vanilla.Categories.Use', TRUE);
+         } else if ($Toggle == 'disable') {
+            SaveToConfig('Vanilla.Categories.Use', FALSE);
+         }
+         Redirect('vanilla/settings/managecategories');
+      }
+      
       $this->Render();
    }
    

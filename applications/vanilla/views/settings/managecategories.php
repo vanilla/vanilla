@@ -2,10 +2,22 @@
 $Session = Gdn::Session();
 $FirstRow = $this->CategoryData->FirstRow();
 $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->ParentCategoryID > 0) ? ' HasParents' : '';
-echo $this->Form->Open();
 ?>
 <h1><?php echo T('Manage Categories'); ?></h1>
-<div class="Info"><?php echo T('Categories are used to help organize discussions.'); ?></div>
+<div class="Info">
+   <?php
+      echo T('Categories are used to help organize discussions. ');
+      if (C('Vanilla.Categories.Use')) {
+         echo Wrap(Anchor("Don't use Categories", 'vanilla/settings/managecategories/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      } else {
+         echo Wrap(Anchor('Use Categories', 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      }
+   ?>
+</div>
+<?php 
+   if (C('Vanilla.Categories.Use')) { 
+      echo $this->Form->Open();
+?>
 <div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'SmallButton'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
@@ -42,4 +54,5 @@ foreach ($this->CategoryData->Result() as $Category) {
    </tbody>
 </table>
 <?php
-echo $this->Form->Close();
+      echo $this->Form->Close();
+   }

@@ -119,7 +119,7 @@ class EntryController extends Gdn_Controller {
                if ($Route !== FALSE)
                   Redirect($Route);
                else
-                  Redirect('DefaultController');
+                  Redirect(Gdn::Router()->GetDestination('DefaultController'));
             }
          break;
       }
@@ -350,7 +350,7 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
 
-   public function Leave($TransientKey = '', $AuthenticationSchemeAlias = 'default') {
+   public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
    
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
@@ -361,17 +361,60 @@ class EntryController extends Gdn_Controller {
       // Only sign the user out if this is an authenticated postback!
       $Session = Gdn::Session();
       $this->Leaving = FALSE;
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         $Authenticator->DeAuthenticate();
+      $Result = Gdn_Authenticator::REACT_RENDER;
+      $AuthenticatedPostbackRequired = $Authenticator->RequireLogoutTransientKey();
+      if (!$AuthenticatedPostbackRequired || $Session->ValidateTransientKey($TransientKey)) {
+         $Result = $Authenticator->DeAuthenticate();
          $this->Leaving = TRUE;
-         $this->RedirectUrl = Url('/entry');
       }
+      
+      if ($Result == Gdn_Authenticator::AUTH_SUCCESS) {
+         $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
+         $Reaction = $Authenticator->SuccessResponse();
+      } else {
+         $Reaction = $Authenticator->LoginResponse();
+      }
+            
+      switch ($Reaction) {
+      
+         case Gdn_Authenticator::REACT_RENDER:
+            // Do nothing (render the view)
+         break;
+      
+         case Gdn_Authenticator::REACT_EXIT:
+            exit();
+         break;
+      
+         case Gdn_Authenticator::REACT_REMOTE:
+            // Render the view, but set the delivery type to VIEW
+            $this->_DeliveryType= DELIVERY_TYPE_VIEW;
+         break;
+         
+         case Gdn_Authenticator::REACT_REDIRECT:
+         default:
+         
+            if (is_string($Reaction))
+               $Route = $Reaction;
+            else
+               $Route = '/entry';
+            
+            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+               $this->RedirectUrl = Url($Route);
+            } else {
+               if ($Route !== FALSE)
+                  Redirect($Route);
+               else
+                  Redirect(Gdn::Router()->GetDestination('DefaultController'));
+            }
+         break;
+      }
+      
       $this->Render();
    }
    
    public function RedirectTo() {
       $IncomingTarget = $this->Form->GetValue('Target', '');
-      return $IncomingTarget == '' ? 'DefaultController' : $IncomingTarget;
+      return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
    }
    
    public function Initialize() {

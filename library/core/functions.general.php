@@ -957,7 +957,9 @@ if (!function_exists('RandomString')) {
 }
 
 if (!function_exists('Redirect')) {
-   function Redirect($Destination) {
+   function Redirect($Destination = FALSE) {
+      if (!$Destination)
+         $Destination = Url('');
       // Close any db connections before exit
       $Database = Gdn::Database();
       $Database->CloseConnection();
@@ -1120,7 +1122,7 @@ if (!function_exists('Translate')) {
 	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
-      trigger_error('Translate() is depricated. Use T() instead.', E_USER_DEPRECATED);
+      trigger_error('Translate() is deprecated. Use T() instead.', E_USER_DEPRECATED);
       return Gdn::Translate($Code, $Default);
    }
 }

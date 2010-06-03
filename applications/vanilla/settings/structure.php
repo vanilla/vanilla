@@ -326,4 +326,5 @@ $Construct->Table('Discussion')
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
+   ->Engine('MyISAM')
    ->Set($Explicit, $Drop);

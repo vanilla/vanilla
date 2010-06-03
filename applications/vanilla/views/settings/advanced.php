@@ -2,7 +2,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('Advanced'); ?></h1>
+<h1><?php echo T('Advanced'); ?></h1>
 <ul>
    <li>
       <?php

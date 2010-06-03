@@ -110,6 +110,8 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     */
    public function DeAuthenticate() {
       $this->SetIdentity(NULL);
+      
+      return Gdn_Authenticator::AUTH_SUCCESS;
    }
    
    public function LoginResponse() {

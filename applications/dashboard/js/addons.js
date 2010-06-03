@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
       }
       var addonName = urlParts[urlParts.length - 2];
       var testUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
+         gdn.definition('WebRoot').replace(/\/\/[a-zA-Z0-9.-]+\//,'//'+window.location.hostname),
          'index.php/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey')+'?DeliveryType=JSON'
       );
       

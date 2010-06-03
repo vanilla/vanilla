@@ -658,6 +658,8 @@ class Gdn_Format {
    public static function ToDate($Timestamp = '') {
       if ($Timestamp == '')
          $Timestamp = time();
+      elseif (!is_numeric($Timestamp))
+         $Timestamp = self::ToTimestamp($Timestamp);
       return date('Y-m-d', $Timestamp);
    }
 

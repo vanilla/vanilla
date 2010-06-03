@@ -957,7 +957,9 @@ if (!function_exists('RandomString')) {
 }
 
 if (!function_exists('Redirect')) {
-   function Redirect($Destination) {
+   function Redirect($Destination = FALSE) {
+      if (!$Destination)
+         $Destination = Url('');
       // Close any db connections before exit
       $Database = Gdn::Database();
       $Database->CloseConnection();

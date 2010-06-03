@@ -13,6 +13,6 @@ $Comment = property_exists($this, 'CommentData') && is_object($this->CommentData
 foreach ($this->ActivityData->Result() as $Activity) {
    if ($this->HideActivity)
       $Activity->ActivityType .= ' Hidden';
-      
+   
    WriteActivity($Activity, $this, $Session, $Comment);
 }

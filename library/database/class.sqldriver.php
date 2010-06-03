@@ -1497,7 +1497,12 @@ abstract class Gdn_SQLDriver {
    }
    
    public function Query($Sql) {
-      $Result = $this->Database->Query($Sql, $this->_NamedParameters);
+      try {
+         $Result = $this->Database->Query($Sql, $this->_NamedParameters);
+      } catch (Exception $Ex) {
+         $this->Reset();
+         throw $Ex;
+      }
       $this->Reset();
       
       return $Result;

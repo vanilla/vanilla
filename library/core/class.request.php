@@ -579,7 +579,7 @@ class Gdn_Request {
     * @param bool $WithDomain set to false to create a relative URL
     * @return string
     */
-   public function Url($Path, $WithDomain = FALSE) {
+   public function Url($Path = '', $WithDomain = FALSE) {
       if (strpos($Path, '://') !== FALSE)
          return $Path;
 

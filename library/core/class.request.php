@@ -286,13 +286,15 @@ class Gdn_Request {
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
       $this->_EnvironmentElement('ConfigStrips', Gdn::Config('Garden.StripWebRoot', FALSE));
 
-      $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
-      
-      if (!is_array($_SERVER))
-         $this->RequestScheme('console');
-      else
+      if (!isset($_SERVER['SHELL'])) {
+         $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
+         $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CONSOLE');
+         
          $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
+      } else {
+         
+         $this->RequestScheme('console');
+      }
       
       $SetURI = FALSE;
       if (isset($_SERVER['REQUEST_URI'])) {
@@ -305,9 +307,16 @@ class Gdn_Request {
          $SetURI = TRUE;
       }
       
-      if (!$SetURI)
+      if (!$SetURI && isset($_ENV['REQUEST_URI'])) {
          $this->RequestURI($_ENV['REQUEST_URI']);
-
+         $SetURI = TRUE;
+      }
+      
+      if (!$SetURI) {
+         
+         return;
+      }
+      
       $PossibleScriptNames = array();
       if (isset($_SERVER['SCRIPT_NAME']))
          $PossibleScriptNames[] = $_SERVER['SCRIPT_NAME'];

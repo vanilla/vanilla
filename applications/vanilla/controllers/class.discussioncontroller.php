@@ -70,7 +70,7 @@ class DiscussionController extends VanillaController {
             $this->Offset = 0;
          
          // Make sure to set the user's discussion watch records
-         $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $ActualResponses);
+         $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
          
          // Load the comments
          $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);

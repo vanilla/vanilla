@@ -305,7 +305,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param unknown_type $OrderDirection
     * @param unknown_type $Limit
     * @param unknown_type $Offset
-    * @return unknown
+    * @return Gdn_DataSet
     * @todo add doc
     */
    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {

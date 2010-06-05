@@ -303,7 +303,6 @@ class EntryController extends Gdn_Controller {
    
    public function PasswordRequest() {
       $this->Form->SetModel($this->UserModel);
-      $this->View = 'PasswordRequest';
       if (
          $this->Form->IsPostBack() === TRUE
          && $this->Form->ValidateModel() == 0)
@@ -317,7 +316,7 @@ class EntryController extends Gdn_Controller {
          }
          if ($this->Form->ErrorCount() == 0) {
             $this->Form->AddError('Success!');
-            $this->View = 'PasswordRequestSent';
+            $this->View = 'passwordrequestsent';
          }
       } else {
 			if ($this->Form->ErrorCount() == 0)
@@ -356,8 +355,6 @@ class EntryController extends Gdn_Controller {
    }
 
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
-		$this->View = 'leave';
-   
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
       } catch (Exception $e) {

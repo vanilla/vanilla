@@ -40,7 +40,6 @@ class EntryController extends Gdn_Controller {
       
       // By default, just render the view
       $Reaction = Gdn_Authenticator::REACT_RENDER;
-      
       // Where are we in the process? Still need to gather (render view) or are we validating?
       $AuthenticationStep = $Authenticator->CurrentStep();
       switch ($AuthenticationStep) {
@@ -54,6 +53,8 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_GATHER:
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
+				if ($this->Form->IsPostBack())
+					$this->Form->AddError('ErrorCredentials');
          break;
          
          // All information is present, authenticate
@@ -302,12 +303,15 @@ class EntryController extends Gdn_Controller {
    
    public function PasswordRequest() {
       $this->Form->SetModel($this->UserModel);
+      $this->View = 'PasswordRequest';
       if (
          $this->Form->IsPostBack() === TRUE
          && $this->Form->ValidateModel() == 0)
       {
          try {
-            $this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''));
+            if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
+					$this->Form->AddError("Couldn't find an account associated with that email address.");
+				}
          } catch (Exception $ex) {
             $this->Form->AddError($ex->getMessage());
          }
@@ -316,7 +320,8 @@ class EntryController extends Gdn_Controller {
             $this->View = 'PasswordRequestSent';
          }
       } else {
-         $this->Form->AddError('That email address was not found.');
+			if ($this->Form->ErrorCount() == 0)
+				$this->Form->AddError('That email address was not found.');
       }
       $this->Render();
    }
@@ -351,6 +356,7 @@ class EntryController extends Gdn_Controller {
    }
 
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
+		$this->View = 'leave';
    
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);

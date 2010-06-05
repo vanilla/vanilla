@@ -346,7 +346,7 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
             $AuthUserID = $Authenticator->Authenticate();
-            Redirect();
+            Redirect('/');
          }
       }
       $this->Render();

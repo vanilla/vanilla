@@ -423,11 +423,8 @@ class Gdn_Request {
        * Resolve WebRoot
        */
 
-      // Attempt to get the webroot from the configuration array
-      // $WebRoot = (string)$this->_EnvironmentElement('ConfigWebRoot');
-      $WebRoot = FALSE;
-
       // Attempt to get the webroot from the server
+      $WebRoot = FALSE;
       if (!$WebRoot) {
          $WebRoot = explode('/', ArrayValue('PHP_SELF', $_SERVER, ''));
 
@@ -445,9 +442,7 @@ class Gdn_Request {
        * Resolve Domain
        */
 
-      // Attempt to get the domain from the configuration array
-      $Domain = Gdn::Config('Garden.Domain', '');
-
+      $Domain = FALSE;
       if ($Domain === FALSE || $Domain == '')
          $Domain = $this->Host();
 

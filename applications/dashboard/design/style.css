@@ -1910,6 +1910,12 @@ body.Discussion a.Bookmark {
 	margin: 13px 8px;
 }
 
+body.Discussion .Back {
+   padding: 3px 6px;
+   text-align: left;
+}
+
+
 /* =================================================================== Drafts */
 ul.Discussions div.ItemContent,
 ul.Drafts div.ItemContent {

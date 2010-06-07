@@ -957,7 +957,7 @@ if (!function_exists('RandomString')) {
 }
 
 if (!function_exists('Redirect')) {
-   function Redirect($Destination = FALSE) {
+   function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)
          $Destination = Url('');
       // Close any db connections before exit
@@ -965,8 +965,11 @@ if (!function_exists('Redirect')) {
       $Database->CloseConnection();
       // Clear out any previously sent content
       @ob_end_clean();
+      
+      // assign status code
+      $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
-      header("location: ".Url($Destination));
+      header("location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
    }

@@ -424,7 +424,8 @@ class Gdn_Request {
        */
 
       // Attempt to get the webroot from the configuration array
-      $WebRoot = (string)$this->_EnvironmentElement('ConfigWebRoot');
+      // $WebRoot = (string)$this->_EnvironmentElement('ConfigWebRoot');
+      $WebRoot = FALSE;
 
       // Attempt to get the webroot from the server
       if (!$WebRoot) {

@@ -461,7 +461,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
 
       if (!array_key_exists('WebRoot', $this->_Definitions))
-         $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
+         $this->_Definitions['WebRoot'] = Gdn::Request()->WebRoot();
 
       if (!array_key_exists('UrlRoot', $this->_Definitions))
          $this->_Definitions['UrlRoot'] = substr(Url(' '), 0, -2);

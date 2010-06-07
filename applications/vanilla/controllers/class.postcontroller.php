@@ -222,6 +222,9 @@ class PostController extends VanillaController {
             $Discussion = $this->DiscussionModel->GetID($DiscussionID);
             $Comment = $this->CommentModel->GetID($CommentID);
             
+            // Mark the comment read
+            $this->CommentModel->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments, $Discussion->CountComments);
+            
             $this->EventArguments['Discussion'] = $Discussion;
             $this->EventArguments['Comment'] = $Comment;
             $this->FireEvent('AfterCommentSave');

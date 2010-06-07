@@ -295,7 +295,7 @@ chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
    
     public function First() {
       // Start the session.
-      Gdn::Session()->Start(Gdn::Authenticator());
+      Gdn::Session()->Start();
    
       $this->Permission('Garden.First'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
       

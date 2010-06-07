@@ -278,6 +278,9 @@ div.Info {
    padding: 6px;
    margin: 0 0 10px;
 }
+div.Info strong {
+	font-weight: bold;
+}
 /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
@@ -821,16 +824,16 @@ body.Entry #Content {
    width: 360px;
    text-align: center;
 }
-body#dashboard_entry_handshake #Content {
+body#dashboard_entrycontroller_handshake #Content {
 	width: 720px;
 }
-body#dashboard_entry_handshake ul.NewAccount {
+body#dashboard_entrycontroller_handshake ul.NewAccount {
 	float: left;
 	width: 330px;
 	margin-right: 29px;
 	border-right: 1px solid #A5D0E7;
 }
-body#dashboard_entry_handshake div.Info {
+body#dashboard_entrycontroller_handshake div.Info {
 	border: 1px solid #A5D0E7;
 	background: #D3F0FF;
 	color: #02475A;
@@ -848,11 +851,11 @@ body.Entry p {
 	padding: 0 10px;
 	margin: 10px 0 10px;
 }
-body#dashboard_entry_leave p {
+body#dashboard_entrycontroller_leave p {
 	margin: 0;
    padding: 20px 10px;
 }
-body#dashboard_entry_leave p.Leaving {
+body#dashboard_entrycontroller_leave p.Leaving {
    background: url('images/progress.gif') left center no-repeat;
 	margin: 0 0 0 14px;
    padding: 20px 0 20px 50px;
@@ -867,7 +870,7 @@ body.Entry #Content h1 {
 	margin: 0;
 	text-align: left;
 }
-body#dashboard_entry_handshake #Content h2 {
+body#dashboard_entrycontroller_handshake #Content h2 {
    border: none;
    color: #02475A;
    font-size:140%;
@@ -879,6 +882,9 @@ body#dashboard_entry_handshake #Content h2 {
 body.Entry #Content form {
 	text-align: left;
 	padding: 10px 30px 20px;
+}
+body#dashboard_entrycontroller_handshake #Content form {
+	padding: 20px 30px 26px;
 }
 body.Entry form ul li label {
 	font-size: 14px;
@@ -921,8 +927,8 @@ body.Entry li.Buttons input.Button {
 body.Entry #Content #Form_User_Password {
 	padding-top: 0;
 }
-#dashboard_entry_index #Form_User_Password ul li label,
-#dashboard_entry_signin #Form_User_Password ul li label {
+#dashboard_entrycontroller_index #Form_User_Password ul li label,
+#dashboard_entrycontroller_signin #Form_User_Password ul li label {
 	padding: 0;
 }
 
@@ -2178,4 +2184,38 @@ div.Popup #ConversationForm h2 {
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {
 	width: 478px;
+}
+
+/* Upload Progress Bar */
+div.UploadProgress {
+	margin: 10px 0;
+	background: url('images/upload-progress-back.gif') repeat;
+	width: 200px;
+	z-index: 0;
+	color: #fff;
+	text-shadow: 0 1px 1px #333;
+	border: 1px solid #0c3c7e;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+div.UploadProgress div {
+	padding: 2px 0;
+}
+div.UploadProgress div strong {
+	font-weight: bold;
+}
+div.UploadProgress div.Foreground,
+div.UploadProgress div.Background {
+	position: absolute;
+}
+div.UploadProgress div.Background {
+	width: 0;
+	background: url('images/upload-bg.gif') repeat;
+	z-index: 1;
+}
+div.UploadProgress div.Foreground {
+	text-indent: 6px;
+	overflow: visible;
+	white-space: nowrap;
+	z-index: 2;
 }

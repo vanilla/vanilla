@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+   <?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -105,12 +105,15 @@ class ConversationMessageModel extends Gdn_Model {
          $Px = $this->SQL->Database->DatabasePrefix;
 
          // Get the new message count for the conversation.
-         list($CountMessages, $LastMessageID) = $this->SQL
+         $SQLR = $this->SQL
             ->Select('MessageID', 'count', 'CountMessages')
             ->Select('MessageID', 'max', 'LastMessageID')
             ->From('ConversationMessage')
             ->Where('ConversationID', $ConversationID)
-            ->Get()->Value(array('CountMessages' => 0, 'LastMessageID' => ''));
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         if (sizeof($SQLR)) {
+            list($CountMessages, $LastMessageID) = array_values($SQLR);
+         } else { return; }
          
          // Update the conversation's DateUpdated field
          $this->SQL

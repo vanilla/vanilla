@@ -674,6 +674,6 @@ class SettingsController extends DashboardController {
          @unlink(PATH_ROOT . DS . $Logo);
       }
 
-      Redirect('/settings/configure');
+      Redirect('/settings/banner');
    }
 }

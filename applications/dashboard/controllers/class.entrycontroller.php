@@ -40,7 +40,6 @@ class EntryController extends Gdn_Controller {
       
       // By default, just render the view
       $Reaction = Gdn_Authenticator::REACT_RENDER;
-      
       // Where are we in the process? Still need to gather (render view) or are we validating?
       $AuthenticationStep = $Authenticator->CurrentStep();
       switch ($AuthenticationStep) {
@@ -54,6 +53,8 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_GATHER:
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
+				if ($this->Form->IsPostBack())
+					$this->Form->AddError('ErrorCredentials');
          break;
          
          // All information is present, authenticate
@@ -307,16 +308,19 @@ class EntryController extends Gdn_Controller {
          && $this->Form->ValidateModel() == 0)
       {
          try {
-            $this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''));
+            if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
+					$this->Form->AddError("Couldn't find an account associated with that email address.");
+				}
          } catch (Exception $ex) {
             $this->Form->AddError($ex->getMessage());
          }
          if ($this->Form->ErrorCount() == 0) {
             $this->Form->AddError('Success!');
-            $this->View = 'PasswordRequestSent';
+            $this->View = 'passwordrequestsent';
          }
       } else {
-         $this->Form->AddError('That email address was not found.');
+			if ($this->Form->ErrorCount() == 0)
+				$this->Form->AddError('That email address was not found.');
       }
       $this->Render();
    }
@@ -342,16 +346,13 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
             $AuthUserID = $Authenticator->Authenticate();
-
-            $this->StatusMessage = T('Password saved. Signing you in now...');
-            $this->RedirectUrl = Url('/');
+				Redirect('/');
          }
       }
       $this->Render();
    }
 
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
-   
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
       } catch (Exception $e) {

@@ -181,7 +181,6 @@ class SettingsController extends DashboardController {
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
          // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');

@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
 	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = gdn.combinePaths(gdn.definition('UrlRoot', ''), '/profile/notifications');
+      document.location = gdn.combinePaths(gdn.definition('WebRoot', ''), 'profile/notifications');
       return false;
    });
    

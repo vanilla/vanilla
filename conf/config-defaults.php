@@ -85,6 +85,7 @@ $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 $Configuration['Garden']['Roles']['Manage']                     = TRUE;
 $Configuration['Garden']['VanillaUrl']                          = 'http://vanillaforums.org';
+$Configuration['Garden']['AllowSSL']                            = TRUE;
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

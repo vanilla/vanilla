@@ -142,10 +142,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * Analyzes the supplied query string and decides how to dispatch the request.
     */
    public function Dispatch($ImportRequest = NULL, $Permanent = TRUE) {
-   
+      if ($ImportRequest && is_string($ImportRequest))
+         $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
+      
       $Request = ($ImportRequest !== NULL) ? $ImportRequest : Gdn::Request();
       if ($ImportRequest !== NULL && $Permanent)
-         Gdn::Request($ImportQuest);
+         Gdn::Request($ImportRequest);
    
       if (Gdn::Config('Garden.UpdateMode', FALSE)) {
          if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {

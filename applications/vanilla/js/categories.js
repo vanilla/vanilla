@@ -54,8 +54,7 @@ jQuery(document).ready(function($) {
             if (response == 'TRUE') {
                // Reload the page content...
                $.get(gdn.combinePaths(webRoot, '/index.php/vanilla/settings/managecategories/?DeliveryType=VIEW'), function(data){
-                  $('#Content form').remove();
-                  $('#Content').append(data);
+                  $('#Content').html(data);
                   $('table.Sortable tbody tr td').effect("highlight", {}, 1000);
                   $("table.Sortable").tableDnD({onDrop: saveAndReload});
                });

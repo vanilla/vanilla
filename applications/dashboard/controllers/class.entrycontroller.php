@@ -34,6 +34,7 @@ class EntryController extends Gdn_Controller {
          break;
          
          case Gdn_Authenticator::DATA_REQUEST:
+         case Gdn_Authenticator::DATA_COOKIE:
             $Authenticator->FetchData(Gdn::Request());
          break;
       }

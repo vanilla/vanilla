@@ -305,9 +305,9 @@ abstract class Gdn_DatabaseStructure {
 	 */
 	public function Query($Sql) {
 		if($this->CaptureOnly) {
-			if(!property_exists($this, 'CapturedSql'))
-				$this->CapturedSql = array();
-			$this->CapturedSql[] = $Sql;
+			if(!property_exists($this->Database, 'CapturedSql'))
+				$this->Database->CapturedSql = array();
+			$this->Database->CapturedSql[] = $Sql;
 			return TRUE;
 		} else {
 			$Result = $this->Database->Query($Sql);
@@ -437,7 +437,7 @@ abstract class Gdn_DatabaseStructure {
       $Decimal = array('decimal');
       $Float = array('float', 'double');
       $Int = array('int', 'tinyint', 'smallint', 'bigint');
-      $String = array('varchar', 'char', 'text');
+      $String = array('varchar', 'char', 'mediumtext', 'text');
       $Length = array('varbinary');
       $Other = array('enum');
 

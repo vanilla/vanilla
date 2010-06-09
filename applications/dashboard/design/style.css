@@ -483,7 +483,6 @@ body #Head h1 {
 #Menu li.Highlight a:hover span {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   margin-left: 4px;
    padding: 0 2px;
    font-size: 9px;
    line-height: 12px;

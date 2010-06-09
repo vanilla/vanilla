@@ -622,8 +622,15 @@ class Gdn_Request {
 
       $Result = implode('/', $Parts);
       
-      if ($SSL)
-         $Result = str_replace('http:', 'https:', $Result);
+      // If we are explicitly setting ssl urls one way or another
+      if (!is_null($SSL)) {
+         // And make sure to use ssl or not
+         if ($SSL) {
+            $Result = str_replace('http:', 'https:', $Result);
+         } else {
+            $Result = str_replace('https:', 'http:', $Result);
+         }
+      }
          
       return $Result;
    }

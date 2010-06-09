@@ -103,6 +103,8 @@ class UtilityController extends DashboardController {
       $CaptureOnly = !($CaptureOnly == '0');
       $Structure = Gdn::Structure();
       $Structure->CaptureOnly = $CaptureOnly;
+      $SQL = Gdn::SQL();
+      $SQL->CaptureModifications = $CaptureOnly;
       $this->SetData('CaptureOnly', $Structure->CaptureOnly);
       $this->SetData('Drop', $Drop);
       $this->SetData('Explicit', $Explicit);
@@ -118,8 +120,8 @@ class UtilityController extends DashboardController {
 			      $this->Form->AddError($Ex);
 			   }
 			}
-			if (property_exists($Structure, 'CapturedSql'))
-			   $this->SetData('CapturedSql', (array)$Structure->CapturedSql);
+			if (property_exists($Structure->Database, 'CapturedSql'))
+			   $this->SetData('CapturedSql', (array)$Structure->Database->CapturedSql);
 			else
 			   $this->SetData('CapturedSql', array());
       }

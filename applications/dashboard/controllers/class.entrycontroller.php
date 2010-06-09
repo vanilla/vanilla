@@ -372,35 +372,17 @@ class EntryController extends Gdn_Controller {
       
       if ($Result == Gdn_Authenticator::AUTH_SUCCESS) {
          $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
-         $Reaction = $Authenticator->SuccessResponse();
+         if ($Target = GetIncomingValue('Target', ''))
+            $Reaction = $Target;
+         else
+            $Reaction = $Authenticator->SuccessResponse();
       } else {
          $Reaction = $Authenticator->LoginResponse();
       }
-            
-      switch ($Reaction) {
-      
-         case Gdn_Authenticator::REACT_RENDER:
-            // Do nothing (render the view)
-         break;
-      
-         case Gdn_Authenticator::REACT_EXIT:
-            exit();
-         break;
-      
-         case Gdn_Authenticator::REACT_REMOTE:
-            // Render the view, but set the delivery type to VIEW
-            $this->_DeliveryType= DELIVERY_TYPE_VIEW;
-         break;
-         
-         case Gdn_Authenticator::REACT_REDIRECT:
-         default:
-         
-            if (is_string($Reaction))
-               $Route = $Reaction;
-            else
-               $Route = '/entry';
-            
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+
+      if (is_string($Reaction)) {
+         $Route = $Reaction;
+         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
             } else {
                if ($Route !== FALSE)
@@ -408,7 +390,35 @@ class EntryController extends Gdn_Controller {
                else
                   Redirect(Gdn::Router()->GetDestination('DefaultController'));
             }
-         break;
+      } else {
+         switch ($Reaction) {
+
+            case Gdn_Authenticator::REACT_RENDER:
+            break;
+
+            case Gdn_Authenticator::REACT_EXIT:
+               exit();
+            break;
+
+            case Gdn_Authenticator::REACT_REMOTE:
+               // Render the view, but set the delivery type to VIEW
+               $this->_DeliveryType= DELIVERY_TYPE_VIEW;
+            break;
+
+            case Gdn_Authenticator::REACT_REDIRECT:
+            default:
+               $Route = '/entry';
+
+               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                  $this->RedirectUrl = Url($Route);
+               } else {
+                  if ($Route !== FALSE)
+                     Redirect($Route);
+                  else
+                     Redirect(Gdn::Router()->GetDestination('DefaultController'));
+               }
+            break;
+         }
       }
       
       $this->Render();

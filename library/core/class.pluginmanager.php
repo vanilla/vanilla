@@ -512,7 +512,7 @@ class Gdn_PluginManager {
       $Paths = (array)$Paths;
       foreach($Paths as $Path) {
          if(file_exists($Path))
-            include($Path);
+            include_once($Path);
       }
       
       return $PluginInfo;

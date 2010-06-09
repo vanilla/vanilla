@@ -374,7 +374,7 @@ if (!function_exists('CombinePaths')) {
       if (is_array($Paths)) {
          $MungedPath = implode($Delimiter, $Paths);
          $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
-         return str_replace('http:/', 'http://', $MungedPath);
+         return str_replace(array('http:/', 'https:/'), array('http://', 'https://'), $MungedPath);
       } else {
          return $Paths;
       }
@@ -504,7 +504,7 @@ if (!function_exists('ForceSSL')) {
     */
    function ForceSSL() {
       if (C('Garden.AllowSSL')) {
-         if (strpos('https:', Gdn::Request()->Url('', TRUE)) !== 0)
+         if (Gdn::Request()->Scheme() != 'https')
             Redirect(Gdn::Request()->Url('', TRUE, TRUE));
       }
    }

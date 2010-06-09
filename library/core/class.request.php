@@ -581,15 +581,22 @@ class Gdn_Request {
     * @param bool $SSL set to true to implement SSL
     * @return string
     */
-   public function Url($Path = '', $WithDomain = FALSE, $SSL = FALSE) {
+   public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
       if (!C('Garden.AllowSSL'))
-         $SSL = FALSE;
-         
-      if ($SSL) {
+         $SSL = NULL;
+      
+      // If we are explicitly setting ssl urls one way or another
+      if (!is_null($SSL)) {
+         // Force the full domain in the url
          $WithDomain = TRUE;
-         $Path = str_replace('http:', 'https:', $Path);
+         // And make sure to use ssl or not
+         if ($SSL) {
+            $Path = str_replace('http:', 'https:', $Path);
+         } else {
+            $Path = str_replace('https:', 'http:', $Path);
+         }
       }
-         
+      
       if (strpos($Path, '://') !== FALSE)
          return $Path;
 
@@ -615,8 +622,15 @@ class Gdn_Request {
 
       $Result = implode('/', $Parts);
       
-      if ($SSL)
-         $Result = str_replace('http:', 'https:', $Result);
+      // If we are explicitly setting ssl urls one way or another
+      if (!is_null($SSL)) {
+         // And make sure to use ssl or not
+         if ($SSL) {
+            $Result = str_replace('http:', 'https:', $Result);
+         } else {
+            $Result = str_replace('https:', 'http:', $Result);
+         }
+      }
          
       return $Result;
    }

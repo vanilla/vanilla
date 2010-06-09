@@ -44,10 +44,14 @@ if (!function_exists('Anchor')) {
 		$SSL = GetValue('SSL', $Attributes);
 		if ($SSL)
 			unset($Attributes['SSL']);
+		
+		$WithDomain = GetValue('WithDomain', $Attributes);
+		if ($WithDomain)
+			unset($Attributes['WithDomain']);
 
       $Prefix = substr($Destination, 0, 7);
       if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
-         $Destination = Gdn::Request()->Url($Destination, FALSE, $SSL);
+         $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
 
       return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }

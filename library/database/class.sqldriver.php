@@ -1408,7 +1408,7 @@ abstract class Gdn_SQLDriver {
       
       if($C === '=' && $EscapeExpr === FALSE) {
          // This is a function call. Each parameter has to be parsed.
-         $FunctionArray = preg_split('/(\[[^\]]+\])', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
+         $FunctionArray = preg_split('/(\[[^\]]+\])/', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
          for($i = 0; $i < count($FunctionArray); $i++) {
             $Part = $FunctionArray[$i];
             if(substr($Part, 1) == '[') {

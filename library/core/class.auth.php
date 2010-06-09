@@ -106,11 +106,16 @@ class Gdn_Auth extends Gdn_Pluggable {
     * @return int
     */
    public function GetIdentity() {
-      $Result = $this->_Identity->GetIdentity();
+      $Result = $this->GetRealIdentity();
       
       if ($Result < 0)
          $Result = 0;
       
+      return $Result;
+   }
+   
+   public function GetRealIdentity() {
+      $Result = $this->_Identity->GetIdentity();
       return $Result;
    }
    

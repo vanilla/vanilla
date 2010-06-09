@@ -31,6 +31,7 @@ class Gdn_Request {
    const INPUT_GET      = "get";
    const INPUT_POST     = "post";
    const INPUT_SERVER   = "server";
+   const INPUT_COOKIES  = "cookies";
    
    protected $_HaveParsedRequest = FALSE; // Bool, signifies whether or not _ParseRequest has been called yet.
    protected $_Environment;               // Raw environment variables, unparsed
@@ -171,7 +172,7 @@ class Gdn_Request {
     */
    public function FromEnvironment() {
       $this->WithURI()
-         ->WithArgs(self::INPUT_GET, self::INPUT_POST, self::INPUT_SERVER, self::INPUT_FILES);
+         ->WithArgs(self::INPUT_GET, self::INPUT_POST, self::INPUT_SERVER, self::INPUT_FILES, self::INPUT_COOKIES);
          
       return $this;
    }
@@ -224,7 +225,8 @@ class Gdn_Request {
          self::INPUT_POST,
          self::INPUT_FILES,
          self::INPUT_SERVER,
-         self::INPUT_ENV
+         self::INPUT_ENV,
+         self::INPUT_COOKIES
       );
       $NumDataTypes = sizeof($QueryOrder);
       
@@ -535,6 +537,10 @@ class Gdn_Request {
             $ArgumentData = $_ENV;
             break;
             
+         case self::INPUT_COOKIES:
+            $ArgumentData = $_COOKIE;
+            break;
+            
          case self::INPUT_CUSTOM:
             $ArgumentData = is_array($ParamsData) ? $ParamsData : array();
             break;
@@ -666,7 +672,7 @@ class Gdn_Request {
     * @return Gdn_Request
     */
    public function WithCustomArgs($CustomArgs) {
-      $this->_AttachRequestArguments(self::INPUT_CUSTOM, $CustomArgs);
+      $this->_SetRequestArguments(self::INPUT_CUSTOM, $CustomArgs);
       return $this;
    }
    

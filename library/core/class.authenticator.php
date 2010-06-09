@@ -25,12 +25,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 abstract class Gdn_Authenticator extends Gdn_Pluggable {
    
+   const DATA_NONE            = 'data none';
    const DATA_FORM            = 'data form';
    const DATA_REQUEST         = 'data request';
+   const DATA_COOKIE          = 'data cookie';
    
    const MODE_REPEAT          = 'already logged in';
    const MODE_GATHER          = 'gather';
    const MODE_VALIDATE        = 'validate';
+   const MODE_NOAUTH          = 'no foreign identity';
    
    const AUTH_DENIED          = 0;
    const AUTH_PERMISSION      = -1;
@@ -110,9 +113,20 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
          foreach ($this->_DataHooks as $DataTarget => $DataHook)
             $this->_DataHooks[$DataTarget]['value'] = ArrayValue($DataTarget, $DirectSupplied);
       
-      if (sizeof($this->_DataHooks))
-         foreach ($this->_DataHooks as $DataTarget => $DataHook)
-            $this->_DataHooks[$DataTarget]['value'] = $this->_DataSource->GetValue($DataHook['lookup'], FALSE);
+      if (sizeof($this->_DataHooks)) {
+         foreach ($this->_DataHooks as $DataTarget => $DataHook) {
+            switch ($this->_DataSourceType) {
+               case self::DATA_REQUEST:
+               case self::DATA_FORM:
+                  $this->_DataHooks[$DataTarget]['value'] = $this->_DataSource->GetValue($DataHook['lookup'], FALSE);
+               break;
+               
+               case self::DATA_COOKIE:
+                  $this->_DataHooks[$DataTarget]['value'] = $this->_DataSource->GetValueFrom(Gdn_Authenticator::INPUT_COOKIES, $DataHook['lookup'], FALSE);
+               break;
+            }
+         }
+      }
    }
    
    public function HookDataField($InternalFieldName, $DataFieldName, $DataFieldRequired = TRUE) {

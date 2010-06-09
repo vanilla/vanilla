@@ -578,9 +578,18 @@ class Gdn_Request {
     *
     * @param sring $Path of the controller method.
     * @param bool $WithDomain set to false to create a relative URL
+    * @param bool $SSL set to true to implement SSL
     * @return string
     */
-   public function Url($Path = '', $WithDomain = FALSE) {
+   public function Url($Path = '', $WithDomain = FALSE, $SSL = FALSE) {
+      if (!C('Garden.AllowSSL'))
+         $SSL = FALSE;
+         
+      if ($SSL) {
+         $WithDomain = TRUE;
+         $Path = str_replace('http:', 'https:', $Path);
+      }
+         
       if (strpos($Path, '://') !== FALSE)
          return $Path;
 
@@ -595,7 +604,7 @@ class Gdn_Request {
          $Parts[] = $this->WebRoot();
 
 
-      if (!Gdn::Config('Garden.RewriteUrls')) {
+      if (!C('Garden.RewriteUrls')) {
          $Parts[] = $this->_EnvironmentElement('Script').'?';
          $Path = str_replace('?', '&', $Path);
       }
@@ -606,6 +615,9 @@ class Gdn_Request {
 
       $Result = implode('/', $Parts);
       
+      if ($SSL)
+         $Result = str_replace('http:', 'https:', $Result);
+         
       return $Result;
    }
    

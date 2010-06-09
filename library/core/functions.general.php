@@ -495,6 +495,21 @@ if (!function_exists('getallheaders')) {
    }
 }
 
+if (!function_exists('ForceSSL')) {
+   /**
+    * Checks the current url for SSL and redirects to SSL version if not
+    * currently on it. Call at the beginning of any method you want forced to
+    * be in SSL. Garden.AllowSSL must be TRUE in order for this function to
+    * work.
+    */
+   function ForceSSL() {
+      if (C('Garden.AllowSSL')) {
+         if (strpos('https:', Gdn::Request()->Url('', TRUE)) !== 0)
+            Redirect(Gdn::Request()->Url('', TRUE, TRUE));
+      }
+   }
+}
+
 if (!function_exists('GetConnectionString')) {
    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
       $HostName = explode(':', $HostName);

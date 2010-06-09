@@ -241,7 +241,11 @@ abstract class Gdn_SQLDriver {
       // Sort the parameters so that we don't have clashes.
       krsort($Parameters);
       foreach ($Parameters as $Key => $Value) {
-         $Sql = str_replace($Key, $this->Database->Connection()->quote($Value), $Sql);
+         if (is_null($Value))
+            $QValue = 'null';
+         else
+            $QValue = $this->Database->Connection()->quote($Value);
+         $Sql = str_replace($Key, $QValue, $Sql);
       }
       return $Sql;
    }

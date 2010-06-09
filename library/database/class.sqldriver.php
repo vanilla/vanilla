@@ -43,6 +43,12 @@ abstract class Gdn_SQLDriver {
     * @var array
     */
    protected $_AliasMap;
+
+   /**
+    *
+    * @var bool Whether or not to capture (not execute) DML statements.
+    */
+   public $CaptureModifications = FALSE;
    
    /**
     * The name of the class that has been instantiated.
@@ -230,6 +236,15 @@ abstract class Gdn_SQLDriver {
       
       return $this;
    }
+
+   public function ApplyParameters($Sql, $Parameters) {
+      // Sort the parameters so that we don't have clashes.
+      krsort($Parameters);
+      foreach ($Parameters as $Key => $Value) {
+         $Sql = str_replace($Key, $this->Database->Connection()->quote($Value), $Sql);
+      }
+      return $Sql;
+   }
    
    /**
     * Begin bracketed group in the where clause to group logical expressions together.
@@ -373,7 +388,7 @@ abstract class Gdn_SQLDriver {
 
       $Sql = $this->GetDelete($Table, $this->_Wheres, $this->_Limit);
 
-      return $this->Query($Sql);
+      return $this->Query($Sql, 'delete');
    }
    
    /**
@@ -405,7 +420,7 @@ abstract class Gdn_SQLDriver {
 
       $Sql = $this->GetDelete($Table);
       
-      return $this->Query($Sql);
+      return $this->Query($Sql, 'delete');
    }
    
    /**
@@ -1055,7 +1070,7 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetInsert($this->EscapeIdentifier($this->Database->DatabasePrefix.$Table), $Set, $Select);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'insert');
       
       return $Result;
    }
@@ -1491,13 +1506,23 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'update');
 
       return $Result;
    }
    
-   public function Query($Sql) {
+   public function Query($Sql, $Type = 'select') {
       try {
+         if ($this->CaptureModifications && strtolower($Type) != 'select') {
+            if(!property_exists($this->Database, 'CapturedSql'))
+               $this->Database->CapturedSql = array();
+            $Sql2 = $this->ApplyParameters($Sql, $this->_NamedParameters);
+            
+            $this->Database->CapturedSql[] = $Sql2;
+            $this->Reset();
+            return TRUE;
+         }
+
          $Result = $this->Database->Query($Sql, $this->_NamedParameters);
       } catch (Exception $Ex) {
          $this->Reset();
@@ -1713,7 +1738,7 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetTruncate($Table);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'truncate');
       return $Result;
    }
 

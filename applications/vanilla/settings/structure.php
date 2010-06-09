@@ -252,79 +252,58 @@ if ($Drop) {
 Apr 26th, 2010
 Removed FirstComment from :_Discussion and moved it into the discussion table.
 */
-if (!$Construct->CaptureOnly) {
-	$Prefix = $SQL->Database->DatabasePrefix;
+$Prefix = $SQL->Database->DatabasePrefix;
 
-	$SQL->Query("update {$Prefix}Discussion, {$Prefix}Comment
-	set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
-		{$Prefix}Discussion.Format = {$Prefix}Comment.Format
-	where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
+$Construct->Query("update {$Prefix}Discussion, {$Prefix}Comment
+set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
+   {$Prefix}Discussion.Format = {$Prefix}Comment.Format
+where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
 
-	// Update lastcommentid & firstcommentid
-	$SQL->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
-	
-	$SQL->Query("delete {$Prefix}Comment
-	from {$Prefix}Comment inner join {$Prefix}Discussion
-	where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
-	
-	$SQL->Query("update {$Prefix}Discussion d
-	inner join {$Prefix}Comment c
-		on c.DiscussionID = d.DiscussionID
-	inner join (
-		select max(c2.CommentID) as CommentID
-		from {$Prefix}Comment c2
-		group by c2.DiscussionID
-	) c2
-	on c.CommentID = c2.CommentID
-	set d.LastCommentID = c.CommentID,
-		d.LastCommentUserID = c.InsertUserID
-	where d.LastCommentUserID is null");
+// Update lastcommentid & firstcommentid
+$Construct->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
 
-	/*
-	    May 12th, 2010
-		 Added ability to disable category-level permissions. Update global permissions in case this option is in effect.
-	 */
-	$SQL->Query("update {$Prefix}Permission p2
-		inner join {$Prefix}Category c
-		 on c.CategoryID = p2.JunctionID
-			 and p2.JunctionTable = 'Category'
-		   and c.Name = 'General'
-		inner join {$Prefix}Permission p
-		  on p.RoleID = p2.RoleID
-			 and p.JunctionTable is null
-		set
-			p.`Vanilla.Discussions.Add` = p2.`Vanilla.Discussions.Add`,
-			p.`Vanilla.Discussions.Edit` = p2.`Vanilla.Discussions.Edit`,
-			p.`Vanilla.Discussions.Announce` = p2.`Vanilla.Discussions.Announce`,
-			p.`Vanilla.Discussions.Sink` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Discussions.Close` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Discussions.Delete` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Discussions.View` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Comments.Add` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Comments.Edit` = p2.`Vanilla.Discussions.Sink`,
-			p.`Vanilla.Comments.Delete` = p2.`Vanilla.Discussions.Sink`
-		where p.RoleID <> 0;");
-}
+$Construct->Query("delete {$Prefix}Comment
+from {$Prefix}Comment inner join {$Prefix}Discussion
+where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
+
+$Construct->Query("update {$Prefix}Discussion d
+inner join {$Prefix}Comment c
+   on c.DiscussionID = d.DiscussionID
+inner join (
+   select max(c2.CommentID) as CommentID
+   from {$Prefix}Comment c2
+   group by c2.DiscussionID
+) c2
+on c.CommentID = c2.CommentID
+set d.LastCommentID = c.CommentID,
+   d.LastCommentUserID = c.InsertUserID
+where d.LastCommentUserID is null");
+
+/*
+    May 12th, 2010
+    Added ability to disable category-level permissions. Update global permissions in case this option is in effect.
+ */
+$Construct->Query("update {$Prefix}Permission p2
+   inner join {$Prefix}Category c
+    on c.CategoryID = p2.JunctionID
+       and p2.JunctionTable = 'Category'
+      and c.Name = 'General'
+   inner join {$Prefix}Permission p
+     on p.RoleID = p2.RoleID
+       and p.JunctionTable is null
+   set
+      p.`Vanilla.Discussions.Add` = p2.`Vanilla.Discussions.Add`,
+      p.`Vanilla.Discussions.Edit` = p2.`Vanilla.Discussions.Edit`,
+      p.`Vanilla.Discussions.Announce` = p2.`Vanilla.Discussions.Announce`,
+      p.`Vanilla.Discussions.Sink` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Discussions.Close` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Discussions.Delete` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Discussions.View` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Comments.Add` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Comments.Edit` = p2.`Vanilla.Discussions.Sink`,
+      p.`Vanilla.Comments.Delete` = p2.`Vanilla.Discussions.Sink`
+   where p.RoleID <> 0;");
 
 // This is the final structure of the discussion table after removed & updated columns
-$Construct->Table('Discussion')
-   ->PrimaryKey('DiscussionID')
-   ->Column('CategoryID', 'int', FALSE, 'key')
-   ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('UpdateUserID', 'int')
-   ->Column('LastCommentID', 'int', TRUE)
-   ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
-	->Column('Body', 'text', FALSE, 'fulltext')
-	->Column('Format', 'varchar(20)', TRUE)
-   ->Column('CountComments', 'int', '1')
-   ->Column('Closed', 'tinyint(1)', '0')
-   ->Column('Announce', 'tinyint(1)', '0')
-   ->Column('Sink', 'tinyint(1)', '0')
-   ->Column('DateInserted', 'datetime', NULL)
-   ->Column('DateUpdated', 'datetime')
-   ->Column('DateLastComment', 'datetime', NULL, 'index')
-	->Column('LastCommentUserID', 'int', TRUE)
-	->Column('Score', 'float', NULL)
-   ->Column('Attributes', 'text', TRUE)
-   ->Engine('MyISAM')
-   ->Set($Explicit, $Drop);
+$Construct->Table('Discussion')->DropColumn('FirstCommentID');
+$Construct->Reset();

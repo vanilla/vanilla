@@ -504,7 +504,7 @@ if (!function_exists('ForceSSL')) {
     */
    function ForceSSL() {
       if (C('Garden.AllowSSL')) {
-         if (strpos('https:', Gdn::Request()->Url('', TRUE)) !== 0)
+         if (Gdn::Request()->Scheme() != 'https')
             Redirect(Gdn::Request()->Url('', TRUE, TRUE));
       }
    }

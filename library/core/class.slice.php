@@ -29,17 +29,17 @@ class Gdn_Slice {
 
    public function Execute() {
       $SliceArgs = func_get_args();
-      
       // strURI
       // strController + strMethod
       switch (count($SliceArgs)) {
          case 1:
-            ob_start();
+            
             $Request = Gdn::Request()->Create()
                ->FromEnvironment()
                ->WithURI($SliceArgs[0])
                ->WithDeliveryType(DELIVERY_TYPE_VIEW);
-               
+            
+            ob_start();
             $this->Dispatcher->Dispatch($Request, FALSE);
             return ob_get_clean();
 

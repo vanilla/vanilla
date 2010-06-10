@@ -57,7 +57,9 @@ var Gdn_Slice = Class.create({
          'padding': '0px 15px',
          'opacity': 0
       });
-      $(Overlay).html('<img src="/applications/dashboard/design/images/progress_sm.gif"/>');
+      
+      var ImgPath = gdn.definition('WebRoot')+"/applications/dashboard/design/images/progress_sm.gif";
+      $(Overlay).html('<img src="'+ImgPath+'"/>');
       this.Slice.append(Overlay);
       $(Overlay).fadeTo('fast',0.7);
       this.Slice.animate({
@@ -80,7 +82,7 @@ var Gdn_Slice = Class.create({
    PostSlice: function() {
       this.PrepareSliceForRequest();
       
-      var SliceURL = this.Slice.attr('rel')+'?DeliveryType=VIEW';
+      var SliceURL = gdn.definition('WebRoot')+this.Slice.attr('rel')+'?DeliveryType=VIEW';
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',

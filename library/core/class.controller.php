@@ -135,7 +135,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * parsed out by the @@Dispatcher and sent to $this->RequestArgs as an
     * array. If there are no additional arguments specified, this value will
     * remain FALSE.
-    * ie. http://localhost/index.php/controller_name/controller_method/arg1/arg2/arg3
+    * ie. http://localhost/index.php?/controller_name/controller_method/arg1/arg2/arg3
     * translates to: array('arg1', 'arg2', 'arg3');
     *
     * @var mixed
@@ -149,7 +149,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * directly to the method that will be called in the controller. This value
     * is also used as $this->View unless $this->View has already been
     * hard-coded to be something else.
-    * ie. http://localhost/index.php/controller_name/controller_method/
+    * ie. http://localhost/index.php?/controller_name/controller_method/
     *
     * @var string
     */

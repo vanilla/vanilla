@@ -7,15 +7,20 @@ class Gdn_SliceProvider {
       $ExplodedPath = explode('/',$CurrentPath);
       switch ($this instanceof Gdn_IPlugin) {
          case TRUE:
-            $ExplodedPath[2] = $SliceName;
+            $ReplacementIndex = 2;
+            
          break;
          
          case FALSE:
-            $ExplodedPath[1] = $SliceName;
+            $ReplacementIndex = 1;
          break;
       }
-      
-      return Gdn::Slice(implode('/',$ExplodedPath));
+      if ($ExplodedPath[0] == Gdn::Dispatcher()->Application() && $ExplodedPath[1] == Gdn::Dispatcher()->Controller())
+         $ReplacementIndex++;
+         
+      $ExplodedPath[$ReplacementIndex] = $SliceName;
+      $SlicePath = implode('/',$ExplodedPath);
+      return Gdn::Slice($SlicePath);
    }
    
    public function EnableSlicing(&$Sender) {

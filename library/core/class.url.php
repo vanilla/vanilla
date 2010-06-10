@@ -30,7 +30,7 @@ class Gdn_Url {
    /**
     * Returns the path to the application's dispatcher. Optionally with the
     * domain prepended.
-    *  ie. http://domain.com/[web_root]/index.php/request
+    *  ie. http://domain.com/[web_root]/index.php?/request
     *
     * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
     * @return string
@@ -49,7 +49,7 @@ class Gdn_Url {
 
    /**
     * Returns the domain from the current url. ie. "http://localhost/" in
-    * "http://localhost/this/that/garden/index.php/controller/action/"
+    * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @return string
     */
@@ -61,7 +61,7 @@ class Gdn_Url {
 
    /**
     * Returns the host from the current url. ie. "localhost" in
-    * "http://localhost/this/that/garden/index.php/controller/action/"
+    * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @return string
     */
@@ -72,7 +72,7 @@ class Gdn_Url {
 
    /**
     * Returns any GET parameters from the querystring. ie. "this=that&y=n" in
-    * http://localhost/index.php/controller/action/?this=that&y=n"
+    * http://localhost/index.php?/controller/action/&this=that&y=n"
     *
     * @return string
     */
@@ -83,7 +83,7 @@ class Gdn_Url {
 
    /**
     * Returns the Request part of the current url. ie. "/controller/action/" in
-    * "http://localhost/garden/index.php/controller/action/".
+    * "http://localhost/garden/index.php?/controller/action/".
     *
     * @param boolean $WithWebRoot
     * @param boolean $WithDomain

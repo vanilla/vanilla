@@ -59,7 +59,7 @@ class Gdn_Request {
    
    /**
     * Gets/Sets the domain from the current url. e.g. "http://localhost/" in
-    * "http://localhost/this/that/garden/index.php/controller/action/"
+    * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @param $Domain optional value to set
     * @return string | NULL
@@ -297,25 +297,13 @@ class Gdn_Request {
          $this->RequestScheme('console');
       }
       
-      $SetURI = FALSE;
-      if (isset($_SERVER['REQUEST_URI'])) {
-         $this->RequestURI($_SERVER['REQUEST_URI']);
-         $SetURI = TRUE;
-      }
-      
-      if (isset($_SERVER['REDIRECT_URL'])) {
-         $this->RequestURI($_SERVER['REDIRECT_URL']);
-         $SetURI = TRUE;
-      }
-      
-      if (!$SetURI && isset($_ENV['REQUEST_URI'])) {
-         $this->RequestURI($_ENV['REQUEST_URI']);
-         $SetURI = TRUE;
-      }
-      
-      if (!$SetURI) {
+      if ($this->RequestScheme() != "console" && is_array($_GET)) {
+         $Value = reset($_GET);
+         $Path = key($_GET);
+         if ($Value !== '')
+            $Path = FALSE;
          
-         return;
+         $this->RequestURI($Path);
       }
       
       $PossibleScriptNames = array();
@@ -335,18 +323,28 @@ class Gdn_Request {
          $PossibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
       
       $this->RequestFolder('');
+      $TrimURI = trim($this->RequestURI(),'/');
       foreach ($PossibleScriptNames as $ScriptName) {
-         
          $Script = basename($ScriptName);
          $this->RequestScript($Script);
          
          $Folder = substr($ScriptName,0,0-strlen($Script));
          $TrimFolder = trim($Folder,'/');
-         $TrimURI = trim($this->RequestURI(),'/');
          $TrimScript = trim($Script,'/');
          
-         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
-            $this->RequestFolder(ltrim($Folder,'/'));
+         if (isset($_SERVER['DOCUMENT_ROOT']))
+            $DocumentRoot = $_SERVER['DOCUMENT_ROOT'];
+         else {
+            $AbsolutePath = str_replace("\\","/",realpath($Script));
+            $DocumentRoot = substr($AbsolutePath,0,strpos($AbsolutePath,$ScriptName));
+         }
+         
+         if (!$DocumentRoot) continue;
+         $TrimRoot = rtrim($DocumentRoot);
+         $RealFolder = str_replace($TrimRoot,'', $Folder);
+         
+         if (!empty($RealFolder)) {
+            $this->RequestFolder(ltrim($RealFolder,'/'));
             break;
          }
       }
@@ -362,7 +360,7 @@ class Gdn_Request {
     *  - atom           -> atom formatted
     *
     * If the request ends with a filename, such as in the case of:
-    *    http://www.forum.com/vanilla/index.php/discussion/345897/attachment/234/download/cashflow2009.pdf
+    *    http://www.forum.com/vanilla/index.php?/discussion/345897/attachment/234/download/cashflow2009.pdf
     * then this method will return the filetype (in this case 'pdf').
     *
     * @param $OutputFormat Optional OutputFormat to set.
@@ -385,18 +383,12 @@ class Gdn_Request {
    protected function _ParseRequest() {
       $this->_Parsing = TRUE;
 
-      // Look for the path as the first get key.
-      $Get = $this->GetRequestArguments(self::INPUT_GET);
-      if(is_array($Get)) {
-         $Value = reset($Get);
-         $Path = key($Get);
-         if($Value !== '')
-            $Path = FALSE;
-      }
-
       /**
        * Resolve final request to send to dispatcher
        */
+       
+      $Path = $this->_EnvironmentElement('URI');
+       
       // Get the dispatch string from the URI
       if($Path !== FALSE) {
          $this->Path(trim($Path, '/'));
@@ -572,9 +564,9 @@ class Gdn_Request {
     * Taking the server's RewriteUrls ability into account, and using information from the
     * actual Request data, this method can construct a trustworthy URL that will point to
     * Garden's dispatcher. Examples:
-    *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php/
+    *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php?/
     *    - Default port, rewrites                     http://www.forum.com/
-    *    - Custom port, rewrites                      http://www.forum.com:8080/index.php/
+    *    - Custom port, rewrites                      http://www.forum.com:8080/index.php?/
     *
     * @param sring $Path of the controller method.
     * @param bool $WithDomain set to false to create a relative URL

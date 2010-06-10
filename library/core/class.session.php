@@ -256,7 +256,7 @@ class Gdn_Session {
          } else {
             $this->UserID = 0;
             $this->User = FALSE;
-            Gdn::Authenticator()->GetAuthenticator()->DeAuthenticate();
+            Gdn::Authenticator()->SetIdentity(NULL);
          }
       }
       // Load guest permissions if necessary

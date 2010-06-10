@@ -27,5 +27,31 @@ class Gdn_Theme {
       $Logo = C('Garden.Logo');
       $Title = C('Garden.Title', 'Title');
       echo $Logo ? Img($Logo, array('alt' => $Title)) : $Title;
-   }   
+   }
+   
+   public static function Pagename() {
+      $Application = Gdn::Dispatcher()->Application();
+      $Controller = Gdn::Dispatcher()->Controller();
+      switch ($Controller) {
+         case 'discussions':
+         case 'discussion':
+         case 'post':
+            return 'discussions';
+            
+         case 'inbox':
+            return 'inbox';
+            
+         case 'activity':
+            return 'activity';
+            
+         case 'profile':
+            $Args = Gdn::Dispatcher()->ControllerArguments();
+            if (!sizeof($Args) || ( sizeof($Args) && $Args[0] == Gdn::Authenticator()->GetIdentity()))
+               return 'profile';
+            break;
+      }
+      
+      return 'unknown';
+   }
+   
 }

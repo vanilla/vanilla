@@ -149,6 +149,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function ControllerMethod() {
       return $this->_ControllerMethod;
    }
+   
+   public function ControllerArguments() {
+      return $this->_ControllerMethodArgs;
+   }
 
    /**
     * Analyzes the supplied query string and decides how to dispatch the request.

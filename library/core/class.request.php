@@ -59,7 +59,7 @@ class Gdn_Request {
    
    /**
     * Gets/Sets the domain from the current url. e.g. "http://localhost/" in
-    * "http://localhost/this/that/garden/index.php/controller/action/"
+    * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @param $Domain optional value to set
     * @return string | NULL
@@ -375,7 +375,7 @@ class Gdn_Request {
     *  - atom           -> atom formatted
     *
     * If the request ends with a filename, such as in the case of:
-    *    http://www.forum.com/vanilla/index.php/discussion/345897/attachment/234/download/cashflow2009.pdf
+    *    http://www.forum.com/vanilla/index.php?/discussion/345897/attachment/234/download/cashflow2009.pdf
     * then this method will return the filetype (in this case 'pdf').
     *
     * @param $OutputFormat Optional OutputFormat to set.
@@ -579,9 +579,9 @@ class Gdn_Request {
     * Taking the server's RewriteUrls ability into account, and using information from the
     * actual Request data, this method can construct a trustworthy URL that will point to
     * Garden's dispatcher. Examples:
-    *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php/
+    *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php?/
     *    - Default port, rewrites                     http://www.forum.com/
-    *    - Custom port, rewrites                      http://www.forum.com:8080/index.php/
+    *    - Custom port, rewrites                      http://www.forum.com:8080/index.php?/
     *
     * @param sring $Path of the controller method.
     * @param bool $WithDomain set to false to create a relative URL

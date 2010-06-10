@@ -180,7 +180,7 @@ jQuery(document).ready(function($) {
       if (draftInp.val() != '')
          $.ajax({
             type: "POST",
-            url: gdn.combinePaths(gdn.definition('WebRoot'), 'index.php/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
+            url: gdn.combinePaths(gdn.definition('WebRoot'), 'index.php?/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
             data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
             dataType: 'json'
          });         
@@ -274,7 +274,7 @@ jQuery(document).ready(function($) {
          
          $.ajax({
             type: "POST",
-            url: gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
+            url: gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {

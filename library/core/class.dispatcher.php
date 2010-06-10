@@ -137,6 +137,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function ControllerName() {
       return $this->_ControllerName.'Controller';
    }
+   
+   public function Application() {
+      return $this->_ApplicationFolder;
+   }
+   
+   public function Controller() {
+      return $this->_ControllerName;
+   }
+   
+   public function ControllerMethod() {
+      return $this->_ControllerMethod;
+   }
 
    /**
     * Analyzes the supplied query string and decides how to dispatch the request.

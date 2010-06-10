@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
+            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -142,7 +142,7 @@ jQuery(document).ready(function($) {
          var transientKey = gdn.definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php/dashboard/utility/sort/'), data, function(response) {
+         $.post(gdn.combinePaths(webRoot, 'index.php?/dashboard/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 

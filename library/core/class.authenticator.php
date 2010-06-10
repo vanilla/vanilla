@@ -47,7 +47,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    const REACT_REDIRECT       = 2;
    const REACT_REMOTE         = 3;
    
-   const URL_REGISTER         = 'RegistrationUrl';
+   const URL_REGISTER         = 'RegisterUrl';
    const URL_SIGNIN           = 'SignInUrl';
    const URL_SIGNOUT          = 'SignOutUrl';
    

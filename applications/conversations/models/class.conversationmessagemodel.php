@@ -138,7 +138,7 @@ class ConversationMessageModel extends Gdn_Model {
          $this->SQL
             ->Update('User u')
             ->Join('UserConversation uc', 'u.UserID = uc.UserID')
-            ->Set('u.CountUnreadConversations', 'u.CountUnreadConversations + 1', FALSE)
+            ->Set('u.CountUnreadConversations', 'coalesce(u.CountUnreadConversations, 0) + 1', FALSE)
             ->Where('uc.ConversationID', $ConversationID)
             ->Where('uc.LastMessageID', $MessageID)
             ->Where('uc.UserID <>', $Session->UserID)

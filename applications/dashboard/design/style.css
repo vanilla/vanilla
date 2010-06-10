@@ -483,7 +483,6 @@ body #Head h1 {
 #Menu li.Highlight a:hover span {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   margin-left: 4px;
    padding: 0 2px;
    font-size: 9px;
    line-height: 12px;
@@ -1845,7 +1844,7 @@ ul.PanelDiscussions li strong {
   + New: there are new comments since the last viewed the discussion
 */
 .Mine { background: #e3f4ff; }
-/* li.New { background: #fffec1; } */
+
 ul.DataList div.Meta a.Category {
    background: #fafafa;
    padding: 2px 4px;
@@ -1855,11 +1854,7 @@ ul.DataList div.Meta a.Category {
 ul.DataList li.Mine div.Meta a.Category {
    background: #eff7ff;
 }
-/*
-ul.DataList li.New div.Meta a.Category {
-   background: #fffed7;
-}
-*/
+
 ul.DataList div.Meta span.Announcement {
 	background: #777777;
 	color: #ffffff;
@@ -2088,9 +2083,6 @@ h2.NewConversation a {
 }
 body.Conversations h2 {
   margin: 0;
-}
-ul.Conversations li.New {
-  background: #fffec1;
 }
 ul.Conversations li.Active {
   cursor: pointer;

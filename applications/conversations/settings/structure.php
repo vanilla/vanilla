@@ -46,6 +46,8 @@ $Construct
 // history, and 
 $Construct->Table('UserConversation');
 
+$UpdateCountReadMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountReadMessages');
+
 $Construct
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('ConversationID', 'int', FALSE, 'primary')
@@ -69,7 +71,7 @@ $Construct->Table('ConversationMessage')
    ->Column('DateInserted', 'datetime', FALSE)
    ->Set($Explicit, $Drop);
 
-if($UpdateCountMessages) {
+if ($UpdateCountMessages) {
    // Calculate the count column.
    $UpSql = "update {$Px}Conversation c
 set CountMessages = (
@@ -78,7 +80,7 @@ set CountMessages = (
    where c.ConversationID = m.ConversationID)";
    $Construct->Query($UpSql);
 }
-if($UpdateLastMessageID) {
+if ($UpdateLastMessageID) {
    // Calculate the count column.
    $UpSql = "update {$Px}Conversation c
 set LastMessageID = (
@@ -87,7 +89,18 @@ set LastMessageID = (
    where c.ConversationID = m.ConversationID)";
    $Construct->Query($UpSql);
 }
-   
+
+if ($UpdateCountReadMessages) {
+   $UpSql = "update {$Px}UserConversation uc
+set CountReadMessages = (
+  select count(cm.MessageID)
+  from {$Px}ConversationMessage cm
+  where cm.ConversationID = uc.ConversationID
+    and cm.MessageID <= uc.LastMessageID)";
+
+  $Construct->Query($UpSql);
+}
+
 // Add extra columns to user table for tracking discussions, comments & replies
 $Construct->Table('User')
    ->Column('CountUnreadConversations', 'int', NULL)

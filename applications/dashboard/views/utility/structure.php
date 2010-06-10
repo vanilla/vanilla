@@ -21,7 +21,12 @@ if(array_key_exists('CapturedSql', $this->Data)) {
 					$Alt = $Alt == TRUE ? FALSE : TRUE;
 				?>
 				<tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-					<td><pre><?php echo $Sql; ?></pre></td>
+					<td><pre><?php
+                  $Sql = trim($Sql);
+                  if (substr_compare($Sql, ';', -1) != 0)
+                     $Sql .= ';';
+                  echo $Sql; 
+               ?></pre></td>
 				</tr>
 				<?php } ?>
 			</tbody>

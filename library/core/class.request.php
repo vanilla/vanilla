@@ -128,7 +128,7 @@ class Gdn_Request {
          return $this->_EnvironmentElement(strtoupper($Matches[2]),$PassedArg);
       }
       else {
-         trigger_error("Call to unknown method 'Gdn_Request->{$Method}'");
+         trigger_error("Call to unknown method 'Gdn_Request->{$Method}'", E_USER_ERROR);
       }
    }
 

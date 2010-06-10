@@ -256,7 +256,7 @@ class Gdn_Email extends Gdn_Pluggable {
          if ($Count == count($RecipientName)) {
             $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
             foreach($RecipientEmail as $Email => $Name) $this->To($Email, $Name);
-         }else
+         } else
             trigger_error(ErrorMessage('Size of arrays do not match', 'Email', 'To'), E_USER_ERROR);
          
          return $this;

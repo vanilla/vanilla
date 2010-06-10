@@ -88,10 +88,10 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * Add the discussion search to the search.
 	 * @param SearchController $Sender
 	 */
-	public function SearchController_Search_Handler($Sender) {
+	public function SearchModel_Search_Handler($Sender) {
 		include_once(dirname(__FILE__).DS.'..'.DS.'models'.DS.'class.vanillasearchmodel.php');
 		$SearchModel = new VanillaSearchModel();
-		$SearchModel->Search($Sender->SearchModel);
+		$SearchModel->Search($Sender);
 	}
    
    // Load some information into the BuzzData collection

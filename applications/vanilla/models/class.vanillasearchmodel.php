@@ -36,7 +36,7 @@ class VanillaSearchModel extends Gdn_Model {
          $this->SQL->WhereIn('d.CategoryID', $Perms, FALSE);
       }
 		
-		$SearchModel->AddMatchSql($this->SQL, 'd.Name, d.Body');
+		$SearchModel->AddMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
 		
 		$this->SQL
 			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary')
@@ -57,7 +57,7 @@ class VanillaSearchModel extends Gdn_Model {
          $this->SQL->WhereIn('d.CategoryID', $Perms, FALSE);
       }
 		
-		$SearchModel->AddMatchSql($this->SQL, 'c.Body');
+		$SearchModel->AddMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
 		
 		$this->SQL
 			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary')

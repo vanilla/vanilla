@@ -55,6 +55,7 @@ class DebuggerPlugin extends Gdn_Plugin {
       //if ($Session->CheckPermission('Plugins.Debugger.View')) {
          $String = '<div id="Sql">';
          $Database = Gdn::Database();
+         $SQL = $Database->SQL();
          if(!is_null($Database)) {
             $Queries = $Database->Queries();
             $QueryTimes = $Database->QueryTimes();
@@ -64,12 +65,8 @@ class DebuggerPlugin extends Gdn_Plugin {
                // this is a bit of a kludge. I found that the regex below would mess up when there were incremented named parameters. Ie. it would replace :Param before :Param0, which ended up with some values like "'4'0".
                if(isset($QueryInfo['Parameters']) && is_array($QueryInfo['Parameters'])) {
                   $tmp = $QueryInfo['Parameters'];
-                  arsort($tmp);
-                  foreach ($tmp as $Name => $Parameter) {
-                     $Pattern = '/(.+)('.$Name.')([\W\s]*)(.*)/';
-                     $Replacement = "$1'".htmlentities($Parameter, ENT_COMPAT, 'UTF-8')."'$3$4";
-                     $Query = preg_replace($Pattern, $Replacement, $Query);
-                  }
+
+                  $Query = $SQL->ApplyParameters($Query, $tmp);
                }
                $String .= $QueryInfo['Method']
                   .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'

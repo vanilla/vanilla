@@ -297,38 +297,13 @@ class Gdn_Request {
          $this->RequestScheme('console');
       }
       
-      $SetURI = FALSE;
-      if (isset($_SERVER['REQUEST_URI'])) {
-         $this->RequestURI($_SERVER['REQUEST_URI']);
-         $SetURI = TRUE;
-      }
-      
-      if (isset($_SERVER['REDIRECT_URL'])) {
-         $this->RequestURI($_SERVER['REDIRECT_URL']);
-         $SetURI = TRUE;
-      }
-      
-      if (!$SetURI && isset($_ENV['REQUEST_URI'])) {
-         $this->RequestURI($_ENV['REQUEST_URI']);
-         $SetURI = TRUE;
-      }
-      
       if ($this->RequestScheme() != "console" && is_array($_GET)) {
-         if (is_array($_GET)) {
-            $Value = reset($_GET);
-            $Path = key($_GET);
-            if ($Value !== '')
-               $Path = FALSE;
-               
-            if (!empty($Path))
-               $this->RequestURI($Path);
-               
-         }
-      }
-      
-      if (!$SetURI) {
+         $Value = reset($_GET);
+         $Path = key($_GET);
+         if ($Value !== '')
+            $Path = FALSE;
          
-         return;
+         $this->RequestURI($Path);
       }
       
       $PossibleScriptNames = array();
@@ -348,18 +323,28 @@ class Gdn_Request {
          $PossibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
       
       $this->RequestFolder('');
+      $TrimURI = trim($this->RequestURI(),'/');
       foreach ($PossibleScriptNames as $ScriptName) {
-         
          $Script = basename($ScriptName);
          $this->RequestScript($Script);
          
          $Folder = substr($ScriptName,0,0-strlen($Script));
          $TrimFolder = trim($Folder,'/');
-         $TrimURI = trim($this->RequestURI(),'/');
          $TrimScript = trim($Script,'/');
          
-         if (empty($TrimFolder) || stristr($TrimURI, $TrimFolder)) {
-            $this->RequestFolder(ltrim($Folder,'/'));
+         if (isset($_SERVER['DOCUMENT_ROOT']))
+            $DocumentRoot = $_SERVER['DOCUMENT_ROOT'];
+         else {
+            $AbsolutePath = str_replace("\\","/",realpath($Script));
+            $DocumentRoot = substr($AbsolutePath,0,strpos($AbsolutePath,$ScriptName));
+         }
+         
+         if (!$DocumentRoot) continue;
+         $TrimRoot = rtrim($DocumentRoot);
+         $RealFolder = str_replace($TrimRoot,'', $Folder);
+         
+         if (!empty($RealFolder)) {
+            $this->RequestFolder(ltrim($RealFolder,'/'));
             break;
          }
       }

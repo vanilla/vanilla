@@ -145,9 +145,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ImportRequest && is_string($ImportRequest))
          $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
       
-      $Request = ($ImportRequest !== NULL) ? $ImportRequest : Gdn::Request();
-      if ($ImportRequest !== NULL && $Permanent)
+      if (is_a($ImportRequest, 'Gdn_Request') && $Permanent) {
          Gdn::Request($ImportRequest);
+      }
+      
+      $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
    
       if (Gdn::Config('Garden.UpdateMode', FALSE)) {
          if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
@@ -268,7 +270,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-            $Request->WithURI(Gdn::Router()->GetDestination('Default404'));
+            Gdn::Request()->WithRoute('Default404');
             return $this->Dispatch();
          }
       }

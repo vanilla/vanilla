@@ -313,6 +313,19 @@ class Gdn_Request {
          $SetURI = TRUE;
       }
       
+      if ($this->RequestScheme() != "console" && is_array($_GET)) {
+         if (is_array($_GET)) {
+            $Value = reset($_GET);
+            $Path = key($_GET);
+            if ($Value !== '')
+               $Path = FALSE;
+               
+            if (!empty($Path))
+               $this->RequestURI($Path);
+               
+         }
+      }
+      
       if (!$SetURI) {
          
          return;
@@ -385,18 +398,12 @@ class Gdn_Request {
    protected function _ParseRequest() {
       $this->_Parsing = TRUE;
 
-      // Look for the path as the first get key.
-      $Get = $this->GetRequestArguments(self::INPUT_GET);
-      if(is_array($Get)) {
-         $Value = reset($Get);
-         $Path = key($Get);
-         if($Value !== '')
-            $Path = FALSE;
-      }
-
       /**
        * Resolve final request to send to dispatcher
        */
+       
+      $Path = $this->_EnvironmentElement('URI');
+       
       // Get the dispatch string from the URI
       if($Path !== FALSE) {
          $this->Path(trim($Path, '/'));

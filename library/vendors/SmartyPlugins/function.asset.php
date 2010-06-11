@@ -28,7 +28,7 @@ function smarty_function_asset($Params, &$Smarty) {
 	if ($Class != '')
 		$Class = ' class="'.$Class.'"';
 	
-	$Controller = $Smarty->get_template_vars('Controller');
+	$Controller = $Smarty->Controller;
 	
 	// Get the asset from the controller.
 	$Asset = $Controller->GetAsset($Name);

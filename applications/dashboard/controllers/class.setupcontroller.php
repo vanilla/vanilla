@@ -35,7 +35,7 @@ class SetupController extends DashboardController {
       
       $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
       if ($Installed)
-         trigger_error(ErrorMessage('Vanilla has already been installed.', 'SetupController', 'Index'));
+         throw new Exception('Vanilla has already been installed.');
       
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';
@@ -57,15 +57,16 @@ class SetupController extends DashboardController {
                   }
                }
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
             if ($this->Form->ErrorCount() == 0) {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
-               SaveToConfig(array(
-                  'Garden.Installed' => TRUE,
-                  'Garden.Errors.MasterView' => 'error.master.php'
-               ));
+               $Config = array('Garden.Installed' => TRUE);
+               if(!defined('DEBUG'))
+                  $Config['Garden.Errors.MasterView'] = 'error.master.php';
+
+               SaveToConfig($Config);
                
                // Go to the dashboard
                Redirect('/settings');
@@ -176,7 +177,7 @@ class SetupController extends DashboardController {
             try {
                include(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'structure.php');
             } catch (Exception $ex) {
-               $this->Form->AddError(strip_tags($ex->getMessage()));
+               $this->Form->AddError($ex);
             }
          
             if ($this->Form->ErrorCount() > 0)
@@ -195,12 +196,9 @@ class SetupController extends DashboardController {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
                // The user has been created successfully, so sign in now
-               $Authenticator = Gdn::Authenticator();
-               $AuthUserID = $Authenticator->Authenticate(array(
-                  'Email' => $this->Form->GetValue('Email'),
-                  'Password' => $this->Form->GetValue('Password'),
-                  'RememberMe' => TRUE)
-               );
+               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+               $Authenticator->FetchData($this->Form);
+               $AuthUserID = $Authenticator->Authenticate();
             }
             
             if ($this->Form->ErrorCount() > 0)
@@ -212,7 +210,7 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             try {
-               $Query = Gdn::Request()->Domain().Gdn::Request()->WebRoot()."entry";
+               $Query = Gdn::Request()->Url("entry", TRUE);
                $Results = ProxyHead($Query, array(), 1);
                $CanRewrite = FALSE;
                if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
@@ -225,9 +223,9 @@ class SetupController extends DashboardController {
       
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               'Garden.WebRoot' => Gdn_Url::WebRoot(),
+               //'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => $CanRewrite,
-               'Garden.Domain' => $Domain,
+               //'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
@@ -293,20 +291,5 @@ chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
 			$this->Form->AddError($PermissionHelp);
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
-   }
-   
-    public function First() {
-      // Start the session.
-      Gdn::Session()->Start(Gdn::Authenticator());
-   
-      $this->Permission('Garden.First'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-      
-      // Enable all of the plugins.
-      $PluginManager = Gdn::Factory('PluginManager');
-      foreach($PluginManager->EnabledPlugins as $PluginName => $PluginFolder) {
-         $PluginManager->EnablePlugin($PluginName, NULL, TRUE);
-      }
-      
-      Redirect('/settings');
    }
 }

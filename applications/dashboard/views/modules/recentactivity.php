@@ -13,7 +13,7 @@
             echo UserAnchor($Author, 'Name');
             if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0) {
                $Author = UserBuilder($Activity, 'Regarding');
-               echo '<span>→</span>'.UserAnchor($Author, 'Name');
+               echo '<span>&rarr;</span>'.UserAnchor($Author, 'Name');
             }
             echo Gdn_Format::Display($Activity->Story);
             echo '<em>'.Gdn_Format::Date($Activity->DateInserted).'</em>';

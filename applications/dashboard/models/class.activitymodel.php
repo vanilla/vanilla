@@ -116,7 +116,7 @@ class ActivityModel extends Gdn_Model {
       if ($Notify) {
          $this->SQL
             ->Update('User')
-            ->Set('CountNotifications', 'CountNotifications + 1', FALSE)
+            ->Set('CountNotifications', 'coalesce(CountNotifications) + 1', FALSE)
             ->Where('UserID', $RegardingUserID)
             ->Put();
       }

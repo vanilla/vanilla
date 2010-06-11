@@ -54,14 +54,6 @@ abstract class Gdn_DatabaseStructure {
     * @var array
     */
    protected $_Columns;
-	
-	/**
-	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
-	 * @return array
-	 */
-	public function Columns() {
-		return $this->_Columns;
-	}
 
    /**
     * The instance of the database singleton.
@@ -70,13 +62,24 @@ abstract class Gdn_DatabaseStructure {
     */
    public $Database;
 
+   /** The existing columns in the database.
+    * @var array
+    */
+   protected $_ExistingColumns = NULL;
+
    /**
     * The name of the table to create or modify.
     *
     * @var string
     */
    protected $_TableName;
-   
+
+   /** @var bool Whether or not this table exists in the database.
+    */
+   protected $_TableExixts;
+
+   /** @var string The name of the storage engine for this table.
+    */
    protected $_TableStorageEngine;
 
    /**
@@ -94,7 +97,7 @@ abstract class Gdn_DatabaseStructure {
       
       $this->DatabasePrefix($this->Database->DatabasePrefix);
       
-      $this->_Reset();
+      $this->Reset();
    }
    
    protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
@@ -185,6 +188,53 @@ abstract class Gdn_DatabaseStructure {
       return $this;
    }
 
+   /** Returns whether or not a column exists in the database.
+    *
+    * @param string $ColumnName The name of the column to check.
+    * @return bool
+    */
+   public function ColumnExists($ColumnName) {
+      $Result = array_key_exists($ColumnName, $this->ExistingColumns());
+      return $Result;
+   }
+   
+   /**
+	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
+	 * @return array
+	 */
+	public function Columns() {
+		return $this->_Columns;
+	}
+
+	/** Return the definition string for a column.
+	 * @param mixed $Column The column to get the type string from.
+	 *  - <b>object</b>: The column as returned by the database schema. The properties looked at are Type, Length, and Precision.
+	 *  - <b>string</b<: The name of the column currently in this structure.
+	 * * @return string The type definition string.
+	 */
+	public function ColumnTypeString($Column) {
+		if(is_string($Column))
+			$Column = $this->_Columns[$Column];
+		
+		$Type = GetValue('Type', $Column);
+		$Length = GetValue('Length', $Column);
+		$Precision = GetValue('Precision', $Column);
+
+		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'int', 'float', 'double')))
+			$Length = NULL;
+
+		if($Type && $Length && $Precision)
+			$Result = "$Type($Length, $Precision)";
+		elseif($Type && $Length)
+			$Result = "$Type($Length)";
+		elseif($Type)
+			$Result = $Type;
+		else
+			$Result = 'int';
+
+		return $Result;
+	}
+
    /**
     * Gets and/or sets the database prefix.
     *
@@ -218,6 +268,21 @@ abstract class Gdn_DatabaseStructure {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
    }
 
+
+	/** Load the schema for this table from the database.
+	 * @param string $TableName The name of the table to get or blank to get the schema for the current table.
+	 * @return Gdn_DatabaseStructure $this
+	 */
+	public function Get($TableName = '') {
+		if($TableName)
+			$this->Table($TableName);
+
+		$Columns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+		$this->_Columns = $Columns;
+
+		return $this;
+	}
+
    /**
     * Defines a primary key column on a table.
     *
@@ -240,9 +305,9 @@ abstract class Gdn_DatabaseStructure {
 	 */
 	public function Query($Sql) {
 		if($this->CaptureOnly) {
-			if(!property_exists($this, 'CapturedSql'))
-				$this->CapturedSql = array();
-			$this->CapturedSql[] = $Sql;
+			if(!property_exists($this->Database, 'CapturedSql'))
+				$this->Database->CapturedSql = array();
+			$this->Database->CapturedSql[] = $Sql;
 			return TRUE;
 		} else {
 			$Result = $this->Database->Query($Sql);
@@ -284,32 +349,32 @@ abstract class Gdn_DatabaseStructure {
     * method will drop the table before attempting to re-create it.
     */
    public function Set($Explicit = FALSE, $Drop = FALSE) {
-      // Make sure that table and columns have been defined
-      if ($this->_TableName == '')
-         throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
+      try {
+         // Make sure that table and columns have been defined
+         if ($this->_TableName == '')
+            throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
 
-      if (count($this->_Columns) == 0)
-         throw new Exception(T('You must provide at least one column before calling DatabaseStructure::Set()'));
+         if (count($this->_Columns) == 0)
+            throw new Exception(T('You must provide at least one column before calling DatabaseStructure::Set()'));
 
-      // Be sure to convert names to lowercase before comparing because
-      // different operating systems/databases vary on how case-sensitivity is
-      // handled in table names.
-      $SQL = $this->Database->SQL();
-      $Tables = $SQL->FetchTables();
-      if (in_array(strtolower($this->_DatabasePrefix.$this->_TableName), array_map('strtolower', $Tables))) {
-         if ($Drop) {
-            // Drop the table.
-            $this->Drop();
+         if ($this->TableExists()) {
+            if ($Drop) {
+               // Drop the table.
+               $this->Drop();
 
-            // And re-create it.
+               // And re-create it.
+               return $this->_Create();
+            }
+
+            // If the table already exists, go into modify mode.
+            return $this->_Modify($Explicit, $Drop);
+         } else {
+            // If it doesn't already exist, go into create mode.
             return $this->_Create();
          }
-
-         // If the table already exists, go into modify mode.
-         return $this->_Modify($Explicit, $Drop);
-      } else {
-         // If it doesn't already exist, go into create mode.
-         return $this->_Create();
+      } catch (Exception $Ex) {
+         $this->Reset();
+         throw $Ex;
       }
    }
 
@@ -319,7 +384,10 @@ abstract class Gdn_DatabaseStructure {
     * @param string $Name The name of the table.
     * @param string $CharacterEncoding The default character encoding to specify for this table.
     */
-   public function Table($Name, $CharacterEncoding = '') {
+   public function Table($Name = '', $CharacterEncoding = '') {
+		if(!$Name)
+			return $this->_TableName;
+		
       $this->_TableName = $Name;
       if ($CharacterEncoding == '')
          $CharacterEncoding = Gdn::Config('Database.CharacterEncoding', '');
@@ -327,6 +395,67 @@ abstract class Gdn_DatabaseStructure {
       $this->_CharacterEncoding = $CharacterEncoding;
       return $this;
    }
+
+   /** Whether or not the table exists in the database.
+    * @return bool
+    */
+   public function TableExists() {
+      if($this->_TableExists === NULL) {
+         if(strlen($this->TableName()) > 0) {
+            $Tables = $this->Database->SQL()->FetchTables(':_'.$this->TableName());
+            $this->_TableExists = count($Tables) > 0;
+         } else {
+            $this->_TableExists = FALSE;
+         }
+      }
+      return $this->_TableExists;
+   }
+
+   /** Returns the name of the table being defined in this object.
+    *
+    * @return string
+    */
+   public function TableName() {
+      return $this->_TableName;
+   }
+
+   /** Gets an arrya of type names allowed in the structure.
+    * @param string $Class The class of types to get. Valid values are:
+    *  - <b>int</b>: Integer types.
+    *  - <b>float</b>: Floating point types.
+    *  - <b>decimal</b>: Precise decimal types.
+    *  - <b>numeric</b>: float, int and decimal.
+    *  - <b>string</b>: String types.
+    *  - <b>date</b>: Date types.
+    *  - <b>length</b>: Types that have a length.
+    *  - <b>precision</b>: Types that have a precision.
+    *  - <b>other</b>: Types that don't fit into any other category on their own.
+    *  - <b>all</b>: All recognized types.
+    */
+   public function Types($Class = 'all') {
+      $Date = array('datetime', 'date');
+      $Decimal = array('decimal');
+      $Float = array('float', 'double');
+      $Int = array('int', 'tinyint', 'smallint', 'bigint');
+      $String = array('varchar', 'char', 'mediumtext', 'text');
+      $Length = array('varbinary');
+      $Other = array('enum');
+
+      switch(strtolower($Class)) {
+         case 'date': return $Date;
+         case 'decimal': return $Decimal;
+         case 'float': return $Float;
+         case 'int': return $Int;
+         case 'string': return $String;
+         case 'other': return array_merge($Length, $Other);
+
+         case 'numeric': return array_merge($Foat, $Int, $Decimal);
+         case 'length': return array_merge($String, $Length, $Decimal);
+         case 'precision': return $Decimal;
+         default: return array();
+      }
+   }
+
 
    /**
     * Specifies the name of the view to create or modify.
@@ -346,6 +475,19 @@ abstract class Gdn_DatabaseStructure {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Create'), E_USER_ERROR);
    }
 
+   /** Gets the column definitions for the columns in the database.
+    * @return array
+    */
+   public function ExistingColumns() {
+      if($this->_ExistingColumns === NULL) {
+         if($this->TableExists())
+            $this->_ExistingColumns = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+         else
+            $this->_ExistingColumns = array();
+      }
+      return $this->_ExistingColumns;
+   }
+
    /**
     * Modifies $this->Table() with the columns specified with $this->Column().
     *
@@ -356,13 +498,17 @@ abstract class Gdn_DatabaseStructure {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Modify'), E_USER_ERROR);
    }
 
-   /**
-    * @todo Undocumented method.
+   /** Reset the internal state of this object so that it can be reused.
+    * @return Gdn_DatabaseStructure $this
     */
-   protected function _Reset() {
+   public function Reset() {
       $this->_CharacterEncoding = '';
       $this->_Columns = array();
+      $this->_ExistingColumns = NULL;
+      $this->_TableExists = NULL;
       $this->_TableName = '';
       $this->_TableStorageEngine = NULL;
+
+		return $this;
    }
 }

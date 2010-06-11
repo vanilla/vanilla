@@ -75,14 +75,14 @@
                foreach ($Queries as $Key => $QueryInfo) {
                   $Query = $QueryInfo['Sql'];
                   // this is a bit of a kludge. I found that the regex below would mess up when there were incremented named parameters. Ie. it would replace :Param before :Param0, which ended up with some values like "'4'0".
-                  $tmp = $QueryInfo['Parameters'];
+                  $tmp = (array)$QueryInfo['Parameters'];
                   arsort($tmp);
                   foreach ($tmp as $Name => $Parameter) {
                      $Pattern = '/(.+)('.$Name.')([\W\s]*)(.*)/';
                      $Replacement = "$1'".htmlentities($Parameter, ENT_COMPAT, 'UTF-8')."'$3$4";
                      $Query = preg_replace($Pattern, $Replacement, $Query);
                   }
-                  echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>',$Query,'; <small>',number_format($QueryTimes[$Key], 6),'s</small></pre>';
+                  echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>',$Query,'; <small>',@number_format($QueryTimes[$Key], 6),'s</small></pre>';
                   $Odd = $Odd == TRUE ? FALSE : TRUE;
                }
                echo "</div>\n";

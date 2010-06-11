@@ -37,7 +37,7 @@ class DiscussionController extends VanillaController {
       }
       
       // Check Permissions
-      $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       if ($this->Discussion === FALSE) {
          Redirect('dashboard/home/filenotfound');
@@ -45,29 +45,36 @@ class DiscussionController extends VanillaController {
          // Setup
          $this->Title(Gdn_Format::Text($this->Discussion->Name));
          
+         // Actual number of comments, excluding the discussion itself
+         $ActualResponses = $this->Discussion->CountComments - 1;
+         
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
             $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
          
-         $this->Offset = $Offset;   
+         $this->Offset = $Offset;
          if (!is_numeric($this->Offset) || $this->Offset < 0) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
-            if ($CountCommentWatch > $this->Discussion->CountComments)
-               $CountCommentWatch = $this->Discussion->CountComments;
+            if ($CountCommentWatch > $ActualResponses)
+               $CountCommentWatch = $ActualResponses;
             
             // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
             $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
          }
          
+         if ($ActualResponses <= $Limit)
+            $this->Offset = 0;
+         
          if ($this->Offset < 0)
             $this->Offset = 0;
-            
+         
          // Make sure to set the user's discussion watch records
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
          
          // Load the comments
-         $this->SetData('CommentData', $this->CommentData = $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
+         $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
+         $this->SetData('Comments', $this->CommentData);
 
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();
@@ -78,7 +85,7 @@ class DiscussionController extends VanillaController {
          $this->Pager->Configure(
             $this->Offset,
             $Limit,
-            $this->Discussion->CountComments,
+            $ActualResponses,
             'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
          );
       }
@@ -119,7 +126,7 @@ class DiscussionController extends VanillaController {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
       // Check permissions.
-      $this->Permission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
       // Get the comments.
@@ -265,7 +272,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->CategoryID)) {
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
          } else {
             $this->Form->AddError('ErrPermission');
@@ -296,7 +303,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Sink', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->CategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Sink');
             } else {
                $State = $Discussion->Sink;
@@ -333,7 +340,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Close', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->CategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Closed');
             } else {
                $State = $Discussion->Closed;
@@ -368,7 +375,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID)) {
             if (!$this->DiscussionModel->Delete($DiscussionID))
                $this->Form->AddError('Failed to delete discussion');
          } else {
@@ -408,7 +415,7 @@ class DiscussionController extends VanillaController {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
             $HasPermission = $Comment->InsertUserID = $Session->UserID;
             if (!$HasPermission && $Discussion)
-               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', $Discussion->CategoryID);
+               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->CategoryID);
             
             if ($Discussion && $HasPermission) {
                if (!$this->CommentModel->Delete($CommentID))

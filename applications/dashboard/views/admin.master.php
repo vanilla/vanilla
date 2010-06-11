@@ -6,12 +6,14 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
    <div id="Frame">
       <div id="Head">
-			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.T('← Visit Site').'</span>', '/'); ?></h1>
+			<h1><?php echo Anchor(Gdn::Config('Garden.Title').' <span>'.T('Visit Site', '&larr; Visit Site').'</span>', '/'); ?></h1>
          <div class="User">
             <?php
 			      $Session = Gdn::Session();
 					$Authenticator = Gdn::Authenticator();
 					if ($Session->IsValid()) {
+						$this->FireEvent('BeforeUserOptionsMenu');
+						
 						$Name = $Session->User->Name;
 						$CountNotifications = $Session->User->CountNotifications;
 						if (is_numeric($CountNotifications) && $CountNotifications > 0)
@@ -28,10 +30,10 @@
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">
-			<div><?php
-				printf(T('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
-			?></div>
-			<?php $this->RenderAsset('Foot'); ?>
+			<?php
+				$this->RenderAsset('Foot');
+				echo Wrap(Anchor(Img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), C('Garden.VanillaUrl')), 'div');
+			?>
 		</div>
    </div>
 	<?php $this->FireEvent('AfterBody'); ?>

@@ -41,6 +41,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->PhpMailer = new PHPMailer();
       $this->PhpMailer->CharSet = Gdn::Config('Garden.Charset', 'utf-8');
       $this->PhpMailer->SingleTo = Gdn::Config('Garden.Email.SingleTo', FALSE);
+      $this->PhpMailer->PluginDir = PATH_LIBRARY.DS.'vendors'.DS.'phpmailer'.DS;
       $this->Clear();
       parent::__construct();
    }
@@ -176,6 +177,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
          $this->PhpMailer->Host = $SmtpHost;
          $this->PhpMailer->Port = $SmtpPort;
+         $this->PhpMailer->SMTPSecure = Gdn::Config('Garden.Email.SmtpSecurity', '');
          $this->PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
          $this->PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
          if(!empty($Username))
@@ -254,7 +256,7 @@ class Gdn_Email extends Gdn_Pluggable {
          if ($Count == count($RecipientName)) {
             $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
             foreach($RecipientEmail as $Email => $Name) $this->To($Email, $Name);
-         }else
+         } else
             trigger_error(ErrorMessage('Size of arrays do not match', 'Email', 'To'), E_USER_ERROR);
          
          return $this;

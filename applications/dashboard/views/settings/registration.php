@@ -3,10 +3,17 @@
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
+
+if ($this->Data('DefaultRoleWarning')) {
+   echo Wrap(
+      sprintf(T('No default roles.', 'You don\'t have your default roles set up. To correct this problem click %s.'),
+      Anchor(T('here'), 'dashboard/settings/defaultroles')), 'div', array('class' => 'Warning'));
+}
+
 ?>
 <ul>
    <li id="RegistrationMethods">
-      <div class="Info"><?php echo T('Choose the registration method for new users:'); ?></div>
+      <div class="Info"><?php echo T('Change the way that new users register with the site.'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
@@ -30,7 +37,11 @@ echo $this->Form->Errors();
                ?>
                <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                   <th><?php
-                     echo $this->Form->Radio('Garden.Registration.Method', $Method, array('value' => $Method));
+                     $MethodName = $Method;
+                     if ($MethodName == 'Captcha')
+                        $MethodName = 'Basic';
+                        
+                     echo $this->Form->Radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                   ?></th>
                   <td class="Alt"><?php echo T($Description); ?></td>
                </tr>
@@ -40,12 +51,16 @@ echo $this->Form->Errors();
          </tbody>
       </table>
    </li>
+   <?php
+   /*
    <li id="NewUserRoles">
       <div class="Info"><?php echo T('Check all roles that should be applied to new/approved users:'); ?></div>
       <?php echo $this->Form->CheckBoxList('Garden.Registration.DefaultRoles', $this->RoleData, $this->ExistingRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
+   */
+   ?>
    <li id="CaptchaSettings">
-      <div class="Info"><?php echo T('In order to use Captcha on your registration forms, you will need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
+      <div class="Info"><?php echo T('<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>

@@ -5,7 +5,7 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
 <h1><?php echo T('Manage Users'); ?></h1>
 <div class="FilterMenu">
-   <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup Button'); ?>
+   <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton'); ?>
 </div>
 <div class="Info">
    <?php

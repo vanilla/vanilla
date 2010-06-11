@@ -26,9 +26,13 @@ $Editing = isset($this->Comment);
    echo $this->Form->Open();
    echo $this->Form->Errors();
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
+   echo "<div class=\"PostFormControlPanel\">\n";
+   $this->FireEvent('BeforeFormButtons');
    echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
    echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', array('class' => 'Button CommentButton'));
+   echo '<div class="Back">'.Anchor(T('&larr; Back to Discussions'), 'discussions', '').'</div>';
    $this->FireEvent('AfterFormButtons');
+   echo "</div>\n";
    echo $this->Form->Close();
    ?>
 </div>

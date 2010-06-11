@@ -9,7 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Report and track all errors.
-error_reporting(E_ALL);
+if(defined('DEBUG'))
+   error_reporting(E_ALL);
+else
+   error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
@@ -19,15 +22,11 @@ ob_start();
 define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.0 rc1');
 
-define('DS', DIRECTORY_SEPARATOR);
+define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
 
 // 2. Include the header.
 require_once(PATH_ROOT.DS.'bootstrap.php');
-
-// 3. Start the application.
-if (substr(Gdn::Request()->Path(),0,15) != 'dashboard/setup')
-   Gdn::Session()->Start(Gdn::Authenticator());
 
 $Dispatcher = Gdn::Dispatcher();
 
@@ -38,3 +37,4 @@ $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // Process the request.
 $Dispatcher->Dispatch();
+$Dispatcher->Cleanup();

@@ -504,14 +504,19 @@ class Gdn_Validation {
     * @param unknown_type $ErrorCode
     * @todo add doc
     */
-   public function AddValidationResult($FieldName, $ErrorCode) {
+   public function AddValidationResult($FieldName, $ErrorCode = '') {
       if (!is_array($this->_ValidationResults))
          $this->_ValidationResults = array();
 
-      if (!array_key_exists($FieldName, $this->_ValidationResults))
-         $this->_ValidationResults[$FieldName] = array();
+      if(is_array($FieldName)) {
+         $ValidationResults = $FieldName;
+         $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
+      } else {
+         if (!array_key_exists($FieldName, $this->_ValidationResults))
+            $this->_ValidationResults[$FieldName] = array();
 
-      $this->_ValidationResults[$FieldName][] = $ErrorCode;
+         $this->_ValidationResults[$FieldName][] = $ErrorCode;
+      }
    }
 
 

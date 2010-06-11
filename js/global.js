@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
+            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -53,15 +53,17 @@ jQuery(document).ready(function($) {
    }
 
    // Main Menu dropdowns
+	/*
    if ($.fn.menu)
       $('#Menu').menu({
          showDelay: 0,
          hideDelay: 0
       });
-      
+	*/
+	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = gdn.combinePaths(gdn.definition('UrlRoot', ''), '/profile/notifications');
+      document.location = gdn.combinePaths(gdn.definition('WebRoot', ''), 'profile/notifications');
       return false;
    });
    
@@ -102,8 +104,8 @@ jQuery(document).ready(function($) {
       $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
-   $('div.Messages ul').live('click', function() {
-      $(this).parents('div.Messages').fadeOut('fast', function() {
+   $('div.Messages').live('click', function() {
+      $(this).fadeOut('fast', function() {
          $(this).remove();
       });
    });
@@ -116,6 +118,16 @@ jQuery(document).ready(function($) {
          });
       }, 3000);
    });
+	
+	// Show hoverhelp on hover
+	$('.HoverHelp').hover(
+		function() {
+			$(this).find('.Help').show();
+		},
+		function() {
+			$(this).find('.Help').hide();
+		}
+	);
 
    // If a page loads with a hidden redirect url, go there after a few moments.
    var RedirectUrl = gdn.definition('RedirectUrl', '');
@@ -130,7 +142,7 @@ jQuery(document).ready(function($) {
          var transientKey = gdn.definition('TransientKey');
          var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php/dashboard/utility/sort/'), data, function(response) {
+         $.post(gdn.combinePaths(webRoot, 'index.php?/dashboard/utility/sort/'), data, function(response) {
             if (response == 'TRUE')
                $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
 

@@ -13,7 +13,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class GuestModule extends Gdn_Module {
    
-   public $MessageCode = "It looks like you're new here. If you want to get involved, click one of these buttons!";
+   public $MessageCode = 'GuestModule.Message';
+   public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
    
    public function AssetTarget() {
       return 'Panel';
@@ -21,8 +22,9 @@ class GuestModule extends Gdn_Module {
    
    public function ToString() {
       $Session = Gdn::Session();
-      if (!$Session->IsValid())
+      if (!$Session->IsValid()) {
          return parent::ToString();
+      }
 
       return '';
    }   

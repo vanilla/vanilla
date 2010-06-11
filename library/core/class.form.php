@@ -191,9 +191,13 @@ class Gdn_Form {
       $Return = '';
       // If the form hasn't been posted back, use the provided $ValueDataSet
       if ($this->IsPostBack() === FALSE) {
-         $CheckedValues = $ValueDataSet;
-         if (is_object($ValueDataSet)) $CheckedValues = ConsolidateArrayValuesByKey(
-            $ValueDataSet->ResultArray(), $FieldName);
+         if ($ValueDataSet === NULL) {
+            $CheckedValues = $this->GetValue($FieldName);
+         } else {
+            $CheckedValues = $ValueDataSet;
+            if (is_object($ValueDataSet))
+               $CheckedValues = ConsolidateArrayValuesByKey($ValueDataSet->ResultArray(), $FieldName);
+         }
       } else {
          $CheckedValues = $this->GetFormValue($FieldName, array());
       }
@@ -761,7 +765,8 @@ class Gdn_Form {
       // Action
       $ActionFromAttributes = ArrayValueI('action', $Attributes);
       if ($this->Action == '')
-         $this->Action = Url(Gdn_Url::Request());
+         $this->Action = Url();
+         
       $this->Action = $ActionFromAttributes === FALSE ? $this->Action : $ActionFromAttributes;
       
       $Return .= ' method="' . $this->Method . '"'
@@ -935,10 +940,26 @@ class Gdn_Form {
     * specified FieldName. Errors added with this method can be rendered with
     * $this->Errors().
     *
-    * @param string $ErrorCode The translation code that represents the error to display.
+    * @param mixed $ErrorCode
+    *  - <b>string</b>: The translation code that represents the error to display.
+    *  - <b>Exception</b>: The exception to display the message for.
     * @param string $FieldName The name of the field to relate the error to.
     */
-   public function AddError($ErrorCode, $FieldName = '') {
+   public function AddError($Error, $FieldName = '') {
+      if(is_string($Error))
+         $ErrorCode = $Error;
+      elseif(is_a($Error, 'Exception')) {
+         if(defined('DEBUG')) {
+            $ErrorCode = '@<pre>'.
+               $Error->getMessage()."\n".
+               $Error->getFile().' Line '.$Error->getLine()."\n".
+               $Error->getTraceAsString().
+               '</pre>';
+         } else {
+            $ErrorCode = '@'.strip_tags($Error->getMessage());
+         }
+      }
+      
       if ($FieldName == '') $FieldName = '<General Error>';
 
       if (!is_array($this->_ValidationResults)) $this->_ValidationResults = array();
@@ -1261,7 +1282,6 @@ class Gdn_Form {
    public function ValidateModel() {
       $this->_Model->DefineSchema();
       if ($this->_Model->Validation->Validate($this->FormValues()) === FALSE) $this->_ValidationResults = $this->_Model->ValidationResults();
-
       return $this->ErrorCount();
    }
 
@@ -1347,8 +1367,13 @@ class Gdn_Form {
     *
     * @return array
     */
-   public function FormValues() {
-      if (is_array($this->_FormValues) === FALSE) {
+   public function FormValues($NewValue = NULL) {
+      if($NewValue !== NULL) {
+         $this->_FormValues = $NewValue;
+         return;
+      }
+
+      if (!is_array($this->_FormValues)) {
          $TableName = $this->InputPrefix;
          if(strlen($TableName) > 0)
             $TableName .= '/';

@@ -61,8 +61,8 @@ class VanillaHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Sender->Menu) {
          $Sender->Menu->AddLink(T('Discussions'), T('Discussions'), '/discussions', FALSE);
-         if ($Session->IsValid())
-            $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
+         // if ($Session->IsValid())
+         //   $Sender->Menu->AddLink(T('Discussions'), T('New Discussion'), '/post/discussion', FALSE);
       }
    }
    
@@ -88,10 +88,10 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * Add the discussion search to the search.
 	 * @param SearchController $Sender
 	 */
-	public function SearchController_Search_Handler($Sender) {
+	public function SearchModel_Search_Handler($Sender) {
 		include_once(dirname(__FILE__).DS.'..'.DS.'models'.DS.'class.vanillasearchmodel.php');
 		$SearchModel = new VanillaSearchModel();
-		$SearchModel->Search($Sender->SearchModel);
+		$SearchModel->Search($Sender);
 	}
    
    // Load some information into the BuzzData collection
@@ -177,11 +177,9 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Forum', T('Forum'));
-      $Menu->AddLink('Forum', T('General'), 'vanilla/settings/general', 'Vanilla.Settings.Manage');
-      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', Gdn::Translate('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
+      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
    }
    
    public function Setup() {

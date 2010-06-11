@@ -26,14 +26,13 @@ class SearchController extends Gdn_Controller {
       $this->AddJsFile('js/library/jquery.livequery.js');
       $this->AddJsFile('js/library/jquery.form.js');
       $this->AddJsFile('js/library/jquery.popup.js');
-      $this->AddJsFile('js/library/jquery.menu.js');
+      // $this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
       $this->AddJsFile('js/global.js');
       
       $this->AddCssFile('style.css');
       $this->AddCssFile('menu.css');
       $GuestModule = new GuestModule($this);
-      $GuestModule->MessageCode = "It looks like you're new here. If you want to take part in the discussions, click one of these buttons!";
       $this->AddModule($GuestModule);
       parent::Initialize();
    }
@@ -51,7 +50,6 @@ class SearchController extends Gdn_Controller {
 			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
 		
 		$Search = $this->Form->GetFormValue('Search');
-		$this->FireEvent('Search');
 		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);

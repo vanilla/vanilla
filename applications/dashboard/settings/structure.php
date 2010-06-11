@@ -21,7 +21,7 @@ $Construct = $Database->Structure();
 $Construct->Table('Role')
 	->Column('RoleID', 'int', FALSE, 'primary')
    ->Column('Name', 'varchar(100)')
-   ->Column('Description', 'varchar(200)', TRUE)
+   ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Column('Deletable', 'tinyint(1)', '1')
    ->Column('CanSession', 'tinyint(1)', '1')
@@ -32,18 +32,19 @@ $Construct->Table('Role')
 $RoleModel = Gdn::Factory('RoleModel');
 $RoleModel->Database = $Database;
 $RoleModel->SQL = $SQL;
-$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Ex-members who do not have permission to sign in.'));
-$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who are not authenticated in any way. Absolutely no permissions to do anything because they have no user account.'));
-$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership. They do not have permission to sign in.'));
-$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can perform rudimentary operations. They have no control over the application or other members.'));
-$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have access to everything in the application.'));
+$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
+$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
+$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
+$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
+$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
 
 // User Table
 $Construct->Table('User')
 	->PrimaryKey('UserID')
    ->Column('PhotoID', 'int', TRUE, 'key')
    ->Column('Name', 'varchar(20)', FALSE, 'key')
-   ->Column('Password', 'varbinary(34)')
+   ->Column('Password', 'varbinary(50)')
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)')
@@ -51,7 +52,7 @@ $Construct->Table('User')
    ->Column('Gender', array('m', 'f'), 'm')
    ->Column('CountVisits', 'int', '0')
    ->Column('CountInvitations', 'int', '0')
-   ->Column('CountNotifications', 'int', '0')
+   ->Column('CountNotifications', 'int', NULL)
    ->Column('InviteUserID', 'int', TRUE)
    ->Column('DiscoveryText', 'text', TRUE)
    ->Column('Preferences', 'text', TRUE)
@@ -79,13 +80,50 @@ $Construct->Table('UserRole')
 	
 // Assign the guest user to the guest role
 $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
+// Assign the admin user to admin role
+$SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
+
+// User Meta Table
+$Construct->Table('UserMeta')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('Name', 'varchar(255)', FALSE, 'primary')
+   ->Column('Value', 'text', TRUE)
+   ->Set($Explicit, $Drop);
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('UniqueID', 'varchar(30)', FALSE, 'primary')
+	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
+	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
+	
+$Construct->Table('UserAuthenticationProvider')
+   ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
+   ->Column('URL', 'varchar(255)', FALSE)
+   ->Column('AssociationSecret', 'text', FALSE)
+   ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
+   ->Column('RegistrationUrl', 'varchar(255)', TRUE)
+   ->Column('SignInUrl', 'varchar(255)', TRUE)
+   ->Column('SignOutUrl', 'varchar(255)', TRUE)
+   ->Set($Explicit, $Drop);
 
+$Construct->Table('UserAuthenticationNonce')
+   ->Column('Nonce', 'varchar(200)', FALSE, 'primary')
+   ->Column('Token', 'varchar(64)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('UserAuthenticationToken')
+   ->Column('Token', 'varchar(64)', FALSE, 'primary')
+   ->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('ForeignUserKey', 'varchar(255)', TRUE)
+   ->Column('TokenSecret', 'varchar(64)', FALSE)
+   ->Column('TokenType', array('request', 'access'), FALSE)
+   ->Column('Authorized', 'tinyint(1)', FALSE)
+   ->Column('Timestamp', 'timestamp', FALSE)
+   ->Column('Lifetime', 'int', FALSE)
+   ->Set($Explicit, $Drop);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();
@@ -129,6 +167,12 @@ $PermissionModel->Save(array(
 	'Garden.Signin.Allow' => 1
 	));
 
+// Set initial moderator permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 32,
+	'Garden.Signin.Allow' => 1
+	));
+
 // Set initial admininstrator permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 16,
@@ -147,7 +191,6 @@ $PermissionModel->Save(array(
 	'Garden.Users.Approve' => 1,
 	'Garden.Activity.Delete' => 1
 	));
-
 
 // Photo Table
 $Construct->Table('Photo')
@@ -239,25 +282,3 @@ $Construct->Table('Message')
 	->Column('CssClass', 'varchar(20)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Set($Explicit, $Drop);
-	
-/*
-   Apr 26th, 2010
-   Changed all "enum" fields representing "bool" (0 or 1) to be tinyint.
-   For some reason mysql makes 0's "2" during this change. Change them back to "0".
-*/
-if (!$Construct->CaptureOnly) {
-	$SQL->Query("update GDN_Role set Deletable = '0' where Deletable = '2'");
-	$SQL->Query("update GDN_Role set CanSession = '0' where CanSession = '2'");
-
-	$SQL->Query("update GDN_User set ShowEmail = '0' where ShowEmail = '2'");
-	$SQL->Query("update GDN_User set Admin = '0' where Admin = '2'");
-
-	$SQL->Query("update GDN_ActivityType set AllowComments = '0' where AllowComments = '2'");
-	$SQL->Query("update GDN_ActivityType set ShowIcon = '0' where ShowIcon = '2'");
-	$SQL->Query("update GDN_ActivityType set Notify = '0' where Notify = '2'");
-	$SQL->Query("update GDN_ActivityType set Public = '0' where Public = '2'");
-
-	$SQL->Query("update GDN_Message set AllowDismiss = '0' where AllowDismiss = '2'");
-	$SQL->Query("update GDN_Message set Enabled = '0' where Enabled = '2'");
-}
-	

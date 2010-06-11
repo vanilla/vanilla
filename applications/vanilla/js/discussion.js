@@ -14,8 +14,15 @@ jQuery(document).ready(function($) {
       cancelButton.hide();
       
    // Reveal it if they start typing a comment
-   $('div.CommentForm textarea').keydown(function() {
+   $('div.CommentForm textarea').focus(function() {
       $('a.Cancel:hidden').show();
+   });
+   
+   // Hide it if they leave the area without typing
+   $('div.CommentForm textarea').blur(function(ev) {
+      var Comment = $(ev.target).val();
+      if (!Comment || Comment == '')
+         $('a.Cancel').hide();
    });
    
    // Reveal the textarea and hide previews.
@@ -134,6 +141,7 @@ jQuery(document).ready(function($) {
                
                // Let listeners know that the comment was added.
                $(this).trigger('CommentAdded');
+               $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);
          },
@@ -143,6 +151,7 @@ jQuery(document).ready(function($) {
             $(frm).find(':submit').removeAttr("disabled");
          }
       });
+      frm.triggerHandler('submit');
       return false;
    });
    
@@ -171,7 +180,7 @@ jQuery(document).ready(function($) {
       if (draftInp.val() != '')
          $.ajax({
             type: "POST",
-            url: gdn.combinePaths(gdn.definition('WebRoot'), 'index.php/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
+            url: gdn.combinePaths(gdn.definition('WebRoot'), 'index.php?/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
             data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
             dataType: 'json'
          });         
@@ -265,7 +274,7 @@ jQuery(document).ready(function($) {
          
          $.ajax({
             type: "POST",
-            url: gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/discussion/getnew/' + discussionID + '/' + lastCommentID),
+            url: gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/discussion/getnew/' + discussionID + '/' + lastCommentID),
             data: "DeliveryType=ASSET&DeliveryMethod=JSON",
             dataType: "json",
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -275,8 +284,7 @@ jQuery(document).ready(function($) {
             success: function(json) {               
                if(json.Data && json.LastCommentID) {
                   gdn.definition('LastCommentID', json.LastCommentID, true);
-                  $current = $("#Discussion").contents();
-                  $(json.Data).appendTo("#Discussion")
+                  $(json.Data).appendTo("ul.Discussion")
                      .effect("highlight", {}, "slow");
                }
                gdn.processTargets(json.Targets);

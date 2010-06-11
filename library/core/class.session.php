@@ -75,7 +75,7 @@ class Gdn_Session {
     * @var object
     */
    protected $_TransientKey;
-
+   
 
    /**
     * Private constructor prevents direct instantiation of object
@@ -98,19 +98,26 @@ class Gdn_Session {
     * @param mixed $Permission The permission (or array of permissions) to check.
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-    * @return boolean
+    * @param string $JunctionTable The name of the junction table for a junction permission.
+	 * @param in $JunctionID The ID of the junction permission.
+	 * * @return boolean
     */
-   public function CheckPermission($Permission, $JunctionID = '', $FullMatch = TRUE) {
+   public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User) && $this->User->Admin == '1')
          return TRUE;
       
       $Permissions = $this->GetPermissions();      
-      if (is_numeric($JunctionID) && $JunctionID > 0) {
+      if(is_numeric($JunctionID) && $JunctionID > 0 && !C('Garden.Permissions.Disabled'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
-               if (!$this->CheckPermission($PermissionName, $JunctionID))
-                  return FALSE;
+               if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
+						if(!$FullMatch)
+							return TRUE;
+					} else {
+						if($FullMatch)
+							return FALSE;
+					}
             }
             return TRUE;
          } else {
@@ -131,12 +138,11 @@ class Gdn_Session {
    /**
     * End a session
     *
-    * @param Gdn_IAuthenticator $Authenticator
+    * @param Gdn_Authenticator $Authenticator
     */
-   function End($Authenticator) {
-      $Authenticator->DeAuthenticate();
+   public function End($Authenticator) {
+      $Authenticator->AuthenticateWith()->DeAuthenticate();
    }
-
 
    /**
     * Returns all "allowed" permissions for the authenticated user in a
@@ -147,7 +153,6 @@ class Gdn_Session {
    public function GetPermissions() {
       return is_array($this->_Permissions) ? $this->_Permissions : array();
    }
-
 
    /**
     * Gets the currently authenticated user's preference for the specified
@@ -160,7 +165,6 @@ class Gdn_Session {
    public function GetPreference($PreferenceName, $DefaultValue = FALSE) {
       return ArrayValue($PreferenceName, $this->_Preferences, $DefaultValue);
    }
-
 
    /**
     * Gets the currently authenticated user's attribute for the specified
@@ -177,7 +181,6 @@ class Gdn_Session {
       return $DefaultValue;
    }
 
-
    /**
     * @return array
     * @todo add doc
@@ -185,7 +188,6 @@ class Gdn_Session {
    public function GetAttributes() {
       return is_array($this->_Attributes) ? $this->_Attributes : array();
    }
-
 
    /**
     * This is the singleton method that return the static
@@ -201,7 +203,6 @@ class Gdn_Session {
       return self::$_Instance;
    }
 
-
    /**
     * Ensure that there is an active session.
     *
@@ -209,20 +210,20 @@ class Gdn_Session {
     *
     * @return boolean
     */
-   function IsValid() {
+   public function IsValid() {
       return $this->UserID > 0;
    }
-
 
    /**
     * Authenticates the user with the provided Authenticator class.
     *
-    * @param Gdn_IAuthenticator $Authenticator The authenticator used to identify the user making the request.
+    * @param int $UserID The UserID to start the session with.
     */
-   function Start($Authenticator) {
+   public function Start($UserID = FALSE) {
+      if (!Gdn::Config('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
-      $UserModel = Gdn::UserModel();
-      $this->UserID = $Authenticator->GetIdentity();
+      $UserModel = Gdn::Authenticator()->GetUserModel();
+      $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
       $this->User = FALSE;
 
       // Now retrieve user information
@@ -230,16 +231,16 @@ class Gdn_Session {
       
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
-         
-         if ($Authenticator->ReturningUser($this->User))
-         {
-            $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $this->User->Attributes['HourOffset']);
-         }
-         
-         $UserModel->EventArguments['User'] =& $this->User;
-         $UserModel->FireEvent('AfterGetSession');
 
          if ($this->User) {
+         
+            if (Gdn::Authenticator()->ReturningUser($this->User)) {
+               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $this->User->Attributes['HourOffset']);
+            }
+            
+            $UserModel->EventArguments['User'] =& $this->User;
+            $UserModel->FireEvent('AfterGetSession');
+         
             $this->_Permissions = Gdn_Format::Unserialize($this->User->Permissions);
             $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
             $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
@@ -255,14 +256,13 @@ class Gdn_Session {
          } else {
             $this->UserID = 0;
             $this->User = FALSE;
-            $Authenticator->DeAuthenticate();
+            Gdn::Authenticator()->SetIdentity(NULL);
          }
       }
       // Load guest permissions if necessary
       if ($this->UserID == 0)
          $this->_Permissions = Gdn_Format::Unserialize($UserModel->DefinePermissions(0));
    }
-
 
    /**
     * Sets a value in the $this->_Attributes array. This setting will persist
@@ -281,7 +281,6 @@ class Gdn_Session {
          $this->_Attributes[$Key] = $Val;
       }
    }
-
 
    /**
     * Sets a value in the $this->_Preferences array. This setting will persist
@@ -305,7 +304,6 @@ class Gdn_Session {
       }
    }
 
-
    /**
     * Returns the transient key for the authenticated user.
     *
@@ -318,7 +316,6 @@ class Gdn_Session {
       else
          return RandomString(12); // Postbacks will never be authenticated if transientkey is not defined.
    }
-
 
    /**
     * Validates that $ForeignKey was generated by the current user.

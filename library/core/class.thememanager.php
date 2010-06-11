@@ -61,12 +61,13 @@ class Gdn_ThemeManager {
       return $ThemeFolder;
    }
    
-   public function EnabledThemeInfo() {
+   public function EnabledThemeInfo($ReturnInSourceFormat = FALSE) {
       $AvailableThemes = $this->AvailableThemes();
       $ThemeFolder = $this->EnabledTheme();
       foreach ($AvailableThemes as $ThemeName => $ThemeInfo) {
          if (ArrayValue('Folder', $ThemeInfo, '') == $ThemeFolder)
-            return array($ThemeName => $ThemeInfo);
+            return $ReturnInSourceFormat ? array($ThemeName => $ThemeInfo) : $ThemeInfo;
+
       }
       return array();
    }
@@ -82,7 +83,10 @@ class Gdn_ThemeManager {
       } else {
          SaveToConfig('Garden.Theme', $ThemeFolder);
       }
-      
+
+      // Tell the locale cache to refresh itself.
+      $ApplicationManager = new Gdn_ApplicationManager();
+      Gdn::Locale()->Refresh();
       return TRUE;
    }
    

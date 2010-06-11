@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+   <?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -102,77 +102,72 @@ class ConversationMessageModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
          $ConversationID = ArrayValue('ConversationID', $Fields, 0);
+         $Px = $this->SQL->Database->DatabasePrefix;
+
+         // Get the new message count for the conversation.
+         $SQLR = $this->SQL
+            ->Select('MessageID', 'count', 'CountMessages')
+            ->Select('MessageID', 'max', 'LastMessageID')
+            ->From('ConversationMessage')
+            ->Where('ConversationID', $ConversationID)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         if (sizeof($SQLR)) {
+            list($CountMessages, $LastMessageID) = array_values($SQLR);
+         } else { return; }
          
          // Update the conversation's DateUpdated field
          $this->SQL
-            ->Update('Conversation')
-            ->Set('DateUpdated', Gdn_Format::ToDateTime())
-            ->Set('UpdateUserID', $Session->UserID)
+            ->Update('Conversation c')
+            ->History()
+            ->Set('CountMessages', $CountMessages)
+            ->Set('LastMessageID', $LastMessageID)
             ->Where('ConversationID', $ConversationID)
-            ->Put();
-         
-         // NOTE: INCREMENTING COUNTS INSTEAD OF GETTING ACTUAL COUNTS COULD
-         // BECOME A PROBLEM. WATCH FOR IT.
-         // Update the message counts for all users in the conversation
-         $this->SQL
-            ->Update('UserConversation')
-            ->Set('CountMessages', 'CountMessages + 1', FALSE)
-            ->Where('ConversationID', $ConversationID)
-            ->Put();
-            
-         $this->SQL
-            ->Update('UserConversation')
-            ->Set('CountNewMessages', 'CountNewMessages + 1', FALSE)
-            ->Where('ConversationID', $ConversationID)
-            ->Where('UserID <>', $Session->UserID)
             ->Put();
 
-         // Update the userconversation records to reflect the most recently
-         // added message for all users other than the one that added the
-         // message (otherwise they would see their name/message on the
-         // conversation list instead of the person they are conversing with).
+         // Update the last message of the users that were previously up-to-date on their read messages.
          $this->SQL
-            ->Update('UserConversation')
-            ->Set('LastMessageID', $MessageID)
-            ->Where('ConversationID', $ConversationID)
-            ->Where('UserID <>', $Session->UserID)
+            ->Update('UserConversation uc')
+            ->Set('uc.LastMessageID', $MessageID)
+            ->Set('uc.CountReadMessages', "case uc.UserID when {$Session->UserID} then $CountMessages else uc.CountReadMessages end", FALSE)
+            ->Where('uc.ConversationID', $ConversationID)
+            ->Where('uc.Deleted', '0')
+            ->Where('uc.CountReadMessages', $CountMessages - 1)
             ->Put();
-            
-         // Update the CountUnreadConversations count on each user related to the discussion.
-         // And notify the users of the new message
+
+         // Incrememnt the users' inbox counts.
+         $this->SQL
+            ->Update('User u')
+            ->Join('UserConversation uc', 'u.UserID = uc.UserID')
+            ->Set('u.CountUnreadConversations', 'coalesce(u.CountUnreadConversations, 0) + 1', FALSE)
+            ->Where('uc.ConversationID', $ConversationID)
+            ->Where('uc.LastMessageID', $MessageID)
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Put();
+
+         // Grab the users that need to be notified.
          $UnreadData = $this->SQL
-            ->Select('c.UserID')
-            ->Select('c2.CountNewMessages', 'count', 'CountUnreadConversations')
-            ->From('UserConversation c')
-            ->Join('UserConversation c2', 'c.UserID = c2.UserID')
-            ->Where('c2.CountNewMessages >', 0)
-            ->Where('c.ConversationID', $ConversationID)
-            ->Where('c.UserID <>', $Session->UserID)
-            ->GroupBy('c.UserID')
+            ->Select('uc.UserID')
+            ->From('UserConversation uc')
+            ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
+            ->Where('uc.LastMessageID', $MessageID)
+            ->Where('uc.UserID <>', $Session->UserID)
             ->Get();
       
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
-            // Update the CountUnreadConversations count on each user related to the discussion.
-            $this->SQL
-               ->Update('User')
-               ->Set('CountUnreadConversations', $User->CountUnreadConversations)
-               ->Where('UserID', $User->UserID)
-               ->Put();
-            
-            // And notify the users of the new message
+            // Notify the users of the new message.
             $ActivityID = $ActivityModel->Add(
                $Session->UserID,
                'ConversationMessage',
                '',
                $User->UserID,
                '',
-               '/messages/'.$ConversationID.'#'.$MessageID,
+               "/messages/$ConversationID#$MessageID",
                FALSE
             );
             $Story = ArrayValue('Body', $Fields, '');
             $ActivityModel->SendNotification($ActivityID, $Story);
-         }      
+         }
             
       }
       return $MessageID;

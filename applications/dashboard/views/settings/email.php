@@ -1,34 +1,13 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T('General Settings'); ?></h1>
+<?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
+
+?>
+<h1><?php echo T('Outgoing Email'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <ul>
-   <li>
-      <?php
-         echo $this->Form->Label('Language', 'Garden.Locale');
-         echo $this->Form->DropDown('Garden.Locale', $this->LocaleData, array('TextField' => 'Code', 'ValueField' => 'Code'));
-      ?>
-   </li>
-   <li>
-      <?php
-         echo $this->Form->Label('Application Title', 'Garden.Title');
-         echo $this->Form->TextBox('Garden.Title');
-      ?>
-   </li>
-   <li>
-      <?php
-         echo $this->Form->CheckBox('Garden.RewriteUrls', "Use Garden's .htaccess file to rewrite urls");
-         
-         if(!$this->Data['HasModRewrite']) {
-            echo '<div class="Warning">',
-               T('Garden.NoModRewrite',
-               'The server configuration for this setting could not be found. If you enable this setting your site may become unavailable.'),
-               '</div>';
-         }
-      ?>
-   </li>
    <li>
       <div class="Info"><?php echo T("Email sent from the application will be addressed from the following name and address"); ?></div>
    </li>

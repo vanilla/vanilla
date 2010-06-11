@@ -16,23 +16,21 @@ class RoleController extends DashboardController {
    public $Uses = array('Database', 'Form', 'RoleModel');
    
    public function Add() {
+		if(!$this->_Permission())
+			return;
+
       $this->Title(T('Add Role'));
-         
-      $this->Permission('Garden.Roles.Manage');
-      
-      // Load default permissions.
-      //$PermissionModel = Gdn::PermissionModel();
-      //$this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit(0, FALSE), TRUE);
-      
+
       // Use the edit form with no roleid specified.
       $this->View = 'Edit';
       $this->Edit();
    }
    
    public function Delete($RoleID = FALSE) {
-      $this->Title(T('Delete Role'));
-         
-      $this->Permission('Garden.Roles.Manage');
+		if(!$this->_Permission())
+			return;
+
+		$this->Title(T('Delete Role'));
       $this->AddSideMenu('dashboard/role');
       
       $Role = $this->RoleModel->GetByRoleID($RoleID);
@@ -69,12 +67,13 @@ class RoleController extends DashboardController {
       $this->Render();
    }
    
-   //public $HasJunctionPermissionData;
    public function Edit($RoleID = FALSE) {
+		if(!$this->_Permission())
+			return;
+
       if ($this->Head && $this->Head->Title() == '')
          $this->Head->Title(T('Edit Role'));
          
-      $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('dashboard/role');
       $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
@@ -89,9 +88,6 @@ class RoleController extends DashboardController {
       
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
       
-      // Load all permissions based on enabled applications and plugins
-      //$this->SetData('PermissionData', $PermissionModel->GetPermissions($RoleID, $LimitToSuffix), TRUE);
-
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.
@@ -113,7 +109,8 @@ class RoleController extends DashboardController {
    }
       
    public function Index() {
-      $this->Permission('Garden.Roles.Manage');
+		$this->Permission('Garden.Roles.Manage');
+
       $this->AddSideMenu('dashboard/role');
       $this->AddJsFile('/js/library/jquery.tablednd.js');
       $this->AddJsFile('/js/library/jquery.ui.packed.js');
@@ -127,4 +124,13 @@ class RoleController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
+
+	protected function _Permission() {
+      $this->Permission('Garden.Roles.Manage');
+		if(!C('Garden.Roles.Manage', TRUE)) {
+			Gdn::Dispatcher()->Dispatch('DefaultPermission');
+			return FALSE;
+		}
+		return TRUE;
+	}
 }

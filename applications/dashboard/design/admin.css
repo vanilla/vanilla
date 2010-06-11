@@ -212,6 +212,11 @@ input.Button:focus {
    padding: 10px 40px 10px 0;
    background: url('images/progress.gif') center center no-repeat;
 }
+.TinyProgress {
+	padding: 10px 40px 10px 0 !important;
+	background: url('images/progress_sm.gif') center center no-repeat;
+}
+
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
 div.Information {
@@ -267,15 +272,31 @@ div.Errors ul li {
    color: #fff !important;
 }
 div.Errors pre {
-	overflow: auto;
-	font-size: 90%;
-	font-family: monospace;
-	color: #333;
-	background: #ffd;
-	padding: 4px;
-	line-height: 1.3;
+	margin: 10px 0 5px;
+	padding: 4px 8px;
+	display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   white-space: pre;
+   overflow: auto;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
 }
-
+div.Errors pre,
+div.Errors pre * {
+	background: #ffa !important;
+	font-size: 12px !important;
+	font-weight: normal !important;
+	font-family: monospace !important;
+	text-shadow: none !important;
+	color: #333  !important;
+	line-height: 1.4 !important;
+}
+div.Errors pre * {
+	margin: 0 !important;
+	padding: 0 !important;
+}
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .DismissMessage {
@@ -352,6 +373,26 @@ a.Close {
 a.Close:hover {
 	color: #333;
 }
+.HoverHelp {
+	position: relative;
+}
+.HoverHelp .Help {
+	display: none;
+	min-width: 200px;
+	background: #333;
+	color: #fff;
+	font-weight: normal;
+	font-size: 11px;
+	position: absolute;
+	left: -5px;
+	bottom: 20px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 6px;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;  
+}
 /* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
 .MorePager {
    list-style: none;
@@ -387,9 +428,9 @@ tr#PagerMore td {
 #PagerMore {
    margin-bottom: 1px;
 }
-/* Note: FilterMenu is used on most administrative dashboard screens to help
-   organize information being managed on screen. For example: applications and
-   plugins. */
+/* Note: Tabs are used on administrative dashboard screens to help organize
+  information being managed on screen. For example: applications and plugins.
+*/
 .FilterMenu {
    color: #aaa;
    padding: 0 0 10px;
@@ -401,6 +442,52 @@ tr#PagerMore td {
 .FilterMenu span {
    color: #999;
    padding: 0 4px;
+}
+div.Tabs {
+	display: block;
+   border-bottom: 1px solid #abdafb;
+   padding: 5px 8px;
+   margin: 0;
+   background: #cfecff;
+}
+div.Tabs li {
+   display: inline;
+   margin: 0;
+}
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: 1px solid #abdafb;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #bbe2f7;
+   display: inline;
+   font-weight: bold;
+   color: #1e79a7;
+   text-decoration: none;
+   padding: 5px 10px;
+	line-height: 2.6;
+}
+div.Tabs li a:hover {
+   background: #f3fcff;
+}
+div.Tabs li.Active a {
+   background: #fff;
+   color: #474747;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+   background: #1e79a7;
+   color: #eaf4fd;
+   margin: 0 0 0 4px;
 }
 
 
@@ -422,6 +509,9 @@ form ul li label {
    font-size: 14px;
 	font-weight: bold;
    }
+form ul li span {
+	display: block;
+}
 body.Messages div.Popup form ul li label {
    width: 100px;
 }
@@ -737,13 +827,33 @@ div.Box {
    margin: 0 0 10px 0;
 	border: 1px solid #a5d0e7;
 }
+#Panel div.Group {
+	padding: 0;
+}
 div.Box h4 {
-   font-size: 110%;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 100%;
+   font-weight: bold;
+   margin: 0 0 4px;
+   padding: 0 6px;
    color: #076C8E;
 	text-shadow: #fff 0 1px 0;
-   font-weight: bold;
-   margin: 0;
-   padding: 0 6px;
+}
+div.Box h4 a {
+	display: block;
+   color: #045974;
+	text-shadow: none;
+}
+div.Box h4 a:hover {
+   color: #ff0084;
+	text-shadow: none;
+}
+div.Box h4.Active {
+	background: #045974;
+}
+div.Box h4.Active a {
+	color: #fff;
+	text-shadow: none;
 }
 div.Box dl {
    border-bottom: 1px solid #aedefc;
@@ -776,29 +886,25 @@ ul.PanelInfo li a {
 	padding: 0 8px;
    font-size: 120%;
 	display: block;
+   position: relative;
 }
-ul.PanelInfo li.HighlightButton {
-	background: #ff5;
-}
-ul.PanelInfo li.Active {
-   background: #fff;
-}
-#Panel a.PanelButton {
-   padding: 6px 0;
-   display: block;
-   text-align: center;
-   font-size: 16px;
-   font-weight: bold;
+span.New {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   background: #44c7f4;
-   color: #fff;
-   text-decoration: none;
-   margin: 0 0 10px 0;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;  
+   position: absolute;
+   top: 3px;
+   right: -4px;
+   padding: 0 4px;
+   background: #ff0;
+   color: #000;
+   font-size: 9px;
+   font-weight: bold;
 }
-#Panel a.PanelButton:hover {
-   background: #11e420;
-   color: #fff;
+ul.PanelInfo li.Active {
+   background: url('images/arrow.png') center left no-repeat #ffffff;
 }
 
 /* ================================================= Dashboard Customizations */

@@ -9,11 +9,13 @@ jQuery(document).ready(function($) {
 				// Refresh the view.
 				$('#Content').html(json.Data);
 				// Go to the next step.
-				if(!json.Complete) {
+				if(!json.Complete && !json.Error) {
 					refreshSteps();
 				}
 			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if(textStatus == "timeout")
+					return;
 				// Remove any old popups
 				$('.Popup').remove();
 				// Add new popup with error

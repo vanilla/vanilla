@@ -122,6 +122,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethodArgs = array();
       $this->_PropertyCollection = array();
    }
+   
+   public function Cleanup() {
+      // Destruct the db connection;
+      $Database = Gdn::Database();
+      if($Database != null)
+         $Database->CloseConnection();
+   }
+
 
    /**
     * Return the properly formatted controller class name.
@@ -129,25 +137,45 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function ControllerName() {
       return $this->_ControllerName.'Controller';
    }
+   
+   public function Application() {
+      return $this->_ApplicationFolder;
+   }
+   
+   public function Controller() {
+      return $this->_ControllerName;
+   }
+   
+   public function ControllerMethod() {
+      return $this->_ControllerMethod;
+   }
+   
+   public function ControllerArguments() {
+      return $this->_ControllerMethodArgs;
+   }
 
    /**
-    * Analyzes the supplied query string and decides how to dispatch the
-    * request.
+    * Analyzes the supplied query string and decides how to dispatch the request.
     */
-   public function Dispatch($Request=NULL) {
+   public function Dispatch($ImportRequest = NULL, $Permanent = TRUE) {
+      if ($ImportRequest && is_string($ImportRequest))
+         $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
+      
+      if (is_a($ImportRequest, 'Gdn_Request') && $Permanent) {
+         Gdn::Request($ImportRequest);
+      }
+      
+      $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
    
       if (Gdn::Config('Garden.UpdateMode', FALSE)) {
          if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
             // Updatemode, and this user is not root admin
-            Gdn::Request()->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
+            $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
          }
       }
-   
-      if ($Request !== NULL && is_a($Request,'Gdn_Request'))
-         Gdn::Request()->FromImport($Request);
       
       $this->FireEvent('BeforeDispatch');
-      $this->_AnalyzeRequest();
+      $this->_AnalyzeRequest($Request);
       
       /*
       echo "<br />Gdn::Request thinks: ".Gdn::Request()->Path();
@@ -215,7 +243,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->ControllerFolder = $this->_ControllerFolder;
          $Controller->RequestMethod = $this->_ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
-
+         $Controller->Request = $Request;
+         $Controller->DeliveryType($Request->GetValue('DeliveryType', ''));
+         $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', ''));
+         
          $Controller->Initialize();
 
          // Call the requested method on the controller - error out if not defined.
@@ -255,19 +286,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
               }
             }
          } else {
-         
-            Gdn::Request()->WithURI(Gdn::Router()->GetDestination('Default404'));
+            Gdn::Request()->WithRoute('Default404');
             return $this->Dispatch();
-            
          }
       }
-
-      // Destruct the db connection;
-      $Database = Gdn::Database();
-      if($Database != null)
-         $Database->CloseConnection();
    }
-
+   
    /**
     * Undocumented method.
     *
@@ -327,7 +351,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @param int $FolderDepth
     * @todo $folderDepth needs a description.
     */
-   protected function _AnalyzeRequest($FolderDepth = 2) {
+   protected function _AnalyzeRequest(&$Request, $FolderDepth = 2) {
       // Here are some examples of what this method could/would receive:
       // /application/controllergroup/controller/method/argn
       // /controllergroup/controller/method/argn
@@ -347,9 +371,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
       
-      $this->Request = Gdn::Request()->Path();
+      $this->Request = $Request->Path();
 
-      switch (Gdn::Request()->OutputFormat()) {
+      switch ($Request->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
             break;
@@ -396,7 +420,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
          }
       }
-
+   
       $Parts = explode('/', $this->Request);
       $Length = count($Parts);
       if ($Length == 1 || $FolderDepth <= 0) {
@@ -415,7 +439,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          if (!$this->_FetchController()) {
             // echo '<div>Failed. AppFolder: '.$this->_ApplicationFolder.'; Cont Folder: '.$this->_ControllerFolder.'; Cont: '.$this->_ControllerName.';</div>';
-            $this->_AnalyzeRequest(1);
+            $this->_AnalyzeRequest($Request, 1);
          }
 
       } else if ($FolderDepth == 1) {
@@ -435,7 +459,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_MapParts($Parts, 1);
             if (!$this->_FetchController()) {
                // echo '<div>Failed. AppFolder: '.$this->_ApplicationFolder.'; Cont Folder: '.$this->_ControllerFolder.'; Cont: '.$this->_ControllerName.';</div>';
-               $this->_AnalyzeRequest(0);
+               $this->_AnalyzeRequest($Request, 0);
             }
          }
       }

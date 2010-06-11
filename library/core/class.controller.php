@@ -20,6 +20,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
+/**
+ * @method void Render() Render the controller's view.
+ */
 class Gdn_Controller extends Gdn_Pluggable {
 
    /**
@@ -132,7 +135,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * parsed out by the @@Dispatcher and sent to $this->RequestArgs as an
     * array. If there are no additional arguments specified, this value will
     * remain FALSE.
-    * ie. http://localhost/index.php/controller_name/controller_method/arg1/arg2/arg3
+    * ie. http://localhost/index.php?/controller_name/controller_method/arg1/arg2/arg3
     * translates to: array('arg1', 'arg2', 'arg3');
     *
     * @var mixed
@@ -146,11 +149,18 @@ class Gdn_Controller extends Gdn_Pluggable {
     * directly to the method that will be called in the controller. This value
     * is also used as $this->View unless $this->View has already been
     * hard-coded to be something else.
-    * ie. http://localhost/index.php/controller_name/controller_method/
+    * ie. http://localhost/index.php?/controller_name/controller_method/
     *
     * @var string
     */
    public $RequestMethod;
+   
+   /**
+    * Reference to the Request object that spawned this controller
+    * 
+    * @var Gdn_Request
+    */
+   public $Request;
 
    /**
     * The requested url to this controller.
@@ -285,6 +295,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->RedirectUrl = '';
       $this->RequestMethod = '';
       $this->RequestArgs = FALSE;
+      $this->Request = FALSE;
       $this->SelfUrl = '';
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
@@ -293,8 +304,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_CssFiles = array();
       $this->_JsFiles = array();
       $this->_Definitions = array();
-      $this->_DeliveryMethod = GetIncomingValue('DeliveryMethod', DELIVERY_METHOD_XHTML);
-      $this->_DeliveryType = GetIncomingValue('DeliveryType', DELIVERY_TYPE_ALL);
+      $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
+      $this->_DeliveryType = DELIVERY_TYPE_ALL;
       $this->_Json = array();
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
@@ -424,6 +435,18 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->FireEvent('AfterAddModule');
    }
 
+   /** Get a value out of the controller's data array.
+    *
+    * @param string $Path The path to the data.
+    * @param mixed $Default The default value if the data array doesn't contain the path.
+    * @return mixed
+    * @see GetValueR()
+    */
+   public function Data($Path, $Default = '' ) {
+      $Result = GetValueR($Path, $this->Data, $Default);
+      return $Result;
+   }
+
    /**
     * Undocumented method.
     *
@@ -438,10 +461,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
 
       if (!array_key_exists('WebRoot', $this->_Definitions))
-         $this->_Definitions['WebRoot'] = Gdn_Url::WebRoot(TRUE);
-
-      if (!array_key_exists('UrlRoot', $this->_Definitions))
-         $this->_Definitions['UrlRoot'] = substr(Url(' '), 0, -2);
+         $this->_Definitions['WebRoot'] = CombinePaths(array(Gdn::Request()->Domain(), Gdn::Request()->WebRoot()), '/');
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
@@ -463,7 +483,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 ';
 
       foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<input type="hidden" id="'.$Term.'" value="'.$Definition.'" />'."\n";
+         $Return .= '<input type="hidden" id="'.$Term.'" value="'.Gdn_Format::Form($Definition).'" />'."\n";
       }
 
       return $Return .'</div>';
@@ -480,6 +500,19 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_DeliveryType = $Default;
 
       return $this->_DeliveryType;
+   }
+   
+   /**
+    * Returns the requested delivery method of the controller if $Default is not
+    * provided. Sets and returns the delivery method otherwise.
+    *
+    * @param string $Default One of the DELIVERY_METHOD_* constants.
+    */
+   public function DeliveryMethod($Default = '') {
+      if ($Default != '')
+         $this->_DeliveryMethod = $Default;
+
+      return $this->_DeliveryMethod;
    }
 
    /**
@@ -593,7 +626,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
       if ($ViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find a `'.$View.'` view for the `'.$ControllerName.'` controller in the `'.$ApplicationFolder.'` application.', $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
 
       return $ViewPath;
    }
@@ -771,7 +804,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Make sure the database connection is closed before exiting.
          $Database = Gdn::Database();
          $Database->CloseConnection();
-         exit(json_encode($this->_Json));
+			$this->_Json['Data'] = utf8_encode($this->_Json['Data']);
+			$Result = json_encode($this->_Json);
+         exit($Result);
       } else {
          if ($this->StatusMessage != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
@@ -857,6 +892,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (ArrayHasValue($this->_CssFiles, 'admin.css'))
                $this->AddCssFile('customadmin.css');
             
+            $this->EventArguments['CssFiles'] = &$this->_CssFiles;
+            $this->FireEvent('BeforeAddCss');
+
             // And now search for/add all css files
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
@@ -956,7 +994,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
          // Add the favicon
-         $this->Head->SetFavIcon(Asset('themes/'.$this->Theme.'/design/'.Gdn::Config('Garden.FavIcon', 'favicon.png')));
+         $this->Head->SetFavIcon(C('Garden.FavIcon', Asset('themes/'.$this->Theme.'/design/favicon.png')));
          
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');
@@ -988,16 +1026,18 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          }
       }
+      
+      $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
+      $this->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === FALSE)
-         trigger_error(ErrorMessage('Could not find master view:'.$this->MasterView.'.master*', $this->ClassName, '_FetchController'), E_USER_ERROR);
-      
+         trigger_error(ErrorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'), E_USER_ERROR);
       
       /// A unique identifier that can be used in the body tag of the master view if needed.
       $ControllerName = $this->ClassName;
       // Strip "Controller" from the body identifier.
       if (substr($ControllerName, -10) == 'Controller')
-         $ControllerName = substr($ControllerName, 0, -10); 
+         $ControllerName = substr($ControllerName, 0, -10);
          
       // Strip "Gdn_" from the body identifier.
       if (substr($ControllerName, 0, 4) == 'Gdn_')
@@ -1016,23 +1056,23 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
    
    /**
-    * Checks that the user has the specified permissions. If the user does not,
-    * they are redirected to the DefaultPermission route.
+    * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
     * @param mixed $Permission A permission or array of permission names required to access this resource.
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-    */
-   public function Permission($Permission, $JunctionID = '', $FullMatch = TRUE) {
+	 * @param string $JunctionTable The name of the junction table for a junction permission.
+	 * @param in $JunctionID The ID of the junction permission.
+	 */
+   public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       $Session = Gdn::Session();
 
       // TODO: Make this work with different delivery types.
-      if (!$Session->CheckPermission($Permission, $JunctionID, $FullMatch)) {
+      if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid()) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {
            Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
         }
       }
-
    }
 
    /**
@@ -1126,8 +1166,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Title The value to pass to $this->Head->Title().
     */
    public function Title($Title) {
-      if ($this->Head)
-         $this->Head->Title($Title);
+      $this->SetData('Title', $Title);
+//      if ($this->Head)
+//         $this->Head->Title($Title);
    }
    
    /**

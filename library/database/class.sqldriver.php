@@ -43,6 +43,12 @@ abstract class Gdn_SQLDriver {
     * @var array
     */
    protected $_AliasMap;
+
+   /**
+    *
+    * @var bool Whether or not to capture (not execute) DML statements.
+    */
+   public $CaptureModifications = FALSE;
    
    /**
     * The name of the class that has been instantiated.
@@ -230,6 +236,19 @@ abstract class Gdn_SQLDriver {
       
       return $this;
    }
+
+   public function ApplyParameters($Sql, $Parameters) {
+      // Sort the parameters so that we don't have clashes.
+      krsort($Parameters);
+      foreach ($Parameters as $Key => $Value) {
+         if (is_null($Value))
+            $QValue = 'null';
+         else
+            $QValue = $this->Database->Connection()->quote($Value);
+         $Sql = str_replace($Key, $QValue, $Sql);
+      }
+      return $Sql;
+   }
    
    /**
     * Begin bracketed group in the where clause to group logical expressions together.
@@ -373,7 +392,7 @@ abstract class Gdn_SQLDriver {
 
       $Sql = $this->GetDelete($Table, $this->_Wheres, $this->_Limit);
 
-      return $this->Query($Sql);
+      return $this->Query($Sql, 'delete');
    }
    
    /**
@@ -405,7 +424,7 @@ abstract class Gdn_SQLDriver {
 
       $Sql = $this->GetDelete($Table);
       
-      return $this->Query($Sql);
+      return $this->Query($Sql, 'delete');
    }
    
    /**
@@ -472,8 +491,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns a platform-specific query to fetch table names.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->Database->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
       trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchTableSql'), E_USER_ERROR);
@@ -481,8 +502,10 @@ abstract class Gdn_SQLDriver {
 
    /**
     * Returns an array containing table names in the database.
-    *
-    * @param boolean $LimitToPrefix Should the query be limited to tables that have $this->DatabasePrefix ?
+    * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
+	 *  - <b>FALSE</b>: All tables will be fetched. Default.
+	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTables($LimitToPrefix = FALSE) {
       $Sql = $this->FetchTableSql($LimitToPrefix);
@@ -983,7 +1006,8 @@ abstract class Gdn_SQLDriver {
    }
    
    public function History($UpdateFields = TRUE, $InsertFields = FALSE) {
-      $UserID = Gdn::Session()->UserID;
+      $UserID = GetValueR('User.UserID', Gdn::Session(), Gdn::Session()->UserID);
+
       if($InsertFields)
          $this->Set('DateInserted', Gdn_Format::ToDateTime())->Set('InsertUserID', $UserID);
       if($UpdateFields)
@@ -1050,7 +1074,7 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetInsert($this->EscapeIdentifier($this->Database->DatabasePrefix.$Table), $Set, $Select);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'insert');
       
       return $Result;
    }
@@ -1403,7 +1427,7 @@ abstract class Gdn_SQLDriver {
       
       if($C === '=' && $EscapeExpr === FALSE) {
          // This is a function call. Each parameter has to be parsed.
-         $FunctionArray = preg_split('/(\[[^\]]+\])', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
+         $FunctionArray = preg_split('/(\[[^\]]+\])/', substr($Expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
          for($i = 0; $i < count($FunctionArray); $i++) {
             $Part = $FunctionArray[$i];
             if(substr($Part, 1) == '[') {
@@ -1439,16 +1463,17 @@ abstract class Gdn_SQLDriver {
    }
    
    /**
-    * Joins the query to a permission junction table and limits the results
-    * accordingly.
+    * Joins the query to a permission junction table and limits the results accordingly.
     *
-    * @param string $JunctionTable The table to join to (ie. Category)
-    * @param string $JunctionColumn The primary key column name of $JunctionTable (ie. CategoryID).
-    * @param mixed $Permissions The permission name (or array of names) to use when limiting the query.
+    * @param mixed $Permission The permission name (or array of names) to use when limiting the query.
+    * @param string $ForeignAlias The alias of the table to join to (ie. Category).
+    * @param string $ForeignColumn The primary key column name of $JunctionTable (ie. CategoryID).
+	 * @param string $JunctionTable
+	 * @param string $JunctionColumn
     */
-   public function Permission($JunctionTableAlias, $JunctionColumn, $Permissions) {
+   public function Permission($Permission, $ForeignAlias, $ForeignColumn, $JunctionTable = '', $JunctionColumn = '') {
       $PermissionModel = Gdn::PermissionModel();
-      $PermissionModel->SQLPermission($this, $JunctionTableAlias, $JunctionColumn, $Permissions);
+      $PermissionModel->SQLPermission($this, $Permission, $ForeignAlias, $ForeignColumn, $JunctionTable, $JunctionColumn);
   
       return $this;
    }
@@ -1485,13 +1510,28 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'update');
 
       return $Result;
    }
    
-   public function Query($Sql) {
-      $Result = $this->Database->Query($Sql, $this->_NamedParameters);
+   public function Query($Sql, $Type = 'select') {
+      try {
+         if ($this->CaptureModifications && strtolower($Type) != 'select') {
+            if(!property_exists($this->Database, 'CapturedSql'))
+               $this->Database->CapturedSql = array();
+            $Sql2 = $this->ApplyParameters($Sql, $this->_NamedParameters);
+            
+            $this->Database->CapturedSql[] = $Sql2;
+            $this->Reset();
+            return TRUE;
+         }
+
+         $Result = $this->Database->Query($Sql, $this->_NamedParameters);
+      } catch (Exception $Ex) {
+         $this->Reset();
+         throw $Ex;
+      }
       $this->Reset();
       
       return $Result;
@@ -1702,7 +1742,7 @@ abstract class Gdn_SQLDriver {
       }
 
       $Sql = $this->GetTruncate($Table);
-      $Result = $this->Query($Sql);
+      $Result = $this->Query($Sql, 'truncate');
       return $Result;
    }
 

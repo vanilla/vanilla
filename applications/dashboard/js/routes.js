@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
    // Pop add/edit route clicks and reload the page contents when finished.
    $('a.AddRoute, a.EditRoute').popup({
       onUnload: function(settings) {
-         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/dashboard/routes?DeliveryType=VIEW'));
+         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/dashboard/routes&DeliveryType=VIEW'));
       }   
    });
    

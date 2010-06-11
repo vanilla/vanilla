@@ -2,16 +2,29 @@
 $Session = Gdn::Session();
 $FirstRow = $this->CategoryData->FirstRow();
 $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->ParentCategoryID > 0) ? ' HasParents' : '';
-echo $this->Form->Open();
 ?>
 <h1><?php echo T('Manage Categories'); ?></h1>
-<div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'Button'); ?></div>
+<div class="Info">
+   <?php
+      echo T('Categories are used to help organize discussions. ');
+      if (C('Vanilla.Categories.Use')) {
+         echo Wrap(Anchor("Don't use Categories", 'vanilla/settings/managecategories/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      } else {
+         echo Wrap(Anchor('Use Categories', 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      }
+   ?>
+</div>
+<?php 
+   if (C('Vanilla.Categories.Use')) { 
+      echo $this->Form->Open();
+?>
+<div class="FilterMenu"><?php echo Anchor('Add Category', 'vanilla/settings/addcategory', 'SmallButton'); ?></div>
 <table class="FormTable Sortable AltColumns<?php echo $CssClass;?>" id="CategoryTable">
    <thead>
       <tr id="0">
          <th><?php echo T('Category'); ?></th>
          <th class="Alt"><?php echo T('Description'); ?></th>
-         <th><?php echo T('Url'); ?></th>
+         <th><?php echo HoverHelp(T('Url'), T('A url-friendly version of the category name for better SEO.')); ?></th>
          <th class="Alt"><?php echo T('Options'); ?></th>
       </tr>
    </thead>
@@ -26,13 +39,20 @@ foreach ($this->CategoryData->Result() as $Category) {
    $CssClass = trim($CssClass);
    ?>
    <tr id="<?php echo $Category->CategoryID; ?>"<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
-      <td class="First"><a href="<?php echo Url('vanilla/settings/editcategory/'.$Category->CategoryID); ?>"><?php echo $Category->Name; ?></a></td>
+      <td class="First"><strong><?php echo $Category->Name; ?></strong></td>
       <td class="Alt"><?php echo $Category->Description; ?></td>
       <td><?php echo $Category->AllowDiscussions == '1' ? Url('categories/'.$Category->UrlCode.'/') : '&nbsp;'; ?></td>
-      <td class="Alt"><?php echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID); ?></td>
+      <td class="Alt">
+         <?php
+         echo Anchor('Edit', 'vanilla/settings/editcategory/'.$Category->CategoryID);
+         echo ' | ';
+         echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID);
+         ?>
+      </td>
    </tr>
 <?php } ?>
    </tbody>
 </table>
 <?php
-echo $this->Form->Close();
+      echo $this->Form->Close();
+   }

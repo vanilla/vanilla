@@ -13,18 +13,47 @@ class SearchModel extends Gdn_Model {
 	protected $_Parameters = array();
 	
 	protected $_SearchSql = array();
-	
+
+   protected $_SearchMode = 'match';
+
+   protected $_SearchText = '';
 	
 	/// METHODS ///
 	public function AddSearch($Sql) {
 		$this->_SearchSql[] = $Sql;
 	}
-	
-	public function AddMatchSql($Sql, $Columns) {
-		$Param = $this->Parameter();
-		$Sql->Select($Columns, "match(%s) against($Param)", 'Relavence');
-		$Param = $this->Parameter();
-		$Sql->Where("match($Columns) against ($Param)", NULL, FALSE, FALSE);
+
+   /** Add the sql to perform a search.
+    *
+    * @param Gdn_SQLDriver $Sql
+    * @param string $Columns a comma seperated list of columns to search on.
+    */
+	public function AddMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
+      if ($this->_SearchMode == 'like') {
+         if ($LikeRelavenceColumn)
+            $Sql->Select($LikeRelavenceColumn, '', 'Relavence');
+         else
+            $Sql->Select(1, '', 'Relavence');
+
+         $Sql->BeginWhereGroup();
+
+         $ColumnsArray = explode(',', $Columns);
+         foreach ($ColumnsArray as $Column) {
+            $Column = trim($Column);
+
+            $Param = $this->Parameter();
+            $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+         }
+
+         $Sql->EndWhereGroup();
+      } else {
+         $Boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : '';
+
+         $Param = $this->Parameter();
+         $Sql->Select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
+         $Param = $this->Parameter();
+         $Sql->Where("match($Columns) against ($Param{$Boolean})", NULL, FALSE, FALSE);
+      }
 	}
 	
 	public function Parameter() {
@@ -40,11 +69,26 @@ class SearchModel extends Gdn_Model {
 	
 	public function Search($Search, $Offset = 0, $Limit = 20) {
 		// If there are no searches then return an empty array.
-		if(count($this->_SearchSql) == 0)
-			return NULL;
 		if(trim($Search) == '')
 			return NULL;
-			
+
+      // Figure out the exact search mode.
+      $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+      if ($SearchMode == 'matchboolean') {
+         if (strpos($Search, '+') !== FALSE || strpos($Search, '-') !== FALSE)
+            $SearchMode = 'boolean';
+         else
+            $SearcMode = 'match';
+      } else {
+         $this->_SearchMode = $SearchMode;
+      }
+      $this->_SearchMode = $SearchMode;
+
+      $this->FireEvent('Search');
+      
+      if(count($this->_SearchSql) == 0)
+			return NULL;
+
 		// Perform the search by unioning all of the sql together.
 		$Sql = $this->SQL
 			->Select()
@@ -57,7 +101,10 @@ class SearchModel extends Gdn_Model {
 		
 		$this->EventArguments['Search'] = $Search;
 		$this->FireEvent('AfterBuildSearchQuery');
-		
+
+      if ($this->_SearchMode == 'like')
+         $Search = '%'.$Search.'%';
+
 		foreach($this->_Parameters as $Key => $Value) {
 			$this->_Parameters[$Key] = $Search;
 		}

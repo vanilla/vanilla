@@ -133,6 +133,10 @@ class Gdn_FileCache {
       return $CacheContents;
    }
    
+   public static function SafeCache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
+      return self::Cache($CacheName, str_replace('.','__',$CacheKey), $CacheContents, $CacheWrite);
+   }
+   
    /**
     * Append the provided resource in the appropriate (named) cache under the named cache key. 
     * If the entry is not already an array, convert it to one... then append the new data.

@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
    
    $('a.AddMessage, a.EditMessage').popup({
       onUnload: function(settings) {
-         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php/dashboard/message?DeliveryType=VIEW'));
+         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/dashboard/message&DeliveryType=VIEW'));
       }   
    });
    
@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
-         $(sender).parents('tr').remove();
+         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?/dashboard/message&DeliveryType=VIEW'));
       }
    });
 

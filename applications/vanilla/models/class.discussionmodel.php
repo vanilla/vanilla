@@ -15,35 +15,6 @@ class DiscussionModel extends VanillaModel {
    public function __construct() {
       parent::__construct('Discussion');
    }
-   /*
-   public function DiscussionQuery() {
-      $Perms = $this->CategoryPermissions();
-      if($Perms !== TRUE) {
-         $this->SQL->WhereIn('d.CategoryID', $Perms);
-      }
-      
-      $this->SQL
-         ->Select('d.InsertUserID')
-         ->Select('d.DateInserted', '', 'InsertDate')
-         ->Select('iu.Name', '', 'InsertName')
-         ->Select('iup.Name', '', 'InsertPhoto')
-         ->Select('d.Body')
-         ->Select('d.DateLastComment', '', 'LastDate')
-         ->Select('d.LastCommentUserID', '', 'LastUserID')
-         ->Select('lcu.Name', '', 'LastName')
-         ->Select('lcup.Name', '', 'LastPhoto')
-         ->Select('lc.Body', '', 'LastBody')
-         ->Select("' &rarr; ', pc.Name, ca.Name", 'concat_ws', 'Category')
-         ->From('Discussion d')
-         ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
-         ->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
-         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
-         ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
-         //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
-   }
-   */
    
    public function DiscussionSummaryQuery($AdditionalFields = array()) {
       $Perms = $this->CategoryPermissions();
@@ -61,19 +32,14 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
-         //->Select('lcup.Name', '', 'LastPhoto')
-         //->Select('lc.Body', '', 'LastBody')
          ->Select("' &rarr; ', pc.Name, ca.Name", 'concat_ws', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
-         //->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
-         //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
-         //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');
 			
 		if(is_array($AdditionalFields)) {
 			foreach($AdditionalFields as $Alias => $Field) {
@@ -224,11 +190,16 @@ class DiscussionModel extends VanillaModel {
          
          if((is_object($Session->User) && $Session->User->Admin == '1')) {
             $this->_CategoryPermissions = TRUE;
+			} elseif(C('Garden.Permissions.Disabled.Category')) {
+				if($Session->CheckPermission('Vanilla.Discussions.View'))
+					$this->_CategoryPermissions = TRUE;
+				else
+					$this->_CategoryPermissions = array(); // no permission
          } else {
             $Data = $this->SQL
                ->Select('c.CategoryID')
                ->From('Category c')
-               ->Permission('c', 'CategoryID', 'Vanilla.Discussions.View')
+               ->Permission('Vanilla.Discussions.View', 'c', 'CategoryID')
                ->Get();
             
             $Data = $Data->ResultArray();
@@ -258,7 +229,6 @@ class DiscussionModel extends VanillaModel {
          $this->SQL
             ->Select('c.CountDiscussions', 'sum', 'CountDiscussions')
             ->From('Category c');
-            //->Permission('c', 'CategoryID', 'Vanilla.Discussions.View');
       } else {
          $this->SQL
 	         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
@@ -566,15 +536,29 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
     */
    public function BookmarkDiscussion($DiscussionID, $UserID, &$Discussion = NULL) {
       $State = '1';
-      $Discussion = $this->GetID($DiscussionID);
-      if ($Discussion->CountCommentWatch == '') {
+
+      $Discussion = $this->SQL
+         ->Select('d.*')
+         ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+         ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
+         ->Select('lcu.Name', '', 'LastName')
+         ->From('Discussion d')
+         ->Join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = $UserID", 'left')
+			->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
+         ->Where('d.DiscussionID', $DiscussionID)
+         ->Get()
+         ->FirstRow();
+
+
+      if ($Discussion->WatchUserID == '') {
          $this->SQL
             ->Insert('UserDiscussion', array(
                'UserID' => $UserID,
                'DiscussionID' => $DiscussionID,
-               'CountComments' => 0,
-               'DateLastViewed' => Gdn_Format::ToDateTime(),
-               'Bookmarked' => '1'
+               'Bookmarked' => $State
             ));
       } else {
          $State = ($Discussion->Bookmarked == '1' ? '0' : '1');

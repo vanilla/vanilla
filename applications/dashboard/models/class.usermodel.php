@@ -85,6 +85,9 @@ class UserModel extends Gdn_Model {
    }
    
    public function GetByUsername($Username) {
+		if ($Username == '')
+		 	return FALSE;
+			
       $this->UserQuery();
       return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }
@@ -182,7 +185,13 @@ class UserModel extends Gdn_Model {
          ->Get();
    }
 
-   public function GetSession($UserID) {
+   public function GetSession($UserID, $Refresh = FALSE) {
+      static $UserCache = array();
+
+      if(!$Refresh && array_key_exists($UserID, $UserCache)) {
+         return $UserCache[$UserID];
+      }
+
       $this->SQL
          ->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
          ->Select('p.Name', '', 'Photo')
@@ -204,6 +213,8 @@ class UserModel extends Gdn_Model {
 
       if ($User && $User->Permissions == '')
          $User->Permissions = $this->DefinePermissions($UserID);
+
+      $UserCache[$UserID] = $User;
 
       return $User;
    }
@@ -380,7 +391,7 @@ class UserModel extends Gdn_Model {
    public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
       if(is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
-         $RoleNames = preg_split('/\s*,\s*/', $RoleNames);
+         $RoleNames = preg_split('/\s*,\s*/', $RoleIDs);
          $RoleIDs = $this->SQL
             ->Select('r.RoleID')
             ->From('Role r')
@@ -809,6 +820,7 @@ class UserModel extends Gdn_Model {
          $PasswordHash = new Gdn_PasswordHash();
          $this->SQL->Update('User')
             ->Set('Password', $PasswordHash->HashPassword($Password))
+				->Set('HashMethod', 'Vanilla')
             ->Where('UserID', $UserData->UserID)
             ->Put();
       }
@@ -1254,43 +1266,27 @@ class UserModel extends Gdn_Model {
    }
    
    /**
-    * Synchronizes the user based on a given UniqueID.
+    * Synchronizes the user based on a given UserKey.
     *
-    * @param string $UniqueID A string that uniquely identifies this user.
+    * @param string $UserKey A string that uniquely identifies this user.
     * @param array $Data Information to put in the user table.
     * @return int The ID of the user.
     */
-   public function Synchronize($UniqueID, $Data) {
+   public function Synchronize($UserKey, $Data) {
       $UserID = 0;
+      
       $Attributes = ArrayValue('Attributes', $Data);
       if (!is_array($Attributes))
          $Attributes = array();
 
-      // Try and get the user based on the uniqueID.
-      $this->SQL->Select('ua.UniqueID, ua.UserID as AuthUserID')
-         ->Select('u.*');
-         
-      if(array_key_exists('UserID', $Data)) {
-         $UniqueIDParam = $this->SQL->NamedParameter('UniqueID', TRUE, $UniqueID);
-         
-         $User = $this->SQL
-            ->From('User u')
-            ->Join('UserAuthentication ua', 'u.UserID = ua.UserID and ua.UniqueID = '.$UniqueIDParam, 'left')
-            ->Where('u.UserID', $Data['UserID']);
-      } else {
-         $this->SQL
-            ->From('UserAuthentication ua')
-            ->Join('User u', 'u.UserID = ua.UserID')
-            ->Where('ua.UniqueID', $UniqueID);
-      }
-
-      $User = $this->SQL->Get()->FirstRow();
-      if ($User === FALSE) {
-         // Clean the user data.
-            
+      // If the user didnt log in, they won't have a UserID yet. That means they want a new
+      // account. So create one for them.
+      if (!isset($Data['UserID']) || $Data['UserID'] <= 0) {
+      
+         // Prepare the user data.
          $UserData['Name'] = $Data['Name'];
-         $UserData['Password'] = RandomString(7);
-         $UserData['Email'] = ArrayValue('Email', $Attributes, 'no@email.com');
+         $UserData['Password'] = RandomString(16);
+         $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
          $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'm'), 0, 1));
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Attributes, 0);
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
@@ -1310,58 +1306,9 @@ class UserModel extends Gdn_Model {
             // Save the roles.
             $Roles = ArrayValue('Roles', $Data, Gdn::Config('Garden.Registration.DefaultRoles'));
             $this->SaveRoles($UserID, $Roles, FALSE);
-            // Save the authentication.
-            $this->SQL->Insert('UserAuthentication', array('UniqueID' => $UniqueID, 'UserID' => $UserID));
          }
-         
       } else {
-         // Check to see if we have to insert an authentication.
-         if(is_null($User->UniqueID)) {
-            $this->SQL->Insert('UserAuthentication', array('UniqueID' => $UniqueID, 'UserID' => $User->UserID));
-         }
-         
-         // Clean the user data.
-         $UserData = array_intersect_key($Data, array('Name' => 0, 'Email' => 0, 'Gender' => 0, 'DateOfBirth' => 0, 'HourOffset' => 0));
-         if(array_key_exists('Gender', $UserData))
-            $UserData['Gender'] = strtolower(substr($UserData['Gender'], 0, 1));
-            
-         // Make sure there isn't another user with this username.
-         if($User->Name != $UserData['Name'] || $User->Email != $UserData['Email']) {
-            $UniqueData = $this->SQL
-               ->Select('u.Name, u.Email')
-               ->From('User u')
-               ->Where('u.UserID <>', $User->UserID)
-               ->BeginWhereGroup();
-               
-            if($User->Name != $UserData['Name']) {
-               $this->SQL->Where('u.Name', $UserData['Name']);
-            }
-            if($User->Email != $UserData['Email']) {
-               if($User->Name != $UserData['Name'])
-                  $this->SQL->OrWhere('u.Email', $UserData['Email']);
-               else
-                  $this->SQL->Where('u.Email', $UserData['Email']);
-            }
-            $this->SQL->EndWhereGroup();
-            $OtherUsers = $this->SQL->Get();
-            foreach($OtherUsers as $OtherUser) {
-               // If there is another user with the same username/email then don't update.
-               if($OtherUser->Name == $UserData['Name'])
-                  $UserData['Name'] = $User->Name;
-               if($OtherUser->Email == $UserData['Email'])
-                  $UserData['Email'] = $User->Email;
-            }
-         }
-         
-         // Update the user.
-         $UserID = $User->UserID;
-         $UserData['UserID'] = $UserID;
-         $this->Save($UserData);
-         
-         // Update the roles.
-         if(array_key_exists('Roles', $Data)) {
-            $this->SaveRoles($UserID, $Data['Roles'], FALSE);
-         }
+         $UserID = $Data['UserID'];
       }
       
       // Synchronize the transientkey from the external user data source if it is present (eg. WordPress' wpnonce).

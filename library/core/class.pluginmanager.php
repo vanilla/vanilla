@@ -79,6 +79,21 @@ class Gdn_PluginManager {
                $MethodName = strtolower($Method);
                // Loop through their individual methods looking for event handlers and method overrides.
                if (isset($MethodName[9])) {
+                  $Suffix = array_pop(explode('_',$MethodName));
+                  switch ($Suffix) {
+                     case 'handler':
+                     case 'before':
+                     case 'after':
+                        $this->RegisterHandler($ClassName, $MethodName);
+                     break;
+                     case 'override':
+                        $this->RegisterOverride($ClassName, $MethodName);
+                     break;
+                     case 'create':
+                        $this->RegisterNewMethod($ClassName, $MethodName);
+                     break;
+                  }
+/*
                   if (substr($MethodName, -8) == '_handler' || substr($MethodName, -7) == '_before' || substr($MethodName, -6) == '_after') {
                      $this->RegisterHandler($ClassName, $MethodName);
                   } else if (substr($MethodName, -9) == '_override') {
@@ -86,6 +101,7 @@ class Gdn_PluginManager {
                   } else if (substr($MethodName, -7) == '_create') {
                      $this->RegisterNewMethod($ClassName, $MethodName);
                   }
+*/
                }
             }
          }
@@ -373,7 +389,7 @@ class Gdn_PluginManager {
       
       // Required Themes
       $ThemeManager = new Gdn_ThemeManager();
-      $EnabledThemes = $ThemeManager->EnabledThemeInfo();
+      $EnabledThemes = $ThemeManager->EnabledThemeInfo(TRUE);
       $RequiredThemes = ArrayValue('RequiredTheme', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       
@@ -496,7 +512,7 @@ class Gdn_PluginManager {
       $Paths = (array)$Paths;
       foreach($Paths as $Path) {
          if(file_exists($Path))
-            include($Path);
+            include_once($Path);
       }
       
       return $PluginInfo;
@@ -516,6 +532,7 @@ class Gdn_PluginManager {
          case self::ACTION_ENABLE:  $HookMethod = 'Setup'; break;
          case self::ACTION_DISABLE: $HookMethod = 'OnDisable'; break;
          case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+         case self::ACTION_ONLOAD:  $HookMethod = 'OnLoad'; break;
       }
       
       $PluginInfo      = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);

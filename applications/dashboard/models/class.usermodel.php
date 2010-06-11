@@ -85,6 +85,9 @@ class UserModel extends Gdn_Model {
    }
    
    public function GetByUsername($Username) {
+		if ($Username == '')
+		 	return FALSE;
+			
       $this->UserQuery();
       return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
    }

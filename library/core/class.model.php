@@ -221,8 +221,8 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function Insert($Fields) {
       $Result = FALSE;
+      $this->AddInsertFields($Fields);
       if ($this->Validate($Fields, TRUE)) {
-         $this->AddInsertFields($Fields);
          $Result = $this->SQL->Insert($this->Name, $Fields);
       }
       return $Result;

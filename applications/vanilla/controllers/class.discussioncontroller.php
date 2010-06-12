@@ -413,7 +413,7 @@ class DiscussionController extends VanillaController {
          $Comment = $this->CommentModel->GetID($CommentID);
          if ($Comment) {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
-            $HasPermission = $Comment->InsertUserID = $Session->UserID;
+            $HasPermission = $Comment->InsertUserID == $Session->UserID;
             if (!$HasPermission && $Discussion)
                $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->CategoryID);
             

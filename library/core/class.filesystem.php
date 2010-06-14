@@ -192,8 +192,8 @@ class Gdn_FileSystem {
          $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
          
       $LibraryKey = str_replace('.', '__', $LibraryName);
-      Gdn_FileCache::PrepareCache($MappingCacheName);
-      $LibraryPath = Gdn_FileCache::GetCache($MappingCacheName, $LibraryKey);
+      Gdn_LibraryMap::PrepareCache($MappingCacheName);
+      $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
       
       if ($LibraryPath === NULL) {
          // $LibraryName wasn't contained in the mappings array.
@@ -209,7 +209,7 @@ class Gdn_FileSystem {
 
          // If the controller was found
          if($LibraryPath !== FALSE) {
-            Gdn_FileCache::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
+            Gdn_LibraryMap::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
          }
       }
       return $LibraryPath;
@@ -249,7 +249,7 @@ class Gdn_FileSystem {
     * @param string $FileName The full path and name of the file to be saved.
     * @param string $FileContents The contents of the file being saved.
     */
-   public static function SaveFile($FileName, $FileContents) {
+   public static function SaveFile($FileName, $FileContents, $Flags = LOCK_EX) {
    
       // Check that the folder exists and is writable
       $DirName = dirname($FileName);
@@ -260,7 +260,7 @@ class Gdn_FileSystem {
       if (!IsWritable($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
          
-      file_put_contents($FileName, $FileContents);
+      file_put_contents($FileName, $FileContents, $Flags);
       return TRUE;
    }
    
@@ -272,7 +272,7 @@ class Gdn_FileSystem {
     */
    public static function Touch($FileName) {
       if (!file_exists($FileName))
-         file_put_contents($FileName, '');
+         file_put_contents($FileName, '', LOCK_EX);
    }
    
    /**

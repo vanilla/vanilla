@@ -311,12 +311,12 @@ class Gdn_Format {
     * it.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
-    * @return mixed
+    * @return string
     */
    public static function Display($Mixed) {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Display');
-      else
+      else {
          $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = preg_replace(
@@ -331,6 +331,7 @@ class Gdn_Format {
          );
 
          return '<p>'.nl2br($Mixed).'</p>';
+      }
    }
 
    /**
@@ -399,12 +400,37 @@ class Gdn_Format {
             // This is an optimization because purifying is very slow and memory intense.
             
             $Result = htmlentities($Mixed);
-            $Result = Gdn_Format::Mentions($Mixed);
-            $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            $Result = Gdn_Format::Mentions($Result);
+            $Result = Gdn_Format::Links($Result);
+            $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
             $Result = '<p>'.$Result.'</p>';
          }
          
          return $Result;
+      }
+   }
+
+   /** Formats the anchor tags around the links in text.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function Links($Mixed) {
+      if (!is_string($Mixed))
+         return self::To($Mixed, 'Links');
+      else {
+         $Mixed = preg_replace(
+            "/
+            (?<!<a href=\")
+            (?<!\")(?<!\">)
+            ((https?|ftp):\/\/)
+            ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
+            /msxi",
+            "<a href=\"$0\" target=\"_blank\" rel=\"nofollow\">$0</a>",
+            $Mixed
+         );
+
+         return $Mixed;
       }
    }
 

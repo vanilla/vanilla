@@ -9,39 +9,21 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * This is a cache implementation that stores its cache items in the filesystem.
- *
+ * This is a cache implementation that caches nothing and always reports cache misses.
+ * 
  * @author Tim Gunter
  * @package Garden
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
  
-class Gdn_Filecache extends Gdn_Cache {
+class Gdn_Dirtycache extends Gdn_Cache {
    
    public function __construct() {
       parent::__construct();
    }
    
-   /**
-   const CONTAINER_LOCATION = 1;
-   const CONTAINER_PERSISTENT = 2;
-   const CONTAINER_WEIGHT = 3;
-   const CONTAINER_TIMEOUT = 4;
-   const CONTAINER_ONLINE = 5;
-   const CONTAINER_CALLBACK = 6;
-   */
    public function AddContainer($Options) {
-      
-      $Required = array(
-         Gdn_Cache::CONTAINER_LOCATION
-      );
-      $KeyedRequirements = array_fill_keys($Required, 1);
-      if (sizeof(array_intersect_key($Options, $KeyedRequirements)) != sizeof($Required)) {
-         $Missing = implode(", ",array_keys(array_diff_key($KeyedRequirements,$Options)));
-         throw new Exception("Required parameters not supplied. Missing: {$Missing}");
-      }
-      
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
@@ -72,5 +54,4 @@ class Gdn_Filecache extends Gdn_Cache {
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
-   
 }

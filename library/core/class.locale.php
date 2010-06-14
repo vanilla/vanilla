@@ -98,8 +98,8 @@ class Gdn_Locale extends Gdn_Pluggable {
       if(!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
       if(!is_array($PluginWhiteList)) $PluginWhiteList = array();
 
-      Gdn_FileCache::PrepareCache('locale');
-      if ($ForceRemapping === TRUE || !Gdn_FileCache::CacheReady('locale')) {
+      Gdn_LibraryMap::PrepareCache('locale');
+      if ($ForceRemapping === TRUE || !Gdn_LibraryMap::CacheReady('locale')) {
          $LocaleSources = array();
          // Get application-based locale definition files
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
@@ -131,7 +131,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          if (file_exists($ConfigLocale))
             $FileContents[$SafeLocaleName][] = $ConfigLocale;
          
-         Gdn_FileCache::Import('locale', $FileContents);
+         Gdn_LibraryMap::Import('locale', $FileContents);
       }
 
       // Set up defaults
@@ -140,7 +140,7 @@ class Gdn_Locale extends Gdn_Pluggable {
 
       // Now set the locale name and import all of the sources.
       $this->_Locale = $LocaleName;
-      $LocaleSources = Gdn_FileCache::GetCache('locale',$SafeLocaleName);
+      $LocaleSources = Gdn_LibraryMap::GetCache('locale',$SafeLocaleName);
       if (is_null($SafeLocaleName))
          $LocaleSources = array();
 

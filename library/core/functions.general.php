@@ -12,21 +12,21 @@ function __autoload($ClassName) {
    if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
       return true;
 
-   if(!class_exists('Gdn_FileSystem', FALSE))
+   if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
       
-   if(!class_exists('Gdn_FileCache', FALSE))
+   if (!class_exists('Gdn_LibraryMap', FALSE))
       return false;
 
-   if(!class_exists('Gdn', FALSE))
+   if (!class_exists('Gdn', FALSE))
       return false;
    
-   if(substr($ClassName, 0, 4) === 'Gdn_')
+   if (substr($ClassName, 0, 4) === 'Gdn_')
       $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
    else
       $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
    
-   if(!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
+   if (!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
       $ApplicationWhiteList = Gdn::Factory('ApplicationManager')->EnabledApplicationFolders();
    else
       $ApplicationWhiteList = NULL;

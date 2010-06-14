@@ -21,6 +21,10 @@ $Configuration['Database']['CharacterEncoding']                = 'utf8';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
+$Configuration['Cache']['Enabled']                              = TRUE;
+$Configuration['Cache']['Method']                               = 'filecache';
+$Configuration['Cache']['Filecache']['Store']                   = CombinePaths(array(PATH_CACHE,'Filecache'));
+
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
 // An array of folders the application should never search through when searching for classes. (note: plugins had to be removed so that locale searches could get the locale folder from the plugin's folder).

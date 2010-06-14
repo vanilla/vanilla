@@ -2,7 +2,7 @@
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
 WriteFilterTabs($this);
-if ($this->DiscussionData->NumRows() > 0 || (property_exists($this, 'AnnounceData') && $this->AnnounceData->NumRows() > 0)) {
+if ($this->DiscussionData->NumRows() > 0 || (is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">
    <?php

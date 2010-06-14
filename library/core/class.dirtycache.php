@@ -35,6 +35,10 @@ class Gdn_Dirtycache extends Gdn_Cache {
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
+   public function Exists($Key) {
+      return Gdn_Cache::CACHEOP_FAILURE;
+   }
+   
    public function Get($Key, $Options = array()) {
       return Gdn_Cache::CACHEOP_FAILURE;
    }

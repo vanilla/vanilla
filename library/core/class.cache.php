@@ -30,16 +30,17 @@ abstract class Gdn_Cache {
    */
    protected $Features;
    
-   const FEATURE_COMPRESS = 1;
-   const FEATURE_EXPIRY = 2;
-   const FEATURE_TIMEOUT = 4;
+   const FEATURE_COMPRESS     = 'f_compress';
+   const FEATURE_EXPIRY       = 'f_expiry';
+   const FEATURE_TIMEOUT      = 'f_timeout';
    
-   const CONTAINER_LOCATION   = 'location';
-   const CONTAINER_PERSISTENT = 'persistent';
-   const CONTAINER_WEIGHT     = 'weight';
-   const CONTAINER_TIMEOUT    = 'timeout';
-   const CONTAINER_ONLINE     = 'online';
-   const CONTAINER_CALLBACK   = 'callback';
+   const CONTAINER_LOCATION   = 'c_location';
+   const CONTAINER_PERSISTENT = 'c_persistent';
+   const CONTAINER_WEIGHT     = 'c_weight';
+   const CONTAINER_TIMEOUT    = 'c_timeout';
+   const CONTAINER_ONLINE     = 'c_online';
+   const CONTAINER_CALLBACK   = 'c_callback';
+   const CONTAINER_CACHEFILE  = 'c_cachefile';
    
    const CACHEOP_FAILURE = FALSE;
    const CACHEOP_SUCCESS = TRUE;
@@ -69,9 +70,9 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
+   * @param string $Key
    * @param mixed $Value
-   * @param mixed $Options
+   * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Add($Key, $Value, $Options = array());
@@ -79,18 +80,26 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
+   * @param string $Key
    * @param mixed $Value
-   * @param mixed $Options
+   * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Store($Key, $Value, $Options = array());
    
    /**
    * put your comment there...
+   *
+   * @param string $Key
+   * @return array augmented container struct for existing key or FALSE if not found.
+   */
+   abstract public function Exists($Key);
+   
+   /**
+   * put your comment there...
    * 
-   * @param mixed $Key
-   * @param mixed $Options
+   * @param string $Key
+   * @param array $Options
    * @return mixed key value or FALSE on failure.
    */
    abstract public function Get($Key, $Options = array());
@@ -98,8 +107,8 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
-   * @param mixed $Options
+   * @param string $Key
+   * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Remove($Key, $Options = array());
@@ -107,9 +116,9 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
+   * @param string $Key
    * @param mixed $Value
-   * @param mixed $Options
+   * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Replace($Key, $Value, $Options = array());
@@ -117,7 +126,7 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
+   * @param string $Key
    * @param mixed $Amount
    * @return integer new value or FALSE on failure.
    */
@@ -126,7 +135,7 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Key
+   * @param string $Key
    * @param mixed $Amount
    * @return integer new value or FALSE on failure.
    */
@@ -135,7 +144,7 @@ abstract class Gdn_Cache {
    /**
    * put your comment there...
    * 
-   * @param mixed $Options
+   * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function AddContainer($Options);
@@ -145,8 +154,8 @@ abstract class Gdn_Cache {
    * 
    * @param int $Feature feature constant
    */
-   public function RegisterFeature($Feature) {
-      $this->Features[$Feature] = TRUE;
+   public function RegisterFeature($Feature, $Meta = TRUE) {
+      $this->Features[$Feature] = $Meta;
    }
    
    /**
@@ -165,6 +174,13 @@ abstract class Gdn_Cache {
    * @param int $Feature feature constant
    */
    public function HasFeature($Feature) {
-      return isset($this->Features[$Feature]);
+      return isset($this->Features[$Feature]) ? $this->Features[$Feature] : Gdn_Cache::CACHEOP_FAILURE;
+   }
+   
+   protected function Failure($Message) {
+      if (defined("DEBUG") && DEBUG)
+         throw new Exception($Message);
+      else
+         return Gdn_Cache::CACHEOP_FAILURE;
    }
 }

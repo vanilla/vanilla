@@ -21,6 +21,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 class Gdn_FileSystem {
+
+   const O_CREATE = 1;
+   const O_WRITE = 2;
+   const O_READ = 4;
+
    /**
     * Searches the provided file path(s). Returns the first one it finds in the
     * filesystem.
@@ -360,4 +365,37 @@ class Gdn_FileSystem {
 
       if (is_dir($Dir)) rmdir($Dir);
    }
+   
+   public static function CheckFolderR($Path, $Flags = 0) {
+      $TrimPath = ltrim($Path, '/');
+      $PathParts = explode('/', $TrimPath);
+      $Prepend = (strlen($Path) !== strlen($TrimPath)) ? DS : '';
+      
+      $CurrentPath = array();
+      foreach ($PathParts as $FolderPart) {
+         array_push($CurrentPath, $FolderPart);
+         $TestFolder = $Prepend.implode(DS, $CurrentPath);
+         
+         if ($Flags & Gdn_FileSystem::O_CREATE) {
+            if (!is_dir($TestFolder))
+               @mkdir($TestFolder);
+         }
+         
+         if (!is_dir($TestFolder))
+            return FALSE;
+
+      }
+      
+      if ($Flags & Gdn_FileSystem::O_READ) {
+         if (!is_readable($Path))
+            return FALSE;
+      }
+         
+      if ($Flags & Gdn_FileSystem::O_WRITE) {
+         if (!is_writable($Path))
+            return FALSE;
+      }
+      return TRUE;
+   }
+   
 }

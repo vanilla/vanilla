@@ -369,26 +369,42 @@ class Gdn_Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
-         $Formatter = Gdn::Factory('HtmlFormatter');
-         if(is_null($Formatter)) {
-            // If there is no HtmlFormatter then make sure that script injections won't work.
-            return self::Display($Mixed);
+         $IsHtml = strpos($Mixed, '<') !== FALSE;
+
+         if ($IsHtml) {
+            // The text contains html and must be purified.
+
+            $Formatter = Gdn::Factory('HtmlFormatter');
+            if(is_null($Formatter)) {
+               // If there is no HtmlFormatter then make sure that script injections won't work.
+               return self::Display($Mixed);
+            }
+
+            // Allow the code tag to keep all enclosed html encoded.
+            $Mixed = preg_replace(
+               array('/<code([^>]*)>(.+?)<\/code>/sei'),
+               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></code>\''),
+               $Mixed
+            );
+
+            // Mentions & Hashes
+            $Mixed = Gdn_Format::Mentions($Mixed);
+
+            // nl2br
+            $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+
+            $Result = $Formatter->Format($Mixed);
+         } else {
+            // The text does not contain text and does not have to be purified.
+            // This is an optimization because purifying is very slow and memory intense.
+            
+            $Result = htmlentities($Mixed);
+            $Result = Gdn_Format::Mentions($Mixed);
+            $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            $Result = '<p>'.$Result.'</p>';
          }
          
-         // Allow the code tag to keep all enclosed html encoded.
-         $Mixed = preg_replace(
-            array('/<code([^>]*)>(.+?)<\/code>/sei'), 
-            array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></code>\''), 
-            $Mixed
-         );
-         
-         // Mentions & Hashes
-         $Mixed = Gdn_Format::Mentions($Mixed);
-         
-         // nl2br
-         $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
-
-         return $Formatter->Format($Mixed);
+         return $Result;
       }
    }
 

@@ -242,6 +242,23 @@ if ($Drop) {
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
+
+   $PermissionModel->Save(array(
+      'RoleID' => 32,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'CategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.Add' => 1,
+      'Vanilla.Discussions.Edit' => 1,
+      'Vanilla.Discussions.Announce' => 1,
+      'Vanilla.Discussions.Sink' => 1,
+      'Vanilla.Discussions.Close' => 1,
+      'Vanilla.Discussions.Delete' => 1,
+      'Vanilla.Discussions.View' => 1,
+      'Vanilla.Comments.Add' => 1,
+      'Vanilla.Comments.Edit' => 1,
+      'Vanilla.Comments.Delete' => 1
+      ), TRUE);
    
    // Make sure that User.Permissions is blank so new permissions for users get applied.
    $SQL->Update('User', array('Permissions' => ''))->Put();

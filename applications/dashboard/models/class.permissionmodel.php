@@ -51,7 +51,7 @@ class PermissionModel extends Gdn_Model {
 			}
 		}
 
-		$this->SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn));
+		$this->SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn), TRUE);
    }
    
    public function Delete($RoleID = NULL, $JunctionTable = NULL, $JunctionColumn = NULL, $JunctionID = NULL) {
@@ -540,7 +540,7 @@ class PermissionModel extends Gdn_Model {
             $Where['JunctionID'] = NULL;
          }
          
-         $this->SQL->Replace('Permission', $this->_Backtick($Values), $Where);
+         $this->SQL->Replace('Permission', $this->_Backtick($Values), $Where, TRUE);
 
 			if($SaveGlobal && !is_null($Where['JunctionTable'])) {
 				// Save these permissions with the global permissions.
@@ -548,7 +548,7 @@ class PermissionModel extends Gdn_Model {
             $Where['JunctionColumn'] = NULL;
             $Where['JunctionID'] = NULL;
 
-				$this->SQL->Replace('Permission', $this->_Backtick($Values), $Where);
+				$this->SQL->Replace('Permission', $this->_Backtick($Values), $Where, TRUE);
 			}
       }
    }

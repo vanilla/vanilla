@@ -21,7 +21,7 @@ class RoleModel extends Gdn_Model {
          $RoleID = $Values['RoleID'];
          unset($Values['RoleID']);
          
-         $this->SQL->Replace('Role', $Values, array('RoleID' => $RoleID));
+         $this->SQL->Replace('Role', $Values, array('RoleID' => $RoleID), TRUE);
       } else {
          // Check to see if there is a role with the same name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Name']))->Value('RoleID', NULL);

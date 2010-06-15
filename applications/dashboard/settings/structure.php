@@ -164,13 +164,13 @@ $PermissionModel->Define(array(
 // Set initial member permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 8,
-	'Garden.Signin.Allow' => 1
+	'Garden.SignIn.Allow' => 1
 	));
 
 // Set initial moderator permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 32,
-	'Garden.Signin.Allow' => 1
+	'Garden.SignIn.Allow' => 1
 	));
 
 // Set initial admininstrator permissions.

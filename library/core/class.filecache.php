@@ -115,6 +115,13 @@ class Gdn_Filecache extends Gdn_Cache {
       
       return $this->Store($Key, $Value, $Options);
    }
+
+   /**
+    * This method is deprecated, but since cache files call it there will be low-level crashes without it.
+    */
+   public static function PrepareCache($CacheName, $ExistingCacheArray = NULL) {
+      Gdn_LibraryMap::PrepareCache($CacheName, $ExistingCacheArray);
+   }
    
    public function Store($Key, $Value, $Options = array()) {
       $Defaults = array(

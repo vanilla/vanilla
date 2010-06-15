@@ -24,62 +24,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 function smarty_function_link($Params, &$Smarty) {
    $Path = GetValue('path', $Params, '', TRUE);
-   $WithDomain = GetValue('withdomain', $Params, FALSE, TRUE);
-   $RemoveSyndication = GetValue('removeSyndication', $Params, FALSE, TRUE);
    $Text = GetValue('text', $Params, '', TRUE);
    $NoTag = GetValue('notag', $Params, FALSE, TRUE);
-   $Class = GetValue('class', $Params, '', TRUE);
 
-   $Session = Gdn::Session();
-   $Authenticator = Gdn::Authenticator();
-
-   // Use some logic to expan special urls.
-   switch(strtolower($Path)) {
-      case "signinout":
-         // The destination is the signin/signout toggle link.
-         if ($Session->IsValid()) {
-            if(!$Text && !$NoTag)
-               $Text = T('Sign Out');
-            $Path = $Authenticator->SignOutUrl();
-            $Class = ConcatSep(' ', $Class, 'SignOut');
-         } else {
-            if(!$Text && !$NoTag)
-               $Text = T('Sign In');
-            $Attribs = array();
-
-            $Path = $Authenticator->SignInUrl('');
-            if (Gdn::Config('Garden.SignIn.Popup'))
-               $Class = ConcatSep(' ', $Class, 'SignInPopup');
-         }
-         break;
-   }
-
-   $Url = Url($Path, $WithDomain, $RemoveSyndication);
-   $Url = str_replace('{Session_TransientKey}', $Session->TransientKey(), $Url);
-
-   if(!$Text)
+   if(!$Text && $Path != 'signinout')
       $NoTag = TRUE;
 
-   if($NoTag) {
-      $Result = $Url;
-   } else {
-      $Result = '<a';
 
-      // Add the standard attrbutes to the anchor.
-      $ID = GetValue('id', $Params, '', TRUE);
-      if($ID)
-         $Result .= ' id="'.urlencode($ID).'"';
-      $Result .= ' href="'.$Url.'"';
-      if($Class)
-         $Result .= ' class="'.urlencode($Class).'"';
+   if ($NoTag)
+      $Format = '%url';
+   else
+      $Format = '<a href="%url" class="%class">%text</a>';
 
-      // Add anything that's left over.
-      foreach($Params as $Key => $Value) {
-         $Result .= ' '.$Key.'="'.urlencode($Value).'"';
-      }
+   $Options = array();
+   if (isset($Params['withdomain'])) $Options['WithDomain'] = $Params['withdomain'];
+   if (isset($Params['class'])) $Options['Class'] = $Params['Class'];
 
-      // Add the link text.
-      $Result .= '>'.$Text.'</a>';
-   }
+   $Result = Gdn_Theme::Link($Path, $Text, $Format, $Options);
+
    return $Result;
 }

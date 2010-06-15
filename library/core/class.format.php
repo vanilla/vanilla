@@ -399,7 +399,7 @@ class Gdn_Format {
             // The text does not contain text and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
             
-            $Result = htmlentities($Mixed);
+            $Result = htmlspecialchars($Mixed);
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);

@@ -20,6 +20,70 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Theme {
 
+   
+   public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
+      $Session = Gdn::Session();
+      $Class = GetValue('Class', $Options, '');
+
+      switch ($Path) {
+         case 'dashboard':
+            $Path = 'dashboard/settings';
+            TouchValue('Permissions', $Options, 'Garden.Settings.Manage');
+            if (!$Text)
+               $Text = T('Dashboard');
+            break;
+         case 'inbox':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('Inbox');
+            if ($Session->IsValid() && $Session->User->CountUnreadConversations)
+               $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
+            
+            break;
+         case 'profile':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text && $Session->IsValid())
+               $Text = $Session->User->Name;
+            if ($Session->IsValid() && $Session->User->CountNotifications)
+               $Text .= ' <span>'.$Session->CountNotifications.'</span>';
+
+            break;
+         case 'signinout':
+            // The destination is the signin/signout toggle link.
+            if ($Session->IsValid()) {
+               if(!$Text)
+                  $Text = T('Sign Out');
+               $Path = Gdn::Authenticator()->SignOutUrl();
+               $Class = ConcatSep(' ', $Class, 'SignOut');
+            } else {
+               if(!$Text && !$NoTag)
+                  $Text = T('Sign In');
+               $Attribs = array();
+
+               $Path = Gdn::Authenticator()->SignInUrl('');
+               if (Gdn::Config('Garden.SignIn.Popup'))
+                  $Class = ConcatSep(' ', $Class, 'SignInPopup');
+            }
+            break;
+      }
+
+      if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions']))
+         return '';
+
+      $Url = Gdn::Request()->Url($Path, GetValue('WithDomain', $Options));
+
+      if (strcasecmp(trim($Path, '/'), Gdn::Request()->Path()) == 0)
+         $Class = ConcatSep(' ', $Class, 'Selected');
+
+      // Build the final result.
+      $Result = $Format;
+      $Result = str_replace('%url', $Url, $Result);
+      $Result = str_replace('%text', $Text, $Result);
+      $Result = str_replace('%class', $Class, $Result);
+
+      return $Result;
+   }
+
    /**
     * Renders the banner logo, or just the banner title if the logo is not defined.
     */

@@ -103,7 +103,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('URL', 'varchar(255)', FALSE)
    ->Column('AssociationSecret', 'text', FALSE)
    ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
-   ->Column('RegistrationUrl', 'varchar(255)', TRUE)
+   ->Column('RegisterUrl', 'varchar(255)', TRUE)
    ->Column('SignInUrl', 'varchar(255)', TRUE)
    ->Column('SignOutUrl', 'varchar(255)', TRUE)
    ->Set($Explicit, $Drop);

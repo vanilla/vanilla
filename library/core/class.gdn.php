@@ -12,6 +12,7 @@ class Gdn {
 
    /// CONSTANTS ///
    const AliasAuthenticator = 'Authenticator';
+   const AliasCache = 'Cache';
    const AliasConfig = 'Config';
    const AliasDatabase = 'Database';
    const AliasDatabaseStructure = 'DatabaseStructure';
@@ -21,9 +22,9 @@ class Gdn {
    const AliasRequest = 'Request';
    const AliasRouter = 'Router';
    const AliasSession = 'Session';
+   const AliasSlice = 'Slice';
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
-   const AliasSlice = 'Slice';
 
    const AliasPluginManager = 'PluginManager';
 
@@ -52,6 +53,15 @@ class Gdn {
    public static function Authenticator() {
       $Result = self::Factory(self::AliasAuthenticator);
       return $Result;
+   }
+   
+   /**
+    * Get the cache object
+    *
+    * @return Gdn_Cache
+    */
+   public static function Cache() {
+      return self::Factory(self::AliasCache);
    }
    
    /**

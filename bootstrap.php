@@ -35,7 +35,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.librarymap.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.format.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.model.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.module.php');
@@ -44,6 +44,10 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.schema.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.session.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.url.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.validation.php');
+
+require_once(PATH_LIBRARY_CORE . DS . 'class.cache.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.dirtycache.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
 
 /// Include the core Gdn object.
 require_once(PATH_LIBRARY_CORE . DS . 'class.gdn.php');
@@ -64,6 +68,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
 header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
+
+Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');

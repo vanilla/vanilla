@@ -400,10 +400,10 @@ class Gdn_Configuration {
          trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
 
       // echo 'saving '.$File;
-      //Gdn_FileSystem::SaveFile($File, $FileContents);
+      Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);
       
       // Call the built in method to remove the dependancy to an external object.
-      file_put_contents($File, $FileContents);
+      //file_put_contents($File, $FileContents);
 
       // Clear out the save data array
       $this->_SaveData = array();

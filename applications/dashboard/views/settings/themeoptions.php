@@ -58,5 +58,23 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Value) {
 
 <?php endif; ?>
 
+<?php if (is_array($this->Data('ThemeInfo.Options.Text'))): ?>
+<h3><?php echo T('Text'); ?></h3>
+<div class="Info">
+   <?php echo T('This theme has customizable text.', 'This theme has text that you can customize.'); ?>
+</div>
+
+<ul>
+<?php foreach ($this->Data('ThemeInfo.Options.Text') as $Code => $Default) {
+  echo '<li>',
+   $this->Form->Label('@'.$Code, 'Text_'.$Code),
+   $this->Form->TextBox('Text_'.$Code, array('MultiLine' => TRUE)),
+   '</li>';
+}
+?>
+</ul>
+
+<?php endif; ?>
+
 <?php
 echo $this->Form->Close('Save');

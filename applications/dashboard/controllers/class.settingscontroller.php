@@ -563,15 +563,30 @@ class SettingsController extends DashboardController {
       $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
 
       if ($this->Form->IsPostBack()) {
+         // Save the styles to the config.
          $StyleKey = $this->Form->GetFormValue('StyleKey');
          SaveToConfig(array(
             'Garden.ThemeOptions.Styles.Key' => $StyleKey,
             'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey")));
+         // Save the text to the locale.
+         $Translations = array();
+         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+            $Translations['Theme_'.$Key] = $this->Form->GetFormValue('Text_'.$Key);
+         }
+         Gdn::Locale()->SaveTranslations($Translations);
+         Gdn::Locale()->Refresh();
+
          $this->StatusMessage = T('Saved');
       }
 
       $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
       $StyleKey = $this->Data('ThemeOptions.Styles.Key');
+
+      if (!$this->Form->IsPostBack()) {
+         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+            $this->Form->SetFormValue('Text_'.$Key, T('Theme_'.$Key, $Default));
+         }
+      }
 
       $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
       $this->SetData('Title', sprintf('%s Options', $this->Data('ThemeOptions.Name', $this->Data('ThemeInfo.Folder'))));

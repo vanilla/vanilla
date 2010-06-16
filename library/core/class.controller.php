@@ -196,6 +196,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $Theme;
 
    /**
+    * Specific options on the currently selected theme.
+    * @var array
+    */
+   public $ThemeOptions;
+
+   /**
     * The name of the view that has been requested. Typically this is part of
     * the view's file name. ie. $this->View.'.php'
     *
@@ -300,6 +306,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
       $this->Theme = Gdn::Config('Garden.Theme');
+      $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
       $this->View = '';
       $this->_CssFiles = array();
       $this->_JsFiles = array();
@@ -914,6 +921,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
                      // $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
                      // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
+                     // a) Check to see if a customized version of the css is there.
+                     if ($this->ThemeOptions) {
+                        $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+                        if (is_string($Filenames) && $Filenames != '%s')
+                           $CssPaths[] = PATH_THEMES.DS.$this->Theme.DS.'design'.DS.ChangeBasename($CssFile, $Filenames);
+                     }
+                     // b) Use the default filename.
                      $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
                   }
                   // 3. Application default. eg. root/applications/app_name/design/

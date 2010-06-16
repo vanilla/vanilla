@@ -26,19 +26,19 @@ printf(
 <div class="CurrentTheme">
    <h3><?php echo T('Current Theme'); ?></h3>
    <?php
-   $Version = GetValue('Version', $this->EnabledTheme, '');
-   $ThemeUrl = GetValue('Url', $this->EnabledTheme, '');
-   $Author = GetValue('Author', $this->EnabledTheme, '');
-   $AuthorUrl = GetValue('AuthorUrl', $this->EnabledTheme, '');   
-   $NewVersion = GetValue('NewVersion', $this->EnabledTheme, '');
+   $Version = $this->Data('EnabledTheme.Version');
+   $ThemeUrl = $this->Data('EnabledTheme.Url');
+   $Author = $this->Data('EnabledTheme.Author');
+   $AuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
+   $NewVersion = $this->Data('EnabledTheme.NewVersion');
    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-   $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->EnabledThemeFolder . DS . "screenshot.*");
+   $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->Data('EnabledThemeFolder') . DS . "screenshot.*");
    $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
    if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
-      echo Img('/themes/'.$this->EnabledThemeFolder.'/'.$PreviewImage, array('alt' => $this->EnabledThemeName, 'height' => '112', 'width' => '150'));
+      echo Img('/themes/'.$this->Data('EnabledThemeFolder').'/'.$PreviewImage, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
    
    echo '<h4>';
-      echo $ThemeUrl != '' ? Url($this->EnabledThemeName, $ThemeUrl) : $this->EnabledThemeName;
+      echo $ThemeUrl != '' ? Url($this->Data('EnabledThemeName'), $ThemeUrl) : $this->Data('EnabledThemeName');
       if ($Version != '')
          echo '<span class="Version">'.sprintf(T('version %s'), $Version).'</span>';
          
@@ -46,10 +46,20 @@ printf(
          echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
    
    echo '</h4>';
-   echo '<div class="Description">'.GetValue('Description', $this->EnabledTheme, '').'</div>';
-	$this->FireEvent('AfterCurrentTheme');
+   echo '<div class="Description">'.GetValue('Description', $this->Data('EnabledTheme'), '').'</div>';
+	if ($this->Data('EnabledTheme.Options')) {
+      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme can be customized with additional options. Go to %s to customize this theme.'),
+         Anchor(sprintf(T('%s Options'), $this->Data('EnabledThemeName')), '/dashboard/settings/themeoptions'));
+      
+      echo '<div class="Options">',
+         $OptionsDescription,
+         '</div>';
+      
+   }
+
+   $this->FireEvent('AfterCurrentTheme');
    
-   $RequiredApplications = GetValue('RequiredApplications', $this->EnabledTheme, FALSE);
+   $RequiredApplications = GetValue('RequiredApplications', $this->Data('EnabledTheme'), FALSE);
    if (is_array($RequiredApplications)) {
       echo '<div class="Requirements">'.T('Requires: ');
 
@@ -67,14 +77,14 @@ printf(
    if ($Upgrade) {
       echo '<div class="Alert">';
       echo Url(
-            sprintf(T('%1$s version %2$s is available.'), $this->EnabledThemeName, $NewVersion),
-            CombinePaths(array($AddonUrl, 'find', urlencode($this->EnabledThemeName)), '/')
+            sprintf(T('%1$s version %2$s is available.'), $this->Data('EnabledThemeName'), $NewVersion),
+            CombinePaths(array($AddonUrl, 'find', urlencode($this->Data('EnabledThemeName'))), '/')
          );
       echo '</div>';
    }
    ?>
 </div>
-<?php if (count($this->AvailableThemes) > 1) { ?>
+<?php if (count($this->Data('AvailableThemes', array())) > 1) { ?>
 <div class="BrowseThemes">
    <h3><?php echo T('Other Themes'); ?></h3>
    <table class="SelectionGrid Themes">
@@ -83,10 +93,10 @@ printf(
    $Alt = FALSE;
    $Cols = 3;
    $Col = 0;
-   foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+   foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
       $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
-      $Active = $ThemeFolder == $this->EnabledThemeFolder;
+      $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
       if (!$Active) {
          $Version = GetValue('Version', $ThemeInfo, '');
          $ThemeUrl = GetValue('Url', $ThemeInfo, '');

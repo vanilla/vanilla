@@ -89,4 +89,20 @@ jQuery(document).ready(function($) {
       return false;
    });
 
+   // Selection for theme styles.
+   $('a.SelectThemeStyle').click(function(e) {
+      e.preventDefault();
+
+      var key = $(this).attr('key');
+
+      // Deselect the current item.
+      $('table.ThemeStyles td').removeClass('Active');
+
+      // Select the new item.
+      $('#' + key + '_td').addClass('Active');
+      $('#Form_StyleKey').val(key);
+
+      $(this).blur();
+      return false;
+   });
 });

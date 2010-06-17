@@ -68,7 +68,7 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Value) {
 <?php foreach ($this->Data('ThemeInfo.Options.Text') as $Code => $Default) {
   echo '<li>',
    $this->Form->Label('@'.$Code, 'Text_'.$Code),
-   $this->Form->TextBox('Text_'.$Code, array('MultiLine' => TRUE)),
+   $this->Form->TextBox($this->Form->EscapeString('Text_'.$Code), array('MultiLine' => TRUE)),
    '</li>';
 }
 ?>

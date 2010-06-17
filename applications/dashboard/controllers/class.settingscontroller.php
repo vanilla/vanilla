@@ -571,7 +571,9 @@ class SettingsController extends DashboardController {
          // Save the text to the locale.
          $Translations = array();
          foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
-            $Translations['Theme_'.$Key] = $this->Form->GetFormValue('Text_'.$Key);
+            $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
+            $Translations['Theme_'.$Key] = $Value;
+            //$this->Form->SetFormValue('Text_'.$Key, $Value);
          }
          Gdn::Locale()->SaveTranslations($Translations);
          Gdn::Locale()->Refresh();
@@ -584,7 +586,7 @@ class SettingsController extends DashboardController {
 
       if (!$this->Form->IsPostBack()) {
          foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
-            $this->Form->SetFormValue('Text_'.$Key, T('Theme_'.$Key, $Default));
+            $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), T('Theme_'.$Key, $Default));
          }
       }
 

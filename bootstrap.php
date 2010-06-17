@@ -25,6 +25,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'functions.error.php');
 require_once(PATH_LIBRARY_CORE . DS . 'functions.general.php');
 require_once(PATH_LIBRARY_CORE . DS . 'functions.validation.php');
 
+require_once(PATH_LIBRARY_CORE . DS . 'interface.ihandshake.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.iplugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');

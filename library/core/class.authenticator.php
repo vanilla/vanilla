@@ -51,6 +51,9 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    const URL_SIGNIN           = 'SignInUrl';
    const URL_SIGNOUT          = 'SignOutUrl';
    
+   const KEY_TYPE_TOKEN       = 'token';
+   const KEY_TYPE_PROVIDER    = 'provider';
+   
    /**
     * Alias of the authentication scheme to use, e.g. "password" or "openid"
     *

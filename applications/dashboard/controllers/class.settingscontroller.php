@@ -15,6 +15,12 @@ class SettingsController extends DashboardController {
    
    public $Uses = array('Form', 'Database');
    public $ModuleSortContainer = 'Dashboard';
+
+   /**
+    *
+    * @var Gdn_Form
+    */
+   public $Form;
    
    /**
     * Application management screen.
@@ -547,22 +553,64 @@ class SettingsController extends DashboardController {
       echo 'Success';
    }
 
+   public function ThemeOptions() {
+      $this->Permission('Garden.Themes.Manage');
+
+      $this->AddJsFile('addons.js');
+      $this->AddSideMenu('dashboard/settings/themeoptions');
+
+      $ThemeManager = new Gdn_ThemeManager();
+      $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
+
+      if ($this->Form->IsPostBack()) {
+         // Save the styles to the config.
+         $StyleKey = $this->Form->GetFormValue('StyleKey');
+         SaveToConfig(array(
+            'Garden.ThemeOptions.Styles.Key' => $StyleKey,
+            'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey")));
+         // Save the text to the locale.
+         $Translations = array();
+         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+            $Translations['Theme_'.$Key] = $this->Form->GetFormValue('Text_'.$Key);
+         }
+         Gdn::Locale()->SaveTranslations($Translations);
+         Gdn::Locale()->Refresh();
+
+         $this->StatusMessage = T('Saved');
+      }
+
+      $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
+      $StyleKey = $this->Data('ThemeOptions.Styles.Key');
+
+      if (!$this->Form->IsPostBack()) {
+         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+            $this->Form->SetFormValue('Text_'.$Key, T('Theme_'.$Key, $Default));
+         }
+      }
+
+      $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
+      $this->SetData('Title', sprintf('%s Options', $this->Data('ThemeOptions.Name', $this->Data('ThemeInfo.Folder'))));
+      $this->Form->AddHidden('StyleKey', $StyleKey);
+
+      $this->Render();
+   }
+
    /**
     * Theme management screen.
     */
    public function Themes($ThemeFolder = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
-      $this->Title(T('Themes'));
+      $this->SetData('Title', T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
-      $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $this->EnabledThemeFolder = $ThemeManager->EnabledTheme();
-      $this->EnabledTheme = $ThemeManager->EnabledThemeInfo();
-      $this->EnabledThemeName = GetValue('Name', $this->EnabledTheme, GetValue('Folder', $this->EnabledTheme, ''));
+      $this->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
+      $this->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
+      $this->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
+      $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
@@ -590,14 +638,14 @@ class SettingsController extends DashboardController {
       
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {
-            foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
+            foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
                   $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
                   $ThemeManager->EnableTheme($ThemeName);
                }
             }
-         } catch (Exception $e) {
-            $this->Form->AddError(strip_tags($e->getMessage()));
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
          if ($this->Form->ErrorCount() == 0)
             Redirect('/settings/themes');

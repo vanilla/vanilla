@@ -7,9 +7,11 @@
 /conf/config.php
 /conf/bootstrap.before.php
 /conf/bootstrap.after.php
+/conf/locale-*
 /applications/vanillaforumscom
 /applications/vfcom
 /applications/vforg
 *.kpf
 .DS_Store
+Thumbs.db
 *.swp

@@ -1238,6 +1238,9 @@ table.SelectionGrid dl dt {
 table.SelectionGrid dl dd {
 	display: inline;
 }
+table.SelectionGrid td.Active {
+   background: #FFFF00;
+}
 
 /* =================================================================== Footer */
 #Foot {

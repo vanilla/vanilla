@@ -117,5 +117,8 @@ class Gdn_Theme {
       
       return 'unknown';
    }
-   
+
+   public static function Text($Code, $Default) {
+      return T('Theme_'.$Code, $Default);
+   }
 }

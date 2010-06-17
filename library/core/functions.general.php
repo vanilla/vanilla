@@ -277,6 +277,21 @@ if (!function_exists('CalculateNumberOfPages')) {
    }
 }
 
+if (!function_exists('ChangeBasename')) {
+   /** Change the basename part of a filename for a given path.
+    *
+    * @param string $Path The path to alter.
+    * @param string $NewBasename The new basename. A %s will be replaced by the old basename.
+    * @return string
+    */
+   function ChangeBasename($Path, $NewBasename) {
+      $NewBasename = str_replace('%s', '$2', $NewBasename);
+      $Result = preg_replace('/(.*\/)?(.*?)(\\.[^.]+)/', '$1'.$NewBasename.'$3', $Path);
+      
+      return $Result;
+   }
+}
+
 if (!function_exists('CheckPermission')) {
    function CheckPermission($PermissionName) {
       $Result = Gdn::Session()->CheckPermission($PermissionName);
@@ -1036,12 +1051,22 @@ if (!function_exists('RemoveQuoteSlashes')) {
 }
 
 if (!function_exists('SafeGlob')) {
-   function SafeGlob($Pattern, $Flags = 0) {
-      $Return = glob($Pattern, $Flags);
-      if (!is_array($Return))
-         $Return = array();
+   function SafeGlob($Pattern, $Flags = 0, $Extensions = array()) {
+      $Result = glob($Pattern, $Flags);
+      if (!is_array($Result))
+         $Result = array();
+
+      // Check against allowed extensions.
+      if (count($Extensions) > 0) {
+         foreach ($Result as $Index => $Path) {
+            if (!$Path)
+               continue;
+            if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), $Extensions))
+               unset($Result[$Index]);
+         }
+      }
          
-      return $Return;
+      return $Result;
    }
 }
 

@@ -43,15 +43,19 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'));
-		$Menu->AddLink('Appearance', T('Banner'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
-		$Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
+		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Themes.Manage');
+      if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) {
+         $Menu->AddLink('Appearance', sprintf(T('%s Options'), $ThemeOptionsName), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
+      }
+
+		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
 
       $Menu->AddItem('Users', T('Users'));
-      $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+      $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
 			
       if (C('Garden.Registration.Manage', TRUE))

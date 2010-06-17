@@ -81,7 +81,15 @@ class Gdn_ThemeManager {
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
-         SaveToConfig('Garden.Theme', $ThemeFolder);
+         $Options = GetValueR("$ThemeName.Options", $this->AvailableThemes());
+         if ($Options) {
+            SaveToConfig(array(
+               'Garden.Theme' => $ThemeFolder,
+               'Garden.ThemeOptions.Name' => GetValueR("$ThemeName.Name", $this->AvailableThemes(), $ThemeFolder)));
+         } else {
+            SaveToConfig('Garden.Theme', $ThemeFolder);
+            RemoveFromConfig('Garden.ThemeOptions');
+         }
       }
 
       // Tell the locale cache to refresh itself.

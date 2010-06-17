@@ -73,6 +73,21 @@ class Gdn_Locale extends Gdn_Pluggable {
       $this->Set($LocalName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
    }
 
+   public function SaveTranslations($Translations, $LocaleName = FALSE) {
+      if (!$LocaleName)
+         $LocaleName = $this->_Locale;
+
+      $Config = Gdn::Factory(Gdn::AliasConfig);
+      $Path = PATH_CONF . DS . "locale-$LocaleName.php";
+      $Config->Load($Path, 'Save', 'Definition');
+
+      foreach ($Translations as $k => $v) {
+         $Config->Set($k, $v);
+      }
+      $this->SetTranslation($Translations);
+      return $Config->Save($Path, 'Definition');
+   }
+
    /**
     * Defines and loads the locale.
     *
@@ -102,11 +117,13 @@ class Gdn_Locale extends Gdn_Pluggable {
       if ($ForceRemapping === TRUE || !Gdn_LibraryMap::CacheReady('locale')) {
          $LocaleSources = array();
          // Get application-based locale definition files
+         $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName.'.php')), $ApplicationWhiteList);
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
          if ($ApplicationLocaleSources !== FALSE)
             $LocaleSources = $ApplicationLocaleSources;
 
          // Get plugin-based locale definition files
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName.'.php')), $PluginWhiteList);
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
@@ -125,9 +142,14 @@ class Gdn_Locale extends Gdn_Pluggable {
          for($i = 0; $i < $Count; ++$i) {
             $FileContents[$SafeLocaleName][] = Gdn_Format::ArrayValueForPhp($LocaleSources[$i]);
          }
-         
-         // Add the config locale if it exists
-         $ConfigLocale = PATH_CONF . DS . 'locale.php';
+
+         // Look for a global locale.
+         $ConfigLocale = PATH_CONF.'/locale.php';
+         if (file_exists($ConfigLocale))
+            $FileContents[$SafeLocaleName][] = $ConfigLocale;
+
+         // Look for a config locale that is locale-specific.
+         $ConfigLocale = PATH_CONF."/locale-$LocaleName.php";
          if (file_exists($ConfigLocale))
             $FileContents[$SafeLocaleName][] = $ConfigLocale;
          

@@ -1077,8 +1077,7 @@ class Gdn_Form {
     * @param string $FieldName The field name to escape.
     * @return string
     */
-   public function EscapeFieldName(
-      $FieldName) {
+   public function EscapeFieldName($FieldName) {
       $Return = $this->InputPrefix;
       if ($Return != '') $Return .= '/';
       return $Return . $this->_EscapeString($FieldName);
@@ -1134,7 +1133,7 @@ class Gdn_Form {
     * @return unknown
     */
    public function GetFormValue($FieldName, $Default = '') {
-      return ArrayValue($FieldName, $this->FormValues(), $Default);
+      return ArrayValue($this->_EscapeString($FieldName), $this->FormValues(), $Default);
    }
 
    /**
@@ -1251,7 +1250,7 @@ class Gdn_Form {
     */
    public function SetFormValue($FieldName, $Value) {
       $this->FormValues();
-      $this->_FormValues[$FieldName] = $Value;
+      $this->_FormValues[$this->_EscapeString($FieldName)] = $Value;
    }
    
    /**

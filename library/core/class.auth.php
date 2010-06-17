@@ -11,10 +11,12 @@ class Gdn_Auth extends Gdn_Pluggable {
    protected $_UserModel = null;
    protected $_PermissionModel = null;
    
+   protected $_AllowHandshake;
+   
    public function __construct() {
       // Prepare Identity storage container
       $this->Identity();
-      
+      $this->_AllowHandshake = FALSE;
       parent::__construct();
    }
    
@@ -29,6 +31,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       // Bring all enabled authenticator classes into the defined scope to allow them to be picked up by the plugin manager
       foreach ($AuthenticationSchemes as $AuthenticationSchemeAlias)
          $Registered = $this->RegisterAuthenticator($AuthenticationSchemeAlias);
+      
    }
    
    public function RegisterAuthenticator($AuthenticationSchemeAlias) {
@@ -96,6 +99,64 @@ class Gdn_Auth extends Gdn_Pluggable {
          'UserID'                   => Gdn::Session()->User->UserID
       ) : array()));
       return Gdn_Format::VanillaSprintf($PlaceholderString, $Replacements);
+   }
+   
+   public function AssociateUser($ProviderKey, $UserKey, $UserID = 0) {
+      $SQL = Gdn::Database()->SQL();
+      
+      if ($UserID == 0) {
+         try {
+            $Success = $SQL->Insert('UserAuthentication',array(
+               'UserID'          => 0,
+               'ForeignUserKey'  => $UserKey,
+               'ProviderKey'     => $ProviderKey
+            ));
+         } catch(Exception $e) { $Success = TRUE; }
+      } else {
+         $Success = $SQL->Replace('UserAuthentication',array(
+               'UserID'          => $UserID
+            ), array(
+               'ForeignUserKey'  => $UserKey,
+               'ProviderKey'     => $ProviderKey
+            ));
+      }
+      
+      if (!$Success) return FALSE;
+      
+      return array(
+         'UserID'          => $UserID,
+         'ForeignUserKey'  => $UserKey,
+         'ProviderKey'     => $ProviderKey
+      );
+   }
+   
+   public function GetAssociation($UserKey, $ProviderKey = FALSE, $KeyType = Gdn_Authenticator::KEY_TYPE_TOKEN) {
+      //die(print_r(func_get_args(),true));
+      $SQL = Gdn::Database()->SQL();
+      $Query = $SQL->Select('ua.UserID, ua.ForeignUserKey')
+         ->From('UserAuthentication ua')
+         ->Where('ua.ForeignUserKey', $UserKey)
+         ->Where('UserID >', 0);
+         
+      if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_TOKEN) {
+         $Query->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
+         ->Where('uat.Token', $ProviderKey);
+      }
+      
+      if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_PROVIDER) {
+         $Query->Where('ua.ProviderKey', $ProviderKey);
+      }
+         
+      $UserAssociation = $Query->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      return $UserAssociation ? $UserAssociation : FALSE;
+   }
+   
+   public function AllowHandshake() {
+      $this->_AllowHandshake = TRUE;
+   }
+   
+   public function CanHandshake() {
+      return $this->_AllowHandshake;
    }
    
    /**

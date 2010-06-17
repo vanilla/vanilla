@@ -205,9 +205,16 @@ class ImportModel extends Gdn_Model {
             if(!$Name)
                throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.'), $Table));
 
-				if(array_key_exists($Name, $DestColumns))
+				if(array_key_exists($Name, $DestColumns)) {
 					$StructureType = $DestStructure->ColumnTypeString($DestColumns[$Name]);
-				else {
+				} elseif (isset($DestColumns[$Type])) {
+               // Fixe the table definition.
+               unset($Tables[$Table]['Columns'][$Name]);
+               $Tables[$Table]['Columns'][$Type] = '';
+
+               $Name = $Type;
+               $StructureType = $DestStructure->ColumnTypeString($DestColumns[$Type]);
+            } else {
 					$StructureType = $Type;
 
 					if(!$StructureType)
@@ -233,7 +240,7 @@ class ImportModel extends Gdn_Model {
                $DestStructure->Set();
          } catch(Exception $Ex) {
             // Since these exceptions are likely caused by a faulty import file they should be considered user exceptions.
-            throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table.'), $Table)); //, $Ex);
+            throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table (%s).'), $Table, $Ex->getMessage())); //, $Ex);
          }
 		}
 		return TRUE;
@@ -422,9 +429,9 @@ class ImportModel extends Gdn_Model {
       if(!$Column)
          return TRUE;
       $Tables = $this->Data['Tables'];
-      if(!array_key_exists('Columns', $Tables) || !array_key_exists($Column, $Tables['Columns']));
-         return FALSE;
-      return TRUE;
+
+      $Exists = GetValueR("Tables.$Table.Columns.$Column", $this->Data, FALSE);
+      return $Exists !== FALSE;
    }
 
 	public function InsertTables() {
@@ -868,7 +875,7 @@ class ImportModel extends Gdn_Model {
 
       if (!$this->ImportExists('Table', 'Body')) {
          // Update the body of the discussion if it isn't there.
-         $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'DateLastComment', 'CommentID');
+         $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID', 'CommentID');
 
          $Sqls['Discussion.Body'] = "update :_Discussion d
          join :_Comment c
@@ -925,7 +932,12 @@ class ImportModel extends Gdn_Model {
       }
 
       // User counts.
-
+      if (!$this->ImportExists('User', 'CountDiscussions')) {
+         $Sqls['User.CountDiscussions'] = $this->GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID');
+      }
+      if (!$this->ImportExists('User', 'CountComments')) {
+         $Sqls['User.CountComments'] = $this->GetCountSQL('count', 'User', 'Comment', 'CountComments', 'Comment', 'UserID', 'InsertUserID');
+      }
 
       // The updates start here.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
@@ -952,6 +964,18 @@ class ImportModel extends Gdn_Model {
 		// Remove the FirstCommentID from the discussion table.
 		Gdn::Structure()->Table('Discussion')->DropColumn('FirstCommentID');
 		$this->Data['CurrentStepMessage'] = '';
+
+      // Update the url codes of categories.
+      if (!$this->ImportExists('Category', 'UrlCode')) {
+         $Categories = Gdn::SQL()->Get('Category')->ResultArray();
+         foreach ($Categories as $Category) {
+            Gdn::SQL()->Put(
+               'Category',
+               array('UrlCode' => Gdn_Format::Url($Category['Name'])),
+               array('CategoryID' => $Category['CategoryID']));
+         }
+      }
+
       return TRUE;
 	}
 }

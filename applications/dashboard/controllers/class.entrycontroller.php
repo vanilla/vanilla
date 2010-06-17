@@ -353,6 +353,19 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
 
+   public function EmailConfirm($UserID = '', $EmailKey = '') {
+      if (!is_numeric($UserID) || $EmailKey != $this->UserModel->GetAttribute($UserID, 'EmailKey', '')) {
+         $this->Form->AddError(T('Couldn\'t confirm email.',
+            'We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.'));
+      }
+
+      if ($this->Form->ErrorCount() == 0) {
+         
+
+      }
+      $this->Render();
+   }
+
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);

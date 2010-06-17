@@ -33,16 +33,7 @@ class PostController extends VanillaController {
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
          $CategoryModel = new CategoryModel();
 
-         // Filter to categories that this user can add to
-         $CategoryModel->SQL->Distinct()
-            ->Join('Permission _p2', '_p2.JunctionID = c.CategoryID', 'inner')
-            ->Join('UserRole _ur2', '_p2.RoleID = _ur2.RoleID', 'inner')
-            ->BeginWhereGroup()
-            ->Where('_ur2.UserID', $Session->UserID)
-            ->Where('_p2.`Vanilla.Discussions.Add`', 1)
-            ->EndWhereGroup();
-
-         $this->CategoryData = $CategoryModel->GetFull();
+         $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }
       $this->AddJsFile('js/library/jquery.autogrow.js');
       $this->AddJsFile('post.js');

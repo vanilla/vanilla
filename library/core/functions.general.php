@@ -1093,6 +1093,29 @@ if (!function_exists('SaneParseStr')) {
    }
 }
 
+if (!function_exists('SaneParseStr')) {
+   function SaneParseStr($Str, &$Output, $Original = NULL) {
+      $Exploded = explode('&',$Str);
+      $Output = array();
+      if (is_array($Original)) {
+         $FirstValue = reset($Original);
+         $FirstKey = key($Original);
+         unset($Original[$FirstKey]);
+      }
+      foreach ($Exploded as $Parameter) {
+         list($Key, $Value) = explode('=',$Parameter);
+         
+         if (!is_null($Original)) {
+            $Output[$Key] = $FirstValue;
+            $Output = array_merge($Output, $Original);
+            break;
+         }
+         
+         $Output[$Key] = $Value;
+      }
+   }
+}
+
 if (!function_exists('SaveToConfig')) {
    function SaveToConfig($Name, $Value = '') {
       $Config = Gdn::Factory(Gdn::AliasConfig);

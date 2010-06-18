@@ -1045,8 +1045,8 @@ if (!function_exists('SafeGlob')) {
    }
 }
 
-if (!function_exists('SaneParseStr')) {
-   function SaneParseStr($Str, &$Output, $Original = NULL) {
+if (!function_exists('SafeParseStr')) {
+   function SafeParseStr($Str, &$Output, $Original = NULL) {
       $Exploded = explode('&',$Str);
       $Output = array();
       if (is_array($Original)) {
@@ -1055,7 +1055,9 @@ if (!function_exists('SaneParseStr')) {
          unset($Original[$FirstKey]);
       }
       foreach ($Exploded as $Parameter) {
-         list($Key, $Value) = explode('=',$Parameter);
+         $Parts = explode('=', $Parameter);
+         $Key = $Parts[0];
+         $Value = count($Parts) > 1 ? $Parts[1] : '';
          
          if (!is_null($Original)) {
             $Output[$Key] = $FirstValue;

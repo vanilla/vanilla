@@ -83,6 +83,8 @@ class ImportController extends DashboardController {
          $this->SetData('CurrentStep', $Imp->CurrentStep);
          $this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
          $this->SetData('ErrorType', GetValue('ErrorType', $Imp));
+         if ($this->Data('ErrorType'))
+            $this->SetJson('Error', TRUE);
 
          $Imp->ToPost($Post);
          $this->Form->FormValues($Post);

@@ -13,4 +13,4 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
    ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Upload');
+<?php echo $this->Form->Close('OK');

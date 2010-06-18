@@ -82,7 +82,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       $Config->Load($Path, 'Save', 'Definition');
 
       foreach ($Translations as $k => $v) {
-         $Config->Set($k, $v);
+         $Config->Set('Definition.'.$k, $v);
       }
       $this->SetTranslation($Translations);
       return $Config->Save($Path, 'Definition');

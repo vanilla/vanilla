@@ -1080,7 +1080,7 @@ class Gdn_Form {
    public function EscapeFieldName($FieldName) {
       $Return = $this->InputPrefix;
       if ($Return != '') $Return .= '/';
-      return $Return . $this->_EscapeString($FieldName);
+      return $Return . $this->EscapeString($FieldName);
    }
 
    /**
@@ -1133,7 +1133,7 @@ class Gdn_Form {
     * @return unknown
     */
    public function GetFormValue($FieldName, $Default = '') {
-      return ArrayValue($this->_EscapeString($FieldName), $this->FormValues(), $Default);
+      return ArrayValue($FieldName, $this->FormValues(), $Default);
    }
 
    /**
@@ -1169,7 +1169,7 @@ class Gdn_Form {
     * @return boolean
     */
    public function ButtonExists($ButtonCode) {
-      $NameKey = $this->_EscapeString($ButtonCode);
+      $NameKey = $this->EscapeString($ButtonCode);
       return array_key_exists($NameKey, $this->FormValues()) ? TRUE : FALSE;
    }
 
@@ -1250,7 +1250,7 @@ class Gdn_Form {
     */
    public function SetFormValue($FieldName, $Value) {
       $this->FormValues();
-      $this->_FormValues[$this->_EscapeString($FieldName)] = $Value;
+      $this->_FormValues[$FieldName] = $Value;
    }
    
    /**
@@ -1498,10 +1498,9 @@ class Gdn_Form {
     * Encodes the string in a php-form safe-encoded format.
     *
     * @param string $String The string to encode.
-    * @return unknown
+    * @return string
     */
-   protected function _EscapeString(
-      $String) {
+   public function EscapeString($String) {
       $Array = FALSE;
       if (substr($String, -2) == '[]') {
          $String = substr($String, 0, -2);

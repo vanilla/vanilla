@@ -37,6 +37,7 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.librarymap.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.format.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.model.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.module.php');

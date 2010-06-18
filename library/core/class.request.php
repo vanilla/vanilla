@@ -303,7 +303,7 @@ class Gdn_Request {
          if (!is_array($Get)) {
             $Original = array();
             parse_str($Get, $Original);
-            SaneParseStr($Get, $Get, $Original);
+            SafeParseStr($Get, $Get, $Original);
          }
          
          $Value = reset($Get);

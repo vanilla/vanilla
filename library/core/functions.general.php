@@ -15,7 +15,7 @@ function __autoload($ClassName) {
    if(!class_exists('Gdn_FileSystem', FALSE))
       return false;
       
-   if(!class_exists('Gdn_FileCache', FALSE))
+   if(!class_exists('Gdn_LibraryMap', FALSE))
       return false;
 
    if(!class_exists('Gdn', FALSE))

@@ -192,8 +192,8 @@ class Gdn_FileSystem {
          $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
          
       $LibraryKey = str_replace('.', '__', $LibraryName);
-      Gdn_FileCache::PrepareCache($MappingCacheName);
-      $LibraryPath = Gdn_FileCache::GetCache($MappingCacheName, $LibraryKey);
+      Gdn_LibraryMap::PrepareCache($MappingCacheName);
+      $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
       
       if ($LibraryPath === NULL) {
          // $LibraryName wasn't contained in the mappings array.
@@ -209,7 +209,7 @@ class Gdn_FileSystem {
 
          // If the controller was found
          if($LibraryPath !== FALSE) {
-            Gdn_FileCache::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
+            Gdn_LibraryMap::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
          }
       }
       return $LibraryPath;

@@ -45,13 +45,13 @@ class Gdn_FileCache {
     */
    public static function PrepareCache($CacheName, $ExistingCacheArray=NULL) {
       // Onetime initialization of in-memory file cache
-      if (!is_array(Gdn_FileCache::$_Caches)) 
-         Gdn_FileCache::$_Caches = array();
+      if (!is_array(Gdn_LibraryMap::$_Caches)) 
+         Gdn_LibraryMap::$_Caches = array();
       
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches)) {
-         $OnDiskCacheName = sprintf(Gdn_FileCache::DISK_CACHE_NAME_FORMAT,strtolower($CacheName));
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches)) {
+         $OnDiskCacheName = sprintf(Gdn_LibraryMap::DISK_CACHE_NAME_FORMAT,strtolower($CacheName));
       
-         Gdn_FileCache::$_Caches[$CacheName] = array(
+         Gdn_LibraryMap::$_Caches[$CacheName] = array(
             'ondisk'    => $OnDiskCacheName,
             'cache'     => array()
          );
@@ -64,7 +64,7 @@ class Gdn_FileCache {
       
       // If cache data array is passed in, merge it with our existing cache
       if (is_array($ExistingCacheArray))
-         Gdn_FileCache::Import($CacheName, $ExistingCacheArray);
+         Gdn_LibraryMap::Import($CacheName, $ExistingCacheArray);
    }
    
    /**
@@ -75,11 +75,11 @@ class Gdn_FileCache {
     * @return void
     */
    public static function Import($CacheName, $CacheContents) {
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches))
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches))
          return FALSE;
       
-      Gdn_FileCache::$_Caches[$CacheName]['cache'] = array_merge(Gdn_FileCache::$_Caches[$CacheName]['cache'], $CacheContents);
-      Gdn_FileCache::SaveCache($CacheName);
+      Gdn_LibraryMap::$_Caches[$CacheName]['cache'] = array_merge(Gdn_LibraryMap::$_Caches[$CacheName]['cache'], $CacheContents);
+      Gdn_LibraryMap::SaveCache($CacheName);
    }
    
    /**
@@ -89,11 +89,11 @@ class Gdn_FileCache {
     * @return void
     */
    public static function ClearCache($CacheName) {
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches))
-         return Gdn_FileCache::PrepareCache($CacheName);
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches))
+         return Gdn_LibraryMap::PrepareCache($CacheName);
          
-      Gdn_FileCache::$_Caches[$CacheName]['cache'] = array();
-      @unlink(PATH_CACHE.DS.Gdn_FileCache::$_Caches[$CacheName]['ondisk']);
+      Gdn_LibraryMap::$_Caches[$CacheName]['cache'] = array();
+      @unlink(PATH_CACHE.DS.Gdn_LibraryMap::$_Caches[$CacheName]['ondisk']);
    }
    
    /**
@@ -103,10 +103,10 @@ class Gdn_FileCache {
     * @return bool ready state of cache
     */
    public static function CacheReady($CacheName) {
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches))
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches))
          return FALSE;
          
-      if (!sizeof(Gdn_FileCache::$_Caches[$CacheName]['cache']))
+      if (!sizeof(Gdn_LibraryMap::$_Caches[$CacheName]['cache']))
          return FALSE;
          
       return TRUE;
@@ -122,19 +122,19 @@ class Gdn_FileCache {
     * @return mixed cache contents
     */
    public static function Cache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches)) 
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches)) 
          return FALSE;
       
       // Set and save cache data to memory and disk
-      Gdn_FileCache::$_Caches[$CacheName]['cache'][$CacheKey] = $CacheContents;
+      Gdn_LibraryMap::$_Caches[$CacheName]['cache'][$CacheKey] = $CacheContents;
       if ($CacheWrite === TRUE)
-         Gdn_FileCache::SaveCache($CacheName);
+         Gdn_LibraryMap::SaveCache($CacheName);
          
       return $CacheContents;
    }
    
    public static function SafeCache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
-      return Gdn_FileCache::Cache($CacheName, str_replace('.','__',$CacheKey), $CacheContents, $CacheWrite);
+      return Gdn_LibraryMap::Cache($CacheName, str_replace('.','__',$CacheKey), $CacheContents, $CacheWrite);
    }
    
    /**
@@ -148,7 +148,7 @@ class Gdn_FileCache {
     * @return array cache contents
     */
    public static function CacheArray($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
-      $ExistingCacheData = Gdn_FileCache::GetCache($CacheName, $CacheKey);
+      $ExistingCacheData = Gdn_LibraryMap::GetCache($CacheName, $CacheKey);
       
       if ($ExistingCacheData === NULL) 
          $ExistingCacheData = array();
@@ -159,7 +159,7 @@ class Gdn_FileCache {
       $ExistingCacheData[] = $CacheContents;
       
       // Save cache data to memory
-      return Gdn_FileCache::Cache($CacheName, $CacheKey, $ExistingCacheData, $CacheWrite);
+      return Gdn_LibraryMap::Cache($CacheName, $CacheKey, $ExistingCacheData, $CacheWrite);
    }
    
    /**
@@ -170,8 +170,8 @@ class Gdn_FileCache {
     * @return mixed cache entry or null on failure
     */
    public static function GetCache($CacheName, $CacheKey) {
-      if (array_key_exists($CacheKey,Gdn_FileCache::$_Caches[$CacheName]['cache']))
-         return Gdn_FileCache::$_Caches[$CacheName]['cache'][$CacheKey];
+      if (array_key_exists($CacheKey,Gdn_LibraryMap::$_Caches[$CacheName]['cache']))
+         return Gdn_LibraryMap::$_Caches[$CacheName]['cache'][$CacheKey];
          
       return NULL;
    }
@@ -183,14 +183,14 @@ class Gdn_FileCache {
     * @return void
     */
    public static function SaveCache($CacheName) {
-      if (!array_key_exists($CacheName,Gdn_FileCache::$_Caches)) 
+      if (!array_key_exists($CacheName,Gdn_LibraryMap::$_Caches)) 
          return FALSE;
       
-      $FileName = Gdn_FileCache::$_Caches[$CacheName]['ondisk'];
+      $FileName = Gdn_LibraryMap::$_Caches[$CacheName]['ondisk'];
       
       $CacheContents = "<?php if (!defined('APPLICATION')) exit();\n".
-                        "Gdn_FileCache::PrepareCache('{$CacheName}',";
-      Gdn_FileCache::RecurseArrayStr(NULL, Gdn_FileCache::$_Caches[$CacheName]['cache'], $CacheContents);
+                        "Gdn_LibraryMap::PrepareCache('{$CacheName}',";
+      Gdn_LibraryMap::RecurseArrayStr(NULL, Gdn_LibraryMap::$_Caches[$CacheName]['cache'], $CacheContents);
       $CacheContents .= ");";
 
       try {
@@ -208,7 +208,7 @@ class Gdn_FileCache {
     * @param int $FormatIndentLevel depth of indentation for pretty data files
     * @return string innards of cache data array
     */
-   private static function RecurseArrayStr($RootCacheKey, $Cache, &$CacheStr, $FormatIndentLevel=0) {
+   public static function RecurseArrayStr($RootCacheKey, $Cache, &$CacheStr, $FormatIndentLevel=0) {
       if ($RootCacheKey !== NULL)
          $CacheStr .= str_repeat('   ',$FormatIndentLevel)."'{$RootCacheKey}'   => ";
       
@@ -227,7 +227,7 @@ class Gdn_FileCache {
             $CacheStr .= "'{$CacheValue}'";
          }
          else {
-            Gdn_FileCache::RecurseArrayStr($CacheKey, $CacheValue, $CacheStr, $FormatIndentLevel+1);
+            Gdn_LibraryMap::RecurseArrayStr($CacheKey, $CacheValue, $CacheStr, $FormatIndentLevel+1);
          }
       }
       if (is_array($Cache))

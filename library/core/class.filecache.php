@@ -299,5 +299,4 @@ class Gdn_Filecache extends Gdn_Cache {
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       return $this->Increment($Key, 0-$Amount, $Options);
    }
-   
 }

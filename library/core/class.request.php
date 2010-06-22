@@ -298,9 +298,17 @@ class Gdn_Request {
       }
       
       if ($this->RequestScheme() != "console" && is_array($_GET)) {
-         $Value = reset($_GET);
-         $Path = key($_GET);
-         if ($Value !== '')
+         $Get = (is_array($_SERVER) && isset($_SERVER['QUERY_STRING'])) ? ArrayValue('QUERY_STRING', $_SERVER, FALSE) : $_GET;
+         if ($Get === FALSE) $Get = $_GET;
+         if (!is_array($Get)) {
+            $Original = array();
+            parse_str($Get, $Original);
+            SafeParseStr($Get, $Get, $Original);
+         }
+         
+         $Value = reset($Get);
+         $Path = key($Get);
+         if ($Value)
             $Path = FALSE;
          
          $this->RequestURI($Path);

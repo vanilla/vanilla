@@ -1070,6 +1070,31 @@ if (!function_exists('SafeGlob')) {
    }
 }
 
+if (!function_exists('SafeParseStr')) {
+   function SafeParseStr($Str, &$Output, $Original = NULL) {
+      $Exploded = explode('&',$Str);
+      $Output = array();
+      if (is_array($Original)) {
+         $FirstValue = reset($Original);
+         $FirstKey = key($Original);
+         unset($Original[$FirstKey]);
+      }
+      foreach ($Exploded as $Parameter) {
+         $Parts = explode('=', $Parameter);
+         $Key = $Parts[0];
+         $Value = count($Parts) > 1 ? $Parts[1] : '';
+         
+         if (!is_null($Original)) {
+            $Output[$Key] = $FirstValue;
+            $Output = array_merge($Output, $Original);
+            break;
+         }
+         
+         $Output[$Key] = $Value;
+      }
+   }
+}
+
 if (!function_exists('SaveToConfig')) {
    function SaveToConfig($Name, $Value = '') {
       $Config = Gdn::Factory(Gdn::AliasConfig);

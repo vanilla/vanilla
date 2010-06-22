@@ -125,9 +125,9 @@ class PostController extends VanillaController {
                   $this->FireEvent('AfterDiscussionSave');
                   
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                     Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     Redirect('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   } else {
-                     $this->RedirectUrl = Url('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->RedirectUrl = Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
                   }
                } else {
                   // If this was a draft save, notify the user about the save
@@ -291,7 +291,9 @@ class PostController extends VanillaController {
                         $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
                      
                      // Make sure the view knows the current offset
-                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
+                     // $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
+                     // Don't reload the first comment if this new comment is the first one.
+                     $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
                      // Make sure to load all new comments since the page was last loaded by this user
                      $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), true);
                      // Load the discussion

@@ -272,6 +272,15 @@ class Gdn {
    public static function PermissionModel() {
       return self::Factory(self::AliasPermissionModel);
    }
+
+   /**
+    * Get the plugin manager for the application.
+    *
+    * @return Gdn_PluginManager
+    */
+   public static function PluginManager() {
+      return self::Factory(self::AliasPluginManager);
+   }
    
    /**
     * Get or set the current request object.

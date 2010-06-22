@@ -49,6 +49,8 @@ class Gdn_PluginManager {
     */
    private $_AvailablePlugins = NULL;
    
+   protected $_Instances = array();
+   
    /**
     * Register all enabled plugins
     *
@@ -106,6 +108,17 @@ class Gdn_PluginManager {
             }
          }
       }
+   }
+   
+   public function CheckPlugin($PluginName) {
+      if (array_key_exists($PluginName, $this->EnablePlugins))
+         return TRUE:
+         
+      return FALSE;
+   }
+   
+   public function EnabledPlugins() {
+      return $this->EnabledPlugins;
    }
    
    /**
@@ -515,6 +528,7 @@ class Gdn_PluginManager {
             include_once($Path);
       }
       
+      $this->EnabledPlugins = $PluginInfo;
       return $PluginInfo;
    }
    

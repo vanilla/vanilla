@@ -96,6 +96,13 @@ class Gdn_ApplicationManager {
       return $this->_EnabledApplications;
    }
    
+   public function CheckApplication($ApplicationName) {
+      if (array_key_exists($ApplicationName, $this->_EnabledApplications))
+         return TRUE;
+         
+      return FALSE;
+   }
+   
    public function AvailableVisibleApplications() {
       $AvailableApplications = $this->AvailableApplications();
       foreach ($AvailableApplications as $ApplicationName => $Info) {

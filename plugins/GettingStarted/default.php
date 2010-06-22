@@ -68,8 +68,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
          && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
          && Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1'
       ) {
-         $PluginManager = Gdn::Factory('PluginManager');
-         $PluginManager->DisablePlugin('GettingStarted');
+         Gdn::PluginManager()->DisablePlugin('GettingStarted');
       }
    }
    
@@ -86,8 +85,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
    }
    
    public function PluginController_DismissGettingStarted_Create(&$Sender) {
-      $PluginManager = Gdn::Factory('PluginManager');
-      $PluginManager->DisablePlugin('GettingStarted');
+      Gdn::PluginManager()->DisablePlugin('GettingStarted');
       echo 'TRUE';
    }
    

@@ -220,8 +220,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->OriginalRequestMethod = $ControllerMethod;
          
          // Take enabled plugins into account, as well
-         $PluginManager = Gdn::Factory('PluginManager');
-         $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
+         $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
          if (!$PluginManagerHasReplacementMethod && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
             // Check to see if there is an 'x' version of the method.
             if (method_exists($Controller, 'x'.$ControllerMethod)) {
@@ -234,7 +233,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                $this->_ControllerMethod = 'Index';
                $ControllerMethod = 'Index';
                
-               $PluginManagerHasReplacementMethod = $PluginManager->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
+               $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
             }
          }
          // Pass in the querystring values
@@ -255,7 +254,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             //call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
             
             if ($PluginManagerHasReplacementMethod) {
-              $PluginManager->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
+              Gdn::PluginManager()->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
             } else {
               
               $Args = $this->_ControllerMethodArgs;

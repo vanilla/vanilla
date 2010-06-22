@@ -196,9 +196,8 @@ class SettingsController extends DashboardController {
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
          if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
             $ApplicationManager = new Gdn_ApplicationManager();
-            $PluginManager = Gdn::Factory('PluginManager');
             $Locale = Gdn::Locale();
-            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
          }
          */
          
@@ -278,8 +277,7 @@ class SettingsController extends DashboardController {
          $UpdateData = array();
          
          // Grab all of the plugins & versions
-         $PluginManager = Gdn::Factory('PluginManager');
-         $Plugins = $PluginManager->AvailablePlugins();
+         $Plugins = Gdn::PluginManager()->AvailablePlugins();
          foreach ($Plugins as $Plugin => $Info) {
             $Name = ArrayValue('Name', $Info, $Plugin);
             $Version = ArrayValue('Version', $Info, '');
@@ -381,9 +379,8 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings/plugins');
       
       // Retrieve all available plugins from the plugins directory
-      $PluginManager = Gdn::Factory('PluginManager');
-      $this->EnabledPlugins = $PluginManager->EnabledPlugins;
-      $this->AvailablePlugins = $PluginManager->AvailablePlugins();
+      $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+      $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       
       // Loop through all of the available plugins and mark them if they have an update available
       // Retrieve the list of plugins that require updates from the config file
@@ -412,10 +409,10 @@ class SettingsController extends DashboardController {
       if ($PluginName != '') {
          try {
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
-               $PluginManager->DisablePlugin($PluginName);
+               Gdn::PluginManager()->DisablePlugin($PluginName);
             } else {
                $Validation = new Gdn_Validation();
-               if (!$PluginManager->EnablePlugin($PluginName, $Validation))
+               if (!Gdn::PluginManager()->EnablePlugin($PluginName, $Validation))
                   $this->Form->SetValidationResults($Validation->Results());
             }
          } catch (Exception $e) {

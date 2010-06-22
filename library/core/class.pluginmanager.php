@@ -112,7 +112,7 @@ class Gdn_PluginManager {
    
    public function CheckPlugin($PluginName) {
       if (array_key_exists($PluginName, $this->EnablePlugins))
-         return TRUE:
+         return TRUE;
          
       return FALSE;
    }

@@ -401,7 +401,30 @@ class DiscussionModel extends VanillaModel {
                      );
                   }
                }
-               $DiscussionName = ArrayValue('Name', $Fields, '');
+					
+               // Notify any users who were mentioned in the comment
+					$DiscussionName = ArrayValue('Name', $Fields, '');
+               $Story = ArrayValue('Body', $Fields, '');
+               $Usernames = GetMentions($Story);
+               $NotifiedUsers = array();
+               foreach ($Usernames as $Username) {
+                  $User = $UserModel->GetByUsername($Username);
+                  if ($User && $User->UserID != $Session->UserID) {
+                     $NotifiedUsers[] = $User->UserID;   
+                     $ActivityModel = new ActivityModel();   
+                     $ActivityID = $ActivityModel->Add(
+                        $Session->UserID,
+                        'CommentMention',
+                        Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)),
+                        $User->UserID,
+                        '',
+                        '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),
+                        FALSE
+                     );
+                     $ActivityModel->SendNotification($ActivityID, $Story);
+                  }
+               }
+					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
             $Data = $this->SQL

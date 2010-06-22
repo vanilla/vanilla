@@ -395,6 +395,10 @@ class Gdn_Format {
             $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
             $Result = $Formatter->Format($Mixed);
+
+//            $Result = $Result.
+//               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
+//               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
          } else {
             // The text does not contain text and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
@@ -418,19 +422,43 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
-         $Mixed = preg_replace(
+         $Mixed = preg_replace_callback(
             "/
             (?<!<a href=\")
             (?<!\")(?<!\">)
-            ((https?|ftp):\/\/)
+            ((?:https?|ftp):\/\/)
             ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
             /msxi",
-            "<a href=\"$0\" target=\"_blank\" rel=\"nofollow\">$0</a>",
-            $Mixed
-         );
+         array('Gdn_Format', 'LinksCallback'),
+         $Mixed);
 
          return $Mixed;
       }
+   }
+   protected static function LinksCallback($Matches) {
+      $Pr = $Matches[1];
+      $Url = $Matches[2];
+      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches)) {
+         $ID = $Matches[1];
+         $Width = 400;
+         $Height = 225;
+         $Result = <<<EOT
+<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
+EOT;
+      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches)) {
+         $ID = $Matches[1];
+         $Width = 400;
+         $Height = 225;
+
+         $Result = <<<EOT
+<div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
+EOT;
+      } else {
+         $Result = <<<EOT
+<a href="$Url" target="_blank" rel="nofollow">$Url</a>
+EOT;
+      }
+      return $Result;
    }
 
    /**

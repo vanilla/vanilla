@@ -396,9 +396,9 @@ class Gdn_Format {
 
             $Result = $Formatter->Format($Mixed);
 
-//            $Result = $Result.
-//               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
-//               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
+            $Result = $Result.
+               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
+               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
          } else {
             // The text does not contain text and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
@@ -455,7 +455,7 @@ EOT;
 EOT;
       } else {
          $Result = <<<EOT
-<a href="$Url" target="_blank" rel="nofollow">$Url</a>
+<a href="$Pr$Url" target="_blank" rel="nofollow">$Pr$Url</a>
 EOT;
       }
       return $Result;
@@ -487,33 +487,32 @@ EOT;
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Mentions');
       } else {         
-         // Handle @mentions
-         // This one grabs mentions that start at the beginning of $Mixed
+         // Handle @mentions.
          $Mixed = preg_replace(
-            '/^(@([\d\w_]{1,20}))/si',
-            Anchor('\\1', '/profile/\\2'),
+            '/(^|[\s,\.])@(\w{3,20})\b/i', //{1,20}
+            Anchor('\1@\2', '/profile/\\2'),
             $Mixed
          );
          
          // This one handles all other mentions
-         $Mixed = preg_replace(
-            '/([\s]+)(@([\d\w_]{1,20}))/si',
-            '\\1'.Anchor('\\2', '/profile/\\3'),
-            $Mixed
-         );
+//         $Mixed = preg_replace(
+//            '/([\s]+)(@([\d\w_]{1,20}))/si',
+//            '\\1'.Anchor('\\2', '/profile/\\3'),
+//            $Mixed
+//         );
          
          // Handle #hashtag searches
          $Mixed = preg_replace(
-            '/^(#([\d\w_-]+))/si',
-            Anchor('\\1', '/search?Search=%23\\2'),
+            '/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
+            '\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
             $Mixed
          );
          
-         $Mixed = preg_replace(
-            '/([\s]+)(#([\d\w_]+))/si',
-            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
-            $Mixed
-         );
+//         $Mixed = preg_replace(
+//            '/([\s]+)(#([\d\w_]+))/si',
+//            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
+//            $Mixed
+//         );
          return $Mixed;
       }
    }

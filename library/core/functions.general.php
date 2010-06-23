@@ -559,26 +559,16 @@ if (!function_exists('GetMentions')) {
       $Mentions = array();
       
       // This one grabs mentions that start at the beginning of $String
-      preg_match(
-         '/^(@([\d\w_-]{1,20}))/si',
-         $String,
-         $Matches
-      );
-      if (count($Matches) == 3)
-         $Mentions[] = $Matches[2];
-      
-      // This one handles all other mentions
       preg_match_all(
-         '/([\s]+)(@([\d\w_-]{1,20}))/si',
+         '/(?:^|[\s,\.])@(\w{3,20})\b/i',
          $String,
          $Matches
       );
-      if (count($Matches) == 4) {
-         for ($i = 0; $i < count($Matches[3]); ++$i) {
-            $Mentions[] = $Matches[3][$i];
-         }
+      if (count($Matches) > 1) {
+         $Result = array_unique($Matches[1]);
+         return $Result;
       }
-      return array_unique($Mentions);
+      return array();
    }
 }
 

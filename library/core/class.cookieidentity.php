@@ -225,13 +225,13 @@ class Gdn_CookieIdentity {
       
       $CookieData = explode('|', $_COOKIE[$CookieName]);
       if (count($CookieData) < 5) {
-         $this->_DeleteCookie($CookieName);
+         self::DeleteCookie($CookieName);
          return FALSE;
       }
          
       list($HashKey, $HMAC, $Time, $UserID, $Expiration) = $CookieData;
       if ($Expiration < time() && $Expiration != 0) {
-         $this->_DeleteCookie($CookieName);
+         self::DeleteCookie($CookieName);
          return FALSE;
       }
       
@@ -239,7 +239,7 @@ class Gdn_CookieIdentity {
       $Hash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
       if ($HMAC != $Hash) {
-         $this->_DeleteCookie($CookieName);
+         self::DeleteCookie($CookieName);
          return FALSE;
       }
       

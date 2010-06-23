@@ -50,6 +50,9 @@ class SearchController extends Gdn_Controller {
 			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
 		
 		$Search = $this->Form->GetFormValue('Search');
+      $Mode = $this->Form->GetFormValue('Mode');
+      if ($Mode)
+         $this->SearchModel->ForceSearchMode = $Mode;
 		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);

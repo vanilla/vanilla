@@ -102,9 +102,8 @@ class PermissionModel extends Gdn_Model {
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
       
-      $PluginManager = Gdn::Factory('PluginManager');
       $PluginNamespaces = array();
-      foreach($PluginManager->EnabledPlugins as $Plugin) {
+      foreach(Gdn::PluginManager()->EnabledPlugins as $Plugin) {
          if(!array_key_exists('RegisterPermissions', $Plugin) || !is_array($Plugin['RegisterPermissions']))
             continue;
          foreach($Plugin['RegisterPermissions'] as $PermissionName) {

@@ -156,9 +156,8 @@ class SetupController extends DashboardController {
             $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
             if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
                $ApplicationManager = new Gdn_ApplicationManager();
-               $PluginManager = Gdn::Factory('PluginManager');
                $Locale = Gdn::Locale();
-               $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+               $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
             }
             
             // Set the instantiated config object's db params and make the database use them (otherwise it will use the default values from conf/config-defaults.php).

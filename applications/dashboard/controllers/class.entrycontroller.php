@@ -130,7 +130,7 @@ class EntryController extends Gdn_Controller {
    }
       
    public function Index() {
-      $this->Auth();
+      $this->SignIn();
    }
    
    /**

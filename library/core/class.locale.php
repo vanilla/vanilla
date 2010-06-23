@@ -65,8 +65,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       $ApplicationManager = Gdn::Factory('ApplicationManager');
       $ApplicationWhiteList = $ApplicationManager->EnabledApplicationFolders();
 
-      $PluginManager = Gdn::Factory('PluginManager');
-      $PluginWhiteList = $PluginManager->EnabledPluginFolders();
+      $PluginWhiteList = Gdn::PluginManager()->EnabledPluginFolders();
 
       $ForceRemapping = TRUE;
 

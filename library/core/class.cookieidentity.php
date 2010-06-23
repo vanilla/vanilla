@@ -224,19 +224,25 @@ class Gdn_CookieIdentity {
          $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
       
       $CookieData = explode('|', $_COOKIE[$CookieName]);
-      if (count($CookieData) < 5)
+      if (count($CookieData) < 5) {
+         $this->_DeleteCookie($CookieName);
          return FALSE;
+      }
          
       list($HashKey, $HMAC, $Time, $UserID, $Expiration) = $CookieData;
-      if ($Expiration < time() && $Expiration != 0)
+      if ($Expiration < time() && $Expiration != 0) {
+         $this->_DeleteCookie($CookieName);
          return FALSE;
-
+      }
+      
       $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
       $Hash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
-      if ($HMAC != $Hash)
+      if ($HMAC != $Hash) {
+         $this->_DeleteCookie($CookieName);
          return FALSE;
-
+      }
+      
       return TRUE;
    }
    

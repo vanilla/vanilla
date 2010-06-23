@@ -81,7 +81,6 @@ class SetupController extends DashboardController {
     * should not be functional after the application has been set up.
     */
    public function Configure($RedirectUrl = '') {
-      $Config = Gdn::Factory(Gdn::AliasConfig);
       
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
@@ -148,10 +147,11 @@ class SetupController extends DashboardController {
             $Domain = Gdn::Request()->Domain();
 
             // Set up cookies now so that the user can be signed in.
-            $ConfigurationFormValues['Garden.Cookie.Salt'] = RandomString(10);
-            $ConfigurationFormValues['Garden.Cookie.Domain'] = strpos($Host, '.') === FALSE ? '' : $Host; // Don't assign the domain if it is a non .com domain as that will break cookies.
-            $ConfigurationModel->Save($ConfigurationFormValues);
-            
+            $ExistingSalt = C('Garden.Cookie.Salt', FALSE);
+            $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : RandomString(10);
+            $ConfigurationFormValues['Garden.Cookie.Domain'] = ''; // Don't set this to anything by default. # Tim - 2010-06-23
+            $ConfigurationModel->Save($ConfigurationFormValues, TRUE);
+                    
             // If changing locale, redefine locale sources:
             $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
             if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
@@ -159,13 +159,6 @@ class SetupController extends DashboardController {
                $Locale = Gdn::Locale();
                $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
             }
-            
-            // Set the instantiated config object's db params and make the database use them (otherwise it will use the default values from conf/config-defaults.php).
-            $Config->Set('Database.Host', $ConfigurationFormValues['Database.Host']);
-            $Config->Set('Database.Name', $ConfigurationFormValues['Database.Name']);
-            $Config->Set('Database.User', $ConfigurationFormValues['Database.User']);
-            $Config->Set('Database.Password', $ConfigurationFormValues['Database.Password']);
-            $Config->ClearSaveData();
             
             Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array(Gdn::Config('Database')));
             
@@ -195,6 +188,7 @@ class SetupController extends DashboardController {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
                // The user has been created successfully, so sign in now
+               Gdn::Authenticator()->Identity()->Init();
                $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
                $Authenticator->FetchData($this->Form);
                $AuthUserID = $Authenticator->Authenticate();

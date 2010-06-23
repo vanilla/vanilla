@@ -25,13 +25,12 @@ class CommentModel extends VanillaModel {
    public function CommentQuery($FireEvent = TRUE) {
       $this->SQL->Select('c.*')
          ->Select('iu.Name', '', 'InsertName')
-         ->Select('iup.Name', '', 'InsertPhoto')
+         ->Select('iu.Photo', '', 'InsertPhoto')
          ->Select('uu.Name', '', 'UpdateName')
          ->Select('du.Name', '', 'DeleteName')
          ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
          ->From('Comment c')
          ->Join('User iu', 'c.InsertUserID = iu.UserID', 'left')
-         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left')
          ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left')
          ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
       if($FireEvent)

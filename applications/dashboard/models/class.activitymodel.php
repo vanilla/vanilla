@@ -23,12 +23,11 @@ class ActivityModel extends Gdn_Model {
          ->Select('t.Name', '', 'ActivityType')
          ->Select('au.Name', '', 'ActivityName')
          ->Select('au.Gender', '', 'ActivityGender')
-         ->Select('aup.Name', '', 'ActivityPhoto')
+         ->Select('au.Photo', '', 'ActivityPhoto')
          ->Select('ru.Name', '', 'RegardingName')
          ->From('Activity a')
          ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
          ->Join('User au', 'a.ActivityUserID = au.UserID')
-         ->Join('Photo aup', 'au.PhotoID = aup.PhotoID', 'left')
          ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
    }
    

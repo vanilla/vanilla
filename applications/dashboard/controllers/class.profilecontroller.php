@@ -253,17 +253,21 @@ class ProfileController extends Gdn_Controller {
             // Generate the target image name
             $TargetImage = $UploadImage->GenerateTargetName(PATH_ROOT . DS . 'uploads');
             $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
-            
+
             // Delete any previously uploaded images
-            @unlink(PATH_ROOT . DS . 'uploads' . DS . 'p' . $this->User->Photo);
+            @unlink( PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s'));
             // Don't delete this one because it hangs around in activity streams:
-            // @unlink(PATH_ROOT . DS . 'uploads' . DS . 't' . $this->User->Photo); 
-            @unlink(PATH_ROOT . DS . 'uploads' . DS . 'n' . $this->User->Photo);
+            // @unlink(PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 't%s'));
+            @unlink(PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'n%s'));
+
+            // Make sure the avatars folder exists.
+            if (!file_exists(PATH_ROOT.'/uploads/userpics'))
+               mkdir(PATH_ROOT.'/uploads/userpics');
             
             // Save the uploaded image in profile size
             $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT . DS . 'uploads' . DS . 'p'.$ImageBaseName,
+               PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
                Gdn::Config('Garden.Profile.MaxHeight', 1000),
                Gdn::Config('Garden.Profile.MaxWidth', 250)
             );
@@ -271,7 +275,7 @@ class ProfileController extends Gdn_Controller {
             // Save the uploaded image in preview size
             $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT . DS . 'uploads' . DS . 't'.$ImageBaseName,
+               PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
                Gdn::Config('Garden.Preview.MaxHeight', 100),
                Gdn::Config('Garden.Preview.MaxWidth', 75)
             );
@@ -280,7 +284,7 @@ class ProfileController extends Gdn_Controller {
             $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
             $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT . DS . 'uploads' . DS . 'n'.$ImageBaseName,
+               PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName,
                $ThumbSize,
                $ThumbSize,
                TRUE
@@ -291,9 +295,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no errors, associate the image with the user
          if ($this->Form->ErrorCount() == 0) {
-            $PhotoModel = new Gdn_Model('Photo');
-            $PhotoID = $PhotoModel->Insert(array('Name' => $ImageBaseName));
-            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'PhotoID' => $PhotoID, 'Photo' => $ImageBaseName)))
+            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => 'userpics/'.$ImageBaseName)))
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
          }
          // If there were no problems, redirect back to the user account
@@ -415,7 +417,7 @@ class ProfileController extends Gdn_Controller {
       $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
       
       // Define the source (profile sized) picture & dimensions
-      $Source = PATH_ROOT . DS . 'uploads' . DS . 'p'. $this->User->Photo;
+      $Source = PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s');
       $this->SourceSize = getimagesize($Source);
       
       // Add some more hidden form fields for jcrop
@@ -451,7 +453,7 @@ class ProfileController extends Gdn_Controller {
             );
             
             // Save the target thumbnail
-            imagejpeg($TargetImage, PATH_ROOT . DS . 'uploads' . DS . 'n'.$this->User->Photo);
+            imagejpeg($TargetImage, PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'n%s'));
          } catch (Exception $ex) {
             $this->Form->AddError($ex->getMessage());
          }

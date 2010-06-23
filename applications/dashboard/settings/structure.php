@@ -51,15 +51,14 @@ if (!$RoleTableExists || $Drop) {
 $Construct->Table('User');
 
 $PhotoIDExists = $Construct->ColumnExists('PhotoID');
-$PhotoPathExists = $Construct->ColumnExists('PhotoPath');
+$PhotoExists = $Construct->ColumnExists('Photo');
 
 $Construct
 	->PrimaryKey('UserID')
    ->Column('Name', 'varchar(20)', FALSE, 'key')
    ->Column('Password', 'varbinary(50)')
 	->Column('HashMethod', 'varchar(10)', TRUE)
-   ->Column('PhotoID', 'int', NULL)
-   ->Column('PhotoPath', 'varchar(255)', NULL)
+   ->Column('Photo', 'varchar(255)', NULL)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)')
    ->Column('ShowEmail', 'tinyint(1)', '0')
@@ -80,8 +79,6 @@ $Construct
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
-	// Add a role cache column to the user table so a user's multiple roles can be read as a single permission.
-	->Column('CacheRoleID', 'int', TRUE)
    ->Column('Admin', 'tinyint(1)', '0')
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
@@ -300,3 +297,16 @@ $Construct->Table('Message')
 	->Column('CssClass', 'varchar(20)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Set($Explicit, $Drop);
+
+$Prefix = $SQL->Database->DatabasePrefix;
+
+if ($PhotoIDExists && !$PhotoExists) {
+   $Construct->Query("update {$Prefix}User u
+   join {$Prefix}Photo p
+      on u.PhotoID = p.PhotoID
+   set u.Photo = p.Name");
+}
+
+if ($PhotoIDExists) {
+   $Construct->Table('User')->DropColumn('PhotoID');
+}

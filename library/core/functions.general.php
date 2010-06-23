@@ -286,7 +286,7 @@ if (!function_exists('ChangeBasename')) {
     */
    function ChangeBasename($Path, $NewBasename) {
       $NewBasename = str_replace('%s', '$2', $NewBasename);
-      $Result = preg_replace('/(.*\/)?(.*?)(\\.[^.]+)/', '$1'.$NewBasename.'$3', $Path);
+      $Result = preg_replace('/^(.*\/)?(.*?)(\.[^.]+)$/', '$1'.$NewBasename.'$3', $Path);
       
       return $Result;
    }

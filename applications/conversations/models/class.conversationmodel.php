@@ -25,15 +25,14 @@ class ConversationModel extends Gdn_Model {
          ->Select('lm.DateInserted', '', 'DateLastMessage')
          ->Select('lm.Body', '', 'LastMessage')
          ->Select('lmu.Name', '', 'LastMessageName')
-         ->Select('lmup.Name', '', 'LastMessagePhoto')
+         ->Select('lmu.Photo', '', 'LastMessagePhoto')
          //->Select('iu.Name', '', 'InsertName')
          // ->Select('uu.Name', '', 'UpdateName')
          ->From('Conversation c')
          //->Join('User iu', 'c.InsertUserID = iu.UserID')
          ->Join('UserConversation uc', "c.ConversationID = uc.ConversationID and uc.UserID = $ViewingUserID and uc.Deleted = 0")
          ->Join('ConversationMessage lm', 'uc.LastMessageID = lm.MessageID')
-         ->Join('User lmu', 'lm.InsertUserID = lmu.UserID')
-         ->Join('Photo lmup', 'lmu.PhotoID = lmup.PhotoID', 'left');
+         ->Join('User lmu', 'lm.InsertUserID = lmu.UserID');
          //->BeginWhereGroup()
          //->Where('uc.DateCleared is null')
          //->OrWhere('c.DateUpdated >', 'uc.DateCleared', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.

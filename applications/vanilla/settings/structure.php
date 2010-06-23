@@ -28,12 +28,18 @@ if ($Drop)
    $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'Sort' => '1'));
 
 // Construct the discussion table.
-$Construct->Table('Discussion')
+$Construct->Table('Discussion');
+
+$FirstCommentIDExists = $Construct->ColumnExists('FirstCommentID');
+$BodyExists = $Construct->ColumnExists('Body');
+$LastCommentIDExists = $Construct->ColumnExists('LastCommentID');
+$LastCommentUserIDExists = $Construct->ColumnExists('LastCommentUserID');
+
+$Construct
    ->PrimaryKey('DiscussionID')
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
-	->Column('FirstCommentID', 'int', TRUE, 'key')	// Deleted April 26, 2010
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
@@ -271,30 +277,35 @@ Removed FirstComment from :_Discussion and moved it into the discussion table.
 */
 $Prefix = $SQL->Database->DatabasePrefix;
 
-$Construct->Query("update {$Prefix}Discussion, {$Prefix}Comment
-set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
-   {$Prefix}Discussion.Format = {$Prefix}Comment.Format
-where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
+if ($FirstCommentIDExists && !$BodyExists) {
+   $Construct->Query("update {$Prefix}Discussion, {$Prefix}Comment
+   set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
+      {$Prefix}Discussion.Format = {$Prefix}Comment.Format
+   where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
+
+   $Construct->Query("delete {$Prefix}Comment
+   from {$Prefix}Comment inner join {$Prefix}Discussion
+   where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
+}
+
+if (!$LastCommentIDExists || !$LastCommentUserIDExists) {
+   $Construct->Query("update {$Prefix}Discussion d
+   inner join {$Prefix}Comment c
+      on c.DiscussionID = d.DiscussionID
+   inner join (
+      select max(c2.CommentID) as CommentID
+      from {$Prefix}Comment c2
+      group by c2.DiscussionID
+   ) c2
+   on c.CommentID = c2.CommentID
+   set d.LastCommentID = c.CommentID,
+      d.LastCommentUserID = c.InsertUserID
+where d.LastCommentUserID is null");
+}
 
 // Update lastcommentid & firstcommentid
-$Construct->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
-
-$Construct->Query("delete {$Prefix}Comment
-from {$Prefix}Comment inner join {$Prefix}Discussion
-where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
-
-$Construct->Query("update {$Prefix}Discussion d
-inner join {$Prefix}Comment c
-   on c.DiscussionID = d.DiscussionID
-inner join (
-   select max(c2.CommentID) as CommentID
-   from {$Prefix}Comment c2
-   group by c2.DiscussionID
-) c2
-on c.CommentID = c2.CommentID
-set d.LastCommentID = c.CommentID,
-   d.LastCommentUserID = c.InsertUserID
-where d.LastCommentUserID is null");
+if ($FirstCommentIDExists)
+   $Construct->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
 
 /*
     May 12th, 2010
@@ -321,6 +332,8 @@ $Construct->Query("update {$Prefix}Permission p2
       p.`Vanilla.Comments.Delete` = p2.`Vanilla.Discussions.Sink`
    where p.RoleID <> 0;");
 
-// This is the final structure of the discussion table after removed & updated columns
-$Construct->Table('Discussion')->DropColumn('FirstCommentID');
-$Construct->Reset();
+// This is the final structure of the discussion table after removed & updated columns.
+if ($FirstCommentIDExists) {
+   $Construct->Table('Discussion')->DropColumn('FirstCommentID');
+   $Construct->Reset();
+}

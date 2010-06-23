@@ -20,6 +20,8 @@ $Construct = $Database->Structure();
 // Role Table
 $Construct->Table('Role');
 
+$RoleTableExists = $Construct->TableExists();
+
 $Construct
    ->PrimaryKey('RoleID')
    ->Column('Name', 'varchar(100)')
@@ -29,26 +31,35 @@ $Construct
    ->Column('CanSession', 'tinyint(1)', '1')
    ->Set($Explicit, $Drop);
 
-// Define some roles.
-// Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
-$RoleModel = Gdn::Factory('RoleModel');
-$RoleModel->Database = $Database;
-$RoleModel->SQL = $SQL;
-$RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
-$RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
-$RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
-$RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
-$RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
-$RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
-$RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
+if (!$RoleTableExists || $Drop) {
+   // Define some roles.
+   // Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
+   $RoleModel = Gdn::Factory('RoleModel');
+   $RoleModel->Database = $Database;
+   $RoleModel->SQL = $SQL;
+   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
+   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
+   $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
+   $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
+   $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
+   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
+   unset($RoleModel);
+}
 
 // User Table
-$Construct->Table('User')
+$Construct->Table('User');
+
+$PhotoIDExists = $Construct->ColumnExists('PhotoID');
+$PhotoPathExists = $Construct->ColumnExists('PhotoPath');
+
+$Construct
 	->PrimaryKey('UserID')
-   ->Column('PhotoID', 'int', TRUE, 'key')
    ->Column('Name', 'varchar(20)', FALSE, 'key')
    ->Column('Password', 'varbinary(50)')
 	->Column('HashMethod', 'varchar(10)', TRUE)
+   ->Column('PhotoID', 'int', NULL)
+   ->Column('PhotoPath', 'varchar(255)', NULL)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)')
    ->Column('ShowEmail', 'tinyint(1)', '0')
@@ -196,7 +207,11 @@ $PermissionModel->Save(array(
 	));
 
 // Photo Table
-$Construct->Table('Photo')
+$Construct->Table('Photo');
+
+$PhotoTableExists = $Construct->TableExists('Photo');
+
+$Construct
 	->PrimaryKey('PhotoID')
    ->Column('Name', 'varchar(255)')
    ->Column('InsertUserID', 'int', TRUE, 'key')

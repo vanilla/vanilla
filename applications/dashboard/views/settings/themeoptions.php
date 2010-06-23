@@ -37,7 +37,8 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
    if ($this->Data('ThemeOptions.Styles.Key') == $Key || (!$this->Data('ThemeOptions.Styles.Key') && $Basename == '%s'))
       $Active = ' Active';
 
-   echo "<td id=\"{$Key}_td\" class=\"{$Classes[$Col]}$Active\">";
+   $KeyID = str_replace(' ', '_', $Key);
+   echo "<td id=\"{$KeyID}_td\" class=\"{$Classes[$Col]}$Active\">";
    echo '<h4>',T($Key),'</h4>';
 
    // Look for a screenshot for for the style.

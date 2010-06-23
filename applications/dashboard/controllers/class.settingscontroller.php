@@ -585,7 +585,8 @@ class SettingsController extends DashboardController {
       $StyleKey = $this->Data('ThemeOptions.Styles.Key');
 
       if (!$this->Form->IsPostBack()) {
-         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
+            $Default = GetValue('Default', $Options, ' ');
             $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), T('Theme_'.$Key, $Default));
          }
       }

@@ -65,8 +65,36 @@ class Gdn_ThemeManager {
       $AvailableThemes = $this->AvailableThemes();
       $ThemeFolder = $this->EnabledTheme();
       foreach ($AvailableThemes as $ThemeName => $ThemeInfo) {
-         if (ArrayValue('Folder', $ThemeInfo, '') == $ThemeFolder)
-            return $ReturnInSourceFormat ? array($ThemeName => $ThemeInfo) : $ThemeInfo;
+         if (ArrayValue('Folder', $ThemeInfo, '') == $ThemeFolder) {
+            $Info = $ReturnInSourceFormat ? array($ThemeName => $ThemeInfo) : $ThemeInfo;
+            // Update the theme info for a format consumable by views.
+            if (is_array($Info) & isset($Info['Options'])) {
+               $Options =& $Info['Options'];
+               if (isset($Options['Styles'])) {
+                  foreach ($Options['Styles'] as $Key => $Params) {
+                     if (is_string($Params)) {
+                        $Options['Styles'][$Key] = array('Basename' => $Params);
+                     } elseif (is_array($Params) && isset($Params[0])) {
+                        $Params['Basename'] = $Params[0];
+                        unset($Params[0]);
+                        $Options['Styles'][$Key] = $Params;
+                     }
+                  }
+               }
+               if (isset($Options['Text'])) {
+                  foreach ($Options['Text'] as $Key => $Params) {
+                     if (is_string($Params)) {
+                        $Options['Text'][$Key] = array('Type' => $Params);
+                     } elseif (is_array($Params) && isset($Params[0])) {
+                        $Params['Type'] = $Params[0];
+                        unset($Params[0]);
+                        $Options['Text'][$Key] = $Params;
+                     }
+                  }
+               }
+            }
+            return $Info;
+         }
 
       }
       return array();

@@ -27,9 +27,9 @@ class RoleModel extends Gdn_Model {
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Name']))->Value('RoleID', NULL);
          
          if(is_null($RoleID)) {
-            // Figure out the next role ID which is the next biggest power of two.
+            // Figure out the next role ID.
             $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
-            $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+            $RoleID = $MaxRoleID + 1;
             $Values['RoleID'] = $RoleID;
             
             // Insert the role.
@@ -173,9 +173,9 @@ class RoleModel extends Gdn_Model {
       $RoleID = ArrayValue('RoleID', $FormPostValues);
       $Insert = $RoleID > 0 ? FALSE : TRUE;
       if ($Insert) {
-         // Figure out the next role ID which is the next biggest power of two.
+         // Figure out the next role ID.
          $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
-         $RoleID = pow(2, ceil(log($MaxRoleID + 1, 2)));
+         $RoleID = $MaxRoleID + 1;
          
          $this->AddInsertFields($FormPostValues);
          $FormPostValues['RoleID'] = strval($RoleID); // string for validation

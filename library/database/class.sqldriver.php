@@ -1539,6 +1539,11 @@ abstract class Gdn_SQLDriver {
    }
    
    public function Query($Sql, $Type = 'select') {
+      switch ($Type) {
+         case 'insert': $ReturnType = 'ID'; break;
+         default: $ReturnType = 'DataSet'; break;
+      }
+
       try {
          if ($this->CaptureModifications && strtolower($Type) != 'select') {
             if(!property_exists($this->Database, 'CapturedSql'))
@@ -1550,7 +1555,7 @@ abstract class Gdn_SQLDriver {
             return TRUE;
          }
 
-         $Result = $this->Database->Query($Sql, $this->_NamedParameters);
+         $Result = $this->Database->Query($Sql, $this->_NamedParameters, array('ReturnType' => $ReturnType));
       } catch (Exception $Ex) {
          $this->Reset();
          throw $Ex;

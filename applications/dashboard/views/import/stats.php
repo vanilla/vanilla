@@ -14,8 +14,8 @@
          $Value = Gdn_Timer::FormatElapsed($Value);
 
 
-		$Name = htmlentities($Name);
-		$Value = htmlentities($Value);
+		$Name = htmlspecialchars($Name);
+		$Value = htmlspecialchars($Value);
 
 		echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
 	}

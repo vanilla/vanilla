@@ -19,7 +19,7 @@ echo $this->Form->Errors();
 			echo $this->Form->Input('ImportFile', 'file');
 
          if($OriginalFilename) {
-				echo ' ', T('Current File: '.htmlentities($OriginalFilename));
+				echo ' ', T('Current File: '.htmlspecialchars($OriginalFilename));
 			}
 		?>
 	</li>

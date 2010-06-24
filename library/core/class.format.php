@@ -396,9 +396,9 @@ class Gdn_Format {
 
             $Result = $Formatter->Format($Mixed);
 
-            $Result = $Result.
-               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
-               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
+//            $Result = $Result.
+//               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
+//               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
          } else {
             // The text does not contain text and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.

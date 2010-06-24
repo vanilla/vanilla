@@ -551,6 +551,17 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
       return $Value;
    }
       
+	/**
+	 * Increments the view count for the specified discussion.
+	 */
+	public function AddView($DiscussionID) {
+      $this->SQL
+         ->Update('Discussion')
+         ->Set('CountViews', 'CountViews + 1', FALSE)
+         ->Where('DiscussionID', $DiscussionID)
+         ->Put();
+	}
+
    /**
     * Bookmarks (or unbookmarks) a discussion. Returns the current state of the
     * bookmark (ie. TRUE for bookmarked, FALSE for unbookmarked)

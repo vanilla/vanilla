@@ -28,12 +28,11 @@ class ConversationMessageModel extends Gdn_Model {
       return $this->SQL
          ->Select('cm.*')
          ->Select('iu.Name', '', 'InsertName')
-         ->Select('iup.Name', '', 'InsertPhoto')
+         ->Select('iu.Photo', '', 'InsertPhoto')
          ->From('ConversationMessage cm')
          ->Join('Conversation c', 'cm.ConversationID = c.ConversationID')
          ->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID and uc.UserID = '.$ViewingUserID)
          ->Join('User iu', 'cm.InsertUserID = iu.UserID')
-         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left')
          ->BeginWhereGroup()
          ->Where('uc.DateCleared is null') 
          ->OrWhere('uc.DateCleared <', 'cm.DateInserted', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.

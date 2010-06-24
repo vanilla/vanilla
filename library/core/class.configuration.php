@@ -155,32 +155,44 @@ class Gdn_Configuration {
 
       if(!is_array($this->_SaveData))
          $this->_SaveData = array();
-
-      $Keys = explode('.', $Name);
-      $KeyCount = count($Keys);
-
-      $Array =& $this->_Data;
+         
+      if (!is_array($Name)) {
+         $Name = array(
+            $Name => $Value
+         );
+      } else {
+         $Overwrite = $Value;
+      }
       
-      $SaveArray =& $this->_SaveData;
-      for ($i = 0; $i < $KeyCount; ++$i) {
-         $Key = $Keys[$i];
-         if (!is_array($Array)) $Array = array();
-         $KeyExists = array_key_exists($Key, $Array);
+      $Data = $Name;
+      foreach ($Data as $Name => $Value) {
 
-         if($i == $KeyCount - 1) {   
-            // If we are on the last iteration of the key, then set the value.
-            if($KeyExists === FALSE || $Overwrite === TRUE) {
-               $Array[$Key] = Gdn_Format::Serialize($Value);
-               $SaveArray[$Key] = Gdn_Format::Serialize($Value);
+         $Keys = explode('.', $Name);
+         $KeyCount = count($Keys);
+   
+         $Array =& $this->_Data;
+         
+         $SaveArray =& $this->_SaveData;
+         for ($i = 0; $i < $KeyCount; ++$i) {
+            $Key = $Keys[$i];
+            if (!is_array($Array)) $Array = array();
+            $KeyExists = array_key_exists($Key, $Array);
+   
+            if($i == $KeyCount - 1) {   
+               // If we are on the last iteration of the key, then set the value.
+               if($KeyExists === FALSE || $Overwrite === TRUE) {
+                  $Array[$Key] = Gdn_Format::Serialize($Value);
+                  $SaveArray[$Key] = Gdn_Format::Serialize($Value);
+               }
+            } else {
+               // Otherwise, traverse the array
+               if($KeyExists === FALSE) {
+                  $Array[$Key] = array();
+                  $SaveArray[$Key] = array();
+               }
+               $Array =& $Array[$Key];
+               $SaveArray =& $SaveArray[$Key];
             }
-         } else {
-            // Otherwise, traverse the array
-            if($KeyExists === FALSE) {
-               $Array[$Key] = array();
-               $SaveArray[$Key] = array();
-            }
-            $Array =& $Array[$Key];
-            $SaveArray =& $SaveArray[$Key];
          }
       }
    }

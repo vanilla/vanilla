@@ -812,8 +812,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Database = Gdn::Database();
          $Database->CloseConnection();
 			$this->_Json['Data'] = utf8_encode($this->_Json['Data']);
-			$Result = json_encode($this->_Json);
-         exit($Result);
+			//$Result = json_encode($this->_Json);
+         $this->_Json['Data'] = json_encode($this->_Json);
+         exit($this->_Json['Data']);
       } else {
          if ($this->StatusMessage != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');

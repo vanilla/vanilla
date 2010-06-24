@@ -34,10 +34,9 @@ class UserModel extends Gdn_Model {
 
    public function UserQuery() {
       $this->SQL->Select('u.*')
-         ->Select('p.Name', '', 'Photo')
+         ->Select('u.Photo', '', 'Photo')
          ->Select('i.Name', '', 'InviteName')
          ->From('User u')
-         ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
          ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
 
@@ -193,10 +192,10 @@ class UserModel extends Gdn_Model {
       }
 
       $this->SQL
-         ->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
-         ->Select('p.Name', '', 'Photo')
+         ->Select('u.*')
+         //->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
+         //->Select('u.Photo', '', 'Photo')
          ->From('User u')
-         ->Join('Photo as p', 'u.PhotoID = p.PhotoID', 'left')
          // Removing this for now. Will break existing installs because you need to have a session to be authenticated to run the structure changes.
          // ->Where('u.Deleted', 0)
          ->Where('u.UserID', $UserID);
@@ -222,7 +221,7 @@ class UserModel extends Gdn_Model {
    public function RemovePicture($UserID) {
       $this->SQL
          ->Update('User')
-         ->Set('PhotoID', 'null', FALSE)
+         ->Set('Photo', 'null', FALSE)
          ->Where('UserID', $UserID)
          ->Put();
    }
@@ -299,7 +298,7 @@ class UserModel extends Gdn_Model {
                // Record activity if the person changed his/her photo
                $Photo = ArrayValue('Photo', $FormPostValues);
                if ($Photo !== FALSE)
-                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/t'.$Photo).'" alt="'.T('Thumbnail').'" />');
+                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/'.ChangeBasename($Photo, 't%s')).'" alt="'.T('Thumbnail').'" />');
    
             } else {
                $RecordRoleChange = FALSE;
@@ -934,7 +933,7 @@ class UserModel extends Gdn_Model {
       $this->SQL->Update('User')
          ->Set(array(
             'Name' => '[Deleted User]',
-            'PhotoID' => 'null',
+            'Photo' => 'null',
             'Password' => RandomString('10'),
             'About' => '',
             'Email' => 'user_'.$UserID.'@deleted.email',

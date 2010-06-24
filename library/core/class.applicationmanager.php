@@ -96,6 +96,13 @@ class Gdn_ApplicationManager {
       return $this->_EnabledApplications;
    }
    
+   public function CheckApplication($ApplicationName) {
+      if (array_key_exists($ApplicationName, $this->_EnabledApplications))
+         return TRUE;
+         
+      return FALSE;
+   }
+   
    public function AvailableVisibleApplications() {
       $AvailableApplications = $this->AvailableApplications();
       foreach ($AvailableApplications as $ApplicationName => $Info) {
@@ -164,9 +171,8 @@ class Gdn_ApplicationManager {
          throw new Exception(T('The application folder was not properly defined.'));
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $PluginManager = Gdn::Factory('PluginManager');
       $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
       
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
@@ -207,9 +213,8 @@ class Gdn_ApplicationManager {
       RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $PluginManager = Gdn::Factory('PluginManager');
       $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), $PluginManager->EnabledPluginFolders(), TRUE);
+      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
    }
 
    /**

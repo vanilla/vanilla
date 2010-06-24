@@ -926,7 +926,25 @@ ul.PanelInfo li.Active {
 	width: 20px;
 	margin-right: 8px;
 }
-
+#UrlCode strong {
+	color: #000000;
+}
+#UrlCode span {
+	display: inline;
+	background: #ffe;
+	padding: 2px 4px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+#UrlCode input.InputBox {
+	width: 200px;
+	padding: 3px;
+	font-size: 12px;
+	font-family:'lucida grande','Lucida Sans Unicode',Tahoma,sans-serif;
+}
+#UrlCode a {
+	margin-left: 10px;
+}
 
 /* =============================================================== User Pages */
 #dashboard_user_index div.Info .InputBox {

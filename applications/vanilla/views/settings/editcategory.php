@@ -12,12 +12,18 @@ echo $this->Form->Errors();
       ?>
    </li>
    <?php if ($this->Category->AllowDiscussions) { ?>
-   <li>
-      <?php echo $this->Form->Label('Url Code', 'UrlCode'); ?>
-      <div class="Info">
-         <?php echo T('The "Url Code" is used to identify the category. It can only contain letters, numbers, underscores, and dashes. It must be unique.'); ?>
-      </div>
-      <?php echo $this->Form->TextBox('UrlCode'); ?>
+   <li id="UrlCode">
+		<?php
+		echo Wrap(T('Category Url:'), 'strong');
+		echo ' ';
+		echo Gdn::Request()->Url('category', TRUE);
+		echo '/';
+		echo Wrap($this->Form->GetValue('UrlCode'));
+		echo $this->Form->TextBox('UrlCode');
+		echo '/';
+		echo Anchor(T('edit'), '#', 'Edit');
+		echo Anchor(T('OK'), '#', 'Save SmallButton');
+		?>
    </li>
    <?php } ?>
    <li>

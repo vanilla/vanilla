@@ -1,13 +1,31 @@
 jQuery(document).ready(function($) {
 
+   $('#Form_UrlCode').alphanumeric({allow:"-"});
+
    // Map plain text category to url code
    $("#Form_Name").keyup(function(event) {
-      if ($('#Form_CodeIsDefined').val() == '0')
-         $("#Form_UrlCode").val($(this).val().replace(/[ ]+/g, '-').replace(/[^a-z0-9\-]+/gi,'').toLowerCase());
+      if ($('#Form_CodeIsDefined').val() == '0') {
+         $('#UrlCode').show();
+         val = $(this).val().replace(/[ ]+/g, '-').replace(/[^a-z0-9\-]+/gi,'').toLowerCase();
+         $("#Form_UrlCode").val(val);
+         $("#UrlCode span").text(val);
+      }
    });
    // Make sure not to override any values set by the user.
+   $('#UrlCode span').text($('#UrlCode input').val());
    $("#Form_UrlCode").focus(function() {
       $('#Form_CodeIsDefined').val('1')
+   });
+   $('#UrlCode input, #UrlCode a.Save').hide();
+   if ($('#UrlCode input').val() == '')
+      $('#UrlCode').hide();
+   
+   // Reveal input when "change" button is clicked
+   $('#UrlCode a, #UrlCode span').click(function() {
+      $('#UrlCode').find('input,span,a').toggle();
+      $('#UrlCode span').text($('#UrlCode input').val());
+      $('#UrlCode input').focus();
+      return false;
    });
 
    // Hide/reveal the permissions grids when the AllowDiscussions checkbox is un/checked.

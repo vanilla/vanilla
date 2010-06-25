@@ -65,6 +65,7 @@ class CategoriesController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->CategoryID);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
+      $this->SetData('AnnounceData', new Gdn_DataSet(), TRUE   );
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
 
       // Build a pager

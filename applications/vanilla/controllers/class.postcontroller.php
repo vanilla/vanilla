@@ -180,7 +180,7 @@ class PostController extends VanillaController {
       $this->Form->AddHidden('CommentID', $CommentID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       $this->DiscussionID = $DiscussionID;
-      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if ($Editing) {
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
@@ -210,7 +210,7 @@ class PostController extends VanillaController {
          } else if (!$Preview) {
             $CommentID = $this->CommentModel->Save($FormValues);
             
-            $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
             $Comment = $this->CommentModel->GetID($CommentID);
             
             // Mark the comment read
@@ -235,7 +235,7 @@ class PostController extends VanillaController {
                // If the comment was not a draft
                if (!$Draft) {
                   // Redirect to the new comment
-                  $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
                   Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
@@ -278,7 +278,7 @@ class PostController extends VanillaController {
                      $this->Offset = $this->Comment = $this->CommentModel->GetOffset($CommentID);
                      $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1), true);
                      // Load the discussion
-                     $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                     // $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
                      
@@ -294,12 +294,39 @@ class PostController extends VanillaController {
                      // $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
                      // Don't reload the first comment if this new comment is the first one.
                      $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
-                     // Make sure to load all new comments since the page was last loaded by this user
-                     $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), true);
-                     // Load the discussion
-                     $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                     $this->ControllerName = 'discussion';
-                     $this->View = 'comments';
+                     // Do not load more than a single page of data...
+                     $Limit = C('Vanilla.Comments.PerPage', 50);
+                     if (($Discussion->CountComments - 1 - $this->Offset) > $Limit) {
+                        // The user posted a comment on a page other than the last one, so just load the last
+                        // page of data and replace the existing page content with this new one.
+                        $this->Offset = floor((intval($Discussion->CountComments) - 1) / $Limit) * $Limit; // Define the new offset
+                        $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
+                        
+                        $PagerFactory = new Gdn_PagerFactory();
+                        $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+                        $this->Pager->MoreCode = '%1$s more comments';
+                        $this->Pager->LessCode = '%1$s older comments';
+                        $this->Pager->ClientID = 'Pager';
+                        $this->Pager->Configure(
+                           $this->Offset,
+                           $Limit,
+                           $this->Discussion->CountComments - 1,
+                           'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+                        );
+               
+                        $this->ControllerName = 'discussion';
+                        $this->View = 'index';
+                        $this->SetJson('Targets', array(array('Target' => '#Content', 'Type' => 'Html')));
+                        $this->ControllerName = 'discussion';
+                        $this->View = 'index';
+                     } else {
+                        // Make sure to load all new comments since the page was last loaded by this user
+                        $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+                        // Load the discussion
+                        // $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                        $this->ControllerName = 'discussion';
+                        $this->View = 'comments';
+                     }
    
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);

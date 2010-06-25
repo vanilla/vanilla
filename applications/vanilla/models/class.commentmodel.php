@@ -373,6 +373,20 @@ class CommentModel extends VanillaModel {
 				}
 			}
 			
+			// Decrement the UserDiscussion comment count if the user has seen this comment
+			$Offset = $this->GetOffset($CommentID);
+			$this->SQL->Update('UserDiscussion')
+				->Set('CountComments', 'CountComments - 1', FALSE)
+				->Where('DiscussionID', $Data->DiscussionID)
+				->Where('CountComments >', $Offset)
+				->Put();
+				
+			// Decrement the Discussion's Comment Count
+			$this->SQL->Update('Discussion')
+				->Set('CountComments', 'CountComments - 1', FALSE)
+				->Where('DiscussionID', $Data->DiscussionID)
+				->Put();
+			
 			$this->FireEvent('DeleteComment');
 			// Delete the comment
 			$this->SQL->Delete('Comment', array('CommentID' => $CommentID));

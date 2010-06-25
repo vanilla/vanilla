@@ -11,10 +11,11 @@ jQuery(document).ready(function($) {
    var cancelButton = $('a.Cancel');
       
    // Reveal it if they start typing a comment
+   /*
    $('div.CommentForm textarea').focus(function() {
       $('a.Cancel:hidden').show();
    });
-   
+   */
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();
@@ -23,11 +24,8 @@ jQuery(document).ready(function($) {
    });
    
    // Reveal the textarea and hide previews.
-   $('a.WriteButton, a.Cancel').livequery('click', function() {
+   $('a.WriteButton').livequery('click', function() {
       resetCommentForm(this);
-      if ($(this).hasClass('Cancel'))
-         clearCommentForm(this);
-         
       return false;
    });
    
@@ -84,6 +82,14 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
+            var processedTargets = false;
+            // If there are targets, process them
+            if (json.Targets && json.Targets.length > 0) {
+               json.Targets[0].Data = json.Data;
+               gdn.processTargets(json.Targets);
+               processedTargets = true;
+            }
+
             // Remove any old popups if not saving as a draft
             if (!draft && json.FormSaved == true)
                $('.Popup,.Overlay').remove();
@@ -119,19 +125,23 @@ jQuery(document).ready(function($) {
                
             } else if (!draft) {
                // Clean up the form
+               if (processedTargets)
+                  btn = $('div.CommentForm :submit');
+                  
                resetCommentForm(btn);
                clearCommentForm(btn);
 
                // If editing an existing comment, replace the appropriate row
                var existingCommentRow = $('#Comment_' + commentID);
-               if (existingCommentRow.length > 0) {
+               if (processedTargets) {
+                  // Don't do anything with the data b/c it's already been handled by processTargets
+               } else if (existingCommentRow.length > 0) {
                   existingCommentRow.after(json.Data).remove();
                   $('#Comment_' + commentID).effect("highlight", {}, "slow");
                } else {   
                   gdn.definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
-                  $(json.Data).appendTo('ul.Discussion')
-                     .effect("highlight", {}, "slow");
+                  $(json.Data).appendTo('ul.Discussion').effect("highlight", {}, "slow");
                }
                
                // Remove any "More" pager links
@@ -166,9 +176,6 @@ jQuery(document).ready(function($) {
    function clearCommentForm(sender) {
       var container = $(sender).parents('li.Editing');
       $(container).removeClass('Editing');
-      if (sender != null && $(sender).hasClass('Cancel'))
-         $(sender).hide();
-      
       $('.Popup,.Overlay').remove();
       var frm = $(sender).parents('div.CommentForm');
       frm.find('textarea').val('');

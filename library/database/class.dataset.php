@@ -133,6 +133,11 @@ class Gdn_DataSet implements IteratorAggregate {
          $this->_DatasetType = $DatasetType;
 		
 		$Result = array();
+      if (is_null($this->_PDOStatement)) {
+         $this->_Result = $Result;
+         return;
+      }
+
 		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 		while($Row = $this->_PDOStatement->fetch()) {
 			$Result[] = $Row;

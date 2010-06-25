@@ -12,11 +12,29 @@ echo $this->Form->Errors();
 ?>
 <ul>
 	<li>
-		<p><?php 
+      <?php
+      echo '<div>', T('Select the file to import.'), '</div>';
+      echo '<div class="Info">',
+         T('You can place files in your /uploads folder.',
+         'If your file is too large to upload directly to this page you can place it in your /uploads folder.
+            Make sure the filename begins with the word <b>export</b> and ends with one of <b>.txt, .gz</b>.'),
+           '</div>';
+
+      foreach ($this->Data('ImportPaths') as $Path => $Text) {
+         echo '<div>',
+            $this->Form->Radio('PathSelect', $Text, array('value' => $Path)),
+            '</div>';
+      }
+      ?>
+		<?php 
          $OriginalFilename = GetValue('OriginalFilename', $this->Data);
 
-			echo T('Select the file to import.'); ?></p><?php
-			echo $this->Form->Input('ImportFile', 'file');
+         echo '<div>';
+         if (count($this->Data('ImportPaths')) > 0)
+            echo $this->Form->Radio('PathSelect', $this->Form->Input('ImportFile', 'file'), array('value' => 'NEW'));
+			else
+            echo $this->Form->Input('ImportFile', 'file');
+         echo '</div>';
 
          if($OriginalFilename) {
 				echo ' ', T('Current File: '.htmlspecialchars($OriginalFilename));
@@ -25,9 +43,9 @@ echo $this->Form->Errors();
 	</li>
 	<li>
 		<?php
-		echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
-		echo '<div class="Info">',
-		T('Garden.Import.Overwrite.Desciption', 'This option will delete all of the user and discussion data in this forum. You must choose a new admin user from the import data below.'),
+		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
+		echo '<div class="Warning">',
+		T('Garden.Import.Overwrite.Desciption', 'All of the user and discussion data in this forum will be overwritten. You must choose a new admin user from the import data below.'),
 		'</div>';
 		
 		echo $this->Form->Label('Email', 'Email'),
@@ -36,7 +54,7 @@ echo $this->Form->Errors();
 		echo $this->Form->Label('Password', 'Password'),
 			$this->Form->Input('Password', 'password');
 		?>
-	</li>
+	</li><?php /*
 	<li>
 		<?php
 		echo $this->Form->Radio('Overwrite', T('Garden.Import.Merge', 'Merge with this forum.'), array('value' => 'merge'));
@@ -46,6 +64,6 @@ echo $this->Form->Errors();
 		'</div>';
 		
 		?>
-	</li>
+	</li> */?>
 </ul>
 <?php echo $this->Form->Close('Upload');

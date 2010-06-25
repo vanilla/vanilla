@@ -102,6 +102,12 @@ class ImportController extends DashboardController {
       $Imp = new ImportModel();
       $Imp->LoadState();
 
+      // Search for the list of acceptable imports.
+      $ImportPaths = array();
+      $ExistingPaths = SafeGlob(PATH_ROOT.'/uploads/export*', array('gz', 'txt'));
+      foreach ($ExistingPaths as $Path)
+         $ImportPaths[$Path] = basename($Path);
+
       if($Imp->CurrentStep < 1) {
          // Check to see if there is a file.
          $ImportPath = Gdn::Config('Garden.Import.ImportPath');
@@ -111,8 +117,14 @@ class ImportController extends DashboardController {
          if (strcasecmp(Gdn::Request()->RequestMethod(), 'post') == 0) {
             $Upload = new Gdn_Upload();
             $Validation = new Gdn_Validation();
+            if (count($ImportPaths) > 0)
+               $Validation->ApplyRule('PathSelect', 'Required', T('You must select a file to import.'));
 
-            $TmpFile = $Upload->ValidateUpload('ImportFile', FALSE);
+            if (count($ImportPaths) == 0 || $this->Form->GetFormValue('PathSelect') == 'NEW')
+               $TmpFile = $Upload->ValidateUpload('ImportFile', FALSE);
+            else
+               $TmpFile = '';
+
             if($TmpFile) {
                $Filename = $_FILES['ImportFile']['name'];
                $Extension = pathinfo($Filename, PATHINFO_EXTENSION);
@@ -123,26 +135,31 @@ class ImportController extends DashboardController {
                $ImportPath = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads' . DS . 'import', $Extension);
                $Upload->SaveAs($TmpFile, $ImportPath);
                $Imp->ImportPath = $ImportPath;
-               $Imp->Data['OriginalFilename'] = basename($Filename);
-               $Imp->Data['FileUploaded'] = TRUE;
 
-            } elseif(!$Imp->ImportPath) {
+               $UploadedFiles = GetValue('UploadedFiles', $Imp->Data);
+               $UploadedFiles[$ImportPath] = basename($Filename);
+               $Imp->Data['UploadedFiles'] = $UploadedFiles;
+            } elseif ($PathSelect = $this->Form->GetFormValue('PathSelect')) {
+               $Imp->ImportPath = $PathSelect;
+            } elseif(!$Imp->ImportPath && count($ImportPaths) == 0) {
                // There was no file uploaded this request or before.
                $Validation->AddValidationResult('ImportFile', $Upload->Exception);
             }
             // Validate the overwrite.
-            if(strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
+            if(TRUE || strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
                $Validation->ApplyRule('Email', 'Required');
                $Validation->ApplyRule('Password', 'Required');
             }
 
             if($Validation->Validate($this->Form->FormValues())) {
+               $this->Form->SetFormValue('Overwrite', 'overwrite');
                $Imp->FromPost($this->Form->FormValues());
                $this->View = 'Info';
             } else {
                $this->Form->SetValidationResults($Validation->Results());
             }
          } else {
+            $this->Form->SetFormValue('PathSelect', $Imp->ImportPath);
             // TODO: Search for an existing file that was uploaded by the web admin.
 //				$ImportPaths = SafeGlob(PATH_ROOT.DS.'uploads'.DS.'export *');
 //				if($ImportPaths) {
@@ -163,6 +180,9 @@ class ImportController extends DashboardController {
          $Imp->DeleteState();
 
       try {
+         $UploadedFiles = GetValue('UploadedFiles', $Imp->Data, array());
+         $ImportPaths = array_merge($ImportPaths, $UploadedFiles);
+         $this->SetData('ImportPaths', $ImportPaths);
          $this->SetData('Header', $Imp->GetImportHeader());
          $this->SetData('Stats', GetValue('Stats', $Imp->Data, array()));
          $this->SetData('ImportPath', $Imp->ImportPath);

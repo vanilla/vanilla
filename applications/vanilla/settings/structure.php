@@ -87,11 +87,13 @@ $Construct->Table('Comment')
 	->Engine('MyISAM')
 	->Set($Explicit, $Drop);
 
-// Allows the tracking of already-read comments on a per-user basis.
-$Construct->Table('CommentWatch')
+// Allows the tracking of already-read comments & votes on a per-user basis.
+$Construct->Table('UserComment')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('CommentID', 'int', FALSE, 'primary')
-   ->Column('DateLastViewed', 'datetime')
+   ->Column('ScoreUp', 'tinyint(1)', '0')
+   ->Column('ScoreDown', 'tinyint(1)', '0')
+   ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Set($Explicit, $Drop);
    
 // Add extra columns to user table for tracking discussions & comments

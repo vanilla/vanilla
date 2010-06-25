@@ -36,9 +36,6 @@ if (Gdn::Config('Vanilla.Categories.Use') === TRUE && $this->CategoryID > 0 && $
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
          $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close this discussion'), array('value' => '1')).'</li>';
 
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
-         $Options .= '<li>'.$this->Form->CheckBox('Sink', T('Sink this discussion'), array('value' => '1')).'</li>';
-         
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';
 

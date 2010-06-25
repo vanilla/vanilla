@@ -6,7 +6,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
-   $CountUnreadComments = $Discussion->CountUnreadComments;
+   $CountUnreadComments = 0;
+   if (is_numeric($Discussion->CountUnreadComments))
+      $CountUnreadComments = $Discussion->CountUnreadComments;
+      
    // Logic for incomplete comment count.
    if($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
       if(Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate)) {
@@ -35,7 +38,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
          <?php } ?>
          <span><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
-            if ($CountUnreadComments > 0 || $CountUnreadComments === '' && $Session->IsValid())
+            if ($CountUnreadComments > 0 && $Session->IsValid())
                echo '<strong>',trim(sprintf(T('%s new'), $CountUnreadComments)),'</strong>';
          ?>
          <span><?php

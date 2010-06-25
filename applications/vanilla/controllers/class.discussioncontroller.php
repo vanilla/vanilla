@@ -47,15 +47,20 @@ class DiscussionController extends VanillaController {
          
          // Actual number of comments, excluding the discussion itself
          $ActualResponses = $this->Discussion->CountComments - 1;
-         
+         $ActualWatch = $this->Discussion->CountCommentWatch - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
             $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+            
+         // If $Offset isn't defined, assume that the user has not clicked to
+         // view a next or previous page, and this is a "view" to be counted.
+         if ($Offset == '')
+            $this->DiscussionModel->AddView($DiscussionID);
          
          $this->Offset = $Offset;
          if (!is_numeric($this->Offset) || $this->Offset < 0) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
-            $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
+            $CountCommentWatch = $ActualWatch > 0 ? $ActualWatch : 0;
             if ($CountCommentWatch > $ActualResponses)
                $CountCommentWatch = $ActualResponses;
             
@@ -68,6 +73,9 @@ class DiscussionController extends VanillaController {
          
          if ($this->Offset < 0)
             $this->Offset = 0;
+         
+         if ($this->Offset == $ActualResponses)
+            $this->Offset -= $Limit;
          
          // Make sure to set the user's discussion watch records
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);

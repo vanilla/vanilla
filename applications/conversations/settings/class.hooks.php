@@ -11,7 +11,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    
    public function UserModel_SessionQuery_Handler($Sender) {
       // Add some extra fields to the session query
-      $Sender->SQL->Select('u.CountUnreadConversations');
+      //$Sender->SQL->Select('u.CountUnreadConversations');
    }
    
    // Remove data when deleting a user

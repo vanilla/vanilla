@@ -9,9 +9,6 @@ jQuery(document).ready(function($) {
 
    // Hijack the "Cancel" button on the comment form
    var cancelButton = $('a.Cancel');
-   var draftId = $('#Form_DraftID').val();
-   if (draftId == '')
-      cancelButton.hide();
       
    // Reveal it if they start typing a comment
    $('div.CommentForm textarea').focus(function() {
@@ -68,7 +65,8 @@ jQuery(document).ready(function($) {
       // Get the last comment id on the page
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
-      var lastCommentID = $(lastComment).attr('id').replace('Comment_', '').replace('Discussion_', '');
+      var lastCommentID = $(lastComment).attr('id');
+      var lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');            

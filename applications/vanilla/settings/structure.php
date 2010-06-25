@@ -45,6 +45,7 @@ $Construct
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
    ->Column('CountComments', 'int', '1')
+   ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
    ->Column('Sink', 'tinyint(1)', '0')

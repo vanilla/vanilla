@@ -26,7 +26,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
-         ->Select('iup.Name', '', 'FirstPhoto')
+         ->Select('iu.Photo', '', 'FirstPhoto')
          ->Select('d.Body') // <-- Need these for rss!
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
@@ -36,7 +36,6 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
@@ -256,12 +255,11 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
 			->Select('iu.Name', '', 'InsertName')
-			->Select('iup.Name', '', 'InsertPhoto')
+			->Select('iu.Photo', '', 'InsertPhoto')
          ->From('Discussion d')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
 			->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // Insert user
-			->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
 			->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->Where('d.DiscussionID', $DiscussionID)
@@ -401,7 +399,30 @@ class DiscussionModel extends VanillaModel {
                      );
                   }
                }
-               $DiscussionName = ArrayValue('Name', $Fields, '');
+					
+               // Notify any users who were mentioned in the comment
+					$DiscussionName = ArrayValue('Name', $Fields, '');
+               $Story = ArrayValue('Body', $Fields, '');
+               $Usernames = GetMentions($Story);
+               $NotifiedUsers = array();
+               foreach ($Usernames as $Username) {
+                  $User = $UserModel->GetByUsername($Username);
+                  if ($User && $User->UserID != $Session->UserID) {
+                     $NotifiedUsers[] = $User->UserID;   
+                     $ActivityModel = new ActivityModel();   
+                     $ActivityID = $ActivityModel->Add(
+                        $Session->UserID,
+                        'CommentMention',
+                        Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)),
+                        $User->UserID,
+                        '',
+                        '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),
+                        FALSE
+                     );
+                     $ActivityModel->SendNotification($ActivityID, $Story);
+                  }
+               }
+					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
             $Data = $this->SQL
@@ -530,6 +551,17 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
       return $Value;
    }
       
+	/**
+	 * Increments the view count for the specified discussion.
+	 */
+	public function AddView($DiscussionID) {
+      $this->SQL
+         ->Update('Discussion')
+         ->Set('CountViews', 'CountViews + 1', FALSE)
+         ->Where('DiscussionID', $DiscussionID)
+         ->Put();
+	}
+
    /**
     * Bookmarks (or unbookmarks) a discussion. Returns the current state of the
     * bookmark (ie. TRUE for bookmarked, FALSE for unbookmarked)

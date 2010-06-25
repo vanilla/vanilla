@@ -16,6 +16,8 @@ class SearchModel extends Gdn_Model {
 
    protected $_SearchMode = 'match';
 
+   public $ForceSearchMode = '';
+
    protected $_SearchText = '';
 	
 	/// METHODS ///
@@ -73,7 +75,11 @@ class SearchModel extends Gdn_Model {
 			return NULL;
 
       // Figure out the exact search mode.
-      $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+      if ($this->ForceSearchMode)
+         $SearchMode = $this->ForceSearchMode;
+      else
+         $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+      
       if ($SearchMode == 'matchboolean') {
          if (strpos($Search, '+') !== FALSE || strpos($Search, '-') !== FALSE)
             $SearchMode = 'boolean';

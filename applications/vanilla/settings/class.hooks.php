@@ -12,7 +12,7 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function UserModel_SessionQuery_Handler(&$Sender) {
       // Add some extra fields to the session query
-      $Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
+      //$Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
    }
    
 	// Remove data when deleting a user

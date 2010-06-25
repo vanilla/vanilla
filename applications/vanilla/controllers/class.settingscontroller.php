@@ -161,6 +161,7 @@ class SettingsController extends Gdn_Controller {
       $RoleModel = new RoleModel();
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
+      $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('categories.js');
       $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
       $this->Title(T('Add Category'));
@@ -176,8 +177,9 @@ class SettingsController extends Gdn_Controller {
 			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {               
-            $this->StatusMessage = T('The category was created successfully.');
-            $this->RedirectUrl = Url('vanilla/settings/managecategories');
+            // $this->StatusMessage = T('The category was created successfully.');
+            // $this->RedirectUrl = Url('vanilla/settings/managecategories');
+				Redirect('vanilla/settings/managecategories');
          } else {
 				unset($CategoryID);
 			}
@@ -271,6 +273,8 @@ class SettingsController extends Gdn_Controller {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       $this->Category = $this->CategoryModel->GetID($CategoryID);
+      $this->AddJsFile('jquery.alphanumeric.js');
+      $this->AddJsFile('categories.js');
       $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
       $this->Title(T('Edit Category'));
          
@@ -287,8 +291,9 @@ class SettingsController extends Gdn_Controller {
       } else {
          if ($this->Form->Save()) {
             // Report success
-            $this->StatusMessage = T('The category was saved successfully.');
-            $this->RedirectUrl = Url('vanilla/settings/managecategories');
+            // $this->StatusMessage = T('The category was saved successfully.');
+            // $this->RedirectUrl = Url('vanilla/settings/managecategories');
+				Redirect('vanilla/settings/managecategories');
          }
       }
        

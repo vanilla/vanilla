@@ -350,7 +350,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @param int $FolderDepth
     * @todo $folderDepth needs a description.
     */
-   protected function _AnalyzeRequest(&$Request, $FolderDepth = 2) {
+   protected function _AnalyzeRequest(&$Request, $FolderDepth = 1) {
       // Here are some examples of what this method could/would receive:
       // /application/controllergroup/controller/method/argn
       // /controllergroup/controller/method/argn

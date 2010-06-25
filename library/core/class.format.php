@@ -371,7 +371,8 @@ class Gdn_Format {
          return self::To($Mixed, 'Html');
       } else {
          $IsHtml = strpos($Mixed, '<') !== FALSE;
-
+         $IsHtml = $IsHtml || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Mixed);
+         
          if ($IsHtml) {
             // The text contains html and must be purified.
 
@@ -396,9 +397,11 @@ class Gdn_Format {
 
             $Result = $Formatter->Format($Mixed);
 
+/*
             $Result = $Result.
                "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
                "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
+*/
          } else {
             // The text does not contain text and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.

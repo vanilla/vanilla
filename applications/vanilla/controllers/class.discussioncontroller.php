@@ -47,7 +47,6 @@ class DiscussionController extends VanillaController {
          
          // Actual number of comments, excluding the discussion itself
          $ActualResponses = $this->Discussion->CountComments - 1;
-         $ActualWatch = $this->Discussion->CountCommentWatch - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
             $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
@@ -58,24 +57,28 @@ class DiscussionController extends VanillaController {
             $this->DiscussionModel->AddView($DiscussionID);
          
          $this->Offset = $Offset;
-         if (!is_numeric($this->Offset) || $this->Offset < 0) {
-            // Round down to the appropriate offset based on the user's read comments & comments per page
-            $CountCommentWatch = $ActualWatch > 0 ? $ActualWatch : 0;
-            if ($CountCommentWatch > $ActualResponses)
-               $CountCommentWatch = $ActualResponses;
+         if (C('Vanilla.Comments.AutoOffset')) {
+            if (!is_numeric($this->Offset) || $this->Offset < 0) {
+               // Round down to the appropriate offset based on the user's read comments & comments per page
+               $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
+               if ($CountCommentWatch > $ActualResponses)
+                  $CountCommentWatch = $ActualResponses;
+               
+               // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
+               $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
+            }
+            if ($ActualResponses <= $Limit)
+               $this->Offset = 0;
             
-            // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-            $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
+            if ($this->Offset == $ActualResponses)
+               $this->Offset -= $Limit;
+         } else {
+            if ($this->Offset == '')
+               $this->Offset = 0;
          }
-         
-         if ($ActualResponses <= $Limit)
-            $this->Offset = 0;
-         
+
          if ($this->Offset < 0)
             $this->Offset = 0;
-         
-         if ($this->Offset == $ActualResponses)
-            $this->Offset -= $Limit;
          
          // Make sure to set the user's discussion watch records
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
@@ -219,7 +222,7 @@ class DiscussionController extends VanillaController {
       $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
 
       // Update the user's bookmark count
-      $CountBookmarks = $this->DiscussionModel->SetBookmarkCount($Session->UserID);
+      $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($Session->UserID);
       
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {

@@ -46,8 +46,49 @@ class CommentModel extends VanillaModel {
          ->Limit($Limit, $Offset)
          ->Get();
    }
+	
+	// Sets the UserComment Score value. Returns the total score.
+	public function SetUserScore($CommentID, $UserID, $Score) {
+		// Insert or update the UserComment row
+		$this->SQL->Replace(
+			'UserComment',
+			array('Score' => $Score),
+			array('CommentID' => $CommentID, 'UserID' => $UserID)
+		);
+		
+		// Get the total new score
+		$TotalScore = $this->SQL->Select('Score', 'sum', 'TotalScore')
+			->From('UserComment')
+			->Where('CommentID', $CommentID)
+			->Get()
+			->FirstRow()
+			->TotalScore;
+		
+		// Update the comment's cached version
+		$this->SQL->Update('Comment')
+			->Set('Score', $TotalScore)
+			->Where('CommentID', $CommentID)
+			->Put();
+			
+		return $TotalScore;
+	}
+
+	// Gets the UserComment Score value for the specified user
+	public function GetUserScore($CommentID, $UserID) {
+		$Data = $this->SQL->Select('Score')
+			->From('UserComment')
+			->Where('CommentID', $CommentID)
+			->Where('UserID', $UserID)
+			->Get()
+			->FirstRow();
+		
+		return $Data ? $Data->Score : 0;
+	}
 
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
+		// echo 'Setting Watch Records for Discussion '.$DiscussionID.' to Limit: '.$Limit.' Offset: '.$Offset.' CountWatch = ' . ($Limit + $Offset) . ' TotalComments ' . $TotalComments;
+		// return;
+		
       // Record the user's watch data
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {

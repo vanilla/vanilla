@@ -45,6 +45,7 @@ $Construct
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
    ->Column('CountComments', 'int', '1')
+   ->Column('CountBookmarks', 'int', '0')
    ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
@@ -63,6 +64,7 @@ $Construct
 $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+	->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
@@ -91,8 +93,7 @@ $Construct->Table('Comment')
 $Construct->Table('UserComment')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('CommentID', 'int', FALSE, 'primary')
-   ->Column('ScoreUp', 'tinyint(1)', '0')
-   ->Column('ScoreDown', 'tinyint(1)', '0')
+   ->Column('Score', 'float', NULL)
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Set($Explicit, $Drop);
    

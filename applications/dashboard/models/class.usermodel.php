@@ -34,7 +34,6 @@ class UserModel extends Gdn_Model {
 
    public function UserQuery() {
       $this->SQL->Select('u.*')
-         ->Select('u.Photo', '', 'Photo')
          ->Select('i.Name', '', 'InviteName')
          ->From('User u')
          ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');

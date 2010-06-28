@@ -20,3 +20,5 @@ $Configuration['Vanilla']['Discussions']['PerCategory']        = '5';
 $Configuration['Vanilla']['Discussions']['PerPage']            = '30';
 $Configuration['Vanilla']['Discussions']['Home']               = 'discussions';
 $Configuration['Vanilla']['Categories']['Use']                 = TRUE;
+// Should users be automatically pushed to the last comment they read in a discussion?
+$Configuration['Vanilla']['Comments']['AutoOffset']            = TRUE;

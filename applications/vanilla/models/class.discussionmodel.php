@@ -25,6 +25,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
+			->Select('d.CountBookmarks')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          ->Select('iu.Photo', '', 'FirstPhoto')
          ->Select('d.Body') // <-- Need these for rss!
@@ -78,13 +79,13 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.CountComments', '', 'CountCommentWatch')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
-            $this->SQL
-               ->Select('0', '', 'WatchUserID')
-               ->Select('now()', '', 'DateLastViewed')
-               ->Select('0', '', 'Dismissed')
-               ->Select('0', '', 'Bookmarked')
-               ->Select('0', '', 'CountCommentWatch')
-					->Select('d.Announce','','IsAnnounce');
+			$this->SQL
+				->Select('0', '', 'WatchUserID')
+				->Select('now()', '', 'DateLastViewed')
+				->Select('0', '', 'Dismissed')
+				->Select('0', '', 'Bookmarked')
+				->Select('0', '', 'CountCommentWatch')
+				->Select('d.Announce','','IsAnnounce');
       }
 		
 		$this->AddArchiveWhere($this->SQL);
@@ -521,8 +522,8 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
 	/**
 	 * Set the bookmark count for the specified user. Returns the bookmark count.
 	 */
-	public function SetBookmarkCount($UserID) {
-		$Count = $this->BookmarkCount($UserID);
+	public function SetUserBookmarkCount($UserID) {
+		$Count = $this->UserBookmarkCount($UserID);
       $this->SQL
          ->Update('User')
          ->Set('CountBookmarks', $Count)
@@ -551,6 +552,44 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
       return $Value;
    }
       
+	// Sets the UserDiscussion Score value
+	public function SetUserScore($DiscussionID, $UserID, $Score) {
+		// Insert or update the UserDiscussion row
+		$this->SQL->Replace(
+			'UserDiscussion',
+			array('Score' => $Score),
+			array('DiscussionID' => $DiscussionID, 'UserID' => $UserID)
+		);
+		
+		// Get the total new score
+		$TotalScore = $this->SQL->Select('Score', 'sum', 'TotalScore')
+			->From('UserDiscussion')
+			->Where('DiscussionID', $DiscussionID)
+			->Get()
+			->FirstRow()
+			->TotalScore;
+			
+		// Update the Discussion's cached version
+		$this->SQL->Update('Discussion')
+			->Set('Score', $TotalScore)
+			->Where('DiscussionID', $DiscussionID)
+			->Put();
+			
+		return $TotalScore;
+	}
+
+	// Gets the UserDiscussion Score value for the specified user
+	public function GetUserScore($DiscussionID, $UserID) {
+		$Data = $this->SQL->Select('Score')
+			->From('UserDiscussion')
+			->Where('DiscussionID', $DiscussionID)
+			->Where('UserID', $UserID)
+			->Get()
+			->FirstRow();
+		
+		return $Data ? $Data->Score : 0;
+	}
+
 	/**
 	 * Increments the view count for the specified discussion.
 	 */
@@ -584,7 +623,6 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          ->Get()
          ->FirstRow();
 
-
       if ($Discussion->WatchUserID == '') {
          $this->SQL
             ->Insert('UserDiscussion', array(
@@ -601,6 +639,14 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+		
+		// Update the cached bookmark count on the discussion
+		$BookmarkCount = $this->BookmarkCount($DiscussionID);
+		$this->SQL->Update('Discussion')
+			->Set('CountBookmarks', $BookmarkCount)
+			->Where('DiscussionID', $DiscussionID)
+			->Put();
+			
       $this->EventArguments['Discussion'] = $Discussion;
       $this->EventArguments['State'] = $State;
       $this->FireEvent('AfterBookmarkDiscussion');
@@ -608,9 +654,24 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
    }
    
    /**
+    * The number of bookmarks the specified $DiscussionID has.
+    */
+   public function BookmarkCount($DiscussionID) {
+      $Data = $this->SQL
+         ->Select('DiscussionID', 'count', 'Count')
+         ->From('UserDiscussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Where('Bookmarked', '1')
+         ->Get()
+         ->FirstRow();
+         
+      return $Data !== FALSE ? $Data->Count : 0;
+   }
+
+   /**
     * The number of bookmarks the specified $UserID has.
     */
-   public function BookmarkCount($UserID) {
+   public function UserBookmarkCount($UserID) {
       $Data = $this->SQL
          ->Select('ud.DiscussionID', 'count', 'Count')
          ->From('UserDiscussion ud')
@@ -620,10 +681,7 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          ->Get()
          ->FirstRow();
          
-      if ($Data !== FALSE)
-         return $Data->Count;
-      
-      return 0;
+      return $Data !== FALSE ? $Data->Count : 0;
    }
    
 	/**
@@ -668,7 +726,7 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
 
 		// Update bookmark counts for users who had bookmarked this discussion
 		foreach ($BookmarkData->Result() as $User) {
-			$this->SetBookmarkCount($User->UserID);
+			$this->SetUserBookmarkCount($User->UserID);
 		}
 			
       return TRUE;

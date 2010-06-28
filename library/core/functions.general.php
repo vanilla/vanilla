@@ -773,14 +773,17 @@ if (!function_exists('ProxyHead')) {
       
       // Get the cookie.
       $Cookie = array('Cookie'      => '');
+      $EncodeCookies = C('Garden.Cookie.Urlencode',TRUE);
+      
       foreach($_COOKIE as $Key => $Value) {
          if(strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
          
-         if(strlen($Cookie['Cookie']) > 0)
-            $Cookie['Cookie'] .= '; ';
+         if(strlen($Cookie) > 0)
+            $Cookie .= '; ';
             
-         $Cookie['Cookie'] .= $Key.'='.urlencode($Value);
+         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EValue}";
       }
       
       $Response = '';
@@ -892,6 +895,8 @@ if (!function_exists('ProxyRequest')) {
       $Query = GetValue('query', $UrlParts, '');
       // Get the cookie.
       $Cookie = '';
+      $EncodeCookies = C('Garden.Cookie.Urlencode',TRUE);
+      
       foreach($_COOKIE as $Key => $Value) {
          if(strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
@@ -899,7 +904,8 @@ if (!function_exists('ProxyRequest')) {
          if(strlen($Cookie) > 0)
             $Cookie .= '; ';
             
-         $Cookie .= $Key.'='.urlencode($Value);
+         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EValue}";
       }
 
       $Response = '';

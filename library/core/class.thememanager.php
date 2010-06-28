@@ -127,6 +127,11 @@ class Gdn_ThemeManager {
    }
    
    public function TestTheme($ThemeName) {
+      // Get some info about the currently enabled theme.
+      $EnabledTheme = $this->EnabledThemeInfo();
+      $EnabledThemeFolder = GetValue('Folder', $EnabledTheme, '');
+      $OldClassName = $EnabledThemeFolder . 'ThemeHooks';
+      
       // Make sure that the theme's requirements are met
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
@@ -146,6 +151,13 @@ class Gdn_ThemeManager {
             $ThemeHooks->Setup();
          }
       }
+
+      // If there is a hooks in the old theme, include it and run the ondisable method.
+      if (class_exists($OldClassName)) {
+         $ThemeHooks = new $OldClassName();
+         $ThemeHooks->OnDisable();
+      }
+
       return TRUE;
    }
 }

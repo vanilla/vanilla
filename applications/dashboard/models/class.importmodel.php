@@ -198,22 +198,22 @@ class ImportModel extends Gdn_Model {
 				$Tables[$Table]['Skip'] = TRUE;
 				continue;
 			}
-			$DestColumns = $DestStructure->Columns();
+			//$DestColumns = $DestStructure->Columns();
 			$DestModified = FALSE;
 
-			foreach($Columns as $Name => $Type) {
-            if(!$Name)
+			foreach ($Columns as $Name => $Type) {
+            if (!$Name)
                throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.'), $Table));
 
-				if(array_key_exists($Name, $DestColumns)) {
-					$StructureType = $DestStructure->ColumnTypeString($DestColumns[$Name]);
-				} elseif (isset($DestColumns[$Type])) {
-               // Fixe the table definition.
+				if ($DestStructure->ColumnExists($Name)) {
+					$StructureType = $DestStructure->ColumnTypeString($DestStructure->Columns($Name));
+				} elseif ($DestStructure->ColumnExists($Type)) {
+               // Fix the table definition.
                unset($Tables[$Table]['Columns'][$Name]);
                $Tables[$Table]['Columns'][$Type] = '';
 
                $Name = $Type;
-               $StructureType = $DestStructure->ColumnTypeString($DestColumns[$Type]);
+               $StructureType = $DestStructure->ColumnTypeString($DestStructure->Columns($Type));
             } else {
 					$StructureType = $Type;
 
@@ -280,19 +280,20 @@ class ImportModel extends Gdn_Model {
 
 	public function DeleteFiles() {
       $St = Gdn::Structure();
-		foreach(GetValue('Tables', $this->Data, array()) as $Table => $TableInfo) {
+		foreach (GetValue('Tables', $this->Data, array()) as $Table => $TableInfo) {
 			$Path = GetValue('Path', $TableInfo, '');
-			if(file_exists($Path))
+			if (file_exists($Path))
 				unlink($Path);
 
          // Drop the import table.
          $St->Table("z$Table")->Drop();
 		}
 
-		// Delete the import file.
-		if(GetValue('FileUploaded', $this->Data) && $this->ImportPath && file_exists($this->ImportPath)) {
-			unlink($this->ImportPath);
-		}
+		// Delete the uploaded files.
+      $UploadedFiles = GetValue('UploadedFiles', $this->Data, array());
+      foreach ($UploadedFiles as $Path => $Name) {
+         @unlink($Path);
+      }
 	}
 
 	/**
@@ -873,7 +874,7 @@ class ImportModel extends Gdn_Model {
          set d.LastCommentUserID = c.InsertUserID";
       }
 
-      if (!$this->ImportExists('Table', 'Body')) {
+      if (!$this->ImportExists('Discussion', 'Body')) {
          // Update the body of the discussion if it isn't there.
          $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID', 'CommentID');
 
@@ -886,6 +887,16 @@ class ImportModel extends Gdn_Model {
          from :_Comment c
          inner join :_Discussion d
            on d.FirstCommentID = c.CommentID";
+      }
+
+      if ($this->ImportExists('UserDiscussion') && !$this->ImportExists('UserDiscussion', 'CountComments') && $this->ImportExists('UserDiscussion', 'DateLastViewed')) {
+         $Sqls['UserDiscussuion.CountComments'] = "update :_UserDiscussion ud
+         set CountComments = (
+           select count(c.CommentID)
+           from :_Comment c
+           where c.DiscussionID = ud.DiscussionID
+             and c.DateInserted <= ud.DateLastViewed)";
+
       }
 
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
@@ -936,7 +947,7 @@ class ImportModel extends Gdn_Model {
          $Sqls['User.CountDiscussions'] = $this->GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID');
       }
       if (!$this->ImportExists('User', 'CountComments')) {
-         $Sqls['User.CountComments'] = $this->GetCountSQL('count', 'User', 'Comment', 'CountComments', 'Comment', 'UserID', 'InsertUserID');
+         $Sqls['User.CountComments'] = $this->GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID');
       }
 
       // The updates start here.

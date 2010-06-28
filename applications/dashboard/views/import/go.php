@@ -14,6 +14,7 @@ if($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
    $Complete = TRUE;
    echo '<div class="Info">',
    T('Garden.Import.Complete.Description', 'You have successfully completed an import.
+   Remember to go into <a href="/dashboard/role">Roles & Permissions</a> and setup your role permissions.
    Click <b>Finished</b> when you are ready.'),
    '</div>';
 }

@@ -195,6 +195,13 @@ abstract class Gdn_DatabaseStructure {
     */
    public function ColumnExists($ColumnName) {
       $Result = array_key_exists($ColumnName, $this->ExistingColumns());
+      if (!$Result) {
+         foreach ($this->_Columns as $ColName => $Def) {
+            if (strcasecmp($ColumnName, $ColName) == 0)
+               return TRUE;
+         }
+         return FALSE;
+      }
       return $Result;
    }
    
@@ -202,7 +209,18 @@ abstract class Gdn_DatabaseStructure {
 	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
 	 * @return array
 	 */
-	public function Columns() {
+	public function Columns($Name = '') {
+      if (strlen($Name) > 0) {
+         if (array_key_exists($Name, $this->_Columns))
+            return $this->_Columns[$Name];
+         else {
+            foreach($this->_Columns as $ColName => $Def) {
+               if (strcasecmp($Name, $ColName) == 0)
+                  return $Def;
+            }
+            return NULL;
+         }
+      }
 		return $this->_Columns;
 	}
 

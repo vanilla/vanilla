@@ -582,7 +582,10 @@ class Gdn_Request {
     * @return string
     */
    public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
-      if (!C('Garden.AllowSSL'))
+      static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
+      static $RewriteUrls = NULL; if ($RewriteUrls === NULL) $RewriteUrls = C('Garden.RewriteUrls', FALSE);
+      
+      if (!$AllowSSL)
          $SSL = NULL;
       
       // If we are explicitly setting ssl urls one way or another
@@ -611,7 +614,7 @@ class Gdn_Request {
          $Parts[] = $this->WebRoot();
 
 
-      if (!C('Garden.RewriteUrls')) {
+      if (!$RewriteUrls) {
          $Parts[] = $this->_EnvironmentElement('Script').'?';
          $Path = str_replace('?', '&', $Path);
       }

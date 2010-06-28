@@ -42,7 +42,7 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
    echo '<h4>',T($Key),'</h4>';
 
    // Look for a screenshot for for the style.
-   $Screenshot = SafeGlob(PATH_THEMES.DS.$this->Data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), 0, array('gif','jpg','png'));
+   $Screenshot = SafeGlob(PATH_THEMES.DS.$this->Data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif','jpg','png'));
    if (is_array($Screenshot) && count($Screenshot) > 0) {
       $Screenshot = basename($Screenshot[0]);
       echo Img('/themes/'.$this->Data('ThemeFolder').'/design/'.$Screenshot, array('alt' => T($Key), 'width' => '160'));

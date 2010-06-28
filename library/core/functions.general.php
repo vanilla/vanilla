@@ -1049,8 +1049,8 @@ if (!function_exists('RemoveQuoteSlashes')) {
 }
 
 if (!function_exists('SafeGlob')) {
-   function SafeGlob($Pattern, $Flags = 0, $Extensions = array()) {
-      $Result = glob($Pattern, $Flags);
+   function SafeGlob($Pattern, $Extensions = array()) {
+      $Result = glob($Pattern);
       if (!is_array($Result))
          $Result = array();
 

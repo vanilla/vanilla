@@ -238,7 +238,7 @@ class Gdn_Form {
             ++$i;
          }
       }
-      return '<ul class="CheckBoxList">' . $Return . '</ul>';
+      return '<ul class="'.ConcatSep(' ', 'CheckBoxList', GetValue('listclass', $Attributes)).'">' . $Return . '</ul>';
    }
 
    /**

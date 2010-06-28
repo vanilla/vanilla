@@ -350,7 +350,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @param int $FolderDepth
     * @todo $folderDepth needs a description.
     */
-   protected function _AnalyzeRequest(&$Request, $FolderDepth = 2) {
+   protected function _AnalyzeRequest(&$Request, $FolderDepth = 1) {
       // Here are some examples of what this method could/would receive:
       // /application/controllergroup/controller/method/argn
       // /controllergroup/controller/method/argn
@@ -497,7 +497,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // application to search in for a view file).
             $this->_ApplicationFolder = explode(DS, str_replace(PATH_APPLICATIONS . DS, '', $ControllerPath));
             $this->_ApplicationFolder = $this->_ApplicationFolder[0];
-            $AppControllerName = strtolower($this->_ApplicationFolder).'Controller';
+            $AppControllerName = ucfirst(strtolower($this->_ApplicationFolder)).'Controller';
 
             // Load the application's master controller
             if (!class_exists($AppControllerName))
@@ -542,7 +542,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private function _MapParts($Parts, $ControllerKey) {
       $Length = count($Parts);
       if ($Length > $ControllerKey)
-         $this->_ControllerName = $Parts[$ControllerKey];
+         $this->_ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
 
       if ($Length > $ControllerKey + 1)
          $this->_ControllerMethod = $Parts[$ControllerKey + 1];

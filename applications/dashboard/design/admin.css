@@ -764,6 +764,14 @@ table.AltColumns tr.Disabled td {
    padding: 0px 0px 0px 0px;
 }
 
+.ColumnCheckBoxList {
+   width: 650px;
+}
+.ColumnCheckBoxList li {
+   display: inline-block;
+   width: 321px;
+}
+
 /* =================================================================== Header */
 #Head {
 	background:#e2f4ff none repeat scroll 0 0;

@@ -2,7 +2,12 @@
 <table class="AltColumns">
 	<?php
    $Header = array();
-   $Filename = GetValue('OriginalFilename', $this->Data);
+   $ImportPaths = $this->Data('ImportPaths');
+   if (is_array($ImportPaths))
+      $Filename = GetValue($this->Data('ImportPath'), $ImportPaths);
+   else
+      $Filename = '';
+   //$Filename = GetValue('OriginalFilename', $this->Data);
    if($Filename)
       $Header[T('Filename')] = $Filename;
 

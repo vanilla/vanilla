@@ -104,13 +104,14 @@ class Gdn {
     * @param mixed $Args A variable number of arguments to pass to the constructor.
     * @see Gdn_Factory::Factory()
     */
-   public static function Factory($Alias = FALSE, $Arg1 = FALSE, $Arg2 = FALSE, $Arg3 = FALSE, $Arg4 = FALSE, $Arg5 = FALSE) {
+   public static function Factory($Alias = FALSE) {
       if ($Alias === FALSE)
          return self::$_Factory;
       
       // Get the arguments to pass to the factory.
-      $Args = array($Arg1, $Arg2, $Arg3, $Arg4, $Arg5); //func_get_args();
-      //array_shift($Args);
+      //$Args = array($Arg1, $Arg2, $Arg3, $Arg4, $Arg5);
+      $Args = func_get_args();
+      array_shift($Args);
       return self::$_Factory->Factory($Alias, $Args);
    }
    

@@ -206,7 +206,7 @@ class Gdn_CookieIdentity {
 
       // Create the cookie.
       setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain);
-      $_COOKIES[$CookieName] = $CookieContents;
+      $_COOKIE[$CookieName] = $CookieContents;
    }
    
    protected function _CheckCookie($CookieName) {
@@ -262,7 +262,7 @@ class Gdn_CookieIdentity {
    }
    
    protected function _DeleteCookie($CookieName) {
-      unset($_COOKIES[$CookieName]);
+      unset($_COOKIE[$CookieName]);
       self::DeleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
    }
    

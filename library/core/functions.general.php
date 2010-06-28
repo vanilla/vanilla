@@ -788,7 +788,7 @@ if (!function_exists('ProxyHead')) {
       
       $Response = '';
       if (function_exists('curl_init')) {
-         $Url = $Scheme.'://'.$Host.$Path;
+         //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
 			curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          curl_setopt($Handler, CURLOPT_URL, $Url);
@@ -801,10 +801,10 @@ if (!function_exists('ProxyHead')) {
          if (strlen($Cookie['Cookie']))
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie['Cookie']);
             
-         if ($Query != '') {
-            curl_setopt($Handler, CURLOPT_POST, 1);
-            curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
-         }
+         //if ($Query != '') {
+         //   curl_setopt($Handler, CURLOPT_POST, 1);
+         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         //}
          $Response = curl_exec($Handler);
          if ($Response == FALSE)
             $Response = curl_error($Handler);
@@ -907,11 +907,10 @@ if (!function_exists('ProxyRequest')) {
          $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
          $Cookie .= "{$Key}={$EValue}";
       }
-
       $Response = '';
       if (function_exists('curl_init')) {
          
-         $Url = $Scheme.'://'.$Host.$Path;
+         //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
@@ -919,11 +918,14 @@ if (!function_exists('ProxyRequest')) {
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
-            
-         if ($Query != '') {
-            curl_setopt($Handler, CURLOPT_POST, 1);
-            curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
-         }
+         
+         // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
+         // 
+         //if ($Query != '') {
+         //   curl_setopt($Handler, CURLOPT_POST, 1);
+         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         //}
+         
          $Response = curl_exec($Handler);
          if ($Response == FALSE)
             $Response = curl_error($Handler);

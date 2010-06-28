@@ -34,6 +34,7 @@ $FirstCommentIDExists = $Construct->ColumnExists('FirstCommentID');
 $BodyExists = $Construct->ColumnExists('Body');
 $LastCommentIDExists = $Construct->ColumnExists('LastCommentID');
 $LastCommentUserIDExists = $Construct->ColumnExists('LastCommentUserID');
+$CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 
 $Construct
    ->PrimaryKey('DiscussionID')
@@ -305,6 +306,16 @@ if (!$LastCommentIDExists || !$LastCommentUserIDExists) {
    set d.LastCommentID = c.CommentID,
       d.LastCommentUserID = c.InsertUserID
 where d.LastCommentUserID is null");
+}
+
+if (!$CountBookmarksExists) {
+   $Construct->Query("update {$Prefix}Discussion d
+   set CountBookmarks = (
+      select count(ud.DiscussionID)
+      from {$Prefix}UserDiscussion ud
+      where ud.Bookmarked = 1
+         and ud.DiscussionID = d.DiscussionID
+   )");
 }
 
 // Update lastcommentid & firstcommentid

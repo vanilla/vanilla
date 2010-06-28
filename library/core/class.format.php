@@ -370,7 +370,8 @@ class Gdn_Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
-         $IsHtml = strpos($Mixed, '<') !== FALSE;
+         $IsHtml = strpos($Mixed, '<') !== FALSE
+            || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Mixed);
 
          if ($IsHtml) {
             // The text contains html and must be purified.

@@ -249,7 +249,7 @@ abstract class Gdn_DatabaseStructure {
 		$Length = GetValue('Length', $Column);
 		$Precision = GetValue('Precision', $Column);
 
-		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'int', 'float', 'double')))
+		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'mediumint', 'int', 'float', 'double')))
 			$Length = NULL;
 
 		if($Type && $Length && $Precision)
@@ -465,7 +465,7 @@ abstract class Gdn_DatabaseStructure {
       $Date = array('datetime', 'date');
       $Decimal = array('decimal');
       $Float = array('float', 'double');
-      $Int = array('int', 'tinyint', 'smallint', 'bigint');
+      $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
       $String = array('varchar', 'char', 'mediumtext', 'text');
       $Length = array('varbinary');
       $Other = array('enum');

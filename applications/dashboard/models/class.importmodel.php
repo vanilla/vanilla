@@ -231,7 +231,7 @@ class ImportModel extends Gdn_Model {
 			if(array_key_exists($Table.'ID', $Columns)) {
 				$St
 				->Column('_NewID', $DestStructure->ColumnTypeString($Table.'ID'), NULL)
-				->Column('_Action', array('Insert', 'Update'));
+				->Column('_Action', array('Insert', 'Update'), NULL);
 			}
 
          try {
@@ -300,9 +300,9 @@ class ImportModel extends Gdn_Model {
 	 * Remove the data from the appropriate tables when we are overwriting the forum.
 	 */
 	public function DeleteOverwriteTables() {
-		$Tables = array('Activity', 'Category', 'Comment', 'CommentWatch', 'Conversation', 'ConversationMessage',
+		$Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
    		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
-   		'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
+   		'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
       // Delete the default role setting.
       SaveToConfig('Garden.Registration.DefaultRoles', array());
@@ -383,6 +383,61 @@ class ImportModel extends Gdn_Model {
       $Post['Password'] = GetValue('OverwritePassword', $D, '');
    }
 
+   public static function FGetCSV2($fp, $Delim = ',', $Quote = '"', $Escape = "\\") {
+      // Get the full line, considering escaped returns.
+      $Line = FALSE;
+      do {
+         $s = fgets($fp);
+
+         if ($s === FALSE) {
+            if ($Line === FALSE)
+               return FALSE;
+         }
+
+         if ($Line === FALSE)
+            $Line = $s;
+         else
+            $Line .= $s;
+      } while(strlen($s) > 1 && substr($s, -2, 1) === $Escape);
+
+      $Line = trim($Line, "\n");
+
+      $Result = array();
+
+      // Loop through the line and split on the delimiter.
+      $Strlen = strlen($Line);
+      $InEscape = FALSE;
+      $InQuote = FALSE;
+      $Token = '';
+      for ($i = 0; $i < $Strlen; ++$i) {
+         $c = $Line[$i];
+
+         if ($InEscape) {
+            $Token .= $c;
+            $InEscape = FALSE;
+         } else {
+            switch ($c) {
+               case $Escape:
+                  $InEscape = TRUE;
+                  break;
+               case $Delim:
+                  $Result[] = $Token;
+                  $Token = '';
+                  break;
+               case $Quote:
+                  $InQuote = !$InQuote;
+                  break;
+               default:
+                  $Token .= $c;
+                  break;
+            }
+         }
+      }
+      $Result[] = $Token;
+
+      return $Result;
+   }
+
 	public function GetImportHeader($fpin = NULL) {
 		$Header = GetValue('Header', $this->Data);
 		if($Header)
@@ -451,7 +506,7 @@ class ImportModel extends Gdn_Model {
             } else {
                switch($TableName) {
                   case 'UserDiscussion':
-                     $Sql = "insert :_UserDiscussion ( UserID, DiscussionID, DateLastViewed, Bookmarked )
+                     $Sql = "insert ignore :_UserDiscussion ( UserID, DiscussionID, DateLastViewed, Bookmarked )
                         select zUserID._NewID, zDiscussionID._NewID, max(i.DateLastViewed) as DateLastViewed, max(i.Bookmarked) as Bookmarked
                         from :_zUserDiscussion i
                         left join :_zUser zUserID
@@ -465,7 +520,7 @@ class ImportModel extends Gdn_Model {
                      $this->Query($Sql);
                      break;
                   case 'UserMeta':
-                     $Sql = "insert :_UserMeta ( UserID, Name, Value )
+                     $Sql = "insert ignore :_UserMeta ( UserID, Name, Value )
                            select zUserID._NewID, i.Name, max(i.Value) as Value
                            from :_zUserMeta i
                            left join :_zUser zUserID
@@ -477,8 +532,8 @@ class ImportModel extends Gdn_Model {
                      $this->Query($Sql);
                      break;
                   case 'UserRole':
-                     $Sql = "insert :_UserRole ( UserID, RoleID )
-                           select distinct zUserID._NewID, zRoleID._NewID
+                     $Sql = "insert ignore :_UserRole ( UserID, RoleID )
+                           select zUserID._NewID, zRoleID._NewID
                            from :_zUserRole i
                            left join :_zUser zUserID
                              on i.UserID = zUserID.UserID
@@ -518,7 +573,7 @@ class ImportModel extends Gdn_Model {
 		$Columns = $TableInfo['Columns'];
 
 		// Build the column insert list.
-		$Insert = "insert :_$TableName (\n  "
+		$Insert = "insert ignore :_$TableName (\n  "
 		.implode(",\n  ", array_keys(array_merge($Columns, $Sets)))
 		."\n)";
 		$From = "from :_z$TableName i";
@@ -646,12 +701,44 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function LoadTable($Tablename, $Path) {
-		$Path = Gdn::Database()->Connection()->quote($Path);
+      $PxTablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+		Gdn::Database()->Query("truncate table $PxTablename;");
+
+      switch ($this->LoadTableType()) {
+         case 'LoadTableOnSameServer':
+            $this->_LoadTableOnSameServer($Tablename, $Path);
+            break;
+         case 'LoadTableLocalInfile':
+            $this->_LoadTableLocalInfile($Tablename, $Path);
+            break;
+         case 'LoadTableWithInsert':
+            // This final option can be 15x slower than the other options.
+            $this->_LoadTableWithInsert($Tablename, $Path);
+            break;
+      }
+
+		return TRUE;
+	}
+
+   protected function _LoadTableOnSameServer($Tablename, $Path) {
 		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+		$Path = Gdn::Database()->Connection()->quote($Path);
 
-		Gdn::Database()->Query("truncate table $Tablename;");
+      $Sql = "load data infile $Path into table $Tablename
+         character set utf8
+         columns terminated by ','
+         optionally enclosed by '\"'
+         escaped by '\\\\'
+         lines terminated by '\\n'
+         ignore 1 lines";
+      $this->Query($Sql);
+   }
 
-		$Sql = "load data infile $Path into table $Tablename
+   protected function _LoadTableLocalInfile($Tablename, $Path) {
+		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+		$Path = Gdn::Database()->Connection()->quote($Path);
+
+      $Sql = "load data local infile $Path into table $Tablename
          character set utf8
          columns terminated by ','
          optionally enclosed by '\"'
@@ -659,10 +746,87 @@ class ImportModel extends Gdn_Model {
          lines terminated by '\\n'
          ignore 1 lines";
 
-		$this->Query($Sql);
+      // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
+      $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Databas.Password'), FALSE, 128);
+      mysql_select_db(C('Database.Name'), $dblink);
+      mysql_query($Sql, $dblink);
+      mysql_close($dblink);
+   }
 
-		return TRUE;
-	}
+   protected function _LoadTableWithInsert($Tablename, $Path) {
+      // This option could take a while so set the timeout.
+      set_time_limit(60 * 5);
+
+      // Get the column count of the table.
+      $St = Gdn::Structure();
+      $St->Get(self::TABLE_PREFIX.$Tablename);
+      $ColumnCount = count($St->Columns());
+      $St->Reset();
+
+      $fp = fopen($Path, 'rb');
+
+      $PDO = Gdn::Database()->Connection();
+		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+
+      // Skip the header row.
+      $Row = self::FGetCSV2($fp);
+
+      $Inserts = '';
+      $Count = 0;
+      while ($Row = self::FGetCSV2($fp)) {
+         ++$Count;
+
+         // Quote the values in the row.
+         $Row = array_map(array($PDO, 'quote'), $Row);
+
+         // Add any extra columns to the row.
+         while (count($Row) < $ColumnCount) {
+            $Row[] = 'null';
+         }
+
+         // Add the insert values to the sql.
+         if (strlen($Inserts) > 0)
+            $Inserts .= ',';
+         $Inserts .= '('.implode(',', $Row).')';
+
+         if ($Count >= 25) {
+            // Insert in chunks.
+            $Sql = "insert $Tablename values $Inserts";
+            $this->Query($Sql);
+            $Count = 0;
+            $Inserts = '';
+         }
+      }
+      fclose($fp);
+
+      if (strlen($Inserts) > 0) {
+         $Sql = "insert $Tablename values $Inserts";
+         $this->Query($Sql);
+      }
+   }
+
+   public function LoadTableType() {
+      if (strcasecmp(C('Database.Host'), 'localhost') == 0) {
+        return 'LoadTableOnSameServer';
+      } else {
+         // Check to see if local-infile is allowed on the server.
+         $Sql = "show variables like 'local_infile'";
+         $Data = $this->Query($Sql)->ResultArray();
+         if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
+            return 'LoadTabeLocalInfile';
+         else
+            return 'LoadTableWithInsert';
+     }
+   }
+
+   public function LocalInfileSupported() {
+      $Sql = "show variables like 'local_infile'";
+      $Data = $this->Query($Sql)->ResultArray();
+      if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
+         return TRUE;
+      else
+         return FALSE;
+   }
 
 	public function Overwrite($Overwrite = '', $Email = '', $Password = '') {
 		if($Overwrite == '')

@@ -46,7 +46,7 @@ $Construct
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
    ->Column('CountComments', 'int', '1')
-   ->Column('CountBookmarks', 'int', '0')
+   ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
@@ -64,7 +64,7 @@ $Construct
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('DiscussionID', 'int', FALSE, array('primary', 'key'))
 	->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never

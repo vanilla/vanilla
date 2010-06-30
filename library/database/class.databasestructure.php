@@ -179,9 +179,20 @@ abstract class Gdn_DatabaseStructure {
          $Null = FALSE;
          $Default = $NullDefault;
       }
-      
-      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
+
+      // Check the key type for validity. A column can be in many keys by specifying an array as key type.
+      $KeyTypes = (array)$KeyType;
+      $KeyTypes1 = array();
+      foreach ($KeyTypes as $KeyType1) {
+         if (in_array($KeyType1, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
+            $KeyTypes1[] = $KeyType1;
+      }
+      if (count($KeyTypes1) == 0)
          $KeyType = FALSE;
+      elseif (count($KeyTypes1) == 1)
+         $KeyType = $KeyTypes1[0];
+      else
+         $KeyType = $KeyTypes1;
 
       $Column = $this->_CreateColumn($Name, $Type, $Null, $Default, $KeyType);
       $this->_Columns[$Name] = $Column;

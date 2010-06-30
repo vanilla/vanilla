@@ -211,16 +211,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
       
       // Gather the names of the columns.
-      foreach($Columns as $ColumnName => $Column) {
-         if(!$Column->KeyType || ($KeyType && $KeyType != $Column->KeyType))
-            continue;
-         
-         if($Column->KeyType == 'key' || $Column->KeyType == 'index') {
-            $Name = $Prefixes[$Column->KeyType].$this->_TableName.'_'.$ColumnName;
-            $Result[$Name] = $Column->KeyType." $Name (`$ColumnName`)";
-         } else {
-            // This is a multi-column key type so just collect the column name.
-            $Keys[$Column->KeyType][] = $ColumnName;
+      foreach ($Columns as $ColumnName => $Column) {
+         $ColumnKeyTypes = (array)$Column->KeyType;
+
+         foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            if(!$ColumnKeyType || ($KeyType && $KeyType != $ColumnKeyType))
+               continue;
+
+            if($ColumnKeyType == 'key' || $ColumnKeyType == 'index') {
+               $Name = $Prefixes[$ColumnKeyType].$this->_TableName.'_'.$ColumnName;
+               $Result[$Name] = $ColumnKeyType." $Name (`$ColumnName`)";
+            } else {
+               // This is a multi-column key type so just collect the column name.
+               $Keys[$ColumnKeyType][] = $ColumnName;
+            }
          }
       }
       
@@ -378,6 +382,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // 4. Update Indexes
       $Indexes = $this->_IndexSql($this->_Columns);
       $IndexesDb = $this->_IndexSqlDb();
+
       $IndexSql = array();
       // Go through the indexes to add or modify.
       foreach($Indexes as $Name => $Sql) {

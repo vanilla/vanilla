@@ -7,6 +7,13 @@ echo '<div class="Info">',
 	T('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla\'s exporter.'),
 	  '</div>';
 
+if ($this->Data('LoadSpeedWarning')) {
+   echo '<div class="Warning">',
+   T('Warning: Loading tables can be slow.', '<b>Warning</b>: Your server configuration does not support fast data loading.
+If you are importing a very large file you might want to consider changing your configuration. Click <a href="http://vanillaforums.org/page/imports">here</a> for more information.'),
+   '</div>';
+}
+
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
@@ -45,7 +52,7 @@ echo $this->Form->Errors();
 		<?php
 		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
 		echo '<div class="Warning">',
-		T('Garden.Import.Overwrite.Desciption', 'All of the user and discussion data in this forum will be overwritten. You must choose a new admin user from the import data below.'),
+		T('Garden.Import.Overwrite.Desciption', '<b>Warning</b>: All of the user and discussion data in this forum will be overwritten. You must choose a new admin user from the import data below.'),
 		'</div>';
 		
 		echo $this->Form->Label('Email', 'Email'),

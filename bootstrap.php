@@ -114,6 +114,7 @@ Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
 // Application manager.
 Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
+
 // Theme manager
 Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);

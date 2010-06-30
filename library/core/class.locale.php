@@ -111,9 +111,10 @@ class Gdn_Locale extends Gdn_Pluggable {
       
       if(!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
       if(!is_array($PluginWhiteList)) $PluginWhiteList = array();
-
-      Gdn_LibraryMap::PrepareCache('locale');
-      if ($ForceRemapping === TRUE || !Gdn_LibraryMap::CacheReady('locale')) {
+      
+      Gdn_LibraryMap::PrepareCache('locale', NULL, 'tree');
+      $LocaleSources = Gdn_LibraryMap::GetCache('locale',$SafeLocaleName);
+      if ($ForceRemapping === TRUE || !Gdn_LibraryMap::CacheReady('locale') || $LocaleSources === NULL) {
          $LocaleSources = array();
          // Get application-based locale definition files
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName.'.php')), $ApplicationWhiteList);

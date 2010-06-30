@@ -199,7 +199,6 @@ class Gdn_FileSystem {
       $LibraryKey = str_replace('.', '__', $LibraryName);
       Gdn_LibraryMap::PrepareCache($MappingCacheName);
       $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
-      
       if ($LibraryPath === NULL) {
          // $LibraryName wasn't contained in the mappings array.
          // I need to look through the folders in this application for the requested file.

@@ -68,7 +68,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
    }
    
    protected function GetUserMeta($UserID, $Key) {
-   $SQL = Gdn::SQL();
+      $SQL = Gdn::SQL();
       $UserMetaQuery = $SQL
          ->Select('*')
          ->From('UserMeta')

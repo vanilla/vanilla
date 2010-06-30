@@ -31,7 +31,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       // Bring all enabled authenticator classes into the defined scope to allow them to be picked up by the plugin manager
       foreach ($AuthenticationSchemes as $AuthenticationSchemeAlias)
          $Registered = $this->RegisterAuthenticator($AuthenticationSchemeAlias);
-      
+
    }
    
    public function RegisterAuthenticator($AuthenticationSchemeAlias) {
@@ -43,7 +43,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       if (!class_exists($AuthenticatorClass) && file_exists($Path)) {
          require_once($Path);
       }
-
+      
       if (class_exists($AuthenticatorClass)) {
          $this->_AuthenticationSchemes[$Alias] = $Alias;
          
@@ -61,9 +61,9 @@ class Gdn_Auth extends Gdn_Pluggable {
       $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
       
       // Check if we are allowing this kind of authentication right now
-      if (!in_array($AuthenticationSchemeAlias, $this->_AuthenticationSchemes))
+      if (!in_array($AuthenticationSchemeAlias, $this->_AuthenticationSchemes)) {
          throw new Exception("Tried to load authenticator '{$AuthenticationSchemeAlias}' which was not yet registered.");
-      
+      }
       if (array_key_exists($AuthenticationSchemeAlias,$this->_Authenticators)) {
          if ($InheritAuthenticator)
             $this->_Authenticator = $this->_Authenticators[$AuthenticationSchemeAlias];

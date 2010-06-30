@@ -188,6 +188,7 @@ class ImportController extends DashboardController {
          $this->SetData('ImportPath', $Imp->ImportPath);
          $this->SetData('OriginalFilename', GetValue('OriginalFilename', $Imp->Data));
          $this->SetData('CurrentStep', $Imp->CurrentStep);
+         $this->SetData('LoadSpeedWarning', $Imp->LoadTableType() == 'LoadTableWithInsert');
       } catch(Gdn_UserException $Ex) {
          $this->Form->AddError($Ex);
          $Imp->SaveState();

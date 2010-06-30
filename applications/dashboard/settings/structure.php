@@ -310,3 +310,10 @@ if ($PhotoIDExists && !$PhotoExists) {
 if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
+
+$Construct->Table('Tag')
+	->PrimaryKey('TagID')
+   ->Column('Name', 'varchar(255)')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Set($Explicit, $Drop);

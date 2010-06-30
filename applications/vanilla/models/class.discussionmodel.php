@@ -362,6 +362,10 @@ class DiscussionModel extends VanillaModel {
 
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Sink']);
+			
+		$this->EventArguments['FormPostValues'] = $FormPostValues;
+		$this->EventArguments['DiscussionID'] = $DiscussionID;
+		$this->FireEvent('BeforeSaveDiscussion');
          
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {

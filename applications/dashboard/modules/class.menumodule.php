@@ -81,7 +81,7 @@ if (!class_exists('MenuModule', FALSE)) {
        * Removes all links from a specific group.
        */
       public function RemoveLinks($Group) {
-         $this->Links[$Group] = array();
+			$this->Items[$Group] = array();
       }
       
       /**

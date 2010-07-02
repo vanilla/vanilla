@@ -298,18 +298,22 @@ class Gdn_Request {
       }
       
       if ($this->RequestScheme() != "console" && is_array($_GET)) {
-         $Get = (is_array($_SERVER) && isset($_SERVER['QUERY_STRING'])) ? ArrayValue('QUERY_STRING', $_SERVER, FALSE) : $_GET;
-         if ($Get === FALSE) $Get = $_GET;
+         $Get = FALSE;
+//         if (is_array($_SERVER) && isset($_SERVER['QUERY_STRING']))
+//            $Get =& $_SERVER['QUERY_STRING'];
+         if ($Get === FALSE) $Get =& $_GET;
          if (!is_array($Get)) {
             $Original = array();
             parse_str($Get, $Original);
             SafeParseStr($Get, $Get, $Original);
          }
-         
-         $Value = reset($Get);
-         $Path = key($Get);
-         if ($Value)
-            $Path = FALSE;
+
+         if (isset($Get['p'])) {
+            $Path = $Get['p'];
+            unset($_GET['p']);
+         } else {
+            $Path = '';
+         }
          
          $this->RequestURI($Path);
       }
@@ -494,6 +498,52 @@ class Gdn_Request {
    public function Path($Path = NULL) {
       return $this->_ParsedRequestElement('Path', $Path);
    }
+
+   public function PathAndQuery($PathAndQuery = NULL) {
+      // Set the path and query if it is supplied.
+      if ($PathAndQuery) {
+         // Parse out the path into parts.
+         $Parts = parse_url($PathAndQuery);
+         $Path = GetValue('path', $Parts, '');
+
+         // Check for a filename.
+         $Filename = basename($Path);
+         if (strpos($Filename, '.') !== FALSE)
+            $Path = substr($Path, 0, -strlen($Filename));
+         else
+            $Filename = '';
+         $Path = trim($Path, '/');
+
+         $Query = GetValue('query', $Parts, '');
+         if (strlen($Query) > 0) {
+            $GetParts = explode('&', $Query);
+            $Get = array();
+            foreach ($GetParts as $GetPart) {
+               $GetTuple = explode('=', $GetPart);
+               $Get[urldecode($GetTuple[0])] = urldecode(GetValue(1, $GetTuple, ''));
+            }
+         } else {
+            $Get = array();
+         }
+
+         // Set the parts of the query here.
+         $this->_ParsedRequest['Path'] = $Path;
+         $this->_ParsedRequest['Filename'] = $Filename;
+         $this->_RequestArguments[self::INPUT_GET] = $Get;
+      }
+
+      // Construct the path and query.
+      $Result = $this->Path();
+
+      $Filename = $this->Filename();
+      if ($Filename && $Filename != 'default')
+         $Result .= ConcatSep('/', $Result, $Filename);
+      $Get = $this->GetRequestArguments(self::INPUT_GET);
+      if (count($Get) > 0)
+         $Result .= '?'.http_build_query($Get);
+
+      return $Result;
+   }
    
    public function Reset() {
       $this->_Environment        = array();
@@ -615,7 +665,7 @@ class Gdn_Request {
 
 
       if (!$RewriteUrls) {
-         $Parts[] = $this->_EnvironmentElement('Script').'?';
+         $Parts[] = $this->_EnvironmentElement('Script').'?p=';
          $Path = str_replace('?', '&', $Path);
       }
 

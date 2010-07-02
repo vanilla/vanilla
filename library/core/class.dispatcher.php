@@ -369,8 +369,38 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-      
       $this->Request = $Request->Path();
+
+      $PathAndQuery = $Request->PathAndQuery();
+      $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
+
+      // We have a route. Take action.
+      if ($MatchRoute !== FALSE) {
+         switch ($MatchRoute['Type']) {
+            case 'Internal':
+               $Request->PathAndQuery($MatchRoute['FinalDestination']);
+               $this->Request = $MatchRoute['FinalDestination'];
+               break;
+
+            case 'Temporary':
+               Header( "HTTP/1.1 302 Moved Temporarily" );
+               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               exit();
+               break;
+
+            case 'Permanent':
+               Header( "HTTP/1.1 301 Moved Permanently" );
+               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               exit();
+               break;
+
+            case 'NotFound':
+               Header( "HTTP/1.1 404 Not Found" );
+               $this->Request = $MatchRoute['FinalDestination'];
+               break;
+         }
+      }
+
 
       switch ($Request->OutputFormat()) {
          case 'rss':
@@ -389,35 +419,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       {
          $DefaultController = Gdn::Router()->GetRoute('DefaultController');
          $this->Request = $DefaultController['Destination'];
-      }
-
-      // Check for re-routing
-      $MatchRoute = Gdn::Router()->MatchRoute($this->Request);
-      
-      // We have a route. Take action.
-      if ($MatchRoute !== FALSE) {
-         switch ($MatchRoute['Type']) {
-            case 'Internal':
-               $this->Request = $MatchRoute['FinalDestination'];
-               break;
-            
-            case 'Temporary':
-               Header( "HTTP/1.1 302 Moved Temporarily" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] ); 
-               exit();
-               break;
-            
-            case 'Permanent':
-               Header( "HTTP/1.1 301 Moved Permanently" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
-               exit();
-               break;
-            
-            case 'NotFound':
-               Header( "HTTP/1.1 404 Not Found" );
-               $this->Request = $MatchRoute['FinalDestination'];
-               break;
-         }
       }
    
       $Parts = explode('/', $this->Request);

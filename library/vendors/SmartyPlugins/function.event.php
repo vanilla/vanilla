@@ -9,11 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 
-/**
- */
-function smarty_function_profile_link($Params, &$Smarty) {
-   $Wrap = GetValue('wrap', $Params, 'li');
-   return Gdn_Theme::Link('profile',
-      GetValue('text', $Params, ''),
-      GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+function smarty_function_event($Params, &$Smarty) {
+	$Name = ArrayValue('name', $Params);
+	return $Smarty->Controller->FireEvent($Name);
 }

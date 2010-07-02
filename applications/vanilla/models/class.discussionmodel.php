@@ -339,6 +339,7 @@ class DiscussionModel extends VanillaModel {
       // Get the DiscussionID from the form so we know if we are inserting or updating.
       $DiscussionID = ArrayValue('DiscussionID', $FormPostValues, '');
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
+		$this->EventArguments['Insert'] = $Insert;
       
       if ($Insert) {
          unset($FormPostValues['DiscussionID']);
@@ -362,6 +363,10 @@ class DiscussionModel extends VanillaModel {
 
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Sink']);
+			
+		$this->EventArguments['FormPostValues'] = $FormPostValues;
+		$this->EventArguments['DiscussionID'] = $DiscussionID;
+		$this->FireEvent('BeforeSaveDiscussion');
          
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
@@ -379,10 +384,6 @@ class DiscussionModel extends VanillaModel {
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
-               $this->EventArguments['FormPostValues'] = $FormPostValues;
-               $this->EventArguments['InsertFields'] = $Fields;
-               $this->EventArguments['DiscussionID'] = $DiscussionID;
-               $this->FireEvent('AfterSaveDiscussion');
                
                // Notify users of mentions
                $DiscussionName = ArrayValue('Name', $Fields, '');
@@ -437,6 +438,13 @@ class DiscussionModel extends VanillaModel {
                $CategoryID = $Data->FirstRow()->CategoryID;
 
             $this->UpdateDiscussionCount($CategoryID);
+				
+				// Fire an event that the discussion was saved.
+				$this->EventArguments['FormPostValues'] = $FormPostValues;
+				$this->EventArguments['Fields'] = $Fields;
+				$this->EventArguments['DiscussionID'] = $DiscussionID;
+				$this->FireEvent('AfterSaveDiscussion');
+
          }
       }
       return $DiscussionID;

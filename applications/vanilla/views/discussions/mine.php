@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+$this->Title(T('My Discussions'));
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $ViewLocation = $this->FetchViewLocation('discussions');
 WriteFilterTabs($this);

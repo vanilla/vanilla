@@ -189,6 +189,7 @@ class Gdn_LibraryMap {
          $Target = &self::$_Caches[$CacheName]['cache'][$CacheName];
       else
          $Target = &self::$_Caches[$CacheName]['cache'];
+      $Target = (array)$Target;
       
       if (array_key_exists($CacheKey,$Target))
          return $Target[$CacheKey];

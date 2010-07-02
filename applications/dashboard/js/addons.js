@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
       var addonName = urlParts[urlParts.length - 2];
       var testUrl = gdn.combinePaths(
          gdn.definition('WebRoot'),
-         'index.php?/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
+         'index.php?p=/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
       );
       
       $.ajax({
@@ -67,7 +67,7 @@ jQuery(document).ready(function($) {
       var addonName = urlParts[urlParts.length - 1];
       var testUrl = gdn.combinePaths(
          gdn.definition('WebRoot'),
-         'index.php?/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
+         'index.php?p=/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
       );
       
       $.ajax({

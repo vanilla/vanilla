@@ -1226,9 +1226,10 @@ table.SelectionGrid td.EmptyCol:hover {
    background: none;
 }
 table.SelectionGrid h4 {
-   font-size: 16px;
-   color: #02455B;
-   text-shadow: 0 1px 0 #fff;
+   color:#02455B;
+   font-size:16px;
+   margin-bottom:10px;
+   text-shadow:0 1px 0 #FFFFFF;
 }
 table.SelectionGrid em {
    display: block;
@@ -1256,16 +1257,19 @@ table.SelectionGrid dl {
 }
 table.SelectionGrid dl dt {
 	display: inline;
-   color: #000;
-   border-right: 1px solid #a5d0e7;
-   padding: 4px 6px 4px 0;
-	margin: 0 4px 0 0;
+   color: #000;
+   border-right: 1px solid #e2f4ff;
+   padding: 4px 6px 4px 0;
+   margin: 0 4px 0 0;
 }
 table.SelectionGrid dl dd {
 	display: inline;
 }
 table.SelectionGrid td.Active {
-   background: #FFFF00;
+   -moz-background-clip:border;
+   -moz-background-inline-policy:continuous;
+   -moz-background-origin:padding;
+   background:#e2f4ff none repeat scroll 0 0;
 }
 
 /* =================================================================== Footer */

@@ -46,7 +46,7 @@ class Gdn_Theme {
             if (!$Text && $Session->IsValid())
                $Text = $Session->User->Name;
             if ($Session->IsValid() && $Session->User->CountNotifications)
-               $Text .= " <span>{$Session->User->CountNotifications}</span>";
+               $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
 
             break;
          case 'signinout':

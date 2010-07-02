@@ -26,13 +26,17 @@ class PostController extends VanillaController {
     * @param int The CategoryID to add the discussion to.
     */
    public function Discussion($CategoryID = '') {
+      $UseCategories = C('Vanilla.Categories.Use');
+      if (!$UseCategories)
+         $CategoryID = 0;
+         
       $Session = Gdn::Session();
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
-      if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+      if ($UseCategories) {
+         echo 'use';
          $CategoryModel = new CategoryModel();
-
          $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }
       $this->AddJsFile('js/library/jquery.autogrow.js');

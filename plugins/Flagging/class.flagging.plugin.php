@@ -26,6 +26,20 @@ $PluginInfo['Flagging'] = array(
 );
 
 class FlaggingPlugin extends Gdn_Plugin {
+   
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
+         ->From('Flag fl')
+         ->GroupBy('ForeignURL')
+         ->Get()->NumRows();
+      
+      $LinkText = T('Flagged Content');
+      if ($NumFlaggedItems)
+         $LinkText .= " ({$NumFlaggedItems})";
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Forum', T('Forum'));
+      $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Settings.Manage');
+   }
 
    public function PluginController_Flagging_Create(&$Sender) {
       $Sender->Title('Content Flagging');
@@ -35,8 +49,38 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Index(&$Sender) {
-      //$Sender->AddCssFile($this->GetWebResource('design/flagging.css'));
       $Sender->AddCssFile('admin.css');
+      $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
+      
+      $FlaggedItems = Gdn::SQL()->Select('*')
+         ->From('Flag fl')
+         ->OrderBy('DateInserted', 'DESC')
+         ->Get();
+      
+      $Sender->FlaggedItems = array();
+      while ($Flagged = $FlaggedItems->NextRow(DATASET_TYPE_ARRAY)) {
+         $URL = $Flagged['ForeignURL'];
+         $Index = $Flagged['DateInserted'].'-'.$Flagged['InsertUserID'];
+         $Flagged['EncodedURL'] = str_replace('=','-',base64_encode($Flagged['ForeignURL']));
+         $Sender->FlaggedItems[$URL][$Index] = $Flagged;
+      }
+      unset($FlaggedItems);
+      
+      $Sender->Render($this->GetView('flagging.php'));
+   }
+   
+   public function Controller_Dismiss(&$Sender) {
+      $Arguments = $Sender->RequestArgs;
+      if (sizeof($Arguments) != 2) return;
+      list($Controller, $EncodedURL) = $Arguments;
+      
+      $URL = base64_decode(str_replace('-','=',$EncodedURL));
+      
+      Gdn::SQL()->Delete('Flag',array(
+         'ForeignURL'      => $URL
+      ));
+      
+      $this->Controller_Index($Sender);
    }
    
    public function DiscussionController_CommentOptions_Handler(&$Sender) {
@@ -68,6 +112,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    public function DiscussionController_Flag_Create(&$Sender) {
       // Signed in users only.
       if (!($UserID = Gdn::Session()->UserID)) return;
+      $UserName = Gdn::Session()->User->Name;
       
       $Arguments = $Sender->RequestArgs;
       if (sizeof($Arguments) != 5) return;
@@ -85,15 +130,20 @@ class FlaggingPlugin extends Gdn_Plugin {
       if ($Sender->Form->AuthenticatedPostBack()) {
          $Comment = $Sender->Form->GetValue('Plugin.Flagging.Reason');
          
-         Gdn::SQL()
-            ->Insert('Flag', array(
-               'InsertUserID'    => $UserID,
-               'ForeignURL'      => $URL,
-               'ForeignID'       => $ElementID,
-               'ForeignType'     => $Context,
-               'Comment'         => $Comment,
-               'DateInserted'    => date('Y-m-d H:i:s')
-         ));
+         try {
+            Gdn::SQL()
+               ->Insert('Flag', array(
+                  'InsertUserID'    => $UserID,
+                  'InsertName'      => $UserName,
+                  'AuthorID'        => $ElementAuthorID,
+                  'AuthorName'      => $ElementAuthor,
+                  'ForeignURL'      => $URL,
+                  'ForeignID'       => $ElementID,
+                  'ForeignType'     => $Context,
+                  'Comment'         => $Comment,
+                  'DateInserted'    => date('Y-m-d H:i:s')
+            ));
+         } catch(Exception $e) {}
          $Sender->StatusMessage = T("Your complaint has been registered.");
       }
       $Sender->Render($this->GetView('flag.php'));
@@ -104,6 +154,9 @@ class FlaggingPlugin extends Gdn_Plugin {
       $Structure
          ->Table('Flag')
          ->Column('InsertUserID', 'int(11)', FALSE, 'key')
+         ->Column('InsertName', 'varchar(64)')
+         ->Column('AuthorID', 'int(11)')
+         ->Column('AuthorName', 'varchar(64)')
          ->Column('ForeignURL', 'varchar(255)', FALSE, 'key')
          ->Column('ForeignID', 'int(11)')
          ->Column('ForeignType', 'varchar(32)')

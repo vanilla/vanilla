@@ -7,6 +7,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Author = UserBuilder($Object, 'Insert');
    $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
    $Sender->EventArguments['Type'] = $Type;
+   $Sender->EventArguments['Author'] = $Author;
    $CssClass = 'Item Comment';
    if ($Type == 'Comment') {
       $Sender->EventArguments['Comment'] = $Object;   

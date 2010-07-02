@@ -161,16 +161,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
          $Sql .= "\n".$this->_DefineColumn($Column);
 
-         if ($Column->KeyType == 'primary')
-            $PrimaryKey[] = $ColumnName;
-         elseif ($Column->KeyType == 'key')
-            $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
-         elseif ($Column->KeyType == 'index')
-            $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
-         elseif ($Column->KeyType == 'unique')
-            $UniqueKey[] = $ColumnName;
-         elseif ($Column->KeyType == 'fulltext')
-            $FullTextKey[] = $ColumnName;
+         $ColumnKeyTypes = (array)$Column->KeyType;
+
+         foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            if ($ColumnKeyType == 'primary')
+               $PrimaryKey[] = $ColumnName;
+            elseif ($ColumnKeyType == 'key')
+               $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            elseif ($ColumnKeyType == 'index')
+               $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            elseif ($ColumnKeyType == 'unique')
+               $UniqueKey[] = $ColumnName;
+            elseif ($ColumnKeyType == 'fulltext')
+               $FullTextKey[] = $ColumnName;
+         }
       }
       // Build primary keys
       if (count($PrimaryKey) > 0)

@@ -84,15 +84,21 @@ $Construct
    ->Set($Explicit, $Drop);
 
 // UserRole Table
-$Construct->Table('UserRole')
+$Construct->Table('UserRole');
+
+$UserRoleExists = $Construct->TableExists();
+
+$Construct
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('RoleID', 'int', FALSE, 'primary')
    ->Set($Explicit, $Drop);
-	
-// Assign the guest user to the guest role
-$SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
-// Assign the admin user to admin role
-$SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
+
+if (!$UserRoleExists) {
+   // Assign the guest user to the guest role
+   $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
+   // Assign the admin user to admin role
+   $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
+}
 
 // User Meta Table
 $Construct->Table('UserMeta')

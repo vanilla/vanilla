@@ -322,42 +322,6 @@ class SettingsController extends DashboardController {
          $this->AddDefinition('UpdateChecks', Gdn_Format::Serialize($UpdateData));
       }
    }
-
-   public function DefaultRoles() {
-      $this->Permission('Garden.Registration.Manage');
-//		if(!C('Garden.Registration.Manage', TRUE))
-//			return Gdn::Dispatcher()->Dispatch('Default404');
-      $this->AddSideMenu('');
-
-      $this->Title(T('Registration Roles'));
-
-      // Load roles for dropdowns.
-      $RoleModel = new RoleModel();
-      $this->SetData('RoleData', $RoleModel->Get());
-
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Get a list of default member roles from the config.
-         $DefaultRoles = C('Garden.Registration.DefaultRoles');
-         $this->Form->SetValue('DefaultRoles', $DefaultRoles);
-
-         // Get the guest roles.
-         $GuestRolesData = $RoleModel->GetByUserID(0);
-         $GuestRoles = ConsolidateArrayValuesByKey($GuestRolesData, 'RoleID');
-         $this->Form->SetValue('GuestRoles', $GuestRoles);
-
-      } else {
-         $DefaultRoles = $this->Form->GetFormValue('DefaultRoles');
-         SaveToConfig('Garden.Registration.DefaultRoles', $DefaultRoles);
-
-         $GuestRoles = $this->Form->GetFormValue('GuestRoles');
-         $UserModel = new UserModel();
-         $UserModel->SaveRoles(0, $GuestRoles, FALSE);
-
-         $this->StatusMessage = T("Saved");
-      }
-
-      $this->Render();
-   }
    
    public function Initialize() {
       parent::Initialize();
@@ -492,18 +456,6 @@ class SettingsController extends DashboardController {
         '-1 month' => T('1 month after being sent'),
         'FALSE' => T('never')
       );
-
-      // Check to see if there are no default roles for guests or members.
-      $DefaultRoleWarning = FALSE;
-      $DefaultRoles = C('Garden.Registration.DefaultRoles');
-      if(count($DefaultRoles) == 0) {
-         $DefaultRoleWarning = TRUE;
-      } else {
-         $GuestRoles = $RoleModel->GetByUserID(0);
-         if($GuestRoles->NumRows() == 0)
-            $DefaultRoleWarning = TRUE;
-      }
-      $this->SetData('DefaultRoleWarning', $DefaultRoleWarning);
       
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($ConfigurationModel->Data);

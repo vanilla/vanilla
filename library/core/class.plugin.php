@@ -66,5 +66,27 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
          return call_user_func(array($this,$ControllerMethod),$Sender);
       }
    }
+   
+   protected function GetUserMeta($UserID, $Key) {
+      $SQL = Gdn::SQL();
+      $UserMetaQuery = $SQL
+         ->Select('*')
+         ->From('UserMeta')
+         ->Where('UserID', $UserID);
+      
+      if (stristr($Key, '%'))
+         $UserMetaQuery->Like('Name', $Key);
+      else
+         $UserMetaQuery->Where('Name', $Key);
+         
+      $UserMetaData = $UserMetaQuery->Get();
+      
+      $UserMeta = array();
+      if ($UserMetaData->NumRows())
+         while ($MetaRow = $UserMetaData->NextRow(DATASET_TYPE_ARRAY))
+            $UserMeta[$MetaRow['Name']] = $MetaRow['Value'];
+      unset($UserMetaData);
+      return $UserMeta;
+   }
 
 }

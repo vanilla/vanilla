@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
       if (email != '') {
          var checkUrl = gdn.combinePaths(
             gdn.definition('WebRoot', ''),
-            'index.php?/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x'
+            'index.php?/p=dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x'
          );
          $.ajax({
             type: "GET",
@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
       if (name != '') {
          var checkUrl = gdn.combinePaths(
             gdn.definition('WebRoot', ''),
-            'index.php?/dashboard/user/usernameavailable/'+encodeURIComponent(name)
+            'index.php?p=/dashboard/user/usernameavailable/'+encodeURIComponent(name)
          );
          $.ajax({
             type: "GET",

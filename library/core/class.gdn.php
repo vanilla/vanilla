@@ -44,6 +44,10 @@ class Gdn {
    protected static $_FactoryOverwrite = TRUE;
    
    protected static $_Locale = NULL;
+
+   protected static $_Request = NULL;
+
+   protected static $_PluginManager = NULL;
    
    protected static $_Session = NULL;
    
@@ -105,6 +109,7 @@ class Gdn {
          return self::$_Factory;
       
       // Get the arguments to pass to the factory.
+      //$Args = array($Arg1, $Arg2, $Arg3, $Arg4, $Arg5);
       $Args = func_get_args();
       array_shift($Args);
       return self::$_Factory->Factory($Alias, $Args);
@@ -142,6 +147,12 @@ class Gdn {
       switch($Alias) {
          case self::AliasConfig:
             self::$_Config = self::Factory($Alias);
+            break;
+         case self::AliasRequest:
+            self::$_Request = self::Factory($Alias);
+            break;
+         case self::AliasPluginManager:
+            self::$_PluginManager = self::Factory($Alias);
             break;
          case self::AliasSession:
             self::$_Session = NULL;
@@ -279,7 +290,7 @@ class Gdn {
     * @return Gdn_PluginManager
     */
    public static function PluginManager() {
-      return self::Factory(self::AliasPluginManager);
+      return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
    }
    
    /**
@@ -288,7 +299,7 @@ class Gdn {
     * @return Gdn_Request
     */
    public static function Request($NewRequest = NULL) {
-      $Request = self::Factory(self::AliasRequest);
+      $Request = self::$_Request; //self::Factory(self::AliasRequest);
       if (!is_null($NewRequest)) {
 			if(is_string($NewRequest))
 				$Request->WithURI($NewRequest);

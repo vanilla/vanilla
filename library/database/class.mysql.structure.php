@@ -161,16 +161,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
          $Sql .= "\n".$this->_DefineColumn($Column);
 
-         if ($Column->KeyType == 'primary')
-            $PrimaryKey[] = $ColumnName;
-         elseif ($Column->KeyType == 'key')
-            $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
-         elseif ($Column->KeyType == 'index')
-            $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
-         elseif ($Column->KeyType == 'unique')
-            $UniqueKey[] = $ColumnName;
-         elseif ($Column->KeyType == 'fulltext')
-            $FullTextKey[] = $ColumnName;
+         $ColumnKeyTypes = (array)$Column->KeyType;
+
+         foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            if ($ColumnKeyType == 'primary')
+               $PrimaryKey[] = $ColumnName;
+            elseif ($ColumnKeyType == 'key')
+               $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            elseif ($ColumnKeyType == 'index')
+               $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+            elseif ($ColumnKeyType == 'unique')
+               $UniqueKey[] = $ColumnName;
+            elseif ($ColumnKeyType == 'fulltext')
+               $FullTextKey[] = $ColumnName;
+         }
       }
       // Build primary keys
       if (count($PrimaryKey) > 0)
@@ -211,16 +215,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
       
       // Gather the names of the columns.
-      foreach($Columns as $ColumnName => $Column) {
-         if(!$Column->KeyType || ($KeyType && $KeyType != $Column->KeyType))
-            continue;
-         
-         if($Column->KeyType == 'key' || $Column->KeyType == 'index') {
-            $Name = $Prefixes[$Column->KeyType].$this->_TableName.'_'.$ColumnName;
-            $Result[$Name] = $Column->KeyType." $Name (`$ColumnName`)";
-         } else {
-            // This is a multi-column key type so just collect the column name.
-            $Keys[$Column->KeyType][] = $ColumnName;
+      foreach ($Columns as $ColumnName => $Column) {
+         $ColumnKeyTypes = (array)$Column->KeyType;
+
+         foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            if(!$ColumnKeyType || ($KeyType && $KeyType != $ColumnKeyType))
+               continue;
+
+            if($ColumnKeyType == 'key' || $ColumnKeyType == 'index') {
+               $Name = $Prefixes[$ColumnKeyType].$this->_TableName.'_'.$ColumnName;
+               $Result[$Name] = $ColumnKeyType." $Name (`$ColumnName`)";
+            } else {
+               // This is a multi-column key type so just collect the column name.
+               $Keys[$ColumnKeyType][] = $ColumnName;
+            }
          }
       }
       
@@ -378,6 +386,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // 4. Update Indexes
       $Indexes = $this->_IndexSql($this->_Columns);
       $IndexesDb = $this->_IndexSqlDb();
+
       $IndexSql = array();
       // Go through the indexes to add or modify.
       foreach($Indexes as $Name => $Sql) {
@@ -427,7 +436,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'float', 'double', 'enum', 'timestamp')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'float', 'double', 'enum', 'timestamp')))
          throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

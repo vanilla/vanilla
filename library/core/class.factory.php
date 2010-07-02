@@ -40,7 +40,8 @@ class Gdn_Factory {
     * @param $Args The arguments to pass to the constructor of the object.
     */
    public function Factory($Alias, $Args = NULL) {
-      if (!$this->Exists($Alias))
+      //if (!$this->Exists($Alias))
+      if (!array_key_exists($Alias, $this->_Objects))
          return NULL;
       
       $Def = &$this->_Objects[$Alias];

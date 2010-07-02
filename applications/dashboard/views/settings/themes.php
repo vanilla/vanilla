@@ -104,9 +104,9 @@ printf(
          $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');   
          $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
          $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-         $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot.*", GLOB_BRACE);
+         $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot.*", array('gif', 'jpg', 'png'));
          $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
-         if($PreviewImage && !in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
+         if($PreviewImage)
 				$PreviewImage = FALSE;
          $Col++;
          if ($Col == 1) {

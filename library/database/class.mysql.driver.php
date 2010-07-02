@@ -138,6 +138,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       $Schema = array();
       foreach ($DataSet->Result() as $Field) {
          $Type = $Field->Type;
+         $Unsigned = stripos($Type, 'unsigned') !== FALSE;
          $Length = '';
 			$Precision = '';
          $Parentheses = strpos($Type, '(');
@@ -162,7 +163,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Object->Name = $Field->Field;
          $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
          $Object->Type = $Type;
-         $Object->Type2 = $Field->Type;
+         //$Object->Type2 = $Field->Type;
+         $Object->Unsigned = $Unsigned;
          $Object->AllowNull = ($Field->Null == 'YES');
          $Object->Default = $Field->Default;
          $Object->Length = $Length;

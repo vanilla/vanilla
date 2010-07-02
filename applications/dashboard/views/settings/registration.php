@@ -4,11 +4,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 
-if ($this->Data('DefaultRoleWarning')) {
-   echo Wrap(
-      sprintf(T('No default roles.', 'You don\'t have your default roles set up. To correct this problem click %s.'),
-      Anchor(T('here'), 'dashboard/settings/defaultroles')), 'div', array('class' => 'Warning'));
-}
+echo Gdn::Slice('/dashboard/role/defaultroleswarning');
 
 ?>
 <ul>

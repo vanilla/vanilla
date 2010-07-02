@@ -548,8 +548,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Use the view handler to parse the view.
          $ViewHandler->Render($ViewPath, $this);
       }
-      $ViewContents = ob_get_contents();
-      @ob_end_clean();
+      $ViewContents = ob_get_clean();
       
       return $ViewContents;
    }

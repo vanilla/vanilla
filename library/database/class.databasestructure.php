@@ -179,9 +179,20 @@ abstract class Gdn_DatabaseStructure {
          $Null = FALSE;
          $Default = $NullDefault;
       }
-      
-      if (!in_array($KeyType, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
+
+      // Check the key type for validity. A column can be in many keys by specifying an array as key type.
+      $KeyTypes = (array)$KeyType;
+      $KeyTypes1 = array();
+      foreach ($KeyTypes as $KeyType1) {
+         if (in_array($KeyType1, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
+            $KeyTypes1[] = $KeyType1;
+      }
+      if (count($KeyTypes1) == 0)
          $KeyType = FALSE;
+      elseif (count($KeyTypes1) == 1)
+         $KeyType = $KeyTypes1[0];
+      else
+         $KeyType = $KeyTypes1;
 
       $Column = $this->_CreateColumn($Name, $Type, $Null, $Default, $KeyType);
       $this->_Columns[$Name] = $Column;
@@ -195,6 +206,13 @@ abstract class Gdn_DatabaseStructure {
     */
    public function ColumnExists($ColumnName) {
       $Result = array_key_exists($ColumnName, $this->ExistingColumns());
+      if (!$Result) {
+         foreach ($this->_Columns as $ColName => $Def) {
+            if (strcasecmp($ColumnName, $ColName) == 0)
+               return TRUE;
+         }
+         return FALSE;
+      }
       return $Result;
    }
    
@@ -202,7 +220,18 @@ abstract class Gdn_DatabaseStructure {
 	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
 	 * @return array
 	 */
-	public function Columns() {
+	public function Columns($Name = '') {
+      if (strlen($Name) > 0) {
+         if (array_key_exists($Name, $this->_Columns))
+            return $this->_Columns[$Name];
+         else {
+            foreach($this->_Columns as $ColName => $Def) {
+               if (strcasecmp($Name, $ColName) == 0)
+                  return $Def;
+            }
+            return NULL;
+         }
+      }
 		return $this->_Columns;
 	}
 
@@ -220,7 +249,7 @@ abstract class Gdn_DatabaseStructure {
 		$Length = GetValue('Length', $Column);
 		$Precision = GetValue('Precision', $Column);
 
-		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'int', 'float', 'double')))
+		if(in_array(strtolower($Type), array('tinyint', 'smallint', 'mediumint', 'int', 'float', 'double')))
 			$Length = NULL;
 
 		if($Type && $Length && $Precision)
@@ -436,7 +465,7 @@ abstract class Gdn_DatabaseStructure {
       $Date = array('datetime', 'date');
       $Decimal = array('decimal');
       $Float = array('float', 'double');
-      $Int = array('int', 'tinyint', 'smallint', 'bigint');
+      $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
       $String = array('varchar', 'char', 'mediumtext', 'text');
       $Length = array('varbinary');
       $Other = array('enum');

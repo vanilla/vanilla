@@ -34,6 +34,7 @@ $FirstCommentIDExists = $Construct->ColumnExists('FirstCommentID');
 $BodyExists = $Construct->ColumnExists('Body');
 $LastCommentIDExists = $Construct->ColumnExists('LastCommentID');
 $LastCommentUserIDExists = $Construct->ColumnExists('LastCommentUserID');
+$CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 
 $Construct
    ->PrimaryKey('DiscussionID')
@@ -46,7 +47,7 @@ $Construct
 	->Column('Format', 'varchar(20)', TRUE)
    ->Column('Tags', 'varchar(255)', NULL)
    ->Column('CountComments', 'int', '1')
-   ->Column('CountBookmarks', 'int', '0')
+   ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
@@ -64,7 +65,7 @@ $Construct
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('DiscussionID', 'int', FALSE, array('primary', 'key'))
 	->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
@@ -307,6 +308,16 @@ if (!$LastCommentIDExists || !$LastCommentUserIDExists) {
    set d.LastCommentID = c.CommentID,
       d.LastCommentUserID = c.InsertUserID
 where d.LastCommentUserID is null");
+}
+
+if (!$CountBookmarksExists) {
+   $Construct->Query("update {$Prefix}Discussion d
+   set CountBookmarks = (
+      select count(ud.DiscussionID)
+      from {$Prefix}UserDiscussion ud
+      where ud.Bookmarked = 1
+         and ud.DiscussionID = d.DiscussionID
+   )");
 }
 
 // Update lastcommentid & firstcommentid

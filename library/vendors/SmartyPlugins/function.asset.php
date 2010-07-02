@@ -34,16 +34,13 @@ function smarty_function_asset($Params, &$Smarty) {
 	$Asset = $Controller->GetAsset($Name);
 	
    if(!is_string($Asset)) {
-		ob_start();
-		$Asset->Render();
-		$Asset = ob_get_contents();
-		ob_end_clean();
-	}
-	
-	if(!empty($Tag)) {
-		$Result = '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
-	} else {
-		$Result = $Asset;
-	}
-	return $Result;
+      $Asset = $Asset->ToString();
+   }
+
+   if(!empty($Tag)) {
+      $Result = '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
+   } else {
+      $Result = $Asset;
+   }
+   return $Result;
 }

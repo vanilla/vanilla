@@ -51,7 +51,7 @@ class Gdn_Router {
    /**
     * Update or add a route to the config table
     * 
-    * @return 
+    * @return void
     */
    public function SetRoute($Route, $Destination, $Type) {
       $Key = $this->_EncodeRouteKey($Route);

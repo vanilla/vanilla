@@ -62,6 +62,7 @@ class TagPlugin extends Gdn_Plugin {
          searchingText: "Searching...",
          searchDelay: 300,
          minChars: 1,
+         maxLength: 25,
          onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); }
      });
    });
@@ -206,7 +207,7 @@ class TagPlugin extends Gdn_Plugin {
       $Sender->SetData('CountDiscussions', $CountDiscussions);
       $Sender->AnnounceData = FALSE;
 		$Sender->SetData('Announcements', array(), TRUE);
-      $DiscussionModel->SQL->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$TagID);
+      $DiscussionModel->FilterToTagID = $TagID;
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -240,6 +241,12 @@ class TagPlugin extends Gdn_Plugin {
       
       // Render the controller
       $Sender->Render(PATH_PLUGINS.'/Tag/views/taggeddiscussions.php');
+   }
+   
+   // Should we limit the discussion query to a specific tagid?
+   public function DiscussionModel_BeforeGet_Handler($Sender) {
+      if (property_exists($Sender, 'FilterToTagID'))
+         $Sender->SQL->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$Sender->FilterToTagID);
    }
    
 }

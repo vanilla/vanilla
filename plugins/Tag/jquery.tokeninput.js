@@ -15,6 +15,7 @@ $.fn.tokenInput = function (url, options) {
         url: url,
         searchDelay: 300,
         minChars: 1,
+        maxLength: 0,
         tokenLimit: null,
         jsonContainer: null,
         method: "GET",
@@ -186,6 +187,10 @@ $.TokenList = function (input, settings) {
                     break;
             }
         });
+        
+    if (settings.maxLength > 0) {
+        $(input_box).attr('maxlength', settings.maxLength);
+    }
 
     // Keep a reference to the original input box
     var hidden_input = $(input)

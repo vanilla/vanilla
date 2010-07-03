@@ -91,8 +91,14 @@ class FlaggingPlugin extends Gdn_Plugin {
       
       $Context = strtolower($Sender->EventArguments['Type']);
       $ElementID = ($Context == 'comment') ? $Sender->EventArguments['Comment']->CommentID : $Sender->EventArguments['Discussion']->DiscussionID;
-      $ElementAuthorID = $Sender->EventArguments['Author']->UserID;
-      $ElementAuthor = $Sender->EventArguments['Author']->Name;
+      
+      if (!is_object($Sender->EventArguments['Author'])) {
+         $ElementAuthorID = 0;
+         $ElementAuthor = 'Unknown';
+      } else {
+         $ElementAuthorID = $Sender->EventArguments['Author']->UserID;
+         $ElementAuthor = $Sender->EventArguments['Author']->Name;
+      }
       switch ($Context) {
          case 'comment':
             $URL = "/discussion/comment/{$ElementID}/#Comment_{$ElementID}";

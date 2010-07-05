@@ -13,7 +13,7 @@ $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
    'Version' => '1.0',
-   'SettingsUrl' => '/dashboard/settings/tags',
+   // 'SettingsUrl' => '/dashboard/settings/tags',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -28,6 +28,7 @@ class TagPlugin extends Gdn_Plugin {
    
    public function SettingsController_Tags_Create($Sender) {
       // TODO: Complete tag management (let admins rename tags, remove tags, etc)
+      // Uncomment SettingsUrl above when finished.
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Tag Management');
       $Sender->AddSideMenu('settings/tags');

@@ -565,7 +565,7 @@ EOT;
       if (!is_string($Mixed))
          return self::To($Mixed, 'Text');
       else
-         return htmlspecialchars(strip_tags(html_entity_decode($Mixed)), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
+         return nl2br(htmlspecialchars(strip_tags(html_entity_decode($Mixed)), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8')));
    }
 
    /**

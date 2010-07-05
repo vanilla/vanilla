@@ -9,8 +9,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
-$PluginInfo['Tag'] = array(
-   'Name' => 'Tag',
+$PluginInfo['Tagging'] = array(
+   'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
    'Version' => '1.0',
    'SettingsUrl' => '/dashboard/settings/tags',
@@ -27,6 +27,7 @@ class TagPlugin extends Gdn_Plugin {
    }
    
    public function SettingsController_Tags_Create($Sender) {
+      // TODO: Complete tag management (let admins rename tags, remove tags, etc)
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Tag Management');
       $Sender->AddSideMenu('settings/tags');
@@ -53,8 +54,8 @@ class TagPlugin extends Gdn_Plugin {
    }
 
    public function PostController_Render_Before($Sender) {
-      $Sender->AddCSSFile('plugins/Tag/design/token-input.css');
-      $Sender->AddJsFile('plugins/Tag/jquery.tokeninput.js');
+      $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
+      $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
@@ -164,9 +165,9 @@ class TagPlugin extends Gdn_Plugin {
       $this->_AddTagModule($Sender);
    }
    private function _AddTagModule($Sender) {
-      $Sender->AddCSSFile('plugins/Tag/design/tag.css');
+      $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
-      include_once(PATH_PLUGINS.'/Tag/class.tagmodule.php');
+      include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
       $TagModule = new TagModule($Sender);
       $TagModule->GetData($DiscussionID);
       $Sender->AddModule($TagModule);      
@@ -240,7 +241,7 @@ class TagPlugin extends Gdn_Plugin {
       }
       
       // Render the controller
-      $Sender->Render(PATH_PLUGINS.'/Tag/views/taggeddiscussions.php');
+      $Sender->Render(PATH_PLUGINS.'/Tagging/views/taggeddiscussions.php');
    }
    
    // Should we limit the discussion query to a specific tagid?

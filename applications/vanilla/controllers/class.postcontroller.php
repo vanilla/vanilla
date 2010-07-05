@@ -35,7 +35,6 @@ class PostController extends VanillaController {
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
       if ($UseCategories) {
-         echo 'use';
          $CategoryModel = new CategoryModel();
          $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }

@@ -26,6 +26,8 @@ class DiscussionsController extends VanillaController {
    public $CategoryID;
    
    public function Index($Offset = '0') {
+      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+
       if ($this->Head) {
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
@@ -45,7 +47,6 @@ class DiscussionsController extends VanillaController {
       $this->AddModule($BookmarkedModule);
 
       $this->SetData('Category', FALSE, TRUE);
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);

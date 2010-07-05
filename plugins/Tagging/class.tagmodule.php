@@ -41,21 +41,19 @@ class TagModule extends Gdn_Module {
    }
 
    public function ToString() {
+      if ($this->_TagData->NumRows() == 0)
+         return '';
+      
       $String = '';
       ob_start();
       ?>
       <div class="Box Tags">
          <h4><?php echo T($this->_DiscussionID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
-         <?php
-         foreach ($this->_TagData->Result() as $Tag) {
-            ?>
-            <div>
-               <?php echo Anchor($Tag->Name, 'discussions/tagged/'.$Tag->Name); ?>
-               x <?php echo $Tag->CountDiscussions; ?>
-            </div>
-            <?php
-         }
-         ?>
+         <ul class="PanelInfo">
+         <?php foreach ($this->_TagData->Result() as $Tag) { ?>
+            <li><strong><?php echo Anchor($Tag->Name, 'discussions/tagged/'.$Tag->Name); ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
+         <?php } ?>
+         </ul>
       </div>
       <?php
       $String = ob_get_contents();

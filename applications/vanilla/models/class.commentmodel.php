@@ -87,7 +87,7 @@ class CommentModel extends VanillaModel {
 
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
 		// echo 'Setting Watch Records for Discussion '.$DiscussionID.' to Limit: '.$Limit.' Offset: '.$Offset.' CountWatch = ' . ($Limit + $Offset) . ' TotalComments ' . $TotalComments;
-		// return;
+		// die();
 		
       // Record the user's watch data
       $Session = Gdn::Session();

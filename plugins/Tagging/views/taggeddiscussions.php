@@ -1,10 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Title(T('All Discussions'));
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
-
-WriteFilterTabs($this);
-if ($this->DiscussionData->NumRows() > 0 || (is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
+<div class="TaggedHeading"><?php printf("Questions tagged with '%s'", $this->Tag); ?></div>
+<?php if ($this->DiscussionData->NumRows() > 0) { ?>
 <ul class="DataList Discussions">
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
@@ -12,6 +10,6 @@ if ($this->DiscussionData->NumRows() > 0 || (is_object($this->AnnounceData) && $
    echo $this->Pager->ToString('more');
 } else {
    ?>
-   <div class="Empty"><?php echo T('No discussions were found.'); ?></div>
+   <div class="Empty"><?php printf(T('No items tagged with %s.'), $this->Tag); ?></div>
    <?php
 }

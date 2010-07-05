@@ -157,6 +157,9 @@ if (!function_exists('UserPhoto')) {
  */
 if (!function_exists('Wrap')) {
    function Wrap($String, $Tag = 'span', $Attributes = '') {
+		if ($Tag == '')
+			return $String;
+		
       if (is_array($Attributes))
          $Attributes = Attribute($Attributes);
          

@@ -14,8 +14,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 function smarty_function_dashboard_link($Params, &$Smarty) {
    $Path = GetValue('path', $Params, '', TRUE);
    $Text = GetValue('text', $Params, '', TRUE);
-
+   $Wrap = GetValue('wrap', $Params, 'li');
    return Gdn_Theme::Link('dashboard',
       GetValue('text', $Params, ''),
-      GetValue('format', $Params, '<li><a href="%url" class="%class">%text</a></li>'));
+      GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

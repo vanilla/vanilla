@@ -170,6 +170,8 @@ if (!class_exists('HeadModule', FALSE)) {
          );
       }
       
+      /*
+       DEPRECATED
       public function SubTitle($SubTitle = FALSE, $Title = FALSE, $TitleDivider = ' - ') {
          $this->_TitleDivider = '';
          if ($Title === FALSE)
@@ -186,39 +188,42 @@ if (!class_exists('HeadModule', FALSE)) {
             
          return $this->_Title.$this->_TitleDivider.$this->_SubTitle;
       }
-   
+      */
+      
       public function Title($Title = '') {
-         if ($Title != '')
+         if ($Title != '') {
+            // Apply $Title to $this->_Title and return it;
             $this->_Title = $Title;
-            
-         if ($this->_Title == '') {
-            $Subtitle = GetValueR('Data.Title', $this->_Sender, '');
-            $this->_Title = ConcatSep(' - ', $Subtitle, C('Garden.Title'));
+            $this->_Sender->Title($Title);
+            return $Title;
+         } else if ($this->_Title != '') {
+            // Return $this->_Title if set;
+            return $this->_Title;
+         } else {
+            // Default Return title from controller's Data.Title + banner title;
+            return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), C('Garden.Title'));
          }
-            
-         return $this->_Title;
       }
    
       public function ToString() {
-         $Head = array();
-         $Head[] = '<title>'.Gdn_Format::Text($this->Title()).'</title>';
+         $Head = '<title>'.Gdn_Format::Text($this->Title()).'</title>';
             
          // Make sure that css loads before js (for jquery)
          ksort($this->_Tags); // "link" comes before "script"
          foreach ($this->_Tags as $Tag => $Collection) {
             $Count = count($Collection);
             for ($i = 0; $i < $Count; ++$i) {
-               $Head[] = '<'.$Tag . Attribute($Collection[$i])
+               $Head .= '<'.$Tag . Attribute($Collection[$i])
                   .($Tag == 'script' ? '></'.$Tag.'>' : ' />');
             }
          }
          
          $Count = count($this->_Strings);
          for ($i = 0; $i < $Count; ++$i) {
-            $Head[] = $this->_Strings[$i];
+            $Head .= $this->_Strings[$i];
          }
          
-         return implode("\n", $Head);
+         return $Head;
       }
    }
 }

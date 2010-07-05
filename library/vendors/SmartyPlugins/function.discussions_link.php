@@ -12,7 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  */
 function smarty_function_discussions_link($Params, &$Smarty) {
+   $Wrap = GetValue('wrap', $Params, 'li');
    return Gdn_Theme::Link('discussions',
       GetValue('text', $Params, T('Discussions')),
-      GetValue('format', $Params, '<li><a href="%url" class="%class">%text</a></li>'));
+      GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

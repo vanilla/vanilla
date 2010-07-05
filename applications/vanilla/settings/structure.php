@@ -45,6 +45,7 @@ $Construct
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
+   ->Column('Tags', 'varchar(255)', NULL)
    ->Column('CountComments', 'int', '1')
    ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')
@@ -114,6 +115,7 @@ $Construct->Table('Draft')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
    ->Column('Name', 'varchar(100)', TRUE)
+   ->Column('Tags', 'varchar(255)', NULL)
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
    ->Column('Sink', 'tinyint(1)', '0')
@@ -352,3 +354,12 @@ if ($FirstCommentIDExists) {
    $Construct->Table('Discussion')->DropColumn('FirstCommentID');
    $Construct->Reset();
 }
+
+$Construct->Table('TagDiscussion')
+   ->Column('TagID', 'int', FALSE, 'primary')
+   ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Tag')
+   ->Column('CountDiscussions', 'int', 0)
+   ->Set();

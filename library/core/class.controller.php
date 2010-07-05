@@ -1184,8 +1184,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Title($Title) {
       $this->SetData('Title', $Title);
-//      if ($this->Head)
-//         $this->Head->Title($Title);
    }
    
    /**

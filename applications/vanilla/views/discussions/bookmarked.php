@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+$this->Title(T('My Bookmarks'));
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
 WriteFilterTabs($this);

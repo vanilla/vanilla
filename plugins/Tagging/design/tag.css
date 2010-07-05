@@ -2,27 +2,6 @@
     background: url('tag.png') left 4px no-repeat;
     padding: 0 0 6px 20px !important;
 }
-.Tags div {
-    font-weight: bold;
-    color: #555;
-    padding: 1px 0;
-}
-.Tags a {
-    font-weight: normal;
-    margin: 0 4px 0 0;
-    padding: 1px 3px;
-    background-color: #eff2f7;
-    border: 1px solid #ccd5e4;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    font-size: 12px;
-}
-.Tags a:hover {
-    background-color: #5670a6;
-    border: 1px solid #3b5998;
-    color: #fff;    
-}
 .TaggedHeading {
     padding: 3px;
     font-weight: bold;

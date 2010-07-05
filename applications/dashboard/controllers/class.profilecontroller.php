@@ -511,6 +511,7 @@ class ProfileController extends Gdn_Controller {
       if ($this->User !== FALSE) {
          $SideMenu = new SideMenuModule($this);
          $SideMenu->HtmlId = 'UserOptions';
+			$SideMenu->AutoLinkGroups = FALSE;
          $Session = Gdn::Session();
          $ViewingUserID = $Session->UserID;
          $SideMenu->AddItem('Options', '');

@@ -106,8 +106,6 @@ printf(
          $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
          $PreviewImage = SafeGlob(PATH_THEMES . DS . $ThemeFolder . DS . "screenshot.*", array('gif', 'jpg', 'png'));
          $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
-         if($PreviewImage)
-				$PreviewImage = FALSE;
          $Col++;
          if ($Col == 1) {
             $ColClass = 'FirstCol';

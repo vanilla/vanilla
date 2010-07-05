@@ -216,8 +216,8 @@ class PostController extends VanillaController {
             // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
             $Comment = $this->CommentModel->GetID($CommentID);
             
-            // Mark the comment read
-            $this->CommentModel->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments, $Discussion->CountComments);
+            // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
+            $this->CommentModel->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
             
             $this->EventArguments['Discussion'] = $Discussion;
             $this->EventArguments['Comment'] = $Comment;

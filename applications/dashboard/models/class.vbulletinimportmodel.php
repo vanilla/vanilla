@@ -9,31 +9,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Handles creating and returning a pager
- *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * Object for doing specific actions to a vbulletin import.
  */
+class vBulletinImportModel extends Gdn_Model {
+   /**
+    * @var ImportModel
+    */
+   var $ImportModel = null;
 
-class Gdn_PagerFactory {
-
-   public function GetPager($PagerType, $Sender) {
-      $PagerType = $PagerType.'Module';
-         
-      if (!class_exists($PagerType, FALSE))
-         __autoload($PagerType);
-         
-      if (!class_exists($PagerType, FALSE)) {
-         $PagerType = 'PagerModule';
-         __autoload($PagerType);
-      }
-      if (!class_exists($PagerType, FALSE))
-         return FALSE;
-
-      return new $PagerType($Sender);
+   public function AfterImport() {
+      // Set up the routes to redirect from their older counterparts.
+      $Router = Gdn::Router();
+      $Router->SetRoute('forumdisplay\.php\?f=(\d+)', 'vanilla/categories/$1', 'Permanent');
+      $Router->SetRoute('showthread\.php\?t=(\d+)', 'vanilla/discussion/$1', 'Permanent');
+      $Router->SetRoute('member\.php\?u=(\d+)', 'dashboard/profile/$1/x', 'Permanent');
    }
 }

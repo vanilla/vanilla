@@ -723,6 +723,43 @@ if (!function_exists('Now')) {
    }
 }
 
+if (!function_exists('OffsetLimit')) {
+   /** Convert various forms of querystring limit/offset, page, limit/range to database limit/offset
+    *
+    * @param string $OffsetOrPage The page query in one of the following formats:
+    *  - p<x>: Get page x.
+    *  - <x>-<y>: This is a range viewing records x through y.
+    *  - <x>lim<n>: This is a limit/offset pair.
+    *  - <x>: This is a limit where offset is given in the next parameter.
+    * @param int $LimitOrPageSize The page size or limit.
+    */
+   function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '') {
+      $LimitOrPageSize = is_numeric($LimitOrPageSize) ? $LimitOrPageSize : 50;
+
+      if (is_numeric($OffsetOrPage)) {
+         $Offset = $OffsetOrPage;
+         $Limit = $LimitOrPageSize;
+      } elseif (preg_match('/p(\d+)/i', $OffsetOrPage, $Matches)) {
+         $Page = $Matches[1];
+         $Offset = $LimitOrPageSize * ($Page - 1);
+         $Limit = $LimitOrPageSize;
+      } elseif (preg_match('/(\d+)-(\d+)/', $OffsetOrPage, $Matches)) {
+         $Offset = $Matches[1] - 1;
+         $Limit = $Matches[2] - $Matches[1] + 1;
+      } elseif (preg_match('/(\d+)lim(\d*)/i', $OffsetOrPage, $Matches)) {
+         $Offset = $Matches[1];
+         $Limit = $Matches[2];
+         if (!is_numeric($Limit))
+            $Limit = $LimitOrPageSize;
+      } else {
+         $Offset = 0;
+         $Limit = $LimitOrPageSize;
+      }
+
+      return array($Offset, $Limit);
+   }
+}
+
 if (!function_exists('parse_ini_string')) {
    /**
     * parse_ini_string not supported until PHP 5.3.0, and we currently support

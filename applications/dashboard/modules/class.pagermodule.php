@@ -192,58 +192,55 @@ class PagerModule extends Gdn_Module {
       if ($CurrentPage == 1) {
          $Pager = '<span class="Previous">'.$PreviousText.'</span>';
       } else {
-         $Offset = ($CurrentPage - 2) * $this->Limit;
-         $Pager .= Anchor($PreviousText, sprintf($this->Url, $Offset, $this->Limit), 'Previous');
+         $PageParam = 'p'.($CurrentPage - 1);
+         $Pager .= Anchor($PreviousText, sprintf($this->Url, $PageParam), 'Previous');
       }
       
       // We don't need elipsis at all (ie. 1 2 3 4 5)
       if ($PageCount <= 1) {
          // Don't build anything
       } else if ($PageCount < 10) {
-         for ($i = 0; $i < $PageCount ; $i++) {
-            $Offset = $this->Limit * $i;
-            if ($Offset == 0) $Offset = '';
-            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
+         for ($i = 1; $i <= $PageCount ; $i++) {
+            $PageParam = $i == 1 ? '' : 'p'.$i;
+            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
       } else if ($FirstPage <= 3) {
          // We're on a page that is before the first elipsis (ie. 1 2 3 4 5 6 7 ... 81)
-         for ($i = 0; $i < 7; $i++) {
-            $Offset = $this->Limit * $i;
-            if ($Offset == 0) $Offset = '';
-            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
+         for ($i = 1; $i <= 7; $i++) {
+            $PageParam = $i == 1 ? '' : 'p'.$i;
+            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
          $Pager .= '<span>...</span>';
-         $Offset = $this->Limit * $PageCount - $this->Limit;
-         $Pager .= Anchor($PageCount, sprintf($this->Url, $Offset, $this->Limit));
+         $Pager .= Anchor($PageCount, sprintf($this->Url, 'p'.$PageCount, $this->Limit));
       } else if ($FirstPage >= $PageCount - 6) {
          // We're on a page that is after the last elipsis (ie. 1 ... 75 76 77 78 79 80 81)
-         $Pager .= Anchor(1, sprintf($this->Url, '', $this->Limit));
+         $Pager .= Anchor(1, sprintf($this->Url, '', 'p1'));
          $Pager .= '<span>...</span>';
 
          for ($i = $PageCount - 6; $i <= $PageCount; $i++) {
-            $Offset = $this->Limit * $i - $this->Limit;
-            $Pager .= Anchor($i, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i, $CurrentPage));
+            $PageParam = 'p'.$i;
+            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
       } else {
          // We're between the two elipsises (ie. 1 ... 4 5 6 7 8 ... 81)
-         $Pager .= Anchor(1, sprintf($this->Url, '', $this->Limit));
+         $Pager .= Anchor(1, sprintf($this->Url, '', 'p1'));
          $Pager .= '<span>...</span>';
 
-         for ($i = $CurrentPage - 3; $i < $CurrentPage + 2; $i++) {
-            $Offset = $this->Limit * $i;
-            $Pager .= Anchor($i+1, sprintf($this->Url, $Offset, $this->Limit), $this->_GetCssClass($i+1, $CurrentPage));
+         for ($i = $CurrentPage - 2; $i <= $CurrentPage + 2; $i++) {
+            $PageParam = 'p'.$i;
+            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
          $Pager .= '<span>...</span>';
-         $Offset = $this->Limit * $PageCount - $this->Limit;
-         $Pager .= Anchor($PageCount, sprintf($this->Url, $Offset, $this->Limit));
+         $Pager .= Anchor($PageCount, sprintf($this->Url, 'p'.$PageCount));
       }
+      
       if ($CurrentPage == $PageCount) {
          $Pager .= '<span class="Next">'.$NextText.'</span>';
       } else {
-         $Offset = ($CurrentPage) * $this->Limit;
-         $Pager .= Anchor($NextText, sprintf($this->Url, $Offset, $this->Limit), 'Next');
+         $PageParam = 'p'.($CurrentPage + 1);
+         $Pager .= Anchor($NextText, sprintf($this->Url, $PageParam), 'Next');
       }
       if ($PageCount <= 1)
          $Pager = '';

@@ -25,6 +25,8 @@ class CategoriesController extends VanillaController {
     * Show all discussions in a particular category.
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
+      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByUrlCode(urldecode($CategoryIdentifier));
       else
@@ -58,7 +60,6 @@ class CategoriesController extends VanillaController {
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
    
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       

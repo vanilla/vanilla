@@ -391,13 +391,17 @@ class ImportModel extends Gdn_Model {
     */
    public function GetCustomImportModel() {
       $Header = $this->GetImportHeader();
-
       $Source = GetValue('Source', $Header, '');
 
       if (substr_compare('vbulletin', $Source, 0, 9, TRUE) == 0)
-         return new vBulletinImportModel();
+         $Result = new vBulletinImportModel();
+      elseif (substr_compare('vanilla 1', $Source, 0, 9, TRUE) == 0)
+         $Result = new Vanilla1ImportModel();
 
-      return NULL;
+      if ($Result !== NULL)
+         $Result->ImportModel = $this;
+
+      return $Result;
    }
 
    public function ToPost(&$Post) {

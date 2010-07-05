@@ -756,6 +756,11 @@ if (!function_exists('OffsetLimit')) {
          $Limit = $LimitOrPageSize;
       }
 
+      if ($Offset < 0)
+         $Offset = 0;
+      if ($Limit < 0)
+         $Limit = 50;
+
       return array($Offset, $Limit);
    }
 }

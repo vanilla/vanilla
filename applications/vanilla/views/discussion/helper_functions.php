@@ -39,7 +39,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             ?>
          </span>
          <span class="Permalink">
-            <?php echo Anchor(T('Permalink'), $Permalink, 'Permalink', array('name' => 'Item_'.$CurrentOffset)); ?>
+            <?php echo Anchor(T('Permalink'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1))); ?>
          </span>
          <?php WriteOptionList($Object, $Sender, $Session); ?>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>

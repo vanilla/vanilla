@@ -39,7 +39,8 @@ class ImportModel extends Gdn_Model {
    	5 => 'AssignUserIDs',
    	6 => 'AssignOtherIDs',
    	7 => 'InsertTables',
-   	8 => 'UpdateCounts'
+   	8 => 'UpdateCounts',
+      9 => 'CustomFinalization'
 	);
 
 	protected $_OverwriteSteps = array(
@@ -51,7 +52,8 @@ class ImportModel extends Gdn_Model {
    	6 => 'LoadTables',
    	7 => 'DeleteOverwriteTables',
    	8 => 'InsertTables',
-   	9 => 'UpdateCounts'
+   	9 => 'UpdateCounts',
+      10 => 'CustomFinalization'
    );
 
 	/**
@@ -176,6 +178,14 @@ class ImportModel extends Gdn_Model {
 		}
 		return $Result;
 	}
+
+   public function CustomFinalization() {
+      $Imp = $this->GetCustomImportModel();
+      if ($Imp !== NULL)
+         $Imp->AfterImport();
+
+      return FALSE;
+   }
 
 	public function DefineTables() {
 		$St = Gdn::Structure();
@@ -376,6 +386,20 @@ class ImportModel extends Gdn_Model {
       return $Result;
    }
 
+   /**
+    * Get a custom import model based on the import's source.
+    */
+   public function GetCustomImportModel() {
+      $Header = $this->GetImportHeader();
+
+      $Source = GetValue('Source', $Header, '');
+
+      if (substr_compare('vbulletin', $Source, 0, 9, TRUE) == 0)
+         return new vBulletinImportModel();
+
+      return NULL;
+   }
+
    public function ToPost(&$Post) {
       $D = $this->Data;
       $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
@@ -459,6 +483,7 @@ class ImportModel extends Gdn_Model {
 		$Header = $this->ParseInfoLine($Header);
 		if(isset($fpopened))
 			fclose($fpin);
+      $this->Data['Header'] = $Header;
 		return $Header;
 	}
 

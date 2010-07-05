@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
 	var refreshSteps = function() {	
-		var url = window.location.href.split('?').shift() + '?DeliveryType=VIEW&DeliveryMethod=JSON';
+		var url = window.location.href.split('&').shift() + '&DeliveryType=VIEW&DeliveryMethod=JSON';
 		$.ajax({
 			type: "POST",
 			url: url,

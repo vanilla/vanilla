@@ -184,7 +184,7 @@ class ImportModel extends Gdn_Model {
       if ($Imp !== NULL)
          $Imp->AfterImport();
 
-      return FALSE;
+      return TRUE;
    }
 
 	public function DefineTables() {

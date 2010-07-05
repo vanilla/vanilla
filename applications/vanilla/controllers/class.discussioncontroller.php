@@ -49,7 +49,7 @@ class DiscussionController extends VanillaController {
          $ActualResponses = $this->Discussion->CountComments - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
-            $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+            $Limit = C('Vanilla.Comments.PerPage', 50);
 
          list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
             
@@ -60,7 +60,7 @@ class DiscussionController extends VanillaController {
          
          $this->Offset = $Offset;
          if (C('Vanilla.Comments.AutoOffset')) {
-            if (!is_numeric($this->Offset) || $this->Offset < 0) {
+            if (!is_numeric($this->Offset) || $this->Offset <= 0) {
                // Round down to the appropriate offset based on the user's read comments & comments per page
                $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
                if ($CountCommentWatch > $ActualResponses)
@@ -84,7 +84,7 @@ class DiscussionController extends VanillaController {
          
          // Make sure to set the user's discussion watch records
          $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
-         
+
          // Load the comments
          $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
          $this->SetData('Comments', $this->CommentData);

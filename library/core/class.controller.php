@@ -372,29 +372,27 @@ class Gdn_Controller extends Gdn_Pluggable {
             return $this->_CanonicalUrl;
          } else {
             $Parts = array(strtolower($this->ApplicationFolder));
-            $Parts[] = trim($this->SelfUrl, '/');
 
-//            $Controller = strtolower($this->ControllerName);
-//            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
-//               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
-//            else
-//               $Parts[] = strtolower($this->ControllerName);
-//
-//            if (strcasecmp($this->RequestMethod, 'index') != 0)
-//               $Parts[] = strtolower($this->RequestMethod);
-//
-//            // The default canonical url is the fully-qualified url.
-//            if (is_array($this->RequestArgs))
-//               $Parts = array_merge($Parts, $this->RequestArgs);
-//            elseif (is_string($this->RequestArgs))
-//               $Parts = trim($this->RequestArgs, '/');
+            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
+               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
+            else
+               $Parts[] = strtolower($this->ControllerName);
+
+            if (strcasecmp($this->RequestMethod, 'index') != 0)
+               $Parts[] = strtolower($this->RequestMethod);
+
+            // The default canonical url is the fully-qualified url.
+            if (is_array($this->RequestArgs))
+               $Parts = array_merge($Parts, $this->RequestArgs);
+            elseif (is_string($this->RequestArgs))
+               $Parts = trim($this->RequestArgs, '/');
 
             $Path = implode('/', $Parts);
             $Result = Url($Path, TRUE);
             return $Result;
          }
       } else {
-         $this->_CanonicalUrl = Value;
+         $this->_CanonicalUrl = $Value;
          return $Value;
       }
    }

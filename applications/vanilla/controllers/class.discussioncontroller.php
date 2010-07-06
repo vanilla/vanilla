@@ -33,14 +33,14 @@ class DiscussionController extends VanillaController {
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       if(!is_object($this->Discussion)) {
-         Redirect('FileNotFound');
+         return Gdn::Dispatcher()->Dispatch('Default404');
       }
       
       // Check Permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       if ($this->Discussion === FALSE) {
-         Redirect('dashboard/home/filenotfound');
+         return Gdn::Dispatcher()->Dispatch('Default404');
       } else {
          // Setup
          $this->Title(Gdn_Format::Text($this->Discussion->Name));

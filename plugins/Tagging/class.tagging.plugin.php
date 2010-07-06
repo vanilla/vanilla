@@ -72,8 +72,10 @@ class TaggingPlugin extends Gdn_Plugin {
    }
    
    public function PostController_BeforeFormButtons_Handler($Sender) {
-      echo $Sender->Form->Label('Tags', 'Tags');
-      echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
+         echo $Sender->Form->Label('Tags', 'Tags');
+         echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+      }
    }
    
    // Validate tags when saving a discussion

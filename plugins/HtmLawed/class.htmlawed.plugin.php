@@ -33,6 +33,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
 	/// METHODS ///
 	public function Format($Html) {
       $Config = array(
+       'anti_link_spam' => array('`.`', ''),
        'comment' => 1,
        'cdata' => 3,
        'css_expression' => 1,

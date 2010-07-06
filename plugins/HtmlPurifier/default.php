@@ -19,14 +19,24 @@ $PluginInfo['HTMLPurifier'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://toddburry.com'
 );
-require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
+//require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
+require_once(dirname(__FILE__).'/htmlpurifier/class.htmlpurifier.php');
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 
 class HTMLPurifierPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
-		$HPConfig = HTMLPurifier_Config::createDefault();
+		
+	}
+	
+	/// PROPERTIES ///
+	protected $_HtmlPurifier;
+	
+	/// METHODS ///
+
+   public function SetupHTMLPurifier() {
+      $HPConfig = HTMLPurifier_Config::createDefault();
 		$HPConfig->set('HTML.Doctype', 'XHTML 1.0 Strict');
 		// Get HtmlPurifier configuration settings from Garden
 		$HPSettings = Gdn::Config('HtmlPurifier');
@@ -39,17 +49,15 @@ class HTMLPurifierPlugin extends Gdn_Plugin {
 			}
 		}
 		$this->_HtmlPurifier = new HTMLPurifier($HPConfig);
-	}
-	
-	/// PROPERTIES ///
-	protected $_HtmlPurifier;
-	
-	/// METHODS ///
+   }
+
 	public function Format($Html) {
+      if (!$this->_HtmlPurifier)
+         $this->SetupHtmlPurifier();
 		return $this->_HtmlPurifier->purify($Html);
 	}
 	
 	public function Setup() {
-		if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
+		if (!file_exists(PATH_CACHE.'/HtmlPurifier')) mkdir(PATH_CACHE.'/HtmlPurifier');
 	}
 }

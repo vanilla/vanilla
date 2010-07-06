@@ -44,7 +44,8 @@ $min_enableBuilder = true;
 //$min_cachePath = preg_replace('/^\\d+;/', '', session_save_path());
 $PathMin = dirname(__FILE__);
 $PathMinParts = explode('/', $PathMin);
-$min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/AssetCache';
+$min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
+
 
 /**
  * Leave an empty string to use PHP's $_SERVER['DOCUMENT_ROOT'].
@@ -57,7 +58,6 @@ $min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/AssetCa
  * second line. The third line might work on some Apache servers.
  */
 $min_documentRoot = '';
-//$min_documentRoot = implode('/', array_slice($PathMinParts, 0, -4));
 //$min_documentRoot = substr(__FILE__, 0, strlen(__FILE__) - 15);
 //$min_documentRoot = $_SERVER['SUBDOMAIN_DOCUMENT_ROOT'];
 
@@ -111,7 +111,7 @@ $min_serveOptions['minApp']['groupsOnly'] = false;
 /**
  * Maximum # of files that can be specified in the "f" GET parameter
  */
-$min_serveOptions['minApp']['maxFiles'] = 15;
+$min_serveOptions['minApp']['maxFiles'] = 10;
 
 
 /**

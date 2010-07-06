@@ -39,70 +39,67 @@ class DiscussionController extends VanillaController {
       // Check Permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
-      if ($this->Discussion === FALSE) {
-         return Gdn::Dispatcher()->Dispatch('Default404');
-      } else {
-         // Setup
-         $this->Title(Gdn_Format::Text($this->Discussion->Name));
-         
-         // Actual number of comments, excluding the discussion itself
-         $ActualResponses = $this->Discussion->CountComments - 1;
-         // Define the query offset & limit
-         if (!is_numeric($Limit) || $Limit < 0)
-            $Limit = C('Vanilla.Comments.PerPage', 50);
+      
+      // Setup
+      $this->Title(Gdn_Format::Text($this->Discussion->Name));
 
-         $OffsetProvided = $Offset != '';
-         list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
-            
-         // If $Offset isn't defined, assume that the user has not clicked to
-         // view a next or previous page, and this is a "view" to be counted.
-         if ($Offset == '')
-            $this->DiscussionModel->AddView($DiscussionID);
-         
-         $this->Offset = $Offset;
-         if (C('Vanilla.Comments.AutoOffset')) {
-            if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
-               // Round down to the appropriate offset based on the user's read comments & comments per page
-               $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
-               if ($CountCommentWatch > $ActualResponses)
-                  $CountCommentWatch = $ActualResponses;
-               
-               // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-               $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
-            }
-            if ($ActualResponses <= $Limit)
-               $this->Offset = 0;
-            
-            if ($this->Offset == $ActualResponses)
-               $this->Offset -= $Limit;
-         } else {
-            if ($this->Offset == '')
-               $this->Offset = 0;
+      // Actual number of comments, excluding the discussion itself
+      $ActualResponses = $this->Discussion->CountComments - 1;
+      // Define the query offset & limit
+      if (!is_numeric($Limit) || $Limit < 0)
+         $Limit = C('Vanilla.Comments.PerPage', 50);
+
+      $OffsetProvided = $Offset != '';
+      list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
+
+      // If $Offset isn't defined, assume that the user has not clicked to
+      // view a next or previous page, and this is a "view" to be counted.
+      if ($Offset == '')
+         $this->DiscussionModel->AddView($DiscussionID);
+
+      $this->Offset = $Offset;
+      if (C('Vanilla.Comments.AutoOffset')) {
+         if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
+            // Round down to the appropriate offset based on the user's read comments & comments per page
+            $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
+            if ($CountCommentWatch > $ActualResponses)
+               $CountCommentWatch = $ActualResponses;
+
+            // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
+            $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
          }
-
-         if ($this->Offset < 0)
+         if ($ActualResponses <= $Limit)
             $this->Offset = 0;
-         
-         // Make sure to set the user's discussion watch records
-         $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
-         // Load the comments
-         $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
-         $this->SetData('Comments', $this->CommentData);
-
-         // Build a pager
-         $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-         $this->Pager->MoreCode = '%1$s more comments';
-         $this->Pager->LessCode = '%1$s older comments';
-         $this->Pager->ClientID = 'Pager';
-         $this->Pager->Configure(
-            $this->Offset,
-            $Limit,
-            $ActualResponses,
-            'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
-         );
+         if ($this->Offset == $ActualResponses)
+            $this->Offset -= $Limit;
+      } else {
+         if ($this->Offset == '')
+            $this->Offset = 0;
       }
+
+      if ($this->Offset < 0)
+         $this->Offset = 0;
+
+      // Make sure to set the user's discussion watch records
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+
+      // Load the comments
+      $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
+      $this->SetData('Comments', $this->CommentData);
+
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+      $this->Pager->MoreCode = '%1$s more comments';
+      $this->Pager->LessCode = '%1$s older comments';
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->Configure(
+         $this->Offset,
+         $Limit,
+         $ActualResponses,
+         'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+      );
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');

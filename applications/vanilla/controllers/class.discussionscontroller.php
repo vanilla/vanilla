@@ -148,6 +148,7 @@ class DiscussionsController extends VanillaController {
       $this->Permission('Garden.SignIn.Allow');
       $this->AddJsFile('/js/library/jquery.resizable.js');
       $this->AddJsFile('/js/library/jquery.ui.packed.js');
+		$this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
       $this->AddJsFile('options.js');

@@ -27,6 +27,7 @@ class DiscussionsController extends VanillaController {
    
    public function Index($Offset = '0') {
       list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE)), TRUE));
 
       if ($this->Head) {
          $this->AddJsFile('discussions.js');

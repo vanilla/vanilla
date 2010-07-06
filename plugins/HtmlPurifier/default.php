@@ -19,8 +19,8 @@ $PluginInfo['HTMLPurifier'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://toddburry.com'
 );
-require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
-//require_once(dirname(__FILE__).'/htmlpurifier/class.htmlpurifier.php');
+//require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
+require_once(dirname(__FILE__).'/htmlpurifier/class.htmlpurifier.php');
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 

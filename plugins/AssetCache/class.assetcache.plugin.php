@@ -76,7 +76,11 @@ class AssetCachePlugin extends Gdn_Plugin {
          if ($CssPath !== FALSE) {
             $CssPath = substr($CssPath, strlen(PATH_ROOT)+1);
             $CssPath = str_replace(DS, '/', $CssPath);
-            $CssToCache[] = CombinePaths(array($WebRoot, $CssPath), '/');
+            $CssPath = CombinePaths(array($WebRoot, $CssPath), '/');
+            if (substr($CssPath, 0, 1) == '/')
+               $CssPath = substr($CssPath, 1);
+               
+            $CssToCache[] = $CssPath;
          }
       }
       $CssToCache = array_unique($CssToCache);
@@ -126,7 +130,11 @@ class AssetCachePlugin extends Gdn_Plugin {
                array('', '/'),
                $JsPath
             );
-            $JsToCache[] = CombinePaths(array($WebRoot, $JsPath), '/');
+            $JsPath = CombinePaths(array($WebRoot, $JsPath), '/');
+            if (substr($JsPath, 0, 1) == '/')
+               $JsPath = substr($JsPath, 1);
+
+            $JsToCache[] = $JsPath;
          }
       }
       $JsToCache = array_unique($JsToCache);

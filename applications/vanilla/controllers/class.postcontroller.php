@@ -353,7 +353,7 @@ class PostController extends VanillaController {
       if (property_exists($this,'Discussion'))
          $this->EventData['Discussion'] = $this->Discussion;
       if (property_exists($this,'Comment'))
-         $this->EventData['Discussion'] = $this->Comment;
+         $this->EventData['Comment'] = $this->Comment;
          
       $this->FireEvent('BeforeCommentRender');
       $this->Render();

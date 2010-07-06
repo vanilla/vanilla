@@ -44,8 +44,7 @@ function __autoload($ClassName) {
          array(
             'core',
             'database',
-            'vendors'. DS . 'phpmailer',
-            'vendors' . DS . 'htmlpurifier'
+            'vendors'. DS . 'phpmailer'
          ),
          $LibraryFileName
       );

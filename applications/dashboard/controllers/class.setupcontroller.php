@@ -220,7 +220,7 @@ class SetupController extends DashboardController {
                //'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
-               'EnabledPlugins.HTMLPurifier' => 'HtmlPurifier' // Make sure html purifier is enabled so html has a default way of being safely parsed
+               'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
             ));
          }
       }
@@ -273,7 +273,6 @@ chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
          $this->Form->AddError(sprintf(T('Your cache folder does not have the correct permissions. PHP needs to be able to read and write to this folder and all the files within: <code>%s</code>'), PATH_CACHE));
          $PermissionProblem = TRUE;
       } else {
-         if (!file_exists(PATH_CACHE.DS.'HtmlPurifier')) mkdir(PATH_CACHE.DS.'HtmlPurifier');
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');

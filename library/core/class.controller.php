@@ -51,6 +51,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public $Assets;
 
+
+   protected $_CanonicalUrl;
+
    /**
     * The controllers subfolder that this controller is placed in (if present).
     * This is defined by the dispatcher.
@@ -361,6 +364,37 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
+   }
+
+   public function CanonicalUrl($Value = NULL) {
+      if ($Value === NULL) {
+         if ($this->_CanonicalUrl) {
+            return $this->_CanonicalUrl;
+         } else {
+            $Parts = array(strtolower($this->ApplicationFolder));
+
+            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
+               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
+            else
+               $Parts[] = strtolower($this->ControllerName);
+
+            if (strcasecmp($this->RequestMethod, 'index') != 0)
+               $Parts[] = strtolower($this->RequestMethod);
+
+            // The default canonical url is the fully-qualified url.
+            if (is_array($this->RequestArgs))
+               $Parts = array_merge($Parts, $this->RequestArgs);
+            elseif (is_string($this->RequestArgs))
+               $Parts = trim($this->RequestArgs, '/');
+
+            $Path = implode('/', $Parts);
+            $Result = Url($Path, TRUE);
+            return $Result;
+         }
+      } else {
+         $this->_CanonicalUrl = $Value;
+         return $Value;
+      }
    }
    
    public function ClearCssFiles() {

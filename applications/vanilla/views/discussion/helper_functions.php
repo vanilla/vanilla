@@ -44,7 +44,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          <?php WriteOptionList($Object, $Sender, $Session); ?>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
-      <div class="Message"><?php echo Gdn_Format::To($Object->Body, $Object->Format); ?></div>
+      <div class="Message"><p><?php echo Gdn_Format::To($Object->Body, $Object->Format); ?></p></div>
       <?php $Sender->FireEvent('AfterCommentBody'); ?>
    </div>
 </li>

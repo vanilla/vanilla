@@ -104,6 +104,13 @@ class ProfileController extends Gdn_Controller {
             $this->CommentData = FALSE;
          }
       }
+
+      // Set the canonical Url.
+      if (is_numeric($this->User->Name) || Gdn_Format::Url($this->User->Name) != strtolower($this->User->Name)) {
+         $this->CanonicalUrl(Url('profile/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), TRUE));
+      } else {
+         $this->CanonicalUrl(Url('profile/'.strtolower($this->User->Name), TRUE));
+      }
       
       $this->Render();
    }
@@ -165,7 +172,7 @@ class ProfileController extends Gdn_Controller {
    }
 
    public function Index($UserReference = '', $Username = '') {
-      $this->Activity($UserReference, $Username);
+      return $this->Activity($UserReference, $Username);
    }
    
    public function Invitations() {

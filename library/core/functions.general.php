@@ -765,6 +765,25 @@ if (!function_exists('OffsetLimit')) {
    }
 }
 
+if (!function_exists('PageNumber')) {
+   /** Get the page number from a database offset and limit.
+    *
+    * @param int $Offset The database offset, starting at zero.
+    * @param int $Limit The database limit, otherwise known as the page size.
+    * @param bool $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    */
+   function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
+      $Result = ceil($Offset / $Limit) + 1;
+      if ($UrlParam) {
+         if ($Result == 1)
+            $Result = '';
+         else
+            $Result = 'p'.$Result;
+      }
+      return $Result;
+   }
+}
+
 if (!function_exists('parse_ini_string')) {
    /**
     * parse_ini_string not supported until PHP 5.3.0, and we currently support

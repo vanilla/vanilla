@@ -207,6 +207,14 @@ if (!class_exists('HeadModule', FALSE)) {
    
       public function ToString() {
          $Head = '<title>'.Gdn_Format::Text($this->Title()).'</title>';
+
+         // Add the canonical Url if necessary.
+         if (method_exists($this->_Sender, 'CanonicalUrl')) {
+            $CanonicalUrl = $this->_Sender->CanonicalUrl();
+            $CurrentUrl = Gdn::Request()->Url('', TRUE);
+            if ($CurrentUrl != $CanonicalUrl)
+               $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+         }
             
          // Make sure that css loads before js (for jquery)
          ksort($this->_Tags); // "link" comes before "script"
@@ -214,7 +222,7 @@ if (!class_exists('HeadModule', FALSE)) {
             $Count = count($Collection);
             for ($i = 0; $i < $Count; ++$i) {
                $Head .= '<'.$Tag . Attribute($Collection[$i])
-                  .($Tag == 'script' ? '></'.$Tag.'>' : ' />');
+                  .($Tag == 'script' ? '></'.$Tag.'>' : ' />')."\n";
             }
          }
          

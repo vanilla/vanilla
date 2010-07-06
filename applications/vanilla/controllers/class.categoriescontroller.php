@@ -79,6 +79,9 @@ class CategoriesController extends VanillaController {
          $CountDiscussions,
          'categories/'.$CategoryIdentifier.'/%1$s'
       );
+
+      // Set the canonical Url.
+      $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.$CategoryIdentifier, PageNumber($Offset, $Limit, TRUE)), TRUE));
       
       // Change the controller name so that it knows to grab the discussion views
       $this->ControllerName = 'DiscussionsController';

@@ -104,7 +104,7 @@ $Configuration['Preferences']['Email']['DiscussionMention']     = '0';
 $Configuration['Preferences']['Email']['CommentMention']        = '0';
 
 // Begin - HtmlPurifier Settings
-$Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = TRUE;
+$Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = FALSE;
 $Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
 $Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . DS . 'HtmlPurifier';
 $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;

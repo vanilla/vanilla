@@ -51,41 +51,51 @@ class DebuggerPlugin extends Gdn_Plugin {
          $Sender->Head = new HeadModule($Sender);
          
       $Sender->Head->AddCss('/plugins/Debugger/style.css');
+
+
       //$Session = Gdn::Session();
       //if ($Session->CheckPermission('Plugins.Debugger.View')) {
-         $String = '<div id="Sql">';
-         $Database = Gdn::Database();
-         $SQL = $Database->SQL();
-         if(!is_null($Database)) {
-            $Queries = $Database->Queries();
-            $QueryTimes = $Database->QueryTimes();
-            $String .= '<h3>'.count($Queries).' queries in '.$Database->ExecutionTime().'s</h3>';
-            foreach ($Queries as $Key => $QueryInfo) {
-               $Query = $QueryInfo['Sql'];
-               // this is a bit of a kludge. I found that the regex below would mess up when there were incremented named parameters. Ie. it would replace :Param before :Param0, which ended up with some values like "'4'0".
-               if(isset($QueryInfo['Parameters']) && is_array($QueryInfo['Parameters'])) {
-                  $tmp = $QueryInfo['Parameters'];
+      $String = '<div id="Sql">';
 
-                  $Query = $SQL->ApplyParameters($Query, $tmp);
-               }
-               $String .= $QueryInfo['Method']
-                  .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
-                  .'<pre>'.$Query.';</pre>';
+      // Add the canonical Url.
+      if (method_exists($Sender, 'CanonicalUrl')) {
+         $CanonicalUrl = $Sender->CanonicalUrl();
+
+         $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
+      }
+
+      $Database = Gdn::Database();
+      $SQL = $Database->SQL();
+      if(!is_null($Database)) {
+         $Queries = $Database->Queries();
+         $QueryTimes = $Database->QueryTimes();
+         $String .= '<h3>'.count($Queries).' queries in '.$Database->ExecutionTime().'s</h3>';
+         foreach ($Queries as $Key => $QueryInfo) {
+            $Query = $QueryInfo['Sql'];
+            // this is a bit of a kludge. I found that the regex below would mess up when there were incremented named parameters. Ie. it would replace :Param before :Param0, which ended up with some values like "'4'0".
+            if(isset($QueryInfo['Parameters']) && is_array($QueryInfo['Parameters'])) {
+               $tmp = $QueryInfo['Parameters'];
+
+               $Query = $SQL->ApplyParameters($Query, $tmp);
             }
+            $String .= $QueryInfo['Method']
+               .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
+               .'<pre>'.$Query.';</pre>';
          }
-         global $Start;
-         $String .= '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
-            /*
-            <div>
-               <strong>Application:</strong> ' . $Sender->ApplicationFolder . ';
-               <strong>Controller:</strong> ' . $Sender->ClassName . ';
-               <strong>Method:</strong> ' . $Sender->RequestMethod . ';
-            </div>
-         </div>';
-              */
-         $String .= '</div>';
-         echo $String;
-      //}
+      }
+      global $Start;
+      $String .= '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
+         /*
+         <div>
+            <strong>Application:</strong> ' . $Sender->ApplicationFolder . ';
+            <strong>Controller:</strong> ' . $Sender->ClassName . ';
+            <strong>Method:</strong> ' . $Sender->RequestMethod . ';
+         </div>
+      </div>';
+           */
+      $String .= '</div>';
+      echo $String;
+   //}
    }
    
    public function PluginController_Debugger_Create($Sender) {

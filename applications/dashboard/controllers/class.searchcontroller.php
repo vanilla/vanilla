@@ -83,6 +83,8 @@ class SearchController extends Gdn_Controller {
          $this->View = 'results';
       }
 		
+      $this->CanonicalUrl(Url('search', TRUE));
+
 		$this->Render();
 	}
 }

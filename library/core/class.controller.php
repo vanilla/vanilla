@@ -401,6 +401,14 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_CssFiles = array();
    }
    
+   public function CssFiles() {
+      return $this->_CssFiles;
+   }
+   
+   public function JsFiles() {
+      return $this->_JsFiles;
+   }
+   
    /**
     * Undocumented method.
     *
@@ -426,9 +434,16 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * Clear all js files from the collection.
+    */
+   public function ClearJsFiles() {
+      $this->_JsFiles = array();
+   }
+
+   /**
     * Removes a JS file from the collection.
     *
-    * @param string $FileName The CSS file to search for.
+    * @param string $FileName The JS file to search for.
     */
    public function RemoveJsFile($FileName) {
       foreach ($this->_JsFiles as $Key => $FileInfo) {

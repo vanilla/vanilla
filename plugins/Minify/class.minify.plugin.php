@@ -9,21 +9,27 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
-$PluginInfo['AssetCache'] = array(
-   'Name' => 'Asset Cache',
-   'Description' => 'Analyzes each page request for external js & css files, merging and minifying them where applicable.',
+$PluginInfo['Minify'] = array(
+   'Name' => 'Minify',
+   'Description' => 'Analyzes each page request for js & css files, merging and minifying them where applicable.',
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 
-class AssetCachePlugin extends Gdn_Plugin {
+class MinifyPlugin extends Gdn_Plugin {
 
    public function Setup() {
-      $Folder = PATH_CACHE . DS . 'AssetCache';
+      $Folder = PATH_CACHE . DS . 'Minify';
 		if (!file_exists($Folder))
 			@mkdir($Folder);
+			
+		/*
+$PathMin = dirname(__FILE__);
+$PathMinParts = explode('/', $PathMin);
+$min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
+		*/
    }
    
    public function Base_BeforeAddCss_Handler($Sender) {
@@ -144,7 +150,7 @@ class AssetCachePlugin extends Gdn_Plugin {
       $Sender->ClearJsFiles();
       
       // Add minified css & js directly to the head module
-      $Url = Gdn::Request()->Url('plugins/AssetCache/min/?f=', TRUE);
+      $Url = Gdn::Request()->Url('plugins/Minify/min/?f=', TRUE);
       $Sender->Head->AddCss($Url.implode(',', $CssToCache), 'screen');
       $Sender->Head->AddScript($Url.implode(',', $JsToCache));
    }   

@@ -423,9 +423,14 @@ class ProfileController extends Gdn_Controller {
       // Define the thumbnail size
       $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
       
-      // Define the source (profile sized) picture & dimensions
-      $Source = PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s');
-      $this->SourceSize = getimagesize($Source);
+      // Define the source (profile sized) picture & dimensions.
+      if (preg_match('`https?://`i', $this->User->Photo)) {
+         $this->Form->AddError('You cannont edit the thumbnail of an externally linked profile picture.');
+         $this->SourceSize = 0;
+      } else {
+         $Source = PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s');
+         $this->SourceSize = getimagesize($Source);
+      }
       
       // Add some more hidden form fields for jcrop
       $this->Form->AddHidden('x', '0');

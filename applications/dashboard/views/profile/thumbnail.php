@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo '<h2>'.T('Edit My Thumbnail').'</h2>';
-echo $this->Form->Open(array('class' => 'Thumbnail'));
 echo $this->Form->Errors();
+echo $this->Form->Open(array('class' => 'Thumbnail'));
 ?>
 <div class="Info"><?php
    echo T('Drag around and resize the square below to define your thumbnail icon.');

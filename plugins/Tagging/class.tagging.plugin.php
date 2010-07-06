@@ -20,7 +20,7 @@ $PluginInfo['Tagging'] = array(
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 
-class TagPlugin extends Gdn_Plugin {
+class TaggingPlugin extends Gdn_Plugin {
 
    public function Setup() {
       // Do nothing

@@ -105,9 +105,9 @@ class CategoriesController extends VanillaController {
    public function All() {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
-      $this->AddJsFile('discussions.js');
       $this->AddJsFile('bookmark.js');
-   	$this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('discussions.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
          

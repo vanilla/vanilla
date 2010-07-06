@@ -30,10 +30,11 @@ class DiscussionsController extends VanillaController {
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE)), TRUE));
 
       if ($this->Head) {
-         $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
-			$this->AddJsFile('js/library/jquery.menu.js');
+         $this->AddJsFile('discussions.js');
+         $this->AddJsFile('js/library/jquery.menu.js');
          $this->AddJsFile('options.js');
+			
 			$this->Title(T('All Discussions'));
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
@@ -99,10 +100,11 @@ class DiscussionsController extends VanillaController {
    
    public function Bookmarked($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-		$this->AddJsFile('js/library/jquery.menu.js');
-      $this->AddJsFile('options.js');
+      
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
+		$this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('options.js');
 
       // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
@@ -147,11 +149,12 @@ class DiscussionsController extends VanillaController {
    
    public function Mine($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddJsFile('/js/library/jquery.resizable.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
-		$this->AddJsFile('js/library/jquery.menu.js');
+      //$this->AddJsFile('/js/library/jquery.resizable.js');
+      //$this->AddJsFile('/js/library/jquery.ui.packed.js');
+		
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
+      $this->AddJsFile('js/library/jquery.menu.js');
       $this->AddJsFile('options.js');
 
       if (!is_numeric($Offset) || $Offset < 0)

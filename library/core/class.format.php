@@ -330,7 +330,7 @@ class Gdn_Format {
             $Mixed
          );
 
-         return '<p>'.nl2br($Mixed).'</p>';
+         return nl2br($Mixed);
       }
    }
 
@@ -385,7 +385,7 @@ class Gdn_Format {
             // Allow the code tag to keep all enclosed html encoded.
             $Mixed = preg_replace(
                array('/<code([^>]*)>(.+?)<\/code>/sei'),
-               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></code>\''),
+               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
                $Mixed
             );
 
@@ -407,7 +407,6 @@ class Gdn_Format {
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
-            $Result = '<p>'.$Result.'</p>';
          }
          
          return $Result;

@@ -139,18 +139,5 @@ class AssetCachePlugin extends Gdn_Plugin {
       $Url = Gdn::Request()->Url('plugins/AssetCache/min/?f=', TRUE);
       $Sender->Head->AddCss($Url.implode(',', $CssToCache), 'screen');
       $Sender->Head->AddScript($Url.implode(',', $JsToCache));
-      
-      /*
-      http://localhost/vanilla/plugins/AssetCache/min/?f=
-      vanilla/js/library/jquery.js,
-      vanilla/js/library/jquery.livequery.js,
-      vanilla/js/library/jquery.form.js,
-      vanilla/js/library/jquery.popup.js,
-      vanilla/js/library/jquery.gardenhandleajaxform.js,
-      vanilla/js/global.js,
-      vanilla/js/library/jquery.autogrow.js,
-      vanilla/js/library/jquery.tablednd.js,
-      vanilla/js/library/jquery.ui.packed.js       
-      */
    }   
 }

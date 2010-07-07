@@ -527,7 +527,7 @@ class SettingsController extends DashboardController {
          Gdn::Locale()->SaveTranslations($Translations);
          Gdn::Locale()->Refresh();
 
-         $this->StatusMessage = T('Saved');
+         $this->StatusMessage = T("Your changes have been saved.");
       }
 
       $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
@@ -545,7 +545,7 @@ class SettingsController extends DashboardController {
       }
 
       $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
-      $this->SetData('Title', sprintf('%s Options', $this->Data('ThemeOptions.Name', $this->Data('ThemeInfo.Folder'))));
+      $this->Title(T('Theme Options'));
       $this->Form->AddHidden('StyleKey', $StyleKey);
 
       $this->Render();

@@ -455,7 +455,7 @@ class DiscussionModel extends VanillaModel {
       AddActivity(
          $UserID,
          'NewDiscussion',
-         Anchor(Gdn_Format::Text($DiscussionName), 'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
+         Anchor(Gdn_Format::Text($DiscussionName), 'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
       );
       
       // Get the user's discussion count

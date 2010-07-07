@@ -48,9 +48,8 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddItem('Appearance', T('Appearance'));
 		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Themes.Manage');
-      if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) {
-         $Menu->AddLink('Appearance', sprintf(T('%s Options'), $ThemeOptionsName), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
-      }
+      if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) 
+         $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
 

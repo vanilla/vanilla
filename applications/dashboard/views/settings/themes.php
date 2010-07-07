@@ -48,8 +48,8 @@ printf(
    echo '</h4>';
    echo '<div class="Description">'.GetValue('Description', $this->Data('EnabledTheme'), '').'</div>';
 	if ($this->Data('EnabledTheme.Options')) {
-      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme can be customized with additional options. Go to %s to customize this theme.'),
-         Anchor(sprintf(T('%s Options'), $this->Data('EnabledThemeName')), '/dashboard/settings/themeoptions'));
+      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
+         Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
       
       echo '<div class="Options">',
          $OptionsDescription,

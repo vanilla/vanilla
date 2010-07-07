@@ -353,6 +353,11 @@ class Gdn_FileSystem {
     * @return void
     */
    public static function RemoveFolder($Dir) {
+      // Make sure the directory is properly denoted (otherwise this function
+      // will also delete directories prefixed with $Dir).
+      if (substr($Dir, -1, 1) != '/')
+         $Dir  .= '/';
+         
       $Files = glob($Dir . '*', GLOB_MARK);
       
       foreach ($Files as $File) {

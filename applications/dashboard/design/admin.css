@@ -361,18 +361,6 @@ div.DismissMessage a.Dismiss {
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
 }
-/* Note: The close class is used on the "close" anchor in popups. */
-a.Close {
-	color: #777;
-	cursor: pointer;
-	font-family: arial;
-	font-size: 22px;
-	font-weight: bold;
-	padding: 0;
-}
-a.Close:hover {
-	color: #333;
-}
 .HoverHelp {
 	position: relative;
 }
@@ -1109,18 +1097,27 @@ div.Popup input.Button {
 body.Entry div.Popup p {
 	color: #000;
 }
-div.Popup .Footer {
-	border-top: 1px solid #a5d0e7;
-	background: #c0e6fc;
-	padding:4px 8px 0 5px;
-	text-align: right;
-	-moz-border-radius-bottomleft: 5px;
-	-moz-border-radius-bottomright: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-webkit-border-bottom-right-radius: 5px;
+/* Note: The close class is used on the "close" anchor in popups. */
+a.Close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	line-height: 1;
+	color: #555;
+	cursor: pointer;
+	font-family: arial;
+	font-size: 22px;
+	font-weight: bold;
+	padding: 0;
 }
-div.Popup .Footer input.Button {
-	font-size: 11px;
+a.Close:hover {
+	color: #111;
+}
+div.Popup .Footer {
+	border: none;
+	background: none;
+	padding: 0;
+	margin: 0;
 }
 
 /* ==================================================================== Legal */

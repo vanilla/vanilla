@@ -393,7 +393,7 @@ class Gdn_Configuration {
          }
          
          $Line = "\$".$Group."['".$Name."']";
-         $this->_FormatArrayAssignment($NewLines, $Line, $Value);
+         FormatArrayAssignment($NewLines, $Line, $Value);
       }
       
       // Record who made the change and when
@@ -427,42 +427,6 @@ class Gdn_Configuration {
       ksort($Data);
    }
 
-   /**
-    * Undocumented method.
-    *
-    * @param array $Array
-    * @param string $Prefix
-    * @param mixed $Value
-    * @todo This method and all variables for this method need documentation.
-    */
-   private function _FormatArrayAssignment(&$Array, $Prefix, $Value) {
-      if (is_array($Value)) {
-         // If $Value doesn't contain a key of "0" OR it does and it's value IS
-         // an array, this should be treated as an associative array.
-         $IsAssociativeArray = array_key_exists(0, $Value) === FALSE || is_array($Value[0]) === TRUE ? TRUE : FALSE;
-         if ($IsAssociativeArray === TRUE) {
-            foreach ($Value as $k => $v) {
-               $this->_FormatArrayAssignment($Array, $Prefix."['$k']", $v);
-            }
-         } else {
-            // If $Value is not an associative array, just write it like a simple array definition.
-            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
-            $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
-         }
-      } elseif (is_int($Value)) {
-			$Array[] = $Prefix .= ' = '.$Value.';';
-		} elseif (is_bool($Value)) {
-         $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
-      } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
-         $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
-      } else {
-         if (strpos($Value, "'") !== FALSE) {
-            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
-         } else {
-            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
-         }
-      }
-   }
 }
 
 /**

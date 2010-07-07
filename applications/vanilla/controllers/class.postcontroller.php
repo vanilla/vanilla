@@ -38,7 +38,7 @@ class PostController extends VanillaController {
          $CategoryModel = new CategoryModel();
          $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }
-      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
       $this->Title(T('Start a New Discussion'));
@@ -82,6 +82,11 @@ class PostController extends VanillaController {
                
             if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
+               
+            // Make sure that the title will not be invisible after rendering
+            $Name = $this->Form->GetFormValue('Name', '');
+            if ($Name != '' && Gdn_Format::Text($Name) == '')
+               $this->Form->AddError(T('You have entered an invalid discussion title'), 'Name');
 
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {
@@ -167,7 +172,7 @@ class PostController extends VanillaController {
     * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
-      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
 

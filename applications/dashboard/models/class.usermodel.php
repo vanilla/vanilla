@@ -143,7 +143,7 @@ class UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = '.C('Garden.Registration.ApplicantRoleID', 0), 'left');
 		
 		if (is_array($Where))
          $this->SQL->Where($Where);

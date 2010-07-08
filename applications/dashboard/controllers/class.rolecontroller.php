@@ -113,7 +113,7 @@ class RoleController extends DashboardController {
       $DefaultRoles = C('Garden.Registration.DefaultRoles');
       if (count($DefaultRoles) == 0) {
          $DefaultRolesWarning = TRUE;
-      } elseif (!C('Garden.Registration.ApplicantRoleID')) {
+      } elseif (!C('Garden.Registration.ApplicantRoleID') && C('Garden.Registration.Method') == 'Approval') {
          $DefaultRolesWarning = TRUE;
       } else {
          $RoleModel = new RoleModel();

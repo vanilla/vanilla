@@ -254,7 +254,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new comment
                   // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                  Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
+                  Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
@@ -329,7 +329,7 @@ class PostController extends VanillaController {
                            $this->Offset,
                            $Limit,
                            $this->Discussion->CountComments - 1,
-                           'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+                           'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
                         );
                
                         $this->ControllerName = 'discussion';

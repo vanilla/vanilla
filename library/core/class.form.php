@@ -630,7 +630,18 @@ class Gdn_Form {
     * @return string
     */
    public function RadioList($FieldName, $DataSet, $Attributes = FALSE) {
+      $List = GetValue('list', $Attributes);
       $Return = '';
+
+      if ($List) {
+         $Return .= '<ul'.(isset($Attributes['listclass']) ? " class=\"{$Attributes['listclass']}\"" : '').'>';
+         $LiOpen = '<li>';
+         $LiClose = '</li>';
+      } else {
+         $LiOpen = '';
+         $LiClose = '';
+      }
+
       if (is_object($DataSet)) {
          $ValueField = ArrayValueI('ValueField', $Attributes, 'value');
          $TextField = ArrayValueI('TextField', $Attributes, 'text');
@@ -639,16 +650,20 @@ class Gdn_Form {
             $TextField)) {
             foreach($DataSet->Result() as $Data) {
                $Attributes['value'] = $Data->$ValueField;
-               $Return .= $this->Radio($FieldName,
-                  $Data->$TextField, $Attributes);
+
+               $Return .= $LiOpen.$this->Radio($FieldName, $Data->$TextField, $Attributes).$LiClose;
             }
          }
       } elseif (is_array($DataSet)) {
          foreach($DataSet as $ID => $Text) {
             $Attributes['value'] = $ID;
-            $Return .= $this->Radio($FieldName, $Text, $Attributes);
+            $Return .= $LiOpen.$this->Radio($FieldName, $Text, $Attributes).$LiClose;
          }
       }
+
+      if ($List)
+         $Return .= '</ul>';
+
       return $Return;
    }
 

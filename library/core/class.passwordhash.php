@@ -57,6 +57,10 @@ class Gdn_PasswordHash extends PasswordHash {
    function CheckPassword($Password, $StoredHash, $Method = FALSE) {
       $Result = FALSE;
 		switch(strtolower($Method)) {
+         case 'phpbb':
+            require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
+            $Result = phpbb_check_hash($Password, $StoredHash);
+            break;
 			case 'vbulletin':
 				$Salt = trim(substr($StoredHash, -3, 3));
 				$VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - 3);

@@ -69,8 +69,6 @@ class RoleController extends DashboardController {
 
    public function DefaultRoles() {
       $this->Permission('Garden.Roles.Manage');
-//		if(!C('Garden.Registration.Manage', TRUE))
-//			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('');
 
       $this->Title(T('Default Roles'));
@@ -89,9 +87,15 @@ class RoleController extends DashboardController {
          $GuestRoles = ConsolidateArrayValuesByKey($GuestRolesData, 'RoleID');
          $this->Form->SetValue('GuestRoles', $GuestRoles);
 
+         // The applicant role.
+         $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', '');
+         $this->Form->SetValue('ApplicantRoleID', $ApplicantRoleID);
       } else {
          $DefaultRoles = $this->Form->GetFormValue('DefaultRoles');
-         SaveToConfig('Garden.Registration.DefaultRoles', $DefaultRoles);
+         $ApplicantRoleID = $this->Form->GetFormValue('ApplicantRoleID');
+         SaveToConfig(array(
+            'Garden.Registration.DefaultRoles' => $DefaultRoles,
+            'Garden.Registration.ApplicantRoleID' => $ApplicantRoleID));
 
          $GuestRoles = $this->Form->GetFormValue('GuestRoles');
          $UserModel = new UserModel();
@@ -107,7 +111,9 @@ class RoleController extends DashboardController {
       // Check to see if there are no default roles for guests or members.
       $DefaultRolesWarning = FALSE;
       $DefaultRoles = C('Garden.Registration.DefaultRoles');
-      if(count($DefaultRoles) == 0) {
+      if (count($DefaultRoles) == 0) {
+         $DefaultRolesWarning = TRUE;
+      } elseif (!C('Garden.Registration.ApplicantRoleID') && C('Garden.Registration.Method') == 'Approval') {
          $DefaultRolesWarning = TRUE;
       } else {
          $RoleModel = new RoleModel();

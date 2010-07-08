@@ -177,6 +177,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest($Request);
       
+      // Send user to login page if this is a private community
+      if (C('Garden.PrivateCommunity') && $this->ControllerName() != 'EntryController' && !Gdn::Session()->IsValid()) {
+         Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
+         exit();
+      }
+         
       /*
       echo "<br />Gdn::Request thinks: ".Gdn::Request()->Path();
       echo "<br />Gdn::Request also suggests: output=".Gdn::Request()->OutputFormat().", filename=".Gdn::Request()->Filename();

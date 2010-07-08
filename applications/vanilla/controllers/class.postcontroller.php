@@ -47,6 +47,11 @@ class PostController extends VanillaController {
          if ($this->Discussion->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
+         // Make sure that content can (still) be edited.
+         $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+         if ($EditContentTimeout == 0 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout < time())
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+
       } else {
          $this->Permission('Vanilla.Discussions.Add');
       }
@@ -191,6 +196,11 @@ class PostController extends VanillaController {
       $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if ($Editing) {
          if ($this->Comment->InsertUserID != $Session->UserID)
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            
+         // Make sure that content can (still) be edited.
+         $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+         if ($EditContentTimeout == 0 || strtotime($this->Comment->DateInserted) + $EditContentTimeout < time())
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {

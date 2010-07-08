@@ -34,13 +34,12 @@ class ProfileController extends Gdn_Controller {
    public function Initialize() {
       $this->ModuleSortContainer = 'Profile';
       $this->Head = new HeadModule($this);
-      $this->AddJsFile('js/library/jquery.js');
-      $this->AddJsFile('js/library/jquery.livequery.js');
-      $this->AddJsFile('js/library/jquery.form.js');
-      $this->AddJsFile('js/library/jquery.popup.js');
-      // $this->AddJsFile('js/library/jquery.menu.js');
-      $this->AddJsFile('js/library/jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('js/global.js');
+      $this->AddJsFile('jquery.js');
+      $this->AddJsFile('jquery.livequery.js');
+      $this->AddJsFile('jquery.form.js');
+      $this->AddJsFile('jquery.popup.js');
+      $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
       $GuestModule = new GuestModule($this);
@@ -406,7 +405,7 @@ class ProfileController extends Gdn_Controller {
    
    public function Thumbnail() {
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+      $this->AddJsFile('jquery.jcrop.pack.js');
       $this->AddJsFile('profile.js');
             
       $Session = Gdn::Session();
@@ -534,7 +533,7 @@ class ProfileController extends Gdn_Controller {
          if ($this->User->UserID != $ViewingUserID) {
             // Include user js files for people with edit users permissions
             if ($Session->CheckPermission('Garden.Users.Edit')) {
-              $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+              $this->AddJsFile('jquery.gardenmorepager.js');
               $this->AddJsFile('user.js');
             }
             
@@ -591,7 +590,7 @@ class ProfileController extends Gdn_Controller {
          $UserInfoModule->User = $this->User;
          $UserInfoModule->Roles = $this->Roles;
          $this->AddModule($UserInfoModule);
-         $this->AddJsFile('/js/library/jquery.jcrop.pack.js');
+         $this->AddJsFile('jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');
          $this->AddJsFile('activity.js');
          $ActivityUrl = 'profile/activity/';

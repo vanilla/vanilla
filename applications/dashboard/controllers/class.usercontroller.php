@@ -22,7 +22,7 @@ class UserController extends DashboardController {
          '',
          FALSE
       );
-      $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
       $this->Title(T('Users'));
 
@@ -104,7 +104,7 @@ class UserController extends DashboardController {
 	public function Applicants() {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('dashboard/user/applicants');
-      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
+      $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {

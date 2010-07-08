@@ -15,6 +15,7 @@
    padding: 4px 0;
 }
 #Sql pre {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	box-shadow: 0 0 2px #999;

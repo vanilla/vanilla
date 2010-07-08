@@ -1,4 +1,5 @@
 div.GettingStarted {
+   border-radius: 4px;
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
    background: #E2F4FF /* Panel Background Color */;

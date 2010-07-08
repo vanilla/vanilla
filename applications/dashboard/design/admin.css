@@ -72,6 +72,7 @@ p {
    line-height: 1.6em;
 }
 code {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    background: #ff9;
@@ -124,6 +125,7 @@ textarea {
    margin: 0;
    width: 250px;
    border: 1px solid #ccc;
+   border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 }
@@ -175,6 +177,7 @@ input.Button {
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
@@ -246,6 +249,7 @@ div.Messages ul {
    border: 1px solid #ee8 !important;
    margin: 0 auto !important;
    padding: 4px 8px !important;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    background: #ff9 !important;
@@ -275,6 +279,7 @@ div.Errors pre {
 	margin: 10px 0 5px;
 	padding: 4px 8px;
 	display: block;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    white-space: pre;
@@ -300,6 +305,7 @@ div.Errors pre * {
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .DismissMessage {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    font-size: 14px;
@@ -327,6 +333,7 @@ strong {
    border: 1px solid #b00;
    color: #fff;
    padding: 3px 6px;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 	text-shadow: 1px 1px 1px #444;
@@ -374,6 +381,7 @@ div.DismissMessage a.Dismiss:hover {
 	position: absolute;
 	left: -5px;
 	bottom: 20px;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 	padding: 6px;
@@ -402,6 +410,8 @@ div.DismissMessage a.Dismiss:hover {
 	text-decoration: none;
 }
 #PagerLess {
+   border-top-right-radius: 2px;
+   border-top-left-radius: 2px;
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
    -webkit-border-top-right-radius: 2px;
@@ -449,6 +459,7 @@ div.Tabs li a:active,
 div.Tabs li a:visited {
    margin: 0;
    border: 1px solid #abdafb;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    background: #bbe2f7;
@@ -470,6 +481,7 @@ div.Tabs li a span {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;
+   border-radius: 3px;
    -webkit-border-radius: 3px;
    -moz-border-radius: 3px;
    font-weight: normal;
@@ -788,6 +800,7 @@ table.AltColumns tr.Disabled td {
 	border: 1px solid #aedefc;
 	padding: 2px 4px;
 	margin: 0 0 0 6px;
+   border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	vertical-align: middle;
@@ -804,6 +817,7 @@ table.AltColumns tr.Disabled td {
 	border: 1px solid #aedefc;
 	padding: 0 4px;
 	margin: 0 0 0 6px;
+   border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 }
@@ -815,6 +829,7 @@ table.AltColumns tr.Disabled td {
    float: left;
 }
 div.Box {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    background: #d3f0ff;
@@ -885,6 +900,7 @@ ul.PanelInfo li a {
    position: relative;
 }
 span.New {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	box-shadow: 0px 0px 2px #777;
@@ -929,6 +945,7 @@ ul.PanelInfo li.Active {
 	display: inline;
 	background: #ffe;
 	padding: 2px 4px;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -1000,6 +1017,7 @@ div.Popup div.Warning {
 }
 div.Popup div.Messages ul {
 	display: block;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -1038,6 +1056,7 @@ div.Popup div.Body {
   padding: 0px;
   background: #e2f4ff;
   max-width: 500px;
+  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border: 8px solid #555;
@@ -1157,6 +1176,7 @@ div.Legal {
 	margin: 0 0 10px;
 	padding: 2px 10px;
 	border: 1px solid #a5d0e7;
+   border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	background: #f6ffff;
@@ -1166,6 +1186,7 @@ div.Popup div.Legal {
 	padding: 0 10px 10px;
 	border: none;
 	background: none;
+   border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 }

@@ -111,17 +111,19 @@ class UserModel extends Gdn_Model {
       return $this->SQL->Select('u.*')
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', '4', TRUE, FALSE) // 4 is Applicant RoleID
+         ->Where('ur.RoleID', C('Garden.Registration.ApplicantRoleID', 0), TRUE, FALSE)
          ->GroupBy('UserID')
          ->OrderBy('DateInserted', 'desc')
          ->Get();
    }
 
    public function GetCountLike($Like = FALSE) {
+      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
+         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
       if (is_array($Like)){
          $this->SQL
 				->BeginWhereGroup()
@@ -141,7 +143,7 @@ class UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
+         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
 		
 		if (is_array($Where))
          $this->SQL->Where($Where);
@@ -156,9 +158,11 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+
       $this->UserQuery();
       $this->SQL
-         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = 4', 'left'); // 4 is Applicant RoleID
+         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
 
       if (is_array($Like)) {
          $this->SQL
@@ -581,7 +585,7 @@ class UserModel extends Gdn_Model {
          );
 
          // Save the user's roles
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(4)); // 4 is "Applicant"
+         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', C('Garden.Registration.ApplicantRoleID', 0));
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;
@@ -857,6 +861,8 @@ class UserModel extends Gdn_Model {
     * Approve a membership applicant.
     */
    public function Approve($UserID, $Email) {
+      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
@@ -864,7 +870,7 @@ class UserModel extends Gdn_Model {
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == 4)
+            if ($Role->RoleID == $ApplicantRoleID)
                $ApplicantFound = TRUE;
          }
       }
@@ -972,7 +978,7 @@ class UserModel extends Gdn_Model {
       } else {
          $ApplicantFound = FALSE;
          foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == 4)
+            if ($Role->RoleID == C('Garden.Registration.ApplicantRoleID', 0))
                $ApplicantFound = TRUE;
          }
       }

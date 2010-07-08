@@ -314,8 +314,11 @@ class ImportModel extends Gdn_Model {
    		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
    		'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
-      // Delete the default role setting.
-      SaveToConfig('Garden.Registration.DefaultRoles', array());
+      // Delete the default role settings.
+      SaveToConfig(array(
+         'Garden.Registration.DefaultRoles' => array(),
+         'Garden.Registration.ApplicantRoleID' => 0
+      ));
 
 		// Execute the SQL.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
@@ -392,6 +395,7 @@ class ImportModel extends Gdn_Model {
    public function GetCustomImportModel() {
       $Header = $this->GetImportHeader();
       $Source = GetValue('Source', $Header, '');
+      $Result = NULL;
 
       if (substr_compare('vbulletin', $Source, 0, 9, TRUE) == 0)
          $Result = new vBulletinImportModel();
@@ -492,13 +496,19 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function GetPasswordHashMethod() {
+      $HashMethod = GetValue('HashMethod', $this->GetImportHeader());
+      if ($HashMethod)
+         return $HashMethod;
+
 		$Source = GetValue('Source', $this->GetImportHeader());
-		if(!$Source)
+		if (!$Source)
 			return 'Unknown';
-		if(substr_compare('Vanilla', $Source, 0, 7, FALSE) == 0)
+		if (substr_compare('Vanilla', $Source, 0, 7, FALSE) == 0)
 			return 'Vanilla';
-		if(substr_compare('vBulletin', $Source, 0,  9, FALSE) == 0)
+		if (substr_compare('vBulletin', $Source, 0,  9, FALSE) == 0)
 			return 'vBulletin';
+      if (substr_compare('phpBB', $Source, 0, 5, FALSE) == 0)
+         return 'phpBB';
 		return 'Unknown';
 	}
 
@@ -1069,7 +1079,8 @@ class ImportModel extends Gdn_Model {
 
       if (!$this->ImportExists('Discussion', 'Body')) {
          // Update the body of the discussion if it isn't there.
-         $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID', 'CommentID');
+         if (!$this->ImportExists('Discussion', 'FirstCommentID'))
+            $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID', 'CommentID');
 
          $Sqls['Discussion.Body'] = "update :_Discussion d
          join :_Comment c

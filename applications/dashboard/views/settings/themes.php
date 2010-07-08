@@ -142,6 +142,8 @@ printf(
                   echo '<div class="Buttons">';
                   echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon', array('target' => '_top'));
                   echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
+						$this->EventArguments['ThemeInfo'] = $ThemeInfo;
+						$this->FireEvent('AfterThemeButtons');
                   echo '</div>';
 
                   $Description = GetValue('Description', $ThemeInfo);

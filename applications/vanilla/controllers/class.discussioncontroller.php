@@ -20,10 +20,10 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
-      $this->AddJsFile('/js/library/jquery.resizable.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
-      $this->AddJsFile('/js/library/jquery.autogrow.js');
-      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('jquery.resizable.js');
+      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');

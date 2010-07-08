@@ -85,7 +85,6 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
-         // $this->AddJsFile('jquery.menu.js');
          $this->AddCssFile('style.css');
       } else {
          $this->AddCssFile('admin.css');
@@ -163,7 +162,7 @@ class SettingsController extends Gdn_Controller {
       $this->Form->SetModel($this->CategoryModel);
       $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('categories.js');
-      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->AddJsFile('jquery.gardencheckboxgrid.js');
       $this->Title(T('Add Category'));
       $this->AddSideMenu('vanilla/settings/managecategories');
       
@@ -275,7 +274,7 @@ class SettingsController extends Gdn_Controller {
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('categories.js');
-      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->AddJsFile('jquery.gardencheckboxgrid.js');
       $this->Title(T('Edit Category'));
          
       $this->AddSideMenu('vanilla/settings/managecategories');

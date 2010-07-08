@@ -24,14 +24,24 @@ class MinifyPlugin extends Gdn_Plugin {
       $Folder = PATH_CACHE . DS . 'Minify';
 		if (!file_exists($Folder))
 			@mkdir($Folder);
-			
-		/*
-$PathMin = dirname(__FILE__);
-$PathMinParts = explode('/', $PathMin);
-$min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
-		*/
    }
+	
+	// Empty the cache when disabling this plugin, enabling or disabling any plugin, application, or theme
+	public function OnDisable() { $this->_EmptyCache(); }
+	public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
+	public function SettingsController_AfterDisablePlugin_Handler() { $this->_EmptyCache(); }
+	public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
+	public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
+	public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
    
+	private function _EmptyCache() {
+      $Files = glob(PATH_CACHE.'/Minify/*', GLOB_MARK);
+      foreach ($Files as $File) {
+         if (substr($File, -1) != '/')
+            unlink($File);
+      }
+	}
+	
    public function Base_BeforeAddCss_Handler($Sender) {
       $WebRoot = Gdn::Request()->WebRoot();
       // Find all css file paths
@@ -82,76 +92,84 @@ $min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify'
          if ($CssPath !== FALSE) {
             $CssPath = substr($CssPath, strlen(PATH_ROOT)+1);
             $CssPath = str_replace(DS, '/', $CssPath);
-            $CssPath = CombinePaths(array($WebRoot, $CssPath), '/');
-            if (substr($CssPath, 0, 1) == '/')
-               $CssPath = substr($CssPath, 1);
-               
             $CssToCache[] = $CssPath;
          }
       }
       $CssToCache = array_unique($CssToCache);
       
       // And now search for/add all JS files
-      $JsToCache = array();
+      $JsToCache = array(); // Add the global js files
+		$GlobalJS = array(
+			'jquery.js',
+			'jquery.livequery.js',
+			'jquery.form.js',
+			'jquery.popup.js',
+			'jquery.gardenhandleajaxform.js',
+			'global.js'
+		);
       foreach ($Sender->JsFiles() as $JsInfo) {
          $JsFile = $JsInfo['FileName'];
-         
-         if (strpos($JsFile, '/') !== FALSE) {
-            // A direct path to the file was given.
-            $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
-         } else {
-            $AppFolder = $JsInfo['AppFolder'];
-            if ($AppFolder == '')
-               $AppFolder = $Sender->ApplicationFolder;
-
-            // JS can come from a theme, an any of the application folder, or it can come from the global js folder:
-            $JsPaths = array();
-            if ($Sender->Theme) {
-               // 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
-               $JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . $AppFolder . DS . 'js' . DS . $JsFile;
-               // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-               $JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . 'js' . DS . $JsFile;
-            }
-            // 3. This application folder
-            $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsFile;
-            // 4. Global JS folder. eg. root/js/
-            $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsFile;
-            // 5. Global JS library folder. eg. root/js/library/
-            $JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsFile;
-         }
-
-         // Find the first file that matches the path.
-         $JsPath = FALSE;
-         foreach($JsPaths as $Glob) {
-            $Paths = SafeGlob($Glob);
-            if(is_array($Paths) && count($Paths) > 0) {
-               $JsPath = $Paths[0];
-               break;
-            }
-         }
-         
-         if ($JsPath !== FALSE) {
-            $JsPath = str_replace(
-               array(PATH_ROOT, DS),
-               array('', '/'),
-               $JsPath
-            );
-            $JsPath = CombinePaths(array($WebRoot, $JsPath), '/');
-            if (substr($JsPath, 0, 1) == '/')
-               $JsPath = substr($JsPath, 1);
-
-            $JsToCache[] = $JsPath;
-         }
+			// Ignore the JsFile if it is in the globaljs minify group (defined in plugins/Minifiy/min/groupsConfig.php).
+			if (!in_array($JsFile, $GlobalJS)) {
+				if (strpos($JsFile, '/') !== FALSE) {
+					// A direct path to the file was given.
+					$JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
+				} else {
+					$AppFolder = $JsInfo['AppFolder'];
+					if ($AppFolder == '')
+						$AppFolder = $Sender->ApplicationFolder;
+	
+					// JS can come from a theme, an any of the application folder, or it can come from the global js folder:
+					$JsPaths = array();
+					if ($Sender->Theme) {
+						// 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
+						$JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . $AppFolder . DS . 'js' . DS . $JsFile;
+						// 2. Garden-wide theme view. eg. root/themes/theme_name/design/
+						$JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . 'js' . DS . $JsFile;
+					}
+					// 3. This application folder
+					$JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsFile;
+					// 4. Global JS folder. eg. root/js/
+					$JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsFile;
+					// 5. Global JS library folder. eg. root/js/library/
+					$JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsFile;
+				}
+	
+				// Find the first file that matches the path.
+				$JsPath = FALSE;
+				foreach($JsPaths as $Glob) {
+					$Paths = SafeGlob($Glob);
+					if(is_array($Paths) && count($Paths) > 0) {
+						$JsPath = $Paths[0];
+						break;
+					}
+				}
+				
+				if ($JsPath !== FALSE) {
+					$JsPath = str_replace(
+						array(PATH_ROOT, DS),
+						array('', '/'),
+						$JsPath
+					);
+					$JsPath = substr($JsPath, 0, 1) == '/' ? substr($JsPath, 1) : $JsPath;
+					$JsToCache[] = $JsPath;
+				}
+			}
       }
+
       $JsToCache = array_unique($JsToCache);
-      
       // Remove all js & css from the controller
       $Sender->ClearCssFiles();
       $Sender->ClearJsFiles();
       
       // Add minified css & js directly to the head module
-      $Url = Gdn::Request()->Url('plugins/Minify/min/?f=', TRUE);
-      $Sender->Head->AddCss($Url.implode(',', $CssToCache), 'screen');
-      $Sender->Head->AddScript($Url.implode(',', $JsToCache));
+      $Url = Gdn::Request()->Url('plugins/Minify/min/?', TRUE);
+		$BasePath = Gdn::Request()->WebRoot();
+		if ($BasePath != '')
+			$BasePath = 'b='.$BasePath.'&';
+		
+      $Sender->Head->AddCss($Url.$BasePath.'f='.implode(',', $CssToCache), 'screen');
+		$Sender->Head->AddScript($Url.'g=globaljs');
+		$Sender->Head->AddScript($Url.$BasePath.'f='.implode(',', $JsToCache));
    }   
 }

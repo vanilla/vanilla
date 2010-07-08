@@ -29,15 +29,10 @@ class DiscussionsController extends VanillaController {
       list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE)), TRUE));
 
-      if ($this->Head) {
-         $this->AddJsFile('bookmark.js');
-         $this->AddJsFile('discussions.js');
-         $this->AddJsFile('js/library/jquery.menu.js');
-         $this->AddJsFile('options.js');
-			
-			$this->Title(T('All Discussions'));
+		$this->Title(T('All Discussions'));
+      if ($this->Head)
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
-      }
+
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
@@ -94,19 +89,17 @@ class DiscussionsController extends VanillaController {
       $this->ShowOptions = TRUE;
       $this->Menu->HighlightRoute('/discussions');
       $this->AddCssFile('vanilla.css');
-      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+		$this->AddJsFile('bookmark.js');
+		$this->AddJsFile('discussions.js');
+		$this->AddJsFile('jquery.menu.js');
+		$this->AddJsFile('options.js');
+      $this->AddJsFile('jquery.gardenmorepager.js');
 		$this->FireEvent('AfterInitialize');
    }
    
    public function Bookmarked($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      
-      $this->AddJsFile('bookmark.js');
-      $this->AddJsFile('discussions.js');
-		$this->AddJsFile('js/library/jquery.menu.js');
-      $this->AddJsFile('options.js');
 
-      // $this->AddToolbar();            
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
@@ -149,12 +142,6 @@ class DiscussionsController extends VanillaController {
    
    public function Mine($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-      //$this->AddJsFile('/js/library/jquery.resizable.js');
-      //$this->AddJsFile('/js/library/jquery.ui.packed.js');
-      $this->AddJsFile('bookmark.js');
-      $this->AddJsFile('discussions.js');
-      $this->AddJsFile('js/library/jquery.menu.js');
-      $this->AddJsFile('options.js');
 
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

@@ -55,7 +55,7 @@ class MessageController extends DashboardController {
    }
    
    public function Edit($MessageID = '') {
-      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('messages.js');
          
       $this->Permission('Garden.Messages.Manage');
@@ -93,9 +93,9 @@ class MessageController extends DashboardController {
    public function Index() {
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('dashboard/message');
-      $this->AddJsFile('/js/library/jquery.autogrow.js');
-      $this->AddJsFile('/js/library/jquery.tablednd.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.tablednd.js');
+      $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('messages.js');
       $this->Title(T('Messages'));
          

@@ -22,7 +22,7 @@ class UserController extends DashboardController {
          '',
          FALSE
       );
-      $this->AddJsFile('js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
       $this->Title(T('Users'));
 
@@ -104,7 +104,7 @@ class UserController extends DashboardController {
 	public function Applicants() {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('dashboard/user/applicants');
-      $this->AddJsFile('/js/library/jquery.gardencheckcolumn.js');
+      $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
@@ -260,20 +260,16 @@ class UserController extends DashboardController {
          $Result = FALSE;
       } else {
          $Session = Gdn::Session();
-         //if (!$Session->CheckPermission('Garden.Users.Approve')) {
-         //   $this->Form->AddError('ErrorPermission');
-         //} else {
-            $UserModel = new UserModel();
-            if (is_numeric($UserID)) {
-               try {
-                  $Email = new Gdn_Email();
-                  $Result = $UserModel->$Action($UserID, $Email);
-               } catch(Exception $ex) {
-                  $Result = FALSE;
-                  $this->Form->AddError(strip_tags($ex->getMessage()));
-               }
+         $UserModel = new UserModel();
+         if (is_numeric($UserID)) {
+            try {
+               $Email = new Gdn_Email();
+               $Result = $UserModel->$Action($UserID, $Email);
+            } catch(Exception $ex) {
+               $Result = FALSE;
+               $this->Form->AddError(strip_tags($ex->getMessage()));
             }
-         //}
+         }
       }
    }
 

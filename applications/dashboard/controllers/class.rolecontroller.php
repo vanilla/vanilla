@@ -140,7 +140,7 @@ class RoleController extends DashboardController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
-      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->AddJsFile('jquery.gardencheckboxgrid.js');
       
       // Set the model on the form.
       $this->Form->SetModel($this->RoleModel);
@@ -174,8 +174,8 @@ class RoleController extends DashboardController {
 		$this->Permission('Garden.Roles.Manage');
 
       $this->AddSideMenu('dashboard/role');
-      $this->AddJsFile('/js/library/jquery.tablednd.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('jquery.tablednd.js');
+      $this->AddJsFile('jquery.ui.packed.js');
       $this->Title(T('Roles & Permissions'));
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();

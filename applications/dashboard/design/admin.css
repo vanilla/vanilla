@@ -1118,7 +1118,13 @@ div.Popup .Footer {
 	background: none;
 	padding: 0;
 	margin: 0;
+	text-align: right;
 }
+div.Popup .Footer input.Button {
+	font-size: 11px;
+	margin-right: 2px;
+}
+
 
 /* ==================================================================== Legal */
 div.Legal ol {

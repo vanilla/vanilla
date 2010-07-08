@@ -28,7 +28,12 @@ $Editing = isset($this->Comment);
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');
-   echo Anchor(T('Back to Discussions'), 'discussions', 'Cancel');
+   $CancelText = 'Back to Discussions';
+   $CancelClass = 'Back';
+   if (!$NewOrDraft) 
+      $CancelText = $CancelClass = 'Cancel';
+
+   echo Anchor(T($CancelText), 'discussions', $CancelClass);
    echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', array('class' => 'Button CommentButton'));
    $this->FireEvent('AfterFormButtons');
    echo "</div>\n";

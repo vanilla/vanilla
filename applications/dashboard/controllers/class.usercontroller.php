@@ -260,20 +260,16 @@ class UserController extends DashboardController {
          $Result = FALSE;
       } else {
          $Session = Gdn::Session();
-         //if (!$Session->CheckPermission('Garden.Users.Approve')) {
-         //   $this->Form->AddError('ErrorPermission');
-         //} else {
-            $UserModel = new UserModel();
-            if (is_numeric($UserID)) {
-               try {
-                  $Email = new Gdn_Email();
-                  $Result = $UserModel->$Action($UserID, $Email);
-               } catch(Exception $ex) {
-                  $Result = FALSE;
-                  $this->Form->AddError(strip_tags($ex->getMessage()));
-               }
+         $UserModel = new UserModel();
+         if (is_numeric($UserID)) {
+            try {
+               $Email = new Gdn_Email();
+               $Result = $UserModel->$Action($UserID, $Email);
+            } catch(Exception $ex) {
+               $Result = FALSE;
+               $this->Form->AddError(strip_tags($ex->getMessage()));
             }
-         //}
+         }
       }
    }
 

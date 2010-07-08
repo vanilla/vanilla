@@ -771,4 +771,32 @@ EOT;
          }
       }
    }
+   
+   /**
+    * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
+    */
+   public static function Seconds($Seconds) {
+      $Minutes = floor($Seconds/60);
+      $Hours = floor($Seconds/60/24);
+      $Days = floor($Seconds/60/60/24);
+      $Weeks = floor($Seconds/60/60/24/7);
+      $Months = floor($Seconds/60/60/24/30);
+      $Years = floor($Seconds/60/60/24/365);
+
+      if ($Seconds < 60)
+         return sprintf(Plural($Seconds, '%s second', '%s seconds'), $Seconds);
+      elseif ($Minutes < 60)
+         return sprintf(Plural($Minutes, '%s minute', '%s minutes'), $Minutes);
+      elseif ($Hours < 24)
+         return sprintf(Plural($Hours, '%s hour', '%s hours'), $Hours);
+      elseif ($Days < 7)
+         return sprintf(Plural($Days, '%s day', '%s days'), $Days);
+      elseif ($Weeks < 4)
+         return sprintf(Plural($Weeks, '%s week', '%s weeks'), $Weeks);
+      elseif ($Months < 12)
+         return sprintf(Plural($Months, '%s month', '%s months'), $Months);
+      else
+         return sprintf(Plural($Years, '%s year', '%s years'), $Years);
+   }
+   
 }

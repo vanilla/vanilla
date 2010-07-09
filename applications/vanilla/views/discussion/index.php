@@ -58,7 +58,7 @@ if ($this->Discussion->Closed == '1') {
 ?>
    <div class="Foot">
       <?php
-      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'TabLink'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'TabLink'.(C('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
       ?> 
    </div>
    <?php 

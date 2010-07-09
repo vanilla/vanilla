@@ -114,6 +114,10 @@ class FlaggingPlugin extends Gdn_Plugin {
       $EncodedURL = str_replace('=','-',base64_encode($URL));
       $Sender->Options .= '<span>'.Anchor(T('Flag'), "discussion/flag/{$Context}/{$ElementID}/{$ElementAuthorID}/{$ElementAuthor}/{$EncodedURL}", 'FlagContent Popup') . '</span>';
    }
+   // Note: Mark added this slick code. Tim does not approve.
+   public function PostController_CommentOptions_Handler($Sender) {
+      $this->DiscussionController_CommentOptions_Handler($Sender);
+   }
    
    public function DiscussionController_Flag_Create(&$Sender) {
       // Signed in users only.

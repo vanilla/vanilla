@@ -62,7 +62,7 @@ class Gdn_Theme {
                $Attribs = array();
 
                $Path = Gdn::Authenticator()->SignInUrl('');
-               if (Gdn::Config('Garden.SignIn.Popup'))
+               if (C('Garden.SignIn.Popup') && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
                   $Class = ConcatSep(' ', $Class, 'SignInPopup');
             }
             break;

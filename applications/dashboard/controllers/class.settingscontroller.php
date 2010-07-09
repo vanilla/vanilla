@@ -669,7 +669,8 @@ class SettingsController extends DashboardController {
          break;
       }
       
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
          try {
             if (array_key_exists($Name, $Manager->$Enabled) === FALSE) {
                $Manager->$Remove($Name);

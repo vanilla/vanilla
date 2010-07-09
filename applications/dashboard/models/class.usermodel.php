@@ -118,7 +118,7 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetCountLike($Like = FALSE) {
-      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
 
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
@@ -143,7 +143,7 @@ class UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = '.C('Garden.Registration.ApplicantRoleID', 0), 'left');
+         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = '.(int)C('Garden.Registration.ApplicantRoleID', 0), 'left');
 		
 		if (is_array($Where))
          $this->SQL->Where($Where);
@@ -158,7 +158,7 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
 
       $this->UserQuery();
       $this->SQL
@@ -585,7 +585,7 @@ class UserModel extends Gdn_Model {
          );
 
          // Save the user's roles
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', C('Garden.Registration.ApplicantRoleID', 0));
+         $RoleIDs = (array)Gdn::Config('Garden.Registration.DefaultRoles', C('Garden.Registration.ApplicantRoleID', array()));
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;

@@ -29,8 +29,6 @@ class Gdn_Slice {
 
    public function Execute() {
       $SliceArgs = func_get_args();
-      // strURI
-      // strController + strMethod
       switch (count($SliceArgs)) {
          case 1:
             

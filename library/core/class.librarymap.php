@@ -70,7 +70,7 @@ class Gdn_LibraryMap {
       
       // If cache data array is passed in, merge it with our existing cache
       if (is_array($ExistingCacheArray))
-         self::Import($CacheName, $ExistingCacheArray);
+         self::Import($CacheName, $ExistingCacheArray, TRUE);
    }
    
    /**
@@ -80,13 +80,14 @@ class Gdn_LibraryMap {
     * @param array $CacheContents well formed cache array
     * @return void
     */
-   public static function Import($CacheName, $CacheContents) {
+   protected static function Import($CacheName, $CacheContents, $AutoSave = FALSE) {
       if (!array_key_exists($CacheName,self::$_Caches))
          return FALSE;
          
       self::$_Caches[$CacheName]['cache'] = array_merge(self::$_Caches[$CacheName]['cache'], $CacheContents);
       self::$_Caches[$CacheName]['mode'] = (sizeof($CacheContents) == 1 && array_key_exists($CacheName, $CacheContents)) ? 'flat' : 'tree';
-      self::SaveCache($CacheName);
+      if ($AutoSave)
+         self::SaveCache($CacheName);
    }
    
    /**

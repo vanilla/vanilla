@@ -5,7 +5,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
 <div class="Box About">
    <h4><?php echo T('About'); ?></h4>
    <dl>
-      <dt><?php echo T('Name'); ?></dt>
+      <dt><?php echo T('Username'); ?></dt>
       <dd><?php echo $this->User->Name; ?></dd>
       <?php               
       if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {

@@ -963,7 +963,9 @@ class Gdn_Form {
    public function AddError($Error, $FieldName = '') {
       if(is_string($Error))
          $ErrorCode = $Error;
-      elseif(is_a($Error, 'Exception')) {
+      elseif(is_a($Error, 'Gdn_UserException')) {
+         $ErrorCode = '@'.$Error->getMessage();
+      } elseif(is_a($Error, 'Exception')) {
          if(defined('DEBUG')) {
             $ErrorCode = '@<pre>'.
                $Error->getMessage()."\n".

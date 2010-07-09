@@ -94,16 +94,16 @@ jQuery(document).ready(function($) {
       e.preventDefault();
 
       var key = $(this).attr('key');
-      var keyID = key.replace(' ', '_');
 
       // Deselect the current item.
       $('table.ThemeStyles td').removeClass('Active');
 
       // Select the new item.
-      $('#' + keyID + '_td').addClass('Active');
+      $(this).parents('td').addClass('Active');
       $('#Form_StyleKey').val(key);
+      $(this).parents('form').submit();
 
-      $(this).blur();
+      // $(this).blur();
       return false;
    });
 });

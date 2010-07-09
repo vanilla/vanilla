@@ -38,13 +38,18 @@ class PostController extends VanillaController {
          $CategoryModel = new CategoryModel();
          $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }
-      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
       $this->Title(T('Start a New Discussion'));
       
       if (isset($this->Discussion)) {
          if ($this->Discussion->InsertUserID != $Session->UserID)
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+
+         // Make sure that content can (still) be edited.
+         $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+         if ($EditContentTimeout == 0 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout < time())
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
       } else {
@@ -82,6 +87,11 @@ class PostController extends VanillaController {
                
             if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
+               
+            // Make sure that the title will not be invisible after rendering
+            $Name = $this->Form->GetFormValue('Name', '');
+            if ($Name != '' && Gdn_Format::Text($Name) == '')
+               $this->Form->AddError(T('You have entered an invalid discussion title'), 'Name');
 
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {
@@ -167,7 +177,7 @@ class PostController extends VanillaController {
     * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
-      $this->AddJsFile('js/library/jquery.autogrow.js');
+      $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
 
@@ -186,6 +196,11 @@ class PostController extends VanillaController {
       $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if ($Editing) {
          if ($this->Comment->InsertUserID != $Session->UserID)
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            
+         // Make sure that content can (still) be edited.
+         $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+         if ($EditContentTimeout == 0 || strtotime($this->Comment->DateInserted) + $EditContentTimeout < time())
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {
@@ -239,7 +254,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new comment
                   // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                  Redirect('/vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
+                  Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
@@ -314,7 +329,7 @@ class PostController extends VanillaController {
                            $this->Offset,
                            $Limit,
                            $this->Discussion->CountComments - 1,
-                           'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+                           'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
                         );
                
                         $this->ControllerName = 'discussion';

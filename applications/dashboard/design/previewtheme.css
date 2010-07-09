@@ -32,6 +32,7 @@ body div.PreviewTheme form#Form_Form div input.PreviewButton {
    border: 1px solid #000 !important;
    text-shadow: 0 1px 0 #fff !important;
    background: url('images/buttonbg.png') repeat-x center left #f8f8f8 !important;
+   border-radius: 3px !important;
    -moz-border-radius: 3px !important;
    -webkit-border-radius: 3px !important;
 }

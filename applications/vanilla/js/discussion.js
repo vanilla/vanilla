@@ -24,8 +24,11 @@ jQuery(document).ready(function($) {
    });
    
    // Reveal the textarea and hide previews.
-   $('a.WriteButton').livequery('click', function() {
+   $('a.WriteButton, a.Cancel').livequery('click', function() {
       resetCommentForm(this);
+      if ($(this).hasClass('Cancel'))
+         clearCommentForm(this);   
+
       return false;
    });
    

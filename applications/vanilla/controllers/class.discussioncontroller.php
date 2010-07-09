@@ -20,10 +20,10 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
-      $this->AddJsFile('/js/library/jquery.resizable.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
-      $this->AddJsFile('/js/library/jquery.autogrow.js');
-      $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+      $this->AddJsFile('jquery.resizable.js');
+      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');
@@ -101,7 +101,7 @@ class DiscussionController extends VanillaController {
          $this->Offset,
          $Limit,
          $ActualResponses,
-         'vanilla/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
       );
       
       // Define the form for the comment input
@@ -204,7 +204,7 @@ class DiscussionController extends VanillaController {
 
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('/vanilla/discussions');
+         Redirect('discussions');
 
       $this->Render();         
    }
@@ -229,7 +229,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions/bookmarked');
+         $Target = GetIncomingValue('Target', 'discussions/bookmarked');
          Redirect($Target);
       }
       
@@ -295,9 +295,9 @@ class DiscussionController extends VanillaController {
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('/vanilla/discussions');
+         Redirect('discussions');
          
-      $this->RedirectUrl = Url('/vanilla/discussions');
+      $this->RedirectUrl = Url('discussions');
       $this->StatusMessage = T('Your changes have been saved.');
       $this->Render();         
    }
@@ -328,7 +328,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions');
+         $Target = GetIncomingValue('Target', 'discussions');
          Redirect($Target);
       }
          
@@ -365,7 +365,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions');
+         $Target = GetIncomingValue('Target', 'discussions');
          Redirect($Target);
       }
       
@@ -406,7 +406,7 @@ class DiscussionController extends VanillaController {
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', Url('/vanilla/discussions'));
+      $this->RedirectUrl = GetIncomingValue('Target', Url('discussions'));
       $this->Render();         
    }
 
@@ -444,7 +444,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions');
+         $Target = GetIncomingValue('Target', 'discussions');
          Redirect($Target);
       }
          

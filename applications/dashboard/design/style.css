@@ -104,6 +104,7 @@ textarea {
    margin: 0;
    width: 250px;
    border: 1px solid #aaa;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -144,6 +145,7 @@ a.Button,
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
@@ -203,6 +205,8 @@ div.Messages ul {
    border: 0 !important;
    margin: 0 auto !important;
    padding: 4px 8px !important;
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
    -moz-border-radius-bottomleft: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
@@ -239,6 +243,7 @@ div.Deleted {
 	border: 1px solid #dddddd;
 	margin: 10px 0 0;
 	padding: 6px 10px;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
@@ -249,6 +254,7 @@ div.Deleted {
    border: 1px solid #ff9;
    color: #000;
    padding: 6px 8px;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
@@ -257,6 +263,7 @@ div.Deleted {
    border: 1px solid #b00;
    color: #fff;
    padding: 3px 6px;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
@@ -272,6 +279,8 @@ div.Info {
    border: 1px solid #eee;
    color: #888;
    -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   border-radius: 4px;
    padding: 6px;
    margin: 0 0 10px;
 }
@@ -298,23 +307,13 @@ div.DismissMessage a.Dismiss {
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
 }
-/* Note: The close class is used on the "close" anchor in popups. */
-a.Close {
-	color:#777;
-	font-family:arial;
-	font-size:20px;
-	font-weight:bold;
-	cursor:pointer;
-	padding: 0 2px;
-}
-a.Close:hover {
-	color: #333;
-}
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-top-left-radius: 2px;
+   border-radius-topright: 2px;
+   border-radius-topleft: 2px;
    margin-bottom: 1px;
 	text-align: left;
 }
@@ -398,6 +397,7 @@ body #Head h1 {
    margin: 15px 0 0;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+   border-radius: 2px;
 }
 #Head form input.InputBox {
    width: 204px;
@@ -409,6 +409,8 @@ body #Head h1 {
    -moz-border-radius-bottomleft: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-bottom-left-radius: 2px;
+   border-top-left-radius: 2px;
+   border-bottom-left-radius: 2px;
    color: #969696;
    font-size: 13px;
 }
@@ -422,10 +424,13 @@ body #Head h1 {
    margin: 0;
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
+   border-radius: 0;
    -moz-border-radius-topright: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
   	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;     	
@@ -480,6 +485,7 @@ body #Head h1 {
 #Menu li.Highlight a:hover span {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+   border-radius: 2px;
    padding: 0 2px;
    font-size: 9px;
    line-height: 12px;
@@ -552,6 +558,7 @@ ul.Options li.Parent strong {
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+   border-radius: 2px;
    color: #555;
    cursor: pointer;
    line-height: 100%;
@@ -573,6 +580,8 @@ ul.Options li.Active strong {
    -moz-border-radius-bottomright: 0;
    -webkit-border-bottom-left-radius: 0;
    -webkit-border-bottom-right-radius: 0;
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
 }
 ul.Options li.Active {
    background: none;
@@ -584,6 +593,8 @@ ul.Options li.Active ul {
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
 }
 ul.Options li.Active ul li a {
    background: none;
@@ -650,6 +661,7 @@ ul#Menu {
    float: right;
 }
 div.Box {
+   border-radius: 1px;
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
    background: #cfecff;
@@ -745,6 +757,7 @@ ul.PanelInfo div.Meta strong {
    font-weight: normal;
    display: inline;
    padding: 1px 3px;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	background: #FFFF00;
@@ -786,6 +799,7 @@ a.BigButton {
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
@@ -836,6 +850,7 @@ body#dashboard_entrycontroller_handshake div.Info {
 }
 body.Entry #Content div.Box {
    background: #c4e1ff;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	border: 0;
@@ -991,6 +1006,7 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta strong {
    background: #ffff00;
    padding: 1px 4px;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -1003,6 +1019,7 @@ ul.DataList a.Delete {
    margin: 0 1px 0 0;
    font-size: 11px;
    font-weight: normal;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    color: #555;
@@ -1212,6 +1229,7 @@ ul.MessageList div.Message p {
 }
 div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    padding: 4px 16px;
@@ -1223,6 +1241,7 @@ div.Preview div.Message pre,
 ul.MessageList div.Message code,
 ul.MessageList div.Message pre {
    display: block;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    background: #ff9;
@@ -1278,6 +1297,8 @@ links, sign in buttons, etc */
    padding: 6px;
    background: #cfecff;
    text-align: right;
+   border-bottom-right-radius: 2px;
+   border-bottom-left-radius: 2px;
    -moz-border-radius-bottomright: 2px;
    -moz-border-radius-bottomleft: 2px;
    -webkit-border-bottom-right-radius: 2px;
@@ -1306,6 +1327,7 @@ body.Profile #Panel {
    width: 250px;
 }
 ul.SideMenu {
+   border-radius: 0;
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
    background: none;
@@ -1343,6 +1365,8 @@ div.User h1 {
    border: 0;
 }
 #Status {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
    -moz-border-radius-topleft: 2px;
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
@@ -1371,6 +1395,8 @@ div.User h1 {
    text-decoration: underline;
 }
 div.User form {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
    -moz-border-radius-topleft: 2px;
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
@@ -1473,6 +1499,11 @@ div.Tabs li {
    display: inline;
    margin: 0;
 }
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
 div.MessageForm a.Cancel,
 div.MessageForm a.Cancel:link,
 div.MessageForm a.Cancel:hover,
@@ -1495,6 +1526,7 @@ div.Tabs li a:active,
 div.Tabs li a:visited {
    margin: 0;
    border: 1px solid #abdafb;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    background: #bbe2f7;
@@ -1505,6 +1537,11 @@ div.Tabs li a:visited {
    padding: 5px 10px;
 	line-height: 2.6;
 }
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
 div.MessageForm a.Cancel,
 div.MessageForm a.Cancel:link,
 div.MessageForm a.Cancel:hover,
@@ -1512,6 +1549,7 @@ div.MessageForm a.Cancel:active,
 div.MessageForm a.Cancel:visited {
 	line-height: 1.2;
 }
+div.MessageForm a.Back:hover,
 div.MessageForm a.Cancel:hover,
 div.MorePager li a:hover,
 a.TabLink:hover,
@@ -1527,6 +1565,7 @@ div.Tabs li a span {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;
+   border-radius: 3px;
    -webkit-border-radius: 3px;
    -moz-border-radius: 3px;
    font-weight: normal;
@@ -1538,6 +1577,7 @@ div.Tabs div.SubTab {
 	margin: 10px 0 0;
 	padding: 4px 8px;
 	background: #f3fcff;
+   border-radius: 2px;
    -webkit-border-radius: 2px;
    -moz-border-radius: 2px;
 }
@@ -1608,6 +1648,7 @@ form.Thumbnail table tr th {
 .custom .jcrop-handle {
    border-color: black;
    background-color: #C7BB00;
+   border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
@@ -1633,6 +1674,7 @@ div.Popup div.Messages {
 }
 div.Popup div.Messages ul {
 	display: block;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
@@ -1671,6 +1713,7 @@ div.Popup div.Body {
   padding: 0px;
   background: #fff;
   max-width: 500px;
+  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border: 8px solid #555;
@@ -1700,15 +1743,31 @@ div.Popup h2 {
 	border-bottom: 1px solid #3DB9E5;
 	padding: 6px 9px 4px;
 }
+a.Close {
+	position: absolute;
+	top: 6px;
+	right: 10px;
+	line-height: 1;
+	color: #E4F7FE;
+	cursor: pointer;
+	font-family: arial;
+	font-size: 22px;
+	font-weight: bold;
+	padding: 0;
+}
+a.Close:hover {
+	color: #fff;
+}
 div.Popup .Footer {
-  background: #cfecff;
-  text-align: right;
-  padding: 2px 6px 0 0;
-  border-top:1px solid #abdafb;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
+	border: none;
+	background: none;
+	padding: 0;
+	margin: 0;
+	text-align: right;
+}
+div.Popup .Footer input.Button {
+	font-size: 11px;
+	margin-right: 2px;
 }
 div.Popup h3 {
 	font-size: 120%;
@@ -1862,6 +1921,7 @@ ul.PanelDiscussions li strong {
 ul.DataList div.Meta a.Category {
    background: #fafafa;
    padding: 2px 4px;
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -1873,7 +1933,10 @@ ul.DataList div.Meta span.Announcement {
 	background: #777777;
 	color: #ffffff;
 	padding: 1px 4px;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
    font-weight: bold;
 }
 ul.DataList div.Meta span.Closed {
@@ -1881,7 +1944,10 @@ ul.DataList div.Meta span.Closed {
    color: #ffffff;
    font-weight: bold;
 	padding: 1px 4px;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
 }
 
 
@@ -1975,6 +2041,7 @@ body.Post #Content {
    padding: 6px;
 }
 #DiscussionForm form {
+   border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    background: #c4e1ff none repeat scroll 0 0;
@@ -1998,6 +2065,7 @@ body.Post #Content {
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
 }
+div.CommentForm a.Back,
 div.CommentForm a.Cancel {
    float: left;
 }
@@ -2115,6 +2183,8 @@ ul.Conversations div.ItemContent {
 	background: #E9F9FF;
 	padding: 4px 8px 8px;
 	margin: 1px 0 0;
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
   -moz-border-radius-bottomleft: 2px;
   -moz-border-radius-bottomright: 2px;
   -webkit-border-bottom-left-radius: 2px;
@@ -2145,7 +2215,10 @@ body.add #Content {
    width: auto;
 }
 #ConversationForm form {
-	-moz-border-radius:2px 2px 2px 2px;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
 	background:none repeat scroll 0 0 #c4e1ff;
 	border:1px solid #7caccb;
 	margin:0;
@@ -2183,8 +2256,10 @@ body.Conversations a.Cancel {
 }
 div.Popup #ConversationForm form {
 	background: none;
+   -border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
+   border-radius: 0;
 	padding: 10px;
 }
 div.Popup #ConversationForm h2 {
@@ -2207,8 +2282,10 @@ div.UploadProgress {
 	color: #fff;
 	text-shadow: 0 1px 1px #333;
 	border: 1px solid #0c3c7e;
+   border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
+   border-radius: 2px;
 }
 div.UploadProgress div {
 	padding: 2px 0;

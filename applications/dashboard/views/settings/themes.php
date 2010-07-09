@@ -48,8 +48,8 @@ printf(
    echo '</h4>';
    echo '<div class="Description">'.GetValue('Description', $this->Data('EnabledTheme'), '').'</div>';
 	if ($this->Data('EnabledTheme.Options')) {
-      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme can be customized with additional options. Go to %s to customize this theme.'),
-         Anchor(sprintf(T('%s Options'), $this->Data('EnabledThemeName')), '/dashboard/settings/themeoptions'));
+      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
+         Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
       
       echo '<div class="Options">',
          $OptionsDescription,
@@ -142,6 +142,8 @@ printf(
                   echo '<div class="Buttons">';
                   echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon', array('target' => '_top'));
                   echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
+						$this->EventArguments['ThemeInfo'] = $ThemeInfo;
+						$this->FireEvent('AfterThemeButtons');
                   echo '</div>';
 
                   $Description = GetValue('Description', $ThemeInfo);

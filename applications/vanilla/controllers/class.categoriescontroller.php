@@ -42,9 +42,9 @@ class CategoriesController extends VanillaController {
          $this->Head->Title($Category->Name);
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
-			$this->AddJsFile('js/library/jquery.menu.js');
+			$this->AddJsFile('jquery.menu.js');
          $this->AddJsFile('options.js');
-         $this->AddJsFile('/js/library/jquery.gardenmorepager.js');
+         $this->AddJsFile('jquery.gardenmorepager.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
       if (!is_numeric($Offset) || $Offset < 0)
@@ -66,7 +66,8 @@ class CategoriesController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->CategoryID);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
-      $this->SetData('AnnounceData', new Gdn_DataSet(), TRUE   );
+      $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
+      $this->SetData('AnnounceData', $AnnounceData, TRUE   );
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
 
       // Build a pager
@@ -107,7 +108,7 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->AddJsFile('js/library/jquery.menu.js');
+      $this->AddJsFile('jquery.menu.js');
       $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
          

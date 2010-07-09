@@ -69,8 +69,6 @@ class RoleController extends DashboardController {
 
    public function DefaultRoles() {
       $this->Permission('Garden.Roles.Manage');
-//		if(!C('Garden.Registration.Manage', TRUE))
-//			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('');
 
       $this->Title(T('Default Roles'));
@@ -89,9 +87,15 @@ class RoleController extends DashboardController {
          $GuestRoles = ConsolidateArrayValuesByKey($GuestRolesData, 'RoleID');
          $this->Form->SetValue('GuestRoles', $GuestRoles);
 
+         // The applicant role.
+         $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', '');
+         $this->Form->SetValue('ApplicantRoleID', $ApplicantRoleID);
       } else {
          $DefaultRoles = $this->Form->GetFormValue('DefaultRoles');
-         SaveToConfig('Garden.Registration.DefaultRoles', $DefaultRoles);
+         $ApplicantRoleID = $this->Form->GetFormValue('ApplicantRoleID');
+         SaveToConfig(array(
+            'Garden.Registration.DefaultRoles' => $DefaultRoles,
+            'Garden.Registration.ApplicantRoleID' => $ApplicantRoleID));
 
          $GuestRoles = $this->Form->GetFormValue('GuestRoles');
          $UserModel = new UserModel();
@@ -107,7 +111,9 @@ class RoleController extends DashboardController {
       // Check to see if there are no default roles for guests or members.
       $DefaultRolesWarning = FALSE;
       $DefaultRoles = C('Garden.Registration.DefaultRoles');
-      if(count($DefaultRoles) == 0) {
+      if (count($DefaultRoles) == 0) {
+         $DefaultRolesWarning = TRUE;
+      } elseif (!C('Garden.Registration.ApplicantRoleID') && C('Garden.Registration.Method') == 'Approval') {
          $DefaultRolesWarning = TRUE;
       } else {
          $RoleModel = new RoleModel();
@@ -134,7 +140,7 @@ class RoleController extends DashboardController {
       $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
-      $this->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $this->AddJsFile('jquery.gardencheckboxgrid.js');
       
       // Set the model on the form.
       $this->Form->SetModel($this->RoleModel);
@@ -168,8 +174,8 @@ class RoleController extends DashboardController {
 		$this->Permission('Garden.Roles.Manage');
 
       $this->AddSideMenu('dashboard/role');
-      $this->AddJsFile('/js/library/jquery.tablednd.js');
-      $this->AddJsFile('/js/library/jquery.ui.packed.js');
+      $this->AddJsFile('jquery.tablednd.js');
+      $this->AddJsFile('jquery.ui.packed.js');
       $this->Title(T('Roles & Permissions'));
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();

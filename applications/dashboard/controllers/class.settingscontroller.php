@@ -70,9 +70,11 @@ class SettingsController extends DashboardController {
       }
       
       if ($ApplicationName != '') {
+         $this->EventArguments['ApplicationName'] = $ApplicationName;
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
             try {
                $ApplicationManager->DisableApplication($ApplicationName);
+               $this->FireEvent('AfterDisableApplication');
             } catch (Exception $e) {
                $this->Form->AddError(strip_tags($e->getMessage()));
             }
@@ -87,6 +89,9 @@ class SettingsController extends DashboardController {
                $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
                $this->Form->SetValidationResults($Validation->Results());
+               
+               $this->EventArguments['Validation'] = $Validation;
+               $this->FireEvent('AfterEnableApplication');
             }
             
          }
@@ -372,12 +377,17 @@ class SettingsController extends DashboardController {
       
       if ($PluginName != '') {
          try {
+            $this->EventArguments['PluginName'] = $PluginName;
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                Gdn::PluginManager()->DisablePlugin($PluginName);
+               $this->FireEvent('AfterDisablePlugin');
             } else {
                $Validation = new Gdn_Validation();
                if (!Gdn::PluginManager()->EnablePlugin($PluginName, $Validation))
                   $this->Form->SetValidationResults($Validation->Results());
+               
+               $this->EventArguments['Validation'] = $Validation;
+               $this->FireEvent('AfterEnablePlugin');
             }
          } catch (Exception $e) {
             $this->Form->AddError(strip_tags($e->getMessage()));
@@ -527,7 +537,7 @@ class SettingsController extends DashboardController {
          Gdn::Locale()->SaveTranslations($Translations);
          Gdn::Locale()->Refresh();
 
-         $this->StatusMessage = T('Saved');
+         $this->StatusMessage = T("Your changes have been saved.");
       }
 
       $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
@@ -545,7 +555,7 @@ class SettingsController extends DashboardController {
       }
 
       $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
-      $this->SetData('Title', sprintf('%s Options', $this->Data('ThemeOptions.Name', $this->Data('ThemeInfo.Folder'))));
+      $this->Title(T('Theme Options'));
       $this->Form->AddHidden('StyleKey', $StyleKey);
 
       $this->Render();
@@ -598,6 +608,9 @@ class SettingsController extends DashboardController {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
                   $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
                   $ThemeManager->EnableTheme($ThemeName);
+                  $this->EventArguments['ThemeName'] = $ThemeName;
+                  $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+                  $this->FireEvent('AfterEnableTheme');
                }
             }
          } catch (Exception $Ex) {

@@ -52,6 +52,14 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 }
 
 function WriteOptionList($Object, $Sender, $Session) {
+   $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+	$CanEdit = $EditContentTimeout == -1 || strtotime($Object->DateInserted) + $EditContentTimeout > time();
+	$TimeLeft = '';
+	if ($CanEdit && $EditContentTimeout > 0) {
+		$TimeLeft = strtotime($Object->DateInserted) + $EditContentTimeout - time();
+		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
+	}
+
    $Sender->Options = '';
 	$CategoryID = GetValue('CategoryID', $Object);
 	if(!$CategoryID && property_exists($Sender, 'Discussion'))
@@ -60,8 +68,8 @@ function WriteOptionList($Object, $Sender, $Session) {
    // Show discussion options if this is the discussion / first comment
    if ($Sender->EventArguments['Type'] == 'Discussion') {
       // Can the user edit the discussion?
-      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $CategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').'</span>';
+      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $CategoryID))
+         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').$TimeLeft.'</span>';
          
       // Can the user announce?
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $CategoryID))
@@ -82,8 +90,8 @@ function WriteOptionList($Object, $Sender, $Session) {
       // And if this is just another comment in the discussion ...
       
       // Can the user edit the comment?
-      if ($Session->UserID == $Object->InsertUserID || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $Sender->Discussion->CategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').'</span>';
+      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $Sender->Discussion->CategoryID))
+         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').$TimeLeft.'</span>';
 
       // Can the user delete the comment?
       if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $CategoryID))

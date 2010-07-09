@@ -524,6 +524,38 @@ if (!function_exists('ForceSSL')) {
    }
 }
 
+// Formats values to be saved as PHP arrays.
+if (!function_exists('FormatArrayAssignment')) {
+   function FormatArrayAssignment(&$Array, $Prefix, $Value) {
+      if (is_array($Value)) {
+         // If $Value doesn't contain a key of "0" OR it does and it's value IS
+         // an array, this should be treated as an associative array.
+         $IsAssociativeArray = array_key_exists(0, $Value) === FALSE || is_array($Value[0]) === TRUE ? TRUE : FALSE;
+         if ($IsAssociativeArray === TRUE) {
+            foreach ($Value as $k => $v) {
+               FormatArrayAssignment($Array, $Prefix."['$k']", $v);
+            }
+         } else {
+            // If $Value is not an associative array, just write it like a simple array definition.
+            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
+            $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
+         }
+      } elseif (is_int($Value)) {
+			$Array[] = $Prefix .= ' = '.$Value.';';
+		} elseif (is_bool($Value)) {
+         $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
+      } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
+         $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
+      } else {
+         if (strpos($Value, "'") !== FALSE) {
+            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
+         } else {
+            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
+         }
+      }
+   }
+}
+
 if (!function_exists('GetConnectionString')) {
    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
       $HostName = explode(':', $HostName);

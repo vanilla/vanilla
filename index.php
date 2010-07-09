@@ -20,7 +20,7 @@ ob_start();
 
 // 1. Define the constants we need to get going.
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0 rc2');
+define('APPLICATION_VERSION', '2.0 rc3');
 
 define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));

@@ -95,8 +95,8 @@ jQuery(document).ready(function($) {
 
             // Remove any old popups if not saving as a draft
             if (!draft && json.FormSaved == true)
-               $('.Popup,.Overlay').remove();
-               
+               $('div.Popup,.Overlay').remove();
+
             var commentID = json.CommentID;
             
             // Assign the comment id to the form if it was defined
@@ -113,10 +113,8 @@ jQuery(document).ready(function($) {
                   
                $('ul#Menu li.MyDrafts a').html(json.MyDrafts);
             }
-
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
-
             if (json.FormSaved == false) {
                $(frm).prepend(json.StatusMessage);
                json.StatusMessage = null;
@@ -130,7 +128,7 @@ jQuery(document).ready(function($) {
                // Clean up the form
                if (processedTargets)
                   btn = $('div.CommentForm :submit');
-                  
+
                resetCommentForm(btn);
                clearCommentForm(btn);
 
@@ -179,7 +177,7 @@ jQuery(document).ready(function($) {
    function clearCommentForm(sender) {
       var container = $(sender).parents('li.Editing');
       $(container).removeClass('Editing');
-      $('.Popup,.Overlay').remove();
+      $('div.Popup,.Overlay').remove();
       var frm = $(sender).parents('div.CommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
@@ -231,7 +229,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Remove any old popups
-               $('.Popup,.Overlay').remove();
+               $('div.Popup,.Overlay').remove();
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {

@@ -177,6 +177,9 @@ class PostController extends VanillaController {
     * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
+      if ($DiscussionID == '' && sizeof($this->RequestArgs))
+         if (is_numeric($this->RequestArgs[0]))
+            $DiscussionID = $this->RequestArgs[0];
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');

@@ -160,15 +160,6 @@ class ImportController extends DashboardController {
             }
          } else {
             $this->Form->SetFormValue('PathSelect', $Imp->ImportPath);
-            // TODO: Search for an existing file that was uploaded by the web admin.
-//				$ImportPaths = SafeGlob(PATH_ROOT.DS.'uploads'.DS.'export *');
-//				if($ImportPaths) {
-//					$ImportPath = $ImportPaths[0];
-//					if(in_array(pathinfo($ImportPath, PATHINFO_EXTENSION), array('gz', 'txt'))) {
-//						$Imp->ImportPath = $ImportPath;
-//						$Imp->Data['OriginalFilename'] = basename($ImportPath);
-//					}
-//				}
          }
          $Imp->SaveState();
       } else {

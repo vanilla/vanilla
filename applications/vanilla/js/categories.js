@@ -1,6 +1,7 @@
 jQuery(document).ready(function($) {
 
-   $('#Form_UrlCode').alphanumeric({allow:"-"});
+   if ($.fn.alphanumeric)
+      $('#Form_UrlCode').alphanumeric({allow:"-"});
 
    // Map plain text category to url code
    $("#Form_Name").keyup(function(event) {

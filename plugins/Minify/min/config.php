@@ -32,7 +32,7 @@ $min_errorLogger = false;
  * Allow use of the Minify URI Builder app. If you no longer need 
  * this, set to false.
  **/
-$min_enableBuilder = true;
+$min_enableBuilder = false;
 
 
 /**
@@ -77,7 +77,7 @@ $min_cacheFileLocking = true;
  * move all @imports to the top of the output. Note that moving @imports could 
  * affect CSS values (which is why this option is disabled by default).
  */
-$min_serveOptions['bubbleCssImports'] = false;
+$min_serveOptions['bubbleCssImports'] = true;
 
 
 /**
@@ -89,7 +89,7 @@ $min_serveOptions['bubbleCssImports'] = false;
  * Note: Despite this setting, if you include a number at the end of the
  * querystring, maxAge will be set to one year. E.g. /min/f=hello.css&123456
  */
-$min_serveOptions['maxAge'] = 1800;
+$min_serveOptions['maxAge'] = 2592000; // 60secs * 60mins * 24hrs * 30days;
 
 
 /**
@@ -111,7 +111,7 @@ $min_serveOptions['minApp']['groupsOnly'] = false;
 /**
  * Maximum # of files that can be specified in the "f" GET parameter
  */
-$min_serveOptions['minApp']['maxFiles'] = 20;
+$min_serveOptions['minApp']['maxFiles'] = 50;
 
 
 /**

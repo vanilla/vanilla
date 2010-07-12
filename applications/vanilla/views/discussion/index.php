@@ -24,7 +24,7 @@ if ($Session->IsValid()) {
       ?></li>
    </ul>
    <div class="SubTab"><?php
-      $DiscussionName = Gdn_Format::Text($Discussion->Name);
+      $DiscussionName = Gdn_Format::Text($this->Discussion->Name);
       if ($DiscussionName == '')
          $DiscussionName = T('Blank Discussion Topic');
          

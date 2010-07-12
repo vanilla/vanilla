@@ -20,6 +20,15 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         $Options = array('0' => 'Authors cannot edit their posts', '350' => 'Authors can edit for 5 minutes after posting', '900' => 'Authors can edit for 15 minutes after posting', '1800' => 'Authors can edit for 30 minutes after posting', '-1' => 'Authors can always edit their posts');
+         $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
+         echo $this->Form->Label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
+         echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
+			echo Wrap(T('EditContentTimeout.Notes', 'Note: If a user is in a role that has permission to edit content, those permissions will override any value selected here.'), 'div', array('class' => 'Info'));
+      ?>
+   </li>
+   <li>
+      <?php
          $Options2 = array('0' => 'Don\'t Refresh', '5' => 'Every 5 seconds', '10' => 'Every 10 seconds', '30' => 'Every 30 seconds', '60' => 'Every 1 minute', '300' => 'Every 5 minutes');
          echo $this->Form->Label('Refresh Comments', 'Vanilla.Comments.AutoRefresh');
          echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);

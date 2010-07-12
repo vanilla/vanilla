@@ -1,10 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T($this->Data['Title']);; ?></h1>
+<h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
    <?php
       echo T('The following content has been flagged by users for moderator review.');
+      $ToggleName = C('Plugins.Flagging.Enabled') ? T('Disable Content Flagging') : T('Enable Content Flagging');
+      echo "<div>".Wrap(Anchor($ToggleName, 'plugin/flagging/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'))."</div>";
    ?>
 </div>
+<?php if (C('Plugins.Flagging.Enabled')) { ?>
 <div class="FlaggedContent">
    <?php
       $NumFlaggedItems = count($this->FlaggedItems);
@@ -68,3 +71,4 @@
       }
    ?>
 </div>
+<?php } ?>

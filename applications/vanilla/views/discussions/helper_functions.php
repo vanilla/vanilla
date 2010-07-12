@@ -23,11 +23,17 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
+   $DiscussionName = Gdn_Format::Text($Discussion->Name);
+   if ($DiscussionName == '')
+      $DiscussionName = T('Blank Discussion Topic');
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <?php WriteOptions($Discussion, $Sender, $Session); ?>
+   <?php
+   $Sender->FireEvent('BeforeDiscussionContent');
+   WriteOptions($Discussion, $Sender, $Session);
+   ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php if ($Discussion->Announce == '1') { ?>

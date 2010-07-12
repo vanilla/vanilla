@@ -194,7 +194,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $Tags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       // Tags can only contain: a-z 0-9 + # _ .
-      if (StringIsNullOrEmpty($Tags))
+      if (StringIsNullOrEmpty($Tags) && C('Plugins.Tagging.Required'))
          $Sender->Validation->AddValidationResult('Tags', 'You must specify at least one tag.');
       else if (!ValidateRegex($Tags, '/^([\s\d\w\+-_.#]+)$/si'))
          $Sender->Validation->AddValidationResult('Tags', 'Tags can only contain the following characters: a-z 0-9 + # _ .');
@@ -256,6 +256,7 @@ class TaggingPlugin extends Gdn_Plugin {
    
    /**
     * TODO: Add tag management (let admins rename tags, remove tags, etc).
+    * Also manage the Plugins.Tagging.Required boolean setting that makes tagging required or not.
     */
    public function SettingsController_Tags_Create($Sender) {
       // Uncomment SettingsUrl above when finished.

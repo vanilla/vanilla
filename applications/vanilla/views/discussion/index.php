@@ -23,7 +23,13 @@ if ($Session->IsValid()) {
          }
       ?></li>
    </ul>
-   <div class="SubTab"><?php echo Gdn_Format::Text($this->Discussion->Name); ?></div>
+   <div class="SubTab"><?php
+      $DiscussionName = Gdn_Format::Text($Discussion->Name);
+      if ($DiscussionName == '')
+         $DiscussionName = T('Blank Discussion Topic');
+         
+      echo $DiscussionName;
+   ?></div>
 </div>
 <?php
    echo $this->Pager->ToString('less');
@@ -58,7 +64,7 @@ if ($this->Discussion->Closed == '1') {
 ?>
    <div class="Foot">
       <?php
-      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'TabLink'.(Gdn::Config('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl), 'TabLink'.(C('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
       ?> 
    </div>
    <?php 

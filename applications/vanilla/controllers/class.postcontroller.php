@@ -49,7 +49,8 @@ class PostController extends VanillaController {
 
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-         if ($EditContentTimeout == 0 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout < time())
+         $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
+         if (!$CanEdit)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
       } else {
@@ -177,6 +178,9 @@ class PostController extends VanillaController {
     * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
+      if ($DiscussionID == '' && sizeof($this->RequestArgs))
+         if (is_numeric($this->RequestArgs[0]))
+            $DiscussionID = $this->RequestArgs[0];
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
@@ -200,7 +204,8 @@ class PostController extends VanillaController {
             
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-         if ($EditContentTimeout == 0 || strtotime($this->Comment->DateInserted) + $EditContentTimeout < time())
+         $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
+         if (!$CanEdit)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {

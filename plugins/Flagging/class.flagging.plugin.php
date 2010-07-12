@@ -69,6 +69,19 @@ class FlaggingPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('flagging.php'));
    }
    
+   public function Controller_Toggle(&$Sender) {
+		
+		// Enable/Disable Content Flagging
+		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+			if (C('Plugins.Flagging.Enabled')) {
+				$this->_Disable();
+			} else {
+				$this->_Enable();
+			}
+			Redirect('plugin/flagging');
+		}
+   }
+   
    public function Controller_Dismiss(&$Sender) {
       $Arguments = $Sender->RequestArgs;
       if (sizeof($Arguments) != 2) return;
@@ -84,6 +97,8 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_CommentOptions_Handler(&$Sender) {
+      if (!C('Plugins.Flagging.Enabled')) return;
+      
       $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
       
       // Signed in users only. No guest reporting!
@@ -114,8 +129,14 @@ class FlaggingPlugin extends Gdn_Plugin {
       $EncodedURL = str_replace('=','-',base64_encode($URL));
       $Sender->Options .= '<span>'.Anchor(T('Flag'), "discussion/flag/{$Context}/{$ElementID}/{$ElementAuthorID}/{$ElementAuthor}/{$EncodedURL}", 'FlagContent Popup') . '</span>';
    }
+   // Note: Mark added this slick code. Tim does not approve.
+   public function PostController_CommentOptions_Handler($Sender) {
+      $this->DiscussionController_CommentOptions_Handler($Sender);
+   }
    
    public function DiscussionController_Flag_Create(&$Sender) {
+      if (!C('Plugins.Flagging.Enabled')) return;
+      
       // Signed in users only.
       if (!($UserID = Gdn::Session()->UserID)) return;
       $UserName = Gdn::Session()->User->Name;
@@ -176,11 +197,11 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    protected function _Enable() {
-      
+      SaveToConfig('Plugins.Flagging.Enabled', TRUE);
    }
    
    protected function _Disable() {
-      
+      RemoveFromConfig('Plugins.Flagging.Enabled');
    }
    
 }

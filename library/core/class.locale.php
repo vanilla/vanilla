@@ -153,7 +153,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          if (file_exists($ConfigLocale))
             $FileContents[$SafeLocaleName][] = $ConfigLocale;
          
-         Gdn_LibraryMap::Import('locale', $FileContents);
+         Gdn_LibraryMap::PrepareCache('locale', $FileContents);
       }
 
       // Set up defaults

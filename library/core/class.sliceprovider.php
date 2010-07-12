@@ -8,16 +8,16 @@ class Gdn_SliceProvider {
       switch ($this instanceof Gdn_IPlugin) {
          case TRUE:
             $ReplacementIndex = 2;
-            
          break;
          
          case FALSE:
             $ReplacementIndex = 1;
          break;
       }
-      if ($ExplodedPath[0] == Gdn::Dispatcher()->Application() && $ExplodedPath[1] == Gdn::Dispatcher()->Controller())
+      
+      if ($ExplodedPath[0] == strtolower(Gdn::Dispatcher()->Application()) && $ExplodedPath[1] == strtolower(Gdn::Dispatcher()->Controller()))
          $ReplacementIndex++;
-         
+
       $ExplodedPath[$ReplacementIndex] = $SliceName;
       $SlicePath = implode('/',$ExplodedPath);
       return Gdn::Slice($SlicePath);

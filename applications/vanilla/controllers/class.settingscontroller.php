@@ -27,7 +27,8 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comments.PerPage',
          'Vanilla.Categories.Use',
          'Vanilla.Archive.Date',
-			'Vanilla.Archive.Exclude'
+			'Vanilla.Archive.Exclude',
+			'Garden.EditContentTimeout'
       ));
       
       // Set the model on the form.
@@ -45,6 +46,7 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
+			$ConfigurationModel->Validation->ApplyRule('Garden.EditContentTimeout', 'Integer');
 			
 			// Grab old config values to check for an update.
 			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');

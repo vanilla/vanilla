@@ -18,16 +18,18 @@ if (!isset($Explicit))
    $Explicit = TRUE;
    
 /*
-The Column method (defined in /library/database/class.generic.structure.php)
-has the following arguments:
+The Column method (defined in /library/database/class.generic.structure.php) has the following arguments:
   Column(
-   $Name, // The name of the column to add
-   $Type, // The type of column to add
-   $Length = '', // The length of the column (if applicable)
-   $Null = FALSE, // A boolean value indicating if the column allows nulls
-   $Default = NULL, // The default value of the column 
-   $KeyType = FALSE, // The type of key to make the column (primary or key)
-   $AutoIncrement = FALSE // Should the field auto_increment?
+   $Name, // The name of the column to create.
+   $Type, // The data type of the column to be created. Types with a length speecifty the length in barackets.
+          //  * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+          //  * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
+   $NullOrDefault = FALSE, // A boolean value indicating if the column allows nulls
+   $Default = NULL, //  Whether or not nulls are allowed, if not a default can be specified.
+                    //   * TRUE: Nulls are allowed.
+                    //   * FALSE: Nulls are not allowed.
+                    //   * Any other value: Nulls are not allowed, and the specified value will be used as the default.
+   $KeyType = FALSE, // What type of key is this column on the table? Options are primary, key, and FALSE (not a key).
   );
 
 Example table construction:

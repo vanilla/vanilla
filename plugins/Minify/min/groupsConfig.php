@@ -8,6 +8,7 @@
  * You may wish to use the Minify URI Builder app to suggest
  * changes. http://yourdomain/min/builder/
  **/
+
 $WebRoot = array_key_exists('PHP_SELF', $_SERVER) ? $_SERVER['PHP_SELF'] : '';
 $WebRoot = explode('/', $WebRoot);
 // Look for plugins in plugins/Minify/min/index.php to figure out where the web root is.
@@ -18,6 +19,8 @@ if ($Key !== FALSE)
 $WebRoot = trim($WebRoot,'/');
 if ($WebRoot != '')
    $WebRoot = '//'.$WebRoot.'/';
+else
+   $WebRoot = '//';
    
 return array(
    globaljs => array(

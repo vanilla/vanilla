@@ -445,7 +445,12 @@ class ImportModel extends Gdn_Model {
          $c = $Line[$i];
 
          if ($InEscape) {
-            $Token .= $c;
+            // Check for an escaped null.
+            if ($c == 'N' && strlen($Token) == 0) {
+               $Token = NULL;
+            } else {
+               $Token .= $c;
+            }
             $InEscape = FALSE;
          } else {
             switch ($c) {

@@ -763,6 +763,13 @@ ul.PanelInfo div.Meta strong {
 	background: #FFFF00;
 	padding:2px 4px;
 }
+ul.PanelInfo li.Parent {
+	text-align: left;
+	font-weight: bold;
+	background: none;
+	color: #333;
+	padding: 2px 0;
+}
 ul.PanelInfo li.Active {
    background: #fff;
    border-bottom: 1px solid #a3e6ff;

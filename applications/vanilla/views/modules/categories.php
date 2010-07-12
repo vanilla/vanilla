@@ -16,13 +16,20 @@ if ($this->_CategoryData !== FALSE) {
          
       ?>><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
       <?php
+   $ParentName = '';
    foreach ($this->_CategoryData->Result() as $Category) {
+      if ($Category->ParentName != '' && $Category->ParentName != $ParentName) {
+         $ParentName = $Category->ParentName;
+         ?>
+         <li class="Parent"><?php echo Gdn_Format::Text($Category->ParentName); ?></li>
+         <?php
+      }
       ?>
       <li<?php
       if ($CategoryID == $Category->CategoryID)
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Gdn_Format::Text(str_replace('&rarr;', '→', $Category->Name)), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
+      ?>><strong><?php echo Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
       <?php
    }
       ?>

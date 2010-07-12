@@ -1,4 +1,6 @@
 <?php
+define('APPLICATION', 'Vanilla');
+define('APPLICATION_VERSION', '2.0 rc3');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -19,9 +21,6 @@ ini_set('track_errors', 1);
 ob_start();
 
 // 1. Define the constants we need to get going.
-define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0 rc3');
-
 define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
 

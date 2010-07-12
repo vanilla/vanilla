@@ -888,7 +888,7 @@ class UserModel extends Gdn_Model {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
 				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, Url(Gdn::Authenticator()->SignInUrl(), TRUE)));
 				$Email->To($User->Email);
-				$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
+				//$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
 				$Email->Send();
          }
 
@@ -1230,7 +1230,7 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
-      $Email->From($Sender->Email, $Sender->Name);
+      //$Email->From($Sender->Email, $Sender->Name);
       $Email->Message(
          sprintf(
             T('EmailWelcome'),
@@ -1253,7 +1253,7 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset'), $AppTitle));
       $Email->To($User->Email);
-      $Email->From($Sender->Email, $Sender->Name);
+      //$Email->From($Sender->Email, $Sender->Name);
       $Email->Message(
          sprintf(
             T('EmailPassword'),
@@ -1332,7 +1332,7 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset Request'), $AppTitle));
       $Email->To($User->Email);
-      $Email->From(Gdn::Config('Garden.Support.Email'), Gdn::Config('Garden.Support.Name'));
+      //$Email->From(Gdn::Config('Garden.Support.Email'), Gdn::Config('Garden.Support.Name'));
       $Email->Message(
          sprintf(
             T('PasswordRequest'),

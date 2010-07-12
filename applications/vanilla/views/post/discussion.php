@@ -15,6 +15,8 @@ if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData-
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
+      $this->FireEvent('BeforeFormInputs');
+      
       echo $this->Form->Label('Discussion Title', 'Name');
       echo $this->Form->TextBox('Name', array('maxlength' => 100));
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {

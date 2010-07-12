@@ -6,6 +6,7 @@
 function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Author = UserBuilder($Object, 'Insert');
    $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
+	$Sender->EventArguments['Object'] = $Object;
    $Sender->EventArguments['Type'] = $Type;
    $Sender->EventArguments['Author'] = $Author;
    $CssClass = 'Item Comment';
@@ -27,6 +28,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
    <div class="Comment">
       <div class="Meta">
+         <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
          <span class="Author">
             <?php
             echo UserPhoto($Author);
@@ -49,6 +51,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    </div>
 </li>
 <?php
+	$Sender->FireEvent('AfterComment');
 }
 
 function WriteOptionList($Object, $Sender, $Session) {

@@ -55,8 +55,7 @@ class Gdn_Router {
     */
    public function SetRoute($Route, $Destination, $Type) {
       $Key = $this->_EncodeRouteKey($Route);
-      SaveToConfig('Routes.'.$Key.'.0', $Destination);
-      SaveToConfig('Routes.'.$Key.'.1', $Type);
+      SaveToConfig('Routes.'.$Key, array($Destination, $Type));
       $this->_LoadRoutes();
    }
    
@@ -129,6 +128,10 @@ class Gdn_Router {
    }
    
    private function _ParseRoute($Destination) {
+   
+      // If Destination is a serialized array
+      if (is_string($Destination) && ($Decoded = unserialize($Destination)) !== FALSE)
+         $Destination = $Decoded;
    
       // If Destination is a short array
       if (is_array($Destination) && sizeof($Destination) == 1)

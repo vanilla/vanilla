@@ -186,6 +186,11 @@ class Gdn_CookieIdentity {
 
       if (is_null($Domain))
          $Domain = Gdn::Config('Garden.Cookie.Domain', '');
+
+      // If the domain being set is completely incompatible with the current domain then make the domain work.
+      $CurrentHost = Gdn::Request()->Host();
+      if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+         $Domain = '';
    
       if (!$CookieHashMethod)
          $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');

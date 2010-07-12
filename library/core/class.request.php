@@ -265,11 +265,25 @@ class Gdn_Request {
       }
       return $Default;
    }
-   
+
+   /**
+    * Gets/Sets the host from the current url. e.g. "foo.com" in
+    * "http://foo.com/this/that/garden/index.php?/controller/action/"
+    *
+    * @param $HostName optional value to set.
+    * @return string | NULL
+    */
    public function Host($Hostname = NULL) {
       return $this->RequestHost($Hostname);
    }
-   
+
+   /**
+    * Gets/Sets the scheme from the current url. e.g. "http" in
+    * "http://foo.com/this/that/garden/index.php?/controller/action/"
+    *
+    * @param $Scheme optional value to set.
+    * @return string | NULL
+    */
    public function Scheme($Scheme = NULL) {
       return $this->RequestScheme($Scheme);
    }

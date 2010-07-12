@@ -49,7 +49,8 @@ class PostController extends VanillaController {
 
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-         if ($EditContentTimeout == 0 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout < time())
+         $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
+         if (!$CanEdit)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
       } else {
@@ -200,7 +201,8 @@ class PostController extends VanillaController {
             
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-         if ($EditContentTimeout == 0 || strtotime($this->Comment->DateInserted) + $EditContentTimeout < time())
+         $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
+         if (!$CanEdit)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {

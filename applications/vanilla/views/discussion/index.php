@@ -23,7 +23,13 @@ if ($Session->IsValid()) {
          }
       ?></li>
    </ul>
-   <div class="SubTab"><?php echo Gdn_Format::Text($this->Discussion->Name); ?></div>
+   <div class="SubTab"><?php
+      $DiscussionName = Gdn_Format::Text($Discussion->Name);
+      if ($DiscussionName == '')
+         $DiscussionName = T('Blank Discussion Topic');
+         
+      echo $DiscussionName;
+   ?></div>
 </div>
 <?php
    echo $this->Pager->ToString('less');

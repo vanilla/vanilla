@@ -81,8 +81,7 @@ class RoutesController extends DashboardController {
             );
 
             $this->StatusMessage = T("The route was saved successfully.");
-            //if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
-               $this->RedirectUrl = Url('dashboard/routes');
+            $this->RedirectUrl = Url('dashboard/routes');
          } else {
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          }

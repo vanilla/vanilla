@@ -1213,7 +1213,44 @@ if (!function_exists('SliceString')) {
    }
 }
 
+if (!function_exists('StringBeginsWith')) {
+   /** Checks whether or not string A begins with string B.
+    *
+    * @param string $A The main string to check.
+    * @param string $B The substring to check against.
+    * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
+    * @return bool
+    */
+   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE) {
+      if (strlen($A) < strlen($B))
+         return FALSE;
+      else
+         return substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+   }
+}
+
+if (!function_exists('StringEndsWith')) {
+   /** Checks whether or not string A ends with string B.
+    *
+    * @param string $A The main string to check.
+    * @param string $B The substring to check against.
+    * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
+    * @return bool
+    */
+   function StringEndsWith($A, $B, $CaseInsensitive = FALSE) {
+      if (strlen($A) < strlen($B))
+         return FALSE;
+      else
+         return substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+   }
+}
+
 if (!function_exists('StringIsNullOrEmpty')) {
+   /** Checks whether or not a string is null or an empty string (after trimming).
+    *
+    * @param string $String The string to check.
+    * @return bool
+    */
    function StringIsNullOrEmpty($String) {
       return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
    }

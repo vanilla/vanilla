@@ -1074,6 +1074,15 @@ class ImportModel extends Gdn_Model {
             on d.LastCommentID = c.CommentID
          set d.DateLastComment = c.DateInserted";
       }
+      if (!$this->ImportExists('Discussion', 'CountBookmarks')) {
+         $Sqls['Discussion.CountBookmarks'] = "update :_Discussion d
+            set CountBookmarks = (
+               select count(ud.DiscussionID)
+               from :_UserDiscussion ud
+               where ud.Bookmarked = 1
+                  and ud.DiscussionID = d.DiscussionID
+            )";
+      }
 
       if(!$this->ImportExists('Discussion', 'LastCommentUserID')) {
          $Sqls['Discussion.LastCommentUseID'] = "update :_Discussion d
@@ -1157,6 +1166,27 @@ class ImportModel extends Gdn_Model {
       }
       if (!$this->ImportExists('User', 'CountComments')) {
          $Sqls['User.CountComments'] = $this->GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID');
+      }
+      if (!$this->ImportExists('User', 'CountBookmarks')) {
+         $Sqls['User.CountBookmarks'] = "update :_User u
+            set CountBookmarks = (
+               select count(ud.DiscussionID)
+               from :_UserDiscussion ud
+               where ud.Bookmarked = 1
+                  and ud.UserID = u.UserID
+            )";
+      }
+      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
+         $Sqls['User.CountUnreadConversations'] =
+            'update :_User u
+            set u.CountUnreadConversations = (
+              select count(c.ConversationID)
+              from :_Conversation c
+              inner join :_UserConversation uc
+                on c.ConversationID = uc.ConversationID
+              where uc.UserID = u.UserID
+                and uc.CountReadMessages < c.CountMessages
+            )';
       }
 
       // The updates start here.

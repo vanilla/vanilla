@@ -117,8 +117,8 @@ class Gdn_Router {
       $Routes = Gdn::Config('Routes', array());
       foreach ($Routes as $Key => $Destination) {
          $Route = $this->_DecodeRouteKey($Key);
-         
          $RouteData = $this->_ParseRoute($Destination);
+         
          $this->Routes[$Route] = array_merge(array(
             'Route'        => $Route,
             'Key'          => $Key,

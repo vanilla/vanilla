@@ -420,6 +420,7 @@ class ImportModel extends Gdn_Model {
       $Line = FALSE;
       do {
          $s = fgets($fp);
+         //echo "<fgets>$s</fgets><br/>\n";
 
          if ($s === FALSE) {
             if ($Line === FALSE)
@@ -433,6 +434,7 @@ class ImportModel extends Gdn_Model {
       } while(strlen($s) > 1 && substr($s, -2, 1) === $Escape);
 
       $Line = trim($Line, "\n");
+      //echo "<Line>$Line</Line><br />\n";
 
       $Result = array();
 
@@ -483,6 +485,7 @@ class ImportModel extends Gdn_Model {
 		if(is_null($fpin)) {
 			if(!$this->ImportPath || !file_exists($this->ImportPath))
 				return array();
+         ini_set('auto_detect_line_endings', TRUE);
 			$fpin = gzopen($this->ImportPath, 'rb');
 			$fpopened = TRUE;
 		}
@@ -748,7 +751,9 @@ class ImportModel extends Gdn_Model {
       $PxTablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
 		Gdn::Database()->Query("truncate table $PxTablename;");
 
-      switch ($this->LoadTableType()) {
+      $Type = $this->LoadTableType();
+
+      switch ($Type) {
          case 'LoadTableOnSameServer':
             $this->_LoadTableOnSameServer($Tablename, $Path);
             break;
@@ -759,6 +764,8 @@ class ImportModel extends Gdn_Model {
             // This final option can be 15x slower than the other options.
             $this->_LoadTableWithInsert($Tablename, $Path);
             break;
+         default:
+            throw new Exception("@Error, unknown LoadTableType: $Type");
       }
 
 		return TRUE;
@@ -791,9 +798,14 @@ class ImportModel extends Gdn_Model {
          ignore 1 lines";
 
       // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-      $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Databas.Password'), FALSE, 128);
+      $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Database.Password'), FALSE, 128);
       mysql_select_db(C('Database.Name'), $dblink);
-      mysql_query($Sql, $dblink);
+      $Result = mysql_query($Sql, $dblink);
+      if ($Result === FALSE) {
+         $Ex = new Exception(mysql_error($dblink));
+         mysql_close($dblink);
+         throw new $Ex;
+      }
       mysql_close($dblink);
    }
 
@@ -807,6 +819,7 @@ class ImportModel extends Gdn_Model {
       $ColumnCount = count($St->Columns());
       $St->Reset();
 
+      ini_set('auto_detect_line_endings', TRUE);
       $fp = fopen($Path, 'rb');
 
       $PDO = Gdn::Database()->Connection();
@@ -857,7 +870,7 @@ class ImportModel extends Gdn_Model {
          $Sql = "show variables like 'local_infile'";
          $Data = $this->Query($Sql)->ResultArray();
          if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
-            return 'LoadTabeLocalInfile';
+            return 'LoadTableLocalInfile';
          else
             return 'LoadTableWithInsert';
      }
@@ -935,6 +948,7 @@ class ImportModel extends Gdn_Model {
 				$TableInfo = $this->ParseInfoLine($Line);
 				$Table = $TableInfo['Table'];
 				$Path = dirname($Path).DS.$Table.'.txt';
+            ini_set('auto_detect_line_endings', TRUE);
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;

@@ -23,7 +23,7 @@ $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'filecache';
-$Configuration['Cache']['Filecache']['Store']                   = CombinePaths(array(PATH_CACHE,'Filecache'));
+$Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
@@ -108,7 +108,7 @@ $Configuration['Preferences']['Email']['CommentMention']        = '0';
 // Begin - HtmlPurifier Settings
 $Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = FALSE;
 $Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
-$Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE . DS . 'HtmlPurifier';
+$Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE.'/HtmlPurifier';
 $Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
 $Configuration['HtmlPurifier']['Filter']['Vimeo']               = TRUE;
 $Configuration['HtmlPurifier']['Attr']['EnableID']              = TRUE;

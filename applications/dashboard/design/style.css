@@ -1,14 +1,11 @@
-@import url('reset.css') /* NoFollow */; 
 /*
 Welcome to the Generic Style CSS File! Some things you should know:
 
-1. The reset.css file imported above breaks all elements down to a base style.
-
-2. This file is included on all front-end/user-facing pages. Applications can
+1. This file is included on all front-end/user-facing pages. Applications can
    override this file in their own custom files (ie. vanilla.css or
    conversations.css).
 
-3. This file is broken down into the following sections:
+2. This file is broken down into the following sections:
    + General Styles & Typography
    + Header
    + Main Menu
@@ -19,8 +16,55 @@ Welcome to the Generic Style CSS File! Some things you should know:
    + Thumbnail Cropper
    + Footer
 */
-   
-   
+
+/* ================================================================ Reset CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   font-weight: inherit;
+   font-style: inherit;
+   font-size: 100%;
+   font-family: inherit;
+   vertical-align: baseline;
+}
+/* remember to define focus styles! */
+:focus {
+   outline: 0;
+}
+body {
+   line-height: 1;
+   color: black;
+   background: white;
+}
+ol, ul {
+   list-style: none;
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+   border-collapse: separate;
+   border-spacing: 0;
+}
+caption, th, td {
+   text-align: left;
+   font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+   content: "";
+}
+blockquote, q {
+   quotes: "" "";
+}
+
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
@@ -762,6 +806,13 @@ ul.PanelInfo div.Meta strong {
    -webkit-border-radius: 2px;
 	background: #FFFF00;
 	padding:2px 4px;
+}
+ul.PanelInfo li.Parent {
+	text-align: left;
+	font-weight: bold;
+	background: none;
+	color: #333;
+	padding: 2px 0;
 }
 ul.PanelInfo li.Active {
    background: #fff;

@@ -61,32 +61,36 @@ class EntryController extends Gdn_Controller {
          // All information is present, authenticate
          case Gdn_Authenticator::MODE_VALIDATE:
             
-            // Attempt to authenticate...
-            $AuthenticationResponse = $Authenticator->Authenticate();
-            switch ($AuthenticationResponse) {
-               case Gdn_Authenticator::AUTH_PERMISSION:
-                  $this->Form->AddError('ErrorPermission');
-               break;
-               
-               case Gdn_Authenticator::AUTH_DENIED:
-                  $this->Form->AddError('ErrorCredentials');
-               break;
-               
-               case Gdn_Authenticator::AUTH_INSUFFICIENT:
-                  // Unable to comply with auth request, more information is needed from user.
-                  $this->Form->AddError('ErrorInsufficient');
-               break;
-               
-               case Gdn_Authenticator::AUTH_PARTIAL:
-                  // Partial auth completed.
-                  $Reaction = $Authenticator->PartialResponse();
-               break;
-               
-               case Gdn_Authenticator::AUTH_SUCCESS:
-               default:
-                  // Full auth completed.
-                  $UserID = $AuthenticationResponse;
-                  $Reaction = $Authenticator->SuccessResponse();
+            // Attempt to authenticate.
+            try {
+               $AuthenticationResponse = $Authenticator->Authenticate();
+               switch ($AuthenticationResponse) {
+                  case Gdn_Authenticator::AUTH_PERMISSION:
+                     $this->Form->AddError('ErrorPermission');
+                  break;
+
+                  case Gdn_Authenticator::AUTH_DENIED:
+                     $this->Form->AddError('ErrorCredentials');
+                  break;
+
+                  case Gdn_Authenticator::AUTH_INSUFFICIENT:
+                     // Unable to comply with auth request, more information is needed from user.
+                     $this->Form->AddError('ErrorInsufficient');
+                  break;
+
+                  case Gdn_Authenticator::AUTH_PARTIAL:
+                     // Partial auth completed.
+                     $Reaction = $Authenticator->PartialResponse();
+                  break;
+
+                  case Gdn_Authenticator::AUTH_SUCCESS:
+                  default:
+                     // Full auth completed.
+                     $UserID = $AuthenticationResponse;
+                     $Reaction = $Authenticator->SuccessResponse();
+               }
+            } catch (Exception $Ex) {
+               $this->Form->AddError($Ex);
             }
          break;
       }
@@ -430,24 +434,24 @@ class EntryController extends Gdn_Controller {
    
    public function PasswordRequest() {
       $this->Form->SetModel($this->UserModel);
-      if (
-         $this->Form->IsPostBack() === TRUE
-         && $this->Form->ValidateModel() == 0)
-      {
-         try {
-            if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
-					$this->Form->AddError("Couldn't find an account associated with that email address.");
-				}
-         } catch (Exception $ex) {
-            $this->Form->AddError($ex->getMessage());
+      if ($this->Form->IsPostBack() === TRUE) {
+
+         if ($this->Form->ValidateModel() == 0) {
+            try {
+               if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
+                  $this->Form->AddError("Couldn't find an account associated with that email address.");
+               }
+            } catch (Exception $ex) {
+               $this->Form->AddError($ex->getMessage());
+            }
+            if ($this->Form->ErrorCount() == 0) {
+               $this->Form->AddError('Success!');
+               $this->View = 'passwordrequestsent';
+            }
+         } else {
+            if ($this->Form->ErrorCount() == 0)
+               $this->Form->AddError('That email address was not found.');
          }
-         if ($this->Form->ErrorCount() == 0) {
-            $this->Form->AddError('Success!');
-            $this->View = 'passwordrequestsent';
-         }
-      } else {
-			if ($this->Form->ErrorCount() == 0)
-				$this->Form->AddError('That email address was not found.');
       }
       $this->Render();
    }

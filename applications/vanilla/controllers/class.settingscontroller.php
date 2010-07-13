@@ -312,6 +312,7 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('categories.js');
       $this->AddJsFile('jquery.tablednd.js');
       $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('js/library/jquery.alphanumeric.js');
       $this->Title(T('Categories'));
       $this->CategoryData = $this->CategoryModel->GetAll('Sort');
       

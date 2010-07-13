@@ -13,8 +13,8 @@ $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
    'Version' => '1.0',
-   // 'SettingsUrl' => '/dashboard/settings/tags',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsUrl' => '/dashboard/settings/tagging',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
@@ -22,6 +22,16 @@ $PluginInfo['Tagging'] = array(
 
 class TaggingPlugin extends Gdn_Plugin {
    
+   /**
+    * Add the Tagging admin menu option.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $LinkText = T('Flagged Content');
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Forum', T('Forum'));
+      $Menu->AddLink('Forum', T('Tagging'), 'settings/tagging', 'Garden.Settings.Manage');
+   }
+
    /**
     * Display the tag module in a discussion.
     */
@@ -110,6 +120,9 @@ class TaggingPlugin extends Gdn_Plugin {
     * Save tags when saving a discussion.
     */
    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender) {
+      if (!C('Plugins.Tagging.Enabled'))
+         return;
+      
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
@@ -180,7 +193,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Should we limit the discussion query to a specific tagid?
     */
    public function DiscussionModel_BeforeGet_Handler($Sender) {
-      if (property_exists($Sender, 'FilterToTagID'))
+      if (C('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToTagID'))
          $Sender->SQL
             ->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$Sender->FilterToTagID)
             ->OrOp()
@@ -191,6 +204,9 @@ class TaggingPlugin extends Gdn_Plugin {
     * Validate tags when saving a discussion.
     */
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
+      if (!C('Plugins.Tagging.Enabled'))
+         return;
+      
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $Tags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       // Tags can only contain: a-z 0-9 + # _ .
@@ -228,7 +244,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add the tag input to the discussion form.
     */
    public function PostController_BeforeFormButtons_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
+      if (C('Plugins.Tagging.Enabled') && in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
       }
@@ -238,6 +254,9 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
     */
    public function PostController_Render_Before($Sender) {
+      if (!C('Plugins.Tagging.Enabled'))
+         return;
+      
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
       $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
       $Sender->Head->AddString('<script type="text/javascript">
@@ -255,16 +274,88 @@ class TaggingPlugin extends Gdn_Plugin {
    }
    
    /**
-    * TODO: Add tag management (let admins rename tags, remove tags, etc).
-    * Also manage the Plugins.Tagging.Required boolean setting that makes tagging required or not.
+    * Edit Tag form.
     */
-   public function SettingsController_Tags_Create($Sender) {
-      // Uncomment SettingsUrl above when finished.
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Tag Management');
-      $Sender->AddSideMenu('settings/tags');
-      $Sender->Form = new Gdn_Form();
-      $this->Dispatch($Sender, $Sender->RequestArgs);
+   public function SettingsController_EditTag_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title(T('Edit Tag'));
+      $Sender->AddSideMenu('settings/tagging');
+      $TagID = GetValue(0, $Sender->RequestArgs);
+      $TagModel = new Gdn_Model('Tag');
+      $Sender->Tag = $TagModel->GetWhere(array('TagID' => $TagID))->FirstRow();
+
+      // Set the model on the form.
+      $Sender->Form->SetModel($TagModel);
+
+      // Make sure the form knows which item we are editing.
+      $Sender->Form->AddHidden('TagID', $TagID);
+
+      if (!$Sender->Form->AuthenticatedPostBack()) {
+         $Sender->Form->SetData($Sender->Tag);
+      } else {
+         // Make sure the tag is valid
+         $Tag = $Sender->Form->GetFormValue('Name');
+         if (!ValidateRegex($Tag, '/^([\d\w\+-_.#]+)$/si'))
+            $Sender->Form->AddError('Tags can only contain the following characters: a-z 0-9 + # _ .');         
+         
+         // Make sure that the tag name is not already in use.
+         if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0)
+            $Sender->Form->AddError('The specified tag name is already in use.');
+         
+         if ($Sender->Form->Save())
+            $Sender->StatusMessage = T('Your changes have been saved successfully.');
+      }
+
+      $Sender->Render('plugins/Tagging/views/edittag.php');
+   }
+
+   /**
+    * Delete a Tag
+    */
+   public function SettingsController_DeleteTag_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+         $TagID = GetValue(0, $Sender->RequestArgs);
+         // Delete tag & tag relations.
+         $SQL = Gdn::SQL();
+         $SQL->Delete('TagDiscussion', array('TagID' => $TagID));
+         $SQL->Delete('Tag', array('TagID' => $TagID));
+      }
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      $Sender->Render();
+   }
+   
+   
+   /**
+    * Tag management (let admins rename tags, remove tags, etc).
+    * TODO: manage the Plugins.Tagging.Required boolean setting that makes tagging required or not.
+    */
+   public function SettingsController_Tagging_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Tagging');
+      $Sender->AddSideMenu('settings/tagging');
+      $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
+      $Sender->AddJSFile('plugins/Tagging/admin.js');
+      $SQL = Gdn::SQL();
+      $Sender->TagData = $SQL
+         ->Select('t.*')
+         ->From('Tag t')
+         ->OrderBy('t.CountDiscussions', 'desc')
+         ->OrderBy('t.Name', 'asc')
+         ->Get();
+         
+      $Sender->Render('plugins/Tagging/views/tagging.php');
+   }
+
+   /**
+    * Turn tagging on or off.
+    */
+   public function SettingsController_ToggleTagging_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
+         SaveToConfig('Plugins.Tagging.Enabled', C('Plugins.Tagging.Enabled') ? FALSE : TRUE);
+         
+      Redirect('settings/tagging');
    }
 
    /**
@@ -278,6 +369,9 @@ class TaggingPlugin extends Gdn_Plugin {
     * Adds the tag module to the page.
     */
    private function _AddTagModule($Sender) {
+      if (!C('Plugins.Tagging.Enabled'))
+         return;
+      
       $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
       include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');

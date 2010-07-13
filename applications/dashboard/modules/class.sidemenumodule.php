@@ -205,8 +205,10 @@ if (!class_exists('SideMenuModule', FALSE)) {
                   if ($GroupIsActive)
                      $Attributes['class'] = 'Active';
                      
-                  if ($GroupName != '')
-                     $Group = Wrap(Wrap(($GroupAnchor == '' ? $GroupName : Anchor($GroupName, $GroupAnchor)), 'h4', $Attributes).$Group, 'div', array('class' => 'Box Group'));
+                  if ($GroupName != '') {
+                     $GroupUrl = Url($GroupAnchor);
+                     $Group = Wrap(Wrap(($GroupAnchor == '' ? $GroupName : "<a href=\"$GroupUrl\">$GroupName</a>" /*Anchor($GroupName, $GroupAnchor)*/), 'h4', $Attributes).$Group, 'div', array('class' => 'Box Group'));
+                  }
                }
 
 

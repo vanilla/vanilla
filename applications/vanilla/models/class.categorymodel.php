@@ -136,8 +136,9 @@ class CategoryModel extends Gdn_Model {
 
    public function GetFull($CategoryID = '', $Permissions = FALSE) {
       $this->SQL
-         ->Select('c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
-         ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
+         ->Select('c.Name, c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
+         ->Select('p.CategoryID', '', 'ParentCategoryID')
+         ->Select('p.Name', '', 'ParentName')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1');

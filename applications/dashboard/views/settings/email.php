@@ -57,5 +57,11 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Garden.Email.SmtpPort', array('class' => 'SmallInput'));
       ?>
    </li>
+   <li>
+      <?php
+         echo $this->Form->Label('SMTP Security', 'Garden.Email.SmtpSecurity');
+         echo $this->Form->RadioList('Garden.Email.SmtpSecurity', array('' => 'None', 'ssl' => 'SSL', 'tls' => 'TLS'), array());
+      ?>
+   </li>
 </ul>
 <?php echo $this->Form->Close('Save');

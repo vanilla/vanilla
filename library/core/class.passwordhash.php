@@ -61,6 +61,9 @@ class Gdn_PasswordHash extends PasswordHash {
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);
             break;
+         case 'reset':
+            throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
+            break;
 			case 'vbulletin':
 				$Salt = trim(substr($StoredHash, -3, 3));
 				$VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - 3);

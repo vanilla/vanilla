@@ -203,9 +203,17 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed2);
                $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed2);
                $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed2);
-               $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\](.*?)\[/color\]#si",'<font color="\\1">\\2</font>',$Mixed2);
-               $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\](.*?)\[/size\]#si",'<font size="\\1">\\2</font>',$Mixed2);
+               $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
+
+               $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#i",'<span style="font-family:\\1;">',$Mixed2);
+               $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#i",'<span style="color:\\1">',$Mixed2);
+               $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</span>", $Mixed2);
+               
+               $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si",'<font size="\\1">',$Mixed2);
+               $Mixed2 = str_ireplace('[/font]', '</font>', $Mixed2);
+
                $Mixed2 = preg_replace('#\[/?left\]#si', '', $Mixed2);
+               $Mixed2 = Gdn_Format::Links($Mixed2);
                $Mixed2 = Gdn_Format::Mentions($Mixed2);
 					$Result = $Formatter->Format($Mixed2);
 					return $Result;

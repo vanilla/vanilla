@@ -108,11 +108,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
   // Close a jquery popup and release escape key bindings
   $.popup.close = function(settings, response) {
-    $(document).unbind('keydown.popup')
+    $(document).unbind('keydown.popup');
+    $('#'+settings.popupId).trigger('popupClose');
     $('.Overlay').remove();
-    $('#'+settings.popupId).remove();
-    if (settings)
-      settings.onUnload(settings, response);
     
     return false;
   }
@@ -152,7 +150,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       if (e.keyCode == 27)
         $.popup.close(settings);
     })    
-    
+
+    if (settings.onUnload) {
+      $('#'+settings.popupId).bind('popupClose',function(){
+          setTimeout(settings.onUnload,1);
+      });
+    }
+
     // Replace language definitions
     if (!settings.confirm) {
       $('#'+settings.popupId+' .Close').click(function() {

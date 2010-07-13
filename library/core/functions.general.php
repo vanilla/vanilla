@@ -912,8 +912,9 @@ if (!function_exists('ProxyHead')) {
          
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
          
+         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = array(
-            'Host'            => $Host,
+            'Host'            => $HostHeader,
             'User-Agent'      => 'Vanilla/2.0',
             'Accept'          => '*/*',
             'Accept-Charset'  => 'utf-8',
@@ -1034,14 +1035,15 @@ if (!function_exists('ProxyRequest')) {
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
+         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = "GET $Path?$Query HTTP/1.1\r\n"
-            ."Host: $Host\r\n"
+            ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
             ."User-Agent: Vanilla/2.0\r\n"
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n"
-            ."Referer: $Referer\r\n"
+            ."Referer: {$Referer}\r\n"
             ."Connection: close\r\n";
             
          if ($Cookie != '')

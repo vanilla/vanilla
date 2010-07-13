@@ -912,8 +912,9 @@ if (!function_exists('ProxyHead')) {
          
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
          
+         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = array(
-            'Host'            => $Host,
+            'Host'            => $HostHeader,
             'User-Agent'      => 'Vanilla/2.0',
             'Accept'          => '*/*',
             'Accept-Charset'  => 'utf-8',
@@ -1034,14 +1035,15 @@ if (!function_exists('ProxyRequest')) {
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
+         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = "GET $Path?$Query HTTP/1.1\r\n"
-            ."Host: $Host\r\n"
+            ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
             ."User-Agent: Vanilla/2.0\r\n"
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n"
-            ."Referer: $Referer\r\n"
+            ."Referer: {$Referer}\r\n"
             ."Connection: close\r\n";
             
          if ($Cookie != '')
@@ -1213,7 +1215,44 @@ if (!function_exists('SliceString')) {
    }
 }
 
+if (!function_exists('StringBeginsWith')) {
+   /** Checks whether or not string A begins with string B.
+    *
+    * @param string $A The main string to check.
+    * @param string $B The substring to check against.
+    * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
+    * @return bool
+    */
+   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE) {
+      if (strlen($A) < strlen($B))
+         return FALSE;
+      else
+         return substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+   }
+}
+
+if (!function_exists('StringEndsWith')) {
+   /** Checks whether or not string A ends with string B.
+    *
+    * @param string $A The main string to check.
+    * @param string $B The substring to check against.
+    * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
+    * @return bool
+    */
+   function StringEndsWith($A, $B, $CaseInsensitive = FALSE) {
+      if (strlen($A) < strlen($B))
+         return FALSE;
+      else
+         return substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+   }
+}
+
 if (!function_exists('StringIsNullOrEmpty')) {
+   /** Checks whether or not a string is null or an empty string (after trimming).
+    *
+    * @param string $String The string to check.
+    * @return bool
+    */
    function StringIsNullOrEmpty($String) {
       return is_null($String) === TRUE || (is_string($String) && trim($String) == '');
    }

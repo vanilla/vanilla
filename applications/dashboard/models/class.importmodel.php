@@ -420,6 +420,7 @@ class ImportModel extends Gdn_Model {
       $Line = FALSE;
       do {
          $s = fgets($fp);
+         //echo "<fgets>$s</fgets><br/>\n";
 
          if ($s === FALSE) {
             if ($Line === FALSE)
@@ -433,6 +434,7 @@ class ImportModel extends Gdn_Model {
       } while(strlen($s) > 1 && substr($s, -2, 1) === $Escape);
 
       $Line = trim($Line, "\n");
+      //echo "<Line>$Line</Line><br />\n";
 
       $Result = array();
 
@@ -483,6 +485,7 @@ class ImportModel extends Gdn_Model {
 		if(is_null($fpin)) {
 			if(!$this->ImportPath || !file_exists($this->ImportPath))
 				return array();
+         ini_set('auto_detect_line_endings', TRUE);
 			$fpin = gzopen($this->ImportPath, 'rb');
 			$fpopened = TRUE;
 		}
@@ -710,10 +713,11 @@ class ImportModel extends Gdn_Model {
 
 	public function LoadUserTable() {
 		$UserTableInfo =& $this->Data['Tables']['User'];
-		$this->LoadTable('User', $UserTableInfo['Path']);
-		$UserTableInfo['Loaded'] = TRUE;
+		$Result = $this->LoadTable('User', $UserTableInfo['Path']);
+      if ($Result)
+         $UserTableInfo['Loaded'] = TRUE;
 
-		return TRUE;
+		return $Result;
 	}
 
 	public function LoadState() {
@@ -730,9 +734,13 @@ class ImportModel extends Gdn_Model {
 				continue;
 			} else {
 				$this->Data['CurrentStepMessage'] = $Table;
-				$this->LoadTable($Table, $TableInfo['Path']);
-				$this->Data['Tables'][$Table]['Loaded'] = TRUE;
-				$LoadedCount++;
+				$LoadResult = $this->LoadTable($Table, $TableInfo['Path']);
+            if ($LoadResult) {
+               $this->Data['Tables'][$Table]['Loaded'] = TRUE;
+               $LoadedCount++;
+            } else {
+               break;
+            }
 			}
 			// Make sure the loading isn't taking too long.
 			if($this->Timer->ElapsedTime() > $this->MaxStepTime)
@@ -745,10 +753,10 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function LoadTable($Tablename, $Path) {
-      $PxTablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
-		Gdn::Database()->Query("truncate table $PxTablename;");
+      $Type = $this->LoadTableType();
+      $Result = TRUE;
 
-      switch ($this->LoadTableType()) {
+      switch ($Type) {
          case 'LoadTableOnSameServer':
             $this->_LoadTableOnSameServer($Tablename, $Path);
             break;
@@ -757,16 +765,20 @@ class ImportModel extends Gdn_Model {
             break;
          case 'LoadTableWithInsert':
             // This final option can be 15x slower than the other options.
-            $this->_LoadTableWithInsert($Tablename, $Path);
+            $Result = $this->_LoadTableWithInsert($Tablename, $Path);
             break;
+         default:
+            throw new Exception("@Error, unknown LoadTableType: $Type");
       }
 
-		return TRUE;
+		return $Result;
 	}
 
    protected function _LoadTableOnSameServer($Tablename, $Path) {
 		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
 		$Path = Gdn::Database()->Connection()->quote($Path);
+
+      Gdn::Database()->Query("truncate table $Tablename;");
 
       $Sql = "load data infile $Path into table $Tablename
          character set utf8
@@ -782,6 +794,8 @@ class ImportModel extends Gdn_Model {
 		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
 		$Path = Gdn::Database()->Connection()->quote($Path);
 
+      Gdn::Database()->Query("truncate table $Tablename;");
+
       $Sql = "load data local infile $Path into table $Tablename
          character set utf8
          columns terminated by ','
@@ -791,15 +805,20 @@ class ImportModel extends Gdn_Model {
          ignore 1 lines";
 
       // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-      $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Databas.Password'), FALSE, 128);
+      $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Database.Password'), FALSE, 128);
       mysql_select_db(C('Database.Name'), $dblink);
-      mysql_query($Sql, $dblink);
+      $Result = mysql_query($Sql, $dblink);
+      if ($Result === FALSE) {
+         $Ex = new Exception(mysql_error($dblink));
+         mysql_close($dblink);
+         throw new $Ex;
+      }
       mysql_close($dblink);
    }
 
    protected function _LoadTableWithInsert($Tablename, $Path) {
       // This option could take a while so set the timeout.
-      set_time_limit(60 * 5);
+      set_time_limit(60*5);
 
       // Get the column count of the table.
       $St = Gdn::Structure();
@@ -807,13 +826,23 @@ class ImportModel extends Gdn_Model {
       $ColumnCount = count($St->Columns());
       $St->Reset();
 
+      ini_set('auto_detect_line_endings', TRUE);
       $fp = fopen($Path, 'rb');
 
-      $PDO = Gdn::Database()->Connection();
-		$Tablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+      // Figure out the current position.
+      $fPosition = GetValue('CurrentLoadPosition', $this->Data, 0);
+      if ($fPosition == 0) {
+         // Skip the header row.
+         $Row = self::FGetCSV2($fp);
 
-      // Skip the header row.
-      $Row = self::FGetCSV2($fp);
+         $Px = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX;
+         Gdn::Database()->Query("truncate table {$Px}{$Tablename}");
+      } else {
+         fseek($fp, $fPosition);
+      }
+
+      $PDO = Gdn::Database()->Connection();
+		$PxTablename = Gdn::Database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
 
       $Inserts = '';
       $Count = 0;
@@ -835,18 +864,37 @@ class ImportModel extends Gdn_Model {
 
          if ($Count >= 25) {
             // Insert in chunks.
-            $Sql = "insert $Tablename values $Inserts";
+            $Sql = "insert $PxTablename values $Inserts";
             $this->Query($Sql);
             $Count = 0;
             $Inserts = '';
+
+            // Check for a timeout.
+            if($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+               // The step's taken too long. Save the file position.
+               $Pos = ftell($fp);
+               $this->Data['CurrentLoadPosition'] = $Pos;
+
+               $Filesize = filesize($Path);
+               if ($Filesize > 0) {
+                  $PercentComplete = $Pos / filesize($Path);
+                  $this->Data['CurrentStepMessage'] = $Tablename.' ('.round($PercentComplete * 100.0).'%)';
+               }
+
+               fclose($fp);
+               return FALSE;
+            }
          }
       }
       fclose($fp);
 
       if (strlen($Inserts) > 0) {
-         $Sql = "insert $Tablename values $Inserts";
+         $Sql = "insert $PxTablename values $Inserts";
          $this->Query($Sql);
       }
+      unset($this->Data['CurrentLoadPosition']);
+      unset($this->Data['CurrentStepMessage']);
+      return TRUE;
    }
 
    public function LoadTableType() {
@@ -857,7 +905,7 @@ class ImportModel extends Gdn_Model {
          $Sql = "show variables like 'local_infile'";
          $Data = $this->Query($Sql)->ResultArray();
          if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
-            return 'LoadTabeLocalInfile';
+            return 'LoadTableLocalInfile';
          else
             return 'LoadTableWithInsert';
      }
@@ -935,6 +983,7 @@ class ImportModel extends Gdn_Model {
 				$TableInfo = $this->ParseInfoLine($Line);
 				$Table = $TableInfo['Table'];
 				$Path = dirname($Path).DS.$Table.'.txt';
+            ini_set('auto_detect_line_endings', TRUE);
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;
@@ -1074,6 +1123,15 @@ class ImportModel extends Gdn_Model {
             on d.LastCommentID = c.CommentID
          set d.DateLastComment = c.DateInserted";
       }
+      if (!$this->ImportExists('Discussion', 'CountBookmarks')) {
+         $Sqls['Discussion.CountBookmarks'] = "update :_Discussion d
+            set CountBookmarks = (
+               select count(ud.DiscussionID)
+               from :_UserDiscussion ud
+               where ud.Bookmarked = 1
+                  and ud.DiscussionID = d.DiscussionID
+            )";
+      }
 
       if(!$this->ImportExists('Discussion', 'LastCommentUserID')) {
          $Sqls['Discussion.LastCommentUseID'] = "update :_Discussion d
@@ -1157,6 +1215,27 @@ class ImportModel extends Gdn_Model {
       }
       if (!$this->ImportExists('User', 'CountComments')) {
          $Sqls['User.CountComments'] = $this->GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID');
+      }
+      if (!$this->ImportExists('User', 'CountBookmarks')) {
+         $Sqls['User.CountBookmarks'] = "update :_User u
+            set CountBookmarks = (
+               select count(ud.DiscussionID)
+               from :_UserDiscussion ud
+               where ud.Bookmarked = 1
+                  and ud.UserID = u.UserID
+            )";
+      }
+      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
+         $Sqls['User.CountUnreadConversations'] =
+            'update :_User u
+            set u.CountUnreadConversations = (
+              select count(c.ConversationID)
+              from :_Conversation c
+              inner join :_UserConversation uc
+                on c.ConversationID = uc.ConversationID
+              where uc.UserID = u.UserID
+                and uc.CountReadMessages < c.CountMessages
+            )';
       }
 
       // The updates start here.

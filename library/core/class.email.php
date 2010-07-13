@@ -103,11 +103,15 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = FALSE) {
-      if ($SenderEmail == '')
-         $SenderEmail = Gdn::Config('Garden.Email.SupportAddress', '');
+      if ($SenderEmail == '') {
+         $SenderEmail = C('Garden.Email.SupportAddress', '');
+         if (!$SenderEmail) {
+            $SenderEmail = 'noreply@'.Gdn::Request()->Domain();
+         }
+      }
 
       if ($SenderName == '')
-         $SenderName = Gdn::Config('Garden.Email.SupportName', '');
+         $SenderName = C('Garden.Email.SupportName', C('Garden.Title', ''));
       
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
       

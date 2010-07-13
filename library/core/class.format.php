@@ -403,7 +403,7 @@ class Gdn_Format {
             // nl2br
             $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
-            $Result = $Formatter->Format($Mixed);
+            $Result = $Mixed; //$Formatter->Format($Mixed);
 
 //            $Result = $Result.
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
@@ -590,8 +590,10 @@ EOT;
       if (is_string($Mixed)) {
          if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
-         } else if (function_exists($FormatMethod)) {
+         } elseif (function_exists($FormatMethod)) {
             $Mixed = $FormatMethod($Mixed);
+         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {;
+            $Mixed = $Formatter->Format($Mixed);
          } else {
             $Mixed = Gdn_Format::Text($Mixed);
          }

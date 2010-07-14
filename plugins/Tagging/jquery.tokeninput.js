@@ -8,6 +8,14 @@
  *
  */
 
+/* ie7 & ie8 don't support jQuery.trim(). */
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/, ''); 
+  }
+}
+
+
 (function($) {
 
 $.fn.tokenInput = function (url, options) {

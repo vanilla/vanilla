@@ -131,8 +131,8 @@ jQuery(document).ready(function($) {
 
    // If a page loads with a hidden redirect url, go there after a few moments.
    var RedirectUrl = gdn.definition('RedirectUrl', '');
-//   if (RedirectUrl != '')
-//      setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+   if (RedirectUrl != '')
+      setTimeout("document.location = '"+RedirectUrl+"';", 2000);
 
    // Make tables sortable if the tableDnD plugin is present.
    if ($.tableDnD)

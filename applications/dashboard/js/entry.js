@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
       if (email != '') {
          var checkUrl = gdn.combinePaths(
             gdn.definition('WebRoot', ''),
-            'index.php?/p=dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x'
+            'index.php?p=/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x'
          );
          $.ajax({
             type: "GET",

@@ -33,7 +33,7 @@ foreach ($this->MessageData->Result() as $Message) {
          <span class="DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
          <span class="ItemLink"><a name="Item_<?php echo $CurrentOffset;?>" class="Item"></a></span>
       </div>
-      <div class="Message"><?php echo Gdn_Format::To($Message->Body, $Format); ?></div>
+      <div class="Message"><p><?php echo Gdn_Format::To($Message->Body, $Format); ?></p></div>
    </div>
 </li>
 <?php }

@@ -147,6 +147,7 @@ class Gdn_LibraryMap {
    }
    
    public static function SafeCache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
+      self::PrepareCache($CacheName);
       return self::Cache($CacheName, str_replace('.','__',$CacheKey), $CacheContents, $CacheWrite);
    }
    

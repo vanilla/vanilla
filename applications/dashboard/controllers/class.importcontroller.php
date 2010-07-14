@@ -125,7 +125,7 @@ class ImportController extends DashboardController {
             else
                $TmpFile = '';
 
-            if($TmpFile) {
+            if ($TmpFile) {
                $Filename = $_FILES['ImportFile']['name'];
                $Extension = pathinfo($Filename, PATHINFO_EXTENSION);
                $TargetFolder = PATH_ROOT . DS . 'uploads' . DS . 'import';
@@ -135,16 +135,21 @@ class ImportController extends DashboardController {
                $ImportPath = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads' . DS . 'import', $Extension);
                $Upload->SaveAs($TmpFile, $ImportPath);
                $Imp->ImportPath = $ImportPath;
+               $this->Form->SetFormValue('PathSelect', $ImportPath);
 
                $UploadedFiles = GetValue('UploadedFiles', $Imp->Data);
                $UploadedFiles[$ImportPath] = basename($Filename);
                $Imp->Data['UploadedFiles'] = $UploadedFiles;
-            } elseif ($PathSelect = $this->Form->GetFormValue('PathSelect')) {
-               $Imp->ImportPath = $PathSelect;
-            } elseif(!$Imp->ImportPath && count($ImportPaths) == 0) {
+            } elseif (($PathSelect = $this->Form->GetFormValue('PathSelect'))) {
+               if ($PathSelect == 'NEW')
+                  $Validation->AddValidationResult('ImportFile', 'ValidateRequired');
+               else
+                  $Imp->ImportPath = $PathSelect;
+            } elseif (!$Imp->ImportPath && count($ImportPaths) == 0) {
                // There was no file uploaded this request or before.
                $Validation->AddValidationResult('ImportFile', $Upload->Exception);
             }
+
             // Validate the overwrite.
             if(TRUE || strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
                $Validation->ApplyRule('Email', 'Required');

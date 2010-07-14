@@ -206,7 +206,7 @@ if (!class_exists('HeadModule', FALSE)) {
       }
    
       public function ToString() {
-         $Head = '<title>'.Gdn_Format::Text($this->Title()).'</title>';
+         $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
 
          // Add the canonical Url if necessary.
          if (method_exists($this->_Sender, 'CanonicalUrl')) {

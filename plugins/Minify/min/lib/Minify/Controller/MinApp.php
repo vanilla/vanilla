@@ -112,7 +112,7 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
                 if (false === $file) {
                     $this->log("Path \"{$path}\" failed realpath()");
                     return $options;
-                } elseif (! parent::_fileIsSafe($file, $allowDirs)) {
+                } elseif (! parent::_fileIsSafe($path, $allowDirs) && ! parent::_fileIsSafe($file, $allowDirs)) { // tburry: changed this for our structure.
                     $this->log("Path \"{$path}\" failed Minify_Controller_Base::_fileIsSafe()");
                     return $options;
                 } else {

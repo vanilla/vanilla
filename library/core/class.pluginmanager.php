@@ -442,7 +442,7 @@ class Gdn_PluginManager {
       // $EnabledPlugins['PluginClassName'] = 'Plugin Folder Name';
       $PluginInfo = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
       $PluginFolder = ArrayValue('Folder', $PluginInfo);
-      SaveToConfig('EnabledPlugins'.'.'.$PluginName, $PluginFolder);
+      SaveToConfig('EnabledPlugins.'.$PluginName, $PluginFolder);
       
       $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();

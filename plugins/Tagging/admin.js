@@ -1,10 +1,9 @@
-// This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
    
    $('a.TagName').popup({
-      onUnload: function(settings) {
+      onUnload: function() {
          $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?p=/dashboard/settings/tagging&DeliveryType=VIEW'));
-      }   
+      }
    });
    
    // Confirm deletes before performing them

@@ -46,13 +46,15 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
          <?php
             if ($CountUnreadComments > 0 && $Session->IsValid())
                echo '<strong>',trim(sprintf(T('%s new'), $CountUnreadComments)),'</strong>';
+
+            if ($Discussion->LastCommentID != '') {
+               echo Wrap(sprintf(T('Most recent by %1$s'), UserAnchor($Last)));
+               echo Wrap(Gdn_Format::Date($Discussion->LastDate));
+            } else {
+               echo Wrap(sprintf(T('Started by %1$s'), UserAnchor($First)));
+               echo Wrap(Gdn_Format::Date($Discussion->FirstDate));
+            }
          ?>
-         <span><?php
-            if ($Discussion->LastCommentID != '')
-               printf(T('Most recent by %1$s %2$s'), UserAnchor($Last), Gdn_Format::Date($Discussion->LastDate));
-            else
-               printf(T('Started by %1$s %2$s'), UserAnchor($First), Gdn_Format::Date($Discussion->FirstDate));
-         ?></span>
          <span><?php echo Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'); ?></span>
          <?php $Sender->FireEvent('DiscussionMeta'); ?>
       </div>

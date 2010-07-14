@@ -798,14 +798,21 @@ ul.PanelInfo div.Meta span a {
    margin-left: 8px;
 }
 ul.PanelInfo div.Meta strong {
-   font-weight: normal;
-   display: inline;
-   padding: 1px 3px;
+	display: inline;
    border-radius: 2px;
-	-moz-border-radius: 2px;
+   -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	background: #FFFF00;
-	padding:2px 4px;
+	/*
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	*/
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
 }
 ul.PanelInfo li.Parent {
 	text-align: left;
@@ -1049,17 +1056,26 @@ ul.DataList div.Excerpt p {
 	display: inline;
 	padding: 0;
 }
+/* ul.DataList div.Meta span a, */
 ul.DataList div.Meta span,
-ul.DataList div.Meta span a,
 ul.DataList div.Meta strong {
    margin-right: 12px;
 }
 ul.DataList div.Meta strong {
-   background: #ffff00;
-   padding: 1px 4px;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+	/*
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	*/
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
 }
 ul.DataList div.Meta a {
    color: #2b2d33;
@@ -1090,12 +1106,14 @@ ul.DataList a.Delete:focus {
 ul.DataList div.Photo {
 	float: left;
 	padding: 0 10px 0 0;
+	font-size: 11px;
 }
 ul.DataList div.Photo img {
 	display: block;
 	height: 43px;
 	width: 43px;
 	overflow: hidden;
+	background: #eee;
 }
 ul.Condensed li,
 li.Condensed {
@@ -1109,10 +1127,13 @@ li.Condensed div.Title {
 	padding: 0;
 }
 ul.Condensed div.Excerpt,
-li.Condensed div.Excerpt,
+li.Condensed div.Excerpt {
+	display: inline;
+}
 ul.Condensed div.Excerpt a,
 li.Condensed div.Excerpt a {
-	display: inline;
+	display: block;
+	padding: 3px 0;
 }
 
 /* =============================================================== Activities */
@@ -1179,8 +1200,10 @@ ul.Activities ul.DataList div.Excerpt p {
 	font-size: 13px;
 	line-height: 1;
 }
+ul.HasPhoto div.Excerpt,
 ul.HasPhoto div.Meta {
-	padding-left: 49px;
+	padding-left: 49px !important;
+	display: block;
 }
 ul.Activities ul.DataList .HasPhoto div.Meta {
 	padding: 2px 0 0;
@@ -2221,11 +2244,15 @@ ul.Conversations li.Active {
   cursor: pointer;
   background: #ffe;
 }
-ul.Conversations li.HasPhoto {
+ul.Conversations li.Item {
 	padding: 4px 5px;
 }
 ul.Conversations div.ItemContent {
    margin:0 0 0 5px;
+}
+ul.Conversations div.Meta a.Name {
+	color: #1E79A7;
+	font-weight: bold;
 }
 
 

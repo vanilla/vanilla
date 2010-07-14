@@ -10,15 +10,18 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
+   $Message = SliceString(Gdn_Format::Text($Conversation->LastMessage), 100);
+   if (StringIsNullOrEmpty(trim($Message)))
+      $Message = T('Blank Message');
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php if ($LastPhoto != '') { ?>
    <div class="Photo"><?php echo $LastPhoto; ?></div>
    <?php } ?>
    <div class="ItemContent Conversation">
-      <?php echo UserAnchor($LastAuthor, 'Name Title'); ?>
-      <div class="Excerpt"><?php echo Anchor(SliceString(Gdn_Format::Text($Conversation->LastMessage), 100), '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
+      <div class="Excerpt"><?php echo Anchor($Message, '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
       <div class="Meta">
+         <span><?php echo UserAnchor($LastAuthor, 'Name'); ?></span>
          <span><?php echo Gdn_Format::Date($Conversation->DateLastMessage); ?></span>
          <span><?php printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages); ?></span>
          <?php

@@ -8,7 +8,7 @@
 <?php
 if ($this->ConversationData->NumRows() > 0) {
 ?>
-<ul class="Condensed DataList HasPhoto Conversations">
+<ul class="Condensed DataList Conversations">
    <?php
    $ViewLocation = $this->FetchViewLocation('conversations');
    include($ViewLocation);

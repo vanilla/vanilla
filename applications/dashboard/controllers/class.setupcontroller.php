@@ -202,7 +202,7 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             try {
-               $Query = Gdn::Request()->Url("entry", TRUE);
+               $Query = Gdn::Request()->Domain().'/entry';
                $Results = ProxyHead($Query, array(), 1);
                $CanRewrite = FALSE;
                if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {

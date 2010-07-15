@@ -58,7 +58,7 @@ class Gdn_Request {
    }
    
    /**
-    * Gets/Sets the domain from the current url. e.g. "http://localhost/" in
+    * Gets/Sets the domain from the current url. e.g. "http://localhost" in
     * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @param $Domain optional value to set

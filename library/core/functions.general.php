@@ -864,7 +864,7 @@ if (!function_exists('ProxyHead')) {
       $Query = GetValue('query', $UrlParts, '');
       
       // Get the cookie.
-      $Cookie = array('Cookie'      => '');
+      $Cookie = '';
       $EncodeCookies = C('Garden.Cookie.Urlencode',TRUE);
       
       foreach($_COOKIE as $Key => $Value) {
@@ -877,6 +877,7 @@ if (!function_exists('ProxyHead')) {
          $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
          $Cookie .= "{$Key}={$EValue}";
       }
+      $Cookie = array('Cookie' => $Cookie);
       
       $Response = '';
       if (function_exists('curl_init')) {

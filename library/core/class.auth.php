@@ -88,7 +88,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       return $this->_Authenticator;
    }
    
-   public function ReplaceAuthPlaceholders($PlaceholderString) {
+   public function ReplaceAuthPlaceholders($PlaceholderString, $ExtraReplacements = array()) {
       $Replacements = array_merge(array(
          'Session_TransientKey'     => '',
          'Username'                 => '',
@@ -97,7 +97,7 @@ class Gdn_Auth extends Gdn_Pluggable {
          'Session_TransientKey'     => Gdn::Session()->TransientKey(),
          'Username'                 => Gdn::Session()->User->Name,
          'UserID'                   => Gdn::Session()->User->UserID
-      ) : array()));
+      ) : array()),$ExtraReplacements);
       return Gdn_Format::VanillaSprintf($PlaceholderString, $Replacements);
    }
    
@@ -273,6 +273,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       return $this->_GetURL(Gdn_Authenticator::URL_SIGNOUT, $Redirect);
    }
    
+   public function GetURL($URLType, $Redirect) { return $this->_GetURL($URLType, $Redirect); }
    protected function _GetURL($URLType, $Redirect) {
       $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
       $AuthenticationScheme = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
@@ -284,11 +285,15 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
       
       $Return = $Authenticator->GetURL($URLType);
-
-      if (!$Return)
-         $Return = sprintf(Gdn::Config('Garden.Authenticator.'.$URLType), $AuthenticationScheme, $Redirect);
+      if (!$Return) $Return = Gdn::Config('Garden.Authenticator.'.$URLType);
       
-      $Return = $this->ReplaceAuthPlaceholders($Return);
+      $FullRedirect = Url($Redirect, TRUE);
+      $Return = sprintf($Return, $AuthenticationScheme, $Redirect, $FullRedirect);
+      $Return = $this->ReplaceAuthPlaceholders($Return, array(
+         'Path'      => $Redirect,
+         'Redirect'  => $FullRedirect,
+         'Scheme'    => $AuthenticationScheme
+      ));
       if ($this->Protocol() == 'https')
          $Return = str_replace('http:', 'https:', Url($Return, TRUE));
       

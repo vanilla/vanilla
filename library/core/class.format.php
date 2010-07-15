@@ -403,7 +403,7 @@ class Gdn_Format {
             // nl2br
             $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
-            $Result = $Mixed; //$Formatter->Format($Mixed);
+            $Result = $Formatter->Format($Mixed);
 
 //            $Result = $Result.
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".

@@ -20,7 +20,7 @@
          }
 
          if ($CountUnreadComments > 0 || $CountUnreadComments === '')
-            echo '<strong>'.trim(sprintf('%s new', $CountUnreadComments)).'</strong>';
+            echo '<strong>'.Plural($CountUnreadComments, '%s new', '%s new').'</strong>';
             
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;

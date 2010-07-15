@@ -48,7 +48,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                if ($CountUnreadComments == $Discussion->CountComments)
                   echo '<strong>'.T('New').'</strong>';
                else if ($CountUnreadComments > 0)
-                  echo '<strong>'.trim(sprintf(T('%s new'), $CountUnreadComments)).'</strong>';
+                  echo '<strong>'.Plural($CountUnreadComments, '%s new', '%s new').'</strong>';
             }
 
             if ($Discussion->LastCommentID != '') {

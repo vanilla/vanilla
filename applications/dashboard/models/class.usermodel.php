@@ -432,15 +432,8 @@ class UserModel extends Gdn_Model {
          if (is_numeric($InsertRoleID))
             $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleID));
       }      
-      
-      // 3. Figure out the ID that is a combination of all of the roles.
-      $CacheRoleID = 0;
-      foreach($RoleIDs as $RoleID) {
-         $CacheRoleID = $CacheRoleID | $RoleID;
-      }
 
-
-      // 4. Remove the cached permissions for this user.
+      // 3. Remove the cached permissions for this user.
       // Note: they are not reset here because I want this action to be
       // performed in one place - /dashboard/library/core/class.session.php
       // It is done in the session because when a role's permissions are changed
@@ -959,7 +952,6 @@ class UserModel extends Gdn_Model {
             'DateUpdated' => null,
             'HourOffset' => '0',
             'Score' => null,
-            'CacheRoleID' => null,
             'Admin' => 0,
             'Deleted' => 1
             ))

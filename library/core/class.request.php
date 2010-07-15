@@ -683,8 +683,11 @@ class Gdn_Request {
          $Path = str_replace('?', '&', $Path);
       }
 
-      if($Path == '')
-         $Path = $this->Path();
+      if($Path == '') {
+         $PathParts = explode('/', $this->Path());
+         $PathParts = array_map('urlencode', $PathParts);
+         $Path = implode('/', $PathParts);
+      }
       $Parts[] = trim($Path, '/');
 
       $Result = implode('/', $Parts);

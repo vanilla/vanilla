@@ -118,12 +118,18 @@ class Gdn_Locale extends Gdn_Pluggable {
          $LocaleSources = array();
          // Get application-based locale definition files
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName.'.php')), $ApplicationWhiteList);
+         if ($ApplicationLocaleSources !== FALSE)
+            $LocaleSources = array_merge($LocaleSources, $ApplicationLocaleSources);
+
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
          if ($ApplicationLocaleSources !== FALSE)
-            $LocaleSources = $ApplicationLocaleSources;
+            $LocaleSources = array_merge($LocaleSources, $ApplicationLocaleSources);
 
          // Get plugin-based locale definition files
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName.'.php')), $PluginWhiteList);
+         if ($PluginLocaleSources !== FALSE)
+            $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+            
          $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);

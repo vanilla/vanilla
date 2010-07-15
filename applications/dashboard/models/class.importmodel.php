@@ -712,6 +712,8 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function LoadUserTable() {
+      if (!$this->ImportExists('User'))
+         throw new Gdn_UserException(T('The user table was not in the import file.'));
 		$UserTableInfo =& $this->Data['Tables']['User'];
 		$Result = $this->LoadTable('User', $UserTableInfo['Path']);
       if ($Result)
@@ -966,7 +968,10 @@ class ImportModel extends Gdn_Model {
 		}
 
       $RowCount = 0;
+      $LineNumber = 0;
 		while(($Line = fgets($fpin)) !== FALSE) {
+         $LineNumber++;
+
 			if($Line == "\n") {
 				if($fpout) {
 					// We are in a table so close it off.
@@ -981,6 +986,9 @@ class ImportModel extends Gdn_Model {
 			} else {
 				// This is the start of a table.
 				$TableInfo = $this->ParseInfoLine($Line);
+            if (!array_key_exists('Table', $TableInfo)) {
+               throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
+            }
 				$Table = $TableInfo['Table'];
 				$Path = dirname($Path).DS.$Table.'.txt';
             ini_set('auto_detect_line_endings', TRUE);
@@ -991,6 +999,7 @@ class ImportModel extends Gdn_Model {
 
 				// Get the column headers from the next line.
 				if(($Line = fgets($fpin)) !== FALSE) {
+               $LineNumber++;
 					fputs($fpout, $Line);
 					$Columns = $this->ParseInfoLine($Line);
 					$TableInfo['Columns'] = $Columns;
@@ -1002,6 +1011,11 @@ class ImportModel extends Gdn_Model {
 		gzclose($fpin);
 		if($fpout)
 			gzclose($fpout);
+
+      if (count($Tables) == 0) {
+         throw new Gdn_UserException(T('The import file does not contain any data.'));
+      }
+
 		$this->Data['Tables'] = $Tables;
 
 		return TRUE;

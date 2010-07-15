@@ -230,14 +230,6 @@ class RoleModel extends Gdn_Model {
       $PermissionModel = Gdn::PermissionModel();
       $PermissionModel->Delete($RoleID);
       
-      // Remove the cached permissions for all users with this role.
-      $this->SQL->Update('User')
-         ->Join('UserRole', 'User.UserID = UserRole.UserID')
-         ->Set('Permissions', '')
-         ->Set('CacheRoleID', NULL)
-         ->Where(array('UserRole.RoleID' => $RoleID))
-         ->Put();
-      
       // Remove the role
       $this->SQL->Delete('Role', array('RoleID' => $RoleID));
    }

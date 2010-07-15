@@ -52,7 +52,7 @@ echo $this->Form->Errors();
 		<?php
 		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
 		echo '<div class="Warning">',
-		T('Garden.Import.Overwrite.Desciption', '<b>Warning</b>: All of the user and discussion data in this forum will be overwritten. You must choose a new admin user from the import data below.'),
+		T('Garden.Import.Overwrite.Desciption', 'Warning: All data in this forum will be overwritten. Enter the username and password of the admin user from the data being imported.'),
 		'</div>';
 		
 		echo $this->Form->Label('Email', 'Email'),

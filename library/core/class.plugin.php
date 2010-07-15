@@ -62,6 +62,11 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
       }
       
       if (method_exists($this, $ControllerMethod)) {
+/*
+         if (sizeof($Sender->RequestArgs))
+            array_shift($Sender->RequestArgs);
+*/
+            
          $Sender->Plugin = $this;
          return call_user_func(array($this,$ControllerMethod),$Sender);
       }

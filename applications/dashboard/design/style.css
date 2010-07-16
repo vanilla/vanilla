@@ -2143,6 +2143,9 @@ div.CommentForm a.Back,
 div.CommentForm a.Cancel {
    float: left;
 }
+#DiscussionForm a.Cancel {
+	margin-left: 18px;
+}
 #DiscussionForm ul {
    margin: 0 0 20px;
 }

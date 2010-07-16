@@ -41,11 +41,11 @@ if (!function_exists('Anchor')) {
       if ($Attributes == '')
          $Attributes = array();
 			
-		$SSL = GetValue('SSL', $Attributes);
+		$SSL = GetValue('SSL', $Attributes, NULL);
 		if ($SSL)
 			unset($Attributes['SSL']);
 		
-		$WithDomain = GetValue('WithDomain', $Attributes);
+		$WithDomain = GetValue('WithDomain', $Attributes, FALSE);
 		if ($WithDomain)
 			unset($Attributes['WithDomain']);
 
@@ -102,7 +102,7 @@ if (!function_exists('Img')) {
  */
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return T($Number == 1 ? $Singular : $Plural);
+      return sprintf(T($Number == 1 ? $Singular : $Plural), $Number);
    }
 }
 

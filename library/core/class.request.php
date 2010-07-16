@@ -298,23 +298,15 @@ class Gdn_Request {
     * @return void
     */
    protected function _LoadEnvironment() {
-   
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
       $this->_EnvironmentElement('ConfigStrips', Gdn::Config('Garden.StripWebRoot', FALSE));
 
-      if (!isset($_SERVER['SHELL'])) {
-         $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? ArrayValue('HTTP_HOST',$_SERVER) : ArrayValue('SERVER_NAME',$_SERVER));
-         $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? ArrayValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
-         
-         $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
-      } else {
-         $this->RequestScheme('console');
-      }
+      $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? ArrayValue('HTTP_HOST',$_SERVER) : ArrayValue('SERVER_NAME',$_SERVER));
+      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? ArrayValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
+      $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
       
-      if ($this->RequestScheme() != "console" && is_array($_GET)) {
+      if (is_array($_GET)) {
          $Get = FALSE;
-//         if (is_array($_SERVER) && isset($_SERVER['QUERY_STRING']))
-//            $Get =& $_SERVER['QUERY_STRING'];
          if ($Get === FALSE) $Get =& $_GET;
          if (!is_array($Get)) {
             $Original = array();
@@ -659,9 +651,13 @@ class Gdn_Request {
          // And make sure to use ssl or not
          if ($SSL) {
             $Path = str_replace('http:', 'https:', $Path);
+            $Scheme = 'https';
          } else {
             $Path = str_replace('https:', 'http:', $Path);
+            $Scheme = 'http';
          }
+      } else {
+         $Scheme = $this->Scheme();
       }
       
       if (strpos($Path, '://') !== FALSE)
@@ -670,7 +666,7 @@ class Gdn_Request {
       $Parts = array();
 
       if ($WithDomain) {
-         $Parts[] = $this->Domain();
+         $Parts[] = $Scheme.'://'.$this->Host();
       } else
          $Parts[] = '';
 

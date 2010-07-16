@@ -85,6 +85,15 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
+            // If there is a redirect url, go to it
+            if (json.RedirectUrl != null && json.RedirectUrl.trim() != '') {
+               resetCommentForm(btn);
+               clearCommentForm(btn);               
+               window.location.replace(json.RedirectUrl);
+               window.location.reload();
+               return false;
+            }
+            
             var processedTargets = false;
             // If there are targets, process them
             if (json.Targets && json.Targets.length > 0) {
@@ -139,17 +148,17 @@ jQuery(document).ready(function($) {
                } else if (existingCommentRow.length > 0) {
                   existingCommentRow.after(json.Data).remove();
                   $('#Comment_' + commentID).effect("highlight", {}, "slow");
-               } else {   
+               } else {
                   gdn.definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
-                  $(json.Data).appendTo('ul.Discussion').effect("highlight", {}, "slow");
+                  $(json.Data).appendTo('ul.Discussion');
+                  $('ul.Discussion li:last').effect("highlight", {}, "slow");
                }
-               
                // Remove any "More" pager links
                $('#PagerMore').remove();
-               
+
                // Let listeners know that the comment was added.
-               $(this).trigger('CommentAdded');
+               $(frm).trigger('CommentAdded');
                $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);

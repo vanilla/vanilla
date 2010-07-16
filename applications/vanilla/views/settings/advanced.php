@@ -20,7 +20,14 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         $Options = array('0' => 'Authors cannot edit their posts', '350' => 'Authors can edit for 5 minutes after posting', '900' => 'Authors can edit for 15 minutes after posting', '1800' => 'Authors can edit for 30 minutes after posting', '-1' => 'Authors can always edit their posts');
+         $Options = array('0' => 'Authors cannot edit their posts',
+                        '350' => 'Authors can edit for 5 minutes after posting', 
+                        '900' => 'Authors can edit for 15 minutes after posting', 
+                       '1800' => 'Authors can edit for 30 minutes after posting',
+                      '86400' => 'Authors can edit for 1 day after posting',
+                     '604800' => 'Authors can edit for 1 week after posting',
+                    '2592000' => 'Authors can edit for 1 month after posting',
+                         '-1' => 'Authors can always edit their posts');
          $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
          echo $this->Form->Label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
          echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);

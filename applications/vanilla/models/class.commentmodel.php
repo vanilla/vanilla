@@ -9,6 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class CommentModel extends VanillaModel {
+	
+	public $OrderBy = 'c.DateInserted';
+	public $OrderDirection = 'asc';
+	
    /**
     * Class constructor.
     */
@@ -42,7 +46,7 @@ class CommentModel extends VanillaModel {
       $this->FireEvent('BeforeGet');
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
-         ->OrderBy('c.DateInserted', 'asc')
+         ->OrderBy($this->OrderBy, $this->OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
    }
@@ -160,13 +164,22 @@ class CommentModel extends VanillaModel {
          ->FirstRow();
    }
    
+   public function GetIDData($CommentID) {
+      $this->CommentQuery(FALSE);
+      return $this->SQL
+         ->Where('c.CommentID', $CommentID)
+         ->Get();
+   }
+   
    public function GetNew($DiscussionID, $LastCommentID) {
       $this->CommentQuery();      
+		$Operator = $this->OrderDirection == 'asc' ? '>' : '<';
+		$this->EventArguments['Operator'] = &$Operator;
       $this->FireEvent('BeforeGetNew');
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
-         ->Where('c.CommentID >', $LastCommentID)
-         ->OrderBy('c.DateInserted', 'asc')
+         ->Where('c.CommentID '.$Operator, $LastCommentID)
+         ->OrderBy($this->OrderBy, $this->OrderDirection)
          ->Get();
    }
    

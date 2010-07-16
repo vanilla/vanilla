@@ -293,15 +293,13 @@ class PostController extends VanillaController {
                   $this->Comment->DateInserted = Gdn_Format::Date();
                   $this->Comment->Body = ArrayValue('Body', $FormValues, '');
                   $this->View = 'preview';
-               } elseif (!$Draft) {
-               // If the comment was not a draft
-                  // If adding a comment 
+               } elseif (!$Draft) { // If the comment was not a draft
+                  // If Editing a comment 
                   if ($Editing) {
                      // Just reload the comment in question
-                     $this->Offset = $this->Comment = $this->CommentModel->GetOffset($CommentID);
-                     $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, 1, $this->Offset-1), true);
+                     $this->Offset = 1;
+                     $this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
                      // Load the discussion
-                     // $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
                      
@@ -313,47 +311,23 @@ class PostController extends VanillaController {
                      if (!is_numeric($LastCommentID))
                         $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
                      
-                     // Make sure the view knows the current offset
-                     // $this->Offset = $this->Comment = $this->CommentModel->GetOffset($LastCommentID);
                      // Don't reload the first comment if this new comment is the first one.
                      $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
                      // Do not load more than a single page of data...
                      $Limit = C('Vanilla.Comments.PerPage', 50);
                      if (($Discussion->CountComments - 1 - $this->Offset) > $Limit) {
-                        // The user posted a comment on a page other than the last one, so just load the last
-                        // page of data and replace the existing page content with this new one.
-                        $this->Offset = floor((intval($Discussion->CountComments) - 1) / $Limit) * $Limit; // Define the new offset
-                        $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
-                        
-                        $PagerFactory = new Gdn_PagerFactory();
-                        $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-                        $this->Pager->MoreCode = '%1$s more comments';
-                        $this->Pager->LessCode = '%1$s older comments';
-                        $this->Pager->ClientID = 'Pager';
-                        $this->Pager->Configure(
-                           $this->Offset,
-                           $Limit,
-                           $this->Discussion->CountComments - 1,
-                           'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
-                        );
-               
-                        $this->ControllerName = 'discussion';
-                        $this->View = 'index';
-                        $this->SetJson('Targets', array(array('Target' => '#Content', 'Type' => 'Html')));
-                        $this->ControllerName = 'discussion';
-                        $this->View = 'index';
+                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
+                        $this->RedirectUrl = Gdn::Request()->Url('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID, TRUE);
                      } else {
                         // Make sure to load all new comments since the page was last loaded by this user
                         $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
-                        // Load the discussion
-                        // $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
                         $this->ControllerName = 'discussion';
                         $this->View = 'comments';
                      }
    
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);
-                     $Limit = $this->CommentData->NumRows();
+                     $Limit = is_object($this->CommentData) ? $this->CommentData->NumRows() : $Discussion->CountComments;
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
@@ -371,9 +345,9 @@ class PostController extends VanillaController {
       }
       
       if (property_exists($this,'Discussion'))
-         $this->EventData['Discussion'] = $this->Discussion;
+         $this->EventArguments['Discussion'] = $this->Discussion;
       if (property_exists($this,'Comment'))
-         $this->EventData['Comment'] = $this->Comment;
+         $this->EventArguments['Comment'] = $this->Comment;
          
       $this->FireEvent('BeforeCommentRender');
       $this->Render();

@@ -102,7 +102,7 @@ if (!function_exists('Img')) {
  */
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return T($Number == 1 ? $Singular : $Plural);
+      return sprintf(T($Number == 1 ? $Singular : $Plural), $Number);
    }
 }
 

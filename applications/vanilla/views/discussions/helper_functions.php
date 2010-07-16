@@ -42,7 +42,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
          <?php if ($Discussion->Closed == '1') { ?>
          <span class="Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
-         <span><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
+         <span class="CommentCount"><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
             if ($Session->IsValid()) {
                if ($CountUnreadComments == $Discussion->CountComments)
@@ -52,11 +52,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             }
 
             if ($Discussion->LastCommentID != '') {
-               echo Wrap(sprintf(T('Most recent by %1$s'), UserAnchor($Last)));
-               echo Wrap(Gdn_Format::Date($Discussion->LastDate));
+               echo '<span class="LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span>';
+               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';
             } else {
-               echo Wrap(sprintf(T('Started by %1$s'), UserAnchor($First)));
-               echo Wrap(Gdn_Format::Date($Discussion->FirstDate));
+               echo '<span class="LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span>';
+               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span>';
             }
          
             if (C('Vanilla.Categories.Use'))
@@ -96,10 +96,13 @@ function WriteFilterTabs(&$Sender) {
    ?>
 <div class="Tabs DiscussionsTabs">
    <ul>
+      <?php $Sender->FireEvent('BeforeDiscussionTabs'); ?>
       <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions'); ?></li>
+      <?php $Sender->FireEvent('AfterAllDiscussionsTab'); ?>
       <?php if ($CountBookmarks > 0 || $Sender->RequestMethod == 'bookmarked') { ?>
       <li<?php echo $Sender->RequestMethod == 'bookmarked' ? ' class="Active"' : ''; ?>><?php echo Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks'); ?></li>
       <?php
+         $Sender->FireEvent('AfterBookmarksTab');
       }
       if ($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') {
       ?>
@@ -109,7 +112,10 @@ function WriteFilterTabs(&$Sender) {
       if ($CountDrafts > 0 || $Sender->ControllerName == 'draftscontroller') {
       ?>
       <li<?php echo $Sender->ControllerName == 'draftscontroller' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDrafts, '/drafts', 'MyDrafts'); ?></li>
-      <?php } ?>
+      <?php
+      }
+      $Sender->FireEvent('AfterDiscussionTabs');
+      ?>
    </ul>
    <?php
    if (property_exists($Sender, 'Category') && is_object($Sender->Category)) {

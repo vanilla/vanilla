@@ -26,7 +26,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
          <span><?php printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages); ?></span>
          <?php
          if ($Conversation->CountNewMessages > 0) {
-            echo '<strong>'.sprintf(T('%s new'), $Conversation->CountNewMessages).'</strong>';
+            echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
          }
          ?>
       </div>

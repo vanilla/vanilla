@@ -287,13 +287,26 @@ class Gdn_Auth extends Gdn_Pluggable {
       $Return = $Authenticator->GetURL($URLType);
       if (!$Return) $Return = Gdn::Config('Garden.Authenticator.'.$URLType);
       
+      $ExtraReplacementParameters = array(
+         'Path'   => $Redirect,
+         'Scheme' => $AuthenticationScheme
+      );
+      
+      // Extended return type, allows provider values to be replaced into final URL
+      if (is_array($Return)) {
+         $ExtraReplacementParameters = array_merge($ExtraReplacementParameters, $Return['Parameters']);
+         $Return = $Return['URL'];
+      }
+      
       $FullRedirect = Url($Redirect, TRUE);
+      $ExtraReplacementParameters['Redirect'] = $FullRedirect;
+      
+      // Support legacy sprintf syntax
       $Return = sprintf($Return, $AuthenticationScheme, $Redirect, $FullRedirect);
-      $Return = $this->ReplaceAuthPlaceholders($Return, array(
-         'Path'      => $Redirect,
-         'Redirect'  => $FullRedirect,
-         'Scheme'    => $AuthenticationScheme
-      ));
+      
+      // Support new named parameter '{}' syntax
+      $Return = $this->ReplaceAuthPlaceholders($Return, $ExtraReplacementParameters);
+      
       if ($this->Protocol() == 'https')
          $Return = str_replace('http:', 'https:', Url($Return, TRUE));
       

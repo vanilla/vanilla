@@ -164,6 +164,99 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       }
    }
    
+   public function CreateToken($TokenType, $ProviderKey, $UserKey = NULL, $Authorized = FALSE) {
+      $TokenKey = implode('.', array('token',$ProviderKey,time(),mt_rand(0,100000)));
+      $TokenSecret = sha1(md5(implode('.',array($TokenKey,mt_rand(0,100000)))));
+      $Timestamp = time();
+      
+      $InsertArray = array(
+         'Token' => $TokenKey,
+         'TokenSecret' => $TokenSecret,
+         'TokenType' => $TokenType,
+         'ProviderKey' => $ProviderKey,
+         'Lifetime' => Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60),
+         'Timestamp' => date('Y-m-d H:i:s',$Timestamp),
+         'Authorized' => $Authorized
+      );
+      
+      if ($UserKey !== NULL)
+         $InsertArray['ForeignUserKey'] = $UserKey;
+      
+      try {
+         Gdn::Database()->SQL()->Insert('UserAuthenticationToken', $InsertArray);
+         if ($TokenType == 'access' && !is_null($UserKey))
+            $this->DeleteToken($ProviderKey, $UserKey, 'request');
+      } catch(Exception $e) {
+         return FALSE;
+      }
+         
+      return $InsertArray;
+   }
+   
+   public function LookupToken($ProviderKey, $UserKey, $TokenType = NULL) {
+   
+      $TokenData = Gdn::Database()->SQL()
+         ->Select('uat.*')
+         ->From('UserAuthenticationToken uat')
+         ->Where('uat.ForeignUserKey', $UserKey)
+         ->Where('uat.ProviderKey', $ProviderKey)
+         ->BeginWhereGroup()
+            ->Where('(uat.Timestamp + uat.Lifetime) >=', 'NOW()')
+            ->OrWHere('uat.Lifetime', 0)
+         ->EndWhereGroup()
+         ->Get()
+         ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      if ($TokenData && (is_null($TokenType) || strtolower($TokenType) == strtolower($TokenData['TokenType'])))
+         return $TokenData;
+      
+      return FALSE;
+   }
+   
+   public function DeleteToken($ProviderKey, $UserKey, $TokenType) {
+      Gdn::Database()->SQL()
+         ->From('UserAuthenticationToken')
+         ->Where('ProviderKey', $ProviderKey)
+         ->Where('ForeignUserKey', $UserKey)
+         ->Where('TokenType', $TokenType)
+         ->Delete();
+   }
+   
+   public function SetNonce($TokenKey, $Nonce, $Timestamp = NULL) {
+      $InsertArray = array(
+         'Token'     => $TokenKey,
+         'Nonce'     => $Nonce,
+         'Timestamp' => date('Y-m-d H:i:s',(is_null($Timestamp)) ? time() : $Timestamp)
+      );
+      
+      try {
+         Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);
+      } catch (Exception $e) {
+         return FALSE;
+      }
+      return TRUE;
+   }
+   
+   public function LookupNonce($TokenKey, $Nonce = NULL) {
+      
+      $NonceData = Gdn::Database()->SQL()->Select('uan.*')
+         ->From('UserAuthenticationNonce uan')
+         ->Where('uan.Token', $TokenKey)
+         ->Get()
+         ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      if ($NonceData && (is_null($Nonce) || $NonceData['Nonce'] == $Nonce))
+         return $NonceData['Nonce'];
+      
+      return FALSE;
+   }
+   
+   public function ClearNonces($TokenKey) {
+      Gdn::SQL()->Delete('UserAuthenticationNonce', array(
+         'Token'  => $TokenKey
+      ));
+   }
+   
    public function RequireLogoutTransientKey() {
       return TRUE;
    }

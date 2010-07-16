@@ -166,3 +166,21 @@ if (!function_exists('Wrap')) {
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }
+/**
+ * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
+ */
+if (!function_exists('DiscussionLink')) {
+   function DiscussionLink($Discussion, $Extended = TRUE) {
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
+      $DiscussionName = GetValue('Name', $Discussion);
+      $Parts = array(
+         'discussion',
+         $DiscussionID,
+         Gdn_Format::Url($DiscussionName)
+      );
+      if ($Extended) {
+         $Parts[] = ($Discussion->CountCommentWatch > 0) ? '#Item_'.$Discussion->CountCommentWatch : '';
+      }
+		return Url(implode('/',$Parts), TRUE);
+   }
+}

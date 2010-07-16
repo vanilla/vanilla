@@ -210,6 +210,10 @@ class CommentModel extends VanillaModel {
          $this->AddInsertFields($FormPostValues);
       else
          $this->AddUpdateFields($FormPostValues);
+
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->EventArguments['CommentID'] = $CommentID;
+      $this->FireEvent('BeforeSaveComment');
       
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {

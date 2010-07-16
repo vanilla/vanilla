@@ -41,11 +41,11 @@ if (!function_exists('Anchor')) {
       if ($Attributes == '')
          $Attributes = array();
 			
-		$SSL = GetValue('SSL', $Attributes);
+		$SSL = GetValue('SSL', $Attributes, NULL);
 		if ($SSL)
 			unset($Attributes['SSL']);
 		
-		$WithDomain = GetValue('WithDomain', $Attributes);
+		$WithDomain = GetValue('WithDomain', $Attributes, FALSE);
 		if ($WithDomain)
 			unset($Attributes['WithDomain']);
 

@@ -651,9 +651,13 @@ class Gdn_Request {
          // And make sure to use ssl or not
          if ($SSL) {
             $Path = str_replace('http:', 'https:', $Path);
+            $Scheme = 'https';
          } else {
             $Path = str_replace('https:', 'http:', $Path);
+            $Scheme = 'http';
          }
+      } else {
+         $Scheme = $this->Scheme();
       }
       
       if (strpos($Path, '://') !== FALSE)
@@ -662,7 +666,7 @@ class Gdn_Request {
       $Parts = array();
 
       if ($WithDomain) {
-         $Parts[] = $this->Domain();
+         $Parts[] = $Scheme.'://'.$this->Host();
       } else
          $Parts[] = '';
 

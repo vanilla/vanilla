@@ -540,7 +540,7 @@ class Gdn_Form {
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ">\n";
-      $Value = ArrayValueI('value', $Attributes);
+      $Value = ArrayValueI('Value', $Attributes);
 
       if ($Value === FALSE) $Value = $this->GetValue($FieldName);
 

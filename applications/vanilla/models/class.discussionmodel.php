@@ -415,7 +415,7 @@ class DiscussionModel extends VanillaModel {
                      $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
                         'CommentMention',
-                        Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)),
+                        Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName), FALSE),
                         $User->UserID,
                         '',
                         '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),

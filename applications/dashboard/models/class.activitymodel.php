@@ -157,7 +157,7 @@ class ActivityModel extends Gdn_Model {
       if (!is_object($Activity))
          return;
       
-      $Story = Gdn_Format::Text($Story == '' ? $Activity->Story : $Story);
+      $Story = Gdn_Format::Text($Story == '' ? $Activity->Story : $Story, FALSE);
       // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
          $CommentActivity = $this->GetID($Activity->CommentActivityID);
@@ -170,7 +170,7 @@ class ActivityModel extends Gdn_Model {
          $Preferences = Gdn_Format::Unserialize($User->Preferences);
          $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
          if ($Preference) {
-            $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID));
+            $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);

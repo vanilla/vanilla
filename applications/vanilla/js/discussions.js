@@ -25,7 +25,8 @@ jQuery(document).ready(function($) {
    if ($.morepager)
       $('.MorePager').livequery(function() {
          $(this).morepager({
-            pageContainerSelector: 'ul.Discussions:last, ul.Drafts:last'
+            pageContainerSelector: 'ul.Discussions:last, ul.Drafts:last',
+            afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }
          });
       });
 

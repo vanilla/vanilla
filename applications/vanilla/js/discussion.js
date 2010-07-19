@@ -158,7 +158,7 @@ jQuery(document).ready(function($) {
                $('#PagerMore').remove();
 
                // Let listeners know that the comment was added.
-               $(frm).trigger('CommentAdded');
+               $(document).trigger('CommentAdded');
                $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);
@@ -210,7 +210,7 @@ jQuery(document).ready(function($) {
    if ($.morepager)
       $('.MorePager').morepager({
          pageContainerSelector: 'ul.Discussion',
-         afterPageLoaded: function() { $(this).trigger('CommentPagingComplete'); }
+         afterPageLoaded: function() { $(document).trigger('CommentPagingComplete'); }
       });
       
    // Autosave comments
@@ -252,6 +252,8 @@ jQuery(document).ready(function($) {
          $(parent).find('span.TinyProgress').remove();
          $(msg).show();
       }
+      
+      $(document).trigger('CommentEditingComplete', [msg]);
       return false;
    });
    // Reveal the original message when cancelling an in-place edit.

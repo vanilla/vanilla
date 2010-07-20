@@ -899,25 +899,55 @@ class ImportModel extends Gdn_Model {
       return TRUE;
    }
 
-   public function LoadTableType() {
-      // Make sure there isn't a secured directory for load data.
-      $SecureFilePriv = $this->Query("show variables like 'secure_file_priv'")->Value('Value', '');
-      // Make sure the database version is > 5 so we can set the character set.
-      $Version = $this->Query(Gdn::SQL()->FetchVersionSql())->Value('Version');
+   public function LoadTableType($Save = TRUE) {
+      $Result = GetValue('LoadTableType', $this->Data, FALSE);
 
-      if (strlen($SecureFilePriv) > 0 || version_compare($Version, '5', '<')) {
-         return 'LoadTableWithInsert';
-      } elseif (strcasecmp(C('Database.Host'), 'localhost') == 0) {
-        return 'LoadTableOnSameServer';
-      } else {
-         // Check to see if local-infile is allowed on the server.
-         $Sql = "show variables like 'local_infile'";
-         $Data = $this->Query($Sql)->ResultArray();
-         if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
-            return 'LoadTableLocalInfile';
-         else
-            return 'LoadTableWithInsert';
-     }
+      if (is_string($Result))
+         return $Result;
+
+      // Create a table to test loading.
+      $St = Gdn::Structure();
+      $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
+
+      // Create a test file to load.
+      $TestPath = PATH_UPLOADS.'/import/test.txt';
+      $TestValue = 123;
+      $TestContents = 'ID'.self::NEWLINE.$TestValue.self::NEWLINE;
+      file_put_contents($TestPath, $TestContents, LOCK_EX);
+
+      // Try LoadTableOnSameServer.
+      try {
+         $this->_LoadTableOnSameServer('Test', $TestPath);
+         $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
+         if ($Value == $TestValue)
+            $Result = 'LoadTableOnSameServer';
+      } catch (Exception $Ex) {
+         $Result = FALSE;
+      }
+
+      // Try LoadTableLocalInfile.
+      if (!$Result) {
+         try {
+            $this->_LoadTableLocalInfile('Test', $TestPath);
+            $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
+            if ($Value == $TestValue)
+               $Result = 'LoadTableLocalInfile';
+         } catch (Exception $Ex) {
+            $Result = FALSE;
+         }
+      }
+
+      // If those two didn't work then default to LoadTableWithInsert.
+      if (!$Result)
+         $Result = 'LoadTableWithInsert';
+
+      // Cleanup.
+      @unlink($TestPath);
+      $St->Table(self::TABLE_PREFIX.'Test')->Drop();
+
+      if ($Save)
+         $this->Data['LoadTableType'] = $Result;
+      return $Result;
    }
 
    public function LocalInfileSupported() {

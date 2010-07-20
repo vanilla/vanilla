@@ -9,13 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Allows views to implement slices, small asynchronously refershable portions of the page
+ * Allows views to implement slices, small asynchronously refreshable portions of the page
  *
  * @author Tim Gunter
  * @package Garden
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
+ 
 class Gdn_Slice {
 
    protected $Dispatcher;

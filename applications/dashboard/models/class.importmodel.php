@@ -900,7 +900,14 @@ class ImportModel extends Gdn_Model {
    }
 
    public function LoadTableType() {
-      if (strcasecmp(C('Database.Host'), 'localhost') == 0) {
+      // Make sure there isn't a secured directory for load data.
+      $SecureFilePriv = $this->Query("show variables like 'secure_file_priv'")->Value('Value', '');
+      // Make sure the database version is > 5 so we can set the character set.
+      $Version = $this->Query(Gdn::SQL()->FetchVersionSql())->Value('Version');
+
+      if (strlen($SecureFilePriv) > 0 || version_compare($Version, '5', '<')) {
+         return 'LoadTableWithInsert';
+      } elseif (strcasecmp(C('Database.Host'), 'localhost') == 0) {
         return 'LoadTableOnSameServer';
       } else {
          // Check to see if local-infile is allowed on the server.

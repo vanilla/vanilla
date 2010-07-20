@@ -241,16 +241,30 @@ class SetupController extends DashboardController {
 
       // Make sure that the correct filesystem permissions are in place
 		$PermissionProblem = FALSE;
-		$PermissionHelp = ' <p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>
-<pre>chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'conf')).'
-chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'cache')).'
-chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
+
+      // Make sure the appropriate folders are writeable.
+      $ProblemDirectories = array();
+      if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF))
+         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'conf'));
+      if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS))
+         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'uploads'));
+      if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE))
+         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'cache'));
+
+      if (count($ProblemDirectories) > 0) {
+         $PermissionProblem = TRUE;
+         
+         $PermissionError = T(
+            'Some folders don\'t have correct permissions.',
+            '<p>Some of your folders do not have the correct permissions.</p><p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>');
+
+         $PermissionHelp = '<pre>chmod -R 777 '.implode("\nchmod -R 777 ", $ProblemDirectories).'</pre>';
+
+         $this->Form->AddError($PermissionError.$PermissionHelp);
+      }
       
       // Make sure the config folder is writeable
-      if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF)) {
-         $this->Form->AddError(T('Your configuration folder does not have the correct permissions. PHP needs to be able to read and write to this folder.'));
-			$PermissionProblem = TRUE;
-      } else {
+      if (!$PermissionProblem) {
          $ConfigFile = PATH_CONF . DS . 'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
@@ -261,25 +275,13 @@ chmod -R 777 '.CombinePaths(array(PATH_ROOT, 'uploads')).'</pre>';
 				$PermissionProblem = TRUE;
          }
       }
-      
-      $UploadsFolder = PATH_ROOT . DS . 'uploads';
-      if (!is_readable($UploadsFolder) || !IsWritable($UploadsFolder)) {
-         $this->Form->AddError(sprintf(T('Your uploads folder does not have the correct permissions. PHP needs to be able to read and write to this folder: <code>%s</code>'), $UploadsFolder));
-         $PermissionProblem = TRUE;
-      }
 
       // Make sure the cache folder is writeable
-      if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE)) {
-         $this->Form->AddError(sprintf(T('Your cache folder does not have the correct permissions. PHP needs to be able to read and write to this folder and all the files within: <code>%s</code>'), PATH_CACHE));
-         $PermissionProblem = TRUE;
-      } else {
+      if (!$PermissionProblem) {
          if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
          if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');
       }
-		
-		if ($PermissionProblem)
-			$this->Form->AddError($PermissionHelp);
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }

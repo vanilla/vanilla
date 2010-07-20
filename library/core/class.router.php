@@ -130,7 +130,7 @@ class Gdn_Router {
    private function _ParseRoute($Destination) {
    
       // If Destination is a serialized array
-      if (is_string($Destination) && ($Decoded = unserialize($Destination)) !== FALSE)
+      if (is_string($Destination) && ($Decoded = @unserialize($Destination)) !== FALSE)
          $Destination = $Decoded;
    
       // If Destination is a short array

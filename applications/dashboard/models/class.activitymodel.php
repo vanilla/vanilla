@@ -45,8 +45,8 @@ class ActivityModel extends Gdn_Model {
       if ($UserID != '') {
          $this->SQL
             ->BeginWhereGroup()
-            ->Where('au.UserID', $UserID)
-            ->OrWhere('ru.UserID', $UserID)
+            ->Where('a.ActivityUserID', $UserID)
+            ->OrWhere('a.RegardingUserID', $UserID)
             ->EndWhereGroup();
       }
       

@@ -966,10 +966,18 @@ class Gdn_Form {
       elseif(is_a($Error, 'Gdn_UserException')) {
          $ErrorCode = '@'.$Error->getMessage();
       } elseif(is_a($Error, 'Exception')) {
+         // Strip the extra information out of the exception.
+         $Parts = explode('|', $Error->getMessage());
+         $Message = $Parts[0];
+         if (count($Parts) >= 3)
+            $FileSuffix = ": {$Parts[1]}->{$Parts[2]}(...)";
+         else
+            $FileSuffix = "";
+
          if(defined('DEBUG')) {
             $ErrorCode = '@<pre>'.
-               $Error->getMessage()."\n".
-               $Error->getFile().' Line '.$Error->getLine()."\n".
+               $Message."\n".
+               '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".
                $Error->getTraceAsString().
                '</pre>';
          } else {

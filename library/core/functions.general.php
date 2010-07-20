@@ -1227,6 +1227,8 @@ if (!function_exists('StringBeginsWith')) {
    function StringBeginsWith($A, $B, $CaseInsensitive = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
+      elseif (strlen($B) == 0)
+         return TRUE;
       else
          return substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
    }
@@ -1243,6 +1245,8 @@ if (!function_exists('StringEndsWith')) {
    function StringEndsWith($A, $B, $CaseInsensitive = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
+      elseif (strlen($B) == 0)
+         return TRUE;
       else
          return substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
    }

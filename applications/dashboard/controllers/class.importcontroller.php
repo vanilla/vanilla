@@ -57,7 +57,7 @@ class ImportController extends DashboardController {
                $Imp->FromPost($this->Form->FormValues());
             try {
                $Result = $Imp->RunStep($Imp->CurrentStep);
-            } catch(Gdn_UserException $Ex) {
+            } catch(Exception $Ex) {
                $Result = FALSE;
                $this->Form->AddError($Ex);
                $this->SetJson('Error', TRUE);

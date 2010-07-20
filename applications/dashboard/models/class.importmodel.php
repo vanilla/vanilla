@@ -40,7 +40,8 @@ class ImportModel extends Gdn_Model {
    	6 => 'AssignOtherIDs',
    	7 => 'InsertTables',
    	8 => 'UpdateCounts',
-      9 => 'CustomFinalization'
+      9 => 'CustomFinalization',
+      10 => 'AddActivity'
 	);
 
 	protected $_OverwriteSteps = array(
@@ -53,7 +54,8 @@ class ImportModel extends Gdn_Model {
    	7 => 'DeleteOverwriteTables',
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
-      10 => 'CustomFinalization'
+      10 => 'CustomFinalization',
+      11 => 'AddActivity'
    );
 
 	/**
@@ -65,6 +67,18 @@ class ImportModel extends Gdn_Model {
 		$this->ImportPath = $ImportPath;
 		parent::__construct();
 	}
+
+   public function AddActivity() {
+      // Build the story for the activity.
+      $Header = $this->GetImportHeader();
+      $PorterVersion = GetValue('Vanilla Export', $Header, T('unknown'));
+      $SourceData = GetValue('Source', $Header, T('unknown'));
+      $Story = sprintf(T('Vanilla Export: %s, Source: %s'), $PorterVersion, $SourceData);
+
+      $ActivityModel = new ActivityModel();
+      $ActivityModel->Add(Gdn::Session()->UserID, 'Import', $Story);
+      return TRUE;
+   }
 
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.

@@ -368,6 +368,9 @@ class Gdn_Configuration {
       if ($File == '')
          trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
 
+      if (!is_writable($File))
+         throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."),$File));
+
       if($Group == '')
          $Group = $this->CurrentGroup;
 

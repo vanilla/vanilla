@@ -365,49 +365,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
    }
-
-   public function CanonicalUrl($Value = NULL) {
-      if ($Value === NULL) {
-         if ($this->_CanonicalUrl) {
-            return $this->_CanonicalUrl;
-         } else {
-            $Parts = array(strtolower($this->ApplicationFolder));
-
-            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
-               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
-            else
-               $Parts[] = strtolower($this->ControllerName);
-
-            if (strcasecmp($this->RequestMethod, 'index') != 0)
-               $Parts[] = strtolower($this->RequestMethod);
-
-            // The default canonical url is the fully-qualified url.
-            if (is_array($this->RequestArgs))
-               $Parts = array_merge($Parts, $this->RequestArgs);
-            elseif (is_string($this->RequestArgs))
-               $Parts = trim($this->RequestArgs, '/');
-
-            $Path = implode('/', $Parts);
-            $Result = Url($Path, TRUE);
-            return $Result;
-         }
-      } else {
-         $this->_CanonicalUrl = $Value;
-         return $Value;
-      }
-   }
-   
-   public function ClearCssFiles() {
-      $this->_CssFiles = array();
-   }
-   
-   public function CssFiles() {
-      return $this->_CssFiles;
-   }
-   
-   public function JsFiles() {
-      return $this->_JsFiles;
-   }
    
    /**
     * Undocumented method.
@@ -431,27 +388,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddJsFile($FileName, $AppFolder = '') {
       $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
-   }
-
-   /**
-    * Clear all js files from the collection.
-    */
-   public function ClearJsFiles() {
-      $this->_JsFiles = array();
-   }
-
-   /**
-    * Removes a JS file from the collection.
-    *
-    * @param string $FileName The JS file to search for.
-    */
-   public function RemoveJsFile($FileName) {
-      foreach ($this->_JsFiles as $Key => $FileInfo) {
-         if ($FileInfo['FileName'] == $FileName) {
-            unset($this->_JsFiles[$Key]);
-            return;
-         }
-      }
    }
 
    /**
@@ -489,6 +425,52 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       $this->FireEvent('AfterAddModule');
+   }
+
+   public function CanonicalUrl($Value = NULL) {
+      if ($Value === NULL) {
+         if ($this->_CanonicalUrl) {
+            return $this->_CanonicalUrl;
+         } else {
+            $Parts = array(strtolower($this->ApplicationFolder));
+
+            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
+               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
+            else
+               $Parts[] = strtolower($this->ControllerName);
+
+            if (strcasecmp($this->RequestMethod, 'index') != 0)
+               $Parts[] = strtolower($this->RequestMethod);
+
+            // The default canonical url is the fully-qualified url.
+            if (is_array($this->RequestArgs))
+               $Parts = array_merge($Parts, $this->RequestArgs);
+            elseif (is_string($this->RequestArgs))
+               $Parts = trim($this->RequestArgs, '/');
+
+            $Path = implode('/', $Parts);
+            $Result = Url($Path, TRUE);
+            return $Result;
+         }
+      } else {
+         $this->_CanonicalUrl = $Value;
+         return $Value;
+      }
+   }
+   
+   public function ClearCssFiles() {
+      $this->_CssFiles = array();
+   }
+   
+   /**
+    * Clear all js files from the collection.
+    */
+   public function ClearJsFiles() {
+      $this->_JsFiles = array();
+   }
+   
+   public function CssFiles() {
+      return $this->_CssFiles;
    }
 
    /** Get a value out of the controller's data array.
@@ -789,6 +771,82 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function Initialize() {
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
+   }
+   
+   public function JsFiles() {
+      return $this->_JsFiles;
+   }
+   
+   /**
+    * If JSON is going to be sent to the client, this method allows you to add
+    * extra values to the JSON array.
+    *
+    * @param string $Key The name of the array key to add.
+    * @param mixed $Value The value to be added. If null, then it won't be set.
+    * @return mixed The value at the key.
+    */
+   public function Json($Key, $Value = NULL) {
+      if(!is_null($Value)) {
+         $this->_Json[$Key] = $Value;
+      }
+      return ArrayValue($Key, $this->_Json, NULL);
+   }
+   
+   public function JsonTarget($Target, $Data, $Type = 'Html') {
+      $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
+      
+      if(!array_key_exists('Targets', $this->_Json))
+         $this->_Json['Targets'] = array($Item);
+      else
+         $this->_Json['Targets'][] = $Item;
+   }
+   
+   /**
+    * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
+    * @param mixed $Permission A permission or array of permission names required to access this resource.
+    * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
+	 * @param string $JunctionTable The name of the junction table for a junction permission.
+	 * @param in $JunctionID The ID of the junction permission.
+	 */
+   public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
+      $Session = Gdn::Session();
+
+      // TODO: Make this work with different delivery types.
+      if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
+        if (!$Session->IsValid()) {
+           Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
+        } else {
+           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
+        }
+      }
+   }
+   
+   /**
+    * Removes a CSS file from the collection.
+    *
+    * @param string $FileName The CSS file to search for.
+    */
+   public function RemoveCssFile($FileName) {
+      foreach ($this->_CssFiles as $Key => $FileInfo) {
+         if ($FileInfo['FileName'] == $FileName) {
+            unset($this->_CssFiles[$Key]);
+            return;
+         }
+      }
+   }
+   
+   /**
+    * Removes a JS file from the collection.
+    *
+    * @param string $FileName The JS file to search for.
+    */
+   public function RemoveJsFile($FileName) {
+      foreach ($this->_JsFiles as $Key => $FileInfo) {
+         if ($FileInfo['FileName'] == $FileName) {
+            unset($this->_JsFiles[$Key]);
+            return;
+         }
+      }
    }
 
    /**
@@ -1120,26 +1178,6 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewHandler->Render($MasterViewPath, $this);
       }
    }
-   
-   /**
-    * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
-    * @param mixed $Permission A permission or array of permission names required to access this resource.
-    * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-	 * @param string $JunctionTable The name of the junction table for a junction permission.
-	 * @param in $JunctionID The ID of the junction permission.
-	 */
-   public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
-      $Session = Gdn::Session();
-
-      // TODO: Make this work with different delivery types.
-      if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-        if (!$Session->IsValid()) {
-           Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
-        } else {
-           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
-        }
-      }
-   }
 
    /**
     * Sends all headers in $this->_Headers (defined with $this->SetHeader()) to
@@ -1235,27 +1273,4 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SetData('Title', $Title);
    }
    
-   /**
-    * If JSON is going to be sent to the client, this method allows you to add
-    * extra values to the JSON array.
-    *
-    * @param string $Key The name of the array key to add.
-    * @param mixed $Value The value to be added. If null, then it won't be set.
-    * @return mixed The value at the key.
-    */
-   public function Json($Key, $Value = NULL) {
-      if(!is_null($Value)) {
-         $this->_Json[$Key] = $Value;
-      }
-      return ArrayValue($Key, $this->_Json, NULL);
-   }
-   
-   public function JsonTarget($Target, $Data, $Type = 'Html') {
-      $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
-      
-      if(!array_key_exists('Targets', $this->_Json))
-         $this->_Json['Targets'] = array($Item);
-      else
-         $this->_Json['Targets'][] = $Item;
-   }
 }

@@ -93,20 +93,20 @@ class ActivityModel extends Gdn_Model {
    public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = '') {
       // Make sure the user is authenticated
       // Get the ActivityTypeID & see if this is a notification
-      $ActivityType = $this->SQL
+      $ActivityTypeRow = $this->SQL
          ->Select('ActivityTypeID, Name, Notify')
          ->From('ActivityType')
          ->Where('Name', $ActivityType)
          ->Get()
          ->FirstRow();
          
-      if ($ActivityType !== FALSE) {
-         $ActivityTypeID = $ActivityType->ActivityTypeID;
-         $Notify = $ActivityType->Notify == '1';
+      if ($ActivityTypeRow !== FALSE) {
+         $ActivityTypeID = $ActivityTypeRow->ActivityTypeID;
+         $Notify = $ActivityTypeRow->Notify == '1';
       } else {
          trigger_error(ErrorMessage(sprintf('Activity type could not be found: %s', $ActivityType), 'ActivityModel', 'Add'), E_USER_ERROR);
       }
-      if ($ActivityType->Name == 'ActivityComment' && $Story == '') {
+      if ($ActivityTypeRow->Name == 'ActivityComment' && $Story == '') {
          $this->Validation->AddValidationResult('Body', 'You must provide a comment.');
          return FALSE;
       }

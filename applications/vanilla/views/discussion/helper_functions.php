@@ -18,7 +18,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;
-      $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name);
+      $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
    }
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';

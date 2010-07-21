@@ -40,7 +40,8 @@ class ImportModel extends Gdn_Model {
    	6 => 'AssignOtherIDs',
    	7 => 'InsertTables',
    	8 => 'UpdateCounts',
-      9 => 'CustomFinalization'
+      9 => 'CustomFinalization',
+      10 => 'AddActivity'
 	);
 
 	protected $_OverwriteSteps = array(
@@ -53,7 +54,8 @@ class ImportModel extends Gdn_Model {
    	7 => 'DeleteOverwriteTables',
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
-      10 => 'CustomFinalization'
+      10 => 'CustomFinalization',
+      11 => 'AddActivity'
    );
 
 	/**
@@ -65,6 +67,18 @@ class ImportModel extends Gdn_Model {
 		$this->ImportPath = $ImportPath;
 		parent::__construct();
 	}
+
+   public function AddActivity() {
+      // Build the story for the activity.
+      $Header = $this->GetImportHeader();
+      $PorterVersion = GetValue('Vanilla Export', $Header, T('unknown'));
+      $SourceData = GetValue('Source', $Header, T('unknown'));
+      $Story = sprintf(T('Vanilla Export: %s, Source: %s'), $PorterVersion, $SourceData);
+
+      $ActivityModel = new ActivityModel();
+      $ActivityModel->Add(Gdn::Session()->UserID, 'Import', $Story);
+      return TRUE;
+   }
 
 	public function AssignUserIDs() {
 		// Assign user IDs of email matches.
@@ -704,8 +718,8 @@ class ImportModel extends Gdn_Model {
 
 		// Authenticate the admin user as the current user.
 		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');
-		$PasswordAuth->FetchData($PasswordAuth, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
-		$PasswordAuth->Authenticate();
+		//$PasswordAuth->FetchData($PasswordAuth, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
+		$PasswordAuth->Authenticate(GetValue('OverwriteEmail', $this->Data), GetValue('OverwritePassword', $this->Data));
 		Gdn::Session()->Start();
 
 		return TRUE;
@@ -899,18 +913,55 @@ class ImportModel extends Gdn_Model {
       return TRUE;
    }
 
-   public function LoadTableType() {
-      if (strcasecmp(C('Database.Host'), 'localhost') == 0) {
-        return 'LoadTableOnSameServer';
-      } else {
-         // Check to see if local-infile is allowed on the server.
-         $Sql = "show variables like 'local_infile'";
-         $Data = $this->Query($Sql)->ResultArray();
-         if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
-            return 'LoadTableLocalInfile';
-         else
-            return 'LoadTableWithInsert';
-     }
+   public function LoadTableType($Save = TRUE) {
+      $Result = GetValue('LoadTableType', $this->Data, FALSE);
+
+      if (is_string($Result))
+         return $Result;
+
+      // Create a table to test loading.
+      $St = Gdn::Structure();
+      $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
+
+      // Create a test file to load.
+      $TestPath = PATH_UPLOADS.'/import/test.txt';
+      $TestValue = 123;
+      $TestContents = 'ID'.self::NEWLINE.$TestValue.self::NEWLINE;
+      file_put_contents($TestPath, $TestContents, LOCK_EX);
+
+      // Try LoadTableOnSameServer.
+      try {
+         $this->_LoadTableOnSameServer('Test', $TestPath);
+         $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
+         if ($Value == $TestValue)
+            $Result = 'LoadTableOnSameServer';
+      } catch (Exception $Ex) {
+         $Result = FALSE;
+      }
+
+      // Try LoadTableLocalInfile.
+      if (!$Result) {
+         try {
+            $this->_LoadTableLocalInfile('Test', $TestPath);
+            $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
+            if ($Value == $TestValue)
+               $Result = 'LoadTableLocalInfile';
+         } catch (Exception $Ex) {
+            $Result = FALSE;
+         }
+      }
+
+      // If those two didn't work then default to LoadTableWithInsert.
+      if (!$Result)
+         $Result = 'LoadTableWithInsert';
+
+      // Cleanup.
+      @unlink($TestPath);
+      $St->Table(self::TABLE_PREFIX.'Test')->Drop();
+
+      if ($Save)
+         $this->Data['LoadTableType'] = $Result;
+      return $Result;
    }
 
    public function LocalInfileSupported() {

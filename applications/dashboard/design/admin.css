@@ -1187,6 +1187,11 @@ div.Popup .Footer input.Button {
 	margin-right: 2px;
 }
 
+.Version {
+   color: #555;
+   text-align: center;
+}
+
 
 /* ==================================================================== Legal */
 div.Legal ol {
@@ -1324,9 +1329,9 @@ table.SelectionGrid dl {
 }
 table.SelectionGrid dl dt {
 	display: inline;
-   color: #000;
-   border-right: 1px solid #e2f4ff;
-   padding: 4px 6px 4px 0;
+   color: #000;
+   border-right: 1px solid #e2f4ff;
+   padding: 4px 6px 4px 0;
    margin: 0 4px 0 0;
 }
 table.SelectionGrid dl dd {

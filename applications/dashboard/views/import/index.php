@@ -10,7 +10,7 @@ echo '<div class="Info">',
 if ($this->Data('LoadSpeedWarning')) {
    echo '<div class="Warning">',
    T('Warning: Loading tables can be slow.', '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file you might want to consider changing your configuration. Click <a href="http://vanillaforums.org/page/imports">here</a> for more information.'),
+If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.'),
    '</div>';
 }
 
@@ -52,7 +52,7 @@ echo $this->Form->Errors();
 		<?php
 		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
 		echo '<div class="Warning">',
-		T('Garden.Import.Overwrite.Desciption', 'Warning: All data in this forum will be overwritten. Enter the username and password of the admin user from the data being imported.'),
+		T('Garden.Import.Overwrite.Desciption', 'Warning: All data in this forum will be overwritten. Enter the email and password of the admin user from the data being imported.'),
 		'</div>';
 		
 		echo $this->Form->Label('Email', 'Email'),

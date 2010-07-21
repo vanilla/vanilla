@@ -196,6 +196,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
+               $Mixed2 = preg_replace("#\[url\]([^/]*?)\[/url\]#si",'<a href="http://\\1">\\1</a>',$Mixed2);
                $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed2);
                $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed2);
                $Mixed2 = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed2);
@@ -215,7 +216,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace('#\[/?left\]#si', '', $Mixed2);
                $Mixed2 = Gdn_Format::Links($Mixed2);
                $Mixed2 = Gdn_Format::Mentions($Mixed2);
-					$Result = $Formatter->Format($Mixed2);
+					$Result = Gdn_Format::Html($Mixed2);
 					return $Result;
 				} catch(Exception $Ex) {
 					return self::Display($Mixed);
@@ -562,17 +563,20 @@ EOT;
    }
 
    /**
-    * Takes a mixed variable, formats it for display on the screen as plain text
-    * with no newlines and returns it.
+    * Takes a mixed variable, formats it for display on the screen as plain text.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
     * @return mixed
     */
-   public static function Text($Mixed) {
+   public static function Text($Mixed, $AddBreaks = TRUE) {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Text');
-      else
-         return nl2br(htmlspecialchars(strip_tags(html_entity_decode($Mixed)), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8')));
+      else {
+         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed)), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
+         if ($AddBreaks)
+            $Result = nl2br($Result);
+         return $Result;
+      }
    }
 
    /**

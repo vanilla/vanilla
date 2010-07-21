@@ -112,9 +112,12 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    public function FetchData($DataSource, $DirectSupplied = array()) {
       $this->_DataSource = $DataSource;
       
-      if ($DataSource == $this)
+      if ($DataSource == $this) {
          foreach ($this->_DataHooks as $DataTarget => $DataHook)
             $this->_DataHooks[$DataTarget]['value'] = ArrayValue($DataTarget, $DirectSupplied);
+            
+         return;
+      }
       
       if (sizeof($this->_DataHooks)) {
          foreach ($this->_DataHooks as $DataTarget => $DataHook) {
@@ -230,9 +233,16 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       );
       
       try {
-         Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);
+         $NumAffected = Gdn::Database()->SQL()->Update('UserAuthenticationNonce')
+            ->Set('Nonce', $Nonce)
+            ->Set('Timestamp', $InsertArray['Timestamp'])
+            ->Where('Token', $InsertArray['Token'])
+            ->Put();
+            
+         if (!$NumAffected->PDOStatement()->rowCount())
+            throw new Exception();
       } catch (Exception $e) {
-         return FALSE;
+         Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);
       }
       return TRUE;
    }

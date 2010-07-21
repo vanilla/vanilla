@@ -57,7 +57,7 @@ class ImportController extends DashboardController {
                $Imp->FromPost($this->Form->FormValues());
             try {
                $Result = $Imp->RunStep($Imp->CurrentStep);
-            } catch(Gdn_UserException $Ex) {
+            } catch(Exception $Ex) {
                $Result = FALSE;
                $this->Form->AddError($Ex);
                $this->SetJson('Error', TRUE);
@@ -184,7 +184,7 @@ class ImportController extends DashboardController {
          $this->SetData('ImportPath', $Imp->ImportPath);
          $this->SetData('OriginalFilename', GetValue('OriginalFilename', $Imp->Data));
          $this->SetData('CurrentStep', $Imp->CurrentStep);
-         $this->SetData('LoadSpeedWarning', $Imp->LoadTableType() == 'LoadTableWithInsert');
+         $this->SetData('LoadSpeedWarning', $Imp->LoadTableType(FALSE) == 'LoadTableWithInsert');
       } catch(Gdn_UserException $Ex) {
          $this->Form->AddError($Ex);
          $Imp->SaveState();

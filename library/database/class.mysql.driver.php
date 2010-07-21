@@ -183,7 +183,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * fieldname "version".
     */
    public function FetchVersionSql() {
-      return "select version() as version";
+      return "select version() as Version";
    }
 
    /**

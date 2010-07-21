@@ -23,7 +23,7 @@ else
    $WebRoot = '//';
    
 return array(
-   globaljs => array(
+   'globaljs' => array(
       $WebRoot.'js/library/jquery.js',
       $WebRoot.'js/library/jquery.livequery.js',
       $WebRoot.'js/library/jquery.form.js',

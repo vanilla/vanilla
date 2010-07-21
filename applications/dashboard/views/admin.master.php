@@ -26,7 +26,12 @@
          </div>
       </div>
       <div id="Body">
-         <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
+         <div id="Panel">
+            <?php
+            echo '<div class="Version">', APPLICATION, ' ', APPLICATION_VERSION, '</div>';
+            $this->RenderAsset('Panel');
+            ?>
+         </div>
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">

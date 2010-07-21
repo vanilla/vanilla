@@ -240,7 +240,7 @@ class PagerModule extends Gdn_Module {
          $Pager .= '<span class="Next">'.$NextText.'</span>';
       } else {
          $PageParam = 'p'.($CurrentPage + 1);
-         $Pager .= Anchor($NextText, sprintf($this->Url, $PageParam), 'Next');
+         $Pager .= Anchor($NextText, sprintf($this->Url, $PageParam, ''), 'Next'); // extra sprintf parameter in case old url style is set
       }
       if ($PageCount <= 1)
          $Pager = '';

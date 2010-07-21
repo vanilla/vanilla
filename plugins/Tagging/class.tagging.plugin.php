@@ -128,7 +128,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $FormTags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       // Tags can only contain letters, numbers, plus, dashes, underscores, hashtags, periods, @ symbols
-      if (ValidateRegex($FormTags, '/^([\s\d\w\+-_.#]+)$/si')) {
+      if ($FormTags == '' || ValidateRegex($FormTags, '/^([\s\d\w\+-_.#]+)$/si')) {
          $FormTags = array_unique(explode(' ', $FormTags));
          
          // Find out which of these tags is not yet in the tag table
@@ -212,7 +212,7 @@ class TaggingPlugin extends Gdn_Plugin {
       // Tags can only contain: a-z 0-9 + # _ .
       if (StringIsNullOrEmpty($Tags) && C('Plugins.Tagging.Required'))
          $Sender->Validation->AddValidationResult('Tags', 'You must specify at least one tag.');
-      else if (!ValidateRegex($Tags, '/^([\s\d\w\+-_.#]+)$/si'))
+      else if (!StringIsNullOrEmpty($Tags) && !ValidateRegex($Tags, '/^([\s\d\w\+-_.#]+)$/si'))
          $Sender->Validation->AddValidationResult('Tags', 'Tags can only contain the following characters: a-z 0-9 + # _ .');
       else if (count(array_unique(explode(' ', $Tags))) > 5)
          $Sender->Validation->AddValidationResult('Tags', 'You can only specify up to 5 tags.');

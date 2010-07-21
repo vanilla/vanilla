@@ -748,44 +748,6 @@ EOT;
       }
    }
 
-   public static function Wiki($Mixed) {
-      if (!is_string($Mixed)) {
-         return self::To($Mixed, 'Html');
-      } else {
-         // Allow the code tag to keep all enclosed html encoded.
-         $Mixed = preg_replace(
-            array('/<code([^>]*)>(.+?)<\/code>/sei'), 
-            array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></code>\''), 
-            $Mixed
-         );
-         $Mixed = preg_replace(
-            array('/<pre([^>]*)>(.+?)<\/pre>/sei'), 
-            array('\'<pre\'.RemoveQuoteSlashes(\'\1\').\'><![CDATA[\'.RemoveQuoteSlashes(\'\2\').\']]></pre>\''), 
-            $Mixed
-         );
-
-         // Replace Wiki Hyperlinks with actual hyperlinks
-         $Mixed = preg_replace(
-            '/\[\[([A-z0-9:.]+)\]\]/si', 
-            Anchor('\\1', 'page/\\1'), 
-            $Mixed
-         );
-         
-         $Mixed = preg_replace(
-            '/\[\[([A-z0-9:.]+)([\|]{1})([A-z0-9\s\-&,.\*]+)\]\]/si', 
-            Anchor('\\3', 'page/\\1'), 
-            $Mixed
-         );
-
-         $Formatter = Gdn::Factory('HtmlFormatter');
-         if(is_null($Formatter)) {
-            return $Mixed;
-         } else {
-            return $Formatter->Format($Mixed);
-         }
-      }
-   }
-   
    /**
     * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
     */

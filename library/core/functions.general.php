@@ -805,12 +805,8 @@ if (!function_exists('PageNumber')) {
     */
    function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
       $Result = ceil($Offset / $Limit) + 1;
-      if ($UrlParam) {
-         if ($Result == 1)
-            $Result = '';
-         else
-            $Result = 'p'.$Result;
-      }
+      if ($UrlParam)
+         $Result = 'p'.$Result;
       return $Result;
    }
 }

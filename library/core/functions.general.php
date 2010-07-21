@@ -1343,29 +1343,6 @@ if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Result = Gdn::Request()->Url($Path, $WithDomain);
       return $Result;
-
-      // Cache the rewrite urls config setting in this object.
-      static $RewriteUrls = NULL;
-      if(is_null($RewriteUrls)) $RewriteUrls = ForceBool(Gdn::Config('Garden.RewriteUrls', FALSE));
-      
-      $Prefix = substr($Path, 0, 7);
-      if (in_array($Prefix, array('http://', 'https:/'))) {
-         return $Path;
-      }
-      if ($Path == '#' || $Path == '') {
-         $Path = Gdn_Url::Request(FALSE, FALSE, $RemoveSyndication).$Path;
-      }
-
-      $Paths = array();
-      if (!$WithDomain)
-         $Paths[] = '/';
-
-      $Paths[] = Gdn_Url::WebRoot($WithDomain);
-      if (!$RewriteUrls)
-         $Paths[] = 'index.php';
-
-      $Paths[] = $Path;
-      return CombinePaths($Paths, '/');
    }
 }
 

@@ -28,7 +28,6 @@
       <div id="Body">
          <div id="Panel">
             <?php
-            echo '<div class="Version">', APPLICATION, ' ', APPLICATION_VERSION, '</div>';
             $this->RenderAsset('Panel');
             ?>
          </div>
@@ -37,6 +36,7 @@
       <div id="Foot">
 			<?php
 				$this->RenderAsset('Foot');
+				echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
 				echo Wrap(Anchor(Img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), C('Garden.VanillaUrl')), 'div');
 			?>
 		</div>

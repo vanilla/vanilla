@@ -677,6 +677,10 @@ class Gdn_Request {
       if (!$RewriteUrls) {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
          $Path = str_replace('?', '&', $Path);
+      } else {
+         $Query = strrchr($Path, '?');
+         if (strlen($Query) > 0)
+            $Path = substr($Path, 0, -strlen($Query));
       }
 
       if($Path == '') {
@@ -697,6 +701,9 @@ class Gdn_Request {
             $Result = str_replace('https:', 'http:', $Result);
          }
       }
+
+      if (isset($Query))
+         $Result .= $Query;
          
       return $Result;
    }

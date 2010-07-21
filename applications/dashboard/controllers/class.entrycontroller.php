@@ -527,12 +527,12 @@ class EntryController extends Gdn_Controller {
          $Route = $Reaction;
          if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
-            } else {
-               if ($Route !== FALSE)
-                  Redirect($Route);
-               else
-                  Redirect(Gdn::Router()->GetDestination('DefaultController'));
-            }
+         } else {
+            if ($Route !== FALSE)
+               Redirect($Route);
+            else
+               Redirect(Gdn::Router()->GetDestination('DefaultController'));
+         }
       } else {
          switch ($Reaction) {
 

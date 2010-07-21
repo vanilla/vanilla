@@ -1187,12 +1187,6 @@ div.Popup .Footer input.Button {
 	margin-right: 2px;
 }
 
-.Version {
-   color: #555;
-   text-align: center;
-}
-
-
 /* ==================================================================== Legal */
 div.Legal ol {
 	list-style-position:outside;
@@ -1354,7 +1348,17 @@ table.SelectionGrid td.Active {
    border-top: 1px solid #fff;
    background: #e2f4ff;
 	padding: 4px 18px 2px;
+	position: relative;
 }
 #Foot a {
 	color: #076C8E;
 }
+.Version {
+	position: absolute;
+	bottom: 10px;
+	right: 20px;
+	color: #acddf8;
+	font-size: 12px;
+	font-weight: normal;
+}
+

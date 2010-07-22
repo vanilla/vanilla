@@ -163,7 +163,7 @@ class MinifyPlugin extends Gdn_Plugin {
       $Sender->ClearJsFiles();
       
       // Add minified css & js directly to the head module
-      $Url = Gdn::Request()->Url('plugins/Minify/min/?', TRUE);
+      $Url = 'plugins/Minify/min/?';
 		$BasePath = Gdn::Request()->WebRoot();
 		if ($BasePath != '')
 			$BasePath = 'b='.$BasePath.'&';

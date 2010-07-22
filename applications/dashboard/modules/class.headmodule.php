@@ -59,7 +59,7 @@ if (!class_exists('HeadModule', FALSE)) {
       public function AddCss($HRef, $Media = '') {
          $this->AddTag('link', array('rel' => 'stylesheet',
             'type' => 'text/css',
-            'href' => Asset($HRef),
+            'href' => Asset($HRef, FALSE, TRUE),
             'media' => $Media));
       }
 
@@ -96,7 +96,7 @@ if (!class_exists('HeadModule', FALSE)) {
        * @param string The type of script being added. ie. "text/javascript"
        */
       public function AddScript($Src, $Type = 'text/javascript') {
-         $this->AddTag('script', array('src' => Asset($Src), 'type' => $Type));
+         $this->AddTag('script', array('src' => Asset($Src, FALSE, TRUE), 'type' => $Type));
       }
       
       /**

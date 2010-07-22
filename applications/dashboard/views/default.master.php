@@ -33,7 +33,7 @@
 						echo $this->Menu->ToString();
 					}
 				?>
-            <div id="Search"><?php
+            <div class="Search"><?php
 					$Form = Gdn::Factory('Form');
 					$Form->InputPrefix = '';
 					echo 

@@ -41,7 +41,7 @@ class DiscussionController extends VanillaController {
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
       // Setup
-      $this->Title(Gdn_Format::Text($this->Discussion->Name));
+      $this->Title($this->Discussion->Name);
 
       // Actual number of comments, excluding the discussion itself
       $ActualResponses = $this->Discussion->CountComments - 1;

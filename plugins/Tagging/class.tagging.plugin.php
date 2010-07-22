@@ -26,7 +26,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add the Tagging admin menu option.
     */
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $LinkText = T('Flagged Content');
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', T('Tagging'), 'settings/tagging', 'Garden.Settings.Manage');

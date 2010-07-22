@@ -409,6 +409,7 @@ div.MorePager a.Loading {
    padding: 0;
    text-align: right;
 }
+div.Search:after,
 div#Search:after {
    content: ".";
    display: block;

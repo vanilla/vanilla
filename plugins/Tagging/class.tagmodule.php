@@ -50,9 +50,15 @@ class TagModule extends Gdn_Module {
       <div class="Box Tags">
          <h4><?php echo T($this->_DiscussionID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
          <ul class="PanelInfo">
-         <?php foreach ($this->_TagData->Result() as $Tag) { ?>
+         <?php
+         foreach ($this->_TagData->Result() as $Tag) {
+            if ($Tag->Name != '') {
+         ?>
             <li><strong><?php echo Anchor($Tag->Name, 'discussions/tagged/'.$Tag->Name); ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
-         <?php } ?>
+         <?php
+            }
+         }
+         ?>
          </ul>
       </div>
       <?php

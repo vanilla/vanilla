@@ -65,7 +65,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
    }
    
    public function GetWebResource($Filepath) {
-      $WebResource = $this->GetResource($Filename, FALSE, FALSE);
+      $WebResource = $this->GetResource($Filepath, FALSE, FALSE);
       
       if (Gdn::Request()->WebRoot())
          $WebResource = Gdn::Request()->WebRoot().'/'.$WebResource;

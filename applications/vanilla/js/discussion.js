@@ -62,15 +62,15 @@ jQuery(document).ready(function($) {
       postValues += '&Type='+type;
       var discussionID = $(frm).find('[name$=DiscussionID]');
       var prefix = discussionID.attr('name').replace('DiscussionID', '');
-      var discussionID = discussionID.val();
+      discussionID = discussionID.val();
       // Get the last comment id on the page
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id');
-      var lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
-      $(frm).find(':submit').attr('disabled', 'disabled');            
+      $(frm).find(':submit').attr('disabled', 'disabled');
       $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&nbsp;</span>');
       // Also add a spinner for comments being edited
       $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
@@ -162,6 +162,7 @@ jQuery(document).ready(function($) {
                $(frm).triggerHandler('complete');
             }
             gdn.inform(json.StatusMessage);
+            return false;
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.

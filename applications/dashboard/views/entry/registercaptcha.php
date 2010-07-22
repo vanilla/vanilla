@@ -46,7 +46,7 @@
          ?>
       </li>
       <li class="CaptchaInput"><?php
-         echo $this->Form->Label("Prove you aren't a robot!", '');
+         echo $this->Form->Label("Security Check", '');
          echo recaptcha_get_html($CaptchaPublicKey);
       ?></li>
       <li>

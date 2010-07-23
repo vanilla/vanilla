@@ -1041,7 +1041,7 @@ if (!function_exists('ProxyRequest')) {
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
          $Header = "GET $Path?$Query HTTP/1.1\r\n"
             ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call

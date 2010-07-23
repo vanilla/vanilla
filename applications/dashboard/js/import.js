@@ -6,6 +6,8 @@ jQuery(document).ready(function($) {
 			url: url,
 			dataType: 'json',
 			success: function(json) {
+			   json = $.postParseJson(json);
+			   
 				// Refresh the view.
 				$('#Content').html(json.Data);
 				// Go to the next step.

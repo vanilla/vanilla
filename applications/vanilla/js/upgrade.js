@@ -17,6 +17,8 @@ jQuery(document).ready(function($) {
             $.popup({}, textStatus);
          },
          success: function(json) {
+            json = $.postParseJson(json);
+            
             // Remove any old errors from the form
             if (json.FormSaved == false) {
                $('#Content').html(json.Data);
@@ -41,6 +43,8 @@ jQuery(document).ready(function($) {
                $.popup({}, textStatus);
             },
             success: function(json) {
+               json = $.postParseJson(json);
+               
                CarryOn(json);
             }
          });

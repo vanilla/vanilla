@@ -85,6 +85,8 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
+            json = $.postParseJson(json);
+            
             // If there is a redirect url, go to it
             if (json.RedirectUrl != null && json.RedirectUrl.trim() != '') {
                resetCommentForm(btn);
@@ -243,6 +245,8 @@ jQuery(document).ready(function($) {
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
+               json = $.postParseJson(json);
+               
                $(msg).after(json.Data);
                $(msg).hide();
                $(parent).find('span.TinyProgress').remove();
@@ -299,7 +303,9 @@ jQuery(document).ready(function($) {
                // Popup the error
                $.popup({}, XMLHttpRequest.responseText);
             },
-            success: function(json) {               
+            success: function(json) {
+               json = $.postParseJson(json);
+               
                if(json.Data && json.LastCommentID) {
                   gdn.definition('LastCommentID', json.LastCommentID, true);
                   $(json.Data).appendTo("ul.Discussion")

@@ -88,6 +88,8 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
+            json = $.postParseJson(json);
+            
             // Remove any old errors from the form
             $('div.Errors').remove();
 

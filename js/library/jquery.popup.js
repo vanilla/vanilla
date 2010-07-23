@@ -51,6 +51,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                    $.popup({}, XMLHttpRequest.responseText);
                 },
                 success: function(json) {
+                  $.base64Decode(item.Data)
+                  
                   $.popup.close(settings);
                   settings.afterConfirm(json, settings.sender);
                   gdn.inform(json.StatusMessage);
@@ -211,33 +213,33 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     
     settings.afterLoad();
     
-    // Now, if there are any forms in the popup, hijack them if necessary.
-    if (settings.hijackForms == true) {
+   // Now, if there are any forms in the popup, hijack them if necessary.
+   if (settings.hijackForms == true) {
       $('#'+settings.popupId+' form').ajaxForm({
-        data: {
-          'DeliveryType' : settings.deliveryType,
-          'DeliveryMethod' : 'JSON'
-        },
-        dataType: 'json',
-        beforeSubmit: function() {
+          data: {
+             'DeliveryType' : settings.deliveryType,
+             'DeliveryMethod' : 'JSON'
+         },
+         dataType: 'json',
+         beforeSubmit: function() {
           settings.onSave(settings) // Notify the user that it is being saved.
-        },  
-        success: function(json) {
-          if (json.StatusMessage)
-             gdn.inform(json.StatusMessage);
-
-          if (json.FormSaved == true) {
-
-            if (json.RedirectUrl)
-              setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+         },  
+         success: function(json) {
+            json = $.postParseJson(json);
+            
+            if (json.StatusMessage)
+               gdn.inform(json.StatusMessage);
+         
+            if (json.FormSaved == true) {
+               if (json.RedirectUrl)
+                  setTimeout("document.location='" + json.RedirectUrl + "';", 300);
               
-            settings.afterSuccess(settings, json);
-            $.popup.close(settings, json);
-              
-          } else {
-            $.popup.reveal(settings, json) // Setup the form again
-          }
-        }
+               settings.afterSuccess(settings, json);
+               $.popup.close(settings, json);
+            } else {
+               $.popup.reveal(settings, json) // Setup the form again
+            }
+         }
       });
     }
     

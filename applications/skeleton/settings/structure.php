@@ -34,6 +34,8 @@ The Column method (defined in /library/database/class.generic.structure.php) has
 
 Example table construction:
 
+$Construct = Gdn::Structure();
+
 $Construct->Table('ExampleTable')
 	->PrimaryKey('ExampleTableID')
    ->Column('ExampleUserID', 'int', TRUE)
@@ -46,5 +48,4 @@ $SQL = $Database->SQL();
 $SQL->Select('e.ExampleTableID, e.ExampleUserID, u.Name as ExampleUser, e.Field1')
    ->From('ExampleTable e')
    ->Join('User u', 'e.ExampleUserID = u.UserID');
-$Construct->View('vw_Example', $SQL);
 */

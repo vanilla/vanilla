@@ -207,17 +207,26 @@ if (!function_exists('Asset')) {
    /**
     * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
     */
-   function Asset($Destination = '', $WithDomain = FALSE) {
+   function Asset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
       $Destination = str_replace('\\', '/', $Destination);
       if (substr($Destination, 0, 7) == 'http://') {
-         return $Destination;
+         $Result = $Destination;
       } else {
          $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
          if (!$WithDomain)
             array_unshift($Parts, '/');
             
-         return CombinePaths($Parts, '/');
+         $Result = CombinePaths($Parts, '/');
       }
+
+      if ($AddVersion) {
+         if (strpos($Result, '?') === FALSE)
+            $Result .= '?';
+         else
+            $Result .= '&';
+         $Result.= 'v='.urlencode(APPLICATION_VERSION);
+      }
+      return $Result;
    }
 }
 

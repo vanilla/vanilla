@@ -156,12 +156,12 @@ class CommentModel extends VanillaModel {
          ->CountComments;
    }
    
-   public function GetID($CommentID) {
+   public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT) {
       $this->CommentQuery(FALSE);
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get()
-         ->FirstRow();
+         ->FirstRow($ResultType);
    }
    
    public function GetIDData($CommentID) {
@@ -314,6 +314,9 @@ class CommentModel extends VanillaModel {
       }
 
       $this->UpdateCommentCount($DiscussionID);
+      // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
+      $this->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
+
 
       // Update the discussion author's CountUnreadDiscussions (ie.
       // the number of discussions created by the user that s/he has

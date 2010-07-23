@@ -239,7 +239,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             ->Where('Token', $InsertArray['Token'])
             ->Put();
             
-         if (!$NumAffected->PDOStatement()->rowCount())
+         if (!$NumAffected->PDOStatement() || !$NumAffected->PDOStatement()->rowCount())
             throw new Exception();
       } catch (Exception $e) {
          Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);

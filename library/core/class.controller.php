@@ -903,14 +903,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          // success status of the form so that jQuery knows what to do
          // with the result.
          $FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
-
+         
          $this->SetJson('FormSaved', $FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
-         if($View instanceof Gdn_IModule) {
-            $this->SetJson('Data', $View->ToString());
-         } else {
-            $this->SetJson('Data', $View);
-         }
+         $this->SetJson('Data', ($View instanceof Gdn_IModule) ? $View->ToString() : $View);
          $this->SetJson('StatusMessage', $this->StatusMessage);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 

@@ -111,7 +111,7 @@ class UserModel extends Gdn_Model {
       return $this->SQL->Select('u.*')
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', C('Garden.Registration.ApplicantRoleID', 0), TRUE, FALSE)
+         ->Where('ur.RoleID', (int)C('Garden.Registration.ApplicantRoleID', 0), TRUE, FALSE)
          ->GroupBy('UserID')
          ->OrderBy('DateInserted', 'desc')
          ->Get();

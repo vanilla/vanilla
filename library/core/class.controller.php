@@ -906,7 +906,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          
          $this->SetJson('FormSaved', $FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
-         $this->SetJson('Data', ($View instanceof Gdn_IModule) ? $View->ToString() : $View);
+         $this->SetJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->ToString() : $View));
          $this->SetJson('StatusMessage', $this->StatusMessage);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 

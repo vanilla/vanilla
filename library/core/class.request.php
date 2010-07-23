@@ -423,7 +423,9 @@ class Gdn_Request {
        */
 
       $UrlParts = explode('/', $this->Path());
-      $LastParam = array_pop(array_slice($UrlParts, -1, 1));
+      $Last = array_slice($UrlParts, -1, 1);
+      // Only variables should be passed by reference (array_pop)
+      $LastParam = array_pop($Last);
       $Match = array();
       if (preg_match('/^(.+)\.([^.]{1,4})$/', $LastParam, $Match)) {
          $this->OutputFormat($Match[2]);
@@ -444,9 +446,13 @@ class Gdn_Request {
          $Key = array_search('index.php', $WebRoot);
          if ($Key !== FALSE) {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
+         } else {
+            // WebRoot is array here, will be error: Array to string conversion on next line trim()
+            // FIX ME!
          }
+         
       }
-
+      
       $ParsedWebRoot = trim($WebRoot,'/');
       $this->WebRoot($ParsedWebRoot);
 

@@ -179,6 +179,7 @@ class EntryController extends Gdn_Controller {
       $ConsumerKey = $Authenticator->GetProviderKeyFromHandshake($Payload);
       $TokenKey = $Authenticator->GetTokenKeyFromHandshake($Payload);
       $UserName = $Authenticator->GetUserNameFromHandshake($Payload);
+      $UserEmail = $Authenticator->GetUserEmailFromHandshake($Payload);
       
       $PreservedKeys = array(
          'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
@@ -252,7 +253,7 @@ class EntryController extends Gdn_Controller {
          }
          
          $Name = $UserName;
-         $Email = $UserKey;
+         $Email = $UserEmail;
          
          // Set the defaults for a new user.
          $this->Form->SetFormValue('NewName', $Name);

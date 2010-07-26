@@ -465,8 +465,6 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    }
 }
 
-/*
- We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('filter_input')) {
    if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
    if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
@@ -488,7 +486,6 @@ if (!function_exists('filter_input')) {
       return $Value;     
    }
 }
-*/
 
 if (!function_exists('ForceBool')) {
    function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
@@ -1041,7 +1038,7 @@ if (!function_exists('ProxyRequest')) {
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
-         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $Header = "GET $Path?$Query HTTP/1.1\r\n"
             ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call

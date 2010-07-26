@@ -99,9 +99,14 @@ jQuery(document).ready(function($) {
             var processedTargets = false;
             // If there are targets, process them
             if (json.Targets && json.Targets.length > 0) {
-               json.Targets[0].Data = json.Data;
+               for(i = 0; i < json.Targets.length; i++) {
+                  if (json.Targets[i].Type != "Ajax") {
+                     json.Targets[i].Data = json.Data;
+                     processedTargets = true;
+                     break;
+                   }
+               }
                gdn.processTargets(json.Targets);
-               processedTargets = true;
             }
 
             // Remove any old popups if not saving as a draft

@@ -231,13 +231,18 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('DraftID', $DraftID, TRUE);
             $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
          } else if (!$Preview) {
+            $Inserted = !$CommentID;
             $CommentID = $this->CommentModel->Save($FormValues);
+
+            // The comment is now half-saved.
+            if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+               $this->Comment2($CommentID, $Inserted);
+            } else {
+               $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+            }
             
             // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
             $Comment = $this->CommentModel->GetID($CommentID);
-            
-            // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
-            $this->CommentModel->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
             
             $this->EventArguments['Discussion'] = $Discussion;
             $this->EventArguments['Comment'] = $Comment;
@@ -351,6 +356,10 @@ class PostController extends VanillaController {
          
       $this->FireEvent('BeforeCommentRender');
       $this->Render();
+   }
+
+   public function Comment2($CommentID, $Inserted = FALSE) {
+      $this->CommentModel->Save2($CommentID, $Inserted);
    }
    
    /**

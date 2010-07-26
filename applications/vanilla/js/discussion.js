@@ -88,7 +88,7 @@ jQuery(document).ready(function($) {
             json = $.postParseJson(json);
             
             // If there is a redirect url, go to it
-            if (json.RedirectUrl != null && json.RedirectUrl.trim() != '') {
+            if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
                resetCommentForm(btn);
                clearCommentForm(btn);               
                window.location.replace(json.RedirectUrl);

@@ -428,7 +428,7 @@ class Gdn_Request {
       if (preg_match('/^(.+)\.([^.]{1,4})$/', $LastParam, $Match)) {
          $this->OutputFormat($Match[2]);
          $this->Filename($Match[0]);
-         $this->Path(implode('/',array_slice($UrlParts, 0, -1)));
+         //$this->Path(implode('/',array_slice($UrlParts, 0, -1)));
       }
 
       /**

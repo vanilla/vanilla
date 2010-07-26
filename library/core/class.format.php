@@ -398,6 +398,8 @@ class Gdn_Format {
                $Mixed
             );
 
+            // Links
+            $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
 

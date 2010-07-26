@@ -110,9 +110,17 @@ class ActivityModel extends Gdn_Model {
          $this->Validation->AddValidationResult('Body', 'You must provide a comment.');
          return FALSE;
       }
+
+      // Massage $SendEmail to allow for only sending an email.
+      if ($SendEmail == 'Only') {
+         $SendEmail = '';
+         $AddActivity = FALSE;
+      } else {
+         $AddActivity = TRUE;
+      }
          
       // If this is a notification, increment the regardinguserid's count
-      if ($Notify) {
+      if ($AddActivity && $Notify) {
          $this->SQL
             ->Update('User')
             ->Set('CountNotifications', 'coalesce(CountNotifications) + 1', FALSE)
@@ -134,10 +142,12 @@ class ActivityModel extends Gdn_Model {
          
       if (is_numeric($CommentActivityID))
          $Fields['CommentActivityID'] = $CommentActivityID;
-         
-      $this->AddInsertFields($Fields);
-      $this->DefineSchema();
-      $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
+
+      if ($AddActivity) {
+         $this->AddInsertFields($Fields);
+         $this->DefineSchema();
+         $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
+      }
 
       // If $SendEmail was FALSE or TRUE, let it override the $Notify setting.
       if ($SendEmail === FALSE || $SendEmail === TRUE)

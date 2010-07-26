@@ -127,10 +127,12 @@ class UserController extends DashboardController {
 	public function Approve($UserID = '', $PostBackKey = '') {
       $this->Permission('Garden.Users.Approve');
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($PostBackKey))
-         if($this->HandleApplicant('Approve', $UserID)) {
+      if ($Session->ValidateTransientKey($PostBackKey)) {
+         $Approved = $this->HandleApplicant('Approve', $UserID);
+         if ($Approved) {
             $this->StatusMessage = T('Your changes have been saved.');
          }
+      }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
          return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();

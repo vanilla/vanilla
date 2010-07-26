@@ -783,11 +783,27 @@ class Gdn_Form {
          $this->Action = Url();
          
       $this->Action = $ActionFromAttributes === FALSE ? $this->Action : $ActionFromAttributes;
-      
+
+      if (!C('Garden.RewriteUrls') && strcasecmp($this->Method, 'get') == 0) {
+         // The path is not getting passed on get forms so put them in hidden fields.
+         $Action = strrchr($this->Action, '?');
+         $this->Action = substr($this->Action, 0, -strlen($Action));
+         parse_str(trim($Action, '?'), $Query);
+         $Hiddens = '';
+         foreach ($Query as $Key => $Value) {
+            $Key = Gdn_Format::Form($Key);
+            $Value = Gdn_Format::Form($Value);
+            $Hiddens .= "\n<input type=\"hidden\" name=\"$Key\" value=\"$Value\" />";
+         }
+      }
+
       $Return .= ' method="' . $this->Method . '"'
          .' action="' . $this->Action . '"'
          .$this->_AttributesToString($Attributes)
          .">\n<div>\n";
+
+      if (isset($Hiddens))
+         $Return .= $Hiddens;
 
       // Postback Key - don't allow it to be posted in the url (prevents csrf attacks & hijacks)
       if ($this->Method != "get") {

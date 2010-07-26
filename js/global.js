@@ -218,6 +218,12 @@ jQuery(document).ready(function($) {
          var item = targets[i];
          $target = $(item.Target);
          switch(item.Type) {
+            case 'Ajax':
+               $.ajax({
+                  type: "POST",
+                  url: item.Data
+               });
+               break;
             case 'Append':
                $target.append(item.Data);
                break;

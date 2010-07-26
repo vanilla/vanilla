@@ -70,7 +70,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 // Load the custom configurations so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
-header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
+// This header is redundantly set in the controller.
+//header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
 
 Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
 

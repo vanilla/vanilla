@@ -122,7 +122,6 @@ class InvitationModel extends Gdn_Model {
          $Email = new Gdn_Email();
          $Email->Subject(sprintf(T('[%s] Invitation'), $AppTitle));
          $Email->To($Invitation->Email);
-         //$Email->From($Invitation->SenderEmail, $Invitation->SenderName);
          $Email->Message(
             sprintf(
                T('EmailInvitation'),

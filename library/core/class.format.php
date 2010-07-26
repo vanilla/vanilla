@@ -572,7 +572,8 @@ EOT;
       if (!is_string($Mixed))
          return self::To($Mixed, 'Text');
       else {
-         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed)), ENT_QUOTES, Gdn::Config('Garden.Charset', 'UTF-8'));
+         $Charset = C('Garden.Charset', 'UTF-8');
+         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
          if ($AddBreaks)
             $Result = nl2br($Result);
          return $Result;

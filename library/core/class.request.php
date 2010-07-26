@@ -424,7 +424,6 @@ class Gdn_Request {
 
       $UrlParts = explode('/', $this->Path());
       $Last = array_slice($UrlParts, -1, 1);
-      // Only variables should be passed by reference (array_pop)
       $LastParam = array_pop($Last);
       $Match = array();
       if (preg_match('/^(.+)\.([^.]{1,4})$/', $LastParam, $Match)) {
@@ -447,8 +446,8 @@ class Gdn_Request {
          if ($Key !== FALSE) {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
          } else {
-            // WebRoot is array here, will be error: Array to string conversion on next line trim()
-            // FIX ME!
+            // Could not determine webroot.
+            $Webroot = '';
          }
          
       }

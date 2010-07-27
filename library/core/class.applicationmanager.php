@@ -88,7 +88,15 @@ class Gdn_ApplicationManager {
          // Add some information about the applications to the array.
          foreach($EnabledApplications as $Name => $Folder) {
             $EnabledApplications[$Name] = array('Folder' => $Folder);
-            $EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
+            //$EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
+            $EnabledApplications[$Name]['Version'] = '';
+            // Get the application version from it's about file.
+            $AboutPath = PATH_APPLICATIONS.'/'.strtolower($Name).'/settings/about.php';
+            if (file_exists($AboutPath)) {
+               $ApplicationInfo = array();
+               include $AboutPath;
+               $EnabledApplications[$Name]['Version'] = GetValueR("$Name.Version", $ApplicationInfo, '');
+            }
          }
          $this->_EnabledApplications = $EnabledApplications;
       }

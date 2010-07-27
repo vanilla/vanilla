@@ -34,6 +34,7 @@ class Gdn_Format {
     *  %6 = his/her
     *  %7 = he/she
     *  %8 = route & routecode
+    *  %9 = gender suffix (some languages require this).
     *
     * @param object $Activity An object representation of the activity being formatted.
     * @param int $ProfileUserID If looking at a user profile, this is the UserID of the profile we are
@@ -48,29 +49,40 @@ class Gdn_Format {
       
       if ($ViewingUserID == $Activity->ActivityUserID) {
          $ActivityName = $ActivityNameP = T('You');
+         $GenderSuffixCode = 'First';
       } else {
          $ActivityName = $Activity->ActivityName;
          $ActivityNameP = FormatPossessive($ActivityName);
+         $GenderSuffixCode = 'Third';
       }
       if ($ProfileUserID != $Activity->ActivityUserID) {
          // If we're not looking at the activity user's profile, link the name
          $ActivityNameD = urlencode($Activity->ActivityName);
          $ActivityName = Anchor($ActivityName, '/profile/' . $Activity->ActivityUserID . '/' . $ActivityNameD);
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
+         $GenderSuffixCode = 'Third';
       }
       $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
-      if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID))
+      if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
          $Gender = $Gender2 = T('your');
+         $GenderSuffixCode = 'First';
+      }
 
       $IsYou = FALSE;
       if ($ViewingUserID == $Activity->RegardingUserID) {
          $IsYou = TRUE;
          $RegardingName = T('you');
          $RegardingNameP = T('your');
+         $GenderSuffixCode = 'First';
       } else {
          $RegardingName = $Activity->RegardingName == '' ? T('somebody') : $Activity->RegardingName;
          $RegardingNameP = FormatPossessive($RegardingName);
+
+         if ($Activity->ActivityUserID != $ViewingUserID)
+            $GenderSuffixCode = 'Third';
+         else
+            $GenderSuffixCode = 'First';
       }
       $RegardingWall = '';
 
@@ -78,12 +90,14 @@ class Gdn_Format {
          // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
          $RegardingName = $RegardingProfile = $Gender;
          $RegardingNameP = $RegardingProfileP = $Gender;
+         $GenderSuffixCode = 'First';
       } else if ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
          if (!$IsYou) {
             $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
             $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
+            $GenderSuffixCode = 'Third';
          }
          $RegardingWall = Anchor(T('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
@@ -95,6 +109,12 @@ class Gdn_Format {
       else
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
+      // Translate the gender suffix.
+      $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.{$Activity->ActivityGender}";
+      $GenderSuffix = T($GenderSuffixCode, '');
+      if ($GenderSuffix == $GenderSuffixCode)
+         $GenderSuffix = ''; // in case translate doesn't support empty strings.
+
       /*
         Debug:
       return $ActivityName
@@ -105,8 +125,9 @@ class Gdn_Format {
       .'/'.$Gender
       .'/'.$Gender2
       .'/'.$Route
+      .'/'.$GenderSuffix.($GenderSuffixCode)
       */
-      return sprintf($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route);
+      return sprintf(($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline)), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
    }
 
    /**

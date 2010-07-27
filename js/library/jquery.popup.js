@@ -51,7 +51,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                    $.popup({}, XMLHttpRequest.responseText);
                 },
                 success: function(json) {
-                  $.base64Decode(item.Data)
+                  json = $.postParseJson(json);
                   
                   $.popup.close(settings);
                   settings.afterConfirm(json, settings.sender);

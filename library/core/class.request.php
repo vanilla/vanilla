@@ -678,14 +678,14 @@ class Gdn_Request {
       if ($this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
 
+      // Strip out the querystring.
+      $Query = strrchr($Path, '?');
+      if (strlen($Query) > 0)
+         $Path = substr($Path, 0, -strlen($Query));
 
       if (!$RewriteUrls) {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
-         $Path = str_replace('?', '&', $Path);
-      } else {
-         $Query = strrchr($Path, '?');
-         if (strlen($Query) > 0)
-            $Path = substr($Path, 0, -strlen($Query));
+         $Query = str_replace('?', '&', $Query);
       }
 
       if($Path == '') {

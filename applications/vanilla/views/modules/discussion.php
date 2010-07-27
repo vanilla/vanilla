@@ -3,7 +3,7 @@
 ?>
 <li id="<?php echo 'Bookmark_'.$Discussion->DiscussionID; ?>">
    <strong><?php
-      echo Anchor($Discussion->Name, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+      echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
    ?></strong>
    <div class="Meta">
       <?php

@@ -311,81 +311,27 @@ if (!function_exists('CheckRequirements')) {
    function CheckRequirements($ItemName, $RequiredItems, $EnabledItems, $RequiredItemTypeCode) {
       // 1. Make sure that $RequiredItems are present
       if (is_array($RequiredItems)) {
+         $MissingRequirements = array();
+
          foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
-            if (array_key_exists($RequiredItemName, $EnabledItems) === FALSE) {
-               throw new Exception(
-                  sprintf(
-                     T('%1$s requires the %2$s %3$s version %4$s.'),
-                     $ItemName,
-                     $RequiredItemName,
-                     $RequiredItemTypeCode,
-                     $RequiredVersion
-                  )
-               );
-            } else if (StringIsNullOrEmpty($RequiredVersion) === FALSE) {
+            if (!array_key_exists($RequiredItemName, $EnabledItems)) {
+               $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
+            } else if ($RequiredVersion && $RequiredVersion != '*') { // * means any version
+               $EnabledItems;
+
                 // If the item exists and is enabled, check the version
                $EnabledVersion = ArrayValue('Version', ArrayValue($RequiredItemName, $EnabledItems, array()), '');
-               if ($EnabledVersion !== $RequiredVersion) {
-                  // Check for version ranges (<, <=, >, >=)
-                  $Matches = FALSE;
-                  preg_match_all('/(>|>=|<|<=){1}([\d\.]+)/', $RequiredVersion, $Matches);
-                  if (is_array($Matches) && count($Matches) == 3 && count($Matches[1]) > 0) {
-                     // The matches array should contain a three parts:
-                     /*
-                      eg. The following $RequiredVersion string:
-                        >1.33<=4.1
-                     would result in:
-                        Array (
-                              [0] => Array
-                                  (
-                                      [0] => >1.33
-                                      [1] => <=4.1
-                                  )
-                              [1] => Array
-                                  (
-                                      [0] => >
-                                      [1] => <=
-                                  )
-                              [2] => Array
-                                  (
-                                      [0] => 1.33
-                                      [1] => 4.1
-                                  )
-                          )
-                     */
-
-                     $Operators = $Matches[1];
-                     $Versions = $Matches[2];
-                     $Count = count($Operators);
-                     for ($i = 0; $i < $Count; ++$i) {
-                        $Operator = $Operators[$i];
-                        $MatchVersion = $Versions[$i];
-                        if (!version_compare($EnabledVersion, $MatchVersion, $Operator)) {
-                           throw new Exception(
-                              sprintf(
-                                 T('%1$s requires the %2$s %3$s version %4$s %5$s'),
-                                 $ItemName,
-                                 $RequiredItemName,
-                                 $RequiredItemTypeCode,
-                                 $Operator,
-                                 $MatchVersion
-                              )
-                           );
-                        }
-                     }
-                  } else if ($RequiredVersion != '*' && $RequiredVersion != '') {
-                     throw new Exception(
-                        sprintf(
-                           T('%1$s requires the %2$s %3$s version %4$s'),
-                           $ItemName,
-                           $RequiredItemName,
-                           $RequiredItemTypeCode,
-                           $RequiredVersion
-                        )
-                     );
-                  }
+               // Compare the versions.
+               if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
+                  $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
                }
             }
+         }
+         if (count($MissingRequirements) > 0) {
+            $Msg = sprintf("%s is missing the following requirement(s): %s.",
+               $ItemName,
+               implode(', ', $MissingRequirements));
+            throw new Gdn_UserException($Msg);
          }
       }
    }

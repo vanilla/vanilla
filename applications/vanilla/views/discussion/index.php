@@ -32,7 +32,7 @@ if ($Session->IsValid()) {
    ?></div>
 </div>
 <?php
-   echo $this->Pager->ToString('less');
+   //echo $this->Pager->ToString('less');
    echo $this->RenderAsset('DiscussionBefore');
 ?>
 <ul class="MessageList Discussion">

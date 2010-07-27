@@ -23,7 +23,7 @@ class DiscussionController extends VanillaController {
       $this->AddJsFile('jquery.resizable.js');
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('jquery.gardenmorepager.js');
+//      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');
@@ -93,16 +93,24 @@ class DiscussionController extends VanillaController {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = '%1$s more comments';
-      $this->Pager->LessCode = '%1$s older comments';
+      $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $this->Offset,
          $Limit,
          $ActualResponses,
-         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s' //'discussions/%1$s'
       );
+
+//      $this->Pager->MoreCode = '%1$s more comments';
+//      $this->Pager->LessCode = '%1$s older comments';
+//      $this->Pager->ClientID = 'Pager';
+//      $this->Pager->Configure(
+//         $this->Offset,
+//         $Limit,
+//         $ActualResponses,
+//         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+//      );
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');

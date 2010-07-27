@@ -46,10 +46,12 @@ class Gdn_Format {
          $Session = Gdn::Session();
          $ViewingUserID = $Session->IsValid() ? $Session->UserID : -1;
       }
+
+      $GenderSuffixCode = 'First';
+      $GenderSuffixGender = $Activity->ActivityGender;
       
       if ($ViewingUserID == $Activity->ActivityUserID) {
          $ActivityName = $ActivityNameP = T('You');
-         $GenderSuffixCode = 'First';
       } else {
          $ActivityName = $Activity->ActivityName;
          $ActivityNameP = FormatPossessive($ActivityName);
@@ -66,7 +68,6 @@ class Gdn_Format {
       $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
          $Gender = $Gender2 = T('your');
-         $GenderSuffixCode = 'First';
       }
 
       $IsYou = FALSE;
@@ -74,15 +75,13 @@ class Gdn_Format {
          $IsYou = TRUE;
          $RegardingName = T('you');
          $RegardingNameP = T('your');
-         $GenderSuffixCode = 'First';
+         $GenderSuffixGender = $Activity->RegardingGender;
       } else {
          $RegardingName = $Activity->RegardingName == '' ? T('somebody') : $Activity->RegardingName;
          $RegardingNameP = FormatPossessive($RegardingName);
 
          if ($Activity->ActivityUserID != $ViewingUserID)
             $GenderSuffixCode = 'Third';
-         else
-            $GenderSuffixCode = 'First';
       }
       $RegardingWall = '';
 
@@ -90,7 +89,6 @@ class Gdn_Format {
          // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
          $RegardingName = $RegardingProfile = $Gender;
          $RegardingNameP = $RegardingProfileP = $Gender;
-         $GenderSuffixCode = 'First';
       } else if ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
@@ -98,6 +96,7 @@ class Gdn_Format {
             $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
             $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
             $GenderSuffixCode = 'Third';
+            $GenderSuffixGender = $Activity->RegardingGender;
          }
          $RegardingWall = Anchor(T('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
       }
@@ -110,7 +109,7 @@ class Gdn_Format {
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
       // Translate the gender suffix.
-      $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.{$Activity->ActivityGender}";
+      $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";
       $GenderSuffix = T($GenderSuffixCode, '');
       if ($GenderSuffix == $GenderSuffixCode)
          $GenderSuffix = ''; // in case translate doesn't support empty strings.

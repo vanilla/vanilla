@@ -25,6 +25,7 @@ class ActivityModel extends Gdn_Model {
          ->Select('au.Gender', '', 'ActivityGender')
          ->Select('au.Photo', '', 'ActivityPhoto')
          ->Select('ru.Name', '', 'RegardingName')
+         ->Select('ru.Gender', '', 'RegardingGender')
          ->From('Activity a')
          ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
          ->Join('User au', 'a.ActivityUserID = au.UserID')

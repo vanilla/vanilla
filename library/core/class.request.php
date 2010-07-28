@@ -692,6 +692,14 @@ class Gdn_Request {
          $PathParts = explode('/', $this->Path());
          $PathParts = array_map('urlencode', $PathParts);
          $Path = implode('/', $PathParts);
+         // Grab the get parameters too.
+         if (!$Query) {
+            $Query = $this->GetRequestArguments(self::INPUT_GET);
+            if (count($Query) > 0)
+               $Query = '?'.http_build_query($Query);
+            else
+               unset($Query);
+         }
       }
       $Parts[] = trim($Path, '/');
 

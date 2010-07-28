@@ -43,10 +43,10 @@ class UserController extends DashboardController {
          $this->Form->SetFormValue('Keywords', $Keywords);
 
       $UserModel = new UserModel();
-      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+      //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       $Limit = 30;
-      $TotalRecords = $UserModel->GetCountLike($Like);
-      $this->UserData = $UserModel->GetLike($Like, 'u.Name', 'asc', $Limit, $Offset);
+      $TotalRecords = $UserModel->SearchCount($Keywords);
+      $this->UserData = $UserModel->Search($Keywords, 'u.Name', 'asc', $Limit, $Offset);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();

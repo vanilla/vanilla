@@ -500,6 +500,73 @@ class UserModel extends Gdn_Model {
       }
    }
 
+   public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+
+      // Check to see if the search exactly matches a role name.
+      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+
+      $this->UserQuery();
+      $this->SQL
+         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+
+      if ($RoleID) {
+         $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } else {
+         // Search on the user table.
+         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+         
+         if (is_array($Like)) {
+            $this->SQL
+               ->BeginWhereGroup()
+               ->OrLike($Like, '', 'right')
+               ->EndWhereGroup();
+         }
+      }
+
+      return $this->SQL
+         ->Where('u.Deleted', 0)
+         ->Where('ur.RoleID is null')
+         ->OrderBy($OrderFields, $OrderDirection)
+         ->Limit($Limit, $Offset)
+         ->Get();
+   }
+
+   public function SearchCount($Keywords = FALSE) {
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+
+
+      // Check to see if the search exactly matches a role name.
+      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+      
+      $this->SQL
+         ->Select('u.UserID', 'count', 'UserCount')
+         ->From('User u')
+         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+
+      if ($RoleID) {
+         $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } else {
+         // Search on the user table.
+         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+
+         if (is_array($Like)) {
+            $this->SQL
+               ->BeginWhereGroup()
+               ->OrLike($Like, '', 'right')
+               ->EndWhereGroup();
+         }
+      }
+
+		$this->SQL
+         ->Where('u.Deleted', 0)
+         ->Where('ur.RoleID is null');
+
+		$Data =  $this->SQL->Get()->FirstRow();
+
+      return $Data === FALSE ? 0 : $Data->UserCount;
+   }
+
    /**
     * To be used for invitation registration
     */

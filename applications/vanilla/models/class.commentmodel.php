@@ -9,15 +9,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class CommentModel extends VanillaModel {
-	
-	public $OrderBy = 'c.DateInserted';
-	public $OrderDirection = 'asc';
-	
    /**
     * Class constructor.
     */
    public function __construct() {
       parent::__construct('Comment');
+      $this->FireEvent('AfterConstruct');
    }
    
    /**
@@ -44,11 +41,43 @@ class CommentModel extends VanillaModel {
    public function Get($DiscussionID, $Limit, $Offset = 0) {
       $this->CommentQuery();
       $this->FireEvent('BeforeGet');
-      return $this->SQL
+      $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
-         ->OrderBy($this->OrderBy, $this->OrderDirection)
-         ->Limit($Limit, $Offset)
-         ->Get();
+         ->Limit($Limit, $Offset);
+      
+      $this->OrderBy($this->SQL);
+
+      return $this->SQL->Get();
+   }
+   
+   protected $_OrderBy = array(array('c.DateInserted', ''));
+   /** Set the order of the comments. */
+   public function OrderBy($Value = NULL) {
+      if ($Value === NULL)
+         return $this->_OrderBy;
+
+      if (is_string($Value))
+         $Value = array($Value);
+
+      if (is_array($Value)) {
+         // Set the order of this object.
+         $OrderBy = array();
+
+         foreach($Value as $Part) {
+            if (StringEndsWith($Part, ' desc', TRUE))
+               $OrderBy[] = array(substr($Part, 0, -5), 'desc');
+            elseif (StringEndsWith($Part, ' asc', TRUE))
+               $OrderBy[] = array(substr($Part, 0, -4), 'asc');
+            else
+               $OrderBy[] = array($Part, 'asc');
+         }
+         $this->_OrderBy = $OrderBy;
+      } elseif (is_a($Value, 'Gdn_SQLDriver')) {
+         // Set the order of the given sql.
+         foreach ($this->_OrderBy as $Parts) {
+            $Value->OrderBy($Parts[0], $Parts[1]);
+         }
+      }
    }
 	
 	// Sets the UserComment Score value. Returns the total score.
@@ -172,14 +201,12 @@ class CommentModel extends VanillaModel {
    }
    
    public function GetNew($DiscussionID, $LastCommentID) {
-      $this->CommentQuery();      
-		$Operator = $this->OrderDirection == 'asc' ? '>' : '<';
-		$this->EventArguments['Operator'] = &$Operator;
+      $this->CommentQuery();
       $this->FireEvent('BeforeGetNew');
+      $this->OrderBy($this->SQL);
       return $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
-         ->Where('c.CommentID '.$Operator, $LastCommentID)
-         ->OrderBy($this->OrderBy, $this->OrderDirection)
+         ->Where('c.CommentID >', $LastCommentID)
          ->Get();
    }
    
@@ -188,18 +215,57 @@ class CommentModel extends VanillaModel {
     *
     * @param int The comment id for which the offset is being defined.
     */
-   public function GetOffset($CommentID) {
+   public function GetOffset($Comment) {
       $this->FireEvent('BeforeGetOffset');
-      return $this->SQL
-         ->Select('c2.CommentID', 'count', 'CountComments')
+      
+      if (is_numeric($Comment)) {
+         $Comment = $this->GetID($Comment);
+      }
+
+      $this->SQL
+         ->Select('c.CommentID', 'count', 'CountComments')
          ->From('Comment c')
-         ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-         ->Join('Comment c2', 'd.DiscussionID = c2.DiscussionID')
-         ->Where('c2.CommentID <=', $CommentID)
-         ->Where('c.CommentID', $CommentID)
+         ->Where('c.DiscussionID', GetValue('DiscussionID', $Comment));
+
+      // Figure out the where clause based on the sort.
+      foreach ($this->_OrderBy as $Part) {
+         //$Op = count($this->_OrderBy) == 1 || isset($PrevWhere) ? '=' : '';
+         list($Expr, $Value) = $this->_WhereFromOrderBy($Part, $Comment, '');
+
+         if (!isset($PrevWhere)) {
+            $this->SQL->Where($Expr, $Value);
+         } else {
+            $this->SQL->BeginWhereGroup();
+            $this->SQL->OrWhere($PrevWhere[0], $PrevWhere[1]);
+            $this->SQL->Where($Expr, $Value);
+            $this->SQL->EndWhereGroup();
+         }
+
+         $PrevWhere = $this->_WhereFromOrderBy($Part, $Comment, '==');
+      }
+
+      return $this->SQL
          ->Get()
          ->FirstRow()
          ->CountComments;
+   }
+
+   protected function _WhereFromOrderBy($Part, $Comment, $Op = '') {
+      if (!$Op || $Op == '=')
+         $Op = ($Part[1] == 'desc' ? '>' : '<').$Op;
+      elseif ($Op == '==')
+         $Op = '=';
+      
+      $Expr = $Part[0].' '.$Op;
+      if (preg_match('/c\.(\w*\b)/', $Part[0], $Matches))
+         $Field = $Matches[1];
+      else
+         $Field = $Part[0];
+      $Value = GetValue($Field, $Comment);
+      if (!$Value)
+         $Value = 0;
+
+      return array($Expr, $Value);
    }
    
    public function Save($FormPostValues) {

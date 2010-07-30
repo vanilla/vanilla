@@ -100,15 +100,6 @@ jQuery(document).ready(function($) {
          success: function(json) {
             json = $.postParseJson(json);
             
-            // If there is a redirect url, go to it
-            if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
-               resetCommentForm(btn);
-               clearCommentForm(btn);               
-               window.location.replace(json.RedirectUrl);
-               window.location.reload();
-               return false;
-            }
-            
             var processedTargets = false;
             // If there are targets, process them
             if (json.Targets && json.Targets.length > 0) {
@@ -120,6 +111,14 @@ jQuery(document).ready(function($) {
                    }
                }
                gdn.processTargets(json.Targets);
+            }
+
+            // If there is a redirect url, go to it
+            if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
+               resetCommentForm(btn);
+               clearCommentForm(btn);
+               window.location.replace(json.RedirectUrl);
+               return false;
             }
 
             // Remove any old popups if not saving as a draft

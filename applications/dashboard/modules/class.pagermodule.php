@@ -215,7 +215,7 @@ class PagerModule extends Gdn_Module {
          $Pager .= Anchor($PageCount, sprintf($this->Url, 'p'.$PageCount, $this->Limit));
       } else if ($FirstPage >= $PageCount - 6) {
          // We're on a page that is after the last elipsis (ie. 1 ... 75 76 77 78 79 80 81)
-         $Pager .= Anchor(1, sprintf($this->Url, '', 'p1'));
+         $Pager .= Anchor(1, sprintf($this->Url, 'p1'));
          $Pager .= '<span>...</span>';
 
          for ($i = $PageCount - 6; $i <= $PageCount; $i++) {
@@ -224,7 +224,7 @@ class PagerModule extends Gdn_Module {
          }
       } else {
          // We're between the two elipsises (ie. 1 ... 4 5 6 7 8 ... 81)
-         $Pager .= Anchor(1, sprintf($this->Url, '', 'p1'));
+         $Pager .= Anchor(1, sprintf($this->Url, 'p1'));
          $Pager .= '<span>...</span>';
 
          for ($i = $CurrentPage - 2; $i <= $CurrentPage + 2; $i++) {

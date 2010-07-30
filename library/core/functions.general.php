@@ -756,7 +756,7 @@ if (!function_exists('PageNumber')) {
     * @param bool $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
     */
    function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
-      $Result = ceil($Offset / $Limit) + 1;
+      $Result = floor($Offset / $Limit) + 1;
       if ($UrlParam)
          $Result = 'p'.$Result;
       return $Result;

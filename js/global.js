@@ -236,6 +236,9 @@ jQuery(document).ready(function($) {
             case 'Prepend':
                $target.prepend(item.Data);
                break;
+            case 'Redirect':
+               window.location.replace(item.Data);
+               break;
             case 'Remove':
                $target.remove();
                break;

@@ -264,7 +264,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new comment
                   // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                  Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID);
+                  Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
@@ -311,18 +311,25 @@ class PostController extends VanillaController {
                      // Also define the discussion url in case this request came from the post screen and needs to be redirected to the discussion
                      $this->SetJson('DiscussionUrl', Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/#Comment_'.$CommentID));
                   } else {
-                     // Otherwise load all new comments that the user hasn't seen yet
-                     $LastCommentID = $this->Form->GetFormValue('LastCommentID');
-                     if (!is_numeric($LastCommentID))
-                        $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
-                     
-                     // Don't reload the first comment if this new comment is the first one.
-                     $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
-                     // Do not load more than a single page of data...
-                     $Limit = C('Vanilla.Comments.PerPage', 50);
-                     if (($Discussion->CountComments - 1 - $this->Offset) > $Limit) {
+                     // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
+                     $OrderBy = GetValueR('0.0', $this->CommentModel->OrderBy());
+                     $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
+
+                     if (!$Redirect) {
+                        // Otherwise load all new comments that the user hasn't seen yet
+                        $LastCommentID = $this->Form->GetFormValue('LastCommentID');
+                        if (!is_numeric($LastCommentID))
+                           $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
+
+                        // Don't reload the first comment if this new comment is the first one.
+                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
+                        // Do not load more than a single page of data...
+                        $Limit = C('Vanilla.Comments.PerPage', 50);
+                     }
+
+                     if ($Redirect || ($Discussion->CountComments - 1 - $this->Offset) > $Limit) {
                         // The user posted a comment on a page other than the last one, so just redirect to the last page.
-                        $this->RedirectUrl = Gdn::Request()->Url('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#Comment_'.$CommentID, TRUE);
+                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
                      } else {
                         // Make sure to load all new comments since the page was last loaded by this user
                         $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);

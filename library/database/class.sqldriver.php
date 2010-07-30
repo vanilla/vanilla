@@ -1330,8 +1330,10 @@ abstract class Gdn_SQLDriver {
     * @param string $Direction The direction of the sort.
     */
    public function OrderBy($Fields, $Direction = 'asc') {
-      if ($Direction != 'asc')
+      if ($Direction && $Direction != 'asc')
          $Direction = 'desc';
+      else
+         $Direction = 'asc';
 
       $this->_OrderBys[] = $this->EscapeIdentifier($Fields, TRUE).' '.$Direction;
       return $this;

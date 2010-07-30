@@ -81,6 +81,7 @@ class TaggingPlugin extends Gdn_Plugin {
 		$Sender->SetData('Announcements', array(), TRUE);
       $DiscussionModel->FilterToTagID = $TagID;
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
 
@@ -193,10 +194,7 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function DiscussionModel_BeforeGet_Handler($Sender) {
       if (C('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToTagID'))
-         $Sender->SQL
-            ->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$Sender->FilterToTagID)
-            ->OrOp()
-            ->Where('1 =', 1, FALSE);
+         $Sender->SQL->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$Sender->FilterToTagID);
    }
    
    /**

@@ -82,7 +82,7 @@ var Gdn_Slice = Class.create({
    PostSlice: function() {
       this.PrepareSliceForRequest();
       
-      var SliceURL = gdn.definition('WebRoot')+this.Slice.attr('rel')+'?DeliveryType=VIEW';
+      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.Slice.attr('rel')+'?DeliveryType=VIEW');
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',

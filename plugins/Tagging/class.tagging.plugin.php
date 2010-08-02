@@ -49,10 +49,13 @@ class TaggingPlugin extends Gdn_Plugin {
     * Load discussions for a specific tag.
     */
    public function DiscussionsController_Tagged_Create($Sender) {
+      $Offset = GetValue('1', $Sender->RequestArgs, 'p1');
+      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+   
       $Sender->Tag = GetValue('0', $Sender->RequestArgs, '');
-      $Offset = GetValue('1', $Sender->RequestArgs, '0');
       $Sender->Title(T('Tagged with ').$Sender->Tag);
       $Sender->Head->Title($Sender->Head->Title());
+      $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.$Sender->Tag, PageNumber($Offset, $Limit, TRUE)), TRUE));
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
@@ -61,6 +64,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
+      
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
@@ -71,7 +75,6 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddModule($BookmarkedModule);
 
       $Sender->SetData('Category', FALSE, TRUE);
-      $Limit = C('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $Tag = $DiscussionModel->SQL->Select()->From('Tag')->Where('Name', $Sender->Tag)->Get()->FirstRow();
       $TagID = $Tag ? $Tag->TagID : 0;
@@ -93,7 +96,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/popular/%1$s'
+         'discussions/tagged/'.$Sender->Tag.'/%1$s'
       );
       
       // Deliver json data if necessary

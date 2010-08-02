@@ -173,7 +173,8 @@ $.TokenList = function (input, settings) {
                 case KEY.RETURN:
                 case KEY.COMMA:
                 case KEY.SPACE:
-                  if(selected_dropdown_item) {
+                
+                  if (selected_dropdown_item) {
                     add_token($(selected_dropdown_item));
                   } else {
                     var val = $(input_box).val();
@@ -308,7 +309,7 @@ $.TokenList = function (input, settings) {
         if((keycode >= 48 && keycode <= 90) ||      // 0-1a-z
            (keycode >= 96 && keycode <= 111) ||     // numpad 0-9 + - / * .
            (keycode >= 186 && keycode <= 192) ||    // ; = , - . / ^
-           (keycode >= 219 && keycode <= 222)       // ( \ ) '
+           (keycode >= 219)       // ( \ ) '
           ) {
               return true;
           } else {

@@ -127,8 +127,8 @@ class TaggingPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $FormTags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
-      // Tags can only contain letters, numbers, plus, dashes, underscores, hashtags, periods, @ symbols
-      if ($FormTags == '' || ValidateRegex($FormTags, '/^([\s\d\w\+-_.#]+)$/si')) {
+      // Tags can only contain letters, numbers, plus, dashes, underscores, hashtags, periods, @ symbols, and unicode
+      if (ValidateRegex($FormTags, '/^([\pL\pN\s\d\w\+-_.#]+)$/usi')) {
          $FormTags = array_unique(explode(' ', $FormTags));
          
          // Find out which of these tags is not yet in the tag table
@@ -206,13 +206,14 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $Tags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
-      // Tags can only contain: a-z 0-9 + # _ .
+      $NumTagsMax = C('Plugin.Tagging.Max', 5);
+      // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
       if (StringIsNullOrEmpty($Tags) && C('Plugins.Tagging.Required'))
          $Sender->Validation->AddValidationResult('Tags', 'You must specify at least one tag.');
-      else if (!StringIsNullOrEmpty($Tags) && !ValidateRegex($Tags, '/^([\s\d\w\+-_.#]+)$/si'))
-         $Sender->Validation->AddValidationResult('Tags', 'Tags can only contain the following characters: a-z 0-9 + # _ .');
-      else if (count(array_unique(explode(' ', $Tags))) > 5)
-         $Sender->Validation->AddValidationResult('Tags', 'You can only specify up to 5 tags.');
+      else if (!StringIsNullOrEmpty($Tags) && !ValidateRegex($Tags, '/^([\pL\pN\s\d\w\+-_.#]+)$/usi'))
+         $Sender->Validation->AddValidationResult('Tags', 'Tags can only contain unicode and the following ascii characters: a-z 0-9 + # _ .');
+      else if (count(array_unique(explode(' ', $Tags))) > $NumTagsMax)
+         $Sender->Validation->AddValidationResult('Tags', 'You can only specify up to '.$NumTagsMax.' tags.');
 
    }
 
@@ -256,6 +257,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
       $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
+      $Sender->AddJsFile($this->GetResource('tagging.js', FALSE,FALSE));
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {

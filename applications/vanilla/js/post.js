@@ -6,6 +6,10 @@ jQuery(document).ready(function($) {
    $('#CommentForm :submit').click(function() {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
+      
+      // Handler before submitting
+      $(frm).triggerHandler('BeforeCommentSubmit', [frm, btn]);
+      
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
       var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
@@ -19,7 +23,6 @@ jQuery(document).ready(function($) {
       $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');
       
-      $(frm).triggerHandler('BeforeCommentSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
          url: action,
@@ -77,6 +80,10 @@ jQuery(document).ready(function($) {
    $('#DiscussionForm :submit').click(function() {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
+      
+      // Handler before submitting
+      $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
+      
       var textbox = $(frm).find('textarea');
       var inpDiscussionID = $(frm).find(':hidden[name$=DiscussionID]');
       var inpDraftID = $(frm).find(':hidden[name$=DraftID]');
@@ -89,7 +96,6 @@ jQuery(document).ready(function($) {
       $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');      
       
-      $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),

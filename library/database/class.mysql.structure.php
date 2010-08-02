@@ -44,7 +44,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function DropColumn($Name) {
       if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`'))
-         throw new Exception(T('Failed to remove the `'.$Name.'` column from the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+         throw new Exception(sprintf(T('Failed to remove the `%1$s` column from the `%2$s` table.'), $Name, $this->_DatabasePrefix.$this->_TableName));
 
       return TRUE;
    }
@@ -93,17 +93,17 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
       // Make sure that one column, or the other exists
       if (!$OldColumn && !$NewColumn)
-         throw new Exception(T('The `'.$OldName.'` column does not exist.'));
+         throw new Exception(sprintf(T('The `%1$s` column does not exist.'),$OldName));
 
       // Make sure the new column name isn't already taken
       if ($OldColumn && $NewColumn)
-         throw new Exception(T('You cannot rename the `'.$OldName.'` column to `'.$NewName.'` because that column already exists.'));
+         throw new Exception(sprintf(T('You cannot rename the `%1$s` column to `%2$s` because that column already exists.'), $OldName, $NewName));
 
       // Rename the column
       // The syntax for renaming a column is:
       // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
       if (!$this->Query('alter table `'.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn)))
-         throw new Exception(T('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+         throw new Exception(sprintf(T('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
 
       return TRUE;
    }
@@ -119,7 +119,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    public function RenameTable($OldName, $NewName, $UsePrefix = FALSE) {
       if (!$this->Query('rename table `'.$OldName.'` to `'.$NewName.'`'))
-         throw new Exception(T('Failed to rename table `'.$OldName.'` to `'.$NewName.'`.'));
+         throw new Exception(sprintf(T('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
 
       return TRUE;
    }
@@ -329,7 +329,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
 				$EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
 				if (!$this->Query($EngineQuery))
-					throw new Exception(T('Failed to alter the storage engine of table `'.$this->_DatabasePrefix.$this->_TableName.'` to `'.$this->_TableStorageEngine.'`.'));
+					throw new Exception(sprintf(T('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
 			}
       }
       
@@ -348,7 +348,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                $AddColumnSql .= " after `$PrevColumnName`";
 
             if (!$this->Query($AddColumnSql))
-               throw new Exception(T('Failed to add the `'.$Column.'` column to the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+               throw new Exception(sprintf(T('Failed to add the `%1$s` column to the `%1$s` table.'), $Column, $this->_DatabasePrefix.$this->_TableName));
          } else {
 				$ExistingColumn = $ExistingColumns[$ColumnName];
 
@@ -359,7 +359,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 				if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
                // The existing & new column types do not match, so modify the column
 					if (!$this->Query($Comment.$AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-						throw new Exception(T('Failed to modify the data type of the `'.$ColumnName.'` column on the `'.$this->_DatabasePrefix.$this->_TableName.'` table.'));
+						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'), $ColumnName, $this->_DatabasePrefix.$this->_TableName);
 
                // Check for a modification from an enum to an int.
                if(strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->Types('int'))) {
@@ -416,13 +416,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Modify all of the indexes.
       foreach($IndexSql as $Name => $Sql) {
          if(!$this->Query($Sql))
-            throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%s` index in the `%s` table.'), $Name, $this->_TableName));
+            throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $Name, $this->_TableName));
       }
 
       // Run any additional Sql.
       foreach($AdditionalSql as $Description => $Sql) {
          if(!$this->Query($Sql))
-            throw new Exception("Error modifying table: $Description.");
+            throw new Exception("Error modifying table: {$Description}.");
       }
 
       $this->Reset();
@@ -437,7 +437,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     */
    protected function _DefineColumn($Column) {
       if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'float', 'double', 'enum', 'timestamp')))
-         throw new Exception(T('The specified data type ('.$Column->Type.') is not accepted for the MySQL database.'));
+         throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;
       

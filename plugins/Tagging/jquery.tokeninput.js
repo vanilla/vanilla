@@ -76,6 +76,12 @@ $.TokenList = function (input, settings) {
         COMMA: 188,
         SPACE: 32
     };
+    
+    $(input).bind('BeforeSubmit', function(e, frm){
+      var val = $(input_box).val();
+      if (val.length)
+         add_blank_token(val, val);
+    });
 
     var cancel_request = false;
     
@@ -97,7 +103,7 @@ $.TokenList = function (input, settings) {
             outline: "none"
         })
         .focus(function () {
-            $(token_list).addClass(settings.classes.tokenList + '-focus');
+           $(token_list).addClass(settings.classes.tokenList + '-focus');
 
 			  if($.isFunction(settings.onFocus)) {
 			      settings.onFocus.call(this);
@@ -173,7 +179,6 @@ $.TokenList = function (input, settings) {
                 case KEY.RETURN:
                 case KEY.COMMA:
                 case KEY.SPACE:
-                
                   if (selected_dropdown_item) {
                     add_token($(selected_dropdown_item));
                   } else {
@@ -355,7 +360,7 @@ $.TokenList = function (input, settings) {
     function add_token (item) {
         var li_data = $.data(item.get(0), "tokeninput");
         var this_token = insert_token(li_data.id, li_data.name);
-
+        
         // Clear input box and make sure it keeps focus
         input_box
             .val("")

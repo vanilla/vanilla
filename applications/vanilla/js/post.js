@@ -17,7 +17,9 @@ jQuery(document).ready(function($) {
       var discussionID = $(frm).find('[name$=DiscussionID]').val();
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
-      $(frm).find(':submit').attr('disabled', 'disabled');            
+      $(frm).find(':submit').attr('disabled', 'disabled');
+      
+      $(frm).triggerHandler('BeforeCommentSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
          url: action,
@@ -86,6 +88,8 @@ jQuery(document).ready(function($) {
       // Add a spinner and disable the buttons
       $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');      
+      
+      $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),

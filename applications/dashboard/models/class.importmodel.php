@@ -1007,6 +1007,7 @@ class ImportModel extends Gdn_Model {
 		$Tables = array();
 
 		// Open the import file.
+      ini_set('auto_detect_line_endings', TRUE);
 		$fpin = gzopen($Path, 'rb');
 		$fpout = NULL;
 
@@ -1020,19 +1021,19 @@ class ImportModel extends Gdn_Model {
 
       $RowCount = 0;
       $LineNumber = 0;
-		while(($Line = fgets($fpin)) !== FALSE) {
+		while (($Line = fgets($fpin)) !== FALSE) {
          $LineNumber++;
 
-			if($Line == "\n") {
-				if($fpout) {
+			if ($Line == "\n") {
+				if ($fpout) {
 					// We are in a table so close it off.
 					fclose($fpout);
 					$fpout = 0;
 				}
-			} elseif($fpout) {
+			} elseif ($fpout) {
 				// We are in a table so dump the line.
 				fputs($fpout, $Line);
-			} elseif(substr_compare(self::COMMENT, $Line, 0, strlen(self::COMMENT)) == 0) {
+			} elseif (substr_compare(self::COMMENT, $Line, 0, strlen(self::COMMENT)) == 0) {
 				// This is a comment line so do nothing.
 			} else {
 				// This is the start of a table.
@@ -1042,16 +1043,18 @@ class ImportModel extends Gdn_Model {
             }
 				$Table = $TableInfo['Table'];
 				$Path = dirname($Path).DS.$Table.'.txt';
-            ini_set('auto_detect_line_endings', TRUE);
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;
 				unset($TableInfo['Table']);
 
 				// Get the column headers from the next line.
-				if(($Line = fgets($fpin)) !== FALSE) {
+				if (($Line = fgets($fpin)) !== FALSE) {
                $LineNumber++;
-					fputs($fpout, $Line);
+
+               // Strip \r out of line.
+               $Line = str_replace(array("\r\n", "\r"), array("\n", "\n"), $Line);
+					fwrite($fpout, $Line);
 					$Columns = $this->ParseInfoLine($Line);
 					$TableInfo['Columns'] = $Columns;
 
@@ -1060,8 +1063,8 @@ class ImportModel extends Gdn_Model {
 			}
 		}
 		gzclose($fpin);
-		if($fpout)
-			gzclose($fpout);
+		if ($fpout)
+			fclose ($fpout);
 
       if (count($Tables) == 0) {
          throw new Gdn_UserException(T('The import file does not contain any data.'));

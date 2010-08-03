@@ -223,7 +223,18 @@ class Gdn_Model extends Gdn_Pluggable {
       $Result = FALSE;
       $this->AddInsertFields($Fields);
       if ($this->Validate($Fields, TRUE)) {
-         $Result = $this->SQL->Insert($this->Name, $Fields);
+         // Strip out fields that aren't in the schema.
+         // This is done after validation to allow custom validations to work.
+         $SchemaFields = $this->Schema->Fields();
+         $Fields = array_intersect_key($Fields, $SchemaFields);
+
+         // Quote all of the fields.
+         $QuotedFields = array();
+         foreach ($Fields as $Name => $Value) {
+            $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
+         }
+
+         $Result = $this->SQL->Insert($this->Name, $QuotedFields);
       }
       return $Result;
    }
@@ -237,6 +248,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function Update($Fields, $Where = FALSE, $Limit = FALSE) {
       $Result = FALSE;
+
       // primary key (always included in $Where when updating) might be "required"
       $AllFields = $Fields;
       if (is_array($Where))
@@ -244,7 +256,19 @@ class Gdn_Model extends Gdn_Pluggable {
          
       if ($this->Validate($AllFields)) {
          $this->AddUpdateFields($Fields);
-         $Result = $this->SQL->Put($this->Name, $Fields, $Where, $Limit);
+
+         // Strip out fields that aren't in the schema.
+         // This is done after validation to allow custom validations to work.
+         $SchemaFields = $this->Schema->Fields();
+         $Fields = array_intersect_key($Fields, $SchemaFields);
+
+         // Quote all of the fields.
+         $QuotedFields = array();
+         foreach ($Fields as $Name => $Value) {
+            $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
+         }
+
+         $Result = $this->SQL->Put($this->Name, $QuotedFields, $Where, $Limit);
       }
       return $Result;
    }

@@ -113,6 +113,7 @@ class ActivityModel extends Gdn_Model {
       }
 
       // Massage $SendEmail to allow for only sending an email.
+      $SendEmail = TRUE; // TODO: Allow just emails.
       if ($SendEmail == 'Only') {
          $SendEmail = '';
          $AddActivity = FALSE;
@@ -144,11 +145,11 @@ class ActivityModel extends Gdn_Model {
       if (is_numeric($CommentActivityID))
          $Fields['CommentActivityID'] = $CommentActivityID;
 
-      if ($AddActivity) {
+//      if ($AddActivity) {
          $this->AddInsertFields($Fields);
          $this->DefineSchema();
          $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
-      }
+//      }
 
       // If $SendEmail was FALSE or TRUE, let it override the $Notify setting.
       if ($SendEmail === FALSE || $SendEmail === TRUE)
@@ -156,8 +157,8 @@ class ActivityModel extends Gdn_Model {
 
       // Otherwise let the decision to email lie with the $Notify setting.
 
-      // If the activity was saved successfully and it was a notification, send a notification to the user.
-      if ($ActivityID > 0 && $Notify)
+      // Send a notification to the user.
+      if ($Notify)
          $this->SendNotification($ActivityID);
       
       return $ActivityID;

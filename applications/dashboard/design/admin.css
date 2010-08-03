@@ -721,6 +721,12 @@ table.AltColumns tr.Disabled td {
    background: #d3f0ff;
 }
 
+label.SubLabel {
+   display: inline-block;
+   font-size: 100%;
+   width: 100px;
+}
+
 /* CheckBoxGrid */
 .CheckBoxGrid {
    margin: 10px 0;

@@ -548,6 +548,20 @@ EOT;
       }
    }
 
+   /** Return the input without any operations performed at all.
+    *  This format should only be used when administrators have access.
+    *
+    * @param string|object|array $Mixed The data to format.
+    * @return string
+    */
+   public static function Raw($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Raw');
+      } else {
+         return $Mixed;
+      }
+   }
+
    /**
     * Takes an object and convert's it's properties => values to an associative
     * array of $Array[Property] => Value sets.

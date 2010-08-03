@@ -17,11 +17,28 @@ class Gdn_ModuleCollection extends Gdn_Module {
    
    /// METHODS ///
    public function Render() {
+      $RenderedCount = 0;
       foreach($this->Items as $Item) {
+         $this->EventArguments['AssetName'] = $this->AssetName;
+
          if(is_string($Item)) {
-            echo $Item;
+            if (!empty($Item)) {
+               if ($RenderedCount > 0)
+                  $this->FireEvent('RenderAsset');
+
+               echo $Item;
+               $RenderedCount++;
+            }
          } elseif($Item instanceof Gdn_IModule) {
+            $LengthBefore = ob_get_length();
             $Item->Render();
+            $LengthAfter = ob_get_length();
+
+            if ($LengthBefore !== FALSE && $LengthAfter > $LengthBefore) {
+               if ($RenderedCount > 0)
+                  $this->FireEvent('RenderAsset');
+               $RenderedCount++;
+            }
          } else {
             throw new Exception();
          }

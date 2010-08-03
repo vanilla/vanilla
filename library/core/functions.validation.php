@@ -171,7 +171,10 @@ if (!function_exists('ValidateMinimumAge')) {
 }
 
 if (!function_exists('ValidateInteger')) {
-   function ValidateInteger($Value, $Field) {
+   function ValidateInteger($Value, $Field = NULL) {
+      if (!$Value || (is_string($Value) && !trim($Value)))
+         return TRUE;
+
       $Integer = intval($Value);
       $String = strval($Integer);
       return $String == $Value ? TRUE : FALSE;

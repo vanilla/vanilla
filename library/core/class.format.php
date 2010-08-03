@@ -728,9 +728,9 @@ EOT;
       } else {
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
-         $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed);
-         $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed);
-         $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed);
+         $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation
+         $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
+         $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
          $Mixed = urlencode(strtolower($Mixed));
 			return $Mixed;
       }

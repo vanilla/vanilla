@@ -21,7 +21,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
 
    public function GetPluginName() {
-      return substr(get_class($this),0,-6);
+      return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+   }
+   
+   public function GetPluginFolder($Absolute = TRUE) {
+      $Folder = GetValue('Folder', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+      $PathParts = array(
+         $Folder,
+         $Filepath
+      );
+         
+      array_unshift($PathParts, ($Absolute) ? PATH_PLUGINS : 'plugins');
+      return implode(DS, $PathParts);
    }
    
    /**
@@ -33,16 +44,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
     * @return string path to the file
     */
    public function GetResource($Filepath, $Include = FALSE, $Absolute = TRUE) {
-      $PluginName = $this->GetPluginName();
-      
-      $PathParts = array(
-         $PluginName,
-         $Filepath
-      );
-         
-      array_unshift($PathParts, ($Absolute) ? PATH_PLUGINS : 'plugins');
-      
-      $RequiredFilename = implode(DS, $PathParts);
+      $RequiredFilename = implode(DS, array($this->GetPluginFolder($Absolute), $Filepath));
       if ($Include && file_exists($RequiredFilename))
          include($RequiredFilename);
             
@@ -59,8 +61,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
     * @return string path to the view file, relative to the document root.
     */
    public function GetView($ViewName) {
-      $PluginName = $this->GetPluginName();
-      $PluginDirectory = PATH_PLUGINS.DS.$PluginName.DS.'views';
+      $PluginDirectory = implode(DS, array($this->GetPluginFolder(TRUE), 'views'));
       return $PluginDirectory.DS.$ViewName;
    }
    

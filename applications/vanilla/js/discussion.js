@@ -74,6 +74,8 @@ jQuery(document).ready(function($) {
       $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&nbsp;</span>');
       // Also add a spinner for comments being edited
       $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      
+      $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
          url: action,

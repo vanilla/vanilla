@@ -284,7 +284,12 @@ class Gdn_Auth extends Gdn_Pluggable {
          $Authenticator = $this->GetAuthenticator();
       }
       
+      if ($Redirect == '' || $Redirect == '/')
+         $Redirect = Gdn::Router()->GetDestination('DefaultController');
+      
+      // Ask the authenticator for this URLType
       $Return = $Authenticator->GetURL($URLType);
+      // If it doesn't know, get the default from our config file
       if (!$Return) $Return = Gdn::Config('Garden.Authenticator.'.$URLType);
       
       $ExtraReplacementParameters = array(
@@ -300,6 +305,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       
       $FullRedirect = Url($Redirect, TRUE);
       $ExtraReplacementParameters['Redirect'] = $FullRedirect;
+      $ExtraReplacementParameters['CurrentPage'] = $FullRedirect;
       
       // Support legacy sprintf syntax
       $Return = sprintf($Return, $AuthenticationScheme, $Redirect, $FullRedirect);

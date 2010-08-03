@@ -836,6 +836,7 @@ if (!function_exists('ProxyHead')) {
          curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_NOBODY, 1);
+         curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($Handler, CURLOPT_HTTPHEADER, $Headers);
          
@@ -864,7 +865,7 @@ if (!function_exists('ProxyHead')) {
          $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
-            'User-Agent'      => 'Vanilla/2.0',
+            'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
             'Accept'          => '*/*',
             'Accept-Charset'  => 'utf-8',
             'Referer'         => $Referer,
@@ -957,6 +958,7 @@ if (!function_exists('ProxyRequest')) {
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, 0);
+         curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
@@ -989,7 +991,7 @@ if (!function_exists('ProxyRequest')) {
             ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-            ."User-Agent: Vanilla/2.0\r\n"
+            ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n"
             ."Referer: {$Referer}\r\n"
@@ -1295,30 +1297,6 @@ if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Result = Gdn::Request()->Url($Path, $WithDomain);
       return $Result;
-   }
-}
-
-if( !function_exists('parse_ini_string') ){
-   function parse_ini_string( $string ) {
-      $array = Array();
-      $lines = explode("\n", $string );
-   
-      foreach( $lines as $line ) {
-         $statement = preg_match("/^(?!;)(?P<key>[\w+\.\-]+?)\s*=\s*(?P<value>.+?)\s*$/", $line, $match );
-   
-         if( $statement ) {
-            $key    = $match[ 'key' ];
-            $value    = $match[ 'value' ];
-   
-            # Remove quote
-            if( preg_match( "/^\".*\"$/", $value ) || preg_match( "/^'.*'$/", $value ) ) {
-               $value = mb_substr( $value, 1, mb_strlen( $value ) - 2 );
-            }
-   
-            $array[ $key ] = $value;
-         }
-      }
-      return $array;
    }
 }
 

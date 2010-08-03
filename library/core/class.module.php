@@ -26,6 +26,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
 
+   /** The name of the current asset that is being rendered.
+    *
+    * @var string
+    */
+   public $AssetName = '';
+
 
    /**
     * The name of the application folder that this module resides within.

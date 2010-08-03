@@ -67,6 +67,17 @@ class Gdn_Schema {
       }
       return $this->_Schema[$this->CurrentTable];
    }
+
+   /** Gets the array of fields/properties for the schema.
+    *
+    * @return array
+    */
+   public function Fields($Tablename = FALSE) {
+      if (!$Tablename)
+         $Tablename = $this->CurrentTable;
+
+      return $this->_Schema[$Tablename];
+   }
    
    /**
     * Returns a the entire field object.

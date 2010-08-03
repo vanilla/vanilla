@@ -695,8 +695,6 @@ class Gdn_Controller extends Gdn_Pluggable {
          // There is a specified sort so sort by it.
          foreach($ModuleSort as $Name) {
             if(array_key_exists($Name, $ThisAssets)) {
-               if(defined("DEBUG"))
-                  $Assets[] = "\n<!-- Asset: $Name -->\n";
                $Assets[] = $ThisAssets[$Name];
                unset($ThisAssets[$Name]);
             }
@@ -704,8 +702,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       // Pick up any leftover assets
       foreach($ThisAssets as $Name => $Asset) {
-         if(defined("DEBUG"))
-            $Assets[] = "\n<!-- Asset: $Name -->\n";
          $Assets[] = $Asset;
       }
          
@@ -972,10 +968,24 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function RenderAsset($AssetName) {
       $Asset = $this->GetAsset($AssetName);
-      if(is_string($Asset))
+
+      $this->EventArguments['AssetName'] = $AssetName;
+      $this->FireEvent('RenderAsset');
+
+      $LengthBefore = ob_get_length();
+
+      if(is_string($Asset)) {
          echo $Asset;
-      else
+      } else {
+         $Asset->AssetName = $AssetName;
          $Asset->Render();
+      }
+
+      if ($LengthBefore !== FALSE) {
+         $LengthAfter = ob_get_length();
+         if ($LengthAfter > $LengthBefore)
+            $this->FireEvent('RenderAsset');
+      }
    }
 
    /**

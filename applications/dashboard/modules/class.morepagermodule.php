@@ -99,7 +99,7 @@ class MorePagerModule extends Gdn_Module {
       $this->PagerEmpty = '';
       $this->MoreCode = 'More';
       $this->LessCode = 'Newer';
-      $this->Url = '/controller/action/$s/';
+      $this->Url = '/controller/action/{Page}/';
       $this->_PropertiesDefined = FALSE;
       $this->_Totalled = FALSE;
       $this->_LastOffset = 0;
@@ -138,9 +138,9 @@ class MorePagerModule extends Gdn_Module {
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
-            $Details = sprintf(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+            $Details = self::FormatUrl(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
-            $Details = sprintf(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+            $Details = self::FormatUrl(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
          }
       }
       return $Details;
@@ -154,6 +154,15 @@ class MorePagerModule extends Gdn_Module {
    public function FirstPage() {
       $Result = $this->Offset == 0;
       return $Result;
+   }
+
+   public static function FormatUrl($Url, $Page, $Limit = '') {
+      // Check for new style page.
+      if (strpos($Url, '{Page}') !== FALSE)
+         return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
+      else
+         return self::FormatUrl($Url, $Page, $Limit);
+
    }
 
    /**
@@ -174,7 +183,10 @@ class MorePagerModule extends Gdn_Module {
    public function ToString($Type = 'more') {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
-         
+      
+      // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
+      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
+
       $Pager = '';
       if ($Type == 'more') {
          $ClientID = $this->ClientID == '' ? '' : $this->ClientID . 'More';
@@ -189,7 +201,7 @@ class MorePagerModule extends Gdn_Module {
 
             $Pager .= Anchor(
                sprintf(T($this->MoreCode), $ActualRecordsLeft),
-               sprintf($this->Url, $NextOffset, $this->Limit)
+               self::FormatUrl($this->Url, $NextOffset, $this->Limit)
             );
          }
       } else if ($Type == 'less') {
@@ -207,7 +219,7 @@ class MorePagerModule extends Gdn_Module {
                
             $Pager .= Anchor(
                sprintf(T($this->LessCode), $this->Offset),
-               sprintf($this->Url, $PreviousOffset, $RecordsBefore)
+               self::FormatUrl($this->Url, $PreviousOffset, $RecordsBefore)
             );
          }
       }

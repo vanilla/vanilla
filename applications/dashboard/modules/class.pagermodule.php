@@ -155,6 +155,15 @@ class PagerModule extends Gdn_Module {
       $Result = $this->Offset == 0;
       return $Result;
    }
+   
+   public static function FormatUrl($Url, $Page, $Limit = '') {
+      // Check for new style page.
+      if (strpos($Url, '{Page}') !== FALSE)
+         return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
+      else
+         return sprintf($Url, $Page, $Limit);
+
+   }
 
    /**
     * Whether or not this is the last page of the pager.
@@ -179,6 +188,9 @@ class PagerModule extends Gdn_Module {
       $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
       $PagesToDisplay = 7;
       $MidPoint = 2; // Middle navigation point for the pager
+
+      // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
+      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
       
       // First page number to display (based on the current page number and the
       // middle position, figure out which page number to start on).
@@ -193,7 +205,7 @@ class PagerModule extends Gdn_Module {
          $Pager = '<span class="Previous">'.$PreviousText.'</span>';
       } else {
          $PageParam = 'p'.($CurrentPage - 1);
-         $Pager .= Anchor($PreviousText, sprintf($this->Url, $PageParam), 'Previous');
+         $Pager .= Anchor($PreviousText, self::FormatUrl($this->Url, $PageParam), 'Previous');
       }
       
       // We don't need elipsis at all (ie. 1 2 3 4 5)
@@ -202,45 +214,45 @@ class PagerModule extends Gdn_Module {
       } else if ($PageCount < 10) {
          for ($i = 1; $i <= $PageCount ; $i++) {
             $PageParam = 'p'.$i;
-            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
+            $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
       } else if ($FirstPage <= 3) {
          // We're on a page that is before the first elipsis (ie. 1 2 3 4 5 6 7 ... 81)
          for ($i = 1; $i <= 7; $i++) {
             $PageParam = 'p'.$i;
-            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
+            $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
          $Pager .= '<span>...</span>';
-         $Pager .= Anchor($PageCount, sprintf($this->Url, 'p'.$PageCount, $this->Limit));
+         $Pager .= Anchor($PageCount, self::FormatUrl($this->Url, 'p'.$PageCount, $this->Limit));
       } else if ($FirstPage >= $PageCount - 6) {
          // We're on a page that is after the last elipsis (ie. 1 ... 75 76 77 78 79 80 81)
-         $Pager .= Anchor(1, sprintf($this->Url, 'p1'));
+         $Pager .= Anchor(1, self::FormatUrl($this->Url, 'p1'));
          $Pager .= '<span>...</span>';
 
          for ($i = $PageCount - 6; $i <= $PageCount; $i++) {
             $PageParam = 'p'.$i;
-            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
+            $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
       } else {
          // We're between the two elipsises (ie. 1 ... 4 5 6 7 8 ... 81)
-         $Pager .= Anchor(1, sprintf($this->Url, 'p1'));
+         $Pager .= Anchor(1, self::FormatUrl($this->Url, 'p1'));
          $Pager .= '<span>...</span>';
 
          for ($i = $CurrentPage - 2; $i <= $CurrentPage + 2; $i++) {
             $PageParam = 'p'.$i;
-            $Pager .= Anchor($i, sprintf($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
+            $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
          $Pager .= '<span>...</span>';
-         $Pager .= Anchor($PageCount, sprintf($this->Url, 'p'.$PageCount));
+         $Pager .= Anchor($PageCount, self::FormatUrl($this->Url, 'p'.$PageCount));
       }
       
       if ($CurrentPage == $PageCount) {
          $Pager .= '<span class="Next">'.$NextText.'</span>';
       } else {
          $PageParam = 'p'.($CurrentPage + 1);
-         $Pager .= Anchor($NextText, sprintf($this->Url, $PageParam, ''), 'Next'); // extra sprintf parameter in case old url style is set
+         $Pager .= Anchor($NextText, self::FormatUrl($this->Url, $PageParam, ''), 'Next'); // extra sprintf parameter in case old url style is set
       }
       if ($PageCount <= 1)
          $Pager = '';

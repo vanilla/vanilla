@@ -26,6 +26,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
+
+   static $FirstDiscussion = TRUE;
+   if (!$FirstDiscussion)
+      $Sender->FireEvent('BetweenDiscussion');
+   else
+      $FirstDiscussion = FALSE;
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php

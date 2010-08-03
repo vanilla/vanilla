@@ -83,7 +83,11 @@ class Gdn {
          
       return $Result;
    }
-   
+
+   /** Gets the global dispatcher object.
+    *
+    * @return Gdn_Dispatcher
+    */
    public static function Dispatcher() {
       $Result = self::Factory(self::AliasDispatcher);
       return $Result;

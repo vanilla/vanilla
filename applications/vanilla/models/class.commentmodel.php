@@ -227,6 +227,8 @@ class CommentModel extends VanillaModel {
          ->From('Comment c')
          ->Where('c.DiscussionID', GetValue('DiscussionID', $Comment));
 
+      $this->SQL->BeginWhereGroup();
+
       // Figure out the where clause based on the sort.
       foreach ($this->_OrderBy as $Part) {
          //$Op = count($this->_OrderBy) == 1 || isset($PrevWhere) ? '=' : '';
@@ -243,6 +245,8 @@ class CommentModel extends VanillaModel {
 
          $PrevWhere = $this->_WhereFromOrderBy($Part, $Comment, '==');
       }
+
+      $this->SQL->EndWhereGroup();
 
       return $this->SQL
          ->Get()

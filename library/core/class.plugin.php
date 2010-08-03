@@ -27,8 +27,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
    public function GetPluginFolder($Absolute = TRUE) {
       $Folder = GetValue('Folder', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
       $PathParts = array(
-         $Folder,
-         $Filepath
+         $Folder
       );
          
       array_unshift($PathParts, ($Absolute) ? PATH_PLUGINS : 'plugins');

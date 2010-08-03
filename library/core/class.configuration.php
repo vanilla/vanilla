@@ -148,8 +148,9 @@ class Gdn_Configuration {
     * <code>$Configuration[$Group]['Database']['Host'] = $Value</code>.
     * @param mixed $Value The value of the configuration setting.
     * @param boolean $Overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
+    * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::Save().
     */
-   public function Set($Name, $Value, $Overwrite = TRUE) {
+   public function Set($Name, $Value, $Overwrite = TRUE, $AddToSave = TRUE) {
       if(!is_array($this->_Data))
          $this->_Data = array();
 
@@ -182,16 +183,19 @@ class Gdn_Configuration {
                // If we are on the last iteration of the key, then set the value.
                if($KeyExists === FALSE || $Overwrite === TRUE) {
                   $Array[$Key] = Gdn_Format::Serialize($Value);
-                  $SaveArray[$Key] = Gdn_Format::Serialize($Value);
+                  if ($AddToSave)
+                     $SaveArray[$Key] = Gdn_Format::Serialize($Value);
                }
             } else {
                // Otherwise, traverse the array
                if($KeyExists === FALSE) {
                   $Array[$Key] = array();
-                  $SaveArray[$Key] = array();
+                  if ($AddToSave)
+                     $SaveArray[$Key] = array();
                }
                $Array =& $Array[$Key];
-               $SaveArray =& $SaveArray[$Key];
+               if ($AddToSave)
+                  $SaveArray =& $SaveArray[$Key];
             }
          }
       }

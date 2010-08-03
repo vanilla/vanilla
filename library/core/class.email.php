@@ -106,7 +106,7 @@ class Gdn_Email extends Gdn_Pluggable {
       if ($SenderEmail == '') {
          $SenderEmail = C('Garden.Email.SupportAddress', '');
          if (!$SenderEmail) {
-            $SenderEmail = 'noreply@'.Gdn::Request()->Domain();
+            $SenderEmail = 'noreply@'.Gdn::Request()->Host();
          }
       }
 

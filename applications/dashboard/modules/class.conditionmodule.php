@@ -9,21 +9,41 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class ConditionModule extends Gdn_Module {
-   protected $_Conditions = array();
+   protected $_Conditions = NULL;
    
    public $Prefix = 'Cond';
 
    public function Conditions($Value = NULL) {
-      if ($Value !== NULL)
+      if (is_array($Value))
          $this->_Conditions = $Value;
+      elseif ($this->_Conditions === NULL) {
+         if ($this->_Sender->Form->AuthenticatedPostBack()) {
+            $this->_Conditions = $this->_FromForm();
+         } else {
+            $this->_Conditions = array();
+         }
+      }
+
+      if ($Value === TRUE) {
+         // Remove blank conditions from the array. This is used for saving.
+         $Result = array();
+         foreach($this->_Conditions as $Condition) {
+            if (count($Condition) < 2 || !$Condition[0])
+               continue;
+            $Result[] = $Condition;
+         }
+         return $Result;
+      }
       return $this->_Conditions;
    }
 
    public function ToString() {
       $Form = $this->_Sender->Form;
+      $this->_Sender->AddJsFile('condition.js');
 
-      if ($Form->IsPostBack()) {
+      if ($Form->AuthenticatedPostBack()) {
          // Grab the conditions from the form and convert them to the conditions array.
+         $this->Conditions($this->_FromForm());
       } else {
       }
 
@@ -49,6 +69,40 @@ class ConditionModule extends Gdn_Module {
       return parent::ToString();
    }
 
+   /** Grab the values from the form into the conditions array. */
    protected function _FromForm() {
+      $Form = new Gdn_Form();
+      $Px = $this->Prefix;
+
+      $Types = (array)$Form->GetFormValue($Px.'Type', array());
+      $PermissionFields = (array)$Form->GetFormValue($Px.'PermissionField', array());
+      $RoleFields = (array)$Form->GetFormValue($Px.'RoleField', array());
+      $Fields = (array)$Form->GetFormValue($Px.'Field', array());
+      $Expressions = (array)$Form->GetFormValue($Px.'Expr', array());
+
+      $Conditions = array();
+      for ($i = 0; $i < count($Types) - 1; $i++) { // last condition always template row.
+
+         $Condition = array($Types[$i]);
+         switch ($Types[$i]) {
+            case Gdn_Condition::PERMISSION:
+               $Condition[1] = GetValue($i, $PermissionFields, '');
+               break;
+            case Gdn_Condition::REQUEST:
+               $Condition[1] = GetValue($i, $Fields, '');
+               $Condition[2] = GetValue($i, $Expressions, '');
+               break;
+            case Gdn_Condition::ROLE:
+               $Condition[1] = GetValue($i, $RoleFields);
+               break;
+            case '':
+               $Condition[1] = '';
+               break;
+            default:
+               continue;
+         }
+         $Conditions[] = $Condition;
+      }
+      return $Conditions;
    }
 }

@@ -24,7 +24,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
          if(is_string($Item)) {
             if (!empty($Item)) {
                if ($RenderedCount > 0)
-                  $this->FireEvent('RenderAsset');
+                  $this->FireEvent('BetweenRenderAsset');
 
                echo $Item;
                $RenderedCount++;
@@ -36,7 +36,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
 
             if ($LengthBefore !== FALSE && $LengthAfter > $LengthBefore) {
                if ($RenderedCount > 0)
-                  $this->FireEvent('RenderAsset');
+                  $this->FireEvent('BetweenRenderAsset');
                $RenderedCount++;
             }
          } else {

@@ -125,7 +125,9 @@ class Gdn_PluginManager {
    }
    
    public function GetPluginInfo($AccessName, $AccessType = self::ACCESS_PLUGINNAME) {
-      $PluginName = NULL; $this->AvailablePlugins();
+      $PluginName = NULL; 
+      $this->AvailablePlugins();
+      
       switch ($AccessType) {
          case self::ACCESS_PLUGINNAME:
             $PluginName = $AccessName;
@@ -354,7 +356,7 @@ class Gdn_PluginManager {
     * each plugin.
     */
    public function AvailablePlugins($GetPlugin = NULL) {
-      if (!is_array($this->_Plugins)) {
+      if (!is_array($this->_AvailablePlugins)) {
       
          $Info = array();
          $InverseRelation = array();

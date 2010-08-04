@@ -5,26 +5,30 @@ var Gdn_Slices = {
       var NextSliceID = SliceUniq+1;
    
       var Candidates = $('.Slice');
+      var Slices = [];
       Candidates.each(jQuery.proxy(function(i,Slice) {
-         new Gdn_Slice(Slice, NextSliceID++);
+         var MySlice = new Gdn_Slice(Slice, NextSliceID++);
+         Slices.push(MySlice);
+         MySlice.Go();
       },this));
    }
 
 };
 
-var Gdn_Slice = Class.create({
+function Gdn_Slice(SliceElement, SliceID) {
 
-   init: function(SliceElement, SliceID) {
-      this.Slice = $(SliceElement);
-      this.Slice.css('position','relative');
-      this.SliceID = SliceID;
+   this.Slice = $(SliceElement);
+   this.Slice.css('position','relative');
+   this.SliceID = SliceID;
+   
+   Gdn_Slice.prototype.Go = function() {
       if (this.Slice.hasClass('Async'))
          this.GetSlice();
       else
          this.ParseSlice();
-   },
+   }
    
-   PrepareSliceForRequest: function() {
+   Gdn_Slice.prototype.PrepareSliceForRequest = function() {
       var SliceDimensions = {
          'width': this.Slice.width(),
          'height': this.Slice.height()
@@ -65,9 +69,9 @@ var Gdn_Slice = Class.create({
       this.Slice.animate({
          'padding': '10px'
       });
-   },
+   }
    
-   GetSlice: function() {
+   Gdn_Slice.prototype.GetSlice = function() {
       this.PrepareSliceForRequest();
       
       var SliceURL = this.Slice.attr('rel');
@@ -77,9 +81,9 @@ var Gdn_Slice = Class.create({
          data: {'DeliveryType':'VIEW'},
          success: jQuery.proxy(this.GotSlice,this)
       });
-   },
+   }
    
-   PostSlice: function() {
+   Gdn_Slice.prototype.PostSlice = function() {
       this.PrepareSliceForRequest();
       
       var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.Slice.attr('rel')+'?DeliveryType=VIEW');
@@ -89,9 +93,9 @@ var Gdn_Slice = Class.create({
          data: this.GetSliceData(),
          success: jQuery.proxy(this.GotSlice,this)
       });
-   },
+   }
    
-   GotSlice: function(Data, Status, XHR) {
+   Gdn_Slice.prototype.GotSlice = function(Data, Status, XHR) {
       this.Slice.animate({
          'padding': '0px'
       });
@@ -106,9 +110,9 @@ var Gdn_Slice = Class.create({
          this.Slice.html(SliceContents.html());
          this.ParseSlice();
       },this));
-   },
+   }
    
-   ParseSlice: function() {
+   Gdn_Slice.prototype.ParseSlice = function() {
       this.SliceFields = [];
       this.Slice.find('form').submit(function() { return false; });
       this.Slice.find('input').each(jQuery.proxy(function(i,Input){
@@ -116,9 +120,9 @@ var Gdn_Slice = Class.create({
          if ($(Input).hasClass('SliceSubmit'))
             $(Input).click(jQuery.proxy(this.PostSlice,this));
       },this));
-   },
+   }
    
-   GetSliceData: function() {
+   Gdn_Slice.prototype.GetSliceData = function() {
       var SubmitData = {};
       $(this.SliceFields).each(jQuery.proxy(function(i,Field){
          Field = $(Field);
@@ -127,7 +131,7 @@ var Gdn_Slice = Class.create({
       return SubmitData;
    }
 
-});
+}
 
 $(document).ready(function(){
    Gdn_Slices.Load();

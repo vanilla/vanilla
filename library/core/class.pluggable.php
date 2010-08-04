@@ -30,7 +30,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Garden
  */
-abstract class Gdn_Pluggable {
+abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
 
    /**

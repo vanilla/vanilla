@@ -48,6 +48,7 @@ $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/regist
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/%1$s/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
+$Configuration['Garden']['Authenticators']['password']['Name']  = "Password";
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';
 $Configuration['Garden']['Errors']['MasterView']                = 'deverror.master.php'; // Used at installation time and you should use it too view when debugging

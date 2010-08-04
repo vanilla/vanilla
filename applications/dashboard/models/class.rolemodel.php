@@ -92,6 +92,7 @@ class RoleModel extends Gdn_Model {
     * Returns a resultset of role data related to the specified UserID.
     *
     * @param int The UserID to filter to.
+    * @return Gdn_DataSet
     */
    public function GetByUserID($UserID) {
       return $this->SQL->Select()

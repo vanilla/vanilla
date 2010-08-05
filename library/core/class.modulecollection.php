@@ -46,18 +46,8 @@ class Gdn_ModuleCollection extends Gdn_Module {
    }
    
    public function ToString() {
-      $Result = '';
-      
-      foreach($this->Items as $Item) {
-         if(is_string($Item)) {
-            $Result .= $Item;
-         } elseif($Item instanceof Gdn_IModule) {
-            $Result .= $Item->ToString();
-         } else {
-            throw new Exception();
-         }
-      }
-      
-      return $Result;
+      ob_start();
+      $this->Render();
+      return ob_get_clean();
    }
 }

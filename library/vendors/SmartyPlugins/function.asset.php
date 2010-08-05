@@ -39,6 +39,7 @@ function smarty_function_asset($Params, &$Smarty) {
 
    $Asset = $Controller->GetAsset($Name);
    if (!is_string($Asset)) {
+      $Asset->AssetName = $Name;
       $Asset = $Asset->ToString();
    }
 

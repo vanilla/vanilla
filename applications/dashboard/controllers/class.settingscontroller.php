@@ -516,48 +516,59 @@ class SettingsController extends DashboardController {
    public function ThemeOptions() {
       $this->Permission('Garden.Themes.Manage');
 
-      $this->AddJsFile('addons.js');
-      $this->AddSideMenu('dashboard/settings/themeoptions');
+      try {
 
-      $ThemeManager = new Gdn_ThemeManager();
-      $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
+         $this->AddJsFile('addons.js');
+         $this->AddSideMenu('dashboard/settings/themeoptions');
 
-      if ($this->Form->IsPostBack()) {
-         // Save the styles to the config.
-         $StyleKey = $this->Form->GetFormValue('StyleKey');
-         SaveToConfig(array(
-            'Garden.ThemeOptions.Styles.Key' => $StyleKey,
-            'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename")));
-         // Save the text to the locale.
-         $Translations = array();
-         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
-            $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
-            $Translations['Theme_'.$Key] = $Value;
-            //$this->Form->SetFormValue('Text_'.$Key, $Value);
+         $ThemeManager = new Gdn_ThemeManager();
+         $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
+
+         if ($this->Form->IsPostBack()) {
+            // Save the styles to the config.
+            $StyleKey = $this->Form->GetFormValue('StyleKey');
+            SaveToConfig(array(
+               'Garden.ThemeOptions.Styles.Key' => $StyleKey,
+               'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename")));
+            // Save the text to the locale.
+            $Translations = array();
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+               $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
+               $Translations['Theme_'.$Key] = $Value;
+               //$this->Form->SetFormValue('Text_'.$Key, $Value);
+            }
+            if (count($Translations) > 0) {
+               try {
+                  Gdn::Locale()->SaveTranslations($Translations);
+                  Gdn::Locale()->Refresh();
+               } catch (Exception $Ex) {
+                  $this->Form->AddError($Ex);
+               }
+            }
+
+            $this->StatusMessage = T("Your changes have been saved.");
          }
-         Gdn::Locale()->SaveTranslations($Translations);
-         Gdn::Locale()->Refresh();
 
-         $this->StatusMessage = T("Your changes have been saved.");
-      }
+         $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
+         $StyleKey = $this->Data('ThemeOptions.Styles.Key');
 
-      $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));
-      $StyleKey = $this->Data('ThemeOptions.Styles.Key');
+         if (!$this->Form->IsPostBack()) {
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
+               $Default = GetValue('Default', $Options, '');
+               $Value = T('Theme_'.$Key, '#DEFAULT#');
+               if ($Value === '#DEFAULT#')
+                  $Value = $Default;
 
-      if (!$this->Form->IsPostBack()) {
-         foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
-            $Default = GetValue('Default', $Options, '');
-            $Value = T('Theme_'.$Key, '#DEFAULT#');
-            if ($Value === '#DEFAULT#')
-               $Value = $Default;
-
-            $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), $Value);
+               $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), $Value);
+            }
          }
-      }
 
-      $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
-      $this->Title(T('Theme Options'));
-      $this->Form->AddHidden('StyleKey', $StyleKey);
+         $this->SetData('ThemeFolder', $ThemeManager->EnabledTheme());
+         $this->Title(T('Theme Options'));
+         $this->Form->AddHidden('StyleKey', $StyleKey);
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
 
       $this->Render();
    }

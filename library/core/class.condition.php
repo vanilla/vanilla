@@ -90,13 +90,22 @@ class Gdn_Condition {
                return !$Result;
             return $Result;
          case REQUEST:
-            // See if the field is targetting a specific part of the request.
-            $Fields = explode('.', $Field, 2);
-            if (count($Fields) >= 2) {
-               $Value = Gdn::Request()->GetValueFrom($Fields[0], $Fields[1], NULL);
-            } else {
-               $Value = Gdn::Request()->GetValue($Field, NULL);
+            // See if the field is a specific value.
+            switch (strtolower($Field)) {
+               case 'path':
+                  $Value = Gdn::Request()->Path();
+                  break;
+               default:
+                  // See if the field is targetting a specific part of the request.
+                  $Fields = explode('.', $Field, 2);
+                  if (count($Fields) >= 2) {
+                     $Value = Gdn::Request()->GetValueFrom($Fields[0], $Fields[1], NULL);
+                  } else {
+                     $Value = Gdn::Request()->GetValue($Field, NULL);
+                  }
+               break;
             }
+
             $Result = Gdn_Condition::TestValue($Value, $Expr);
             return $Result;
          case ROLE:

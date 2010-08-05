@@ -970,9 +970,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Asset = $this->GetAsset($AssetName);
 
       $this->EventArguments['AssetName'] = $AssetName;
-      $this->FireEvent('RenderAsset');
+      $this->FireEvent('BeforeRenderAsset');
 
-      $LengthBefore = ob_get_length();
+      //$LengthBefore = ob_get_length();
 
       if(is_string($Asset)) {
          echo $Asset;
@@ -981,11 +981,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Asset->Render();
       }
 
-      if ($LengthBefore !== FALSE) {
-         $LengthAfter = ob_get_length();
-         if ($LengthAfter > $LengthBefore)
-            $this->FireEvent('RenderAsset');
-      }
+      $this->FireEvent('AfterRenderAsset');
    }
 
    /**

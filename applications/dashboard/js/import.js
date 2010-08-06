@@ -10,6 +10,8 @@ jQuery(document).ready(function($) {
 			   
 				// Refresh the view.
 				$('#Content').html(json.Data);
+            bindAjaxForm();
+            
 				// Go to the next step.
 				if(!json.Complete && !json.Error) {
 					refreshSteps();
@@ -25,5 +27,24 @@ jQuery(document).ready(function($) {
 			}
 		});
 	}
-	refreshSteps();
+
+   var bindAjaxForm = function() {
+      $('form').ajaxForm({
+         dataType: 'json',
+         success: function(json) {
+            json = $.postParseJson(json);
+
+            $('#Content').html(json.Data);
+            bindAjaxForm();
+            
+            // Go to the next step.
+				if(!json.Complete && !json.Error) {
+					refreshSteps();
+				}
+         }
+      });
+   };
+
+   refreshSteps();
+   bindAjaxForm();
 });

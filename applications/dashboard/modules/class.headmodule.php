@@ -169,6 +169,13 @@ if (!class_exists('HeadModule', FALSE)) {
             'type' => 'image/x-icon'
          );
       }
+
+      /**
+       * Gets the tags collection.
+       */
+      public function Tags() {
+         return $this->_Tags;
+      }
       
       /*
        DEPRECATED
@@ -206,6 +213,8 @@ if (!class_exists('HeadModule', FALSE)) {
       }
    
       public function ToString() {
+         $this->FireEvent('BeforeToString');
+
          $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
 
          // Add the canonical Url if necessary.

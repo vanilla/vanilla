@@ -17,13 +17,6 @@ echo $this->Form->Open();
             echo $this->Form->TextBox('Database.Host');
          ?>
       </li>
-      <li class="Warning">
-         <div>
-         <?php
-            echo T('If you are upgrading from a Vanilla 1 installation, use your existing Vanilla 1 database name below.');
-         ?>
-         </div>
-      </li>
       <li>
          <?php
             echo $this->Form->Label('Database Name', 'Database.Name');

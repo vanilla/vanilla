@@ -796,6 +796,35 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $this->_Json['Targets'][] = $Item;
    }
+
+   protected $_PageName = NULL;
+
+   /** Gets or sets the name of the page for the controller.
+    *  The page name is meant to be a friendly name suitable to be consumed by developers.
+    *
+    * @param string|NULL $Value A new value to set.
+    */
+   public function PageName($Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_PageName = $Value;
+         return $Value;
+      }
+
+      if ($this->_PageName === NULL) {
+         if ($this->ControllerName)
+            $Name = $this->ControllerName;
+         else
+            $Name = get_class($this);
+         $Name = strtolower($Name);
+         
+         if (StringEndsWith($Name, 'controller', FALSE))
+            $Name = substr($Name, 0, -strlen('controller'));
+
+         return $Name;
+      } else {
+         return $this->_PageName;
+      }
+   }
    
    /**
     * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.

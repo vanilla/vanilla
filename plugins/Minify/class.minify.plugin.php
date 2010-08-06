@@ -73,8 +73,15 @@ class MinifyPlugin extends Gdn_Plugin {
                // b) Use the default filename.
                $CssPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . 'design' . DS . $CssFile;
             }
-            // 3. Application default. eg. root/applications/app_name/design/
-            $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+            // 3. Application or plugin.
+            if (StringBeginsWith($AppFolder, 'plugins/')) {
+               // The css is coming from a plugin.
+               $AppFolder = substr($AppFolder, strlen('plugins/'));
+               $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
+            } else {
+               // Application default. eg. root/applications/app_name/design/
+               $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+            }
             // 4. Garden default. eg. root/applications/dashboard/design/
             $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
          }

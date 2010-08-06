@@ -361,6 +361,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $FileName The CSS file to search for.
     * @param string $AppFolder The application folder that should contain the CSS file. Default is to
     * use the application folder that this controller belongs to.
+    *  - If you specify plugins/PluginName as $AppFolder then you can contain a CSS file in a plugin's design folder.
     */
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
@@ -1071,8 +1072,18 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // b) Use the default filename.
                      $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
                   }
-                  // 3. Application default. eg. root/applications/app_name/design/
-                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+
+
+                  // 3. Application or plugin.
+                  if (StringBeginsWith($AppFolder, 'plugins/')) {
+                     // The css is coming from a plugin.
+                     $AppFolder = substr($AppFolder, strlen('plugins/'));
+                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
+                  } else {
+                     // Application default. eg. root/applications/app_name/design/
+                     $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+                  }
+
                   // 4. Garden default. eg. root/applications/dashboard/design/
                   $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }

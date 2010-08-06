@@ -1359,11 +1359,11 @@ table.SelectionGrid td.Active {
 #Foot a {
 	color: #076C8E;
 }
-.Version {
+#Foot .Version {
 	position: absolute;
 	bottom: 10px;
 	right: 20px;
-	color: #acddf8;
+	color: #5F9BBF;
 	font-size: 12px;
 	font-weight: normal;
 }

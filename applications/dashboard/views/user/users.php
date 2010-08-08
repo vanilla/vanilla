@@ -14,13 +14,10 @@ foreach ($this->UserData->Format('Text')->Result() as $User) {
       <?php if ($EditUser || $DeleteUser) { ?>
          <td><?php
          if ($EditUser)
-            echo Anchor('Edit', '/user/edit/'.$User->UserID, 'Popup');
+            echo Anchor('Edit', '/user/edit/'.$User->UserID, 'Popup SmallButton');
             
-         if ($EditUser && $DeleteUser)
-            echo ' | ';
-
          if ($DeleteUser)
-            echo Anchor('Delete', '/user/delete/'.$User->UserID);
+            echo Anchor('Delete', '/user/delete/'.$User->UserID, 'SmallButton');
          ?></td>
       <?php } ?>
    </tr>

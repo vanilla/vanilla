@@ -68,12 +68,11 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             echo Anchor(
                T($ToggleText),
                '/settings/applications/'.$AppName.'/'.$Session->TransientKey(),
-               $ToggleText.'Addon'
+               $ToggleText.'Addon SmallButton'
             );
             
             if ($SettingsUrl != '') {
-               echo '<span>|</span>';
-               echo Anchor('Settings', $SettingsUrl);
+               echo Anchor('Settings', $SettingsUrl, 'SmallButton');
             }
          ?></td>
          <td class="Alt Info"><?php

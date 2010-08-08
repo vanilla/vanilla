@@ -68,18 +68,15 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             echo Anchor(
                T($ToggleText),
                '/settings/plugins/'.$PluginName.'/'.$Session->TransientKey(),
-               $ToggleText . 'Addon'
+               $ToggleText . 'Addon SmallButton'
             );
             
-            if ($SettingsUrl != '') {
-               echo '<span>|</span>';
-               echo Anchor('Settings', $SettingsUrl);
-            }
+            if ($SettingsUrl != '')
+               echo Anchor('Settings', $SettingsUrl, 'SmallButton');
             
-            if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName)) {
-               echo '<span>|</span>';
-               echo Anchor('Remove', '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem');
-            }
+            if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName))
+               echo Anchor('Remove', '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
+
          ?></td>
          <td class="Alt Info"><?php
             $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, FALSE);

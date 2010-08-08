@@ -20,8 +20,8 @@
 						if (is_numeric($CountNotifications) && $CountNotifications > 0)
 							$Name .= '<span>'.$CountNotifications.'</span>';
 							
-						echo Anchor($Name, '/profile/'.$Session->User->UserID.'/'.$Session->User->Name);
-						echo Anchor(T('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
+						echo Anchor($Name, '/profile/'.$Session->User->UserID.'/'.$Session->User->Name, 'Profile');
+						echo Anchor(T('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
 					}
 				?>
          </div>

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $this->AddSideMenu();
 ?>
-<h2><?php echo T('Import'); ?></h2>
+<h1><?php echo T('Import'); ?></h1>
 <?php
 $CurrentStep = GetValue('CurrentStep', $this->Data, 0);
 $Complete = FALSE;

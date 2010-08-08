@@ -2,28 +2,11 @@ ul li div.Warning {
    margin: 10px 0px;
 }
 
-div.FlaggedContent {
-   
-}
-
 div.FlaggedContent div.FlaggedItem {
-   background-color: #E2F4FF;
-   border: 1px solid #A5D0E7;
-   margin-bottom: 6px;
-   padding: 5px;
+   border-bottom: 1px solid #e0e0e0;
+   padding: 10px 20px;
 }
 
-div.FlaggedContent div.FlaggedItem div.FlaggedTitleCell {
-
-}
-
-div.FlaggedContent div.FlaggedItem div.FlaggedTitleCell div.FlaggedActions {
-   padding: 10px;
-}
-
-div.FlaggedContent div.FlaggedItem div.FlaggedTitleCell div.FlaggedActions input {
-   margin-right: 10px;
-}
 
 div.FlaggedContent div.FlaggedItem div.FlaggedItemURL {
    font-weight: bold;

@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
-   <?php
-      echo Wrap(T('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'), 'div');
+   <?php echo T('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
+</div>
+<div class="FilterMenu">
+      <?php
       echo Anchor(
          T(C('Plugins.Tagging.Enabled') ? 'Disable Tagging' : 'Enable Tagging'),
          'settings/toggletagging/'.Gdn::Session()->TransientKey(),
@@ -11,8 +13,8 @@
    ?>
 </div>
 <?php if (C('Plugins.Tagging.Enabled')) { ?>
+<h3><?php printf(T('%s tags in the system'), $this->TagData->NumRows()); ?></h3>
 <div class="Info">
-   <h4><?php printf(T('%s tags in the system'), $this->TagData->NumRows()); ?></h4>
    <?php echo T('Click a tag name to edit. Click x to remove.'); ?>
 </div>
 <div class="Tags">

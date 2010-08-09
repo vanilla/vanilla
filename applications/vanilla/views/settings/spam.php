@@ -49,7 +49,7 @@ echo $this->Form->Errors();
       </tr>
    </tbody>
 </table>
-<br /><ul>
+<ul>
    <li>
       <div class="Info"><?php echo T("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
    </li>

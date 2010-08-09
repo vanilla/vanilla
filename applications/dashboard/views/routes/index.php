@@ -31,11 +31,10 @@ foreach ($this->MyRoutes as $Route => $RouteData) {
          <strong><?php echo $Route; ?></strong>
          <div>
          <?php
-         echo Anchor('Edit', '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute');
-         if (!$Reserved) {
-            echo '<span>|</span>';
-            echo Anchor('Delete', '/routes/delete/'.trim($RouteData['Key']. '=').'/'.$Session->TransientKey(), 'DeleteRoute');
-         }
+         echo Anchor('Edit', '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute SmallButton');
+         if (!$Reserved)
+            echo Anchor('Delete', '/routes/delete/'.trim($RouteData['Key']. '=').'/'.$Session->TransientKey(), 'DeleteRoute SmallButton');
+
          ?>
          </div>
       </td>

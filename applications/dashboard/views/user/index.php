@@ -4,9 +4,6 @@ $EditUser = $Session->CheckPermission('Garden.Users.Edit');
 echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
 <h1><?php echo T('Manage Users'); ?></h1>
-<div class="FilterMenu">
-   <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton'); ?>
-</div>
 <div class="Info">
    <?php
       echo $this->Form->Errors();
@@ -15,6 +12,9 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
       printf(T('%s user(s) found.'), $this->Pager->TotalRecords);
       
    ?>
+</div>
+<div class="FilterMenu">
+   <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton'); ?>
 </div>
 <table id="Users" class="AltColumns">
    <thead>

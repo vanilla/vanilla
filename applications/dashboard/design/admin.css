@@ -231,6 +231,7 @@ a.Button {
 	padding: 5px 7px;
 }
 a.SmallButton {
+	margin-right: 10px;
 	padding: 4px;
 	font-size: 12px;
 }
@@ -661,6 +662,7 @@ table tbody td.Info span {
    padding: 0 6px;
 }
 table tbody td.Info strong {
+	margin-right: 10px;
    font-weight: bold;
    color: #000;
 }
@@ -1359,11 +1361,11 @@ table.SelectionGrid td.Active {
 #Foot a {
 	color: #076C8E;
 }
-.Version {
+#Foot .Version {
 	position: absolute;
 	bottom: 10px;
 	right: 20px;
-	color: #acddf8;
+	color: #5F9BBF;
 	font-size: 12px;
 	font-weight: normal;
 }

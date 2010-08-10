@@ -43,6 +43,8 @@ jQuery(document).ready(function($) {
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
+               json = $.postParseJson(json);
+
                $('span.Progress').remove();
                if (json['FormSaved'] == true) {
                   $(inp).val('');
@@ -53,7 +55,7 @@ jQuery(document).ready(function($) {
                      // And add the activity list
                      $(frm).after('<ul class="Activities"></ul>');
                   }
-                  $('ul.Activities').prepend(json['Data']);
+                  $('ul.Activities').prepend(json.Data);
                   // Make sure that hidden items appear
                   $('ul.Activities li.Hidden').slideDown('fast');
                   // If the user's status was updated, show it.

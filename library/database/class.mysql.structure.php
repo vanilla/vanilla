@@ -358,8 +358,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             
 				if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
                // The existing & new column types do not match, so modify the column
-					if (!$this->Query($Comment.$AlterSqlPrefix.' change '.$ColumnName.' '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'), $ColumnName, $this->_DatabasePrefix.$this->_TableName));
+					if (!$this->Query($Comment.$AlterSqlPrefix.' change `'.$ColumnName.'` '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
+						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
+                     $ColumnName,
+                     $this->_DatabasePrefix.$this->_TableName));
 
                // Check for a modification from an enum to an int.
                if(strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->Types('int'))) {

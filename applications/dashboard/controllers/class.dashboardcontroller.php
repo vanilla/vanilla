@@ -12,6 +12,7 @@ class DashboardController extends Gdn_Controller {
    
    public function __construct() {
       parent::__construct();
+      $this->PageName = 'dashboard';
    }
    
    public function Initialize() {

@@ -14,6 +14,14 @@ if (!class_exists('HeadModule', FALSE)) {
     * page.
     */
    class HeadModule extends Gdn_Module {
+      /**
+       * The name of the key in a tag that refers to the tag's name.
+       */
+      const TAG_KEY = '_tag';
+
+      const CONTENT_KEY = '_content';
+
+      const SORT_KEY = '_sort';
       
       /**
        * A collection of tags to be placed in the head.
@@ -77,16 +85,21 @@ if (!class_exists('HeadModule', FALSE)) {
        *
        * @param string The type of tag to add to the head. ie. "link", "script", "base", "meta".
        * @param array An associative array of property => value pairs to be placed in the tag.
+       * @param string an index to give the tag for later manipulation.
        */
-      public function AddTag($Tag, $Properties) {
-         $Tag = strtolower($Tag);
-         
-         if (!array_key_exists($Tag, $this->_Tags))
-            $this->_Tags[$Tag] = array();
+      public function AddTag($Tag, $Properties, $Content = NULL, $Index = NULL) {
+         $Tag = array_merge(array(self::TAG_KEY => strtolower($Tag)), array_change_key_case($Properties));
+         if ($Content)
+            $Tag[self::CONTENT_KEY] = $Content;
+         if (!array_key_exists(self::SORT_KEY, $Tag))
+            $Tag[self::SORT_KEY] = count($this->_Tags);
+
+         if ($Index !== NULL)
+            $this->_Tags[$Index] = $Tag;
          
          // Make sure this item has not already been added.
-         if (is_array($Properties) && !in_array($Properties, $this->_Tags[$Tag]))
-            $this->_Tags[$Tag][] = $Properties;
+         if (!in_array($Tag, $this->_Tags))
+            $this->_Tags[] = $Tag;
       }
       
       /**
@@ -95,8 +108,11 @@ if (!class_exists('HeadModule', FALSE)) {
        * @param string The location of the script relative to the web root. ie. "/js/jquery.js"
        * @param string The type of script being added. ie. "text/javascript"
        */
-      public function AddScript($Src, $Type = 'text/javascript') {
-         $this->AddTag('script', array('src' => Asset($Src, FALSE, TRUE), 'type' => $Type));
+      public function AddScript($Src, $Type = 'text/javascript', $Sort = NULL) {
+         $Attributes = array('src' => Asset($Src, FALSE, TRUE), 'type' => $Type);
+         if ($Sort !== NULL)
+            $Attributes[self::SORT_KEY] = $Sort;
+         $this->AddTag('script', $Attributes);
       }
       
       /**
@@ -116,7 +132,7 @@ if (!class_exists('HeadModule', FALSE)) {
        * Removes any added stylesheets from the head.
        */
       public function ClearCSS() {
-         $this->ClearTag('link', 'rel', 'stylesheet');
+         $this->ClearTag('link', array('rel' => 'stylesheet'));
       }
       
       /**
@@ -133,25 +149,24 @@ if (!class_exists('HeadModule', FALSE)) {
        *
        * @param string The name of the tag to remove from the head.  ie. "link"
        * @param string Any property to search for in the tag.
+       *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
        * @param string Any value to search for in the specified property.
        */
       public function ClearTag($Tag, $Property = '', $Value = '') {
          $Tag = strtolower($Tag);
+         if (is_array($Property))
+            $Query = array_change_key_case($Property);
+         elseif ($Property)
+            $Query = array(strtolower($Property), $Value);
+         else
+            $Query = FALSE;
    
-         foreach($this->_Tags as $TagName => $Collection) {
+         foreach($this->_Tags as $Index => $Collection) {
+            $TagName = $Collection[self::TAG_KEY];
+
             if ($TagName == $Tag) {
-               if ($Property == '') {
-                  // If no property was defined, and the tag is found, remove it.
-                  unset($this->_Tags[$TagName]);
-               } else {
-                  $Count = count($Collection);
-                  for ($i = 0; $i < $Count; ++$i) {
-                     if (array_key_exists($Property, $Collection[$i])
-                        && ($Value == '' || $this->_Tags[$TagName][$i][$Property] == $Value)) {
-                           // If the property exists but no value is specified, or the value matches the one specified, remove it.
-                           unset($this->_Tags[$TagName][$i]);
-                     }
-                  }
+               if ($Query && count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
+                  unset($this->_Tags[$Index]);
                }
             }
          }
@@ -163,32 +178,22 @@ if (!class_exists('HeadModule', FALSE)) {
        * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
        */
       public function SetFavIcon($HRef) {
-         $this->_Tags['link'][] = array(
-            'rel' => 'shortcut icon',
-            'href' => $HRef,
-            'type' => 'image/x-icon'
-         );
+         $this->AddTag('link', 
+            array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
+            NULL,
+            'favicon');
       }
-      
-      /*
-       DEPRECATED
-      public function SubTitle($SubTitle = FALSE, $Title = FALSE, $TitleDivider = ' - ') {
-         $this->_TitleDivider = '';
-         if ($Title === FALSE)
-            $Title = Gdn::Config('Garden.Title', FALSE);
-            
-         if ($Title !== FALSE)
-            $this->_Title = Gdn_Format::Text($Title);
-            
-         if ($SubTitle !== FALSE)
-            $this->_SubTitle = $SubTitle;
-            
-         if ($this->_SubTitle != '' && $this->_Title != '')
-            $this->_TitleDivider = $TitleDivider;
-            
-         return $this->_Title.$this->_TitleDivider.$this->_SubTitle;
+
+      /**
+       * Gets or sets the tags collection.
+       *
+       *  @param array $Value.
+       */
+      public function Tags($Value = NULL) {
+         if ($Value != NULL)
+            $this->_Tags = $Value;
+         return $this->_Tags;
       }
-      */
       
       public function Title($Title = '') {
          if ($Title != '') {
@@ -204,10 +209,26 @@ if (!class_exists('HeadModule', FALSE)) {
             return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), C('Garden.Title'));
          }
       }
+
+      public static function TagCmp($A, $B) {
+         if ($A[self::TAG_KEY] == 'title')
+            return -1;
+         if ($B[self::TAG_KEY] == 'title')
+            return 1;
+         $Cmp = strcasecmp($A[self::TAG_KEY], $B[self::TAG_KEY]);
+         if ($Cmp == 0) {
+            $SortA = GetValue(self::SORT_KEY, $A, 0);
+            $SortB = GetValue(self::SORT_KEY, $B, 0);
+            if ($SortA < $SortB)
+               $Cmp = -1;
+            elseif ($SortA > $SortB)
+               $Cmp = 1;
+         }
+
+         return $Cmp;
+      }
    
       public function ToString() {
-         $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
-
          // Add the canonical Url if necessary.
          if (method_exists($this->_Sender, 'CanonicalUrl')) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
@@ -215,22 +236,36 @@ if (!class_exists('HeadModule', FALSE)) {
             if ($CurrentUrl != $CanonicalUrl)
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
          }
+
+         $this->FireEvent('BeforeToString');
+
+         $Tags = $this->_Tags;
             
          // Make sure that css loads before js (for jquery)
-         ksort($this->_Tags); // "link" comes before "script"
-         foreach ($this->_Tags as $Tag => $Collection) {
-            $Count = count($Collection);
-            for ($i = 0; $i < $Count; ++$i) {
-               $Head .= '<'.$Tag . Attribute($Collection[$i])
-                  .($Tag == 'script' ? '></'.$Tag.'>' : ' />')."\n";
-            }
+         usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+
+         $Tags2 = $this->_Tags;
+
+         // Start with the title.
+         $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
+
+         // Loop through each tag.
+         foreach ($this->_Tags as $Index => $Attributes) {
+            $Tag = $Attributes[self::TAG_KEY];
+
+            unset($Attributes[self::CONTENT_KEY], $Attributes[self::SORT_KEY], $Attributes[self::TAG_KEY]);
+
+            $Head .= '<'.$Tag.Attribute($Attributes);
+
+            if (array_key_exists(self::CONTENT_KEY, $Attributes))
+               $Head .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
+            elseif ($Tag == 'script')
+               $Head .= '></script>';
+            else
+               $Head .= ' />';
+
+            $Head .= "\n";
          }
-         
-         $Count = count($this->_Strings);
-         for ($i = 0; $i < $Count; ++$i) {
-            $Head .= $this->_Strings[$i];
-         }
-         
          return $Head;
       }
    }

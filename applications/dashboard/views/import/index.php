@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $this->AddSideMenu();
 ?>
-<h2><?php echo T('Import'); ?></h2>
+<h1><?php echo T('Import'); ?></h1>
 <?php
 echo '<div class="Info">',
 	sprintf(T('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla\'s exporter. For more information see the documentation <a href="%s">here</a>.'), 'http://vanillaforums.com/blog/help-topics/importing-data/'),

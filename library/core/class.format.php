@@ -199,7 +199,17 @@ class Gdn_Format {
    public static function BBCode($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'BBCode');
-      } else {         
+      } else {
+         // See if there is a custom BBCode formatter.
+         $BBCodeFormatter = Gdn::Factory('BBCodeFormatter');
+         if (is_object($BBCodeFormatter)) {
+            $Result = $BBCodeFormatter->Format($Mixed);
+            $Result = Gdn_Format::Links($Result);
+            $Result = Gdn_Format::Mentions($Result);
+
+            return $Result;
+         }
+
          $Formatter = Gdn::Factory('HtmlFormatter');
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);

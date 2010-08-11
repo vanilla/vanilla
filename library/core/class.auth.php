@@ -45,7 +45,10 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
       
       if (class_exists($AuthenticatorClass)) {
-         $this->_AuthenticationSchemes[$Alias] = $Alias;
+         $this->_AuthenticationSchemes[$Alias] = array(
+            'Name'      => C("Garden.Authenticators.{$Alias}.Name", $Alias),
+            'Configure' => FALSE
+         );
          
          // Now wake it up so it can do setup work
          $Authenticator = $this->AuthenticateWith($Alias, FALSE);
@@ -61,7 +64,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
       
       // Check if we are allowing this kind of authentication right now
-      if (!in_array($AuthenticationSchemeAlias, $this->_AuthenticationSchemes)) {
+      if (!array_key_exists($AuthenticationSchemeAlias, $this->_AuthenticationSchemes)) {
          throw new Exception("Tried to load authenticator '{$AuthenticationSchemeAlias}' which was not yet registered.");
       }
       if (array_key_exists($AuthenticationSchemeAlias,$this->_Authenticators)) {
@@ -86,6 +89,17 @@ class Gdn_Auth extends Gdn_Pluggable {
          $this->AuthenticateWith($Default);
       
       return $this->_Authenticator;
+   }
+   
+   /**
+    * Gets a list of all the currently available authenticators installed
+    */
+   public function GetAvailable() {
+      return $this->_AuthenticationSchemes;
+   }
+   
+   public function GetAuthenticatorInfo($AuthenticationSchemeAlias) {
+      return (array_key_exists($AuthenticationSchemeAlias, $this->_AuthenticationSchemes)) ? $this->_AuthenticationSchemes[$AuthenticationSchemeAlias] : FALSE;
    }
    
    public function ReplaceAuthPlaceholders($PlaceholderString, $ExtraReplacements = array()) {

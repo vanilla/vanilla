@@ -32,7 +32,7 @@ class Gdn_Slice {
       $SliceArgs = func_get_args();
       switch (count($SliceArgs)) {
          case 1:
-            
+            //die('slice request: '.$SliceArgs[0]);
             $Request = Gdn::Request()->Create()
                ->FromEnvironment()
                ->WithURI($SliceArgs[0])

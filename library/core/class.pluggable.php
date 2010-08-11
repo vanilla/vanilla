@@ -119,7 +119,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
     */
    public function FireEvent($EventName) {
       // Look to the PluginManager to see if there are related event handlers and call them
-      Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $EventName);
+      return Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $EventName);
    }
 
 

@@ -57,7 +57,7 @@ function Gdn_Slice(SliceElement, SliceID) {
          'position': 'absolute',
          'top': '0px',
          'left': '0px',
-         'background-color': 'white',
+         'background-color': '#DBF3FC',
          'width': SliceDimensions.width-30,
          'height': SliceDimensions.height+20,
          'color': '#222222',

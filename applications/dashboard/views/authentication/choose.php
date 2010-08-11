@@ -44,12 +44,12 @@
    var ConfigureList = <?php echo $this->Data('AuthenticationConfigureList'); ?>;
    jQuery(document).ready(function(){
       if ($('select#Form_Garden-dot-Authentication-dot-Chooser').attr('bound')) return;
-/*
-      var ChosenAuthenticator = '<?php echo $this->AuthenticatorChoice; ?>';
+
+      var ChosenAuthenticator = '<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>';
       if (!ChosenAuthenticator) {
          $('select#Form_Garden-dot-Authentication-dot-Chooser').val('');
       }
-*/
+
       $('select#Form_Garden-dot-Authentication-dot-Chooser').attr('bound',true);
       $('select#Form_Garden-dot-Authentication-dot-Chooser').bind('change',function(e){
          var Chooser = $(e.target);

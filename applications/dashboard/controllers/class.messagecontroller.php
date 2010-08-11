@@ -84,7 +84,7 @@ class MessageController extends DashboardController {
             
             // Redirect
             $this->StatusMessage = T('Your changes have been saved.');
-            $this->RedirectUrl = Url('dashboard/message');
+            //$this->RedirectUrl = Url('dashboard/message');
          }
       }
       $this->Render();

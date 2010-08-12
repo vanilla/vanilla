@@ -29,7 +29,7 @@ class Gdn_CookieIdentity {
    public $CookieHashMethod;
    public $CookieSalt;
    
-   public function __contruct($Config = NULL) {
+   public function __construct($Config = NULL) {
       $this->Init($Config);
    }
    

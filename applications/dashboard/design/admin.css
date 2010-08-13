@@ -971,13 +971,11 @@ ul.PanelInfo li.Active {
 }
 
 /* ================================================= Dashboard Customizations */
-.Column {
-	width: 50%;
-	float: left;
-}
 .Column table {
-	margin: 0 0 10px;
-   width: 98%;
+   width: 100%;
+}
+.Column table th {
+	width: 160px;
 }
 .Col {
 	width: 175px;

@@ -203,11 +203,13 @@ class Gdn_Request {
     * @param int $ParamType Type of data to export. One of the self::INPUT_* constants
     * @return array
     */
-   public function GetRequestArguments($ParamType) {
-      if (!isset($this->_RequestArguments[$ParamType]))
+   public function GetRequestArguments($ParamType = NULL) {
+      if ($ParamType === NULL)
+         return $this->_RequestArguments;
+      elseif (!isset($this->_RequestArguments[$ParamType]))
          return array();
-
-      return $this->_RequestArguments[$ParamType];
+      else
+         return $this->_RequestArguments[$ParamType];
    }
 
    /**
@@ -447,7 +449,7 @@ class Gdn_Request {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
          } else {
             // Could not determine webroot.
-            $Webroot = '';
+            $WebRoot = '';
          }
          
       }

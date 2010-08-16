@@ -187,49 +187,15 @@ class EntryController extends Gdn_Controller {
       
       $UserID = 0;
       
-      if ($this->Form->IsPostBack() === TRUE) {
-      
-         $FormValues = $this->Form->FormValues();
-         if (ArrayValue('StopLinking', $FormValues)) {
-         
-            $Authenticator->DeleteCookie();
-            Gdn::Request()->WithRoute('DefaultController');
-            return Gdn::Dispatcher()->Dispatch();
-            
-         } elseif (ArrayValue('NewAccount', $FormValues)) {
-         
-            // Try and synchronize the user with the new username/email.
-            $FormValues['Name'] = $FormValues['NewName'];
-            $FormValues['Email'] = $FormValues['NewEmail'];
-            $UserID = $this->UserModel->Synchronize($UserKey, $FormValues);
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-            
-         } else {
-
-            // Try and sign the user in.
-            $PasswordAuthenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $PasswordAuthenticator->HookDataField('Email', 'SignInEmail');
-            $PasswordAuthenticator->HookDataField('Password', 'SignInPassword');
-            $PasswordAuthenticator->FetchData($this->Form);
-            
-            $UserID = $PasswordAuthenticator->Authenticate();
-            
-            if ($UserID < 0) {
-               $this->Form->AddError('ErrorPermission');
-            } else if ($UserID == 0) {
-               $this->Form->AddError('ErrorCredentials');
-            }
-            
-            if ($UserID > 0) {
-               $Data = $FormValues;
-               $Data['UserID'] = $UserID;
-               $Data['Email'] = ArrayValue('SignInEmail', $FormValues, '');
-               $UserID = $this->UserModel->Synchronize($UserKey, $Data);
-            }
-         }
+      // Manual user sync is disabled. No hand holding will occur for users.
+      if (!C('Garden.Authenticator.SyncScreen', TRUE)) {
+         $UserID = $this->UserModel->Synchronize($UserKey, array(
+            'Name'   => $UserName,
+            'Email'  => $UserEmail
+         ));
          
          if ($UserID > 0) {
-            // The user has been created successfully, so sign in now
+            // Account created successfully.
             
             // Finalize the link between the forum user and the foreign userkey
             $Authenticator->Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $Payload);
@@ -238,44 +204,109 @@ class EntryController extends Gdn_Controller {
             $Route = $this->RedirectTo();
             if ($Route !== FALSE)
                Redirect($Route);
+            else
+               Redirect('/');
+               
          } else {
-            // Add the hidden inputs back into the form.
-            foreach($FormValues as $Key => $Value) {
-               if (in_array($Key, $PreservedKeys))
-                  $this->Form->AddHidden($Key, $Value);
-            }
+            // Account not created.
+            
+            $Authenticator->DeleteCookie();
+            Gdn::Request()->WithRoute('DefaultController');
+            return Gdn::Dispatcher()->Dispatch();
          }
+      
       } else {
-         $Id = Gdn::Authenticator()->GetIdentity(TRUE);
-         if ($Id > 0) {
-            // The user is signed in so we can just go back to the homepage.
-            Redirect($Target);
+      
+         if ($this->Form->IsPostBack() === TRUE) {
+         
+            $FormValues = $this->Form->FormValues();
+            if (ArrayValue('StopLinking', $FormValues)) {
+            
+               $Authenticator->DeleteCookie();
+               Gdn::Request()->WithRoute('DefaultController');
+               return Gdn::Dispatcher()->Dispatch();
+               
+            } elseif (ArrayValue('NewAccount', $FormValues)) {
+            
+               // Try and synchronize the user with the new username/email.
+               $FormValues['Name'] = $FormValues['NewName'];
+               $FormValues['Email'] = $FormValues['NewEmail'];
+               $UserID = $this->UserModel->Synchronize($UserKey, $FormValues);
+               $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+               
+            } else {
+   
+               // Try and sign the user in.
+               $PasswordAuthenticator = Gdn::Authenticator()->AuthenticateWith('password');
+               $PasswordAuthenticator->HookDataField('Email', 'SignInEmail');
+               $PasswordAuthenticator->HookDataField('Password', 'SignInPassword');
+               $PasswordAuthenticator->FetchData($this->Form);
+               
+               $UserID = $PasswordAuthenticator->Authenticate();
+               
+               if ($UserID < 0) {
+                  $this->Form->AddError('ErrorPermission');
+               } else if ($UserID == 0) {
+                  $this->Form->AddError('ErrorCredentials');
+               }
+               
+               if ($UserID > 0) {
+                  $Data = $FormValues;
+                  $Data['UserID'] = $UserID;
+                  $Data['Email'] = ArrayValue('SignInEmail', $FormValues, '');
+                  $UserID = $this->UserModel->Synchronize($UserKey, $Data);
+               }
+            }
+            
+            if ($UserID > 0) {
+               // The user has been created successfully, so sign in now
+               
+               // Finalize the link between the forum user and the foreign userkey
+               $Authenticator->Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $Payload);
+               
+               /// ... and redirect them appropriately
+               $Route = $this->RedirectTo();
+               if ($Route !== FALSE)
+                  Redirect($Route);
+            } else {
+               // Add the hidden inputs back into the form.
+               foreach($FormValues as $Key => $Value) {
+                  if (in_array($Key, $PreservedKeys))
+                     $this->Form->AddHidden($Key, $Value);
+               }
+            }
+         } else {
+            $Id = Gdn::Authenticator()->GetIdentity(TRUE);
+            if ($Id > 0) {
+               // The user is signed in so we can just go back to the homepage.
+               Redirect($Target);
+            }
+            
+            $Name = $UserName;
+            $Email = $UserEmail;
+            
+            // Set the defaults for a new user.
+            $this->Form->SetFormValue('NewName', $Name);
+            $this->Form->SetFormValue('NewEmail', $Email);
+            
+            // Set the default for the login.
+            $this->Form->SetFormValue('SignInEmail', $Email);
+            $this->Form->SetFormValue('Handshake', 'NEW');
+            
+            // Add the handshake data as hidden fields.
+            $this->Form->AddHidden('Name',       $Name);
+            $this->Form->AddHidden('Email',      $Email);
+            $this->Form->AddHidden('UserKey',    $UserKey);
+            $this->Form->AddHidden('Token',      $TokenKey);
+            $this->Form->AddHidden('Consumer',   $ConsumerKey);
+            
          }
          
-         $Name = $UserName;
-         $Email = $UserEmail;
+         $this->SetData('Name', ArrayValue('Name', $this->Form->HiddenInputs));
+         $this->SetData('Email', ArrayValue('Email', $this->Form->HiddenInputs));
          
-         // Set the defaults for a new user.
-         $this->Form->SetFormValue('NewName', $Name);
-         $this->Form->SetFormValue('NewEmail', $Email);
-         
-         // Set the default for the login.
-         $this->Form->SetFormValue('SignInEmail', $Email);
-         $this->Form->SetFormValue('Handshake', 'NEW');
-         
-         // Add the handshake data as hidden fields.
-         $this->Form->AddHidden('Name',       $Name);
-         $this->Form->AddHidden('Email',      $Email);
-         $this->Form->AddHidden('UserKey',    $UserKey);
-         $this->Form->AddHidden('Token',      $TokenKey);
-         $this->Form->AddHidden('Consumer',   $ConsumerKey);
-         
+         $this->Render();
       }
-      
-      $this->SetData('Name', ArrayValue('Name', $this->Form->HiddenInputs));
-      $this->SetData('Email', ArrayValue('Email', $this->Form->HiddenInputs));
-      
-      $this->Render();
    }
    
    /**

@@ -19,9 +19,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class Gdn_SliceProvider {
 
+   protected $SliceHandler;
+   protected $SliceConfig;
+
    public function EnableSlicing(&$Sender) {
+      $this->SliceHandler = $Sender;
+      $this->SliceConfig = array(
+         'css'       => array(),
+         'js'        => array()
+      );
       $Sender->AddJsFile('/js/library/jquery.class.js');
       $Sender->AddJsFile('/js/slice.js');
+      $Sender->AddCssFile('/applications/dashboard/design/slice.css');
    }
 
    public function Slice($SliceName, $Arguments = array()) {
@@ -43,6 +52,25 @@ class Gdn_SliceProvider {
       $ExplodedPath[$ReplacementIndex] = $SliceName;
       $SlicePath = implode('/',$ExplodedPath);
       return Gdn::Slice($SlicePath);
+   }
+   
+   public function AddSliceAsset($Asset) {
+      $Extension = strtolower(array_pop(explode('.',basename($Asset))));
+      switch ($Extension) {
+         case 'css':
+            if (!in_array($Asset, $this->SliceConfig['css'])) 
+               $this->SliceConfig['css'][] = $Asset;
+            break;
+            
+         case 'js':
+            if (!in_array($Asset, $this->SliceConfig['js'])) 
+               $this->SliceConfig['js'][] = $Asset;
+            break;
+      }
+   }
+   
+   public function RenderSliceConfig() {
+      return json_encode($this->SliceConfig);
    }
 
 }

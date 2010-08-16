@@ -1,0 +1,14 @@
+input.SmallButton {
+   font-size: 12px;
+   padding: 3px;
+   margin-left: 5px;
+}
+
+div.AuthenticationChooser {
+   margin: 20px;
+   padding: 0px;
+}
+
+#Content div.AuthenticationChooser form ul {
+   padding: 0px;
+}

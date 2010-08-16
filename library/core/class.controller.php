@@ -361,6 +361,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $FileName The CSS file to search for.
     * @param string $AppFolder The application folder that should contain the CSS file. Default is to
     * use the application folder that this controller belongs to.
+    *  - If you specify plugins/PluginName as $AppFolder then you can contain a CSS file in a plugin's design folder.
     */
    public function AddCssFile($FileName, $AppFolder = '') {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
@@ -796,6 +797,35 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $this->_Json['Targets'][] = $Item;
    }
+
+   protected $_PageName = NULL;
+
+   /** Gets or sets the name of the page for the controller.
+    *  The page name is meant to be a friendly name suitable to be consumed by developers.
+    *
+    * @param string|NULL $Value A new value to set.
+    */
+   public function PageName($Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_PageName = $Value;
+         return $Value;
+      }
+
+      if ($this->_PageName === NULL) {
+         if ($this->ControllerName)
+            $Name = $this->ControllerName;
+         else
+            $Name = get_class($this);
+         $Name = strtolower($Name);
+         
+         if (StringEndsWith($Name, 'controller', FALSE))
+            $Name = substr($Name, 0, -strlen('controller'));
+
+         return $Name;
+      } else {
+         return $this->_PageName;
+      }
+   }
    
    /**
     * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
@@ -970,9 +1000,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Asset = $this->GetAsset($AssetName);
 
       $this->EventArguments['AssetName'] = $AssetName;
-      $this->FireEvent('RenderAsset');
+      $this->FireEvent('BeforeRenderAsset');
 
-      $LengthBefore = ob_get_length();
+      //$LengthBefore = ob_get_length();
 
       if(is_string($Asset)) {
          echo $Asset;
@@ -981,11 +1011,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Asset->Render();
       }
 
-      if ($LengthBefore !== FALSE) {
-         $LengthAfter = ob_get_length();
-         if ($LengthAfter > $LengthBefore)
-            $this->FireEvent('RenderAsset');
-      }
+      $this->FireEvent('AfterRenderAsset');
    }
 
    /**
@@ -1046,8 +1072,18 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // b) Use the default filename.
                      $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
                   }
-                  // 3. Application default. eg. root/applications/app_name/design/
-                  $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+
+
+                  // 3. Application or plugin.
+                  if (StringBeginsWith($AppFolder, 'plugins/')) {
+                     // The css is coming from a plugin.
+                     $AppFolder = substr($AppFolder, strlen('plugins/'));
+                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
+                  } else {
+                     // Application default. eg. root/applications/app_name/design/
+                     $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
+                  }
+
                   // 4. Garden default. eg. root/applications/dashboard/design/
                   $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }

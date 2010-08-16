@@ -325,15 +325,21 @@ class PostController extends VanillaController {
                         $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
                         // Do not load more than a single page of data...
                         $Limit = C('Vanilla.Comments.PerPage', 50);
+
+                        // Redirect if the new new comment isn't on the same page.
+                        $Redirect |= PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
                      }
 
-                     if ($Redirect || ($Discussion->CountComments - 1 - $this->Offset) > $Limit) {
+
+
+                     if ($Redirect) {
                         // The user posted a comment on a page other than the last one, so just redirect to the last page.
                         $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
                         $this->CommentData = NULL;
                      } else {
                         // Make sure to load all new comments since the page was last loaded by this user
                         $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+                        $this->SetData('NewComments', TRUE);
                         $this->ControllerName = 'discussion';
                         $this->View = 'comments';
                      }

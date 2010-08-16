@@ -322,15 +322,14 @@ a.SmallButton:hover,
 div.Information {
    text-align: center;
    position: fixed;
-   top: 10px;
+   top: 0;
    left: 0;
-   z-index: 200;
-   margin: 0 !important;
+	right: 0;
+   margin: auto !important;
    padding: 0 !important;
    list-style: none !important;
    font-size: 12px;
-   display: block;
-   width: 100%;
+	width: 300px;
 }
 * html div.Information {
   position: absolute;
@@ -343,17 +342,19 @@ div.Information {
 div.Messages ul {
    cursor: pointer;
    width: auto !important;
-   border: 1px solid #ee8 !important;
    margin: 0 auto !important;
    background: #ff9 !important;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
    *display:inline;
-   border-radius: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
-	padding: 10px 20px !important;
+   border-radius: 0 0 2px 2px;
+   -moz-border-radius: 0 0 2px 2px;
+   -webkit-border-radius: 0 0 2px 2px;
+	box-shadow: 0px 1px 2px #333;
+	-moz-box-shadow: 0px 1px 2px #333;
+	-webkit-box-shadow: 0px 1px 2px #333;  
+	padding: 6px 10px !important;
 }
 div.Messages ul li {
    text-align: left !important;
@@ -362,12 +363,18 @@ div.Messages ul li {
    padding: 0 !important;
    margin: 0 !important;
    list-style-position: outside;
-	font-size: 120%;
 }
 div.Errors ul {
 	display: block;
 	background: #ff0000 !important;
 	border: none !important;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	padding: 10px 20px !important;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
 }
 div.Errors ul li {
    color: #fff !important;
@@ -1170,9 +1177,6 @@ ul.PanelInfo li.Active {
 
 
 /* =================================================================== Popups */
-div.Popup div.Errors ul {
-	border: 1px solid #a00 !important;
-}
 div.Popup div.Messages {
    text-align: left;
    position: inherit;
@@ -1353,14 +1357,18 @@ div.Legal em {
 }
 div.Legal p {
 	padding: 6px 0 10px;
+	margin: 0;
 }
 div.Legal h3 {
 	font-weight: bold;
-	padding: 6px 0 0;
+	padding: 6px 0 4px !important;
+	margin: 0 !important;
+	border: none !important;
+	background: none !important;
 }
 div.Legal {
-	margin: 0 0 10px;
-	padding: 2px 10px;
+	margin: 10px;
+	padding: 2px 8px;
 	border: 1px solid #a5d0e7;
    border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -1404,6 +1412,10 @@ div.BrowseThemes h3 {
 }
 div.Description {
 	padding: 0 20px 20px;
+}
+div.Options,
+div.CustomThemeOptions {
+	padding: 0 20px;
 }
 table.SelectionGrid {
 	background: none;

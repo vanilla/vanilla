@@ -55,7 +55,6 @@ class Gdn_SliceProvider {
    }
    
    public function AddSliceAsset($Asset) {
-      $Asset = '/'.ltrim($Asset);
       $Extension = strtolower(array_pop(explode('.',basename($Asset))));
       switch ($Extension) {
          case 'css':

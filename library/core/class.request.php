@@ -449,7 +449,7 @@ class Gdn_Request {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
          } else {
             // Could not determine webroot.
-            $Webroot = '';
+            $WebRoot = '';
          }
          
       }

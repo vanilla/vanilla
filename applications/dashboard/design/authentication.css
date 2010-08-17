@@ -12,3 +12,6 @@ div.AuthenticationChooser {
 #Content div.AuthenticationChooser form ul {
    padding: 0px;
 }
+#Content table.SplitConfiguration td.VanillaConfig form ul {
+   padding:0;
+}

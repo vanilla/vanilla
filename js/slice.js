@@ -82,7 +82,7 @@ function Gdn_Slice(SliceElement, SliceID) {
          
       this.PrepareSliceForRequest();
       
-      var SliceURL = this.SliceURL;
+      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'GET',
@@ -124,14 +124,14 @@ function Gdn_Slice(SliceElement, SliceID) {
             var v_css  = document.createElement('link');
          	v_css.rel = 'stylesheet'
          	v_css.type = 'text/css';
-         	v_css.href = el;
+         	v_css.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
          	document.getElementsByTagName('head')[0].appendChild(v_css);
          });
          
          $(SliceConfig.js).each(function(i,el){
             var v_js  = document.createElement('script');
          	v_js.type = 'text/javascript';
-         	v_js.href = el;
+         	v_js.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
          	document.getElementsByTagName('head')[0].appendChild(v_js);
          });
       }

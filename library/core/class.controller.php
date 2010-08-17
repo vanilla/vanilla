@@ -502,6 +502,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('WebRoot', $this->_Definitions))
          $this->_Definitions['WebRoot'] = CombinePaths(array(Gdn::Request()->Domain(), Gdn::Request()->WebRoot()), '/');
 
+      if (!array_key_exists('UrlFormat', $this->_Definitions))
+         $this->_Definitions['UrlFormat'] = Url('{Path}');
+
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
 

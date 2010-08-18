@@ -266,6 +266,12 @@ if (!class_exists('HeadModule', FALSE)) {
 
             $Head .= "\n";
          }
+
+         foreach ($this->_Strings as $String) {
+            $Head .= $String;
+            $Head .= "\n";
+         }
+
          return $Head;
       }
    }

@@ -22,6 +22,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * @method void Render() Render the controller's view.
+ * @param string $View
+ * @param string $ControllerName
+ * @param string $ApplicationFolder
+ * @param string $AssetName The name of the asset container that the content should be rendered in.
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
@@ -407,10 +411,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
             $Module = $this->$Module;
          } else {
-            if (!class_exists($Module))
-               __autoload($Module);
+            $ModuleClassExists = class_exists($Module);
 
-            if (class_exists($Module)) {
+            if ($ModuleClassExists) {
                // Make sure that the class implements Gdn_IModule
                $ReflectionClass = new ReflectionClass($Module);
                if ($ReflectionClass->implementsInterface("Gdn_IModule"))

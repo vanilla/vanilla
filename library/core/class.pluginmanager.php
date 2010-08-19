@@ -563,6 +563,11 @@ class Gdn_PluginManager {
       foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
          $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
          $Paths = array_merge($Paths, SafeGlob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
+
+         // Make sure the plugin is in the config.
+         if (!C("EnabledPlugins.$PluginName")) {
+            SaveToConfig("EnabledPlugins.$PluginName", $PluginFolder, FALSE);
+         }
       }
       if (!is_array($Paths))
          $Paths = array();

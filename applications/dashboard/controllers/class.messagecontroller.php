@@ -121,11 +121,13 @@ class MessageController extends DashboardController {
    
    protected function _GetLocationData() {
       $ControllerData = array();
-      $ControllerData['Dashboard/Settings/Index'] = 'Dashboard';
+      $ControllerData['[Base]'] = 'Every Page';
+      $ControllerData['[NonAdmin]'] = 'Only Forum Pages';
+      $ControllerData['[Admin]'] = 'Only Dashboard Pages';
       $ControllerData['Dashboard/Profile/Index'] = 'Profile Page';
       $ControllerData['Vanilla/Discussions/Index'] = 'Discussions Page';
       $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
-      $ControllerData['Base'] = 'Every Page';
+      $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;
       $this->FireEvent('AfterGetLocationData');
       return $ControllerData;

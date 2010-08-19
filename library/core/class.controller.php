@@ -1147,8 +1147,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all JS files
             foreach ($this->_JsFiles as $JsInfo) {
                $JsFile = $JsInfo['FileName'];
-               
-               if (strpos($JsFile, '/') !== FALSE) {
+
+               if (strpos($JsFile, '//') !== FALSE) {
+                  // This is a link to an external file.
+                  $this->Head->AddScript($JsFile);
+                  continue;
+               } if (strpos($JsFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
                } else {

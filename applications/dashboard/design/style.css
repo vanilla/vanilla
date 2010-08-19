@@ -336,17 +336,20 @@ div.Info strong {
 div.DismissMessage {
    margin: 6px 0 10px;
 	text-align: left;
+	position: relative;
 }
 div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
 	font-family: arial;
-   float: right;
+   position: absolute;
 	font-size: 22px;
 	font-weight: bold;
-   line-height: 120%;
+   line-height: 1;
    color: #999;
+	top: 3px;
+	right: 5px;
 }
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;

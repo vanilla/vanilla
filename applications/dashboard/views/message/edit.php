@@ -38,8 +38,6 @@ echo $this->Form->Errors();
          echo '<div class="Warning"'.$Style.'>'.T('Warning').'</div>';
          echo $this->Form->Radio('CssClass', '', array('value' => 'Box'));
          echo '<div class="Box"'.$Style.'>'.T('Panel Box').'</div>';
-         echo $this->Form->Radio('CssClass', '', array('value' => ''));
-         echo '<div'.$Style.'>'.T('None').'</div>';
       ?>
    </li>
    <li>

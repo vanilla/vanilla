@@ -83,7 +83,6 @@ body {
 	background: #dbf3fc;
 }
 #Body {
-	border-top:1px solid #a5d0e7;
 	background: #fff;
 	float: left;
 	width: 100%;
@@ -91,7 +90,6 @@ body {
 #Content {
 	padding: 0;
 	margin: 0 0 0 200px;
-	border-top: 1px solid #fff;
 	border-left: 1px solid #82bddd;
 	background: #fff;
 }
@@ -121,6 +119,7 @@ h1, h2, h3, h4, h5, h6 {
 	text-shadow: 0 1px 0 #fff;
 	color: #222;
 	background: #dbf3fc;
+	border-top: 1px solid #8bc1de;
 	border-bottom: 1px solid #8bc1de;
 	padding: 10px 20px;
 	font-size: 14px;
@@ -410,23 +409,53 @@ div.Errors pre * {
 }
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
+/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.Info,
 .DismissMessage {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    font-size: 14px;
+	position: relative;
+   margin: 10px;
+	padding: 10px;
+	line-height: 1.4;
+}
+#Panel div.Info,
+#Panel .DismissMessage {
+	margin: 0;
+	border-width: 1px 0 1px 0;
+	font-size: 13px;
+}
+div.DismissMessage p {
+   margin: 2px 0;
+	padding: 4px 0 0;
+}
+div.DismissMessage a.Dismiss {
+	position: absolute;
+	top: 3px;
+	right: 5px;
+	font-family: arial;
+	font-size: 22px;
+	font-weight: bold;
+   line-height: 1;
+   color: #999;
+}
+#Panel div.DismissMessage a.Dismiss {
+	top: 1px;
+	right: 3px;
+}
+div.DismissMessage a.Dismiss:hover {
+	color: #ff0084;
+}
+div.Box {
+	border: 1px solid #a5d0e7;
+   background: #d3f0ff;
 }
 .Warning {
-	line-height: 180%;
-   background: #ffc;
    border: 1px solid #aaa;
-   color: #000;
-   padding: 6px;
-}
-div.Info {
-   color: #333;
-	margin: 20px 0;
-	padding: 0 20px;
+   background: #ffc;
 }
 strong {
 	font-weight: bold;
@@ -449,27 +478,6 @@ strong {
 }
 div.EmptyInfo {
    margin: 10px 0;
-}
-/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
-  that it renders in a div with this DismissMessage class. */
-div.DismissMessage {
-   margin: 6px 0 10px;
-	padding: 0 6px 4px;
-}
-div.DismissMessage p {
-   margin: 2px 0;
-	padding: 4px 0 0;
-}
-div.DismissMessage a.Dismiss {
-	font-family: arial;
-   float: right;
-	font-size: 22px;
-	font-weight: bold;
-   line-height: 120%;
-   color: #999;
-}
-div.DismissMessage a.Dismiss:hover {
-	color: #ff0084;
 }
 .HoverHelp {
 	position: relative;
@@ -970,19 +978,9 @@ label.SubLabel {
    float: left;
 	margin: 0;
 	width: 200px;
-	border-top: 1px solid #fff;
+	border-top: 1px solid #82BDDD;
 	border-right: 1px solid #82bddd;
 	background: #dbf3fc;
-}
-div.Box {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #d3f0ff;
-   color: #999;
-   padding: 6px 0;
-   margin: 0 0 10px 0;
-	border: 1px solid #a5d0e7;
 }
 #Panel div.Box {
 	margin: 0;
@@ -1102,6 +1100,9 @@ ul.PanelInfo li.Active {
 }
 .Column table th {
 	width: 160px;
+}
+#Content .Column2 h1 {
+	border-top: 0;
 }
 .Col {
 	width: 175px;
@@ -1496,9 +1497,9 @@ table.SelectionGrid td.Active {
 }
 
 
-#dashboard_user_browse #Content div.Info,
-#dashboard_user_index #Content div.Info {
-	padding: 10px 20px 0;
+#dashboard_user_browse #Content form div.Info,
+#dashboard_user_index #Content form div.Info {
+	padding: 10px 10px 0;
 }
 #dashboard_user_browse #Content form input.Button,
 #dashboard_user_index #Content form input.Button {
@@ -1507,8 +1508,15 @@ table.SelectionGrid td.Active {
 #Content form input.Button {
 	margin: 0 20px 20px;
 }
+/* A general rule to remove padding from info (form adds it) */
 #Content form ul div.Info {
 	padding: 0;
+	margin: 10px 0;
+}
+/* Exceptions to padding rule */
+body#dashboard_settings_registration #Content form ul div.Info {
+	padding: 10px;
+	margin: 10px;
 }
 table tbody td.Info strong,
 a.SmallButton {
@@ -1523,8 +1531,7 @@ body.Import table {
 body.Import .Button {
 	margin: 0 0 0 20px;
 }
-#InvitationExpiration,
-#dashboard_settings_registration #Content form ul div.Info {
+#InvitationExpiration {
 	padding: 0 20px;
 }
 table.AltRows tr.Disabled th,

@@ -29,18 +29,29 @@ function smarty_function_asset($Params, &$Smarty) {
 		$Class = ' class="'.$Class.'"';
 	
 	$Controller = $Smarty->Controller;
-	
-	// Get the asset from the controller.
-	$Asset = $Controller->GetAsset($Name);
-	
-   if(!is_string($Asset)) {
+   $Controller->EventArguments['AssetName'] = $Name;
+   
+   $Result = '';
+
+   ob_start();
+   $Controller->FireEvent('BeforeRenderAsset');
+   $Result .= ob_get_clean();
+
+   $Asset = $Controller->GetAsset($Name);
+   if (!is_string($Asset)) {
+      $Asset->AssetName = $Name;
       $Asset = $Asset->ToString();
    }
 
-   if(!empty($Tag)) {
-      $Result = '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
+   if (!empty($Tag)) {
+      $Result .= '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
    } else {
-      $Result = $Asset;
+      $Result .= $Asset;
    }
+   
+   ob_start();
+   $Controller->FireEvent('AfterRenderAsset');
+   $Result .= ob_get_clean();
+
    return $Result;
 }

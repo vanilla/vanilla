@@ -31,10 +31,10 @@ foreach ($this->MessageData->Result() as $Message) {
          );
       ?><div>
          <strong><?php echo $Message->Enabled == '1' ? 'Enabled' : 'Disabled'; ?></strong>
-         <span>|</span>
-         <?php echo Anchor('Edit', '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage'); ?>
-         <span>|</span>
-         <?php echo Anchor('Delete', '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage'); ?>
+         <?php
+         echo Anchor('Edit', '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
+         echo Anchor('Delete', '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');
+         ?>
          </div>
       </td>
       <td class="Alt"><?php echo Gdn_Format::Text($Message->Content); ?></td>

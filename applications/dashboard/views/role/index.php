@@ -30,13 +30,9 @@ foreach ($this->RoleData->Result() as $Role) {
          <?php if ($Advanced) { ?>
          <div>
             <?php
-            echo Anchor('Edit', '/role/edit/'.$Role->RoleID);
-            if ($Role->Deletable) {
-            ?>
-            <span>|</span>
-            <?php
-            echo Anchor('Delete', '/role/delete/'.$Role->RoleID, 'Popup');
-            }
+            echo Anchor('Edit', '/role/edit/'.$Role->RoleID, 'SmallButton');
+            if ($Role->Deletable)
+               echo Anchor('Delete', '/role/delete/'.$Role->RoleID, 'Popup SmallButton');
             ?>
          </div>
          <?php } ?>

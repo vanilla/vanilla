@@ -41,63 +41,16 @@ class MinifyPlugin extends Gdn_Plugin {
             unlink($File);
       }
 	}
-	
-   public function Base_BeforeAddCss_Handler($Sender) {
-      $WebRoot = Gdn::Request()->WebRoot();
-      // Find all css file paths
+
+   /**
+    *
+    * @param HeadModule $Head
+    */
+   public function HeadModule_BeforeToString_Handler($Head) {
+      $Tags = $Head->Tags();
+
+      // Grab all of the css.
       $CssToCache = array();
-      foreach ($Sender->CssFiles() as $CssInfo) {
-         $CssFile = $CssInfo['FileName'];
-         
-         if(strpos($CssFile, '/') !== FALSE) {
-            // A direct path to the file was given.
-            $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
-         } else {
-            $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
-            $AppFolder = $CssInfo['AppFolder'];
-            if ($AppFolder == '')
-               $AppFolder = $Sender->ApplicationFolder;
-
-            // CSS comes from one of four places:
-            $CssPaths = array();
-            if ($Sender->Theme) {
-               // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-               // $CssPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-               // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
-               // a) Check to see if a customized version of the css is there.
-               if ($Sender->ThemeOptions) {
-                  $Filenames = GetValueR('Styles.Value', $Sender->ThemeOptions);
-                  if (is_string($Filenames) && $Filenames != '%s')
-                     $CssPaths[] = PATH_THEMES.DS.$Sender->Theme.DS.'design'.DS.ChangeBasename($CssFile, $Filenames);
-               }
-               // b) Use the default filename.
-               $CssPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . 'design' . DS . $CssFile;
-            }
-            // 3. Application default. eg. root/applications/app_name/design/
-            $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
-            // 4. Garden default. eg. root/applications/dashboard/design/
-            $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
-         }
-
-         // Find the first file that matches the path.
-         $CssPath = FALSE;
-         foreach($CssPaths as $Glob) {
-            $Paths = SafeGlob($Glob);
-            if(is_array($Paths) && count($Paths) > 0) {
-               $CssPath = $Paths[0];
-               break;
-            }
-         }
-         
-         if ($CssPath !== FALSE) {
-            $CssPath = substr($CssPath, strlen(PATH_ROOT)+1);
-            $CssPath = str_replace(DS, '/', $CssPath);
-            $CssToCache[] = $CssPath;
-         }
-      }
-      $CssToCache = array_unique($CssToCache);
-      
-      // And now search for/add all JS files
       $JsToCache = array(); // Add the global js files
 		$GlobalJS = array(
 			'jquery.js',
@@ -107,69 +60,55 @@ class MinifyPlugin extends Gdn_Plugin {
 			'jquery.gardenhandleajaxform.js',
 			'global.js'
 		);
-      foreach ($Sender->JsFiles() as $JsInfo) {
-         $JsFile = $JsInfo['FileName'];
-			// Ignore the JsFile if it is in the globaljs minify group (defined in plugins/Minifiy/min/groupsConfig.php).
-			if (!in_array($JsFile, $GlobalJS)) {
-				if (strpos($JsFile, '/') !== FALSE) {
-					// A direct path to the file was given.
-					$JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
-				} else {
-					$AppFolder = $JsInfo['AppFolder'];
-					if ($AppFolder == '')
-						$AppFolder = $Sender->ApplicationFolder;
-	
-					// JS can come from a theme, an any of the application folder, or it can come from the global js folder:
-					$JsPaths = array();
-					if ($Sender->Theme) {
-						// 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
-						$JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . $AppFolder . DS . 'js' . DS . $JsFile;
-						// 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-						$JsPaths[] = PATH_THEMES . DS . $Sender->Theme . DS . 'js' . DS . $JsFile;
-					}
-					// 3. This application folder
-					$JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsFile;
-					// 4. Global JS folder. eg. root/js/
-					$JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsFile;
-					// 5. Global JS library folder. eg. root/js/library/
-					$JsPaths[] = PATH_ROOT . DS . 'js' . DS . 'library' . DS . $JsFile;
-				}
-	
-				// Find the first file that matches the path.
-				$JsPath = FALSE;
-				foreach($JsPaths as $Glob) {
-					$Paths = SafeGlob($Glob);
-					if(is_array($Paths) && count($Paths) > 0) {
-						$JsPath = $Paths[0];
-						break;
-					}
-				}
-				
-				if ($JsPath !== FALSE) {
-					$JsPath = str_replace(
-						array(PATH_ROOT, DS),
-						array('', '/'),
-						$JsPath
-					);
-					$JsPath = substr($JsPath, 0, 1) == '/' ? substr($JsPath, 1) : $JsPath;
-					$JsToCache[] = $JsPath;
-				}
-			}
-      }
 
-      $JsToCache = array_unique($JsToCache);
-      // Remove all js & css from the controller
-      $Sender->ClearCssFiles();
-      $Sender->ClearJsFiles();
+      foreach ($Tags as $Index => $Tag) {
+         $IsJs = GetValue(HeadModule::TAG_KEY, $Tag) == 'script';
+         $IsCss = (GetValue(HeadModule::TAG_KEY, $Tag) == 'link' && GetValue('rel', $Tag) == 'stylesheet');
+         if (!$IsJs && !$IsCss)
+            continue;
+
+         if ($IsCss)
+            $Href = GetValue('href', $Tag, '!');
+         else
+            $Href = GetValue('src', $Tag, '!');
+
+         if ($Href[0] != '/')
+            continue;
+
+         // Strip any querystring off the href.
+         $Href = preg_replace('`\?.*`', '', $Href);
+
+         $Path = PATH_ROOT.$Href;
+
+         if (!file_exists($Path))
+            continue;
+
+         // Remove the css from the tag because minifier is taking care of it.
+         unset($Tags[$Index]);
+
+         // Add the reference to the appropriate cache collection.
+         if ($IsCss) {
+            $CssToCache[] = $Href;
+         } elseif ($IsJs) {
+            // Don't include the file if it's in the global js.
+            $Filename = basename($Path);
+            if (in_array($Filename, $GlobalJS)) {
+               $GlobalJsFound = TRUE;
+               continue;
+            }
+            $JsToCache[] = $Href;
+         }
+      }
       
-      // Add minified css & js directly to the head module
+      // Add minified css & js directly to the head module.
       $Url = 'plugins/Minify/min/?';
 		$BasePath = Gdn::Request()->WebRoot();
 		if ($BasePath != '')
 			$BasePath = 'b='.$BasePath.'&';
-		
-      $Sender->Head->AddCss($Url.$BasePath.'f='.implode(',', $CssToCache), 'screen');
-		$Sender->Head->AddScript($Url.'g=globaljs');
-		$Sender->Head->AddScript($Url.$BasePath.'f='.implode(',', $JsToCache));
-   }   
+
+      $Head->Tags($Tags);
+      $Head->AddCss($Url.$BasePath.'f='.implode(',', $CssToCache), 'screen');
+      $Head->AddScript($Url.'g=globaljs', 'text/javascript', -100);
+		$Head->AddScript($Url.$BasePath.'f='.implode(',', $JsToCache));
+   }
 }

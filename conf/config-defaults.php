@@ -48,6 +48,7 @@ $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/regist
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/%1$s/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
+$Configuration['Garden']['Authenticator']['SyncScreen']         = TRUE;
 $Configuration['Garden']['Authenticators']['password']['Name']  = "Password";
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';

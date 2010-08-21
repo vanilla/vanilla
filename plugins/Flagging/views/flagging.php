@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
+   <?php echo T('The following content has been flagged by users for moderator review.'); ?>
+</div>
+<div class="FilterMenu">
    <?php
-      echo T('The following content has been flagged by users for moderator review.');
       $ToggleName = C('Plugins.Flagging.Enabled') ? T('Disable Content Flagging') : T('Enable Content Flagging');
       echo "<div>".Wrap(Anchor($ToggleName, 'plugin/flagging/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'))."</div>";
    ?>
@@ -42,10 +44,12 @@
                            <div class="FlaggedActions">
                               <?php 
                                  echo $this->Form->Button('Dismiss',array(
-                                    'onclick'      => "window.location.href='".Url('plugin/flagging/dismiss/'.$Flag['EncodedURL'],TRUE)."'"
+                                    'onclick'      => "window.location.href='".Url('plugin/flagging/dismiss/'.$Flag['EncodedURL'],TRUE)."'",
+                                    'class' => 'SmallButton'
                                  ));
                                  echo $this->Form->Button('Take Action',array(
-                                    'onclick'      => "window.location.href='".Url($Flag['ForeignURL'],TRUE)."'"
+                                    'onclick'      => "window.location.href='".Url($Flag['ForeignURL'],TRUE)."'",
+                                    'class' => 'SmallButton'
                                  ));
                               ?>
                            </div>

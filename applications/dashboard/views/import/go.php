@@ -2,7 +2,7 @@
 $this->AddSideMenu();
 ?>
 <style> .Complete { text-decoration: line-through; }</style>
-<h2><?php echo T('Import'); ?></h2>
+<h1><?php echo T('Import'); ?></h1>
 <?php
 echo $this->Form->Errors();
 

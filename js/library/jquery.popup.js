@@ -57,7 +57,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   settings.afterConfirm(json, settings.sender);
                   gdn.inform(json.StatusMessage);
                   if (json.RedirectUrl)
-                    setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                    setTimeout("document.location='" + gdn.url(json.RedirectUrl) + "';", 300);
 
                 }
              });

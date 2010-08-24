@@ -40,7 +40,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $Path = sprintf($AuthenticatorClassPath, $Alias);
       $AuthenticatorClass = sprintf('Gdn_%sAuthenticator',ucfirst($Alias));
       // Include the class if it exists
-      if (!class_exists($AuthenticatorClass) && file_exists($Path)) {
+      if (!class_exists($AuthenticatorClass, FALSE) && file_exists($Path)) {
          require_once($Path);
       }
       

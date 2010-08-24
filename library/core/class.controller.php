@@ -379,8 +379,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method AddDefinition(), $Term and $Definition need descriptions.
     */
    public function AddDefinition($Term, $Definition = NULL) {
-      if(!is_null($Definition))
+      if(!is_null($Definition)) {
+         // Make sure the term is a valid id.
+         if (!preg_match('/[a-z][0-9a-z_\-]*/i', $Term))
+            throw new Exception('Definition term must start with a letter or an underscore and consist of alphanumeric characters.');
          $this->_Definitions[$Term] = $Definition;
+      }
       return ArrayValue($Term, $this->_Definitions);
    }
 

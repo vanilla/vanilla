@@ -145,6 +145,28 @@ class EntryController extends Gdn_Controller {
    public function SignIn() {
       $this->Auth('password');
    }
+
+   /** A version of signin that supports multiple authentication methods.
+    *  This method should replace EntryController::SignIn() eventually.
+    *
+    * @param string $Method
+    */
+   public function SignIn2($SelectedMethod = FALSE) {
+      // Set up the initial methods. Other methods can be added by plugins.
+      $Methods = array(
+         'password' => array('Label' => 'Vanilla', 'Url' => Url('/entry/auth/password'), 'ViewLocation' => $this->FetchViewLocation('SignIn'))
+      );
+
+      // Make sure a valid method is chosen.
+      if (!array_key_exists((string)$SelectedMethod, $Methods)) {
+         $SelectedMethod = array_shift(array_keys($Methods));
+      }
+      
+      $this->SetData('SelectedMethod', $SelectedMethod);
+      $this->SetData('Methods', $Methods);
+
+      return $this->Render();
+   }
    
    public function Handshake($AuthenticationSchemeAlias = 'default') {
       

@@ -252,6 +252,9 @@ jQuery(document).ready(function($) {
    };
 
    gdn.url = function(path) {
+      if (path.indexOf("//") >= 0)
+         return path; // this is an absolute path.
+
       var urlFormat = gdn.definition("UrlFormat", "");
 
       if (path[0] == "/")

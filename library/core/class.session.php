@@ -310,7 +310,10 @@ class Gdn_Session {
     * @return string
     * @todo check return type
     */
-   public function TransientKey() {
+   public function TransientKey($NewKey = NULL) {
+      if (!is_null($NewKey))
+         $this->_TransientKey = $NewKey;
+      
       if ($this->_TransientKey !== FALSE)
          return $this->_TransientKey;
       else

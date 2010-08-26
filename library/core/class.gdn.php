@@ -52,7 +52,7 @@ class Gdn {
    protected static $_Session = NULL;
    
    /// METHODS ///
-
+   
    /** @return Gdn_Auth */
    public static function Authenticator() {
       $Result = self::Factory(self::AliasAuthenticator);

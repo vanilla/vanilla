@@ -142,6 +142,7 @@ class Gdn_CookieIdentity {
    public function SetIdentity($UserID, $Persist = FALSE) {
       if(is_null($UserID)) {
          $this->_ClearIdentity();
+         return;
       }
       
       $this->UserID = $UserID;

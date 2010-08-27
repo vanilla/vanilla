@@ -48,7 +48,7 @@ $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/regist
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/%1$s/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
-$Configuration['Garden']['Authenticator']['SyncScreen']         = TRUE;
+$Configuration['Garden']['Authenticator']['SyncScreen']         = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name']  = "Password";
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';
@@ -77,7 +77,7 @@ $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '50M';
-$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png', 'zip', 'gz', 'tar.gz');
+$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png','bmp','zip','gz','tar.gz','tgz','psd','ai','fla','swf','pdf','doc','xls','ppt','docx','xlsx','log');
 $Configuration['Garden']['Picture']['MaxHeight']                = 1000;
 $Configuration['Garden']['Picture']['MaxWidth']                 = 600;
 $Configuration['Garden']['Profile']['MaxHeight']                = 1000;

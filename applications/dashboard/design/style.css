@@ -1680,7 +1680,6 @@ div.SearchTabs input.InputBox {
 	margin-right: 10px;
 }
 
-
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {
    width: 100%;
@@ -1785,23 +1784,14 @@ div.Popup {
   z-index: 5000;
   text-align: center;
 }
-div.Popup div.Body {
+div.Popup div.Border {
   margin: 0px auto;
   text-align: left;
   position: relative;
-  padding: 0px;
-  background: #fff;
   max-width: 500px;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border: 8px solid #555;
-	box-shadow: 0px 0px 10px #333;
-	-moz-box-shadow: 0px 0px 10px #333;
-	-webkit-box-shadow: 0px 0px 10px #333;  
 }
-div.Popup div.Body div.Body {
-   border: 0;
+div.Popup div.Body {
+  background: #fff;
 }
 div.Popup div.Legal,
 div.Popup .Content form {
@@ -1824,8 +1814,8 @@ div.Popup h2 {
 }
 a.Close {
 	position: absolute;
-	top: 6px;
-	right: 10px;
+	top: 16px;
+	right: 20px;
 	line-height: 1;
 	color: #E4F7FE;
 	cursor: pointer;
@@ -1900,7 +1890,7 @@ div.Popup #Form_User div.Warning,
 #dashboard_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
 }
-div.SignInPopup div.Body {
+div.SignInPopup div.Border {
 	max-width: 320px;
 }
 div.SignInPopup .Content form {
@@ -2393,4 +2383,82 @@ div.UploadProgress div.Foreground {
 	overflow: visible;
 	white-space: nowrap;
 	z-index: 2;
+}
+
+
+/* Adding CSS for multiple sign-in methods */
+
+/* Container */
+div.Border {
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	background: none repeat scroll 0 0 rgba(82, 82, 82, 0.7);
+	padding: 10px;
+}
+
+/* Tabs */
+ul.Tabs {
+	border-bottom: 1px solid #aaa;
+	text-align: left;
+	padding-left: 4px;
+}
+ul.Tabs li {
+	display: inline-block;
+}
+ul.Tabs li a,
+ul.Tabs li a:link,
+ul.Tabs li a:active,
+ul.Tabs li a:visited,
+ul.Tabs li a:hover {
+	display: inline-block;
+	margin-left: 4px;
+	border: 1px solid #aaa;
+	border-width: 1px 1px 0 1px;
+	border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	background: #eee;
+	color: #888;
+	position: relative;
+	top: 1px;
+	padding: 2px 8px 1px;
+}
+ul.Tabs li a:hover {
+	background: #f5f5f5;
+	color: #444;
+}
+ul.Tabs li a.Active {
+	padding: 2px 8px;
+	background: #fff;
+	color: #000;
+}
+
+/* Icons */
+ul.Tabs li a.EntryTabFor_password {
+	padding-left: 22px;
+	background-image: url('../../../themes/default/design/favicon.png');
+	background-position: 3px 4px;
+	background-repeat: no-repeat;
+}
+body.Entry #Content div.Entry {
+	background: #fff;
+}
+body.Entry #Content div.Entry div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background:none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+body.Entry #Content div.Entry div.Method h1 {
+	display: none;
+}
+body.Entry #Content div.Entry form {
+	padding:10px 20px 20px;
 }

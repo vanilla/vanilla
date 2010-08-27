@@ -18,6 +18,7 @@ define('DELIVERY_TYPE_VIEW', 'VIEW'); // Deliver only the view
 define('DELIVERY_TYPE_BOOL', 'BOOL'); // Deliver only the success status (or error) of the request
 define('DELIVERY_TYPE_NONE', 'NONE'); // Deliver nothing
 define('DELIVERY_TYPE_MESSAGE', 'MESSAGE'); // Just deliver messages.
+define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
 
 // Delivery method enumerators
 define('DELIVERY_METHOD_XHTML', 'XHTML');

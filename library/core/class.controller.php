@@ -940,7 +940,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->Assets['Content'] = '';
 
       // Define the view
-      if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
+      if (!in_array($this->_DeliveryType, array(DELIVERY_TYPE_BOOL, DELIVERY_TYPE_DATA))) {
          $View = $this->FetchView($View, $ControllerName, $ApplicationFolder);
          // Add the view to the asset container if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_VIEW)
@@ -959,6 +959,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGE && $this->Form) {
          $View = $this->Form->Errors();
+      }
+
+      if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
+         $this->_RenderData();
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1049,6 +1053,31 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       $this->FireEvent('AfterRenderAsset');
+   }
+
+   // Render the data array.
+   protected function _RenderData($Data = NULL) {
+      if ($Data === NULL)
+         $Data = $this->Data;
+
+      // Massage the data for better rendering.
+      foreach ($Data as $Key => $Value) {
+         if (is_a($Value, 'Gdn_DataSet')) {
+            $Data[$Key] = $Value->ResultArray();
+         }
+      }
+
+      switch ($this->_DeliveryMethod) {
+         case DELIVERY_METHOD_XHTML:
+            break;
+         case DELIVERY_METHOD_JSON:
+         default:
+            $Database = Gdn::Database();
+            $Database->CloseConnection();
+            
+            exit(json_encode($Data));
+            break;
+      }
    }
 
    /**
@@ -1147,6 +1176,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                   $this->Head->AddCss($CssPath, 'screen');
                }
             }
+
+            // Add a custom js file.
+            if (ArrayHasValue($this->_CssFiles, 'style.css'))
+               $this->AddJsFile('custom.js'); // only to non-admin pages.
+
             
             // And now search for/add all JS files
             foreach ($this->_JsFiles as $JsInfo) {

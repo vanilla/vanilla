@@ -37,6 +37,18 @@ function Gdn_Autoload($ClassName) {
    if (strtolower(substr($ClassName, -5)) == 'model')
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
+   // Look for plugin files.
+   if ($LibraryPath === FALSE) {
+      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+   }
+
+   // Look for the class in the applications' library folders.
+   if ($LibraryPath === FALSE) {
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/$LibraryFileName");
+   }
+
+   // Look for the class in the core.
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping(
          'library',
@@ -52,12 +64,6 @@ function Gdn_Autoload($ClassName) {
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
-
-   // Look for plugin files.
-   if ($LibraryPath === FALSE) {
-      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
-   }
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
@@ -568,6 +574,23 @@ if (!function_exists('GetMentions')) {
          return $Result;
       }
       return array();
+   }
+}
+
+if (!function_exists('GetObject')) {
+   /**
+    * Get a value off of an object.
+    *
+    * @deprecated GetObject() is deprecated. Use GetValue() instead.
+    * @param string $Property The name of the property on the object.
+    * @param object $Object The object that contains the value.
+    * @param mixed $Default The default to return if the object doesn't contain the property.
+    * @return mixed
+    */
+   function GetObject($Property, $Object, $Default) {
+      trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
+      $Result = GetValue($Property, $Object, $Default);
+      return $Result;
    }
 }
 

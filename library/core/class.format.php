@@ -255,6 +255,40 @@ class Gdn_Format {
       }
    }
 
+   /** Format a number by putting K/M/B suffix after it when appropriate.
+    *
+    * @param mixed $Number The number to format. If a number isn't passed then it is returned as is.
+    * @return string The formatted number.
+    * @todo Make this locale aware.
+    */
+   public static function BigNumber($Number) {
+      if (!is_numeric($Number))
+         return $Number;
+
+      if ($Number >= 1000000000) {
+         $Number = $Number / 1000000000;
+         $Suffix = "B";
+      } elseif ($Number >= 1000000) {
+         $Number = $Number / 1000000;
+         $Suffix = "M";
+      } elseif ($Number >= 1000) {
+         $Number = $Number / 1000;
+         $Suffix = "K";
+      }
+
+      if (isset($Suffix)) {
+         return number_format($Number, 1).$Suffix;
+      } else {
+         return $Number;
+      }
+   }
+
+   /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
+    *
+    * @param int $Bytes The bytes to format.
+    * @param int $Precision The number of decimal places to return.
+    * @return string The formatted bytes.
+    */
    public static function Bytes($Bytes, $Precision = 2) {
       $Units = array('B', 'K', 'M', 'G', 'T');
       $Bytes = max($Bytes, 0);

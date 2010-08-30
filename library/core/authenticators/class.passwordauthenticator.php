@@ -94,7 +94,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             // Update some information about the user...
             $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
             
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
             $this->FireEvent('Authenticated');
+         } else {
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_DENIED);
          }
       }
       return $UserID;

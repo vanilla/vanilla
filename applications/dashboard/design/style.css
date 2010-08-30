@@ -1287,6 +1287,23 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
+ul.MessageList div.Comment div.Meta {
+   min-height: 50px;
+}
+
+ul.MessageList div.Comment div.Meta span {
+   line-height: inherit;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo {
+   line-height: normal;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo span {
+   padding-left: 0px;
+   padding-right: 10px;
+}
+
 div.Preview {
 	text-align: left;
 	background: #E3F4FF;

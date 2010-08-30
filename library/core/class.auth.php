@@ -377,5 +377,28 @@ class Gdn_Auth extends Gdn_Pluggable {
       
       return $Return;
    }
+   
+   public function Trigger($AuthResponse) {
+      switch ($AuthResponse) {
+         case Gdn_Authenticator::AUTH_SUCCESS:
+            $this->FireEvent('AuthSuccess');
+         break;
+         case Gdn_Authenticator::AUTH_PARTIAL:
+            $this->FireEvent('AuthPartial');
+         break;
+         case Gdn_Authenticator::AUTH_DENIED:
+            $this->FireEvent('AuthDenied');
+         break;
+         case Gdn_Authenticator::AUTH_INSUFFICIENT:
+            $this->FireEvent('AuthInsufficient');
+         break;
+         case Gdn_Authenticator::AUTH_PERMISSION:
+            $this->FireEvent('AuthPermission');
+         break;
+         case Gdn_Authenticator::AUTH_ABORTED:
+            $this->FireEvent('AuthAborted');
+         break;
+      }
+   }
 
 }

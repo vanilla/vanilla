@@ -64,6 +64,7 @@ class EntryController extends Gdn_Controller {
             // Attempt to authenticate.
             try {
                $AuthenticationResponse = $Authenticator->Authenticate();
+               Gdn::Authenticator()->Trigger($AuthenticationResponse);
                switch ($AuthenticationResponse) {
                   case Gdn_Authenticator::AUTH_PERMISSION:
                      $this->Form->AddError('ErrorPermission');
@@ -84,7 +85,7 @@ class EntryController extends Gdn_Controller {
                   break;
 
                   case Gdn_Authenticator::AUTH_SUCCESS:
-                  default:
+                  default: 
                      // Full auth completed.
                      $UserID = $AuthenticationResponse;
                      $Reaction = $Authenticator->SuccessResponse();

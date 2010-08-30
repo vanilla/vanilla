@@ -409,9 +409,10 @@ class Gdn_PluginManager {
                         
                      // Define the folder name and assign the class name for the newly added item
                      if (is_array($PluginInfo)) {
+                        $PluginInfo[$Item]['Index'] = $Item;
                         if (!array_key_exists('Name', $PluginInfo[$Item]))
                            $PluginInfo[$Item]['Name'] = $Item;
-
+                           
                         $Info = array_merge($Info, $PluginInfo);
                         foreach ($Info as $PluginName => $Plugin) {
                            $InverseRelation[$ClassName] = $PluginName;

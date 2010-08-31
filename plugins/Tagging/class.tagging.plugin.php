@@ -297,7 +297,7 @@ class TaggingPlugin extends Gdn_Plugin {
       } else {
          // Make sure the tag is valid
          $Tag = $Sender->Form->GetFormValue('Name');
-         if (!ValidateRegex($Tag, '/^([\d\w\+-_.#]+)$/si'))
+         if (!ValidateRegex($Tag, '/^([\pL\pN\s\d\w\+-_.#]+)$/usi'))
             $Sender->Form->AddError('Tags can only contain the following characters: a-z 0-9 + # _ .');         
          
          // Make sure that the tag name is not already in use.

@@ -1599,7 +1599,6 @@ div.Summary table tbody th {
 }
 div.Summary table thead td,
 div.Summary table tbody td {
-   text-align: right;
    width: 80px;
    padding: 4px 6px 4px 0;
 }

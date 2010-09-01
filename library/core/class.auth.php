@@ -132,12 +132,22 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function UnsetDefaultAuthenticator($AuthenticationSchemeAlias) {
+      $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
       if (C('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
          RemoveFromConfig('Garden.Authenticator.DefaultScheme');
          return TRUE;
       }
       
       return FALSE;
+   }
+   
+   public function SetDefaultAuthenticator($AuthenticationSchemeAlias) {
+      $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      if (!in_array($AuthenticationSchemeAlias, $EnabledSchemes)) return FALSE;
+      
+      SaveToConfig('Garden.Authenticator.DefaultScheme', $AuthenticationSchemeAlias);
+      return TRUE;
    }
    
    public function GetAuthenticator($Default = 'default') {

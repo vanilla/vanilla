@@ -897,16 +897,16 @@ body.Entry #Content {
    width: 360px;
    text-align: center;
 }
-body#dashboard_entrycontroller_handshake #Content {
+body#dashboard_entry_handshake #Content {
 	width: 720px;
 }
-body#dashboard_entrycontroller_handshake ul.NewAccount {
+body#dashboard_entry_handshake ul.NewAccount {
 	float: left;
 	width: 330px;
 	margin-right: 29px;
 	border-right: 1px solid #A5D0E7;
 }
-body#dashboard_entrycontroller_handshake div.Info {
+body#dashboard_entry_handshake div.Info {
 	border: 1px solid #A5D0E7;
 	background: #D3F0FF;
 	color: #02475A;
@@ -925,11 +925,11 @@ body.Entry p {
 	padding: 0 10px;
 	margin: 10px 0 10px;
 }
-body#dashboard_entrycontroller_leave p {
+body#dashboard_entry_leave p {
 	margin: 0;
    padding: 20px 10px;
 }
-body#dashboard_entrycontroller_leave p.Leaving {
+body#dashboard_entry_leave p.Leaving {
    background: url('images/progress.gif') left center no-repeat;
 	margin: 0 0 0 14px;
    padding: 20px 0 20px 50px;
@@ -944,7 +944,7 @@ body.Entry #Content h1 {
 	margin: 0;
 	text-align: left;
 }
-body#dashboard_entrycontroller_handshake #Content h2 {
+body#dashboard_entry_handshake #Content h2 {
    border: none;
    color: #02475A;
    font-size:140%;
@@ -957,7 +957,7 @@ body.Entry #Content form {
 	text-align: left;
 	padding: 10px 30px 20px;
 }
-body#dashboard_entrycontroller_handshake #Content form {
+body#dashboard_entry_handshake #Content form {
 	padding: 20px 30px 26px;
 }
 body.Entry form ul li label {
@@ -1001,8 +1001,8 @@ body.Entry li.Buttons input.Button {
 body.Entry #Content #Form_User_Password {
 	padding-top: 0;
 }
-#dashboard_entrycontroller_index #Form_User_Password ul li label,
-#dashboard_entrycontroller_signin #Form_User_Password ul li label {
+#dashboard_entry_index #Form_User_Password ul li label,
+#dashboard_entry_signin #Form_User_Password ul li label {
 	padding: 0;
 }
 
@@ -1287,6 +1287,23 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
+ul.MessageList div.Comment div.Meta {
+   min-height: 50px;
+}
+
+ul.MessageList div.Comment div.Meta span {
+   line-height: inherit;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo {
+   line-height: normal;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo span {
+   padding-left: 0px;
+   padding-right: 10px;
+}
+
 div.Preview {
 	text-align: left;
 	background: #E3F4FF;

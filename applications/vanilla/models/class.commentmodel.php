@@ -294,7 +294,7 @@ class CommentModel extends VanillaModel {
       else
          $this->AddUpdateFields($FormPostValues);
 
-      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->EventArguments['FormPostValues'] = &$FormPostValues;
       $this->EventArguments['CommentID'] = $CommentID;
       $this->FireEvent('BeforeSaveComment');
       

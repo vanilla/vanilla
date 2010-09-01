@@ -26,7 +26,7 @@ class EntryController extends Gdn_Controller {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-   
+      
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
          case Gdn_Authenticator::DATA_FORM:
@@ -41,6 +41,7 @@ class EntryController extends Gdn_Controller {
       
       // By default, just render the view
       $Reaction = Gdn_Authenticator::REACT_RENDER;
+      
       // Where are we in the process? Still need to gather (render view) or are we validating?
       $AuthenticationStep = $Authenticator->CurrentStep();
       switch ($AuthenticationStep) {
@@ -49,6 +50,8 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_REPEAT:
          
             $Reaction = $Authenticator->RepeatResponse();
+            
+         break;
             
          // Not enough information to perform authentication, render input form
          case Gdn_Authenticator::MODE_GATHER:
@@ -64,18 +67,22 @@ class EntryController extends Gdn_Controller {
             // Attempt to authenticate.
             try {
                $AuthenticationResponse = $Authenticator->Authenticate();
+               Gdn::Authenticator()->Trigger($AuthenticationResponse);
                switch ($AuthenticationResponse) {
                   case Gdn_Authenticator::AUTH_PERMISSION:
                      $this->Form->AddError('ErrorPermission');
+                     $Reaction = $Authenticator->FailedResponse();
                   break;
 
                   case Gdn_Authenticator::AUTH_DENIED:
                      $this->Form->AddError('ErrorCredentials');
+                     $Reaction = $Authenticator->FailedResponse();
                   break;
 
                   case Gdn_Authenticator::AUTH_INSUFFICIENT:
                      // Unable to comply with auth request, more information is needed from user.
                      $this->Form->AddError('ErrorInsufficient');
+                     $Reaction = $Authenticator->FailedResponse();
                   break;
 
                   case Gdn_Authenticator::AUTH_PARTIAL:
@@ -84,7 +91,7 @@ class EntryController extends Gdn_Controller {
                   break;
 
                   case Gdn_Authenticator::AUTH_SUCCESS:
-                  default:
+                  default: 
                      // Full auth completed.
                      $UserID = $AuthenticationResponse;
                      $Reaction = $Authenticator->SuccessResponse();
@@ -107,8 +114,10 @@ class EntryController extends Gdn_Controller {
          break;
       
          case Gdn_Authenticator::REACT_REMOTE:
-            // Render the view, but set the delivery type to VIEW
+            // Let the authenticator handle generating output, using a blank slate
             $this->_DeliveryType= DELIVERY_TYPE_VIEW;
+            
+            exit;
          break;
          
          case Gdn_Authenticator::REACT_REDIRECT:
@@ -122,10 +131,12 @@ class EntryController extends Gdn_Controller {
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
             } else {
-               if ($Route !== FALSE)
+               
+               if ($Route !== FALSE) {
                   Redirect($Route);
-               else
+               } else {
                   Redirect(Gdn::Router()->GetDestination('DefaultController'));
+               }
             }
          break;
       }
@@ -135,6 +146,10 @@ class EntryController extends Gdn_Controller {
       
    public function Index() {
       $this->SignIn();
+   }
+   
+   public function Password() {
+      $this->Auth('password');
    }
    
    /**
@@ -589,11 +604,10 @@ class EntryController extends Gdn_Controller {
       }
       
       // Only sign the user out if this is an authenticated postback!
-      $Session = Gdn::Session();
       $this->Leaving = FALSE;
       $Result = Gdn_Authenticator::REACT_RENDER;
       $AuthenticatedPostbackRequired = $Authenticator->RequireLogoutTransientKey();
-      if (!$AuthenticatedPostbackRequired || $Session->ValidateTransientKey($TransientKey)) {
+      if (!$AuthenticatedPostbackRequired || Gdn::Session()->ValidateTransientKey($TransientKey)) {
          $Result = $Authenticator->DeAuthenticate();
          $this->Leaving = TRUE;
       }
@@ -603,7 +617,7 @@ class EntryController extends Gdn_Controller {
          if ($Target = GetIncomingValue('Target', ''))
             $Reaction = $Target;
          else
-            $Reaction = $Authenticator->SuccessResponse();
+            $Reaction = $Authenticator->LogoutResponse();
       } else {
          $Reaction = $Authenticator->LoginResponse();
       }
@@ -635,15 +649,16 @@ class EntryController extends Gdn_Controller {
 
             case Gdn_Authenticator::REACT_REDIRECT:
             default:
-               $Route = '/entry';
+               $Route = '/';
 
                if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                   $this->RedirectUrl = Url($Route);
                } else {
-                  if ($Route !== FALSE)
+                  if ($Route !== FALSE) {
                      Redirect($Route);
-                  else
+                  } else {
                      Redirect(Gdn::Router()->GetDestination('DefaultController'));
+                  }
                }
             break;
          }

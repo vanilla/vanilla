@@ -311,8 +311,9 @@ class Gdn_Session {
     * @todo check return type
     */
    public function TransientKey($NewKey = NULL) {
-      if (!is_null($NewKey))
-         $this->_TransientKey = $NewKey;
+      if (!is_null($NewKey)) {
+         $this->_TransientKey = Gdn::Authenticator()->GetUserModel()->SetTransientKey($this->UserID, $NewKey);
+      }
       
       if ($this->_TransientKey !== FALSE)
          return $this->_TransientKey;

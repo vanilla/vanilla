@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-function __autoload($ClassName) {
+function Gdn_Autoload($ClassName) {
    if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
       return true;
 
@@ -53,9 +53,25 @@ function __autoload($ClassName) {
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
 
+   // Look for plugin files.
+   if ($LibraryPath === FALSE) {
+      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+   }
+
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
 }
+
+if (!function_exists('__autoload')) {
+   function __autoload($ClassName) {
+      trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
+      spl_autoload_call($ClassName);
+   }
+}
+
+spl_autoload_register('Gdn_Autoload', FALSE);
+
 
 if (!function_exists('AddActivity')) {
    /**
@@ -1033,6 +1049,7 @@ if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)
          $Destination = Url('');
+         
       // Close any db connections before exit
       $Database = Gdn::Database();
       $Database->CloseConnection();
@@ -1139,7 +1156,7 @@ if (!function_exists('SafeParseStr')) {
 }
 
 if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '') {
+   function SaveToConfig($Name, $Value = '', $Save = TRUE) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . 'config.php';
       $Config->Load($Path, 'Save');
@@ -1147,9 +1164,12 @@ if (!function_exists('SaveToConfig')) {
          $Name = array($Name => $Value);
       
       foreach ($Name as $k => $v) {
-         $Config->Set($k, $v);
+         $Config->Set($k, $v, TRUE, $Save);
       }
-      return $Config->Save($Path);
+      if ($Save)
+         return $Config->Save($Path);
+      else
+         return TRUE;
    }
 }
 
@@ -1274,8 +1294,7 @@ if (!function_exists('Translate')) {
 	 * @see Gdn::Translate()
 	 */
    function Translate($Code, $Default = '') {
-      $ErrorCode = defined('E_USER_DEPRECATED') ? E_USER_DEPRECATED : E_USER_WARNING;
-      trigger_error('Translate() is deprecated. Use T() instead.', $ErrorCode);
+      trigger_error('Translate() is deprecated. Use T() instead.', E_USER_DEPRECATED);
       return Gdn::Translate($Code, $Default);
    }
 }

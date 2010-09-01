@@ -53,6 +53,7 @@ class Gdn_CookieIdentity {
     */
    protected function _ClearIdentity() {
       // Destroy the cookie.
+      $this->UserID = 0;
       $this->_DeleteCookie($this->CookieName);
    }
    
@@ -67,7 +68,10 @@ class Gdn_CookieIdentity {
       if (!is_null($this->UserID))
          return $this->UserID;
          
-      if (!$this->_CheckCookie($this->CookieName)) return 0;
+      if (!$this->_CheckCookie($this->CookieName)) {
+         $this->_ClearIdentity();
+         return 0;
+      }
       
       list($UserID, $Expiration) = $this->GetCookiePayload($this->CookieName);
       
@@ -142,6 +146,7 @@ class Gdn_CookieIdentity {
    public function SetIdentity($UserID, $Persist = FALSE) {
       if(is_null($UserID)) {
          $this->_ClearIdentity();
+         return;
       }
       
       $this->UserID = $UserID;
@@ -215,11 +220,13 @@ class Gdn_CookieIdentity {
    }
    
    protected function _CheckCookie($CookieName) {
-      return self::CheckCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
+      $CookieStatus = self::CheckCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
+      if ($CookieStatus === FALSE)
+         $this->_DeleteCookie($CookieName);
+      return $CookieStatus;
    }
    
    public static function CheckCookie($CookieName, $CookieHashMethod = NULL, $CookieSalt = NULL) {
-   
       if (empty($_COOKIE[$CookieName])) {
          return FALSE;
       }
@@ -235,7 +242,7 @@ class Gdn_CookieIdentity {
          self::DeleteCookie($CookieName);
          return FALSE;
       }
-         
+      
       list($HashKey, $CookieHash, $Time, $UserID, $Expiration) = $CookieData;
       if ($Expiration < time() && $Expiration != 0) {
          self::DeleteCookie($CookieName);
@@ -281,6 +288,7 @@ class Gdn_CookieIdentity {
       
       $Expiry = strtotime('one year ago');
       setcookie($CookieName, "", $Expiry, $Path, $Domain);
+      $_COOKIE[$CookieName] = NULL;
    }
    
 }

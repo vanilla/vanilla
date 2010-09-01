@@ -2,6 +2,9 @@ ul li div.Warning {
    margin: 10px 0px;
 }
 
+div.FlaggedContent {
+   padding: 20px;
+}
 div.FlaggedContent div.FlaggedItem {
    border-bottom: 1px solid #e0e0e0;
    padding: 10px 20px;

@@ -21,7 +21,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function StartAuthenticator() {
-   
+      
       // Start the 'session'
       Gdn::Session()->Start();
       
@@ -35,12 +35,13 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function RegisterAuthenticator($AuthenticationSchemeAlias) {
+      
       $AuthenticatorClassPath = PATH_LIBRARY.'/core/authenticators/class.%sauthenticator.php';
       $Alias = strtolower($AuthenticationSchemeAlias);
       $Path = sprintf($AuthenticatorClassPath, $Alias);
       $AuthenticatorClass = sprintf('Gdn_%sAuthenticator',ucfirst($Alias));
       // Include the class if it exists
-      if (!class_exists($AuthenticatorClass) && file_exists($Path)) {
+      if (!class_exists($AuthenticatorClass, FALSE) && file_exists($Path)) {
          require_once($Path);
       }
       
@@ -84,6 +85,61 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
    }
    
+   public function EnableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = FALSE) {
+      // Get list of currently enabled schemes.
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      // If the list is empty (shouldnt ever be empty), add 'password' to it.
+      if (!is_array($EnabledSchemes))
+         $EnabledSchemes = array('password');
+      
+      // First, loop through the list and remove any instances of the supplied authentication scheme
+      $HaveScheme = FALSE;
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == $AuthenticationSchemeAlias) {
+            if ($HaveScheme === TRUE)
+               unset($EnabledSchemes[$SchemeIndex]);
+            $HaveScheme = TRUE;
+         }
+      }
+      
+      // Now add the new scheme to the list (once)
+      if (!$HaveScheme)
+         array_push($EnabledSchemes, $AuthenticationSchemeAlias);
+      
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      
+      if ($SetAsDefault == TRUE)
+         $this->SetDefaultAuthenticator($AuthenticationSchemeAlias);
+   }
+   
+   public function DisableAuthenticationScheme($AuthenticationSchemeAlias) {
+      
+      $this->UnsetDefaultAuthenticator($AuthenticationSchemeAlias);
+      
+		// Remove this authenticator from the enabled schemes collection.
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      // If the list is empty (shouldnt ever be empty), add 'password' to it.
+      if (!is_array($EnabledSchemes))
+         $EnabledSchemes = array('password');
+      
+      // Loop through the list and remove any instances of the supplied authentication scheme
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == $AuthenticationSchemeAlias)
+            unset($EnabledSchemes[$SchemeIndex]);
+      }
+      
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+   }
+   
+   public function UnsetDefaultAuthenticator($AuthenticationSchemeAlias) {
+      if (C('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
+         RemoveFromConfig('Garden.Authenticator.DefaultScheme');
+         return TRUE;
+      }
+      
+      return FALSE;
+   }
+   
    public function GetAuthenticator($Default = 'default') {
       if (!$this->_Authenticator)
          $this->AuthenticateWith($Default);
@@ -116,23 +172,22 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function AssociateUser($ProviderKey, $UserKey, $UserID = 0) {
-      $SQL = Gdn::Database()->SQL();
-      
       if ($UserID == 0) {
          try {
-            $Success = $SQL->Insert('UserAuthentication',array(
+            $Success = Gdn::SQL()->Insert('UserAuthentication',array(
                'UserID'          => 0,
                'ForeignUserKey'  => $UserKey,
                'ProviderKey'     => $ProviderKey
             ));
+            $Success = TRUE;
          } catch(Exception $e) { $Success = TRUE; }
       } else {
-         $Success = $SQL->Replace('UserAuthentication',array(
-               'UserID'          => $UserID
-            ), array(
-               'ForeignUserKey'  => $UserKey,
-               'ProviderKey'     => $ProviderKey
-            ));
+         $Success = Gdn::SQL()->Replace('UserAuthentication',array(
+            'UserID'          => $UserID
+         ), array(
+            'ForeignUserKey'  => $UserKey,
+            'ProviderKey'     => $ProviderKey
+         ));
       }
       
       if (!$Success) return FALSE;
@@ -145,16 +200,14 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function GetAssociation($UserKey, $ProviderKey = FALSE, $KeyType = Gdn_Authenticator::KEY_TYPE_TOKEN) {
-      //die(print_r(func_get_args(),true));
-      $SQL = Gdn::Database()->SQL();
-      $Query = $SQL->Select('ua.UserID, ua.ForeignUserKey')
+      $Query = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.Token')
          ->From('UserAuthentication ua')
+         ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
          ->Where('ua.ForeignUserKey', $UserKey)
          ->Where('UserID >', 0);
          
       if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_TOKEN) {
-         $Query->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
-         ->Where('uat.Token', $ProviderKey);
+         $Query->Where('uat.Token', $ProviderKey);
       }
       
       if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_PROVIDER) {
@@ -298,9 +351,14 @@ class Gdn_Auth extends Gdn_Pluggable {
          $Authenticator = $this->GetAuthenticator();
       }
       
-      if ($Redirect == '' || $Redirect == '/')
+      if (!is_null($Redirect) && ($Redirect == '' || $Redirect == '/')) {
          $Redirect = Gdn::Router()->GetDestination('DefaultController');
-      
+      }
+         
+      if (is_null($Redirect)) {
+         $Redirect = '';
+      }
+         
       // Ask the authenticator for this URLType
       $Return = $Authenticator->GetURL($URLType);
       // If it doesn't know, get the default from our config file
@@ -317,7 +375,7 @@ class Gdn_Auth extends Gdn_Pluggable {
          $Return = $Return['URL'];
       }
       
-      $FullRedirect = Url($Redirect, TRUE);
+      $FullRedirect = ($Redirect != '') ? Url($Redirect, TRUE) : '';
       $ExtraReplacementParameters['Redirect'] = $FullRedirect;
       $ExtraReplacementParameters['CurrentPage'] = $FullRedirect;
       
@@ -331,6 +389,29 @@ class Gdn_Auth extends Gdn_Pluggable {
          $Return = str_replace('http:', 'https:', Url($Return, TRUE));
       
       return $Return;
+   }
+   
+   public function Trigger($AuthResponse) {
+      switch ($AuthResponse) {
+         case Gdn_Authenticator::AUTH_SUCCESS:
+            $this->FireEvent('AuthSuccess');
+         break;
+         case Gdn_Authenticator::AUTH_PARTIAL:
+            $this->FireEvent('AuthPartial');
+         break;
+         case Gdn_Authenticator::AUTH_DENIED:
+            $this->FireEvent('AuthDenied');
+         break;
+         case Gdn_Authenticator::AUTH_INSUFFICIENT:
+            $this->FireEvent('AuthInsufficient');
+         break;
+         case Gdn_Authenticator::AUTH_PERMISSION:
+            $this->FireEvent('AuthPermission');
+         break;
+         case Gdn_Authenticator::AUTH_ABORTED:
+            $this->FireEvent('AuthAborted');
+         break;
+      }
    }
 
 }

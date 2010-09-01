@@ -57,7 +57,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   settings.afterConfirm(json, settings.sender);
                   gdn.inform(json.StatusMessage);
                   if (json.RedirectUrl)
-                    setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                    setTimeout("document.location='" + gdn.url(json.RedirectUrl) + "';", 300);
 
                 }
              });
@@ -278,11 +278,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     popupHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
-      <div class="Body"> \
-        <div class="Content"> \
-        </div> \
-        <div class="Footer"> \
-          <a href="#" class="Close"><span>×</span></a> \
+      <div class="Border"> \
+        <div class="Body"> \
+          <div class="Content"> \
+          </div> \
+          <div class="Footer"> \
+            <a href="#" class="Close"><span>×</span></a> \
+          </div> \
         </div> \
       </div> \
     </div> \
@@ -290,11 +292,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     confirmHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
-      <div class="Body"> \
-        <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
-        <div class="Footer"> \
-          <input type="button" class="Button Okay" value="Okay" /> \
-          <input type="button" class="Button Cancel" value="Cancel" /> \
+      <div class="Border"> \
+        <div class="Body"> \
+          <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
+          <div class="Footer"> \
+            <input type="button" class="Button Okay" value="Okay" /> \
+            <input type="button" class="Button Cancel" value="Cancel" /> \
+          </div> \
         </div> \
       </div> \
     </div> \

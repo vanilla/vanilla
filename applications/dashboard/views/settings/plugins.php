@@ -17,7 +17,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == '' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/all'); ?></li>
       <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
       <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
       <?php
@@ -45,7 +45,7 @@ $Alt = FALSE;
 foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
    $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
    $State = strtolower($Css);
-   if ($this->Filter == '' || $this->Filter == $State) {
+   if ($this->Filter == 'all' || $this->Filter == $State) {
       $Alt = $Alt ? FALSE : TRUE;
       $Version = ArrayValue('Version', $PluginInfo, '');
       $ScreenName = ArrayValue('Name', $PluginInfo, $PluginName);
@@ -67,7 +67,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             $ToggleText = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Disable' : 'Enable';
             echo Anchor(
                T($ToggleText),
-               '/settings/plugins/'.$PluginName.'/'.$Session->TransientKey(),
+               '/settings/plugins/'.$this->Filter.'/'.$PluginName.'/'.$Session->TransientKey(),
                $ToggleText . 'Addon SmallButton'
             );
             

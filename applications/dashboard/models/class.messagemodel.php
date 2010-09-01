@@ -17,6 +17,8 @@ class MessageModel extends Gdn_Model {
       parent::__construct('Message');
    }
    
+   private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
+   
    /**
     * Returns a single message object for the specified id or FALSE if not found.
     *
@@ -30,8 +32,8 @@ class MessageModel extends Gdn_Model {
    
    public function DefineLocation($Message) {
       if (is_object($Message)) {
-         if ($Message->Controller == 'Base') {
-            $Message->Location = 'Base';
+         if (in_array($Message->Controller, $this->_SpecialLocations)) {
+            $Message->Location = $Message->Controller;
          } else {
             $Message->Location = $Message->Application;
             if (!StringIsNullOrEmpty($Message->Controller)) $Message->Location .= '/'.$Message->Controller;
@@ -41,7 +43,7 @@ class MessageModel extends Gdn_Model {
       return $Message;
    }
    
-   public function GetMessagesForLocation($Location) {
+   public function GetMessagesForLocation($Location, $Exceptions = array('[Base]')) {
       $Session = Gdn::Session();
       $Prefs = $Session->GetPreference('DismissedMessages', array());
       if (count($Prefs) == 0)
@@ -53,7 +55,7 @@ class MessageModel extends Gdn_Model {
          ->From('Message')
          ->Where('Enabled', '1')
          ->BeginWhereGroup()
-         ->Where('Controller', 'Base')
+         ->WhereIn('Controller', $Exceptions)
          ->BeginWhereGroup()
          ->OrWhere('Application', $Application)
          ->Where('Controller', $Controller)
@@ -78,8 +80,8 @@ class MessageModel extends Gdn_Model {
          
       $Locations = array();
       foreach ($Data as $Row) {
-         if ($Row->Controller == 'Base') {
-            $Locations[] = 'Base';
+         if (in_array($Row->Controller, $this->_SpecialLocations)) {
+            $Locations[] = $Row->Controller;
          } else {
             $Location = $Row->Application;
             if ($Row->Controller != '') $Location .= '/' . $Row->Controller;
@@ -95,12 +97,13 @@ class MessageModel extends Gdn_Model {
       $Location = ArrayValue('Location', $FormPostValues, '');
       if ($Location != '') {
          $Location = explode('/', $Location);
-         if ($Location[0] == 'Base') {
-            $FormPostValues['Controller'] = 'Base';
+         $Application = GetValue(0, $Location, '');
+         if (in_array($Application, $this->_SpecialLocations)) {
+            $FormPostValues['Controller'] = $Application;
          } else {
-            if (count($Location) >= 1) $FormPostValues['Application'] = $Location[0];
-            if (count($Location) >= 2) $FormPostValues['Controller'] = $Location[1];
-            if (count($Location) >= 3) $FormPostValues['Method'] = $Location[2];
+            $FormPostValues['Application'] = $Application;
+            $FormPostValues['Controller'] = GetValue(1, $Location, '');
+            $FormPostValues['Method'] = GetValue(2, $Location, '');
          }
       }
 

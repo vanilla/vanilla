@@ -183,7 +183,7 @@ jQuery(document).ready(function($) {
          else
             $(message).appendTo('body').show();
       }
-   }
+   };
    
    // Generate a random string of specified length
    gdn.generateString = function(length) {
@@ -198,7 +198,7 @@ jQuery(document).ready(function($) {
          string += chars.substring(pos, pos + 1);
       }
       return string;
-   }
+   };
    
    // Combine two paths and make sure that there is only a single directory concatenator
    gdn.combinePaths = function(path1, path2) {
@@ -209,7 +209,7 @@ jQuery(document).ready(function($) {
          path2 = path2.substring(1);
       
       return path1 + '/' + path2;
-   }
+   };
 
    gdn.processTargets = function(targets) {
       if(!targets || !targets.length)
@@ -249,7 +249,23 @@ jQuery(document).ready(function($) {
                $target.html(item.Data);
          }
       }
-   }
+   };
+
+   gdn.url = function(path) {
+      if (path.indexOf("//") >= 0)
+         return path; // this is an absolute path.
+
+      var urlFormat = gdn.definition("UrlFormat", "");
+
+      if (path[0] == "/")
+         path = path.substr(1);
+
+      if (urlFormat.indexOf("?") >= 0)
+         path = path.replace("?", "&");
+
+      var result = urlFormat.replace("{Path}", path);
+      return result;
+   };
 
    // Fill the search input with "search" if empty and blurred
    var searchText = gdn.definition('Search', 'Search');
@@ -262,7 +278,7 @@ jQuery(document).ready(function($) {
    $('#Search input.InputBox').focus(function() {
       var searchText = gdn.definition('Search', 'Search');
       if ($(this).val() == searchText)
-         $(this).val('');      
+         $(this).val('');
    });
    
    // Add a spinner onclick of buttons with this class

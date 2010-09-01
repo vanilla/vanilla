@@ -46,3 +46,6 @@ define('SYNDICATION_ATOM', 'ATOM');
 
 // Environment
 define('ENVIRONMENT_PHP_VERSION','5.2.0');
+
+if (!defined('E_USER_DEPRECATED'))
+   define('E_USER_DEPRECATED', E_USER_WARNING);

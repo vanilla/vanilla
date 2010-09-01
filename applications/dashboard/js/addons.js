@@ -6,12 +6,15 @@ jQuery(document).ready(function($) {
       
       var url = $(this).attr('href');
       var urlParts = url.split('/');
-      var addonType = urlParts[urlParts.length - 3];
+      var addonType = urlParts[urlParts.length - 4];
       if (addonType == 'plugins')
          addonType = 'Plugin';
       else if (addonType == 'applications')
          addonType = 'Application';
       else if (addonType == 'themes')
+         addonType = 'Theme';
+      
+      if ($(this).hasClass('EnableTheme'))
          addonType = 'Theme';
          
       if (addonType != 'Theme') {

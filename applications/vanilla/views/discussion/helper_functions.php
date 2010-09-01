@@ -44,6 +44,9 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             <?php echo Anchor(T('Permalink'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
          </span>
          <?php WriteOptionList($Object, $Sender, $Session); ?>
+         <div class="CommentInfo">
+            <?php $Sender->FireEvent('CommentInfo'); ?>
+         </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
       <div class="Message">

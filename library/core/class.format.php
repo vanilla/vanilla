@@ -674,10 +674,10 @@ EOT;
       return date('Y-m-d', $Timestamp);
    }
 
-   /**
+   /** Format a timestamp or the current time to go into the database.
+    * 
     * @param int $Timestamp
-    * @return string
-    * @todo add summary
+    * @return string The formatted date and time.
     */
    public static function ToDateTime($Timestamp = '') {
       if ($Timestamp == '')

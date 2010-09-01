@@ -15,10 +15,6 @@ echo $this->Form->Errors();
 
 <?php if (is_array($this->Data('ThemeInfo.Options.Styles'))): ?>
 <h3><?php echo T('Styles'); ?></h3>
-<div class="Info">
-   <?php echo T('This theme has different styles.', 'This theme has several different styles. Select the style you want and click save.'); ?>
-</div>
-
 <table class="SelectionGrid ThemeStyles">
    <tbody>
 <?php
@@ -109,4 +105,4 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
 <?php endif; ?>
 
 <?php
-echo $this->Form->Close('Save');
+echo '<br />'.$this->Form->Close('Save');

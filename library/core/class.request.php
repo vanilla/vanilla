@@ -698,7 +698,7 @@ class Gdn_Request {
          if (!$Query) {
             $Query = $this->GetRequestArguments(self::INPUT_GET);
             if (count($Query) > 0)
-               $Query = '?'.http_build_query($Query);
+               $Query = ($RewriteUrls ? '?' : '&').http_build_query($Query);
             else
                unset($Query);
          }

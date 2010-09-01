@@ -24,6 +24,10 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
       return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
    }
    
+   public function GetPluginIndex() {
+      return GetValue('Index', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+   }
+   
    public function GetPluginFolder($Absolute = TRUE) {
       $Folder = GetValue('Folder', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
       $PathParts = array($Folder);
@@ -225,7 +229,7 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
     * @return string fully qualified meta key
     */
    protected function MakeMetaKey($RelativeUserKey) {
-      return implode('.',array('Plugin',$this->GetPluginName(),$this->TrimMetaKey($RelativeUserKey)));
+      return implode('.',array('Plugin',$this->GetPluginIndex(),$this->TrimMetaKey($RelativeUserKey)));
    }
 
 }

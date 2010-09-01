@@ -314,6 +314,29 @@ if (!function_exists('LogMessage')) {
    }
 }
 
+if (!function_exists('Boop')) {
+   /**
+    * Logs a message or print_r()'s an array to the screen.
+    * 
+    * @param mixed $Message The object or string to log to the screen
+    * @param optional $Arguments A list of arguments to log to the screen as if from a function call
+    */
+   function Boop($Message, $Arguments=array(), $Vardump = FALSE) {
+      if (!defined('BOOP') || !BOOP) return;
+      
+      if (is_array($Message) || is_object($Message) || $Vardump === TRUE) {
+         if ($Vardump) var_dump($Message);
+         else print_r($Message);
+      } else
+         echo $Message;
+      
+      if (!is_null($Argument) && sizeof($Arguments))
+         echo " (".implode(', ',$Arguments).")";
+         
+      echo "\n";
+   }
+}
+
 if (!function_exists('CleanErrorArguments')) {
    function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
       if (is_array($Var)) {

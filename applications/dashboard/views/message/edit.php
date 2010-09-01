@@ -30,15 +30,14 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         $Style = ' style="display: inline; padding: 2px 6px 2px 6px; margin: 0 6px 0 0;"';
          echo $this->Form->Label('Appearance', 'CssClass');
          echo $this->Form->Radio('CssClass', '', array('value' => 'Info'));
-         echo '<div class="Info" style="display: inline;">'.T('Information').'</div>';
+         echo '<div class="Info"'.$Style.'>'.T('Information').'</div>';
          echo $this->Form->Radio('CssClass', '', array('value' => 'Warning'));
-         echo '<div class="Warning" style="display: inline;">'.T('Warning').'</div>';
+         echo '<div class="Warning"'.$Style.'>'.T('Warning').'</div>';
          echo $this->Form->Radio('CssClass', '', array('value' => 'Box'));
-         echo '<div class="Box" style="display: inline;">'.T('Panel Box').'</div>';
-         echo $this->Form->Radio('CssClass', '', array('value' => ''));
-         echo '<span>'.T('None').'</span>';
+         echo '<div class="Box"'.$Style.'>'.T('Panel Box').'</div>';
       ?>
    </li>
    <li>

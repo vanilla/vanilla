@@ -30,9 +30,15 @@ class DashboardHooks implements Gdn_IPlugin {
       // Add Message Modules (if necessary)
       $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
       $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
-      if ($Sender->MasterView != 'empty' && in_array('Base', $MessageCache) || InArrayI($Location, $MessageCache)) {
+		$Exceptions = array('[Base]');
+		if ($Sender->MasterView == 'admin')
+			$Exceptions[] = '[Admin]';
+		else if (in_array($Sender->MasterView, array('', 'default')))
+			$Exceptions[] = '[NonAdmin]';
+			
+      if ($Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
          $MessageModel = new MessageModel();
-         $MessageData = $MessageModel->GetMessagesForLocation($Location);
+         $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
             $Sender->AddModule($MessageModule);

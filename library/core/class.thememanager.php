@@ -55,6 +55,10 @@ class Gdn_ThemeManager {
 
       return $this->_AvailableThemes;
    }
+
+   public function CurrentTheme() {
+      return C('Garden.Theme', '');
+   }
    
    public function EnabledTheme() {
       $ThemeFolder = Gdn::Config('Garden.Theme', 'default');

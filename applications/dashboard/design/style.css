@@ -336,17 +336,20 @@ div.Info strong {
 div.DismissMessage {
    margin: 6px 0 10px;
 	text-align: left;
+	position: relative;
 }
 div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
 	font-family: arial;
-   float: right;
+   position: absolute;
 	font-size: 22px;
 	font-weight: bold;
-   line-height: 120%;
+   line-height: 1;
    color: #999;
+	top: 3px;
+	right: 5px;
 }
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
@@ -725,18 +728,16 @@ div.Box h4 {
    padding: 0 0 1px;
 }
 div.Box dl {
-   border-top: 1px solid #abdafb;
-   border-bottom: 1px solid #abdafb;
-   background: #e3f4ff;
-   padding: 3px;
    overflow: hidden;
 }
 div.Box dl dt {
+	font-size: 12px;
    float: left;
    width: 80px;
    color: #555;
 }
 div.Box dl dd {
+	font-size: 12px;
    margin-left: 80px;
 }
 div.Box p {
@@ -836,6 +837,9 @@ ul.PanelInfo li.ShowAll {
    text-align: right;
 	background: none;
 }
+#UserOptions {
+	margin-bottom: 10px;
+}
 body.Profile ul.PanelInfo {
    border-bottom: 1px solid #abdafb;
 }
@@ -893,16 +897,16 @@ body.Entry #Content {
    width: 360px;
    text-align: center;
 }
-body#dashboard_entrycontroller_handshake #Content {
+body#dashboard_entry_handshake #Content {
 	width: 720px;
 }
-body#dashboard_entrycontroller_handshake ul.NewAccount {
+body#dashboard_entry_handshake ul.NewAccount {
 	float: left;
 	width: 330px;
 	margin-right: 29px;
 	border-right: 1px solid #A5D0E7;
 }
-body#dashboard_entrycontroller_handshake div.Info {
+body#dashboard_entry_handshake div.Info {
 	border: 1px solid #A5D0E7;
 	background: #D3F0FF;
 	color: #02475A;
@@ -921,11 +925,11 @@ body.Entry p {
 	padding: 0 10px;
 	margin: 10px 0 10px;
 }
-body#dashboard_entrycontroller_leave p {
+body#dashboard_entry_leave p {
 	margin: 0;
    padding: 20px 10px;
 }
-body#dashboard_entrycontroller_leave p.Leaving {
+body#dashboard_entry_leave p.Leaving {
    background: url('images/progress.gif') left center no-repeat;
 	margin: 0 0 0 14px;
    padding: 20px 0 20px 50px;
@@ -940,7 +944,7 @@ body.Entry #Content h1 {
 	margin: 0;
 	text-align: left;
 }
-body#dashboard_entrycontroller_handshake #Content h2 {
+body#dashboard_entry_handshake #Content h2 {
    border: none;
    color: #02475A;
    font-size:140%;
@@ -953,7 +957,7 @@ body.Entry #Content form {
 	text-align: left;
 	padding: 10px 30px 20px;
 }
-body#dashboard_entrycontroller_handshake #Content form {
+body#dashboard_entry_handshake #Content form {
 	padding: 20px 30px 26px;
 }
 body.Entry form ul li label {
@@ -997,8 +1001,8 @@ body.Entry li.Buttons input.Button {
 body.Entry #Content #Form_User_Password {
 	padding-top: 0;
 }
-#dashboard_entrycontroller_index #Form_User_Password ul li label,
-#dashboard_entrycontroller_signin #Form_User_Password ul li label {
+#dashboard_entry_index #Form_User_Password ul li label,
+#dashboard_entry_signin #Form_User_Password ul li label {
 	padding: 0;
 }
 
@@ -1283,6 +1287,23 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
+ul.MessageList div.Comment div.Meta {
+   min-height: 50px;
+}
+
+ul.MessageList div.Comment div.Meta span {
+   line-height: inherit;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo {
+   line-height: normal;
+}
+
+ul.MessageList div.Comment div.Meta div.CommentInfo span {
+   padding-left: 0px;
+   padding-right: 10px;
+}
+
 div.Preview {
 	text-align: left;
 	background: #E3F4FF;
@@ -1676,7 +1697,6 @@ div.SearchTabs input.InputBox {
 	margin-right: 10px;
 }
 
-
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {
    width: 100%;
@@ -1781,23 +1801,14 @@ div.Popup {
   z-index: 5000;
   text-align: center;
 }
-div.Popup div.Body {
+div.Popup div.Border {
   margin: 0px auto;
   text-align: left;
   position: relative;
-  padding: 0px;
-  background: #fff;
   max-width: 500px;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border: 8px solid #555;
-	box-shadow: 0px 0px 10px #333;
-	-moz-box-shadow: 0px 0px 10px #333;
-	-webkit-box-shadow: 0px 0px 10px #333;  
 }
-div.Popup div.Body div.Body {
-   border: 0;
+div.Popup div.Body {
+  background: #fff;
 }
 div.Popup div.Legal,
 div.Popup .Content form {
@@ -1820,8 +1831,8 @@ div.Popup h2 {
 }
 a.Close {
 	position: absolute;
-	top: 6px;
-	right: 10px;
+	top: 16px;
+	right: 20px;
 	line-height: 1;
 	color: #E4F7FE;
 	cursor: pointer;
@@ -1896,7 +1907,7 @@ div.Popup #Form_User div.Warning,
 #dashboard_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
 }
-div.SignInPopup div.Body {
+div.SignInPopup div.Border {
 	max-width: 320px;
 }
 div.SignInPopup .Content form {
@@ -2389,4 +2400,82 @@ div.UploadProgress div.Foreground {
 	overflow: visible;
 	white-space: nowrap;
 	z-index: 2;
+}
+
+
+/* Adding CSS for multiple sign-in methods */
+
+/* Container */
+div.Border {
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	background: none repeat scroll 0 0 rgba(82, 82, 82, 0.7);
+	padding: 10px;
+}
+
+/* Tabs */
+ul.Tabs {
+	border-bottom: 1px solid #aaa;
+	text-align: left;
+	padding-left: 4px;
+}
+ul.Tabs li {
+	display: inline-block;
+}
+ul.Tabs li a,
+ul.Tabs li a:link,
+ul.Tabs li a:active,
+ul.Tabs li a:visited,
+ul.Tabs li a:hover {
+	display: inline-block;
+	margin-left: 4px;
+	border: 1px solid #aaa;
+	border-width: 1px 1px 0 1px;
+	border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	background: #eee;
+	color: #888;
+	position: relative;
+	top: 1px;
+	padding: 2px 8px 1px;
+}
+ul.Tabs li a:hover {
+	background: #f5f5f5;
+	color: #444;
+}
+ul.Tabs li a.Active {
+	padding: 2px 8px;
+	background: #fff;
+	color: #000;
+}
+
+/* Icons */
+ul.Tabs li a.EntryTabFor_password {
+	padding-left: 22px;
+	background-image: url('../../../themes/default/design/favicon.png');
+	background-position: 3px 4px;
+	background-repeat: no-repeat;
+}
+body.Entry #Content div.Entry {
+	background: #fff;
+}
+body.Entry #Content div.Entry div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background:none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+body.Entry #Content div.Entry div.Method h1 {
+	display: none;
+}
+body.Entry #Content div.Entry form {
+	padding:10px 20px 20px;
 }

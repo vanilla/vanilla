@@ -192,7 +192,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       ."\n)";
       
       if (!is_null($this->_TableStorageEngine))
-         $Sql .= ' TYPE='.$this->_TableStorageEngine;
+         $Sql .= ' ENGINE='.$this->_TableStorageEngine;
 
       if ($this->_CharacterEncoding !== FALSE && $this->_CharacterEncoding != '')
          $Sql .= ' default character set '.$this->_CharacterEncoding;

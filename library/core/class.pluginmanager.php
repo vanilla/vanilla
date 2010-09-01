@@ -409,9 +409,10 @@ class Gdn_PluginManager {
                         
                      // Define the folder name and assign the class name for the newly added item
                      if (is_array($PluginInfo)) {
+                        $PluginInfo[$Item]['Index'] = $Item;
                         if (!array_key_exists('Name', $PluginInfo[$Item]))
                            $PluginInfo[$Item]['Name'] = $Item;
-
+                           
                         $Info = array_merge($Info, $PluginInfo);
                         foreach ($Info as $PluginName => $Plugin) {
                            $InverseRelation[$ClassName] = $PluginName;
@@ -563,6 +564,11 @@ class Gdn_PluginManager {
       foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
          $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
          $Paths = array_merge($Paths, SafeGlob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
+
+         // Make sure the plugin is in the config.
+         if (!C("EnabledPlugins.$PluginName")) {
+            SaveToConfig("EnabledPlugins.$PluginName", $PluginFolder, FALSE);
+         }
       }
       if (!is_array($Paths))
          $Paths = array();

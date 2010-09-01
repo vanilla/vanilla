@@ -80,14 +80,18 @@ body {
    margin: 0;
    padding: 0;
    font-size: small;
-   background: #ffffff;
-	background: #c2e7fc url('images/slicesplash.jpg') no-repeat scroll center top;
+	background: #dbf3fc;
 }
 #Body {
-	border-top:1px solid #a5d0e7;
+	background: #fff;
+	float: left;
+	width: 100%;
 }
 #Content {
-   margin: 15px 15px 15px 180px;
+	padding: 0;
+	margin: 0 0 0 200px;
+	border-left: 1px solid #82bddd;
+	background: #fff;
 }
 .Hidden {
    display: none;
@@ -109,6 +113,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+}
+#Content h1,
+#Content h3 {
+	text-shadow: 0 1px 0 #fff;
+	color: #222;
+	background: #dbf3fc;
+	border-top: 1px solid #8bc1de;
+	border-bottom: 1px solid #8bc1de;
+	padding: 10px 20px;
+	font-size: 14px;
+	margin: 0;
+}
+#Content h3 {
+	border-top: 1px solid #8bc1de;
+}
+#Content h4 {
+	padding: 20px 20px 0;
+}
+#Content table h4 {
+	padding: 0;
 }
 p {
    margin: 0.5em 0 0 0;
@@ -210,22 +234,24 @@ select.Year {
 }
 a.SmallButton,
 a.Button,
-input.Button {
-   cursor: pointer;
+input.Button,
+input.SmallButton {
    margin: 0;
-   font-weight: bold;
-	font-size: 16px;
-   padding: 4px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
-   color: #02475A;
-	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #999;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
+   border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background:url("images/bg-button-blue.png") repeat-x scroll left top transparent;
+	border:1px solid #0F7FE6;
+	color:#003673;
+	cursor:pointer;
+	font-size:12px;
+	font-weight:bold;
+	padding:6px 10px;
+	text-decoration:none;
+	text-shadow:0 1px 0 #B7F5FD;
 }
 a.Button {
 	padding: 5px 7px;
@@ -237,14 +263,40 @@ a.SmallButton {
 }
 a.SmallButton:hover,
 a.Button:hover,
-input.Button:hover {
-   color: #111;
-   border: 1px solid #666;
+input.Button:hover,
+input.SmallButton:hover {
+	border: 1px solid #0B64C6;
+	color: #001F44;
+	text-shadow:0 1px 0 #EEFFFF;
 }
 a.SmallButton:focus,
 a.Button:focus,
-input.Button:focus {
-   background: #eee;
+input.Button:focus,
+input.SmallButton:focus {
+	background: #81CFF6;
+	border:1px solid #0B64C6;
+	color:#001F44;
+	text-shadow:0 1px 0 #EEFFFF;
+}
+input.SmallButton,
+a.SmallButton {
+   border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	font-size:11px;
+	font-weight:normal;
+	padding:2px 4px;
+	background-position: 0 -3px;
+	box-shadow:0 0 0 #999999;
+	-moz-box-shadow:0 0 0 #999999;
+	-webkit-box-shadow:0 0 0 #999999;
+}
+input.SmallButton:hover,
+a.SmallButton:hover,
+.SmallBlueButton:hover {
+	box-shadow:0 0 2px #999999;
+	-moz-box-shadow:0 0 2px #999999;
+	-webkit-box-shadow:0 0 2px #999999;
 }
 .Loading {
    height: 100px;
@@ -269,15 +321,14 @@ input.Button:focus {
 div.Information {
    text-align: center;
    position: fixed;
-   top: 10px;
+   top: 0;
    left: 0;
-   z-index: 200;
-   margin: 0 !important;
+	right: 0;
+   margin: auto !important;
    padding: 0 !important;
    list-style: none !important;
    font-size: 12px;
-   display: block;
-   width: 100%;
+	width: 300px;
 }
 * html div.Information {
   position: absolute;
@@ -290,17 +341,19 @@ div.Information {
 div.Messages ul {
    cursor: pointer;
    width: auto !important;
-   border: 1px solid #ee8 !important;
    margin: 0 auto !important;
-   padding: 4px 8px !important;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
    background: #ff9 !important;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
    *display:inline;
+   border-radius: 0 0 2px 2px;
+   -moz-border-radius: 0 0 2px 2px;
+   -webkit-border-radius: 0 0 2px 2px;
+	box-shadow: 0px 1px 2px #333;
+	-moz-box-shadow: 0px 1px 2px #333;
+	-webkit-box-shadow: 0px 1px 2px #333;  
+	padding: 6px 10px !important;
 }
 div.Messages ul li {
    text-align: left !important;
@@ -309,15 +362,23 @@ div.Messages ul li {
    padding: 0 !important;
    margin: 0 !important;
    list-style-position: outside;
-	font-size: 120%;
 }
 div.Errors ul {
 	display: block;
-   background: #d50a0a !important;
-   border: 1px solid #a00 !important;
+	background: #ff0000 !important;
+	border: none !important;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	padding: 10px 20px !important;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
 }
 div.Errors ul li {
    color: #fff !important;
+	font-size: 12px;
+	text-shadow: 0 1px 0 #000;
 }
 div.Errors pre {
 	margin: 10px 0 5px;
@@ -348,26 +409,53 @@ div.Errors pre * {
 }
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
+/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.Info,
 .DismissMessage {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    font-size: 14px;
+	position: relative;
+   margin: 10px;
+	padding: 10px;
+	line-height: 1.4;
+}
+#Panel div.Info,
+#Panel .DismissMessage {
+	margin: 0;
+	border-width: 1px 0 1px 0;
+	font-size: 13px;
+}
+div.DismissMessage p {
+   margin: 2px 0;
+	padding: 4px 0 0;
+}
+div.DismissMessage a.Dismiss {
+	position: absolute;
+	top: 3px;
+	right: 5px;
+	font-family: arial;
+	font-size: 22px;
+	font-weight: bold;
+   line-height: 1;
+   color: #999;
+}
+#Panel div.DismissMessage a.Dismiss {
+	top: 1px;
+	right: 3px;
+}
+div.DismissMessage a.Dismiss:hover {
+	color: #ff0084;
+}
+div.Box {
+	border: 1px solid #a5d0e7;
+   background: #d3f0ff;
 }
 .Warning {
-	line-height: 180%;
-   background: #ffc;
    border: 1px solid #aaa;
-   color: #000;
-   padding: 6px;
-}
-div.Info {
-	line-height: 180%;
-   background: #e2f4ff;
-   color: #333;
-   padding: 6px;
-   margin: 0 0 10px;
-	border: 1px solid #aedefc;
+   background: #ffc;
 }
 strong {
 	font-weight: bold;
@@ -390,27 +478,6 @@ strong {
 }
 div.EmptyInfo {
    margin: 10px 0;
-}
-/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
-  that it renders in a div with this DismissMessage class. */
-div.DismissMessage {
-   margin: 6px 0 10px;
-	padding: 0 6px 4px;
-}
-div.DismissMessage p {
-   margin: 2px 0;
-	padding: 4px 0 0;
-}
-div.DismissMessage a.Dismiss {
-	font-family: arial;
-   float: right;
-	font-size: 22px;
-	font-weight: bold;
-   line-height: 120%;
-   color: #999;
-}
-div.DismissMessage a.Dismiss:hover {
-	color: #ff0084;
 }
 .HoverHelp {
 	position: relative;
@@ -439,7 +506,6 @@ div.DismissMessage a.Dismiss:hover {
    margin: 1px 0 0;
    padding: 3px 6px;
    text-align: right;
-   background: #d3f0ff;
    }
 .MorePager a {
    font-size: 13px;
@@ -476,6 +542,9 @@ tr#PagerMore td {
 .FilterMenu {
    color: #aaa;
    padding: 0 0 10px;
+	padding:0 20px 10px;
+	position:relative;
+	top:-10px;	
 }
 .FilterMenu strong {
    font-weight: bold;
@@ -487,10 +556,8 @@ tr#PagerMore td {
 }
 div.Tabs {
 	display: block;
-   border-bottom: 1px solid #abdafb;
-   padding: 5px 8px;
+   padding: 0 10px;
    margin: 0;
-   background: #cfecff;
 }
 div.Tabs li {
    display: inline;
@@ -501,11 +568,14 @@ div.Tabs li a:link,
 div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
+	position: relative;
+	top: 4px;
    margin: 0;
-   border: 1px solid #abdafb;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border: 1px solid #8bc1de;
+	border-bottom: 0;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
    background: #bbe2f7;
    display: inline;
    font-weight: bold;
@@ -518,8 +588,9 @@ div.Tabs li a:hover {
    background: #f3fcff;
 }
 div.Tabs li.Active a {
-   background: #fff;
-   color: #474747;
+   background: #DBF3FC;
+	border-bottom: 1px solid #DBF3FC;
+   color: #222;
 }
 div.Tabs li a span {
    line-height: 1;
@@ -540,6 +611,9 @@ form ul {
    list-style: none;
    margin: 0px;
    padding: 0px;
+}
+#Content form ul {
+	padding: 20px 20px 0;
 }
 form ul li {
    margin-bottom: 10px;
@@ -609,9 +683,10 @@ input.SmallInput {
 table {
    width: 100%;
    border-collapse: collapse;
-   margin: 10px 0;
-	background: #e2f4ff;
 	border: 1px solid #a5d0e7;
+	border-left: none;
+	border-right: none;
+	margin: 0;
 }
 table label {
    font-size: 12px;
@@ -825,8 +900,8 @@ label.SubLabel {
 
 /* =================================================================== Header */
 #Head {
-	background:#e2f4ff none repeat scroll 0 0;
-	border-bottom:1px solid #FFFFFF;
+	background: url('images/dashboard-bg.png') top center repeat-x #014687;
+	border-bottom: 1px solid #000;
 	padding: 10px 18px 18px;
    text-align: right;
 }
@@ -838,56 +913,80 @@ label.SubLabel {
 	padding: 3px 0 0;
 }
 #Head h1 a {
-	color:#02475a;
-	font-size:160%;
-	text-shadow: #fff 0 1px 0;
-}
-#Head h1 a span {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-	font-size: 40%;
-	text-shadow: none;
-	font-weight: normal;
-	background: #c2e7fc;
-	border: 1px solid #aedefc;
-	padding: 2px 4px;
-	margin: 0 0 0 6px;
-   border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	vertical-align: middle;
+	font-size: 24px;
+	color:#f8fdff;
+	text-shadow:0 1px 0 #000;
 }
 #Head div.User {
 	padding: 8px 0 0;
 }
-#Head div.User a {
-	color:#02475a;
-	margin-left: 20px;
+#Head h1 a span {
+	vertical-align: middle;
 }
-#Head div.User a span {
-	background: #c2e7fc;
-	border: 1px solid #aedefc;
-	padding: 0 4px;
+#Head div.User a,
+#Head h1 a span {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
+	border: 1px solid #002b57;
+	color: #fff;
+	text-shadow:0 1px 0 #000;
+	padding: 4px 6px;
 	margin: 0 0 0 6px;
+	font-size: 12px;
+	font-weight: normal;
    border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 }
+#Head div.User a:hover,
+#Head h1 a span:hover {
+	background-position: -480px -191px;
+	box-shadow: 0 0 1px #0066C8;
+	-moz-box-shadow: 0 0 1px #0066C8;
+	-webkit-box-shadow: 0 0 1px #0066C8;
+}
+#Head div.User a.Profile,
+#Head div.User a.Profile:hover {
+	background-position: -5px -191px;
+	padding: 4px 6px 4px 24px;
+}
+#Head h1 a span,
+#Head h1 a span:hover {
+	background-position: -454px -191px;
+	padding: 4px 6px 4px 22px;
+}
+#Head div.User a:focus { background-position: -480px -294px; }
+#Head div.User a.Profile:focus { background-position: -5px -294px; }
+#Head h1 a:focus span { background-position: -454px -294px; }
+#Head div.User a:focus,
+#Head h1 a:focus span {
+	box-shadow: 0 0 1px #6fa3c9;
+	-moz-box-shadow: 0 1px 0 #6fa3c9;
+	-webkit-box-shadow: 0 0 1px #6fa3c9;
+}
+#Head div.User a span {
+	margin: 0 0 0 6px;
+   border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	background: #003671;
+	padding:0 4px;
+}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
-	margin: 15px;
-   width: 150px;
    float: left;
+	margin: 0;
+	width: 200px;
+	border-top: 1px solid #82BDDD;
+	border-right: 1px solid #82bddd;
+	background: #dbf3fc;
 }
-div.Box {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #d3f0ff;
-   color: #999;
-   padding: 6px 0;
-   margin: 0 0 10px 0;
-	border: 1px solid #a5d0e7;
+#Panel div.Box {
+	margin: 0;
+	border: none;
+	border-bottom: 1px solid #8bc1de;
+	background: none;
 }
 #Panel div.Group {
 	padding: 0;
@@ -917,6 +1016,17 @@ div.Box h4.Active a {
 	color: #fff;
 	text-shadow: none;
 }
+#Panel div.Box h4 {
+	padding: 0;
+	margin: 0;
+}
+#Panel div.Box h4 { background: url('images/dashboard-sprites.png') 166px -145px no-repeat; }
+#Panel div.Dashboard h4 { background-position: 166px 7px; }
+#Panel div.Appearance h4 { background-position: 166px -492px; }
+#Panel div.Users h4 { background-position: 162px -292px; }
+#Panel div.Forum h4 { background-position: 167px -442px; }
+#Panel div.Addons h4 { background-position: 166px -240px; }
+#Panel div.SiteSettings h4 { background-position: 164px -92px; }
 div.Box dl {
    border-bottom: 1px solid #aedefc;
    background: #f0fbff;
@@ -937,47 +1047,62 @@ div.Box p {
    padding: 0 0 4px;
    color: #555;
 }
+#Panel div.Active {
+	background: #fff;
+}
 ul.PanelInfo {
-	margin-bottom: 6px;
+	margin: 0 0 10px;
 }
 ul.PanelInfo li {
-   padding: 2px 0;
+   padding: 0;
    font-size: 80%;
 }
 ul.PanelInfo li a {
-	padding: 0 8px;
-   font-size: 120%;
-	display: block;
    position: relative;
+}
+#Panel div.Box h4 a,
+ul.PanelInfo li a {
+	font-size: 13px;
+	color: #000;
+	text-shadow: 0 0 1px #fff;
+	display: block;
+	padding: 2px 10px;
+}
+#Panel div.Box h4 a {
+	font-size: 14px;
+	font-weight: bold;
+	padding: 10px;
 }
 span.New {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	box-shadow: 0px 0px 2px #777;
-	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;  
-   position: absolute;
-   top: 3px;
-   right: -4px;
-   padding: 0 4px;
    background: #ff0;
    color: #000;
    font-size: 9px;
    font-weight: bold;
+	box-shadow: 0 1px 2px #333;
+	-moz-box-shadow: 0 1px 2px #333;
+	-webkit-box-shadow: 0 1px 2px #333;
+	padding:0px 2px;
+	position: relative;
+	top: -4px;
+	right: auto;
 }
 ul.PanelInfo li.Active {
    background: url('images/arrow.png') center left no-repeat #ffffff;
 }
 
 /* ================================================= Dashboard Customizations */
-.Column {
-	width: 50%;
-	float: left;
-}
 .Column table {
-	margin: 0 0 10px;
-   width: 98%;
+   width: 100%;
+	border: none;
+}
+.Column table th {
+	width: 160px;
+}
+#Content .Column2 h1 {
+	border-top: 0;
 }
 .Col {
 	width: 175px;
@@ -988,13 +1113,14 @@ ul.PanelInfo li.Active {
 	height: 20px;
 	width: 20px;
 	margin-right: 8px;
+	overflow: hidden;
 }
 #UrlCode strong {
 	color: #000000;
 }
 #UrlCode span {
 	display: inline;
-	background: #ffe;
+	background: #ff8;
 	padding: 2px 4px;
    border-radius: 2px;
 	-moz-border-radius: 2px;
@@ -1052,9 +1178,6 @@ ul.PanelInfo li.Active {
 
 
 /* =================================================================== Popups */
-div.Popup div.Errors ul {
-	border: 1px solid #a00 !important;
-}
 div.Popup div.Messages {
    text-align: left;
    position: inherit;
@@ -1085,12 +1208,13 @@ div.Popup div.Info {
 div.Popup .Loading {
    display: block;
 }
-div.Overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.Overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(255,255,255,0.7);
 }
 div.Popup {
   position: absolute;
@@ -1101,23 +1225,26 @@ div.Popup {
   text-align: center;
 }
 div.Popup div.Body {
-  margin: 0px auto;
-  text-align: left;
-  position: relative;
-  padding: 0px;
-  background: #e2f4ff;
-  max-width: 500px;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border: 8px solid #555;
+	margin: 0px auto;
+	text-align: left;
+	position: relative;
+	padding: 0px;
+	max-width: 500px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background: #f1fbfe;
+	border: 1px solid #01416b;
+	box-shadow: 0px 0px 3px #01416b;
+	-moz-box-shadow: 0px 0px 3px #01416b;
+	-webkit-box-shadow: 0px 0px 3px #01416b;  
 }
 div.Popup div.Body div.Body {
    border: 0;
 }
 div.Popup div.Legal,
 div.Popup .Content form {
-	max-height: 440px;
+	max-height: 450px;
 	overflow: auto;
 	padding: 0 10px 10px;
 }
@@ -1126,18 +1253,21 @@ div.Popup .Loading {
 }
 div.Popup h1,
 div.Popup h2 {
-	font-size:150%;
-	font-weight:bold;
-	margin-bottom: 0;
-	color: #02455B;
-	background: #c0e6fc;
-	border-bottom: 1px solid #a5d0e7;
-	text-shadow: none;
 	padding: 6px 9px 4px;
 	text-shadow: 0 1px 0 #fff;
+	border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #f8fdff;
+	background: url('images/dashboard-bg.png') top center repeat-x #014687;
+	border-bottom: 1px solid #000;
+	text-shadow: 0 1px 0 #000;
 }
 div.Popup h3 {
-	font-size: 120%;
+	font-size: 13px;
 	font-weight: bold;
 	padding: 20px 0 10px;
 }
@@ -1151,7 +1281,7 @@ div.Popup form p {
 	padding: 0;
 }
 div.Popup form ul li label {
-	color:#000;
+	color:#222;
 	display:block;
 	font-size:14px;
 	font-weight:bold;
@@ -1169,9 +1299,6 @@ body.Entry div.Popup p {
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
-	position: absolute;
-	top: 10px;
-	right: 10px;
 	line-height: 1;
 	color: #555;
 	cursor: pointer;
@@ -1179,6 +1306,20 @@ a.Close {
 	font-size: 22px;
 	font-weight: bold;
 	padding: 0;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+	border-bottom: 1px solid #006edf;
+	position:absolute;
+	right:10px;
+	top:7px;
+	height: 18px;
+	width: 18px;
+	overflow: hidden;
+}
+a.Close span {
+	display: none;
 }
 a.Close:hover {
 	color: #111;
@@ -1217,14 +1358,18 @@ div.Legal em {
 }
 div.Legal p {
 	padding: 6px 0 10px;
+	margin: 0;
 }
 div.Legal h3 {
 	font-weight: bold;
-	padding: 6px 0 0;
+	padding: 6px 0 4px !important;
+	margin: 0 !important;
+	border: none !important;
+	background: none !important;
 }
 div.Legal {
-	margin: 0 0 10px;
-	padding: 2px 10px;
+	margin: 10px;
+	padding: 2px 8px;
 	border: 1px solid #a5d0e7;
    border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -1254,12 +1399,11 @@ div.BrowseThemes h3 {
 }
 .CurrentTheme img {
 	float: left;
-	margin: 0 20px 0 0;
+	margin: 20px;
 }
 .CurrentTheme {
-	min-height: 170px;
-	border-bottom: 1px solid #AFD3E0;
-	margin-bottom: 20px;
+	min-height: 200px;
+	margin:0;
 }
 .CurrentTheme h4 {
 	padding: 6px 0;
@@ -1267,16 +1411,22 @@ div.BrowseThemes h3 {
 .CurrentTheme h4 span {
 	padding-left: 10px;
 }
+div.Description {
+	padding: 0 20px 20px;
+}
+div.Options,
+div.CustomThemeOptions {
+	padding: 0 20px;
+}
 table.SelectionGrid {
 	background: none;
-	border-left: 0;
-	border-right: 0;
+	margin: 0;
+	border: none;
 }
 table.SelectionGrid td {
 	width: 33%;
 	border: 1px solid #a5d0e7;
-	border-left: 0;
-	border-right: 0;
+	border-width: 0 0 1px;
 	padding: 16px;
 	vertical-align: top;
 }
@@ -1293,11 +1443,11 @@ table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol {
 	border-left: 1px solid #a5d0e7;
 }
-table.SelectionGrid td:hover {
-   background: #e2f4ff;
-}
-table.SelectionGrid td.EmptyCol:hover {
-   background: none;
+table.SelectionGrid td.FirstCol,
+table.SelectionGrid td.EmptyCol,
+table.SelectionGrid td.LastCol,
+table.SelectionGrid td {
+	border-color: #e0e0e0;
 }
 table.SelectionGrid h4 {
    color:#02455B;
@@ -1346,17 +1496,127 @@ table.SelectionGrid td.Active {
    background:#e2f4ff none repeat scroll 0 0;
 }
 
+
+#dashboard_user_browse #Content form div.Info,
+#dashboard_user_index #Content form div.Info {
+	padding: 10px 10px 0;
+}
+#dashboard_user_browse #Content form input.Button,
+#dashboard_user_index #Content form input.Button {
+	margin: 0 20px 10px;
+}
+#Content form input.Button {
+	margin: 0 20px 20px;
+}
+/* A general rule to remove padding from info (form adds it) */
+#Content form ul div.Info {
+	padding: 0;
+	margin: 10px 0;
+}
+/* Exceptions to padding rule */
+body#dashboard_settings_registration #Content form ul div.Info {
+	padding: 10px;
+	margin: 10px;
+}
+table tbody td.Info strong,
+a.SmallButton {
+	margin-right: 10px;
+}
+#dashboard_settings_registration #Content form ul {
+	padding: 0;
+}
+body.Import table {
+	margin-bottom: 20px;
+}
+body.Import .Button {
+	margin: 0 0 0 20px;
+}
+#InvitationExpiration {
+	padding: 0 20px;
+}
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td,
+table.AltColumns th.Alt,
+table.AltColumns td.Alt {
+	background: none;
+}
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+	background: #ff8;
+}
+.CheckBoxGrid tbody th,
+.CheckBoxGrid thead td,
+.CheckBoxGrid thead td.Alt,
+.CheckBoxGrid thead th,
+.CheckBoxGrid thead th.Alt,
+table thead th,
+table thead td,
+table.AltColumns thead th.Alt,
+table.AltColumns thead td.Alt {
+	background: #dbf3fc;
+	font-size: 13px;
+	color: #222;
+	text-shadow: 0 1px 0 #fff;
+}
+table th,
+table td {
+	padding: 6px 6px 6px 20px;
+}
+table tbody th,
+table tbody td {
+	border-bottom: 1px solid #e0e0e0;
+}
+.CheckBoxGrid td.Alt {
+	background: none;
+}
+body.managecategories table td.Last {
+	white-space: nowrap;
+}
+
+/* Summary Tables */
+div.Summary {
+   clear: left;
+   margin: 20px 0 20px 20px;
+   width: 46%;
+   display: inline-block;
+   vertical-align: top;
+}
+div.Summary table {
+   margin: 0;
+   padding: 0;
+}
+div.Summary table th,
+div.Summary table td {
+   font-size: 11px;
+   padding: 4px 6px;
+}
+div.Summary table tbody th {
+   font-weight: normal;
+}
+div.Summary table thead td,
+div.Summary table tbody td {
+   width: 80px;
+   padding: 4px 6px 4px 0;
+}
+
 /* =================================================================== Footer */
 #Foot {
    clear: both;
    font-size: 13px;
-   border-bottom: 1px solid #a5d0e7;
    color: #076C8E;
    font-weight: bold;
-   border-top: 1px solid #fff;
-   background: #e2f4ff;
 	padding: 4px 18px 2px;
 	position: relative;
+	background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
+	border: none;
+	border-bottom:1px solid #000204;
+}
+#Foot img {
+	display: none;
 }
 #Foot a {
 	color: #076C8E;
@@ -1368,5 +1628,12 @@ table.SelectionGrid td.Active {
 	color: #5F9BBF;
 	font-size: 12px;
 	font-weight: normal;
+	padding-bottom: 5px;
 }
-
+#Foot div a {
+	display: block;
+	background: url('images/logo_footer.png') center center no-repeat;
+	height: 32px;
+	width: 72px;
+	margin: 6px 0 10px;
+}

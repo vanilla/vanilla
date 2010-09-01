@@ -22,6 +22,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * @method void Render() Render the controller's view.
+ * @param string $View
+ * @param string $ControllerName
+ * @param string $ApplicationFolder
+ * @param string $AssetName The name of the asset container that the content should be rendered in.
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
@@ -375,8 +379,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method AddDefinition(), $Term and $Definition need descriptions.
     */
    public function AddDefinition($Term, $Definition = NULL) {
-      if(!is_null($Definition))
+      if(!is_null($Definition)) {
+         // Make sure the term is a valid id.
+         if (!preg_match('/[a-z][0-9a-z_\-]*/i', $Term))
+            throw new Exception('Definition term must start with a letter or an underscore and consist of alphanumeric characters.');
          $this->_Definitions[$Term] = $Definition;
+      }
       return ArrayValue($Term, $this->_Definitions);
    }
 
@@ -407,10 +415,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
             $Module = $this->$Module;
          } else {
-            if (!class_exists($Module))
-               __autoload($Module);
+            $ModuleClassExists = class_exists($Module);
 
-            if (class_exists($Module)) {
+            if ($ModuleClassExists) {
                // Make sure that the class implements Gdn_IModule
                $ReflectionClass = new ReflectionClass($Module);
                if ($ReflectionClass->implementsInterface("Gdn_IModule"))
@@ -502,6 +509,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('WebRoot', $this->_Definitions))
          $this->_Definitions['WebRoot'] = CombinePaths(array(Gdn::Request()->Domain(), Gdn::Request()->WebRoot()), '/');
 
+      if (!array_key_exists('UrlFormat', $this->_Definitions))
+         $this->_Definitions['UrlFormat'] = Url('{Path}');
+
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
 
@@ -565,7 +575,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $ApplicationFolder The name of the application folder that contains the requested controller
     * if it is not $this->ApplicationFolder.
     */
-   public function FetchView($View = '', $ControllerName = '', $ApplicationFolder = '') {
+   public function FetchView($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE) {
       $ViewPath = $this->FetchViewLocation($View, $ControllerName, $ApplicationFolder);
       
       // Check to see if there is a handler for this particular extension.
@@ -593,10 +603,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     * of $this->View. If $this->View is not specified, it will use the value
     * of $this->RequestMethod (which is defined by the dispatcher class).
     * @param string $ControllerName The name of the controller that owns the view if it is not $this.
-    * @param string $ApplicationFolder The name of the application folder that contains the requested controller
-    * if it is not $this->ApplicationFolder.
+    *  - If the controller name is FALSE then the name of the current controller will be used.
+    *  - If the controller name is an empty string then the view will be looked for in the base views folder.
+    * @param string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
     */
-   public function FetchViewLocation($View = '', $ControllerName = '', $ApplicationFolder = '') {
+   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE) {
       // Accept an explicitly defined view, or look to the method that was called on this controller
       if ($View == '')
          $View = $this->View;
@@ -604,20 +615,20 @@ class Gdn_Controller extends Gdn_Pluggable {
       if ($View == '')
          $View = $this->RequestMethod;
 
-      if ($ControllerName == '')
+      if ($ControllerName === FALSE)
          $ControllerName = $this->ControllerName;
 
       // Munge the controller folder onto the controller name if it is present.
       if ($this->ControllerFolder != '')
          $ControllerName = $this->ControllerFolder . DS . $ControllerName;
 
-      if (strtolower(substr($ControllerName, -10, 10)) == 'controller')
+      if (StringEndsWith($ControllerName, 'controller', TRUE))
          $ControllerName = substr($ControllerName, 0, -10);
 
       if (strtolower(substr($ControllerName, 0, 4)) == 'gdn_')
          $ControllerName = substr($ControllerName, 4);
 
-      if ($ApplicationFolder == '')
+      if (!$ApplicationFolder)
          $ApplicationFolder = $this->ApplicationFolder;
 
       $ApplicationFolder = strtolower($ApplicationFolder);
@@ -634,21 +645,47 @@ class Gdn_Controller extends Gdn_Pluggable {
       $LocationName = $ApplicationFolder.'/'.$ControllerName.'/'.$View;
       $ViewPath = ArrayValue($LocationName, $this->_ViewLocations, FALSE);
       if ($ViewPath === FALSE) {
+         // Define the search paths differently depending on whether or not we are in a plugin or application.
+         $ApplicationFolder = trim($ApplicationFolder, '/');
+         if (StringBeginsWith($ApplicationFolder, 'plugins/')) {
+            $BasePath = PATH_PLUGINS;
+            $ApplicationFolder = trim(strstr($ApplicationFolder, '/'), '/');
+         } else {
+            $BasePath = PATH_APPLICATIONS;
+         }
+
+         $SubPaths = array();
+         // Define the subpath for the view.
+         // The $ControllerName used to default to '' instead of FALSE.
+         // This extra search is added for backwards-compatibility.
+         if (strlen($ControllerName) > 0)
+            $SubPaths[] = "views/$ControllerName/$View";
+         else {
+            $SubPaths[] = "views/$View";
+            $SubPaths[] = "views/{$this->ControllerName}/$View";
+         }
+
          // Views come from one of four places:
          $ViewPaths = array();
-         // 1. An explicitly defined path to a view
-         if (strpos($View, DS) !== FALSE)
-            $ViewPaths[] = $View;
 
-         if ($this->Theme) {
-            // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
-            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
-            // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
-            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
+         foreach ($SubPaths as $SubPath) {
+            // 1. An explicitly defined path to a view
+            if (strpos($View, DS) !== FALSE)
+               $ViewPaths[] = $View;
+
+            if ($this->Theme) {
+               // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+               $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$ApplicationFolder/$SubPath.*";
+               // $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
+
+               // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+               $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$SubPath.*";
+               //$ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
+            }
+            // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+            $ViewPaths[] = "$BasePath/$ApplicationFolder/$SubPath.*";
+            //$ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
          }
-         // 4. Application default. eg. /path/to/application/app_name/views/controller_name/
-         $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
-
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
@@ -885,7 +922,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $AssetName The name of the asset container that the content should be rendered in.
     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
     */
-   public function xRender($View = '', $ControllerName = '', $ApplicationFolder = '', $AssetName = 'Content') {
+   public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
 
@@ -1114,8 +1151,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all JS files
             foreach ($this->_JsFiles as $JsInfo) {
                $JsFile = $JsInfo['FileName'];
-               
-               if (strpos($JsFile, '/') !== FALSE) {
+
+               if (strpos($JsFile, '//') !== FALSE) {
+                  // This is a link to an external file.
+                  $this->Head->AddScript($JsFile);
+                  continue;
+               } if (strpos($JsFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
                } else {
@@ -1131,8 +1172,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
                      $JsPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'js' . DS . $JsFile;
                   }
-                  // 3. This application folder
-                  $JsPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'js' . DS . $JsFile;
+
+                  // 3. The application or plugin folder.
+                  if (StringBeginsWith(trim($AppFolder, '/'), 'plugins/'))
+                     $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/js/$JsFile";
+                  else
+                     $JsPaths[] = PATH_APPLICATIONS."/$AppFolder/js/$JsFile";
+
                   // 4. Global JS folder. eg. root/js/
                   $JsPaths[] = PATH_ROOT . DS . 'js' . DS . $JsFile;
                   // 5. Global JS library folder. eg. root/js/library/

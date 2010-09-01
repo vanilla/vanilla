@@ -1,38 +1,41 @@
 div.GettingStarted {
-   border-radius: 4px;
-   -webkit-border-radius: 4px;
-   -moz-border-radius: 4px;
-   background: #E2F4FF /* Panel Background Color */;
-   padding: 0 8px 8px;
-   margin: 10px 0 20px;
-   border: 1px solid #A5D0E7 /* Panel Inlay Border Color */;
+   background: #fff;
+   padding: 0 0 10px;
+   margin: 0;
+   border-bottom: 1px solid #A5D0E7;
+	position: relative;
 }
 div.GettingStarted a.Dismiss {
+	position: absolute;
 	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 	font-weight: bold;
 	font-size: 22px;
-	float: right;
+	top: 1px;
+	right: 10px;
 }
 div.GettingStarted p {
 	color: #02455B;
-	font-size: 160%;
-	font-weight: bold;
-	text-shadow: 0 1px 0 #fff;
+	font-size: 13px;
 	padding: 2px 0 0;
 	margin: 0;
 }
 div.GettingStarted ul li {
 	color: #000;
    font-size: 16px;
-	margin: 0 0 0 30px;
-   padding: 8px 0 8px 4px;
+	margin: 0 0 0 50px;
+   padding: 8px 0px;
 	list-style: decimal;
-	width: 400px;
+	max-width: 600px;
 }
 div.GettingStarted ul li.Done,
-div.GettingStarted ul li.Done a {
+div.GettingStarted ul li.Done a,
+div.GettingStarted ul li.Done p {
 	color: #888;
 }
-div.GettingStarted ul li.Done {
-	background: url('check.png') no-repeat center right;
+div.GettingStarted ul li strong {
+	padding: 3px 0;
+}
+div.GettingStarted ul li.Done strong {
+	background: url('check.png') no-repeat center left;
+	padding-left: 36px;
 }

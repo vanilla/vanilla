@@ -94,7 +94,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             // Update some information about the user...
             $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
             
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
             $this->FireEvent('Authenticated');
+         } else {
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_DENIED);
          }
       }
       return $UserID;
@@ -130,7 +133,16 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
    
+   public function LogoutResponse() {
+      return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
    public function RepeatResponse() {
+      return Gdn_Authenticator::REACT_RENDER;
+   }
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   public function FailedResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
    

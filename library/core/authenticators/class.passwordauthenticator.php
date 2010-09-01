@@ -133,7 +133,16 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
    
+   public function LogoutResponse() {
+      return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
    public function RepeatResponse() {
+      return Gdn_Authenticator::REACT_RENDER;
+   }
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   public function FailedResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
    

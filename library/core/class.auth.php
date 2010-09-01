@@ -185,16 +185,14 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function GetAssociation($UserKey, $ProviderKey = FALSE, $KeyType = Gdn_Authenticator::KEY_TYPE_TOKEN) {
-      //die(print_r(func_get_args(),true));
-      $SQL = Gdn::Database()->SQL();
-      $Query = $SQL->Select('ua.UserID, ua.ForeignUserKey')
+      $Query = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.Token')
          ->From('UserAuthentication ua')
+         ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
          ->Where('ua.ForeignUserKey', $UserKey)
          ->Where('UserID >', 0);
          
       if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_TOKEN) {
-         $Query->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
-         ->Where('uat.Token', $ProviderKey);
+         $Query->Where('uat.Token', $ProviderKey);
       }
       
       if ($ProviderKey && $KeyType == Gdn_Authenticator::KEY_TYPE_PROVIDER) {

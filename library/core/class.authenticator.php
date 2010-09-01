@@ -42,6 +42,10 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    const AUTH_SUCCESS         = -4;
    const AUTH_ABORTED         = -5;
    
+   const HANDSHAKE_JS         = 'javascript';
+   const HANDSHAKE_DIRECT     = 'direct';
+   const HANDSHAKE_IMAGE      = 'image';
+   
    const REACT_RENDER         = 0;
    const REACT_EXIT           = 1;
    const REACT_REDIRECT       = 2;
@@ -85,6 +89,12 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    
    // What to do if the entry/auth/* page is triggered for a user that is already logged in
    abstract public function RepeatResponse();
+   
+   // What to do if the entry/leave/* page is triggered for a user that is logged in and successfully logs out
+   abstract public function LogoutResponse();
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   abstract public function FailedResponse();
    
    // Get one of the three Forwarding URLs (Registration, SignIn, SignOut)
    abstract public function GetURL($URLType);

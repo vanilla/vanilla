@@ -81,7 +81,6 @@ class AuthenticationController extends DashboardController {
    }
 
    public function Configure($AuthenticationSchemeAlias = NULL) {
-      //print_r(func_get_args());
       $Message = T("Please choose an authenticator to configure.");
       if (!is_null($AuthenticationSchemeAlias)) {
          $AuthenticatorInfo = Gdn::Authenticator()->GetAuthenticatorInfo($AuthenticationSchemeAlias);

@@ -41,5 +41,7 @@ interface Gdn_IHandshake {
    public function GetUserEmailFromHandshake($Handshake);
    
    public function Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $Payload);
+   
+   public function GetHandshakeMode();
 
 }

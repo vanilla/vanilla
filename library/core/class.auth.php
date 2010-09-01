@@ -85,7 +85,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
    }
    
-   public function EnableAuthenticationScheme($AuthenticationSchemeAlias) {
+   public function EnableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = FALSE) {
       // Get list of currently enabled schemes.
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
@@ -107,9 +107,15 @@ class Gdn_Auth extends Gdn_Pluggable {
          array_push($EnabledSchemes, $AuthenticationSchemeAlias);
       
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      
+      if ($SetAsDefault == TRUE)
+         $this->SetDefaultAuthenticator($AuthenticationSchemeAlias);
    }
    
    public function DisableAuthenticationScheme($AuthenticationSchemeAlias) {
+      
+      $this->UnsetDefaultAuthenticator($AuthenticationSchemeAlias);
+      
 		// Remove this authenticator from the enabled schemes collection.
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
@@ -123,6 +129,15 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
       
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+   }
+   
+   public function UnsetDefaultAuthenticator($AuthenticationSchemeAlias) {
+      if (C('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
+         RemoveFromConfig('Garden.Authenticator.DefaultScheme');
+         return TRUE;
+      }
+      
+      return FALSE;
    }
    
    public function GetAuthenticator($Default = 'default') {

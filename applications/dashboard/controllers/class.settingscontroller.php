@@ -25,12 +25,12 @@ class SettingsController extends DashboardController {
    /**
     * Application management screen.
     */
-   public function Applications($Filter = '', $TransientKey = '') {
+   public function Applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $Session = Gdn::Session();
-      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $ApplicationName : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
-         $Filter = '';
+         $Filter = 'all';
          
       $this->Filter = $Filter;
       $this->Permission('Garden.Applications.Manage');
@@ -96,7 +96,7 @@ class SettingsController extends DashboardController {
             
          }
          if ($this->Form->ErrorCount() == 0)
-            Redirect('settings/applications');
+            Redirect('settings/applications/'.$this->Filter);
       }
       $this->Render();
    }
@@ -335,14 +335,14 @@ class SettingsController extends DashboardController {
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
    
-   public function Plugins($Filter = '', $TransientKey = '') {
+   public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $this->Title(T('Plugins'));
          
       $Session = Gdn::Session();
-      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $Filter : '';
+      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
-         $Filter = '';
+         $Filter = 'all';
          
       $this->Filter = $Filter;
       $this->Permission('Garden.Plugins.Manage');
@@ -394,7 +394,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError(strip_tags($e->getMessage()));
          }
          if ($this->Form->ErrorCount() == 0)
-            Redirect('/settings/plugins');
+            Redirect('/settings/plugins/'.$this->Filter);
       }
       $this->Render();
    }

@@ -769,7 +769,17 @@ EOT;
    public static function Url($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Url');
+      } elseif (preg_replace('`([^\PP])`u', '', 'Test') == '') {
+         // No Unicode PCRE support
+         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
+         $Mixed = strtr($Mixed, self::$_UrlTranslations);
+         $Mixed = preg_replace('/([^\w\d_:.])/', ' ', $Mixed); // get rid of punctuation and symbols
+         $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
+         $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
+         $Mixed = urlencode(strtolower($Mixed));
+         return $Mixed;
       } else {
+         // Better Unicode support
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation

@@ -87,7 +87,6 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param SearchController $Sender
 	 */
 	public function SearchModel_Search_Handler($Sender) {
-		include_once(dirname(__FILE__).DS.'..'.DS.'models'.DS.'class.vanillasearchmodel.php');
 		$SearchModel = new VanillaSearchModel();
 		$SearchModel->Search($Sender);
 	}

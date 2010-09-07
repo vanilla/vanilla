@@ -18,6 +18,43 @@ class UserModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('User');
    }
+
+   /** Connect a user with a foreign authentication system.
+    *
+    * @param string $ForeignUserKey The user's unique key in the other authentication system.
+    * @param string $ProviderKey The key of the system providing the authentication.
+    * @param array $UserData Data to go in the user table.
+    * @return int The new/existing user ID.
+    */
+   public function Connect($ForeignUserKey, $ProviderKey, $UserData) {
+      if (!isset($UserData['UserID'])) {
+         // Check to see if the user already exists.
+         $ConnectUserID = $this->SQL->GetWhere('UserAuthentication',
+            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey))
+            ->Value('UserID', FALSE);
+
+         if ($ConnectUserID !== FALSE)
+            $UserData['UserID'] = $ConnectUserID;
+      }
+
+      $NewUser = !isset($ConnectUserID) && !GetValue('UserID', $UserData);
+
+      // Save the user.
+      $UserID = $this->Save($UserData, array('ActivityType' => 'Join', 'CheckExisting' => TRUE));
+
+      // Add the user to the default role(s).
+      if ($UserID && $NewUser) {
+         $this->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
+      }
+
+      // Save the authentication.
+      if ($UserID && !isset($ConnectUserID)) {
+         $this->SQL->Replace('UserAuthentication',
+            array('UserID' => $UserID),
+            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey));
+      }
+      return $UserID;
+   }
    
    /**
     * A convenience method to be called when inserting users (because users
@@ -300,8 +337,21 @@ class UserModel extends Gdn_Model {
    
                // Record activity if the person changed his/her photo
                $Photo = ArrayValue('Photo', $FormPostValues);
-               if ($Photo !== FALSE)
-                  AddActivity($UserID, 'PictureChange', '<img src="'.Asset('uploads/'.ChangeBasename($Photo, 't%s')).'" alt="'.T('Thumbnail').'" />');
+               if ($Photo !== FALSE) {
+                  if (GetValue('CheckExisting', $Settings)) {
+                     $User = $this->Get($UserID);
+                     $OldPhoto = GetValue('Photo', $User);
+                  }
+
+                  if (!isset($OldPhoto) || $Photo != $Photo) {
+                     if (strpos($Photo, '//'))
+                        $PhotoUrl = $Photo;
+                     else
+                        $PhotoUrl = Asset('uploads/'.ChangeBasename($Photo, 't%s'));
+
+                     AddActivity($UserID, 'PictureChange', '<img src="'.$PhotoUrl.'" alt="'.T('Thumbnail').'" />');
+                  }
+               }
    
             } else {
                $RecordRoleChange = FALSE;
@@ -321,7 +371,7 @@ class UserModel extends Gdn_Model {
                $Session = Gdn::Session();
                AddActivity(
                   $UserID,
-                  'JoinCreated',
+                  GetValue('ActivityType', $Settings, 'JoinCreated'),
                   T('Welcome Aboard!'),
                   $Session->UserID > 0 ? $Session->UserID : ''
                );

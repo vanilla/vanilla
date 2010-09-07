@@ -137,6 +137,12 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       unset($UserMetaData);
       return $UserMeta;
    }
+
+   /** Implementaion of Gdn_IPlugin::Setup().
+    */
+   public function Setup() {
+      // Do nothing...
+   }
    
    /**
     * Sets UserMeta data to the UserMeta table

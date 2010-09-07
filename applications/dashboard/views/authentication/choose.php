@@ -37,7 +37,7 @@
 <?php
    if ($this->Data('PreFocusAuthenticationScheme')) {
 ?>
-      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>">
+      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>"></div>
 <?php
    } else {
       echo $this->Slice('configure');

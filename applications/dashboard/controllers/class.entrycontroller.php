@@ -48,13 +48,12 @@ class EntryController extends Gdn_Controller {
       
          // User is already logged in
          case Gdn_Authenticator::MODE_REPEAT:
-         
             $Reaction = $Authenticator->RepeatResponse();
-            
          break;
             
          // Not enough information to perform authentication, render input form
          case Gdn_Authenticator::MODE_GATHER:
+            die('gatherrrr');
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
 				if ($this->Form->IsPostBack())
@@ -99,6 +98,10 @@ class EntryController extends Gdn_Controller {
             } catch (Exception $Ex) {
                $this->Form->AddError($Ex);
             }
+         break;
+         
+         case Gdn_Authenticator::MODE_NOAUTH:
+            $Reaction = Gdn_Authenticator::REACT_REDIRECT;
          break;
       }
       
@@ -152,15 +155,16 @@ class EntryController extends Gdn_Controller {
       $this->Auth('password');
    }
    
-   /**
-    * This is a good example of how to use the form, model, and validator to
-    * validate a form that does use the model, but doesn't save data to the
-    * model.
-    */
    public function SignIn() {
-      $this->Auth('password');
+      $this->FireEvent("SignIn");
+      $this->Auth('default');
    }
 
+   public function SignOut() {
+      $this->FireEvent("SignOut");
+      $this->Leave('default');
+   }
+  
    /** A version of signin that supports multiple authentication methods.
     *  This method should replace EntryController::SignIn() eventually.
     *

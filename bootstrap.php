@@ -31,8 +31,8 @@ require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
 
 require_once(PATH_LIBRARY_CORE . DS . 'class.sliceprovider.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.plugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.plugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.authenticator.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');

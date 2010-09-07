@@ -18,7 +18,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
+abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
    public function GetPluginName() {
       return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
@@ -29,11 +29,22 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
    }
    
    public function GetPluginFolder($Absolute = TRUE) {
-      $Folder = GetValue('Folder', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
-      $PathParts = array($Folder);
+      $Folder = GetValue('PluginRoot', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+      if (!$Absolute)
+         $Folder = str_replace(rtrim(PATH_PLUGINS,'/'), 'plugins', $Folder);
          
-      array_unshift($PathParts, ($Absolute) ? PATH_PLUGINS : 'plugins');
-      return implode(DS, $PathParts);
+      return $Folder;
+   }
+   
+   /**
+    * Get a specific keyvalue from the plugin info array
+    *
+    * @param string $Key Name of the key whose value you wish to retrieve
+    * @param mixed $Default Optional value to return if the key cannot be found
+    * @return mixed value of the provided key
+    */
+   public function GetPluginKey($Key, $Default = NULL) {
+      return GetValue($Key, Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME), $Default);
    }
    
    /**
@@ -72,23 +83,6 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
       if (Gdn::Request()->WebRoot())
          $WebResource = Gdn::Request()->WebRoot().'/'.$WebResource;
       return '/'.$WebResource;
-   }
-   
-   public function Dispatch(&$Sender, $RequestArgs = array()) {
-      $ControllerMethod = 'Controller_Index';
-      if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
-         list($MethodName) = $Sender->RequestArgs;
-         $TestControllerMethod = 'Controller_'.$MethodName;
-         if (method_exists($this, $TestControllerMethod))
-            $ControllerMethod = $TestControllerMethod;
-      }
-      
-      if (method_exists($this, $ControllerMethod)) {
-         $Sender->Plugin = $this;
-         return call_user_func(array($this,$ControllerMethod),$Sender);
-      } else {
-         throw new Exception(sprintf("Call to invalid plugin controller method '%s' on %sPlugin",$MethodName, $this->GetPluginName()));
-      }
    }
    
    /**
@@ -230,6 +224,72 @@ abstract class Gdn_Plugin extends Gdn_SliceProvider implements Gdn_IPlugin {
     */
    protected function MakeMetaKey($RelativeUserKey) {
       return implode('.',array('Plugin',$this->GetPluginIndex(),$this->TrimMetaKey($RelativeUserKey)));
+   }
+   
+   /**
+    * Automatically handle the toggle effect
+    *
+    * @param object $Sender Reference to the invoking controller
+    * @param mixed $Redirect 
+    */
+   public function AutoToggle($Sender, $Redirect = NULL) {
+      $PluginName = $this->GetPluginIndex();
+      $EnabledKey = "Plugins.{$PluginName}.Enabled";
+      $CurrentConfig = C($EnabledKey, FALSE);
+      $PassedKey = GetValue(1, $Sender->RequestArgs);
+      if (Gdn::Session()->ValidateTransientKey($PassedKey)) {
+         $CurrentConfig = !$CurrentConfig;
+         SaveToConfig($EnabledKey, $CurrentConfig);
+      }
+      
+      if ($Redirect === FALSE) return $CurrentConfig;
+      if (is_null($Redirect))
+         Redirect('plugin/'.strtolower($PluginName));
+      else
+         Redirect($Redirect);
+         
+      return $CurrentConfig;
+   }
+   
+   public function AutoTogglePath($Path = NULL) {
+      if (is_null($Path)) {
+         $PluginName = $this->GetPluginIndex();
+         $Path = 'plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
+      }
+      return $Path;
+   }
+   
+   /**
+    * Convenience method for determining 2nd level activation
+    *
+    * This method checks the secondary "Plugin.PLUGINNAME.Enabled" setting that has becoming the de-facto
+    * standard for keeping plugins enabled but de-activated.
+    *
+    * @return boolean Status of plugin's 2nd level activation
+    */
+   public function IsEnabled() {
+      $PluginName = $this->GetPluginIndex();
+      $EnabledKey = "Plugins.{$PluginName}.Enabled";
+      return C($EnabledKey, FALSE);
+   }
+   
+   public function Dispatch($Sender, $RequestArgs = array()) {
+      $Sender->Form = new Gdn_Form();
+      
+      $ControllerMethod = 'Controller_Index';
+      if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
+         list($MethodName) = $Sender->RequestArgs;
+         $TestControllerMethod = 'Controller_'.$MethodName;
+         if (method_exists($this, $TestControllerMethod))
+            $ControllerMethod = $TestControllerMethod;
+      }
+      
+      if (method_exists($this, $ControllerMethod)) {
+         $Sender->Plugin = $this;
+         return call_user_func(array($this,$ControllerMethod),&$Sender);
+      } else {
+         throw new Exception(sprintf("Call to invalid plugin controller method '%s' on %sPlugin",$MethodName, $this->GetPluginName()));
+      }
    }
 
 }

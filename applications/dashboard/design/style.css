@@ -1287,9 +1287,6 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
-ul.MessageList div.Comment div.Meta {
-   min-height: 50px;
-}
 
 ul.MessageList div.Comment div.Meta span {
    line-height: inherit;

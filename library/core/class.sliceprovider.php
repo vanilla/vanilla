@@ -55,7 +55,7 @@ class Gdn_SliceProvider {
    }
    
    public function AddSliceAsset($Asset) {
-      $Extension = strtolower(array_pop(explode('.',basename($Asset))));
+      $Extension = strtolower(array_pop($Trash = explode('.',basename($Asset))));
       switch ($Extension) {
          case 'css':
             if (!in_array($Asset, $this->SliceConfig['css'])) 

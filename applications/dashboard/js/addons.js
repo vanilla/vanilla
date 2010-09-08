@@ -22,14 +22,12 @@ jQuery(document).ready(function($) {
          $(this).after('<span class="TinyProgress">&nbsp;</span>');
       }
       var addonName = urlParts[urlParts.length - 2];
-      var testUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
-      );
+      var testUrl = gdn.url('/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey'));
       
       $.ajax({
          type: "GET",
          url: testUrl,
+         data: {'DeliveryType':'JSON'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form
@@ -68,14 +66,12 @@ jQuery(document).ready(function($) {
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonName = urlParts[urlParts.length - 1];
-      var testUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
-      );
+      var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey'));
       
       $.ajax({
          type: "GET",
          url: testUrl,
+         data: {'DeliveryType':'JSON'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form

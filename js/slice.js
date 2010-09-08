@@ -92,7 +92,7 @@ function Gdn_Slice(SliceElement, SliceID) {
          
       this.PrepareSliceForRequest();
       
-      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.SliceURL);
+      var SliceURL = gdn.url(this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'GET',
@@ -105,7 +105,7 @@ function Gdn_Slice(SliceElement, SliceID) {
       this.PrepareSliceForRequest();
       
       var SliceForm = $(Event.target).parents('form');
-      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.SliceURL);
+      var SliceURL = gdn.url(this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',
@@ -128,26 +128,6 @@ function Gdn_Slice(SliceElement, SliceID) {
       var SliceHolder = document.createElement('div');
       $(SliceHolder).html(Data);
       
-      // Configs
-      var SliceConfig = $(SliceHolder).find('.Slice .SliceConfig');
-      if (SliceConfig.length) {
-         var SliceConfig = $.parseJSON(SliceConfig.html());
-         $(SliceConfig.css).each(function(i,el){
-            var v_css  = document.createElement('link');
-         	v_css.rel = 'stylesheet'
-         	v_css.type = 'text/css';
-         	v_css.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
-         	document.getElementsByTagName('head')[0].appendChild(v_css);
-         });
-         
-         $(SliceConfig.js).each(function(i,el){
-            var v_js  = document.createElement('script');
-         	v_js.type = 'text/javascript';
-         	v_js.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
-         	document.getElementsByTagName('head')[0].appendChild(v_js);
-         });
-      }
-      
       var SliceContents = $(SliceHolder).find('.Slice');
       this.Slice.find('.SliceOverlay').fadeTo('fast', 0,jQuery.proxy(function(){
          this.Slice.css({
@@ -155,6 +135,27 @@ function Gdn_Slice(SliceElement, SliceID) {
             'width': ''
          });
          this.Slice.html(SliceContents.html());
+         
+         // Configs
+         var SliceConfig = $(SliceHolder).find('.Slice .SliceConfig');
+         if (SliceConfig.length) {
+            var SliceConfig = $.parseJSON(SliceConfig.html());
+            $(SliceConfig.css).each(function(i,el){
+               var v_css  = document.createElement('link');
+               v_css.rel = 'stylesheet'
+               v_css.type = 'text/css';
+               v_css.href = gdn.url(el);
+               document.getElementsByTagName('head')[0].appendChild(v_css);
+            });
+            
+            $(SliceConfig.js).each(function(i,el){
+               var v_js  = document.createElement('script');
+               v_js.type = 'text/javascript';
+               v_js.src = gdn.url(el);
+               document.getElementsByTagName('head')[0].appendChild(v_js);
+            });
+         }
+      
          this.ParseSlice();
       },this));
    }

@@ -169,7 +169,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
          if (!is_null($ProviderKey)) {
             $ProviderData = $AuthModel->GetProviderByKey($ProviderKey);
          } else {
-            $ProviderData = $AuthModel->GetProviderByScheme($AuthenticationSchemeAlias, $UserID);
+            $ProviderData = $AuthModel->GetProviderByScheme($AuthenticationSchemeAlias, Gdn::Session()->UserID);
          }
          
          if ($ProviderData)

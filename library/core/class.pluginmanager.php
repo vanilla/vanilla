@@ -27,9 +27,9 @@ class Gdn_PluginManager {
    
    /**
     * An associative array of arrays containing information about each
-    * enabled plugin. This value is assigned in the bootstrap.php.
+    * enabled plugin.
     */
-   public $EnabledPlugins = array();
+   public $EnabledPlugins = NULL;
 
    /**
     * An associative array of EventHandlerName => PluginName pairs.
@@ -59,6 +59,8 @@ class Gdn_PluginManager {
    
    protected $_PluginsByClassName = array();
    
+   protected $_RegisteredPlugins = array();
+   
    /**
     * Register all enabled plugins
     *
@@ -78,47 +80,62 @@ class Gdn_PluginManager {
     *  }
     */
    public function RegisterPlugins() {
+      // Cache plugin info list
+      $this->AvailablePlugins();
+      
       // Loop through all declared classes looking for ones that implement iPlugin.
       foreach(get_declared_classes() as $ClassName) {
          // Only implement the plugin if it implements the Gdn_IPlugin interface and
          // it has it's properties defined in $this->EnabledPlugins.
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
-            $ClassMethods = get_class_methods($ClassName);
-            foreach ($ClassMethods as $Method) {
-               $MethodName = strtolower($Method);
-               // Loop through their individual methods looking for event handlers and method overrides.
-               if (isset($MethodName[9])) {
-                  $Suffix = array_pop(explode('_',$MethodName));
-                  switch ($Suffix) {
-                     case 'handler':
-                     case 'before':
-                     case 'after':
-                        $this->RegisterHandler($ClassName, $MethodName);
-                     break;
-                     case 'override':
-                        $this->RegisterOverride($ClassName, $MethodName);
-                     break;
-                     case 'create':
-                        $this->RegisterNewMethod($ClassName, $MethodName);
-                     break;
-                  }
-/*
-                  if (substr($MethodName, -8) == '_handler' || substr($MethodName, -7) == '_before' || substr($MethodName, -6) == '_after') {
-                     $this->RegisterHandler($ClassName, $MethodName);
-                  } else if (substr($MethodName, -9) == '_override') {
-                     $this->RegisterOverride($ClassName, $MethodName);
-                  } else if (substr($MethodName, -7) == '_create') {
-                     $this->RegisterNewMethod($ClassName, $MethodName);
-                  }
-*/
-               }
+            // Check that the plugin is in AvailablePlugins...
+            $Plugin = $this->GetPluginInfo($ClassName, self::ACCESS_CLASSNAME);
+            if (!$Plugin) {
+               $PluginFile = Gdn_LibraryMap::GetCache('plugin', $ClassName);
+               if ($PluginFile)
+                  $Plugin = $this->PluginAvailable($PluginFile);
+            }
+            
+            // If this plugin was already indexed, skip it.
+            if (array_key_exists($ClassName, $this->_RegisteredPlugins))
+               continue;
+            
+            // Register this plugin's methods
+            $this->RegisterPlugin($ClassName, $Plugin);
+            
+         }
+      }
+      
+      $this->EnabledPlugins(TRUE);
+   }
+   
+   public function RegisterPlugin($ClassName, $PluginInfo) {
+      $ClassMethods = get_class_methods($ClassName);
+      foreach ($ClassMethods as $Method) {
+         $MethodName = strtolower($Method);
+         // Loop through their individual methods looking for event handlers and method overrides.
+         if (isset($MethodName[9])) {
+            $Suffix = array_pop(explode('_',$MethodName));
+            switch ($Suffix) {
+               case 'handler':
+               case 'before':
+               case 'after':
+                  $this->RegisterHandler($ClassName, $MethodName);
+               break;
+               case 'override':
+                  $this->RegisterOverride($ClassName, $MethodName);
+               break;
+               case 'create':
+                  $this->RegisterNewMethod($ClassName, $MethodName);
+               break;
             }
          }
       }
+      $this->_RegisteredPlugins[$PluginInfo['Index']] = $PluginInfo;
    }
    
    public function CheckPlugin($PluginName) {
-      if (array_key_exists($PluginName, $this->EnablePlugins))
+      if (array_key_exists($PluginName, $this->EnabledPlugins()))
          return TRUE;
          
       return FALSE;
@@ -139,7 +156,7 @@ class Gdn_PluginManager {
          break;
       }
       
-      return $this->AvailablePlugins($PluginName);
+      return ($PluginName !== FALSE) ? $this->AvailablePlugins($PluginName) : FALSE;
    }
    
    public function GetPluginInstance($AccessName, $AccessType = self::ACCESS_CLASSNAME, $Sender = NULL) {
@@ -165,7 +182,19 @@ class Gdn_PluginManager {
       return $this->_Instances[$ClassName];
    }
    
-   public function EnabledPlugins() {
+   public function EnabledPlugins($ForceReindex = FALSE) {
+      if (!is_array($this->EnabledPlugins) || $ForceReindex) {
+         $EnabledPlugins = Gdn::Config('EnabledPlugins', array());
+         
+         // Get a list of files to include.
+         foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
+            $Plugin = $this->GetPluginInfo($PluginName, self::ACCESS_PLUGINNAME);
+            if ($Plugin) {
+               $this->EnabledPlugins[$PluginName] = $Plugin;
+            }
+         }
+      }
+      
       return $this->EnabledPlugins;
    }
    
@@ -355,8 +384,10 @@ class Gdn_PluginManager {
     * adds "Folder", and "ClassName" definitions to the Plugin Info Array for
     * each plugin.
     */
-   public function AvailablePlugins($GetPlugin = NULL) {
-      if (!is_array($this->_AvailablePlugins)) {
+   public function AvailablePlugins($GetPlugin = NULL, $ForceReindex = FALSE) {
+      if (!is_array($this->_AvailablePlugins) || $ForceReindex) {
+         $this->_AvailablePlugins = array();
+         $this->_PluginsByClassName = array();
       
          $Info = array();
          $InverseRelation = array();
@@ -373,66 +404,84 @@ class Gdn_PluginManager {
                $PluginPaths[] = PATH_PLUGINS . DS . $Item . DS . 'default.php';
                
                foreach ($PluginPaths as $i => $PluginFile) {
-                  if (file_exists($PluginFile)) {
-                     // Find the $PluginInfo array
-                     $Lines = file($PluginFile);
-                     $InfoBuffer = FALSE;
-                     $ClassBuffer = FALSE;
-                     $ClassName = '';
-                     $PluginInfoString = '';
-                     $PluginInfo = FALSE;
-                     foreach ($Lines as $Line) {
-                        if ($InfoBuffer && substr(trim($Line), -2) == ');') {
-                           $PluginInfoString .= $Line;
-                           $ClassBuffer = TRUE;
-                           $InfoBuffer = FALSE;
-                        }
-                        
-                        if (substr(trim($Line), 0, 11) == '$PluginInfo')
-                           $InfoBuffer = TRUE;
-                           
-                        if ($InfoBuffer)
-                           $PluginInfoString .= $Line;
-                           
-                        if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
-                           $Parts = explode(' ', $Line);
-                           if (count($Parts) > 2)
-                              $ClassName = $Parts[1];
-                              
-                           break;
-                        }
-                        
-                     }
-                     unset($Lines);
-                     if ($PluginInfoString != '')
-                        @eval($PluginInfoString);
-                        
-                     // Define the folder name and assign the class name for the newly added item
-                     if (is_array($PluginInfo)) {
-                        $PluginInfo[$Item]['Index'] = $Item;
-                        if (!array_key_exists('Name', $PluginInfo[$Item]))
-                           $PluginInfo[$Item]['Name'] = $Item;
-                           
-                        $Info = array_merge($Info, $PluginInfo);
-                        foreach ($Info as $PluginName => $Plugin) {
-                           $InverseRelation[$ClassName] = $PluginName;
-                           if (array_key_exists('Folder', $Info[$PluginName]) === FALSE) {
-                              $Info[$PluginName]['Folder'] = $Item;
-                              $Info[$PluginName]['ClassName'] = $ClassName;
-                           }
-                        }
-                     }
-                  }
+                  $this->PluginAvailable($PluginFile);
                }
             }
             closedir($FolderHandle);
          }
-         
-         $this->_AvailablePlugins = $Info;
-         $this->_PluginsByClassName = $InverseRelation;
       }
       
       return (is_null($GetPlugin)) ? $this->_AvailablePlugins : ((array_key_exists($GetPlugin,$this->_AvailablePlugins)) ? $this->_AvailablePlugins[$GetPlugin] : FALSE);
+   }
+   
+   public function ScanPluginFile($PluginFile) {
+      // Find the $PluginInfo array
+      $Lines = file($PluginFile);
+      $InfoBuffer = FALSE;
+      $ClassBuffer = FALSE;
+      $ClassName = '';
+      $PluginInfoString = '';
+      $PluginInfo = FALSE;
+      foreach ($Lines as $Line) {
+         if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+            $PluginInfoString .= $Line;
+            $ClassBuffer = TRUE;
+            $InfoBuffer = FALSE;
+         }
+         
+         if (substr(trim($Line), 0, 11) == '$PluginInfo')
+            $InfoBuffer = TRUE;
+            
+         if ($InfoBuffer)
+            $PluginInfoString .= $Line;
+            
+         if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
+            $Parts = explode(' ', $Line);
+            if (count($Parts) > 2)
+               $ClassName = $Parts[1];
+               
+            break;
+         }
+         
+      }
+      unset($Lines);
+      if ($PluginInfoString != '')
+         @eval($PluginInfoString);
+         
+      // Define the folder name and assign the class name for the newly added item
+      if (is_array($PluginInfo)) {
+         $Item = array_pop($Trash = array_keys($PluginInfo));
+         
+         $PluginInfo[$Item]['Index'] = $Item;
+         $PluginInfo[$Item]['ClassName'] = $ClassName;
+         $PluginInfo[$Item]['PluginFilePath'] = $PluginFile;
+         $PluginInfo[$Item]['PluginRoot'] = dirname($PluginFile);
+         
+         if (!array_key_exists('Name', $PluginInfo[$Item]))
+            $PluginInfo[$Item]['Name'] = $Item;
+            
+         if (!array_key_exists('Folder', $PluginInfo[$Item]))
+            $PluginInfo[$Item]['Folder'] = $Item;
+            
+         return $PluginInfo[$Item];
+      }
+      
+      return NULL;
+   }
+   
+   public function PluginAvailable($PluginFile) {
+      if (file_exists($PluginFile)) {
+         $PluginInfo = $this->ScanPluginFile($PluginFile);
+         
+         if (!is_null($PluginInfo)) {
+            $this->_AvailablePlugins[$PluginInfo['Index']] = $PluginInfo;
+            $this->_PluginsByClassName[$PluginInfo['ClassName']] = $PluginInfo['Index'];
+         }
+         
+         return $PluginInfo;
+      }
+      
+      return FALSE;
    }
    
    public function EnabledPluginFolders() {
@@ -481,7 +530,24 @@ class Gdn_PluginManager {
       return TRUE;
    }
 
-   public function EnablePlugin($PluginName, $Validation, $Setup = FALSE) {
+   public function EnablePlugin($PluginName, $Validation, $Setup = FALSE, $EnabledPluginValueIndex = 'Folder') {
+      
+      // Check that the plugin is in AvailablePlugins...
+      $Plugin = $this->GetPluginInfo($PluginName, self::ACCESS_PLUGINNAME);
+      
+      // If not, we're dealing with a special case. Enabling with a classname...
+      if (!$Plugin) {
+         $ClassName = $PluginName;
+         $PluginFile = Gdn_LibraryMap::GetCache('plugin', $ClassName);
+         if ($PluginFile) {
+            $Plugin = $this->PluginAvailable($PluginFile);
+            $PluginName = $Plugin['Index'];
+         }
+      }
+      
+      // Couldn't load the plugin info.
+      if (!$Plugin) return;
+      
       $this->TestPlugin($PluginName, $Validation, $Setup);
       
       if (is_object($Validation) && count($Validation->Results()) > 0)
@@ -490,9 +556,13 @@ class Gdn_PluginManager {
       // If everything succeeded, add the plugin to the
       // $EnabledPlugins array in conf/plugins.php
       // $EnabledPlugins['PluginClassName'] = 'Plugin Folder Name';
-      $PluginInfo = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
+      // $PluginInfo = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
+      $PluginInfo = $this->GetPluginInfo($PluginName);
       $PluginFolder = ArrayValue('Folder', $PluginInfo);
-      SaveToConfig('EnabledPlugins.'.$PluginName, $PluginFolder);
+      $PluginEnabledValue = ArrayValue($EnabledPluginValueIndex, $PluginInfo, $PluginFolder);
+      SaveToConfig('EnabledPlugins.'.$PluginName, $PluginEnabledValue);
+      $this->EnabledPlugins[$PluginName] = $PluginInfo;
+      $this->RegisterPlugin($PluginInfo['ClassName'], $PluginInfo);
       
       $ApplicationManager = new Gdn_ApplicationManager();
       $Locale = Gdn::Locale();
@@ -556,15 +626,17 @@ class Gdn_PluginManager {
     */
    public function IncludePlugins($EnabledPlugins = NULL) {
       // Include all of the plugins.
-      if(is_null($EnabledPlugins))
+      if (is_null($EnabledPlugins))
          $EnabledPlugins = Gdn::Config('EnabledPlugins', array());
       
       // Get a list of files to include.
       $Paths = array();
       foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
-         $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
-         $Paths = array_merge($Paths, SafeGlob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
-
+         if (!class_exists($PluginFolder)) {
+            $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
+            $Paths = array_merge($Paths, SafeGlob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
+         }
+         
          // Make sure the plugin is in the config.
          if (!C("EnabledPlugins.$PluginName")) {
             SaveToConfig("EnabledPlugins.$PluginName", $PluginFolder, FALSE);
@@ -573,18 +645,12 @@ class Gdn_PluginManager {
       if (!is_array($Paths))
          $Paths = array();
       
-      // Include all of the paths.
-      $PluginInfo = array();
-      
       $PluginManager = &$this;
       $Paths = (array)$Paths;
       foreach($Paths as $Path) {
          if(file_exists($Path))
             include_once($Path);
       }
-      
-      $this->EnabledPlugins = $PluginInfo;
-      return $PluginInfo;
    }
    
    /**

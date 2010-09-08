@@ -1189,6 +1189,9 @@ class ImportModel extends Gdn_Model {
 	}
 
    public function UpdateCounts() {
+      // This option could take a while so set the timeout.
+      set_time_limit(60*5);
+      
       // Define the necessary SQL.
       $Sqls = array();
 

@@ -32,30 +32,32 @@ class ImportModel extends Gdn_Model {
 	public $MaxStepTime = 1; // seconds
 
 	protected $_MergeSteps = array(
-   	1 => 'ProcessImportFile',
-   	2 => 'DefineTables',
-   	3 => 'LoadTables',
-   	4 => 'DefineIndexes',
-   	5 => 'AssignUserIDs',
-   	6 => 'AssignOtherIDs',
-   	7 => 'InsertTables',
-   	8 => 'UpdateCounts',
-      9 => 'CustomFinalization',
-      10 => 'AddActivity'
-	);
-
-	protected $_OverwriteSteps = array(
-   	1 => 'ProcessImportFile',
-   	2 => 'DefineTables',
-   	3 => 'LoadUserTable',
-   	4 => 'AuthenticateAdminUser',
-   	5 => 'InsertUserTable',
-   	6 => 'LoadTables',
-   	7 => 'DeleteOverwriteTables',
+      1 => 'Initialize',
+   	2 => 'ProcessImportFile',
+   	3 => 'DefineTables',
+   	4 => 'LoadTables',
+   	5 => 'DefineIndexes',
+   	6 => 'AssignUserIDs',
+   	7 => 'AssignOtherIDs',
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
       10 => 'CustomFinalization',
       11 => 'AddActivity'
+	);
+
+	protected $_OverwriteSteps = array(
+      1 => 'Initialize',
+   	2 => 'ProcessImportFile',
+   	3 => 'DefineTables',
+   	4 => 'LoadUserTable',
+   	5 => 'AuthenticateAdminUser',
+   	6 => 'InsertUserTable',
+   	7 => 'LoadTables',
+   	8 => 'DeleteOverwriteTables',
+   	9 => 'InsertTables',
+   	10 => 'UpdateCounts',
+      11 => 'CustomFinalization',
+      12 => 'AddActivity'
    );
 
 	/**
@@ -551,6 +553,12 @@ class ImportModel extends Gdn_Model {
       return $Exists !== FALSE;
    }
 
+   public function Initialize() {
+      // This is just a dummy step so the ajax can get going right away.
+
+      return TRUE;
+   }
+
 	public function InsertTables() {
 		$InsertedCount = 0;
 		$Timer = new Gdn_Timer();
@@ -1003,6 +1011,9 @@ class ImportModel extends Gdn_Model {
 	}
 	
 	public function ProcessImportFile() {
+      // This one step can take a while so give it more time.
+      set_time_limit(60 * 5);
+
 		$Path = $this->ImportPath;
 		$Tables = array();
 

@@ -53,7 +53,6 @@ class EntryController extends Gdn_Controller {
             
          // Not enough information to perform authentication, render input form
          case Gdn_Authenticator::MODE_GATHER:
-            die('gatherrrr');
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
 				if ($this->Form->IsPostBack())

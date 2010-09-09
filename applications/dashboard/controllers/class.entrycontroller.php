@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+   <?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -26,7 +26,7 @@ class EntryController extends Gdn_Controller {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-      
+
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
          case Gdn_Authenticator::DATA_FORM:
@@ -44,6 +44,7 @@ class EntryController extends Gdn_Controller {
       
       // Where are we in the process? Still need to gather (render view) or are we validating?
       $AuthenticationStep = $Authenticator->CurrentStep();
+      
       switch ($AuthenticationStep) {
       
          // User is already logged in
@@ -143,6 +144,7 @@ class EntryController extends Gdn_Controller {
          break;
       }
       
+      $this->SetData('SendWhere', "/entry/auth/{$AuthenticationSchemeAlias}");
       $this->Render();
    }
       

@@ -91,10 +91,10 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    abstract public function RepeatResponse();
    
    // What to do if the entry/leave/* page is triggered for a user that is logged in and successfully logs out
-   abstract public function LogoutResponse();
+   public function LogoutResponse() { }
    
    // What to do if the entry/auth/* page is triggered but login is denied or fails
-   abstract public function FailedResponse();
+   public function FailedResponse() { }
    
    // Get one of the three Forwarding URLs (Registration, SignIn, SignOut)
    abstract public function GetURL($URLType);

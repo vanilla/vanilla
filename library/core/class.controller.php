@@ -1066,16 +1066,22 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data[$Key] = $Value->ResultArray();
          }
       }
+      
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
 
       switch ($this->_DeliveryMethod) {
          case DELIVERY_METHOD_XHTML:
             break;
          case DELIVERY_METHOD_JSON:
          default:
-            $Database = Gdn::Database();
-            $Database->CloseConnection();
-            
-            exit(json_encode($Data));
+            if ($Callback = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+               // This is a jsonp request.
+               exit($Callback.'('.json_encode($Data).');');
+            } else {
+               // This is a regular json request.
+               exit(json_encode($Data));
+            }
             break;
       }
    }
@@ -1333,7 +1339,18 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param mixed $AddProperty Whether or not to also set the data as a property of this object.
     * @return mixed The $Value that was set.
     */
-   public function SetData($Key, $Value, $AddProperty = FALSE) {
+   public function SetData($Key, $Value = NULL, $AddProperty = FALSE) {
+      if (is_array($Key)) {
+         $this->Data = array_merge($this->Data, $Key);
+
+         if ($AddProperty === TRUE) {
+            foreach ($Key as $Name => $Value) {
+               $this->$Name = $Value;
+            }
+         }
+         return;
+      }
+
       $this->Data[$Key] = $Value;
       if($AddProperty === TRUE) {
          $this->$Key = $Value;

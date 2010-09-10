@@ -29,6 +29,8 @@ if ($this->UserData->NumRows() == 0) {
          <td class="Alt">
             <?php
             printf(T('<strong>%1$s</strong> (%2$s) %3$s'), $User->Name, Gdn_Format::Email($User->Email), Gdn_Format::Date($User->DateInserted));
+            $this->EventArguments['User'] = $User;
+            $this->FireEvent("ApplicantInfo");
             echo '<blockquote>'.$User->DiscoveryText.'</blockquote>';
          ?></td>
          <td><?php

@@ -1326,6 +1326,29 @@ class Gdn_Form {
    }
 
    /**
+    * Validates a rule on the form and adds its result to the errors collection.
+    *
+    * @param string $FieldName The name of the field to validate.
+    * @param string|array $Rule The rule to validate against.
+    * @param string $CustomError A custom error string.
+    * @return bool Whether or not the rule succeeded.
+    *
+    * @see Gdn_Validation::ValidateRule()
+    */
+   public function ValidateRule($FieldName, $Rule, $CustomError = '') {
+      $Value = $this->GetFormValue($FieldName);
+      $Valid = Gdn_Validation::ValidateRule($Value, $FieldName, $Rule, $CustomError);
+
+      if ($Valid === TRUE)
+         return TRUE;
+      else {
+         $this->AddError('@'.$Valid);
+         return FALSE;
+      }
+      
+   }
+
+   /**
     * Assign a set of data to be displayed in the form elements.
     *
     * @param Ressource $Data A result resource or associative array containing data to be filled in

@@ -330,7 +330,7 @@ if (!function_exists('Boop')) {
       } else
          echo $Message;
       
-      if (!is_null($Argument) && sizeof($Arguments))
+      if (!is_null($Arguments) && sizeof($Arguments))
          echo " (".implode(', ',$Arguments).")";
          
       echo "\n";

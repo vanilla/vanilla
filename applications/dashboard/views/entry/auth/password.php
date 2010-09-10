@@ -4,7 +4,7 @@
    <?php
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):
-   echo $this->Form->Open(array('Action' => Url('/entry/signin'), 'id' => 'Form_User_SignIn'));
+   echo $this->Form->Open(array('Action' => Url('/entry/password'), 'id' => 'Form_User_SignIn'));
    echo $this->Form->Errors();
    ?>
    <ul>

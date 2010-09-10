@@ -240,7 +240,8 @@ class SetupController extends DashboardController {
          $this->Form->AddError(T('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'));
 
       // Make sure the user has copied the htaccess file over.
-      if (!file_exists(PATH_ROOT.'/.htaccess')) {
+      if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->GetFormValue('SkipHtaccess')) {
+         $this->SetData('NoHtaccess', TRUE);
          $this->Form->AddError(T('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copy the <b>.htaccess</b> file before continuing.'));
       }
 

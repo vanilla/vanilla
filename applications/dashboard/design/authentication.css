@@ -41,7 +41,7 @@ td.VanillaConfig input[type='text'] {
    width: 460px;
 }
 
-td.VanillaConfig div.HighlightBox {
+td.VanillaConfig div.HighlightBox, div.AuthenticatorDescription {
    padding: 10px;
    color: black;
    margin-bottom: 15px;

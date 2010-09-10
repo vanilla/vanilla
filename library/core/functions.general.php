@@ -37,6 +37,23 @@ function Gdn_Autoload($ClassName) {
    if (strtolower(substr($ClassName, -5)) == 'model')
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
+   // Look for plugin files.
+   if ($LibraryPath === FALSE) {
+      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+   }
+   
+   // Look harder for plugin files.
+   if ($LibraryPath === FALSE && Gdn::PluginManager() instanceof Gdn_PluginManager) {
+      $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
+   }
+
+   // Look for the class in the applications' library folders.
+   if ($LibraryPath === FALSE) {
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/$LibraryFileName");
+   }
+
+   // Look for the class in the core.
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping(
          'library',
@@ -52,12 +69,6 @@ function Gdn_Autoload($ClassName) {
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
-
-   // Look for plugin files.
-   if ($LibraryPath === FALSE) {
-      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
-   }
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
@@ -571,6 +582,23 @@ if (!function_exists('GetMentions')) {
    }
 }
 
+if (!function_exists('GetObject')) {
+   /**
+    * Get a value off of an object.
+    *
+    * @deprecated GetObject() is deprecated. Use GetValue() instead.
+    * @param string $Property The name of the property on the object.
+    * @param object $Object The object that contains the value.
+    * @param mixed $Default The default to return if the object doesn't contain the property.
+    * @return mixed
+    */
+   function GetObject($Property, $Object, $Default) {
+      trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
+      $Result = GetValue($Property, $Object, $Default);
+      return $Result;
+   }
+}
+
 if (!function_exists('GetPostValue')) {
    /**
     * Return the value for $FieldName from the $_POST collection.
@@ -816,7 +844,12 @@ if (!function_exists('PrefixString')) {
 
 if (!function_exists('ProxyHead')) {
    
-   function ProxyHead($Url, $Headers=array(), $Timeout = FALSE) {
+   function ProxyHead($Url, $Headers=NULL, $Timeout = FALSE, $FollowRedirects = FALSE) {
+      if (is_null($Headers))
+         $Headers = array();
+      
+      $OriginalHeaders = $Headers;
+      $OriginalTimeout = $Timeout;
 		if(!$Timeout)
 			$Timeout = C('Garden.SocketTimeout', 1.0);
 
@@ -917,7 +950,7 @@ if (!function_exists('ProxyHead')) {
       $Response = array();
       $Response['HTTP'] = trim($Status);
       
-      /* get the numeric statuc code. 
+      /* get the numeric status code. 
        * - trim off excess edge whitespace, 
        * - split on spaces, 
        * - get the 2nd element (as a single element array), 
@@ -927,7 +960,19 @@ if (!function_exists('ProxyHead')) {
       $Response['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
       foreach ($ResponseLines as $Line) {
          $Line = explode(':',trim($Line));
-         $Response[array_shift($Line)] = implode(':',$Line);
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $Response[$Key] = $Value;
+      }
+      
+      if ($FollowRedirects) { 
+         $Code = GetValue('StatusCode',$Response, 200);
+         if (in_array($Code, array(301,302))) {
+            if (array_key_exists('Location', $Response)) {
+               $Location = GetValue('Location', $Response);
+               return ProxyHead($Location, $OriginalHeaders, $OriginalTimeout, $FollowRedirects);
+            }
+         }
       }
       
       return $Response;
@@ -942,7 +987,8 @@ if (!function_exists('ProxyRequest')) {
     *
     * @param string $Url The full url to the page being requested (including http://)
     */
-   function ProxyRequest($Url, $Timeout = FALSE) {
+   function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
+      $OriginalTimeout = $Timeout;
 		if(!$Timeout)
 			$Timeout = C('Garden.SocketTimeout', 1.0);
 
@@ -973,7 +1019,7 @@ if (!function_exists('ProxyRequest')) {
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
-         curl_setopt($Handler, CURLOPT_HEADER, 0);
+         curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')
@@ -987,9 +1033,12 @@ if (!function_exists('ProxyRequest')) {
          //}
          
          $Response = curl_exec($Handler);
-         if ($Response == FALSE)
+         $Success = TRUE;
+         if ($Response == FALSE) {
+            $Success = FALSE;
             $Response = curl_error($Handler);
-            
+         }
+         
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
@@ -1025,10 +1074,47 @@ if (!function_exists('ProxyRequest')) {
          }
          @fclose($Pointer);
          $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
-         return $Response;
+         $Success = TRUE;
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
+      
+      if (!$Success)
+         return $Response;
+      
+      $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
+      $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+      
+      $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
+      $Status = array_shift($ResponseHeaderLines);
+      $ResponseHeaders = array();
+      $ResponseHeaders['HTTP'] = trim($Status);
+      
+      /* get the numeric status code. 
+       * - trim off excess edge whitespace, 
+       * - split on spaces, 
+       * - get the 2nd element (as a single element array), 
+       * - pop the first (only) element off it... 
+       * - return that.
+       */
+      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      foreach ($ResponseHeaderLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $ResponseHeaders[$Key] = $Value;
+      }
+      
+      if ($FollowRedirects) { 
+         $Code = GetValue('StatusCode',$ResponseHeaders, 200);
+         if (in_array($Code, array(301,302))) {
+            if (array_key_exists('Location', $ResponseHeaders)) {
+               $Location = GetValue('Location', $ResponseHeaders);
+               return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
+            }
+         }
+      }
+      
       return $Response;
    }
 }

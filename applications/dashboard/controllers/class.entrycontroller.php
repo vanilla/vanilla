@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+   <?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -26,7 +26,7 @@ class EntryController extends Gdn_Controller {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-      
+
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
          case Gdn_Authenticator::DATA_FORM:
@@ -44,13 +44,12 @@ class EntryController extends Gdn_Controller {
       
       // Where are we in the process? Still need to gather (render view) or are we validating?
       $AuthenticationStep = $Authenticator->CurrentStep();
+      
       switch ($AuthenticationStep) {
       
          // User is already logged in
          case Gdn_Authenticator::MODE_REPEAT:
-         
             $Reaction = $Authenticator->RepeatResponse();
-            
          break;
             
          // Not enough information to perform authentication, render input form
@@ -100,6 +99,10 @@ class EntryController extends Gdn_Controller {
                $this->Form->AddError($Ex);
             }
          break;
+         
+         case Gdn_Authenticator::MODE_NOAUTH:
+            $Reaction = Gdn_Authenticator::REACT_REDIRECT;
+         break;
       }
       
       // AddActivity($AuthenticatedUserID, 'SignIn');
@@ -141,6 +144,7 @@ class EntryController extends Gdn_Controller {
          break;
       }
       
+      $this->SetData('SendWhere', "/entry/auth/{$AuthenticationSchemeAlias}");
       $this->Render();
    }
       
@@ -152,15 +156,16 @@ class EntryController extends Gdn_Controller {
       $this->Auth('password');
    }
    
-   /**
-    * This is a good example of how to use the form, model, and validator to
-    * validate a form that does use the model, but doesn't save data to the
-    * model.
-    */
    public function SignIn() {
-      $this->Auth('password');
+      $this->FireEvent("SignIn");
+      $this->Auth('default');
    }
 
+   public function SignOut() {
+      $this->FireEvent("SignOut");
+      $this->Leave('default');
+   }
+  
    /** A version of signin that supports multiple authentication methods.
     *  This method should replace EntryController::SignIn() eventually.
     *

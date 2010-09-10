@@ -9,16 +9,17 @@
       echo "<div>".Wrap(Anchor($ToggleName, 'plugin/flagging/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'))."</div>";
    ?>
 </div>
-<?php if (C('Plugins.Flagging.Enabled')) { ?>
-<div class="FlaggedContent">
-   <?php
-      $NumFlaggedItems = count($this->FlaggedItems);
-      if (!$NumFlaggedItems) {
-         echo T("There are no items awaiting moderation at this time.");
-      } else {
-         echo "<h3>".$NumFlaggedItems." ".Plural($NumFlaggedItems,"item","items")." in queue</h3>\n";
-         foreach ($this->FlaggedItems as $URL => $FlaggedList) {
-   ?>
+<?php 
+if (C('Plugins.Flagging.Enabled')) {
+   echo "<h3>".T('Flagged Items')."</h3>\n";
+   echo '<div class="FlaggedContent">';
+   $NumFlaggedItems = count($this->FlaggedItems);
+   if (!$NumFlaggedItems) {
+      echo T("There are no items awaiting moderation at this time.");
+   } else {
+      echo $NumFlaggedItems." ".Plural($NumFlaggedItems,"item","items")." in queue\n";
+      foreach ($this->FlaggedItems as $URL => $FlaggedList) {
+?>
             <div class="FlaggedItem">
                <?php
                   $TitleCell = TRUE;

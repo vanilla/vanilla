@@ -224,6 +224,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote=[\"']?(.*?)[\"']?\](.*?)\[/quote\]#si",'<p><cite>\\1</cite>:</p><blockquote>\\2</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
                $Mixed2 = preg_replace("#\[url\]([^/]*?)\[/url\]#si",'<a href="http://\\1">\\1</a>',$Mixed2);
@@ -255,6 +256,40 @@ class Gdn_Format {
       }
    }
 
+   /** Format a number by putting K/M/B suffix after it when appropriate.
+    *
+    * @param mixed $Number The number to format. If a number isn't passed then it is returned as is.
+    * @return string The formatted number.
+    * @todo Make this locale aware.
+    */
+   public static function BigNumber($Number) {
+      if (!is_numeric($Number))
+         return $Number;
+
+      if ($Number >= 1000000000) {
+         $Number = $Number / 1000000000;
+         $Suffix = "B";
+      } elseif ($Number >= 1000000) {
+         $Number = $Number / 1000000;
+         $Suffix = "M";
+      } elseif ($Number >= 1000) {
+         $Number = $Number / 1000;
+         $Suffix = "K";
+      }
+
+      if (isset($Suffix)) {
+         return number_format($Number, 1).$Suffix;
+      } else {
+         return $Number;
+      }
+   }
+
+   /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
+    *
+    * @param int $Bytes The bytes to format.
+    * @param int $Precision The number of decimal places to return.
+    * @return string The formatted bytes.
+    */
    public static function Bytes($Bytes, $Precision = 2) {
       $Units = array('B', 'K', 'M', 'G', 'T');
       $Bytes = max($Bytes, 0);
@@ -735,7 +770,17 @@ EOT;
    public static function Url($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Url');
+      } elseif (preg_replace('`([^\PP])`u', '', 'Test') == '') {
+         // No Unicode PCRE support
+         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
+         $Mixed = strtr($Mixed, self::$_UrlTranslations);
+         $Mixed = preg_replace('/([^\w\d_:.])/', ' ', $Mixed); // get rid of punctuation and symbols
+         $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
+         $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
+         $Mixed = urlencode(strtolower($Mixed));
+         return $Mixed;
       } else {
+         // Better Unicode support
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation

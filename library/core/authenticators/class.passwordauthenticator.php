@@ -47,8 +47,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     *
     * @param string $Email The email address (or unique username) assigned to the user in the database.
     * @param string $Password The password assigned to the user in the database.
-    * @param boolean $PersistentSession Should the user's session remain persistent across visits?
-    * @param int $ClientHour The current hour (24 hour format) of the client.
+    * @return int The UserID of the authenticated user or 0 if one isn't found.
     */
    public function Authenticate($Email = '', $Password = '') {
       if (!$Email || !$Password) {

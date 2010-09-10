@@ -241,6 +241,20 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             }
          }
       });
+
+      // Hijack links to navigate within the same popup.
+      $('#'+settings.popupId+' .PopLink').click(function() {
+         $.popup.loading(settings);
+         
+         // Ajax the link into the current popup.
+          $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data) {
+             $.popup.reveal(settings, data);
+//            $('#'+settings.popupId+' .Content').html(data);
+          });
+
+         return false;
+      });
+
     }
     
     // If there is a cancel button in the popup, hide it (the popup has it's own close button)

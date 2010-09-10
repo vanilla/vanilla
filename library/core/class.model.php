@@ -323,6 +323,13 @@ class Gdn_Model extends Gdn_Pluggable {
       return $Data === FALSE ? 0 : $Data->Count;
    }
 
+   /**
+    * Get the data from the model based on its primary key.
+    *
+    * @param mixed $ID The value of the primary key in the database.
+    * @param string $DatasetType The format of the result dataset.
+    * @return Gdn_DataSet
+    */
    public function GetID($ID, $DatasetType = FALSE) {
       $Result = $this->GetWhere(array("{$this->Name}ID" => $ID))->FirstRow($DatasetType);
       return $Result;

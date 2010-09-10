@@ -19,7 +19,7 @@ if($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
    '</div>';
 }
 ?>
-
+<div class="Info">
 <ol>
    <?php
    foreach($Steps as $Number => $Name) {
@@ -58,6 +58,7 @@ if($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
    }
    ?>
 </ol>
+</div>
 <?php
 
 if($Complete) {

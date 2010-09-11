@@ -160,8 +160,8 @@ class UtilityController extends DashboardController {
 
    public function UpdateResponse() {
       // Get the message, response, and transientkey
-      $Messages = GetIncomingValue('Messages', '');
-      $Response = GetIncomingValue('Response', '');
+      $Messages = TrueStripSlashes(GetValue('Messages', $_POST));
+      $Response = TrueStripSlashes(GetValue('Response', $_POST));
       $TransientKey = GetIncomingValue('TransientKey', '');
       
       // If the key validates
@@ -200,10 +200,10 @@ class UtilityController extends DashboardController {
 
          // Save some info to the configuration file
          $Save = array();
-         
+
          // If the response wasn't empty, save it in the config
          if ($Response != '')
-            $Save['Garden.RequiredUpdates'] = $Response;
+            $Save['Garden.RequiredUpdates'] = Gdn_Format::Unserialize($Response);
       
          // Record the current update check time in the config.
          $Save['Garden.UpdateCheckDate'] = time();

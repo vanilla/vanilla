@@ -47,7 +47,7 @@ class SettingsController extends DashboardController {
       
       // Loop through all of the available visible apps and mark them if they have an update available
       // Retrieve the list of apps that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
       if (is_array($RequiredUpdates)) {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))

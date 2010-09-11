@@ -77,6 +77,25 @@ jQuery(document).ready(function($) {
    // current screen).
    if ($.fn.popup)
       $('a.Popup').popup();
+
+   $(".PopupWindow").live('click', function() {
+      var $this = $(this);
+
+      var width = $this.attr('popupWidth');
+      var height = $this.attr('popupHeight');
+      var left = (screen.width - width) / 2;
+      var right = (screen.height - height) / 2;
+
+      var id = $this.attr('id');
+      var href = $this.attr('href');
+      var args = $this.attr('popupArgs');
+      if (args)
+         href += '&' + args;
+
+      var win = window.open(href, 'Window_' + id, "left="+left+",height="+height+",width="+width+",height="+height+",status=0,scrollbars=0");
+
+      return false;
+   });
    
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.

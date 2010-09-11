@@ -236,6 +236,10 @@ class Gdn_Auth extends Gdn_Pluggable {
       return $this->_AllowHandshake;
    }
    
+   public function IsPrimary($AuthenticationSchemeAlias) {
+      return ($AuthenticationSchemeAlias == strtolower(Gdn::Config('Garden.Authenticator.DefaultScheme', 'password')));
+   }
+   
    /**
     * Returns the unique id assigned to the user in the database (retrieved
     * from the session cookie if the cookie authenticates) or FALSE if not
@@ -348,6 +352,18 @@ class Gdn_Auth extends Gdn_Pluggable {
     */
    public function SignOutUrl($Redirect = '/') {
       return $this->_GetURL(Gdn_Authenticator::URL_SIGNOUT, $Redirect);
+   }
+   
+   public function RemoteRegisterUrl($Redirect = '/') {
+      return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_REGISTER, $Redirect);
+   }
+   
+   public function RemoteSignInUrl($Redirect = '/') {
+      return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_SIGNIN, $Redirect);
+   }
+   
+   public function RemoteSignOutUrl($Redirect = '/') {
+      return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_SIGNOUT, $Redirect);
    }
    
    public function GetURL($URLType, $Redirect) { return $this->_GetURL($URLType, $Redirect); }

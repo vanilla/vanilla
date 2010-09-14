@@ -186,7 +186,15 @@ class EntryController extends Gdn_Controller {
 
       // The different providers can check to see if they are being used and modify the data array accordingly.
       $this->EventArguments = array($Method);
-      $this->FireEvent('ConnectData');
+      try {
+         $this->FireEvent('ConnectData');
+      } catch (Exception $Ex) {
+         if (defined('DEBUG'))
+            $this->Form->AddError($Ex);
+         else
+            $this->Form->AddError('There was an error fetching the connection data.');
+         return $this->Render();
+      }
 
       $FormData = $this->Form->FormValues(); // debug
 

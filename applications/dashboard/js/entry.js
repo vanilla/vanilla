@@ -29,10 +29,7 @@ jQuery(document).ready(function($) {
    $('#Register input[name=User/Name], body.register input[name=User/Name]').blur(function() {
       var name = $(this).val();
       if (name != '') {
-         var checkUrl = gdn.combinePaths(
-            gdn.definition('WebRoot', ''),
-            'index.php?p=/dashboard/user/usernameavailable/'+encodeURIComponent(name)
-         );
+         var checkUrl = gdn.url('/dashboard/user/usernameavailable/'+encodeURIComponent(name));
          $.ajax({
             type: "GET",
             url: checkUrl,
@@ -49,6 +46,43 @@ jQuery(document).ready(function($) {
          });
       }
    });
+
+   var checkConnectName = function() {
+      if (gdn.definition('NoConnectName', false)) {
+         $('#ConectPassword').show();
+         return;
+      }
+
+      var selectedName = $('input[name=Form/UserSelect]:checked').val();
+      if (!selectedName || selectedName == 'other') {
+         var name = $('#Form_ConnectName').val();
+         if (name != '') {
+            var checkUrl = gdn.url('/dashboard/user/usernameavailable/'+encodeURIComponent(name));
+            $.ajax({
+               type: "GET",
+               url: checkUrl,
+               dataType: 'text',
+               error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  $.popup({}, XMLHttpRequest.responseText);
+               },
+               success: function(text) {
+                  if (text == 'TRUE')
+                     $('#ConnectPassword').hide();
+                  else
+                     $('#ConnectPassword').show();
+               }
+            });
+         } else {
+            $('#ConnectPassword').hide();
+         }
+      } else {
+         $('#ConnectPassword').show();
+      }
+   }
+
+   checkConnectName();
+   $('#Form_ConnectName').blur(checkConnectName);
+   $('input[name=Form/UserSelect]').click(checkConnectName);
    
    // Check to see if passwords match
    $('input[name=User/PasswordMatch]').blur(function() {
@@ -56,5 +90,9 @@ jQuery(document).ready(function($) {
          $('#PasswordsDontMatch').hide();
       else
          $('#PasswordsDontMatch').show();
+   });
+
+   $('#Form_ConnectName').focus(function() {
+      $('input[value=other]').attr('checked', 'checked');
    });
 });

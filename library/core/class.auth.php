@@ -390,7 +390,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $ExtraReplacementParameters['CurrentPage'] = $FullRedirect;
       
       // Support legacy sprintf syntax
-      $Return = sprintf($Return, $AuthenticationScheme, $Redirect, $FullRedirect);
+      $Return = sprintf($Return, $AuthenticationScheme, urlencode($Redirect), $FullRedirect);
       
       // Support new named parameter '{}' syntax
       $Return = $this->ReplaceAuthPlaceholders($Return, $ExtraReplacementParameters);

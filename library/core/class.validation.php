@@ -576,10 +576,10 @@ class Gdn_Validation {
     *
     * @return array
     */
-   public function Results() {
-      if (!is_array($this->_ValidationResults))
+   public function Results($Reset = FALSE) {
+      if (!is_array($this->_ValidationResults) || $Reset)
          $this->_ValidationResults = array();
-
+      
       return $this->_ValidationResults;
    }
 }

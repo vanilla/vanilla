@@ -127,12 +127,12 @@ $Construct->Table('UserAuthenticationProvider')
 
 $Construct->Table('UserAuthenticationNonce')
    ->Column('Nonce', 'varchar(200)', FALSE, 'primary')
-   ->Column('Token', 'varchar(64)', FALSE)
+   ->Column('Token', 'varchar(128)', FALSE)
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationToken')
-   ->Column('Token', 'varchar(64)', FALSE, 'primary')
+   ->Column('Token', 'varchar(128)', FALSE, 'primary')
    ->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
    ->Column('ForeignUserKey', 'varchar(255)', TRUE)
    ->Column('TokenSecret', 'varchar(64)', FALSE)

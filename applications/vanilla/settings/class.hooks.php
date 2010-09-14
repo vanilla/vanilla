@@ -60,7 +60,7 @@ class VanillaHooks implements Gdn_IPlugin {
       // Add menu items.
       $Session = Gdn::Session();
       if ($Sender->Menu) {
-         $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE);
+         $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE, array('Standard' => TRUE));
       }
    }
    

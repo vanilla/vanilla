@@ -4,10 +4,7 @@ jQuery(document).ready(function($) {
    $('#Register input[name=User/Email], body.register input[name=User/Email]').blur(function() {
       var email = $(this).val();
       if (email != '') {
-         var checkUrl = gdn.combinePaths(
-            gdn.definition('WebRoot', ''),
-            'index.php?p=/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x'
-         );
+         var checkUrl = gdn.url('/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x');
          $.ajax({
             type: "GET",
             url: checkUrl,

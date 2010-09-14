@@ -29,7 +29,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
     this.live('click', function() {
       settings.sender = this;
-      $.extent(settings, { popupType: $(this).attr('popupType') });
+      $.extend(settings, { popupType: $(this).attr('popupType') });
 
       $.popup.init(settings);
       if (!settings.confirm)

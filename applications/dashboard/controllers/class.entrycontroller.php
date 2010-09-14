@@ -18,6 +18,16 @@ class EntryController extends Gdn_Controller {
     * @var Gdn_Form The current form.
     */
    public $Form;
+
+   public function  __construct() {
+      parent::__construct();
+
+      switch (isset($_GET['display'])) {
+         case 'popup':
+            $this->MasterView = 'empty';
+            break;
+      }
+   }
    
    public function Auth($AuthenticationSchemeAlias = 'default') {
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
@@ -166,12 +176,6 @@ class EntryController extends Gdn_Controller {
    public function Connect($Method) {
       $this->View = 'connect';
       $IsPostBack = $this->Form->IsPostBack();
-
-      switch (isset($_GET['display'])) {
-         case 'popup':
-            $this->MasterView = 'empty';
-            break;
-      }
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.

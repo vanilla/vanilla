@@ -3,6 +3,7 @@
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
+$this->FireEvent("BeforePreferencesRender");
 ?>
 <ul>
    <?php
@@ -18,4 +19,6 @@ echo $this->Form->Errors();
       </li>
    <?php } ?>
 </ul>
-<?php echo $this->Form->Close(T('Save Preferences'));
+<?php 
+echo $this->Form->Close(T('Save Preferences'));
+$this->FireEvent("AfterPreferencesRender");

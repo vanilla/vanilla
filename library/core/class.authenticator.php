@@ -230,14 +230,19 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       $TokenSecret = sha1(md5(implode('.',array($TokenKey,mt_rand(0,100000)))));
       $Timestamp = time();
       
+      $Lifetime = Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60);
+      if ($Lifetime == 0 && $TokenType == 'request')
+         $Lifetime = 300;
+      
       $InsertArray = array(
          'Token' => $TokenKey,
          'TokenSecret' => $TokenSecret,
          'TokenType' => $TokenType,
          'ProviderKey' => $ProviderKey,
-         'Lifetime' => Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60),
+         'Lifetime' => $Lifetime,
          'Timestamp' => date('Y-m-d H:i:s',$Timestamp),
-         'Authorized' => $Authorized
+         'Authorized' => $Authorized,
+         'ForeignUserKey' => NULL
       );
       
       if ($UserKey !== NULL)
@@ -252,6 +257,16 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       }
          
       return $InsertArray;
+   }
+   
+   public function AuthorizeToken($TokenKey) {
+      try {
+         Gdn::Database()->SQL()->Update('UserAuthenticationToken uat')
+            ->Set('Authorized',1)
+            ->Where('Token', $TokenKey)
+            ->Put();
+      } catch (Exception $e) { return FALSE; }
+      return TRUE;
    }
    
    public function LookupToken($ProviderKey, $UserKey, $TokenType = NULL) {

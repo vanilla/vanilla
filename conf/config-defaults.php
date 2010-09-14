@@ -46,7 +46,7 @@ $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 
 $Configuration['Garden']['Authenticator']['DefaultScheme']      = 'password'; // Types include 'Password', 'Handshake', 'Openid'
 $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
-$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/%1$s/{Session_TransientKey}?Target=%2$s';
+$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/signout/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
 $Configuration['Garden']['Authenticator']['SyncScreen']         = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name']  = "Password";

@@ -2,7 +2,7 @@ jQuery(document).ready(function($) {
    
    $('a.TagName').popup({
       onUnload: function() {
-         $('#Content').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?p=/dashboard/settings/tagging&DeliveryType=VIEW'));
+         $('#Content').load(gdn.url('/dashboard/settings/tagging?DeliveryType=VIEW'));
       }
    });
    
@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {
-         $('#Content:first').load(gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?p=/dashboard/settings/tagging&DeliveryType=VIEW'));
+         $('#Content:first').load(gdn.url('/dashboard/settings/tagging?DeliveryType=VIEW'));
       }
    });
 

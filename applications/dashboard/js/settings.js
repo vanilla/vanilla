@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
 
       $.ajax({
          type: "POST",
-         url: gdn.combinePaths(webroot, 'index.php?p=/dashboard/utility/updateproxy'),
+         url: gdn.url('/dashboard/utility/updateproxy'),
          data: data,
          dataType: 'json',
          success: function(json) {
@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
                // Save the message
                $.ajax({
                   type: "POST",
-                  url: gdn.combinePaths(webroot, 'index.php?p=/dashboard/utility/updateresponse'),
+                  url: gdn.url('/dashboard/utility/updateresponse'),
                   data: 'Messages='+json.messages+'&Response='+json.response+'&TransientKey='+gdn.definition('TransientKey'),
                   success: function() {
                      // After the responses have been saved, re-fill the
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
                      // messages to be displayed)
                      if (json.messages != '')
                         $('#Content').load(
-                           gdn.combinePaths(webroot, 'index.php?p=/dashboard/settings/index'),
+                           gdn.url('/dashboard/settings/index'),
                            'DeliveryType=ASSET&DeliveryMethod=XHTML'
                         );
                   }

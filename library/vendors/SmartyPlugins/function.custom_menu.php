@@ -17,6 +17,31 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return
  */
 function smarty_function_custom_menu($Params, &$Smarty) {
-   
+   $Controller = $Smarty->Controller;
+   if (is_object($Menu = GetValue('Menu', $Controller))) {
+      $Format = GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', GetValue('wrap', $Params, 'li')));
+
+
+      $Result = '';
+      foreach ($Menu->Items as $Group) {
+         foreach ($Group as $Item) {
+            // Make sure the item is a custom item.
+            if (GetValueR('Attributes.Standard', $Item))
+               continue;
+
+            // Make sure the user has permission for the item.
+            if ($Permission = GetValue('Permission', $Item)) {
+               if (!Gdn::Session()->CheckPermission($Permission))
+                  continue;
+            }
+
+            if (($Url = GetValue('Url', $Item)) && ($Text = GetValue('Text', $Item))) {
+               $Result .= Gdn_Theme::Link($Url, $Text, $Format);
+            }
+         }
+      }
+      return $Result;
+   }
+   return '';
 }
 

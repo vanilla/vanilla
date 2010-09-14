@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
-$AddonUrl = Gdn::Config('Garden.AddonUrl');
+$UpdateUrl = C('Garden.UpdateCheckUrl');
+$AddonUrl = C('Garden.AddonUrl');
 $AppCount = count($this->AvailableApplications);
 $EnabledCount = count($this->EnabledApplications);
 $DisabledCount = $AppCount - $EnabledCount;
@@ -118,7 +118,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
          ?>
          <tr class="<?php echo $RowClass; ?>">
             <td colspan="2"><div class="Alert"><a href="<?php
-               echo CombinePaths(array($AddonUrl, 'find', urlencode($AppName)), '/');
+               echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
             ?>"><?php
                printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
             ?></a></div></td>

@@ -20,6 +20,12 @@ class EntryController extends Gdn_Controller {
    public $Form;
    
    public function Auth($AuthenticationSchemeAlias = 'default') {
+      $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
+      $this->FireEvent('BeforeAuth');
+      
+      // Allow hijacking auth type
+      $AuthenticationSchemeAlias = $this->EventArguments['AuthenticationSchemeAlias'];
+      
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
       } catch (Exception $e) {
@@ -510,7 +516,7 @@ class EntryController extends Gdn_Controller {
    public function SyncScreen($Authenticator, $UserInfo, $Payload) {
       $this->AddJsFile('entry.js');
       $this->View = 'handshake';
-      $this->HandshakeScheme = $AuthenticationSchemeAlias;
+      $this->HandshakeScheme = $Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
@@ -600,9 +606,9 @@ class EntryController extends Gdn_Controller {
          // Add the handshake data as hidden fields.
          $this->Form->AddHidden('Name',       $Name);
          $this->Form->AddHidden('Email',      $Email);
-         $this->Form->AddHidden('UserKey',    $UserKey);
-         $this->Form->AddHidden('Token',      $TokenKey);
-         $this->Form->AddHidden('Consumer',   $ConsumerKey);
+         $this->Form->AddHidden('UserKey',    $UserInfo['UserKey']);
+         $this->Form->AddHidden('Token',      $UserInfo['TokenKey']);
+         $this->Form->AddHidden('Consumer',   $UserInfo['ConsumerKey']);
          
       }
       
@@ -832,15 +838,26 @@ class EntryController extends Gdn_Controller {
    }
 
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
+      $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
+      $this->FireEvent('BeforeLeave');
+      
+      // Allow hijacking deauth type
+      $AuthenticationSchemeAlias = $this->EventArguments['AuthenticationSchemeAlias'];
+      
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
       } catch (Exception $e) {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith('default');
       }
       
-      // Only sign the user out if this is an authenticated postback!
+      // Only sign the user out if this is an authenticated postback! Start off pessimistic
       $this->Leaving = FALSE;
       $Result = Gdn_Authenticator::REACT_RENDER;
+      
+      // Build these before doing anything desctructive as they are supposed to have user context
+      $LogoutResponse = $Authenticator->LogoutResponse();
+      $LoginResponse = $Authenticator->LoginResponse();
+      
       $AuthenticatedPostbackRequired = $Authenticator->RequireLogoutTransientKey();
       if (!$AuthenticatedPostbackRequired || Gdn::Session()->ValidateTransientKey($TransientKey)) {
          $Result = $Authenticator->DeAuthenticate();
@@ -848,55 +865,49 @@ class EntryController extends Gdn_Controller {
       }
       
       if ($Result == Gdn_Authenticator::AUTH_SUCCESS) {
+         $this->View = 'leave';
+         $Reaction = $LogoutResponse;
+      } else {
          $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
-         if ($Target = GetIncomingValue('Target', ''))
-            $Reaction = $Target;
-         else
-            $Reaction = $Authenticator->LogoutResponse();
-      } else {
-         $Reaction = $Authenticator->LoginResponse();
+         $Reaction = $LoginResponse;
       }
+      
+      switch ($Reaction) {
+         case Gdn_Authenticator::REACT_RENDER:
+            
+         break;
 
-      if (is_string($Reaction)) {
-         $Route = $Reaction;
-         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->RedirectUrl = Url($Route);
-         } else {
-            if ($Route !== FALSE)
-               Redirect($Route);
-            else
-               Redirect(Gdn::Router()->GetDestination('DefaultController'));
-         }
-      } else {
-         switch ($Reaction) {
+         case Gdn_Authenticator::REACT_EXIT:
+            exit();
+         break;
 
-            case Gdn_Authenticator::REACT_RENDER:
-            break;
+         case Gdn_Authenticator::REACT_REMOTE:
+            // Render the view, but set the delivery type to VIEW
+            $this->_DeliveryType= DELIVERY_TYPE_VIEW;
+         break;
 
-            case Gdn_Authenticator::REACT_EXIT:
-               exit();
-            break;
-
-            case Gdn_Authenticator::REACT_REMOTE:
-               // Render the view, but set the delivery type to VIEW
-               $this->_DeliveryType= DELIVERY_TYPE_VIEW;
-            break;
-
-            case Gdn_Authenticator::REACT_REDIRECT:
-            default:
+         case Gdn_Authenticator::REACT_REDIRECT:
+         default:
+            // If we're just told to redirect, but not where... try to figure out somewhere that makes sense.
+            if ($Reaction == Gdn_Authenticator::REACT_REDIRECT) {
                $Route = '/';
-
-               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                  $this->RedirectUrl = Url($Route);
+               $Target = GetIncomingValue('Target', NULL);
+               if (!is_null($Target)) 
+                  $Route = $Target;
+            } else {
+               $Route = $Reaction;
+            }
+            
+            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+               $this->RedirectUrl = Url($Route);
+            } else {
+               if ($Route !== FALSE) {
+                  Redirect($Route);
                } else {
-                  if ($Route !== FALSE) {
-                     Redirect($Route);
-                  } else {
-                     Redirect(Gdn::Router()->GetDestination('DefaultController'));
-                  }
+                  Redirect(Gdn::Router()->GetDestination('DefaultController'));
                }
-            break;
-         }
+            }
+         break;
       }
       
       $this->Render();

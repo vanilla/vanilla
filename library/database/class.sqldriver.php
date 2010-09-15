@@ -147,6 +147,13 @@ abstract class Gdn_SQLDriver {
    protected $_OpenWhereGroupCount;
 
    /**
+    * Extended options for a statement, usable by the driver.
+    *
+    * @var array
+    */
+   protected $_Options = array();
+
+   /**
     * A collection of order by statements.
     *
     * @var array
@@ -1324,6 +1331,23 @@ abstract class Gdn_SQLDriver {
    }
 
    /**
+    * Gets/sets an option on the object.
+    *
+    * @param string $Key The key of the option.
+    * @param mixed $Value The value of the option or not specified just to get the current value.
+    * @return mixed The value of the option or $this if $Value is specified.
+    */
+   public function Options($Key, $Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_Options[$Key] = VALUE;
+         return $this;
+      } elseif (isset($this->_Options[$Key]))
+         return $this->_Options[$Key];
+      else
+         return NULL;
+   }
+
+   /**
     * Adds to the $this->_OrderBys collection.
     *
     * @param string $Fields A string of fields to be ordered.
@@ -1605,6 +1629,7 @@ abstract class Gdn_SQLDriver {
       
       $this->_Sets            = array();
       $this->_NamedParameters = array();
+      $this->_Options = array();
    }
 
    /**

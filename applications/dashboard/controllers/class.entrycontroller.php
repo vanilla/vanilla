@@ -266,10 +266,25 @@ class EntryController extends Gdn_Controller {
          $this->SetData('ExistingUsers', $ExistingUsers);
 
          if ($this->Form->GetFormValue('Name') && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
-            // There is no user with the suggested name so we can just create the user.
-            $UserID = $UserModel->Save($this->Data);
-            $this->Form->SetFormValue('UserID', $UserID);
-            $UserModel->SaveAuthentication($this->Form->FormValues());
+            // There is no existing user with the suggested name so we can just create the user.
+            $User = $this->Form->FormValues();
+            $User['Password'] = RandomString(50); // some password is required
+            $User['HashMethod'] = 'Random';
+
+            $UserID = $UserModel->InsertForBasic($User);
+            $User['UserID'] = $UserID;
+            $this->Form->SetValidationResults($UserModel->ValidationResults());
+
+            if ($UserID) {
+               $UserModel->SaveAuthentication(array(
+                      'UserID' => $UserID,
+                      'Provider' => $this->Form->GetFormValue('Provider'),
+                      'UniqueID' => $this->Form->GetFormValue('UniqueID')));
+               $this->Form->SetFormValue('UserID', $UserID);
+
+               Gdn::Session()->Start($UserID);
+               $this->_SetRedirect(TRUE);
+            }
          }
       }
 
@@ -329,7 +344,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->Save($User);
+            $UserID = $UserModel->InsertForBasic($User);
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -365,11 +380,11 @@ class EntryController extends Gdn_Controller {
       $this->MasterView = 'empty';
       $this->View = 'redirect';
 
-      if ($CheckPopup) {
-         $this->AddDefinition('CheckPopup', $CheckPopup);
-      } elseif ($this->DeliveryType() != DELIVERY_TYPE_ALL) {
+      if ($this->DeliveryType() != DELIVERY_TYPE_ALL) {
          $this->DeliveryMethod(DELIVERY_METHOD_JSON);
          $this->SetHeader('Content-Type', 'application/json');
+      } elseif ($CheckPopup) {
+         $this->AddDefinition('CheckPopup', $CheckPopup);
       } else {
          Redirect(Url($this->RedirectUrl));
       }

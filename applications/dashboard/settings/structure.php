@@ -120,9 +120,12 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('URL', 'varchar(255)', FALSE)
    ->Column('AssociationSecret', 'text', FALSE)
    ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
+   ->Column('AuthenticateUrl', 'varchar(255)', TRUE)
    ->Column('RegisterUrl', 'varchar(255)', TRUE)
    ->Column('SignInUrl', 'varchar(255)', TRUE)
    ->Column('SignOutUrl', 'varchar(255)', TRUE)
+   ->Column('PasswordUrl', 'varchar(255)', TRUE)
+   ->Column('ProfileUrl', 'varchar(255)', TRUE)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')

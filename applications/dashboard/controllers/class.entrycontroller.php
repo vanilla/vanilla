@@ -403,6 +403,20 @@ class EntryController extends Gdn_Controller {
       $this->Auth('default');
    }
 
+   public function SignOut($TransientKey = "") {
+      $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
+      $AuthenticationScheme = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
+
+      try {
+         $Authenticator = Gdn::Authenticator()->GetAuthenticator($AuthenticationScheme);
+      } catch (Exception $e) {
+         $Authenticator = Gdn::Authenticator()->GetAuthenticator();
+      }
+   
+      $this->FireEvent("SignOut");
+      $this->Leave($AuthenticationScheme, $TransientKey);
+   }
+  
    /** A version of signin that supports multiple authentication methods.
     *  This method should replace EntryController::SignIn() eventually.
     *

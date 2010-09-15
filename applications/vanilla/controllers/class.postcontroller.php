@@ -53,6 +53,7 @@ class PostController extends VanillaController {
          if (!$CanEdit)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
+         $this->Title(T('Edit Discussion'));
       } else {
          $this->Permission('Vanilla.Discussions.Add');
       }

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
-$AddonUrl = Gdn::Config('Garden.AddonUrl', 'http://vanillaforums.org/update');
+$UpdateUrl = C('Garden.UpdateCheckUrl');
+$AddonUrl = C('Garden.AddonUrl');
 $PluginCount = count($this->AvailablePlugins);
 $EnabledCount = count($this->EnabledPlugins);
 $DisabledCount = $PluginCount - $EnabledCount;
@@ -133,7 +133,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
          ?>
          <tr class="<?php echo $RowClass; ?>">
             <td colspan="2"><div class="Alert"><a href="<?php
-               echo CombinePaths(array($AddonUrl, 'find', urlencode($ScreenName)), '/');
+               echo CombinePaths(array($UpdateUrl, 'find', urlencode($ScreenName)), '/');
             ?>"><?php
                printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
             ?></a></div></td>

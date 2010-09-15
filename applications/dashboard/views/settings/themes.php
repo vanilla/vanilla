@@ -3,13 +3,6 @@ $Session = Gdn::Session();
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
 <h1><?php echo T('Manage Themes'); ?></h1>
-<?php
-if ($AddonUrl != '')
-   echo '<div class="FilterMenu">',
-      Anchor('Get More Themes', $AddonUrl),
-      '</div>';
-         
-?>
 <div class="Info">
 <?php
 printf(
@@ -17,6 +10,13 @@ printf(
    '<code>'.PATH_THEMES.'</code>'
 );
 ?></div>
+<?php
+if ($AddonUrl != '')
+   echo '<div class="FilterMenu">',
+      Anchor('Get More Themes', $AddonUrl, 'SmallButton'),
+      '</div>';
+         
+?>
 <?php echo $this->Form->Errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">
    <ul>

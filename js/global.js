@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?p=/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
+            gdn.url('/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -68,7 +68,7 @@ jQuery(document).ready(function($) {
 	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = gdn.combinePaths(gdn.definition('WebRoot', ''), 'profile/notifications');
+      document.location = gdn.url('/profile/notifications');
       return false;
    });
    

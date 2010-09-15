@@ -459,11 +459,6 @@ class EntryController extends Gdn_Controller {
 
       return $this->Render('signin2');
    }
-
-   public function SignOut() {
-      $this->FireEvent("SignOut");
-      $this->Leave('default');
-   }
    
    public function Handshake($AuthenticationSchemeAlias = 'default') {
       

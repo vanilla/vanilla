@@ -38,7 +38,7 @@ function Gdn_Autoload($ClassName) {
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    // Look for plugin files.
-   if ($LibraryPath === FALSE) {
+   if ($LibraryPath === FALSE && Gdn::PluginManager() instanceof Gdn_PluginManager) {
       $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
    }

@@ -38,7 +38,7 @@ function Gdn_Autoload($ClassName) {
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    // Look for plugin files.
-   if ($LibraryPath === FALSE) {
+   if ($LibraryPath === FALSE && Gdn::PluginManager() instanceof Gdn_PluginManager) {
       $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
    }
@@ -179,6 +179,34 @@ if (!function_exists('ArrayInArray')) {
          }
       }
       return $Return;
+   }
+}
+
+if (!function_exists('ArrayTranslate')) {
+   /**
+    * Take all of the items specified in an array and make a new array with them specified by mappings.
+    *
+    *
+    * @param array $Array The input array to translate.
+    * @param array $Mappings The mappings to translate the array.
+    * @return array
+    */
+   function ArrayTranslate($Array, $Mappings) {
+      $Result = array();
+      foreach ($Mappings as $Index => $Value) {
+         if (is_numeric($Index)) {
+            $Key = $Value;
+            $NewKey = $Value;
+         } else {
+            $Key = $Index;
+            $NewKey = $Value;
+         }
+         if (isset($Array[$Key]))
+            $Result[$NewKey] = $Array[$Key];
+         else
+            $Result[$NewKey] = NULL;
+      }
+      return $Result;
    }
 }
 

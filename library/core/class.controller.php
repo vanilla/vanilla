@@ -707,6 +707,14 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * Cleanup any remaining resources for this controller.
+    */
+   public function Finalize() {
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
+   }
+
+   /**
     * Undocumented method.
     *
     * @param string $AssetName
@@ -1067,21 +1075,63 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
       
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
+      $this->Finalize();
 
       switch ($this->_DeliveryMethod) {
-         case DELIVERY_METHOD_XHTML:
+         case DELIVERY_METHOD_XML:
+            // TODO:
+            exit("<$Root>TODO</$Root>");
             break;
          case DELIVERY_METHOD_JSON:
          default:
-            if ($Callback = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+            if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
                // This is a regular json request.
                exit(json_encode($Data));
             }
+            break;
+      }
+   }
+
+   /**
+    * Render an exception as the sole output.
+    *
+    * @param Exception $Ex The exception to render.
+    */
+   public function RenderException($Ex) {
+      $this->Finalize();
+      $this->SendHeaders();
+
+      $Code = $Ex->getCode();
+      if (defined('DEBUG'))
+         $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
+      else
+         $Message = $Ex->getMessage();
+
+      if ($Code >= 100 && $Code <= 505) {
+         header("HTTP/1.0 $Code", TRUE, $Code);
+      }
+
+      $Data = array('Code' => $Code, 'Exception' => $Message);
+      switch ($this->DeliveryMethod()) {
+         case DELIVERY_METHOD_JSON:
+            if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+               // This is a jsonp request.
+               exit($Callback.'('.json_encode($Data).');');
+            } else {
+               // This is a regular json request.
+               exit(json_encode($Data));
+            }
+            break;
+         case DELIVERY_METHOD_XHTML:
+            Gdn_ExceptionHandler($Exception);
+            break;
+         case DELIVERY_METHOD_XML:
+            header('Content-Type: text/xml', TRUE);
+            array_map('htmlspecialchars', $Data);
+            exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
             break;
       }
    }

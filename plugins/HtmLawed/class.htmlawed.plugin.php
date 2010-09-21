@@ -41,15 +41,30 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
-       'valid_xml' => 2
+       'valid_xml' => 2,
+       'hook_tag' => 'HTMLawedHookTag'
       );
 
-      $Result = htmLawed($Html, $Config,
-         'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)');
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+
+      $Result = htmLawed($Html, $Config, $Spec);
       
       return $Result;
 	}
 
 	public function Setup() {
 	}
+}
+
+function HTMLawedHookTag($Element, $Attributes) {
+   $Attribs = '';
+   foreach ($Attributes as $Key => $Value) {
+      if (strcasecmp($Key, 'style') == 0) {
+         if (strpos($Value, 'position') !== FALSE || strpos($Value, 'z-index') !== FALSE || strpos($Value, 'opacity') !== FALSE)
+            continue;
+      }
+
+      $Attribs = " {$Key}=\"{$Value}\"";
+   }
+   return "<{$Element}{$Attribs}>";
 }

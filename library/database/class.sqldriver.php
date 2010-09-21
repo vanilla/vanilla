@@ -1339,7 +1339,7 @@ abstract class Gdn_SQLDriver {
     */
    public function Options($Key, $Value = NULL) {
       if ($Value !== NULL) {
-         $this->_Options[$Key] = VALUE;
+         $this->_Options[$Key] = $Value;
          return $this;
       } elseif (isset($this->_Options[$Key]))
          return $this->_Options[$Key];

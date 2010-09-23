@@ -562,9 +562,9 @@ class Gdn_Request {
       // Construct the path and query.
       $Result = $this->Path();
 
-      $Filename = $this->Filename();
-      if ($Filename && $Filename != 'default')
-         $Result .= ConcatSep('/', $Result, $Filename);
+//      $Filename = $this->Filename();
+//      if ($Filename && $Filename != 'default')
+//         $Result .= ConcatSep('/', $Result, $Filename);
       $Get = $this->GetRequestArguments(self::INPUT_GET);
       if (count($Get) > 0)
          $Result .= '?'.http_build_query($Get);

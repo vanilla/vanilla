@@ -27,7 +27,7 @@
       } elseif ($ConnectName) {
          $NameFormat = T('You are connected as %s.');
       } elseif ($ConnectSource) {
-         $NameFormat = T('You are connected through %s.');
+         $NameFormat = T('You are connected through %2$s.');
       } else {
          $NameFormat = '';
       }

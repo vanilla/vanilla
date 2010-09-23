@@ -216,7 +216,8 @@ class EntryController extends Gdn_Controller {
       $UserModel = new UserModel();
 
       // Check to see if there is an existing user associated with the information above.
-      $UserID = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'))->Value('UserID');
+      $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
+      $UserID = GetValue('UserID', $Auth);
 
       if ($UserID) {
          // The user is already connected.

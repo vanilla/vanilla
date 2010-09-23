@@ -384,19 +384,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               Header( "HTTP/1.1 302 Moved Temporarily" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 302 Moved Temporarily" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
             case 'Permanent':
-               Header( "HTTP/1.1 301 Moved Permanently" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 301 Moved Permanently" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
+            case 'NotAuthorized':
+               header( "HTTP/1.1 401 Not Found" );
+               $this->Request = $MatchRoute['FinalDestination'];
+               break;
+
             case 'NotFound':
-               Header( "HTTP/1.1 404 Not Found" );
+               header( "HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
          }
@@ -579,7 +584,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $ParamName = strtolower($MethParam->getName());
 
          if (isset($this->_ControllerMethodArgs[$Index]))
-            $Args[] = $PathParts[$Index];
+            $Args[] = $this->_ControllerMethodArgs[$Index];
          elseif (isset($Get[$ParamName]))
             $Args[] = $Get[$ParamName];
          elseif ($MethParam->isDefaultValueAvailable())

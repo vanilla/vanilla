@@ -25,16 +25,16 @@ class DiscussionsController extends VanillaController {
    public $Category;
    public $CategoryID;
    
-   public function Index($Offset = '0') {
-      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE)), TRUE));
+   public function Index($Page = '0') {
+      list($Page, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE)), TRUE));
 
 		$this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
 
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
+      if (!is_numeric($Page) || $Page < 0)
+         $Page = 0;
       
       // Add Modules
       $this->AddModule('NewDiscussionModule');
@@ -47,18 +47,18 @@ class DiscussionsController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
-      $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
+      $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
-      $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
-      $this->SetJson('Loading', $Offset . ' to ' . $Limit);
+      $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
       // Build a pager.
       $PagerFactory = new Gdn_PagerFactory();
       $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
-         $Offset,
+         $Page,
          $Limit,
          $CountDiscussions,
          'discussions/%1$s'

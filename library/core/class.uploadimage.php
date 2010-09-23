@@ -149,7 +149,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       if ($OutputType == 'gif')
          imagegif($TargetImage, $Target);
       else if ($OutputType == 'png')
-         imagepng($TargetImage, $Target, $ImageQuality);
+         imagepng($TargetImage, $Target, (int)($ImageQuality/10));
       else
          imagejpeg($TargetImage, $Target, $ImageQuality);
    }

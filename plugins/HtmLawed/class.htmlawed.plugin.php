@@ -26,9 +26,12 @@ class HTMLawedPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
       require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
+      $this->SafeStyles = C('Garden.Html.SafeStyles');
 	}
 
 	/// PROPERTIES ///
+
+   public $SafeStyles = TRUE;
 
 	/// METHODS ///
 	public function Format($Html) {
@@ -41,9 +44,16 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
-       'valid_xml' => 2,
-       'hook_tag' => 'HTMLawedHookTag'
+       'valid_xml' => 2
       );
+
+      if ($this->SafeStyles) {
+         // Deny all class and style attributes.
+         // A lot of damage can be done by hackers with these attributes.
+         $Config['deny_attribute'] .= ',style,class';
+      } else {
+         $Config['hook_tag'] = 'HTMLawedHookTag';
+      }
 
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
 

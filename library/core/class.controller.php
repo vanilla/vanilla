@@ -545,7 +545,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Default One of the DELIVERY_TYPE_* constants.
     */
    public function DeliveryType($Default = '') {
-      if ($Default != '')
+      if ($Default)
          $this->_DeliveryType = $Default;
 
       return $this->_DeliveryType;

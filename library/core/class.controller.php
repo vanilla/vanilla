@@ -607,7 +607,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *  - If the controller name is an empty string then the view will be looked for in the base views folder.
     * @param string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
     */
-   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE) {
+   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
       // Accept an explicitly defined view, or look to the method that was called on this controller
       if ($View == '')
          $View = $this->View;
@@ -700,7 +700,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_ViewLocations[$LocationName] = $ViewPath;
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
-      if ($ViewPath === FALSE)
+      if ($ViewPath === FALSE && $ThrowError)
          trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
 
       return $ViewPath;
@@ -970,7 +970,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
-         $this->_RenderData();
+         $this->RenderData();
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1064,7 +1064,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    // Render the data array.
-   protected function _RenderData($Data = NULL) {
+   public function RenderData($Data = NULL) {
       if ($Data === NULL)
          $Data = $this->Data;
 
@@ -1077,10 +1077,19 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       $this->Finalize();
 
-      switch ($this->_DeliveryMethod) {
+      // Check for a special view.
+      $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
+      if (file_exists($ViewLocation)) {
+         include $ViewLocation;
+         return;
+      }
+
+      switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
-            // TODO:
-            exit("<$Root>TODO</$Root>");
+            header('Content-Type: text/xml', TRUE);
+            echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
+            $this->_RenderXml($Data);
+            exit();
             break;
          case DELIVERY_METHOD_JSON:
          default:
@@ -1096,11 +1105,43 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * A simple default method for rendering xml.
+    *
+    * @param mixed $Data The data to render. This is usually $this->Data.
+    * @param string $Node The name of the root node.
+    * @param string $Indent The indent before the data for layout that is easier to read.
+    */
+   protected function _RenderXml($Data, $Node = 'Data', $Indent = '') {
+      // Handle numeric arrays.
+      if (is_numeric($Node))
+         $Node = 'Item';
+      
+      echo "$Indent<$Node>";
+
+      if (is_scalar($Data)) {
+         echo htmlspecialchars($Data);
+      } else {
+         $Data = (array)$Data;
+         foreach ($Data as $Key => $Value) {
+            echo "\n";
+            $this->_RenderXml($Value, $Key, $Indent.' ');
+         }
+         echo "\n";
+      }
+      echo "</$Node>";
+   }
+
+   /**
     * Render an exception as the sole output.
     *
     * @param Exception $Ex The exception to render.
     */
    public function RenderException($Ex) {
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+         Gdn_ExceptionHandler($Ex);
+         return;
+      }
+
       $this->Finalize();
       $this->SendHeaders();
 
@@ -1125,9 +1166,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                exit(json_encode($Data));
             }
             break;
-         case DELIVERY_METHOD_XHTML:
-            Gdn_ExceptionHandler($Exception);
-            break;
+//         case DELIVERY_METHOD_XHTML:
+//            Gdn_ExceptionHandler($Ex);
+//            break;
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);

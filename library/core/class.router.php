@@ -11,6 +11,7 @@ class Gdn_Router {
          'Internal'     => 'Internal',
          'Temporary'    => 'Temporary (302)',
          'Permanent'    => 'Permanent (301)',
+         'NotAuthorized' => 'Not Authorized (401)',
          'NotFound'     => 'Not Found (404)'
       );
       $this->ReservedRoutes = array('DefaultController', 'Default404', 'DefaultPermission', 'UpdateMode');

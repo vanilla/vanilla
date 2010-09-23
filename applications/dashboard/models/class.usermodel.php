@@ -159,11 +159,11 @@ class UserModel extends Gdn_Model {
     *
     * @param string $UniqueID The unique ID of the user in the foreign authentication scheme.
     * @param string $Provider The key of the provider.
-    * @return Gdn_DataSet
+    * @return array|false
     */
    public function GetAuthentication($UniqueID, $Provider) {
       return $this->SQL->GetWhere('UserAuthentication',
-         array('ForeignUserKey' => $UniqueID, 'ProviderKey' => $Provider));
+         array('ForeignUserKey' => $UniqueID, 'ProviderKey' => $Provider))->FirstRow(DATASET_TYPE_ARRAY);
    }
 
    public function GetCountLike($Like = FALSE) {
@@ -963,18 +963,22 @@ class UserModel extends Gdn_Model {
          $Where['UserID <> '] = $UserID;
 
       // Make sure the username & email aren't already being used
-      $Where['Name'] = $Username;
-      $TestData = $this->GetWhere($Where);
-      if ($TestData->NumRows() > 0) {
-         $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
-         $Valid = FALSE;
+      if (C('Garden.Registration.NameUnique', TRUE)) {
+         $Where['Name'] = $Username;
+         $TestData = $this->GetWhere($Where);
+         if ($TestData->NumRows() > 0) {
+            $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
+            $Valid = FALSE;
+         }
+         unset($Where['Name']);
       }
-      unset($Where['Name']);
-      $Where['Email'] = $Email;
-      $TestData = $this->GetWhere($Where);
-      if ($TestData->NumRows() > 0) {
-         $this->Validation->AddValidationResult('Email', 'The email you entered is in use by another member.');
-         $Valid = FALSE;
+      if (C('Garden.Registration.EmailUnique')) {
+         $Where['Email'] = $Email;
+         $TestData = $this->GetWhere($Where);
+         if ($TestData->NumRows() > 0) {
+            $this->Validation->AddValidationResult('Email', 'The email you entered is in use by another member.');
+            $Valid = FALSE;
+         }
       }
       return $Valid;
    }

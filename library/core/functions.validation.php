@@ -140,8 +140,9 @@ if (!function_exists('ValidateDate')) {
 				$Hour = ArrayValue(4, $Matches, 0);
 				$Minutes = ArrayValue(5, $Matches, 0);
 				$Seconds = ArrayValue(6, $Matches, 0);
-			}
-         return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
+			   
+            return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
+         }
       }
 
       return FALSE;

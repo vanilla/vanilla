@@ -8,10 +8,12 @@ class Gdn_Router {
 
    public function __construct() {
       $this->RouteTypes = array(
-         'Internal'     => 'Internal',
-         'Temporary'    => 'Temporary (302)',
-         'Permanent'    => 'Permanent (301)',
-         'NotFound'     => 'Not Found (404)'
+         'Internal'        => 'Internal',
+         'Temporary'       => 'Temporary (302)',
+         'Permanent'       => 'Permanent (301)',
+         'NotFound'        => 'Not Found (404)',
+         'NotAuthorized'   => 'Not Authorized (401)',
+         'PaymentRequired' => 'Payment Required (402)'
       );
       $this->ReservedRoutes = array('DefaultController', 'Default404', 'DefaultPermission', 'UpdateMode');
       $this->_LoadRoutes();

@@ -585,7 +585,7 @@ class SettingsController extends DashboardController {
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
-      $this->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
+      $AvailableThemes = $ThemeManager->AvailableThemes();
       $this->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
       $this->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
@@ -601,18 +601,19 @@ class SettingsController extends DashboardController {
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailableThemes as $Theme => $Info) {
+            foreach ($AvailableThemes as $Theme => $Info) {
                $CurrentName = ArrayValue('Name', $Info, $Theme);
                if (
                   $CurrentName == $Name
                   && $Type == 'Theme'
                ) {
                   $Info['NewVersion'] = $NewVersion;
-                  $this->AvailableThemes[$Theme] = $Info;
+                  $AvailableThemes[$Theme] = $Info;
                }
             }
          }
       }
+      $this->SetData('AvailableThemes', $AvailableThemes);
       
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {

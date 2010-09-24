@@ -86,6 +86,7 @@ $Configuration['Garden']['Preview']['MaxWidth']                 = 75;
 $Configuration['Garden']['Thumbnail']['Size']                   = 50;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Conversations', 'User');
 $Configuration['Garden']['InputFormatter']                      = 'Html';
+$Configuration['Garden']['Html']['SafeStyles']                  = TRUE; // disallow style/class attributes in html to prevent click jacking
 $Configuration['Garden']['Search']['Mode']                      = 'matchboolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;

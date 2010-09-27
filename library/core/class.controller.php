@@ -1164,9 +1164,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $Message = $Ex->getMessage();
 
-      if ($Code >= 100 && $Code <= 505) {
+      if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
-      }
+      else
+         header('HTTP/1.0 500', TRUE, 500);
 
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {

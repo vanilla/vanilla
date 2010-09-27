@@ -54,7 +54,9 @@ class Gdn_Upload {
 	 * @param mixed The name (or array of names) of the extension to allow.
 	 */
 	public function AllowFileExtension($Extension) {
-		if (is_array($Extension))
+      if ($Extension === NULL)
+         $this->_AllowedFileExtensions = array();
+		elseif (is_array($Extension))
 			array_merge($this->_AllowedFileExtensions, $Extension);
 		else
 			$this->_AllowedFileExtensions[] = $Extension;
@@ -145,7 +147,7 @@ class Gdn_Upload {
 			// Make sure that the file extension is allowed.
 			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
 			if (!InArrayI($Extension, $this->_AllowedFileExtensions))
-				$Ex = sprintf(T('You cannot upload files with this extension (%s).'), $Extension);
+				$Ex = sprintf(T('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), $Extension, implode(', ', $this->_AllowedFileExtensions));
 		}
 
 		if($Ex) {

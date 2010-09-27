@@ -51,7 +51,8 @@ function Gdn_ExceptionHandler($Exception) {
       
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
-      header('Content-Type: text/html; charset=utf-8');
+      // prevent headers already sent error
+      if(!headers_sent()) header('Content-Type: text/html; charset=utf-8');
       
       $SenderMessage = $Message;
       $SenderObject = 'PHP';
@@ -64,6 +65,12 @@ function Gdn_ExceptionHandler($Exception) {
          list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
       else if ($MessageCount == 3)
          list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+      elseif (function_exists('GetValueR')) {
+            $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
+            $N = ($IsError) ? '1' : '0';
+            $SenderMethod = GetValueR($N.'.function', $SenderTrace, $SenderMethod);
+            $SenderObject = GetValueR($N.'.class', $SenderTrace, $SenderObject);
+      }
       
       $SenderMessage = strip_tags($SenderMessage);
       
@@ -83,7 +90,7 @@ function Gdn_ExceptionHandler($Exception) {
       if (!defined('PATH_ROOT')) $PanicError = TRUE;
       if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
       if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-      $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
+      $WebRoot = class_exists('Gdn_Url', FALSE) ? Gdn_Url::WebRoot() : '';
       
       // Try and rollback a database transaction.
       if(class_exists('Gdn', FALSE)) {

@@ -157,7 +157,7 @@ jQuery(document).ready(function($) {
    // Format email addresses
    $('span.Email.EmailUnformatted').livequery(function() {
       var el = $(this);
-      el.removeClass('unformatted');
+      el.removeClass('EmailUnformatted');
       var email = el.html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
       el.html('<a href="mailto:' + email + '">' + email + '</a>');
    });

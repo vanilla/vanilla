@@ -24,6 +24,7 @@ define('DELIVERY_TYPE_EMBED', 'EMBED'); // Use the "EMBED" master view for embed
 // Delivery method enumerators
 define('DELIVERY_METHOD_XHTML', 'XHTML');
 define('DELIVERY_METHOD_JSON', 'JSON');
+define('DELIVERY_METHOD_XML', 'XML');
 
 // Handler enumerators:
 define('HANDLER_TYPE_NORMAL', 'NORMAL'); // Standard call to a method on the object.

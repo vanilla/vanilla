@@ -196,6 +196,20 @@ class Gdn_Request {
       $this->_Parsing = FALSE;
       return $this;
    }
+
+   /**
+    * Get a value from the post array or return the entire post array.
+    *
+    * @param string|null $Key The key of the post item or null to return the entire post array.
+    * @param mixed $Default The value to return if the item isn't set.
+    * @return mixed
+    */
+   public function Get($Key = NULL, $Default = NULL) {
+      if ($Key === NULL)
+         return $this->GetRequestArguments (self::INPUT_GET);
+      else
+         return $this->GetValueFrom(self::INPUT_GET, $Key, $Default);
+   }
    
    /**
     * Export an entire dataset (effectively, one of the superglobals) from the request arguments list
@@ -556,6 +570,20 @@ class Gdn_Request {
          $Result .= '?'.http_build_query($Get);
 
       return $Result;
+   }
+
+   /**
+    * Get a value from the post array or return the entire post array.
+    *
+    * @param string|null $Key The key of the post item or null to return the entire post array.
+    * @param mixed $Default The value to return if the item isn't set.
+    * @return mixed
+    */
+   public function Post($Key = NULL, $Default = NULL) {
+      if ($Key === NULL)
+         return $this->GetRequestArguments (self::INPUT_POST);
+      else
+         return $this->GetValueFrom(self::INPUT_POST, $Key, $Default);
    }
    
    public function Reset() {

@@ -28,7 +28,7 @@ class CategoriesController extends VanillaController {
       list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
       
       if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByUrlCode(urldecode($CategoryIdentifier));
+         $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       $this->SetData('Category', $Category, TRUE);
@@ -82,7 +82,7 @@ class CategoriesController extends VanillaController {
       );
 
       // Set the canonical Url.
-      $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.$CategoryIdentifier, PageNumber($Offset, $Limit, TRUE)), TRUE));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE)), TRUE));
       
       // Change the controller name so that it knows to grab the discussion views
       $this->ControllerName = 'DiscussionsController';

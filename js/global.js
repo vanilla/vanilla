@@ -174,10 +174,11 @@ jQuery(document).ready(function($) {
       }});
 
    // Format email addresses
-   $('span.Email').livequery(function() {
-      var html = $(this).html();
-      var email = $(this).html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
-      $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
+   $('span.Email.EmailUnformatted').livequery(function() {
+      var el = $(this);
+      el.removeClass('unformatted');
+      var email = el.html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
+      el.html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters

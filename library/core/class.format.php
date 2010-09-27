@@ -418,7 +418,7 @@ class Gdn_Format {
    public static function Email($Email) {
       $At = T('at');
       $Dot = T('dot');
-      return '<span class="Email">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
+      return '<span class="Email EmailUnformatted">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
    }
 
    /**

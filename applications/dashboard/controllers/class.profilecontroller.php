@@ -136,8 +136,7 @@ class ProfileController extends Gdn_Controller {
       if ($Session->UserID != $this->User->UserID)
          $this->Permission('Garden.Users.Edit');
       
-      $this->CanEditUsername = TRUE;
-      $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
+      $this->CanEditUsername = Gdn::Config("Garden.Profile.EditUsernames");
       $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();

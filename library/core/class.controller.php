@@ -552,7 +552,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Default One of the DELIVERY_TYPE_* constants.
     */
    public function DeliveryType($Default = '') {
-      if ($Default != '')
+      if ($Default)
          $this->_DeliveryType = $Default;
       
       // If this is an embed delivery type, force the embed master view and default back to ALL
@@ -1151,7 +1151,20 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function RenderException($Ex) {
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-         Gdn_ExceptionHandler($Ex);
+         try {
+            switch ($Ex->getCode()) {
+               case 401:
+                  Gdn::Dispatcher()->Dispatch('DefaultPermission');
+                  break;
+               case 404:
+                  Gdn::Dispatcher()->Dispatch('Default404');
+                  break;
+               default:
+                  Gdn_ExceptionHandler($Ex);
+            }
+         } catch(Exception $Ex2) {
+            Gdn_ExceptionHandler($Ex);
+         }
          return;
       }
 
@@ -1164,9 +1177,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $Message = $Ex->getMessage();
 
-      if ($Code >= 100 && $Code <= 505) {
+      if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
-      }
+      else
+         header('HTTP/1.0 500', TRUE, 500);
 
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {

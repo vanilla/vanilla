@@ -519,11 +519,26 @@ class Gdn_Request {
    /**
     * Gets/Sets the final path to be sent to the dispatcher.
     *
-    * @param $Path Optional Path to set
+    * @param string|true|null $Path Optional Path to set
+    *  - string: Set a new path.
+    *  - true: Url encode the returned path.
+    *  - null: Return the path.
     * @return string | NULL
     */
    public function Path($Path = NULL) {
-      return $this->_ParsedRequestElement('Path', $Path);
+      if (is_string($Path)) {
+         $Result = $this->_ParsedRequestElement('Path', $Path);
+      } else {
+         $Result = $this->_ParsedRequestElement('Path');
+         if ($Path === TRUE) {
+            // Encode the path.
+            $Parts = explode('/', $Result);
+            $Parts = array_map('urlencode', $Parts);
+            $Result = implode('/', $Parts);
+         }
+      }
+      
+      return $Result;
    }
 
    public function PathAndQuery($PathAndQuery = NULL) {
@@ -562,9 +577,9 @@ class Gdn_Request {
       // Construct the path and query.
       $Result = $this->Path();
 
-      $Filename = $this->Filename();
-      if ($Filename && $Filename != 'default')
-         $Result .= ConcatSep('/', $Result, $Filename);
+//      $Filename = $this->Filename();
+//      if ($Filename && $Filename != 'default')
+//         $Result .= ConcatSep('/', $Result, $Filename);
       $Get = $this->GetRequestArguments(self::INPUT_GET);
       if (count($Get) > 0)
          $Result .= '?'.http_build_query($Get);

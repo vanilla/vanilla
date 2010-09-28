@@ -194,6 +194,21 @@ class Gdn_DataSet implements IteratorAggregate {
       return new ArrayIterator($this->Result());
    }
 
+   public static function Index($Data, $Columns, $Sep = '|') {
+      $Columns = (array)$Columns;
+      $Result = array();
+
+      foreach ($Data as $Row) {
+         $IndexValues = array();
+         foreach ($Columns as $Column) {
+            $IndexValues[] = GetValue($Column, $Row);
+         }
+         $Index = implode($Sep, $IndexValues);
+         $Result[$Index] = $Row;
+      }
+      return $Result;
+   }
+
    /**
     * Returns the last row in the or FALSE if there are no rows to return.
     *

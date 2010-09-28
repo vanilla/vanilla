@@ -92,6 +92,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_ControllerMethodArgs = array();
 
    /**
+    * @var string|FALSE The delivery method to set on the controller.
+    */
+   private $_DeliveryMethod = FALSE;
+
+
+   /**
+    * @var string|FALSE The delivery type to set on the controller.
+    */
+   private $_DeliveryType = FALSE;
+
+   /**
     * An associative collection of variables that will get passed into the
     * controller as properties once it has been instantiated.
     *
@@ -249,11 +260,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->RequestMethod = $this->_ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
-         $Controller->DeliveryType($Request->GetValue('DeliveryType', ''));
-         $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', ''));
+         $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
+         $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
 
          // Set special controller method options for REST APIs.
-         $this->_SetControllerMethod($Controller);
+         $this->_ReflectControllerArgs($Controller);
          
          $Controller->Initialize();
 
@@ -359,7 +370,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-      $this->Request = Url('');//$Request->Path();
+      $this->Request = $Request->Path(TRUE);
 
       $PathAndQuery = $Request->PathAndQuery();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
@@ -373,19 +384,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               Header( "HTTP/1.1 302 Moved Temporarily" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 302 Moved Temporarily" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
             case 'Permanent':
-               Header( "HTTP/1.1 301 Moved Permanently" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 301 Moved Permanently" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
+            case 'NotAuthorized':
+               header( "HTTP/1.1 401 Not Found" );
+               $this->Request = $MatchRoute['FinalDestination'];
+               break;
+
             case 'NotFound':
-               Header( "HTTP/1.1 404 Not Found" );
+               header( "HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
          }
@@ -415,7 +431,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Length = count($Parts);
       if ($Length == 1 || $FolderDepth <= 0) {
          $FolderDepth = 0;
-         $this->_ControllerName = $Parts[0];
+         list($this->_ControllerName, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[0]);
+         $Parts[0] = $this->_ControllerName;
          $this->_MapParts($Parts, 0);
          $this->_FetchController(TRUE); // Throw an error if this fails because there's nothing else to check
       } else if ($Length == 2) {
@@ -453,6 +470,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          }
       }
+      if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
+         $this->_DeliveryType = DELIVERY_TYPE_DATA;
    }
 
    /**
@@ -536,92 +555,60 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->_ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
 
       if ($Length > $ControllerKey + 1)
-         $this->_ControllerMethod = $Parts[$ControllerKey + 1];
+         list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
 
       if ($Length > $ControllerKey + 2) {
          for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
             if ($Parts[$i] != '')
                $this->_ControllerMethodArgs[] = $Parts[$i];
-
          }
       }
    }
 
-   /**
-    * Set up the dispatch defaults.
-    */
-   protected function _SetControllerMethod($Controller) {
-      // Start with the controller name.
-      $ControllerName = $Controller->ControllerName;
-      if (StringEndsWith($ControllerName, 'controller', TRUE))
-         $ControllerName = substr($ControllerName, 0, -10);
+   protected function _ReflectControllerArgs($Controller) {
+      // Reflect the controller arguments based on the get.
+      if (count($Controller->Request->Get()) == 0)
+         return;
 
-      // Figure out the method from the api.
-      $PathParts = explode('/', trim($Controller->Request->Path(), '/'));
+      if (!method_exists($Controller, $this->_ControllerMethod))
+         return;
 
-      foreach ($PathParts as $Part) {
-         $Curr = array_shift($PathParts);
-         if (strcasecmp($Curr, $ControllerName) == 0) {
-            break;
+      $Meth = new ReflectionMethod($Controller, $this->_ControllerMethod);
+      $MethArgs = $Meth->getParameters();
+      $Args = array();
+      $Get = array_change_key_case($Controller->Request->Get());
+      $MissingArgs = array();
+
+      // Set all of the parameters.
+      foreach ($MethArgs as $Index => $MethParam) {
+         $ParamName = strtolower($MethParam->getName());
+
+         if (isset($this->_ControllerMethodArgs[$Index]))
+            $Args[] = $this->_ControllerMethodArgs[$Index];
+         elseif (isset($Get[$ParamName]))
+            $Args[] = $Get[$ParamName];
+         elseif ($MethParam->isDefaultValueAvailable())
+            $Args[] = $MethParam->getDefaultValue();
+         else {
+            $Args[] = NULL;
+            $MissingArgs[] = "$Index: $ParamName";
          }
       }
 
-      // We've gotten rid of the controller so the next part is the method.
-      if (count($PathParts) == 0)
-         return FALSE;
-      $MethodName = array_shift($PathParts);
-      $DeliveryMethod = strstr($MethodName, '.');
+      $this->_ControllerMethodArgs = $Args;
+         
+   }
 
-      if ($DeliveryMethod !== FALSE) {
-         $DeliveryMethod = strtoupper(trim($DeliveryMethod, '.'));
-         switch ($DeliveryMethod) {
-            case DELIVERY_METHOD_JSON:
-            case DELIVERY_METHOD_XML:
-               // The extension was recognized.
-               $Controller->DeliveryMethod($DeliveryMethod);
-               $MethodName = ucfirst(substr($MethodName, 0, -(strlen($DeliveryMethod) + 1)));
-               $Controller->DeliveryType(DELIVERY_TYPE_DATA);
-               $Controller->RequestMethod = $MethodName;
-               $Controller->OriginalRequestMethod = strtolower($MethodName);
-
-               if (!method_exists($Controller, $MethodName)) {
-                  throw new Exception(sprintf(T('Method does not exist: %s.'), get_class($Controller).'::'.$MethodName.'()'), 404);
-               }
-
-               $Meth = new ReflectionMethod($Controller, $MethodName);
-               $MethParams = $Meth->getParameters();
-               $Params = array();
-               $Get = array_change_key_case($Controller->Request->GetRequestArguments(Gdn_Request::INPUT_GET));
-               $MissingParams = array();
-
-               // Set all of the parameters.
-               foreach ($MethParams as $Index => $MethParam) {
-                  $ParamName = strtolower($MethParam->getName());
-
-                  if (isset($PathParts[$Index]))
-                     $Params[] = $PathParts[$Index];
-                  elseif (isset($Get[$ParamName]))
-                     $Params[] = $Get[$ParamName];
-                  elseif ($MethParam->isDefaultValueAvailable())
-                     $Params[] = $MethParam->getDefaultValue();
-                  else
-                     $MissingParams[] = "$Index: $ParamName";
-               }
-
-               if (count($MissingParams) > 0)
-                  throw new Exception(sprintf(T('Missing required parameters: %s.'), implode(', ', $MissingParams)), 400);
-
-               // Call the method.
-               //call_user_func_array(array($Controller, $MethodName), $Params);
-               $this->_ControllerMethodArgs = $Params;
-
-               break;
-            default:
-               return FALSE;
+   protected function _SplitDeliveryMethod($Name) {
+      $Parts = explode('.', $Name, 2);
+      if (count($Parts) >= 2) {
+         if (in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
+            return array($Parts[0], strtoupper($Parts[1]));
+         } else {
+            return array($Name, FALSE);
          }
       } else {
-         return FALSE;
+         return array($Name, FALSE);
       }
-      return TRUE;
    }
 }

@@ -331,8 +331,6 @@ class PostController extends VanillaController {
                         $Redirect |= PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
                      }
 
-
-
                      if ($Redirect) {
                         // The user posted a comment on a page other than the last one, so just redirect to the last page.
                         $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);

@@ -133,6 +133,7 @@ class Gdn_Validation {
       $this->AddRule('Captcha', 'function:ValidateCaptcha');
       $this->AddRule('Match', 'function:ValidateMatch');
       $this->AddRule('OldPassword', 'function:ValidateOldPassword');
+      $this->AddRule('Version', 'function:ValidateVersion');
    }
 
 

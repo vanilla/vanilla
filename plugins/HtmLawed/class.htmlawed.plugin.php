@@ -50,7 +50,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
       if ($this->SafeStyles) {
          // Deny all class and style attributes.
          // A lot of damage can be done by hackers with these attributes.
-         $Config['deny_attribute'] .= ',style,class';
+         $Config['deny_attribute'] .= ',style';
       } else {
          $Config['hook_tag'] = 'HTMLawedHookTag';
       }
@@ -74,7 +74,7 @@ function HTMLawedHookTag($Element, $Attributes) {
             continue;
       }
 
-      $Attribs = " {$Key}=\"{$Value}\"";
+      $Attribs .= " {$Key}=\"{$Value}\"";
    }
    return "<{$Element}{$Attribs}>";
 }

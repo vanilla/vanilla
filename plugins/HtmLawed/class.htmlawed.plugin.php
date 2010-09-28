@@ -74,7 +74,7 @@ function HTMLawedHookTag($Element, $Attributes) {
             continue;
       }
 
-      $Attribs = " {$Key}=\"{$Value}\"";
+      $Attribs .= " {$Key}=\"{$Value}\"";
    }
    return "<{$Element}{$Attribs}>";
 }

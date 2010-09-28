@@ -186,6 +186,9 @@ class Gdn_Upload {
 	}
 
 	public function SaveAs($Source, $Target) {
+      if (!file_exists(dirname($Target)))
+         mkdir(dirname($Target));
+
 		if (!move_uploaded_file($Source, $Target))
 			throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
 	}

@@ -126,7 +126,12 @@ class Gdn_Format {
       .'/'.$Route
       .'/'.$GenderSuffix.($GenderSuffixCode)
       */
-      return sprintf(($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline)), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
+
+      $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
+      $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
+      $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $FullHeadline : $ProfileHeadline);
+      
+      return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
    }
 
    /**

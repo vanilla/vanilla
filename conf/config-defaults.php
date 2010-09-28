@@ -96,6 +96,7 @@ $Configuration['Garden']['VanillaUrl']                          = 'http://vanill
 $Configuration['Garden']['AllowSSL']                            = TRUE;
 $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
+$Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

@@ -11,13 +11,6 @@ echo $this->Form->Open();
 <div class="Form">
    <?php echo $this->Form->Errors(); ?>
    <ul>
-      <?php if ($this->Data('NoHtaccess')): ?>
-      <li>
-         <?php
-            echo $this->Form->CheckBox('SkipHtaccess', T('Install Vanilla without a .htaccess file.'));
-         ?>
-      </li>
-      <?php endif; ?>
       <li>
          <?php
             echo $this->Form->Label('Database Host', 'Database.Host');
@@ -42,6 +35,14 @@ echo $this->Form->Open();
             echo $this->Form->Input('Database.Password', 'password');
          ?>
       </li>
+      <?php if ($this->Data('NoHtaccess')): ?>
+      <li>
+         <div class="Box"><?php echo T('You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'); ?></div>
+         <?php
+            echo $this->Form->CheckBox('SkipHtaccess', T('Install Vanilla without a .htaccess file.'));
+         ?>
+      </li>
+      <?php endif; ?>
       <li class="Warning">
          <div>
          <?php

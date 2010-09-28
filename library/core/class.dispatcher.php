@@ -370,7 +370,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-      $this->Request = $Request->Path();
+      $this->Request = $Request->Path(TRUE);
 
       $PathAndQuery = $Request->PathAndQuery();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);

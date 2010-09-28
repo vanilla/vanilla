@@ -410,12 +410,12 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', '/discussions'));
+         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', Url('discussions'));
+      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
       $this->Render();         
    }
 

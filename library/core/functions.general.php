@@ -131,8 +131,7 @@ if (!function_exists('ArrayHasValue')) {
          return TRUE;
       } else {
          foreach ($Array as $k => $v) {
-            if (is_array($v))
-               return ArrayHasValue($v, $Value);
+            if (is_array($v) && ArrayHasValue($v, $Value) === TRUE) return TRUE;
          }
          return FALSE;
       }

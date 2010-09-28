@@ -104,6 +104,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $MasterView;
+   
+   /**
+    * If set, it will use the assigned master view over any defined by child
+    * controllers (used by DELIVERY_TYPE_EMBED to force the embed master template).
+    */
+   public $ForceMasterView;
 
    /**
     * A Menu module for rendering the main menu on each page.
@@ -303,6 +309,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->CssClass = '';
       $this->Head = Gdn::Factory('Dummy');
       $this->MasterView = '';
+      $this->ForceMasterView = '';
       $this->ModuleSortContainer = '';
       $this->OriginalRequestMethod = '';
       $this->RedirectUrl = '';
@@ -547,6 +554,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DeliveryType($Default = '') {
       if ($Default)
          $this->_DeliveryType = $Default;
+      
+      // If this is an embed delivery type, force the embed master view and default back to ALL
+      if ($this->_DeliveryType == DELIVERY_TYPE_EMBED) {
+         $this->ForceMasterView = 'embed';
+         $this->_DeliveryType = DELIVERY_TYPE_ALL;
+      }
 
       return $this->_DeliveryType;
    }
@@ -1005,7 +1018,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
             echo $View ? 'TRUE' : 'FALSE';
-         } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+         } else if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_EMBED))) {
             // Add definitions to the page
             if ($this->SyndicationMethod === SYNDICATION_NONE)
                $this->AddAsset('Foot', $this->DefinitionList());
@@ -1197,8 +1210,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method RenderMaster() needs a description.
     */
    public function RenderMaster() {
+      if ($this->ForceMasterView != '')
+         $this->MasterView = $this->ForceMasterView;
+      
       // Build the master view if necessary
-      if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+      if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_EMBED))) {
          // Define some default master views unless one was explicitly defined
          if ($this->MasterView == '') {
             // If this is a syndication request, use the appropriate master view

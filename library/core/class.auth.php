@@ -35,6 +35,10 @@ class Gdn_Auth extends Gdn_Pluggable {
 
       $this->_Started = TRUE;
       $this->WakeUpAuthenticators();
+      
+      if (Gdn::Session()->IsValid() && !Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+         return Gdn::Authenticator()->AuthenticateWith('user')->DeAuthenticate();
+      }
    }
    
    public function RegisterAuthenticator($AuthenticationSchemeAlias) {
@@ -69,6 +73,13 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function AuthenticateWith($AuthenticationSchemeAlias = 'default', $InheritAuthenticator = TRUE) {
+      if ($AuthenticationSchemeAlias == 'user') {
+         if (Gdn::Session()->IsValid()) {
+            $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
+            $AuthenticationSchemeAlias = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
+         }
+      }
+      
       if ($AuthenticationSchemeAlias == 'default')
          $AuthenticationSchemeAlias = Gdn::Config('Garden.Authenticator.DefaultScheme', 'password');
       

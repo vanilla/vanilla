@@ -249,9 +249,6 @@ class Gdn_Session {
             $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
             $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
             $this->_TransientKey = is_array($this->_Attributes) ? ArrayValue('TransientKey', $this->_Attributes) : FALSE;
-            
-            if (!$this->CheckPermission('Garden.SignIn.Allow'))
-               return $this->End(Gdn::Authenticator());
                
             if ($this->_TransientKey === FALSE)
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);

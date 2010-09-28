@@ -376,5 +376,5 @@ set_exception_handler('Gdn_ExceptionHandler');
  * @return Exception
  */
 function NotFoundException($Code) {
-   return new Exception(sprintf('%s not found.'), T($Code), 404);
+   return new Exception(sprintf(T('%s not found.'), T($Code)), 404);
 }

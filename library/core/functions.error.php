@@ -378,3 +378,17 @@ set_exception_handler('Gdn_ExceptionHandler');
 function NotFoundException($Code) {
    return new Exception(sprintf(T('%s not found.'), T($Code)), 404);
 }
+
+/**
+ * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string|null $Permission The name of the permission that was required.
+ * @return Exception
+ */
+function PermissionException($Permission = NULL) {
+  if (!$Permission)
+     $Message = T('You do not have permission to access the requested resource.');
+  else
+     $Message = sprintf(T('You need the %s permission to perform that operation.'), $Permission);
+  return new Exception($Message, 401);
+}

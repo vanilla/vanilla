@@ -22,10 +22,11 @@ echo '<div>';
 
       // Render the buttons to select other methods of signing in.
       if (count($Methods) > 0) {
-         echo '<div class="Methods">';
+         echo '<div class="Methods">'
+            .Wrap(T('Or use your existing account from...'), 'div');
 
          foreach ($Methods as $Key => $Method) {
-            $CssClass = 'Method_'.$Key;
+            $CssClass = 'Method Method_'.$Key;
             echo '<div class="'.$CssClass.'">',
                $Method['SignInHtml'],
                '</div>';

@@ -29,6 +29,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
     this.live('click', function() {
       settings.sender = this;
+      $.extend(settings, { popupType: $(this).attr('popupType') });
+
       $.popup.init(settings);
       if (!settings.confirm)
         $.popup.loading(settings);
@@ -45,7 +47,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             $.ajax({
                 type: "GET",
                 url: target,
-                data: { 'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON' },
+                data: {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'},
                 dataType: 'json',
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
                    $.popup({}, XMLHttpRequest.responseText);
@@ -66,6 +68,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       } else {
         if (target) {
           $.get(target, {'DeliveryType': settings.deliveryType}, function(data) {
+            if (typeof(data) == 'object')
+               data = $.postParseJson(data);
+
             $.popup.reveal(settings, data)
           });
         }
@@ -139,7 +144,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $('#'+settings.popupId).addClass(settings.containerCssClass);
       
     var pagesize = $.popup.getPageSize();
-    $('div.Overlay').css({ height: pagesize[1] });
+    $('div.Overlay').css({height: pagesize[1]});
     
     var pageScroll = $.popup.getPageScroll();
     $('#'+settings.popupId).css({
@@ -201,6 +206,15 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       formSaved = json['FormSaved'];
       data = json['Data'];
+
+      // Add any js that's come in.
+      $(json.js).each(function(i, el){
+         var v_js  = document.createElement('script');
+         v_js.type = 'text/javascript';
+         v_js.src = gdn.url(el);
+         document.getElementsByTagName('head')[0].appendChild(v_js);
+      });
+
       // mosullivan - need to always reload the data b/c when uninviting ppl
       // we need to reload the invitation table. Is there a reason not to reload
       // the content?
@@ -247,7 +261,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          $.popup.loading(settings);
          
          // Ajax the link into the current popup.
-          $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data) {
+          $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data, textStatus, xhr) {
+             if (typeof(data) == 'object') {
+                if (data.RedirectUrl)
+                    setTimeout("document.location='" + gdn.url(data.RedirectUrl) + "';", 300);
+
+                $.postParseJson(data);
+             }
              $.popup.reveal(settings, data);
 //            $('#'+settings.popupId+' .Content').html(data);
           });

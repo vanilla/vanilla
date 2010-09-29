@@ -367,3 +367,14 @@ if (!function_exists('CleanErrorArguments')) {
 // Set up Garden to handle php errors
 set_error_handler('Gdn_ErrorHandler', E_ALL);
 set_exception_handler('Gdn_ExceptionHandler');
+
+
+/**
+ * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string $Code The translation code of the type of object that wasn't found.
+ * @return Exception
+ */
+function NotFoundException($Code) {
+   return new Exception(sprintf('%s not found.'), T($Code), 404);
+}

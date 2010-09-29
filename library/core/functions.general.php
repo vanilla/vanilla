@@ -37,15 +37,17 @@ function Gdn_Autoload($ClassName) {
    if (strtolower(substr($ClassName, -5)) == 'model')
       $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
-   // Look for plugin files.
-   if ($LibraryPath === FALSE && Gdn::PluginManager() instanceof Gdn_PluginManager) {
-      $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
-   }
-   
-   // Look harder for plugin files.
-   if ($LibraryPath === FALSE && Gdn::PluginManager() instanceof Gdn_PluginManager) {
-      $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
+   if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
+      // Look for plugin files.
+      if ($LibraryPath === FALSE) {
+         $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
+         $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+      }
+
+      // Look harder for plugin files.
+      if ($LibraryPath === FALSE) {
+         $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
+      }
    }
 
    // Look for the class in the applications' library folders.

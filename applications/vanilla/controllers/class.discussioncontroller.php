@@ -33,7 +33,7 @@ class DiscussionController extends VanillaController {
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       if(!is_object($this->Discussion)) {
-         return Gdn::Dispatcher()->Dispatch('Default404');
+         throw new Exception(sprintf(T('%s Not Found'), T('Discussion')), 404);
       }
       
       // Check Permissions

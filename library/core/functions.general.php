@@ -692,6 +692,28 @@ if (!function_exists('GetValueR')) {
    }
 }
 
+if (!function_exists('ImplodeAssoc')) {
+   /**
+    * A version of implode() that operates on array keys and values.
+    *
+    * @param string $KeyGlue The glue between keys and values.
+    * @param string $ElementGlue The glue between array elements.
+    * @param array $Array The array to implode.
+    * @return string The imploded array.
+    */
+   function ImplodeAssoc($KeyGlue, $ElementGlue, $Array) {
+      $Result = '';
+
+      foreach ($Array as $Key => $Value) {
+         if (strlen($Result) > 0)
+            $Result .= $ElementGlue;
+
+         $Result .= $Key.$KeyGlue.$Value;
+      }
+      return $Result;
+   }
+}
+
 if (!function_exists('InArrayI')) {
    /**
     * Case-insensitive version of php's native in_array function.

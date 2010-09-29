@@ -7,6 +7,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div id="EmbedContainer">
    <div id="Frame">
+		<?php $this->RenderAsset('Banner'); ?>
       <div id="Body">
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>

@@ -94,6 +94,7 @@ class DiscussionsController extends VanillaController {
 		$this->AddJsFile('jquery.menu.js');
 		$this->AddJsFile('options.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
+		$this->AddModule('SignedInModule');
 		$this->FireEvent('AfterInitialize');
    }
    

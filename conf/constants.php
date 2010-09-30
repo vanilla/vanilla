@@ -19,7 +19,6 @@ define('DELIVERY_TYPE_BOOL', 'BOOL'); // Deliver only the success status (or err
 define('DELIVERY_TYPE_NONE', 'NONE'); // Deliver nothing
 define('DELIVERY_TYPE_MESSAGE', 'MESSAGE'); // Just deliver messages.
 define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
-define('DELIVERY_TYPE_EMBED', 'EMBED'); // Use the "EMBED" master view for embedding content within other applications with iframes.
 
 // Delivery method enumerators
 define('DELIVERY_METHOD_XHTML', 'XHTML');

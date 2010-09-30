@@ -1968,6 +1968,7 @@ body.connect h2 {
 	background: #38abe3;
 	border-bottom: 1px solid #3DB9E5;
 	padding: 6px 9px 4px;
+	border-bottom: 1px solid #888;
 }
 body.connect div.Box {
 	border-radius: none;
@@ -1980,18 +1981,18 @@ body.connect div.Box {
 	margin: 0 auto;
 	text-align: left;
 }
-body.connect div.ConnectInfo {
+div.ConnectInfo {
 	margin: 10px 0 0;
 	position: relative;
 }
-body.connect div.ConnectInfo img {
+div.ConnectInfo img {
 	position: absolute;
 	height: 36px;
 	width: 36px;
 	top: 0;
 	left: 0;
 }
-body.connect div.ConnectInfo span.Name {
+div.ConnectInfo span.Name {
 	padding-left: 46px;
 	font-weight: bold;
 	line-height: 1;
@@ -1999,7 +2000,7 @@ body.connect div.ConnectInfo span.Name {
 	color: #444;
 	display: block;
 }
-body.connect div.ConnectInfo h3 {
+div.ConnectInfo h3 {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 15px;
 	font-weight: bold;
@@ -2008,22 +2009,27 @@ body.connect div.ConnectInfo h3 {
 	padding: 0 0 10px 46px;
 	border: none;
 }
-body.connect form ul li label {
+body.connect form ul li label,
+div.SignInPopup form ul li label {
 	font-size: 13px;
 	line-height: 1;
 	padding: 0;
 }
-body.connect form ul li#ConnectPassword label {
+body.connect form ul li#ConnectPassword label,
+div.SignInPopup form ul li#ConnectPassword label {
 	padding: 10px 0 0;
 }
-body.connect .FinePrint {
+body.connect .FinePrint,
+div.SignInPopup .FinePrint {
 	font-size: 11px;
 	color: #777;
 }
-body.connect input.InputBox {
+body.connect input.InputBox,
+div.SignInPopup input.InputBox {
 	padding: 3px
 }
-body.connect .ExistingUsername {
+body.connect .ExistingUsername,
+div.SignInPopup .ExistingUsername {
 	font-weight: bold;
 	line-height: 1;
 	font-size: 13px;
@@ -2035,9 +2041,10 @@ body.connect div.ButtonContainer {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background: #aaa;
+	background: #38abe3;
 	padding: 6px 8px;
 	text-align: right;
+	border-top: 1px solid #888;
 }
 body.connect input.Button {
 	margin: 0;

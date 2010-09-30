@@ -72,6 +72,10 @@ div.Errors {
    line-height: 150%;
    text-shadow: #900 0 1px 0;
 }
+.Errors li label {
+   color: #fff !important;
+   text-shadow: #900 0 1px 0;
+}
 .Errors li pre,
 .Errors li code {
    border-radius: 3px;

@@ -26,9 +26,12 @@ class HTMLawedPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
       require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
+      $this->SafeStyles = C('Garden.Html.SafeStyles');
 	}
 
 	/// PROPERTIES ///
+
+   public $SafeStyles = TRUE;
 
 	/// METHODS ///
 	public function Format($Html) {
@@ -44,12 +47,34 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'valid_xml' => 2
       );
 
-      $Result = htmLawed($Html, $Config,
-         'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)');
+      if ($this->SafeStyles) {
+         // Deny all class and style attributes.
+         // A lot of damage can be done by hackers with these attributes.
+         $Config['deny_attribute'] .= ',style';
+      } else {
+         $Config['hook_tag'] = 'HTMLawedHookTag';
+      }
+
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+
+      $Result = htmLawed($Html, $Config, $Spec);
       
       return $Result;
 	}
 
 	public function Setup() {
 	}
+}
+
+function HTMLawedHookTag($Element, $Attributes) {
+   $Attribs = '';
+   foreach ($Attributes as $Key => $Value) {
+      if (strcasecmp($Key, 'style') == 0) {
+         if (strpos($Value, 'position') !== FALSE || strpos($Value, 'z-index') !== FALSE || strpos($Value, 'opacity') !== FALSE)
+            continue;
+      }
+
+      $Attribs .= " {$Key}=\"{$Value}\"";
+   }
+   return "<{$Element}{$Attribs}>";
 }

@@ -218,8 +218,9 @@ class Gdn_Session {
     * Authenticates the user with the provided Authenticator class.
     *
     * @param int $UserID The UserID to start the session with.
+    * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
-   public function Start($UserID = FALSE) {
+   public function Start($UserID = FALSE, $SetIdentity = TRUE) {
       if (!Gdn::Config('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
@@ -233,7 +234,8 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($UserID)
+         
+            if ($UserID && $SetIdentity)
                Gdn::Authenticator()->SetIdentity($UserID);
          
             if (Gdn::Authenticator()->ReturningUser($this->User)) {
@@ -247,6 +249,7 @@ class Gdn_Session {
             $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
             $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
             $this->_TransientKey = is_array($this->_Attributes) ? ArrayValue('TransientKey', $this->_Attributes) : FALSE;
+               
             if ($this->_TransientKey === FALSE)
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
                
@@ -258,7 +261,8 @@ class Gdn_Session {
          } else {
             $this->UserID = 0;
             $this->User = FALSE;
-            Gdn::Authenticator()->SetIdentity(NULL);
+            if ($SetIdentity)
+               Gdn::Authenticator()->SetIdentity(NULL);
          }
       }
       // Load guest permissions if necessary

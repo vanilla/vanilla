@@ -12,6 +12,8 @@ class Gdn_Auth extends Gdn_Pluggable {
    protected $_PermissionModel = null;
    
    protected $_AllowHandshake;
+
+   protected $_Started = FALSE;
    
    public function __construct() {
       // Prepare Identity storage container
@@ -21,7 +23,6 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function StartAuthenticator() {
-      
       // Start the 'session'
       Gdn::Session()->Start();
       
@@ -32,10 +33,15 @@ class Gdn_Auth extends Gdn_Pluggable {
       foreach ($AuthenticationSchemes as $AuthenticationSchemeAlias)
          $Registered = $this->RegisterAuthenticator($AuthenticationSchemeAlias);
 
+      $this->_Started = TRUE;
+      $this->WakeUpAuthenticators();
+      
+      if (Gdn::Session()->IsValid() && !Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+         return Gdn::Authenticator()->AuthenticateWith('user')->DeAuthenticate();
+      }
    }
    
    public function RegisterAuthenticator($AuthenticationSchemeAlias) {
-      
       $AuthenticatorClassPath = PATH_LIBRARY.'/core/authenticators/class.%sauthenticator.php';
       $Alias = strtolower($AuthenticationSchemeAlias);
       $Path = sprintf($AuthenticatorClassPath, $Alias);
@@ -52,12 +58,28 @@ class Gdn_Auth extends Gdn_Pluggable {
          );
          
          // Now wake it up so it can do setup work
+         if ($this->_Started) {
+            $Authenticator = $this->AuthenticateWith($Alias, FALSE);
+            $Authenticator->WakeUp();
+         }
+      }
+   }
+
+   public function WakeUpAuthenticators() {
+      foreach ($this->_AuthenticationSchemes as $Alias => $Properties) {
          $Authenticator = $this->AuthenticateWith($Alias, FALSE);
-         $Authenticator->WakeUp();
+         $Authenticator->Wakeup();
       }
    }
    
    public function AuthenticateWith($AuthenticationSchemeAlias = 'default', $InheritAuthenticator = TRUE) {
+      if ($AuthenticationSchemeAlias == 'user') {
+         if (Gdn::Session()->IsValid()) {
+            $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
+            $AuthenticationSchemeAlias = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
+         }
+      }
+      
       if ($AuthenticationSchemeAlias == 'default')
          $AuthenticationSchemeAlias = Gdn::Config('Garden.Authenticator.DefaultScheme', 'password');
       

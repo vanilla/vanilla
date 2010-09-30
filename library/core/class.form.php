@@ -679,9 +679,12 @@ class Gdn_Form {
          foreach($this->_ValidationResults as $FieldName => $Problems) {
             $Count = count($Problems);
             for($i = 0; $i < $Count; ++$i) {
-               $Return .= '<li>' . sprintf(
-                  T($Problems[$i]),
-                  T($FieldName)) . "</li>\n";
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= '<li>'.substr($Problems[$i], 1)."</li>\n";
+               else
+                  $Return .= '<li>' . sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)) . "</li>\n";
             }
          }
          $Return .= "</ul>\n</div>\n";

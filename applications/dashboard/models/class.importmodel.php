@@ -186,7 +186,11 @@ class ImportModel extends Gdn_Model {
 		} else {
 			$Data = $Data->FirstRow();
 			$PasswordHash = new Gdn_PasswordHash();
-			$Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
+         if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
+            $Result = TRUE;
+         } else {
+            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
+         }
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
@@ -723,6 +727,20 @@ class ImportModel extends Gdn_Model {
 		// Set the admin user flag.
 		$AdminEmail = GetValue('OverwriteEmail', $this->Data);
 		$this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+
+      // If doing a password reset, save out the new admin password:
+      if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
+         $PasswordHash = new Gdn_PasswordHash();
+         $Hash = $PasswordHash->HashPassword(GetValue('OverwritePassword', $this->Data));
+
+         // Write it out.
+         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
+         $this->Query('update :_User set Admin = 1, Password = :Hash, HashMethod = "vanilla" where Email = :Email', array(':Hash' => $Hash, ':Email' => $AdminEmail));
+      } else {
+         // Set the admin user flag.
+         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
+         $this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+      }
 
 		// Authenticate the admin user as the current user.
 		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');

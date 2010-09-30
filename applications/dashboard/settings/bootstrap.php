@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
 
 // User.
 Gdn::FactoryInstall(Gdn::AliasUserModel, 'UserModel', PATH_APPLICATIONS.DS.'dashboard'.DS.'models'.DS.'class.usermodel.php', Gdn::FactorySingleton);

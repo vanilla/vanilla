@@ -33,7 +33,7 @@ class DiscussionController extends VanillaController {
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       if(!is_object($this->Discussion)) {
-         return Gdn::Dispatcher()->Dispatch('Default404');
+         throw new Exception(sprintf(T('%s Not Found'), T('Discussion')), 404);
       }
       
       // Check Permissions
@@ -176,6 +176,7 @@ class DiscussionController extends VanillaController {
    
    public function Initialize() {
       parent::Initialize();
+      $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 
@@ -410,12 +411,13 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', '/discussions'));
+         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', Url('discussions'));
+      // Don't assign a redirect url, or the page will refresh after the discussion has been deleted
+      // $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
       $this->Render();         
    }
 

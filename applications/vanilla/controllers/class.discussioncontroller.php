@@ -176,6 +176,7 @@ class DiscussionController extends VanillaController {
    
    public function Initialize() {
       parent::Initialize();
+      $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 
@@ -415,7 +416,8 @@ class DiscussionController extends VanillaController {
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
+      // Don't assign a redirect url, or the page will refresh after the discussion has been deleted
+      // $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
       $this->Render();         
    }
 

@@ -983,6 +983,9 @@ body.Entry div.Popup input.InputBox,
 body.Entry div.Popup textarea {
    width: 250px;
 }
+body.Entry input.Password {
+	width: 200px;
+}
 span.Incorrect {
    display: block;
    color: red;
@@ -996,10 +999,6 @@ body.Entry input.Button {
 #Form_User_SignIn li.Buttons input.Button,
 body.Entry li.Buttons input.Button {
 	margin: 10px 0;
-}
-#Form_User_Password,
-body.Entry #Content #Form_User_Password {
-	padding-top: 0;
 }
 #dashboard_entry_index #Form_User_Password ul li label,
 #dashboard_entry_signin #Form_User_Password ul li label {
@@ -1905,16 +1904,54 @@ div.Popup #Form_User div.Warning,
 	margin: 6px 0;
 }
 div.SignInPopup div.Border {
-	max-width: 320px;
+	max-width: 280px;
 }
 div.SignInPopup .Content form {
-	padding: 0 30px 10px;
+	padding: 0 10px 10px;
 }
 div.SignInPopup div.Box {
 	margin: 0;
 	padding: 0;
 	background: none;
 	border: 0;
+}
+input.Password {
+	width: 180px;
+}
+a.ForgotPassword {
+	margin-left: 10px;
+}
+#Form_User_Password a.ForgotPassword {
+	display: block;
+	margin: 0;
+}
+
+body.signin form ul li label.CheckBoxLabel,
+div.SignInPopup form ul li label.CheckBoxLabel {
+	color: #777;
+	display: inline;
+	font-size: 12px;
+	font-weight: normal;
+	margin: 10px 0 0 10px;
+}
+li.CreateAccount {
+	font-size: 14px;
+}
+div.SignInPopup div.Methods {
+	font-size: 11px;
+	color: #555;
+	position: absolute;
+	top: 43px;
+	bottom: 10px;
+	left: 290px;
+	right: 10px;
+	background: #CFECFF;
+	border-left: 1px solid #abdafb;
+	padding: 20px 6px 6px;
+	line-height: 1;
+}
+div.SignInPopup div.Methods div.Method {
+	padding: 10px 0 0;
 }
 /* Serious Ajax Error Styles */
 div.AjaxError {

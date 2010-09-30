@@ -128,25 +128,8 @@ class MessagesController extends ConversationsController {
          $this->View = 'conversations';
       }
       
+      $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
-      /*
-      // TODO: ADD THE DISMISS MODULE ABILITY
-      $DismissModule = new DismissModule($this);
-      // The first arg is the ID of the help module - used to identify if the user has dismissed it or not.
-      // The second arg is the translation code for the help message
-      $DismissModule->Define('ConversationHelp', 'ConversationHelp');
-      $this->AddModule($DismissModule);
-      
-      // TODO: ADD THE BOOKMARKING ABILITY
-      $BookmarkedConversationsModule = new BookmarkedConversationsModule($this);
-      $BookmarkedConversationsModule->GetData($Session->UserID);
-      $this->AddModule($BookmarkedConversationsModule);      
-
-      // TODO: ADD THE DRAFTING ABILITY
-      $ConversationDraftsModule = new ConversationDraftsModule($this);
-      $ConversationDraftsModule->GetData($Session->UserID);
-      $this->AddModule($ConversationDraftsModule);      
-      */
       $this->Render();
    }
    
@@ -258,6 +241,7 @@ class MessagesController extends ConversationsController {
          $this->View = 'messages';
       }
       
+      $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
 
       $ClearHistoryModule = new ClearHistoryModule($this);

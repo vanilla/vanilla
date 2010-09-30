@@ -51,7 +51,12 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       </div>
       <div class="Message">
 			<?php $Sender->FireEvent('BeforeCommentBody'); ?>
-			<p><?php echo Gdn_Format::To($Object->Body, $Object->Format); ?></p>
+			<p><?php 
+			   $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
+			   $Sender->FireEvent('AfterCommentFormat');
+			   $Object = $Sender->EventArguments['Object'];
+			   echo $Object->FormatBody;
+			?></p>
 		</div>
       <?php $Sender->FireEvent('AfterCommentBody'); ?>
    </div>

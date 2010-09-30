@@ -1398,7 +1398,7 @@ if (!function_exists('T')) {
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @see Gdn::Translate()
 	 */
-   function T($Code, $Default = '') {
+   function T($Code, $Default = FALSE) {
       return Gdn::Translate($Code, $Default);
    }
 }

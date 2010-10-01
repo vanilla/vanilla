@@ -19,4 +19,4 @@ $LocaleInfo['skeleton'] = array( // make sure the key of this array is the same 
    'License' => 'Your choice of license'
 );
 
-$Definition['Some code'] = 'Translation goes here.';
+$Definition['Some Code'] = 'Translation goes here.';

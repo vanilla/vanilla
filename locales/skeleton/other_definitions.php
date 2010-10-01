@@ -12,4 +12,4 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * You can create as many definition files as you want if you find it easier to keep track of things this way.
  */
 
-$Definition['Some Code'] = 'Some code translation.';
+$Definition['Some Other Code'] = 'Translation goes here.';

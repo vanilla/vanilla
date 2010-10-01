@@ -1320,7 +1320,7 @@ if (!function_exists('SafeParseStr')) {
 }
 
 if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '', $Save = TRUE) {
+   function SaveToConfig($Name, $Value = '', $Save = TRUE, $RemoveEmpty = FALSE) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . 'config.php';
       $Config->Load($Path, 'Save');
@@ -1328,7 +1328,11 @@ if (!function_exists('SaveToConfig')) {
          $Name = array($Name => $Value);
       
       foreach ($Name as $k => $v) {
-         $Config->Set($k, $v, TRUE, $Save);
+         if (!$v && $RemoveEmpty) {
+            $Config->Remove($k);
+         } else {
+            $Config->Set($k, $v, TRUE, $Save);
+         }
       }
       if ($Save)
          return $Config->Save($Path);

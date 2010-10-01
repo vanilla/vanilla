@@ -44,7 +44,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     *
     * @var array
     */
-   private $_Definition = array();
+   protected $_Definition = array();
 
 
    /**
@@ -242,7 +242,10 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @param string $Default The default value to be displayed if the translation code is not found.
     * @return string
     */
-   public function Translate($Code, $Default = '') {
+   public function Translate($Code, $Default = FALSE) {
+      if ($Default === FALSE)
+         $Default = $Code;
+
       // Codes that begin with @ are considered literals.
       if(substr_compare('@', $Code, 0, 1) == 0)
          return substr($Code, 1);

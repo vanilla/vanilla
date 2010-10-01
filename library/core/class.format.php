@@ -103,9 +103,12 @@ class Gdn_Format {
       if ($RegardingWall == '')
          $RegardingWall = T('wall');
 
-      if ($Activity->Route == '')
-         $Route = T($Activity->RouteCode);
-      else
+      if ($Activity->Route == '') {
+         if ($Activity->RouteCode)
+            $Route = T($Activity->RouteCode);
+         else
+            $Route = '';
+      } else
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
       // Translate the gender suffix.

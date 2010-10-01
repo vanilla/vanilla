@@ -7,7 +7,7 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <div class="Info"><?php
-         echo Wrap(T('<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'), 'div');
+         echo Wrap(T('Categories are used to organize discussions.', '<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'), 'div');
          echo Wrap(T('<strong>Parent categories</strong> allow you to organize your categories. Parent categories can only contain categories.'), 'div');
       ?></div>
       <?php

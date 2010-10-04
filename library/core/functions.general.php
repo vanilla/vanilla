@@ -9,9 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 function Gdn_Autoload($ClassName) {
-   if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
-      return true;
-
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
       

@@ -109,6 +109,15 @@ if (!function_exists('ValidateEmail')) {
       );
    }
 }
+if (!function_exists('ValidateWebAddress')) {
+   function ValidateWebAddress($Value, $Field = '') {
+      if ($Value == '')
+         return TRUE; // Required picks up this error
+      
+      return filter_var($Value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== FALSE;
+   }
+}
+
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       return ValidateRegex(

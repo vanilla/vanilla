@@ -72,11 +72,12 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		$Trace = debug_backtrace();
 		$Method = '';
 		foreach($Trace as $Info) {
-			$Class = ArrayValue('class', $Info, '');
-			if($Class === '' || (strlen($Class) > 5 && substr_compare($Class, 'Model', -5, 5, FALSE) == 0)) {
+			$Class = GetValue('class', $Info, '');
+			if($Class === '' || StringEndsWith($Class, 'Model', TRUE)) {
 				$Type = ArrayValue('type', $Info, '');
 				
 				$Method = $Class.$Type.$Info['function'].'('.self::FormatArgs($Info['args']).')';
+            break;
 			}
 		}
 		

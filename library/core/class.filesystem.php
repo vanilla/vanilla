@@ -296,7 +296,7 @@ class Gdn_FileSystem {
          $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($Name == '') {
             $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
-         } else {
+         } elseif (!StringEndsWith($Name, '.'.$Extension)) {
             $Name .= '.'.$Extension;
          }
          $Name = rawurldecode($Name);

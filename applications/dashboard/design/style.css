@@ -1267,13 +1267,14 @@ ul.MessageList div.Meta {
    color: #777;
 }
 ul.MessageList div.Meta span.Author img {
+	display: inline-block;
    height: 40px;
    width: 40px;
    border: 0;
    margin: 0 10px 0 0;
-   float: left;
    overflow: hidden;
    background: #eee;
+	vertical-align: middle;
 }
 ul.MessageList div.Meta span {
    line-height: 2.5;
@@ -1311,7 +1312,7 @@ div.Popup div.Preview {
 }
 div.Preview div.Message,
 ul.MessageList div.Message {
-   clear: both;
+   /* clear: both; */
    line-height: 140%;
    font-size: 100%;
 }
@@ -2351,6 +2352,9 @@ body.add #Content {
 	margin:0;
 	padding:20px;
 	text-align: right;
+}
+div.Popup #ConversationForm form {
+	border: none;
 }
 #ConversationForm h2 {
 	color:#02475A;

@@ -401,6 +401,8 @@ class EntryController extends Gdn_Controller {
     * Calls the appropriate registration method based on the configuration setting.
     */
    public function Register($InvitationCode = '') {
+      $this->FireEvent("Register");
+      
       $this->Form->SetModel($this->UserModel);
 
       // Define gender dropdown options

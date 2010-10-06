@@ -53,8 +53,21 @@ class LocaleModel {
       return $DestPath;
    }
 
-   public function EnabledLocalePacks() {
+   public function EnabledLocalePacks($GetInfo = FALSE) {
       $Result = (array)C('EnabledLocales', array());
+
+      if ($GetInfo) {
+         foreach ($Result as $Key => $Locale) {
+            $InfoPath = PATH_ROOT."/locales/$Key/definitions.php";
+            if (file_exists($InfoPath)) {
+               $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+               $Result[$Key] = current($LocaleInfo);
+            } else {
+               unset($Result[$Key]);
+            }
+         }
+      }
+
       return $Result;
    }
 

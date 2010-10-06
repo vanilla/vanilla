@@ -141,10 +141,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     var pagesize = $.popup.getPageSize();
     $('div.Overlay').css({ height: pagesize[1] });
     
-    var pageScroll = $.popup.getPageScroll();
+    var pagePos = $.popup.getPagePosition();
     $('#'+settings.popupId).css({
-      top:   pageScroll[1] + ($.popup.getPageHeight() / 10),
-      left:   pageScroll[0]
+      top: pagePos.top,
+      left: pagePos.left
     });
     $('#'+settings.popupId).show();
 
@@ -320,19 +320,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     afterLoad: function() {}
   }
 
-  // Adapted from getPageSize() by quirksmode.com
-  $.popup.getPageHeight = function() {
-    var windowHeight
-    if (self.innerHeight) {   // all except Explorer
-      windowHeight = self.innerHeight;
-    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
-      windowHeight = document.documentElement.clientHeight;
-    } else if (document.body) { // other Explorers
-      windowHeight = document.body.clientHeight;
-    }   
-    return windowHeight
-  }
-  
   $.popup.getPageSize = function() {
     var xScroll, yScroll;
     if (window.innerHeight && window.scrollMaxY) {   
@@ -376,21 +363,25 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     return arrayPageSize;
   };  
   
-  
-  // getPageScroll() by quirksmode.com
-  $.popup.getPageScroll = function() {
-    var xScroll, yScroll;
-    if (self.pageYOffset) {
-      yScroll = self.pageYOffset;
-      xScroll = self.pageXOffset;
-    } else if (document.documentElement && document.documentElement.scrollTop) {    // Explorer 6 Strict
-      yScroll = document.documentElement.scrollTop;
-      xScroll = document.documentElement.scrollLeft;
-    } else if (document.body) {// all other Explorers
-      yScroll = document.body.scrollTop;
-      xScroll = document.body.scrollLeft;   
+  $.popup.getPagePosition = function() {
+    var InFrame = (top !== self);
+    var doc = $(top !== self ? parent.document : document);
+    var scroll = { 'top':doc.scrollTop(), 'left':doc.scrollLeft() };
+    var t = scroll.top + ($(doc).height() / 12);
+    if (InFrame) {
+      var el = $(parent.document).find('iframe[id^=vanilla]');
+      el = el ? el : $(document); // Just in case iframe is not id'd properly
+      t -= (el.offset().top);
+      // Don't slide above or below the frame bounds.
+      var diff = $(doc).height() - $(document).height();
+      var maxOffset = $(document).height() - diff;
+      if (t < 0) {
+        t = 0;
+      } else if (t > maxOffset) {
+        t = maxOffset;
+      }
     }
-    return new Array(xScroll,yScroll) 
-  }
+    return {'top':t, 'left':scroll.left};
+  };
 
 })(jQuery);

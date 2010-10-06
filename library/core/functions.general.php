@@ -9,9 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 function Gdn_Autoload($ClassName) {
-   if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
-      return true;
-
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
       
@@ -692,6 +689,28 @@ if (!function_exists('GetValueR')) {
    }
 }
 
+if (!function_exists('ImplodeAssoc')) {
+   /**
+    * A version of implode() that operates on array keys and values.
+    *
+    * @param string $KeyGlue The glue between keys and values.
+    * @param string $ElementGlue The glue between array elements.
+    * @param array $Array The array to implode.
+    * @return string The imploded array.
+    */
+   function ImplodeAssoc($KeyGlue, $ElementGlue, $Array) {
+      $Result = '';
+
+      foreach ($Array as $Key => $Value) {
+         if (strlen($Result) > 0)
+            $Result .= $ElementGlue;
+
+         $Result .= $Key.$KeyGlue.$Value;
+      }
+      return $Result;
+   }
+}
+
 if (!function_exists('InArrayI')) {
    /**
     * Case-insensitive version of php's native in_array function.
@@ -1298,7 +1317,7 @@ if (!function_exists('SafeParseStr')) {
 }
 
 if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '', $Save = TRUE) {
+   function SaveToConfig($Name, $Value = '', $Save = TRUE, $RemoveEmpty = FALSE) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . 'config.php';
       $Config->Load($Path, 'Save');
@@ -1306,7 +1325,11 @@ if (!function_exists('SaveToConfig')) {
          $Name = array($Name => $Value);
       
       foreach ($Name as $k => $v) {
-         $Config->Set($k, $v, TRUE, $Save);
+         if (!$v && $RemoveEmpty) {
+            $Config->Remove($k);
+         } else {
+            $Config->Set($k, $v, TRUE, $Save);
+         }
       }
       if ($Save)
          return $Config->Save($Path);
@@ -1403,7 +1426,7 @@ if (!function_exists('T')) {
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @see Gdn::Translate()
 	 */
-   function T($Code, $Default = '') {
+   function T($Code, $Default = FALSE) {
       return Gdn::Translate($Code, $Default);
    }
 }

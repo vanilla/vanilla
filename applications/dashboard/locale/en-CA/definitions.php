@@ -8,7 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-
 /**
  * English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
  *
@@ -26,8 +25,8 @@ if (!function_exists('Plural')) {
    }
 }
 
-
 $Definition['Locale'] = 'en-CA';
+$Definition['_Locale'] = 'Locale';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';

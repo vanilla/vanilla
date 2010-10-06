@@ -501,7 +501,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DefinitionList() {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
-         $this->_Definitions['TransportError'] = T('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+         $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
 
       if (!array_key_exists('TransientKey', $this->_Definitions))
          $this->_Definitions['TransientKey'] = $Session->TransientKey();

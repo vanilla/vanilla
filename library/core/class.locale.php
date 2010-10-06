@@ -44,7 +44,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     *
     * @var array
     */
-   private $_Definition = array();
+   protected $_Definition = array();
 
 
    /**
@@ -141,6 +141,23 @@ class Gdn_Locale extends Gdn_Pluggable {
             if(file_exists($ThemeLocalePath))
                $LocaleSources[] = $ThemeLocalePath;
          }
+
+         // Get locale-based locale definition files.
+         $EnabledLocales = C('EnabledLocales');
+         if (is_array($EnabledLocales)) {
+            foreach ($EnabledLocales as $Key => $Locale) {
+               if ($Locale != $LocaleName)
+                  continue; // skip locales that aren't in effect.
+
+               // Grab all of the files in the locale's folder.
+               $Paths = SafeGlob(PATH_ROOT."/locales/$Key/*.php");
+               if (is_array($Paths)) {
+                  foreach($Paths as $Path) {
+                     $LocaleSources[] = $Path;
+                  }
+               }
+            }
+         }
             
          // Save the mappings
          $FileContents = array();
@@ -168,7 +185,7 @@ class Gdn_Locale extends Gdn_Pluggable {
 
       // Now set the locale name and import all of the sources.
       $this->_Locale = $LocaleName;
-      $LocaleSources = Gdn_LibraryMap::GetCache('locale',$SafeLocaleName);
+      $LocaleSources = Gdn_LibraryMap::GetCache('locale', $SafeLocaleName);
       if (is_null($SafeLocaleName))
          $LocaleSources = array();
 
@@ -176,12 +193,12 @@ class Gdn_Locale extends Gdn_Pluggable {
       $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
          if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last
-            include_once($LocaleSources[$i]);
+            include($LocaleSources[$i]);
       }
 
       // Also load any custom defined definitions from the conf directory
       if (file_exists($ConfLocaleOverride))
-         include_once($ConfLocaleOverride);
+         include($ConfLocaleOverride);
 
       // All of the included files should have contained
       // $Definition['Code'] = 'Definition'; assignments. The overwrote each
@@ -190,6 +207,15 @@ class Gdn_Locale extends Gdn_Pluggable {
       $this->_Definition = $Definition;
    }
 
+   /**
+    * Load a locale definition file.
+    *
+    * @param string $Path The path to the locale.
+    */
+   public function Load($Path) {
+      $Definition = &$this->_Definition;
+      include($Path);
+   }
 
    /**
     * Assigns a translation code.
@@ -208,7 +234,6 @@ class Gdn_Locale extends Gdn_Pluggable {
       }
    }
 
-
    /**
     * Translates a code into the selected locale's definition.
     *
@@ -217,7 +242,10 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @param string $Default The default value to be displayed if the translation code is not found.
     * @return string
     */
-   public function Translate($Code, $Default = '') {
+   public function Translate($Code, $Default = FALSE) {
+      if ($Default === FALSE)
+         $Default = $Code;
+
       // Codes that begin with @ are considered literals.
       if(substr_compare('@', $Code, 0, 1) == 0)
          return substr($Code, 1);
@@ -228,7 +256,6 @@ class Gdn_Locale extends Gdn_Pluggable {
          return $Default;
       }
    }
-
 
    /**
     *  Clears out the currently loaded locale settings.
@@ -249,7 +276,6 @@ class Gdn_Locale extends Gdn_Pluggable {
          return $this->_Locale;
    }
 
-
    /**
     * Search the garden/locale folder for other locale sources that are
     * available. Returns an array of locale names.
@@ -259,6 +285,4 @@ class Gdn_Locale extends Gdn_Pluggable {
    public function GetAvailableLocaleSources() {
       return Gdn_FileSystem::Folders(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'locale');
    }
-
-
 }

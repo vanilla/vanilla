@@ -1,0 +1,23 @@
+/* Messages */
+body.Message div.Popup div.Info,
+body.Message div.Popup div.Warning,
+body.Message div.Popup div.Box {
+	background: #ffd;
+	border: 1px solid #ccc;
+	padding:6px 8px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	font-size: 12px;
+}
+body.Message div.Popup div.Warning {
+	background: #d00;
+	border: 1px solid #b00;
+	color: #fff;
+	text-shadow: 1px 1px 1px #444;
+}
+body.Message div.Popup div.Box {
+	background: #D3F0FF;
+	border: 1px solid #A5D0E7;
+	color: #000;
+}

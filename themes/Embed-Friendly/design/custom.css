@@ -105,6 +105,10 @@ div.CommentForm textarea,
 #DiscussionForm textarea {
 	width:99%;
 }
+div.Preview div.Message,
+ul.MessageList div.Message {
+	clear: none;
+}
 
 /* Tabs */
 div.Tabs {

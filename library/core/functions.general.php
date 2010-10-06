@@ -1317,13 +1317,29 @@ if (!function_exists('SafeParseStr')) {
 }
 
 if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '', $Save = TRUE, $RemoveEmpty = FALSE) {
+   /**
+    * Save values to the application's configuration file.
+    *
+    * @param string|array $Name One of the following:
+    *  - string: The key to save.
+    *  - array: An array of key/value pairs to save.
+    * @param mixed|null $Value The value to save.
+    * @param array $Options An array of additional options for the save.
+    *  - Save: If this is false then only the in-memory config is set.
+    *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
+    * @return bool: Whethr or not the save was successful.
+    */
+   function SaveToConfig($Name, $Value = '', $Options = array()) {
+      $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
+      $RemoveEmpty = GetValue('RemoveEmpty', $Options);
+
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . 'config.php';
       $Config->Load($Path, 'Save');
+
       if (!is_array($Name))
          $Name = array($Name => $Value);
-      
+
       foreach ($Name as $k => $v) {
          if (!$v && $RemoveEmpty) {
             $Config->Remove($k);
@@ -1331,6 +1347,7 @@ if (!function_exists('SaveToConfig')) {
             $Config->Set($k, $v, TRUE, $Save);
          }
       }
+
       if ($Save)
          return $Config->Save($Path);
       else

@@ -141,7 +141,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     var pagesize = $.popup.getPageSize();
     $('div.Overlay').css({ height: pagesize[1] });
     
-    var pagePos = $.popup.getPagePosition();
+    var pagePos = $.popup.getPagePosition(pagesize);
     $('#'+settings.popupId).css({
       top: pagePos.top,
       left: pagePos.left
@@ -363,11 +363,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     return arrayPageSize;
   };  
   
-  $.popup.getPagePosition = function() {
+  $.popup.getPagePosition = function(pagePosition) {
     var InFrame = (top !== self);
     var doc = $(top !== self ? parent.document : document);
     var scroll = { 'top':doc.scrollTop(), 'left':doc.scrollLeft() };
-    var t = scroll.top + ($(doc).height() / 12);
+    var height = $(doc).height();
+    if (pagePosition)
+       height = pagePosition[3];
+    var t = scroll.top + (height / 12);
     if (InFrame) {
       var el = $(parent.document).find('iframe[id^=vanilla]');
       el = el ? el : $(document); // Just in case iframe is not id'd properly

@@ -42,7 +42,12 @@ class UpdateModel extends Gdn_Model {
                 ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
                ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
 
-            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.GetValue($ZipOpened, $Errors, 'Unknown Error').')', 400);
+            // Try opening with zip_open.
+            $zh = zip_open($Path);
+            $Worked = is_resource($zh) ? ' zip_open() worked.' : '';
+            zip_close($zh);
+
+            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
          }
          return FALSE;
       }

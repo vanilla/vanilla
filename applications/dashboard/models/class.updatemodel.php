@@ -275,6 +275,7 @@ class UpdateModel extends Gdn_Model {
                $Valud = FALSE;
             } elseif (strcasecmp($Info['Locale'], $Key) == 0) {
                $Result[] = $Name.': '.T('The locale\'s key cannot be the same as the name of the locale.');
+               $Valid = FALSE;
             }
 
             if (!GetValue('Description', $Info)) {

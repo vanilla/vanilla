@@ -32,6 +32,11 @@ class UpdateModel extends Gdn_Model {
    public static function AnalyzeAddon($Path, $Fix = FALSE, $ThrowError = TRUE) {
       $Result = array();
 
+      // Try opening with zip_open.
+      $zh = zip_open($Path);
+      $Worked = is_resource($zh) ? ' zip_open() worked.' : '';
+      zip_close($zh);
+
       // Extract the zip file so we can make sure it has appropriate information.
       $Zip = new ZipArchive();
 
@@ -42,12 +47,7 @@ class UpdateModel extends Gdn_Model {
                 ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
                ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
 
-            // Try opening with zip_open.
-            $zh = zip_open($Path);
-            $Worked = is_resource($zh) ? ' zip_open() worked.' : '';
-            zip_close($zh);
-
-            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
          }
          return FALSE;
       }

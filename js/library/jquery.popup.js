@@ -321,53 +321,23 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   }
 
   $.popup.getPageSize = function() {
-    var xScroll, yScroll;
-    if (window.innerHeight && window.scrollMaxY) {   
-       xScroll = window.innerWidth + window.scrollMaxX;
-       yScroll = window.innerHeight + window.scrollMaxY;
-    } else if (document.body.scrollHeight > document.body.offsetHeight){ // all but Explorer Mac
-       xScroll = document.body.scrollWidth;
-       yScroll = document.body.scrollHeight;
-    } else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
-       xScroll = document.body.offsetWidth;
-       yScroll = document.body.offsetHeight;
-    }
-    var windowWidth, windowHeight;
-    if (self.innerHeight) {   // all except Explorer
-       if(document.documentElement.clientWidth){
-          windowWidth = document.documentElement.clientWidth; 
-       } else {
-          windowWidth = self.innerWidth;
-       }
-       windowHeight = self.innerHeight;
-    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
-       windowWidth = document.documentElement.clientWidth;
-       windowHeight = document.documentElement.clientHeight;
-    } else if (document.body) { // other Explorers
-       windowWidth = document.body.clientWidth;
-       windowHeight = document.body.clientHeight;
-    }   
-    // for small pages with total height less then height of the viewport
-    if(yScroll < windowHeight){
-       pageHeight = windowHeight;
-    } else { 
-       pageHeight = yScroll;
-    }
-    // for small pages with total width less then width of the viewport
-    if(xScroll < windowWidth){   
-       pageWidth = xScroll;      
-    } else {
-       pageWidth = windowWidth;
-    }
-    arrayPageSize = new Array(pageWidth,pageHeight,windowWidth,windowHeight);
+    var doc = $(top !== self ? parent.document : document);
+    var win = $(top !== self ? parent.window : window);
+    arrayPageSize = new Array(
+      $(doc).width(),
+      $(doc).height(),
+      $(win).width(),
+      $(win).height()
+    );
     return arrayPageSize;
   };  
   
   $.popup.getPagePosition = function() {
     var InFrame = (top !== self);
     var doc = $(top !== self ? parent.document : document);
+    var win = $(top !== self ? parent.window : window);
     var scroll = { 'top':doc.scrollTop(), 'left':doc.scrollLeft() };
-    var t = scroll.top + ($(doc).height() / 12);
+    var t = scroll.top + ($(win).height() / 10);
     if (InFrame) {
       var el = $(parent.document).find('iframe[id^=vanilla]');
       el = el ? el : $(document); // Just in case iframe is not id'd properly

@@ -323,7 +323,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   $.popup.getPageSize = function() {
     var doc = $(top !== self ? parent.document : document);
     var win = $(top !== self ? parent.window : window);
-    arrayPageSize = new Array(
+      arrayPageSize = new Array(
       $(doc).width(),
       $(doc).height(),
       $(win).width(),

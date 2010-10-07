@@ -130,6 +130,9 @@ class DebuggerPlugin extends Gdn_Plugin {
          $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
             .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields));
          return $Result;
+      } elseif (is_a($Data, 'stdClass')) {
+         $Data = (array)$Data;
+         return self::FormatData($Data, $Indent);
       } elseif (is_object($Data)) {
          $Result .= $Indent.get_class($Data);
       } else {

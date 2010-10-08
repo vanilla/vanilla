@@ -65,9 +65,21 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         });
       } else {
         if (target) {
-          $.get(target, {'DeliveryType': settings.deliveryType}, function(data) {
-            $.popup.reveal(settings, data)
-          });
+           $.ajax({
+              type: 'GET',
+              url: target,
+              data: {
+                 'DeliveryType': settings.deliveryType },
+                 error: function(request, textStatus, errorThrown) {
+                    $.popup.reveal(settings, request.responseText);
+                 },
+                 success: function(data) {
+                    $.popup.reveal(settings, data);
+                 }
+           });
+//          $.get(target, {'DeliveryType': settings.deliveryType}, function(data) {
+//            $.popup.reveal(settings, data)
+//          });
         }
       }
         

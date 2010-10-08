@@ -21,8 +21,13 @@ class Gdn_Condition {
    const REQUEST = 'request';
    const ROLE = 'role';
 
+   const COMPARE_AND = 'and';
+   const COMPARE_OR = 'or';
+
+   public $CompareType = self::COMPARE_OR;
+
    public static function AllTypes() {
-      return array(self::PERMISSION => self::PERMISSION, self::REQUEST => self::REQUEST, self::ROLE => self::ROLE);
+      return array(self::PERMISSION => self::PERMISSION, self::ROLE => self::ROLE);
    }
 
    public static function Blank() {
@@ -63,15 +68,20 @@ class Gdn_Condition {
 
       foreach ($Conditions as $Condition) {
          if (!is_array($Condition) || count($Condition) < 2)
-            return FALSE;
+            continue;
          
          $Expr = isset($Condition[2]) ? $Condition[2] : NULL;
 
          $Test = Gdn_Condition::TestOne($Condition[0], $Condition[1], $Expr);
-         if (!$Test)
+         if (!$Test && $this->CompareType == self::COMPARE_AND)
             return FALSE;
+         if ($Test && $this->CompareType == self::COMPARE_OR)
+            return TRUE;
       }
-      return TRUE;
+      if ($this->CompareType == self::COMPARE_AND)
+         return TRUE;
+      else
+         return FALSE;
    }
 
    /** Test an individual condition.

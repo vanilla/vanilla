@@ -38,7 +38,7 @@ class UpdateModel extends Gdn_Model {
       if (class_exists('ZipArchive', FALSE)) {
          $Zip = new ZipArchive();
          $ZipOpened = $Zip->open($Path);
-         if (!$ZipOpened)
+         if ($ZipOpened !== TRUE)
             $Zip = NULL;
       }
 

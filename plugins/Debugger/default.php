@@ -108,17 +108,21 @@ class DebuggerPlugin extends Gdn_Plugin {
       $Result = '';
       if (is_array($Data)) {
          foreach ($Data as $Key => $Value) {
+            if ($Key === NULL)
+               $Key = 'NULL';
             $Result .= "$Indent<b>$Key</b>: ";
 
-            if (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
+            if ($Value === NULL) {
+               $Result .= 'NULL';
+            } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
                $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
             } else {
                if (is_a($Value, 'Gdn_DataSet'))
-                  $Result .= 'DataSet';
+                  $Result .= "DataSet\n";
 
-               $Result .= "\n"
-                  .self::FormatData($Value, $Indent.'  ')
-                  ."\n";
+               $Result .= 
+                  "\n"
+                  .self::FormatData($Value, $Indent.'   ');
             }
          }
       } elseif (is_a($Data, 'Gdn_DataSet')) {
@@ -136,7 +140,7 @@ class DebuggerPlugin extends Gdn_Plugin {
       } elseif (is_object($Data)) {
          $Result .= $Indent.get_class($Data);
       } else {
-         return var_export($Data, TRUE);
+         return trim(var_export($Data, TRUE));
       }
       return $Result;
    }

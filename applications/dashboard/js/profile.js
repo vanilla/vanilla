@@ -95,6 +95,7 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
+            json = $.postParseJson(json);
             $.popup.reveal({ popupId: popupId }, json);
          }
       });

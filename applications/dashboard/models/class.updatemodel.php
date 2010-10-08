@@ -32,15 +32,22 @@ class UpdateModel extends Gdn_Model {
    public static function AnalyzeAddon($Path, $Fix = FALSE, $ThrowError = TRUE) {
       $Result = array();
 
-      // Try opening with zip_open.
-      $zh = zip_open($Path);
-      $Worked = is_resource($zh) ? ' zip_open() worked.' : '';
-      zip_close($zh);
-
       // Extract the zip file so we can make sure it has appropriate information.
-      $Zip = new ZipArchive();
+      $Zip = NULL;
 
-      $ZipOpened = $Zip->open($Path);
+      if (class_exists('ZipArchive', FALSE)) {
+         $Zip = new ZipArchive();
+         $ZipOpened = $Zip->open($Path);
+         if (!$ZipOpened)
+            $Zip = NULL;
+      }
+
+      if (!$Zip) {
+         require_once PATH_LIBRARY."/vendors/pclzip/class.pclzipadapter.php";
+         $Zip = new PclZipAdapter();
+         $ZipOpened = $Zip->open($Path);
+      }
+
       if ($ZipOpened !== TRUE) {
          if ($ThrowError) {
             $Errors = array(ZIPARCHIVE::ER_EXISTS => 'ER_EXISTS', ZIPARCHIVE::ER_INCONS => 'ER_INCONS', ZIPARCHIVE::ER_INVAL => 'ER_INVAL',

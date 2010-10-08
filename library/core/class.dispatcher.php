@@ -401,7 +401,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'NotAuthorized':
-               header( "HTTP/1.1 401 Not Found" );
+               header( "HTTP/1.1 401 Not Authorized" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
 

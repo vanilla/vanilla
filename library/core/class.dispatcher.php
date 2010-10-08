@@ -193,7 +193,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          C('Garden.PrivateCommunity')
          && $this->ControllerName() != 'EntryController'
          && !Gdn::Session()->IsValid()
-         && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable'))
+         && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
       ) {
          Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
          exit();
@@ -610,10 +610,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          if (in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
             return array($Parts[0], strtoupper($Parts[1]));
          } else {
-            return array($Name, FALSE);
+            return array($Name, $this->_DeliveryMethod);
          }
       } else {
-         return array($Name, FALSE);
+         return array($Name, $this->_DeliveryMethod);
       }
    }
 }

@@ -884,10 +884,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-        if (!$Session->IsValid()) {
+        if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {
-           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
+           Gdn::Dispatcher()->Dispatch('DefaultPermission');
+           exit();
         }
       }
    }
@@ -1065,8 +1066,18 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    // Render the data array.
    public function RenderData($Data = NULL) {
-      if ($Data === NULL)
-         $Data = $this->Data;
+      if ($Data === NULL) {
+         $Data = array();
+
+         // Remove standard and "protected" data from the top level.
+         foreach ($this->Data as $Key => $Value) {
+            if (in_array($Key, array('Title')))
+               continue;
+            if (isset($Key[0]) && $Key[0] == '_')
+               continue; // protected
+            $Data[$Key] = $Value;
+         }
+      }
 
       // Massage the data for better rendering.
       foreach ($Data as $Key => $Value) {

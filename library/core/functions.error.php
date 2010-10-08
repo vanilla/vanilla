@@ -90,7 +90,7 @@ function Gdn_ExceptionHandler($Exception) {
       if (!defined('PATH_ROOT')) $PanicError = TRUE;
       if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
       if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-      $WebRoot = class_exists('Gdn_Url', FALSE) ? Gdn_Url::WebRoot() : '';
+      $WebRoot = '';
       
       // Try and rollback a database transaction.
       if(class_exists('Gdn', FALSE)) {
@@ -375,7 +375,7 @@ set_exception_handler('Gdn_ExceptionHandler');
  * @param string $Code The translation code of the type of object that wasn't found.
  * @return Exception
  */
-function NotFoundException($Code) {
+function NotFoundException($Code = 'Page') {
    return new Exception(sprintf(T('%s not found.'), T($Code)), 404);
 }
 

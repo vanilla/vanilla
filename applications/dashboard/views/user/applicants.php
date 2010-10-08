@@ -8,7 +8,7 @@ echo $this->Form->Open(array('action' => Url('/dashboard/user/applicants')));
 echo $this->Form->Errors();
 if ($this->UserData->NumRows() == 0) {
    ?>
-<p><?php echo T('There are currently no applicants.'); ?></p>
+<div class="Info"><?php echo T('There are currently no applicants.'); ?></div>
    <?php
 } else {
    ?>

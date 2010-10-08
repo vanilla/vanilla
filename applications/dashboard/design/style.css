@@ -1267,14 +1267,13 @@ ul.MessageList div.Meta {
    color: #777;
 }
 ul.MessageList div.Meta span.Author img {
-	display: inline-block;
    height: 40px;
    width: 40px;
    border: 0;
    margin: 0 10px 0 0;
    overflow: hidden;
    background: #eee;
-	vertical-align: middle;
+	float: left;
 }
 ul.MessageList div.Meta span {
    line-height: 2.5;

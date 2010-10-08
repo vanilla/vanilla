@@ -90,7 +90,7 @@ function Gdn_ExceptionHandler($Exception) {
       if (!defined('PATH_ROOT')) $PanicError = TRUE;
       if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
       if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-      $WebRoot = class_exists('Gdn_Url', FALSE) ? Gdn_Url::WebRoot() : '';
+      $WebRoot = '';
       
       // Try and rollback a database transaction.
       if(class_exists('Gdn', FALSE)) {

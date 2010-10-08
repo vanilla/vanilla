@@ -48,8 +48,8 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
    $State = strtolower($Css);
    if ($this->Filter == 'all' || $this->Filter == $State) {
       $Alt = $Alt ? FALSE : TRUE;
-      $Version = ArrayValue('Version', $PluginInfo, '');
-      $ScreenName = ArrayValue('Name', $PluginInfo, $PluginName);
+      $Version = Gdn_Format::Display(GetValue('Version', $PluginInfo, ''));
+      $ScreenName = Gdn_Format::Display(GetValue('Name', $PluginInfo, $PluginName));
       $SettingsUrl = $State == 'enabled' ? ArrayValue('SettingsUrl', $PluginInfo, '') : '';
       $PluginUrl = ArrayValue('PluginUrl', $PluginInfo, '');
       $Author = ArrayValue('Author', $PluginInfo, '');
@@ -61,7 +61,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
       ?>
       <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
-         <td class="Alt"><?php echo ArrayValue('Description', $PluginInfo, ''); ?></td>
+         <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $PluginInfo, '')); ?></td>
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php

@@ -1524,3 +1524,45 @@ if (!function_exists('check_utf8')){
        return true;
    }
 }
+
+if (!function_exists('IsMobile')) {
+   function IsMobile() {
+      $Mobile = 0;
+      $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
+      $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
+      $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone)/i', $UserAgent))
+         $Mobile++;
+ 
+      if(
+         (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
+         || (
+            (isset($_SERVER['HTTP_X_WAP_PROFILE'])
+            || isset($_SERVER['HTTP_PROFILE'])))
+         )
+         $Mobile++;
+ 
+      $MobileUserAgent = strtolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
+      $MobileUserAgents = array(
+          'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
+          'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
+          'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
+          'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
+          'newt','noki','oper','palm','pana','pant','phil','play','port','prox',
+          'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
+          'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
+          'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
+          'wapr','webc','winw','winw','xda','xda-');
+ 
+      if (in_array($MobileUserAgent, $MobileUserAgents))
+         $Mobile++;
+ 
+      if (strpos($AllHttp, 'operamini') > 0)
+         $Mobile++;
+ 
+      if (strpos($UserAgent, 'windows') > 0)
+         $Mobile = 0;
+ 
+      return $Mobile > 0;
+   }
+}

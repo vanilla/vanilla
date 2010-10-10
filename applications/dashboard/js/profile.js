@@ -23,53 +23,6 @@ jQuery(document).ready(function($) {
       return false;      
    });
 
-   // Hijack activity comment form submits
-   $('form.Activity :submit').live('click', function() {
-      var but = this;
-      var frm = $(this).parents('form');
-      var inp = $(frm).find('textarea');
-      // Only submit the form if the textarea isn't empty
-      if ($(inp).val() != '') {
-         $('span.Progress').remove();
-         $(but).after('<span class="Progress">&nbsp;</span>');
-         var postValues = $(frm).serialize();
-         postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
-         $.ajax({
-            type: "POST",
-            url: $(frm).attr('action'),
-            data: postValues,
-            dataType: 'json',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, XMLHttpRequest.responseText);
-            },
-            success: function(json) {
-               json = $.postParseJson(json);
-
-               $('span.Progress').remove();
-               if (json['FormSaved'] == true) {
-                  $(inp).val('');
-                  // If there were no activities
-                  if ($('ul.Activities').length == 0) {
-                     // Make sure that empty rows are removed
-                     $('div.EmptyInfo').slideUp('fast');
-                     // And add the activity list
-                     $(frm).after('<ul class="Activities"></ul>');
-                  }
-                  $('ul.Activities').prepend(json.Data);
-                  // Make sure that hidden items appear
-                  $('ul.Activities li.Hidden').slideDown('fast');
-                  // If the user's status was updated, show it.
-                  if (typeof(json['UserData']) != 'undefined') {
-                     $('div.User').remove();
-                     $('div.Profile').prepend(json['UserData']);
-                  }
-               }
-            }
-         });
-      }
-      return false;
-   });
-   
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
    

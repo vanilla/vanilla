@@ -50,7 +50,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          <span class="DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
          <?php
          if ($Activity->AllowComments == '1' && $Session->IsValid())
-            echo '<span class="AddComment">'.Anchor(T('Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
+            echo '<span class="AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
          ?>
       </div>
    </div>

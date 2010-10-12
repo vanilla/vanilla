@@ -1332,7 +1332,6 @@ div.Preview div.Message code,
 div.Preview div.Message pre,
 ul.MessageList div.Message code,
 ul.MessageList div.Message pre {
-   display: block;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;

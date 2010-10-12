@@ -52,7 +52,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Offset = GetValue('1', $Sender->RequestArgs, 'p1');
       list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
    
-      $Sender->Tag = GetValue('0', $Sender->RequestArgs, '');
+      $Sender->SetData('Tag', GetValue('0', $Sender->RequestArgs, ''), TRUE);
       $Sender->Title(T('Tagged with ').$Sender->Tag);
       $Sender->Head->Title($Sender->Head->Title());
       $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.$Sender->Tag, PageNumber($Offset, $Limit, TRUE)), TRUE));
@@ -116,7 +116,7 @@ class TaggingPlugin extends Gdn_Plugin {
       }
       
       // Render the controller
-      $Sender->Render(PATH_PLUGINS.'/Tagging/views/taggeddiscussions.php');
+      $Sender->Render('TaggedDiscussions', '', 'plugins/Tagging');
    }
    
    /**

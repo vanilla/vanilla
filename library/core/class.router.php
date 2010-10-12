@@ -14,7 +14,7 @@ class Gdn_Router {
          'NotAuthorized' => 'Not Authorized (401)',
          'NotFound'     => 'Not Found (404)'
       );
-      $this->ReservedRoutes = array('DefaultController', 'Default404', 'DefaultPermission(\?.*)', 'UpdateMode');
+      $this->ReservedRoutes = array('DefaultController', 'Default404', 'DefaultPermission', 'UpdateMode');
       $this->_LoadRoutes();
    }
    
@@ -89,7 +89,7 @@ class Gdn_Router {
          );
          
          // Check for a match
-         if (preg_match('#^'.$Route.'$#', $Request)) {
+         if (preg_match('#^'.$Route.'#', $Request)) {
             // Route matched!
             $Final = $this->GetRoute($Route);
             $Final['FinalDestination'] = $Final['Destination'];

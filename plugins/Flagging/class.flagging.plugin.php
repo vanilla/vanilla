@@ -42,6 +42,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
 
    public function PluginController_Flagging_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Content Flagging');
       $Sender->AddSideMenu('plugin/flagging');
       $Sender->Form = new Gdn_Form();

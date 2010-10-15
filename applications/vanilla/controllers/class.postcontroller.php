@@ -71,6 +71,7 @@ class PostController extends VanillaController {
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
+         $this->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
             
@@ -330,8 +331,6 @@ class PostController extends VanillaController {
                         // Redirect if the new new comment isn't on the same page.
                         $Redirect |= PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
                      }
-
-
 
                      if ($Redirect) {
                         // The user posted a comment on a page other than the last one, so just redirect to the last page.

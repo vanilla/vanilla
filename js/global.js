@@ -21,7 +21,8 @@ jQuery(document).ready(function($) {
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {
-      $('#Form_User_Password').slideToggle('fast');
+		$('#Form_User_Password').toggle();
+		$('#Form_User_SignIn').toggle();
       return false;
    });
    
@@ -181,10 +182,11 @@ jQuery(document).ready(function($) {
       }});
 
    // Format email addresses
-   $('span.Email').livequery(function() {
-      var html = $(this).html();
-      var email = $(this).html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
-      $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
+   $('span.Email.EmailUnformatted').livequery(function() {
+      var el = $(this);
+      el.removeClass('EmailUnformatted');
+      var email = el.html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
+      el.html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters

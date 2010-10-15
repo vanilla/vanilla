@@ -104,7 +104,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $MasterView;
-
+   
    /**
     * A Menu module for rendering the main menu on each page.
     *
@@ -501,7 +501,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DefinitionList() {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
-         $this->_Definitions['TransportError'] = T('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+         $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
 
       if (!array_key_exists('TransientKey', $this->_Definitions))
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
@@ -545,9 +545,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Default One of the DELIVERY_TYPE_* constants.
     */
    public function DeliveryType($Default = '') {
-      if ($Default != '')
+      if ($Default)
          $this->_DeliveryType = $Default;
-
+      
       return $this->_DeliveryType;
    }
    
@@ -607,7 +607,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *  - If the controller name is an empty string then the view will be looked for in the base views folder.
     * @param string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
     */
-   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE) {
+   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
       // Accept an explicitly defined view, or look to the method that was called on this controller
       if ($View == '')
          $View = $this->View;
@@ -700,7 +700,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_ViewLocations[$LocationName] = $ViewPath;
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
-      if ($ViewPath === FALSE)
+      if ($ViewPath === FALSE && $ThrowError)
          trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
 
       return $ViewPath;
@@ -884,10 +884,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-        if (!$Session->IsValid()) {
+        if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {
-           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
+           Gdn::Dispatcher()->Dispatch('DefaultPermission');
+           exit();
         }
       }
    }
@@ -970,7 +971,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
-         $this->_RenderData();
+         $this->RenderData();
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1064,9 +1065,19 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    // Render the data array.
-   protected function _RenderData($Data = NULL) {
-      if ($Data === NULL)
-         $Data = $this->Data;
+   public function RenderData($Data = NULL) {
+      if ($Data === NULL) {
+         $Data = array();
+
+         // Remove standard and "protected" data from the top level.
+         foreach ($this->Data as $Key => $Value) {
+            if (in_array($Key, array('Title')))
+               continue;
+            if (isset($Key[0]) && $Key[0] == '_')
+               continue; // protected
+            $Data[$Key] = $Value;
+         }
+      }
 
       // Massage the data for better rendering.
       foreach ($Data as $Key => $Value) {
@@ -1077,10 +1088,19 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       $this->Finalize();
 
-      switch ($this->_DeliveryMethod) {
+      // Check for a special view.
+      $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
+      if (file_exists($ViewLocation)) {
+         include $ViewLocation;
+         return;
+      }
+
+      switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
-            // TODO:
-            exit("<$Root>TODO</$Root>");
+            header('Content-Type: text/xml', TRUE);
+            echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
+            $this->_RenderXml($Data);
+            exit();
             break;
          case DELIVERY_METHOD_JSON:
          default:
@@ -1096,11 +1116,56 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * A simple default method for rendering xml.
+    *
+    * @param mixed $Data The data to render. This is usually $this->Data.
+    * @param string $Node The name of the root node.
+    * @param string $Indent The indent before the data for layout that is easier to read.
+    */
+   protected function _RenderXml($Data, $Node = 'Data', $Indent = '') {
+      // Handle numeric arrays.
+      if (is_numeric($Node))
+         $Node = 'Item';
+      
+      echo "$Indent<$Node>";
+
+      if (is_scalar($Data)) {
+         echo htmlspecialchars($Data);
+      } else {
+         $Data = (array)$Data;
+         foreach ($Data as $Key => $Value) {
+            echo "\n";
+            $this->_RenderXml($Value, $Key, $Indent.' ');
+         }
+         echo "\n";
+      }
+      echo "</$Node>";
+   }
+
+   /**
     * Render an exception as the sole output.
     *
     * @param Exception $Ex The exception to render.
     */
    public function RenderException($Ex) {
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+         try {
+            switch ($Ex->getCode()) {
+               case 401:
+                  Gdn::Dispatcher()->Dispatch('DefaultPermission');
+                  break;
+               case 404:
+                  Gdn::Dispatcher()->Dispatch('Default404');
+                  break;
+               default:
+                  Gdn_ExceptionHandler($Ex);
+            }
+         } catch(Exception $Ex2) {
+            Gdn_ExceptionHandler($Ex);
+         }
+         return;
+      }
+
       $this->Finalize();
       $this->SendHeaders();
 
@@ -1110,9 +1175,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $Message = $Ex->getMessage();
 
-      if ($Code >= 100 && $Code <= 505) {
+      if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
-      }
+      else
+         header('HTTP/1.0 500', TRUE, 500);
 
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {
@@ -1125,9 +1191,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                exit(json_encode($Data));
             }
             break;
-         case DELIVERY_METHOD_XHTML:
-            Gdn_ExceptionHandler($Exception);
-            break;
+//         case DELIVERY_METHOD_XHTML:
+//            Gdn_ExceptionHandler($Ex);
+//            break;
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);
@@ -1143,7 +1209,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function RenderMaster() {
       // Build the master view if necessary
-      if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+      if ($this->_DeliveryType = DELIVERY_TYPE_ALL) {
          // Define some default master views unless one was explicitly defined
          if ($this->MasterView == '') {
             // If this is a syndication request, use the appropriate master view

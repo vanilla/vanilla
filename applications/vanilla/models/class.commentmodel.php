@@ -318,6 +318,9 @@ class CommentModel extends VanillaModel {
             }
          }
       }
+      $DiscussionID = GetValue('DiscussionID', $FormPostValues);
+      $this->UpdateCommentCount($DiscussionID);
+
       return $CommentID;
    }
 
@@ -332,8 +335,38 @@ class CommentModel extends VanillaModel {
          return;
 
       $DiscussionModel = new DiscussionModel();
-      $DiscussionID = ArrayValue('DiscussionID', $Fields);
+      $DiscussionID = GetValue('DiscussionID', $Fields);
       $Discussion = $DiscussionModel->GetID($DiscussionID);
+
+      // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
+      $this->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
+
+      // Update the discussion author's CountUnreadDiscussions (ie.
+      // the number of discussions created by the user that s/he has
+      // unread messages in) if this comment was not added by the
+      // discussion author.
+      $Data = $this->SQL
+         ->Select('d.InsertUserID')
+         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion d')
+         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
+         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
+         ->Where('w.CountComments >', 0)
+         ->Where('c.InsertUserID', $Session->UserID)
+         ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
+         ->GroupBy('d.InsertUserID')
+         ->Get();
+
+      if ($Data->NumRows() > 0) {
+         $UserData = $Data->FirstRow();
+         $this->SQL
+            ->Update('User')
+            ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
+            ->Where('UserID', $UserData->InsertUserID)
+            ->Put();
+      }
+
+      $this->UpdateUser($Session->UserID);
 
       if ($Insert) {
          // Notify any users who were mentioned in the comment
@@ -382,38 +415,6 @@ class CommentModel extends VanillaModel {
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers))
             $this->RecordActivity($Discussion, $Session->UserID, $CommentID, 'Only');
       }
-
-      $this->UpdateCommentCount($DiscussionID);
-      // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
-      $this->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
-
-
-      // Update the discussion author's CountUnreadDiscussions (ie.
-      // the number of discussions created by the user that s/he has
-      // unread messages in) if this comment was not added by the
-      // discussion author.
-      $Data = $this->SQL
-         ->Select('d.InsertUserID')
-         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
-         ->From('Discussion d')
-         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
-         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
-         ->Where('w.CountComments >', 0)
-         ->Where('c.InsertUserID', $Session->UserID)
-         ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
-         ->GroupBy('d.InsertUserID')
-         ->Get();
-
-      if ($Data->NumRows() > 0) {
-         $UserData = $Data->FirstRow();
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
-            ->Where('UserID', $UserData->InsertUserID)
-            ->Put();
-      }
-
-      $this->UpdateUser($Session->UserID);
    }
       
    public function RecordActivity($Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
@@ -430,8 +431,7 @@ class CommentModel extends VanillaModel {
    }
    
    /**
-    * Updates the CountComments value on the discussion based on the CommentID
-    * being saved. 
+    * Updates the CountComments value on the discussion based on the CommentID being saved. 
     *
     * @param int The CommentID relating to the discussion we are updating.
     */

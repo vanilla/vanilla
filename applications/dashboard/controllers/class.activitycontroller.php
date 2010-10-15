@@ -26,21 +26,43 @@ class ActivityController extends Gdn_Controller {
       $this->AddModule($GuestModule);
       parent::Initialize();
    }
+   
    public function Index() {
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
          
       $Session = Gdn::Session();
-      $this->ActivityData = $this->ActivityModel->Get();
-      if ($this->ActivityData->NumRows() > 0) {
-         $ActivityData = $this->ActivityData->ResultArray();
-         $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
-         $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
+      $Comment = $this->Form->GetFormValue('Comment');
+      $this->CommentData = FALSE;
+      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
+         $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
+         
+         // Update About if necessary
+         $ActivityType = 'WallComment';
+         $NewActivityID = $this->ActivityModel->Add(
+            $Session->UserID,
+            $ActivityType,
+            $Comment);
+         
+         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
+            Redirect('activity');
+         } else {
+            echo 'yes';
+            // Load just the single new comment
+            $this->HideActivity = TRUE;
+            $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID);
+            $this->View = 'activities';
+         }
       } else {
-         $this->CommentData = FALSE;
+         $this->ActivityData = $this->ActivityModel->Get();
+         if ($this->ActivityData->NumRows() > 0) {
+            $ActivityData = $this->ActivityData->ResultArray();
+            $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
+            $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
+         }
+         $this->View = 'all';
       }
       
-      $this->View = 'all';
       $this->Render();
    }
    

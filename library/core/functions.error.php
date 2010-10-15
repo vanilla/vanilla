@@ -51,7 +51,8 @@ function Gdn_ExceptionHandler($Exception) {
       
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
-      header('Content-Type: text/html; charset=utf-8');
+      // prevent headers already sent error
+      if(!headers_sent()) header('Content-Type: text/html; charset=utf-8');
       
       $SenderMessage = $Message;
       $SenderObject = 'PHP';
@@ -64,6 +65,12 @@ function Gdn_ExceptionHandler($Exception) {
          list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
       else if ($MessageCount == 3)
          list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+      elseif (function_exists('GetValueR')) {
+            $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
+            $N = ($IsError) ? '1' : '0';
+            $SenderMethod = GetValueR($N.'.function', $SenderTrace, $SenderMethod);
+            $SenderObject = GetValueR($N.'.class', $SenderTrace, $SenderObject);
+      }
       
       $SenderMessage = strip_tags($SenderMessage);
       
@@ -83,7 +90,7 @@ function Gdn_ExceptionHandler($Exception) {
       if (!defined('PATH_ROOT')) $PanicError = TRUE;
       if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
       if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-      $WebRoot = class_exists('Url', FALSE) ? Gdn_Url::WebRoot() : '';
+      $WebRoot = '';
       
       // Try and rollback a database transaction.
       if(class_exists('Gdn', FALSE)) {
@@ -360,3 +367,28 @@ if (!function_exists('CleanErrorArguments')) {
 // Set up Garden to handle php errors
 set_error_handler('Gdn_ErrorHandler', E_ALL);
 set_exception_handler('Gdn_ExceptionHandler');
+
+
+/**
+ * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string $Code The translation code of the type of object that wasn't found.
+ * @return Exception
+ */
+function NotFoundException($Code = 'Page') {
+   return new Exception(sprintf(T('%s not found.'), T($Code)), 404);
+}
+
+/**
+ * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string|null $Permission The name of the permission that was required.
+ * @return Exception
+ */
+function PermissionException($Permission = NULL) {
+  if (!$Permission)
+     $Message = T('You do not have permission to access the requested resource.');
+  else
+     $Message = sprintf(T('You need the %s permission to perform that operation.'), $Permission);
+  return new Exception($Message, 401);
+}

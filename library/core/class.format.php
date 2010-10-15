@@ -103,9 +103,12 @@ class Gdn_Format {
       if ($RegardingWall == '')
          $RegardingWall = T('wall');
 
-      if ($Activity->Route == '')
-         $Route = T($Activity->RouteCode);
-      else
+      if ($Activity->Route == '') {
+         if ($Activity->RouteCode)
+            $Route = T($Activity->RouteCode);
+         else
+            $Route = '';
+      } else
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
       // Translate the gender suffix.
@@ -126,7 +129,12 @@ class Gdn_Format {
       .'/'.$Route
       .'/'.$GenderSuffix.($GenderSuffixCode)
       */
-      return sprintf(($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline)), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
+
+      $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
+      $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
+      $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $FullHeadline : $ProfileHeadline);
+      
+      return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
    }
 
    /**
@@ -418,7 +426,7 @@ class Gdn_Format {
    public static function Email($Email) {
       $At = T('at');
       $Dot = T('dot');
-      return '<span class="Email">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
+      return '<span class="Email EmailUnformatted">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
    }
 
    /**

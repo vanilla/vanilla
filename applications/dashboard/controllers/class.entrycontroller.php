@@ -537,7 +537,7 @@ class EntryController extends Gdn_Controller {
                   
                   // This resets vanilla's internal "where am I" to the homepage. Needed.
                   Gdn::Request()->WithRoute('DefaultController');
-                  $this->SelfUrl = Gdn::Request()->Path();
+                  $this->SelfUrl = Url('');//Gdn::Request()->Path();
                   
                   $this->View = 'syncfailed';
                   $this->ProviderSite = $Authenticator->GetProviderUrl();
@@ -659,6 +659,8 @@ class EntryController extends Gdn_Controller {
     * Calls the appropriate registration method based on the configuration setting.
     */
    public function Register($InvitationCode = '') {
+      $this->FireEvent("Register");
+      
       $this->Form->SetModel($this->UserModel);
 
       // Define gender dropdown options

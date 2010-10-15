@@ -296,7 +296,7 @@ class Gdn_FileSystem {
          $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($Name == '') {
             $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
-         } else {
+         } elseif (!StringEndsWith($Name, '.'.$Extension)) {
             $Name .= '.'.$Extension;
          }
          $Name = rawurldecode($Name);
@@ -352,22 +352,30 @@ class Gdn_FileSystem {
     * @param string $Dir 
     * @return void
     */
-   public static function RemoveFolder($Dir) {
-      // Make sure the directory is properly denoted (otherwise this function
-      // will also delete directories prefixed with $Dir).
-      if (substr($Dir, -1, 1) != '/')
-         $Dir  .= '/';
-         
-      $Files = glob($Dir . '*', GLOB_MARK);
-      
-      foreach ($Files as $File) {
-         if (substr($File, -1) == '/')
-            self::RemoveFolder($File);
-         else
-            unlink($File);
+   public static function RemoveFolder($Path) {
+      if (is_file($Path)) {
+         unlink($Path);
+         return;
       }
 
-      if (is_dir($Dir)) rmdir($Dir);
+      $Path = rtrim($Path, '/').'/';
+
+      // Get all of the files in the directory.
+      if ($dh = opendir($Path)) {
+         while (($File = readdir($dh)) !== false) {
+            if (trim($File, '.') == '')
+               continue;
+
+            $SubPath = $Path.$File;
+
+            if (is_dir($SubPath))
+               self::RemoveFolder($SubPath);
+            else
+               unlink($SubPath);
+         }
+         closedir($dh);
+      }
+      rmdir($Path);
    }
    
    public static function CheckFolderR($Path, $Flags = 0) {

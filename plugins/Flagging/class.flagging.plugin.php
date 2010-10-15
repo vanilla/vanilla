@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Flagging'] = array(
    'Name' => 'Flagging',
    'Description' => 'This plugin allows users to report content that violates forum rules.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -42,6 +42,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
 
    public function PluginController_Flagging_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Content Flagging');
       $Sender->AddSideMenu('plugin/flagging');
       $Sender->Form = new Gdn_Form();
@@ -96,10 +97,13 @@ class FlaggingPlugin extends Gdn_Plugin {
       $this->Controller_Index($Sender);
    }
    
+   public function DiscussionController_BeforeCommentsRender_Handler($Sender) {
+      if (!C('Plugins.Flagging.Enabled')) return;
+      $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
+   }
+   
    public function DiscussionController_CommentOptions_Handler($Sender) {
       if (!C('Plugins.Flagging.Enabled')) return;
-      
-      $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
       
       // Signed in users only. No guest reporting!
       if (!Gdn::Session()->UserID) return;

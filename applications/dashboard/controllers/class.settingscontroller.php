@@ -334,6 +334,52 @@ class SettingsController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
+
+   public function Locales($Op = NULL, $LocaleKey = NULL, $TransientKey = NULL) {
+      $this->Permission('Garden.Settings.Manage');
+
+      $this->Title(T('Locales'));
+      $this->AddSideMenu('dashboard/settings/locales');
+      $this->AddJsFile('addons.js');
+
+      $LocaleModel = new LocaleModel();
+
+      // Get the available locales.
+      $AvailableLocales = $LocaleModel->AvailableLocalePacks();
+      // Get the enabled locales.
+      $EnabledLocales = $LocaleModel->EnabledLocalePacks();
+
+      // Check to enable/disable a plugin.
+      if ($Op && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+
+         $Refresh = FALSE;
+         switch(strtolower($Op)) {
+            case 'enable':
+               $Locale = GetValue($LocaleKey, $AvailableLocales);
+               if (!is_array($Locale)) {
+                  $this->Form->AddError('@'.sprintf(T('The %s locale pack does not exist.'), htmlspecialchars($LocaleKey)), 'LocaleKey');
+               } elseif (!isset($Locale['Locale'])) {
+                  $this->Form->AddError('ValidateRequired', 'Locale');
+               } else {
+                  SaveToConfig("EnabledLocales.$LocaleKey", $Locale['Locale']);
+                  $EnabledLocales[$LocaleKey] = $Locale['Locale'];
+                  $Refresh = TRUE;
+               }
+               break;
+            case 'disable':
+               RemoveFromConfig("EnabledLocales.$LocaleKey");
+               unset($EnabledLocales[$LocaleKey]);
+               $Refresh = TRUE;
+               break;
+         }
+         if ($Refresh)
+            Gdn::Locale()->Refresh();
+      }
+      
+      $this->SetData('AvailableLocales', $AvailableLocales);
+      $this->SetData('EnabledLocales', $EnabledLocales);
+      $this->Render();
+   }
    
    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
@@ -497,14 +543,19 @@ class SettingsController extends DashboardController {
     * Test and addon to see if there are any fatal errors during install.
     */
    public function TestAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
-      if (!in_array($AddonType, array('Plugin', 'Application', 'Theme')))
+      if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale')))
          $AddonType = 'Plugin';
          
       $Session = Gdn::Session();
       $AddonName = $Session->ValidateTransientKey($TransientKey) ? $AddonName : '';
-      $AddonManagerName = $AddonType.'Manager';
-      $TestMethod = 'Test'.$AddonType;
-      $AddonManager = Gdn::Factory($AddonManagerName);
+      if ($AddonType == 'Locale') {
+         $AddonManager = new LocaleModel();
+         $TestMethod = 'TestLocale';
+      } else {
+         $AddonManagerName = $AddonType.'Manager';
+         $TestMethod = 'Test'.$AddonType;
+         $AddonManager = Gdn::Factory($AddonManagerName);
+      }
       if ($AddonName != '') {
          $Validation = new Gdn_Validation();
          $AddonManager->$TestMethod($AddonName, $Validation);
@@ -585,7 +636,7 @@ class SettingsController extends DashboardController {
 
       $Session = Gdn::Session();
       $ThemeManager = new Gdn_ThemeManager();
-      $this->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
+      $AvailableThemes = $ThemeManager->AvailableThemes();
       $this->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
       $this->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
@@ -601,18 +652,19 @@ class SettingsController extends DashboardController {
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailableThemes as $Theme => $Info) {
+            foreach ($AvailableThemes as $Theme => $Info) {
                $CurrentName = ArrayValue('Name', $Info, $Theme);
                if (
                   $CurrentName == $Name
                   && $Type == 'Theme'
                ) {
                   $Info['NewVersion'] = $NewVersion;
-                  $this->AvailableThemes[$Theme] = $Info;
+                  $AvailableThemes[$Theme] = $Info;
                }
             }
          }
       }
+      $this->SetData('AvailableThemes', $AvailableThemes);
       
       if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
          try {

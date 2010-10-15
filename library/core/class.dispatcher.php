@@ -92,6 +92,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_ControllerMethodArgs = array();
 
    /**
+    * @var string|FALSE The delivery method to set on the controller.
+    */
+   private $_DeliveryMethod = FALSE;
+
+
+   /**
+    * @var string|FALSE The delivery type to set on the controller.
+    */
+   private $_DeliveryType = FALSE;
+
+   /**
     * An associative collection of variables that will get passed into the
     * controller as properties once it has been instantiated.
     *
@@ -177,8 +188,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest($Request);
       
-      // Send user to login page if this is a private community
-      if (C('Garden.PrivateCommunity') && $this->ControllerName() != 'EntryController' && !Gdn::Session()->IsValid()) {
+      // Send user to login page if this is a private community (with some minor exceptions)
+      if (
+         C('Garden.PrivateCommunity')
+         && $this->ControllerName() != 'EntryController'
+         && !Gdn::Session()->IsValid()
+         && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
+      ) {
          Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
          exit();
       }
@@ -249,8 +265,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->RequestMethod = $this->_ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
-         $Controller->DeliveryType($Request->GetValue('DeliveryType', ''));
-         $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', ''));
+         $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
+         $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
+
+         // Set special controller method options for REST APIs.
+         $this->_ReflectControllerArgs($Controller);
          
          $Controller->Initialize();
 
@@ -261,33 +280,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             
             if ($PluginManagerHasReplacementMethod) {
               Gdn::PluginManager()->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
-            } else {
-              
+            } else { 
               $Args = $this->_ControllerMethodArgs;
               $Count = count($Args);
-              
-              if ($Count == 0) {
-                 $Controller->$ControllerMethod();
-              } else if ($Count == 1) {
-                 $Controller->$ControllerMethod($Args[0]);
-              } else if ($Count == 2) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1]);
-              } else if ($Count == 3) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2]);
-              } else if ($Count == 4) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3]);
-              } else if ($Count == 5) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
-              } else if ($Count == 6) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
-              } else if ($Count == 7) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
-              } else if ($Count == 8) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
-              } else if ($Count == 9) {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8]);
-              } else {
-                 $Controller->$ControllerMethod($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7], $Args[8], $Args[9]);
+
+              try {
+                 call_user_func_array(array($Controller, $ControllerMethod), $Args);
+              } catch (Exception $Ex) {
+                 $Controller->RenderException($Ex);
+                 exit();
               }
             }
          } else {
@@ -357,17 +358,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @todo $folderDepth needs a description.
     */
    protected function _AnalyzeRequest(&$Request, $FolderDepth = 1) {
+      // Here is the basic format of a request:
+      // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
+
       // Here are some examples of what this method could/would receive:
-      // /application/controllergroup/controller/method/argn
-      // /controllergroup/controller/method/argn
-      // /application/controllergroup/controller/argn
-      // /controllergroup/controller/argn
-      // /controllergroup/controller
       // /application/controller/method/argn
       // /controller/method/argn
       // /application/controller/argn
       // /controller/argn
       // /controller
+
 
       // Clear the slate
       $this->_ApplicationFolder = '';
@@ -375,9 +375,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-      $this->Request = $Request->Path();
+      $this->Request = $Request->Path(TRUE);
 
       $PathAndQuery = $Request->PathAndQuery();
+      //$Router = Gdn::Router();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
 
       // We have a route. Take action.
@@ -389,19 +390,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               Header( "HTTP/1.1 302 Moved Temporarily" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 302 Moved Temporarily" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
             case 'Permanent':
-               Header( "HTTP/1.1 301 Moved Permanently" );
-               Header( "Location: ".$MatchRoute['FinalDestination'] );
+               header( "HTTP/1.1 301 Moved Permanently" );
+               header( "Location: ".$MatchRoute['FinalDestination'] );
                exit();
                break;
 
+            case 'NotAuthorized':
+               header( "HTTP/1.1 401 Not Authorized" );
+               $this->Request = $MatchRoute['FinalDestination'];
+               break;
+
             case 'NotFound':
-               Header( "HTTP/1.1 404 Not Found" );
+               header( "HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
          }
@@ -431,7 +437,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Length = count($Parts);
       if ($Length == 1 || $FolderDepth <= 0) {
          $FolderDepth = 0;
-         $this->_ControllerName = $Parts[0];
+         list($this->_ControllerName, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[0]);
+         $Parts[0] = $this->_ControllerName;
          $this->_MapParts($Parts, 0);
          $this->_FetchController(TRUE); // Throw an error if this fails because there's nothing else to check
       } else if ($Length == 2) {
@@ -469,6 +476,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          }
       }
+      if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
+         $this->_DeliveryType = DELIVERY_TYPE_DATA;
    }
 
    /**
@@ -552,14 +561,60 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->_ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
 
       if ($Length > $ControllerKey + 1)
-         $this->_ControllerMethod = $Parts[$ControllerKey + 1];
+         list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
 
       if ($Length > $ControllerKey + 2) {
          for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
             if ($Parts[$i] != '')
                $this->_ControllerMethodArgs[] = $Parts[$i];
-
          }
+      }
+   }
+
+   protected function _ReflectControllerArgs($Controller) {
+      // Reflect the controller arguments based on the get.
+      if (count($Controller->Request->Get()) == 0)
+         return;
+
+      if (!method_exists($Controller, $this->_ControllerMethod))
+         return;
+
+      $Meth = new ReflectionMethod($Controller, $this->_ControllerMethod);
+      $MethArgs = $Meth->getParameters();
+      $Args = array();
+      $Get = array_change_key_case($Controller->Request->Get());
+      $MissingArgs = array();
+
+      // Set all of the parameters.
+      foreach ($MethArgs as $Index => $MethParam) {
+         $ParamName = strtolower($MethParam->getName());
+
+         if (isset($this->_ControllerMethodArgs[$Index]))
+            $Args[] = $this->_ControllerMethodArgs[$Index];
+         elseif (isset($Get[$ParamName]))
+            $Args[] = $Get[$ParamName];
+         elseif ($MethParam->isDefaultValueAvailable())
+            $Args[] = $MethParam->getDefaultValue();
+         else {
+            $Args[] = NULL;
+            $MissingArgs[] = "$Index: $ParamName";
+         }
+      }
+
+      $this->_ControllerMethodArgs = $Args;
+         
+   }
+
+   protected function _SplitDeliveryMethod($Name) {
+      $Parts = explode('.', $Name, 2);
+      if (count($Parts) >= 2) {
+         if (in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
+            return array($Parts[0], strtoupper($Parts[1]));
+         } else {
+            return array($Name, $this->_DeliveryMethod);
+         }
+      } else {
+         return array($Name, $this->_DeliveryMethod);
       }
    }
 }

@@ -282,13 +282,37 @@ class Gdn_PluginManager {
       // Look for "Base" (aka any class that has $EventName)
       if ($this->CallEventHandler($Sender, 'Base', $EventName, $EventHandlerType))
          $Return = TRUE;
+
+      // Look for Wildcard event handlers
+      $WildEventKey = $EventClassName.'_'.$EventName.'_'.$EventHandlerType;
+      if ($this->CallEventHandler($Sender, 'Base', 'All', $EventHandlerType, $WildEventKey))
+         $Return = TRUE;
+      if ($this->CallEventHandler($Sender, $EventClassName, 'All', $EventHandlerType, $WildEventKey))
+         $Return = TRUE;
          
       return $Return;
    }
    
-   public function CallEventHandler(&$Sender, $EventClassName, $EventName, $EventHandlerType) {
+   public function CallEventHandler(&$Sender, $EventClassName, $EventName, $EventHandlerType, $PassedEventKey = NULL) {
       $Return = FALSE;
+      
       $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
+      if (is_null($PassedEventKey))
+         $PassedEventKey = $EventKey;
+         
+      // For "All" events, calculate the stack
+      if ($EventName == 'All') {
+         $Stack = debug_backtrace();
+         // this call
+         array_shift($Stack);
+         
+         // plural call
+         array_shift($Stack);
+         
+         $EventCaller = array_shift($Stack);
+         $Sender->EventArguments['WildEventStack'] = $EventCaller;
+      }
+      
       if (array_key_exists($EventKey, $this->_EventHandlerCollection)) {
          // Loop through the handlers and execute them
          foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
@@ -299,7 +323,7 @@ class Gdn_PluginManager {
                if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
                   $Sender->Returns[$EventKey] = array();
                
-               $Sender->Returns[$EventKey][$PluginKey] = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments);
+               $Sender->Returns[$EventKey][$PluginKey] = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
                $Return = TRUE;
             }
          }
@@ -414,7 +438,7 @@ class Gdn_PluginManager {
       return (is_null($GetPlugin)) ? $this->_AvailablePlugins : ((array_key_exists($GetPlugin,$this->_AvailablePlugins)) ? $this->_AvailablePlugins[$GetPlugin] : FALSE);
    }
    
-   public function ScanPluginFile($PluginFile) {
+   public function ScanPluginFile($PluginFile, $VariableName = NULL) {
       // Find the $PluginInfo array
       $Lines = file($PluginFile);
       $InfoBuffer = FALSE;
@@ -422,6 +446,8 @@ class Gdn_PluginManager {
       $ClassName = '';
       $PluginInfoString = '';
       $PluginInfo = FALSE;
+      $ParseVariableName = $VariableName ? '$'.$VariableName : '$PluginInfo';
+
       foreach ($Lines as $Line) {
          if ($InfoBuffer && substr(trim($Line), -2) == ');') {
             $PluginInfoString .= $Line;
@@ -429,7 +455,7 @@ class Gdn_PluginManager {
             $InfoBuffer = FALSE;
          }
          
-         if (substr(trim($Line), 0, 11) == '$PluginInfo')
+         if (StringBeginsWith(trim($Line), $ParseVariableName))
             $InfoBuffer = TRUE;
             
          if ($InfoBuffer)
@@ -464,6 +490,9 @@ class Gdn_PluginManager {
             $PluginInfo[$Item]['Folder'] = $Item;
             
          return $PluginInfo[$Item];
+      } elseif ($VariableName !== NULL) {
+         if (isset($$VariableName) && is_array($$VariableName))
+            return $$VariableName;
       }
       
       return NULL;

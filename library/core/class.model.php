@@ -291,6 +291,19 @@ class Gdn_Model extends Gdn_Pluggable {
       }
    }
 
+   /**
+    * Returns an array with only those keys that are actually in the schema.
+    *
+    * @param array $Data An array of key/value pairs.
+    * @return array The filtered array.
+    */
+   public function FilterSchema($Data) {
+      $Fields = $this->Schema->Fields($this->Name);
+
+      $Result = array_intersect_key($Data, $Fields);
+      return $Result;
+   }
+
 
    /**
     * @param unknown_type $OrderFields

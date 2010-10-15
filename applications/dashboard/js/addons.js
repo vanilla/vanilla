@@ -7,12 +7,21 @@ jQuery(document).ready(function($) {
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonType = urlParts[urlParts.length - 4];
-      if (addonType == 'plugins')
-         addonType = 'Plugin';
-      else if (addonType == 'applications')
-         addonType = 'Application';
-      else if (addonType == 'themes')
-         addonType = 'Theme';
+
+      switch (addonType) {
+         case 'plugins':
+            addonType = 'Plugin';
+            break;
+         case 'applications':
+            addonType = 'Application';
+            break;
+         case 'themes':
+            addonType = 'Theme';
+            break;
+         case 'locales':
+            addonType = 'Locale';
+            break;
+      }
       
       if ($(this).hasClass('EnableTheme'))
          addonType = 'Theme';

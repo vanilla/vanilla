@@ -83,6 +83,12 @@ class DebuggerPlugin extends Gdn_Plugin {
                .'<pre>'.$Query.';</pre>';
          }
       }
+      $String .= '<h3>Controller Data</h3><pre>';
+      
+      $String .= self::FormatData($Sender->Data);
+
+      $String .= '</pre>';
+
       global $Start;
       $String .= '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
          /*
@@ -96,6 +102,47 @@ class DebuggerPlugin extends Gdn_Plugin {
       $String .= '</div>';
       echo $String;
    //}
+   }
+
+   public static function FormatData($Data, $Indent = '') {
+      $Result = '';
+      if (is_array($Data)) {
+         foreach ($Data as $Key => $Value) {
+            if ($Key === NULL)
+               $Key = 'NULL';
+            $Result .= "$Indent<b>$Key</b>: ";
+
+            if ($Value === NULL) {
+               $Result .= 'NULL';
+            } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
+               $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
+            } else {
+               if (is_a($Value, 'Gdn_DataSet'))
+                  $Result .= "DataSet\n";
+
+               $Result .= 
+                  "\n"
+                  .self::FormatData($Value, $Indent.'   ');
+            }
+         }
+      } elseif (is_a($Data, 'Gdn_DataSet')) {
+         $Data = $Data->Result();
+         if (count($Data) == 0)
+            return $Result.'EMPTY';
+
+         $Fields = array_keys((array)$Data[0]);
+         $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
+            .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields));
+         return $Result;
+      } elseif (is_a($Data, 'stdClass')) {
+         $Data = (array)$Data;
+         return self::FormatData($Data, $Indent);
+      } elseif (is_object($Data)) {
+         $Result .= $Indent.get_class($Data);
+      } else {
+         return trim(var_export($Data, TRUE));
+      }
+      return $Result;
    }
    
    public function PluginController_Debugger_Create($Sender) {

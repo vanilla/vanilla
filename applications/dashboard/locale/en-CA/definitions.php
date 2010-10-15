@@ -8,7 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-
 /**
  * English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
  *
@@ -26,8 +25,8 @@ if (!function_exists('Plural')) {
    }
 }
 
-
 $Definition['Locale'] = 'en-CA';
+$Definition['_Locale'] = 'Locale';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
@@ -47,6 +46,7 @@ $Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least on
 $Definition['ValidateConnection'] = 'The connection parameters you specified failed to open a connection to the database. The database reported the following error: <code>%s</code>';
 $Definition['ValidateMinimumAge'] = 'You must be at least 16 years old to proceed.';
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
+$Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email and password you entered.';

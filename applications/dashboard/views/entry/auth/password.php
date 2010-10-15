@@ -29,7 +29,6 @@
       </li>
       <li class="CreateAccount">
          <?php
-            echo $this->Form->Button('Sign In →', array('Name' => 'Form/SignIn'));
             $Target = GetIncomingValue('Target', '');
             if ($Target != '')
                $Target = '?Target='.$Target;

@@ -1903,9 +1903,6 @@ div.Popup #Form_User div.Warning,
 #dashboard_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
 }
-div.SignInPopup div.Border {
-	max-width: 280px;
-}
 div.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }
@@ -1921,12 +1918,6 @@ input.Password {
 a.ForgotPassword {
 	margin-left: 10px;
 }
-#Form_User_Password a.ForgotPassword {
-	display: block;
-	margin: 0;
-}
-
-body.signin form ul li label.CheckBoxLabel,
 div.SignInPopup form ul li label.CheckBoxLabel {
 	color: #777;
 	display: inline;
@@ -1953,11 +1944,118 @@ div.SignInPopup div.Methods {
 div.SignInPopup div.Methods div.Method {
 	padding: 10px 0 0;
 }
+
+	line-height: 1;
+}
+div.SignInPopup div.Methods div.Method {
+	padding: 10px 0 0;
+}
 /* Serious Ajax Error Styles */
 div.AjaxError {
 	white-space: pre;
 	overflow: auto;
 	padding: 10px;
+}
+
+
+/* External App Connect Designs */
+body.connect {
+	background: #CFECFF;
+}
+body.connect h1,
+body.connect h2 {
+	text-align: left;
+	font-size:120%;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #fff;
+	background: #38abe3;
+	border-bottom: 1px solid #3DB9E5;
+	padding: 6px 9px 4px;
+	border-bottom: 1px solid #888;
+}
+body.connect div.Box {
+	border-radius: none;
+	-moz-border-radius: none;
+	-webkit-border-radius: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	width: 300px;
+	margin: 0 auto;
+	text-align: left;
+}
+div.ConnectInfo {
+	margin: 10px 0 0;
+	position: relative;
+}
+div.ConnectInfo img {
+	position: absolute;
+	height: 36px;
+	width: 36px;
+	top: 0;
+	left: 0;
+}
+div.ConnectInfo span.Name {
+	padding-left: 46px;
+	font-weight: bold;
+	line-height: 1;
+	font-size: 13px;
+	color: #444;
+	display: block;
+}
+div.ConnectInfo h3 {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	line-height: 1.6;
+	color: #333;
+	padding: 0 0 10px 46px;
+	border: none;
+}
+body.connect form ul li label,
+div.SignInPopup form ul li label {
+	font-size: 13px;
+	line-height: 1;
+	padding: 0;
+}
+body.connect form ul li#ConnectPassword label,
+div.SignInPopup form ul li#ConnectPassword label {
+	padding: 10px 0 0;
+}
+body.connect .FinePrint,
+div.SignInPopup .FinePrint {
+	font-size: 11px;
+	color: #777;
+}
+body.connect input.InputBox,
+div.SignInPopup input.InputBox {
+	padding: 3px
+}
+body.connect .ExistingUsername,
+div.SignInPopup .ExistingUsername {
+	font-weight: bold;
+	line-height: 1;
+	font-size: 13px;
+	color: #000;
+	display: block;
+}
+body.connect div.ButtonContainer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: #38abe3;
+	padding: 6px 8px;
+	text-align: right;
+	border-top: 1px solid #888;
+}
+body.connect input.Button {
+	margin: 0;
+	border:1px solid #555;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
 }
 
 

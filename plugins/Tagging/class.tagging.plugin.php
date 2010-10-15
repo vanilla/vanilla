@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -283,7 +283,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Title(T('Edit Tag'));
       $Sender->AddSideMenu('settings/tagging');
       $TagID = GetValue(0, $Sender->RequestArgs);
-      $TagModel = new Gdn_Model('Tag');
+      $TagModel = new TagModel;
       $Sender->Tag = $TagModel->GetWhere(array('TagID' => $TagID))->FirstRow();
 
       // Set the model on the form.
@@ -301,14 +301,18 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->Form->AddError('Tags can only contain the following characters: a-z 0-9 + # _ .');         
          
          // Make sure that the tag name is not already in use.
-         if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0)
-            $Sender->Form->AddError('The specified tag name is already in use.');
+         if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0) {
+            $Sender->SetData('MergeTagVisible', TRUE);
+            if (!$Sender->Form->GetFormValue('MergeTag')) {
+               $Sender->Form->AddError('The specified tag name is already in use.');
+            }
+         }
          
          if ($Sender->Form->Save())
             $Sender->StatusMessage = T('Your changes have been saved successfully.');
       }
 
-      $Sender->Render('plugins/Tagging/views/edittag.php');
+      $Sender->Render('EditTag', '', 'plugins/Tagging');
    }
 
    /**
@@ -342,8 +346,8 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->TagData = $SQL
          ->Select('t.*')
          ->From('Tag t')
-         ->OrderBy('t.CountDiscussions', 'desc')
          ->OrderBy('t.Name', 'asc')
+         ->OrderBy('t.CountDiscussions', 'desc')
          ->Get();
          
       $Sender->Render('plugins/Tagging/views/tagging.php');

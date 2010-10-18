@@ -36,15 +36,19 @@
 </div>
 <?php
    if ($this->Data('PreFocusAuthenticationScheme')) {
+      $Scheme = $this->Data('PreFocusAuthenticationScheme');
+      $Rel = $this->Data('AuthenticationConfigureList.'.$Scheme);
+      if (!is_String($Rel))
+         $Rel = '/dashboard/authentication/configure/'.$Scheme;
 ?>
-      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>"></div>
+      <div class="AuthenticationConfigure Slice Async" rel="<?php echo $Rel; ?>"></div>
 <?php
    } else {
       echo $this->Slice('configure');
    }
 ?>
 <script type="text/javascript">
-   var ConfigureList = <?php echo $this->Data('AuthenticationConfigureList'); ?>;
+   var ConfigureList = <?php echo json_encode($this->Data('AuthenticationConfigureList')); ?>;
    jQuery(document).ready(function(){
       if ($('select#Form_Garden-dot-Authentication-dot-Chooser').attr('bound')) return;
 

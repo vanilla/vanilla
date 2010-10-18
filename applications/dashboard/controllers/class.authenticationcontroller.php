@@ -75,7 +75,7 @@ class AuthenticationController extends DashboardController {
          }
       }
       
-      $this->SetData('AuthenticationConfigureList', json_encode($this->ConfigureList));
+      $this->SetData('AuthenticationConfigureList', $this->ConfigureList);
       $this->SetData('PreFocusAuthenticationScheme', $PreFocusAuthenticationScheme);
       $this->Render();
    }

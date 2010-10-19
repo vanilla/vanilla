@@ -128,16 +128,15 @@ class Gdn_Auth extends Gdn_Pluggable {
          }
       }
       
-      if ($HaveScheme && !$ForceWrite) return;
-      
       // Now add the new scheme to the list (once)
-      if (!$HaveScheme)
+      if (!$HaveScheme || $ForceWrite) {
          array_push($EnabledSchemes, $AuthenticationSchemeAlias);
+         SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      }
       
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-      
-      if ($SetAsDefault == TRUE)
+      if ($SetAsDefault == TRUE) {
          $this->SetDefaultAuthenticator($AuthenticationSchemeAlias);
+      }
    }
    
    public function DisableAuthenticationScheme($AuthenticationSchemeAlias) {
@@ -162,9 +161,9 @@ class Gdn_Auth extends Gdn_Pluggable {
          }
       }
       
-      if (!$HadScheme && !$ForceWrite) return;
-      
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      if ($HadScheme || $ForceWrite) {
+         SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      }
    }
    
    public function UnsetDefaultAuthenticator($AuthenticationSchemeAlias) {
@@ -181,7 +180,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       if (!in_array($AuthenticationSchemeAlias, $EnabledSchemes)) return FALSE;
-      
+
       SaveToConfig('Garden.Authenticator.DefaultScheme', $AuthenticationSchemeAlias);
       return TRUE;
    }

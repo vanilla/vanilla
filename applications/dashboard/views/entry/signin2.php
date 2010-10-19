@@ -2,7 +2,7 @@
 
 $Methods = $this->Data('Methods', array());
 $SelectedMethod = $this->Data('SelectedMethod', array());
-$CssClass = count($Methods) > 0 ? '' : ' SingleMethodEntry';
+$CssClass = count($Methods) > 0 ? ' MultipleEntryMethods' : ' SingleEntryMethod';
 
 // Testing
 //$Methods['Facebook'] = array('Label' => 'Facebook', 'Url' => '#', 'ViewLocation' => 'signin');

@@ -142,5 +142,5 @@ try {
    if (window.location.hash.substr(0, 6) != "#poll:")
       window.vanilla.embed();
 } catch(e) {
-   document.write("<div style=\"padding: 10px; font-size: 12px; font-family: 'lucida grande'; background: #fff; color:#000\";>Failed to embed Vanilla: " + e + "</div>");
+   document.write("<div style=\"padding: 10px; font-size: 12px; font-family: 'lucida grande'; background: #fff; color:#000;\">Failed to embed Vanilla: " + e + "</div>");
 }

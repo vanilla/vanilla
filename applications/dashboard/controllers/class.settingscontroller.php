@@ -271,6 +271,9 @@ class SettingsController extends DashboardController {
     * plugins.
     */
    public function AddUpdateCheck() {
+      if (C('Garden.NoUpdateCheck'))
+         return;
+      
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.

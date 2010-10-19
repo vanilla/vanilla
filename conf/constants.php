@@ -31,12 +31,6 @@ define('HANDLER_TYPE_EVENT', 'EVENT'); // Call to an event handler.
 define('HANDLER_TYPE_OVERRIDE', 'OVERRIDE'); // Call to a method override.
 define('HANDLER_TYPE_NEW', 'NEW'); // Call to a new object method.
 
-// Addon type enumerators:
-define('ADDON_TYPE_APPLICATION', 'Application');
-define('ADDON_TYPE_PLUGIN', 'Plugin');
-define('ADDON_TYPE_THEME', 'Theme');
-define('ADDON_TYPE_LOCALE', 'Locale');
-
 // Dataset type enumerators:
 define('DATASET_TYPE_ARRAY', 'array');
 define('DATASET_TYPE_OBJECT', 'object');

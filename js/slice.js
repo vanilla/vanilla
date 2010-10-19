@@ -116,8 +116,9 @@ function Gdn_Slice(SliceElement, SliceID) {
    
       var DataObj = $(Data);
       if (!DataObj.find('.Slice').length && !DataObj.hasClass('Slice')) {
-         console.log(Data);
-         return;
+         // The slice isn't wrapped in anything so just put it inside the existing slice div.
+         var SliceWrap = this.Slice.clone().empty().append(DataObj);
+         DataObj = SliceWrap;
       }
    
       this.Slice.find('.SliceOverlay').fadeTo('fast', 0,jQuery.proxy(function(){

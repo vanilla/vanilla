@@ -324,7 +324,8 @@ if ($PhotoIDExists) {
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
-   ->Column('Name', 'varchar(255)')
+   ->Column('Name', 'varchar(255)', 'unique')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Engine('InnoDB')
    ->Set($Explicit, $Drop);

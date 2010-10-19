@@ -501,7 +501,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DefinitionList() {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
-         $this->_Definitions['TransportError'] = T('A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+         $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
 
       if (!array_key_exists('TransientKey', $this->_Definitions))
          $this->_Definitions['TransientKey'] = $Session->TransientKey();
@@ -884,10 +884,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-        if (!$Session->IsValid()) {
+        if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
         } else {
-           Redirect(Gdn::Router()->GetDestination('DefaultPermission'));
+           Gdn::Dispatcher()->Dispatch('DefaultPermission');
+           exit();
         }
       }
    }
@@ -1065,8 +1066,18 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    // Render the data array.
    public function RenderData($Data = NULL) {
-      if ($Data === NULL)
-         $Data = $this->Data;
+      if ($Data === NULL) {
+         $Data = array();
+
+         // Remove standard and "protected" data from the top level.
+         foreach ($this->Data as $Key => $Value) {
+            if (in_array($Key, array('Title')))
+               continue;
+            if (isset($Key[0]) && $Key[0] == '_')
+               continue; // protected
+            $Data[$Key] = $Value;
+         }
+      }
 
       // Massage the data for better rendering.
       foreach ($Data as $Key => $Value) {
@@ -1198,7 +1209,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function RenderMaster() {
       // Build the master view if necessary
-      if ($this->_DeliveryType ==DELIVERY_TYPE_ALL) {
+      if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_EMBED))) {
          // Define some default master views unless one was explicitly defined
          if ($this->MasterView == '') {
             // If this is a syndication request, use the appropriate master view

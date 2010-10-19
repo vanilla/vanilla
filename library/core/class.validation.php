@@ -119,6 +119,7 @@ class Gdn_Validation {
       $this->AddRule('Required', 'function:ValidateRequired');
       $this->AddRule('RequiredArray', 'function:ValidateRequiredArray');
       $this->AddRule('Email', 'function:ValidateEmail');
+      $this->AddRule('WebAddress', 'function:ValidateWebAddress');
       $this->AddRule('Username', 'function:ValidateUsername');
       $this->AddRule('UrlString', 'function:ValidateUrlString');
       $this->AddRule('Date', 'function:ValidateDate');

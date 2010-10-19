@@ -188,8 +188,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->FireEvent('BeforeDispatch');
       $this->_AnalyzeRequest($Request);
       
-      // Send user to login page if this is a private community
-      if (C('Garden.PrivateCommunity') && $this->ControllerName() != 'EntryController' && !Gdn::Session()->IsValid()) {
+      // Send user to login page if this is a private community (with some minor exceptions)
+      if (
+         C('Garden.PrivateCommunity')
+         && $this->ControllerName() != 'EntryController'
+         && !Gdn::Session()->IsValid()
+         && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
+      ) {
          Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
          exit();
       }
@@ -373,6 +378,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->Request = $Request->Path(TRUE);
 
       $PathAndQuery = $Request->PathAndQuery();
+      //$Router = Gdn::Router();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
 
       // We have a route. Take action.
@@ -396,7 +402,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'NotAuthorized':
-               header( "HTTP/1.1 401 Not Found" );
+               header( "HTTP/1.1 401 Not Authorized" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
 
@@ -605,10 +611,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          if (in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
             return array($Parts[0], strtoupper($Parts[1]));
          } else {
-            return array($Name, FALSE);
+            return array($Name, $this->_DeliveryMethod);
          }
       } else {
-         return array($Name, FALSE);
+         return array($Name, $this->_DeliveryMethod);
       }
    }
 }

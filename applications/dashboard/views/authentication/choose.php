@@ -2,7 +2,7 @@
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Info">
    <?php echo T('Choose and configure your forum\'s authentication scheme.'); ?><br/>
-   <span class="PasswordForce"><?php echo sprintf(T('If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'),Url('entry/password', TRUE)); ?></span>
+   <span class="PasswordForce"><?php echo sprintf(T('You can always use your password at<a href="%1$s">%1$s</a>.', 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'),Url('entry/password', TRUE)); ?></span>
 </div>
 <div class="AuthenticationChooser">
    <?php 
@@ -36,15 +36,19 @@
 </div>
 <?php
    if ($this->Data('PreFocusAuthenticationScheme')) {
+      $Scheme = $this->Data('PreFocusAuthenticationScheme');
+      $Rel = $this->Data('AuthenticationConfigureList.'.$Scheme);
+      if (!is_String($Rel))
+         $Rel = '/dashboard/authentication/configure/'.$Scheme;
 ?>
-      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>"></div>
+      <div class="AuthenticationConfigure Slice Async" rel="<?php echo $Rel; ?>"></div>
 <?php
    } else {
       echo $this->Slice('configure');
    }
 ?>
 <script type="text/javascript">
-   var ConfigureList = <?php echo $this->Data('AuthenticationConfigureList'); ?>;
+   var ConfigureList = <?php echo json_encode($this->Data('AuthenticationConfigureList')); ?>;
    jQuery(document).ready(function(){
       if ($('select#Form_Garden-dot-Authentication-dot-Chooser').attr('bound')) return;
 

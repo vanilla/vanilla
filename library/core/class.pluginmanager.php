@@ -438,7 +438,7 @@ class Gdn_PluginManager {
       return (is_null($GetPlugin)) ? $this->_AvailablePlugins : ((array_key_exists($GetPlugin,$this->_AvailablePlugins)) ? $this->_AvailablePlugins[$GetPlugin] : FALSE);
    }
    
-   public function ScanPluginFile($PluginFile) {
+   public function ScanPluginFile($PluginFile, $VariableName = NULL) {
       // Find the $PluginInfo array
       $Lines = file($PluginFile);
       $InfoBuffer = FALSE;
@@ -446,6 +446,8 @@ class Gdn_PluginManager {
       $ClassName = '';
       $PluginInfoString = '';
       $PluginInfo = FALSE;
+      $ParseVariableName = $VariableName ? '$'.$VariableName : '$PluginInfo';
+
       foreach ($Lines as $Line) {
          if ($InfoBuffer && substr(trim($Line), -2) == ');') {
             $PluginInfoString .= $Line;
@@ -453,7 +455,7 @@ class Gdn_PluginManager {
             $InfoBuffer = FALSE;
          }
          
-         if (substr(trim($Line), 0, 11) == '$PluginInfo')
+         if (StringBeginsWith(trim($Line), $ParseVariableName))
             $InfoBuffer = TRUE;
             
          if ($InfoBuffer)
@@ -488,6 +490,9 @@ class Gdn_PluginManager {
             $PluginInfo[$Item]['Folder'] = $Item;
             
          return $PluginInfo[$Item];
+      } elseif ($VariableName !== NULL) {
+         if (isset($$VariableName) && is_array($$VariableName))
+            return $$VariableName;
       }
       
       return NULL;

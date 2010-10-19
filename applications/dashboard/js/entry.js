@@ -13,10 +13,10 @@ jQuery(document).ready(function($) {
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(text) {
-               if (text == 'TRUE')
-                  $('#EmailUnavailable').hide();
-               else
+               if (text == 'FALSE')
                   $('#EmailUnavailable').show();
+               else
+                  $('#EmailUnavailable').hide();
             }
          });
       }
@@ -35,10 +35,10 @@ jQuery(document).ready(function($) {
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(text) {
-               if (text == 'TRUE')
-                  $('#NameUnavailable').hide();
-               else
+               if (text == 'FALSE')
                   $('#NameUnavailable').show();
+               else
+                  $('#NameUnavailable').hide();
             }
          });
       }

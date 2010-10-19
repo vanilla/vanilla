@@ -174,6 +174,7 @@ class EntryController extends Gdn_Controller {
     * This controller method is meant to be used with plugins that set its data array to work.
     */
    public function Connect($Method) {
+      $this->AddJsFile('entry.js');
       $this->View = 'connect';
       $IsPostBack = $this->Form->IsPostBack();
 
@@ -659,6 +660,8 @@ class EntryController extends Gdn_Controller {
     * Calls the appropriate registration method based on the configuration setting.
     */
    public function Register($InvitationCode = '') {
+      $this->FireEvent("Register");
+      
       $this->Form->SetModel($this->UserModel);
 
       // Define gender dropdown options

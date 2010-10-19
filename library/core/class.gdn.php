@@ -152,6 +152,9 @@ class Gdn {
          case self::AliasConfig:
             self::$_Config = self::Factory($Alias);
             break;
+         case self::AliasLocale:
+            self::$_Locale = self::Factory($Alias);
+            break;
          case self::AliasRequest:
             self::$_Request = self::Factory($Alias);
             break;
@@ -368,10 +371,7 @@ class Gdn {
     * @param string $Default The default value to be displayed if the translation code is not found.
     * @return string The translated string or $Code if there is no value in $Default.
     */
-   public static function Translate($Code, $Default = '') {
-      if ($Default == '')
-         $Default = $Code;
-         
+   public static function Translate($Code, $Default = FALSE) {
       return Gdn::Locale()->Translate($Code, $Default);
    }
    

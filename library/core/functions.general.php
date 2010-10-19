@@ -9,9 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 function Gdn_Autoload($ClassName) {
-   if (class_exists('HTMLPurifier_Bootstrap', FALSE) && HTMLPurifier_Bootstrap::autoload($ClassName))
-      return true;
-
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
       
@@ -692,6 +689,28 @@ if (!function_exists('GetValueR')) {
    }
 }
 
+if (!function_exists('ImplodeAssoc')) {
+   /**
+    * A version of implode() that operates on array keys and values.
+    *
+    * @param string $KeyGlue The glue between keys and values.
+    * @param string $ElementGlue The glue between array elements.
+    * @param array $Array The array to implode.
+    * @return string The imploded array.
+    */
+   function ImplodeAssoc($KeyGlue, $ElementGlue, $Array) {
+      $Result = '';
+
+      foreach ($Array as $Key => $Value) {
+         if (strlen($Result) > 0)
+            $Result .= $ElementGlue;
+
+         $Result .= $Key.$KeyGlue.$Value;
+      }
+      return $Result;
+   }
+}
+
 if (!function_exists('InArrayI')) {
    /**
     * Case-insensitive version of php's native in_array function.
@@ -701,6 +720,33 @@ if (!function_exists('InArrayI')) {
       foreach ($Haystack as $Item) {
          if (strtolower($Item) == $Needle)
             return TRUE;
+      }
+      return FALSE;
+   }
+}
+
+if (!function_exists('IsSearchEngine')) {
+   function IsSearchEngine() {
+      $Engines = array(
+         'googlebot', 
+         'slurp', 
+         'search.msn.com', 
+         'nutch', 
+         'simpy', 
+         'bot', 
+         'aspseek', 
+         'crawler', 
+         'msnbot', 
+         'libwww-perl', 
+         'fast', 
+         'baidu', 
+      );
+      $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
+      if ($HttpUserAgent != '') {
+         foreach ($Engines as $Engine) {
+            if (strpos($HttpUserAgent, $Engine) !== FALSE)
+               return TRUE;
+         }
       }
       return FALSE;
    }
@@ -1271,16 +1317,37 @@ if (!function_exists('SafeParseStr')) {
 }
 
 if (!function_exists('SaveToConfig')) {
-   function SaveToConfig($Name, $Value = '', $Save = TRUE) {
+   /**
+    * Save values to the application's configuration file.
+    *
+    * @param string|array $Name One of the following:
+    *  - string: The key to save.
+    *  - array: An array of key/value pairs to save.
+    * @param mixed|null $Value The value to save.
+    * @param array $Options An array of additional options for the save.
+    *  - Save: If this is false then only the in-memory config is set.
+    *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
+    * @return bool: Whethr or not the save was successful.
+    */
+   function SaveToConfig($Name, $Value = '', $Options = array()) {
+      $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
+      $RemoveEmpty = GetValue('RemoveEmpty', $Options);
+
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . 'config.php';
       $Config->Load($Path, 'Save');
+
       if (!is_array($Name))
          $Name = array($Name => $Value);
-      
+
       foreach ($Name as $k => $v) {
-         $Config->Set($k, $v, TRUE, $Save);
+         if (!$v && $RemoveEmpty) {
+            $Config->Remove($k);
+         } else {
+            $Config->Set($k, $v, TRUE, $Save);
+         }
       }
+
       if ($Save)
          return $Config->Save($Path);
       else
@@ -1376,7 +1443,7 @@ if (!function_exists('T')) {
 	 * @return string The translated string or $Code if there is no value in $Default.
 	 * @see Gdn::Translate()
 	 */
-   function T($Code, $Default = '') {
+   function T($Code, $Default = FALSE) {
       return Gdn::Translate($Code, $Default);
    }
 }
@@ -1455,5 +1522,47 @@ if (!function_exists('check_utf8')){
            }
        }
        return true;
+   }
+}
+
+if (!function_exists('IsMobile')) {
+   function IsMobile() {
+      $Mobile = 0;
+      $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
+      $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
+      $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone)/i', $UserAgent))
+         $Mobile++;
+ 
+      if(
+         (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
+         || (
+            (isset($_SERVER['HTTP_X_WAP_PROFILE'])
+            || isset($_SERVER['HTTP_PROFILE'])))
+         )
+         $Mobile++;
+ 
+      $MobileUserAgent = strtolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
+      $MobileUserAgents = array(
+          'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
+          'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
+          'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
+          'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
+          'newt','noki','oper','palm','pana','pant','phil','play','port','prox',
+          'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
+          'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
+          'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
+          'wapr','webc','winw','winw','xda','xda-');
+ 
+      if (in_array($MobileUserAgent, $MobileUserAgents))
+         $Mobile++;
+ 
+      if (strpos($AllHttp, 'operamini') > 0)
+         $Mobile++;
+ 
+      if (strpos($UserAgent, 'windows') > 0)
+         $Mobile = 0;
+ 
+      return $Mobile > 0;
    }
 }

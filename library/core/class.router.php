@@ -89,7 +89,7 @@ class Gdn_Router {
          );
          
          // Check for a match
-         if (preg_match('#^'.$Route.'$#', $Request)) {
+         if (preg_match('#^'.$Route.'#', $Request)) {
             // Route matched!
             $Final = $this->GetRoute($Route);
             $Final['FinalDestination'] = $Final['Destination'];

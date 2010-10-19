@@ -79,6 +79,15 @@ class Gdn_UploadImage extends Gdn_Upload {
          
       if ($Width == '' || !is_numeric($Width))
          $Width = $WidthSource;
+
+      if (!$OutputType) {
+         $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png');
+         $OutputType = GetValue($Type, $OutputTypes, 'jpg');
+      }
+
+      if (!file_exists(dirname($Target))) {
+         mkdir(dirname($Target), 0777, TRUE);
+      }
       
       // Don't resize if the source dimensions are smaller than the target dimensions
       $XCoord = 0;
@@ -155,6 +164,10 @@ class Gdn_UploadImage extends Gdn_Upload {
    }
    
    public function GenerateTargetName($TargetFolder, $Extension = 'jpg') {
+      if (!$Extension) {
+         $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
+      }
+
       $Name = RandomString(12);
       while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
          $Name = RandomString(12);

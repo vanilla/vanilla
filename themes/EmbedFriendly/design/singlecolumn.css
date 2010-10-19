@@ -1,0 +1,22 @@
+#Panel {
+	display: none;
+}
+body.Profile #Panel {
+	display: block;
+}
+#Content {
+	margin: 24px 10px 0 !important;
+	position: relative;
+}
+body.Profile #Content {
+	margin:0 10px 0 280px !important;
+}
+a.BigButton,
+a.BigButton:hover,
+a.BigButton:focus {
+	padding: 2px 6px;
+	position: absolute;
+	display: inline;
+	top: -30px;
+	right: 0;
+}

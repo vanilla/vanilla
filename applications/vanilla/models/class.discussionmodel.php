@@ -712,6 +712,9 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          $CategoryID = $Data->FirstRow()->CategoryID;
       }
       
+      $this->EventArguments['DiscussionID'] = $DiscussionID;
+      $this->FireEvent('DeleteDiscussion');
+      
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));

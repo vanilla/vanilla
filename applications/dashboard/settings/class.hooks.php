@@ -44,6 +44,12 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->AddModule($MessageModule);
          }
       }
+		// If there are applicants, alert admins by showing in the main menu
+		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
+			$CountApplicants = Gdn::UserModel()->GetApplicants()->NumRows();
+			if ($CountApplicants > 0)
+				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span>'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Registration.Manage'));
+		}
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -76,11 +82,14 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
       $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', T('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Site Settings', T('Settings'), FALSE, array('class' => 'SiteSettings'));
       $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
-      $Menu->AddLink('Site Settings', T('Import'), 'dashboard/import', 'Garden.Import');
+		
+		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
+		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
 		
    }
 }

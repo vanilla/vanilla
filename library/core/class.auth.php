@@ -110,9 +110,13 @@ class Gdn_Auth extends Gdn_Pluggable {
    public function EnableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = FALSE) {
       // Get list of currently enabled schemes.
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $ForceWrite = FALSE;
+      
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
-      if (!is_array($EnabledSchemes))
+      if (!is_array($EnabledSchemes)) {
+         $ForceWrite = TRUE;
          $EnabledSchemes = array('password');
+      }
       
       // First, loop through the list and remove any instances of the supplied authentication scheme
       $HaveScheme = FALSE;
@@ -123,6 +127,8 @@ class Gdn_Auth extends Gdn_Pluggable {
             $HaveScheme = TRUE;
          }
       }
+      
+      if ($HaveScheme && !$ForceWrite) return;
       
       // Now add the new scheme to the list (once)
       if (!$HaveScheme)
@@ -135,20 +141,28 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function DisableAuthenticationScheme($AuthenticationSchemeAlias) {
-      
       $this->UnsetDefaultAuthenticator($AuthenticationSchemeAlias);
+      
+      $ForceWrite = FALSE;
       
 		// Remove this authenticator from the enabled schemes collection.
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
-      if (!is_array($EnabledSchemes))
+      if (!is_array($EnabledSchemes)) {
+         $ForceWrite = TRUE;
          $EnabledSchemes = array('password');
+      }
       
+      $HadScheme = FALSE;
       // Loop through the list and remove any instances of the supplied authentication scheme
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == $AuthenticationSchemeAlias)
+         if ($SchemeKey == $AuthenticationSchemeAlias) {
             unset($EnabledSchemes[$SchemeIndex]);
+            $HadScheme = TRUE;
+         }
       }
+      
+      if (!$HadScheme && !$ForceWrite) return;
       
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }

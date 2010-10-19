@@ -55,8 +55,8 @@
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));
          ?>
       </li>
-      <li>
-         <?php echo $this->Form->Button('Apply &rarr;'); ?>
+      <li class="Buttons">
+         <?php echo $this->Form->Button('Apply'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

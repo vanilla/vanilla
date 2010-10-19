@@ -49,8 +49,8 @@
             echo $this->Form->CheckBox('RememberMe', T('Remember me on this computer'), array('value' => '1'));
          ?>
       </li>
-      <li>
-         <?php echo $this->Form->Button('Sign Up &rarr;'); ?>
+      <li class="Buttons">
+         <?php echo $this->Form->Button('Sign Up'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

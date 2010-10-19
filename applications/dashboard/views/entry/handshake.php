@@ -18,7 +18,7 @@
 	// );
 	?></div>
 	<ul class="NewAccount">
-		<li><h2><?php echo T('✔ Give me a new account'); ?></h2></li>
+		<li><h2><?php echo T('Give me a new account'); ?></h2></li>
 		<li>
 			<?php
 				echo $this->Form->Label('Username', 'NewName');
@@ -31,12 +31,12 @@
 				echo $this->Form->Textbox('NewEmail');
 			?>
 		</li>
-		<li>
+		<li class="Buttons">
 			<?php echo $this->Form->Button('Create New Account', array('Name' => 'User/NewAccount')); ?>
 		</li>
 	</ul>
 	<ul class="LinkAccount">
-		<li><h2><?php echo T('⇄ Link my existing account'); ?></h2></li>
+		<li><h2><?php echo T('Link my existing account'); ?></h2></li>
 		<li>
 			<?php
 				echo $this->Form->Label('Email', 'SignInEmail');
@@ -49,7 +49,7 @@
 				echo $this->Form->Input('SignInPassword', 'password');
 			?>
 		</li>
-		<li>
+		<li class="Buttons">
 			<?php echo $this->Form->Button('Link Existing Account', array('Name' => 'User/LinkAccount')); ?>
 		</li>
 	</ul>

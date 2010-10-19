@@ -21,6 +21,7 @@ jQuery(document).ready(function($) {
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {
+      $('.Methods').toggle();
       $('#Form_User_Password').toggle();
 		$('#Form_User_SignIn').toggle();
       return false;

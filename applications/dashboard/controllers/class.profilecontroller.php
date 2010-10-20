@@ -695,7 +695,7 @@ class ProfileController extends Gdn_Controller {
          $this->ControllerName = $Controller;
          $this->ApplicationFolder = $Application;
       }
-      $this->_CurrentTab = T($CurrentTab);
+		$this->_CurrentTab = T($CurrentTab);
    }
    
 }

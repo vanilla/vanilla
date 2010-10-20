@@ -18,9 +18,9 @@
             echo $this->Form->Input('Confirm', 'password');
          ?>
       </li>
-      <li>
+      <li class="Buttons">
          <?php
-            echo $this->Form->Button('Save your password &rarr;');
+            echo $this->Form->Button('Save your password');
          ?>
       </li>
    </ul>

@@ -40,6 +40,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		if ($InDashboard)
 			$Sender->AddDefinition('InDashboard', TRUE);
 			
+		$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
 	}
 	
 	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -61,7 +62,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl'));
+      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.PopOutDashboard'));
       
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
@@ -94,6 +95,10 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Sender->Render(PATH_PLUGINS.'/embedvanilla/views/settings.php');
    }
+	
+	public function PluginController_GadgetInfo_Create($Sender) {
+		$Sender->Render('plugins/embedvanilla/views/gadget.php');
+	}
 	
 	public function PluginController_Gadget_Create($Sender) {
 		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>

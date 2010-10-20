@@ -25,7 +25,7 @@ $RecommendedThemeName = 'Embed-Friendly';
       <em>Use these custom-built plugins to embed the forum into various other applications without the need to touch any code.</em>
       <ul>
          <li><?php echo Anchor(T('WordPress Plugin'), 'plugins/embedvanilla/plugins/wordpress.zip', 'WordPress'); ?></li>
-         <li><?php echo Anchor(T('Blogger Gadget'), 'plugin/gadget', 'Blogger'); ?></li>
+         <li><?php echo Anchor(T('Blogger Gadget'), 'plugin/gadgetinfo', 'Popup'); ?></li>
       </ul>
    </div>
 </div>
@@ -86,6 +86,12 @@ if (C('Plugins.EmbedVanilla.RemoteUrl')) {
 echo $this->Form->Errors();
 ?>
 <ul class="RemoteSettings">
+   <li>
+      <?php
+      echo Wrap(T('Dashboard Embed'), 'strong');
+      echo $this->Form->CheckBox('Plugins.EmbedVanilla.EmbedDashboard', "Embed your forum admin dashboard (ie. don't pop it out to full-screen)");
+      ?>
+   </li>
    <li>
       <?php
       echo Wrap(T('Remote Url'), 'strong');

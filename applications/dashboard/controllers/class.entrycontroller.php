@@ -378,7 +378,7 @@ class EntryController extends Gdn_Controller {
    protected function _SetRedirect($CheckPopup = FALSE) {
       $Url = Url($this->RedirectTo(), TRUE);
 
-      $this->RedirectUrl = Url($Url);
+      $this->RedirectUrl = $Url;
       $this->MasterView = 'empty';
       $this->View = 'redirect';
 

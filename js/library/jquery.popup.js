@@ -289,6 +289,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     // If there is a cancel button in the popup, hide it (the popup has it's own close button)
     $('#'+settings.popupId+' a.Cancel').hide();
     
+    // Trigger an even that plugins can attach to when popups are revealed.
+    $('body').trigger('popupReveal');
+    
     return false;
   }
   
@@ -349,10 +352,20 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     afterLoad: function() {}
   }
 
+  $.popup.inFrame = function() {
+    try {
+      if (top !== self && $(parent.document).width())
+        return true;
+    } catch(e) { }
+    
+    return false;
+  }
+  
   $.popup.getPageSize = function() {
-    var doc = $(top !== self ? parent.document : document);
-    var win = $(top !== self ? parent.window : window);
-      arrayPageSize = new Array(
+    var inFrame = $.popup.inFrame();
+    var doc = $(inFrame ? parent.document : document);
+    var win = $(inFrame ? parent.window : window);
+    arrayPageSize = new Array(
       $(doc).width(),
       $(doc).height(),
       $(win).width(),
@@ -362,12 +375,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   };  
   
   $.popup.getPagePosition = function() {
-    var InFrame = (top !== self);
-    var doc = $(top !== self ? parent.document : document);
-    var win = $(top !== self ? parent.window : window);
+    var inFrame = $.popup.inFrame();
+    var doc = $(inFrame ? parent.document : document);
+    var win = $(inFrame ? parent.window : window);
     var scroll = { 'top':doc.scrollTop(), 'left':doc.scrollLeft() };
     var t = scroll.top + ($(win).height() / 10);
-    if (InFrame) {
+    if (inFrame) {
       var el = $(parent.document).find('iframe[id^=vanilla]');
       el = el ? el : $(document); // Just in case iframe is not id'd properly
       t -= (el.offset().top);

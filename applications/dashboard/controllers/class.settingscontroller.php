@@ -271,6 +271,9 @@ class SettingsController extends DashboardController {
     * plugins.
     */
    public function AddUpdateCheck() {
+      if (C('Garden.NoUpdateCheck'))
+         return;
+      
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.
@@ -579,7 +582,7 @@ class SettingsController extends DashboardController {
       echo 'Success';
    }
 
-   public function ThemeOptions() {
+   public function ThemeOptions($Style = NULL) {
       $this->Permission('Garden.Themes.Manage');
 
       try {
@@ -593,6 +596,7 @@ class SettingsController extends DashboardController {
          if ($this->Form->IsPostBack()) {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
+
             SaveToConfig(array(
                'Garden.ThemeOptions.Styles.Key' => $StyleKey,
                'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename")));
@@ -613,6 +617,10 @@ class SettingsController extends DashboardController {
             }
 
             $this->StatusMessage = T("Your changes have been saved.");
+         } elseif ($Style) {
+            SaveToConfig(array(
+               'Garden.ThemeOptions.Styles.Key' => $Style,
+               'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$Style.Basename")));
          }
 
          $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));

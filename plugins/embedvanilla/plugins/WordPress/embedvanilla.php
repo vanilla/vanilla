@@ -3,7 +3,7 @@
 Plugin Name: Embed Vanilla
 Plugin URI: http://vanillaforums.org/addons/
 Description: Turns WordPress into a Vanilla-loving temptress.
-Version: 1.0.0
+Version: 1.0.1
 Author: Mark O'Sullivan
 Author URI: http://www.markosullivan.ca/
 
@@ -14,19 +14,6 @@ The Embed Vanilla plugin is distributed in the hope that it will be useful, but 
 You should have received a copy of the GNU General Public License along with the Embed Vanilla plugin.  If not, see <http://www.gnu.org/licenses/>.
 Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
 */
-
-/* Convenience Function */
-if (!function_exists('TrueStripSlashes')) {
-   if(get_magic_quotes_gpc()) {
-      function TrueStripSlashes($String) {
-         return stripslashes($String);
-      }
-   } else {
-      function TrueStripSlashes($String) {
-         return $String;
-      }
-   }
-}
 
 /* Create a placeholder page and template for the forum when the plugin is enabled. */
 register_activation_hook(__FILE__, 'embed_vanilla_activate');
@@ -62,7 +49,7 @@ add_filter('the_content', 'embed_vanilla_content');
 function embed_vanilla_content($content) {
 	global $post;
 	if ($post->ID == get_option('vanilla_embed_postid')) {
-		$content = TrueStripSlashes(get_option('vanilla_embed_code'));
+		$content = stripslashes(get_option('vanilla_embed_code'));
 	}
 
 	return $content;
@@ -91,14 +78,10 @@ function vanilla_embed_options() {
       if (function_exists('current_user_can') && !current_user_can('manage_options'))
          die(__('Permission Denied'));
 
-      $VanillaEmbedCode = TrueStripSlashes(array_key_exists('vanilla_embed_code', $_POST) ? $_POST['vanilla_embed_code'] : '');
+      $VanillaEmbedCode = stripslashes(array_key_exists('vanilla_embed_code', $_POST) ? $_POST['vanilla_embed_code'] : '');
       update_option('vanilla_embed_code', $VanillaEmbedCode);
-      /*
-      $VanillaPageName = array_key_exists('vanilla_page_name', $_POST) ? $_POST['vanilla_page_name'] : '';
-      wp_update_post(array('ID' => $PostID, 'post_title' => $VanillaPageName));
-		*/
    } else {
-      $VanillaEmbedCode = TrueStripSlashes(get_option('vanilla_embed_code'));
+      $VanillaEmbedCode = stripslashes(get_option('vanilla_embed_code'));
 		$VanillaPost = get_post($PostID);
       $VanillaPageName = $VanillaPost->post_title;
    }

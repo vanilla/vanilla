@@ -249,23 +249,27 @@ if (!class_exists('HeadModule', FALSE)) {
          // Start with the title.
          $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
 
+         $TagStrings = array();
          // Loop through each tag.
          foreach ($this->_Tags as $Index => $Attributes) {
             $Tag = $Attributes[self::TAG_KEY];
 
             unset($Attributes[self::CONTENT_KEY], $Attributes[self::SORT_KEY], $Attributes[self::TAG_KEY]);
+            
+            $TagString = '';
 
-            $Head .= '<'.$Tag.Attribute($Attributes);
+            $TagString .= '<'.$Tag.Attribute($Attributes);
 
             if (array_key_exists(self::CONTENT_KEY, $Attributes))
-               $Head .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
+               $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
             elseif ($Tag == 'script')
-               $Head .= '></script>';
+               $TagString .= '></script>';
             else
-               $Head .= ' />';
+               $TagString .= ' />';
 
-            $Head .= "\n";
+            $TagStrings[] = $TagString;
          }
+         $Head .= implode("\n", array_unique($TagStrings));
 
          foreach ($this->_Strings as $String) {
             $Head .= $String;

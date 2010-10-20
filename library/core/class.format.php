@@ -586,13 +586,13 @@ EOT;
 //         );
          
          // Handle #hashtag searches
-         if(!C('Garden.Format.DisableHastags')) {
-            $Mixed = preg_replace(
-               '/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
-               '\1'.Anchor('#\2', '/search?BadSearch=%23\2&Mode=like').'\3',
-               $Mixed
-            );
-         }
+			if(!C('Garden.Format.DisableHashtags')) {
+				$Mixed = preg_replace(
+					'/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
+					'\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
+					$Mixed
+				);
+			}
          
 //         $Mixed = preg_replace(
 //            '/([\s]+)(#([\d\w_]+))/si',

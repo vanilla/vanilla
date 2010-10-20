@@ -129,5 +129,5 @@ $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', '
 // Routes
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
-$Configuration['Routes']['RGVmYXVsdFBlcm1pc3Npb24oXD8uKik='] = array('dashboard/home/permission', 'NotAuthorized');
+$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';

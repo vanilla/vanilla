@@ -32,7 +32,7 @@ class TagModule extends Gdn_Module {
          ->From('Tag t')
          ->Where('t.CountDiscussions >', 0, FALSE)
          ->OrderBy('t.CountDiscussions', 'desc')
-         ->Limit(50)
+         ->Limit(25)
          ->Get();
    }
 

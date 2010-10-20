@@ -106,6 +106,9 @@ class DiscussionModel extends VanillaModel {
 			
 		$this->AddDiscussionColumns($Data);
 		
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
+		
 		return $Data;
    }
 	

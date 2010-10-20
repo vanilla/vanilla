@@ -23,6 +23,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
+   
+   $Sender->FireEvent('BeforeDiscussionName');
+   
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');

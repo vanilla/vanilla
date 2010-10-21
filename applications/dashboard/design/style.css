@@ -754,6 +754,14 @@ ul.PanelActivity li {
    border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
 	color: #555;
+	font-size: 11px;
+	line-height: 1.6;
+}
+ul.PanelActivity li a {
+	font-size: 13px;
+}
+ul.PanelActivity li a.Name {
+	margin-right: 2px;
 }
 ul.PanelActivity span {
 	padding: 0 4px;

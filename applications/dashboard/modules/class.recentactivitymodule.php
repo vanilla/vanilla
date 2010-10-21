@@ -13,17 +13,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class RecentActivityModule extends Gdn_Module {
    
-   protected $_ActivityData;
-   public $Form;
-   
-   public function __construct(&$Sender = '') {
-      $this->_ActivityData = FALSE;
-      parent::__construct($Sender);
-   }
-   
-   public function GetData($Limit = 5, $DiscussionID = '') {
+   public $ActivityModuleTitle = '';
+   protected $_RoleID = '';
+   public function GetData($Limit = 5, $RoleID = '') {
+      if (!is_array($RoleID) && $RoleID != '')
+         $RoleID = array($RoleID);
+         
       $ActivityModel = new ActivityModel();
-      $this->_ActivityData = $ActivityModel->Get('', 0, $Limit);
+      if (is_array($RoleID)) {
+         $Data = $ActivityModel->GetForRole($RoleID, 0, $Limit);
+      } else {
+         $Data = $ActivityModel->Get('', 0, $Limit);
+      }
+      $this->_Sender->SetData('RecentActivityData', $Data);
+      if (!is_array($RoleID))
+         $RoleID = array();
+
+      $this->_RoleID = $RoleID;
    }
 
    public function AssetTarget() {
@@ -31,7 +37,11 @@ class RecentActivityModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if ($this->_ActivityData !== FALSE && $this->_ActivityData->NumRows() > 0)
+      if (StringIsNullOrEmpty($this->ActivityModuleTitle))
+         $this->ActivityModuleTitle = T('Recent Activity');
+         
+      $Data = $this->_Sender->Data['RecentActivityData'];
+      if (is_object($Data) && $Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

@@ -62,6 +62,21 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   public function GetForRole($RoleID = '', $Offset = '0', $Limit = '50') {
+      if (!is_array($RoleID))
+         $RoleID = array($RoleID);
+      
+      $this->ActivityQuery();
+      return $this->SQL
+         ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
+         ->WhereIn('ur.RoleID', $RoleID)
+         ->Where('a.CommentActivityID is null')
+         ->Where('t.Public', '1')
+         ->OrderBy('a.DateInserted', 'desc')
+         ->Limit($Limit, $Offset)
+         ->Get();
+   }
+   
    public function GetID($ActivityID) {
       $this->ActivityQuery();
       return $this->SQL

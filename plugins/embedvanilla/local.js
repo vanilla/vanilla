@@ -3,6 +3,7 @@ $(function() {
       remotePostMessage = null,
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',
+      embedDashboard = gdn.definition('EmbedDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       webroot = gdn.definition('WebRoot'),
@@ -73,7 +74,7 @@ $(function() {
          path = path.substr(0, hashIndex);
       
       document.location = remoteUrl + '#' + path;
-   } else if (inIframe && inDashboard) {
+   } else if (inIframe && inDashboard && !embedDashboard) {
       remotePostMessage('unembed', '*');
    }
 
@@ -106,7 +107,9 @@ $(function() {
                path = path.substr(0, hashIndex);
             }
             
-            remotePostMessage('location:' + path, '*');
+            if (path != '')
+               remotePostMessage('location:' + path, '*');
+               
             // setLocation(pathroot + path + hash);
             // return false;
          }
@@ -114,7 +117,7 @@ $(function() {
       
       // Simulate a page unload when popups are opened (so they are scrolled into view).
       $('body').bind('popupReveal', function() {
-         remotePostMessage('scrolltop', '*');
+         remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
       });
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });

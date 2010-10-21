@@ -132,7 +132,7 @@ class DebuggerPlugin extends Gdn_Plugin {
 
          $Fields = array_keys((array)$Data[0]);
          $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
-            .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields));
+            .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
          return $Result;
       } elseif (is_a($Data, 'stdClass')) {
          $Data = (array)$Data;

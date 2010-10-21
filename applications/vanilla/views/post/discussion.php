@@ -37,7 +37,10 @@ if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData-
 
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
          $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close this discussion'), array('value' => '1')).'</li>';
-
+      
+      $this->EventArguments['Options'] = &$Options;
+      $this->FireEvent('DiscussionFormOptions');
+      
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';
 

@@ -104,7 +104,9 @@ window.vanilla.embed = function(host) {
             document.getElementById('vanilla'+id).scrollIntoView(true);
 
       } else if (message[0] == 'scrolltop') {
-         document.getElementById('vanilla'+id).scrollIntoView(true);
+         window.scrollTo(0, document.getElementById('vanilla'+id).offsetTop);
+      } else if (message[0] == 'scrollto') {
+         window.scrollTo(0, document.getElementById('vanilla'+id).offsetTop - 40 + (message[1] * 1));
       } else if (message[0] == 'unembed') {
          document.location = 'http://' + host + window.location.hash.substr(1);
       }

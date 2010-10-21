@@ -260,6 +260,16 @@ ul.PanelInfo li.Active {
 ul.PanelInfo li.Active {
 	background: #ffd;
 }
+#Status {
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	background: #eee;
+	color: #000;
+	line-height: 1.6;
+	padding: 3px 6px;
+	margin: 0 0 8px;
+}
 body.Profile ul.PanelInfo {
 	border: none;
 }

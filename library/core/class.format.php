@@ -224,7 +224,7 @@ class Gdn_Format {
          } else {
 				try {
 					$Mixed2 = $Mixed;
-					$Mixed2 = str_replace("\n", '<br />', $Mixed2);
+					//$Mixed2 = str_replace("\n", '<br />', $Mixed2);
 
                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);

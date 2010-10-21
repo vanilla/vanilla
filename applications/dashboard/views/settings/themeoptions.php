@@ -46,7 +46,7 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
 
    $Disabled = $Active ? ' Disabled' : '';
    echo '<div class="Buttons">',
-      Anchor(T('Select'), '#', 'SmallButton SelectThemeStyle'.$Disabled, array('Key' => $Key)),
+      Anchor(T('Select'), '?style='.urlencode($Key), 'SmallButton SelectThemeStyle'.$Disabled, array('Key' => $Key)),
       '</div>';
 
    if (isset($Options['Description'])) {
@@ -101,8 +101,10 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
 }
 ?>
 </ul>
-
-<?php endif; ?>
+<?php
+echo $this->Form->Button('Save');
+endif;
+?>
 
 <?php
-echo '<br />'.$this->Form->Close('Save');
+echo '<br />'.$this->Form->Close();

@@ -55,6 +55,23 @@ textarea:focus {
     -webkit-border-radius: 0;
     border: 1px inset #888;
 }
+input.GadgetInput {
+    font-family: monospace;
+    color: #000;
+    width: 99%;
+    font-size: 12px;
+    margin: 10px 0 0;
+    padding: 4px 3px;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border: 1px inset #888;
+}
+img.Screenshot {
+    margin: 10px 0;
+    width: 99%;
+    border: 1px solid #888;
+}
 #Content form .EmbedPlugins ul {
     padding: 14px 0 0;
     margin: 0;

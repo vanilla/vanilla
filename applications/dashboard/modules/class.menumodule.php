@@ -98,6 +98,8 @@ if (!class_exists('MenuModule', FALSE)) {
             
          if ($HighlightRoute == '')
             $HighlightRoute = Gdn_Url::Request();
+            
+         $this->FireEvent('BeforeToString');
          
          $Username = '';
          $UserID = '';

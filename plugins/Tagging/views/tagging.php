@@ -28,7 +28,7 @@
             ?>
             <div class="Tag">
                <?php
-               echo Anchor($Tag->Name.' '.Wrap($Tag->CountDiscussions), 'settings/edittag/'.$Tag->TagID, 'TagName');
+               echo Anchor(htmlspecialchars($Tag->Name).' '.Wrap($Tag->CountDiscussions), 'settings/edittag/'.$Tag->TagID, 'TagName');
                echo ' '.Anchor('×', 'settings/deletetag/'.$Tag->TagID.'/'.$Session->TransientKey(), 'Delete');
                ?>
             </div>

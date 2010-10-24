@@ -36,7 +36,8 @@ function smarty_function_custom_menu($Params, &$Smarty) {
             }
 
             if (($Url = GetValue('Url', $Item)) && ($Text = GetValue('Text', $Item))) {
-               $Result .= Gdn_Theme::Link($Url, $Text, $Format);
+               $Attributes = GetValue('Attributes', $Item);
+               $Result .= Gdn_Theme::Link($Url, $Text, $Format, $Attributes);
             }
          }
       }

@@ -153,7 +153,7 @@ unset($Gdn_Path);
 unset($Hooks_Path);
 
 // If there is a hooks file in the theme folder, include it.
-$ThemeName = C('Garden.Theme', 'default');
+$ThemeName = C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
 $ThemeHooks = PATH_THEMES . DS . $ThemeName . DS . 'class.' . strtolower($ThemeName) . 'themehooks.php';
 if (file_exists($ThemeHooks))
 	include_once($ThemeHooks);

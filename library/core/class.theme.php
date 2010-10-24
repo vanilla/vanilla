@@ -23,7 +23,7 @@ class Gdn_Theme {
    
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();
-      $Class = GetValue('Class', $Options, '');
+      $Class = GetValue('class', $Options, '');
 
       switch ($Path) {
          case 'dashboard':
@@ -49,6 +49,7 @@ class Gdn_Theme {
                $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
 
             break;
+         case 'signin':
          case 'signinout':
             // The destination is the signin/signout toggle link.
             if ($Session->IsValid()) {

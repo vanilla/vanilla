@@ -90,6 +90,7 @@ $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Html']['SafeStyles']                  = TRUE; // disallow style/class attributes in html to prevent click jacking
 $Configuration['Garden']['Search']['Mode']                      = 'matchboolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['Theme']                               = 'default';
+$Configuration['Garden']['MobileTheme']                         = 'mobile';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 $Configuration['Garden']['Roles']['Manage']                     = TRUE;

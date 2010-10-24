@@ -105,8 +105,10 @@ echo $this->Form->Errors();
          echo ' '.Anchor('View Page', C('Plugins.EmbedVanilla.RemoteUrl'), 'SmallButton', array('target' => '_blank'));
       ?><span>For SEO purposes, search engine crawlers are excluded from being forced to view the forum in the remote url.</span>
    </li>
+   <li>
+      <?php echo $this->Form->Button('Save Changes'); ?>
+   </li>
 </ul>
 <?php
-echo $this->Form->Button('Save');
 }
 echo $this->Form->Close();

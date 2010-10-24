@@ -127,6 +127,10 @@ div.CommentForm textarea,
 #DiscussionForm textarea {
 	width:98%;
 }
+input.DraftButton,
+input.PreviewButton {
+	display: none;
+}
 div.Preview div.Message,
 ul.MessageList div.Message {
 	clear: none;
@@ -504,13 +508,12 @@ div.MessageForm,
 #ConversationForm form {
 	border: none;
 	background: transparent;
-	padding: 0 6px 6px;
+	padding: 6px;
 }
 #DiscussionForm h2,
 #MessageForm h2,
 #ConversationForm h2 {
-	font-size: 16px;
-	color: #1C2A47;
+	display: none;
 }
 .NumberedPager,
 #PagerMore,
@@ -526,6 +529,9 @@ body.Discussion #Content {
 .Foot {
 	background: none;
 	border-bottom: 1px solid #BEC8CC;
+}
+li.Editing {
+	background: #EDEFF4;
 }
 
 

@@ -1,9 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="RecentActivity" class="Box">
-   <h4><?php echo T('Recent Activity'); ?></h4>
+   <h4><?php echo $this->_Sender->Data['ActivityModuleTitle']; ?></h4>
    <ul class="PanelActivity">
       <?php
-      foreach ($this->_ActivityData->Result() as $Activity) {
+      $Data = $this->_Sender->Data['RecentActivityData'];
+      foreach ($Data->Result() as $Activity) {
          echo '<li class="Activity ' . $Activity->ActivityType . '">';
          // If this was a status update or a wall comment, don't bother with activity strings
          $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
@@ -15,7 +16,7 @@
                $Author = UserBuilder($Activity, 'Regarding');
                echo '<span>&rarr;</span>'.UserAnchor($Author, 'Name');
             }
-            echo Gdn_Format::Display($Activity->Story);
+            echo ' '.Gdn_Format::Display($Activity->Story).' ';
             echo '<em>'.Gdn_Format::Date($Activity->DateInserted).'</em>';
          } else {
             echo Gdn_Format::ActivityHeadline($Activity);
@@ -29,6 +30,6 @@
          echo '</li>';
       }
       ?>
-      <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'activity'); ?></li>
+      <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'activity/'.implode(',', $this->_RoleID)); ?></li>
    </ul>
 </div>

@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+$this->Title(T('Start a New Discussion'));
 $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
 if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
@@ -33,10 +34,10 @@ if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData-
       // Note: I need to validate that they have permission in the specified category on the back-end
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
       if ($Session->CheckPermission('Vanilla.Discussions.Announce'))
-         $Options .= '<li>'.$this->Form->CheckBox('Announce', T('Announce this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Announce', T('Announce'), array('value' => '1')).'</li>';
 
       if ($Session->CheckPermission('Vanilla.Discussions.Close'))
-         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close this discussion'), array('value' => '1')).'</li>';
+         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close'), array('value' => '1')).'</li>';
 
       if ($Options != '')
          echo '<ul class="PostOptions">' . $Options .'</ul>';

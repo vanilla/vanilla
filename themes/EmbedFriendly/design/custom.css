@@ -249,9 +249,11 @@ body.add #Content {
 div.Box h4 {
 	color: #333;
 }
+ul.PanelActivity,
 ul.PanelInfo {
 	border-top:1px solid #ccc;
 }
+ul.PanelActivity li,
 ul.PanelInfo li,
 ul.PanelInfo li.Active {
 	background: none;

@@ -8,26 +8,14 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/**
- * Renders a user's photo (if they've uploaded one).
- */
-class UserPhotoModule extends Gdn_Module {
-   
-   public $User;
-   
-   public function __construct(&$Sender = '') {
-      $this->User = FALSE;
-      parent::__construct($Sender);
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   public function ToString() {
-      $Session = Gdn::Session();
-		return parent::ToString();
-			
-		return '';
+/**
+ */
+function smarty_function_signin_link($Params, &$Smarty) {
+   if (!Gdn::Session()->IsValid()) {
+      $Wrap = GetValue('wrap', $Params, 'li');
+      return Gdn_Theme::Link('signinout',
+         GetValue('text', $Params, ''),
+         GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
    }
 }

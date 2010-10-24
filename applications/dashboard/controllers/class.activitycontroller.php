@@ -27,7 +27,11 @@ class ActivityController extends Gdn_Controller {
       parent::Initialize();
    }
    
-   public function Index() {
+   public function Index($RoleID) {
+      // Limit to specific RoleIDs?
+      if ($RoleID != '')
+         $RoleID = explode(',', $RoleID);
+         
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
          
@@ -47,14 +51,13 @@ class ActivityController extends Gdn_Controller {
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('activity');
          } else {
-            echo 'yes';
             // Load just the single new comment
             $this->HideActivity = TRUE;
             $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID);
             $this->View = 'activities';
          }
       } else {
-         $this->ActivityData = $this->ActivityModel->Get();
+         $this->ActivityData = is_array($RoleID) ? $this->ActivityModel->GetForRole($RoleID) : $this->ActivityModel->Get();
          if ($this->ActivityData->NumRows() > 0) {
             $ActivityData = $this->ActivityData->ResultArray();
             $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');

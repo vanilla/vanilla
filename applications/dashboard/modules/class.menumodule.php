@@ -174,7 +174,7 @@ if (!class_exists('MenuModule', FALSE)) {
                         $CssClass = ArrayValue('class', $Attributes, '');
                         if ($CurrentLink)
                            $Attributes['class'] = $CssClass . ' Highlight';
-                           
+								
                         $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
                      } else {

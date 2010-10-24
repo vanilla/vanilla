@@ -1599,11 +1599,6 @@ div.Tabs li {
    display: inline;
    margin: 0;
 }
-div.MessageForm a.Back,
-div.MessageForm a.Back:link,
-div.MessageForm a.Back:hover,
-div.MessageForm a.Back:active,
-div.MessageForm a.Back:visited,
 div.MessageForm a.Cancel,
 div.MessageForm a.Cancel:link,
 div.MessageForm a.Cancel:hover,
@@ -1649,7 +1644,6 @@ div.MessageForm a.Cancel:active,
 div.MessageForm a.Cancel:visited {
 	line-height: 1.2;
 }
-div.MessageForm a.Back:hover,
 div.MessageForm a.Cancel:hover,
 div.MorePager li a:hover,
 a.TabLink:hover,

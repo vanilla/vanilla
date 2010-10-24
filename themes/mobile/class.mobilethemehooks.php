@@ -49,6 +49,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
 	public function MessagesController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'Conversation');
 	}
+
+   public function PostController_Render_Before($Sender) {
+		$this->_AddButton($Sender, 'Discussion');
+   }
 	
 	private function _AddButton($Sender, $ButtonType) {
 		if (is_object($Sender->Menu)) {

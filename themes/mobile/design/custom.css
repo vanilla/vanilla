@@ -445,6 +445,7 @@ div.Warning a.Dismiss {
 ul.Discussions {
 	background: #fff;
 }
+ul.Discussions div.Meta strong,
 ul.Discussions div.Meta span {
 	display: none;
 }

@@ -536,6 +536,9 @@ li.Editing {
 
 
 /* Foot */
+#Foot {
+	border-bottom: 1px solid #BEC8CC;
+}
 #Foot div {
 	width: auto;
 	margin: 0;

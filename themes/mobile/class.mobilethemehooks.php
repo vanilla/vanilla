@@ -18,6 +18,16 @@ class MobileThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
 	
+	/**
+	 * Remove plugins that are not mobile friendly!
+	 */
+	public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
+		Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+	}
+	
+	/**
+	 * Add mobile meta info. Add script to hide iphone browser bar on pageload.
+	 */
 	public function Base_Render_Before($Sender) {
 		if (IsMobile() && is_object($Sender->Head)) {
 			$Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
@@ -30,6 +40,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
 		}
 	}
 	
+	/**
+	 * Add new discussion & conversation buttons to various pages.
+	 */
    public function CategoriesController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'Discussion');
    }
@@ -63,7 +76,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
 		}
 	}
 	
-	/* Add Counts after discussion title */
+	/**
+	 * Add Counts after discussion title
+	 */
 	public function Base_DiscussionMeta_Handler($Sender) {
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		$CountUnreadComments = 0;
@@ -80,7 +95,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
 		.'</span>';
 	}
 	
-	/* Add Author Icon before discussion title */
+	/**
+	 * Add Author Icon before discussion title.
+	 */
 	public function Base_BeforeDiscussionContent_Handler($Sender) {
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		$Author = UserBuilder($Discussion, 'First');

@@ -134,6 +134,23 @@ class Gdn_PluginManager {
       $this->_RegisteredPlugins[$PluginInfo['Index']] = $PluginInfo;
    }
    
+   public function UnRegisterPlugin($PluginName) {
+      $this->_RemoveFromCollectionByPrefix($PluginName, $this->_EventHandlerCollection);
+      $this->_RemoveFromCollectionByPrefix($PluginName, $this->_MethodOverrideCollection);
+      $this->_RemoveFromCollectionByPrefix($PluginName, $this->_NewMethodCollection);
+      if (array_key_exists($PluginName, $this->_RegisteredPlugins))
+         unset($this->_RegisteredPlugins[$PluginName]);
+   }
+   
+   private function _RemoveFromCollectionByPrefix($Prefix, &$Collection) {
+      foreach ($Collection as $Event => $Hooks) {
+         foreach ($Hooks as $Index => $Hook) {
+            if (strpos($Hook, $Prefix.'.') === 0)
+               unset($Collection[$Event][$Index]);
+         }
+      }
+   }
+   
    public function CheckPlugin($PluginName) {
       if (array_key_exists($PluginName, $this->EnabledPlugins()))
          return TRUE;

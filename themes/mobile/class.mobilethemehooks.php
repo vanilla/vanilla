@@ -22,7 +22,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
 	 * Remove plugins that are not mobile friendly!
 	 */
 	public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
-		Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+		// Remove plugins so they don't mess up layout or functionality.
+		if (in_array($Sender->Application(), array('vanilla', 'dashboard', 'conversations')))
+			Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
 	}
 	
 	/**

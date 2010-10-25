@@ -50,7 +50,7 @@
          ?>
       </li>
       <li>
-         <?php echo $this->Form->Button('Sign Up &rarr;'); ?>
+         <?php echo $this->Form->Button('Sign Up'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

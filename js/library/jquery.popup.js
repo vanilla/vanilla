@@ -112,7 +112,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   $.popup.close = function(settings, response) {
     $(document).unbind('keydown.popup');
     $('#'+settings.popupId).trigger('popupClose');
-    $('.Overlay').remove();
+    $('#'+settings.popupId).parents('.Overlay').remove();
     
     return false;
   }
@@ -149,8 +149,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     $('#'+settings.popupId).show();
 
     $(document).bind('keydown.popup', function(e) {
-      if (e.keyCode == 27)
+      if (e.keyCode == 27){
+        //settings.popupId = popupId;
         $.popup.close(settings);
+      }
     })    
 
     if (settings.onUnload) {
@@ -162,6 +164,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     // Replace language definitions
     if (!settings.confirm) {
       $('#'+settings.popupId+' .Close').click(function() {
+        settings.popupId = popupId;
         return $.popup.close(settings);
       });
     } else {
@@ -169,6 +172,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $('#'+settings.popupId+' .Content p').text(gdn.definition('ConfirmText', 'Are you sure you want to do that?'));
       $('#'+settings.popupId+' .Okay').val(gdn.definition('Okay', 'Okay'));
       $('#'+settings.popupId+' .Cancel').val(gdn.definition('Cancel', 'Cancel')).click(function() {
+        settings.popupId = popupId;
         $.popup.close(settings);
       });
     }
@@ -278,11 +282,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     popupHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
-      <div class="Body"> \
-        <div class="Content"> \
-        </div> \
-        <div class="Footer"> \
-          <a href="#" class="Close"><span>×</span></a> \
+      <div class="Border"> \
+        <div class="Body"> \
+          <div class="Content"> \
+          </div> \
+          <div class="Footer"> \
+            <a href="#" class="Close"><span>×</span></a> \
+          </div> \
         </div> \
       </div> \
     </div> \
@@ -290,11 +296,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     confirmHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
-      <div class="Body"> \
-        <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
-        <div class="Footer"> \
-          <input type="button" class="Button Okay" value="Okay" /> \
-          <input type="button" class="Button Cancel" value="Cancel" /> \
+      <div class="Border"> \
+        <div class="Body"> \
+          <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
+          <div class="Footer"> \
+            <input type="button" class="Button Okay" value="Okay" /> \
+            <input type="button" class="Button Cancel" value="Cancel" /> \
+          </div> \
         </div> \
       </div> \
     </div> \

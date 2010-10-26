@@ -1566,3 +1566,9 @@ if (!function_exists('IsMobile')) {
       return $Mobile > 0;
    }
 }
+
+if (!function_exists('Theme')) {
+   function Theme() {
+      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+   }
+}

@@ -98,6 +98,8 @@ if (!class_exists('MenuModule', FALSE)) {
             
          if ($HighlightRoute == '')
             $HighlightRoute = Gdn_Url::Request();
+            
+         $this->FireEvent('BeforeToString');
          
          $Username = '';
          $UserID = '';
@@ -172,7 +174,7 @@ if (!class_exists('MenuModule', FALSE)) {
                         $CssClass = ArrayValue('class', $Attributes, '');
                         if ($CurrentLink)
                            $Attributes['class'] = $CssClass . ' Highlight';
-                           
+								
                         $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
                      } else {

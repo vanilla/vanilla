@@ -9,25 +9,28 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Renders a user's photo (if they've uploaded one).
+ * Renders the recently active users. Built for use in a side panel.
  */
-class UserPhotoModule extends Gdn_Module {
-   
-   public $User;
+class RecentUserModule extends Gdn_Module {
    
    public function __construct(&$Sender = '') {
-      $this->User = FALSE;
       parent::__construct($Sender);
    }
    
+   public function GetData($Limit = 5, $DiscussionID = '') {
+      $UserModel = new UserModel();
+      $this->_Sender->SetData('RecentUserData', $UserModel->GetActiveUsers($Limit));
+   }
+
    public function AssetTarget() {
       return 'Panel';
    }
 
    public function ToString() {
-      $Session = Gdn::Session();
-		return parent::ToString();
-			
-		return '';
+      $Data = $this->_Sender->Data['RecentUserData'];
+      if ($Data !== FALSE && $Data->NumRows() > 0)
+         return parent::ToString();
+
+      return '';
    }
 }

@@ -567,7 +567,7 @@ class SettingsController extends DashboardController {
       echo 'Success';
    }
 
-   public function ThemeOptions() {
+   public function ThemeOptions($Style = NULL) {
       $this->Permission('Garden.Themes.Manage');
 
       try {
@@ -581,6 +581,7 @@ class SettingsController extends DashboardController {
          if ($this->Form->IsPostBack()) {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
+
             SaveToConfig(array(
                'Garden.ThemeOptions.Styles.Key' => $StyleKey,
                'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename")));
@@ -601,6 +602,10 @@ class SettingsController extends DashboardController {
             }
 
             $this->StatusMessage = T("Your changes have been saved.");
+         } elseif ($Style) {
+            SaveToConfig(array(
+               'Garden.ThemeOptions.Styles.Key' => $Style,
+               'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$Style.Basename")));
          }
 
          $this->SetData('ThemeOptions', C('Garden.ThemeOptions'));

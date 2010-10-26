@@ -241,6 +241,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
          
+         $this->FireEvent('AfterAnalyzeRequest');
+         
          // Take enabled plugins into account, as well
          $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
          if (!$PluginManagerHasReplacementMethod && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
@@ -258,6 +260,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
             }
          }
+         
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
@@ -267,6 +270,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
+
+         $this->FireEvent('BeforeControllerMethod');
 
          // Set special controller method options for REST APIs.
          $this->_ReflectControllerArgs($Controller);

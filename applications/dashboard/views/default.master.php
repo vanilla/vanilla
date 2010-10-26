@@ -8,7 +8,7 @@
    <div id="Frame">
       <div id="Head">
          <div class="Menu">
-				<h1><a class="Title" href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
+            <h1><a class="Title" href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
             <?php
 			      $Session = Gdn::Session();
 					if ($this->Menu) {

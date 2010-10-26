@@ -20,7 +20,7 @@
       </li>
       <li>
          <?php
-            echo $this->Form->Button('Save your password &rarr;');
+            echo $this->Form->Button('Save your password');
          ?>
       </li>
    </ul>

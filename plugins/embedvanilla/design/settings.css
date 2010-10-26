@@ -103,3 +103,6 @@ input.InputBox:focus {
     -webkit-border-radius: 0;
     border: 1px inset #888;
 }
+#Content form ul.RemoteSettings input.Button {
+    margin: 0;
+}

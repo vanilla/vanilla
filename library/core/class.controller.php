@@ -312,7 +312,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SelfUrl = '';
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
-      $this->Theme = Gdn::Config('Garden.Theme');
+      $this->Theme = Theme();
       $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
       $this->View = '';
       $this->_CssFiles = array();

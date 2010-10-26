@@ -49,13 +49,23 @@ class TaggingPlugin extends Gdn_Plugin {
     * Load discussions for a specific tag.
     */
    public function DiscussionsController_Tagged_Create($Sender) {
-      $Offset = GetValue('1', $Sender->RequestArgs, 'p1');
-      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      if ($Sender->Request->Get('Tag')) {
+         $Tag = $_GET['Tag'];
+         $Page = GetValue('0', $Sender->RequestArgs, 'p1');
+      } else {
+         $Tag = urldecode(GetValue('0', $Sender->RequestArgs, ''));
+         $Page = GetValue('1', $Sender->RequestArgs, 'p1');
+      }
+      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
    
-      $Sender->SetData('Tag', GetValue('0', $Sender->RequestArgs, ''), TRUE);
-      $Sender->Title(T('Tagged with ').$Sender->Tag);
+      $Sender->SetData('Tag', $Tag, TRUE);
+      $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
       $Sender->Head->Title($Sender->Head->Title());
-      $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.$Sender->Tag, PageNumber($Offset, $Limit, TRUE)), TRUE));
+      if (urlencode($Tag) == $Tag) {
+         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.urlencode($Tag), PageNumber($Offset, $Limit, TRUE)), TRUE));
+      } else {
+         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.urlencode($Tag), TRUE));
+      }
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
@@ -92,11 +102,17 @@ class TaggingPlugin extends Gdn_Plugin {
       $PagerFactory = new Gdn_PagerFactory();
       $Sender->Pager = $PagerFactory->GetPager('Pager', $Sender);
       $Sender->Pager->ClientID = 'Pager';
+
+      if (urlencode($Sender->Tag) == $Sender->Tag)
+         $PageUrlFormat = "discussions/tagged/{$Sender->Tag}/{Page}";
+      else
+         $PageUrlFormat = 'discussions/tagged/{Page}?Tag='.urlencode($Sender->Tag);
+
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/tagged/'.$Sender->Tag.'/%1$s'
+         $PageUrlFormat
       );
       
       // Deliver json data if necessary
@@ -130,66 +146,62 @@ class TaggingPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $FormTags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
-      // Tags can only contain letters, numbers, plus, dashes, underscores, hashtags, periods, @ symbols, and unicode
-      if (ValidateRegex($FormTags, '/^([\pL\pN\s\d\w\+-_.#]+)$/usi')) {
-         $FormTags = array_unique(explode(' ', $FormTags));
-         
-         // Find out which of these tags is not yet in the tag table
-         $ExistingTagData = $Sender->SQL->Select('TagID, Name')->From('Tag')->WhereIn('Name', $FormTags)->Get();
-         $NewTags = $FormTags;
-         $Tags = array(); // <-- Build a complete associative array of $Tags[TagID] => TagName values for this discussion.
-         foreach ($ExistingTagData as $ExistingTag) {
-            if (in_array($ExistingTag->Name, $NewTags))
-               unset($NewTags[array_search($ExistingTag->Name, $NewTags)]);
+      $FormTags = TagModel::SplitTags($FormTags);
+      // Find out which of these tags is not yet in the tag table
+      $ExistingTagData = $Sender->SQL->Select('TagID, Name')->From('Tag')->WhereIn('Name', $FormTags)->Get();
+      $NewTags = $FormTags;
+      $Tags = array(); // <-- Build a complete associative array of $Tags[TagID] => TagName values for this discussion.
+      foreach ($ExistingTagData as $ExistingTag) {
+         if (in_array($ExistingTag->Name, $NewTags))
+            unset($NewTags[array_search($ExistingTag->Name, $NewTags)]);
 
-            $Tags[$ExistingTag->TagID] = $ExistingTag->Name;
-         }
-         
-         // Insert the missing ones
-         foreach ($NewTags as $NewTag) {
-            $TagID = $Sender->SQL->Insert(
-                  'Tag',
-                  array(
-                     'Name' => strtolower($NewTag),
-                     'InsertUserID' => Gdn::Session()->UserID,
-                     'DateInserted' => Gdn_Format::ToDateTime(),
-                     'CountDiscussions' => 0
-                  )
-               );
-            $Tags[$TagID] = $NewTag;
-         }
-         
-         // Find out which tags are not yet associated with this discussion, and which tags are no longer on this discussion
-         $TagIDs = array_keys($Tags);
-         $NonAssociatedTagIDs = $TagIDs;
-         $AssociatedTagIDs = array();
-         $RemovedTagIDs = array();
-         $ExistingTagData = $Sender->SQL->Select('TagID')->From('TagDiscussion')->Where('DiscussionID', $DiscussionID)->Get();
-         foreach ($ExistingTagData as $ExistingTag) {
-            if (in_array($ExistingTag->TagID, $TagIDs))
-               unset($NonAssociatedTagIDs[array_search($ExistingTag->TagID, $NonAssociatedTagIDs)]);
-            else if (!in_array($ExistingTag->TagID, $TagIDs))
-               $RemovedTagIDs[] = $ExistingTag->TagID;
-            else
-               $AssociatedTagIDs[] = $ExistingTag->TagID;
-         }
-         
-         // Associate the ones that weren't already associated
-         foreach ($NonAssociatedTagIDs as $TagID) {
-            $Sender->SQL->Insert('TagDiscussion', array('DiscussionID' => $DiscussionID, 'TagID' => $TagID));
-         }
-         
-         // Remove tags that were removed, and reduce their counts
-         if (count($RemovedTagIDs) > 0) {
-            // Reduce count
-            $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', $RemovedTagIDs)->Put();
-            // Remove association
-            $Sender->SQL->WhereIn('TagID', $RemovedTagIDs)->Delete('TagDiscussion', array('DiscussionID' => $DiscussionID));
-         }
-         
-         // Update the count on all previously unassociated tags
-         $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)->WhereIn('TagID', $NonAssociatedTagIDs)->Put();
+         $Tags[$ExistingTag->TagID] = $ExistingTag->Name;
       }
+
+      // Insert the missing ones
+      foreach ($NewTags as $NewTag) {
+         $TagID = $Sender->SQL->Insert(
+               'Tag',
+               array(
+                  'Name' => strtolower($NewTag),
+                  'InsertUserID' => Gdn::Session()->UserID,
+                  'DateInserted' => Gdn_Format::ToDateTime(),
+                  'CountDiscussions' => 0
+               )
+            );
+         $Tags[$TagID] = $NewTag;
+      }
+
+      // Find out which tags are not yet associated with this discussion, and which tags are no longer on this discussion
+      $TagIDs = array_keys($Tags);
+      $NonAssociatedTagIDs = $TagIDs;
+      $AssociatedTagIDs = array();
+      $RemovedTagIDs = array();
+      $ExistingTagData = $Sender->SQL->Select('TagID')->From('TagDiscussion')->Where('DiscussionID', $DiscussionID)->Get();
+      foreach ($ExistingTagData as $ExistingTag) {
+         if (in_array($ExistingTag->TagID, $TagIDs))
+            unset($NonAssociatedTagIDs[array_search($ExistingTag->TagID, $NonAssociatedTagIDs)]);
+         else if (!in_array($ExistingTag->TagID, $TagIDs))
+            $RemovedTagIDs[] = $ExistingTag->TagID;
+         else
+            $AssociatedTagIDs[] = $ExistingTag->TagID;
+      }
+
+      // Associate the ones that weren't already associated
+      foreach ($NonAssociatedTagIDs as $TagID) {
+         $Sender->SQL->Insert('TagDiscussion', array('DiscussionID' => $DiscussionID, 'TagID' => $TagID));
+      }
+
+      // Remove tags that were removed, and reduce their counts
+      if (count($RemovedTagIDs) > 0) {
+         // Reduce count
+         $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', $RemovedTagIDs)->Put();
+         // Remove association
+         $Sender->SQL->WhereIn('TagID', $RemovedTagIDs)->Delete('TagDiscussion', array('DiscussionID' => $DiscussionID));
+      }
+
+      // Update the count on all previously unassociated tags
+      $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)->WhereIn('TagID', $NonAssociatedTagIDs)->Put();
    }
    
    /**
@@ -208,16 +220,19 @@ class TaggingPlugin extends Gdn_Plugin {
          return;
       
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
-      $Tags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
+      $TagsString = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       $NumTagsMax = C('Plugin.Tagging.Max', 5);
       // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
-      if (StringIsNullOrEmpty($Tags) && C('Plugins.Tagging.Required'))
+      if (StringIsNullOrEmpty($TagsString) && C('Plugins.Tagging.Required')) {
          $Sender->Validation->AddValidationResult('Tags', 'You must specify at least one tag.');
-      else if (!StringIsNullOrEmpty($Tags) && !ValidateRegex($Tags, '/^([\pL\pN\s\d\w\+-_.#]+)$/usi'))
-         $Sender->Validation->AddValidationResult('Tags', 'Tags can only contain unicode and the following ascii characters: a-z 0-9 + # _ .');
-      else if (count(array_unique(explode(' ', $Tags))) > $NumTagsMax)
-         $Sender->Validation->AddValidationResult('Tags', 'You can only specify up to '.$NumTagsMax.' tags.');
-
+      } else {
+         $Tags = TagModel::SplitTags($TagsString);
+         if (!TagModel::ValidateTags($Tags)) {
+            $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain spaces.'));
+         } elseif (count($Tags) > $NumTagsMax) {
+            $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
+         }
+      }
    }
 
    /**
@@ -297,8 +312,8 @@ class TaggingPlugin extends Gdn_Plugin {
       } else {
          // Make sure the tag is valid
          $Tag = $Sender->Form->GetFormValue('Name');
-         if (!ValidateRegex($Tag, '/^([\d\w\+-_.#]+)$/si'))
-            $Sender->Form->AddError('Tags can only contain the following characters: a-z 0-9 + # _ .');         
+         if (!TagModel::ValidateTag($Tag))
+            $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain spaces.'));
          
          // Make sure that the tag name is not already in use.
          if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0) {

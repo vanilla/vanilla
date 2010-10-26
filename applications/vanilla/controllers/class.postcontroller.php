@@ -41,7 +41,6 @@ class PostController extends VanillaController {
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
-      $this->Title(T('Start a New Discussion'));
       
       if (isset($this->Discussion)) {
          if ($this->Discussion->InsertUserID != $Session->UserID)

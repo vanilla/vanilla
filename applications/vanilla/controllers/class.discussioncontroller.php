@@ -203,6 +203,10 @@ class DiscussionController extends VanillaController {
    
    // Discussion Options:  
    public function DismissAnnouncement($DiscussionID = '', $TransientKey = '') {
+      if (!C('Vanilla.Discussions.Dismiss', 1)) {
+         throw PermissionException('Vanilla.Discussions.Dismiss');
+      }
+
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
       if (

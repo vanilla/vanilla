@@ -1560,8 +1560,9 @@ if (!function_exists('IsMobile')) {
       if (strpos($AllHttp, 'operamini') > 0)
          $Mobile++;
  
-      if (strpos($UserAgent, 'windows') > 0)
-         $Mobile = 0;
+      // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
+      // if (strpos($UserAgent, 'windows') > 0)
+      //   $Mobile = 0;
  
       return $Mobile > 0;
    }

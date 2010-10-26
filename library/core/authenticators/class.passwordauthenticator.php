@@ -47,8 +47,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     *
     * @param string $Email The email address (or unique username) assigned to the user in the database.
     * @param string $Password The password assigned to the user in the database.
-    * @param boolean $PersistentSession Should the user's session remain persistent across visits?
-    * @param int $ClientHour The current hour (24 hour format) of the client.
+    * @return int The UserID of the authenticated user or 0 if one isn't found.
     */
    public function Authenticate($Email = '', $Password = '') {
       if (!$Email || !$Password) {
@@ -94,7 +93,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             // Update some information about the user...
             $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
             
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
             $this->FireEvent('Authenticated');
+         } else {
+            Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_DENIED);
          }
       }
       return $UserID;
@@ -130,7 +132,16 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
    
+   public function LogoutResponse() {
+      return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
    public function RepeatResponse() {
+      return Gdn_Authenticator::REACT_RENDER;
+   }
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   public function FailedResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
    

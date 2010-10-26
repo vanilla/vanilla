@@ -60,7 +60,7 @@ class VanillaHooks implements Gdn_IPlugin {
       // Add menu items.
       $Session = Gdn::Session();
       if ($Sender->Menu) {
-         $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE);
+         $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE, array('Standard' => TRUE));
       }
    }
    
@@ -87,7 +87,6 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param SearchController $Sender
 	 */
 	public function SearchModel_Search_Handler($Sender) {
-		include_once(dirname(__FILE__).DS.'..'.DS.'models'.DS.'class.vanillasearchmodel.php');
 		$SearchModel = new VanillaSearchModel();
 		$SearchModel->Search($Sender);
 	}

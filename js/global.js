@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
       var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            gdn.combinePaths(gdn.definition('WebRoot', ''), 'index.php?p=/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
+            gdn.url('/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -21,7 +21,8 @@ jQuery(document).ready(function($) {
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {
-      $('#Form_User_Password').slideToggle('fast');
+		$('#Form_User_Password').toggle();
+		$('#Form_User_SignIn').toggle();
       return false;
    });
    
@@ -68,7 +69,7 @@ jQuery(document).ready(function($) {
 	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
-      document.location = gdn.combinePaths(gdn.definition('WebRoot', ''), 'profile/notifications');
+      document.location = gdn.url('/profile/notifications');
       return false;
    });
    
@@ -77,6 +78,25 @@ jQuery(document).ready(function($) {
    // current screen).
    if ($.fn.popup)
       $('a.Popup').popup();
+
+   $(".PopupWindow").live('click', function() {
+      var $this = $(this);
+
+      var width = $this.attr('popupWidth');
+      var height = $this.attr('popupHeight');
+      var left = (screen.width - width) / 2;
+      var right = (screen.height - height) / 2;
+
+      var id = $this.attr('id');
+      var href = $this.attr('href');
+      var args = $this.attr('popupArgs');
+      if (args)
+         href += '&' + args;
+
+      var win = window.open(href, 'Window_' + id, "left="+left+",height="+height+",width="+width+",height="+height+",status=0,scrollbars=0");
+
+      return false;
+   });
    
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
@@ -155,10 +175,11 @@ jQuery(document).ready(function($) {
       }});
 
    // Format email addresses
-   $('span.Email').livequery(function() {
-      var html = $(this).html();
-      var email = $(this).html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
-      $(this).html('<a href="mailto:' + email + '">' + email + '</a>');
+   $('span.Email.EmailUnformatted').livequery(function() {
+      var el = $(this);
+      el.removeClass('EmailUnformatted');
+      var email = el.html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
+      el.html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
@@ -183,7 +204,7 @@ jQuery(document).ready(function($) {
          else
             $(message).appendTo('body').show();
       }
-   }
+   };
    
    // Generate a random string of specified length
    gdn.generateString = function(length) {
@@ -198,7 +219,7 @@ jQuery(document).ready(function($) {
          string += chars.substring(pos, pos + 1);
       }
       return string;
-   }
+   };
    
    // Combine two paths and make sure that there is only a single directory concatenator
    gdn.combinePaths = function(path1, path2) {
@@ -209,7 +230,7 @@ jQuery(document).ready(function($) {
          path2 = path2.substring(1);
       
       return path1 + '/' + path2;
-   }
+   };
 
    gdn.processTargets = function(targets) {
       if(!targets || !targets.length)
@@ -249,7 +270,23 @@ jQuery(document).ready(function($) {
                $target.html(item.Data);
          }
       }
-   }
+   };
+
+   gdn.url = function(path) {
+      if (path.indexOf("//") >= 0)
+         return path; // this is an absolute path.
+
+      var urlFormat = gdn.definition("UrlFormat", "");
+
+      if (path[0] == "/")
+         path = path.substr(1);
+
+      if (urlFormat.indexOf("?") >= 0)
+         path = path.replace("?", "&");
+
+      var result = urlFormat.replace("{Path}", path);
+      return result;
+   };
 
    // Fill the search input with "search" if empty and blurred
    var searchText = gdn.definition('Search', 'Search');
@@ -262,7 +299,7 @@ jQuery(document).ready(function($) {
    $('#Search input.InputBox').focus(function() {
       var searchText = gdn.definition('Search', 'Search');
       if ($(this).val() == searchText)
-         $(this).val('');      
+         $(this).val('');
    });
    
    // Add a spinner onclick of buttons with this class

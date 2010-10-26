@@ -67,12 +67,12 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * @todo Undocumented method.
     */
-   public function __construct() {
+   public function __construct($Result = NULL) {
       // Set defaults
       $this->Connection = NULL;
       $this->_Cursor = -1;
       $this->_PDOStatement = NULL;
-      $this->_Result = NULL;
+      $this->_Result = $Result;
    }
 
    public function  __destruct() {
@@ -192,6 +192,21 @@ class Gdn_DataSet implements IteratorAggregate {
     */
    public function getIterator() {
       return new ArrayIterator($this->Result());
+   }
+
+   public static function Index($Data, $Columns, $Sep = '|') {
+      $Columns = (array)$Columns;
+      $Result = array();
+
+      foreach ($Data as $Row) {
+         $IndexValues = array();
+         foreach ($Columns as $Column) {
+            $IndexValues[] = GetValue($Column, $Row);
+         }
+         $Index = implode($Sep, $IndexValues);
+         $Result[$Index] = $Row;
+      }
+      return $Result;
    }
 
    /**

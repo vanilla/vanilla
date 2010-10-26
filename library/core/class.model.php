@@ -291,6 +291,19 @@ class Gdn_Model extends Gdn_Pluggable {
       }
    }
 
+   /**
+    * Returns an array with only those keys that are actually in the schema.
+    *
+    * @param array $Data An array of key/value pairs.
+    * @return array The filtered array.
+    */
+   public function FilterSchema($Data) {
+      $Fields = $this->Schema->Fields($this->Name);
+
+      $Result = array_intersect_key($Data, $Fields);
+      return $Result;
+   }
+
 
    /**
     * @param unknown_type $OrderFields
@@ -321,6 +334,18 @@ class Gdn_Model extends Gdn_Pluggable {
          ->FirstRow();
 
       return $Data === FALSE ? 0 : $Data->Count;
+   }
+
+   /**
+    * Get the data from the model based on its primary key.
+    *
+    * @param mixed $ID The value of the primary key in the database.
+    * @param string $DatasetType The format of the result dataset.
+    * @return Gdn_DataSet
+    */
+   public function GetID($ID, $DatasetType = FALSE) {
+      $Result = $this->GetWhere(array("{$this->Name}ID" => $ID))->FirstRow($DatasetType);
+      return $Result;
    }
 
    /**
@@ -370,12 +395,14 @@ class Gdn_Model extends Gdn_Pluggable {
    protected function AddInsertFields(&$Fields) {
       $this->DefineSchema();
       if ($this->Schema->FieldExists($this->Name, $this->DateInserted)) {
-         $Fields[$this->DateInserted] = Gdn_Format::ToDateTime();
+         if (!isset($Fields[$this->DateInserted]))
+            $Fields[$this->DateInserted] = Gdn_Format::ToDateTime();
       }
 
       $Session = Gdn::Session();
       if ($Session->UserID > 0 && $this->Schema->FieldExists($this->Name, $this->InsertUserID))
-         $Fields[$this->InsertUserID] = $Session->UserID;
+         if (!isset($Fields[$this->InsertUserID]))
+            $Fields[$this->InsertUserID] = $Session->UserID;
    }
 
 
@@ -389,12 +416,14 @@ class Gdn_Model extends Gdn_Pluggable {
    protected function AddUpdateFields(&$Fields) {
       $this->DefineSchema();
       if ($this->Schema->FieldExists($this->Name, $this->DateUpdated)) {
-         $Fields[$this->DateUpdated] = Gdn_Format::ToDateTime();
+         if (!isset($Fields[$this->DateUpdated]))
+            $Fields[$this->DateUpdated] = Gdn_Format::ToDateTime();
       }
 
       $Session = Gdn::Session();
       if ($Session->UserID > 0 && $this->Schema->FieldExists($this->Name, $this->UpdateUserID))
-         $Fields[$this->UpdateUserID] = $Session->UserID;
+         if (!isset($Fields[$this->UpdateUserID]))
+            $Fields[$this->UpdateUserID] = $Session->UserID;
    }
 
 	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {

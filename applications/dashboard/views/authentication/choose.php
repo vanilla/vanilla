@@ -1,6 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Info"><?php echo T('Choose and configure your forum\'s authentication scheme.'); ?> </div>
+<div class="Info">
+   <?php echo T('Choose and configure your forum\'s authentication scheme.'); ?><br/>
+   <span class="PasswordForce"><?php echo sprintf(T('You can always use your password at<a href="%1$s">%1$s</a>.', 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'),Url('entry/password', TRUE)); ?></span>
+</div>
 <div class="AuthenticationChooser">
    <?php 
       echo $this->Form->Open(array(
@@ -34,7 +37,7 @@
 <?php
    if ($this->Data('PreFocusAuthenticationScheme')) {
 ?>
-      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>">
+      <div class="AuthenticationConfigure Slice Async" rel="dashboard/authentication/configure/<?php echo $this->Data('PreFocusAuthenticationScheme'); ?>"></div>
 <?php
    } else {
       echo $this->Slice('configure');

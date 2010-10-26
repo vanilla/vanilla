@@ -39,7 +39,10 @@ class HomeController extends Gdn_Controller {
     * is encountered.
     */
    public function FileNotFound() {
-      $this->Render();
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+         $this->Render();
+      else
+         $this->RenderException(NotFoundException());
    }
    
    public function UpdateMode() {
@@ -59,7 +62,10 @@ class HomeController extends Gdn_Controller {
    }
    
    public function Permission() {
-      $this->Render();
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+         $this->Render();
+      else
+         $this->RenderException(PermissionException());
    }
    
 }

@@ -46,9 +46,9 @@ $Configuration['Garden']['Cookie']['HashMethod']                = 'md5'; // md5 
 $Configuration['Garden']['Authenticator']['DefaultScheme']      = 'password'; // Types include 'Password', 'Handshake', 'Openid'
 $Configuration['Garden']['Authenticator']['RegisterUrl']        = '/entry/register?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignInUrl']          = '/entry/signin?Target=%2$s';
-$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/leave/%1$s/{Session_TransientKey}?Target=%2$s';
+$Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/signout/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
-$Configuration['Garden']['Authenticator']['SyncScreen']         = TRUE;
+$Configuration['Garden']['Authenticator']['SyncScreen']         = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name']  = "Password";
 $Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';
@@ -72,12 +72,11 @@ $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';
 $Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/addons/update';
 $Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
-$Configuration['Garden']['AddonUrl']                            = '';
 $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '50M';
-$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png', 'zip', 'gz', 'tar.gz');
+$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','gif','png','bmp','zip','gz','tar.gz','tgz','psd','ai','fla','swf','pdf','doc','xls','ppt','docx','xlsx','log','pdf');
 $Configuration['Garden']['Picture']['MaxHeight']                = 1000;
 $Configuration['Garden']['Picture']['MaxWidth']                 = 600;
 $Configuration['Garden']['Profile']['MaxHeight']                = 1000;
@@ -85,10 +84,13 @@ $Configuration['Garden']['Profile']['MaxWidth']                 = 250;
 $Configuration['Garden']['Preview']['MaxHeight']                = 100;
 $Configuration['Garden']['Preview']['MaxWidth']                 = 75;
 $Configuration['Garden']['Thumbnail']['Size']                   = 50;
-$Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Conversations', 'User');
+$Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User');
+$Configuration['Garden']['DashboardMenu']['Sort']               = array('Dashboard', 'Appearance', 'Banner', 'Themes', 'Theme Options', 'Custom Theme', 'Messages', 'Custom Domain', 'Users', 'Roles & Permissions', 'Registration', 'Applicants', 'Authentication', 'Forum', 'Forum Settings', 'Categories', 'Tagging', 'Voting', 'Spam', 'Flagging', 'Flagged Content', 'Media', 'Signatures', 'Add-ons', 'Addons', 'Plugins', 'Applications', '&lt;Embed&t; Vanilla', 'Locales', 'Site Settings', 'Import');
 $Configuration['Garden']['InputFormatter']                      = 'Html';
+$Configuration['Garden']['Html']['SafeStyles']                  = TRUE; // disallow style/class attributes in html to prevent click jacking
 $Configuration['Garden']['Search']['Mode']                      = 'matchboolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['Theme']                               = 'default';
+$Configuration['Garden']['MobileTheme']                         = 'mobile';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 $Configuration['Garden']['Roles']['Manage']                     = TRUE;
@@ -96,6 +98,13 @@ $Configuration['Garden']['VanillaUrl']                          = 'http://vanill
 $Configuration['Garden']['AllowSSL']                            = TRUE;
 $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
+$Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
+$Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
+
+// Formatting
+$Configuration['Garden']['Format']['DisableHashtags']           = FALSE;
+$Configuration['Garden']['Format']['YouTube']                   = TRUE;
+$Configuration['Garden']['Format']['Vimeo']                     = TRUE;
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
@@ -107,23 +116,16 @@ $Configuration['Preferences']['Email']['DiscussionComment']     = '0';
 $Configuration['Preferences']['Email']['DiscussionMention']     = '0';
 $Configuration['Preferences']['Email']['CommentMention']        = '0';
 
-// Begin - HtmlPurifier Settings
-$Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = FALSE;
-$Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
-$Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE.'/HtmlPurifier';
-$Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
-$Configuration['HtmlPurifier']['Filter']['Vimeo']               = TRUE;
-$Configuration['HtmlPurifier']['Attr']['EnableID']              = TRUE;
-
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
 $Configuration['Modules']['Garden']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
-$Configuration['Modules']['Conversations']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
+$Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'SignedInModule', 'GuestModule', 'Ads');
+$Configuration['Modules']['Vanilla']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads');
+$Configuration['Modules']['Conversations']['Panel'] = array('NewConversationModule', 'SignedInModule', 'GuestModule', 'Ads');
+$Configuration['Modules']['Conversations']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads');
 
 // Routes
 $Configuration['Routes']['DefaultController'] = 'discussions';
-$Configuration['Routes']['Default404'] = 'dashboard/home/filenotfound';
-$Configuration['Routes']['DefaultPermission'] = 'dashboard/home/permission';
+$Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
+$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';

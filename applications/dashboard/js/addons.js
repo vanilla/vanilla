@@ -6,12 +6,24 @@ jQuery(document).ready(function($) {
       
       var url = $(this).attr('href');
       var urlParts = url.split('/');
-      var addonType = urlParts[urlParts.length - 3];
-      if (addonType == 'plugins')
-         addonType = 'Plugin';
-      else if (addonType == 'applications')
-         addonType = 'Application';
-      else if (addonType == 'themes')
+      var addonType = urlParts[urlParts.length - 4];
+
+      switch (addonType) {
+         case 'plugins':
+            addonType = 'Plugin';
+            break;
+         case 'applications':
+            addonType = 'Application';
+            break;
+         case 'themes':
+            addonType = 'Theme';
+            break;
+         case 'locales':
+            addonType = 'Locale';
+            break;
+      }
+      
+      if ($(this).hasClass('EnableTheme'))
          addonType = 'Theme';
          
       if (addonType != 'Theme') {
@@ -19,14 +31,12 @@ jQuery(document).ready(function($) {
          $(this).after('<span class="TinyProgress">&nbsp;</span>');
       }
       var addonName = urlParts[urlParts.length - 2];
-      var testUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
-      );
+      var testUrl = gdn.url('/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey'));
       
       $.ajax({
          type: "GET",
          url: testUrl,
+         data: {'DeliveryType':'JSON'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form
@@ -65,14 +75,12 @@ jQuery(document).ready(function($) {
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonName = urlParts[urlParts.length - 1];
-      var testUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey')+'&DeliveryType=JSON'
-      );
+      var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey'));
       
       $.ajax({
          type: "GET",
          url: testUrl,
+         data: {'DeliveryType':'JSON'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form

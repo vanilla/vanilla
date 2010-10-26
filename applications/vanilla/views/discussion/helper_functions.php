@@ -44,11 +44,19 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             <?php echo Anchor(T('Permalink'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
          </span>
          <?php WriteOptionList($Object, $Sender, $Session); ?>
+         <div class="CommentInfo">
+            <?php $Sender->FireEvent('CommentInfo'); ?>
+         </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
       <div class="Message">
 			<?php $Sender->FireEvent('BeforeCommentBody'); ?>
-			<p><?php echo Gdn_Format::To($Object->Body, $Object->Format); ?></p>
+			<p><?php 
+			   $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
+			   $Sender->FireEvent('AfterCommentFormat');
+			   $Object = $Sender->EventArguments['Object'];
+			   echo $Object->FormatBody;
+			?></p>
 		</div>
       <?php $Sender->FireEvent('AfterCommentBody'); ?>
    </div>

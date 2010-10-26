@@ -18,22 +18,18 @@ define('DELIVERY_TYPE_VIEW', 'VIEW'); // Deliver only the view
 define('DELIVERY_TYPE_BOOL', 'BOOL'); // Deliver only the success status (or error) of the request
 define('DELIVERY_TYPE_NONE', 'NONE'); // Deliver nothing
 define('DELIVERY_TYPE_MESSAGE', 'MESSAGE'); // Just deliver messages.
+define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
 
 // Delivery method enumerators
 define('DELIVERY_METHOD_XHTML', 'XHTML');
 define('DELIVERY_METHOD_JSON', 'JSON');
+define('DELIVERY_METHOD_XML', 'XML');
 
 // Handler enumerators:
 define('HANDLER_TYPE_NORMAL', 'NORMAL'); // Standard call to a method on the object.
 define('HANDLER_TYPE_EVENT', 'EVENT'); // Call to an event handler.
 define('HANDLER_TYPE_OVERRIDE', 'OVERRIDE'); // Call to a method override.
 define('HANDLER_TYPE_NEW', 'NEW'); // Call to a new object method.
-
-// Addon type enumerators:
-define('ADDON_TYPE_APPLICATION', 'Application');
-define('ADDON_TYPE_PLUGIN', 'Plugin');
-define('ADDON_TYPE_THEME', 'Theme');
-define('ADDON_TYPE_LOCALE', 'Locale');
 
 // Dataset type enumerators:
 define('DATASET_TYPE_ARRAY', 'array');
@@ -46,3 +42,6 @@ define('SYNDICATION_ATOM', 'ATOM');
 
 // Environment
 define('ENVIRONMENT_PHP_VERSION','5.2.0');
+
+if (!defined('E_USER_DEPRECATED'))
+   define('E_USER_DEPRECATED', E_USER_WARNING);

@@ -156,7 +156,7 @@ class CategoryModel extends Gdn_Model {
 
    public function GetFullByUrlCode($UrlCode) {
       $this->SQL
-         ->Select('c.CategoryID, c.Description, c.CountDiscussions')
+         ->Select('c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
          ->Select("' &rarr; ', p.Name, c.Name", 'concat_ws', 'Name')
          ->From('Category c')
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')

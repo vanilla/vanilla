@@ -32,7 +32,7 @@ class TagModule extends Gdn_Module {
          ->From('Tag t')
          ->Where('t.CountDiscussions >', 0, FALSE)
          ->OrderBy('t.CountDiscussions', 'desc')
-         ->Limit(50)
+         ->Limit(25)
          ->Get();
    }
 
@@ -54,7 +54,13 @@ class TagModule extends Gdn_Module {
          foreach ($this->_TagData->Result() as $Tag) {
             if ($Tag->Name != '') {
          ?>
-            <li><strong><?php echo Anchor($Tag->Name, 'discussions/tagged/'.$Tag->Name); ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
+            <li><strong><?php 
+                           if (urlencode($Tag->Name) == $Tag->Name) {
+                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
+                           } else {
+                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
+                           }
+                        ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
          <?php
             }
          }

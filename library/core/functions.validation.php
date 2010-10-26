@@ -109,6 +109,15 @@ if (!function_exists('ValidateEmail')) {
       );
    }
 }
+if (!function_exists('ValidateWebAddress')) {
+   function ValidateWebAddress($Value, $Field = '') {
+      if ($Value == '')
+         return TRUE; // Required picks up this error
+      
+      return filter_var($Value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== FALSE;
+   }
+}
+
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       return ValidateRegex(
@@ -140,8 +149,9 @@ if (!function_exists('ValidateDate')) {
 				$Hour = ArrayValue(4, $Matches, 0);
 				$Minutes = ArrayValue(5, $Matches, 0);
 				$Seconds = ArrayValue(6, $Matches, 0);
-			}
-         return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
+			   
+            return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
+         }
       }
 
       return FALSE;
@@ -259,3 +269,18 @@ if (!function_exists('ValidateMatch')) {
    }
 }
 
+if (!function_exists('ValidateVersion')) {
+   function ValidateVersion($Value) {
+      if (empty($Value))
+         return TRUE;
+
+      if (preg_match('`(?:\d+\.)*\d+\s*(\w*)\d*`', $Value, $Matches)) {
+         // Get the version word out of the matches and validate it.
+         $Word = $Matches[1];
+         if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p')))
+         	return FALSE;
+         return TRUE;
+      }
+      return FALSE;
+   }
+}

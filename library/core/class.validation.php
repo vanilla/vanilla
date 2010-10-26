@@ -119,6 +119,7 @@ class Gdn_Validation {
       $this->AddRule('Required', 'function:ValidateRequired');
       $this->AddRule('RequiredArray', 'function:ValidateRequiredArray');
       $this->AddRule('Email', 'function:ValidateEmail');
+      $this->AddRule('WebAddress', 'function:ValidateWebAddress');
       $this->AddRule('Username', 'function:ValidateUsername');
       $this->AddRule('UrlString', 'function:ValidateUrlString');
       $this->AddRule('Date', 'function:ValidateDate');
@@ -133,6 +134,7 @@ class Gdn_Validation {
       $this->AddRule('Captcha', 'function:ValidateCaptcha');
       $this->AddRule('Match', 'function:ValidateMatch');
       $this->AddRule('OldPassword', 'function:ValidateOldPassword');
+      $this->AddRule('Version', 'function:ValidateVersion');
    }
 
 
@@ -423,6 +425,56 @@ class Gdn_Validation {
       }
    }
 
+   /**
+    * Execute a single validation rule and return its result.
+    *
+    * @param mixed $Value The value to validate.
+    * @param string $FieldName The name of the field to put into the error result.
+    * @param string|array $Rule The rule to validate which can be one of the following.
+    *  - string: The name of a function used to validate the value.
+    *  - 'regex:<regex>': The regular expression used to validate the value.
+    *  - array: An array with the following keys:
+    *    - Name: The name of the function used to validate.
+    *    - Args: An argument to pass to the function after the value.
+    * @param string $CustomError A custom error message.
+    * @return bool|string One of the following
+    *  - TRUE: The value passed validation.
+    *  - string: The error message associated with the error.
+    */
+   public static function ValidateRule($Value, $FieldName, $Rule, $CustomError = FALSE) {
+      // Figure out the type of rule.
+      if (is_string($Rule)) {
+         if (StringBeginsWith($Rule, 'regex:', TRUE)) {
+            $RuleName = 'regex';
+            $Args = substr($Rule, 6);
+         } elseif (StringBeginsWith($Rule, 'function:', TRUE)) {
+            $RuleName = substr($Rule, 9);
+         } elseif (function_exists($Rule)) {
+            $RuleName = $Rule;
+         }
+      } elseif (is_array($Rule)) {
+         $RuleName = GetValue('Name', $Rule);
+         $Args = GetValue('Args', $Rule);
+      }
+
+      if (!isset($Args))
+         $Args = NULL;
+
+      if (function_exists($RuleName)) {
+         $Result = $RuleName($Value, $Args);
+         if ($Result === TRUE)
+            return TRUE;
+         elseif ($CustomError)
+            return $CustomError;
+         elseif (is_string($Result))
+            return $Result;
+         else
+            return sprintf(T($RuleName), T($FieldName));
+      } else {
+         return sprintf('Validation does not exist: %s.', $RuleName);
+      }
+   }
+
 
    /**
     * Examines the posted fields, defines $this->_ValidationFields, and
@@ -526,10 +578,10 @@ class Gdn_Validation {
     *
     * @return array
     */
-   public function Results() {
-      if (!is_array($this->_ValidationResults))
+   public function Results($Reset = FALSE) {
+      if (!is_array($this->_ValidationResults) || $Reset)
          $this->_ValidationResults = array();
-
+      
       return $this->_ValidationResults;
    }
 }

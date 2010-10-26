@@ -68,7 +68,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
     *
     * @var array
     */
-   public $Returns;
+   public $Returns = array();
 
 
    /**

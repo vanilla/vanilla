@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
-$AddonUrl = Gdn::Config('Garden.AddonUrl', '');
+$UpdateUrl = C('Garden.UpdateCheckUrl');
+$AddonUrl = C('Garden.AddonUrl');
 $PluginCount = count($this->AvailablePlugins);
 $EnabledCount = count($this->EnabledPlugins);
 $DisabledCount = $PluginCount - $EnabledCount;
@@ -17,7 +17,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == '' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/all'); ?></li>
       <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
       <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
       <?php
@@ -43,12 +43,13 @@ $DisabledCount = $PluginCount - $EnabledCount;
 <?php
 $Alt = FALSE;
 foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
+   if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE) continue;
    $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
    $State = strtolower($Css);
-   if ($this->Filter == '' || $this->Filter == $State) {
+   if ($this->Filter == 'all' || $this->Filter == $State) {
       $Alt = $Alt ? FALSE : TRUE;
-      $Version = ArrayValue('Version', $PluginInfo, '');
-      $ScreenName = ArrayValue('Name', $PluginInfo, $PluginName);
+      $Version = Gdn_Format::Display(GetValue('Version', $PluginInfo, ''));
+      $ScreenName = Gdn_Format::Display(GetValue('Name', $PluginInfo, $PluginName));
       $SettingsUrl = $State == 'enabled' ? ArrayValue('SettingsUrl', $PluginInfo, '') : '';
       $PluginUrl = ArrayValue('PluginUrl', $PluginInfo, '');
       $Author = ArrayValue('Author', $PluginInfo, '');
@@ -60,14 +61,14 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
       ?>
       <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
-         <td class="Alt"><?php echo ArrayValue('Description', $PluginInfo, ''); ?></td>
+         <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $PluginInfo, '')); ?></td>
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php
             $ToggleText = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Disable' : 'Enable';
             echo Anchor(
                T($ToggleText),
-               '/settings/plugins/'.$PluginName.'/'.$Session->TransientKey(),
+               '/settings/plugins/'.$this->Filter.'/'.$PluginName.'/'.$Session->TransientKey(),
                $ToggleText . 'Addon SmallButton'
             );
             
@@ -132,7 +133,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
          ?>
          <tr class="<?php echo $RowClass; ?>">
             <td colspan="2"><div class="Alert"><a href="<?php
-               echo CombinePaths(array($AddonUrl, 'find', urlencode($PluginName)), '/');
+               echo CombinePaths(array($UpdateUrl, 'find', urlencode($ScreenName)), '/');
             ?>"><?php
                printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
             ?></a></div></td>

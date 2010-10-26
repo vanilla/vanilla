@@ -679,9 +679,12 @@ class Gdn_Form {
          foreach($this->_ValidationResults as $FieldName => $Problems) {
             $Count = count($Problems);
             for($i = 0; $i < $Count; ++$i) {
-               $Return .= '<li>' . sprintf(
-                  T($Problems[$i]),
-                  T($FieldName)) . "</li>\n";
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= '<li>'.substr($Problems[$i], 1)."</li>\n";
+               else
+                  $Return .= '<li>' . sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)) . "</li>\n";
             }
          }
          $Return .= "</ul>\n</div>\n";
@@ -1323,6 +1326,29 @@ class Gdn_Form {
       $this->_Model->DefineSchema();
       if ($this->_Model->Validation->Validate($this->FormValues()) === FALSE) $this->_ValidationResults = $this->_Model->ValidationResults();
       return $this->ErrorCount();
+   }
+
+   /**
+    * Validates a rule on the form and adds its result to the errors collection.
+    *
+    * @param string $FieldName The name of the field to validate.
+    * @param string|array $Rule The rule to validate against.
+    * @param string $CustomError A custom error string.
+    * @return bool Whether or not the rule succeeded.
+    *
+    * @see Gdn_Validation::ValidateRule()
+    */
+   public function ValidateRule($FieldName, $Rule, $CustomError = '') {
+      $Value = $this->GetFormValue($FieldName);
+      $Valid = Gdn_Validation::ValidateRule($Value, $FieldName, $Rule, $CustomError);
+
+      if ($Valid === TRUE)
+         return TRUE;
+      else {
+         $this->AddError('@'.$Valid);
+         return FALSE;
+      }
+      
    }
 
    /**

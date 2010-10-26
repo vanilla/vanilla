@@ -106,6 +106,9 @@ class DiscussionModel extends VanillaModel {
 			
 		$this->AddDiscussionColumns($Data);
 		
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
+		
 		return $Data;
    }
 	
@@ -364,7 +367,7 @@ class DiscussionModel extends VanillaModel {
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Sink']);
 			
-		$this->EventArguments['FormPostValues'] = $FormPostValues;
+		$this->EventArguments['FormPostValues'] = &$FormPostValues;
 		$this->EventArguments['DiscussionID'] = $DiscussionID;
 		$this->FireEvent('BeforeSaveDiscussion');
          
@@ -711,6 +714,9 @@ set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
          $UserID = $Data->FirstRow()->InsertUserID;
          $CategoryID = $Data->FirstRow()->CategoryID;
       }
+      
+      $this->EventArguments['DiscussionID'] = $DiscussionID;
+      $this->FireEvent('DeleteDiscussion');
       
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));

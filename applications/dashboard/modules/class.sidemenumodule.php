@@ -85,9 +85,9 @@ if (!class_exists('SideMenuModule', FALSE)) {
       
       public function RemoveLink($Group, $Text) {
          if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
-            for ($i = 0; $i < count($this->Items[$Group]); $i++) {
-               if ($this->Items[$Group][$i]['Text'] == $Text) {
-                  unset($this->Items[$Group][$i]);
+            foreach ($this->Items[$Group] as $Index => $GroupArray) {
+               if ($this->Items[$Group][$Index]['Text'] == $Text) {
+                  unset($this->Items[$Group][$Index]);
                   array_merge($this->Items[$Group]);
                   break;
                }
@@ -127,7 +127,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
          
          $Menu = '';
          if (count($this->Items) > 0) {
-            // Apply the menu group sort if present...
+            // Apply the menu sort if present...
             if (is_array($this->Sort)) {
                $Items = array();
                $Count = count($this->Sort);
@@ -138,12 +138,26 @@ if (!class_exists('SideMenuModule', FALSE)) {
                      unset($this->Items[$Group]);
                   }
                }
-               foreach ($this->Items as $Group => $Links) {
-                  $Items[$Group] = $Links;
+               foreach ($Items as $Group => $Links) {
+                  $LinkNames = ConsolidateArrayValuesByKey($Links, 'Text');
+                  $SortedLinks = array();
+                  for ($j = 0; $j < $Count; ++$j) {
+                     $SortName = $this->Sort[$j];
+                     $Key = array_search($SortName, $LinkNames);
+                     if ($Key !== FALSE) {
+                        $SortedLinks[] = $Links[$Key];
+                        unset($Links[$Key]);
+                        $LinkNames[$Key] = '-=EMPTY=-';
+                     }
+                  }
+                  $SortedLinks = array_merge($SortedLinks, $Links);
+                  $Items[$Group] = $SortedLinks;
                }
             } else {
                $Items = $this->Items;
             }
+            
+            // Build the menu
             foreach ($Items as $GroupName => $Links) {
                $ItemCount = 0;
                $LinkCount = 0;
@@ -208,7 +222,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
                      $GroupAttributes['class'] .= ' Active';
                      
                   if ($GroupName != '') {
-                     if ($LinkCount == 1)
+                     if ($LinkCount == 1 && $GroupName == $Text)
                         $Group = '';
                         
                      $GroupUrl = Url($GroupAnchor);

@@ -5,7 +5,7 @@ echo $this->Form->Open();
 <h1><?php echo T('Manage Roles & Permissions'); ?></h1>
 <?php $this->DefaultRolesWarning(); ?>
 <div class="Info"><?php
-   echo T('Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
+   echo T('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
    $this->FireEvent('AfterRolesInfo');
 ?></div>
 <?php if ($Advanced) { ?>

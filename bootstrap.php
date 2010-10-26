@@ -31,8 +31,8 @@ require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
 require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
 
 require_once(PATH_LIBRARY_CORE . DS . 'class.sliceprovider.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.plugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
+require_once(PATH_LIBRARY_CORE . DS . 'class.plugin.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.authenticator.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
@@ -153,7 +153,7 @@ unset($Gdn_Path);
 unset($Hooks_Path);
 
 // If there is a hooks file in the theme folder, include it.
-$ThemeName = C('Garden.Theme', 'default');
+$ThemeName = C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
 $ThemeHooks = PATH_THEMES . DS . $ThemeName . DS . 'class.' . strtolower($ThemeName) . 'themehooks.php';
 if (file_exists($ThemeHooks))
 	include_once($ThemeHooks);

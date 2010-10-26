@@ -103,9 +103,12 @@ class Gdn_Format {
       if ($RegardingWall == '')
          $RegardingWall = T('wall');
 
-      if ($Activity->Route == '')
-         $Route = T($Activity->RouteCode);
-      else
+      if ($Activity->Route == '') {
+         if ($Activity->RouteCode)
+            $Route = T($Activity->RouteCode);
+         else
+            $Route = '';
+      } else
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
 
       // Translate the gender suffix.
@@ -126,7 +129,12 @@ class Gdn_Format {
       .'/'.$Route
       .'/'.$GenderSuffix.($GenderSuffixCode)
       */
-      return sprintf(($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? T($Activity->FullHeadline) : T($Activity->ProfileHeadline)), $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
+
+      $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
+      $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
+      $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $FullHeadline : $ProfileHeadline);
+      
+      return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
    }
 
    /**
@@ -216,7 +224,7 @@ class Gdn_Format {
          } else {
 				try {
 					$Mixed2 = $Mixed;
-					$Mixed2 = str_replace("\n", '<br />', $Mixed2);
+					//$Mixed2 = str_replace("\n", '<br />', $Mixed2);
 
                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
@@ -224,6 +232,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote=[\"']?(.*?)[\"']?\](.*?)\[/quote\]#si",'<p><cite>\\1</cite>:</p><blockquote>\\2</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
                $Mixed2 = preg_replace("#\[url\]([^/]*?)\[/url\]#si",'<a href="http://\\1">\\1</a>',$Mixed2);
@@ -255,6 +264,40 @@ class Gdn_Format {
       }
    }
 
+   /** Format a number by putting K/M/B suffix after it when appropriate.
+    *
+    * @param mixed $Number The number to format. If a number isn't passed then it is returned as is.
+    * @return string The formatted number.
+    * @todo Make this locale aware.
+    */
+   public static function BigNumber($Number) {
+      if (!is_numeric($Number))
+         return $Number;
+
+      if ($Number >= 1000000000) {
+         $Number = $Number / 1000000000;
+         $Suffix = "B";
+      } elseif ($Number >= 1000000) {
+         $Number = $Number / 1000000;
+         $Suffix = "M";
+      } elseif ($Number >= 1000) {
+         $Number = $Number / 1000;
+         $Suffix = "K";
+      }
+
+      if (isset($Suffix)) {
+         return number_format($Number, 1).$Suffix;
+      } else {
+         return $Number;
+      }
+   }
+
+   /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
+    *
+    * @param int $Bytes The bytes to format.
+    * @param int $Precision The number of decimal places to return.
+    * @return string The formatted bytes.
+    */
    public static function Bytes($Bytes, $Precision = 2) {
       $Units = array('B', 'K', 'M', 'G', 'T');
       $Bytes = max($Bytes, 0);
@@ -383,7 +426,7 @@ class Gdn_Format {
    public static function Email($Email) {
       $At = T('at');
       $Dot = T('dot');
-      return '<span class="Email">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
+      return '<span class="Email EmailUnformatted">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
    }
 
    /**
@@ -479,14 +522,14 @@ class Gdn_Format {
    protected static function LinksCallback($Matches) {
       $Pr = $Matches[1];
       $Url = $Matches[2];
-      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches)) {
+      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches) && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
          $Width = 400;
          $Height = 225;
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
-      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches)) {
+      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
          $Width = 400;
          $Height = 225;
@@ -543,11 +586,13 @@ EOT;
 //         );
          
          // Handle #hashtag searches
-         $Mixed = preg_replace(
-            '/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
-            '\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
-            $Mixed
-         );
+			if(!C('Garden.Format.DisableHashtags')) {
+				$Mixed = preg_replace(
+					'/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
+					'\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
+					$Mixed
+				);
+			}
          
 //         $Mixed = preg_replace(
 //            '/([\s]+)(#([\d\w_]+))/si',
@@ -674,10 +719,10 @@ EOT;
       return date('Y-m-d', $Timestamp);
    }
 
-   /**
+   /** Format a timestamp or the current time to go into the database.
+    * 
     * @param int $Timestamp
-    * @return string
-    * @todo add summary
+    * @return string The formatted date and time.
     */
    public static function ToDateTime($Timestamp = '') {
       if ($Timestamp == '')
@@ -735,7 +780,17 @@ EOT;
    public static function Url($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Url');
+      } elseif (preg_replace('`([^\PP])`u', '', 'Test') == '') {
+         // No Unicode PCRE support
+         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
+         $Mixed = strtr($Mixed, self::$_UrlTranslations);
+         $Mixed = preg_replace('/([^\w\d_:.])/', ' ', $Mixed); // get rid of punctuation and symbols
+         $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
+         $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
+         $Mixed = urlencode(strtolower($Mixed));
+         return $Mixed;
       } else {
+         // Better Unicode support
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation

@@ -30,14 +30,26 @@ class DashboardHooks implements Gdn_IPlugin {
       // Add Message Modules (if necessary)
       $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
       $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
-      if ($Sender->MasterView != 'empty' && in_array('Base', $MessageCache) || InArrayI($Location, $MessageCache)) {
+		$Exceptions = array('[Base]');
+		if ($Sender->MasterView == 'admin')
+			$Exceptions[] = '[Admin]';
+		else if (in_array($Sender->MasterView, array('', 'default')))
+			$Exceptions[] = '[NonAdmin]';
+			
+      if ($Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
          $MessageModel = new MessageModel();
-         $MessageData = $MessageModel->GetMessagesForLocation($Location);
+         $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
             $Sender->AddModule($MessageModule);
          }
       }
+		// If there are applicants, alert admins by showing in the main menu
+		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
+			$CountApplicants = Gdn::UserModel()->GetApplicants()->NumRows();
+			if ($CountApplicants > 0)
+				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span>'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Registration.Manage'));
+		}
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -67,14 +79,17 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		
 		
-		$Menu->AddItem('Add-ons', T('Add-ons'), FALSE, array('class' => 'Addons'));
+		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
       $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', T('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Site Settings', T('Settings'), FALSE, array('class' => 'SiteSettings'));
       $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
-      $Menu->AddLink('Site Settings', T('Import'), 'dashboard/import', 'Garden.Import');
+		
+		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
+		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
 		
    }
 }

@@ -24,14 +24,10 @@ class Gdn_PagerFactory {
    public function GetPager($PagerType, $Sender) {
       $PagerType = $PagerType.'Module';
          
-      if (!class_exists($PagerType, FALSE))
-         __autoload($PagerType);
-         
-      if (!class_exists($PagerType, FALSE)) {
+      if (!class_exists($PagerType))
          $PagerType = 'PagerModule';
-         __autoload($PagerType);
-      }
-      if (!class_exists($PagerType, FALSE))
+
+      if (!class_exists($PagerType))
          return FALSE;
 
       return new $PagerType($Sender);

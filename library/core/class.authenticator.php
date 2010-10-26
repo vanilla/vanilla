@@ -42,14 +42,22 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    const AUTH_SUCCESS         = -4;
    const AUTH_ABORTED         = -5;
    
-   const REACT_RENDER         = 0;
-   const REACT_EXIT           = 1;
-   const REACT_REDIRECT       = 2;
-   const REACT_REMOTE         = 3;
+   const HANDSHAKE_JS         = 'javascript';
+   const HANDSHAKE_DIRECT     = 'direct';
+   const HANDSHAKE_IMAGE      = 'image';
+   
+   const REACT_RENDER         = 1;
+   const REACT_EXIT           = 2;
+   const REACT_REDIRECT       = 3;
+   const REACT_REMOTE         = 4;
    
    const URL_REGISTER         = 'RegisterUrl';
    const URL_SIGNIN           = 'SignInUrl';
    const URL_SIGNOUT          = 'SignOutUrl';
+   
+   const URL_REMOTE_REGISTER  = 'RemoteRegisterUrl';
+   const URL_REMOTE_SIGNIN    = 'RemoteSignInUrl';
+   const URL_REMOTE_SIGNOUT   = 'RemoteSignOutUrl';
    
    const KEY_TYPE_TOKEN       = 'token';
    const KEY_TYPE_PROVIDER    = 'provider';
@@ -59,15 +67,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     *
     */
    protected $_AuthenticationSchemeAlias = NULL;
-   
-   /**
-    * Contains authenticator configuration information, such as a preshared key or
-    * discovery URL.
-    *
-    */
-   protected $_AuthenticationProviderModel = NULL;
-   protected $_AuthenticationProviderData = NULL;
-   
+      
    protected $_DataSourceType = self::DATA_FORM;
    protected $_DataSource = NULL;
    public $_DataHooks = array();
@@ -93,6 +93,12 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    
    // What to do if the entry/auth/* page is triggered for a user that is already logged in
    abstract public function RepeatResponse();
+   
+   // What to do if the entry/leave/* page is triggered for a user that is logged in and successfully logs out
+   public function LogoutResponse() { }
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   public function FailedResponse() { }
    
    // Get one of the three Forwarding URLs (Registration, SignIn, SignOut)
    abstract public function GetURL($URLType);
@@ -153,18 +159,70 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       
       return Gdn_Authenticator::MODE_VALIDATE;
    }
+      
+   public function GetProvider($ProviderKey = NULL, $Force = FALSE) {
+      static $AuthModel = NULL;
+      static $Provider = NULL;
+      
+      if (is_null($AuthModel))
+         $AuthModel = new Gdn_AuthenticationProviderModel();
+      
+      $AuthenticationSchemeAlias = $this->GetAuthenticationSchemeAlias();
+      if (is_null($Provider) || $Force === TRUE) {
+         
+         if (!is_null($ProviderKey)) {
+            $ProviderData = $AuthModel->GetProviderByKey($ProviderKey);
+         } else {
+            $ProviderData = $AuthModel->GetProviderByScheme($AuthenticationSchemeAlias, Gdn::Session()->UserID);
+            if (!$ProviderData && Gdn::Session()->UserID > 0) {
+               $ProviderData = $AuthModel->GetProviderByScheme($AuthenticationSchemeAlias, NULL);
+            }
+         }
+         
+         if ($ProviderData)
+            $Provider = $ProviderData;
+         else
+            return FALSE;
+      }
+      
+      return $Provider;
+   }
    
-   public function LoadProvider($AuthenticationProviderLookupKey) {
-      
-      $this->_AuthenticationProviderModel = new Gdn_AuthenticationProviderModel();
-      $AuthenticatorData = $this->_AuthenticationProviderModel->GetProviderByKey($AuthenticationProviderLookupKey);
-      
-      if ($AuthenticatorData) {
-         $this->_AuthenticationProviderData = $AuthenticatorData;
+   public function GetToken() {
+      $Provider = $this->GetProvider();
+      if (is_null($this->Token)) {
+         $UserID = Gdn::Authenticator()->GetIdentity();
+         $UserAuthenticationData = Gdn::SQL()->Select('uat.*')
+            ->From('UserAuthenticationToken uat')
+            ->Join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
+            ->Where('ua.UserID', $UserID)
+            ->Where('ua.ProviderKey', $Provider['AuthenticationKey'])
+            ->Get();
+            
+         if ($UserAuthenticationData->NumRows())
+            $this->Token = $UserAuthenticationData->FirstRow(DATASET_TYPE_ARRAY);
+         else
+            return FALSE;
       }
-      else {
-         throw new Exception("Tried to load bogus authentication provider via lookup key'{$AuthenticationProviderLookupKey}'. No information stored for this key.");
+      
+      return $this->Token;
+   }
+
+   public function GetNonce() {
+      $Token = $this->GetToken();
+      if (is_null($this->Nonce)) {
+         $UserNonceData = Gdn::SQL()->Select('uan.*')
+            ->From('UserAuthenticationNonce uan')
+            ->Where('uan.Token', $this->Token['Token'])
+            ->Get();
+            
+         if ($UserNonceData->NumRows())
+            $this->Nonce = $UserNonceData->FirstRow(DATASET_TYPE_ARRAY);
+         else
+            return FALSE;
       }
+      
+      return $this->Nonce;
    }
    
    public function CreateToken($TokenType, $ProviderKey, $UserKey = NULL, $Authorized = FALSE) {
@@ -172,14 +230,19 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       $TokenSecret = sha1(md5(implode('.',array($TokenKey,mt_rand(0,100000)))));
       $Timestamp = time();
       
+      $Lifetime = Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60);
+      if ($Lifetime == 0 && $TokenType == 'request')
+         $Lifetime = 300;
+      
       $InsertArray = array(
          'Token' => $TokenKey,
          'TokenSecret' => $TokenSecret,
          'TokenType' => $TokenType,
          'ProviderKey' => $ProviderKey,
-         'Lifetime' => Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60),
+         'Lifetime' => $Lifetime,
          'Timestamp' => date('Y-m-d H:i:s',$Timestamp),
-         'Authorized' => $Authorized
+         'Authorized' => $Authorized,
+         'ForeignUserKey' => NULL
       );
       
       if ($UserKey !== NULL)
@@ -194,6 +257,16 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       }
          
       return $InsertArray;
+   }
+   
+   public function AuthorizeToken($TokenKey) {
+      try {
+         Gdn::Database()->SQL()->Update('UserAuthenticationToken uat')
+            ->Set('Authorized',1)
+            ->Where('Token', $TokenKey)
+            ->Put();
+      } catch (Exception $e) { return FALSE; }
+      return TRUE;
    }
    
    public function LookupToken($ProviderKey, $UserKey, $TokenType = NULL) {
@@ -234,15 +307,17 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       
       try {
          $NumAffected = Gdn::Database()->SQL()->Update('UserAuthenticationNonce')
-            ->Set('Nonce', $Nonce)
+            ->Set('Nonce', $InsertArray['Nonce'])
             ->Set('Timestamp', $InsertArray['Timestamp'])
             ->Where('Token', $InsertArray['Token'])
             ->Put();
+         
+         if (!$NumAffected || !$NumAffected->PDOStatement() || !$NumAffected->PDOStatement()->rowCount()) {
+            throw new Exception("Nothing to update."); 
+         }
             
-         if (!$NumAffected->PDOStatement() || !$NumAffected->PDOStatement()->rowCount())
-            throw new Exception();
       } catch (Exception $e) {
-         Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);
+         $Inserted = Gdn::Database()->SQL()->Insert('UserAuthenticationNonce', $InsertArray);
       }
       return TRUE;
    }
@@ -277,13 +352,6 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       $ClassName = substr($ClassName,-strlen($StipSuffix)) == $StipSuffix ? substr($ClassName,0,-strlen($StipSuffix)) : $ClassName;
       return strtolower($ClassName);
    }
-
-   public function GetProviderValue($Key, $Default = FALSE) {
-      if (array_key_exists($Key, $this->_AuthenticationProviderData))
-         return $this->_AuthenticationProviderData[$Key];
-         
-      return $Default;
-   }
    
    public function SetIdentity($UserID, $Persist = TRUE) {
       $AuthenticationSchemeAlias = $this->GetAuthenticationSchemeAlias();
@@ -295,6 +363,14 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       } else {
          Gdn::Session()->SetPreference('Authenticator', '');
       }
+   }
+   
+   public function GetProviderValue($Key, $Default = FALSE) {
+      $Provider = $this->GetProvider();
+      if (array_key_exists($Key, $Provider))
+         return $Provider[$Key];
+         
+      return $Default;
    }
    
    public function GetProviderKey() {

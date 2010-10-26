@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Flagging'] = array(
    'Name' => 'Flagging',
    'Description' => 'This plugin allows users to report content that violates forum rules.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -27,7 +27,7 @@ $PluginInfo['Flagging'] = array(
 
 class FlaggingPlugin extends Gdn_Plugin {
    
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
          ->From('Flag fl')
          ->GroupBy('ForeignURL')
@@ -36,19 +36,20 @@ class FlaggingPlugin extends Gdn_Plugin {
       $LinkText = T('Flagged Content');
       if ($NumFlaggedItems)
          $LinkText .= " ({$NumFlaggedItems})";
-      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Settings.Manage');
    }
 
-   public function PluginController_Flagging_Create(&$Sender) {
+   public function PluginController_Flagging_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Content Flagging');
       $Sender->AddSideMenu('plugin/flagging');
       $Sender->Form = new Gdn_Form();
       $this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function Controller_Index(&$Sender) {
+   public function Controller_Index($Sender) {
       $Sender->AddCssFile('admin.css');
       $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
       
@@ -69,7 +70,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('flagging.php'));
    }
    
-   public function Controller_Toggle(&$Sender) {
+   public function Controller_Toggle($Sender) {
 		
 		// Enable/Disable Content Flagging
 		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
@@ -82,7 +83,7 @@ class FlaggingPlugin extends Gdn_Plugin {
 		}
    }
    
-   public function Controller_Dismiss(&$Sender) {
+   public function Controller_Dismiss($Sender) {
       $Arguments = $Sender->RequestArgs;
       if (sizeof($Arguments) != 2) return;
       list($Controller, $EncodedURL) = $Arguments;
@@ -96,10 +97,13 @@ class FlaggingPlugin extends Gdn_Plugin {
       $this->Controller_Index($Sender);
    }
    
-   public function DiscussionController_CommentOptions_Handler(&$Sender) {
+   public function DiscussionController_BeforeCommentsRender_Handler($Sender) {
       if (!C('Plugins.Flagging.Enabled')) return;
-      
       $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
+   }
+   
+   public function DiscussionController_CommentOptions_Handler($Sender) {
+      if (!C('Plugins.Flagging.Enabled')) return;
       
       // Signed in users only. No guest reporting!
       if (!Gdn::Session()->UserID) return;
@@ -134,7 +138,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       $this->DiscussionController_CommentOptions_Handler($Sender);
    }
    
-   public function DiscussionController_Flag_Create(&$Sender) {
+   public function DiscussionController_Flag_Create($Sender) {
       if (!C('Plugins.Flagging.Enabled')) return;
       
       // Signed in users only.

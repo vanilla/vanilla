@@ -4,7 +4,7 @@
    <?php
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):
-   echo $this->Form->Open(array('Action' => Url('/entry/signin'), 'id' => 'Form_User_SignIn'));
+   echo $this->Form->Open(array('Action' => $this->Data('FormUrl', Url('/entry/signin')), 'id' => 'Form_User_SignIn'));
    echo $this->Form->Errors();
    ?>
    <ul>
@@ -17,28 +17,23 @@
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password');
-         ?>
-      </li>
-      <li>
-         <?php
-            echo $this->Form->CheckBox('RememberMe', T('Remember me on this computer'), array('value' => '1', 'id' => 'SignInRememberMe'));
+            echo $this->Form->Input('Password', 'password', array('class' => 'InputBox Password'));
+            echo Anchor(T('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
          ?>
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Sign In &rarr;');
-            echo '<span>'.T('or').'</span>';
+            echo $this->Form->Button('Sign In');
+            echo $this->Form->CheckBox('RememberMe', T('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
+         ?>
+      </li>
+      <li class="CreateAccount">
+         <?php
             $Target = GetIncomingValue('Target', '');
             if ($Target != '')
                $Target = '?Target='.$Target;
                
-            echo Anchor(T('Apply for Membership'), '/entry/register'.$Target);
-         ?>
-      </li>
-      <li>
-         <?php
-            echo Anchor(T('Forgot your password?'), '/entry/passwordrequest', 'ForgotPassword');
+            printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
          ?>
       </li>
    </ul>
@@ -55,7 +50,8 @@
       </li>
       <li>
          <?php
-            echo $this->Form->Button('Request a new password &rarr;');
+            echo $this->Form->Button('Request a new password');
+            echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
          ?>
       </li>
    </ul>

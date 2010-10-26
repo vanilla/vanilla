@@ -23,6 +23,10 @@ abstract class VanillaModel extends Gdn_Model {
     * Checks to see if the user is spamming. Returns TRUE if the user is spamming.
     */
    public function CheckForSpam($Type) {
+      $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
+      if ($SpamCheckEnabled === FALSE) 
+         return FALSE;
+      
       $Spam = FALSE;
       if (!in_array($Type, array('Comment', 'Discussion')))
          trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);

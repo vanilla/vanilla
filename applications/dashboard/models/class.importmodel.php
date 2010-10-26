@@ -32,30 +32,32 @@ class ImportModel extends Gdn_Model {
 	public $MaxStepTime = 1; // seconds
 
 	protected $_MergeSteps = array(
-   	1 => 'ProcessImportFile',
-   	2 => 'DefineTables',
-   	3 => 'LoadTables',
-   	4 => 'DefineIndexes',
-   	5 => 'AssignUserIDs',
-   	6 => 'AssignOtherIDs',
-   	7 => 'InsertTables',
-   	8 => 'UpdateCounts',
-      9 => 'CustomFinalization',
-      10 => 'AddActivity'
-	);
-
-	protected $_OverwriteSteps = array(
-   	1 => 'ProcessImportFile',
-   	2 => 'DefineTables',
-   	3 => 'LoadUserTable',
-   	4 => 'AuthenticateAdminUser',
-   	5 => 'InsertUserTable',
-   	6 => 'LoadTables',
-   	7 => 'DeleteOverwriteTables',
+      1 => 'Initialize',
+   	2 => 'ProcessImportFile',
+   	3 => 'DefineTables',
+   	4 => 'LoadTables',
+   	5 => 'DefineIndexes',
+   	6 => 'AssignUserIDs',
+   	7 => 'AssignOtherIDs',
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
       10 => 'CustomFinalization',
       11 => 'AddActivity'
+	);
+
+	protected $_OverwriteSteps = array(
+      1 => 'Initialize',
+   	2 => 'ProcessImportFile',
+   	3 => 'DefineTables',
+   	4 => 'LoadUserTable',
+   	5 => 'AuthenticateAdminUser',
+   	6 => 'InsertUserTable',
+   	7 => 'LoadTables',
+   	8 => 'DeleteOverwriteTables',
+   	9 => 'InsertTables',
+   	10 => 'UpdateCounts',
+      11 => 'CustomFinalization',
+      12 => 'AddActivity'
    );
 
 	/**
@@ -184,7 +186,11 @@ class ImportModel extends Gdn_Model {
 		} else {
 			$Data = $Data->FirstRow();
 			$PasswordHash = new Gdn_PasswordHash();
-			$Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
+         if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
+            $Result = TRUE;
+         } else {
+            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
+         }
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
@@ -551,6 +557,12 @@ class ImportModel extends Gdn_Model {
       return $Exists !== FALSE;
    }
 
+   public function Initialize() {
+      // This is just a dummy step so the ajax can get going right away.
+
+      return TRUE;
+   }
+
 	public function InsertTables() {
 		$InsertedCount = 0;
 		$Timer = new Gdn_Timer();
@@ -715,6 +727,20 @@ class ImportModel extends Gdn_Model {
 		// Set the admin user flag.
 		$AdminEmail = GetValue('OverwriteEmail', $this->Data);
 		$this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+
+      // If doing a password reset, save out the new admin password:
+      if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
+         $PasswordHash = new Gdn_PasswordHash();
+         $Hash = $PasswordHash->HashPassword(GetValue('OverwritePassword', $this->Data));
+
+         // Write it out.
+         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
+         $this->Query('update :_User set Admin = 1, Password = :Hash, HashMethod = "vanilla" where Email = :Email', array(':Hash' => $Hash, ':Email' => $AdminEmail));
+      } else {
+         // Set the admin user flag.
+         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
+         $this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+      }
 
 		// Authenticate the admin user as the current user.
 		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');
@@ -924,6 +950,9 @@ class ImportModel extends Gdn_Model {
       $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
 
       // Create a test file to load.
+      if (!file_exists(PATH_UPLOADS.'/import'))
+         mkdir(PATH_UPLOADS.'/import');
+
       $TestPath = PATH_UPLOADS.'/import/test.txt';
       $TestValue = 123;
       $TestContents = 'ID'.self::NEWLINE.$TestValue.self::NEWLINE;
@@ -1003,6 +1032,9 @@ class ImportModel extends Gdn_Model {
 	}
 	
 	public function ProcessImportFile() {
+      // This one step can take a while so give it more time.
+      set_time_limit(60 * 5);
+
 		$Path = $this->ImportPath;
 		$Tables = array();
 
@@ -1178,6 +1210,9 @@ class ImportModel extends Gdn_Model {
 	}
 
    public function UpdateCounts() {
+      // This option could take a while so set the timeout.
+      set_time_limit(60*5);
+      
       // Define the necessary SQL.
       $Sqls = array();
 

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$UpdateUrl = Gdn::Config('Garden.UpdateCheckUrl');
-$AddonUrl = Gdn::Config('Garden.AddonUrl');
+$UpdateUrl = C('Garden.UpdateCheckUrl');
+$AddonUrl = C('Garden.AddonUrl');
 $AppCount = count($this->AvailableApplications);
 $EnabledCount = count($this->EnabledApplications);
 $DisabledCount = $AppCount - $EnabledCount;
@@ -17,7 +17,7 @@ $DisabledCount = $AppCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == '' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($AppCount)), 'settings/applications/'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($AppCount)), 'settings/applications/'); ?></li>
       <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/applications/enabled'); ?></li>
       <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/applications/disabled'); ?></li>
       <?php
@@ -45,7 +45,7 @@ $Alt = FALSE;
 foreach ($this->AvailableApplications as $AppName => $AppInfo) {
    $Css = array_key_exists($AppName, $this->EnabledApplications) ? 'Enabled' : 'Disabled';
    $State = strtolower($Css);
-   if ($this->Filter == '' || $this->Filter == $State) {
+   if ($this->Filter == 'all' || $this->Filter == $State) {
       $Alt = $Alt ? FALSE : TRUE;
       $Version = ArrayValue('Version', $AppInfo, '');
       $ScreenName = ArrayValue('Name', $AppInfo, $AppName);
@@ -67,7 +67,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             $ToggleText = array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable';
             echo Anchor(
                T($ToggleText),
-               '/settings/applications/'.$AppName.'/'.$Session->TransientKey(),
+               '/settings/applications/'.$this->Filter.'/'.$AppName.'/'.$Session->TransientKey(),
                $ToggleText.'Addon SmallButton'
             );
             
@@ -118,7 +118,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
          ?>
          <tr class="<?php echo $RowClass; ?>">
             <td colspan="2"><div class="Alert"><a href="<?php
-               echo CombinePaths(array($AddonUrl, 'find', urlencode($AppName)), '/');
+               echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
             ?>"><?php
                printf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
             ?></a></div></td>

@@ -1,14 +1,24 @@
 var Gdn_Slices = {
 
-   Load: function() {
-      var SliceUniq = Math.floor(Math.random() * 9999999);
-      var NextSliceID = SliceUniq+1;
-   
-      var Candidates = $('.Slice');
-      var Slices = [];
+   Prepare: function() {
+      Gdn_Slices.SliceUniq = Math.floor(Math.random() * 9999999);
+      Gdn_Slices.Slices = [];
+      
+      Gdn_Slices.Load();
+   },
+
+   Load: function(Root) {
+      if (Root != undefined) {
+         var Candidates = Root.find('.Slice');
+      } else {
+         var Candidates = $('.Slice');
+      }
+      
       Candidates.each(jQuery.proxy(function(i,Slice) {
-         var MySlice = new Gdn_Slice(Slice, NextSliceID++);
-         Slices.push(MySlice);
+         var NextSliceID = Gdn_Slices.SliceUniq++;
+         $(Slice).attr('slice', NextSliceID);
+         var MySlice = new Gdn_Slice(Slice, NextSliceID);
+         Gdn_Slices.Slices.push(MySlice);
          MySlice.Go();
       },this));
    }
@@ -27,9 +37,10 @@ function Gdn_Slice(SliceElement, SliceID) {
    Gdn_Slice.prototype.Go = function() {
       this.RawSlice.Slice = this;
       
-      if (this.Slice.hasClass('Async'))
+      if (this.Slice.hasClass('Async')) {
+         this.Slice.removeClass('Async');
          this.GetSlice();
-      else
+      } else
          this.ParseSlice();
    }
    
@@ -43,13 +54,6 @@ function Gdn_Slice(SliceElement, SliceID) {
          this.Slice.css('height', '30px');
          SliceDimensions.height = 30;
       }
-         
-/*
-      if (!SliceDimensions.width) {
-         this.Slice.css('width', '300px');
-         SliceDimensions.width = 300;
-      }
-*/
 
       var Overlay = document.createElement('div');
       Overlay.className = 'SliceOverlay';
@@ -71,9 +75,6 @@ function Gdn_Slice(SliceElement, SliceID) {
       $(Overlay).html('<img src="'+ImgPath+'"/>');
       this.Slice.append(Overlay);
       $(Overlay).fadeTo('fast',0.7);
-      this.Slice.animate({
-         'padding': '10px'
-      });
    }
    
    Gdn_Slice.prototype.GetSlice = function(PassiveGet) {
@@ -82,7 +83,7 @@ function Gdn_Slice(SliceElement, SliceID) {
          
       this.PrepareSliceForRequest();
       
-      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.SliceURL);
+      var SliceURL = gdn.url(this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'GET',
@@ -91,16 +92,18 @@ function Gdn_Slice(SliceElement, SliceID) {
       });
    }
    
-   Gdn_Slice.prototype.PostSlice = function() {
+   Gdn_Slice.prototype.PostSlice = function(Event) {
       this.PrepareSliceForRequest();
       
-      var SliceURL = gdn.combinePaths(gdn.definition('WebRoot'),this.SliceURL+'?DeliveryType=VIEW');
+      var SliceForm = $(Event.target).parents('form').first();
+      var SliceURL = gdn.url(this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',
-         data: this.GetSliceData(),
+         data: this.GetSliceData(SliceForm),
          success: jQuery.proxy(this.GotSlice,this)
       });
+      return false;
    }
    
    Gdn_Slice.prototype.ReplaceSlice = function(NewSliceURL) {
@@ -110,39 +113,48 @@ function Gdn_Slice(SliceElement, SliceID) {
    }
    
    Gdn_Slice.prototype.GotSlice = function(Data, Status, XHR) {
-      this.Slice.animate({
-         'padding': '0px'
-      });
-      var SliceHolder = document.createElement('div');
-      $(SliceHolder).html(Data);
-      
-      // Configs
-      var SliceConfig = $(SliceHolder).find('.Slice .SliceConfig');
-      if (SliceConfig.length) {
-         var SliceConfig = $.parseJSON(SliceConfig.html());
-         $(SliceConfig.css).each(function(i,el){
-            var v_css  = document.createElement('link');
-         	v_css.rel = 'stylesheet'
-         	v_css.type = 'text/css';
-         	v_css.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
-         	document.getElementsByTagName('head')[0].appendChild(v_css);
-         });
-         
-         $(SliceConfig.js).each(function(i,el){
-            var v_js  = document.createElement('script');
-         	v_js.type = 'text/javascript';
-         	v_js.href = gdn.combinePaths(gdn.definition('WebRoot'),el);
-         	document.getElementsByTagName('head')[0].appendChild(v_js);
-         });
+   
+      var DataObj = $(Data);
+      if (!DataObj.find('.Slice').length && !DataObj.hasClass('Slice')) {
+         console.log(Data);
+         return;
       }
-      
-      var SliceContents = $(SliceHolder).find('.Slice');
+   
       this.Slice.find('.SliceOverlay').fadeTo('fast', 0,jQuery.proxy(function(){
          this.Slice.css({
             'height': '',
             'width': ''
          });
-         this.Slice.html(SliceContents.html());
+         
+         this.Slice.html('');
+         for (var i = 0; i < DataObj.length; i++) {
+            
+            if (DataObj[i].tagName !== 'SCRIPT') {
+               this.Slice.append($(DataObj[i]).html());
+            } else {
+               eval($(DataObj[i]).text());
+            }
+         }
+         
+         var SliceConfig = this.Slice.find('.SliceConfig').first();
+         if (SliceConfig.length) {
+            SliceConfig = $.parseJSON(SliceConfig.html());
+            $(SliceConfig.css).each(function(i,el){
+               var v_css  = document.createElement('link');
+               v_css.rel = 'stylesheet'
+               v_css.type = 'text/css';
+               v_css.href = gdn.url(el);
+               document.getElementsByTagName('head')[0].appendChild(v_css);
+            });
+            
+            $(SliceConfig.js).each(function(i,el){
+               var v_js  = document.createElement('script');
+               v_js.type = 'text/javascript';
+               v_js.src = gdn.url(el);
+               document.getElementsByTagName('head')[0].appendChild(v_js);
+            });
+         }
+         
          this.ParseSlice();
       },this));
    }
@@ -150,26 +162,39 @@ function Gdn_Slice(SliceElement, SliceID) {
    Gdn_Slice.prototype.ParseSlice = function() {
       this.SliceURL = this.Slice.attr('rel');
       
-      this.SliceFields = [];
-      this.Slice.find('form').submit(function() { return false; });
-      this.Slice.find('input').each(jQuery.proxy(function(i,Input){
-         this.SliceFields.push(Input);
-         if ($(Input).hasClass('SliceSubmit'))
-            $(Input).one('click',jQuery.proxy(this.PostSlice,this));
+      this.Slice.find('input.SliceSubmit').each(jQuery.proxy(function(i,Input){
+         if ($(Input).parents('.Slice').attr('slice') != this.SliceID) return;
+         
+         $(Input).one('click',jQuery.proxy(this.PostSlice,this));
+         var SliceForm = $(Input).parents('form').first()[0];
+         SliceForm.SliceFields = [];
+         $(SliceForm).find('input').each(jQuery.proxy(function(i,LoopedInput){
+            SliceForm.SliceFields.push(LoopedInput);
+         },this));
       },this));
+      
+      jQuery(document).trigger('SliceReady');
+      
+      // Load potential inner slices
+      Gdn_Slices.Load(this.Slice);
    }
    
-   Gdn_Slice.prototype.GetSliceData = function() {
-      var SubmitData = {};
-      $(this.SliceFields).each(jQuery.proxy(function(i,Field){
+   Gdn_Slice.prototype.GetSliceData = function(SliceForm) {
+      SliceForm = $(SliceForm).first()[0];
+      var SubmitData = {'DeliveryType':'VIEW'};
+      $(SliceForm.SliceFields).each(jQuery.proxy(function(i,Field){
          Field = $(Field);
          SubmitData[Field.attr('name')] = Field.val();
       },this));
       return SubmitData;
    }
+   
+   Gdn_Slice.prototype.Log = function(Message) {
+      console.log('[sid:'+this.SliceID+'] '+Message);
+   }
 
 }
 
 $(document).ready(function(){
-   Gdn_Slices.Load();
+   Gdn_Slices.Prepare();
 });

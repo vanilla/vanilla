@@ -174,8 +174,19 @@ body.Profile #Content {
 }
 div.Tabs,
 #UserOptions,
-body.Profile #Panel div.Box {
+body.Profile #Panel div.Box,
+body.Discussion div.HeadingTabs ul {
 	display: none;
+}
+body.Discussion div.HeadingTabs {
+	display: block;
+}
+body.Discussion div.HeadingTabs div.SubTab {
+	line-height: normal;
+	margin: 0;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
 }
 div.ProfileTabs {
 	display: block;

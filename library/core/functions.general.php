@@ -1411,13 +1411,16 @@ if (!function_exists('SaveToConfig')) {
     * @param array $Options An array of additional options for the save.
     *  - Save: If this is false then only the in-memory config is set.
     *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
-    * @return bool: Whethr or not the save was successful. NULL if no changes were necessary.
+    * @return bool: Whether or not the save was successful. NULL if no changes were necessary.
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
       // Don't save the value if it hasn't changed.
+      /*
+      Tim: The world ain't ready for you yet, son
       if (is_string($Name) && C($Name) == $Value)
          return NULL;
-         
+      */
+      
       $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 

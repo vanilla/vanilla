@@ -1,4 +1,11 @@
 $(function() {
+   if (typeof(gdn) == "undefined") {
+      gdn = {};
+      gdn.definition = function() {
+         return '';
+      }
+   }
+      
    var currentHeight = null,
       remotePostMessage = null,
       inIframe = top !== self,

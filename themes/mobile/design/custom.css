@@ -21,6 +21,7 @@ a:hover {
 	margin: 0;
 	position: relative;
 	width: 100%;
+	clear: left;
 }
 #Head {
 	background: #3B5998;
@@ -63,18 +64,21 @@ body.Post a.Close {
 	background: #3B5998;
 	padding: 0;
 	margin: 0;
+	width: 100%;
+	float: left;
 }
 .Banner ul li {
-	display: inline-block;
+	display: block;
 	padding: 0;
 	margin: 0;
+	float: left;
 }
 .Banner ul li a {
 	font-weight: bold;
 	padding: 3px 6px;
 	font-size: 11px;
 	color: #fff;
-	display: inline-block;
+	display: block;
 }
 .Banner ul li a:hover {
 	background: #4b67a1;
@@ -90,7 +94,7 @@ body.Post a.Close {
 	top: 0;
 	right: 0;
 	padding: 2px 6px 4px;
-	display: inline-block;
+	display: block;
 	border-left: 1px solid #627AAD;
 }
 .Banner ul li a.NewDiscussion img,
@@ -170,8 +174,19 @@ body.Profile #Content {
 }
 div.Tabs,
 #UserOptions,
-body.Profile #Panel div.Box {
+body.Profile #Panel div.Box,
+body.Discussion div.HeadingTabs ul {
 	display: none;
+}
+body.Discussion div.HeadingTabs {
+	display: block;
+}
+body.Discussion div.HeadingTabs div.SubTab {
+	line-height: normal;
+	margin: 0;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
 }
 div.ProfileTabs {
 	display: block;
@@ -416,19 +431,22 @@ div.Popup div.Messages ul {
   overflow: auto; 
 }
 div.DismissMessage {
+	color: #000;
 	background: #ffd;
-	border: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
 	padding:6px 8px;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	margin: 0;
 }
 div.DismissMessage a.Dismiss:hover {
 	color: #000;
 }
 div.Warning {
 	background: #d00;
-	border: 1px solid #b00;
+	border: none;
+	border-bottom: 1px solid #b00;
 	color: #fff;
 	text-shadow: 1px 1px 1px #444;
 }
@@ -438,13 +456,18 @@ div.Warning a.Dismiss {
 #Content div.Box {
 	color: #000;
 	background: #D3F0FF;
-	border: 1px solid #A5D0E7;
+	border: none;
+	border-bottom: 1px solid #A5D0E7;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
 }
 
 /* Discussions */
 ul.Discussions {
 	background: #fff;
 }
+ul.Discussions div.Meta strong,
 ul.Discussions div.Meta span {
 	display: none;
 }
@@ -536,6 +559,9 @@ li.Editing {
 
 
 /* Foot */
+#Foot {
+	border-bottom: 1px solid #BEC8CC;
+}
 #Foot div {
 	width: auto;
 	margin: 0;

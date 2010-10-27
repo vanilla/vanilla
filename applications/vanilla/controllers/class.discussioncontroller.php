@@ -420,8 +420,7 @@ class DiscussionController extends VanillaController {
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      // Don't assign a redirect url, or the page will refresh after the discussion has been deleted
-      // $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
+      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
       $this->Render();         
    }
 
@@ -459,7 +458,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', 'discussions');
+         $Target = GetIncomingValue('Target', '/vanilla/discussions');
          Redirect($Target);
       }
          

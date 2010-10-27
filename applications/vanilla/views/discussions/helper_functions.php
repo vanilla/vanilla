@@ -157,7 +157,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       $Sender->Options = '';
       
       // Dismiss an announcement
-      if ($Discussion->Announce == '1' && $Discussion->Dismissed != '1')
+      if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
          $Sender->Options .= '<li>'.Anchor(T('Dismiss'), 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
       
       // Edit discussion

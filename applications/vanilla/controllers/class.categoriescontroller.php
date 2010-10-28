@@ -184,9 +184,9 @@ class CategoriesController extends VanillaController {
    }
    
    /**
-    * Highlight route
+    * Highlight route.
     *
-    * Always called by dispatcher before controller's requested method
+    * Always called by dispatcher before controller's requested method.
     * 
     * @since 2.0.0
     * @access public

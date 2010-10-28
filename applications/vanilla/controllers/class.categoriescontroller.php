@@ -39,7 +39,7 @@ class CategoriesController extends VanillaController {
    public $ShowOptions = TRUE;
    
    /**
-    * Unique identifier
+    * Unique identifier.
     * 
     * @since 2.0.0
     * @access public
@@ -48,7 +48,7 @@ class CategoriesController extends VanillaController {
    public $CategoryID;
    
    /**
-    * Category object
+    * Category object.
     * 
     * @since 2.0.0
     * @access public
@@ -184,6 +184,8 @@ class CategoriesController extends VanillaController {
    }
    
    /**
+    * Highlight route
+    *
     * Always called by dispatcher before controller's requested method
     * 
     * @since 2.0.0
@@ -192,6 +194,6 @@ class CategoriesController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
-         $this->Menu->HighlightRoute('/dashboard/settings');
+         $this->Menu->HighlightRoute('/categories');
    }      
 }

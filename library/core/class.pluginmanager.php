@@ -608,11 +608,11 @@ class Gdn_PluginManager {
       
       if (is_object($Validation) && count($Validation->Results()) > 0)
          return FALSE;
-
-      // If everything succeeded, add the plugin to the
-      // $EnabledPlugins array in conf/plugins.php
+      
+      // If everything succeeded, add the plugin to the $EnabledPlugins array in conf/config.php
       // $EnabledPlugins['PluginClassName'] = 'Plugin Folder Name';
       // $PluginInfo = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
+      
       $PluginInfo = $this->GetPluginInfo($PluginName);
       $PluginFolder = ArrayValue('Folder', $PluginInfo);
       $PluginEnabledValue = ArrayValue($EnabledPluginValueIndex, $PluginInfo, $PluginFolder);
@@ -694,8 +694,8 @@ class Gdn_PluginManager {
          }
          
          // Make sure the plugin is in the config.
-         if (!C("EnabledPlugins.$PluginName")) {
-            SaveToConfig("EnabledPlugins.$PluginName", $PluginFolder, FALSE);
+         if (!C("EnabledPlugins.{$PluginName}")) {
+            SaveToConfig("EnabledPlugins.{$PluginName}", $PluginFolder, FALSE);
          }
       }
       if (!is_array($Paths))

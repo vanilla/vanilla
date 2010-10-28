@@ -162,14 +162,24 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
          
-      $Data = $this->SQL
-         ->Where('d.Announce', '1')
-			->BeginWhereGroup()
-         ->Where('w.Dismissed is null')
-         ->OrWhere('w.Dismissed', '0')
+
+
+      $this->SQL
+         ->Where('d.Announce', '1');
+
+      if (C('Vanilla.Discussions.Dismiss', 1)) {
+         $this->SQL
+            ->BeginWhereGroup()
+            ->Where('w.Dismissed is null')
+            ->OrWhere('w.Dismissed', '0')
+            ->EndWhereGroup();
+      }
+
+      $this->SQL
          ->OrderBy('d.DateLastComment', 'desc')
-         ->Limit($Limit, $Offset)
-         ->Get();
+         ->Limit($Limit, $Offset);
+
+      $Data = $this->SQL->Get();
 			
 		$this->AddDiscussionColumns($Data);
 		return $Data;

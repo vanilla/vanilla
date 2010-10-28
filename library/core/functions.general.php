@@ -390,6 +390,30 @@ if (!function_exists('CheckRequirements')) {
    }
 }
 
+if (!function_exists('check_utf8')){
+   function check_utf8($str) {
+       $len = strlen($str);
+       for($i = 0; $i < $len; $i++){
+           $c = ord($str[$i]);
+           if ($c > 128) {
+               if (($c > 247)) return false;
+               elseif ($c > 239) $bytes = 4;
+               elseif ($c > 223) $bytes = 3;
+               elseif ($c > 191) $bytes = 2;
+               else return false;
+               if (($i + $bytes) > $len) return false;
+               while ($bytes > 1) {
+                   $i++;
+                   $b = ord($str[$i]);
+                   if ($b < 128 || $b > 191) return false;
+                   $bytes--;
+               }
+           }
+       }
+       return true;
+   }
+}
+
 if (!function_exists('CombinePaths')) {
    // filesystem input/output functions that deal with loading libraries, application paths, etc.
    function CombinePaths($Paths, $Delimiter = DS) {
@@ -464,6 +488,23 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    }
 }
 
+if (!function_exists('decho')) {
+   /**
+    * Echo's debug variables if user is root admin.
+    */
+   function decho($Mixed, $Prefix = 'DEBUG: ') {
+      if (Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
+         echo '<div>'.$Prefix;
+         if (is_string($Mixed))
+            echo $Mixed;
+         else
+            var_dump($Mixed);
+      
+         echo '</div>';
+      }
+   }
+}
+
 if (!function_exists('filter_input')) {
    if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
    if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
@@ -497,20 +538,6 @@ if (!function_exists('ForceBool')) {
       } else {
          return $DefaultValue;
       }
-   }
-}
-
-if (!function_exists('getallheaders')) {
-   /**
-    * If PHP isn't running as an apache module, getallheaders doesn't exist in
-    * some systems.
-    * Ref: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
-    */
-   function getallheaders() {
-      foreach($_SERVER as $name => $value)
-          if(substr($name, 0, 5) == 'HTTP_')
-              $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-      return $headers;
    }
 }
 
@@ -558,6 +585,20 @@ if (!function_exists('FormatArrayAssignment')) {
             $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
          }
       }
+   }
+}
+
+if (!function_exists('getallheaders')) {
+   /**
+    * If PHP isn't running as an apache module, getallheaders doesn't exist in
+    * some systems.
+    * Ref: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
+    */
+   function getallheaders() {
+      foreach($_SERVER as $name => $value)
+          if(substr($name, 0, 5) == 'HTTP_')
+              $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+      return $headers;
    }
 }
 
@@ -722,6 +763,49 @@ if (!function_exists('InArrayI')) {
             return TRUE;
       }
       return FALSE;
+   }
+}
+
+if (!function_exists('IsMobile')) {
+   function IsMobile() {
+      $Mobile = 0;
+      $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
+      $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
+      $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
+         $Mobile++;
+ 
+      if(
+         (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
+         || (
+            (isset($_SERVER['HTTP_X_WAP_PROFILE'])
+            || isset($_SERVER['HTTP_PROFILE'])))
+         )
+         $Mobile++;
+ 
+      $MobileUserAgent = substr($UserAgent, 0, 4);
+      $MobileUserAgents = array(
+          'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
+          'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
+          'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
+          'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
+          'newt','noki','palm','pana','pant','phil','play','port','prox','qwap',
+          'sage','sams','sany','sch-','sec-','send','seri','sgh-','shar','sie-',
+          'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
+          'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
+          'webc','winw','winw','xda','xda-');
+ 
+      if (in_array($MobileUserAgent, $MobileUserAgents))
+         $Mobile++;
+ 
+      if (strpos($AllHttp, 'operamini') > 0)
+         $Mobile++;
+ 
+      // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
+      // if (strpos($UserAgent, 'windows') > 0)
+      //   $Mobile = 0;
+ 
+      return $Mobile > 0;
    }
 }
 
@@ -1327,9 +1411,16 @@ if (!function_exists('SaveToConfig')) {
     * @param array $Options An array of additional options for the save.
     *  - Save: If this is false then only the in-memory config is set.
     *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
-    * @return bool: Whethr or not the save was successful.
+    * @return bool: Whether or not the save was successful. NULL if no changes were necessary.
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
+      // Don't save the value if it hasn't changed.
+      /*
+      Tim: The world ain't ready for you yet, son
+      if (is_string($Name) && C($Name) == $Value)
+         return NULL;
+      */
+      
       $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
@@ -1448,6 +1539,12 @@ if (!function_exists('T')) {
    }
 }
 
+if (!function_exists('Theme')) {
+   function Theme() {
+      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+   }
+}
+
 if (!function_exists('TouchValue')) {
 	/**
 	 * Set the value on an object/array if it doesn't already exist.
@@ -1498,78 +1595,5 @@ if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Result = Gdn::Request()->Url($Path, $WithDomain);
       return $Result;
-   }
-}
-
-if (!function_exists('check_utf8')){
-   function check_utf8($str) {
-       $len = strlen($str);
-       for($i = 0; $i < $len; $i++){
-           $c = ord($str[$i]);
-           if ($c > 128) {
-               if (($c > 247)) return false;
-               elseif ($c > 239) $bytes = 4;
-               elseif ($c > 223) $bytes = 3;
-               elseif ($c > 191) $bytes = 2;
-               else return false;
-               if (($i + $bytes) > $len) return false;
-               while ($bytes > 1) {
-                   $i++;
-                   $b = ord($str[$i]);
-                   if ($b < 128 || $b > 191) return false;
-                   $bytes--;
-               }
-           }
-       }
-       return true;
-   }
-}
-
-if (!function_exists('IsMobile')) {
-   function IsMobile() {
-      $Mobile = 0;
-      $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
-      $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
-      $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone)/i', $UserAgent))
-         $Mobile++;
- 
-      if(
-         (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
-         || (
-            (isset($_SERVER['HTTP_X_WAP_PROFILE'])
-            || isset($_SERVER['HTTP_PROFILE'])))
-         )
-         $Mobile++;
- 
-      $MobileUserAgent = strtolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
-      $MobileUserAgents = array(
-          'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-          'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-          'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-          'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-          'newt','noki','oper','palm','pana','pant','phil','play','port','prox',
-          'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
-          'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
-          'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
-          'wapr','webc','winw','winw','xda','xda-');
- 
-      if (in_array($MobileUserAgent, $MobileUserAgents))
-         $Mobile++;
- 
-      if (strpos($AllHttp, 'operamini') > 0)
-         $Mobile++;
- 
-      // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
-      // if (strpos($UserAgent, 'windows') > 0)
-      //   $Mobile = 0;
- 
-      return $Mobile > 0;
-   }
-}
-
-if (!function_exists('Theme')) {
-   function Theme() {
-      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
    }
 }

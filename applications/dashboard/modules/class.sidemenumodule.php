@@ -138,7 +138,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
                      unset($this->Items[$Group]);
                   }
                }
-               foreach ($Items as $Group => $Links) {
+               foreach ($this->Items as $Group => $Links) {
                   $LinkNames = ConsolidateArrayValuesByKey($Links, 'Text');
                   $SortedLinks = array();
                   for ($j = 0; $j < $Count; ++$j) {

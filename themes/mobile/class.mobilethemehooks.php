@@ -35,7 +35,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
 			$Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
 			
 			$Sender->Head->AddString('<script type="text/javascript">
-	setTimeout(function () {
+setTimeout(function () {
   window.scrollTo(0, 1);
 }, 1000);
 </script>');
@@ -50,6 +50,17 @@ class MobileThemeHooks implements Gdn_IPlugin {
    }
    
    public function DiscussionsController_Render_Before($Sender) {
+		// Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
+		if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
+			$Sender->Head->AddString('<script type="text/javascript">
+jQuery(document).ready(function($) {
+	$("ul.DataList li.Item").click(function() {
+		document.location = $(this).find("a.Title").attr("href");
+	});
+});
+</script>');
+		}
+		// Add the new discussion button to the page.
 		$this->_AddButton($Sender, 'Discussion');
    }
 
@@ -103,7 +114,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
 	public function Base_BeforeDiscussionContent_Handler($Sender) {
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		$Author = UserBuilder($Discussion, 'First');
-		echo UserPhoto($Author);
+      if ($Author->Photo != '') {
+         $PhotoUrl = strtolower(substr($Author->Photo, 0, 7)) == 'http://' ? $Author->Photo : 'uploads/'.ChangeBasename($Author->Photo, 'n%s');
+         echo Anchor(Img($PhotoUrl, array('alt' => $Author->Name)), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''));
+		}
 	}
    
 }

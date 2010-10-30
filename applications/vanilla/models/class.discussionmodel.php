@@ -119,7 +119,7 @@ class DiscussionModel extends VanillaModel {
 		foreach($Result as &$Discussion) {
 			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
-				if($Discussion->CountCommentWatch) {
+				if ($Discussion->CountCommentWatch) {
 					$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 				} else {
 					$Discussion->CountUnreadComments = 0;
@@ -127,6 +127,20 @@ class DiscussionModel extends VanillaModel {
 			} else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
+			// Logic for incomplete comment count.
+			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
+				$Discussion->CountUnreadComments = 0;
+				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
+					$Discussion->CountCommentWatch = $Discussion->CountComments;
+			}
+			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
+			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+/*			decho('CountComments: '
+				.$Discussion->CountComments.'; CountCommentWatch: '
+				.$Discussion->CountCommentWatch.'; CountUnreadComments: '
+				.$Discussion->CountUnreadComments
+			);
+*/
 		}
 	}
 	

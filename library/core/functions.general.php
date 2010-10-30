@@ -494,7 +494,7 @@ if (!function_exists('decho')) {
     */
    function decho($Mixed, $Prefix = 'DEBUG: ') {
       if (Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
-         echo '<div>'.$Prefix;
+         echo '<div style="text-align: left; padding: 0 4px;">'.$Prefix;
          if (is_string($Mixed))
             echo $Mixed;
          else

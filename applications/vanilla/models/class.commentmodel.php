@@ -119,9 +119,6 @@ class CommentModel extends VanillaModel {
 	}
 
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
-		// echo 'Setting Watch Records for Discussion '.$DiscussionID.' to Limit: '.$Limit.' Offset: '.$Offset.' CountWatch = ' . ($Limit + $Offset) . ' TotalComments ' . $TotalComments;
-		// die();
-		
       // Record the user's watch data
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
@@ -161,6 +158,11 @@ class CommentModel extends VanillaModel {
 					);
 				}
 			}
+			// decho('Limit: '.$Limit.'; Offset: '.$Offset.'; CountComments: '.$TotalComments);
+			// decho('Setting Watch Records for Discussion '.$Discussion->DiscussionID.' to CountWatch: '.$CountWatch.' Limit: '.$Limit.' Offset: '.$Offset.' TotalComments ' . $TotalComments);
+			// die();
+		
+			
 		}
    }
 
@@ -171,7 +173,7 @@ class CommentModel extends VanillaModel {
          ->Where('DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow()
-         ->CountComments;
+         ->CountComments + 1; // Add 1 so the comment in the discussion table is counted
    }
 
    public function GetCountWhere($Where = FALSE) {
@@ -334,13 +336,6 @@ class CommentModel extends VanillaModel {
       if ($Fields['InsertUserID'] != $Session->UserID)
          return;
 
-      $DiscussionModel = new DiscussionModel();
-      $DiscussionID = GetValue('DiscussionID', $Fields);
-      $Discussion = $DiscussionModel->GetID($DiscussionID);
-
-      // Mark the comment read (note: add 1 to $Discussion->CountComments because this comment has been added since $Discussion was loaded)
-      $this->SetWatch($Discussion, $Discussion->CountComments, $Discussion->CountComments+1, $Discussion->CountComments+1);
-
       // Update the discussion author's CountUnreadDiscussions (ie.
       // the number of discussions created by the user that s/he has
       // unread messages in) if this comment was not added by the
@@ -369,6 +364,10 @@ class CommentModel extends VanillaModel {
       $this->UpdateUser($Session->UserID);
 
       if ($Insert) {
+			$DiscussionModel = new DiscussionModel();
+			$DiscussionID = GetValue('DiscussionID', $Fields);
+			$Discussion = $DiscussionModel->GetID($DiscussionID);
+
          // Notify any users who were mentioned in the comment
          $Usernames = GetMentions($Fields['Body']);
          $UserModel = Gdn::UserModel();

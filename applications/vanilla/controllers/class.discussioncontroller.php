@@ -7,17 +7,50 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Discussion Controller - handles accessing & displaying a single discussion
- * and all of it's parts.
+ * Discussion Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Handles accessing & displaying a single discussion
+ *
+ * @since 2.0.0
+ * @package Vanilla
  */
 class DiscussionController extends VanillaController {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
+   
+   /**
+    * Unique identifier.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $CategoryID;
    
+   /**
+    * Default single discussion display.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $DiscussionStub URL-safe title slug
+    * @param int $Offset How many comments to skip
+    * @param int $Limit Total comments to display
+    */
    public function Index($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      // Setup head
       $this->AddCssFile('vanilla.css');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.ui.packed.js');
@@ -34,7 +67,7 @@ class DiscussionController extends VanillaController {
          throw new Exception(sprintf(T('%s Not Found'), T('Discussion')), 404);
       }
       
-      // Check Permissions
+      // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
@@ -100,15 +133,15 @@ class DiscussionController extends VanillaController {
          'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s' //'discussions/%1$s'
       );
 
-//      $this->Pager->MoreCode = '%1$s more comments';
-//      $this->Pager->LessCode = '%1$s older comments';
-//      $this->Pager->ClientID = 'Pager';
-//      $this->Pager->Configure(
-//         $this->Offset,
-//         $Limit,
-//         $ActualResponses,
-//         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
-//      );
+      /*$this->Pager->MoreCode = '%1$s more comments';
+      $this->Pager->LessCode = '%1$s older comments';
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->Configure(
+         $this->Offset,
+         $Limit,
+         $ActualResponses,
+         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
+      );*/
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
@@ -131,7 +164,7 @@ class DiscussionController extends VanillaController {
          $this->View = 'comments';
       }
 
-      // Add Modules
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $BookmarkedModule = new BookmarkedModule($this);
@@ -142,6 +175,15 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
+   /**
+    * Display comments in a discussion since a particular CommentID.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique discussion ID
+    * @param int $LastCommentID Only shows comments posted after this one
+    */
    public function GetNew($DiscussionID, $LastCommentID = 0) {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
@@ -172,13 +214,28 @@ class DiscussionController extends VanillaController {
       $this->Render();
    }
    
+   /**
+    * Highlight route; include SignedIn module.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 
-   // Used for pointing directly to a comment in a discussion (ie. start the discussion page with that comment)
+   /**
+    * Display discussion page starting with a particular comment.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CommentID Unique comment ID
+    */
    public function Comment($CommentID) {
       // Get the discussionID
       $Comment = $this->CommentModel->GetID($CommentID);
@@ -199,8 +256,20 @@ class DiscussionController extends VanillaController {
       $this->Index($DiscussionID, 'x', $PageNumber);
    }
    
-   // Discussion Options:  
+   /**
+    * Allows user to remove announcement.
+    *
+    * Users may remove announcements from being displayed for themselves only.
+    * Does not affect what announcements are shown for other users.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
+    */
    public function DismissAnnouncement($DiscussionID = '', $TransientKey = '') {
+      // Confirm announcements may be dismissed
       if (!C('Vanilla.Discussions.Dismiss', 1)) {
          throw PermissionException('Vanilla.Discussions.Dismiss');
       }
@@ -220,9 +289,18 @@ class DiscussionController extends VanillaController {
 
       $this->Render();         
    }
-   
+
    /**
-    * Allows you to bookmark or unbookmark a discussion (depending on it's current state).
+    * Allows user to bookmark or unbookmark a discussion.
+    *
+    * If the discussion isn't bookmarked by the user, this bookmarks it.
+    * If it is already bookmarked, this unbookmarks it.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function Bookmark($DiscussionID = '', $TransientKey = '') {
       $Session = Gdn::Session();
@@ -285,7 +363,18 @@ class DiscussionController extends VanillaController {
    }
    
    /**
-    * Allows you to announce or unannounce a discussion (depending on it's current state).
+    * Allows user to announce or unannounce a discussion.
+    *
+    * If the discussion isn't announced, this announces it.
+    * If it is already announced, this unannounces it.
+    * Announced discussions stay at the top of the discussions
+    * list regardless of how long ago the last comment was.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function Announce($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -315,7 +404,17 @@ class DiscussionController extends VanillaController {
    }
 
    /**
-    * Allows you to sink or unsink a discussion (depending on it's current state).
+    * Allows user to sink or unsink a discussion.
+    *
+    * If the discussion isn't sunk, this sinks it. If it is already sunk, 
+    * this unsinks it. Sunk discussions do not move to the top of the 
+    * discussion list when a new comment is added.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function Sink($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -352,7 +451,17 @@ class DiscussionController extends VanillaController {
    }
 
    /**
-    * Allows you to close or re-open a discussion (depending on it's current state).
+    * Allows user to close or re-open a discussion.
+    *
+    * If the discussion isn't closed, this closes it. If it is already 
+    * closed, this re-opens it. Closed discussions may not have new 
+    * comments added to them.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function Close($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -389,7 +498,15 @@ class DiscussionController extends VanillaController {
    }
 
    /**
-    * Allows you to delete a discussion.
+    * Allows user to delete a discussion.
+    *
+    * This is a "hard" delete - it is removed from the database.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique discussion ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -423,10 +540,18 @@ class DiscussionController extends VanillaController {
    }
 
    /**
-    * Allows you to delete a comment. If the comment is the only one in the
-    * discussion, the discussion will be deleted as well. Users without
-    * administrative delete abilities should not be able to delete a comment
-    * unless it is a draft.
+    * Allows user to delete a comment.
+    *
+    * If the comment is the only one in the discussion, the discussion will 
+    * be deleted as well. Users without administrative delete abilities 
+    * should not be able to delete a comment unless it is a draft. This is
+    * a "hard" delete - it is removed from the database.   
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CommentID Unique comment ID
+    * @param string $TransientKey Single-use hash to prove intent
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();

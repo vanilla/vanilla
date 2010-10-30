@@ -185,7 +185,7 @@ class MorePagerModule extends Gdn_Module {
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
       
       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
-      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
+      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), array('{Page}', '{Size}', '{Page}'), $this->Url);
 
       $Pager = '';
       if ($Type == 'more') {

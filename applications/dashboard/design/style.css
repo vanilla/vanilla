@@ -1274,6 +1274,7 @@ ul.MessageList li.Item {
 ul.MessageList div.Meta {
    font-size: 11px;
    color: #777;
+	min-height: 40px;
 }
 ul.MessageList div.Meta span.Author img {
    height: 40px;
@@ -1316,7 +1317,11 @@ div.Preview {
 	margin: 4px 0 8px;
 }
 div.Popup div.Preview {
+	padding: 8px;
 	margin: 0;
+}
+body.Post div.Popup a.Close {
+	color: #1e79a7;
 }
 div.Preview div.Message,
 ul.MessageList div.Message {
@@ -2110,20 +2115,19 @@ li.Editing {
 	background: #E3F4FF;
 }
 div.CommentForm textarea {
-   width: 656px;
+   width: 99%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
 div.Comment div.CommentForm {
-	width: 652px;
+	width: 98%;
 	background: none;
 	padding: 6px 4px;
 	border: 0;
-	clear: left;
 }
 div.Comment div.CommentForm textarea {
-	width: 643px;	
+	width: 99%;	
 }
 #DiscussionForm label {
    font-size: 14px;
@@ -2134,7 +2138,7 @@ body.Post #Panel {
    display: none;
 }
 body.Post #Content {
-   width: auto;
+   width: 100%;
 }
 #DiscussionForm h2 {
    border: none;
@@ -2154,13 +2158,13 @@ body.Post #Content {
    padding: 20px;
 }
 #DiscussionForm textarea {
-   width: 910px;
+   width: 99%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
 #DiscussionForm input.InputBox {
-   width: 910px;
+   width: 99%;
    margin-bottom: 10px;
 }
 #DiscussionForm div.Category {

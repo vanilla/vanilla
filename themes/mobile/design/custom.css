@@ -469,6 +469,7 @@ ul.Discussions {
 }
 ul.Discussions div.Meta span.Author {
 	font-weight: bold;
+	margin-right: 8px;
 }
 ul.Discussions div.Meta span.LastCommentBy,
 ul.Discussions div.Meta span.LastCommentDate {

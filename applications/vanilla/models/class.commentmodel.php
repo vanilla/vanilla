@@ -367,6 +367,9 @@ class CommentModel extends VanillaModel {
 			$DiscussionModel = new DiscussionModel();
 			$DiscussionID = GetValue('DiscussionID', $Fields);
 			$Discussion = $DiscussionModel->GetID($DiscussionID);
+			// Prepare the notification queue
+         $ActivityModel = new ActivityModel();
+			$ActivityModel->ClearNotificationQueue();
 
          // Notify any users who were mentioned in the comment
          $Usernames = GetMentions($Fields['Body']);
@@ -377,7 +380,6 @@ class CommentModel extends VanillaModel {
             $User = $UserModel->GetByUsername($Username);
             if ($User && $User->UserID != $Session->UserID) {
                $NotifiedUsers[] = $User->UserID;
-               $ActivityModel = new ActivityModel();
                $ActivityID = $ActivityModel->Add(
                   $Session->UserID,
                   'CommentMention',
@@ -387,7 +389,7 @@ class CommentModel extends VanillaModel {
                   'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
                   FALSE
                );
-               $ActivityModel->SendNotification($ActivityID, $Story);
+               $ActivityModel->QueueNotification($ActivityID, $Story);
             }
          }
          
@@ -406,28 +408,31 @@ class CommentModel extends VanillaModel {
                   'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
                   FALSE
                );
-               $ActivityModel->SendNotification($ActivityID, $Story);
+               $ActivityModel->QueueNotification($ActivityID, $Story);
             }
          }
 
          // Record user-comment activity
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers))
-            $this->RecordActivity($Discussion, $Session->UserID, $CommentID, 'Only');
+            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, 'QueueOnly');
+				
+			// Send all notifications
+			$ActivityModel->SendNotificationQueue();
       }
    }
       
-   public function RecordActivity($Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
-      // Get the author of the discussion
-      if ($Discussion->InsertUserID != $ActivityUserID) 
-         AddActivity(
-            $ActivityUserID,
-            'DiscussionComment',
-            Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
-            $Discussion->InsertUserID,
-            'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
-            $SendEmail
-         );
-   }
+   public function RecordActivity(&$ActivityModel, $Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
+      if ($Discussion->InsertUserID != $ActivityUserID)
+			$ActivityModel->Add(
+				$ActivityUserID,
+				'DiscussionComment',
+				Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+				$Discussion->InsertUserID,
+				'',
+				'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
+				$SendEmail
+			);
+	}
    
    /**
     * Updates the CountComments value on the discussion based on the CommentID being saved. 

@@ -467,13 +467,13 @@ div.Warning a.Dismiss {
 ul.Discussions {
 	background: #fff;
 }
-ul.Discussions div.Meta strong,
-ul.Discussions div.Meta span {
-	display: none;
+ul.Discussions div.Meta span.Author {
+	font-weight: bold;
+	margin-right: 8px;
 }
-ul.Discussions div.Meta span.LastCommentDate,
-ul.Discussions div.Meta span.Counts {
-	display: inline;
+ul.Discussions div.Meta span.LastCommentBy,
+ul.Discussions div.Meta span.LastCommentDate {
+	margin-right: 0;
 }
 ul.DataList div.Options {
 	display: none;

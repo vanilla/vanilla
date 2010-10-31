@@ -88,36 +88,5 @@ jQuery(document).ready(function($) {
 				$Sender->Menu->AddLink('NewConversation', Img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
 		}
 	}
-	
-	/**
-	 * Add Counts after discussion title
-	 */
-	public function Base_DiscussionMeta_Handler($Sender) {
-		$Discussion = GetValue('Discussion', $Sender->EventArguments);
-		$CountUnreadComments = 0;
-		if (is_numeric($Discussion->CountUnreadComments))
-			$CountUnreadComments = $Discussion->CountUnreadComments;
-			
-		$CssClass = 'Counts';
-		if ($CountUnreadComments > 0)
-			$CssClass .= ' NewCounts';
-			
-		echo '<span class="'.$CssClass.'">'
-			.$Discussion->CountComments
-			.($CountUnreadComments > 0 ? '/'.$CountUnreadComments : '')
-		.'</span>';
-	}
-	
-	/**
-	 * Add Author Icon before discussion title.
-	 */
-	public function Base_BeforeDiscussionContent_Handler($Sender) {
-		$Discussion = GetValue('Discussion', $Sender->EventArguments);
-		$Author = UserBuilder($Discussion, 'First');
-      if ($Author->Photo != '') {
-         $PhotoUrl = strtolower(substr($Author->Photo, 0, 7)) == 'http://' ? $Author->Photo : 'uploads/'.ChangeBasename($Author->Photo, 'n%s');
-         echo Anchor(Img($PhotoUrl, array('alt' => $Author->Name)), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''));
-		}
-	}
    
 }

@@ -469,6 +469,11 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
 				
 				$this->FireEvent('RegistrationSuccessful');
             
@@ -506,6 +511,11 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
 				
 				$this->FireEvent('RegistrationSuccessful');
             

@@ -99,8 +99,18 @@ class DiscussionModel extends VanillaModel {
 			
 		$this->FireEvent('BeforeGet');
       
+		
+		$SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+		if (!in_array($SortField, array('d.DateLastComment', 'd.DateInserted')))
+			$SortField = 'd.DateLastComment';
+			
+		$SortDirection = C('Vanilla.Discussions.SortDirection', 'desc');
+		if ($SortDirection != 'asc')
+			$SortDirection = 'desc';
+			
+		$this->SQL->OrderBy($SortField, $SortDirection);
+
       $Data = $this->SQL
-         ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
 			

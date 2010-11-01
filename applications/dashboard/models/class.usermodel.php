@@ -154,6 +154,18 @@ class UserModel extends Gdn_Model {
          ->Get();
    }
 
+   /**
+    * Get the a user authentication row.
+    *
+    * @param string $UniqueID The unique ID of the user in the foreign authentication scheme.
+    * @param string $Provider The key of the provider.
+    * @return array|false
+    */
+   public function GetAuthentication($UniqueID, $Provider) {
+      return $this->SQL->GetWhere('UserAuthentication',
+         array('ForeignUserKey' => $UniqueID, 'ProviderKey' => $Provider))->FirstRow(DATASET_TYPE_ARRAY);
+   }
+
    public function GetCountLike($Like = FALSE) {
       $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
 
@@ -951,18 +963,22 @@ class UserModel extends Gdn_Model {
          $Where['UserID <> '] = $UserID;
 
       // Make sure the username & email aren't already being used
-      $Where['Name'] = $Username;
-      $TestData = $this->GetWhere($Where);
-      if ($TestData->NumRows() > 0) {
-         $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
-         $Valid = FALSE;
+      if (C('Garden.Registration.NameUnique', TRUE)) {
+         $Where['Name'] = $Username;
+         $TestData = $this->GetWhere($Where);
+         if ($TestData->NumRows() > 0) {
+            $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
+            $Valid = FALSE;
+         }
+         unset($Where['Name']);
       }
-      unset($Where['Name']);
-      $Where['Email'] = $Email;
-      $TestData = $this->GetWhere($Where);
-      if ($TestData->NumRows() > 0) {
-         $this->Validation->AddValidationResult('Email', 'The email you entered in use by another member.');
-         $Valid = FALSE;
+      if (C('Garden.Registration.EmailUnique')) {
+         $Where['Email'] = $Email;
+         $TestData = $this->GetWhere($Where);
+         if ($TestData->NumRows() > 0) {
+            $this->Validation->AddValidationResult('Email', 'The email you entered is in use by another member.');
+            $Valid = FALSE;
+         }
       }
       return $Valid;
    }
@@ -1308,6 +1324,19 @@ class UserModel extends Gdn_Model {
       return $this->SaveToSerializedColumn('Attributes', $UserID, $Attribute, $Value);
    }
 
+   public function SaveAuthentication($Data) {
+      $Cn = $this->Database->Connection();
+      $Px = $this->Database->DatabasePrefix;
+
+      $UID = $Cn->quote($Data['UniqueID']);
+      $Provider = $Cn->quote($Data['Provider']);
+      $UserID = $Cn->quote($Data['UserID']);
+
+      $Sql = "insert {$Px}UserAuthentication (ForeignUserKey, ProviderKey, UserID) values ($UID, $Provider, $UserID) on duplicate key update UserID = $UserID";
+      $Result = $this->Database->Query($Sql);
+      return $Result;
+   }
+
    public function SetTransientKey($UserID, $ExplicitKey = '') {
       $Key = $ExplicitKey == '' ? RandomString(12) : $ExplicitKey;
       $this->SaveAttribute($UserID, 'TransientKey', $Key);
@@ -1331,7 +1360,7 @@ class UserModel extends Gdn_Model {
       return $DefaultValue;
    }
 
-   public function SendWelcomeEmail($UserID, $Password) {
+   public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = NULL) {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
@@ -1339,18 +1368,32 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
-      //$Email->From($Sender->Email, $Sender->Name);
-      $Email->Message(
-         sprintf(
-            T('EmailWelcome'),
-            $User->Name,
-            $Sender->Name,
-            $AppTitle,
-            Gdn_Url::WebRoot(TRUE),
-            $Password,
-            $User->Email
-         )
-      );
+
+      // Check for the new email format.
+      if (($EmailFormat = T("EmailWelcome{$RegisterType}", '#')) != '#') {
+         $Data = array();
+         $Data['User'] = ArrayTranslate((array)$User, array('Name', 'Email'));
+         $Data['Sender'] = ArrayTranslate((array)$Sender, array('Name', 'Email'));
+         $Data['Title'] = $AppTitle;
+         if (is_array($AdditionalData))
+            $Data = array_merge($Data, $AdditionalData);
+
+         $Message = FormatString($EmailFormat, $Data);
+         $Email->Message($Message);
+      } else {
+         $Email->Message(
+            sprintf(
+               T('EmailWelcome'),
+               $User->Name,
+               $Sender->Name,
+               $AppTitle,
+               Gdn_Url::WebRoot(TRUE),
+               $Password,
+               $User->Email
+            )
+         );
+      }
+
       $Email->Send();
    }
 

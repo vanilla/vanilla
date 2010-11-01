@@ -1210,7 +1210,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function RenderMaster() {
       // Build the master view if necessary
-      if ($this->_DeliveryType = DELIVERY_TYPE_ALL) {
+      if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_EMBED))) {
          // Define some default master views unless one was explicitly defined
          if ($this->MasterView == '') {
             // If this is a syndication request, use the appropriate master view

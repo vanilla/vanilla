@@ -83,7 +83,16 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
       ?>
    </li>
    <li id="InvitationSettings">
-      <div class="Info"><?php echo T('Choose who can send out invitations to new members:'); ?></div>
+      <div class="Info">
+      <?php
+         echo sprintf(T('Invitations can be sent from users\' profile pages.',
+            'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.'),
+            Url('/dashboard/profile/invitations')),
+            '<br /><br />';
+         
+         echo T('Choose who can send out invitations to new members:');
+      ?>
+      </div>
       <table class="Label AltColumns">
          <thead>
             <tr>

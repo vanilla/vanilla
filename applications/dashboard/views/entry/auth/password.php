@@ -48,10 +48,10 @@
             echo $this->Form->TextBox('Email');
          ?>
       </li>
-      <li>
+      <li class="Buttons">
          <?php
             echo $this->Form->Button('Request a new password');
-            echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
+            echo Wrap(Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword'), 'div');
          ?>
       </li>
    </ul>

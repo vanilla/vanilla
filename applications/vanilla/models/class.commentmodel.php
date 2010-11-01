@@ -7,10 +7,33 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Comment Model
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Manages discussion comments.
+ *
+ * @since 2.0.0
+ * @package Vanilla
+ */
 class CommentModel extends VanillaModel {
    /**
-    * Class constructor.
+    * List of fields to order results by.
+    * 
+    * @var array
+    * @access protected
+    * @since 2.0.0
+    */
+   protected $_OrderBy = array(array('c.DateInserted', ''));
+   
+   /**
+    * Class constructor. Defines the related database table name.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function __construct() {
       parent::__construct('Comment');
@@ -19,9 +42,11 @@ class CommentModel extends VanillaModel {
    
    /**
     * Select the data for a single comment.
-    *
-    * @param boolean $FireEvent Whether or not to fire the event.
-    * This is a bit of a kludge to fix an issue with the VanillaCommentReplies plugin.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param bool $FireEvent Kludge to fix VanillaCommentReplies plugin.
     */
    public function CommentQuery($FireEvent = TRUE) {
       $this->SQL->Select('c.*')
@@ -38,6 +63,17 @@ class CommentModel extends VanillaModel {
          $this->FireEvent('AfterCommentQuery');
    }
    
+   /**
+    * Get comments for a discussion.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Which discussion to get comment from.
+    * @param int $Limit Max number to get.
+    * @param int $Offset Number to skip.
+    * @return object SQL results.
+    */
    public function Get($DiscussionID, $Limit, $Offset = 0) {
       $this->CommentQuery();
       $this->FireEvent('BeforeGet');
@@ -49,9 +85,18 @@ class CommentModel extends VanillaModel {
 
       return $this->SQL->Get();
    }
-   
-   protected $_OrderBy = array(array('c.DateInserted', ''));
-   /** Set the order of the comments. */
+  
+   /** 
+    * Set the order of the comments or return current order. 
+    * 
+    * Getter/setter for $this->_OrderBy.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param mixed Field name(s) to order results by. May be a string or array of strings.
+    * @return array $this->_OrderBy (optionally)
+    */
    public function OrderBy($Value = NULL) {
       if ($Value === NULL)
          return $this->_OrderBy;
@@ -80,7 +125,17 @@ class CommentModel extends VanillaModel {
       }
    }
 	
-	// Sets the UserComment Score value. Returns the total score.
+	/**
+	 * Sets the UserComment Score value. 
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of comment we're setting the score for.
+    * @param int $UserID Unique ID of user scoring the comment.
+    * @param int $Score Score being assigned to the comment.
+	 * @return int New total score for the comment.
+	 */
 	public function SetUserScore($CommentID, $UserID, $Score) {
 		// Insert or update the UserComment row
 		$this->SQL->Replace(
@@ -105,8 +160,17 @@ class CommentModel extends VanillaModel {
 			
 		return $TotalScore;
 	}
-
-	// Gets the UserComment Score value for the specified user
+   
+   /**
+	 * Gets the UserComment Score value for the specified user.
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of comment we're getting the score for.
+    * @param int $UserID Unique ID of user who scored the comment.
+	 * @return int Current score for the comment.
+	 */
 	public function GetUserScore($CommentID, $UserID) {
 		$Data = $this->SQL->Select('Score')
 			->From('UserComment')

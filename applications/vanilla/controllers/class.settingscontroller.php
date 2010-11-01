@@ -7,18 +7,42 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Settings Controller - Handles displaying the dashboard "settings" pages for
- * Vanilla.
+ * Settings Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Handles displaying the dashboard "settings" pages for Vanilla via Dashboard.
+ *
+ * @since 2.0.0
+ * @package Vanilla
+ * @todo Resolve inconsistency between use of $Page and $Offset as parameters.
  */
 class SettingsController extends Gdn_Controller {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Database', 'Form', 'CategoryModel');
 	
+	/**
+    * Advanced settings.
+    *
+    * Allows setting configuration values via form elements.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
 	public function Advanced() {
+	   // Check permission
       $this->Permission('Vanilla.Settings.Manage');
 		
+		// Load up config options we'll be setting
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
@@ -52,6 +76,7 @@ class SettingsController extends Gdn_Controller {
 			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
 			$ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
 			
+			// Save new settings
 			$Saved = $this->Form->Save();
 			if($Saved) {
 				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
@@ -69,15 +94,31 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('settings.js');
       $this->Title(T('Advanced Forum Settings'));
 		
+		// Render default view (settings/advanced.php)
 		$this->Render();
 	}
-   
+	
+   /**
+    * Alias for General method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Index() {
       $this->View = 'general';
       $this->General();
    }
    
+   /**
+    * Switch MasterView. Include JS, CSS used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
+      // Set up head
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
@@ -92,10 +133,19 @@ class SettingsController extends Gdn_Controller {
          $this->AddCssFile('admin.css');
       }
       
+      // Change master template
       $this->MasterView = 'admin';
       parent::Initialize();
    }   
    
+   /**
+    * Configures navigation sidebar in Dashboard.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param $CurrentUrl Path to current location in dashboard.
+    */
    public function AddSideMenu($CurrentUrl) {
       // Only add to the assets if this is not a view-only request
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
@@ -108,12 +158,22 @@ class SettingsController extends Gdn_Controller {
          $this->AddModule($SideMenu, 'Panel');
       }
    }
-
+   
+   /**
+    * Display spam management options.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Spam() {
-      $this->Title(T('Spam'));
+      // Check permission
       $this->Permission('Vanilla.Spam.Manage');
+      
+      // Display options
+      $this->Title(T('Spam'));
       $this->AddSideMenu('vanilla/settings/spam');
       
+      // Load up config options we'll be setting
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
@@ -155,26 +215,39 @@ class SettingsController extends Gdn_Controller {
          }
       }
       
+      // Render default view
       $this->Render();
    }
    
+   /**
+    * Adding a new category.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function AddCategory() {
+      // Check permission
       $this->Permission('Vanilla.Categories.Manage');
-      $RoleModel = new RoleModel();
-      $PermissionModel = Gdn::PermissionModel();
-      $this->Form->SetModel($this->CategoryModel);
+      
+      // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('categories.js');
       $this->AddJsFile('jquery.gardencheckboxgrid.js');
       $this->Title(T('Add Category'));
       $this->AddSideMenu('vanilla/settings/managecategories');
       
+      // Prep models
+      $RoleModel = new RoleModel();
+      $PermissionModel = Gdn::PermissionModel();
+      $this->Form->SetModel($this->CategoryModel);
+      
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
       
-      if (!$this->Form->AuthenticatedPostBack()) {
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
 			$this->Form->AddHidden('CodeIsDefined', '0');
       } else {
+			// Form was validly submitted
 			$IsParent = $this->Form->GetFormValue('IsParent', '0');
 			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
@@ -192,16 +265,30 @@ class SettingsController extends Gdn_Controller {
 	
       $this->SetData('PermissionData', $Permissions, TRUE);
       
+      // Render default view
       $this->Render();      
    }
    
+   /**
+    * Deleting a category.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of the category to be deleted.
+    */
    public function DeleteCategory($CategoryID = FALSE) {
+      // Check permission
       $this->Permission('Vanilla.Categories.Manage');
+      
+      // Set up head
       $this->AddJsFile('categories.js');
       $this->Title(T('Delete Category'));
-
-      $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->AddSideMenu('vanilla/settings/managecategories');
+
+      // Get category data
+      $this->Category = $this->CategoryModel->GetID($CategoryID);
+      
       
       if (!$this->Category) {
          $this->Form->AddError('The specified category could not be found.');
@@ -266,15 +353,32 @@ class SettingsController extends Gdn_Controller {
             }
          }
       }
+      
+      // Render default view
       $this->Render();
    }
    
+   /**
+    * Editing a category.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of the category to be updated.
+    */
    public function EditCategory($CategoryID = '') {
+      // Check permission
       $this->Permission('Vanilla.Categories.Manage');
+      
+      // Set up models
       $RoleModel = new RoleModel();
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
+      
+      // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
+      
+      // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('categories.js');
       $this->AddJsFile('jquery.gardencheckboxgrid.js');
@@ -304,17 +408,29 @@ class SettingsController extends Gdn_Controller {
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
       $this->SetData('PermissionData', $Permissions, TRUE);
       
+      // Render default view
       $this->Render();
    }
    
+   /**
+    * Enabling and disabling categories from list.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function ManageCategories() {
+      // Check permission
       $this->Permission('Vanilla.Categories.Manage');
+      
+      // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
       $this->AddJsFile('categories.js');
       $this->AddJsFile('jquery.tablednd.js');
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('js/library/jquery.alphanumeric.js');
       $this->Title(T('Categories'));
+      
+      // Get category data
       $this->CategoryData = $this->CategoryModel->GetAll('Sort');
       
       // Enable/Disable Categories
@@ -328,18 +444,33 @@ class SettingsController extends Gdn_Controller {
          Redirect('vanilla/settings/managecategories');
       }
       
+      // Render default view
       $this->Render();
    }
    
+   /**
+    * Sorting display order of categories.
+    *
+    * Accessed by ajax so its default is to only output true/false.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function SortCategories() {
+      // Check permission
       $this->Permission('Vanilla.Categories.Manage');
+      
+      // Set delivery type to true/false
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      
       $Success = FALSE;
       if ($this->Form->AuthenticatedPostBack()) {
+         // Data submitted
          $TableID = GetPostValue('TableID', FALSE);
          if ($TableID) {
             $Rows = GetPostValue($TableID, FALSE);
             if (is_array($Rows)) {
+               // Assign each category its new position in sort order
                foreach ($Rows as $Sort => $ID) {
                   $this->CategoryModel->Update(array('Sort' => $Sort), array('CategoryID' => $ID));
                }
@@ -353,6 +484,7 @@ class SettingsController extends Gdn_Controller {
       if (!$Success)
          $this->Form->AddError('ErrorBool');
          
+      // Renders true/false rather than template  
       $this->Render();
    }   
    

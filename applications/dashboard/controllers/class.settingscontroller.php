@@ -273,7 +273,7 @@ class SettingsController extends DashboardController {
    public function AddUpdateCheck() {
       if (C('Garden.NoUpdateCheck'))
          return;
-      
+
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.
@@ -399,7 +399,9 @@ class SettingsController extends DashboardController {
       
       // Retrieve all available plugins from the plugins directory
       $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+      self::SortAddons($this->EnabledPlugins);
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+      self::SortAddons($this->AvailablePlugins);
       
       // Loop through all of the available plugins and mark them if they have an update available
       // Retrieve the list of plugins that require updates from the config file
@@ -540,6 +542,19 @@ class SettingsController extends DashboardController {
       }
       
       $this->Render();
+   }
+
+   public static function SortAddons(&$Array) {
+      // Make sure every addon has a name.
+      foreach ($Array as $Key => $Value) {
+         $Name = GetValue('Name', $Value, $Key);
+         SetValue('Name', $Array[$Key], $Name);
+      }
+      uasort($Array, array('SettingsController', 'CompareAddonName'));
+   }
+
+   public static function CompareAddonName($A, $B) {
+      return strcasecmp(GetValue('Name', $A), GetValue('Name', $B));
    }
    
    /**

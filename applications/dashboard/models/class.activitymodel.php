@@ -151,7 +151,6 @@ class ActivityModel extends Gdn_Model {
       }
 
       // Massage $SendEmail to allow for only sending an email.
-      $SendEmail = TRUE; // TODO: Allow just emails.
       $QueueEmail = FALSE;
       if ($SendEmail == 'Only') {
          $SendEmail = '';
@@ -203,9 +202,9 @@ class ActivityModel extends Gdn_Model {
       // Send a notification to the user.
       if ($Notify) {
          if ($QueueEmail)
-            $this->QueueNotification($ActivityID);
+            $this->QueueNotification($ActivityID, $Story);
          else
-            $this->SendNotification($ActivityID);
+            $this->SendNotification($ActivityID, $Story);
       }
       
       return $ActivityID;
@@ -276,9 +275,10 @@ class ActivityModel extends Gdn_Model {
             $Email = $Notification['Email'];
             if (is_object($Email))
                $Email->Send();
+
          }
       }
-      
+
       // Clear out the queue
       unset($this->_NotificationQueue);
       $this->_NotificationQueue = array();

@@ -113,7 +113,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
   </ModulePrefs>
   <Content type=\"html\">
   <![CDATA[
-  <script type=\"text/javascript\" src=\"".Url('plugins/embedvanilla/remote.js', TRUE)."\"></script>
+  <script type=\"text/javascript\" src=\"".Asset('plugins/embedvanilla/remote.js', TRUE)."\"></script>
   ]]>
   </Content>
 </Module>";

@@ -14,9 +14,12 @@ if (C('Garden.Modules.ShowSignedInModule') && $Session->IsValid()) {
    <h4>My Profile</h4>
    <ul class="PanelInfo">
       <li><strong><?php echo Anchor($Name, 'profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Name)); ?></strong>&nbsp;</li>
-      <li><strong><?php echo Anchor('Inbox', '/messages/all'); ?></strong> <?php echo $CountInbox; ?></li>
-      <li><strong><?php echo Anchor('Notifications', '/profile/notifications'); ?></strong> <?php echo $CountNotifications; ?></li>
-      <li><strong><?php echo Anchor('Sign Out', $Authenticator->SignOutUrl()); ?></strong>&nbsp;</li>
+      <li><strong><?php echo Anchor(T('Inbox'), '/messages/all'); ?></strong> <?php echo $CountInbox; ?></li>
+      <li><strong><?php echo Anchor(T('Notifications'), '/profile/notifications'); ?></strong> <?php echo $CountNotifications; ?></li>
+      <li><strong><?php echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl()); ?></strong>&nbsp;</li>
+      <?php if ($Session->CheckPermission('Garden.Settings.Manage')) { ?>
+      <li><strong><?php echo Anchor(T('Dashboard'), '/dashboard/settings'); ?></strong>&nbsp;</li>
+      <?php } ?>
    </ul>
 </div>
 <?php

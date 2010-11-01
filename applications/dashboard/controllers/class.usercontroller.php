@@ -91,7 +91,7 @@ class UserController extends DashboardController {
          $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE));
          if ($NewUserID !== FALSE) {
             $Password = $this->Form->GetValue('Password', '');
-            $UserModel->SendWelcomeEmail($NewUserID, $Password);
+            $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');
             $this->StatusMessage = T('The user has been created successfully');
             $this->RedirectUrl = Url('dashboard/user');
          }

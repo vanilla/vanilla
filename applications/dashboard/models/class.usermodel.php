@@ -1360,7 +1360,7 @@ class UserModel extends Gdn_Model {
       return $DefaultValue;
    }
 
-   public function SendWelcomeEmail($UserID, $Password) {
+   public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = NULL) {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
@@ -1368,18 +1368,32 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
-      //$Email->From($Sender->Email, $Sender->Name);
-      $Email->Message(
-         sprintf(
-            T('EmailWelcome'),
-            $User->Name,
-            $Sender->Name,
-            $AppTitle,
-            Gdn_Url::WebRoot(TRUE),
-            $Password,
-            $User->Email
-         )
-      );
+
+      // Check for the new email format.
+      if (($EmailFormat = T("EmailWelcome{$RegisterType}", '#')) != '#') {
+         $Data = array();
+         $Data['User'] = ArrayTranslate((array)$User, array('Name', 'Email'));
+         $Data['Sender'] = ArrayTranslate((array)$Sender, array('Name', 'Email'));
+         $Data['Title'] = $AppTitle;
+         if (is_array($AdditionalData))
+            $Data = array_merge($Data, $AdditionalData);
+
+         $Message = FormatString($EmailFormat, $Data);
+         $Email->Message($Message);
+      } else {
+         $Email->Message(
+            sprintf(
+               T('EmailWelcome'),
+               $User->Name,
+               $Sender->Name,
+               $AppTitle,
+               Gdn_Url::WebRoot(TRUE),
+               $Password,
+               $User->Email
+            )
+         );
+      }
+
       $Email->Send();
    }
 

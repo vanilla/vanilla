@@ -18,23 +18,49 @@ class MobileThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
 	
+	/**
+	 * Remove plugins that are not mobile friendly!
+	 */
+	public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
+		// Remove plugins so they don't mess up layout or functionality.
+		if (in_array($Sender->Application(), array('vanilla', 'dashboard', 'conversations')))
+			Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+	}
+	
+	/**
+	 * Add mobile meta info. Add script to hide iphone browser bar on pageload.
+	 */
 	public function Base_Render_Before($Sender) {
 		if (IsMobile() && is_object($Sender->Head)) {
 			$Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
 			
 			$Sender->Head->AddString('<script type="text/javascript">
-	setTimeout(function () {
+setTimeout(function () {
   window.scrollTo(0, 1);
 }, 1000);
 </script>');
 		}
 	}
 	
+	/**
+	 * Add new discussion & conversation buttons to various pages.
+	 */
    public function CategoriesController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'Discussion');
    }
    
    public function DiscussionsController_Render_Before($Sender) {
+		// Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
+		if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
+			$Sender->Head->AddString('<script type="text/javascript">
+jQuery(document).ready(function($) {
+	$("ul.DataList li.Item").click(function() {
+		document.location = $(this).find("a.Title").attr("href");
+	});
+});
+</script>');
+		}
+		// Add the new discussion button to the page.
 		$this->_AddButton($Sender, 'Discussion');
    }
 
@@ -61,30 +87,6 @@ class MobileThemeHooks implements Gdn_IPlugin {
 			elseif ($ButtonType == 'Conversation')
 				$Sender->Menu->AddLink('NewConversation', Img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
 		}
-	}
-	
-	/* Add Counts after discussion title */
-	public function Base_DiscussionMeta_Handler($Sender) {
-		$Discussion = GetValue('Discussion', $Sender->EventArguments);
-		$CountUnreadComments = 0;
-		if (is_numeric($Discussion->CountUnreadComments))
-			$CountUnreadComments = $Discussion->CountUnreadComments;
-			
-		$CssClass = 'Counts';
-		if ($CountUnreadComments > 0)
-			$CssClass .= ' NewCounts';
-			
-		echo '<span class="'.$CssClass.'">'
-			.$Discussion->CountComments
-			.($CountUnreadComments > 0 ? '/'.$CountUnreadComments : '')
-		.'</span>';
-	}
-	
-	/* Add Author Icon before discussion title */
-	public function Base_BeforeDiscussionContent_Handler($Sender) {
-		$Discussion = GetValue('Discussion', $Sender->EventArguments);
-		$Author = UserBuilder($Discussion, 'First');
-		echo UserPhoto($Author);
 	}
    
 }

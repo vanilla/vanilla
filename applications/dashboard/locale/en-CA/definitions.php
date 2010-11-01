@@ -100,6 +100,16 @@ $Definition['EmailPassword'] = 'Hello %1$s,
   Url: %4$s
 
 Have a great day!';
+$Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
+
+You have successfully registered for an account at {Title}. Here is the your information:
+
+  Username: {User.Name}
+  Email: {User.Email}
+
+You can access the site at {/,url,domain}.
+
+Have a great day!';
 $Definition['PasswordRequest'] = 'Hello %1$s,
 
 Someone has requested to reset your password at %2$s. To reset your password, follow this link:

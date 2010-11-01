@@ -224,7 +224,7 @@ class Gdn_Format {
          } else {
 				try {
 					$Mixed2 = $Mixed;
-					$Mixed2 = str_replace("\n", '<br />', $Mixed2);
+					//$Mixed2 = str_replace("\n", '<br />', $Mixed2);
 
                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
@@ -522,14 +522,14 @@ class Gdn_Format {
    protected static function LinksCallback($Matches) {
       $Pr = $Matches[1];
       $Url = $Matches[2];
-      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches)) {
+      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches) && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
          $Width = 400;
          $Height = 225;
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
-      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches)) {
+      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
          $Width = 400;
          $Height = 225;
@@ -586,7 +586,7 @@ EOT;
 //         );
          
          // Handle #hashtag searches
-			if(!C('Garden.Format.DisableHashtags')) {
+			if(C('Garden.Format.Hashtags')) {
 				$Mixed = preg_replace(
 					'/(^|[\s,\.])\#([\w\-]+)(?=[\s,\.]|$)/i',
 					'\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',

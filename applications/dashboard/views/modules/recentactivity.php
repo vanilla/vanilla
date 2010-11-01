@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="RecentActivity" class="Box">
-   <h4><?php echo $this->_Sender->Data['ActivityModuleTitle']; ?></h4>
+   <h4><?php echo GetValue('ActivityModuleTitle', $this, T('Recent Activity')); ?></h4>
    <ul class="PanelActivity">
       <?php
       $Data = $this->_Sender->Data['RecentActivityData'];

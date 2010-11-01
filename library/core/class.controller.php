@@ -312,7 +312,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SelfUrl = '';
       $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
-      $this->Theme = C(IsMobile() ? 'Garden.MobileTheme' : 'Garden.Theme');
+      $this->Theme = Theme();
       $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
       $this->View = '';
       $this->_CssFiles = array();
@@ -631,7 +631,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!$ApplicationFolder)
          $ApplicationFolder = $this->ApplicationFolder;
 
-      $ApplicationFolder = strtolower($ApplicationFolder);
+      //$ApplicationFolder = strtolower($ApplicationFolder);
       $ControllerName = strtolower($ControllerName);
       if(strpos($View, DS) === FALSE) // keep explicit paths as they are.
          $View = strtolower($View);
@@ -642,7 +642,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       else if ($this->SyndicationMethod == SYNDICATION_RSS)
          $View .= '_rss';
 
-      $LocationName = $ApplicationFolder.'/'.$ControllerName.'/'.$View;
+      $LocationName = ConcatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
       $ViewPath = ArrayValue($LocationName, $this->_ViewLocations, FALSE);
       if ($ViewPath === FALSE) {
          // Define the search paths differently depending on whether or not we are in a plugin or application.
@@ -652,6 +652,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $ApplicationFolder = trim(strstr($ApplicationFolder, '/'), '/');
          } else {
             $BasePath = PATH_APPLICATIONS;
+            $ApplicationFolder = strtolower($ApplicationFolder);
          }
 
          $SubPaths = array();

@@ -99,8 +99,18 @@ class DiscussionModel extends VanillaModel {
 			
 		$this->FireEvent('BeforeGet');
       
+		
+		$SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+		if (!in_array($SortField, array('d.DateLastComment', 'd.DateInserted')))
+			$SortField = 'd.DateLastComment';
+			
+		$SortDirection = C('Vanilla.Discussions.SortDirection', 'desc');
+		if ($SortDirection != 'asc')
+			$SortDirection = 'desc';
+			
+		$this->SQL->OrderBy($SortField, $SortDirection);
+
       $Data = $this->SQL
-         ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
 			
@@ -119,7 +129,7 @@ class DiscussionModel extends VanillaModel {
 		foreach($Result as &$Discussion) {
 			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
-				if($Discussion->CountCommentWatch) {
+				if ($Discussion->CountCommentWatch) {
 					$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 				} else {
 					$Discussion->CountUnreadComments = 0;
@@ -127,6 +137,20 @@ class DiscussionModel extends VanillaModel {
 			} else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
+			// Logic for incomplete comment count.
+			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
+				$Discussion->CountUnreadComments = 0;
+				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
+					$Discussion->CountCommentWatch = $Discussion->CountComments;
+			}
+			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
+			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+/*			decho('CountComments: '
+				.$Discussion->CountComments.'; CountCommentWatch: '
+				.$Discussion->CountCommentWatch.'; CountUnreadComments: '
+				.$Discussion->CountUnreadComments
+			);
+*/
 		}
 	}
 	
@@ -162,14 +186,24 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
          
-      $Data = $this->SQL
-         ->Where('d.Announce', '1')
-			->BeginWhereGroup()
-         ->Where('w.Dismissed is null')
-         ->OrWhere('w.Dismissed', '0')
+
+
+      $this->SQL
+         ->Where('d.Announce', '1');
+
+      if (C('Vanilla.Discussions.Dismiss', 1)) {
+         $this->SQL
+            ->BeginWhereGroup()
+            ->Where('w.Dismissed is null')
+            ->OrWhere('w.Dismissed', '0')
+            ->EndWhereGroup();
+      }
+
+      $this->SQL
          ->OrderBy('d.DateLastComment', 'desc')
-         ->Limit($Limit, $Offset)
-         ->Get();
+         ->Limit($Limit, $Offset);
+
+      $Data = $this->SQL->Get();
 			
 		$this->AddDiscussionColumns($Data);
 		return $Data;

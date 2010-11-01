@@ -701,10 +701,12 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
-         if (!$this->UserModel->InsertForApproval($this->Form->FormValues()))
+         if (!$this->UserModel->InsertForApproval($this->Form->FormValues())) {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-         else
+			} else {
+				$this->FireEvent('RegistrationPending');
             $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
+			}
       }
       $this->Render();
    }
@@ -726,6 +728,13 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
+				
+				$this->FireEvent('RegistrationSuccessful');
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -761,6 +770,13 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
+				
+				$this->FireEvent('RegistrationSuccessful');
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -797,6 +813,8 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+				
+				$this->FireEvent('RegistrationSuccessful');
             
             // ... and redirect them appropriately
             $Route = $this->RedirectTo();

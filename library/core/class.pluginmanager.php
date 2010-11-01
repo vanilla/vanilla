@@ -134,6 +134,33 @@ class Gdn_PluginManager {
       $this->_RegisteredPlugins[$PluginInfo['Index']] = $PluginInfo;
    }
    
+   public function UnRegisterPlugin($PluginClassName) {
+      $this->_RemoveFromCollectionByPrefix($PluginClassName, $this->_EventHandlerCollection);
+      $this->_RemoveFromCollectionByPrefix($PluginClassName, $this->_MethodOverrideCollection);
+      $this->_RemoveFromCollectionByPrefix($PluginClassName, $this->_NewMethodCollection);
+      if (array_key_exists($PluginClassName, $this->_RegisteredPlugins))
+         unset($this->_RegisteredPlugins[$PluginClassName]);
+   }
+   
+   private function _RemoveFromCollectionByPrefix($Prefix, &$Collection) {
+      foreach ($Collection as $Event => $Hooks) {
+         foreach ($Hooks as $Index => $Hook) {
+            if (strpos($Hook, $Prefix.'.') === 0)
+               unset($Collection[$Event][$Index]);
+         }
+      }
+   }
+   
+   public function RemoveMobileUnfriendlyPlugins() {
+      foreach ($this->EnabledPlugins() as $PluginName => $PluginInfo) {
+         if (!GetValue('MobileFriendly', $PluginInfo)) {
+            $ClassName = GetValue('ClassName', $PluginInfo);
+            if ($ClassName)
+               $this->UnRegisterPlugin($ClassName);
+         }
+      }
+   }
+   
    public function CheckPlugin($PluginName) {
       if (array_key_exists($PluginName, $this->EnabledPlugins()))
          return TRUE;
@@ -581,11 +608,11 @@ class Gdn_PluginManager {
       
       if (is_object($Validation) && count($Validation->Results()) > 0)
          return FALSE;
-
-      // If everything succeeded, add the plugin to the
-      // $EnabledPlugins array in conf/plugins.php
+      
+      // If everything succeeded, add the plugin to the $EnabledPlugins array in conf/config.php
       // $EnabledPlugins['PluginClassName'] = 'Plugin Folder Name';
       // $PluginInfo = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
+      
       $PluginInfo = $this->GetPluginInfo($PluginName);
       $PluginFolder = ArrayValue('Folder', $PluginInfo);
       $PluginEnabledValue = ArrayValue($EnabledPluginValueIndex, $PluginInfo, $PluginFolder);
@@ -667,8 +694,8 @@ class Gdn_PluginManager {
          }
          
          // Make sure the plugin is in the config.
-         if (!C("EnabledPlugins.$PluginName")) {
-            SaveToConfig("EnabledPlugins.$PluginName", $PluginFolder, FALSE);
+         if (!C("EnabledPlugins.{$PluginName}")) {
+            SaveToConfig("EnabledPlugins.{$PluginName}", $PluginFolder, FALSE);
          }
       }
       if (!is_array($Paths))

@@ -101,6 +101,11 @@ $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 mean
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 
+// Formatting
+$Configuration['Garden']['Format']['Hashtags']                  = TRUE;
+$Configuration['Garden']['Format']['YouTube']                   = TRUE;
+$Configuration['Garden']['Format']['Vimeo']                     = TRUE;
+
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Email']['AddedToConversation']   = '1';
@@ -110,14 +115,6 @@ $Configuration['Preferences']['Email']['ActivityComment']       = '0';
 $Configuration['Preferences']['Email']['DiscussionComment']     = '0';
 $Configuration['Preferences']['Email']['DiscussionMention']     = '0';
 $Configuration['Preferences']['Email']['CommentMention']        = '0';
-
-// Begin - HtmlPurifier Settings
-$Configuration['HtmlPurifier']['AutoFormat']['AutoParagraph']   = FALSE;
-$Configuration['HtmlPurifier']['AutoFormat']['Linkify']         = TRUE;
-$Configuration['HtmlPurifier']['Cache']['SerializerPath']       = PATH_CACHE.'/HtmlPurifier';
-$Configuration['HtmlPurifier']['Filter']['YouTube']             = TRUE;
-$Configuration['HtmlPurifier']['Filter']['Vimeo']               = TRUE;
-$Configuration['HtmlPurifier']['Attr']['EnableID']              = TRUE;
 
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');

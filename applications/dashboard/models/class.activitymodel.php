@@ -32,6 +32,29 @@ class ActivityModel extends Gdn_Model {
          ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
    }
    
+   public function Delete($ActivityID) {
+      // Get the activity first
+      $Activity = $this->GetID($ActivityID);
+      if (is_object($Activity)) {
+         $Users = array();
+         $Users[] = $Activity->ActivityUserID;
+         if (is_numeric($Activity->RegardingUserID) && $Activity->RegardingUserID > 0)
+            $Users[] = $Activity->RegardingUserID;
+            
+         // Update the user's dateupdated field so that profile pages will not
+         // be cached and will reflect this deletion.
+         $this->SQL->Update('User')
+            ->Set('DateUpdated', Gdn_Format::ToDateTime())
+            ->WhereIn('UserID', $Users)
+            ->Put();
+         
+         // Delete comments on the activity item
+         parent::Delete(array('CommentActivityID' => $ActivityID), FALSE, TRUE);
+         // Delete the activity item
+         parent::Delete(array('ActivityID' => $ActivityID));
+      }
+   }
+
    public function GetWhere($Field, $Value = '') {
       $this->ActivityQuery();
       return $this->SQL
@@ -129,8 +152,13 @@ class ActivityModel extends Gdn_Model {
 
       // Massage $SendEmail to allow for only sending an email.
       $SendEmail = TRUE; // TODO: Allow just emails.
+      $QueueEmail = FALSE;
       if ($SendEmail == 'Only') {
          $SendEmail = '';
+         $AddActivity = FALSE;
+      } else if ($SendEmail == 'QueueOnly') {
+         $SendEmail = '';
+         $QueueEmail = TRUE;
          $AddActivity = FALSE;
       } else {
          $AddActivity = TRUE;
@@ -173,8 +201,12 @@ class ActivityModel extends Gdn_Model {
       // Otherwise let the decision to email lie with the $Notify setting.
 
       // Send a notification to the user.
-      if ($Notify)
-         $this->SendNotification($ActivityID);
+      if ($Notify) {
+         if ($QueueEmail)
+            $this->QueueNotification($ActivityID);
+         else
+            $this->SendNotification($ActivityID);
+      }
       
       return $ActivityID;
    }
@@ -220,26 +252,81 @@ class ActivityModel extends Gdn_Model {
       }
    }
    
-   public function Delete($ActivityID) {
-      // Get the activity first
+   /**
+    * The Notification Queue is used to stack up notifications to users. Ensures
+    * that they only receive one notification about a single topic. For example:
+    * if someone comments on a discussion that they started and they have
+    * bookmarked, it will only notify them about one or the other, not both.
+    *
+    * This code makes the assumption that the queue is used for one user action
+    * at a time. For example: a comment being added to a discussion. The queue
+    * should be cleared before it is used, and sending the queue will clear it
+    * again.
+    */
+   private $_NotificationQueue = array();
+   public function ClearNotificationQueue() {
+      unset($this->_NotificationQueue);
+      $this->_NotificationQueue = array();
+   }
+   public function SendNotificationQueue() {
+      foreach ($this->_NotificationQueue as $UserID => $Notifications) {
+         if (is_array($Notifications)) {
+            // Only send out one notification per user.
+            $Notification = $Notifications[0];
+            $Email = $Notification['Email'];
+            if (is_object($Email))
+               $Email->Send();
+         }
+      }
+      
+      // Clear out the queue
+      unset($this->_NotificationQueue);
+      $this->_NotificationQueue = array();
+   }
+   
+   /**
+    * Queue a notification for sending.
+    */
+   public function QueueNotification($ActivityID, $Story = '') {
       $Activity = $this->GetID($ActivityID);
-      if (is_object($Activity)) {
-         $Users = array();
-         $Users[] = $Activity->ActivityUserID;
-         if (is_numeric($Activity->RegardingUserID) && $Activity->RegardingUserID > 0)
-            $Users[] = $Activity->RegardingUserID;
+      if (!is_object($Activity))
+         return;
+      
+      $Story = Gdn_Format::Text($Story == '' ? $Activity->Story : $Story, FALSE);
+      // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
+      if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
+         $CommentActivity = $this->GetID($Activity->CommentActivityID);
+         $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
+         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Gdn_Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+      }
+      $User = $this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+
+      if ($User) {
+         $Preferences = Gdn_Format::Unserialize($User->Preferences);
+         $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
+         if ($Preference) {
+            $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
+            $Email = new Gdn_Email();
+            $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
+            $Email->To($User->Email, $User->Name);
+            //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
+            $Email->Message(
+               sprintf(
+                  T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+                  $ActivityHeadline,
+                  Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+                  $Story
+               )
+            );
+            if (!array_key_exists($User->UserID, $this->_NotificationQueue))
+               $this->_NotificationQueue[$User->UserID] = array();
             
-         // Update the user's dateupdated field so that profile pages will not
-         // be cached and will reflect this deletion.
-         $this->SQL->Update('User')
-            ->Set('DateUpdated', Gdn_Format::ToDateTime())
-            ->WhereIn('UserID', $Users)
-            ->Put();
-         
-         // Delete comments on the activity item
-         parent::Delete(array('CommentActivityID' => $ActivityID), FALSE, TRUE);
-         // Delete the activity item
-         parent::Delete(array('ActivityID' => $ActivityID));
+            $this->_NotificationQueue[$User->UserID][] = array(
+               'ActivityID' => $ActivityID,
+               'User' => $User,
+               'Email' => $Email
+            );
+         }
       }
    }
 }

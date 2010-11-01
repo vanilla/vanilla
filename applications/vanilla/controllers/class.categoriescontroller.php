@@ -7,25 +7,66 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Categories Controller - Handles displaying categories.
+ * Categories Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Handles displaying categories.
+ *
+ * @since 2.0.0
+ * @package Vanilla
  */
 class CategoriesController extends VanillaController {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Database', 'Form', 'CategoryModel');
    
    /**
     * Should the discussions have their options available.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var bool
     */
    public $ShowOptions = TRUE;
+   
+   /**
+    * Unique identifier.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var int
+    */
    public $CategoryID;
+   
+   /**
+    * Category object.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var object
+    */
    public $Category;
+   
    /**
     * Show all discussions in a particular category.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param string $CategoryIdentifier Unique category slug or ID
+    * @param int $Offset Number of discussions to skip
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
-      list($Offset, $Limit) = OffsetLimit($Offset, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      list($Offset, $Limit) = OffsetLimit($Offset, C('Vanilla.Discussions.PerPage', 30));
       
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
@@ -36,6 +77,7 @@ class CategoriesController extends VanillaController {
       if ($Category === FALSE)
          return $this->All();
       
+      // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
@@ -50,24 +92,28 @@ class CategoriesController extends VanillaController {
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
          
-      
+      // Set CategoryID
       $this->SetData('CategoryID', $this->Category->CategoryID, TRUE);
 
-      // Add Modules
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-   
+      
+      // Get a DiscussionModel
       $DiscussionModel = new DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       
+      // Check permission
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->CategoryID);
+      
+      // Set discussion meta data
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
-      $this->SetData('AnnounceData', $AnnounceData, TRUE   );
+      $this->SetData('AnnounceData', $AnnounceData, TRUE);
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
 
       // Build a pager
@@ -101,9 +147,13 @@ class CategoriesController extends VanillaController {
    }
 
    /**
-    * Show all categories, and few discussions from each.
+    * Show all categories and few discussions from each.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function All() {
+      // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
@@ -111,8 +161,9 @@ class CategoriesController extends VanillaController {
       $this->AddJsFile('jquery.menu.js');
       $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
-         
-      $this->DiscussionsPerCategory = Gdn::Config('Vanilla.Discussions.PerCategory', 5);
+      
+      // Get category data and discussions
+      $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
       $this->CategoryData = $this->CategoryModel->GetFull();
       $this->CategoryDiscussionData = array();
@@ -120,20 +171,29 @@ class CategoriesController extends VanillaController {
          $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));
       }
       
-      // Add Modules
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
       
+      // Set view and render
       $this->View = 'all';
       $this->Render();
    }
    
+   /**
+    * Highlight route
+    *
+    * Always called by dispatcher before controller's requested method
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
-         $this->Menu->HighlightRoute('/dashboard/settings');
+         $this->Menu->HighlightRoute('/categories');
    }      
 }

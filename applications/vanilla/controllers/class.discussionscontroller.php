@@ -7,42 +7,89 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Discussions Controller - handles displaying discussions in all their forms.
+ * Discussions Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Handles displaying discussions in most contexts.
+ *
+ * @since 2.0.0
+ * @package Vanilla
+ * @todo Resolve inconsistency between use of $Page and $Offset as parameters.
  */
 class DiscussionsController extends VanillaController {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Database', 'DiscussionModel', 'Form');
    
    /**
     * A boolean value indicating if discussion options should be displayed when
     * rendering the discussion view.
     *
+    * @since 2.0.0
+    * @access public
     * @var boolean
     */
    public $ShowOptions;
+   
+   /**
+    * Category object. 
+    * 
+    * Used to limit which discussion are returned to a particular category.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var object
+    */
    public $Category;
+   
+   /**
+    * Unique identifier for category.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var int
+    */
    public $CategoryID;
    
+   /**
+    * Default all discussions view: chronological by most recent comment.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $Page Multiplied by PerPage option to determine offset.
+    */
    public function Index($Page = '0') {
+      // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE)), TRUE));
-
-		$this->Title(T('All Discussions'));
-      if ($this->Head)
-         $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
-
+      
+      // Validate $Page
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
       
-      // Add Modules
+      // Setup head
+		$this->Title(T('All Discussions'));
+      if ($this->Head)
+         $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
+      
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
-
+      
+      // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
       $CountDiscussions = $DiscussionModel->GetCount();
@@ -53,7 +100,7 @@ class DiscussionsController extends VanillaController {
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
-      // Build a pager.
+      // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
       $this->Pager = $PagerFactory->GetPager('Pager', $this);
       $this->Pager->ClientID = 'Pager';
@@ -64,7 +111,7 @@ class DiscussionsController extends VanillaController {
          'discussions/%1$s'
       );
       
-      // Deliver json data if necessary
+      // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
@@ -80,10 +127,18 @@ class DiscussionsController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
-      // Render the controller
+      // Render default view (discussions/index.php)
       $this->Render();
    }
    
+   /**
+    * Highlight route and include JS, CSS, and modules used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       $this->ShowOptions = TRUE;
@@ -98,12 +153,22 @@ class DiscussionsController extends VanillaController {
 		$this->FireEvent('AfterInitialize');
    }
    
+   /**
+    * Display discussions the user has bookmarked.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $Offset Number of discussions to skip.
+    */
    public function Bookmarked($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-
+      
+      // Validate $Offset
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
+      // Set criteria & get discussions data
       $Session = Gdn::Session();
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $Wheres = array('w.Bookmarked' => '1', 'w.UserID' => $Session->UserID);
@@ -127,26 +192,37 @@ class DiscussionsController extends VanillaController {
          'discussions/bookmarked/%1$s'
       );
       
-      // Deliver json data if necessary
+      // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
       
-      // Add Modules
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       
+      // Render default view (discussions/bookmarked.php)
       $this->Render();
    }
    
+   /**
+    * Display discussions started by the user.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $Offset Number of discussions to skip.
+    */
    public function Mine($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
-
+      
+      // Validate $Offset
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
+      // Set criteria & get discussions data
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
@@ -168,21 +244,21 @@ class DiscussionsController extends VanillaController {
          'discussions/mine/%1$s'
       );
       
-      // Deliver json data if necessary
+      // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
       
-      // Add Modules
+      // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $BookmarkedModule = new BookmarkedModule($this);
       $BookmarkedModule->GetData();
       $this->AddModule($BookmarkedModule);
       
-      // Render the controller
+      // Render default view (discussions/mine.php)
       $this->Render();
    }
 }

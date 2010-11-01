@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
  
 /**
- * Handles accessing & displaying a single discussion
+ * Handles accessing & displaying a single discussion.
  *
  * @since 2.0.0
  * @package Vanilla
@@ -157,7 +157,7 @@ class DiscussionController extends VanillaController {
       if ($Draft)
          $this->Form->SetFormValue('Body', $Draft->Body);
       
-      // Deliver json data if necessary
+      // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
@@ -265,8 +265,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function DismissAnnouncement($DiscussionID = '', $TransientKey = '') {
       // Confirm announcements may be dismissed
@@ -299,8 +299,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Bookmark($DiscussionID = '', $TransientKey = '') {
       $Session = Gdn::Session();
@@ -373,8 +373,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Announce($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -413,8 +413,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Sink($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -460,8 +460,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Close($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -505,8 +505,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $DiscussionID Unique discussion ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $DiscussionID Unique discussion ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -550,8 +550,8 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     *
-    * @param int $CommentID Unique comment ID
-    * @param string $TransientKey Single-use hash to prove intent
+    * @param int $CommentID Unique comment ID.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();

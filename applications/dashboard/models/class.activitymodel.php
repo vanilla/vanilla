@@ -202,9 +202,9 @@ class ActivityModel extends Gdn_Model {
       // Send a notification to the user.
       if ($Notify) {
          if ($QueueEmail)
-            $this->QueueNotification($ActivityID);
+            $this->QueueNotification($ActivityID, $Story);
          else
-            $this->SendNotification($ActivityID);
+            $this->SendNotification($ActivityID, $Story);
       }
       
       return $ActivityID;

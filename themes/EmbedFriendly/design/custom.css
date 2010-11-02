@@ -13,7 +13,7 @@
 div.Popup h1,
 div.Popup h2 {
 	background: #3b5998;
-	border: none;
+	border-bottom: 1px solid #3b5998;
 }
 .Banner {
 	padding: 10px;
@@ -108,6 +108,15 @@ div.CommentForm textarea,
 div.Preview div.Message,
 ul.MessageList div.Message {
 	clear: none;
+}
+#DiscussionForm form {
+	background: #efefef;
+	border: 1px solid #ccc;
+}
+div.MessageForm,
+div.Tabs {
+	background: #efefef;
+	border-bottom:1px solid #ccc;
 }
 
 /* Tabs */
@@ -227,7 +236,7 @@ body.add #Content {
 }
 
 /* Panel Boxes */
-div.Box {
+#Panel div.Box {
 	border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -280,11 +289,16 @@ body.Profile ul.PanelInfo li a:hover {
 }
 
 /* Sign In Page */
+body.Entry #Content {
+	text-align: center;
+	margin: 0 auto !important;
+}
 body.Entry #Content div.Box {
 	background: #efefef;
+	border: 0;
 }
-body.Entry #Panel {
-	display: none;
+div.Methods {
+	border-left: 1px solid #ccc;
 }
 
 /* Messages */
@@ -312,4 +326,7 @@ div.Warning a.Dismiss {
 	color: #000;
 	background: #D3F0FF;
 	border: 1px solid #A5D0E7;
+}
+body#dashboard_entrycontroller_signin div.Box {
+	border: none;
 }

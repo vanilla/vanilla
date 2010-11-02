@@ -615,6 +615,34 @@ class ProfileController extends Gdn_Controller {
       return TRUE;
    }
 
+   public function Get($UserID = FALSE) {
+      if (!$UserID)
+         $UserID = Gdn::Session()->UserID;
+
+      if (($UserID != Gdn::Session()->UserID || !Gdn::Session()->UserID) && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
+         throw new Exception(T('You do not have permission to view other profiles.'), 401);
+      }
+
+      $UserModel = new UserModel();
+
+      // Get the user.
+      $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User) {
+         throw new Exception(T('User not found.'), 404);
+      }
+
+      $PhotoUrl = $User['Photo'];
+      if ($PhotoUrl && strpos($PhotoUrl, '//') == FALSE) {
+         $PhotoUrl = Url('/uploads/'.ChangeBasename($PhotoUrl, 'n%s'), TRUE);
+      }
+      $User['Photo'] = $PhotoUrl;
+
+      // Remove unwanted fields.
+      $this->Data = ArrayTranslate($User, array('UserID', 'Name', 'Email', 'Photo'));
+
+      $this->Render();
+   }
+
    /**
     * Retrieve the user to be manipulated. If no params are passed, this will
     * retrieve the current user from the session.
@@ -670,7 +698,7 @@ class ProfileController extends Gdn_Controller {
          $this->ControllerName = $Controller;
          $this->ApplicationFolder = $Application;
       }
-      $this->_CurrentTab = T($CurrentTab);
+		$this->_CurrentTab = T($CurrentTab);
    }
    
 }

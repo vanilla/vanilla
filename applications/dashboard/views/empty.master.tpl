@@ -6,5 +6,6 @@
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
 {asset name='Content'}
+{asset name='Foot'}
 </body>
 </html>

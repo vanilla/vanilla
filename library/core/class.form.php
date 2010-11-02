@@ -787,7 +787,7 @@ class Gdn_Form {
          
       $this->Action = $ActionFromAttributes === FALSE ? $this->Action : $ActionFromAttributes;
 
-      if (!C('Garden.RewriteUrls') && strcasecmp($this->Method, 'get') == 0) {
+      if (strcasecmp($this->Method, 'get') == 0) {
          // The path is not getting passed on get forms so put them in hidden fields.
          $Action = strrchr($this->Action, '?');
          $this->Action = substr($this->Action, 0, -strlen($Action));

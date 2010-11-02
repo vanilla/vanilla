@@ -375,6 +375,10 @@ div.Errors ul {
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
 }
+div.Errors a {
+   color: #fff;
+   text-decoration: underline;
+}
 div.Errors ul li {
    color: #fff !important;
 	font-size: 12px;
@@ -454,8 +458,8 @@ div.Box {
    background: #d3f0ff;
 }
 .Warning {
-   border: 1px solid #aaa;
-   background: #ffc;
+   background: #ff9;
+   padding: 10px 20px;
 }
 strong {
 	font-weight: bold;

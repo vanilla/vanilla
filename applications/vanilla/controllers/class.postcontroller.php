@@ -7,14 +7,34 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Post Controller - Handles posting and editing comments, discussions, and drafts
+ * Post Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Handles posting and editing comments, discussions, and drafts.
+ *
+ * @since 2.0.0
+ * @package Vanilla
  */
 class PostController extends VanillaController {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
+   /**
+    * Alias for Discussion method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Index() {
       $this->View = 'discussion';
       $this->Discussion();
@@ -23,14 +43,25 @@ class PostController extends VanillaController {
    /**
     * Create a discussion.
     *
-    * @param int The CategoryID to add the discussion to.
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CategoryID Unique ID of the category to add the discussion to.
     */
    public function Discussion($CategoryID = '') {
+      // Override CategoryID if categories are disabled
       $UseCategories = C('Vanilla.Categories.Use');
       if (!$UseCategories)
          $CategoryID = 0;
          
+      // Setup head
+      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('post.js');
+      $this->AddJsFile('autosave.js');
+      
       $Session = Gdn::Session();
+      
+      // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
@@ -38,11 +69,10 @@ class PostController extends VanillaController {
          $CategoryModel = new CategoryModel();
          $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
       }
-      $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('post.js');
-      $this->AddJsFile('autosave.js');
       
+      // Check permission 
       if (isset($this->Discussion)) {
+         // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
 
@@ -54,12 +84,14 @@ class PostController extends VanillaController {
 
          $this->Title(T('Edit Discussion'));
       } else {
+         // Permission to add
          $this->Permission('Vanilla.Discussions.Add');
       }
       
-      // Set the model on the form.
+      // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Form was validly submitted
          if (isset($this->Discussion))
             $this->Form->SetData($this->Discussion);
          else if (isset($this->Draft))
@@ -151,15 +183,25 @@ class PostController extends VanillaController {
             }
          }
       }
+      
+      // Add hidden fields for editing
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
+      
+      // Render default view (posts/discussion.php)
       $this->Render();
    }
    
    /**
     * Edit a discussion.
     *
-    * @param int The DiscussionID of the discussion to edit. If blank, this method will throw an error.
+    * Will throw an error if both params are blank.
+    *
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique ID of the discussion to edit.
+    * @param int $DraftID Unique ID of draft discussion to edit.
     */
    public function EditDiscussion($DiscussionID = '', $DraftID = '') {
       if ($DraftID != '') {
@@ -169,6 +211,8 @@ class PostController extends VanillaController {
          $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
          $this->CategoryID = $this->Discussion->CategoryID;
       }
+      
+      // Set view and render
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);
    }
@@ -176,30 +220,49 @@ class PostController extends VanillaController {
    /**
     * Create a comment.
     *
-    * @param int The DiscussionID to add the comment to. If blank, this method will throw an error.
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique ID to add the comment to. If blank, this method will throw an error.
     */
    public function Comment($DiscussionID = '') {
+      // Get $DiscussionID from RequestArgs if valid
       if ($DiscussionID == '' && sizeof($this->RequestArgs))
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
+            
+      // Setup head
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
-
+      
+      // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
       $this->Form->SetModel($this->CommentModel);
       $CommentID = isset($this->Comment) && property_exists($this->Comment, 'CommentID') ? $this->Comment->CommentID : '';
       $DraftID = isset($this->Comment) && property_exists($this->Comment, 'DraftID') ? $this->Comment->DraftID : '';
       $this->EventArguments['CommentID'] = $CommentID;
+      $this->EventArguments['DraftID'] = $DraftID;
+      
+      // Determine whether we are editing
       $Editing = $CommentID > 0 || $DraftID > 0;
       $this->EventArguments['Editing'] = $Editing;
+      
+      // If invalid $DiscussionID, get from form
       $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
+      
+      // Add hidden IDs to form
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('CommentID', $CommentID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
+      
+      // Set discussion data
       $this->DiscussionID = $DiscussionID;
       $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      // Check permissions
       if ($Editing) {
+         // Permisssion to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
             
@@ -210,10 +273,12 @@ class PostController extends VanillaController {
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
 
       } else {
+         // Permission to add
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->CategoryID);
       }
 
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Form was validly submitted
          if (isset($this->Comment))
             $this->Form->SetData($this->Comment);
             
@@ -362,15 +427,28 @@ class PostController extends VanillaController {
          }
       }
       
+      // Include data for FireEvent
       if (property_exists($this,'Discussion'))
          $this->EventArguments['Discussion'] = $this->Discussion;
       if (property_exists($this,'Comment'))
          $this->EventArguments['Comment'] = $this->Comment;
          
       $this->FireEvent('BeforeCommentRender');
+      
+      // Render default view
       $this->Render();
    }
-
+   
+   /**
+    * Triggers saving the extra info about a comment
+    * like notifications and unread totals.
+    *
+    * @since 2.0.?
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of the comment.
+    * @param bool $Inserted
+    */
    public function Comment2($CommentID, $Inserted = FALSE) {
       $this->CommentModel->Save2($CommentID, $Inserted);
    }
@@ -378,7 +456,13 @@ class PostController extends VanillaController {
    /**
     * Edit a comment.
     *
-    * @param int The CommentID of the comment to edit.
+    * Will throw an error if both params are blank.
+    *
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of the comment to edit.
+    * @param int $DraftID Unique ID of the draft to edit.
     */
    public function EditComment($CommentID = '', $DraftID = '') {
       if (is_numeric($CommentID) && $CommentID > 0) {
@@ -392,6 +476,14 @@ class PostController extends VanillaController {
       $this->Comment($this->Comment->DiscussionID);
    }
    
+   /**
+    * Include CSS for all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       $this->AddCssFile('vanilla.css');

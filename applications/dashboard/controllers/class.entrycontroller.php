@@ -13,6 +13,21 @@ class EntryController extends Gdn_Controller {
    // Make sure the database class is loaded (class.controller.php takes care of this).
    public $Uses = array('Database', 'Form', 'UserModel');
 	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
+
+   /**
+    * @var Gdn_Form The current form.
+    */
+   public $Form;
+
+   public function  __construct() {
+      parent::__construct();
+
+      switch (isset($_GET['display'])) {
+         case 'popup':
+            $this->MasterView = 'empty';
+            break;
+      }
+   }
    
    public function Auth($AuthenticationSchemeAlias = 'default') {
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
@@ -153,6 +168,229 @@ class EntryController extends Gdn_Controller {
       $this->SetData('SendWhere', "/entry/auth/{$AuthenticationSchemeAlias}");
       $this->Render();
    }
+
+   /**
+    * Connect the user with an external source.
+    * This controller method is meant to be used with plugins that set its data array to work.
+    */
+   public function Connect($Method) {
+      $this->AddJsFile('entry.js');
+      $this->View = 'connect';
+      $IsPostBack = $this->Form->IsPostBack();
+
+      if (!$IsPostBack) {
+         // Here are the initial data array values. that can be set by a plugin.
+         $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => GetIncomingValue('Target', '/'));
+         $this->Form->FormValues($Data);
+         $this->Form->AddHidden('Target');
+      }
+
+      // The different providers can check to see if they are being used and modify the data array accordingly.
+      $this->EventArguments = array($Method);
+      try {
+         $this->FireEvent('ConnectData');
+      } catch (Exception $Ex) {
+         if (defined('DEBUG'))
+            $this->Form->AddError($Ex);
+         else
+            $this->Form->AddError('There was an error fetching the connection data.');
+         return $this->Render();
+      }
+
+      $FormData = $this->Form->FormValues(); // debug
+
+      // Make sure the minimum required data has been provided to the connect.
+      if (!$this->Form->GetFormValue('Provider'))
+         $this->Form->AddError('ValidateRequired', T('Provider'));
+      if (!$this->Form->GetFormValue('UniqueID'))
+         $this->Form->AddError('ValidateRequired', T('UniqueID'));
+      
+      if (!$this->Data('Verified')) {
+         // Whatever event handler catches this must Set the data 'Verified' to true to prevent a random site from connecting without credentials.
+         // This must be done EVERY postback and is VERY important.
+         $this->Form->AddError('The connection data has not been verified.');
+      }
+      
+      if ($this->Form->ErrorCount() > 0)
+         return $this->Render();
+
+      $UserModel = new UserModel();
+
+      // Check to see if there is an existing user associated with the information above.
+      $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
+      $UserID = GetValue('UserID', $Auth);
+
+      if ($UserID) {
+         // The user is already connected.
+         $this->Form->SetFormValue('UserID', $UserID);
+         // Synchronize the user's data.
+         $UserModel->Save($this->Data);
+
+         // Sign the user in.
+         Gdn::Session()->Start($UserID);
+         $this->_SetRedirect(TRUE);
+      } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
+         // Get the existing users that match the name or email of the connection.
+         $Where = array();
+         if ($this->Form->GetFormValue('Name'))
+            $Where['Name'] = $this->Form->GetFormValue('Name');
+         if ($this->Form->GetFormValue('Email'))
+            $Where['Email'] = $this->Form->GetFormValue('Email');
+
+         $ExistingUsers = $UserModel->GetWhere($Where, 'Name')->ResultArray();
+
+         $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
+         $CurrentUserID = Gdn::Session()->UserID;
+
+         // Massage the existing users.
+         foreach ($ExistingUsers as $Index => $UserRow) {
+            if ($EmailUnique && $UserRow['Email'] == $this->Form->GetFormValue('Email')) {
+               $EmailFound = $UserRow;
+               break;
+            }
+
+            if ($CurrentUserID > 0 && $UserRow['UserID'] == $CurrentUserID) {
+               unset($ExistingUsers[$Index]);
+               $CurrentUserFound = TRUE;
+            }
+         }
+
+         if (isset($EmailFound)) {
+            // The email address was found and can be the only user option.
+            $ExistingUsers = array($UserRow);
+            $this->SetData('NoConnectName', TRUE);
+         } elseif (isset($CurrentUserFound)) {
+            $ExistingUsers = array_merge(
+               array('UserID' => 'current', 'Name' => sprintf(T('%s (Current)'), Gdn::Session()->User->Name)),
+               $ExistingUsers);
+         }
+
+         $this->SetData('ExistingUsers', $ExistingUsers);
+
+         if ($this->Form->GetFormValue('Name') && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+            // There is no existing user with the suggested name so we can just create the user.
+            $User = $this->Form->FormValues();
+            $User['Password'] = RandomString(50); // some password is required
+            $User['HashMethod'] = 'Random';
+
+            $UserID = $UserModel->InsertForBasic($User);
+            $User['UserID'] = $UserID;
+            $this->Form->SetValidationResults($UserModel->ValidationResults());
+
+            if ($UserID) {
+               $UserModel->SaveAuthentication(array(
+                      'UserID' => $UserID,
+                      'Provider' => $this->Form->GetFormValue('Provider'),
+                      'UniqueID' => $this->Form->GetFormValue('UniqueID')));
+               $this->Form->SetFormValue('UserID', $UserID);
+
+               Gdn::Session()->Start($UserID);
+               $this->_SetRedirect(TRUE);
+            }
+         }
+      }
+
+      // Save the user's choice.
+      if ($IsPostBack) {
+         // The user has made their decision.
+         $PasswordHash = new Gdn_PasswordHash();
+
+         $UserSelect = $this->Form->GetFormValue('UserSelect');
+
+         if (!$UserSelect || $UserSelect == 'other') {
+            // The user entered a username.
+            $ConnectNameEntered = TRUE;
+
+            if ($this->Form->ValidateRule('ConnectName', 'ValidateRequired')) {
+               $ConnectName = $this->Form->GetFormValue('ConnectName');
+
+               // Check to see if there is already a user with the given name.
+               $User = $UserModel->GetWhere(array('Name' => $ConnectName))->FirstRow(DATASET_TYPE_ARRAY);
+
+               if (!$User) {
+                  $this->Form->ValidateRule('ConnectName', 'ValidateUsername');
+               }
+            }
+         } else {
+            // The user selected an existing user.
+
+            if ($UserSelect == 'current') {
+               if (Gdn::Session()->UserID == 0) {
+                  // This shouldn't happen, but a use could sign out in another browser and click submit on this form.
+                  $this->Form->AddError('@You were uexpectidly signed out.');
+               } else {
+                  $UserSelect = Gdn::Session()->UserID;
+               }
+            }
+            $User = $UserModel->GetID($UserSelect, DATASET_TYPE_ARRAY);
+         }
+
+         if (isset($User) && $User) {
+            // Make sure the user authenticates.
+            if (!$User['UserID'] == Gdn::Session()->UserID) {
+
+               if ($this->Form->ValidateRule('ConnectPassword', 'ValidateRequired', sprintf(T('ValidateRequired'), T('Password')))
+                  && !$PasswordHash->CheckPassword($this->Form->GetFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'])) {
+
+                  if ($ConnectNameEntered) {
+                     $this->Form->AddError('The username you entered has already been taken.');
+                  } else {
+                     $this->Form->AddError('The password you entered is incorrect.');
+                  }
+               }
+            }
+         } elseif ($this->Form->ErrorCount() == 0) {
+            // The user doesn't exist so we need to add another user.
+            $User = $this->Form->FormValues();
+            $User['Name'] = $User['ConnectName'];
+            $User['Password'] = RandomString(50); // some password is required
+            $User['HashMethod'] = 'Random';
+
+            $UserID = $UserModel->InsertForBasic($User);
+            $User['UserID'] = $UserID;
+            $this->Form->SetValidationResults($UserModel->ValidationResults());
+
+            if ($UserID) {
+               // Add the user to the default roles.
+               $UserModel->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
+            }
+         }
+
+         if ($this->Form->ErrorCount() == 0) {
+            // Save the authentication.
+            if (isset($User) && GetValue('UserID', $User)) {
+               $UserModel->SaveAuthentication(array(
+                   'UserID' => $User['UserID'],
+                   'Provider' => $this->Form->GetFormValue('Provider'),
+                   'UniqueID' => $this->Form->GetFormValue('UniqueID')));
+               $this->Form->SetFormValue('UserID', $User['UserID']);
+            }
+
+            // Sign the appropriate user in.
+            Gdn::Session()->Start($this->Form->GetFormValue('UserID'));
+            $this->_SetRedirect(TRUE);
+         }
+      }
+
+      $this->Render();
+   }
+
+   protected function _SetRedirect($CheckPopup = FALSE) {
+      $Url = Url($this->RedirectTo(), TRUE);
+
+      $this->RedirectUrl = $Url;
+      $this->MasterView = 'empty';
+      $this->View = 'redirect';
+
+      if ($this->DeliveryType() != DELIVERY_TYPE_ALL) {
+         $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+         $this->SetHeader('Content-Type', 'application/json');
+      } elseif ($CheckPopup) {
+         $this->AddDefinition('CheckPopup', $CheckPopup);
+      } else {
+         Redirect(Url($this->RedirectUrl));
+      }
+   }
       
    public function Index() {
       $this->SignIn();
@@ -162,7 +400,7 @@ class EntryController extends Gdn_Controller {
       $this->Auth('password');
    }
    
-   public function SignIn() {
+   public function SignIn2() {
       $this->FireEvent("SignIn");
       $this->Auth('default');
    }
@@ -186,21 +424,42 @@ class EntryController extends Gdn_Controller {
     *
     * @param string $Method
     */
-   public function SignIn2($SelectedMethod = FALSE) {
-      // Set up the initial methods. Other methods can be added by plugins.
-      $Methods = array(
-         'password' => array('Label' => 'Vanilla', 'Url' => Url('/entry/auth/password'), 'ViewLocation' => $this->FetchViewLocation('SignIn'))
-      );
+   public function SignIn($Method = FALSE, $Arg1 = FALSE) {
+      $this->AddJsFile('entry.js');
 
-      // Make sure a valid method is chosen.
-      if (!array_key_exists((string)$SelectedMethod, $Methods)) {
-         $SelectedMethod = array_shift(array_keys($Methods));
-      }
-      
-      $this->SetData('SelectedMethod', $SelectedMethod);
+      // Additional signin methods are set up with plugins.
+      $Methods = array();
+
+      if (in_array($Method, array('connect', 'password')))
+         $this->SetData('MainFormMethod', array($this, ucfirst($Method)));
+      else
+         $this->SetData('MainFormMethod', array($this, 'Password'));
+
+      $this->SetData('MainFormArgs', array($Arg1));
       $this->SetData('Methods', $Methods);
+      $this->SetData('FormUrl', Url('entry/signin'));
 
-      return $this->Render();
+      $this->FireEvent('SignIn');
+
+      // Figure out the current method.
+      $DeliveryType = $this->DeliveryType();
+      $this->DeliveryType(DELIVERY_TYPE_VIEW);
+
+      $DeliveryMethod = $this->DeliveryMethod();
+      $this->DeliveryMethod(DELIVERY_METHOD_XHTML);
+
+      // Capture the appropriate method.
+      ob_start();
+      call_user_func_array($this->Data('MainFormMethod'), $this->Data('MainFormArgs', array()));
+      $View = ob_get_clean();
+
+      $this->SetData('MainForm', $View);
+
+      $this->DeliveryType($DeliveryType);
+      $this->DeliveryMethod($DeliveryMethod);
+
+
+      return $this->Render('signin2');
    }
    
    public function Handshake($AuthenticationSchemeAlias = 'default') {
@@ -469,6 +728,11 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
 				
 				$this->FireEvent('RegistrationSuccessful');
             
@@ -506,6 +770,11 @@ class EntryController extends Gdn_Controller {
             $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
             $Authenticator->FetchData($this->Form);
             $AuthUserID = $Authenticator->Authenticate();
+
+            try {
+               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+            } catch (Exception $Ex) {
+            }
 				
 				$this->FireEvent('RegistrationSuccessful');
             

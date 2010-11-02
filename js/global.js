@@ -21,7 +21,8 @@ jQuery(document).ready(function($) {
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {
-		$('#Form_User_Password').toggle();
+      $('.Methods').toggle();
+      $('#Form_User_Password').toggle();
 		$('#Form_User_SignIn').toggle();
       return false;
    });
@@ -85,16 +86,16 @@ jQuery(document).ready(function($) {
       var width = $this.attr('popupWidth');
       var height = $this.attr('popupHeight');
       var left = (screen.width - width) / 2;
-      var right = (screen.height - height) / 2;
+      var top = (screen.height - height) / 2;
 
       var id = $this.attr('id');
       var href = $this.attr('href');
-      var args = $this.attr('popupArgs');
-      if (args)
-         href += '&' + args;
+      if ($this.attr('popupHref'))
+         href = $this.attr('popupHref');
 
-      var win = window.open(href, 'Window_' + id, "left="+left+",height="+height+",width="+width+",height="+height+",status=0,scrollbars=0");
-
+      var win = window.open(href, 'Window_' + id, "left="+left+",top="+top+",width="+width+",height="+height+",status=0,scrollbars=0");
+      if (win)
+         win.focus();
       return false;
    });
    
@@ -156,8 +157,15 @@ jQuery(document).ready(function($) {
 
    // If a page loads with a hidden redirect url, go there after a few moments.
    var RedirectUrl = gdn.definition('RedirectUrl', '');
-   if (RedirectUrl != '')
-      setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+   var CheckPopup = gdn.definition('CheckPopup', '');
+   if (RedirectUrl != '') {
+      if (CheckPopup && window.opener) {
+         window.opener.location.replace(RedirectUrl);
+         window.close();
+      } else {
+         setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+      }
+   }
 
    // Make tables sortable if the tableDnD plugin is present.
    if ($.tableDnD)

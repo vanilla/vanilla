@@ -11,7 +11,9 @@
 	position: relative;
 }
 div.Popup h1,
-div.Popup h2 {
+div.Popup h2,
+div.Connect h1,
+div.Connect h2 {
 	background: #3b5998;
 	border-bottom: 1px solid #3b5998;
 }

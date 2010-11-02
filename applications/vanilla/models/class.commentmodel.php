@@ -477,8 +477,10 @@ class CommentModel extends VanillaModel {
          }
 
          // Record user-comment activity
-         if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers))
-            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, 'QueueOnly');
+         if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
+            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, '');
+				$ActivityModel->QueueNotification($ActivityID, $Story);
+			}
 				
 			// Send all notifications
 			$ActivityModel->SendNotificationQueue();

@@ -307,6 +307,9 @@ class ProfileController extends Gdn_Controller {
          if ($this->Form->ErrorCount() == 0)
             Redirect('dashboard/profile/'.$UserReference);
       }
+		if ($this->Form->ErrorCount() > 0)
+			$this->DeliveryType(DELIVERY_TYPE_ALL);
+
       $this->Render();
    }
    

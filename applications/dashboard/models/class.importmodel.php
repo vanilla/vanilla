@@ -331,7 +331,7 @@ class ImportModel extends Gdn_Model {
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
-   		'Discussion', 'Draft', 'Invitation', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
+   		'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
    		'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
       // Delete the default role settings.
@@ -344,6 +344,13 @@ class ImportModel extends Gdn_Model {
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 		for($i = $CurrentSubstep; $i < count($Tables); $i++) {
 			$Table = $Tables[$i];
+
+         // Make sure the table exists.
+         $Exists = Gdn::Structure()->Table($Table)->TableExists();
+         Gdn::Structure()->Reset();
+         if (!$Exists)
+            continue;
+
          $this->Data['CurrentStepMessage'] = $Table;
          
 			if($Table == 'Permission')
@@ -1252,6 +1259,14 @@ class ImportModel extends Gdn_Model {
          join :_Comment c
             on d.FirstCommentID = c.CommentID
          set d.Body = c.Body, d.Format = c.Format";
+
+         if ($this->ImportExists('Media')) {
+            // Comment Media has to go onto the discussion.
+            $Sqls['Media.Foreign'] = "update :_Media m
+            join :_Discussion d
+               on d.FirstCommentID = m.ForeignID and m.ForeignTable = 'comment'
+            set m.ForeignID = d.DiscussionID, m.ForeignTable = 'discussion'";
+         }
 
          $Sqls['Comment.FirstComment.Delete'] = "delete :_Comment c
          from :_Comment c

@@ -38,9 +38,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 			$Sender->AddDefinition('ForceRemoteUrl', TRUE);
 			
 		if ($InDashboard)
-			$Sender->AddDefinition('InDashboard', TRUE);
-			
-		$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
+			$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
 	}
 	
 	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -62,7 +60,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.PopOutDashboard'));
+      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.EmbedDashboard'));
       
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {

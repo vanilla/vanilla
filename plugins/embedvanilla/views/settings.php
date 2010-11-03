@@ -89,7 +89,7 @@ echo $this->Form->Errors();
    <li>
       <?php
       echo Wrap(T('Dashboard Embed'), 'strong');
-      echo $this->Form->CheckBox('Plugins.EmbedVanilla.EmbedDashboard', "Embed your forum admin dashboard (ie. don't pop it out to full-screen)");
+      echo $this->Form->CheckBox('Plugins.EmbedVanilla.EmbedDashboard', "Don't embed your forum admin dashboard (pop it out to full-screen)");
       ?>
    </li>
    <li>

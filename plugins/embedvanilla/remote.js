@@ -26,6 +26,7 @@ window.vanilla.embed = function(host) {
             host = scripts[i].src;
             host = host.replace('http://', '').replace('https://', '');
             host = host.substr(0, host.indexOf(jsPath));
+            host += '/index.php?p=';
          }
       }
    }
@@ -63,7 +64,6 @@ window.vanilla.embed = function(host) {
          processMessage(message);
       }, 300);
    }
-
 
    checkHash = function() {
       var path = window.location.hash.substr(1);
@@ -133,8 +133,7 @@ window.vanilla.embed = function(host) {
    }
 
    vanillaUrl = function(path) {
-      var concat = path.indexOf('?') > -1 ? '&' : '?';
-      return 'http://' + host + path + concat + 'remote=' + encodeURIComponent(embedUrl);
+      return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
    }
 
    document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'" scrolling="no" frameborder="0" border="0" width="100%" height="1000" style="width: 100%; height: 1000px; border: 0; display: block;"></iframe>');

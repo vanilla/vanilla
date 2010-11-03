@@ -240,7 +240,6 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
          'TokenType' => $TokenType,
          'ProviderKey' => $ProviderKey,
          'Lifetime' => $Lifetime,
-         'Timestamp' => date('Y-m-d H:i:s',$Timestamp),
          'Authorized' => $Authorized,
          'ForeignUserKey' => NULL
       );
@@ -249,7 +248,10 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
          $InsertArray['ForeignUserKey'] = $UserKey;
       
       try {
-         Gdn::Database()->SQL()->Insert('UserAuthenticationToken', $InsertArray);
+         Gdn::SQL()
+            ->Set('Timestamp', 'NOW()', FALSE)
+            ->Insert('UserAuthenticationToken', $InsertArray);
+            
          if ($TokenType == 'access' && !is_null($UserKey))
             $this->DeleteToken($ProviderKey, $UserKey, 'request');
       } catch(Exception $e) {

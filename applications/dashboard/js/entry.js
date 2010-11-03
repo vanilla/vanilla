@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
       var selectedName = $('input[name=Form/UserSelect]:checked').val();
       if (!selectedName || selectedName == 'other') {
          var name = $('#Form_ConnectName').val();
-         if (name != '') {
+         if (typeof(name) == 'string' && name != '') {
             var checkUrl = gdn.url('/dashboard/user/usernameavailable/'+encodeURIComponent(name));
             $.ajax({
                type: "GET",

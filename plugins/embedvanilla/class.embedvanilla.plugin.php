@@ -62,7 +62,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.PopOutDashboard'));
+      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.EmbedDashboard'));
       
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {

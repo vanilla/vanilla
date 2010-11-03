@@ -7,18 +7,39 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Category Model
+ *
+ * @package Vanilla
+ */
+ 
 /**
  * Manages discussion categories.
+ *
+ * @since 2.0.0
+ * @package Vanilla
  */
 class CategoryModel extends Gdn_Model {
    
    /**
     * Class constructor. Defines the related database table name.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function __construct() {
       parent::__construct('Category');
    }
+   
+   /**
+    * Delete a single category and assign its discussions to another.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param object $Category
+    * @param int $ReplacementCategoryID Unique ID of category all discussion are being move to.
+    */
    public function Delete($Category, $ReplacementCategoryID) {
       // Don't do anything if the required category object & properties are not defined.
       if (
@@ -31,7 +52,7 @@ class CategoryModel extends Gdn_Model {
       ) {
          throw new Exception(T('Invalid category for deletion.'));
       } else {
-         // Remove permissions.
+         // Remove permissions related to category
          $PermissionModel = Gdn::PermissionModel();
          $PermissionModel->Delete(NULL, 'Category', 'CategoryID', $Category->CategoryID);
          
@@ -100,14 +121,32 @@ class CategoryModel extends Gdn_Model {
       }
       // Make sure to reorganize the categories after deletes
       $this->Organize();
-   }   
-
+   }
+      
+   /**
+    * Get data for a single category selected by ID
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of category we're getting data for.
+    * @return object SQL results.
+    */
    public function GetID($CategoryID) {
       return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow();
    }
 
    /**
-    * Applies permissions.
+    * Get list of categories (respecting user permission).
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $OrderFields Ignored.
+    * @param string $OrderDirection Ignored.
+    * @param int $Limit Ignored.
+    * @param int $Offset Ignored.
+    * @return object SQL results.
     */
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->SQL
@@ -123,7 +162,16 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
-    * Does not apply permissions (for administrators).
+    * Get list of categories (disregarding user permission for admins).
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $OrderFields Ignored.
+    * @param string $OrderDirection Ignored.
+    * @param int $Limit Ignored.
+    * @param int $Offset Ignored.
+    * @return object SQL results.
     */
    public function GetAll($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->SQL
@@ -134,7 +182,20 @@ class CategoryModel extends Gdn_Model {
       return $this->SQL->Get();
    }
 
+   /**
+    * Get full data for a single category or all categories.
+    *
+    * If no CategoryID is provided, it gets all categories.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of category to return.
+    * @param string $Permissions Permission to check.
+    * @return object SQL results.
+    */
    public function GetFull($CategoryID = '', $Permissions = FALSE) {
+      // Build base query
       $this->SQL
          ->Select('c.Name, c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
          ->Select('p.CategoryID', '', 'ParentCategoryID')
@@ -143,17 +204,28 @@ class CategoryModel extends Gdn_Model {
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1');
 
+      // Minimally check for view discussion permission
       if (!$Permissions)
          $Permissions = 'Vanilla.Discussions.View';
 
       $this->SQL->Permission($Permissions, 'c', 'CategoryID');
 
+      // Single record or full list?
       if (is_numeric($CategoryID) && $CategoryID > 0)
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
       else
          return $this->SQL->OrderBy('c.Sort')->Get();
    }
-
+   
+   /**
+    * Get full data for a single category by its URL slug.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $UrlCode Unique category slug from URL.
+    * @return object SQL results.
+    */
    public function GetFullByUrlCode($UrlCode) {
       $this->SQL
          ->Select('c.CategoryID, c.Description, c.CountDiscussions, c.UrlCode')
@@ -162,14 +234,24 @@ class CategoryModel extends Gdn_Model {
          ->Join('Category p', 'c.ParentCategoryID = p.CategoryID', 'left')
          ->Where('c.AllowDiscussions', '1')
          ->Where('c.UrlCode', $UrlCode);
-         
+      
+      // Require permission   
       $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'CategoryID');
          
       return $this->SQL
          ->Get()
          ->FirstRow();
    }
-
+   
+   /**
+    * Check whether category has any children categories.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $CategoryID Unique ID for category being checked.
+    * @return bool
+    */
    public function HasChildren($CategoryID) {
       $ChildData = $this->SQL
          ->Select('CategoryID')
@@ -181,9 +263,13 @@ class CategoryModel extends Gdn_Model {
    
    /**
     * Organizes the category table so that all child categories are sorted
-    * below the appropriate parent category (they can get out of wack when
-    * parent categories are deleted and their children are re-assigned to a new
-    * parent category).
+    * below the appropriate parent category.
+    * 
+    * They can get out of wack when parent categories are deleted and their 
+    * children are re-assigned to a new parent category.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function Organize() {
       // Load all categories
@@ -195,9 +281,9 @@ class CategoryModel extends Gdn_Model {
       }
       // Only reorder if there are parent categories present.
       if ($ParentsExist) {
-         // If parent categories exist, make sure that child
-         // categories fall underneath parent categories
-         // and when a child appears under a parent, it becomes a child of that parent.
+         // If parent categories exist, make sure that:
+         // 1. Child categories fall underneath parent categories
+         // 2. When a child appears under a parent, it becomes a child of that parent.
          $FirstParent = FALSE;
          $CurrentParent = FALSE;
          $Orphans = array();
@@ -238,17 +324,24 @@ class CategoryModel extends Gdn_Model {
    
    /**
     * Saves the category.
+    * 
+    * @since 2.0.0
+    * @access public
     *
     * @param array $FormPostValue The values being posted back from the form.
+    * @return int ID of the saved category.
     */
    public function Save($FormPostValues) {
       // Define the primary key in this model's table.
       $this->DefineSchema();
-
+      
+      // Get data from form
       $CategoryID = ArrayValue('CategoryID', $FormPostValues);
       $NewName = ArrayValue('Name', $FormPostValues, '');
       $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
       $AllowDiscussions = ArrayValue('AllowDiscussions', $FormPostValues, '');
+      
+      // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
       if ($Insert)
          $this->AddInsertFields($FormPostValues);               
@@ -336,6 +429,7 @@ class CategoryModel extends Gdn_Model {
       } else {
          $CategoryID = FALSE;
       }
+      
       return $CategoryID;
    }
 }

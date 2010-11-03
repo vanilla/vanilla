@@ -1212,12 +1212,8 @@ ul.MessageList div.Message p {
 }
 div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
    padding: 4px 16px;
    margin: 4px 0;
-   background: #ffc;
 }
 div.Preview div.Message code,
 div.Preview div.Message pre,
@@ -1688,7 +1684,9 @@ div.Popup .Loading {
   text-align: center;
 }
 div.Popup h1,
-div.Popup h2 {
+div.Popup h2,
+div.Connect h1,
+div.Connect h2 {
 	font-size:120%;
 	font-weight:bold;
 	margin-bottom: 0;
@@ -2376,7 +2374,7 @@ div.SignInPopup div.Box {
 }
 body#dashboard_entrycontroller_password #Content,
 body#dashboard_entrycontroller_signin #Content {
-	width: 500px;
+	width: auto;
 }
 div.SignInPopup .Content form {
 	padding: 0 10px 10px;
@@ -2391,8 +2389,13 @@ body#dashboard_entrycontroller_signin #Content form,
 div.SignInPopup form {
 	width: 270px;
 }
+div.SingleEntryMethod {
+	width: 290px;
+	margin: 0 auto;
+}
 div.MultipleEntryMethods {
 	width: 500px;
+	margin: 0 auto;
 }
 body#dashboard_entrycontroller_handshake #Content input.InputBox,
 body#dashboard_entrycontroller_signin #Content input.InputBox,
@@ -2520,20 +2523,9 @@ body#dashboard_entrycontroller_leave p.Leaving {
 
 
 /* External App Connect Designs */
-body.connect {
-	background: #CFECFF;
-}
-body.connect h1,
-body.connect h2 {
+div.Connect h1,
+div.Connect h2 {
 	text-align: left;
-	font-size:120%;
-	font-weight:bold;
-	margin-bottom: 0;
-	color: #fff;
-	background: #38abe3;
-	border-bottom: 1px solid #3DB9E5;
-	padding: 6px 9px 4px;
-	border-bottom: 1px solid #888;
 }
 body.connect div.Box {
 	border-radius: none;
@@ -2542,9 +2534,10 @@ body.connect div.Box {
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
-	width: 300px;
+	width: 320px;
 	margin: 0 auto;
 	text-align: left;
+	background: none;
 }
 div.ConnectInfo {
 	margin: 10px 0 0;
@@ -2574,7 +2567,7 @@ div.ConnectInfo h3 {
 	padding: 0 0 10px 46px;
 	border: none;
 }
-body.connect form ul li label,
+div.Connect form ul li label,
 div.SignInPopup form ul li label,
 body#dashboard_entrycontroller_password form ul li label,
 body#dashboard_entrycontroller_signin form ul li label {
@@ -2582,43 +2575,26 @@ body#dashboard_entrycontroller_signin form ul li label {
 	line-height: 1.5;
 	padding: 0;
 }
-body.connect form ul li#ConnectPassword label,
+div.Connect form ul li#ConnectPassword label,
 div.SignInPopup form ul li#ConnectPassword label {
 	padding: 10px 0 0;
 }
-body.connect .FinePrint,
+div.Connect .FinePrint,
 div.SignInPopup .FinePrint {
 	font-size: 11px;
 	color: #777;
 }
 body#dashboard_entrycontroller_password input.InputBox,
 body#dashboard_entrycontroller_signin input.InputBox,
-body.connect input.InputBox,
+div.Connect input.InputBox,
 div.SignInPopup input.InputBox {
 	padding: 3px
 }
-body.connect .ExistingUsername,
+div.Connect .ExistingUsername,
 div.SignInPopup .ExistingUsername {
 	font-weight: bold;
 	line-height: 1;
 	font-size: 13px;
 	color: #000;
 	display: block;
-}
-body.connect div.ButtonContainer {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: #38abe3;
-	padding: 6px 8px;
-	text-align: right;
-	border-top: 1px solid #888;
-}
-body.connect input.Button {
-	margin: 0;
-	border:1px solid #555;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
 }

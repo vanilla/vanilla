@@ -111,7 +111,7 @@ class RoleController extends DashboardController {
       // Check to see if there are no default roles for guests or members.
       $DefaultRolesWarning = FALSE;
       $DefaultRoles = C('Garden.Registration.DefaultRoles');
-      if (count($DefaultRoles) == 0) {
+      if (!is_array($DefaultRoles) || count($DefaultRoles) == 0) {
          $DefaultRolesWarning = TRUE;
       } elseif (!C('Garden.Registration.ApplicantRoleID') && C('Garden.Registration.Method') == 'Approval') {
          $DefaultRolesWarning = TRUE;
@@ -123,9 +123,10 @@ class RoleController extends DashboardController {
       }
 
       if ($DefaultRolesWarning) {
-         echo Wrap(
+         echo '<div class="Messages Errors"><ul><li>',
             sprintf(T('No default roles.', 'You don\'t have your default roles set up. To correct this problem click %s.'),
-            Anchor(T('here'), 'dashboard/role/defaultroles')), 'div', array('class' => 'Warning'));
+            Anchor(T('here'), 'dashboard/role/defaultroles')),
+            '</div>';
       }
    }
    

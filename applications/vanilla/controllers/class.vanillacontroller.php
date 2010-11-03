@@ -7,13 +7,30 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * The application controller for Vanilla.
+ * Vanilla Controller
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Master application controller for Vanilla, extended by all others except Settings.
+ *
+ * @since 2.0.0
+ * @package Vanilla
  */
 class VanillaController extends Gdn_Controller {
    
+   /**
+    * Include JS, CSS, and modules used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
+      // Set up head
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
@@ -21,10 +38,12 @@ class VanillaController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
-      
       $this->AddCssFile('style.css');
+      
+      // Add modules
       $GuestModule = new GuestModule($this);
       $this->AddModule($GuestModule);
+      
       parent::Initialize();
    }
 

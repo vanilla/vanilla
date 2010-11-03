@@ -62,8 +62,8 @@ class CategoriesController extends VanillaController {
     * @since 2.0.0
     * @access public
     * 
-    * @param string $CategoryIdentifier Unique category slug or ID
-    * @param int $Offset Number of discussions to skip
+    * @param string $CategoryIdentifier Unique category slug or ID.
+    * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
       list($Offset, $Limit) = OffsetLimit($Offset, C('Vanilla.Discussions.PerPage', 30));
@@ -135,14 +135,14 @@ class CategoriesController extends VanillaController {
       // Pick up the discussions class
       $this->CssClass = 'Discussions';
       
-      // Deliver json data if necessary
+      // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
       
-      // Render the controller
+      // Render default view
       $this->Render();
    }
 
@@ -184,9 +184,9 @@ class CategoriesController extends VanillaController {
    }
    
    /**
-    * Highlight route
+    * Highlight route.
     *
-    * Always called by dispatcher before controller's requested method
+    * Always called by dispatcher before controller's requested method.
     * 
     * @since 2.0.0
     * @access public

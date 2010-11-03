@@ -572,11 +572,13 @@ EOT;
          return self::To($Mixed, 'Mentions');
       } else {         
          // Handle @mentions.
-         $Mixed = preg_replace(
-            '/(^|[\s,\.])@(\w{3,20})\b/i', //{1,20}
-            Anchor('\1@\2', '/profile/\\2'),
-            $Mixed
-         );
+         if(C('Garden.Format.Mentions')) {
+            $Mixed = preg_replace(
+               '/(^|[\s,\.])@(\w{3,20})\b/i', //{1,20}
+               Anchor('\1@\2', '/profile/\\2'),
+               $Mixed
+            );
+         }
          
          // This one handles all other mentions
 //         $Mixed = preg_replace(

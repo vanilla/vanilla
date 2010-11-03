@@ -102,6 +102,7 @@ $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 
 // Formatting
+$Configuration['Garden']['Format']['Mentions']                  = TRUE;
 $Configuration['Garden']['Format']['Hashtags']                  = TRUE;
 $Configuration['Garden']['Format']['YouTube']                   = TRUE;
 $Configuration['Garden']['Format']['Vimeo']                     = TRUE;

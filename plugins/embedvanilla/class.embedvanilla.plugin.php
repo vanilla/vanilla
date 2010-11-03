@@ -38,9 +38,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 			$Sender->AddDefinition('ForceRemoteUrl', TRUE);
 			
 		if ($InDashboard)
-			$Sender->AddDefinition('InDashboard', TRUE);
-			
-		$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
+			$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
 	}
 	
 	public function Base_GetAppSettingsMenuItems_Handler($Sender) {

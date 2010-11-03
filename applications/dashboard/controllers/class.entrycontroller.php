@@ -47,7 +47,7 @@ class EntryController extends Gdn_Controller {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
-
+      
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
          case Gdn_Authenticator::DATA_FORM:
@@ -113,7 +113,10 @@ class EntryController extends Gdn_Controller {
                   case Gdn_Authenticator::AUTH_SUCCESS:
                   default: 
                      // Full auth completed.
-                     $UserID = $AuthenticationResponse;
+                     if ($AuthenticationResponse == Gdn_Authenticator::AUTH_SUCCESS)
+                        $UserID = Gdn::Session()->UserID;
+                     else
+                        $UserID = $AuthenticationResponse;
                      $Reaction = $Authenticator->SuccessResponse();
                }
             } catch (Exception $Ex) {

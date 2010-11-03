@@ -1212,12 +1212,8 @@ ul.MessageList div.Message p {
 }
 div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
    padding: 4px 16px;
    margin: 4px 0;
-   background: #ffc;
 }
 div.Preview div.Message code,
 div.Preview div.Message pre,

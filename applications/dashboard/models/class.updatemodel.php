@@ -399,6 +399,7 @@ class UpdateModel extends Gdn_Model {
 
       if ($Addon) {
          $Addon['MD5'] = md5_file($Path);
+         $Addon['FileSize'] = filesize($Path);
          return $Addon;
       } else {
          if ($ThrowError) {

@@ -341,6 +341,30 @@ class UpdateModel extends Gdn_Model {
             $Info = array();
             break;
          }
+
+         // Check to see if the entry is the porter.
+         if (StringEndsWith($Name, 'vanilla2export.php')) {
+            if (count(explode('/', $Folder)) != 2) {
+               continue;
+            }
+
+            $Zip->extractTo($FolderPath, $Entry['name']);
+            $FilePath = CombinePaths(array($FolderPath, $Name));
+            $Version = self::ParseCoreVersion($FilePath, 'VERSION');
+
+            if (!$Version)
+               continue;
+
+            $Addon = array(
+                'AddonKey' => 'porter',
+                'AddonTypeID' => ADDON_TYPE_CORE,
+                'Name' => 'Vanilla Porter',
+                'Description' => 'Drop this script on your existing site and go to it to export your existing forum data to the Vanilla 2 import format. If you want more information on how to use this application go to http://vanillaforums.com/blog/help-topics/importing-data.',
+                'Version' => $Version,
+                'Path' => $Path);
+            $Info = array();
+            break;
+         }
       }
 
       if ($Addon) {

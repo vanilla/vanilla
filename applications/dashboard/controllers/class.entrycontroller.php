@@ -192,12 +192,15 @@ class EntryController extends Gdn_Controller {
       $this->EventArguments = array($Method);
       try {
          $this->FireEvent('ConnectData');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+         return $this->Render('ConnectError');
       } catch (Exception $Ex) {
          if (defined('DEBUG'))
             $this->Form->AddError($Ex);
          else
             $this->Form->AddError('There was an error fetching the connection data.');
-         return $this->Render();
+         return $this->Render('ConnectError');
       }
 
       $FormData = $this->Form->FormValues(); // debug

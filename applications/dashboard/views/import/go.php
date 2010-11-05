@@ -13,10 +13,12 @@ $Complete = FALSE;
 if($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
    $Complete = TRUE;
    echo '<div class="Info">',
-   T('Garden.Import.Complete.Description', 'You have successfully completed an import.
-   Remember to visit "Dashboard" &gt; "Roles & Permissions" to set up your role permissions.
-   Click <b>Finished</b> when you are ready.'),
+   sprintf(T('Garden.Import.Complete.Description', 'You have successfully completed an import.
+   Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
+   Click <b>Finished</b> when you are ready.'), Url('/dashboard/role')),
    '</div>';
+
+   echo Gdn::Slice('/dashboard/role/defaultroleswarning');
 }
 ?>
 <div class="Info">

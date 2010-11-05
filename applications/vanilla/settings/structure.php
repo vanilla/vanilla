@@ -1,4 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Vanilla database structure
+ *
+ * Called by VanillaHooks::Setup() to update database upon enabling app.
+ *
+ * @package Vanilla
+ */
 
 if (!isset($Drop))
    $Drop = FALSE;

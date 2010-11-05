@@ -1,6 +1,8 @@
 <?php
 /**
  * An associative array of information about this application.
+ *
+ * @package Vanilla
  */
 $ApplicationInfo['Vanilla'] = array(
    'Description' => "Vanilla is the sweetest discussion forum on the web.",

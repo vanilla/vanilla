@@ -428,14 +428,20 @@ abstract class Gdn_DatabaseStructure {
    /** Whether or not the table exists in the database.
     * @return bool
     */
-   public function TableExists() {
-      if($this->_TableExists === NULL) {
-         if(strlen($this->TableName()) > 0) {
-            $Tables = $this->Database->SQL()->FetchTables(':_'.$this->TableName());
-            $this->_TableExists = count($Tables) > 0;
+   public function TableExists($TableName = NULL) {
+      if($this->_TableExists === NULL || $TableName !== NULL) {
+         if ($TableName === NULL)
+            $TableName = $this->TableName();
+
+         if(strlen($TableName) > 0) {
+            $Tables = $this->Database->SQL()->FetchTables(':_'.$TableName);
+            $Result = count($Tables) > 0;
          } else {
-            $this->_TableExists = FALSE;
+            $Result = FALSE;
          }
+         if ($TableName == $this->TableName())
+            $this->_TableExists = $Result;
+         return $Result;
       }
       return $this->_TableExists;
    }

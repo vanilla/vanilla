@@ -1458,8 +1458,10 @@ class UserModel extends Gdn_Model {
          }
 
          if ($UserID) {
+            $RoleID = $this->NewUserRoleIDs();
+            
             // Save the roles.
-            $Roles = ArrayValue('Roles', $Data, Gdn::Config('Garden.Registration.DefaultRoles'));
+            $Roles = (array)GetValue('Roles', $Data, $RoleID);
             $this->SaveRoles($UserID, $Roles, FALSE);
          }
       } else {
@@ -1473,6 +1475,30 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
    
+   public function NewUserRoleIDs() {
+      // Registration method
+      $RegistrationMethod = C('Garden.Registration.Method', 'Captcha');
+      $DefaultRoleID = C('Garden.Registration.DefaultRoles');
+      switch ($RegistrationMethod) {
+      
+         case 'Approval':
+            $RoleID = C('Garden.Registration.ApplicantRoleID', $DefaultRoleID);
+         break;
+         
+         case 'Invitation':
+            throw new Gdn_UserException(T('This forum is currently set to invitation only mode.'));
+         break;
+         
+         case 'Basic':
+         case 'Captcha':
+         default:
+            $RoleID = $DefaultRoleID;
+         break;
+      }
+      
+      return $RoleID;
+   }
+   
    public function PasswordRequest($Email) {
       $User = $this->GetWhere(array('Email' => $Email))->FirstRow();
       if (!is_object($User) || $Email == '')
@@ -1480,7 +1506,7 @@ class UserModel extends Gdn_Model {
       
       $PasswordResetKey = RandomString(6);
       $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
-      $AppTitle = Gdn::Config('Garden.Title');
+      $AppTitle = C('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset Request'), $AppTitle));
       $Email->To($User->Email);

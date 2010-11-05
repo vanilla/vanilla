@@ -22,7 +22,6 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    }
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
-   
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">

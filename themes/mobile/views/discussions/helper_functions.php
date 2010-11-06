@@ -24,7 +24,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 <li class="<?php echo $CssClass; ?>">
    <?php
       if ($Discussion->FirstPhoto != '') {
-         $PhotoUrl = strtolower(substr($Discussion->FirstPhoto, 0, 7)) == 'http://' ? $Discussion->FirstPhoto : 'uploads/'.ChangeBasename($Discussion->FirstPhoto, 'n%s');
+         if (strtolower(substr($Discussion->FirstPhoto, 0, 7)) == 'http://' || strtolower(substr($Discussion->FirstPhoto, 0, 8)) == 'https://') { 
+            $PhotoUrl = $Discussion->FirstPhoto;
+         } else {
+            $PhotoUrl = 'uploads/'.ChangeBasename($Discussion->FirstPhoto, 'n%s');
+         }
          echo Img($PhotoUrl, array('alt' => $Discussion->FirstName));
 		}
    ?>

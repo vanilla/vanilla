@@ -197,7 +197,7 @@ if (!function_exists('Img')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if (substr($Image, 0, 7) != 'http://' && $Image != '')
+      if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
          $Image = Asset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';

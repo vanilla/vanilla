@@ -62,6 +62,8 @@ echo $this->Form->Errors();
 		
 		echo $this->Form->Label('Password', 'Password'),
 			$this->Form->Input('Password', 'password');
+
+      echo $this->Form->CheckBox('UseCurrentPassword', 'Use My Current Password');
 		?>
 	</li><?php /*
 	<li>

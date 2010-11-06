@@ -159,7 +159,9 @@ class Gdn_ThemeManager {
       // If there is a hooks in the old theme, include it and run the ondisable method.
       if (class_exists($OldClassName)) {
          $ThemeHooks = new $OldClassName();
-         $ThemeHooks->OnDisable();
+         if (method_exists($ThemeHooks, 'OnDisable')) {
+            $ThemeHooks->OnDisable();
+         }
       }
 
       return TRUE;

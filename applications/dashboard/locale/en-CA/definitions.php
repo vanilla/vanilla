@@ -110,6 +110,16 @@ You have successfully registered for an account at {Title}. Here is the your inf
 You can access the site at {/,url,domain}.
 
 Have a great day!';
+$Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
+
+You have successfully connected to {Title}. Here is the your information:
+
+  Username: {User.Name}
+  Connected With: {ProviderName}
+
+You can access the site at {/,url,domain}.
+
+Have a great day!';
 $Definition['PasswordRequest'] = 'Hello %1$s,
 
 Someone has requested to reset your password at %2$s. To reset your password, follow this link:

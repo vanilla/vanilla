@@ -153,7 +153,8 @@ class ImportController extends DashboardController {
             // Validate the overwrite.
             if(TRUE || strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
                $Validation->ApplyRule('Email', 'Required');
-               $Validation->ApplyRule('Password', 'Required');
+               if (!$this->Form->GetFormValue('UseCurrentPassword'))
+                  $Validation->ApplyRule('Password', 'Required');
             }
 
             if($Validation->Validate($this->Form->FormValues())) {

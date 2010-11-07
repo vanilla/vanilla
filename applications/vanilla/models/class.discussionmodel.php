@@ -522,15 +522,15 @@ class DiscussionModel extends VanillaModel {
       // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
       $this->AddUpdateFields($FormPostValues);
       
-      // Remove checkboxes from the fields if they were unchecked
+      // Set checkbox values to zero if they were unchecked
       if (ArrayValue('Announce', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Announce']);
+         $FormPostValues['Announce'] = 0;
 
       if (ArrayValue('Closed', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Closed']);
+         $FormPostValues['Closed'] = 0;
 
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Sink']);
+         $FormPostValues['Sink'] = 0;
 		
 		//	Prep and fire event
 		$this->EventArguments['FormPostValues'] = &$FormPostValues;

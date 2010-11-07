@@ -16,7 +16,7 @@ foreach ($this->UserData->Format('Text')->Result() as $User) {
          if ($EditUser)
             echo Anchor('Edit', '/user/edit/'.$User->UserID, 'Popup SmallButton');
             
-         if ($DeleteUser)
+         if ($DeleteUser && $User->UserID != $Session->User->UserID)
             echo Anchor('Delete', '/user/delete/'.$User->UserID, 'SmallButton');
          ?></td>
       <?php } ?>

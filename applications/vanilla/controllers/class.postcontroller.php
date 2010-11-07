@@ -91,7 +91,7 @@ class PostController extends VanillaController {
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Form was validly submitted
+         // Prep form with current data for editing
          if (isset($this->Discussion))
             $this->Form->SetData($this->Discussion);
          else if (isset($this->Draft))
@@ -99,7 +99,7 @@ class PostController extends VanillaController {
          else
             $this->Form->SetData(array('CategoryID' => $CategoryID));
             
-      } else {
+      } else { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $this->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));

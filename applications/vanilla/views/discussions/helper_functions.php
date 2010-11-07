@@ -5,6 +5,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;

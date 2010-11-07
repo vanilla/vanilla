@@ -142,9 +142,12 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Where($Wheres);
 			
 		// If not looking at discussions filtered by bookmarks or user, filter announcements out.
-		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
 			$this->SQL->Where('d.Announce<>', '1');
-			
+			if ($UserID > 0)
+			   $this->SQL->OrWhere('w.Dismissed', '1');
+      }
+      
 		$this->FireEvent('BeforeGet');
       
 		// Get sorting options from config

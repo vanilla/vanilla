@@ -148,6 +148,8 @@ class PostController extends VanillaController {
             $this->Comment->InsertPhoto = $Session->User->Photo;
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+            
+            $this->FireEvent('BeforeDiscussionPreview');
 
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                $this->AddAsset('Content', $this->FetchView('preview'));
@@ -188,7 +190,7 @@ class PostController extends VanillaController {
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       
-      // Render default view (posts/discussion.php)
+      // Render view (posts/discussion.php or post/preview.php)
       $this->Render();
    }
    

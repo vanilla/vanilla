@@ -37,6 +37,9 @@ class RecentActivityModule extends Gdn_Module {
    }
 
    public function ToString() {
+      if(!$this->CheckPermission('Garden.Activity.View'))
+         return '';
+      
       if (StringIsNullOrEmpty($this->ActivityModuleTitle))
          $this->ActivityModuleTitle = T('Recent Activity');
          

@@ -178,19 +178,39 @@ $PermissionModel->Define(array(
 	'Garden.Users.Edit',
 	'Garden.Users.Delete',
 	'Garden.Users.Approve',
-	'Garden.Activity.Delete'
+	'Garden.Activity.Delete',
+	'Garden.Activity.View',
+	'Garden.Profiles.View'
+	));
+	
+// Set initial guest permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 2,
+	'Garden.Activity.View' => 1,
+	'Garden.Profiles.View' => 1
+	));
+	
+// Set initial applicant permissions.
+$PermissionModel->Save(array(
+	'RoleID' => 4,
+	'Garden.Activity.View' => 1,
+	'Garden.Profiles.View' => 1
 	));
 
 // Set initial member permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 8,
-	'Garden.SignIn.Allow' => 1
+	'Garden.SignIn.Allow' => 1,
+	'Garden.Activity.View' => 1,
+	'Garden.Profiles.View' => 1
 	));
 
 // Set initial moderator permissions.
 $PermissionModel->Save(array(
 	'RoleID' => 32,
-	'Garden.SignIn.Allow' => 1
+	'Garden.SignIn.Allow' => 1,
+	'Garden.Activity.View' => 1,
+	'Garden.Profiles.View' => 1
 	));
 
 // Set initial admininstrator permissions.
@@ -209,7 +229,9 @@ $PermissionModel->Save(array(
 	'Garden.Users.Edit' => 1,
 	'Garden.Users.Delete' => 1,
 	'Garden.Users.Approve' => 1,
-	'Garden.Activity.Delete' => 1
+	'Garden.Activity.Delete' => 1,
+	'Garden.Activity.View' => 1,
+   'Garden.Profiles.View' => 1
 	));
 
 // Photo Table

@@ -28,6 +28,8 @@ class ActivityController extends Gdn_Controller {
    }
    
    public function Index($RoleID) {
+      $this->Permission('Garden.Activity.View');
+      
       // Limit to specific RoleIDs?
       if ($RoleID != '')
          $RoleID = explode(',', $RoleID);

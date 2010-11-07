@@ -41,7 +41,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Create a discussion.
+    * Create or update a discussion.
     *
     * @since 2.0.0
     * @access public
@@ -195,7 +195,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Edit a discussion.
+    * Edit a discussion (wrapper for PostController::Discussion). 
     *
     * Will throw an error if both params are blank.
     *
@@ -220,7 +220,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Create a comment.
+    * Create or update a comment.
     *
     * @since 2.0.0
     * @access public
@@ -456,7 +456,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Edit a comment.
+    * Edit a comment (wrapper for PostController::Comment).
     *
     * Will throw an error if both params are blank.
     *

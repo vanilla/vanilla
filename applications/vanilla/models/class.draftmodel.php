@@ -7,15 +7,35 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Draft Model
+ *
+ * @package Vanilla
+ */
+ 
+/**
+ * Manages unpublished drafts of comments and discussions.
+ *
+ * @since 2.0.0
+ * @package Vanilla
+ */
 class DraftModel extends VanillaModel {
    /**
-    * Class constructor.
+    * Class constructor. Defines the related database table name.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function __construct() {
       parent::__construct('Draft');
    }
    
+   /**
+    * Build base SQL query used by get methods.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function DraftQuery() {
       $this->SQL
          ->Select()
@@ -23,12 +43,16 @@ class DraftModel extends VanillaModel {
    }
    
 	/**
-	 * Get the discussion drafts.
-	 * @param int $UserID The user that wrote the drafts.
-	 * @param int $Offset The offset in the result set.
-	 * @param int $Limit The limit in the result set.
-	 * @param int $DiscussionID The discussion the drafts belong to.
-	 * @return Gdn_DataSet
+	 * Gets drafts matching the given criteria.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param int $UserID Unique ID of user that wrote the drafts.
+	 * @param int $Offset Number of results to skip.
+	 * @param int $Limit Max number of drafts to return.
+	 * @param int $DiscussionID Limits drafts returned to a single discussion.
+	 * @return object Gdn_DataSet SQL results.
 	 */
    public function Get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
       if (!is_numeric($Offset) || $Offset < 0)
@@ -52,6 +76,15 @@ class DraftModel extends VanillaModel {
       return $this->SQL->Get();
    }
    
+   /**
+	 * Gets data for a single draft.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param int $DraftID Unique ID of draft to get data for.
+	 * @return object SQL results.
+	 */
    public function GetID($DraftID) {
       $this->DraftQuery();
       return $this->SQL
@@ -60,6 +93,15 @@ class DraftModel extends VanillaModel {
          ->FirstRow();
    }
    
+   /**
+	 * Gets number of drafts a user has.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param int $UserID Unique ID of user to count drafts for.
+	 * @return int Total drafts.
+	 */
    public function GetCount($UserID) {
       return $this->SQL
          ->Select('DraftID', 'count', 'CountDrafts')
@@ -70,6 +112,15 @@ class DraftModel extends VanillaModel {
          ->CountDrafts;
    }
    
+   /**
+	 * Insert or update a draft from form values.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param array $FormPostValues Form values sent from form model.
+	 * @return int Unique ID of draft.
+	 */
    public function Save($FormPostValues) {
       $Session = Gdn::Session();
       
@@ -129,9 +180,21 @@ class DraftModel extends VanillaModel {
             $this->UpdateUser($Session->UserID);
          }
       }
+      
       return $DraftID;
    }
 
+   /**
+	 * Deletes a specified draft.
+	 * 
+	 * This is a hard delete that completely removes it.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param int $DraftID Unique ID of the draft to be deleted.
+	 * @return bool Always returns TRUE.
+	 */
    public function Delete($DraftID) {
       // Get some information about this draft
       $DraftUser = $this->SQL
@@ -148,6 +211,14 @@ class DraftModel extends VanillaModel {
       return TRUE;
    }
    
+   /**
+	 * Updates a user's draft count.
+	 * 
+    * @since 2.0.0
+    * @access public
+	 * 
+	 * @param int $UserID Unique ID of the user to be updated.
+	 */
    public function UpdateUser($UserID) {
       // Retrieve a draft count
       $CountDrafts = $this->GetCount($UserID);

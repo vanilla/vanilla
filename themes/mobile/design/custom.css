@@ -87,7 +87,7 @@ body.Post a.Close {
 .Banner ul li a.NewConversation em {
 	display: none;
 }
-.Banner ul li a.SignInPopup,
+.Banner ul li a.SignIn,
 .Banner ul li a.NewDiscussion,
 .Banner ul li a.NewConversation {
 	position: absolute;
@@ -580,6 +580,6 @@ div.FootMenu span {
 	color: #444;
 	margin-left: 6px;
 }
-#Foot a.SignInPopup {
+#Foot a.SignIn {
 	color: #3B5998;
 }

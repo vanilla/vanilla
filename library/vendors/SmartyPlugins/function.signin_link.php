@@ -14,8 +14,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 function smarty_function_signin_link($Params, &$Smarty) {
    if (!Gdn::Session()->IsValid()) {
       $Wrap = GetValue('wrap', $Params, 'li');
-      return Gdn_Theme::Link('signinout',
+      return Gdn_Theme::Link(
+         'signinout',
          GetValue('text', $Params, ''),
-         GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+         GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)),
+         $Params
+      );
    }
 }

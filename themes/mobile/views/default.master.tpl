@@ -12,7 +12,7 @@
 		  {profile_link}
 		  {inbox_link}
 		  {custom_menu}
-		  {signin_link}
+		  {signin_link class="SignIn"}
 		</ul>
 	 </div>
 	 <div id="Body">

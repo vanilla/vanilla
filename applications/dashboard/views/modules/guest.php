@@ -5,7 +5,7 @@
    <?php $this->FireEvent('BeforeSignInButton'); ?>
    <p>
       <?php 
-      echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->_Sender->SelfUrl), 'Button'.(C('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+      echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->_Sender->SelfUrl), 'Button'.(SignInPopup() ? ' SignInPopup' : ''));
       $Url = Gdn::Authenticator()->RegisterUrl($this->_Sender->SelfUrl);
       if(!empty($Url))
          echo ' '.Anchor(T('Apply for Membership'), $Url, 'Button');

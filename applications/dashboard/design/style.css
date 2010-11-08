@@ -424,9 +424,9 @@ body #Head h1 {
    display: block;
    font-weight: bold;
    margin: 0;
-   padding: 14px 7px 0 0;
+   padding: 21px 7px 0 0;
    border: 0;
-   text-align: left;
+   float: left;
    line-height: 1;
 }
 #Head h1 a span {
@@ -442,7 +442,7 @@ body #Head h1 {
    width: 250px;
    background: #fff;
    padding: 0;
-   margin: 0;
+   margin: 15px 0 0;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    border-radius: 2px;
@@ -677,7 +677,7 @@ div.Menu {
 ul#Menu {
    float: left;
    margin: 0 auto;
-   padding: 7px 0 0;
+   padding: 22px 0 0 10px;
 }
 #Menu ul,
 #Menu li.Active {

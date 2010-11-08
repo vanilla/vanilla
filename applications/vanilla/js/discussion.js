@@ -25,9 +25,14 @@ jQuery(document).ready(function($) {
    
    // Reveal the textarea and hide previews.
    $('a.WriteButton, a.Cancel').livequery('click', function() {
+      if ($(this).hasClass('WriteButton')) {
+         var frm = $(this).parents('.MessageForm').find('form');
+         frm.trigger('WriteButtonClick', [frm]);
+      }
+
       resetCommentForm(this);
       if ($(this).hasClass('Cancel'))
-         clearCommentForm(this);   
+         clearCommentForm(this);
 
       return false;
    });
@@ -149,6 +154,7 @@ jQuery(document).ready(function($) {
                $(frm).prepend(json.StatusMessage);
                json.StatusMessage = null;
             } else if (preview) {
+               $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');
                $(btn).parents('li').addClass('Active');
                $(frm).find('textarea').after(json.Data);

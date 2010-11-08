@@ -186,7 +186,7 @@ class ImportModel extends Gdn_Model {
 		} else {
 			$Data = $Data->FirstRow();
 			$PasswordHash = new Gdn_PasswordHash();
-         if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
+         if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0 || $this->Data('UseCurrentPassword')) {
             $Result = TRUE;
          } else {
             $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
@@ -205,6 +205,13 @@ class ImportModel extends Gdn_Model {
          $Imp->AfterImport();
 
       return TRUE;
+   }
+
+   public function Data($Key, $Value = NULL) {
+      if ($Value === NULL) {
+         return GetValue($Key, $this->Data);
+      }
+      $this->Data[$Key] = $Value;
    }
 
 	public function DefineTables() {
@@ -382,6 +389,7 @@ class ImportModel extends Gdn_Model {
          $this->Data['OverwriteEmail'] = $Post['Email'];
       if(isset($Post['Password'])) {
          $this->Data['OverwritePassword'] = $Post['Password'];
+         $this->Data['UseCurrentPassword'] = GetValue('UseCurrentPassword', $Post);
       }
    }
 
@@ -440,6 +448,7 @@ class ImportModel extends Gdn_Model {
       $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
       $Post['Email'] = GetValue('OverwriteEmail', $D, '');
       $Post['Password'] = GetValue('OverwritePassword', $D, '');
+      $Post['UseCurrentPassword'] = GetValue('UseCurrentPassword', $D, FALSE);
    }
 
    public static function FGetCSV2($fp, $Delim = ',', $Quote = '"', $Escape = "\\") {
@@ -723,6 +732,8 @@ class ImportModel extends Gdn_Model {
 	}
 
 	public function InsertUserTable() {
+      $UserCurrentPassword = $this->Data('UseCurrentPassword');
+
 		// Delete the current user table.
 		$this->Query('truncate table :_User');
 
@@ -731,22 +742,32 @@ class ImportModel extends Gdn_Model {
 		$this->_InsertTable('User', array('HashMethod' => $this->GetPasswordHashMethod()));
 		$UserTableInfo['Inserted'] = TRUE;
 
-		// Set the admin user flag.
-		$AdminEmail = GetValue('OverwriteEmail', $this->Data);
-		$this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+      $AdminEmail = GetValue('OverwriteEmail', $this->Data);
+      $SqlArgs = array(':Email' => $AdminEmail);
+      $SqlSet = '';
+
+      if ($UserCurrentPassword) {
+         $SqlArgs[':Password'] = Gdn::Session()->User->Password;
+         $SqlArgs[':HashMethod'] = Gdn::Session()->User->HashMethod;
+         $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
+      }
 
       // If doing a password reset, save out the new admin password:
       if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
-         $PasswordHash = new Gdn_PasswordHash();
-         $Hash = $PasswordHash->HashPassword(GetValue('OverwritePassword', $this->Data));
+         if (!isset($SqlArgs[':Password'])) {
+            $PasswordHash = new Gdn_PasswordHash();
+            $Hash = $PasswordHash->HashPassword(GetValue('OverwritePassword', $this->Data));
+            $SqlSet .= ', Password = :Password, HashMethod = :HashMethod';
+            $SqlArgs[':Password'] = $Hash;
+            $SqlArgs[':HashMthod'] = 'Vanilla';
+         }
 
          // Write it out.
-         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
-         $this->Query('update :_User set Admin = 1, Password = :Hash, HashMethod = "vanilla" where Email = :Email', array(':Hash' => $Hash, ':Email' => $AdminEmail));
+         
+         $this->Query("update :_User set Admin = 1{$SqlSet} where Email = :Email", $SqlArgs);
       } else {
          // Set the admin user flag.
-         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
-         $this->Query('update :_User set Admin = 1 where Email = :Email', array(':Email' => $AdminEmail));
+         $this->Query("update :_User set Admin = 1{$SqlSet} where Email = :Email", $SqlArgs);
       }
 
 		// Authenticate the admin user as the current user.
@@ -1260,7 +1281,7 @@ class ImportModel extends Gdn_Model {
             on d.FirstCommentID = c.CommentID
          set d.Body = c.Body, d.Format = c.Format";
 
-         if ($this->ImportExists('Media')) {
+         if ($this->ImportExists('Media') && Gdn::Structure()->TableExists('Media')) {
             // Comment Media has to go onto the discussion.
             $Sqls['Media.Foreign'] = "update :_Media m
             join :_Discussion d

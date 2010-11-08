@@ -760,7 +760,7 @@ class UserModel extends Gdn_Model {
    /**
     * To be used for basic registration, and captcha registration
     */
-   public function InsertForBasic($FormPostValues) {
+   public function InsertForBasic($FormPostValues, $CheckCaptcha = TRUE) {
       $UserID = FALSE;
 
       // Define the primary key in this model's table.
@@ -785,7 +785,7 @@ class UserModel extends Gdn_Model {
          $Fields['Password'] = array('md5' => $Fields['Password']);
 
          // If in Captcha registration mode, check the captcha value
-         if (Gdn::Config('Garden.Registration.Method') == 'Captcha') {
+         if ($CheckCaptcha && Gdn::Config('Garden.Registration.Method') == 'Captcha') {
             $CaptchaPublicKey = ArrayValue('Garden.Registration.CaptchaPublicKey', $FormPostValues, '');
             $CaptchaValid = ValidateCaptcha($CaptchaPublicKey);
             if ($CaptchaValid !== TRUE) {

@@ -31,10 +31,9 @@ class Gdn_Smarty {
 
       // Get a friendly name for the controller.
       $ControllerName = get_class($Controller);
-//      if(preg_match('/^(?:Gdn_)?(.*?)(?:Controller)?$/', $ControllerName, $Matches)) {
-//         $ControllerName = $Matches[1];
-//      }
-//      $Smarty->assign('ControllerName', $ControllerName);
+      if (StringEndsWith($ControllerName, 'Controller', TRUE)) {
+         $ControllerName = substr($ControllerName, 0, -10);
+      }
 
       // Get an ID for the body.
       $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::AlphaNumeric(strtolower($Controller->RequestMethod)));

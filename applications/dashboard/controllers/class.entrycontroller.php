@@ -192,12 +192,15 @@ class EntryController extends Gdn_Controller {
       $this->EventArguments = array($Method);
       try {
          $this->FireEvent('ConnectData');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+         return $this->Render('ConnectError');
       } catch (Exception $Ex) {
          if (defined('DEBUG'))
             $this->Form->AddError($Ex);
          else
             $this->Form->AddError('There was an error fetching the connection data.');
-         return $this->Render();
+         return $this->Render('ConnectError');
       }
 
       $FormData = $this->Form->FormValues(); // debug
@@ -276,7 +279,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User);
+            $UserID = $UserModel->InsertForBasic($User, FALSE);
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -288,6 +291,10 @@ class EntryController extends Gdn_Controller {
                $this->Form->SetFormValue('UserID', $UserID);
 
                Gdn::Session()->Start($UserID);
+
+               // Send the welcome email.
+               $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
+
                $this->_SetRedirect(TRUE);
             }
          }
@@ -349,13 +356,16 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User);
+            $UserID = $UserModel->InsertForBasic($User, FALSE);
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
             if ($UserID) {
                // Add the user to the default roles.
                $UserModel->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
+
+               // Send the welcome email.
+               $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
             }
          }
 

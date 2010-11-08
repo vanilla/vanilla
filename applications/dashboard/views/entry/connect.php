@@ -5,7 +5,6 @@ if (!($ConnectName = $this->Form->GetFormValue('FullName')))
 
 $ConnectPhoto = $this->Form->GetFormValue('Photo');
 $ConnectSource = $this->Form->GetFormValue('ProviderName');
-
 ?>
 <div class="Connect">
 	<h1><?php echo StringIsNullOrEmpty($ConnectSource) ? T("Sign in") : sprintf(T('%s Connect'), $ConnectSource); ?></h1>

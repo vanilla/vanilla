@@ -236,14 +236,22 @@ class EntryController extends Gdn_Controller {
          Gdn::Session()->Start($UserID);
          $this->_SetRedirect(TRUE);
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
-         // Get the existing users that match the name or email of the connection.
-         $Where = array();
-         if ($this->Form->GetFormValue('Name'))
-            $Where['Name'] = $this->Form->GetFormValue('Name');
-         if ($this->Form->GetFormValue('Email'))
-            $Where['Email'] = $this->Form->GetFormValue('Email');
 
-         $ExistingUsers = $UserModel->GetWhere($Where, 'Name')->ResultArray();
+         // Get the existing users that match the name or email of the connection.
+         $Search = FALSE;
+         if ($this->Form->GetFormValue('Name')) {
+            $UserModel->SQL->OrWhere('Name', $this->Form->GetFormValue('Name'));
+            $Search = TRUE;
+         }
+         if ($this->Form->GetFormValue('Email')) {
+            $UserModel->SQL->OrWhere('Email', $this->Form->GetFormValue('Email'));
+            $Search = TRUE;
+         }
+
+         if ($Search)
+            $ExistingUsers = $UserModel->GetWhere()->ResultArray();
+         else
+            $ExistingUsers = array();
 
          $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
          $CurrentUserID = Gdn::Session()->UserID;

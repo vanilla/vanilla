@@ -87,7 +87,7 @@ body.Post a.Close {
 .Banner ul li a.NewConversation em {
 	display: none;
 }
-.Banner ul li a.SignInPopup,
+.Banner ul li a.SignIn,
 .Banner ul li a.NewDiscussion,
 .Banner ul li a.NewConversation {
 	position: absolute;
@@ -389,10 +389,33 @@ body.Entry #Content div.Box {
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
 	background: transparent;
-	border-bottom: 1px solid #BEC8CC;
+	border-bottom: none;
+	margin: 0;
+	padding: 10px;
 }
 body.Entry #Content form {
 	padding: 0 6px 6px;
+}
+div.MultipleEntryMethods {
+	width: 290px;
+}
+body#dashboard_entry_password div.Methods,
+body#dashboard_entry_signin div.Methods,
+div.Methods {
+	background: #D3D8E7;
+	border-left: none;
+	position: relative;
+	left: auto;
+	right: auto;
+	top: auto;
+	bottom: auto;
+	font-size: 14px;
+	color: #02475A;
+	font-weight: bold;
+	text-align: left;
+}
+div.Methods div.Method {
+	padding: 10px 3px 0;
 }
 
 /* Messages */
@@ -580,6 +603,6 @@ div.FootMenu span {
 	color: #444;
 	margin-left: 6px;
 }
-#Foot a.SignInPopup {
+#Foot a.SignIn {
 	color: #3B5998;
 }

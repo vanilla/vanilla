@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+echo '<div class="Connect">';
 echo '<h1>', $this->Data('Title'), '</h1>';
 $Form = $this->Form; //new Gdn_Form();
 $Form->Method = 'get';
@@ -21,3 +21,4 @@ echo $Form->Errors();
 </div>
 <?php
 echo $Form->Close();
+echo '</div>';

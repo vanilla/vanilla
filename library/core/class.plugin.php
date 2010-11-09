@@ -232,6 +232,19 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       return implode('.',array('Plugin',$this->GetPluginIndex(),$this->TrimMetaKey($RelativeUserKey)));
    }
    
+   public function Controller_Index($Sender) {
+      $Sender->Title($this->GetPluginKey('Name'));
+      $Sender->AddSideMenu('plugin/'.$this->GetPluginIndex());
+      $Sender->SetData('Description', $this->GetPluginKey('Description'));
+      
+      $CSSFile = $this->GetResource('css/'.$this->GetPluginIndex().'.css',FALSE,FALSE);
+      if (file_exists($CSSFile))
+         $Sender->AddCssFile($CSSFile);
+      
+      $ViewFile = $this->GetView($this->GetPluginIndex().'.php');
+      $Sender->Render($ViewFile);
+   }
+   
    /**
     * Automatically handle the toggle effect
     *

@@ -47,11 +47,11 @@ class GoogleSignInPlugin extends Gdn_Plugin {
     * Act as a mini dispatcher for API requests to the plugin app
     */
    public function PluginController_GoogleSignIn_Create(&$Sender) {
+      $this->Permission('Garden.Settings.Manage');
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
    public function Controller_Toggle($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
       $this->AutoToggle($Sender);
    }
    

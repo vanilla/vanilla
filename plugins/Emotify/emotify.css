@@ -1,0 +1,155 @@
+.EmotifyDropdown span,
+.Emoticon span { display: none; }
+.EmotifyDropdown,
+.Emoticon {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 18px;
+    width: 18px;
+    vertical-align: top;
+}
+.Emoticon1 { background-image: url('images/1.gif'); }
+.Emoticon2 { background-image: url('images/2.gif'); }
+.Emoticon3 { background-image: url('images/3.gif'); }
+.Emoticon4 { background-image: url('images/4.gif'); }
+.Emoticon5 { background-image: url('images/5.gif'); }
+.Emoticon6 { background-image: url('images/6.gif'); width: 42px; }
+.Emoticon7 { background-image: url('images/7.gif'); width: 20px; }
+.Emoticon8 { background-image: url('images/8.gif'); }
+.Emoticon9 { background-image: url('images/9.gif'); }
+.Emoticon10 { background-image: url('images/10.gif'); }
+.Emoticon11 { background-image: url('images/11.gif'); }
+.Emoticon12 { background-image: url('images/12.gif'); }
+.Emoticon13 { background-image: url('images/13.gif'); }
+.Emoticon14 { background-image: url('images/14.gif'); width: 34px; }
+.Emoticon15 { background-image: url('images/15.gif'); }
+.Emoticon16 { background-image: url('images/16.gif'); }
+.Emoticon17 { background-image: url('images/17.gif'); }
+.Emoticon18 { background-image: url('images/18.gif'); width: 34px; }
+.Emoticon19 { background-image: url('images/19.gif'); }
+.Emoticon20 { background-image: url('images/20.gif'); width: 22px; }
+.Emoticon21 { background-image: url('images/21.gif'); }
+.Emoticon22 { background-image: url('images/22.gif'); }
+.Emoticon23 { background-image: url('images/23.gif'); }
+.Emoticon24 { background-image: url('images/24.gif'); width: 30px; }
+.Emoticon25 { background-image: url('images/25.gif'); width: 30px; }
+.Emoticon26 { background-image: url('images/26.gif'); width: 24px; }
+.Emoticon27 { background-image: url('images/27.gif'); }
+.Emoticon28 { background-image: url('images/28.gif'); width: 21px; }
+.Emoticon29 { background-image: url('images/29.gif'); }
+.Emoticon30 { background-image: url('images/30.gif'); width: 24px; }
+.Emoticon31 { background-image: url('images/31.gif'); }
+.Emoticon32 { background-image: url('images/32.gif'); }
+.Emoticon33 { background-image: url('images/33.gif'); }
+.Emoticon34 { background-image: url('images/34.gif'); width: 28px; }
+.Emoticon35 { background-image: url('images/35.gif'); width: 24px; }
+.Emoticon36 { background-image: url('images/36.gif'); width: 38px; }
+.Emoticon37 { background-image: url('images/37.gif'); }
+.Emoticon38 { background-image: url('images/38.gif'); }
+.Emoticon39 { background-image: url('images/39.gif'); }
+.Emoticon40 { background-image: url('images/40.gif'); width: 24px; }
+.Emoticon41 { background-image: url('images/41.gif'); }
+.Emoticon42 { background-image: url('images/42.gif'); width: 36px; }
+.Emoticon43 { background-image: url('images/43.gif'); }
+.Emoticon44 { background-image: url('images/44.gif'); }
+.Emoticon45 { background-image: url('images/45.gif'); width: 23px; }
+.Emoticon46 { background-image: url('images/46.gif'); width: 24px; }
+.Emoticon47 { background-image: url('images/47.gif'); }
+.Emoticon48 { background-image: url('images/48.gif'); }
+.Emoticon49 { background-image: url('images/49.gif'); }
+.Emoticon50 { background-image: url('images/50.gif'); }
+.Emoticon51 { background-image: url('images/51.gif'); width: 21px; }
+.Emoticon52 { background-image: url('images/52.gif'); }
+.Emoticon53 { background-image: url('images/53.gif'); }
+.Emoticon54 { background-image: url('images/54.gif'); }
+.Emoticon55 { background-image: url('images/55.gif'); width: 25px; }
+.Emoticon56 { background-image: url('images/56.gif'); }
+.Emoticon57 { background-image: url('images/57.gif'); }
+.Emoticon58 { background-image: url('images/58.gif'); width: 30px; }
+.Emoticon59 { background-image: url('images/59.gif'); }
+.Emoticon60 { background-image: url('images/60.gif'); width: 20px; }
+.Emoticon61 { background-image: url('images/61.gif'); }
+.Emoticon62 { background-image: url('images/62.gif'); }
+.Emoticon63 { background-image: url('images/63.gif'); }
+.Emoticon64 { background-image: url('images/64.gif'); }
+.Emoticon65 { background-image: url('images/65.gif'); width: 22px; }
+.Emoticon66 { background-image: url('images/66.gif'); }
+.Emoticon67 { background-image: url('images/67.gif'); width: 22px; }
+.Emoticon68 { background-image: url('images/68.gif'); width: 22px; }
+.Emoticon69 { background-image: url('images/69.gif'); width: 26px; }
+.Emoticon70 { background-image: url('images/70.gif'); width: 23px; }
+.Emoticon71 { background-image: url('images/71.gif'); }
+.Emoticon72 { background-image: url('images/72.gif'); }
+.Emoticon73 { background-image: url('images/73.gif'); }
+.Emoticon74 { background-image: url('images/74.gif'); }
+.Emoticon75 { background-image: url('images/75.gif'); }
+.Emoticon76 { background-image: url('images/76.gif'); width: 36px; }
+.Emoticon77 { background-image: url('images/77.gif'); width: 32px; }
+.Emoticon78 { background-image: url('images/78.gif'); width: 26px; }
+.Emoticon79 { background-image: url('images/79.gif'); }
+.Emoticon100 { background-image: url('images/100.gif'); width: 31px; }
+.Emoticon101 { background-image: url('images/101.gif'); width: 28px; }
+.Emoticon102 { background-image: url('images/102.gif'); width: 44px; }
+.Emoticon103 { background-image: url('images/103.gif'); width: 28px; }
+.Emoticon104 { background-image: url('images/104.gif'); width: 30px; }
+.Emoticon105 { background-image: url('images/105.gif'); width: 23px; }
+.Emoticon106 { background-image: url('images/106.gif'); width: 40px; }
+.Emoticon107 { background-image: url('images/107.gif'); width: 52px; }
+.Emoticon108 { background-image: url('images/108.gif'); width: 31px; }
+.Emoticon109 { background-image: url('images/109.gif'); width: 25px; }
+.Emoticon110 { background-image: url('images/110.gif'); width: 36px; }
+.Emoticon111 { background-image: url('images/111.gif'); width: 32px; }
+.Emoticon112 { background-image: url('images/112.gif'); width: 28px; }
+.Emoticon113 { background-image: url('images/113.gif'); width: 39px; }
+.Emoticon114 { background-image: url('images/114.gif'); width: 40px; }
+.Emoticon115 { background-image: url('images/115.gif'); width: 29px; height: 22px; }
+.Emoticonpirate { background-image: url('images/pirate.gif');  width: 20px; height: 20px; }
+.Emoticontransformer { background-image: url('images/transformer.gif'); width: 20px; }
+
+.EmotifyWrapper {
+    text-align: right;
+    position: relative;
+}
+.EmotifyDropdown {
+    display: block;
+    height: 23px;
+    width: 29px;
+    background: url('images/arrow.png') 0 0 no-repeat;
+    position: absolute;
+    text-align: left;
+    top: 1px;
+    right: 0;
+    cursor: pointer;
+}
+.EmotifyDropdownActive {
+    background-color: #eee;
+}
+.EmoticonContainer {
+    position: absolute;
+    top: 21px;
+    right: 0;
+    border: 1px solid #aaa;
+    border-bottom: 0;
+    border-right: 0;
+    width: 391px;
+    text-align: left;
+    float: right;
+    box-shadow: 2px 2px 4px #777;
+    -moz-box-shadow: 2px 2px 4px #777;
+    -webkit-box-shadow: 2px 2px 4px #777;
+}
+.EmoticonBox {
+    background-color: #fff;
+    background-position: center center;
+    border: 1px solid #aaa;
+    border-top: 0;
+    border-left: 0;
+    display: block;
+    float: left;
+    height: 22px;
+    width: 22px;
+    overflow: hidden;
+    cursor: pointer;
+}
+

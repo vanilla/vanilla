@@ -185,7 +185,13 @@ function Gdn_Slice(SliceElement, SliceID) {
       var SubmitData = {'DeliveryType':'VIEW'};
       $(SliceForm.SliceFields).each(jQuery.proxy(function(i,Field){
          Field = $(Field);
-         SubmitData[Field.attr('name')] = Field.val();
+         
+         if (Field.attr('type').toLowerCase() == 'checkbox') {
+            if (Field.attr('checked'))
+               SubmitData[Field.attr('name')] = Field.val();
+         } else {
+            SubmitData[Field.attr('name')] = Field.val();
+         }
       },this));
       return SubmitData;
    }

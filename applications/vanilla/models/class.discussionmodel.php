@@ -519,15 +519,15 @@ class DiscussionModel extends VanillaModel {
       // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
       $this->AddUpdateFields($FormPostValues);
       
-      // Remove checkboxes from the fields if they were unchecked
+      // Set checkbox values to zero if they were unchecked
       if (ArrayValue('Announce', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Announce']);
+         $FormPostValues['Announce'] = 0;
 
       if (ArrayValue('Closed', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Closed']);
+         $FormPostValues['Closed'] = 0;
 
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
-         unset($FormPostValues['Sink']);
+         $FormPostValues['Sink'] = 0;
 		
 		//	Prep and fire event
 		$this->EventArguments['FormPostValues'] = &$FormPostValues;
@@ -538,15 +538,29 @@ class DiscussionModel extends VanillaModel {
       if ($this->Validate($FormPostValues, $Insert)) {
          // If the post is new and it validates, make sure the user isn't spamming
          if (!$Insert || !$this->CheckForSpam('Discussion')) {
-            $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
+            // Get all fields on the form that relate to the schema
+            $Fields = $this->Validation->SchemaValidationFields(); 
+            
+            // Get DiscussionID if one was sent
             $DiscussionID = intval(ArrayValue('DiscussionID', $Fields, 0));
-            $Fields = RemoveKeyFromArray($Fields, 'DiscussionID'); // Remove the primary key from the fields for saving
+            
+            // Remove the primary key from the fields for saving
+            $Fields = RemoveKeyFromArray($Fields, 'DiscussionID');
+            
             $Discussion = FALSE;
+            $StoredCategoryID = FALSE;
+            
             if ($DiscussionID > 0) {
+               // Updating
+               $Stored = $this->GetID($DiscussionID);
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
+               if($Stored->CategoryID != $Fields['CategoryID']) 
+                  $StoredCategoryID = $Stored->CategoryID;
             } else {
+               // Inserting
 					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+               
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
@@ -593,6 +607,8 @@ class DiscussionModel extends VanillaModel {
 					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
+            
+            // Get CategoryID of this discussion
             $Data = $this->SQL
                ->Select('CategoryID')
                ->From('Discussion')
@@ -602,8 +618,11 @@ class DiscussionModel extends VanillaModel {
             $CategoryID = FALSE;
             if ($Data->NumRows() > 0)
                $CategoryID = $Data->FirstRow()->CategoryID;
-
+            
+            // Update discussion counter for affected categories
             $this->UpdateDiscussionCount($CategoryID);
+            if ($StoredCategoryID)
+               $this->UpdateDiscussionCount($StoredCategoryID);
 				
 				// Fire an event that the discussion was saved.
 				$this->EventArguments['FormPostValues'] = $FormPostValues;

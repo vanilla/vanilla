@@ -236,6 +236,9 @@ class UserController extends DashboardController {
 
    public function Delete($UserID = '', $Method = '') {
       $this->Permission('Garden.Users.Delete');
+      $Session = Gdn::Session();
+      if($Session->User->UserID == $UserID)
+         trigger_error(ErrorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
       $this->AddSideMenu('dashboard/user');
       $this->Title(T('Delete User'));
 

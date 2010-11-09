@@ -101,14 +101,12 @@ if (!function_exists('ValidateOldPassword')) {
 
 if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
-      if($Value == '')
-         return TRUE; // required picks up this error
-      return ValidateRegex(
-         $Value,
-         '/^([\w\d+_-][\w\d+_.-]{0,63})@(([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})|([\w\d][\w\d.-]{0,244}\.[\w]{2,10}))$/'
-      );
+      $Result = PHPMailer::ValidateAddress($Value);
+      $Result = (bool)$Result;
+      return $Result;
    }
 }
+
 if (!function_exists('ValidateWebAddress')) {
    function ValidateWebAddress($Value, $Field = '') {
       if ($Value == '')
@@ -126,6 +124,7 @@ if (!function_exists('ValidateUsername')) {
       );
    }
 }
+
 if (!function_exists('ValidateUrlString')) {
    function ValidateUrlString($Value, $Field = '') {
       return ValidateRegex(

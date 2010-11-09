@@ -543,7 +543,7 @@ class CommentModel extends VanillaModel {
          // Notify any users who were mentioned in the comment
          $Usernames = GetMentions($Fields['Body']);
          $UserModel = Gdn::UserModel();
-         $Story = ArrayValue('Body', $Fields, '');
+         $Story = '['.$Discussion->Name."]\n".ArrayValue('Body', $Fields, '');
          $NotifiedUsers = array();
          foreach ($Usernames as $Username) {
             $User = $UserModel->GetByUsername($Username);
@@ -583,7 +583,7 @@ class CommentModel extends VanillaModel {
 
          // Record user-comment activity
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
-            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, '');
+            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
 				$ActivityModel->QueueNotification($ActivityID, $Story);
 			}
 				

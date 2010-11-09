@@ -277,7 +277,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    public function AutoTogglePath($Path = NULL) {
       if (is_null($Path)) {
          $PluginName = $this->GetPluginIndex();
-         $Path = 'plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
+         $Path = '/dashboard/plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
       }
       return $Path;
    }
@@ -311,8 +311,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          $Sender->Plugin = $this;
          return call_user_func(array($this,$ControllerMethod),$Sender);
       } else {
-         throw new Exception(sprintf("Call to invalid plugin controller method '%s' on %sPlugin",$MethodName, $this->GetPluginName()));
+         $PluginName = get_class($this);
+         throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
       }
    }
-
 }

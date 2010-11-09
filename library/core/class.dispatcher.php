@@ -284,7 +284,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             //call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
             
             if ($PluginManagerHasReplacementMethod) {
-              Gdn::PluginManager()->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
+              try {
+                 Gdn::PluginManager()->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
+              } catch (Exception $Ex) {
+                 $Controller->RenderException($Ex);
+              }
             } else { 
               $Args = $this->_ControllerMethodArgs;
               $Count = count($Args);

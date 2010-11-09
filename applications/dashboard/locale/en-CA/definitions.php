@@ -102,7 +102,7 @@ $Definition['EmailPassword'] = 'Hello %1$s,
 Have a great day!';
 $Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
 
-You have successfully registered for an account at {Title}. Here is the your information:
+You have successfully registered for an account at {Title}. Here is your information:
 
   Username: {User.Name}
   Email: {User.Email}
@@ -112,7 +112,7 @@ You can access the site at {/,url,domain}.
 Have a great day!';
 $Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
 
-You have successfully connected to {Title}. Here is the your information:
+You have successfully connected to {Title}. Here is your information:
 
   Username: {User.Name}
   Connected With: {ProviderName}

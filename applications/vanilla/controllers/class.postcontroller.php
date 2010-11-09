@@ -41,7 +41,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Create a discussion.
+    * Create or update a discussion.
     *
     * @since 2.0.0
     * @access public
@@ -91,7 +91,7 @@ class PostController extends VanillaController {
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Form was validly submitted
+         // Prep form with current data for editing
          if (isset($this->Discussion))
             $this->Form->SetData($this->Discussion);
          else if (isset($this->Draft))
@@ -99,7 +99,7 @@ class PostController extends VanillaController {
          else
             $this->Form->SetData(array('CategoryID' => $CategoryID));
             
-      } else {
+      } else { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $this->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));
@@ -148,6 +148,8 @@ class PostController extends VanillaController {
             $this->Comment->InsertPhoto = $Session->User->Photo;
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+            
+            $this->FireEvent('BeforeDiscussionPreview');
 
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                $this->AddAsset('Content', $this->FetchView('preview'));
@@ -188,12 +190,12 @@ class PostController extends VanillaController {
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       
-      // Render default view (posts/discussion.php)
+      // Render view (posts/discussion.php or post/preview.php)
       $this->Render();
    }
    
    /**
-    * Edit a discussion.
+    * Edit a discussion (wrapper for PostController::Discussion). 
     *
     * Will throw an error if both params are blank.
     *
@@ -218,7 +220,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Create a comment.
+    * Create or update a comment.
     *
     * @since 2.0.0
     * @access public
@@ -454,7 +456,7 @@ class PostController extends VanillaController {
    }
    
    /**
-    * Edit a comment.
+    * Edit a comment (wrapper for PostController::Comment).
     *
     * Will throw an error if both params are blank.
     *

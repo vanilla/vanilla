@@ -46,9 +46,11 @@ abstract class VanillaModel extends Gdn_Model {
     * @return bool Whether spam check is positive (TRUE = spammer).
     */
    public function CheckForSpam($Type) {
-      // If spam checking is disabled, skip
+      $Session = Gdn::Session();
+      
+      // If spam checking is disabled or user is an admin, skip
       $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-      if ($SpamCheckEnabled === FALSE) 
+      if ($SpamCheckEnabled === FALSE || $Session->User->Admin == '1') 
          return FALSE;
       
       $Spam = FALSE;
@@ -57,7 +59,6 @@ abstract class VanillaModel extends Gdn_Model {
       if (!in_array($Type, array('Comment', 'Discussion')))
          trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
       
-      $Session = Gdn::Session();
       $CountSpamCheck = $Session->GetAttribute('Count'.$Type.'SpamCheck', 0);
       $DateSpamCheck = $Session->GetAttribute('Date'.$Type.'SpamCheck', 0);
       $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);

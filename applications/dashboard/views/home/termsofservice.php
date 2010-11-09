@@ -7,7 +7,7 @@
    inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually
    oriented, threatening, invasive of a person's privacy, or otherwise violative
    of any law. You agree not to post any copyrighted material unless the
-   copyright is owned by you.
+   copyright is owned by you.</p>
    
    <p>We at this community also reserve the right to reveal your identity (or
    whatever information we know about you) in the event of a complaint or legal

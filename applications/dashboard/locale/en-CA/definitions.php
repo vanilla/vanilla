@@ -135,8 +135,9 @@ Follow the link below to check it out:
 Have a great day!';
 $Definition['EmailStoryNotification'] = '%1$s
 
-"%3$s"
+%3$s
 
+---
 Follow the link below to check it out:
 %2$s
 

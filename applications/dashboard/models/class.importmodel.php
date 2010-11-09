@@ -654,6 +654,10 @@ class ImportModel extends Gdn_Model {
 		return $Result;
 	}
 
+   protected static function BackTick($Str) {
+      return '`'.str_replace('`', '\`', $Str).'`';
+   }
+
 	protected function _InsertTable($TableName, $Sets = array()) {
 		if(!array_key_exists($TableName, $this->Tables()))
 			return;
@@ -663,7 +667,7 @@ class ImportModel extends Gdn_Model {
 
 		// Build the column insert list.
 		$Insert = "insert ignore :_$TableName (\n  "
-		.implode(",\n  ", array_keys(array_merge($Columns, $Sets)))
+		.implode(",\n  ", array_map(array('ImportModel', 'BackTick'), array_keys(array_merge($Columns, $Sets))))
 		."\n)";
 		$From = "from :_z$TableName i";
 		$Where = '';
@@ -671,9 +675,11 @@ class ImportModel extends Gdn_Model {
 		// Build the select list for the insert.
 		$Select = array();
 		foreach($Columns as $Column => $X) {
+         $BColumn = self::BackTick($Column);
+
 			if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
 				// The data goes in raw.
-				$Select[] = "i.$Column";
+				$Select[] = "i.$BColumn";
 			} elseif($Column == $TableName.'ID') {
 				// This is the primary key.
 				$Select[] = "i._NewID as $Column";
@@ -690,7 +696,7 @@ class ImportModel extends Gdn_Model {
 				}
 			} else {
 				// This is a straight columns insert.
-				$Select[] = "i.$Column";
+				$Select[] = "i.$BColumn";
 			}
 		}
 		// Add the original table to prevent duplicates.

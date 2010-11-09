@@ -277,7 +277,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    public function AutoTogglePath($Path = NULL) {
       if (is_null($Path)) {
          $PluginName = $this->GetPluginIndex();
-         $Path = 'plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
+         $Path = '/dashboard/plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
       }
       return $Path;
    }

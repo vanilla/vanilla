@@ -4,6 +4,9 @@ if (!($ConnectName = $this->Form->GetFormValue('FullName')))
 	$ConnectName = $this->Form->GetFormValue('Name');
 
 $ConnectPhoto = $this->Form->GetFormValue('Photo');
+if (!$ConnectPhoto) {
+   $ConnectPhoto = '/applications/dashboard/design/images/usericon.gif';
+}
 $ConnectSource = $this->Form->GetFormValue('ProviderName');
 ?>
 <div class="Connect">

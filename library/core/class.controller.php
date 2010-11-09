@@ -429,7 +429,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (is_object($Module)) {
          $AssetTarget = ($AssetTarget == '' ? $Module->AssetTarget() : $AssetTarget);
          // echo '<div>adding: '.$Module->Name().' ('.(property_exists($Module, 'HtmlId') ? $Module->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$Module->ToString().'</textarea></div>';
-         $this->AddAsset($AssetTarget, $Module->ToString(), $Module->Name());
+         $this->AddAsset($AssetTarget, $Module, $Module->Name());
       }
 
       $this->FireEvent('AfterAddModule');

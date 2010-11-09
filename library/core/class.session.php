@@ -107,7 +107,7 @@ class Gdn_Session {
          return TRUE;
       
       $Permissions = $this->GetPermissions();      
-      if(is_numeric($JunctionID) && $JunctionID > 0 && !C('Garden.Permissions.Disabled'.$JunctionTable)) {
+      if(is_numeric($JunctionID) && $JunctionID > 0 && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {

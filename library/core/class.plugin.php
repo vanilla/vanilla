@@ -237,11 +237,11 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       $Sender->AddSideMenu('plugin/'.$this->GetPluginIndex());
       $Sender->SetData('Description', $this->GetPluginKey('Description'));
       
-      $CSSFile = $this->GetResource('css/'.$this->GetPluginIndex().'.css',FALSE,FALSE);
+      $CSSFile = $this->GetResource('css/'.strtolower($this->GetPluginIndex()).'.css',FALSE,FALSE);
       if (file_exists($CSSFile))
          $Sender->AddCssFile($CSSFile);
       
-      $ViewFile = $this->GetView($this->GetPluginIndex().'.php');
+      $ViewFile = $this->GetView(strtolower($this->GetPluginIndex()).'.php');
       $Sender->Render($ViewFile);
    }
    

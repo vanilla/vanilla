@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
-   'Description' => 'This plugin allows users to sign in with OpenID.',
+   'Description' => 'This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
@@ -73,11 +73,11 @@ class OpenIDPlugin extends Gdn_Plugin {
     * Act as a mini dispatcher for API requests to the plugin app
     */
    public function PluginController_OpenID_Create(&$Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
    public function Controller_Toggle($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
       $this->AutoToggle($Sender);
    }
    

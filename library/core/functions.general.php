@@ -986,6 +986,16 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
+if (!function_exists('SignInPopup')) {
+   /**
+    * Returns a boolean value indicating if sign in windows should be "popped"
+    * into modal in-page popups.
+    */
+   function SignInPopup() {
+      return C('Garden.SignIn.Popup') && !IsMobile();
+   }
+}
+
 if (!function_exists('PrefixString')) {
    /**
     * Takes a string, and prefixes it with $Prefix unless it is already prefixed that way.

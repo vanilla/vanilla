@@ -95,7 +95,7 @@ class CommentModel extends VanillaModel {
     * @access public
     * 
     * @param mixed Field name(s) to order results by. May be a string or array of strings.
-    * @return array $this->_OrderBy (optionally)
+    * @return array $this->_OrderBy (optionally).
     */
    public function OrderBy($Value = NULL) {
       if ($Value === NULL)
@@ -181,9 +181,19 @@ class CommentModel extends VanillaModel {
 		
 		return $Data ? $Data->Score : 0;
 	}
-
+   
+   /**
+	 * Record the user's watch data.
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param object $Discussion Discussion being watched.
+    * @param int $Limit Max number to get.
+    * @param int $Offset Number to skip.
+    * @param int $TotalComments Total in entire discussion (hard limit).
+	 */
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
-      // Record the user's watch data
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
          $CountWatch = $Limit + $Offset;
@@ -198,7 +208,7 @@ class CommentModel extends VanillaModel {
 						'UserDiscussion',
 						array(
 							'CountComments' => $CountWatch,
-                  'DateLastViewed' => Gdn_Format::ToDateTime()
+                     'DateLastViewed' => Gdn_Format::ToDateTime()
 						),
 						array(
 							'UserID' => $Session->UserID,
@@ -217,7 +227,7 @@ class CommentModel extends VanillaModel {
 							'UserID' => $Session->UserID,
 							'DiscussionID' => $Discussion->DiscussionID,
 							'CountComments' => $CountWatch,
-                  'DateLastViewed' => Gdn_Format::ToDateTime()
+                     'DateLastViewed' => Gdn_Format::ToDateTime()
 						)
 					);
 				}
@@ -225,11 +235,20 @@ class CommentModel extends VanillaModel {
 			// decho('Limit: '.$Limit.'; Offset: '.$Offset.'; CountComments: '.$TotalComments);
 			// decho('Setting Watch Records for Discussion '.$Discussion->DiscussionID.' to CountWatch: '.$CountWatch.' Limit: '.$Limit.' Offset: '.$Offset.' TotalComments ' . $TotalComments);
 			// die();
-		
-			
 		}
    }
 
+   /**
+	 * Count total comments in a discussion specified by ID.
+	 *
+	 * Events: BeforeGetCount
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique ID of discussion we're counting comments from.
+    * @return object SQL result.
+	 */
    public function GetCount($DiscussionID) {
       $this->FireEvent('BeforeGetCount');
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
@@ -239,7 +258,16 @@ class CommentModel extends VanillaModel {
          ->FirstRow()
          ->CountComments + 1; // Add 1 so the comment in the discussion table is counted
    }
-
+   
+   /**
+	 * Count total comments in a discussion specified by $Where conditions.
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param array $Where Conditions
+    * @return object SQL result.
+	 */
    public function GetCountWhere($Where = FALSE) {
       if (is_array($Where))
          $this->SQL->Where($Where);
@@ -251,21 +279,52 @@ class CommentModel extends VanillaModel {
          ->CountComments;
    }
    
+   /**
+	 * Get single comment by ID. Allows you to pick data format of return value.
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of the comment.
+    * @param string $ResultType Format to return comment in.
+    * @return mixed SQL result in format specified by $ResultType.
+	 */
    public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT) {
-      $this->CommentQuery(FALSE);
+      $this->CommentQuery(FALSE); // FALSE supresses FireEvent
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get()
          ->FirstRow($ResultType);
    }
    
+   /**
+	 * Get single comment by ID as SQL result data.
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $CommentID Unique ID of the comment.
+    * @return object SQL result.
+	 */
    public function GetIDData($CommentID) {
-      $this->CommentQuery(FALSE);
+      $this->CommentQuery(FALSE); // FALSE supresses FireEvent
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get();
    }
    
+   /**
+	 * Get comments in a discussion since the specified one.
+	 *
+	 * Events: BeforeGetNew
+	 * 
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $DiscussionID Unique ID of the discusion.
+    * @param int $LastCommentID Unique ID of the comment.
+    * @return object SQL result.
+	 */
    public function GetNew($DiscussionID, $LastCommentID) {
       $this->CommentQuery();
       $this->FireEvent('BeforeGetNew');
@@ -277,9 +336,15 @@ class CommentModel extends VanillaModel {
    }
    
    /**
-    * Returns the offset of the specified comment in it's related discussion.
+    * Gets the offset of the specified comment in its related discussion.
+    * 
+    * Events: BeforeGetOffset
+    * 
+    * @since 2.0.0
+    * @access public
     *
-    * @param int The comment id for which the offset is being defined.
+    * @param mixed $Comment Unique ID or or a comment object for which the offset is being defined.
+    * @return object SQL result.
     */
    public function GetOffset($Comment) {
       $this->FireEvent('BeforeGetOffset');
@@ -319,7 +384,19 @@ class CommentModel extends VanillaModel {
          ->FirstRow()
          ->CountComments;
    }
-
+   
+   /**
+    * Builds Where statements for GetOffset method.
+    * 
+    * @since 2.0.0
+    * @access protected
+    * @see CommentModel::GetOffset()
+    *
+    * @param array $Part Value from $this->_OrderBy.
+    * @param object $Comment
+    * @param string $Op Comparison operator.
+    * @return array Expression and value.
+    */
    protected function _WhereFromOrderBy($Part, $Comment, $Op = '') {
       if (!$Op || $Op == '=')
          $Op = ($Part[1] == 'desc' ? '>' : '<').$Op;
@@ -338,6 +415,17 @@ class CommentModel extends VanillaModel {
       return array($Expr, $Value);
    }
    
+   /**
+    * Insert or update core data about the comment.
+    * 
+    * Events: BeforeSaveComment, AfterSaveComment.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $FormPostValues Data from the form model.
+    * @return int $CommentID
+    */
    public function Save($FormPostValues) {
       $Session = Gdn::Session();
       
@@ -352,6 +440,7 @@ class CommentModel extends VanillaModel {
          $this->Validation->ApplyRule('Body', 'Length');
       }
       
+      // Validate $CommentID and whether this is an insert
       $CommentID = ArrayValue('CommentID', $FormPostValues);
       $CommentID = is_numeric($CommentID) && $CommentID > 0 ? $CommentID : FALSE;
       $Insert = $CommentID === FALSE;
@@ -359,7 +448,8 @@ class CommentModel extends VanillaModel {
          $this->AddInsertFields($FormPostValues);
       else
          $this->AddUpdateFields($FormPostValues);
-
+      
+      // Prep and fire event
       $this->EventArguments['FormPostValues'] = &$FormPostValues;
       $this->EventArguments['CommentID'] = $CommentID;
       $this->FireEvent('BeforeSaveComment');
@@ -384,16 +474,31 @@ class CommentModel extends VanillaModel {
             }
          }
       }
+      
+      // Update discussion's comment count
       $DiscussionID = GetValue('DiscussionID', $FormPostValues);
       $this->UpdateCommentCount($DiscussionID);
 
       return $CommentID;
    }
 
-   // Save the stuff about a comment
+   /**
+    * Insert or update meta data about the comment.
+    * 
+    * Updates unread comment totals, bookmarks, and activity. Sends notifications.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $CommentID Unique ID for this comment.
+    * @param int $Insert Used as a boolean for whether this is a new comment.
+    * @param bool $CheckExisting Not used.
+    */
    public function Save2($CommentID, $Insert, $CheckExisting = TRUE) {
-      $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
       $Session = Gdn::Session();
+      
+      // Load comment data
+      $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.
@@ -486,7 +591,20 @@ class CommentModel extends VanillaModel {
 			$ActivityModel->SendNotificationQueue();
       }
    }
-      
+   
+   /**
+    * Helper function for recording comment-related activity.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @see CategoryModel::Save2()
+    *
+    * @param object $ActivityModel Passed along so we can use its Add method.
+    * @param object $Discussion Discussion data used to compose link for activity stream.
+    * @param int $ActivityUserID User taking the action; passed to ActivityModel::Add().
+    * @param int $CommentID Unique ID of comment inserted or updated. Used to compose link for activity stream.
+    * @param int $SendEmail Passed directly to ActivityModel::Add().
+    */  
    public function RecordActivity(&$ActivityModel, $Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
       if ($Discussion->InsertUserID != $ActivityUserID)
 			$ActivityModel->Add(
@@ -503,7 +621,12 @@ class CommentModel extends VanillaModel {
    /**
     * Updates the CountComments value on the discussion based on the CommentID being saved. 
     *
-    * @param int The CommentID relating to the discussion we are updating.
+    * Events: BeforeUpdateCommentCount.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $DiscussionID Unique ID of the discussion we are updating.
     */
    public function UpdateCommentCount($DiscussionID) {
       $this->FireEvent('BeforeUpdateCommentCount');
@@ -540,6 +663,14 @@ class CommentModel extends VanillaModel {
       }
    }
    
+   /**
+    * Update user's total comment count.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $UserID Unique ID of the user to be updated.
+    */
    public function UpdateUser($UserID) {
       // Retrieve a comment count
       $CountComments = $this->SQL
@@ -558,6 +689,18 @@ class CommentModel extends VanillaModel {
          ->Put();
    }
    
+   /**
+    * Delete a comment.
+    *
+    * This is a hard delete that completely removes it from the database.
+    * Events: DeleteComment.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $CommentID Unique ID of the comment to be deleted.
+    * @param bool Always returns TRUE.
+    */
    public function Delete($CommentID) {
       $this->EventArguments['CommentID'] = $CommentID;
 

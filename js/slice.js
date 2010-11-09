@@ -104,8 +104,10 @@ function Gdn_Slice(SliceElement, SliceID) {
          else
             var SliceURL = $(SliceForm).attr('action');
       } else {
-         var SliceURL = gdn.url(this.SliceURL);
+         var SliceURL = this.SliceURL;
       }
+      
+      SliceURL = gdn.url(SliceURL);
       
       jQuery.ajax({
          url: SliceURL,

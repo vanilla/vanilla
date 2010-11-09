@@ -36,7 +36,7 @@ class BookmarkedModule extends Gdn_Module {
    }
 
    public function ToString() {
-      $Data = $this->_Sender->Data['BookmarkedModuleData'];
+      $Data = $this->_Sender->Data('BookmarkedModuleData');
       if (is_object($Data) && $Data->NumRows() > 0)
          return parent::ToString();
 

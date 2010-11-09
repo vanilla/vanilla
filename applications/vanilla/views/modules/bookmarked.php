@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$Data = $this->_Sender->Data['BookmarkedModuleData'];
+$Data = $this->_Sender->Data('BookmarkedModuleData');
 if (is_object($Data) && $Data->NumRows() > 0) {
    $DiscussionView = $this->FetchViewLocation('discussion');
    ?>

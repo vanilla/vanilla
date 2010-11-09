@@ -96,7 +96,9 @@ function Gdn_Slice(SliceElement, SliceID) {
       this.PrepareSliceForRequest();
       
       var SliceForm = $(Event.target).parents('form').first();
-      var SliceURL = gdn.url(this.SliceURL);
+      
+      
+      var SliceURL = this.SliceForm ? gdn.url($(SliceForm).attr('action')) : gdn.url(this.SliceURL);
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',
@@ -168,6 +170,11 @@ function Gdn_Slice(SliceElement, SliceID) {
          
          $(Input).one('click',jQuery.proxy(this.PostSlice,this));
          var SliceForm = $(Input).parents('form').first()[0];
+         
+         this.SliceForm = false;
+         if ($(Input).hasClass('SliceForm'))
+            this.SliceForm = true;
+         
          SliceForm.SliceFields = [];
          $(SliceForm).find('input').each(jQuery.proxy(function(i,LoopedInput){
             SliceForm.SliceFields.push(LoopedInput);

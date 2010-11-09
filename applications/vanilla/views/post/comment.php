@@ -27,10 +27,14 @@ $Editing = isset($this->Comment);
    echo $this->Form->Errors();
    
    $CommentOptions = array('MultiLine' => TRUE);
-   if (!Gdn::Session()->CheckPermission('Vanilla.Comment.Add')) {
+   /*
+    Caused non-root users to not be able to add comments. Must take categories
+    into account. Look at CheckPermission for more information.
+   if (!$Session->CheckPermission('Vanilla.Comment.Add')) {
       $CommentOptions['Disabled'] = 'disabled';
       $CommentOptions['Value'] = T('You do not have permission to write new comments.');
    }
+   */
    
    echo $this->Form->TextBox('Body', $CommentOptions);
    echo "<div class=\"Buttons\">\n";
@@ -43,8 +47,12 @@ $Editing = isset($this->Comment);
    echo Anchor(T($CancelText), 'discussions', $CancelClass);
    
    $ButtonOptions = array('class' => 'Button CommentButton');
+   /*
+    Caused non-root users to not be able to add comments. Must take categories
+    into account. Look at CheckPermission for more information.
    if (!Gdn::Session()->CheckPermission('Vanilla.Comment.Add'))
       $ButtonOptions['Disabled'] = 'disabled';
+   */
 
    echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
    $this->FireEvent('AfterFormButtons');

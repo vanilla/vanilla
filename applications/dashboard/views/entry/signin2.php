@@ -22,7 +22,7 @@ echo '<div class="Entry'.$CssClass.'">';
    // Render the buttons to select other methods of signing in.
    if (count($Methods) > 0) {
       echo '<div class="Methods">'
-         .Wrap(T('Or use your existing account from...'), 'div');
+         .Wrap(T('Or you can...'), 'div');
 
       foreach ($Methods as $Key => $Method) {
          $CssClass = 'Method Method_'.$Key;

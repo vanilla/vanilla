@@ -22,7 +22,7 @@ class DashboardHooks implements Gdn_IPlugin {
          // echo 'test'.$PreviewThemeFolder;
          if ($PreviewThemeFolder != '') {
             $Sender->Theme = $PreviewThemeFolder;
-            $Sender->AddAsset('Content', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
+            $Sender->AddAsset('Foot', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
             $Sender->AddCssFile('previewtheme.css');
          }
       }

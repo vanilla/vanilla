@@ -294,8 +294,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          $Sender->Plugin = $this;
          return call_user_func(array($this,$ControllerMethod),$Sender);
       } else {
-         throw new Exception(sprintf("Call to invalid plugin controller method '%s' on %sPlugin",$MethodName, $this->GetPluginName()));
+         $PluginName = get_class($this);
+         throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
       }
    }
-
 }

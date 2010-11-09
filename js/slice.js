@@ -98,7 +98,17 @@ function Gdn_Slice(SliceElement, SliceID) {
       var SliceForm = $(Event.target).parents('form').first();
       
       
-      var SliceURL = this.SliceForm ? gdn.url($(SliceForm).attr('action')) : gdn.url(this.SliceURL);
+      if (this.SliceForm) {
+         if ($(SliceForm).attr('jsaction'))
+            var SliceURL = $(SliceForm).attr('jsaction');
+         else
+            var SliceURL = $(SliceForm).attr('action');
+      } else {
+         var SliceURL = this.SliceURL;
+      }
+      
+      SliceURL = gdn.url(SliceURL);
+      
       jQuery.ajax({
          url: SliceURL,
          type: 'POST',

@@ -25,7 +25,7 @@ class RecentActivityModule extends Gdn_Module {
       } else {
          $Data = $ActivityModel->Get('', 0, $Limit);
       }
-      $this->_Sender->SetData('RecentActivityData', $Data);
+      $this->ActivityData = $Data;
       if (!is_array($RoleID))
          $RoleID = array();
 
@@ -40,7 +40,7 @@ class RecentActivityModule extends Gdn_Module {
       if (StringIsNullOrEmpty($this->ActivityModuleTitle))
          $this->ActivityModuleTitle = T('Recent Activity');
          
-      $Data = $this->_Sender->Data['RecentActivityData'];
+      $Data = $this->ActivityData;
       if (is_object($Data) && $Data->NumRows() > 0)
          return parent::ToString();
 

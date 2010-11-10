@@ -4,6 +4,7 @@ $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces emoticons in forum comments with images.',
 	'Version' 	=>	 '1.0',
+	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',
 	'AuthorUrl' =>	 'http://vanillaforums.org',

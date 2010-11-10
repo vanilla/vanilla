@@ -140,13 +140,6 @@ class DiscussionModel extends VanillaModel {
       
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
-			
-		// If not looking at discussions filtered by bookmarks or user, filter announcements out.
-		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID'])) {
-			$this->SQL->Where('d.Announce<>', '1');
-			if ($UserID > 0)
-			   $this->SQL->OrWhere('w.Dismissed', '1');
-      }
       
 		$this->FireEvent('BeforeGet');
       
@@ -165,6 +158,10 @@ class DiscussionModel extends VanillaModel {
       $Data = $this->SQL
          ->Limit($Limit, $Offset)
          ->Get();
+         
+      // If not looking at discussions filtered by bookmarks or user, filter announcements out.
+		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+			$this->RemoveAnnouncements($Data);
 		
 		// Change discussions returned based on additional criteria	
 		$this->AddDiscussionColumns($Data);
@@ -174,6 +171,24 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('AfterAddColumns');
 		
 		return $Data;
+   }
+   
+   /**
+    * Removes undismissed announcements from the data.
+    *
+    * @since 2.0.0
+    * @access public
+    *
+    * @param object $Data SQL result.
+    */
+   public function RemoveAnnouncements($Data) {
+      $Result = &$Data->Result();
+      foreach($Result as $Key => &$Discussion) {
+         if ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
+            // Unset discussions that are announced and not dismissed
+            unset($Result[$Key]);
+         }
+      }
    }
 	
 	/**

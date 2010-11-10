@@ -12,7 +12,10 @@
 		  {profile_link}
 		  {inbox_link}
 		  {custom_menu}
-		  {signin_link class="SignIn"}
+		  {event name="BeforeSignInLink"}
+		  {if !$User.SignedIn}
+			 <li class="SignInItem">{link path="signin" class="SignIn"}</li>
+		  {/if}
 		</ul>
 	 </div>
 	 <div id="Body">

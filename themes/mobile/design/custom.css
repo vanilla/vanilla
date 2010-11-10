@@ -87,7 +87,6 @@ body.Post a.Close {
 .Banner ul li a.NewConversation em {
 	display: none;
 }
-.Banner ul li a.SignIn,
 .Banner ul li a.NewDiscussion,
 .Banner ul li a.NewConversation {
 	position: absolute;
@@ -97,6 +96,20 @@ body.Post a.Close {
 	display: block;
 	border-left: 1px solid #627AAD;
 }
+.Banner ul li.Connect,
+.Banner ul li.SignInItem {
+	float: right;
+}
+.Banner ul li.SignInItem a {
+	padding-left: 6px;
+	padding-right: 6px;
+	border-left: 1px solid #627AAD;
+}
+.Banner ul li.Connect a {
+	line-height: 1;
+	padding: 3px 2px;
+}
+
 .Banner ul li a.NewDiscussion img,
 .Banner ul li a.NewConversation img {
 	vertical-align: middle;

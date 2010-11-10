@@ -3,7 +3,7 @@
    <h4><?php echo GetValue('ActivityModuleTitle', $this, T('Recent Activity')); ?></h4>
    <ul class="PanelActivity">
       <?php
-      $Data = $this->_Sender->Data['RecentActivityData'];
+      $Data = $this->ActivityData;
       foreach ($Data->Result() as $Activity) {
          echo '<li class="Activity ' . $Activity->ActivityType . '">';
          // If this was a status update or a wall comment, don't bother with activity strings

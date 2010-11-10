@@ -782,6 +782,9 @@ if (!function_exists('IsMobile')) {
             || isset($_SERVER['HTTP_PROFILE'])))
          )
          $Mobile++;
+      
+      if(strpos($UserAgent,'android') > 0)
+         $Mobile++;
  
       $MobileUserAgent = substr($UserAgent, 0, 4);
       $MobileUserAgents = array(

@@ -27,7 +27,7 @@ function smarty_function_link($Params, &$Smarty) {
    $Text = GetValue('text', $Params, '', TRUE);
    $NoTag = GetValue('notag', $Params, FALSE, TRUE);
 
-   if(!$Text && $Path != 'signinout')
+   if(!$Text && $Path != 'signinout' && $Path != 'signin')
       $NoTag = TRUE;
 
 
@@ -38,7 +38,7 @@ function smarty_function_link($Params, &$Smarty) {
 
    $Options = array();
    if (isset($Params['withdomain'])) $Options['WithDomain'] = $Params['withdomain'];
-   if (isset($Params['class'])) $Options['Class'] = $Params['Class'];
+   if (isset($Params['class'])) $Options['class'] = $Params['class'];
 
    $Result = Gdn_Theme::Link($Path, $Text, $Format, $Options);
 

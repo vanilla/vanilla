@@ -783,6 +783,9 @@ if (!function_exists('IsMobile')) {
          )
          $Mobile++;
  
+      if(strpos($UserAgent,'android') > 0)
+         $Mobile++;
+
       $MobileUserAgent = substr($UserAgent, 0, 4);
       $MobileUserAgents = array(
           'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',

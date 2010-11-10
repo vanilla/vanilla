@@ -58,7 +58,7 @@ class Gdn_Theme {
                $Path = Gdn::Authenticator()->SignOutUrl();
                $Class = ConcatSep(' ', $Class, 'SignOut');
             } else {
-               if(!$Text && !$NoTag)
+               if(!$Text)
                   $Text = T('Sign In');
                $Attribs = array();
 

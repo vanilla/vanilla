@@ -179,8 +179,8 @@ $PermissionModel->Define(array(
 	'Garden.Users.Delete',
 	'Garden.Users.Approve',
 	'Garden.Activity.Delete',
-	'Garden.Activity.View',
-	'Garden.Profiles.View'
+	'Garden.Activity.View' => 1,
+	'Garden.Profiles.View' => 1
 	));
 	
 // Set initial guest permissions.

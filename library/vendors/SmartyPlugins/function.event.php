@@ -11,5 +11,5 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 function smarty_function_event($Params, &$Smarty) {
 	$Name = ArrayValue('name', $Params);
-	return $Smarty->Controller->FireEvent($Name);
+	$Smarty->Controller->FireEvent($Name);
 }

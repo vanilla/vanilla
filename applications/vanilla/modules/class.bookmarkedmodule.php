@@ -26,7 +26,7 @@ class BookmarkedModule extends Gdn_Module {
                   'w.Bookmarked' => '1',
                   'w.UserID' => $Session->UserID
                )
-            )
+            )->Result()
          );
       }
    }
@@ -37,7 +37,7 @@ class BookmarkedModule extends Gdn_Module {
 
    public function ToString() {
       $Data = $this->_Sender->Data('BookmarkedModuleData');
-      if (is_object($Data) && $Data->NumRows() > 0)
+      if (is_array($Data) && count($Data) > 0)
          return parent::ToString();
 
       return '';

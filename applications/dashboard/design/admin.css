@@ -1642,3 +1642,14 @@ div.Summary table tbody td {
 	width: 72px;
 	margin: 6px 0 10px;
 }
+
+.Tag {
+   background: #333;
+   color: #fff;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+
+   font-size: 11px;
+   padding: 1px 6px !Important;
+}

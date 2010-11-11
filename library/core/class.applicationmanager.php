@@ -80,7 +80,8 @@ class Gdn_ApplicationManager {
    }
 
    /**
-    * @todo Undocumented method.
+    * Gets an array of all of the enabled applications.
+    * @return array
     */
    public function EnabledApplications() {
       if (!is_array($this->_EnabledApplications)) {

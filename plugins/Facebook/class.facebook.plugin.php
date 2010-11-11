@@ -225,7 +225,8 @@ class FacebookPlugin extends Gdn_Plugin {
          $this->_RedirectUri = $NewValue;
       elseif ($this->_RedirectUri === NULL) {
          $RedirectUri = Url('/entry/connect/facebook', TRUE);
-         $Args = array('Target' => GetValue('Target', $_GET, Gdn::Request()->Path()));
+         $Path = Gdn::Request()->Path();
+         $Args = array('Target' => GetValue('Target', $_GET, $Path ? $Path : '/'));
          $RedirectUri .= '?'.http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
       }

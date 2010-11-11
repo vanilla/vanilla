@@ -5,7 +5,7 @@ $Session = Gdn::Session();
 <div class="Info">
    <?php
    printf(
-      T('Locales are in your %s folder.', "Locales allow you to support other languages on your site. Once an locale has been added to your %s folder, you can enable or disable it here."),
+      T('Locales are in your %s folder.', "Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here."),
       '<code>'.PATH_ROOT.'/locales</code>'
    );
    ?>

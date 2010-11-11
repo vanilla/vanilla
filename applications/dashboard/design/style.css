@@ -1219,7 +1219,6 @@ div.Preview div.Message code,
 div.Preview div.Message pre,
 ul.MessageList div.Message code,
 ul.MessageList div.Message pre {
-   display: block;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -1229,6 +1228,10 @@ ul.MessageList div.Message pre {
    font-family: monospace;
    overflow: auto;
 	border: 1px solid #eec;
+}
+div.Preview div.Message pre,
+ul.MessageList div.Message pre {
+   display: block;
 }
 div.Preview div.Message strong,
 ul.MessageList div.Message strong {

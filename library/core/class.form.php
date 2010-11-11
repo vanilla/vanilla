@@ -156,7 +156,7 @@ class Gdn_Form {
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
          $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel">' . $Input . ' ' .
-          $Label . '</label>';
+          T($Label) . '</label>';
 
       return $Input;
    }
@@ -599,7 +599,7 @@ class Gdn_Form {
       $Input = $this->Input($FieldName, 'radio', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
          $this->EscapeID($FieldName, FALSE)) . '" class="RadioLabel">' . $Input . ' ' .
-          $Label . '</label>';
+          T($Label) . '</label>';
 
       return $Input;
    }

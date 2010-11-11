@@ -23,7 +23,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
       <div class="Meta">
          <span><?php echo UserAnchor($LastAuthor, 'Name'); ?></span>
          <span><?php echo Gdn_Format::Date($Conversation->DateLastMessage); ?></span>
-         <span><?php printf(T(Plural($Conversation->CountMessages, '%s message', '%s messages')), $Conversation->CountMessages); ?></span>
+         <span><?php printf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages); ?></span>
          <?php
          if ($Conversation->CountNewMessages > 0) {
             echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';

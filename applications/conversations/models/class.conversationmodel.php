@@ -168,6 +168,33 @@ class ConversationModel extends Gdn_Model {
             ->WhereIn('UserID', $RecipientUserIDs)
             ->Where('UserID <>', $Session->UserID)
             ->Put();
+
+         // Add notifications (this isn't done by the conversationmessagemodule
+         // because the conversation has not yet been created at the time they are
+         // inserted)
+         $UnreadData = $this->SQL
+            ->Select('uc.UserID')
+            ->From('UserConversation uc')
+            ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Get();
+   
+         $ActivityModel = new ActivityModel();
+         foreach ($UnreadData->Result() as $User) {
+            // Notify the users of the new message.
+            $ActivityID = $ActivityModel->Add(
+               $Session->UserID,
+               'ConversationMessage',
+               '',
+               $User->UserID,
+               '',
+               "/messages/$ConversationID#$MessageID",
+               FALSE
+            );
+            $Story = ArrayValue('Body', $FormPostValues, '');
+            $ActivityModel->SendNotification($ActivityID, $Story);
+         }
+
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
          foreach ($MessageModel->ValidationResults() as $FieldName => $Results) {
@@ -176,7 +203,7 @@ class ConversationModel extends Gdn_Model {
             }
          }
       }
-
+      
       return $ConversationID;
    }
    

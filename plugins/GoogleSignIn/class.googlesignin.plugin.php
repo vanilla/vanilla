@@ -92,14 +92,25 @@ class GoogleSignInPlugin extends Gdn_Plugin {
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsEnabled()) return;
-      
+		echo "\n".$this->_GetButton();
+	}
+	
+	private function _GetButton() {      
       $ImgSrc = Asset('/plugins/GoogleSignIn/design/google-icon.png');
       $ImgAlt = T('Sign In with Google');
       $SigninHref = $this->_AuthorizeHref();
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-
-      $Html = "\n<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
-
-      echo $Html;
+      return "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
    }
+	
+	public function Base_BeforeSignInLink_Handler($Sender) {
+      if (!$this->IsEnabled())
+			return;
+		
+		// if (!IsMobile())
+		// 	return;
+
+		if (!Gdn::Session()->IsValid())
+			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect GoogleConnect'));
+	}
 }

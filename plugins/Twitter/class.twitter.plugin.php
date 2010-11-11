@@ -115,19 +115,31 @@ class TwitterPlugin extends Gdn_Plugin {
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
-            return;
-      
+			return;
+			
+		echo "\n".$this->_GetButton();
+	}
+	
+	public function Base_BeforeSignInLink_Handler($Sender) {
+      if (!$this->IsConfigured())
+			return;
+		
+		// if (!IsMobile())
+		// 	return;
+
+		if (!Gdn::Session()->IsValid())
+			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect TwitterConnect'));
+	}
+	
+	private function _GetButton() {      
       $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
       $ImgAlt = T('Sign In with Twitter');
       $SigninHref = $this->_AuthorizeHref();
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-
-      $Html = "\n<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
-
-      echo $Html;
+		return "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
    }
 
-   public function Authorize($Query = FALSE) {
+	public function Authorize($Query = FALSE) {
       // Aquire the request token.
       $Consumer = new OAuthConsumer(C('Plugins.Twitter.ConsumerKey'), C('Plugins.Twitter.Secret'));
 

@@ -86,17 +86,29 @@ class FacebookPlugin extends Gdn_Plugin {
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
          return;
+		
+		echo "\n".$this->_GetButton();
+	}
+	
+	public function Base_BeforeSignInLink_Handler($Sender) {
+      if (!$this->IsConfigured())
+			return;
+		
+		// if (!IsMobile())
+		// 	return;
 
+		if (!Gdn::Session()->IsValid())
+			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect FacebookConnect'));
+	}
+	
+	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
       $ImgAlt = T('Login with Facebook');
       $SigninHref = $this->AuthorizeUri();
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
-      
-      $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
-   
-      echo $Html;
+      return "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
    }
-
+	
    public function SettingsController_Facebook_Create($Sender, $Args) {
       if ($Sender->Form->IsPostBack()) {
          $Settings = array(

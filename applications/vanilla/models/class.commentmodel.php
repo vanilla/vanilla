@@ -196,7 +196,7 @@ class CommentModel extends VanillaModel {
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
-         $CountWatch = $Limit + $Offset;
+         $CountWatch = $Limit + $Offset + 1; // Include the first comment (in the discussion table) in the count.
          if ($CountWatch > $TotalComments)
             $CountWatch = $TotalComments;
             

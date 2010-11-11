@@ -177,14 +177,25 @@ class OpenIDPlugin extends Gdn_Plugin {
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsEnabled()) return;
-      
+      echo "\n".$this->_GetButton();
+   }
+	
+	private function _GetButton() {
       $ImgSrc = Asset('/plugins/OpenID/design/openid-icon.png');
       $ImgAlt = T('Sign In with OpenID');
       $SigninHref = $this->_AuthorizeHref();
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+      return "<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+	}
+	
+	public function Base_BeforeSignInLink_Handler($Sender) {
+      if (!$this->IsEnabled())
+			return;
+		
+		// if (!IsMobile())
+		// 	return;
 
-      $Html = "\n<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
-
-      echo $Html;
-   }
+		if (!Gdn::Session()->IsValid())
+			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
+	}
 }

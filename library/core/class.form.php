@@ -790,11 +790,14 @@ class Gdn_Form {
       if (strcasecmp($this->Method, 'get') == 0) {
          // The path is not getting passed on get forms so put them in hidden fields.
          $Action = strrchr($this->Action, '?');
+         $Exclude = GetValue('Exclude', $Attributes, array());
          if ($Action !== FALSE) {
             $this->Action = substr($this->Action, 0, -strlen($Action));
             parse_str(trim($Action, '?'), $Query);
             $Hiddens = '';
             foreach ($Query as $Key => $Value) {
+               if (in_array($Key, $Exclude))
+                  continue;
                $Key = Gdn_Format::Form($Key);
                $Value = Gdn_Format::Form($Value);
                $Hiddens .= "\n<input type=\"hidden\" name=\"$Key\" value=\"$Value\" />";

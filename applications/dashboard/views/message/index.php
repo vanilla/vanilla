@@ -3,7 +3,7 @@ $Session = Gdn::Session();
 ?>
 <h1><?php echo T('Manage Messages'); ?></h1>
 <div class="Info"><?php echo T('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
-<div class="FilterMenu"><?php echo Anchor('Add Message', 'dashboard/message/add', 'AddMessage SmallButton'); ?></div>
+<div class="FilterMenu"><?php echo Anchor(T('Add Message'), 'dashboard/message/add', 'AddMessage SmallButton'); ?></div>
 <?php if ($this->MessageData->NumRows() > 0) { ?>
 <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
    <thead>
@@ -32,8 +32,8 @@ foreach ($this->MessageData->Result() as $Message) {
       ?><div>
          <strong><?php echo $Message->Enabled == '1' ? 'Enabled' : 'Disabled'; ?></strong>
          <?php
-         echo Anchor('Edit', '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
-         echo Anchor('Delete', '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');
+         echo Anchor(T('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
+         echo Anchor(T('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');
          ?>
          </div>
       </td>

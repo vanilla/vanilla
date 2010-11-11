@@ -13,7 +13,7 @@ printf(
 <?php
 if ($AddonUrl != '')
    echo '<div class="FilterMenu">',
-      Anchor('Get More Themes', $AddonUrl, 'SmallButton'),
+      Anchor(T('Get More Themes'), $AddonUrl, 'SmallButton'),
       '</div>';
          
 ?>
@@ -140,8 +140,8 @@ if ($AddonUrl != '')
                   }
 
                   echo '<div class="Buttons">';
-                  echo Anchor('Apply', 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                  echo Anchor('Preview', 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
+                  echo Anchor(T('Apply'), 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                  echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
 						$this->EventArguments['ThemeInfo'] = $ThemeInfo;
 						$this->FireEvent('AfterThemeButtons');
                   echo '</div>';

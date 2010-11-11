@@ -10,12 +10,6 @@ jQuery(document).ready(function($) {
    // Hijack the "Cancel" button on the comment form
    var cancelButton = $('a.Cancel');
       
-   // Reveal it if they start typing a comment
-   /*
-   $('div.CommentForm textarea').focus(function() {
-      $('a.Cancel:hidden').show();
-   });
-   */
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();

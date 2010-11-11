@@ -139,14 +139,11 @@ class ConversationModel extends Gdn_Model {
          $RecipientUserIDs = array_unique($RecipientUserIDs);
          sort($RecipientUserIDs);
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         
          $Fields['Contributors'] = Gdn_Format::Serialize($RecipientUserIDs);
          $ConversationID = $this->SQL->Insert($this->Name, $Fields);
-
-            
          $FormPostValues['ConversationID'] = $ConversationID;
          $MessageID = $MessageModel->Save($FormPostValues);
-         // if ($Data->NumRows() == 0)
+
          $this->SQL
             ->Update('Conversation')
             ->Set('FirstMessageID', $MessageID)
@@ -154,7 +151,6 @@ class ConversationModel extends Gdn_Model {
             ->Put();
             
          // Now that the message & conversation have been inserted, insert all of the recipients
-         // if ($Data->NumRows() == 0) {
          foreach ($RecipientUserIDs as $UserID) {
             $CountReadMessages = $UserID == $Session->UserID ? 1 : 0;
             $this->SQL->Insert('UserConversation', array(

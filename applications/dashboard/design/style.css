@@ -1267,8 +1267,12 @@ div.Message h2 { font-size: 20px; }
 div.Message h3 { font-size: 18px; }
 div.Message h4 { font-size: 16px; }
 div.Message h5 { font-size: 14px; }
-
-
+div.Message div.ImageResized {
+	font-size: 11px;
+	font-weight: normal;
+	cursor: pointer;
+	margin-bottom: 10px;
+}
 /* The "Foot" is at the bottom of the #Content section. Used for more results
 links, sign in buttons, etc */
 .Foot {

@@ -124,7 +124,7 @@ class DiscussionController extends VanillaController {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-		$this->EventArguments['PagerType'] = 'MorePager';
+		$this->EventArguments['PagerType'] = 'Pager';
 		$this->FireEvent('BeforeBuildPager');
       $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->ClientID = 'Pager';

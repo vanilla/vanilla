@@ -28,7 +28,7 @@ echo $this->Form->Errors();
                Img($Logo),
                'div'
             );
-            echo Wrap(Anchor('Remove Banner Logo', '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+            echo Wrap(Anchor(T('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
             echo Wrap(
                T('Browse for a new banner logo if you would like to change it:'),
                'div',

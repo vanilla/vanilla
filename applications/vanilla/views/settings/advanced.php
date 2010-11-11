@@ -20,14 +20,14 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         $Options = array('0' => 'Authors cannot edit their posts',
-                        '350' => 'Authors can edit for 5 minutes after posting', 
-                        '900' => 'Authors can edit for 15 minutes after posting', 
-                       '1800' => 'Authors can edit for 30 minutes after posting',
-                      '86400' => 'Authors can edit for 1 day after posting',
-                     '604800' => 'Authors can edit for 1 week after posting',
-                    '2592000' => 'Authors can edit for 1 month after posting',
-                         '-1' => 'Authors can always edit their posts');
+         $Options = array('0' => T('Authors cannot edit their posts'),
+                        '350' => T('Authors can edit for 5 minutes after posting'), 
+                        '900' => T('Authors can edit for 15 minutes after posting'), 
+                       '1800' => T('Authors can edit for 30 minutes after posting'),
+                      '86400' => T('Authors can edit for 1 day after posting'),
+                     '604800' => T('Authors can edit for 1 week after posting'),
+                    '2592000' => T('Authors can edit for 1 month after posting'),
+                         '-1' => T('Authors can always edit their posts'));
          $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
          echo $this->Form->Label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
          echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
@@ -36,7 +36,12 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         $Options2 = array('0' => 'Don\'t Refresh', '5' => 'Every 5 seconds', '10' => 'Every 10 seconds', '30' => 'Every 30 seconds', '60' => 'Every 1 minute', '300' => 'Every 5 minutes');
+         $Options2 = array('0' => T('Don\'t Refresh'), 
+                           '5' => T('Every 5 seconds'),
+                          '10' => T('Every 10 seconds'),
+                          '30' => T('Every 30 seconds'),
+                          '60' => T('Every 1 minute'),
+                         '300' => T('Every 5 minutes'));
          echo $this->Form->Label('Refresh Comments', 'Vanilla.Comments.AutoRefresh');
          echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
       ?>

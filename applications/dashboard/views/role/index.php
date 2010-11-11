@@ -9,7 +9,7 @@ echo $this->Form->Open();
    $this->FireEvent('AfterRolesInfo');
 ?></div>
 <?php if ($Advanced) { ?>
-<div class="FilterMenu"><?php echo Anchor('Add Role', 'dashboard/role/add', 'SmallButton'); ?></div>
+<div class="FilterMenu"><?php echo Anchor(T('Add Role'), 'dashboard/role/add', 'SmallButton'); ?></div>
 <?php } ?>
 <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
    <thead>
@@ -30,9 +30,9 @@ foreach ($this->RoleData->Result() as $Role) {
          <?php if ($Advanced) { ?>
          <div>
             <?php
-            echo Anchor('Edit', '/role/edit/'.$Role->RoleID, 'SmallButton');
+            echo Anchor(T('Edit'), '/role/edit/'.$Role->RoleID, 'SmallButton');
             if ($Role->Deletable)
-               echo Anchor('Delete', '/role/delete/'.$Role->RoleID, 'Popup SmallButton');
+               echo Anchor(T('Delete'), '/role/delete/'.$Role->RoleID, 'Popup SmallButton');
             ?>
          </div>
          <?php } ?>

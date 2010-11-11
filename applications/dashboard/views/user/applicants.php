@@ -34,8 +34,8 @@ if ($this->UserData->NumRows() == 0) {
             echo '<blockquote>'.$User->DiscoveryText.'</blockquote>';
          ?></td>
          <td><?php
-         echo Anchor('Approve', '/user/approve/'.$User->UserID.'/'.$Session->TransientKey())
-            .', '.Anchor('Decline', '/user/decline/'.$User->UserID.'/'.$Session->TransientKey());
+         echo Anchor(T('Approve'), '/user/approve/'.$User->UserID.'/'.$Session->TransientKey())
+            .', '.Anchor(T('Decline'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey());
          ?></td>
       </tr>
    <?php } ?>

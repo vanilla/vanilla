@@ -8,11 +8,11 @@ $CssClass = $FirstRow && ($FirstRow->AllowDiscussions == '0' || $FirstRow->Paren
    <?php echo T('Categories are used to help organize discussions. '); ?>
 </div>
 <div class="FilterMenu"><?php
-   echo Anchor('Add Category', 'vanilla/settings/addcategory', 'SmallButton');
+   echo Anchor(T('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
    if (C('Vanilla.Categories.Use')) {
-      echo Wrap(Anchor("Don't use Categories", 'vanilla/settings/managecategories/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      echo Wrap(Anchor(T("Don't use Categories"), 'vanilla/settings/managecategories/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
    } else {
-      echo Wrap(Anchor('Use Categories', 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      echo Wrap(Anchor(T('Use Categories'), 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
    }
 ?></div>
 <?php 
@@ -44,8 +44,8 @@ foreach ($this->CategoryData->Result() as $Category) {
       <td><?php echo $Category->AllowDiscussions == '1' ? Url('categories/'.$Category->UrlCode.'/') : '&nbsp;'; ?></td>
       <td class="Alt Last">
          <?php
-         echo Anchor('Edit', 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton');
-         echo Anchor('Delete', 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton');
+         echo Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton');
+         echo Anchor(T('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton');
          ?>
       </td>
    </tr>

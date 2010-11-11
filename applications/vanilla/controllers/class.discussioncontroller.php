@@ -124,7 +124,9 @@ class DiscussionController extends VanillaController {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('Pager', $this);
+		$this->EventArguments['PagerType'] = 'MorePager';
+		$this->FireEvent('BeforeBuildPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $this->Offset,
@@ -132,6 +134,7 @@ class DiscussionController extends VanillaController {
          $ActualResponses,
          'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s' //'discussions/%1$s'
       );
+      $this->FireEvent('AfterBuildPager');
 
       /*$this->Pager->MoreCode = '%1$s more comments';
       $this->Pager->LessCode = '%1$s older comments';
@@ -224,6 +227,7 @@ class DiscussionController extends VanillaController {
     */
    public function Initialize() {
       parent::Initialize();
+      $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
       $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }

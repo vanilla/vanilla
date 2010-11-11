@@ -102,7 +102,9 @@ class DiscussionsController extends VanillaController {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('Pager', $this);
+		$this->EventArguments['PagerType'] = 'Pager';
+		$this->FireEvent('BeforeBuildPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Page,
@@ -110,6 +112,7 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/%1$s'
       );
+		$this->FireEvent('AfterBuildPager');
       
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -181,7 +184,9 @@ class DiscussionsController extends VanillaController {
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+		$this->EventArguments['PagerType'] = 'MorePager';
+		$this->FireEvent('BeforeBuildBookmarkedPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
       $this->Pager->ClientID = 'Pager';
@@ -191,6 +196,7 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/bookmarked/%1$s'
       );
+		$this->FireEvent('AfterBuildBookmarkedPager');
       
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -233,7 +239,9 @@ class DiscussionsController extends VanillaController {
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+		$this->EventArguments['PagerType'] = 'MorePager';
+		$this->FireEvent('BeforeBuildMinePager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->MoreCode = 'More Discussions';
       $this->Pager->LessCode = 'Newer Discussions';
       $this->Pager->ClientID = 'Pager';
@@ -243,6 +251,7 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/mine/%1$s'
       );
+		$this->FireEvent('AfterBuildMinePager');
       
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

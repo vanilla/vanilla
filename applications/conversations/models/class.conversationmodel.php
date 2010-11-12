@@ -139,14 +139,11 @@ class ConversationModel extends Gdn_Model {
          $RecipientUserIDs = array_unique($RecipientUserIDs);
          sort($RecipientUserIDs);
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         
          $Fields['Contributors'] = Gdn_Format::Serialize($RecipientUserIDs);
          $ConversationID = $this->SQL->Insert($this->Name, $Fields);
-
-            
          $FormPostValues['ConversationID'] = $ConversationID;
          $MessageID = $MessageModel->Save($FormPostValues);
-         // if ($Data->NumRows() == 0)
+
          $this->SQL
             ->Update('Conversation')
             ->Set('FirstMessageID', $MessageID)
@@ -154,7 +151,6 @@ class ConversationModel extends Gdn_Model {
             ->Put();
             
          // Now that the message & conversation have been inserted, insert all of the recipients
-         // if ($Data->NumRows() == 0) {
          foreach ($RecipientUserIDs as $UserID) {
             $CountReadMessages = $UserID == $Session->UserID ? 1 : 0;
             $this->SQL->Insert('UserConversation', array(
@@ -172,6 +168,33 @@ class ConversationModel extends Gdn_Model {
             ->WhereIn('UserID', $RecipientUserIDs)
             ->Where('UserID <>', $Session->UserID)
             ->Put();
+
+         // Add notifications (this isn't done by the conversationmessagemodule
+         // because the conversation has not yet been created at the time they are
+         // inserted)
+         $UnreadData = $this->SQL
+            ->Select('uc.UserID')
+            ->From('UserConversation uc')
+            ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Get();
+   
+         $ActivityModel = new ActivityModel();
+         foreach ($UnreadData->Result() as $User) {
+            // Notify the users of the new message.
+            $ActivityID = $ActivityModel->Add(
+               $Session->UserID,
+               'ConversationMessage',
+               '',
+               $User->UserID,
+               '',
+               "/messages/$ConversationID#$MessageID",
+               FALSE
+            );
+            $Story = ArrayValue('Body', $FormPostValues, '');
+            $ActivityModel->SendNotification($ActivityID, $Story);
+         }
+
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form
          foreach ($MessageModel->ValidationResults() as $FieldName => $Results) {
@@ -180,7 +203,7 @@ class ConversationModel extends Gdn_Model {
             }
          }
       }
-
+      
       return $ConversationID;
    }
    

@@ -8,14 +8,11 @@ ul.Conversations div.Meta a.Name,
 a,
 a:link,
 a:visited,
-a:active {
-   text-decoration: none;
-	color: #3B5998;
-}
+a:active,
 ul.Conversations div.Meta a.Name:hover,
 a:hover {
    text-decoration: none;
-   color: #ff0084;
+	color: #3B5998;
 }
 #Body {
 	margin: 0;
@@ -340,54 +337,6 @@ div.MorePager a:hover {
 	padding: 3px 6px;
 	text-decoration: none;	
 }
-div.MorePager a:hover {
-	color: #ff0084;
-	text-decoration: underline;
-}
-
-/* Panel Boxes 
-div.Box {
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	background: none;
-	padding: 0;
-}
-div.Box h4 {
-	color: #333;
-}
-ul.PanelActivity,
-ul.PanelInfo {
-	border-top:1px solid #ccc;
-}
-ul.PanelActivity li,
-ul.PanelInfo li,
-ul.PanelInfo li.Active {
-	background: none;
-	border-bottom: 1px solid #ccc;
-}
-ul.PanelInfo li.Active {
-	background: #ffd;
-}
-body.Profile ul.PanelInfo {
-	border: none;
-}
-body.Profile ul.PanelInfo li {
-	margin: 0;
-	padding: 0;
-}
-body.Profile ul.PanelInfo li a {
-	font-size: 12px;
-	display: block;
-	padding: 0 6px;
-}
-body.Profile ul.PanelInfo li a:hover {
-	background: #D8DFEA;
-}
-*/
 
 /* Entry Pages */
 body.Entry #Content {
@@ -592,7 +541,11 @@ body.Discussion #Content {
 li.Editing {
 	background: #EDEFF4;
 }
-
+div.MorePager {
+	text-align: center;
+	font-size: 14px;
+	line-height: 2;
+}
 
 /* Foot */
 #Foot {

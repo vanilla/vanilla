@@ -92,5 +92,28 @@ jQuery(document).ready(function($) {
 				$Sender->Menu->AddLink('NewConversation', Img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
 		}
 	}
+	
+	// Change all pagers to be "more" pagers instead of standard numbered pagers
+	public function DiscussionsController_BeforeBuildPager_Handler($Sender) {
+		$Sender->EventArguments['PagerType'] = 'MorePager';
+	}
    
+	public function DiscussionController_BeforeBuildPager_Handler($Sender) {
+		$Sender->EventArguments['PagerType'] = 'MorePager';
+		$Sender->AddJsFile('jquery.gardenmorepager.js');
+	}
+	
+   public function DiscussionController_BeforeDiscussion_Handler($Sender) {
+		echo $Sender->Pager->ToString('less');
+	}
+	
+	public function DiscussionController_AfterBuildPager_Handler($Sender) {
+		$Sender->Pager->LessCode = 'Older Comments';
+		$Sender->Pager->MoreCode = 'More Comments';
+	}
+	
+	public function DiscussionsController_AfterBuildPager_Handler($Sender) {
+		$Sender->Pager->MoreCode = 'More Discussions';
+	}
+
 }

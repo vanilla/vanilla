@@ -321,6 +321,24 @@ jQuery(document).ready(function($) {
          return false;
       }
    });
+	
+	// Shrink large images to fit into message space, and pop into new window when clicked.
+	$('div.Message img').livequery(function() {
+		var img = $(this);
+		var container = img.parents('div.Message');
+		if (img.width() > container.width()) {
+			img.css('width', container.width()).css('cursor', 'pointer');
+			img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
+			img.next().click(function() {
+				window.open($(img).attr('src'));
+				return false;
+			});
+			img.click(function() {
+				window.open($(this).attr('src'));
+				return false;
+			})
+		}
+	}); 
    
 });
 

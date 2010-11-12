@@ -107,6 +107,9 @@ div.CommentForm textarea,
 #DiscussionForm textarea {
 	width:99%;
 }
+#ConversationForm form {
+	border: none;
+}
 div.Preview div.Message,
 ul.MessageList div.Message {
 	clear: none;

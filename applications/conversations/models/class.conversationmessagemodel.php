@@ -150,10 +150,10 @@ class ConversationMessageModel extends Gdn_Model {
             ->Select('uc.UserID')
             ->From('UserConversation uc')
             ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
-            ->Where('uc.LastMessageID', $MessageID)
+            // ->Where('uc.LastMessageID', $MessageID)
             ->Where('uc.UserID <>', $Session->UserID)
             ->Get();
-      
+
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
             // Notify the users of the new message.
@@ -169,7 +169,6 @@ class ConversationMessageModel extends Gdn_Model {
             $Story = ArrayValue('Body', $Fields, '');
             $ActivityModel->SendNotification($ActivityID, $Story);
          }
-            
       }
       return $MessageID;
    }

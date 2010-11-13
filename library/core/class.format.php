@@ -575,7 +575,7 @@ EOT;
          if(C('Garden.Format.Mentions')) {
             $Mixed = preg_replace(
                '/(^|[\s,\.])@(\w{1,20})\b/i', //{3,20}
-               Anchor('\1@\2', '/profile/\\2'),
+               '\1'.Anchor('@\2', '/profile/\\2'),
                $Mixed
             );
          }

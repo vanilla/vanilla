@@ -294,7 +294,7 @@ if (!function_exists('Attribute')) {
          $Name = array($Name => $Value);
       }
       foreach ($Name as $Attribute => $Val) {
-         if ($Val != '') {
+         if ($Val != '' && $Attribute != 'Standard') {
             $Return .= ' '.$Attribute.'="'.$Val.'"';
          }
       }

@@ -406,7 +406,7 @@ class ProfileController extends Gdn_Controller {
       $this->Invitations();
    }
    
-   public function Thumbnail() {
+   public function Thumbnail($UserReference = '', $Username = '') {
       $this->Permission('Garden.SignIn.Allow');
       $this->AddJsFile('jquery.jcrop.pack.js');
       $this->AddJsFile('profile.js');
@@ -414,8 +414,12 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          $this->Form->AddError('You must be authenticated in order to use this form.');
-         
-      $this->GetUserInfo();
+               
+      $this->GetUserInfo($UserReference, $Username);
+      
+      if ($this->User->UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
+         throw new Exception(T('You cannot edit the thumbnail of another member.'));
+      
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -427,7 +431,7 @@ class ProfileController extends Gdn_Controller {
       
       // Define the source (profile sized) picture & dimensions.
       if (preg_match('`https?://`i', $this->User->Photo)) {
-         $this->Form->AddError('You cannont edit the thumbnail of an externally linked profile picture.');
+         $this->Form->AddError('You cannot edit the thumbnail of an externally linked profile picture.');
          $this->SourceSize = 0;
       } else {
          $Source = PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s');
@@ -541,8 +545,11 @@ class ProfileController extends Gdn_Controller {
             }
             
             // Add profile options for everyone
-            if ($this->User->Photo != '' && $AllowImages)
-               $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            if ($this->User->Photo != '' && $AllowImages) {
+               $SideMenu->AddLink('Options', T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+            }
             
             $SideMenu->AddLink('Options', T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup'));
             $SideMenu->AddLink('Options', T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete');

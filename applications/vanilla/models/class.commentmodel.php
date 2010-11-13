@@ -726,10 +726,20 @@ class CommentModel extends VanillaModel {
 					->FirstRow();
 				if (is_object($OldData)) {
 					$this->SQL->Update('Discussion')
-						->Set('LastCommentID', $OldData->CommentID)
+                  ->Set('LastCommentID', $OldData->CommentID)
+                  ->Set('LastCommentUserID', $OldData->InsertUserID)
+                  ->Set('DateLastComment', $OldData->DateInserted)
 						->Where('DiscussionID', $Data->DiscussionID)
 						->Put();
 				}
+				else { // It was the ONLY comment
+               $this->SQL->Update('Discussion')
+                  ->Set('LastCommentID', NULL)
+                  ->Set('LastCommentUserID', NULL)
+                  ->Set('DateLastComment', $Data->DateUpdated)
+                  ->Where('DiscussionID', $Data->DiscussionID)
+                  ->Put();
+            }
 			}
 			
 			// Decrement the UserDiscussion comment count if the user has seen this comment

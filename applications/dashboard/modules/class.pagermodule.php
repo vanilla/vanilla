@@ -138,9 +138,9 @@ class PagerModule extends Gdn_Module {
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
-            $Details = sprintf(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+            $Details = sprintf(T('%1$s to %2$s of %3$s'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
-            $Details = sprintf(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+            $Details = sprintf(T('%1$s to %2$s'), $this->Offset, $this->_LastOffset);
          }
       }
       return $Details;

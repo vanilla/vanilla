@@ -359,7 +359,7 @@ class UpdateModel extends Gdn_Model {
                 'AddonKey' => 'porter',
                 'AddonTypeID' => ADDON_TYPE_CORE,
                 'Name' => 'Vanilla Porter',
-                'Description' => 'Drop this script on your existing site and go to it to export your existing forum data to the Vanilla 2 import format. If you want more information on how to use this application go to http://vanillaforums.com/blog/help-topics/importing-data.',
+                'Description' => 'Drop this script on your existing site and go to it to export your existing forum data to the Vanilla 2 import format. If you want more information on how to use this application go <a href="http://vanillaforums.com/blog/help-topics/importing-data">here</a>',
                 'Version' => $Version,
                 'Path' => $Path);
             $Info = array();

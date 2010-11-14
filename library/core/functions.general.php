@@ -1453,7 +1453,7 @@ if (!function_exists('SliceString')) {
       	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
       	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
       } else {
-         $Trim = trim($String, 0, $Length);
+         $Trim = substr($String, 0, $Length);
          return $Trim . ((strlen($Trim) != strlen($String)) ? $Suffix: ''); 
       }
    }

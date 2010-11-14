@@ -137,8 +137,10 @@ class Gdn_UploadImage extends Gdn_Upload {
                $SourceImage = imagecreatefromjpeg($Source);
             break;
          case 3:
-            if (GetValue('PNG Support', $GdInfo))
+            if (GetValue('PNG Support', $GdInfo)) {
                $SourceImage = imagecreatefrompng($Source);
+               imagealphablending($SourceImage, TRUE);
+            }
             break;
       }
       
@@ -146,10 +148,16 @@ class Gdn_UploadImage extends Gdn_Upload {
          throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
       
       // Create a new image from the raw source
-      if (function_exists('imagecreatetruecolor'))
+      if (function_exists('imagecreatetruecolor')) {
+         echo "TRUE";
          $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
-      else
+      } else
          $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
+
+      if ($OutputType == 'png') {
+         imagealphablending($TargetImage, FALSE);
+         imagesavealpha($TargetImage, TRUE);
+      }
          
       imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
       imagedestroy($SourceImage);
@@ -157,9 +165,9 @@ class Gdn_UploadImage extends Gdn_Upload {
       // No need to check these, if we get here then whichever function we need will be available
       if ($OutputType == 'gif')
          imagegif($TargetImage, $Target);
-      else if ($OutputType == 'png')
+      else if ($OutputType == 'png') {
          imagepng($TargetImage, $Target, (int)($ImageQuality/10));
-      else
+      } else
          imagejpeg($TargetImage, $Target, $ImageQuality);
    }
    

@@ -7,9 +7,14 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
 <div class="Info">
    <?php
       echo $this->Form->Errors();
+
+      echo '<div>', T('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
+
+      echo '<p>';
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button(T('Go'));
       printf(T('%s user(s) found.'), $this->Pager->TotalRecords);
+      echo '</p>';
       
    ?>
 </div>

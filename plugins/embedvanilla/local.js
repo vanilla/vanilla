@@ -74,7 +74,6 @@ $(function() {
 
    // If not embedded and we should be, redirect to the embedded version.
    if (!inIframe && forceRemoteUrl && remoteUrl != '') {
-      console.log('test');
       var path = document.location.toString().substr(webroot.length);
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)

@@ -572,3 +572,27 @@ div.FootMenu span {
 #Foot a.SignIn {
 	color: #3B5998;
 }
+
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #d7d8da;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #d7d8da;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dbe1ec;
+}
+.ac_over strong {
+   background: #5670a6;
+}
+.ac_over {
+   background: #3b5998;
+   color: #fff;
+}

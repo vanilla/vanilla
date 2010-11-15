@@ -2,6 +2,15 @@
 $Session = Gdn::Session();
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo '<li>', Anchor(T('Theming Overview'), 'http://vanillaforums.org/page/Configuration-DashboardAppearanceThemes'), '</li>';
+   echo '<li>', Anchor(T('Quick-Start Guide to Creating Themes for Vanilla'), 'http://vanillaforums.org/page/ThemeQuickStart'), '</li>';
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Manage Themes'); ?></h1>
 <div class="Info">
 <?php

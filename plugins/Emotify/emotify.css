@@ -138,6 +138,7 @@
     box-shadow: 2px 2px 4px #777;
     -moz-box-shadow: 2px 2px 4px #777;
     -webkit-box-shadow: 2px 2px 4px #777;
+    z-index: 1000;
 }
 .EmoticonBox {
     background-color: #fff;

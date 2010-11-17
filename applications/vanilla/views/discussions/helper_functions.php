@@ -77,10 +77,10 @@ function WriteFilterTabs(&$Sender) {
       $CountDrafts = $Session->User->CountDrafts;
    }
    if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
-      $Bookmarked .= '<span>'.$CountBookmarks.'</span>';            
+      $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
    if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
-      $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';            
+      $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';
 
    if (is_numeric($CountDrafts) && $CountDrafts > 0)
       $MyDrafts .= '<span>'.$CountDrafts.'</span>';

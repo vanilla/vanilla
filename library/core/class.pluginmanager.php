@@ -461,8 +461,13 @@ class Gdn_PluginManager {
             closedir($FolderHandle);
          }
       }
-      
-      return (is_null($GetPlugin)) ? $this->_AvailablePlugins : ((array_key_exists($GetPlugin,$this->_AvailablePlugins)) ? $this->_AvailablePlugins[$GetPlugin] : FALSE);
+
+      if (is_null($GetPlugin))
+         return $this->_AvailablePlugins;
+      elseif (ArrayKeyExistsI($GetPlugin, $this->_AvailablePlugins))
+         return ArrayValueI($GetPlugin, $this->_AvailablePlugins);
+      else
+         return FALSE;
    }
    
    public function ScanPluginFile($PluginFile, $VariableName = NULL) {
@@ -472,8 +477,13 @@ class Gdn_PluginManager {
       $ClassBuffer = FALSE;
       $ClassName = '';
       $PluginInfoString = '';
-      $PluginInfo = FALSE;
-      $ParseVariableName = $VariableName ? '$'.$VariableName : '$PluginInfo';
+      if ($VariableName) {
+         $ParseVariableName = '$'.$VariableName;
+         $$VariableName = array();
+      } else {
+         $ParseVariableName = '$PluginInfo';
+         $PluginInfo = FALSE;
+      }
 
       foreach ($Lines as $Line) {
          if ($InfoBuffer && substr(trim($Line), -2) == ');') {
@@ -603,6 +613,8 @@ class Gdn_PluginManager {
       
       // Couldn't load the plugin info.
       if (!$Plugin) return;
+
+      $PluginName = $Plugin['Index'];
       
       $this->TestPlugin($PluginName, $Validation, $Setup);
       
@@ -627,6 +639,11 @@ class Gdn_PluginManager {
    }
    
    public function DisablePlugin($PluginName) {
+      // Get the plugin and make sure it's name is the correct case.
+      $Plugin = $this->GetPluginInfo($PluginName);
+      if ($Plugin)
+         $PluginName = $Plugin['Index'];
+
       // 1. Check to make sure that no other enabled plugins rely on this one
       // Get all available plugins and compile their requirements
       foreach ($this->EnabledPlugins as $CheckingName => $CheckingInfo) {
@@ -644,9 +661,7 @@ class Gdn_PluginManager {
       unset($this->EnabledPlugins[$PluginName]);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $ApplicationManager->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
+      Gdn::Locale()->Refresh();
    }
    
     /**

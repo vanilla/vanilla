@@ -1644,7 +1644,7 @@ div.Summary table tbody td {
 }
 
 .Tag {
-   background: #333;
+   background: #555;
    color: #fff;
    border-radius: 2px;
    -moz-border-radius: 2px;
@@ -1652,4 +1652,35 @@ div.Summary table tbody td {
 
    font-size: 11px;
    padding: 1px 6px !Important;
+}
+
+.NumberedPager {
+   font-size:16px;
+   font-weight:bold;
+   margin:1px 0 0;
+   text-align:right;
+}
+
+.NumberedPager a,
+.NumberedPager span {
+	padding: 0 4px;
+}
+.NumberedPager span,
+.NumberedPager a.Highlight {
+	color: #777;
+}
+.NumberedPager a.Next,
+.NumberedPager span.Next,
+.NumberedPager a.Previous,
+.NumberedPager span.Previous {
+	font-size: 16px;
+	line-height: 10px;
+}
+.NumberedPager a.Next,
+.NumberedPager span.Next {
+	margin-left: 6px;
+}
+.NumberedPager a.Previous,
+.NumberedPager span.Previous {
+	margin-right: 6px;
 }

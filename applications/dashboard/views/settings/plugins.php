@@ -17,12 +17,12 @@ $DisabledCount = $PluginCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($PluginCount)), 'settings/plugins/all'); ?></li>
-      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
-      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All ').Wrap($PluginCount), 'settings/plugins/all'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled ').Wrap($EnabledCount), 'settings/plugins/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled ').Wrap($DisabledCount), 'settings/plugins/disabled'); ?></li>
       <?php
       if ($AddonUrl != '')
-         echo Wrap(Anchor('Get More Plugins', $AddonUrl), 'li');
+         echo Wrap(Anchor(T('Get More Plugins'), $AddonUrl), 'li');
       ?>
    </ul>
 </div>
@@ -73,10 +73,10 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             );
             
             if ($SettingsUrl != '')
-               echo Anchor('Settings', $SettingsUrl, 'SmallButton');
+               echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
             
             if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName))
-               echo Anchor('Remove', '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
+               echo Anchor(T('Remove'), '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
 
          ?></td>
          <td class="Alt Info"><?php
@@ -116,12 +116,12 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
 
             if ($Author != '') {
                $Info .= '<span>|</span>';
-               $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
+               $Info .= sprintf(T('By %s'), $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
             }
             
             if ($PluginUrl != '') {
                $Info .= '<span>|</span>';
-               $Info .= Anchor('Visit Site', $PluginUrl);
+               $Info .= Anchor(T('Visit Site'), $PluginUrl);
             }
             
             echo $Info != '' ? $Info : '&nbsp;';

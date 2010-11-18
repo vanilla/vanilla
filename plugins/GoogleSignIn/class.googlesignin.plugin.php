@@ -31,15 +31,17 @@ class GoogleSignInPlugin extends Gdn_Plugin {
    /// Properties ///
 
    protected function _AuthorizeHref($Popup = FALSE) {
-      $Result = Url('/entry/openid', TRUE);
-      $Query = array('url' => 'https://www.google.com/accounts/o8/id');
+      $Url = Url('/entry/openid', TRUE);
+      $UrlParts = explode('?', $Url);
+      parse_str(GetValue(1, $UrlParts, ''), $Query);
+
+      $Query['url'] = 'https://www.google.com/accounts/o8/id';
       if (isset($_GET['Target']))
          $Query['Target'] = $_GET['Target'];
       if ($Popup)
          $Query['display'] = 'popup';
 
-      if (count($Query) > 0)
-         $Result .= '?'.http_build_query ($Query);
+       $Result = $UrlParts[0].'?'.http_build_query($Query);
       return $Result;
    }
    
@@ -106,9 +108,6 @@ class GoogleSignInPlugin extends Gdn_Plugin {
 	public function Base_BeforeSignInLink_Handler($Sender) {
       if (!$this->IsEnabled())
 			return;
-		
-		// if (!IsMobile())
-		// 	return;
 
 		if (!Gdn::Session()->IsValid())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect GoogleConnect'));

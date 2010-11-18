@@ -107,8 +107,8 @@ class MinifyPlugin extends Gdn_Plugin {
 			$BasePath = 'b='.$BasePath.'&';
 
       $Head->Tags($Tags);
-      $Head->AddCss($Url.$BasePath.'f='.implode(',', $CssToCache), 'screen');
+      $Head->AddCss($Url.$BasePath.'f='.implode(',', array_unique($CssToCache)), 'screen');
       $Head->AddScript($Url.'g=globaljs', 'text/javascript', -100);
-		$Head->AddScript($Url.$BasePath.'f='.implode(',', $JsToCache));
+		$Head->AddScript($Url.$BasePath.'f='.implode(',', array_unique($JsToCache)));
    }
 }

@@ -410,7 +410,6 @@ div.MorePager a.Loading {
 #Head {
    background: #38abe3;
    padding: 0;
-   text-align: right;
 }
 div.Search:after,
 div#Search:after {
@@ -421,13 +420,11 @@ div#Search:after {
    visibility: hidden;
 }
 body #Head h1 {
-   display: block;
+   display: inline-block;
    font-weight: bold;
    margin: 0;
-   padding: 21px 7px 0 0;
+   padding: 21px 10px 4px 0;
    border: 0;
-   float: left;
-   line-height: 1;
 }
 #Head h1 a span {
    font-size: 24px;
@@ -482,14 +479,6 @@ body #Head h1 {
   	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;     	
-}
-#Menu {
-   height: 28px;
-   padding: 0;
-}
-#Menu {
-   margin: 0;
-   padding: 0;
 }
 #Menu ul {
 	display: none;
@@ -670,14 +659,16 @@ ul.Options li.Active ul {
 
 /* ================================================================ Main Menu */
 div.Menu {
-   text-align: right;
    width: 960px;
    margin: 0 auto;
+   position: relative;
+   text-align: left;
+   vertical-align: bottom;
 }
 ul#Menu {
-   float: left;
-   margin: 0 auto;
-   padding: 22px 0 0 10px;
+   display: inline-block;
+   margin-right: 280px;
+   vertical-align: bottom;
 }
 #Menu ul,
 #Menu li.Active {
@@ -702,6 +693,12 @@ ul#Menu {
    color: #299fc7;
 }
 
+#Head .Search, #Head #Search {
+   position: absolute;
+   right: 0;
+   bottom: 6px;
+   text-align: right;
+}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {

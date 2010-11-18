@@ -540,6 +540,11 @@ class Gdn_PluginManager {
          $PluginInfo = $this->ScanPluginFile($PluginFile);
          
          if (!is_null($PluginInfo)) {
+            // Look for an icon.
+            $IconFile = SafeGlob(dirname($PluginFile).'/icon.*', array('jpg', 'gif', 'png'));
+            if (($IconFile = GetValue(0, $IconFile)))
+               $PluginInfo['IconUrl'] = Url(str_replace(PATH_ROOT, '', $IconFile));
+
             $this->_AvailablePlugins[$PluginInfo['Index']] = $PluginInfo;
             $this->_PluginsByClassName[$PluginInfo['ClassName']] = $PluginInfo['Index'];
          }

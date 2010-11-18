@@ -20,3 +20,4 @@ $LocaleInfo['skeleton'] = array( // make sure the key of this array is the same 
 );
 
 $Definition['Some Code'] = 'Translation goes here.';
+$Definition['Iñtërnâtiônàlizætiøn'] = 'Iñtërnâtiônàlizætiøn Translation!!!';

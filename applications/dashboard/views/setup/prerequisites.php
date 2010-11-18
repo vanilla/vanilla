@@ -13,7 +13,7 @@ echo $this->Form->Open();
       echo $this->Form->Errors(); 
    ?>
    <div class="Button">
-      <?php echo Anchor('Try Again', '/dashboard/setup'); ?>
+      <?php echo Anchor(T('Try Again'), '/dashboard/setup'); ?>
    </div>
 </div>
 <?php

@@ -7,6 +7,6 @@ echo $this->Form->Open();
 </div>
 <div class="Form">
    <ul>
-      <li><?php echo Anchor('Click here to carry on to your dashboard', 'settings'); ?>.</li>
+      <li><?php echo Anchor(T('Click here to carry on to your dashboard'), 'settings'); ?>.</li>
    </ul>
 </div>

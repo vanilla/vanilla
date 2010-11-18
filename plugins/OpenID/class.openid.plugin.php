@@ -92,6 +92,12 @@ class OpenIDPlugin extends Gdn_Plugin {
       }
    }
 
+   public function Setup() {
+      if (!ini_get('allow_url_fopen')) {
+         throw new Gdn_UserException('This plugin requires the allow_url_fopen php.ini setting.');
+      }
+   }
+
    /// Plugin Event Handlers ///
 
    public function Base_ConnectData_Handler($Sender, $Args) {

@@ -520,20 +520,19 @@ class Gdn_Format {
       }
    }
    protected static function LinksCallback($Matches) {
+      static $Width, $Height;
+      if (!isset($Width)) {
+         list($Width, $Height) = Gdn_Format::GetEmbedSize();
+      }
       $Pr = $Matches[1];
       $Url = $Matches[2];
       if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches) && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
-         $Width = 400;
-         $Height = 225;
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
-         $Width = 400;
-         $Height = 225;
-
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
@@ -543,6 +542,41 @@ EOT;
 EOT;
       }
       return $Result;
+   }
+   
+   /**
+    * Returns embedded video width and height, based on configuration.
+    * 
+    * @return array array(Width, Height)
+    */
+   protected static function GetEmbedSize() {
+      $Sizes = array(
+         'tiny' => array( 400, 225),
+         'small'=> array( 560, 340),
+         'normal'=>array( 640, 385),
+         'big'  => array( 853, 505),
+         'huge' => array(1280, 745));
+      $Size = Gdn::Config('Garden.Format.EmbedSize', 'normal');
+      
+      // We allow custom sizes <Width>x<Height>
+      if (!isset($Sizes[$Size])) {
+         if (strpos($Size, 'x')) {
+            list($Width, $Height) = explode('x', $Size);
+            $Width = intval($Width);
+            $Height = intval($Height);
+            
+            // Dimensions are too small, or 0
+            if ($Width<30 or $Height<30) {
+               $Size = 'normal';
+            }
+         } else {
+            $Size = 'normal';
+         }
+      }
+      if (isset($Sizes[$Size])) {
+         list($Width, $Height) = $Sizes[$Size];
+      }
+      return array($Width, $Height);
    }
 
    /**

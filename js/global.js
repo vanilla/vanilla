@@ -186,7 +186,7 @@ jQuery(document).ready(function($) {
    $('span.Email.EmailUnformatted').livequery(function() {
       var el = $(this);
       el.removeClass('EmailUnformatted');
-      var email = el.html().replace(/<em>dot<\/em>/ig, '.').replace(/<strong>at<\/strong>/ig, '@');
+	  var email = $(this).html().replace(/<em[^>]*>dot<\/em>/ig, '.').replace(/<strong[^>]*>at<\/strong>/ig, '@');
       el.html('<a href="mailto:' + email + '">' + email + '</a>');
    });
 

@@ -200,7 +200,7 @@ $(function(){
   
   emotify.emoticons(emoticons);
   
-  $('div.Comment div.Message p, div.Preview div.Message').livequery(function() {
+  $('div.Comment div.Message, div.Preview div.Message').livequery(function() {
     $(this).html(emotify($(this).html()));
   });
   

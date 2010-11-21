@@ -233,6 +233,17 @@ class PostController extends VanillaController {
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
             
+      // If invalid $DiscussionID, get from form
+      $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
+      
+      // Set discussion data
+      $this->DiscussionID = $DiscussionID;
+      $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      // If closed, cancel & go to discussion
+      if ($Discussion->Closed == 1)
+         Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+            
       // Setup head
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
@@ -250,17 +261,10 @@ class PostController extends VanillaController {
       $Editing = $CommentID > 0 || $DraftID > 0;
       $this->EventArguments['Editing'] = $Editing;
       
-      // If invalid $DiscussionID, get from form
-      $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
-      
       // Add hidden IDs to form
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('CommentID', $CommentID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
-      
-      // Set discussion data
-      $this->DiscussionID = $DiscussionID;
-      $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       
       // Check permissions
       if ($Editing) {

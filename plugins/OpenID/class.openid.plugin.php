@@ -32,15 +32,19 @@ class OpenIDPlugin extends Gdn_Plugin {
    /// Methods ///
 
    protected function _AuthorizeHref($Popup = FALSE) {
-      $Result = Url('/entry/openid', TRUE);
-      $Query = array();
+      $Url = Url('/entry/openid', TRUE);
+      $UrlParts = explode('?', $Url);
+      parse_str(GetValue(1, $UrlParts, ''), $Query);
+
+      $Path = '/'.Gdn::Request()->Path();
+      $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
+
       if (isset($_GET['Target']))
          $Query['Target'] = $_GET['Target'];
       if ($Popup)
          $Query['display'] = 'popup';
 
-      if (count($Query) > 0)
-         $Result .= '?'.http_build_query ($Query);
+      $Result = $UrlParts[0].'?'.http_build_query($Query);
       return $Result;
    }
 
@@ -59,8 +63,12 @@ class OpenIDPlugin extends Gdn_Plugin {
       if (isset($_GET['url']))
          $OpenID->identity = $_GET['url'];
 
-      $OpenID->returnUrl = Url('/entry/connect/openid', TRUE);
-      $OpenID->returnUrl .= '?'.http_build_query(ArrayTranslate($_GET, array('display')));
+      $Url = Url('/entry/connect/openid', TRUE);
+      $UrlParts = explode('?', $Url);
+      parse_str(GetValue(1, $UrlParts, ''), $Query);
+      $Query = array_merge($Query, ArrayTranslate($_GET, array('display')));
+
+      $OpenID->returnUrl = $UrlParts[0].'?'.http_build_query($Query);
       $OpenID->required = array('contact/email', 'namePerson/first', 'namePerson/last', 'pref/language');
 
       $this->EventArguments['OpenID'] = $OpenID;
@@ -89,6 +97,12 @@ class OpenIDPlugin extends Gdn_Plugin {
          $List = $Sender->Data('AuthenticationConfigureList');
          $List['openid'] = '/dashboard/plugin/openid';
          $Sender->SetData('AuthenticationConfigureList', $List);
+      }
+   }
+
+   public function Setup() {
+      if (!ini_get('allow_url_fopen')) {
+         throw new Gdn_UserException('This plugin requires the allow_url_fopen php.ini setting.');
       }
    }
 

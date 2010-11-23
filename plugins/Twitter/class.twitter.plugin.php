@@ -66,15 +66,19 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
    protected function _AuthorizeHref($Popup = FALSE) {
-      $Result = Url('/entry/twauthorize', TRUE);
-      $Query = array();
-      if (isset($_GET['Target']))
-         $Query['Target'] = $_GET['Target'];
+      $Url = Url('/entry/twauthorize', TRUE);
+      $UrlParts = explode('?', $Url);
+
+      parse_str(GetValue(1, $UrlParts, ''), $Query);
+      $Path = Gdn::Request()->Path();
+      $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
+
+//      if (isset($_GET['Target']))
+//         $Query['Target'] = $_GET['Target'];
       if ($Popup)
          $Query['display'] = 'popup';
+      $Result = $UrlParts[0].'?'.http_build_query($Query);
 
-      if (count($Query) > 0)
-         $Result .= '?'.http_build_query ($Query);
       return $Result;
    }
 
@@ -183,10 +187,9 @@ class TwitterPlugin extends Gdn_Plugin {
       echo $Response;
    }
 
-   public function EntryController_Twauthorize_Create() {
-      $Query = FALSE;
-      if (GetIncomingValue('display'))
-         $Query = 'display='.urlencode(GetIncomingValue('display'));
+   public function EntryController_Twauthorize_Create($Sender, $Args) {
+      $Query = ArrayTranslate($Sender->Request->Get(), array('display', 'Target'));
+      $Query = http_build_query($Query);
       $this->Authorize($Query);
    }
 

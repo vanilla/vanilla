@@ -148,17 +148,33 @@ class FacebookPlugin extends Gdn_Plugin {
       if ($Sender->Request->Get('display'))
          $Query = 'display='.urlencode($Sender->Request->Get('display'));
 
-      $RedirectUri = urlencode(ConcatSep('&', $this->RedirectUri(), $Query));
+      $RedirectUri = ConcatSep('&', $this->RedirectUri(), $Query);
+      $RedirectUri = urlencode($RedirectUri);
 
       // Get the access token.
       if ($Code || !($AccessToken = $this->AccessToken())) {
          // Exchange the token for an access token.
+         $Code = urlencode($Code);
 
          $Url = "https://graph.facebook.com/oauth/access_token?client_id=$AppID&client_secret=$Secret&code=$Code&redirect_uri=$RedirectUri";
 
          // Get the redirect URI.
-         $Contents = file_get_contents($Url);
-         parse_str($Contents, $Tokens);
+         $C = curl_init();
+         curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
+         curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
+         curl_setopt($C, CURLOPT_URL, $Url);
+         $Contents = curl_exec($C);
+         $Info = curl_getinfo($C);
+         if (strpos(GetValue('content_type', $Info, ''), '/javascript') !== FALSE) {
+            $Tokens = json_decode($Contents, TRUE);
+         } else {
+            parse_str($Contents, $Tokens);
+         }
+
+         if (GetValue('error', $Tokens)) {
+            throw new Gdn_UserException('Facebook returned the following error: '.GetValueR('error.message', $Tokens, 'Unknown error.'), 400);
+         }
+
          $AccessToken = GetValue('access_token', $Tokens);
          $Expires = GetValue('expires', $Tokens, NULL);
 
@@ -210,7 +226,6 @@ class FacebookPlugin extends Gdn_Plugin {
       if ($Query)
          $RedirectUri .= '&'.$Query;
       $RedirectUri = urlencode($RedirectUri);
-      $Foo = strlen($RedirectUri);
 
       $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=email,publish_stream";
       if ($Query)
@@ -225,9 +240,17 @@ class FacebookPlugin extends Gdn_Plugin {
          $this->_RedirectUri = $NewValue;
       elseif ($this->_RedirectUri === NULL) {
          $RedirectUri = Url('/entry/connect/facebook', TRUE);
+         if (strpos($RedirectUri, '=') !== FALSE) {
+            $p = strrchr($RedirectUri, '=');
+            $Uri = substr($RedirectUri, 0, -strlen($p));
+            $p = urlencode(ltrim($p, '='));
+            $RedirectUri = $Uri.'='.$p;
+         }
+
          $Path = Gdn::Request()->Path();
          $Args = array('Target' => GetValue('Target', $_GET, $Path ? $Path : '/'));
-         $RedirectUri .= '?'.http_build_query($Args);
+         $RedirectUri .= strpos($RedirectUri, '?') === FALSE ? '?' : '&';
+         $RedirectUri .= http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
       }
       
@@ -243,6 +266,15 @@ class FacebookPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+      $Error = '';
+      if (!ini_get('allow_url_fopen'))
+         $Error = ConcatSep("\n", $Error, 'This plugin requires the allow_url_fopen php.ini setting.');
+      if (!function_exists('curl_init'))
+         $Error = ConcatSep("\n", $Error, 'This plugin requires curl.');
+      if ($Error)
+         throw new Gdn_UserException($Error, 400);
+
+
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),

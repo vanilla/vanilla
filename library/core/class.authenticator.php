@@ -41,6 +41,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
    const AUTH_PARTIAL         = -3;
    const AUTH_SUCCESS         = -4;
    const AUTH_ABORTED         = -5;
+   const AUTH_CREATED         = -6;
    
    const HANDSHAKE_JS         = 'javascript';
    const HANDSHAKE_DIRECT     = 'direct';

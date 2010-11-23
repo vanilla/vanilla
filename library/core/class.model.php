@@ -458,6 +458,25 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Set($Column, $Values)
 			->Put();
 	}
+    
+    
+	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
+		if (!isset($this->Schema)) $this->DefineSchema();
+		$PrimaryKey = $this->PrimaryKey;
+        
+		if ($ForceValue !== FALSE) {
+            $Value = $ForceValue;
+		} else {
+            $Value = '1';
+            $Row = $this->GetID($RowID);
+            $Value = ($Row->$Property == '1' ? '0' : '1');
+		}
+		$this->SQL
+            ->Update($this->Name)
+            ->Set($Property, $Value)
+            ->Where($PrimaryKey, $RowID)
+            ->Put();
+		return $Value;
+   }
 }
 
-?>

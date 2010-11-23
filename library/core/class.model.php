@@ -467,6 +467,7 @@ class Gdn_Model extends Gdn_Pluggable {
 		if ($ForceValue !== FALSE) {
             $Value = $ForceValue;
 		} else {
+            $Value = '1';
             $Row = $this->GetID($RowID);
             $Value = ($Row->$Property == '1' ? '0' : '1');
 		}

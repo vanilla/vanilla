@@ -1140,11 +1140,13 @@ class Gdn_Controller extends Gdn_Pluggable {
          echo htmlspecialchars($Data);
       } else {
          $Data = (array)$Data;
-         foreach ($Data as $Key => $Value) {
+         if (count($Data) > 0) {
+            foreach ($Data as $Key => $Value) {
+               echo "\n";
+               $this->_RenderXml($Value, $Key, $Indent.' ');
+            }
             echo "\n";
-            $this->_RenderXml($Value, $Key, $Indent.' ');
          }
-         echo "\n";
       }
       echo "</$Node>";
    }

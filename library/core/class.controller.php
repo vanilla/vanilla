@@ -1135,7 +1135,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else {
          $Data = (array)$Data;
          if (count($Data) > 0) {
-               foreach ($Data as $Key => $Value) {
+            foreach ($Data as $Key => $Value) {
                echo "\n";
                $this->_RenderXml($Value, $Key, $Indent.' ');
             }

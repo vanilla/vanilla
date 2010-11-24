@@ -124,7 +124,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
                $Info .= Anchor(T('Visit Site'), $PluginUrl);
             }
             
-            echo $Info != '' ? $Info : '&nbsp;';
+            echo $Info != '' ? $Info : '&#160;';
                
          ?></td>
       </tr>

@@ -41,7 +41,7 @@ foreach ($this->CategoryData->Result() as $Category) {
    <tr id="<?php echo $Category->CategoryID; ?>"<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
       <td class="First"><strong><?php echo $Category->Name; ?></strong></td>
       <td class="Alt"><?php echo $Category->Description; ?></td>
-      <td><?php echo $Category->AllowDiscussions == '1' ? Url('categories/'.$Category->UrlCode.'/') : '&nbsp;'; ?></td>
+      <td><?php echo $Category->AllowDiscussions == '1' ? Url('categories/'.$Category->UrlCode.'/') : '&#160;'; ?></td>
       <td class="Alt Last">
          <?php
          echo Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton');

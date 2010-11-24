@@ -83,7 +83,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
             $InfoString .= sprintf('By %s', Anchor($Author, GetValue('AuthorUrl', $Info, '')));
          }
 
-         echo $InfoString != '' ? $InfoString : '&nbsp;';
+         echo $InfoString != '' ? $InfoString : '&#160;';
 
       ?></td>
    </tr>

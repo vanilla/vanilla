@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
       postValues += '&'+btn.name+'='+btn.value;
       var discussionID = $(frm).find('[name$=DiscussionID]').val();
       var action = $(frm).attr('action') + '/' + discussionID;
-      $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
+      $(frm).find(':submit:last').after('<span class="Progress">&#160;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');
       
       $.ajax({
@@ -96,7 +96,7 @@ jQuery(document).ready(function($) {
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
       // Add a spinner and disable the buttons
-      $(frm).find(':submit:last').after('<span class="Progress">&nbsp;</span>');
+      $(frm).find(':submit:last').after('<span class="Progress">&#160;</span>');
       $(frm).find(':submit').attr('disabled', 'disabled');      
       
       $.ajax({

@@ -62,7 +62,7 @@ foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
       echo '</tr>';
 }
    if ($Col > 0)
-      echo '<td colspan="'.(3 - $Col).'">&nbsp;</td></tr>';
+      echo '<td colspan="'.(3 - $Col).'">&#160;</td></tr>';
 
 ?>
    </tbody>

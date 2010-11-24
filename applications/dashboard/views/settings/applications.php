@@ -109,7 +109,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
                $Info .= Anchor(T('Visit Site'), $AppUrl);
             }
             
-            echo $Info != '' ? $Info : '&nbsp;';
+            echo $Info != '' ? $Info : '&#160;';
             ?>
          </td>
       </tr>

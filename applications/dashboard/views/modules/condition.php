@@ -63,7 +63,7 @@ function WriteConditionEdit($Condition, $Sender) {
          <th width="30%"><?php echo T('Condition Type', 'Type'); ?></th>
          <th width="30%"><?php echo T('Condition Field', 'Field'); ?></th>
          <th width="30%"><?php echo T('Condition Expression', 'Value'); ?></th>
-         <th>&nbsp;</th>
+         <th>&#160;</th>
       </tr>
    </thead>
    <?php

@@ -22,7 +22,8 @@ class UpdateController extends Gdn_Controller {
       $this->Permission('Garden.Settings.Manage');
       $this->Update = new UpdateModel();
       
-      // Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
+      /*
+// Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
       
          $Next = $this->Update->Action();
@@ -40,6 +41,7 @@ class UpdateController extends Gdn_Controller {
          }
          
       }
+*/
       
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
@@ -49,7 +51,6 @@ class UpdateController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       
-      $this->AddCssFile('admin.css');
       $this->AddCssFile('update.css');
       
       $this->MasterView = 'update';

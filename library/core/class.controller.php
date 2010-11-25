@@ -1088,7 +1088,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Remove values that should not be transmitted via api
-      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod'));
+      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
       
       $this->Finalize();
 
@@ -1130,6 +1130,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Handle numeric arrays.
       if (is_numeric($Node))
          $Node = 'Item';
+
+      if (!$Node)
+         return;
       
       echo "$Indent<$Node>";
 

@@ -33,7 +33,7 @@ class BookmarkedModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (is_object($this->Data) && $this->Data->NumRows() > 0)
+      if (isset($this->Data) && is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

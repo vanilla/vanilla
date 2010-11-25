@@ -1,0 +1,1 @@
+<?php echo T('Your copy of Vanilla is currently up to date. No update is necessary.'); ?>

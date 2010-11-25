@@ -658,7 +658,14 @@ class ProfileController extends Gdn_Controller {
    public function GetUserInfo($UserReference = '', $Username = '') {
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
          Redirect('dashboard/home/permission');
-         
+      
+		// If a UserID was provided as a querystring parameter, use it over anything else:
+		$UserID = GetIncomingValue('UserID');
+		if ($UserID > 0) {
+			$UserReference = $UserID;
+			$Username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
+		}
+		   
       $this->Roles = array();
       if ($UserReference == '') {
          $this->User = $this->UserModel->Get(Gdn::Session()->UserID);
@@ -676,6 +683,9 @@ class ProfileController extends Gdn_Controller {
          $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
             $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
+			
+			$this->SetData('User', $this->User);
+			$this->SetData('UserRoles', $this->Roles);
       }
       
       // Make sure the userphoto module gets added to the page

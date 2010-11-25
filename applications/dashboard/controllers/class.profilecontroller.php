@@ -111,6 +111,12 @@ class ProfileController extends Gdn_Controller {
       } else {
          $this->CanonicalUrl(Url('profile/'.strtolower($this->User->Name), TRUE));
       }
+
+//      $User = ArrayTranslate((array)$this->User, array('UserID', 'Name', 'Gender', 'CountVisits', 'CountNotifications', 'CountDiscussions', 'CountComments'));
+//      if ($this->User->ShowEmail)
+//         $User['Email'] = $this->User->Email;
+
+      $this->SetData($User);
       
       $this->Render();
    }
@@ -170,8 +176,8 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
 
-   public function Index($UserReference = '', $Username = '') {
-      return $this->Activity($UserReference, $Username);
+   public function Index($User = '', $Username = '') {
+      return $this->Activity($User, $Username);
    }
    
    public function Invitations() {

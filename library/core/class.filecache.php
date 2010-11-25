@@ -170,7 +170,8 @@ class Gdn_Filecache extends Gdn_Cache {
       }
       $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
       
-      $Cache = fopen($CacheFile, 'r');
+      $Cache = @fopen($CacheFile, 'r');
+      if (!$Cache) return Gdn_Cache::CACHEOP_FAILURE;
       $TimeoutMS = $Container[Gdn_Cache::CONTAINER_TIMEOUT] * 1000;
       $EndTimeMS = microtime(TRUE) + $TimeoutMS;
       $Data = NULL;

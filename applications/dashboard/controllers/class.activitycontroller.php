@@ -27,7 +27,7 @@ class ActivityController extends Gdn_Controller {
       parent::Initialize();
    }
    
-   public function Index($RoleID) {
+   public function Index($RoleID = '') {
       $this->Permission('Garden.Activity.View');
       
       // Limit to specific RoleIDs?

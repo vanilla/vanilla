@@ -285,8 +285,9 @@ class Gdn_FileSystem {
     * @param string $File The full path to the file being served.
     * @param string $Name The name to give the file being served (don't include file extension, it will be added automatically). Will use file's name on disk if ignored.
     * @param string $MimeType The mime type of the file.
+    * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
-   public static function ServeFile($File, $Name = '', $MimeType = '') {
+   public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
       if (is_readable($File)) {
          // Get the db connection and make sure it is closed
          $Database = Gdn::Database();
@@ -330,11 +331,15 @@ class Gdn_FileSystem {
          @ob_end_clean();
          
          // required for IE, otherwise Content-Disposition may be ignored
-         if(ini_get('zlib.output_compression'))
+         if (ini_get('zlib.output_compression'))
             ini_set('zlib.output_compression', 'Off');
          
-         header('Content-Type: ' . $MimeType);
-         header('Content-Disposition: attachment; filename="'.$Name.'"');
+         if ($ServeMode == 'inline')
+            header('Content-Disposition: inline; filename="'.$Name.'"');
+         else
+            header('Content-Disposition: attachment; filename="'.$Name.'"');
+         
+         header('Content-Type: '.$MimeType);
          header("Content-Transfer-Encoding: binary");
          header('Accept-Ranges: bytes');
          header("Cache-control: private");

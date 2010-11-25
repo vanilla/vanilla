@@ -72,11 +72,12 @@ class CategoriesController extends VanillaController {
          $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
-      $this->SetData('Category', $Category, TRUE);
       
       if ($Category === FALSE)
          return $this->All();
       
+      $this->SetData('Category', $Category, TRUE);
+
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
@@ -166,6 +167,7 @@ class CategoriesController extends VanillaController {
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
       $this->CategoryData = $this->CategoryModel->GetFull();
+		$this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
          $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));

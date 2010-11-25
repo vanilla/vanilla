@@ -730,7 +730,7 @@ class Gdn_Request {
 
       if (!$RewriteUrls) {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
-         $Query = str_replace('?', '&', $Query);
+         $Query = str_replace('?', '&amp;', $Query);
       }
 
       if($Path == '') {
@@ -741,7 +741,7 @@ class Gdn_Request {
          if (!$Query) {
             $Query = $this->GetRequestArguments(self::INPUT_GET);
             if (count($Query) > 0)
-               $Query = ($RewriteUrls ? '?' : '&').http_build_query($Query);
+               $Query = ($RewriteUrls ? '?' : '&amp;').http_build_query($Query);
             else
                unset($Query);
          }

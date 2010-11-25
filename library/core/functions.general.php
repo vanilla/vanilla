@@ -1362,6 +1362,38 @@ if (!function_exists('RemoveKeyFromArray')) {
    }
 }
 
+if (!function_exists('RemoveKeysFromNestedArray')) {
+   function RemoveKeysFromNestedArray($Array, $Matches) {
+      if (is_array($Array)) {
+         foreach ($Array as $Key => $Value) {
+            $IsMatch = FALSE;
+            foreach ($Matches as $Match) {
+               if (StringEndsWith($Key, $Match)) {
+                  unset($Array[$Key]);
+                  $IsMatch = TRUE;
+               }
+            }
+            if (!$IsMatch && (is_array($Value) || is_object($Value)))
+               $Array[$Key] = RemoveKeysFromNestedArray($Value, $Matches);
+         }
+      } else if (is_object($Array)) {
+         $Arr = get_object_vars($Array);
+         foreach ($Arr as $Key => $Value) {
+            $IsMatch = FALSE;
+            foreach ($Matches as $Match) {
+               if (StringEndsWith($Key, $Match)) {
+                  unset($Array->$Key);
+                  $IsMatch = TRUE;
+               }
+            }
+            if (!$IsMatch && (is_array($Value) || is_object($Value)))
+               $Array->$Key = RemoveKeysFromNestedArray($Value, $Matches);
+         }
+      }
+      return $Array;
+   }
+}
+
 if (!function_exists('RemoveQuoteSlashes')) {
  	function RemoveQuoteSlashes($String) {
 		return str_replace("\\\"", '"', $String);

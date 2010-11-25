@@ -115,10 +115,15 @@ class SearchModel extends Gdn_Model {
 			$this->_Parameters[$Key] = $Search;
 		}
 		
-		$Result = $this->Database->Query($Sql, $this->_Parameters); //$this->SQL->Query($Sql);
+		$Result = $this->Database->Query($Sql, $this->_Parameters)->ResultArray();
+		foreach ($Result as $Key => $Value) {
+			if (isset($Value['Summary'])) {
+				$Value['Summary'] = Gdn_Format::Text($Value['Summary']);
+				$Result[$Key] = $Value;
+			}
+		}
 		$this->Reset();
 		$this->SQL->Reset();
-		
 		return $Result;
 	}
 }

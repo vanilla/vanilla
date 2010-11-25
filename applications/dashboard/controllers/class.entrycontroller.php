@@ -87,7 +87,14 @@ class EntryController extends Gdn_Controller {
             // Attempt to authenticate.
             try {
                $AuthenticationResponse = $Authenticator->Authenticate();
-               Gdn::Authenticator()->Trigger($AuthenticationResponse);
+
+               $UserInfo = array();
+               $UserEventData = array_merge(array(
+                  'UserID'    => Gdn::Session()->UserID,
+                  'Payload'   => GetValue('HandshakeResponse', $Authenticator, FALSE)
+               ),$UserInfo);
+               
+               Gdn::Authenticator()->Trigger($AuthenticationResponse, $UserEventData);
                switch ($AuthenticationResponse) {
                   case Gdn_Authenticator::AUTH_PERMISSION:
                      $this->Form->AddError('ErrorPermission');
@@ -517,6 +524,7 @@ class EntryController extends Gdn_Controller {
       switch ($SyncScreen) {
          case 'on':
          
+            // Authenticator events fired inside
             $this->SyncScreen($Authenticator, $UserInfo, $Payload);
             
          break;
@@ -533,6 +541,12 @@ class EntryController extends Gdn_Controller {
                
                // Finalize the link between the forum user and the foreign userkey
                $Authenticator->Finalize($UserInfo['UserKey'], $UserID, $UserInfo['ConsumerKey'], $UserInfo['TokenKey'], $Payload);
+               
+               $UserEventData = array_merge(array(
+                  'UserID'       => $UserID,
+                  'Payload'      => $Payload
+               ),$UserInfo);
+               Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_CREATED, $UserEventData);
                
                /// ... and redirect them appropriately
                $Route = $this->RedirectTo();
@@ -590,12 +604,20 @@ class EntryController extends Gdn_Controller {
             
          $FormValues = $this->Form->FormValues();
          if (ArrayValue('StopLinking', $FormValues)) {
-         
+            $AuthResponse = Gdn_Authenticator::AUTH_ABORTED;
+            
+            $UserEventData = array_merge(array(
+               'UserID'       => $UserID,
+               'Payload'      => $Payload
+            ),$UserInfo);
+            Gdn::Authenticator()->Trigger($AuthResponse, $UserEventData);
+            
             $Authenticator->DeleteCookie();
             Gdn::Request()->WithRoute('DefaultController');
             return Gdn::Dispatcher()->Dispatch();
             
          } elseif (ArrayValue('NewAccount', $FormValues)) {
+            $AuthResponse = Gdn_Authenticator::AUTH_CREATED;
          
             // Try and synchronize the user with the new username/email.
             $FormValues['Name'] = $FormValues['NewName'];
@@ -604,6 +626,7 @@ class EntryController extends Gdn_Controller {
             $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             
          } else {
+            $AuthResponse = Gdn_Authenticator::AUTH_SUCCESS;
    
             // Try and sign the user in.
             $PasswordAuthenticator = Gdn::Authenticator()->AuthenticateWith('password');
@@ -632,6 +655,12 @@ class EntryController extends Gdn_Controller {
             
             // Finalize the link between the forum user and the foreign userkey
             $Authenticator->Finalize($UserInfo['UserKey'], $UserID, $UserInfo['ConsumerKey'], $UserInfo['TokenKey'], $Payload);
+            
+            $UserEventData = array_merge(array(
+               'UserID'       => $UserID,
+               'Payload'      => $Payload
+            ),$UserInfo);
+            Gdn::Authenticator()->Trigger($AuthResponse, $UserEventData);
             
             /// ... and redirect them appropriately
             $Route = $this->RedirectTo();
@@ -668,6 +697,11 @@ class EntryController extends Gdn_Controller {
          $this->Form->AddHidden('UserKey',    $UserInfo['UserKey']);
          $this->Form->AddHidden('Token',      $UserInfo['TokenKey']);
          $this->Form->AddHidden('Consumer',   $UserInfo['ConsumerKey']);
+         
+/*
+         $this->Form->AddHidden('Payload',    serialize($Payload));
+         $this->Form->AddHidden('UserInfo',   serialize($UserInfo));
+*/
          
       }
       

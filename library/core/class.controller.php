@@ -1087,6 +1087,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
       
+      // Remove values that should not be transmitted via api
+      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod'));
+      
       $this->Finalize();
 
       // Check for a special view.

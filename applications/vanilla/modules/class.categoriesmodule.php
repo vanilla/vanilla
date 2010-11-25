@@ -13,16 +13,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoriesModule extends Gdn_Module {
    
-   protected $_CategoryData;
-   
    public function __construct(&$Sender = '') {
       // Load categories
-      $this->_CategoryData = FALSE;
+      $this->Data = FALSE;
       if (Gdn::Config('Vanilla.Categories.Use') == TRUE) {
          if (!property_exists($Sender, 'CategoryModel') || !is_object($Sender->CategoryModel))
             $Sender->CategoryModel = new CategoryModel();
             
-         $this->_CategoryData = $Sender->CategoryModel->GetFull();
+         $this->Data = $Sender->CategoryModel->GetFull();
       }
       parent::__construct($Sender);
    }
@@ -32,7 +30,7 @@ class CategoriesModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (Gdn::Config('Vanilla.Categories.Use') == TRUE)
+      if (C('Vanilla.Categories.Use') == TRUE)
          return parent::ToString();
 
       return '';

@@ -17,16 +17,13 @@ class BookmarkedModule extends Gdn_Module {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
          $DiscussionModel = new DiscussionModel();
-         $this->_Sender->SetData(
-            'BookmarkedModuleData',
-            $DiscussionModel->Get(
-               0,
-               $Limit,
-               array(
-                  'w.Bookmarked' => '1',
-                  'w.UserID' => $Session->UserID
-               )
-            )->Result()
+         $this->Data = $DiscussionModel->Get(
+            0,
+            $Limit,
+            array(
+               'w.Bookmarked' => '1',
+               'w.UserID' => $Session->UserID
+            )
          );
       }
    }
@@ -36,8 +33,7 @@ class BookmarkedModule extends Gdn_Module {
    }
 
    public function ToString() {
-      $Data = $this->_Sender->Data('BookmarkedModuleData');
-      if (is_array($Data) && count($Data) > 0)
+      if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

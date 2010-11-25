@@ -452,7 +452,12 @@ class Gdn_Auth extends Gdn_Pluggable {
       return $Return;
    }
    
-   public function Trigger($AuthResponse) {
+   public function Trigger($AuthResponse, $UserData = NULL) {
+      if (!is_null($UserData)) 
+         $this->EventArguments['UserData'] = $UserData;
+      else
+         $this->EventArguments['UserData'] = FALSE;
+         
       switch ($AuthResponse) {
          case Gdn_Authenticator::AUTH_SUCCESS:
             $this->FireEvent('AuthSuccess');
@@ -471,6 +476,9 @@ class Gdn_Auth extends Gdn_Pluggable {
          break;
          case Gdn_Authenticator::AUTH_ABORTED:
             $this->FireEvent('AuthAborted');
+         break;
+         case Gdn_Authenticator::AUTH_CREATED:
+            $this->FireEvent('AuthCreated');
          break;
       }
    }

@@ -1685,39 +1685,34 @@ div.Summary table tbody td {
 	margin-right: 6px;
 }
 
+/* Help Links */
 .Help {
-   border: solid 1px #cc3;
-   background: #ff9;
    padding: 8px;
-   line-height: 100%;
-
-   border-radius: 5px;
-   -moz-border-radius: 5px;
-   -webkit-border-radius: 3px;
+	line-height: 1;
 }
-
 .Help h2 {
-   font-size: 15px;
-   margin-bottom: 2px;
+   font-size: 14px;
+	font-weight: bold;
+	text-shadow: none;
+   margin: 0 0 10px;
 }
-
 .Help ul {
    list-style: disc;
-   margin-left: 14px;
+   margin-left: 19px;
 }
-
 .Help li {
    margin-top: 6px;
+	line-height: 1.5;
 }
-
 .Aside {
+   border: solid 1px #ccc;
+   background: #ff8;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
    width: 220px;
    float: right;
    z-index: 200;
    position: relative;
    margin: 6px;
-
-   box-shadow: 0 0 6px #999;
-   -moz-box-shadow: 0 0 6px #999;
-   -webkit-box-shadow: 0 0 6px #999;
 }

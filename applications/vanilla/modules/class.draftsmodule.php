@@ -10,19 +10,12 @@
  */
 class DraftsModule extends Gdn_Module {
    
-   protected $_DraftData;
    public $Form;
-   
-   public function __construct(&$Sender = '') {
-      $this->_DraftData = FALSE;
-      parent::__construct($Sender);
-   }
-   
    public function GetData($Limit = 20, $DiscussionID = '') {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
          $DraftModel = new DraftModel();
-         $this->_DraftData = $DraftModel->Get($Session->UserID, 0, $Limit, $DiscussionID);
+         $this->Data = $DraftModel->Get($Session->UserID, 0, $Limit, $DiscussionID);
       }
       $this->Form = $this->_Sender->Form;
    }
@@ -32,7 +25,7 @@ class DraftsModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if ($this->_DraftData !== FALSE && $this->_DraftData->NumRows() > 0)
+      if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

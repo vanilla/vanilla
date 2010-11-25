@@ -8,19 +8,8 @@
    <div class="Meta">
       <?php
          echo '<span>'.$Discussion->CountComments.'</span>';
-         $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
-         // Logic for incomplete comment count.
-         if($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-            if(Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate)) {
-               $CountUnreadComments = 0;
-               $Discussion->CountCommentWatch = $Discussion->CountComments;
-            } else {
-               $CountUnreadComments = '';
-            }
-         }
-
-         if ($CountUnreadComments > 0 || $CountUnreadComments === '')
-            echo '<strong>'.Plural($CountUnreadComments, '%s new', '%s new').'</strong>';
+         if ($Discussion->CountUnreadComments > 0 || $Discussion->CountUnreadComments === '')
+            echo '<strong>'.Plural($Discussion->CountUnreadComments, '%s new', '%s new').'</strong>';
             
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;

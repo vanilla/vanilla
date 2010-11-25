@@ -7,7 +7,8 @@ $PluginInfo['GettingStarted'] = array(
    'Version' => '1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'Hidden' => TRUE
 );
 
 class GettingStartedPlugin extends Gdn_Plugin {

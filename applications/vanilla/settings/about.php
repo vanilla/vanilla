@@ -13,5 +13,6 @@ $ApplicationInfo['Vanilla'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
-   'License' => 'GPL v2'
+   'License' => 'GPL v2',
+   'Hidden' => TRUE
 );

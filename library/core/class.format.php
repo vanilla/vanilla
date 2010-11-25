@@ -26,15 +26,15 @@ class Gdn_Format {
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
     * used on this page (the user profile page). The FullHeadline field is to be
     * used on the main activity page. The replacement definitions are as follows:
-    *  %1 = ActivityName
-    *  %2 = ActivityName Possessive
-    *  %3 = RegardingName
-    *  %4 = RegardingName Possessive
-    *  %5 = Link to RegardingName's Wall
-    *  %6 = his/her
-    *  %7 = he/she
-    *  %8 = route & routecode
-    *  %9 = gender suffix (some languages require this).
+    *  %1$s = ActivityName
+    *  %2$s = ActivityName Possessive
+    *  %3$s = RegardingName
+    *  %4$s = RegardingName Possessive
+    *  %5$s = Link to RegardingName's Wall
+    *  %6$s = his/her
+    *  %7$s = he/she
+    *  %8$s = route & routecode
+    *  %9$s = gender suffix (some languages require this).
     *
     * @param object $Activity An object representation of the activity being formatted.
     * @param int $ProfileUserID If looking at a user profile, this is the UserID of the profile we are

@@ -153,6 +153,27 @@ class Gdn_Session {
    public function GetPermissions() {
       return is_array($this->_Permissions) ? $this->_Permissions : array();
    }
+   
+	/**
+    * 
+    * 
+	* @todo Add description.
+	* @param string|array $PermissionName
+	* @param mixed $Value
+	* @return NULL
+	*/
+	
+	public function SetPermission($PermissionName, $Value = FALSE) {
+		if (is_string($PermissionName)) {
+			if ($Value === FALSE) $this->_Permissions[] = $PermissionName;
+			elseif (is_array($Value)) $this->_Permissions[$PermissionName] = $Value;
+		} elseif (is_array($PermissionName)) {
+			if (array_key_exists(0, $PermissionName))
+				foreach ($PermissionName as $Name) $this->SetPermission($Name);
+			else
+				foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
+		}
+    }
 
    /**
     * Gets the currently authenticated user's preference for the specified

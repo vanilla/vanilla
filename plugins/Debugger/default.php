@@ -118,7 +118,7 @@ class DebuggerPlugin extends Gdn_Plugin {
                $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
             } else {
                if (is_a($Value, 'Gdn_DataSet'))
-                  $Result .= "DataSet\n";
+                  $Result .= "DataSet";
 
                $Result .= 
                   "\n"
@@ -128,7 +128,7 @@ class DebuggerPlugin extends Gdn_Plugin {
       } elseif (is_a($Data, 'Gdn_DataSet')) {
          $Data = $Data->Result();
          if (count($Data) == 0)
-            return $Result.'EMPTY';
+            return $Result.'EMPTY<br />';
 
          $Fields = array_keys((array)$Data[0]);
          $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"

@@ -682,7 +682,7 @@ class ProfileController extends Gdn_Controller {
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
             $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
 			
-			$this->SetData('User', $this->User);
+			$this->SetData('Profile', $this->User);
 			$this->SetData('UserRoles', $this->Roles);
       }
       

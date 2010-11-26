@@ -206,7 +206,7 @@ class DiscussionModel extends VanillaModel {
 		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
-			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
+			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
 				if ($Discussion->CountCommentWatch) {
 					$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
@@ -437,6 +437,7 @@ class DiscussionModel extends VanillaModel {
 		// Close if older than archive date
 		if (
 			$Data
+         && $Data->DateLastComment
 			&& Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))
 		) {
 			$Data->Closed = '1';

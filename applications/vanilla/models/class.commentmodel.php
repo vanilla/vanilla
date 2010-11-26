@@ -644,7 +644,7 @@ class CommentModel extends VanillaModel {
       
       if (!is_null($Data)) {
          $this->SQL->Update('Discussion');
-         if ($Data->Sink == '0')
+         if ($Data->Sink == '0' && $Data->DateLastComment)
             $this->SQL->Set('DateLastComment', $Data->DateLastComment);
 
          $this->SQL->Set('LastCommentID', $Data->LastCommentID)
@@ -706,7 +706,7 @@ class CommentModel extends VanillaModel {
 
       // Check to see if this is the last comment in the discussion
       $Data = $this->SQL
-         ->Select('d.DiscussionID, d.LastCommentID, c.InsertUserID')
+         ->Select('d.DiscussionID, d.LastCommentID, c.InsertUserID, d.DateInserted')
          ->From('Discussion d')
          ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
          ->Where('c.CommentID', $CommentID)
@@ -736,7 +736,7 @@ class CommentModel extends VanillaModel {
                $this->SQL->Update('Discussion')
                   ->Set('LastCommentID', NULL)
                   ->Set('LastCommentUserID', NULL)
-                  ->Set('DateLastComment', $Data->DateUpdated)
+                  ->Set('DateLastComment', $Data->DateInserted)
                   ->Where('DiscussionID', $Data->DiscussionID)
                   ->Put();
             }

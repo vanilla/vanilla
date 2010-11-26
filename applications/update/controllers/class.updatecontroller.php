@@ -62,22 +62,6 @@ class UpdateController extends Gdn_Controller {
       $this->UpdaterVersion = GetValue('Version', $this->UpdaterApplication);
    }
    
-   public function AddSideMenu($CurrentUrl = FALSE) {
-      if (!$CurrentUrl)
-         $CurrentUrl = strtolower($this->SelfUrl);
-      
-      // Only add to the assets if this is not a view-only request
-      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-         $SideMenu = new SideMenuModule($this);
-         $SideMenu->HtmlId = '';
-         $SideMenu->HighlightRoute($CurrentUrl);
-         $SideMenu->Sort = C('Garden.UpdateMenu.Sort');
-         $this->EventArguments['SideMenu'] = &$SideMenu;
-         $this->FireEvent('UpdateAppSettingsMenuItems');
-         $this->AddModule($SideMenu, 'Panel');
-      }
-   }
-   
    protected function CheckStatus() {
       // Determine if an update is required.
       $CurrentVersion = APPLICATION_VERSION;
@@ -91,14 +75,6 @@ class UpdateController extends Gdn_Controller {
       $LatestVersion = $this->GetLatestVersionNumber();
       
       return version_compare($CurrentVersion, $LatestVersion);
-   }
-   
-   protected function PrepareUpdateModule($Fresh = FALSE) {
-      $TasksLoaded = $this->UpdateModule->Load();
-      if (!$TasksLoaded && $Fresh !== FALSE)
-         $this->UpdateModule->Fresh();
-      
-      $this->AddModule($this->UpdateModule);
    }
    
    protected function GetLatestVersion() {

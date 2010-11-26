@@ -17,8 +17,6 @@ class CheckController extends UpdateController {
    
    public function Initialize() {
       parent::Initialize();
-      
-      $this->AddSideMenu('update/check');
    }
 
    public function Index() {
@@ -64,12 +62,12 @@ class CheckController extends UpdateController {
    }
    
    public function Update() {
-      $this->UpdateModule->Fresh();
+      //$this->UpdateModule->Fresh();
       Redirect('update/check');
    }
    
    public function CheckController_Render_Before($Sender) {
-      $Sender->AddModule($Sender->UpdateModule);
+      //$Sender->AddModule($Sender->UpdateModule);
    }
    
 }

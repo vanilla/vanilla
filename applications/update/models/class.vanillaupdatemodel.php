@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class UpdateModel {
+class VanillaUpdateModel {
    
    protected $Tag;
    protected $Tasks;
@@ -97,18 +97,24 @@ class UpdateModel {
       $this->Clear();
       $this->Tag();
       
-      $this->AddGroup('backup', 'Set Restore Point')
+      echo "creating...\n";
+      
+      $this->AddGroup('backup', 'Backup')
          ->AddTask('backup', 'files', 'Backup Files')
          ->AddTask('backup', 'data', 'Backup Data');
       
-      $this->AddGroup('download', 'Download Update')
+      $this->AddGroup('download', 'Download')
          ->AddTask('download', 'get', 'Download Files');
       
-      $this->AddGroup('verify', 'Verify Install Integrity')
+      $this->AddGroup('verify', 'Verify')
          ->AddTask('verify', 'extract',  'Extract Downloaded Archives')
          ->AddTask('verify', 'signatures',  'Check Signatures')
          ->AddTask('verify', 'clean', 'Clean Archives')
          ->AddTask('verify', 'registerchanged', 'Register Changed Files');
+         
+      $this->AddGroup('apply', 'Apply')
+         ->AddTask('apply', 'files', 'Update Filesystem')
+         ->AddTask('apply', 'structure', 'Update Database Structure');
    }
    
    /**
@@ -116,7 +122,7 @@ class UpdateModel {
     * TRUE - Update in progress, but completed
     * Task Array - Destination controller/method
     */
-   protected function GetInternalAction() {
+   public function GetInternalAction() {
       if (!sizeof($this->Tasks) || !sizeof($this->Tag)) return FALSE;
       
       // There's an update in progress. We need to know what stage of the process we're at
@@ -146,7 +152,7 @@ class UpdateModel {
    }
    
    public function GetTasks() { 
-      return (sizeof($this->TaskList)) ? $this->TaskList : NULL;
+      return (sizeof($this->Tasks)) ? $this->Tasks : NULL;
    }
    
    protected function Inflate($Encoded) {
@@ -155,6 +161,7 @@ class UpdateModel {
    
    public function Load() {
       $UpdateStr = Gdn::Cache()->Get($this->Key);
+      
       if ($UpdateStr === Gdn_Cache::CACHEOP_FAILURE) {
          return FALSE;
       }
@@ -199,8 +206,10 @@ class UpdateModel {
    public function __destruct() {
       $Encoded = $this->Deflate();
       $EncodedHash = md5($Encoded);
-      if ($EncodedHash != $this->LoadHash)
+      
+      if ($EncodedHash != $this->LoadHash) {
          $this->Save();
+      }
    }
    
 }

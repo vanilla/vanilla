@@ -116,88 +116,33 @@ div#Frame div#Head div.Header span.About {
 	padding: 20px 0px;
 }
 
-div#Frame div#Body div#Panel div.Box {
-   border-width: 0px;
-   border-bottom-width: 1px;
-   border-style: solid;
-   margin-bottom: 20px;
-}
-
-div#Panel div#UpdateModule h4 {
+ul.PanelUpdate li {
+   background: transparent url('images/update-panel-splitter.gif') no-repeat center right;
+   line-height: 33px;
+   padding: 0px 15px;
    font-size: 14px;
    font-weight: bold;
-   padding: 10px;
-   background: transparent url("images/dashboard-sprites.png") no-repeat scroll 214px -1140px;
-   color: black;
-}
-
-ul.PanelUpdate {
-   
-}
-
-ul.PanelUpdate div.UpdateTask {
-   width: 250px;
-   height: 100%;
-   overflow: hidden;
-}
-
-ul.PanelUpdate div.UpdateTask div.TaskName {
-   font-weight: bold;
-   float: left;
-   width: 200px;
-   padding: 0px 5px;
-   
-}
-
-ul.PanelUpdate div.UpdateTask div.TaskCompletion {
-   float: right;
-   width: 22px;
-   padding: 0px 5px;
-   padding-right: 11px;
-   text-align: right;
-}
-
-ul.PanelUpdate div.TaskCompletion img {
-   width: 22px;
-   height: 22px;
+   text-transform: uppercase;
    display: inline;
-   background: transparent url("images/star_sprite.png") no-repeat scroll 0px 0px;
 }
 
-ul.PanelUpdate div.UpdateTaskChildren div.TaskName {
-   font-weight: normal;
-   padding-left: 15px;
-   font-size: 85%;
-   width: 185px;
+ul.PanelUpdate li.Last {
+   background: none;
+   padding-right: none;
 }
 
-ul.PanelUpdate div.UpdateTaskChildren div.TaskCompletion {
-   font-weight: normal;
-   font-size: 85%;
+ul.PanelUpdate li span {
+   margin-right: 33px;
 }
 
-ul.PanelUpdate div.TaskCompletion img.Complete {
-   background-position: 0px -22px;
+ul.PanelUpdate li span.Active {
+   color: white;
 }
 
-ul.PanelUpdate div.TaskCompletion img.Incomplete {
-   background-position: 0px -44px;
+ul.PanelUpdate li span.Done {
+   background: transparent url('images/update-panel-done.gif') no-repeat center right;
 }
 
-ul.PanelUpdate div.TaskCompletion img.NotStarted {
-   background-position: 0px 0px;
-}
-
-body div#Panel div.UpdateSettings h4 {
-   background-position: 214px -145px;
-}
-
-div#Panel div#UpdateModule div.TagDescription {
-   background-color: #DBF3FC;
-   margin: 0px 10px 15px 10px;
-   padding: 10px;
-   color: #014989;
-}
 
 /*
  * CONTENT

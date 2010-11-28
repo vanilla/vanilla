@@ -20,7 +20,11 @@ class UpdateController extends Gdn_Controller {
    
    public function Initialize() {
       $this->Permission('Garden.Settings.Manage');
-      $this->Update = new UpdateModel();
+      parent::Initialize();
+      
+      $this->Update = new VanillaUpdateModel();
+      if (!$this->Update->Active())
+         $this->Update->Fresh();
       
       /*
 // Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
@@ -54,7 +58,6 @@ class UpdateController extends Gdn_Controller {
       $this->AddCssFile('update.css');
       
       $this->MasterView = 'update';
-      parent::Initialize();
       
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();

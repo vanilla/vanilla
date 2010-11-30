@@ -17,9 +17,9 @@ $DisabledCount = $AppCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All '.Wrap($AppCount)), 'settings/applications/'); ?></li>
-      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled '.Wrap($EnabledCount)), 'settings/applications/enabled'); ?></li>
-      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled '.Wrap($DisabledCount)), 'settings/applications/disabled'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('All %1$s'), Wrap($AppCount)), 'settings/applications/'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Enabled %1$s'), Wrap($EnabledCount)), 'settings/applications/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Disabled %1$s'), Wrap($DisabledCount)), 'settings/applications/disabled'); ?></li>
       <?php
       if ($AddonUrl != '')
          echo Wrap(Anchor(T('Get More Applications'), $AddonUrl), 'li');

@@ -47,12 +47,13 @@ class Gdn_ThemeManager {
                      
                   $Folder = substr($Folder, 0, strpos($Folder, DS));
                   $ThemeInfo[$ThemeName]['Folder'] = $Folder;
+                  $ThemeInfo[$ThemeName]['Index'] = $ThemeName;
 
                   // Add the screenshot.
                   $ScreenshotPath = SafeGlob(PATH_THEMES."/$Folder/screenshot.*", array('gif', 'jpg', 'png'));
                   if (count($ScreenshotPath) > 0) {
                      $ScreenshotPath = $ScreenshotPath[0];
-                     $ThemeInfo[$ThemeName]['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath));
+                     $ThemeInfo[$ThemeName]['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath), TRUE);
                   }
                }
             }
@@ -65,6 +66,13 @@ class Gdn_ThemeManager {
 
    public function CurrentTheme() {
       return C('Garden.Theme', '');
+   }
+
+   public function DisableTheme() {
+      if ($this->CurrentTheme() == 'default') {
+         throw new Gdn_UserException(T('You cannot disable the default theme.'));
+      }
+      RemoveFromConfig('Garden.Theme');
    }
    
    public function EnabledTheme() {
@@ -115,8 +123,10 @@ class Gdn_ThemeManager {
       // Make sure to run the setup
       $this->TestTheme($ThemeName);
       
-      // Set the theme
-      $ThemeFolder = ArrayValue('Folder', ArrayValue($ThemeName, $this->AvailableThemes(), array()), '');
+      // Set the theme.
+      $ThemeInfo = ArrayValueI($ThemeName, $this->AvailableThemes(), array());
+      $ThemeName = GetValue('Index', $ThemeInfo, $ThemeName);
+      $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
@@ -147,7 +157,8 @@ class Gdn_ThemeManager {
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
       $AvailableThemes = $this->AvailableThemes();
-      $NewThemeInfo = ArrayValue($ThemeName, $AvailableThemes, array());
+      $NewThemeInfo = ArrayValueI($ThemeName, $AvailableThemes, array());
+      $ThemeName = GetValue('Index', $NewThemeInfo, $ThemeName);
       $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, FALSE);
       $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
       CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
@@ -156,7 +167,7 @@ class Gdn_ThemeManager {
       $ClassName = $ThemeFolder . 'ThemeHooks';
       $HooksFile = PATH_THEMES . DS . $ThemeFolder . DS . 'class.' . strtolower($ClassName) . '.php';
       if (file_exists($HooksFile)) {
-         include($HooksFile);
+         include_once($HooksFile);
          if (class_exists($ClassName)) {
             $ThemeHooks = new $ClassName();
             $ThemeHooks->Setup();

@@ -106,10 +106,10 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary')
 			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
 			->Select('c.DateInserted')
-			->Select('c.InsertUserID, u.Name')
+			->Select('c.InsertUserID as UserID, u.Name')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-			->Join('User u', 'u.UserID = d.InsertUserID', 'left');
+			->Join('User u', 'u.UserID = c.InsertUserID', 'left');
 		
 		// Exectute query
 		$Result = $this->SQL->GetSelect();

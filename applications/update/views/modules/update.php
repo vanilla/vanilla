@@ -12,15 +12,24 @@
          
          $TaskName = $Task['Name'];
          $TaskLabel = $Task['Label'];
+         $Completion =  $Task['Completion'];
+         $TaskText = T($TaskLabel);
+
+         if ($IsActive) {
+            $CompletionText = (int)$Completion.'%';
+            $Complete = Wrap($CompletionText, 'span', array('class' => 'Completion'));
+            $TaskText .= $Complete;
+         }
 
          $LinkProps = array();
          if ($IsActive)
             array_push($LinkProps, 'Active');
          if ($IsDone)
             array_push($LinkProps, 'Done');
-         $Link = Wrap(T($TaskLabel),'span',array('class' => implode(' ',$LinkProps)));
-         
+         $Link = Wrap($TaskText,'span',array('class' => implode(' ',$LinkProps)));
+                  
          $LiProps = array();
+         array_push($LiProps,ucfirst($TaskLabel)."Task");
          $IsLast = ($TaskNumber == $NumTasks) ? TRUE : FALSE;
          if ($IsLast)
             array_push($LiProps, 'Last');

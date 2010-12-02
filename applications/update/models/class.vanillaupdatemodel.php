@@ -32,9 +32,9 @@ class VanillaUpdateModel {
       $Action = $this->GetInternalAction();
       if ($Action === FALSE || $Action === TRUE) return $Action;
       
-      $Name = array();
-      array_push($Name, ucfirst(GetValue('Group', $Action)));
-      array_push($Name, ucfirst(GetValue('Name', $Action)));
+      $Name = array('update');
+      array_push($Name, strtolower(GetValue('Group', $Action)));
+      array_push($Name, strtolower(GetValue('Name', $Action)));
       
       return CombinePaths($Name);
    }
@@ -180,9 +180,22 @@ class VanillaUpdateModel {
       return TRUE;
    }
    
+   public function Progress($GroupName, $TaskName, $NewProgressPercentage, $Save = FALSE) {
+      if (!array_key_exists($GroupName, $this->Tasks)) return FALSE;
+      if (!array_key_exists($TaskName, $this->Tasks[$GroupName]['Tasks'])) return FALSE;
+      
+      $this->Tasks[$GroupName]['Tasks'][$TaskName]['Completion'] = $NewProgressPercentage;
+      
+      if ($Save) {
+         $this->Save();
+      }
+      return TRUE;
+   }
+   
    protected function Save() {
       $Encoded = $this->Deflate();
       Gdn::Cache()->Store($this->Key, $Encoded);
+      $this->LoadHash = md5($Encoded);
    }
    
    public function SetMeta($Key, $Data = NULL) {

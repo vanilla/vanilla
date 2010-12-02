@@ -17,10 +17,6 @@ class CheckController extends UpdateController {
    
    public function Initialize() {
       parent::Initialize();
-      
-      $this->UpdateModule = new UpdateModule($this);
-      $this->UpdateModule->GetData($this->Update);
-      $this->AddModule($this->UpdateModule);
    }
 
    public function Index() {
@@ -66,7 +62,7 @@ class CheckController extends UpdateController {
    }
    
    public function Update() {
-      //$this->UpdateModule->Fresh();
+      //$this->Update->Fresh();
       Redirect('update/check');
    }
    

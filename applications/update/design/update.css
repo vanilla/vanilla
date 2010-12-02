@@ -54,7 +54,7 @@ body {
 }
 
 div#Frame div#Head {
-   margin: 25px 0px 10px 0px;
+   margin: 25px 0px 13px 0px;
    height: 273px;
    background: transparent url('images/update-banner-bg.gif') repeat-x top left;
 }
@@ -110,10 +110,11 @@ div#Frame div#Head div.Header span.About {
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+   margin-bottom: 20px;
 }
 
 #Content {
-	padding: 20px 0px;
+	margin-bottom: 20px;
 }
 
 ul.PanelUpdate li {
@@ -124,6 +125,7 @@ ul.PanelUpdate li {
    font-weight: bold;
    text-transform: uppercase;
    display: inline;
+   color: #2f2f2f;
 }
 
 ul.PanelUpdate li.Last {
@@ -143,6 +145,11 @@ ul.PanelUpdate li span.Done {
    background: transparent url('images/update-panel-done.gif') no-repeat center right;
 }
 
+ul.PanelUpdate li span span.Completion {
+   margin-left: 5px;
+   color: #2f2f2f;
+   margin-right: 0px;
+}
 
 /*
  * CONTENT
@@ -169,4 +176,37 @@ div.UpdatePrompt p {
 div.UpdatePrompt p div {
    padding: 10px;
 
+}
+
+div#Content div.Backup h1 {
+   font-size: 24px;
+   font-weight: bold;
+   
+}
+
+div#Content div.UpdateProgress {
+   margin: 0px auto;
+   width: 400px;
+   margin-top: 50px;
+   color: white;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer {
+   border: 2px solid #29292A;
+   background-color: #29292A;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSlider {
+   background-color: #B0EA2E;
+   width: 0%;
+   height: 30px;
+   text-align: right;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSlider span {
+   line-height: 30px;
+   color: #29292A;
+   margin-right: 3px;
 }

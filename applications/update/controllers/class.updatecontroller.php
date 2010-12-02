@@ -15,7 +15,6 @@ class UpdateController extends Gdn_Controller {
    
    public function __construct() {
       parent::__construct();
-      $this->PageName = 'update';
    }
    
    public function Initialize() {
@@ -26,26 +25,28 @@ class UpdateController extends Gdn_Controller {
       if (!$this->Update->Active())
          $this->Update->Fresh();
       
-      /*
-// Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
+      // Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
       
          $Next = $this->Update->Action();
          
          // Redirect if we're on the wrong page
          if (is_string($Next)) {
-            $WhereAmI = strtolower($this->SelfUrl);
+            $WhereAmI = Gdn::Request()->Path();
+            
             if (substr($WhereAmI, 0, 6) != 'update')
                $WhereAmI = CombinePaths(array('update',$WhereAmI));
+            
+            if ($Next != substr($WhereAmI,0,strlen($Next))) {
+            
+               // Add request args to the redirect
+               $Final = CombinePaths(array_merge(array($Next),$this->RequestArgs));
                
-            if ($Next != $WhereAmI) {
-               Gdn::Dispatcher()->Dispatch($Next);
+               Gdn::Dispatcher()->Dispatch($Final);
                exit;
             }
          }
-         
       }
-*/
       
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
@@ -55,6 +56,7 @@ class UpdateController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       
+      $this->AddJsFile('updater.js');
       $this->AddCssFile('update.css');
       
       $this->MasterView = 'update';
@@ -63,6 +65,24 @@ class UpdateController extends Gdn_Controller {
       $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
       $this->UpdaterApplication = GetValue('Update', $this->EnabledApplications);
       $this->UpdaterVersion = GetValue('Version', $this->UpdaterApplication);
+      
+      $this->UpdateModule = new UpdateModule($this);
+      $this->UpdateModule->GetData($this->Update);
+      $this->AddModule($this->UpdateModule);
+   }
+   
+   public function Menu() {
+      if (!$this->Update->Active()) return;
+      
+      echo $this->UpdateModule->ToString();
+      $this->Render('blank','update');
+   }
+   
+   protected function RequestType() {
+      list($Type) = $this->RequestArgs;
+      $Type = strtolower($Type);
+      if (in_array($Type, array('ui','perform','check'))) return $Type;
+      return 'ui';
    }
    
    protected function CheckStatus() {

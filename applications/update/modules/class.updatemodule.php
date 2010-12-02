@@ -23,7 +23,8 @@ class UpdateModule extends Gdn_Module {
       $this->Tasks = array();
       
       $ActiveTask = $UpdateModel->GetInternalAction();
-      $ActiveGroup = GetValue(GetValue('Group',$ActiveTask,NULL),$Tasks,FALSE);
+      $this->ActiveTask = $ActiveTask;
+      $ActiveGroup = strtolower(GetValue('Group',$ActiveTask,NULL));
       foreach ($Tasks as $TaskName => $Task) {
          $this->Tasks[$TaskName] = array_merge($Task,array(
             'Active'       => (($ActiveGroup == $TaskName) ? TRUE : FALSE)

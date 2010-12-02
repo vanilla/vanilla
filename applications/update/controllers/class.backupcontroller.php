@@ -28,14 +28,14 @@ class BackupController extends UpdateController {
       $this->Backups();
       
       // Check if we're in an update. If so, extract the backup task. If we don't yet have one, create one.
-      if ($this->UpdateModule->Active()) {
-         $CurrentBackupID = $this->UpdateModule->GetMeta('BackupTask', FALSE);
+      if ($this->Update->Active()) {
+         $CurrentBackupID = $this->Update->GetMeta('BackupTask', FALSE);
          
          // Don't have a backup yet... make one
          if ($CurrentBackupID === FALSE) {
             $CurrentBackupID = $this->GetBackupTask();
             
-            $this->UpdateModule->SetMeta('BackupTask', $CurrentBackupID);
+            $this->Update->SetMeta('BackupTask', $CurrentBackupID);
          }
          
          $this->BackupTask = $CurrentBackupID;
@@ -152,7 +152,6 @@ class BackupController extends UpdateController {
    }
 
    public function Index() {
-      $this->AddSideMenu('update/backup');
       
       switch ($this->GetActiveStep()) {
          
@@ -163,16 +162,78 @@ class BackupController extends UpdateController {
    
    public function Files() {
       $this->GetBackupTask();
+      $RenderController = 'backup';
       
-      $this->View = 'files';
-      $this->Render();
+      $RequestType = $this->RequestType();
+      switch ($RequestType) {
+         case 'ui':
+            $this->BackupTitle = T('Backing up files...');
+            $this->BackupFilesTasks = array(
+               'update/backup/files'   => $this->BackupTitle
+            );
+            $RenderView = 'files';
+            break;
+            
+         case 'check':
+         case 'perform':
+
+            $RenderView = 'blank';
+            $RenderController = 'update';
+
+            if ($RequestType == 'perform') {
+               // Percent chance i'll sleep per loop cycle
+               $SleepProb = 50;
+               
+               // Do actual backup here
+               for ($i = 1; $i <= 100; $i++) {
+                  $Dice = mt_rand(0,100);
+                  if ($Dice < $SleepProb)
+                     sleep(1);
+                  
+                  if (!$this->Update->Progress('backup','files',$i, TRUE)) die('failed to update');
+               }
+            }
+            
+            if ($RequestType == 'check') {
+               $this->SetData('Completion', GetValue('Completion',$this->Update->GetInternalAction(),NULL));
+               $this->SetData('Menu', $this->UpdateModule->ToString());
+            }
+            
+            break;
+      }
+      $this->Render($RenderView,$RenderController);
    }
    
    public function Data() {
       $this->GetBackupTask();
+      $RenderController = 'backup';
       
-      $this->View = 'data';
-      $this->Render();
+      $RequestType = $this->RequestType();
+      switch ($RequestType) {
+         case 'ui':
+            $this->BackupTitle = T('Backing up data...');
+            $RenderView = 'data';
+            break;
+            
+         case 'check':
+         case 'perform':
+
+            $RenderView = 'blank';
+            $RenderController = 'update';
+            
+            if ($RequestType == 'perform') {
+               // Do actual backup here
+            }
+            
+            if ($RequestType == 'check') {
+               $this->SetData('Completion', GetValue('Completion',$this->Update->GetInternalAction(),NULL));
+            }
+            
+            $this->SetData('Menu', $this->UpdateModule->ToString());
+            
+            break;
+      }
+      $this->Render($RenderView,$RenderController);
    }
    
 }

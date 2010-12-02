@@ -199,7 +199,8 @@ if (!function_exists('ValidateBoolean')) {
 
 if (!function_exists('ValidateDecimal')) {
    function ValidateDecimal($Value, $Field) {
-      return is_numeric($Value);
+       if (is_object($Field) && $Field->AllowNull && trim($Value) === '') return TRUE;
+       return is_numeric($Value);
    }
 }
 

@@ -23,5 +23,52 @@ class vBulletinImportModel extends Gdn_Model {
       $Router->SetRoute('forumdisplay\.php\?f=(\d+)', 'vanilla/categories/$1', 'Permanent');
       $Router->SetRoute('showthread\.php\?t=(\d+)', 'vanilla/discussion/$1', 'Permanent');
       $Router->SetRoute('member\.php\?u=(\d+)', 'dashboard/profile/$1/x', 'Permanent');
+      // Make different sizes of avatars
+      $this->ProcessAvatars();
+   }
+   
+   /**
+    * Create different sizes of user photos.
+    */
+   public function ProcessAvatars() {
+      $UploadImage = new Gdn_UploadImage();
+      $UserData = $this->SQL->Select('u.*')->From('User u')->Get();
+      foreach ($UserData->Result() as $User) {
+         try {
+            $Image = PATH_ROOT . DS . 'uploads' . DS . $User->Photo;
+            $ImageBaseName = pathinfo($Image, PATHINFO_BASENAME);
+   
+            // Make sure the avatars folder exists.
+            if (!file_exists(PATH_ROOT.'/uploads/userpics'))
+               mkdir(PATH_ROOT.'/uploads/userpics');
+            
+            // Save the uploaded image in profile size
+            $UploadImage->SaveImageAs(
+               $Image,
+               PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
+               Gdn::Config('Garden.Profile.MaxHeight', 1000),
+               Gdn::Config('Garden.Profile.MaxWidth', 250)
+            );
+            
+            // Save the uploaded image in preview size
+            $UploadImage->SaveImageAs(
+               $Image,
+               PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
+               Gdn::Config('Garden.Preview.MaxHeight', 100),
+               Gdn::Config('Garden.Preview.MaxWidth', 75)
+            );
+   
+            // Save the uploaded image in thumbnail size
+            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+            $UploadImage->SaveImageAs(
+               $Image,
+               PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName,
+               $ThumbSize,
+               $ThumbSize,
+               TRUE
+            );
+            
+         } catch (Exception $ex) { }
+      }
    }
 }

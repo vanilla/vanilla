@@ -420,7 +420,7 @@ class CategoryModel extends Gdn_Model {
          if ($AllowDiscussions) {
             $PermissionModel = Gdn::PermissionModel();
             $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
          }
          
          // Force the user permissions to refresh.

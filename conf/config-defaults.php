@@ -106,6 +106,7 @@ $Configuration['Garden']['Format']['Mentions']                  = TRUE;
 $Configuration['Garden']['Format']['Hashtags']                  = TRUE;
 $Configuration['Garden']['Format']['YouTube']                   = TRUE;
 $Configuration['Garden']['Format']['Vimeo']                     = TRUE;
+$Configuration['Garden']['Format']['EmbedSize']                 = 'normal'; // tiny/small/normal/big/huge or WIDTHxHEIGHT
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';

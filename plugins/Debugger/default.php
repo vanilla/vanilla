@@ -113,7 +113,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             $Result .= "$Indent<b>$Key</b>: ";
 
             if ($Value === NULL) {
-               $Result .= 'NULL';
+               $Result .= "NULL\n";
             } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
                $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
             } else {

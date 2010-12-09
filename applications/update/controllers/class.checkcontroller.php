@@ -62,7 +62,7 @@ class CheckController extends UpdateController {
    }
    
    public function Update() {
-      //$this->Update->Fresh();
+      $this->Update->Fresh();
       Redirect('update/check');
    }
    

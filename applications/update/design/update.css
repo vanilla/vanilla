@@ -143,6 +143,8 @@ ul.PanelUpdate li span.Active {
 
 ul.PanelUpdate li span.Done {
    background: transparent url('images/update-panel-done.gif') no-repeat center right;
+   padding-right: 24px;
+   margin-right: 24px;
 }
 
 ul.PanelUpdate li span span.Completion {
@@ -175,10 +177,9 @@ div.UpdatePrompt p {
 
 div.UpdatePrompt p div {
    padding: 10px;
-
 }
 
-div#Content div.Backup h1 {
+div#Content div.Group h1 {
    font-size: 24px;
    font-weight: bold;
    
@@ -205,8 +206,25 @@ div#Content div.UpdateProgress div.ProgressContainer div.ProgressSlider {
    overflow: hidden;
 }
 
-div#Content div.UpdateProgress div.ProgressContainer div.ProgressSlider span {
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSpinner {
+   background: transparent url('images/spinner.gif') no-repeat center center;
+   width: 100%;
+   height: 30px;
+   text-align: right;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer span {
    line-height: 30px;
    color: #29292A;
    margin-right: 3px;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSpinner span {
+   display: none;
+}
+
+div#Content div.UpdateProgress div.ProgressContinue { 
+   font-size: 18px;
+   margin-top: 10px;
 }

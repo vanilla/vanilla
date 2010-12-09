@@ -22,8 +22,10 @@ class UpdateController extends Gdn_Controller {
       parent::Initialize();
       
       $this->Update = new VanillaUpdateModel();
+/*
       if (!$this->Update->Active())
          $this->Update->Fresh();
+*/
       
       // Do automatic things only if we're accessing with DELIVERY_TYPE_ALL
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
@@ -79,6 +81,7 @@ class UpdateController extends Gdn_Controller {
    }
    
    protected function RequestType() {
+      if (!sizeof($this->RequestArgs)) return 'ui';
       list($Type) = $this->RequestArgs;
       $Type = strtolower($Type);
       if (in_array($Type, array('ui','perform','check'))) return $Type;

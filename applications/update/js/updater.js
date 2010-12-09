@@ -1,21 +1,45 @@
+
 function Gdn_Updater() {
    this.Words = [];
+   this.TaskQueue = false;
+   this.Active = false;
+   this.Libraries = ['queue'];
+
+   Gdn_Updater.prototype.Ready = function() {
    
-   Gdn_Updater.prototype.Prepare = function() {
-   
+      this.Menu = $('div#Panel div.UpdateModule');
       this.Frame = $('div.UpdateProgress');
       if (this.Frame.length) {
          this.Action = this.Frame.html();
          this.Frame.html('');
+      }
+      
+      // Watch for library readiness
+      $(document).bind('libraryloaded',jQuery.proxy(function(Event, Library){
+         var Available = gdn.available(this.Libraries);
+         if (Available)
+            this.Prepare();
+      },this));
+      
+      // Require the queue library
+      gdn.requires(this.Libraries);
+   }
+      
+   Gdn_Updater.prototype.Prepare = function() {
+      if (this.Prepared == true) return;
+      this.Prepared = true;
+      
+      this.TaskQueue = new Gdn_Queue();
+      
+      try {
+         if (!this.Action.length) return;
+         var Tasks = jQuery.parseJSON(this.Action);
          
-         try {
-            var Tasks = jQuery.parseJSON(this.Action);
-            
-            this.BuildProgressBar();
-            this.PreloadQueue(Tasks);
-         } catch(err) {
-            
-         }
+         this.BuildProgressBar();
+         this.PreloadQueue(Tasks);
+         this.Perform();
+      } catch(err) {
+         console.log(err);
       }
    }
    
@@ -40,35 +64,52 @@ function Gdn_Updater() {
       this.Status = $(Status);
       $(this.Frame).append(Status);
       
-      this.SetStatus(this.GetFillerWord());
+      this.SetStatus(this.GetFillerWord(), true);
+      this.SetProgressMode('progress');
       this.SetProgress(0);
    }
    
-   Gdn_Updater.prototype.SetStatus = function(StatusText) {
-      this.Status.html(StatusText);
+   Gdn_Updater.prototype.SetMenu = function(MenuHTML) {
+      var Menu = document.createElement(MenuHTML);
+      this.Menu.html($(Menu).html());
    }
    
-   Gdn_Updater.prototype.SetProgress = function(Percent) {
-      this.Progress.html(Percent+'%');
-   }
-
-   Gdn_Updater.prototype.PreloadQueue = function(QueueJSON) {
-      for (prop in QueueJSON) {
-         
+   Gdn_Updater.prototype.SetStatus = function(StatusText, Decay) {
+      if (this.StatusMessage == StatusText) return;
+      if (StatusText == false) return;
+      this.StatusMessage = StatusText;
+      
+      this.Status.stop();
+      this.Status.css({'opacity':1,'display':'block'});
+      this.Status.html(StatusText);
+      
+      if (Decay) {
+         var Speed = ((Decay == 'slow') ? 2500 : 1250);
+         clearTimeout(this.DecayTimer);
+         this.DecayTimer = setTimeout(jQuery.proxy(function(){
+            this.Status.fadeOut(500);
+         },this),Speed);
       }
    }
    
-   Gdn_Updater.prototype.Start = function() {
-      if (this.Queue.length) return;
-      
-      var ResultsBox = $('div.CatchupBlock div.CatchupResults');
-      ResultsBox.html('Preparing to run catchup queue...');
-      
-      $.ajax({
-         url: gdn.url('plugin/statistics/startcatchup'),
-         dataType: 'json',
-         success: jQuery.proxy(this.PreloadQueue, this)
-      });
+   Gdn_Updater.prototype.SetProgress = function(Percent) {
+   
+      // allow this function to be called blank
+      if (Percent == undefined)
+         Percent = 0;
+            
+      this.ProgressPercent = Percent;      
+      this.Progress.html(Percent+'%');
+      this.Slider.css('width',Percent+'%');
+   }
+   
+   Gdn_Updater.prototype.GetProgress = function() {
+      return this.ProgressPercent;
+   }
+
+   Gdn_Updater.prototype.PreloadQueue = function(QueueJSON) {
+      for (prop in QueueJSON)
+         this.Queue(prop,QueueJSON[prop]);
    }
    
    Gdn_Updater.prototype.GetFillerWord = function() {
@@ -90,70 +131,142 @@ function Gdn_Updater() {
       return this.Words[Math.floor(Math.random()*this.Words.length)] + '...';
    }
    
-   Gdn_Updater.prototype.Catchup = function(Element) {
-      if (Element != '' && Element != undefined) {
-         this.Queue.push(Element);
+   Gdn_Updater.prototype.SetProgressMode = function(ProgressMode) {
+      if (this.ProgressMode == ProgressMode) return;
+      
+      switch (ProgressMode) {
+         case 'spin':
+            this.ProgressMode = ProgressMode;
+            this.Slider.removeClass('ProgressSlider').addClass('ProgressSpinner').css('width','100%');
+         break;
+         
+         case 'progress':
+            this.ProgressMode = ProgressMode;
+            this.Slider.removeClass('ProgressSpinner').addClass('ProgressSlider');
+            this.SetProgress(0);
+         break;
       }
+   }
+   
+   Gdn_Updater.prototype.Queue = function(TaskURL, TaskName) {
+      this.TaskQueue.Add({
+         "Task":TaskURL,
+         "Name":TaskName
+      });
+   }
+   
+   Gdn_Updater.prototype.Perform = function() {
       
-      // If we got nothing in queue, gtfo
-      if (!this.Queue.length) return;
+      // If we've got nothing in the queue, gtfo
+      if (!this.TaskQueue.Length()) return true;
       
-      // If we are not currently busy, get
+      // If we are not currently busy, start a task
       if (!this.Active) {
          
-         var NextQueueItem = this.Queue.shift();
-         this.Active = NextQueueItem;
-         
+         this.Active = this.TaskQueue.Get();
+         this.Active.URL = this.Active.Task+'.json';
+         this.ProgressPercent = 0;
          $.ajax({
-            url: gdn.url('plugin/statistics/execcatchup/'+this.Active),
+            url: gdn.url(gdn.combinePaths(this.Active.URL,'perform')),
             dataType: 'json',
-            success: jQuery.proxy(this.DoneCatchup, this)
+            success: jQuery.proxy(this.TaskComplete, this)
          });
          
          this.Monitor();
       }
+      return false;
    }
    
    Gdn_Updater.prototype.Monitor = function(data, status, xhr) {
       
       if (data == undefined) {
          if (this.Active == false) return;
-         this.MonitorQuery(this.Active);
+         this.MonitorQuery();
       } else {
-         if (data.Progress) {
-            var Element = data.Progress.Item;
+         var CheckAgain = true;
+         var Fade = true;
+         
+         var Completion = parseInt(data.Completion);
+         if (Completion >= 0 && Completion <= 100) {
+         
+            if (Completion == 100)
+               Fade = 'slow';
+         
+            // Defined progress
+            this.SetProgressMode('progress');
             
-            var ResultBox = $('div.CatchupBlock div.CatchupResults');
-            ResultBox.find('div#CatchupResult_'+Element+' span.CatchupValue').html(data.Progress.Completion+'%');
-            if (data.Progress.Completion >= 100) return;
-            if (data.Progress.Item != this.Active) return;
+            // Don't update for old responses returned out of order. (should never happen, but defend anyway!)
+            if (Completion > this.GetProgress()) {
+               this.SetProgress(Completion);
+            }
+            
+         } else if (Completion == -1) {
+            
+            // Indefinitely task length
+            this.SetProgressMode('spin');
+            Fade = false;
+            
+         } else if (Completion == -2) {
+         
+            // Fatal error occured.
+            CheckAgain = false;
+            this.SetProgress(0);
+            //this.SetProgressStatus('bad');
+            Fade = false;
+            
          }
          
+         if (data.Message != undefined) {
+            this.SetStatus(data.Message, Fade);
+         }
          
-         var Exec = jQuery.proxy(function(){ this.Monitor(); }, this);
-         setTimeout(Exec, 4000);
+         if (CheckAgain) {
+            var Exec = jQuery.proxy(function(){ this.Monitor(); }, this);
+            setTimeout(Exec, 1000);
+         }
+
       }
    }
    
-   Gdn_Updater.prototype.MonitorQuery = function(Element) {
+   Gdn_Updater.prototype.MonitorQuery = function() {
+      if (this.Active == false) return;
       $.ajax({
-         url: gdn.url('plugin/statistics/monitor/'+Element),
+         url: gdn.url(gdn.combinePaths(this.Active.URL,'check')),
          dataType: 'json',
          success: jQuery.proxy(this.Monitor, this)
       });
    }
    
-   Gdn_Updater.prototype.DoneCatchup = function(data, status, xhr) {
+   Gdn_Updater.prototype.TaskComplete = function(data, status, xhr) {
       // Final lookup to get last tick
       this.Monitor();
       
       this.Active = false;
-      this.Catchup();
+      var Finished = this.Perform();
+      if (Finished)
+         this.Next();
+
+   }
+   
+   Gdn_Updater.prototype.Next = function() {
+      var Cont = document.createElement('div');
+      $(Cont).addClass('ProgressContinue');
+      
+      var ContClick = document.createElement('a');
+      ContClick.href = window.location;
+      $(ContClick).html('Next Step');
+      
+      $(Cont).append(ContClick);
+      this.Frame.append(Cont);
+   }
+   
+   Gdn_Updater.prototype.Failed = function() {
+   
    }
 }
 
 var Updater;
 jQuery(document).ready(function(){
    Updater = new Gdn_Updater();
-   Updater.Prepare();
+   Updater.Ready();
 });

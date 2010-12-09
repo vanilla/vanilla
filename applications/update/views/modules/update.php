@@ -7,12 +7,14 @@
       $TaskNumber = 0;
       foreach ($this->Tasks as $TaskName => $Task) {
          $TaskNumber++;
-         $IsActive = $Task['Active'];
-         $IsDone = ($Task['Completion'] == 100) ? TRUE : FALSE;
+         $Completion = GetValue('Completion',$Task,0);
          
-         $TaskName = $Task['Name'];
-         $TaskLabel = $Task['Label'];
-         $Completion =  $Task['Completion'];
+         $IsActive = GetValue('Active',$Task,FALSE);
+         $IsDone = ($Completion == 100) ? TRUE : FALSE;
+         
+         $TaskName = GetValue('Name',$Task,'');
+         $TaskLabel = GetValue('Label',$Task,'');
+         
          $TaskText = T($TaskLabel);
 
          if ($IsActive) {

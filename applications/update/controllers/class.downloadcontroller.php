@@ -18,8 +18,12 @@ class DownloadController extends UpdateController {
    }
 
    public function Index() {
-      $this->AddSideMenu('update/download');
+   
       $this->Render();
+   }
+   
+   public function Get() {
+   
    }
    
 }

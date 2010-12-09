@@ -18,17 +18,27 @@ class UpdateModule extends Gdn_Module {
    }
    
    public function GetData($UpdateModel) {
-      $Tasks = $UpdateModel->GetTasks();
-      
       $this->Tasks = array();
+      $Tasks = $UpdateModel->GetTasks();
       
       $ActiveTask = $UpdateModel->GetInternalAction();
       $this->ActiveTask = $ActiveTask;
+      
+      if (!is_array($Tasks)) return;
       $ActiveGroup = strtolower(GetValue('Group',$ActiveTask,NULL));
       foreach ($Tasks as $TaskName => $Task) {
          $this->Tasks[$TaskName] = array_merge($Task,array(
             'Active'       => (($ActiveGroup == $TaskName) ? TRUE : FALSE)
          ));
+         
+         $TotalProgressPoints = 0;
+         $CompletedPoints = 0;
+         foreach (GetValue('Tasks',$Task) as $ChildTask) {
+            $TotalProgressPoints += 100;
+            $CompletedPoints += GetValue('Completion', $ChildTask, 0);
+         }
+         
+         $this->Tasks[$TaskName]['Completion'] = round(($CompletedPoints / $TotalProgressPoints) * 100,0);
       }
    }
 

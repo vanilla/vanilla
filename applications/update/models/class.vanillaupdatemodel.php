@@ -97,8 +97,6 @@ class VanillaUpdateModel {
       $this->Clear();
       $this->Tag();
       
-      echo "creating...\n";
-      
       $this->AddGroup('backup', 'Backup')
          ->AddTask('backup', 'files', 'Backup Files')
          ->AddTask('backup', 'data', 'Backup Data');
@@ -147,8 +145,22 @@ class VanillaUpdateModel {
       return (array_key_exists($Key, $this->Meta)) ? $this->Meta[$Key] : FALSE;
    }
    
+   public function GetProperty($GroupName, $TaskName, $Property) {
+      if (!array_key_exists($GroupName, $this->Tasks)) return FALSE;
+      if (!array_key_exists($TaskName, $this->Tasks[$GroupName]['Tasks'])) return FALSE;
+      
+      return GetValue($this->Tasks[$GroupName]['Tasks'][$TaskName], $Property);
+   }
+   
    public function GetTag() {
       return (sizeof($this->Tag)) ? $this->Tag : NULL;
+   }
+   
+   public function GetTask($GroupName, $TaskName) {
+      if (!array_key_exists($GroupName, $this->Tasks)) return FALSE;
+      if (!array_key_exists($TaskName, $this->Tasks[$GroupName]['Tasks'])) return FALSE;
+      
+      return $this->Tasks[$GroupName]['Tasks'][$TaskName];
    }
    
    public function GetTasks() { 
@@ -174,22 +186,14 @@ class VanillaUpdateModel {
       $this->Tag = GetValue('Tag', $Update, FALSE);
       $this->Meta = GetValue('Meta', $Update, FALSE);
       
-      if ($this->TaskList === FALSE || $this->Tag === FALSE)
+      if ($this->Tasks === FALSE || $this->Tag === FALSE)
          $this->Clear();
       
       return TRUE;
    }
    
-   public function Progress($GroupName, $TaskName, $NewProgressPercentage, $Save = FALSE) {
-      if (!array_key_exists($GroupName, $this->Tasks)) return FALSE;
-      if (!array_key_exists($TaskName, $this->Tasks[$GroupName]['Tasks'])) return FALSE;
-      
-      $this->Tasks[$GroupName]['Tasks'][$TaskName]['Completion'] = $NewProgressPercentage;
-      
-      if ($Save) {
-         $this->Save();
-      }
-      return TRUE;
+   public function Progress($GroupName, $TaskName, $NewProgressPercentage = NULL, $Save = FALSE) {
+      $this->SetProperty($GroupName, $TaskName, 'Completion', $NewProgressPercentage, $Save);
    }
    
    protected function Save() {
@@ -205,6 +209,20 @@ class VanillaUpdateModel {
          $this->Meta[$Key] = $Data;
          
       return $Data;
+   }
+   
+   public function SetProperty($GroupName, $TaskName, $Property, $Value = NULL, $Save = FALSE) {
+      if (!array_key_exists($GroupName, $this->Tasks)) return FALSE;
+      if (!array_key_exists($TaskName, $this->Tasks[$GroupName]['Tasks'])) return FALSE;
+      
+      if ($Value == NULL) return GetValue($Property, $this->Tasks[$GroupName]['Tasks'][$TaskName], NULL);
+      
+      $this->Tasks[$GroupName]['Tasks'][$TaskName][$Property] = $Value;
+      
+      if ($Save)
+         $this->Save();
+      
+      return TRUE;
    }
    
    public function Tag() {

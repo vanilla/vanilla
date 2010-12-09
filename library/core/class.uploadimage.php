@@ -93,16 +93,16 @@ class Gdn_UploadImage extends Gdn_Upload {
       $XCoord = 0;
       $YCoord = 0;
       if ($HeightSource > $Height || $WidthSource > $Width) {
-         $HeightDiff = $HeightSource - $Height;
-         $WidthDiff = $WidthSource - $Width;
          $AspectRatio = (float) $WidthSource / $HeightSource;
          if ($Crop === FALSE) {
-            if ($WidthDiff > $HeightDiff) {
-               $Height = round($Width / $AspectRatio);
-            } else {
+            if (round($Width / $AspectRatio) > $Height) {
                $Width = round($Height * $AspectRatio);
+            } else {
+               $Height = round($Width / $AspectRatio);
             }
          } else {
+            $HeightDiff = $HeightSource - $Height;
+            $WidthDiff = $WidthSource - $Width;
             if ($WidthDiff > $HeightDiff) {
                // Crop the original width down
                $NewWidthSource = round(($Width * $HeightSource) / $Height);
@@ -149,7 +149,6 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       // Create a new image from the raw source
       if (function_exists('imagecreatetruecolor')) {
-         echo "TRUE";
          $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
       } else
          $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed

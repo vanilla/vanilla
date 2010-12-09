@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $DiscussionView = $this->FetchViewLocation('discussion');
 ?>
-<div id="Bookmarks" class="Box">
+<div id="Bookmarks" class="Box BoxBookmarks">
    <h4><?php echo T('Bookmarked Discussions'); ?></h4>
    <ul id="Bookmark_List" class="PanelInfo PanelDiscussions">
       <?php

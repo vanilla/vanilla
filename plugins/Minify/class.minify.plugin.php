@@ -19,28 +19,30 @@ $PluginInfo['Minify'] = array(
 );
 
 class MinifyPlugin extends Gdn_Plugin {
+   
+   protected $BasePath = "";
 
    public function Setup() {
       $Folder = PATH_CACHE . DS . 'Minify';
-		if (!file_exists($Folder))
-			@mkdir($Folder);
+      if (!file_exists($Folder))
+         @mkdir($Folder);
    }
-	
-	// Empty the cache when disabling this plugin, enabling or disabling any plugin, application, or theme
-	public function OnDisable() { $this->_EmptyCache(); }
-	public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
-	public function SettingsController_AfterDisablePlugin_Handler() { $this->_EmptyCache(); }
-	public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
-	public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
-	public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
    
-	private function _EmptyCache() {
+   // Empty the cache when disabling this plugin, enabling or disabling any plugin, application, or theme
+   public function OnDisable() { $this->_EmptyCache(); }
+   public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
+   public function SettingsController_AfterDisablePlugin_Handler() { $this->_EmptyCache(); }
+   public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
+   public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
+   public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
+   
+   private function _EmptyCache() {
       $Files = glob(PATH_CACHE.'/Minify/*', GLOB_MARK);
       foreach ($Files as $File) {
          if (substr($File, -1) != '/')
             unlink($File);
       }
-	}
+   }
 
    /**
     *
@@ -52,14 +54,14 @@ class MinifyPlugin extends Gdn_Plugin {
       // Grab all of the css.
       $CssToCache = array();
       $JsToCache = array(); // Add the global js files
-		$GlobalJS = array(
-			'jquery.js',
-			'jquery.livequery.js',
-			'jquery.form.js',
-			'jquery.popup.js',
-			'jquery.gardenhandleajaxform.js',
-			'global.js'
-		);
+      $GlobalJS = array(
+         'jquery.js',
+         'jquery.livequery.js',
+         'jquery.form.js',
+         'jquery.popup.js',
+         'jquery.gardenhandleajaxform.js',
+         'global.js'
+      );
 
       foreach ($Tags as $Index => $Tag) {
          $IsJs = GetValue(HeadModule::TAG_KEY, $Tag) == 'script';
@@ -102,13 +104,30 @@ class MinifyPlugin extends Gdn_Plugin {
       
       // Add minified css & js directly to the head module.
       $Url = 'plugins/Minify/min/?';
-		$BasePath = Gdn::Request()->WebRoot();
-		if ($BasePath != '')
-			$BasePath = 'b='.$BasePath.'&';
+      $query = array();
 
       $Head->Tags($Tags);
-      $Head->AddCss($Url.$BasePath.'f='.implode(',', array_unique($CssToCache)), 'screen');
-      $Head->AddScript($Url.'g=globaljs', 'text/javascript', -100);
-		$Head->AddScript($Url.$BasePath.'f='.implode(',', array_unique($JsToCache)));
+      $this->BasePath = Gdn::Request()->WebRoot();
+
+      $Head->AddCss($Url . 'token=' . $this->_PrepareToken($CssToCache), 'screen');
+
+      $Head->AddScript($Url . ($BasePath!='' ? "b=$BasePath&amp;" : '')
+			. 'g=globaljs', 'text/javascript', -100);
+
+      $Head->AddScript($Url . 'token=' . $this->_PrepareToken($JsToCache));
+   }
+   
+   protected function _PrepareToken($Files) {
+      $Query = array('f' => implode(',', array_unique($Files)));
+      if ($this->BasePath != '')
+	 $Query['b'] = $BasePath;
+      $Query = serialize($Query);
+      $token = md5($Query);
+      // save file
+      $CacheFile = PATH_CACHE . DS . 'Minify' . DS . 'query_' . $token;
+      if (!file_exists($CacheFile)) {
+	 file_put_contents($CacheFile, $Query);
+      }
+      return $token;
    }
 }

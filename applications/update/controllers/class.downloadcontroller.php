@@ -23,7 +23,42 @@ class DownloadController extends UpdateController {
    }
    
    public function Get() {
-   
+      $this->GetBackupTask();
+      $RenderController = 'download';
+      
+      $RequestType = $this->RequestType();
+      switch ($RequestType) {
+         case 'ui':
+            $this->DownloadTitle = T('Downloading updates...');
+            $this->DownloadGetTasks = array(
+               'update/download/get'   => $this->DownloadTitle
+            );
+            $RenderView = 'get';
+            break;
+            
+         case 'check':
+         case 'perform':
+
+            $RenderView = 'blank';
+            $RenderController = 'update';
+
+            if ($RequestType == 'perform') {
+               // Don't interrupt if another process is already doing this.
+               if ($this->Update->Progress('download','get')) exit();
+               $this->DownloadModel->BackupFiles($this->GetBackupTask(), $this->Update);
+            }
+            
+            if ($RequestType == 'check') {
+               $ThisAction = $this->Update->GetTask('backup','files');
+               $this->SetData('Completion', GetValue('Completion',$ThisAction,NULL));
+               $this->SetData('Message', $this->Update->GetMeta('backup/message'));
+               $this->Update->SetMeta('backup/message');
+               $this->SetData('Menu', $this->UpdateModule->ToString());
+            }
+            
+            break;
+      }
+      $this->Render($RenderView,$RenderController);
    }
    
 }

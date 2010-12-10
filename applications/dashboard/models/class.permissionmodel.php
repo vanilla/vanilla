@@ -544,6 +544,11 @@ class PermissionModel extends Gdn_Model {
 				$this->SQL->Replace('Permission', $this->_Backtick($Values), $Where, TRUE);
 			}
       }
+      
+      // Remove the cached permissions for all users.
+      $this->SQL->Update('User')
+         ->Set('Permissions', '')
+         ->Put();
    }
    
    public function SaveAll($Permissions, $AllWhere = NULL) {

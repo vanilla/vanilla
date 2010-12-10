@@ -146,12 +146,11 @@ class TwitterPlugin extends Gdn_Plugin {
 	public function Authorize($Query = FALSE) {
       // Aquire the request token.
       $Consumer = new OAuthConsumer(C('Plugins.Twitter.ConsumerKey'), C('Plugins.Twitter.Secret'));
-
-      $Params = array(
-          'oauth_callback' => $this->RedirectUri()
-      );
+      $RedirectUri = $this->RedirectUri();
       if ($Query)
-         $Params['oauth_callback'] .= '&'.$Query;
+         $RedirectUri .= (strpos($RedirectUri, '?') === FALSE ? '?' : '&').$Query;
+
+      $Params = array('oauth_callback' => $RedirectUri);
       
       $Url = 'https://api.twitter.com/oauth/request_token';
       $Request = OAuthRequest::from_consumer_and_token($Consumer, NULL, 'POST', $Url, $Params);

@@ -47,6 +47,13 @@ class Gdn_ThemeManager {
                      
                   $Folder = substr($Folder, 0, strpos($Folder, DS));
                   $ThemeInfo[$ThemeName]['Folder'] = $Folder;
+
+                  // Add the screenshot.
+                  $ScreenshotPath = SafeGlob(PATH_THEMES."/$Folder/screenshot.*", array('gif', 'jpg', 'png'));
+                  if (count($ScreenshotPath) > 0) {
+                     $ScreenshotPath = $ScreenshotPath[0];
+                     $ThemeInfo[$ThemeName]['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath));
+                  }
                }
             }
          }

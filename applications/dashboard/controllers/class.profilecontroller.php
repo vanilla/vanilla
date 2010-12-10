@@ -47,9 +47,9 @@ class ProfileController extends Gdn_Controller {
       parent::Initialize();
    }   
    
-   public function Activity($UserReference = '', $Username = '') {
+   public function Activity($UserReference = '', $Username = '', $UserID = '') {
       $this->Permission('Garden.Profiles.View');
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, $UserID);
       $this->SetTabView('Activity');
       $this->ActivityModel = new ActivityModel();
       $Session = Gdn::Session();
@@ -170,8 +170,8 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
 
-   public function Index($UserReference = '', $Username = '') {
-      return $this->Activity($UserReference, $Username);
+   public function Index($User = '', $Username = '', $UserID = '') {
+      return $this->Activity($User, $Username, $UserID);
    }
    
    public function Invitations() {
@@ -314,11 +314,11 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
    
-   public function Preferences($UserReference = '', $Username = '') {
+   public function Preferences($UserReference = '', $Username = '', $UserID = '') {
       $Session = Gdn::Session();
       $this->Permission('Garden.SignIn.Allow');
-      $this->GetUserInfo($UserReference, $Username);
-      $UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
+      $this->GetUserInfo($UserReference, $Username, $UserID);
+		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
 
@@ -655,10 +655,16 @@ class ProfileController extends Gdn_Controller {
     * Retrieve the user to be manipulated. If no params are passed, this will
     * retrieve the current user from the session.
     */
-   public function GetUserInfo($UserReference = '', $Username = '') {
+   public function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
          Redirect('dashboard/home/permission');
-         
+      
+		// If a UserID was provided as a querystring parameter, use it over anything else:
+		if ($UserID) {
+			$UserReference = $UserID;
+			$Username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
+		}
+		   
       $this->Roles = array();
       if ($UserReference == '') {
          $this->User = $this->UserModel->Get(Gdn::Session()->UserID);
@@ -669,13 +675,16 @@ class ProfileController extends Gdn_Controller {
       }
          
       if ($this->User === FALSE) {
-         Redirect('dashboard/home/filenotfound');
+         throw NotFoundException();
       } else if ($this->User->Deleted == 1) {
          Redirect('dashboard/home/deleted');
       } else {
          $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
             $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
+			
+			$this->SetData('Profile', $this->User);
+			$this->SetData('UserRoles', $this->Roles);
       }
       
       // Make sure the userphoto module gets added to the page

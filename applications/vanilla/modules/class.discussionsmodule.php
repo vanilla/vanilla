@@ -15,8 +15,7 @@ class DiscussionsModule extends Gdn_Module {
    
    public function GetData($Limit = 10) {
       $DiscussionModel = new DiscussionModel();
-      $Data = $DiscussionModel->Get(0, $Limit);
-      $this->_Sender->SetData('DiscussionsModuleData', $Data);
+      $this->Data = $DiscussionModel->Get(0, $Limit);
    }
 
    public function AssetTarget() {
@@ -24,8 +23,7 @@ class DiscussionsModule extends Gdn_Module {
    }
 
    public function ToString() {
-      $Data = $this->_Sender->Data['DiscussionsModuleData'];
-      if (is_object($Data) && $Data->NumRows() > 0)
+      if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

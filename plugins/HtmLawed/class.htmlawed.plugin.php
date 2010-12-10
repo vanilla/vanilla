@@ -17,7 +17,8 @@ $PluginInfo['HtmLawed'] = array(
    'HasLocale' => FALSE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
+   'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
+   'Hidden' => TRUE
 );
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);

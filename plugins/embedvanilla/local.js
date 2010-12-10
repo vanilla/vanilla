@@ -7,6 +7,7 @@ $(function() {
    }
       
    var currentHeight = null,
+      minHeight = 400,
       remotePostMessage = null,
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',
@@ -90,6 +91,9 @@ $(function() {
          var newHeight = document.body.offsetHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
+            if (currentHeight < minHeight)
+               currentHeight = minHeight;
+               
             remotePostMessage('height:'+currentHeight, '*');
          }
       }

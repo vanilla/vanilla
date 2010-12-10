@@ -116,7 +116,10 @@ class UserModel extends Gdn_Model {
 
    public function Get($UserID) {
       $this->UserQuery();
-      return $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow();
+      $User = $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow();
+      $this->SetCalculatedFields($User);
+
+      return $User;
    }
    
    public function GetByUsername($Username) {
@@ -124,11 +127,15 @@ class UserModel extends Gdn_Model {
 		 	return FALSE;
 			
       $this->UserQuery();
-      return $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
+      $User = $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
+      $this->SetCalculatedFields($User);
+      return $User;
    }
 	public function GetByEmail($Email) {
       $this->UserQuery();
-      return $this->SQL->Where('u.Email', $Email)->Get()->FirstRow();
+      $User = $this->SQL->Where('u.Email', $Email)->Get()->FirstRow();
+      $this->SetCalculatedFields($User);
+      return $User;
    }
 
    public function GetActiveUsers($Limit = 5) {
@@ -1335,6 +1342,17 @@ class UserModel extends Gdn_Model {
       $Sql = "insert {$Px}UserAuthentication (ForeignUserKey, ProviderKey, UserID) values ($UID, $Provider, $UserID) on duplicate key update UserID = $UserID";
       $Result = $this->Database->Query($Sql);
       return $Result;
+   }
+
+   public function SetCalculatedFields(&$User) {
+      if ($v = GetValue('Attributes', $User))
+         SetValue('Attributes', $User, @unserialize($v));
+      if ($v = GetValue('Permissions', $User))
+         SetValue('Permissions', $User, @unserialize($v));
+      if ($v = GetValue('Preferences', $User))
+         SetValue('Preferences', $User, @unserialize($v));
+      if ($v = GetValue('Photo', $User))
+         SetValue('PhotoUrl', $User, Asset('uploads/'.$v, TRUE));
    }
 
    public function SetTransientKey($UserID, $ExplicitKey = '') {

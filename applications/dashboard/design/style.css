@@ -1203,7 +1203,9 @@ ul.MessageList div.Message {
    line-height: 140%;
    font-size: 100%;
 }
+div.Preview div.Message,
 div.Preview div.Message p,
+ul.MessageList div.Message,
 ul.MessageList div.Message p {
    margin: 8px 0;
 }

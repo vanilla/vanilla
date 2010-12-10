@@ -153,7 +153,11 @@ class Gdn_Filecache extends Gdn_Cache {
          time()
       ));
       $Value = $Context."\n\n".$Value;
-      $StoreOp = file_put_contents($CacheFile,$Value,LOCK_EX | LOCK_NB);
+      try {
+         $StoreOp = file_put_contents($CacheFile,$Value,LOCK_EX | LOCK_NB);
+      } catch (Exception $e) {
+         die("exp: ".$e->getMessage());
+      }
       if ($StoreOp === FALSE)
          return $this->Failure("Trying to save cache value to file '{$CacheFile}' but file_put_contents returned FALSE.");
          
@@ -170,7 +174,8 @@ class Gdn_Filecache extends Gdn_Cache {
       }
       $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
       
-      $Cache = fopen($CacheFile, 'r');
+      $Cache = @fopen($CacheFile, 'r');
+      if (!$Cache) return Gdn_Cache::CACHEOP_FAILURE;
       $TimeoutMS = $Container[Gdn_Cache::CONTAINER_TIMEOUT] * 1000;
       $EndTimeMS = microtime(TRUE) + $TimeoutMS;
       $Data = NULL;

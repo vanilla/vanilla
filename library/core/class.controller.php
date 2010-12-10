@@ -1087,6 +1087,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
       
+      // Remove values that should not be transmitted via api
+      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
+      
       $this->Finalize();
 
       // Check for a special view.
@@ -1127,6 +1130,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Handle numeric arrays.
       if (is_numeric($Node))
          $Node = 'Item';
+
+      if (!$Node)
+         return;
       
       echo "$Indent<$Node>";
 
@@ -1134,11 +1140,13 @@ class Gdn_Controller extends Gdn_Pluggable {
          echo htmlspecialchars($Data);
       } else {
          $Data = (array)$Data;
-         foreach ($Data as $Key => $Value) {
+         if (count($Data) > 0) {
+            foreach ($Data as $Key => $Value) {
+               echo "\n";
+               $this->_RenderXml($Value, $Key, $Indent.' ');
+            }
             echo "\n";
-            $this->_RenderXml($Value, $Key, $Indent.' ');
          }
-         echo "\n";
       }
       echo "</$Node>";
    }

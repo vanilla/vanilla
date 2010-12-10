@@ -56,7 +56,7 @@ class SearchController extends Gdn_Controller {
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
 		if($ResultSet)
-			$NumResults = $ResultSet->NumRows();
+			$NumResults = count($ResultSet);
 		else
 			$NumResults = 0;
 		if ($NumResults == $Offset + $Limit)
@@ -64,17 +64,16 @@ class SearchController extends Gdn_Controller {
 		
 		// Build a pager
 		$PagerFactory = new Gdn_PagerFactory();
-		$Pager = $PagerFactory->GetPager('MorePager', $this);
-		$Pager->MoreCode = 'More Results';
-		$Pager->LessCode = 'Previous Results';
-		$Pager->ClientID = 'Pager';
-		$Pager->Configure(
+		$this->Pager = $PagerFactory->GetPager('MorePager', $this);
+		$this->Pager->MoreCode = 'More Results';
+		$this->Pager->LessCode = 'Previous Results';
+		$this->Pager->ClientID = 'Pager';
+		$this->Pager->Configure(
 			$Offset,
 			$Limit,
 			$NumResults,
 			'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
 		);
-		$this->SetData('Pager', $Pager, TRUE);
 		
 		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));

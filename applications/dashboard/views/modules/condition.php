@@ -83,7 +83,7 @@ function WriteConditionEdit($Condition, $Sender) {
    echo '</tfoot>';
    ?>
 </table>
-   <div style="text-align: right;">
+   <div style="text-align: right; margin-top: 10px;">
       <a class="AddCondition Button"><?php echo sprintf(T('Add %s'), T('Condition')); ?></a>
    </div>
 </div>

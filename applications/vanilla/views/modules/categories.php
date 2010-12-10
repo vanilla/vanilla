@@ -2,12 +2,12 @@
 $CountDiscussions = 0;
 $CategoryID = isset($this->_Sender->CategoryID) ? $this->_Sender->CategoryID : '';
 
-if ($this->_CategoryData !== FALSE) {
-   foreach ($this->_CategoryData->Result() as $Category) {
+if ($this->Data !== FALSE) {
+   foreach ($this->Data->Result() as $Category) {
       $CountDiscussions = $CountDiscussions + $Category->CountDiscussions;
    }
    ?>
-<div class="Box">
+<div class="Box BoxCategories">
    <h4><?php echo T('Categories'); ?></h4>
    <ul class="PanelInfo">
       <li<?php
@@ -17,7 +17,7 @@ if ($this->_CategoryData !== FALSE) {
       ?>><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
       <?php
    $ParentName = '';
-   foreach ($this->_CategoryData->Result() as $Category) {
+   foreach ($this->Data->Result() as $Category) {
       if ($Category->ParentName != '' && $Category->ParentName != $ParentName) {
          $ParentName = $Category->ParentName;
          ?>

@@ -387,7 +387,7 @@ function NotFoundException($Code = 'Page') {
  */
 function PermissionException($Permission = NULL) {
   if (!$Permission)
-     $Message = T('PermissionErrorMessage', 'You don&rsquo;t have permission to do that.');
+     $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
   else
      $Message = sprintf(T('You need the %s permission to do that.'), $Permission);
   return new Exception($Message, 401);

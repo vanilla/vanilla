@@ -9,11 +9,11 @@
 	
 	if ($this->SearchResults) {
 ?>
-	<div class="SubTab"><?php printf(T($this->SearchResults->NumRows() == 0 ? "↳ No results for '%s'" : "↳ Search results for '%s'"), $this->SearchTerm); ?></div>
+	<div class="SubTab"><?php printf(T(count($this->SearchResults) == 0 ? "↳ No results for '%s'" : "↳ Search results for '%s'"), $this->SearchTerm); ?></div>
 <?php } ?>
 </div>
 <?php
-if ($this->SearchResults && $this->SearchResults->NumRows() > 0) {
+if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
    echo $this->Pager->ToString('less');
    $ViewLocation = $this->FetchViewLocation('results');
    include($ViewLocation);

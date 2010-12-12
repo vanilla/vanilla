@@ -282,8 +282,8 @@ class Gdn_FileSystem {
    /**
     * Serves a file to the browser.
     *
-    * @param string $File The full path to the file being served.
-    * @param string $Name The name to give the file being served (don't include file extension, it will be added automatically). Will use file's name on disk if ignored.
+    * @param string $File Full path to the file being served.
+    * @param string $Name Name to give the file being served. Including extension overrides $File extension. Uses $File filename if empty.
     * @param string $MimeType The mime type of the file.
     * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
@@ -294,6 +294,8 @@ class Gdn_FileSystem {
          $Database->CloseConnection();
          
          $Size = filesize($File);
+         $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
+         $Extension = ($NameExtension != '') ? $NameExtension : strtolower(pathinfo($File, PATHINFO_EXTENSION));
          $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($Name == '') {
             $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;

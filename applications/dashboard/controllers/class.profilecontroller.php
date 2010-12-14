@@ -318,6 +318,7 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, $UserID);
+		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
 

@@ -256,7 +256,9 @@ abstract class Gdn_DatabaseStructure {
 			$Result = "$Type($Length, $Precision)";
 		elseif($Type && $Length)
 			$Result = "$Type($Length)";
-		elseif($Type)
+      elseif(strtolower($Type) == 'enum') {
+         $Result = GetValue('Enum', $Column, array());
+		} elseif($Type)
 			$Result = $Type;
 		else
 			$Result = 'int';

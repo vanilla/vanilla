@@ -294,13 +294,16 @@ class Gdn_FileSystem {
          $Database->CloseConnection();
          
          $Size = filesize($File);
+         
+         // Determine if Path extension should be appended to Name
          $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
-         $Extension = ($NameExtension != '') ? $NameExtension : strtolower(pathinfo($File, PATHINFO_EXTENSION));
-         $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
-         if ($Name == '') {
-            $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
-         } elseif (!StringEndsWith($Name, '.'.$Extension)) {
-            $Name .= '.'.$Extension;
+         if ($NameExtension == '') {
+            $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
+            if ($Name == '') {
+               $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
+            } elseif (!StringEndsWith($Name, '.'.$Extension)) {
+             $Name .= '.'.$Extension;
+            }
          }
          $Name = rawurldecode($Name);
  

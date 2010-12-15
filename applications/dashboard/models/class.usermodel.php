@@ -147,16 +147,33 @@ class UserModel extends Gdn_Model {
          ->Limit($Limit, 0)
          ->Get();
    }
+
+   public function GetApplicantCount() {
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      if ($ApplicantRoleID == 0)
+         return 0;
+
+      $Result = $this->SQL->Select('u.UserID', 'count', 'ApplicantCount')
+         ->From('User u')
+         ->Join('UserRole ur', 'u.UserID = ur.UserID')
+         ->Where('ur.RoleID', $ApplicantRoleID, TRUE, FALSE)
+         ->Get()->Value('ApplicantCount', 0);
+      return $Result;
+   }
    
    /**
     * Returns all users in the applicant role
     */
    public function GetApplicants() {
+      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      if ($ApplicantRoleID == 0)
+         return new Gdn_DataSet();
+
       return $this->SQL->Select('u.*')
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', (int)C('Garden.Registration.ApplicantRoleID', 0), TRUE, FALSE)
-         ->GroupBy('UserID')
+         ->Where('ur.RoleID', $ApplicantRoleID, TRUE, FALSE)
+//         ->GroupBy('UserID')
          ->OrderBy('DateInserted', 'desc')
          ->Get();
    }
@@ -570,14 +587,19 @@ class UserModel extends Gdn_Model {
    }
 
    public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      if (C('Garden.Registration.Method') == 'Approval')
+         $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      else
+         $ApplicantRoleID = 0;
 
       // Check to see if the search exactly matches a role name.
       $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
 
       $this->UserQuery();
-      $this->SQL
-         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+      if ($ApplicantRoleID != 0) {
+         $this->SQL
+            ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+      }
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
@@ -593,16 +615,21 @@ class UserModel extends Gdn_Model {
          }
       }
 
+      if ($ApplicantRoleID != 0)
+         $this->SQL->Where('ur.RoleID is null');
+
       return $this->SQL
          ->Where('u.Deleted', 0)
-         ->Where('ur.RoleID is null')
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
    }
 
    public function SearchCount($Keywords = FALSE) {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      if (C('Garden.Registration.Method') == 'Approval')
+         $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
+      else
+         $ApplicantRoleID = 0;
 
 
       // Check to see if the search exactly matches a role name.
@@ -610,8 +637,9 @@ class UserModel extends Gdn_Model {
       
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+         ->From('User u');
+      if ($ApplicantRoleID != 0)
+         $this->SQL->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
@@ -628,8 +656,10 @@ class UserModel extends Gdn_Model {
       }
 
 		$this->SQL
-         ->Where('u.Deleted', 0)
-         ->Where('ur.RoleID is null');
+         ->Where('u.Deleted', 0);
+      
+      if ($ApplicantRoleID != 0)
+         $this->SQL->Where('ur.RoleID is null');
 
 		$Data =  $this->SQL->Get()->FirstRow();
 

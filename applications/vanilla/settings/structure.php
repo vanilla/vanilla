@@ -19,7 +19,11 @@ $Construct = $Database->Structure();
 $Construct->Table('Category')
    ->PrimaryKey('CategoryID')
    ->Column('ParentCategoryID', 'int', TRUE)
+   ->Column('TreeLeft', 'int', TRUE)
+   ->Column('TreeRight', 'int', TRUE)
+   ->Column('Depth', 'int', TRUE)
    ->Column('CountDiscussions', 'int', '0')
+   ->Column('CountComments', 'int', '0')
    ->Column('AllowDiscussions', 'tinyint', '1')
    ->Column('Name', 'varchar(30)')
    ->Column('UrlCode', 'varchar(30)', TRUE)
@@ -29,10 +33,15 @@ $Construct->Table('Category')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime')
+   ->Column('LastCommentID', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
+if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0)
+   $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.'));
+
 if ($Drop)
-   $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'Sort' => '1'));
+   $SQL->Insert('Category', array('TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions'));
+
 
 // Construct the discussion table.
 $Construct->Table('Discussion');

@@ -154,6 +154,10 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddModule('SignedInModule');
 		$this->FireEvent('AfterInitialize');
+		
+		// Applies db changes in 2.0.17
+		$CategoryModel = new CategoryModel();
+		$CategoryModel->ApplyUpdates();
    }
    
    /**

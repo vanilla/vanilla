@@ -8,31 +8,24 @@ if ($this->Data !== FALSE) {
    }
    ?>
 <div class="Box">
-   <h4><?php echo T('Categories'); ?></h4>
-   <ul class="PanelInfo">
+   <h4><?php echo Anchor(T('Categories'), 'categories/all'); ?></h4>
+   <ul class="PanelInfo PanelCategories">
       <li<?php
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
-      <?php
-   $ParentName = '';
+      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></span></li>
+<?php
    foreach ($this->Data->Result() as $Category) {
-      if ($Category->ParentName != '' && $Category->ParentName != $ParentName) {
-         $ParentName = $Category->ParentName;
-         ?>
-         <li class="Parent"><?php echo Gdn_Format::Text($Category->ParentName); ?></li>
-         <?php
+      if ($Category->CategoryID > 0) {
+         // Only check stack if there is one
+         echo '<li class="Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').'">';
+         echo Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode), 'strong');
+         echo ' '.$Category->CountDiscussions;
+         echo "</li>\n";
       }
-      ?>
-      <li<?php
-      if ($CategoryID == $Category->CategoryID)
-         echo ' class="Active"';
-         
-      ?>><strong><?php echo Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
-      <?php
    }
-      ?>
+?>
    </ul>
 </div>
    <?php

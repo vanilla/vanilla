@@ -65,9 +65,25 @@ class PostController extends VanillaController {
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
+      $this->Category = FALSE;
       if ($UseCategories) {
          $CategoryModel = new CategoryModel();
-         $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $aCategoryData = array();
+         foreach ($CategoryData->Result() as $Category) {
+            if ($this->CategoryID == $Category->CategoryID)
+               $this->Category = $Category;
+            
+            $CategoryName = $Category->Name;   
+            if ($Category->Depth > 1) {
+               $CategoryName = '↳ '.$CategoryName;
+               $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
+               $CategoryName = str_replace(' ', '&nbsp;', $CategoryName);
+            }
+               
+            $aCategoryData[$Category->CategoryID] = $CategoryName;
+         }
+         $this->CategoryData = $aCategoryData;
       }
       
       // Check permission 

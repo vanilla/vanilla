@@ -29,17 +29,6 @@ jQuery(document).ready(function($) {
       return false;
    });
 
-   // Hide/reveal the permissions grids when the AllowDiscussions checkbox is un/checked.
-   $('[name=Category/IsParent]').click(function() {
-      if ($(this).attr('checked'))
-         $('#Permissions,#UrlCode').slideUp('fast');
-      else
-         $('#Permissions,#UrlCode').slideDown('fast');
-   });
-   // Hide onload if unchecked   
-   if ($('[name=Category/IsParent]').attr('checked'))
-      $('#Permissions,#UrlCode').hide();
-   
    // Categories->Delete()
    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
    $('[name=Form/DeleteDiscussions]').click(function() {
@@ -61,26 +50,32 @@ jQuery(document).ready(function($) {
       $('#DeleteDiscussions').hide();
    }
 
-   // Categories->Manage()
-   // Make category table sortable
-   if ($.tableDnD) {
-      saveAndReload = function(table, row) {
-         var webRoot = gdn.definition('WebRoot', '');
-         var transientKey = gdn.definition('TransientKey');
-         var tableId = $($.tableDnD.currentTable).attr('id');
-         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&DeliveryType=VIEW&Form/TransientKey=' + transientKey;
-         $.post(gdn.url('/vanilla/settings/sortcategories/'), data, function(response) {
-            if (response == 'TRUE') {
-               // Reload the page content...
-               $.get(gdn.url('/vanilla/settings/managecategories/?DeliveryType=VIEW'), function(data){
-                  $('#Content').html(data);
-                  $('table.Sortable tbody tr td').effect("highlight", {}, 1000);
-                  $("table.Sortable").tableDnD({onDrop: saveAndReload});
-               });
-            }
-         });
-      }
-      $("table.Sortable").tableDnD({onDrop: saveAndReload});
-   }
-
+   if ($.ui && $.ui.nestedSortable)
+      $('ol.Sortable').nestedSortable({
+         disableNesting: 'NoNesting',
+         errorClass: 'SortableError',
+         forcePlaceholderSize: true,
+         handle: 'div',
+         items: 'li',
+         opacity: .6,
+         placeholder: 'Placeholder',
+         tabSize: 25,
+         tolerance: 'pointer',
+         toleranceElement: '> div',
+         update: function() {
+            $.post(
+               gdn.url('/vanilla/settings/sortcategories/'),
+               {
+                  'TreeArray': $('ol.Sortable').nestedSortable('toArray', {startDepthCount: 0}),
+                  'DeliveryType': 'VIEW',
+                  'TransientKey': gdn.definition('TransientKey')
+               },
+               function(response) {
+                  if (response != 'TRUE') {
+                     alert("Oops - Didn't save order properly");
+                  }
+               }
+            );
+         }
+      });
 });

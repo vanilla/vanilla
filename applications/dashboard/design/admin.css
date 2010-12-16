@@ -1578,9 +1578,6 @@ table tbody td {
 .CheckBoxGrid td.Alt {
 	background: none;
 }
-body.managecategories table td.Last {
-	white-space: nowrap;
-}
 
 /* Summary Tables */
 div.Summary {
@@ -1715,4 +1712,77 @@ div.Summary table tbody td {
    z-index: 200;
    position: relative;
    margin: 6px;
+}
+
+/* Homepage Admin */
+.HomeOptions {
+	padding: 0 20px;
+}
+.HomeOptions a {
+	color: #333;
+	font-weight: bold;
+	text-decoration: none;
+	display: inline-block;
+	vertical-align: bottom;
+	width: 180px;
+	margin: 0 10px 10px 0;
+	padding: 0 6px;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border: 1px solid #ddd;
+	background: url('images/homepage-sprites.png') 6px 23px no-repeat #eee;
+	height: 152px;
+}
+.HomeOptions a.categoriesdiscussions { background-position: -184px 23px; }
+.HomeOptions a.categoriesall { background-position: -564px 23px; }
+.HomeOptions a.activity { background-position: -374px 23px; }
+.HomeOptions a:hover {
+	background-color: #f5f5f5;
+	border-color: #ccc;
+}
+
+ol.Sortable, ol.Sortable ol {
+	margin: 0 0 0 25px;
+	padding: 0;
+	list-style-type: none;
+}
+ol.Sortable {
+	margin: 0;
+	background: #f3f3f3;
+}
+.Sortable li {
+	margin: 0;
+	padding: 0;
+}
+.Sortable li div  {
+	padding: 0;
+	margin: 0;
+	cursor: move;
+}
+.Placeholder {
+	background-color: #cfcfcf;
+}
+.SortableError {
+	background:#fbe3e4;
+	color:#8a1f11;
+}
+.Sortable table {
+	border: 1px solid #e0e0e0;
+	border-right: none;
+	margin: -1px 0 0 -1px;
+}
+.Sortable table td {
+	vertical-align: top;
+	padding: 6px;
+	background: #fff;
+	border-bottom: none;
+}
+.Sortable table td strong,
+.Sortable table td blockquote {
+	display: block;
+}
+.Sortable table td.Buttons {
+	text-align: right;
+	padding: 6px 0;
 }

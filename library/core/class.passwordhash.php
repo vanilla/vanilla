@@ -42,6 +42,23 @@ class Gdn_PasswordHash extends PasswordHash {
       parent::PasswordHash(8, TRUE);
    }
 
+   function CheckDjango($Password, $StoredHash) {
+      if (strpos($StoredHash, '$') === FALSE) {
+         return md5($Password) == $StoredHash;
+      } else {
+         list($Method, $Salt, $Hash) = explode('$', $StoredHash);
+         switch (strtolower($Method)) {
+            case 'crypt':
+               return crypt($Password, $Salt) == $Hash;
+            case 'md5':
+               return md5($Salt.$Password) == $Hash;
+            case 'sha1':
+            default:
+               return sha1($Salt.$Password) == $Hash;
+         }
+      }
+   }
+
    /**
     * Chech a password against a stored password
     *
@@ -57,6 +74,9 @@ class Gdn_PasswordHash extends PasswordHash {
    function CheckPassword($Password, $StoredHash, $Method = FALSE) {
       $Result = FALSE;
 		switch(strtolower($Method)) {
+         case 'django':
+            $Result = $this->CheckDjango($Password, $StoredHash);
+            break;
          case 'phpbb':
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);
@@ -65,8 +85,11 @@ class Gdn_PasswordHash extends PasswordHash {
             throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
             break;
 			case 'vbulletin':
-				$Salt = trim(substr($StoredHash, -3, 3));
-				$VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - 3);
+            // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4
+            $SaltLength = strlen($StoredHash) - 32;
+            $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
+            $VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
+            
 				$VbHash = md5(md5($Password).$Salt);
 				$Result = $VbHash == $VbStoredHash;
 				break;

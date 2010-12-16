@@ -7,7 +7,7 @@ if ($this->Data !== FALSE) {
       $CountDiscussions = $CountDiscussions + $Category->CountDiscussions;
    }
    ?>
-<div class="Box">
+<div class="Box BoxCategories">
    <h4><?php echo Anchor(T('Categories'), 'categories/all'); ?></h4>
    <ul class="PanelInfo PanelCategories">
       <li<?php

@@ -548,7 +548,7 @@ class Gdn_PluginManager {
             // Look for an icon.
             $IconFile = SafeGlob(dirname($PluginFile).'/icon.*', array('jpg', 'gif', 'png'));
             if (($IconFile = GetValue(0, $IconFile)))
-               $PluginInfo['IconUrl'] = Url(str_replace(PATH_ROOT, '', $IconFile));
+               $PluginInfo['IconUrl'] = str_replace(PATH_ROOT, '', $IconFile);
 
             $this->_AvailablePlugins[$PluginInfo['Index']] = $PluginInfo;
             $this->_PluginsByClassName[$PluginInfo['ClassName']] = $PluginInfo['Index'];
@@ -625,6 +625,11 @@ class Gdn_PluginManager {
       if (!$Plugin) return;
 
       $PluginName = $Plugin['Index'];
+
+      // Check to see if the plugin is already enabled.
+      if (array_key_exists($PluginName, $this->EnabledPlugins())) {
+         throw new Gdn_UserException(T('The plugin is already enabled.'));
+      }
       
       $this->TestPlugin($PluginName, $Validation, $Setup);
       

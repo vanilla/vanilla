@@ -96,6 +96,13 @@ if (!class_exists('SideMenuModule', FALSE)) {
       }
       
       /**
+       * Removes all links from a specific group.
+       */
+      public function RemoveLinks($Group) {
+			$this->Items[$Group] = array();
+      }
+      
+      /**
        * Removes an entire group of links, and the group itself, from the menu.
        */
       public function RemoveGroup($Group) {

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Box">
+<div class="Box BoxDrafts">
    <h4><?php echo T('My Drafts'); ?></h4>
    <ul class="PanelInfo PanelDiscussions">
       <?php foreach ($this->Data->Result() as $Draft) {

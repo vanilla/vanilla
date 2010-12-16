@@ -1546,7 +1546,7 @@ class UserModel extends Gdn_Model {
       $PasswordHash = new Gdn_PasswordHash();
       $Password = $PasswordHash->HashPassword($Password);
 
-      $this->SQL->Update('User')->Set('Password', $Password)->Where('UserID', $UserID)->Put();
+      $this->SQL->Update('User')->Set('Password', $Password)->Set('HashMethod', 'Vanilla')->Where('UserID', $UserID)->Put();
       $this->SaveAttribute($UserID, 'PasswordResetKey', '');
       return $this->Get($UserID);
    }

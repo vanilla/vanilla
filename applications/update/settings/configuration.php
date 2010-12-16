@@ -12,4 +12,6 @@ $Configuration['Update']['Local']['TaskListKey'] = 'UpdateTaskList-progress';
 
 $Configuration['Update']['Remote']['Repository'] = 'http://www.vanillaforums.org';
 $Configuration['Update']['Remote']['Addon'] = 'vanilla-core';
-$Configuration['Update']['Remote']['APICall'] = 'addon.xml';
+
+$Configuration['Update']['Remote']['RPC']['Information'] = 'addon.xml';
+$Configuration['Update']['Remote']['RPC']['Download'] = 'get';

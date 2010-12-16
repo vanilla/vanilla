@@ -15,6 +15,36 @@ class DownloadController extends UpdateController {
    
    public function Initialize() {
       parent::Initialize();
+      
+      $this->DownloadModel = new DownloadModel();
+      /*
+
+      $DefaultOptions = array(
+         'SendCookies'     => TRUE,
+         'RequestMethod'   => 'GET',
+         'FollowRedirects' => TRUE,
+         'SaveFile'        => FALSE,
+         'Timeout'         => C('Garden.SocketTimeout', 2.0),
+         'BufferSize'      => 8192,
+         'UserAgent'       => GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
+         'Referer'         => Gdn_Url::WebRoot(TRUE),
+         'Authentication'  => FALSE,
+         'Username'        => NULL,
+         'Password'        => NULL
+      );
+*/
+      
+      $Results = $this->DownloadModel->Request(
+         "http://www.vanillaforums.org/uploads/addons/LABOJ70HFYO0.zip",
+         NULL,
+         array(
+            'SaveFile'     => '/www/vanilla/vanilla/cache',
+            'SendCookies'  => FALSE
+         )
+      );
+      
+      var_dump($Results);
+      die();
    }
 
    public function Index() {

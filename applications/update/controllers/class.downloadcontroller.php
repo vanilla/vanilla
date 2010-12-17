@@ -34,14 +34,7 @@ class DownloadController extends UpdateController {
       );
 */
       
-      $Results = $this->DownloadModel->Request(
-         "http://www.vanillaforums.org/uploads/addons/LABOJ70HFYO0.zip",
-         NULL,
-         array(
-            'SaveFile'     => '/www/vanilla/vanilla/cache',
-            'SendCookies'  => FALSE
-         )
-      );
+      $Results = $this->DownloadModel->GetAddonArchive('vanilla-core');
       
       var_dump($Results);
       die();

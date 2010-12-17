@@ -25,6 +25,8 @@ class DownloadModel {
    // Addon version and file information stored here as we download it
    protected $Addons = NULL;
    
+   protected $RemoteInfo = NULL;
+   
    public function __construct() {
    
       $this->Repository = C('Update.Remote.Repository');
@@ -34,6 +36,7 @@ class DownloadModel {
       );
 
       $this->Addons = array();
+      $this->RemoteInfo = array();
 
       $this->DownloadDir = C('Update.Local.Downloads', NULL);
       $this->Downloads = array();
@@ -59,6 +62,8 @@ class DownloadModel {
          'RequestMethod'   => 'GET',
          'FollowRedirects' => TRUE,
          'SaveFile'        => FALSE,
+         'SaveVerify'      => FALSE,
+         'UseExisting'     => TRUE,
          'Timeout'         => C('Garden.SocketTimeout', 2.0),
          'BufferSize'      => 8192,
          'UserAgent'       => GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
@@ -119,8 +124,26 @@ class DownloadModel {
             $Filename = CombinePaths(array($Filename, $RequestFilename));
          }
          
-         $VacantSpace = TRUE;
+         echo "Request(): Filename = {$Filename}\n";
+         
+         // Check if the folder exists at least
+         $VacantSpace = Gdn_Filesystem::CheckFolderR(dirname($Filename), Gdn_Filesystem::O_CREATE);
+         echo "Request(): Dir exists? "; var_dump($VacantSpace);
+         
          if (file_exists($Filename)) {
+            if (GetValue('UseExisting', $Options) && md5_file($Filename) == GetValue('SaveVerify', $Options)) {
+               return array(
+                  'Headers'      => array(),
+                  'RawHeaders'   => '',
+                  'Body'         => '',
+                  'File'         => array(
+                     'Path'         => $Filename,
+                     'Size'         => filesize($Filename),
+                     'Success'      => TRUE
+                  )
+               );
+            }
+         
             // Delete the file first
             $VacantSpace = @unlink($Filename);
          }
@@ -128,6 +151,7 @@ class DownloadModel {
          if (!$VacantSpace)
             throw new Exception(sprintf(T('Could not save to file %s'), $Filename));
          
+         echo "Request(): Opening {$Filename} for writing\n";
          $FilePointer = fopen($Filename, 'wb');
          if (!$FilePointer)
             throw new Exception(sprintf(T('Could not open target file %s for writing'), $Filename));
@@ -138,6 +162,8 @@ class DownloadModel {
       
       // Pick request mode based on feature availability and priority
       if (function_exists('curl_init') && FALSE) {
+         
+         echo "Request(): Using curl\n";
          
          /**
           * cURL mode
@@ -194,6 +220,8 @@ class DownloadModel {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
+      
+         echo "Request(): Using fsockopen\n";
          
          $LogFile = fopen('/www/vanilla/vanilla/cache/download.log', 'w');
          
@@ -325,38 +353,116 @@ class DownloadModel {
          }
       }
       
-      return array(
+      $ReturnData = array(
          'RawHeaders'   => $ResponseHeaderData,
          'Headers'      => $ResponseHeaders,
          'Body'         => $Response
       );
-   }
-   
-   protected function DownloadAddon($Addon, $Version = NULL, $ForceFresh = FALSE) {
-      $VersionData = NULL;
       
-   }
-   
-   protected function LatestVersion($Addon) {
-      if (is_null($this->Latest)) {
-         $Addon = $Addon;
-         $Request = CombinePaths(array($Repository,$APICall,$Addon));
+      if ($SaveFile === TRUE) {
+         $Exists = file_exists($Filename);
          
-         $this->Latest = simplexml_load_file($Request);
-         if ($this->Latest === FALSE)
-            throw new Exception("Unable to contact remote addon repository at '{$Request}'.");
+         $DownloadedSize = $Exists ? filesize($Filename) : 0;
+         $DownloadedVerify = md5_file($Filename);
+         $SaveVerify = GetValue('SaveVerify', $Options, FALSE);
+         
+         if ($SaveVerify === FALSE) {
+            $Success = $DownloadedSize > 0;
+         } else {
+            $Success = $SaveVerify == $DownloadedVerify;
+         }
+         
+         $ReturnData['File'] = array(
+            'Path'      => $Filename,
+            'Size'      => $DownloadedSize,
+            'Success'   => $Success
+         );
       }
       
-      $Versions = sizeof($this->Latest->Versions->Item);
-      if (!$Versions) return FALSE;
-      $LatestVersion = (array)$this->Latest->Versions->Item;
-      return $LatestVersion;
+      return $ReturnData;
    }
    
-   protected function LatestVersionNumber($Addon) {
-      $LatestVersion = $this->LatestVersion($Addon);
-      $LatestVersionNumber = GetValue('Version', $LatestVersion, 'COULD NOT FIND');
-      return $LatestVersionNumber;
+   public function GetAddonArchive($Addon, $Version = NULL, $ForceFresh = FALSE) {
+      
+      if (is_null($Version))
+         $Version = 'latest';
+      
+      $VersionInfo = $this->VersionInfo($Addon, $Version);
+      if ($VersionInfo === FALSE) 
+         throw new Exception(sprintf(T("Could not find version '%s' of %s"), $Version, $Addon));
+      
+      print_r($VersionInfo);
+      echo "downloading version '{$Version}' of addon '{$Addon}'\n";
+      
+      $DownloadPath = CombinePaths(array($this->DownloadDir, $Addon, basename(GetValue('File',$VersionInfo))));
+      $DownloadAddonName = implode('-',array($Addon,GetValue('Version',$VersionInfo)));
+      
+      // TODO: Fix this serve method so that it doesnt add useless bytes to the file
+      //$APICall = GetValue('download', $this->RPC);
+      //$Request = CombinePaths(array($this->Repository,$APICall,$DownloadAddonName,'1'));
+      
+      // Manually download
+      $Request = GetValue('Url', $VersionInfo);
+      
+      $Response = $this->Request(
+         $Request,
+         NULL,
+         array(
+            'SaveFile'     => $DownloadPath,
+            'SaveVerify'   => GetValue('MD5', $VersionInfo),
+            'UseExisting'  => TRUE,
+            'SendCookies'  => FALSE
+         )
+      );
+      
+      //if ($Response
+      
+   }
+   
+   public function RemoteAddonInfo($Addon) {
+      if (!array_key_exists($Addon, $this->RemoteInfo)) {
+         $APICall = GetValue('query', $this->RPC);
+         $Request = CombinePaths(array($this->Repository,$APICall,$Addon));
+         $AddonData = simplexml_load_file($Request);
+         
+         if ($AddonData === FALSE)
+            throw new Exception(sprintf(T("Unable to contact remote addon repository at '%s'."),$Request));
+         
+         if (!GetValue('CurrentVersion', $AddonData))
+            throw new Exception(sprintf(T("Requested addon '%s' was not found in the remote repository."),$Addon));
+         
+         $this->RemoteInfo[$Addon] = $AddonData;
+      }
+      
+      return $this->RemoteInfo[$Addon];
+   }
+   
+   public function VersionInfo($Addon, $Version = NULL) {
+   
+      // Normalize "latest" to NULL
+      if ($Version == 'latest')
+         $Version = NULL;
+      
+      try {
+         $AddonInfo = $this->RemoteAddonInfo($Addon);
+      } catch (Exception $e) { return FALSE; }
+      
+      if (is_null($Version)) 
+         $Version = (string)$AddonInfo->Version;
+      
+      $CountVersions = sizeof($AddonInfo->Versions->Item);
+      if (!$CountVersions) return FALSE;
+      
+      foreach ($AddonInfo->Versions->Item as $VersionElement) {
+         if ($VersionElement->Version == $Version)
+            return (array)$VersionElement;
+      }
+      return FALSE;
+   }
+   
+   public function LatestVersion($Addon) {
+      $LatestVersion = $this->VersionInfo($Addon);
+      return GetValue('Version', $LatestVersion, FALSE);
    }
    
    

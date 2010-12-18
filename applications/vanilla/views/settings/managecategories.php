@@ -6,26 +6,35 @@ $Session = Gdn::Session();
    <?php echo T('Categories are used to help organize discussions.', 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.'); ?>
 </div>
 <div class="FilterMenu"><?php
-   echo Anchor(T('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
    if (C('Vanilla.Categories.Use')) {
+      echo Anchor(T('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
       echo Wrap(Anchor(T("Don't use Categories"), 'vanilla/settings/managecategories/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
    } else {
-      echo Wrap(Anchor(T('Use Categories'), 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
+      echo Anchor(T('Use Categories'), 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
    }
 ?></div>
 <?php 
 if (C('Vanilla.Categories.Use')) {
    ?>
-   <table cellpadding="0" cellspacing="0" border="0">
-      <thead>
-         <tr>
-            <th><?php echo T('Category'); ?></th>
-            <th class="Right"><?php echo T('Options'); ?></th>
-         </tr>
-      </thead>
-   </table>
+   <h1><?php
+      echo T('Category Page Layout');
+      echo ' ';
+      echo Anchor(T('View Page'), 'categories/all');
+   ?></h1>
    <?php
-   echo '<ol class="Sortable">';
+   echo $this->Form->Open();
+   echo $this->Form->Errors();
+   echo '<div class="Info">'
+      .T('Configure how nested categories are displayed to users.')
+      .Wrap(sprintf(
+         T('Vanilla.Categories.MaxDisplayDepth', 'Place nested categories in a comma-delimited list when they are %1$s'),
+         $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', GetValue('MaxDepthData', $this->Data))
+      ), 'div')
+      .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
+   .'</div>'
+   .$this->Form->Close('Save')
+   .Wrap(T('Organize Categories'), 'h1')
+   .'<ol class="Sortable">';
    $Right = array(); // Start with an empty $Right stack
    $LastRight = 0;
    $OpenCount = 0;

@@ -1,38 +1,65 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+$CatList = '';
+$DoHeadings = C('Vanilla.Categories.DoHeadings');
+$MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
+$ChildCategories = '';
+?>
 <div class="Tabs Headings CategoryHeadings">
    <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
 </div>
-<ul class="DataList CategoryList">
 <?php
+echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    foreach ($this->CategoryData->Result() as $Category) {
       if ($Category->CategoryID > 0) {
-         $LastComment = UserBuilder($Category, 'LastComment');
+         // If we are below the max depth, and there are some child categories
+         // in the $ChildCategories variable, do the replacement.
+         if ($Category->Depth < $MaxDisplayDepth && $ChildCategories != '') {
+            $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(T('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
+            $ChildCategories = '';
+         }
+
+         if ($Category->Depth >= $MaxDisplayDepth && $MaxDisplayDepth > 0) {
+            if ($ChildCategories != '')
+               $ChildCategories .= ', ';
+            $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
+         } else if ($DoHeadings && $Category->Depth == 1) {
+            $CatList .= '<li class="Item CategoryHeading Depth'.$Category->Depth.'">
+               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>
+            </li>';
+         } else {
+            $LastComment = UserBuilder($Category, 'LastComment');
+            $CatList .= '<li class="Item Depth'.$Category->Depth.'">
+               <div class="ItemContent Category">'
+                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                  .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
+                  .'<div class="Meta">
+                     <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
+                     <span class="DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
+                     <span class="CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
+                     if ($Category->LastCommentID != '' && $Category->LastDiscussionName != '') {
+                        $CatList .= '<span class="LastDiscussionName">'.sprintf(
+                              T('Most recent: %1$s by %2$s'),
+                              Anchor(SliceString($Category->LastDiscussionName, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName)),
+                              UserAnchor($LastComment)
+                           ).'</span>'
+                           .'<span class="LastCommentDate">'.Gdn_Format::Date($Category->DateLastComment).'</span>';
+                     }
+                     // If this category is one level above the max display depth, and it
+                     // has children, add a replacement string for them.
+                     if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
+                        $CatList .= '{ChildCategories}';
          
-         echo '<li class="Item Depth'.$Category->Depth.'">';
-         echo '<div class="ItemContent Category">';
-         echo Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title');
-         echo Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'));
-         ?>
-            <div class="Meta">
-               <span class="DiscussionCount"><?php
-               printf(Plural(number_format($Category->CountDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions);
-               ?></span>
-               <span class="CommentCount"><?php printf(Plural(number_format($Category->CountComments), '%s comment', '%s comments'), $Category->CountComments); ?></span>
-               <?php
-               if ($Category->LastCommentID != '' && $Category->LastDiscussionName != '') {
-                  echo '<span class="LastDiscussionName">'.sprintf(
-                     T('Most recent: %1$s by %2$s'),
-                     Anchor(SliceString($Category->LastDiscussionName, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName)),
-                     UserAnchor($LastComment)
-                  ).'</span>';
-                  echo '<span class="LastCommentDate">'.Gdn_Format::Date($Category->DateLastComment).'</span>';
-               }
-               ?>
-            </div>
-         <?php
-         echo '</div>';
-         echo '</li>';
+                  $CatList .= '</div>
+               </div>
+            </li>';
+         }
       }
    }
+   // If there are any remaining child categories that have been collected, do
+   // the replacement one last time.
+   if ($ChildCategories != '')
+      $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(T('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
+   
+   echo $CatList;
 ?>
 </ul>

@@ -14,15 +14,14 @@ if ($this->Data !== FALSE) {
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></span></li>
+      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo number_format($CountDiscussions); ?></span></li>
 <?php
    foreach ($this->Data->Result() as $Category) {
       if ($Category->CategoryID > 0) {
-         // Only check stack if there is one
-         echo '<li class="Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').'">';
-         echo Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode), 'strong');
-         echo ' '.$Category->CountDiscussions;
-         echo "</li>\n";
+         echo '<li class="Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').'">'
+            .Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode), 'strong')
+            .' '.number_format($Category->CountAllDiscussions)
+         ."</li>\n";
       }
    }
 ?>

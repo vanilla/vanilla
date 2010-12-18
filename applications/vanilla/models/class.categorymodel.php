@@ -160,7 +160,9 @@ class CategoryModel extends Gdn_Model {
          // Ref: http://articles.sitepoint.com/article/hierarchical-data-database/2
          // Ref: http://en.wikipedia.org/wiki/Nested_set_model
          
-      return $this->SQL->Get();
+      $CategoryData = $this->SQL->Get();
+      $this->AddCategoryColumns($CategoryData);
+      return $CategoryData;
    }
    
    /**
@@ -176,11 +178,14 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetAll() {
-      return $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
+      $CategoryData = $this->SQL
+         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode')
          ->From('Category c')
          ->OrderBy('TreeLeft', 'asc')
          ->Get();
+         
+      $this->AddCategoryColumns($CategoryData);
+      return $CategoryData;
    }
    
    /**
@@ -197,7 +202,7 @@ class CategoryModel extends Gdn_Model {
    public function GetDescendantsByCode($Code) {
       // SELECT title FROM tree WHERE lft < 4 AND rgt > 5 ORDER BY lft ASC;
       return $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
+         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode')
          ->From('Category c')
          ->Join('Category d', 'c.TreeLeft < d.TreeLeft and c.TreeRight > d.TreeRight')
          ->Where('d.UrlCode', $Code)
@@ -240,10 +245,13 @@ class CategoryModel extends Gdn_Model {
       $this->SQL->Permission($Permissions, 'c', 'CategoryID');
 
       // Single record or full list?
-      if (is_numeric($CategoryID) && $CategoryID > 0)
+      if (is_numeric($CategoryID) && $CategoryID > 0) {
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
-      else
-         return $this->SQL->OrderBy('TreeLeft', 'asc')->Get();
+      } else {
+         $CategoryData = $this->SQL->OrderBy('TreeLeft', 'asc')->Get();
+         $this->AddCategoryColumns($CategoryData);
+         return $CategoryData;
+      }
    }
    
    /**
@@ -479,4 +487,35 @@ class CategoryModel extends Gdn_Model {
          SaveToConfig('Vanilla.NestedCategoriesUpdate', 1);
       }
    }
+   
+	/**
+    * Modifies category data before it is returned.
+    *
+    * Adds CountAllDiscussions column to each category representing the sum of
+    * discussions within this category as well as all subcategories.
+    * 
+    * @since 2.0.17
+    * @access public
+    *
+    * @param object $Data SQL result.
+    */
+	public function AddCategoryColumns($Data) {
+		$Result = &$Data->Result();
+      $Result2 = $Result;
+		foreach ($Result as &$Category) {
+         if (!property_exists($Category, 'CountAllDiscussions'))
+            $Category->CountAllDiscussions = $Category->CountDiscussions;
+            
+         if (!property_exists($Category, 'CountAllComments'))
+            $Category->CountAllComments = $Category->CountComments;
+
+         foreach ($Result2 as $Category2) {
+            if ($Category2->TreeLeft > $Category->TreeLeft && $Category2->TreeRight < $Category->TreeRight) {
+               $Category->CountAllDiscussions += $Category2->CountDiscussions;
+               $Category->CountAllComments += $Category2->CountComments;
+            }
+         }
+		}
+	}
+   
 }

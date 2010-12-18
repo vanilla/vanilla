@@ -125,6 +125,11 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 14px;
 	margin: 0;
 }
+#Content h1 a {
+	text-shadow: none;
+	font-size: 12px;
+	margin-left: 20px;
+}
 #Content h3 {
 	border-top: 1px solid #8bc1de;
 }
@@ -900,6 +905,9 @@ label.SubLabel {
 .ColumnCheckBoxList li {
    display: inline-block;
    width: 321px;
+}
+body.managecategories div.Info div {
+	padding-top: 16px;
 }
 
 /* =================================================================== Header */

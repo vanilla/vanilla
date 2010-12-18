@@ -437,7 +437,7 @@ class SettingsController extends Gdn_Controller {
       
       // Get category data
       $this->CategoryData = $this->CategoryModel->GetAll('Sort');
-      
+		
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
          $Toggle = GetValue(0, $this->RequestArgs, '');
@@ -448,6 +448,34 @@ class SettingsController extends Gdn_Controller {
          }
          Redirect('vanilla/settings/managecategories');
       }
+		
+		// Setup & save forms
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Vanilla.Categories.MaxDisplayDepth',
+         'Vanilla.Categories.DoHeadings'
+      ));
+      
+      // Set the model on the form.
+      $this->Form->SetModel($ConfigurationModel);
+      
+		// Define MaxDepthOptions
+      $DepthData = array();
+      $DepthData['2'] = 'more than one level deep';
+      $DepthData['3'] = 'more than two levels deep';
+      $DepthData['4'] = 'more than three levels deep';
+      $DepthData['0'] = 'never';
+		$this->SetData('MaxDepthData', $DepthData);
+      
+      // If seeing the form for the first time...
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+      } else {
+         if ($this->Form->Save() !== FALSE)
+            $this->StatusMessage = T("Your settings have been saved.");
+		}
       
       // Render default view
       $this->Render();

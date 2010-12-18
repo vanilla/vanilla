@@ -910,6 +910,17 @@ ul.CategoryList li.Depth9 { padding-left: 200px !important; }
 ul.CategoryList li.Depth10 { padding-left: 225px !important; }
 ul.CategoryList li.Depth11 { padding-left: 250px !important; }
 ul.CategoryList li.Depth12 { padding-left: 275px !important; }
+ul.CategoryListWithHeadings li.Depth2 { padding-left: 0 !important; }
+ul.CategoryListWithHeadings li.Depth3 { padding-left: 25px !important; }
+ul.CategoryListWithHeadings li.Depth4 { padding-left: 50px !important; }
+ul.CategoryListWithHeadings li.Depth5 { padding-left: 75px !important; }
+ul.CategoryListWithHeadings li.Depth6 { padding-left: 100px !important; }
+ul.CategoryListWithHeadings li.Depth7 { padding-left: 125px !important; }
+ul.CategoryListWithHeadings li.Depth8 { padding-left: 150px !important; }
+ul.CategoryListWithHeadings li.Depth9 { padding-left: 175px !important; }
+ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
+ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
+ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
 
 
 /* ================================================ DataList (Search Results) */
@@ -1337,6 +1348,20 @@ ul.CategoryList .ItemContent {
 	border: 1px solid #BEC8CC;
 	border-width: 1px 0;
 	padding: 4px 9px;
+}
+div.Meta span.ChildCategories {
+	border-top: 1px dotted #ddd;
+	display: block;
+}
+ul.DataList div.Meta span.RSS {
+	margin-right: 6px;
+}
+div.Meta span.RSS img {
+	vertical-align: text-bottom;
+}
+ul.CategoryList li.CategoryHeading {
+	font-weight: bold;
+	font-size: 14px;
 }
 
 /* ============================================================= Profile Page */

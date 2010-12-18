@@ -27,6 +27,18 @@ $Configuration['Vanilla']['Discussions']['PerCategory']        = '5';
 $Configuration['Vanilla']['Discussions']['PerPage']            = '30';
 $Configuration['Vanilla']['Discussions']['Home']               = 'discussions';
 $Configuration['Vanilla']['Categories']['Use']                 = TRUE;
+// Categories can be infinitely nested, but this doesn't look great when
+// displaying them to users. Use the MaxDisplayDepth settings to control how
+// deep they should be displayed to the users on the category listing. The final
+// depth layer will be represented as a comma-delimited list.
+// Zero means "no max", and categories will be displayed in a nested format indefinitely.
+
+// The max depth of nested categories to display on all category view.
+$Configuration['Vanilla']['Categories']['MaxDisplayDepth']     = 0;
+// The max depth of nested categories to display in the category module (in the panel).
+$Configuration['Vanilla']['Categories']['MaxModuleDisplayDepth'] = 0;
+// Should the first level of category above root be a heading and unclickable?
+$Configuration['Vanilla']['Categories']['DoHeadings']          = 0;
 
 // Should users be automatically pushed to the last comment they read in a discussion?
 $Configuration['Vanilla']['Comments']['AutoOffset']            = TRUE;

@@ -1052,7 +1052,7 @@ class EntryController extends Gdn_Controller {
          $Target = GetIncomingValue('Target', '');
       
       // Make sure that the target is a valid url.
-      if (!preg_match('`(^https?://)|/`')) {
+      if (!preg_match('`(^https?://)|/`', $Target)) {
          $Target = '/'.$Target;
       }
       return $Target;

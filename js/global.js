@@ -38,6 +38,7 @@ jQuery(document).ready(function($) {
    }
 		
 	gdn = { };
+	gdn.Libraries = {};
 
    // Grab a definition from hidden inputs in the page
    gdn.definition = function(definition, defaultVal, set) {
@@ -279,6 +280,54 @@ jQuery(document).ready(function($) {
          }
       }
    };
+   
+   gdn.requires = function(Library) {
+      if (!(Library instanceof Array))
+         Library = [Library];
+      
+      var Response = true;
+      
+      $(Library).each(function(i,Lib){
+         // First check if we already have this library
+         var LibAvailable = gdn.available(Lib);
+         
+         if (!LibAvailable) Response = false;
+         
+         // Skip any libs that are ready or processing
+         if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
+            return;
+         
+         // As yet unseen. Try to load
+         gdn.Libraries[Lib] = false;
+         var Src = '/js/'+Lib+'.js';
+         var head = document.getElementsByTagName('head')[0];
+         var script = document.createElement('script');
+         script.type = 'text/javascript';
+         script.src = Src;
+         head.appendChild(script);
+      });
+      
+      if (Response) gdn.loaded(null);
+      return Response;
+   };
+   
+   gdn.loaded = function(Library) {
+      if (Library != null) 
+         gdn.Libraries[Library] = true;
+         
+      $(document).trigger('libraryloaded',[Library])
+   }
+   
+   gdn.available = function(Library) {
+      if (!(Library instanceof Array))
+         Library = [Library];
+         
+      for (var i = 0; i<Library.length; i++) {
+         var Lib = Library[i];
+         if (gdn.Libraries[Lib] !== true) return false;
+      }
+      return true;
+   }
 
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)

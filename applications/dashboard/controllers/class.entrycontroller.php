@@ -45,8 +45,11 @@ class EntryController extends Gdn_Controller {
       // Set up controller
       $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
+      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default.
+
+      $Target = $this->Target();
+
+      $this->Form->AddHidden('Target', $Target);
       
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
@@ -190,7 +193,7 @@ class EntryController extends Gdn_Controller {
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.
-         $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => GetIncomingValue('Target', '/'));
+         $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
          $this->Form->FormValues($Data);
          $this->Form->AddHidden('Target');
       }
@@ -592,13 +595,13 @@ class EntryController extends Gdn_Controller {
       $this->HandshakeScheme = $Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
+      $this->Form->AddHidden('Target', $this->Target());
       
       $PreservedKeys = array(
          'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
       );
       $UserID = 0;
-      $Target = GetIncomingValue('Target', '/');
+      $Target = $this->Target();
    
       if ($this->Form->IsPostBack() === TRUE) {
             
@@ -729,7 +732,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('entry.js');
          
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
+      $this->Form->AddHidden('Target', $this->Target());
 
       $RegistrationMethod = $this->_RegistrationView();
       $this->View = $RegistrationMethod;
@@ -1004,7 +1007,7 @@ class EntryController extends Gdn_Controller {
             // If we're just told to redirect, but not where... try to figure out somewhere that makes sense.
             if ($Reaction == Gdn_Authenticator::REACT_REDIRECT) {
                $Route = '/';
-               $Target = GetIncomingValue('Target', NULL);
+               $Target = $this->Target();
                if (!is_null($Target)) 
                   $Route = $Target;
             } else {
@@ -1027,7 +1030,7 @@ class EntryController extends Gdn_Controller {
    }
    
    public function RedirectTo() {
-      $IncomingTarget = $this->Form->GetValue('Target', '');
+      $IncomingTarget = $this->Target($this->Form->GetValue('Target', ''));
       return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
    }
    
@@ -1042,6 +1045,17 @@ class EntryController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       parent::Initialize();
+   }
+
+   public function Target($Target = FALSE) {
+      if ($Target === FALSE)
+         $Target = GetIncomingValue('Target', '');
+      
+      // Make sure that the target is a valid url.
+      if (!preg_match('`(^https?://)|/`')) {
+         $Target = '/'.$Target;
+      }
+      return $Target;
    }
 
 }

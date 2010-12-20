@@ -13,26 +13,36 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
    
-$SQL = $Database->SQL();
-$Construct = $Database->Structure();
+$SQL = Gdn::Database()->SQL();
+$Construct = Gdn::Database()->Structure();
 
-$Construct->Table('Category')
-   ->PrimaryKey('CategoryID')
+$Construct->Table('Category');
+$CategoryExists = $Construct->TableExists();
+$PermissionCategoryIDExists = $Construct->ColumnExists('PermissionCategoryID');
+
+$Construct->PrimaryKey('CategoryID')
    ->Column('ParentCategoryID', 'int', TRUE)
    ->Column('CountDiscussions', 'int', '0')
    ->Column('AllowDiscussions', 'tinyint', '1')
-   ->Column('Name', 'varchar(255)') // unicode eats this
+   ->Column('Name', 'varchar(255)')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
+   ->Column('PermissionCategoryID', 'int', '0')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime')
    ->Set($Explicit, $Drop);
 
-if ($Drop)
+if ($Drop) {
    $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'Sort' => '1'));
+} elseif ($CategoryExists && !$PermissionCategoryIDExists) {
+   if (!C('Garden.Permissions.Disabled.Category')) {
+      // Existing installations need to be set up with per/category permissions.
+      $SQL->Update('Category')->Set('PermissionCategoryID', 'CategoryID', FALSE)->Put();
+   }
+}
 
 // Construct the discussion table.
 $Construct->Table('Discussion');

@@ -71,6 +71,9 @@ class PostController extends VanillaController {
          $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
          $aCategoryData = array();
          foreach ($CategoryData->Result() as $Category) {
+            if ($Category->CategoryID <= 0)
+               continue;
+            
             if ($this->CategoryID == $Category->CategoryID)
                $this->Category = $Category;
             

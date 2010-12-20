@@ -4,11 +4,13 @@
 $PluginInfo['Gravatar'] = array(
    'Name' => 'Gravatar',
    'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-   'Version' => '1',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
 );
+
+// 1.1 Fixes - Used GetValue to retrieve array props instead of direct references
 
 class GravatarPlugin extends Gdn_Plugin {
    
@@ -71,7 +73,7 @@ if (!function_exists('UserBuilder')) {
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-      $Protocol =  (strlen($_SERVER['HTTPS']) > 0 || $_SERVER['SERVER_PORT'] == 443) ? 'https://secure.' : 'http://www.';
+      $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
       if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = $Protocol.'gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))

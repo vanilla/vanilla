@@ -111,10 +111,19 @@ function WriteFilterTabs(&$Sender) {
       ?>
    </ul>
    <?php
-   if (property_exists($Sender, 'Category') && is_object($Sender->Category)) {
-      ?>
-      <div class="SubTab">↳ <?php echo $Sender->Category->Name; ?></div>
-      <?php
+   $DescendantData = GetValue('DescendantData', $Sender->Data);
+   $Category = GetValue('Category', $Sender->Data);
+   if ($DescendantData && $Category) {
+      echo '<div class="SubTab">↳ ';
+      foreach ($DescendantData->Result() as $Descendant) {
+         // Ignore the root node
+         if ($Descendant->CategoryID > 0) {
+            echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
+            echo ' &rarr; ';
+         }
+      }
+      echo $Category->Name;
+      echo '</div>';
    }
    ?>
 </div>

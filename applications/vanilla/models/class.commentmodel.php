@@ -469,7 +469,8 @@ class CommentModel extends VanillaModel {
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
                $this->EventArguments['CommentID'] = $CommentID;
                // IsNewDiscussion is passed when the first comment for new discussions are created.
-               $this->EventArguments['IsNewDiscussion'] = ArrayValue('IsNewDiscussion', $FormPostValues);
+               $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
+					
                $this->FireEvent('AfterSaveComment');
             }
          }
@@ -536,6 +537,25 @@ class CommentModel extends VanillaModel {
 			$DiscussionModel = new DiscussionModel();
 			$DiscussionID = GetValue('DiscussionID', $Fields);
 			$Discussion = $DiscussionModel->GetID($DiscussionID);
+			
+			// UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
+			if ($Discussion->CategoryID > 0) {
+				$CountComments = $this->SQL
+					->Select('CountComments', 'sum', 'CountComments')
+					->From('Discussion')
+					->Where('CategoryID', $Discussion->CategoryID)
+					->Get()
+					->FirstRow()
+					->CountComments;
+				
+				$this->SQL
+					->Update('Category')
+					->Set('LastCommentID', $Discussion->LastCommentID)
+					->Set('CountComments', $CountComments)
+					->Where('CategoryID', $Discussion->CategoryID)
+					->Put();
+			}
+			
 			// Prepare the notification queue
          $ActivityModel = new ActivityModel();
 			$ActivityModel->ClearNotificationQueue();
@@ -583,7 +603,7 @@ class CommentModel extends VanillaModel {
 
          // Record user-comment activity
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
-            $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
+            $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
 				$ActivityModel->QueueNotification($ActivityID, $Story);
 			}
 				

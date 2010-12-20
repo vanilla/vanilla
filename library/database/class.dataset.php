@@ -100,13 +100,15 @@ class Gdn_DataSet implements IteratorAggregate {
 			if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
             // Loop through the dataset and switch the types.
             $Count = count($this->_Result);
-            for($Index = 0; $Index < $Count; $Index++) {
+				foreach($this->_Result as $Index => &$Row) {
                switch($DatasetType) {
                   case DATASET_TYPE_ARRAY:
-                     $this->_Result[$Index] = (array)$this->_Result[$Index];
+							$Row = (array)$Row;
+                     //$this->_Result[$Index] = (array)$this->_Result[$Index];
                      break;
                   case DATASET_TYPE_OBJECT:
-                     $this->_Result[$Index] = (object)$this->_Result[$Index];
+							$Row = (object)$Row;
+                     //$this->_Result[$Index] = (object)$this->_Result[$Index];
                      break;
                }
             }

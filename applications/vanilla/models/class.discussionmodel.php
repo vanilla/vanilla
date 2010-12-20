@@ -64,13 +64,12 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
-         ->Select("' &rarr; ', pc.Name, ca.Name", 'concat_ws', 'Category')
+         ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
-         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
-         ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
+         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left'); // Category
 		
 		// Add any additional fields that were requested	
 		if(is_array($AdditionalFields)) {
@@ -883,7 +882,7 @@ class DiscussionModel extends VanillaModel {
    public function BookmarkDiscussion($DiscussionID, $UserID, &$Discussion = NULL) {
       $State = '1';
 
-      $Discussion = $this->SQL
+      $DiscussionData = $this->SQL
          ->Select('d.*')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
@@ -895,8 +894,10 @@ class DiscussionModel extends VanillaModel {
          ->Join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = $UserID", 'left')
 			->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          ->Where('d.DiscussionID', $DiscussionID)
-         ->Get()
-         ->FirstRow();
+         ->Get();
+			
+		$this->AddDiscussionColumns($DiscussionData);
+		$Discussion = $DiscussionData->FirstRow();
 
       if ($Discussion->WatchUserID == '') {
          $this->SQL
@@ -921,6 +922,8 @@ class DiscussionModel extends VanillaModel {
 			->Set('CountBookmarks', $BookmarkCount)
 			->Where('DiscussionID', $DiscussionID)
 			->Put();
+			
+		
 		
 		// Prep and fire event	
       $this->EventArguments['Discussion'] = $Discussion;

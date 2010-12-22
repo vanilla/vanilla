@@ -24,6 +24,7 @@ class ActivityController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $GuestModule = new GuestModule($this);
       $this->AddModule($GuestModule);
+      $this->AddModule('SignedInModule');
       parent::Initialize();
    }
    

@@ -344,7 +344,7 @@ class DiscussionModel extends VanillaModel {
             $Data = $this->SQL
                ->Select('c.CategoryID')
                ->From('Category c')
-               ->Permission('Vanilla.Discussions.View', 'c', 'CategoryID')
+               ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
                ->Get();
             
             $Data = $Data->ResultArray();

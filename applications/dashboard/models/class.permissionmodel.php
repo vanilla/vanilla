@@ -171,7 +171,18 @@ class PermissionModel extends Gdn_Model {
          $JunctionTable = $Row['JunctionTable'];
          $JunctionColumn = $Row['JunctionColumn'];
          unset($Row['PermissionID'], $Row['RoleID'], $Row['JunctionTable'], $Row['JunctionColumn'], $Row['JunctionID']);
-         
+
+         // If the junction column is not the primary key then we must figure out and limit the permissions.
+         if ($JunctionColumn != $JunctionTable.'ID') {
+            $JuncIDs = $SQL
+               ->Distinct(TRUE)
+               ->Select("c.{$JunctionTable}ID")
+               ->Select("c.$JunctionColumn")
+               ->Select('p.Name')
+               ->From("$JunctionTable c")
+               ->Join("$JunctionTable p", "c.$JunctionColumn = p.{$JunctionTable}ID", 'left')
+               ->Get()->ResultArray();
+         }
          
          // Figure out which columns to select.
          foreach($Row as $PermissionName => $Value) {
@@ -192,8 +203,13 @@ class PermissionModel extends Gdn_Model {
             $SQL->Select('junc.Name')
                ->Select('junc.'.$JunctionColumn, '', 'JunctionID')
                ->From($JunctionTable.' junc')
-               ->Join('Permission p', 'p.JunctionID = junc.'.$JunctionColumn.' and p.RoleID = '.$RoleID, 'left')
+               ->Join('Permission p', "coalesce(p.JunctionID, 0) = junc.$JunctionColumn and p.RoleID = $RoleID", 'left')
+               ->OrderBy('junc.Sort')
                ->OrderBy('junc.Name');
+
+            if (isset($JuncIDs)) {
+               $SQL->WhereIn("junc.{$JunctionTable}ID", ConsolidateArrayValuesByKey($JuncIDs, "{$JunctionTable}ID"));
+            }
          } else {
             // Here we are getting permissions for all roles.
             $SQL->Select('r.RoleID, r.Name, r.CanSession')
@@ -621,8 +637,8 @@ class PermissionModel extends Gdn_Model {
       $Session = Gdn::Session();
 
 		// Figure out the junction table if necessary.
-		if(!$JunctionTable && strlen($ForeignColumn) > 2 && substr_compare($ForeignColumn, 'ID', -2, 2) == 0)
-				$JunctionTable = substr($ForeignColumn, 0, -2);
+		if(!$JunctionTable && StringEndsWith($ForeignColumn, 'ID'))
+         $JunctionTable = substr($ForeignColumn, 0, -2);
 
 		// Check to see if the permission is disabled.
 		if(C('Garden.Permission.Disabled.'.$JunctionTable)) {
@@ -630,7 +646,7 @@ class PermissionModel extends Gdn_Model {
 				$SQL->Where('1', '0', FALSE, FALSE);
 		} elseif($Session->UserID <= 0 || (is_object($Session->User) && $Session->User->Admin != '1')) {
          $SQL->Distinct()
-            ->Join('Permission _p', '_p.JunctionID = '.$ForeignAlias.'.'.$ForeignColumn, 'inner')
+            ->Join('Permission _p', 'coalesce(_p.JunctionID, 0) = '.$ForeignAlias.'.'.$ForeignColumn, 'inner')
             ->Join('UserRole _ur', '_p.RoleID = _ur.RoleID', 'inner')
             ->BeginWhereGroup()
             ->Where('_ur.UserID', $Session->UserID);

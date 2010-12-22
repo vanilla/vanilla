@@ -49,7 +49,14 @@ if ($Drop) {
    if (!C('Garden.Permissions.Disabled.Category')) {
       // Existing installations need to be set up with per/category permissions.
       $SQL->Update('Category')->Set('PermissionCategoryID', 'CategoryID', FALSE)->Put();
+      $SQL->Update('Permission')->Set('JunctionColumn', 'PermissionCategoryID')->Where('JunctionColumn', 'CategoryID')->Put();
    }
+}
+
+if ($CategoryExists) {
+   $CategoryModel = new CategoryModel();
+   $CategoryModel->RebuildTree();
+   unset($CategoryModel);
 }
 
 // Construct the discussion table.
@@ -205,7 +212,7 @@ $PermissionModel->Define(array(
 	'Vanilla.Comments.Delete' => 0),
 	'tinyint',
 	'Category',
-	'CategoryID'
+	'PermissionCategoryID'
 	);
 
 if ($Drop) {
@@ -216,7 +223,7 @@ if ($Drop) {
    $PermissionModel->Save(array(
       'RoleID' => 2,
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
       ), TRUE);
@@ -225,7 +232,7 @@ if ($Drop) {
    $PermissionModel->Save(array(
       'RoleID' => 8,
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.View' => 1,
@@ -242,7 +249,7 @@ if ($Drop) {
    $PermissionModel->Save(array(
       'RoleID' => 32,
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.Edit' => 1,
@@ -267,7 +274,7 @@ if ($Drop) {
    $PermissionModel->Save(array(
       'RoleID' => 16,
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.Edit' => 1,
@@ -284,7 +291,7 @@ if ($Drop) {
    $PermissionModel->Save(array(
       'RoleID' => 32,
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.Edit' => 1,

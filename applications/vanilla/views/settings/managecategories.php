@@ -77,6 +77,7 @@ if (C('Vanilla.Categories.Use')) {
                      <strong>'.$Category->Name.'</strong>
                      '.Anchor($CategoryUrl, $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
+                     '.Wrap("ID: {$Category->CategoryID}, PID: {$Category->PermissionCategoryID}", 'div').'
                   </td>
                   <td class="Buttons">'
                      .Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')

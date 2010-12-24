@@ -68,6 +68,7 @@ class ActivityController extends Gdn_Controller {
          }
          $this->View = 'all';
       }
+      $this->SetData('ActivityData', $this->ActivityData);
       
       $this->Render();
    }

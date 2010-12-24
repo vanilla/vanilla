@@ -415,7 +415,19 @@ if (!function_exists('check_utf8')){
 }
 
 if (!function_exists('CombinePaths')) {
-   // filesystem input/output functions that deal with loading libraries, application paths, etc.
+   /**
+    * Takes an array of path parts and concatenates them using the specified
+    * delimiter. Delimiters will not be duplicated. Example: all of the
+    * following arrays will generate the path "/path/to/vanilla/applications/dashboard"
+    * array('/path/to/vanilla', 'applications/dashboard')
+    * array('/path/to/vanilla/', '/applications/dashboard')
+    * array('/path', 'to', 'vanilla', 'applications', 'dashboard')
+    * array('/path/', '/to/', '/vanilla/', '/applications/', '/dashboard')
+    * 
+    * @param array $Paths The array of paths to concatenate.
+    * @param string $Delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
+    * @returns The concatentated path.
+    */
    function CombinePaths($Paths, $Delimiter = DS) {
       if (is_array($Paths)) {
          $MungedPath = implode($Delimiter, $Paths);

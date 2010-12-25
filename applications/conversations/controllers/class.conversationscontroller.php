@@ -7,9 +7,19 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Conversations Controller
+ *
+ * @package Conversations
+ */
+ 
+/**
+ * Master controller for Conversations for others to extend.
+ *
+ * @since 2.0.0
+ * @package Conversations
+ */
 class ConversationsController extends Gdn_Controller {
-   
    /**
     * Returns an array of pages that contain settings information for this application.
     *
@@ -19,10 +29,23 @@ class ConversationsController extends Gdn_Controller {
       // There are no configuration pages for Conversations
    }
    
+   /**
+    * Do-nothing construct to let children constructs bubble up.
+    *
+    * @access public
+    */
    public function __construct() {
       parent::__construct();
    }
    
+   /**
+    * Include JS, CSS, and modules used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       $this->Permission('Garden.SignIn.Allow');
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {

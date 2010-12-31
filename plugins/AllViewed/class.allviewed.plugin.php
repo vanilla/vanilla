@@ -12,7 +12,9 @@ $PluginInfo['AllViewed'] = array(
 );
 
 class AllViewedPlugin extends Gdn_Plugin {
-   
+   /**
+    * Adds "Mark All Viewed" to main menu.
+    */
    public function Base_Render_Before(&$Sender) {
       // Add "Mark All Viewed" to menu
       $Session = Gdn::Session();
@@ -32,7 +34,7 @@ class AllViewedPlugin extends Gdn_Plugin {
    }
    
    /**
-    * 
+    * Get the number of comments inserted since the given timestamp.
     */
    function GetCommentCountSince($DiscussionID, $DateSince) {
       if (!C('Plugins.AllViewed.Enabled')) return;

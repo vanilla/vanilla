@@ -4,7 +4,7 @@
 $PluginInfo['AllViewed'] = array(
    'Name' => 'Mark All Viewed',
    'Description' => 'Allows users to mark all discussions as viewed.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
    'AuthorUrl' => 'http://www.tmprod.com/web-development/vanilla.php',

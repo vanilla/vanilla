@@ -32,6 +32,34 @@ class AllViewedPlugin extends Gdn_Plugin {
    }
    
    /**
+    * 
+    */
+   function GetCommentCountSince($DiscussionID, $DateSince) {
+      if (!C('Plugins.AllViewed.Enabled')) return;
+      // Only for members
+      $Session = Gdn::Session();
+      if(!$Session->IsValid()) return;
+      
+      // Validate DiscussionID
+      $DiscussionID = (int) $DiscussionID;
+      if (!$DiscussionID)
+         throw new Exception('A valid DiscussionID is required in GetCommentCountSince.');
+      
+      // Prep DB
+      $Database = Gdn::Database();
+      $SQL = $Database->SQL();
+      
+      // Get new comment count
+      return $this->SQL
+         ->Select('c.CommentID')
+         ->From('Comment c')
+         ->Where('DiscussionID = '.$DiscussionID)
+         ->Where("DateInserted > '".$DateSince."'")
+         ->FirstRow()
+         ->Count;
+   }
+   
+   /**
     * Modify CountUnreadComments to account for DateAllViewed
     *
     * Required in DiscussionModel->Get() just before the return:
@@ -48,13 +76,13 @@ class AllViewedPlugin extends Gdn_Plugin {
       // Recalculate New count with user's DateAllViewed   
       $Sender->Data = GetValue('Data', $Sender->EventArguments, '');
       $Result = &$Sender->Data->Result();
+      $DateAllViewed = Gdn_Format::ToTimestamp($Session->User->DateAllViewed);
 		foreach($Result as &$Discussion) {
-			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= Gdn_Format::ToTimestamp($Session->User->DateAllViewed)) {
+			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed) {
 				$Discussion->CountUnreadComments = 0; // Covered by AllViewed
 			}
-			elseif($Discussion->CountCommentWatch == 0) { // AllViewed used, but new comments since then
-			   $Discussion->CountCommentWatch = -1; // hack around "incomplete comment count" logic in WriteDiscussion
-			   $Discussion->CountUnreadComments = $Discussion->CountComments;
+         elseif($Discussion->DateLastViewed == $DateAllViewed) { // AllViewed used since last "real" view, but new comments since then
+			   $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
 			}
 		}
    }
@@ -70,21 +98,23 @@ class AllViewedPlugin extends Gdn_Plugin {
       
       $UserID = $Session->User->UserID; // Can only activate on yourself
             
-      // Validity check (in case UserID passed from elsewhere some day)
+      // Validite UserID
       $UserID = (int) $UserID;
-      if (!$UserID) {
+      if (!$UserID)
          throw new Exception('A valid UserId is required.');
-      }
+      
+      // Create timestamp first so all uses match.
+      $AllViewed = Gdn_Format::ToDateTime();
       
       // Update User timestamp
       $Sender->SQL->Update('User')
-         ->Set('DateAllViewed', Gdn_Format::ToDateTime());
+         ->Set('DateAllViewed', $AllViewed);
       $Sender->SQL->Where('UserID', $UserID)->Put();
       
-      // Update CountComments = 0
+      // Update DateLastViewed = now
       $Sender->SQL->Update('UserDiscussion')
-         ->Set('CountComments', 0); // Hack to avoid massive update query
-      $Sender->SQL->Where('UserID', $UserID)->Put();
+         ->Set('DateLastViewed', $AllViewed) 
+         ->Where('UserID', $UserID)->Put();
       
       // Set in current session
       $Session->User->DateAllViewed = Gdn_Format::ToDateTime();

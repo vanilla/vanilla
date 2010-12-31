@@ -50,12 +50,12 @@ class AllViewedPlugin extends Gdn_Plugin {
       $SQL = $Database->SQL();
       
       // Get new comment count
-      return $this->SQL
+      return $SQL
          ->Select('c.CommentID')
          ->From('Comment c')
          ->Where('DiscussionID = '.$DiscussionID)
          ->Where("DateInserted > '".$DateSince."'")
-         ->FirstRow()
+         ->Get()
          ->Count;
    }
    
@@ -78,11 +78,11 @@ class AllViewedPlugin extends Gdn_Plugin {
       $Result = &$Sender->Data->Result();
       $DateAllViewed = Gdn_Format::ToTimestamp($Session->User->DateAllViewed);
 		foreach($Result as &$Discussion) {
-			if(Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed) {
-				$Discussion->CountUnreadComments = 0; // Covered by AllViewed
-			}
-         elseif($Discussion->DateLastViewed == $DateAllViewed) { // AllViewed used since last "real" view, but new comments since then
-			   $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
+		   if ($DateAllViewed != 0) { // Only if they've used AllViewed
+			   if (Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed)
+				   $Discussion->CountUnreadComments = 0; // Covered by AllViewed
+            elseif ($Discussion->DateLastViewed == $DateAllViewed) // AllViewed used since last "real" view, but new comments since then
+			      $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
 			}
 		}
    }

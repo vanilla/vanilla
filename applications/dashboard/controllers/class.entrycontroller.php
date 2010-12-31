@@ -753,7 +753,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
@@ -774,7 +774,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
@@ -813,7 +813,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
@@ -859,7 +859,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');

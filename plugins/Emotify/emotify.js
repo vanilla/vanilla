@@ -86,7 +86,7 @@ window.emotify = (function(){
         arr.push(regexp_str);
       }
       
-      EMOTICON_RE = new RegExp('(\\s?)(' + arr.join('|') + ')(?=(?:$|\\s))', 'g');
+      EMOTICON_RE = new RegExp('(\\s?)(' + arr.join('|') + ')(?=(?:$|\\s|<|&nbsp;))', 'g');
     }
     
     return emoticons;

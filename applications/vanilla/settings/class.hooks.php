@@ -122,6 +122,7 @@ class VanillaHooks implements Gdn_IPlugin {
       if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
          // Add the discussion tab
          $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
+         $Sender->AddProfileTab(T('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
          // Add the discussion tab's CSS and Javascript
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
          $Sender->AddJsFile('jquery.gardenmorepager.js');
@@ -185,6 +186,64 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->BuzzData[T('New comments in the last day')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Comments in the last week
       $Sender->BuzzData[T('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
+   }
+   
+   /**
+	 * Creates virtual 'Comments' method in ProfileController.
+	 * 
+    * @since 2.0.0
+    * @package Vanilla
+	 *
+	 * @param object $Sender ProfileController.
+	 */
+   public function ProfileController_Comments_Create(&$Sender) {
+      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
+		$Username = ArrayValue(1, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
+      // Tell the ProfileController what tab to load
+		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
+      
+      // Load the data for the requested tab.
+      if (!is_numeric($Offset) || $Offset < 0)
+         $Offset = 0;
+      
+      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      $CommentModel = new CommentModel();
+      $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
+      $CountComments = $Offset + $Sender->CommentData->NumRows();
+      if ($Sender->CommentData->NumRows() == $Limit)
+         $CountComments = $Offset + $Limit + 1;
+      
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+      $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
+      $Sender->Pager->MoreCode = 'More Comments';
+      $Sender->Pager->LessCode = 'Newer Comments';
+      $Sender->Pager->ClientID = 'Pager';
+      $Sender->Pager->Configure(
+         $Offset,
+         $Limit,
+         $CountComments,
+         'profile/comments/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+      );
+      
+      // Deliver JSON data if necessary
+      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
+         $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
+         $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
+         $Sender->View = 'results';
+      }
+		$Sender->Offset = $Offset;
+      
+      // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
+      $Sender->HandlerType = HANDLER_TYPE_NORMAL;
+      
+      // Do not show discussion options
+      $Sender->ShowOptions = FALSE;
+      
+      // Render the ProfileController
+      $Sender->Render();
    }
    
    /**

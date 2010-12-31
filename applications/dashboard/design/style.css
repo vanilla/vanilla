@@ -1425,7 +1425,7 @@ div.User h1 {
    padding: 8px 8px 0;
    color: #999;
    font-weight: normal;
-   line-height: 100%;
+   line-height: 1.5;
 }
 #Status p {
    font-size: 120%;
@@ -1468,6 +1468,7 @@ form.Activity textarea {
    height: 60px;
    min-height: 60px;
 }
+
 /* Invitations Form */
 #Form_Invitation table {
    width: 100%;

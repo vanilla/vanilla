@@ -86,6 +86,32 @@ class CommentModel extends VanillaModel {
       return $this->SQL->Get();
    }
   
+   /**
+    * Get comments for a user.
+    * 
+    * @since 2.0.17
+    * @access public
+    * 
+    * @param int $UserID Which user to get comments for.
+    * @param int $Limit Max number to get.
+    * @param int $Offset Number to skip.
+    * @return object SQL results.
+    */
+   public function GetByUser($UserID, $Limit, $Offset = 0) {
+      $this->CommentQuery();
+      $this->FireEvent('BeforeGet');
+      $this->SQL
+			->Select('d.Name', '', 'DiscussionName')
+			->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+         ->Where('c.InsertUserID', $UserID)
+			->OrderBy('c.DateInserted', 'desc')
+         ->Limit($Limit, $Offset);
+      
+      $this->OrderBy($this->SQL);
+
+      return $this->SQL->Get();
+   }
+  
    /** 
     * Set the order of the comments or return current order. 
     * 

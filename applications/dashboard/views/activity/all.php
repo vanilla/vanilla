@@ -5,6 +5,7 @@
    </ul>
 </div>
 <?php
+$this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();
 if ($Session->IsValid()) {
    echo $this->Form->Open(array('action' => Url('/activity'), 'class' => 'Activity'));

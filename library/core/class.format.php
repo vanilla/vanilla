@@ -702,7 +702,7 @@ EOT;
          $Charset = C('Garden.Charset', 'UTF-8');
          $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
          if ($AddBreaks)
-            $Result = nl2br($Result);
+            $Result = nl2br(trim($Result));
          return $Result;
       }
    }

@@ -53,7 +53,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span>';
             }
          
-            if (C('Vanilla.Categories.Use'))
+            if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
                echo Wrap(Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');

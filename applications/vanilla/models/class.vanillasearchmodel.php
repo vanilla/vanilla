@@ -69,7 +69,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary')
 			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
 			->Select('d.DateInserted')
-			->Select('d.InsertUserID as UserID, u.Name')
+			->Select('d.InsertUserID as UserID, u.Name, u.Photo')
 			->From('Discussion d')
 			->Join('User u', 'd.InsertUserID = u.UserID', 'left');
 		
@@ -106,7 +106,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary')
 			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
 			->Select('c.DateInserted')
-			->Select('c.InsertUserID as UserID, u.Name')
+			->Select('c.InsertUserID as UserID, u.Name, u.Photo')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
 			->Join('User u', 'u.UserID = c.InsertUserID', 'left');

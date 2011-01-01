@@ -22,6 +22,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_Format {
 
    /**
+    * Flag which allows plugins to decide if the output
+	* should include rel="nofollow" on any <a> links.
+	* Example: a plugin can run on "BeforeCommentBody" to
+	* check the current users role and decide if his/her post
+	* should contain rel="nofollow" links.
+	* The default setting is true, meaning all links will contain
+	* the rel="nofollow" attribute.   
+    */
+	public static $DisplayNoFollow = true;
+
+   /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
     * used on this page (the user profile page). The FullHeadline field is to be
@@ -409,6 +420,7 @@ class Gdn_Format {
       else {
          $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
+         $nofollow = (self::$DisplayNoFollow) ? ' rel=\"nofollow\"' : '';
          $Mixed = preg_replace(
             "/
             (?<!<a href=\")
@@ -416,7 +428,7 @@ class Gdn_Format {
             ((https?|ftp):\/\/)
             ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
             /msxi",
-            "<a href=\"$0\" target=\"_blank\" rel=\"nofollow\">$0</a>",
+            "<a href=\"$0\" target=\"_blank\"$nofollow>$0</a>",
             $Mixed
          );
 
@@ -546,8 +558,9 @@ EOT;
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } else {
+		 $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
          $Result = <<<EOT
-<a href="$Pr$Url" target="_blank" rel="nofollow">$Pr$Url</a>
+<a href="$Pr$Url" target="_blank"$nofollow>$Pr$Url</a>
 EOT;
       }
       return $Result;

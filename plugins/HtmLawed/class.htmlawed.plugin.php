@@ -47,6 +47,19 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
        'valid_xml' => 2
       );
+      // We check the flag within Gdn_Format to see
+      // if htmLawed should place rel="nofollow" links
+      // within output or not.
+      // A plugin can set this flag (for example).
+      // The default is to show rel="nofollow" on all links.
+      if(Gdn_Format::$DisplayNoFollow){
+         // display rel="nofollow" on all links.
+         $Config['anti_link_spam'] = array('`.`', '');
+      }else{
+         // never display rel="nofollow"
+         $Config['anti_link_spam'] = array('','');
+      }
+
 
       if ($this->SafeStyles) {
          // Deny all class and style attributes.

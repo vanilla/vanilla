@@ -922,6 +922,23 @@ ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
 ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
 ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
 
+div.Box.RecentUsers {
+	float: left;
+}
+div.Icons a {
+	display: block;
+	margin: 0 2px 2px 0;
+	float: left;
+}
+div.Icons img {
+	display: block;
+	height: 44px;
+	width: 44px;
+	overflow: hidden;
+	background: #c4cde0;
+	color: #c4cde0;
+	text-indent: 50px;
+}
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */

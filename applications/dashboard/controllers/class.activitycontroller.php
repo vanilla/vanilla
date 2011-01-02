@@ -28,13 +28,22 @@ class ActivityController extends Gdn_Controller {
       parent::Initialize();
    }
    
-   public function Index($RoleID = '') {
+   public function Index($RoleID = '', $Offset = FALSE) {
       $this->Permission('Garden.Activity.View');
       
       // Limit to specific RoleIDs?
+      if ($RoleID == 0)
+         $RoleID = '';
+         
       if ($RoleID != '')
          $RoleID = explode(',', $RoleID);
          
+      // Which page to load
+      $Offset = is_numeric($Offset) ? $Offset : 0;
+      if ($Offset < 0)
+         $Offset = 0;
+         
+      $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
          
@@ -60,14 +69,39 @@ class ActivityController extends Gdn_Controller {
             $this->View = 'activities';
          }
       } else {
-         $this->ActivityData = is_array($RoleID) ? $this->ActivityModel->GetForRole($RoleID) : $this->ActivityModel->Get();
+         $Limit = 50;
+         $this->ActivityData = is_array($RoleID) ? $this->ActivityModel->GetForRole($RoleID, $Offset, $Limit) : $this->ActivityModel->Get('', $Offset, $Limit);
+         $TotalRecords = is_array($RoleID) ? $this->ActivityModel->GetCountForRole($RoleID) : $this->ActivityModel->GetCount();
          if ($this->ActivityData->NumRows() > 0) {
             $ActivityData = $this->ActivityData->ResultArray();
             $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
             $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
          }
          $this->View = 'all';
+         
+         // Build a pager
+         $PagerFactory = new Gdn_PagerFactory();
+         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+         $this->Pager->MoreCode = 'More';
+         $this->Pager->LessCode = 'Newer Activity';
+         $this->Pager->ClientID = 'Pager';
+         $this->Pager->Configure(
+            $Offset,
+            $Limit,
+            $TotalRecords,
+            'activity/0/%1$s/%2$s/'
+         );
+         
+         // Deliver json data if necessary
+         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+            $this->SetJson('LessRow', $this->Pager->ToString('less'));
+            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+            $this->View = 'activities';
+         }
       }
+      $RecentUserModule = new RecentUserModule($this);
+      $RecentUserModule->GetData();
+      $this->AddModule($RecentUserModule);
       $this->SetData('ActivityData', $this->ActivityData);
       
       $this->Render();

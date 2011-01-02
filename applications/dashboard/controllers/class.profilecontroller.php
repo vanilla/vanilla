@@ -47,8 +47,12 @@ class ProfileController extends Gdn_Controller {
       parent::Initialize();
    }   
    
-   public function Activity($UserReference = '', $Username = '', $UserID = '') {
+   public function Activity($UserReference = '', $Username = '', $UserID = '', $Offset = '0') {
       $this->Permission('Garden.Profiles.View');
+		$Offset = is_numeric($Offset) ? $Offset : 0;
+      if ($Offset < 0)
+         $Offset = 0;
+
       $this->GetUserInfo($UserReference, $Username, $UserID);
       $this->SetTabView('Activity');
       $this->ActivityModel = new ActivityModel();
@@ -87,7 +91,9 @@ class ProfileController extends Gdn_Controller {
          }
       } else {
          $this->ProfileUserID = $this->User->UserID;
-         $this->ActivityData = $this->ActivityModel->Get($this->User->UserID);
+			$Limit = 50;
+         $this->ActivityData = $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit);
+			$TotalRecords = $this->ActivityModel->GetCount($this->User->UserID);
          if ($this->ActivityData->NumRows() > 0) {
             $ActivityData = $this->ActivityData->Result();
             $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
@@ -102,6 +108,29 @@ class ProfileController extends Gdn_Controller {
             $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
          } else {
             $this->CommentData = FALSE;
+         }
+			
+         // Build a pager
+         $PagerFactory = new Gdn_PagerFactory();
+         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+         $this->Pager->MoreCode = 'More';
+         $this->Pager->LessCode = 'Newer Activity';
+         $this->Pager->ClientID = 'Pager';
+         $this->Pager->Configure(
+            $Offset,
+            $Limit,
+            $TotalRecords,
+            'profile/activity/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$this->User->UserID.'/%1$s/'
+         );
+         
+         // Deliver json data if necessary
+         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+            $this->SetJson('LessRow', $this->Pager->ToString('less'));
+            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+				if ($Offset > 0) {
+					$this->View = 'activities';
+					$this->ControllerName = 'Activity';
+				}
          }
       }
 
@@ -192,9 +221,16 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
    
-   public function Notifications() {
+   public function Notifications($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
+		
+		$Limit = 50;
+		$Offset = is_numeric($Offset) ? $Offset : 0;
+      if ($Offset < 0)
+         $Offset = 0;
+
       $this->GetUserInfo(); 
+      $this->SetTabView('Notifications');
       $Session = Gdn::Session();
       // Drop notification count back to zero.
       $SQL = Gdn::SQL();
@@ -205,8 +241,31 @@ class ProfileController extends Gdn_Controller {
          ->Put();
       
       $this->ActivityModel = new ActivityModel();
-      $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID);
-      $this->SetTabView('Notifications');
+      $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit);
+		$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
+		
+		// Build a pager
+		$PagerFactory = new Gdn_PagerFactory();
+		$this->Pager = $PagerFactory->GetPager('MorePager', $this);
+		$this->Pager->MoreCode = 'More';
+		$this->Pager->LessCode = 'Newer Notifications';
+		$this->Pager->ClientID = 'Pager';
+		$this->Pager->Configure(
+			$Offset,
+			$Limit,
+			$TotalRecords,
+			'profile/notifications/%1$s/'
+		);
+		// Deliver json data if necessary
+		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+			$this->SetJson('LessRow', $this->Pager->ToString('less'));
+			$this->SetJson('MoreRow', $this->Pager->ToString('more'));
+			if ($Offset > 0) {
+				$this->View = 'activities';
+				$this->ControllerName = 'Activity';
+			}
+		}
+		
       $this->Render();
    }   
    
@@ -603,6 +662,7 @@ class ProfileController extends Gdn_Controller {
          $this->AddModule($UserInfoModule);
          $this->AddJsFile('jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');
+	      $this->AddJsFile('jquery.gardenmorepager.js');
          $this->AddJsFile('activity.js');
          $ActivityUrl = 'profile/activity/';
          if ($this->User->UserID != $Session->UserID)

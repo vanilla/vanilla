@@ -197,6 +197,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Comments_Create(&$Sender) {
+		$View = $Sender->View;
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
@@ -232,7 +233,7 @@ class VanillaHooks implements Gdn_IPlugin {
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
-         $Sender->View = 'results';
+         $Sender->View = 'profilecomments';
       }
 		$Sender->Offset = $Offset;
       

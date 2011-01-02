@@ -2,6 +2,7 @@
 jQuery(document).ready(function($) {
    
    // Load tab content on tab-click
+   /*
    $('.Tabs li a').click(function() {
       $('.Tabs li').removeAttr('class');
       $(this).parent('li').attr('class', 'Active');
@@ -14,6 +15,7 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
+   */
    
    // Hijack "clear status" link clicks
    $('#Status a').live('click', function() {

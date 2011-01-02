@@ -100,6 +100,7 @@ $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
+$Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 
 // Formatting
 $Configuration['Garden']['Format']['Mentions']                  = TRUE;

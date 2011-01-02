@@ -19,7 +19,6 @@ class DashboardHooks implements Gdn_IPlugin {
       // Enable theme previewing
       if ($Session->IsValid()) {
          $PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', '');
-         // echo 'test'.$PreviewThemeFolder;
          if ($PreviewThemeFolder != '') {
             $Sender->Theme = $PreviewThemeFolder;
             $Sender->AddAsset('Foot', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
@@ -36,13 +35,14 @@ class DashboardHooks implements Gdn_IPlugin {
 		else if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
 			
-      if ($Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
+      if (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
             $Sender->AddModule($MessageModule);
          }
+			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
 		// If there are applicants, alert admins by showing in the main menu
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {

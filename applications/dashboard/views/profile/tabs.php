@@ -32,5 +32,3 @@ foreach ($this->_ProfileTabs as $TabCode => $TabInfo) {
    ?>
    </ul>
 </div>
-<?php
-$this->FireEvent('AfterProfileTabs');

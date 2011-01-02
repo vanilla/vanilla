@@ -42,7 +42,6 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
             }
-            
             break;
          case 'profile':
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
@@ -52,7 +51,6 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
             }
-
             break;
          case 'user':
             $Path = 'profile';
@@ -70,6 +68,33 @@ class Gdn_Theme {
                $Text = Img($PhotoUrl, array('alt' => urlencode($Session->User->Name)));
             }
 
+            break;
+         case 'drafts':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Drafts');
+            if ($Session->IsValid() && $Session->User->CountDrafts) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountDrafts.'</span>';
+            }
+            break;
+         case 'discussions/bookmarked':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Bookmarks');
+            if ($Session->IsValid() && $Session->User->CountBookmarks) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountBookmarks.'</span>';
+            }
+            break;
+         case 'discussions/mine':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Discussions');
+            if ($Session->IsValid() && $Session->User->CountDiscussions) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountDiscussions.'</span>';
+            }
             break;
          case 'signin':
          case 'signinout':

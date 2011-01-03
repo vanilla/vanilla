@@ -89,7 +89,7 @@ class ActivityController extends Gdn_Controller {
             $Offset,
             $Limit,
             $TotalRecords,
-            'activity/0/%1$s/%2$s/'
+            'activity/'.(is_array($RoleID) ? implode(',', $RoleID) : '0').'/%1$s/%2$s/'
          );
          
          // Deliver json data if necessary

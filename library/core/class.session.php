@@ -163,9 +163,9 @@ class Gdn_Session {
 	* @return NULL
 	*/
 	
-	public function SetPermission($PermissionName, $Value = FALSE) {
+	public function SetPermission($PermissionName, $Value = NULL) {
 		if (is_string($PermissionName)) {
-			if ($Value === FALSE) $this->_Permissions[] = $PermissionName;
+			if ($Value === NULL) $this->_Permissions[] = $PermissionName;
 			elseif (is_array($Value)) $this->_Permissions[$PermissionName] = $Value;
 		} elseif (is_array($PermissionName)) {
 			if (array_key_exists(0, $PermissionName))

@@ -144,9 +144,14 @@ class Gdn_PluginManager {
    
    private function _RemoveFromCollectionByPrefix($Prefix, &$Collection) {
       foreach ($Collection as $Event => $Hooks) {
-         foreach ($Hooks as $Index => $Hook) {
-            if (strpos($Hook, $Prefix.'.') === 0)
-               unset($Collection[$Event][$Index]);
+         if (is_array($Hooks)) {
+            foreach ($Hooks as $Index => $Hook) {
+               if (strpos($Hook, $Prefix.'.') === 0)
+                  unset($Collection[$Event][$Index]);
+            }
+         } elseif (is_string($Hooks)) {
+            if (strpos($Hooks, $Prefix.'.') === 0)
+               unset($Collection[$Event]);
          }
       }
    }

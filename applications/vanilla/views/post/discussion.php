@@ -2,14 +2,9 @@
 $this->Title(T('Start a New Discussion'));
 $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
-if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
-   foreach ($this->CategoryData->Result() as $Cat) {
-      if ($Cat->CategoryID == $this->CategoryID) {
-         $CancelUrl = '/vanilla/discussions/0/'.$Cat->CategoryID.'/'.Gdn_Format::Url($Cat->Name);
-         break;
-      }      
-   }
-}
+if (C('Vanilla.Categories.Use') && is_object($this->Category))
+   $CancelUrl = '/vanilla/discussions/0/'.$this->Category->CategoryID.'/'.Gdn_Format::Url($this->Category->Name);
+
 ?>
 <div id="DiscussionForm">
    <h2><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h2>

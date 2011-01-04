@@ -158,6 +158,33 @@ class SettingsController extends DashboardController {
    }      
    
    /**
+    * Homepage management screen.
+    */
+   public function Homepage() {
+      $this->Permission('Garden.Settings.Manage');
+      $this->AddSideMenu('dashboard/settings/homepage');
+      $this->Title(T('Homepage'));
+      $this->AddJsFile('homepage.js');
+      if (!$this->Form->AuthenticatedPostBack()) {
+         $this->Route = Gdn::Router()->GetRoute('DefaultController');
+         $this->Form->SetData(array(
+            'Target' => $this->Route['Destination']
+         ));
+      } else {
+            Gdn::Router()->DeleteRoute('DefaultController');
+            Gdn::Router()->SetRoute(
+               'DefaultController',
+               ArrayValue('Target', $this->Form->FormValues()),
+               'Internal'
+            );
+
+            $this->StatusMessage = T("The homepage was saved successfully.");
+         }
+      
+      $this->Render();      
+   }      
+
+   /**
     * Outgoing Email management screen.
     */
    public function Email() {

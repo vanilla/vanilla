@@ -21,7 +21,9 @@ if (!function_exists('FormatPossessive')) {
 
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return sprintf(T($Number == 1 ? $Singular : $Plural), $Number);
+		// Make sure to fix comma-formatted numbers
+      $WorkingNumber = str_replace(',', '', $Number);
+      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
    }
 }
 

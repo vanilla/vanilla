@@ -1,0 +1,392 @@
+<!doctype html>
+<!-- =================================================================================================================== -->
+<html lang="en">
+
+<!-- =================================================================================================================== -->
+<head>
+	<meta charset="utf-8">
+
+	<title>nestedSortable jQuery Plugin</title>
+	<meta name="description" content="Demo page of the Nested Sortable jQuery Plugin">
+	<meta name="author" content="Manuele J Sarfatti">
+
+	<style type="text/css">
+
+		html {
+			background-color: #eee;
+		}
+
+		body {
+			color: #333;
+			background-color: #fff;
+			font-size: 13px;
+			font-family: "Helvetica Neue", Corbel, "Nimbus Sans L", Helvetica, Arial, sans-serif;
+			padding: 2em 4em;
+			width: 860px;
+			margin: 0 auto;
+		}
+
+		pre, code {
+			font-size: 12px;
+		}
+
+		small {
+			font-size: 90%;
+		}
+
+		small code {
+			font-size: 11px;
+		}
+
+		.placeholder {
+			background-color: #cfcfcf;
+		}
+
+		.ui-nestedSortable-error {
+			background:#fbe3e4;
+			color:#8a1f11;
+		}
+
+		ol {
+			margin: 0;
+			padding: 0;
+			padding-left: 30px;
+		}
+
+		ol.sortable, ol.sortable ol {
+			margin: 0 0 0 25px;
+			padding: 0;
+			list-style-type: none;
+		}
+
+		ol.sortable {
+			margin: 4em 0;
+		}
+
+		.sortable li {
+			margin: 7px 0 0 0;
+			padding: 0;
+		}
+
+		.sortable li div  {
+			border: 1px solid black;
+			padding: 3px;
+			margin: 0;
+			cursor: move;
+		}
+
+		h1 {
+			font-size: 2em;
+			margin-bottom: 0;
+		}
+
+		h2 {
+			font-size: 1.2em;
+			font-weight: normal;
+			font-style: italic;
+			margin-top: .2em;
+			margin-bottom: 1.5em;
+		}
+
+		h3 {
+			font-size: 1em;
+			margin: 1em 0 .3em;;
+		}
+
+		p, ol, ul, pre {
+			margin-top: 0;
+			margin-bottom: 1em;
+		}
+
+		dl {
+			margin: 0;
+		}
+
+		dd {
+			margin: 0;
+			padding: 0 0 0 1.5em;
+		}
+
+		code {
+			background: #e5e5e5;
+		}
+
+		#notice {
+			color: #c33;
+		}
+
+	</style>
+
+
+<!-- =================================================================================================================== -->
+<body>
+
+<header>
+	<h1>nestedSortable jQuery Plugin 1.2.1</h1>
+	<h2>Sort and move list items between nested lists</h2>
+</header>
+
+<section id="notice">
+	<p>
+		<strong>NOTICE: If you are using version 1.1.1 or lower, please note that the default list type has now
+		changed to <code>&lt;ol&gt;</code>.<br />
+		See <em>Custom options</em> and <em>Changelog</em> in the documentation below for more info.</strong>
+	</p>
+</section> <!-- END #notice -->
+
+<section id="demo">
+	<ol class="sortable">
+		<li id="list_1"><div>Item 1</div>
+		<li id="list_2"><div>Item 2</div>
+			<ol>
+				<li id="list_3"><div>Sub Item 1.1</div>
+				<li id="list_4"><div>Sub Item 1.2</div>
+				<li id="list_5"><div>Sub Item 1.3</div>
+				<li id="list_6"><div >Sub Item 1.4</div>
+			</ol>
+		<li id="list_7" class="no-nest"><div>Item 3 (no-nesting)</div>
+		<li id="list_8" class="no-nest"><div>Item 4 (no-nesting)</div>
+		<li id="list_9"><div>Item 5</div>
+		<li id="list_10"><div>Item 6</div>
+			<ol>
+				<li id="list_11"><div>Sub Item 1</div>
+				<li id="list_12" class="no-nest"><div>Sub Item 3 (no-nesting)</div>
+				<li id="list_13"><div>Sub Item 4</div>
+				<li id="list_14"><div>Sub Item 5</div>
+			</ol>
+		<li id="list_15"><div>Item 7</div>
+		<li id="list_16"><div>Item 8</div>
+	</ol>
+
+	<p>
+		<input type="submit" name="serialize" id="serialize" value="Serialize" />
+	<p id="serializeOutput"></p>
+
+	<p>
+		<input type="submit" name="toArray" id="toArray" value="To array" />
+	<pre id="toArrayOutput"></pre>
+</section> <!-- END #demo -->
+
+
+<section id="documentation">
+	<p>
+		<strong>Download full package (jQuery, jQuery UI, nestedSortable and demo page):</strong>
+		<a href="nestedSortable.1.2.1.zip">nestedSortable.1.2.1.zip</a><br />
+		<strong>View the source code:</strong> <a href="jquery.ui.nestedSortable.js">jquery.ui.nestedSortable.js</a>
+
+	<p>
+		<em>If you want to talk about this plugin, or you have anything to tell me, please refer to
+		<a href="http://forum.jquery.com/topic/nested-lists-sortable-tree-plugin"
+		   title="Link to official topic in jQuery forums">this	post</a> in the jQuery forum.<br />
+		This plugin has also <a href="http://plugins.jquery.com/project/nestedSortableExt"
+		   title="Link to plugin project page in jQuery plugin repository">its place</a> in the jQuery Plugin
+		Repository, which can be used for version and issue tracking.</em>
+
+	<h3>Features:</h3>
+	<ul>
+		<li>Designed to work seamlessly with the <a href="http://en.wikipedia.org/wiki/Nested_set_model"
+		title="Link to the Wikipedia article">nested</a>
+		<a href="http://articles.sitepoint.com/article/hierarchical-data-database"
+		   title="Link to a Sitepoint tutorial on the use of MYSQL and PHP">set</a> model (have a look at the
+		<code>toArray</code> method).
+		<li>Items can be sorted in their own list, moved across the tree, or nested under other items.
+		<li>All jQuery Sortable options, events and methods are available.
+		<li>It is possible to define elements that will not accept a new nested list (<code>no-nesting</code> in the
+		above list).
+	</ul>
+
+	<h3>Usage:</h3>
+	<pre>
+&lt;ul class="sortable"&gt;
+	&lt;li&gt;&lt;div&gt;Some content&lt;/div&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;div&gt;Some content&lt;/div&gt;
+		&lt;ul&gt;
+			&lt;li&gt;&lt;div&gt;Some sub-item content&lt;/div&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;div&gt;Some sub-item content&lt;/div&gt;&lt;/li&gt;
+		&lt;/ul&gt;
+	&lt;/li&gt;
+	&lt;li&gt;&lt;div&gt;Some content&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;</pre>
+	<p>
+		<small>
+		<code>&lt;div&gt;</code> can be any tag (e.g. <code>&lt;span&gt;</code>), but it has to be some tag. This
+		same tag has to be set as the 'toleranceElement' in the options, and this, or one of its children, as the
+		'handle'.<br />
+		Any <code>&lt;li&gt;</code> can have either one or two tags, the second being <code>&lt;ul&gt;</code>.
+		</small>
+
+	<h3>Custom options:</h3>
+	<dl>
+		<dt><code>tabSize</code>
+			<dd>How far right or left (in pixels) the item has to travel in order to be nested or to be sent
+			outside its current list. Default: <code>20</code>
+		<dt><code>disableNesting</code>
+			<dd>The class name of the items that will not accept nested lists. Default:
+			<code>'ui-nestedSortable-no-nesting'</code>
+		<dt><code>errorClass</code>
+			<dd>The class given to the placeholder in case of error. Default:
+			<code>'ui-nestedSortable-error'</code>
+		<dt><code>listType</code>
+			<dd>The list type used (ordered or unordered). Default: <code>'ol'</code> (see changelog)
+	</dl>
+
+	<h3>Custom methods:</h3>
+	<dl>
+		<dt><code>serialize</code>
+			<dd>Serializes the nested list into a string like
+			<strong><em>setName</em>[<em>itemId</em>]=<em>parentId</em>&<em>setName</em>[<em>itemId</em>]=<em>parentId</em></strong>
+			from each item's id reading 'setName_itemId' (where itemId is a number).<br />
+			It accepts the same options as the UI Sortable method.
+		<dt><code>toArray</code>
+			<dd>Builds an array where each element is in the form:
+			<pre>
+
+setName[n] =>
+{
+	'item_id': <em>itemId</em>,
+	'parent_id': <em>parentId</em>,
+	'depth': <em>depth</em>,
+	'left': <em>left</em>,
+	'right': <em>right</em>,
+}</pre>
+			looking at the items' id's as in <code>serialize</code>.<br />
+			The <strong>left</strong> and <strong>right</strong> values comply with the nested set model.<br />
+			This method accepts two options:<br />
+			<code>startDepthCount</code> sets the starting depth number (default is 0), <code>expression</code>
+			is the regex used to extract the number from the item's id (default is the same as
+			<code>serialize</code>).<br />
+			The first array element is the root element which contains all the others, and it is built from the
+			available data with no need for any special entry.
+	</dl>
+
+	<h3>1.2.1 Changelog:</h3>
+	<ul>
+		<li>Finally made <code>serialize</code> and <code>toArray</code> work in IE6+ (In fact,
+		<code>serialize</code> already worked, but it was badly implemented in this demo page).
+	</ul>
+
+	<h3>1.2b Changelog:</h3>
+	<ul>
+		<li>There was a trailing comma too much on line 21. Either download 1.2b or remove that comma yourself.
+	</ul>
+
+	<h3>1.2 Changelog:</h3>
+	<ul>
+		<li>Added a custom option to specify the desired list type, and changed the default list type to
+		<code>&lt;ol&gt;</code>. Since we are dealing with ordering sets of items ordered lists are the way to go
+		according to HTML specifications.
+	</ul>
+
+	<h3>1.1.1 Changelog:</h3>
+	<ul>
+		<li>Improved the <code>toArray</code> method (<strong>right</strong> and <strong>left</strong> values have
+		been added, <strong>item_id</strong> and <strong>parent_id</strong> are now actual numbers).
+	</ul>
+
+	<h3>1.1 Changelog:</h3>
+	<ul>
+		<li>Implemented <code>serialize</code> and <code>toArray</code> methods.
+	</ul>
+
+	<h3>1.0.3 Changelog:</h3>
+	<ul>
+		<li>Fixed a bug that made IE 6 & 7 to not detect the correct placeholder height.
+		<li>Fixed a minor visual issue.
+	</ul>
+
+	<h3>1.0.2 Changelog:</h3>
+	<ul>
+		<li>Definitive fix for absolutely positioned lists.
+	</ul>
+
+	<h3>Bugs:</h3>
+	<p>
+		None that I know of.
+
+	<h3>Roadmap:</h3>
+	<dl>
+		<dt><del>1.1</del>
+			<dd><del>Adapt <code>serialize</code> and <code>toArray</code> in order to have it show the
+			indentation level, somehow.</del>
+		<dt>2.0
+			<dd>Make <code>maxItems</code> and <code>maxLevels</code> options.
+	</dl>
+
+	<h3>Requires:</h3>
+	<p>
+		jQuery 1.4+<br />
+		jQuery UI Sortable 1.8+
+
+	<h3>Browser compatibility:</h3>
+	<p>
+		Tested with: IE 6, Firefox 3.6, Chrome 5, Safari 3<br />
+		Will also work with: IE 6+, Firefox 3.5+, Chrome 4+, Safari 3+
+
+	<h3>Licence:</h3>
+	<p>
+		Creative Commons CC Zero Declaration. No Rights	Reserved. (But I will appreciate if you quote me)
+	<p>
+		© 2010 Manuele J Sarfatti
+	</p>
+</section> <!-- END #documentation -->
+
+<script src="jquery-1.4.2.min.js"></script>
+<script src="jquery-ui-1.8.2.custom.min.js"></script>
+<script src="jquery.ui.nestedSortable.js"></script>
+
+<script>
+
+	$(document).ready(function(){
+
+		$('ol.sortable').nestedSortable({
+			disableNesting: 'no-nest',
+			forcePlaceholderSize: true,
+			handle: 'div',
+			items: 'li',
+			opacity: .6,
+			placeholder: 'placeholder',
+			tabSize: 25,
+			tolerance: 'pointer',
+			toleranceElement: '> div'
+		});
+
+		$('#serialize').click(function(){
+			serialized = $('ol.sortable').nestedSortable('serialize');
+			$('#serializeOutput').text(serialized);
+		})
+
+		$('#toArray').click(function(e){
+			arraied = $('ol.sortable').nestedSortable('toArray', {startDepthCount: 0});
+			arraied = dump(arraied);
+			(typeof($('#toArrayOutput')[0].textContent) != 'undefined') ?
+			$('#toArrayOutput')[0].textContent = arraied : $('#toArrayOutput')[0].innerText = arraied;
+		})
+
+	});
+
+	function dump(arr,level) {
+		var dumped_text = "";
+		if(!level) level = 0;
+
+		//The padding given at the beginning of the line.
+		var level_padding = "";
+		for(var j=0;j<level+1;j++) level_padding += "    ";
+
+		if(typeof(arr) == 'object') { //Array/Hashes/Objects
+			for(var item in arr) {
+				var value = arr[item];
+
+				if(typeof(value) == 'object') { //If it is an array,
+					dumped_text += level_padding + "'" + item + "' ...\n";
+					dumped_text += dump(value,level+1);
+				} else {
+					dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+				}
+			}
+		} else { //Stings/Chars/Numbers etc.
+			dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+		}
+		return dumped_text;
+	}
+
+</script>

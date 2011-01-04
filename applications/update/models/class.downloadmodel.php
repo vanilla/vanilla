@@ -56,13 +56,14 @@ class DownloadModel {
    }
    
    public function Request($Url, $Parameters, $Options = array()) {
-
+      
       $DefaultOptions = array(
          'SendCookies'     => TRUE,
          'RequestMethod'   => 'GET',
          'FollowRedirects' => TRUE,
          'SaveFile'        => FALSE,
          'SaveVerify'      => FALSE,
+         'SaveProgress'    => NULL,
          'UseExisting'     => TRUE,
          'Timeout'         => C('Garden.SocketTimeout', 2.0),
          'BufferSize'      => 8192,
@@ -74,6 +75,8 @@ class DownloadModel {
       );
       
       $Options = array_merge($DefaultOptions, $Options);
+      
+      print_r($Options);
 
       // Break provided URL into constituent pieces
       $UrlParts = parse_url($Url);
@@ -112,6 +115,7 @@ class DownloadModel {
       // Get Timeout for connection attempts
       $Timeout = GetValue('Timeout', $Options);
       
+      // Are we saving this to a file?
       $SaveFile = (GetValue('SaveFile', $Options) !== FALSE);
       
       // If we want to save the response to a file, handle the FP and existing issues
@@ -124,11 +128,8 @@ class DownloadModel {
             $Filename = CombinePaths(array($Filename, $RequestFilename));
          }
          
-         echo "Request(): Filename = {$Filename}\n";
-         
          // Check if the folder exists at least
          $VacantSpace = Gdn_Filesystem::CheckFolderR(dirname($Filename), Gdn_Filesystem::O_CREATE);
-         echo "Request(): Dir exists? "; var_dump($VacantSpace);
          
          if (file_exists($Filename)) {
             if (GetValue('UseExisting', $Options) && md5_file($Filename) == GetValue('SaveVerify', $Options)) {
@@ -150,20 +151,13 @@ class DownloadModel {
          
          if (!$VacantSpace)
             throw new Exception(sprintf(T('Could not save to file %s'), $Filename));
-         
-         echo "Request(): Opening {$Filename} for writing\n";
-         $FilePointer = fopen($Filename, 'wb');
-         if (!$FilePointer)
-            throw new Exception(sprintf(T('Could not open target file %s for writing'), $Filename));
-         
-         $HeaderFilename = $Filename.'-headers';
-         $HeaderFilePointer = fopen($HeaderFilename, 'w');
+            
+         $FileDataHandler = new FileDataHandler($Options);
+         $FileDataHandler->SetFile($Filename);
       }
       
       // Pick request mode based on feature availability and priority
-      if (function_exists('curl_init') && FALSE) {
-         
-         echo "Request(): Using curl\n";
+      if (function_exists('curl_init')) {
          
          /**
           * cURL mode
@@ -179,7 +173,7 @@ class DownloadModel {
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($Handler, CURLOPT_BUFFERSIZE, $BufferSize);
          curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $Timeout);
-         
+                  
          // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
          if (GetValue('Authentication', $Options) === TRUE) {
             $ChallengeResponse = GetValue('Username', $Options).":".GetValue('Password', $Options);
@@ -203,9 +197,9 @@ class DownloadModel {
             // No header when saving a file
             curl_setopt($Handler, CURLOPT_HEADER, 0);
             
-            // Point cURL at a file handle
-            curl_setopt($Handler, CURLOPT_FILE, $FilePointer);
-            curl_setopt($Handler, CURLOPT_WRITEHEADER, $HeaderFilePointer);
+            // Point cURL at the File Data Handler for storing received data.
+            curl_setopt($Handler, CURLOPT_WRITEFUNCTION, array($Writeback, 'CurlWrite'));
+            curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($Writeback, 'CurlHeader'));
          }
          
          $Response = curl_exec($Handler);
@@ -220,8 +214,6 @@ class DownloadModel {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
-      
-         echo "Request(): Using fsockopen\n";
          
          $LogFile = fopen('/www/vanilla/vanilla/cache/download.log', 'w');
          
@@ -319,7 +311,7 @@ class DownloadModel {
       }
       
       if (!$Success)
-         return $Response;
+         throw new Exception(sprintf(T('Error performing request: %s'), $Response));
       
       $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
       $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
@@ -391,9 +383,6 @@ class DownloadModel {
       if ($VersionInfo === FALSE) 
          throw new Exception(sprintf(T("Could not find version '%s' of %s"), $Version, $Addon));
       
-      print_r($VersionInfo);
-      echo "downloading version '{$Version}' of addon '{$Addon}'\n";
-      
       $DownloadPath = CombinePaths(array($this->DownloadDir, $Addon, basename(GetValue('File',$VersionInfo))));
       $DownloadAddonName = implode('-',array($Addon,GetValue('Version',$VersionInfo)));
       
@@ -403,6 +392,7 @@ class DownloadModel {
       
       // Manually download
       $Request = GetValue('Url', $VersionInfo);
+      $Request = "http://www.cs.cmu.edu/~dst/DeCSS/MoRE+DoD.txt";
       
       $Response = $this->Request(
          $Request,
@@ -410,13 +400,24 @@ class DownloadModel {
          array(
             'SaveFile'     => $DownloadPath,
             'SaveVerify'   => GetValue('MD5', $VersionInfo),
-            'UseExisting'  => TRUE,
+            'BufferSize'   => 258,
+            'UseExisting'  => !$ForceFresh,
             'SendCookies'  => FALSE
          )
       );
+      print_r($Response);
       
-      //if ($Response
-      
+      if (!is_array($Response))
+         throw new Exception($Response);
+         
+      $FileData = GetValue('File', $Response, FALSE);
+      if ($FileData === FALSE) 
+         throw new Exception(T('Invalid data format returned from DownloadModel::Request()'));
+         
+      $Success = GetValue('Success', $FileData, FALSE);
+      if ($Success)
+         return GetValue('Path', $FileData);
+      return FALSE;
    }
    
    public function RemoteAddonInfo($Addon) {
@@ -465,5 +466,121 @@ class DownloadModel {
       return GetValue('Version', $LatestVersion, FALSE);
    }
    
+}
+
+/**
+ * File transfer handler
+ *
+ * This object encapsulates the process of saving a file to disk, packetwise.
+ * It also handles the UpdateModel->Progress and keeps that value updated.
+ */
+class FileDataHandler {
+   
+   protected $FilePointer;
+   protected $Filename;
+   protected $Options;
+   protected $UpdateModel;
+   
+   protected $HeaderData;
+   
+   protected $TransferInfo;
+   
+   public function __construct($Options, &$UpdateModel = NULL) {
+      $this->Options = $Options;
+      $this->LogFile = fopen('/www/vanilla/vanilla/cache/download.log', 'w');
+      
+      if ($UpdateModel instanceof UpdateModel)
+         $this->UpdateModel = $UpdateModel;
+      else
+         $this->UpdateModel = NULL;
+         
+      $this->TransferInfo = array(
+         'Size'      => 0,
+         'Speed'     => 0,
+         'Start'     => 0,
+         'Elapsed'   => 0
+      );
+   }
+   
+   public function SetFile($Filename) {
+      $this->Filename = $Filename;
+      $this->FilePointer = @fopen($Filename, 'wb');
+      
+      if (!$this->FilePointer)
+         throw new Exception(sprintf(T('Could not open target file %s for writing'), $Filename));
+   }
+   
+   public function SetTransferInfo($Option, $Value) {
+      $this->TransferInfo[$Option] = $Value;
+   }
+   
+   public function Start() {
+      $this->SetTransferInfo('Start', microtime(true));
+   }
+   
+   public function End() {
+      $this->SetTransferInfo('End', microtime(true));
+   }
+   
+   public function Elapsed() {
+      return microtime(true) - GetValue('', $this->TransferInfo, microtime(true))
+   }
+   
+   public function 
+   
+   public function CurlHeader($Curl, $Data) {
+      $Bytes = $this->Header($Data);
+      return $Bytes;
+   }
+   
+   public function CurlWrite($Curl, $Data) {
+      $Bytes = $this->Store($Data);
+      return $Bytes;
+   }
+   
+   public function Store($Data) {
+      $Bytes = fwrite($this->FilePointer, $Data);
+      $this->Progress($Bytes);
+      return $Bytes;
+   }
+   
+   public function Header($Data) {
+      $this->HeaderData .= $Data;
+      return strlen($Data);
+   }
+   
+   public function Progress($WrittenBytes = NULL) {
+      if (!is_null($WrittenBytes) && $this->UpdateModel instanceof UpdateModel) {
+         $this->UpdateModel->SetMeta('download/get', T("Downloading..."));
+         $this->UpdateModel->Progress('download', 'get', $ProgressPercent, TRUE);
+      }
+   }
+   
+   public function Headers() {
+      $ResponseHeaderLines = explode("\n",trim($this->HeaderData));
+      $Status = array_shift($ResponseHeaderLines);
+      $ResponseHeaders = array();
+      $ResponseHeaders['HTTP'] = trim($Status);
+      
+      // * get the numeric status code. 
+      // * - trim off excess edge whitespace, 
+      // * - split on spaces, 
+      // * - get the 2nd element (as a single element array), 
+      // * - pop the first (only) element off it... 
+      // * - return that.
+      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      foreach ($ResponseHeaderLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $ResponseHeaders[$Key] = $Value;
+      }
+      
+      return $ResponseHeaders;
+   }
+   
+   public function RawHeaders() {
+      return $this->HeaderData;
+   }
    
 }

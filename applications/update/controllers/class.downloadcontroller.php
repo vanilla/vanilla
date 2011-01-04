@@ -17,26 +17,9 @@ class DownloadController extends UpdateController {
       parent::Initialize();
       
       $this->DownloadModel = new DownloadModel();
-      /*
-
-      $DefaultOptions = array(
-         'SendCookies'     => TRUE,
-         'RequestMethod'   => 'GET',
-         'FollowRedirects' => TRUE,
-         'SaveFile'        => FALSE,
-         'Timeout'         => C('Garden.SocketTimeout', 2.0),
-         'BufferSize'      => 8192,
-         'UserAgent'       => GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
-         'Referer'         => Gdn_Url::WebRoot(TRUE),
-         'Authentication'  => FALSE,
-         'Username'        => NULL,
-         'Password'        => NULL
-      );
-*/
+      $R = $this->DownloadModel->GetAddonArchive('vanilla-core', NULL, TRUE);
       
-      $Results = $this->DownloadModel->GetAddonArchive('vanilla-core');
-      
-      var_dump($Results);
+      print_r($R);
       die();
    }
 
@@ -46,7 +29,6 @@ class DownloadController extends UpdateController {
    }
    
    public function Get() {
-      $this->GetBackupTask();
       $RenderController = 'download';
       
       $RequestType = $this->RequestType();
@@ -68,13 +50,13 @@ class DownloadController extends UpdateController {
             if ($RequestType == 'perform') {
                // Don't interrupt if another process is already doing this.
                if ($this->Update->Progress('download','get')) exit();
-               $this->DownloadModel->BackupFiles($this->GetBackupTask(), $this->Update);
+               $Results = $this->DownloadModel->GetAddonArchive('vanilla-core');
             }
             
             if ($RequestType == 'check') {
-               $ThisAction = $this->Update->GetTask('backup','files');
+               $ThisAction = $this->Update->GetTask('download','get');
                $this->SetData('Completion', GetValue('Completion',$ThisAction,NULL));
-               $this->SetData('Message', $this->Update->GetMeta('backup/message'));
+               $this->SetData('Message', $this->Update->GetMeta('download/message'));
                $this->Update->SetMeta('backup/message');
                $this->SetData('Menu', $this->UpdateModule->ToString());
             }

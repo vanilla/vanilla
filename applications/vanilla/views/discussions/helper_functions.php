@@ -115,12 +115,12 @@ function WriteFilterTabs(&$Sender) {
    $DescendantData = GetValue('DescendantData', $Sender->Data);
    $Category = GetValue('Category', $Sender->Data);
    if ($DescendantData && $Category) {
-      echo '<div class="SubTab">↳ ';
+      echo '<div class="SubTab"><span class="FirstCrumb">↳ </span>';
       foreach ($DescendantData->Result() as $Descendant) {
          // Ignore the root node
          if ($Descendant->CategoryID > 0) {
             echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
-            echo ' &rarr; ';
+            echo '<span class="BreadCrumb"> &rarr; </span>';
          }
       }
       echo $Category->Name;

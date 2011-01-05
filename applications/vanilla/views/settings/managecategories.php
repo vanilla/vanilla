@@ -31,6 +31,7 @@ if (C('Vanilla.Categories.Use')) {
          $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', GetValue('MaxDepthData', $this->Data))
       ), 'div')
       .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
+      .Wrap($this->Form->CheckBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
    .'</div>'
    .$this->Form->Close('Save')
    .Wrap(T('Organize Categories'), 'h1')
@@ -77,7 +78,7 @@ if (C('Vanilla.Categories.Use')) {
                      <strong>'.$Category->Name.'</strong>
                      '.Anchor($CategoryUrl, $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
-                     '.Wrap("ID: {$Category->CategoryID}, PID: {$Category->PermissionCategoryID}", 'div').'
+                     './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/'
                   </td>
                   <td class="Buttons">'
                      .Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')

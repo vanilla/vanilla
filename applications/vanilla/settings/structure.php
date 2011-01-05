@@ -41,7 +41,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Set($Explicit, $Drop);
 
 if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0)
-   $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.'));
+   $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
 
 if ($Drop) {
    $SQL->Insert('Category', array('TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions'));
@@ -55,7 +55,7 @@ if ($Drop) {
 
 if ($CategoryExists) {
    $CategoryModel = new CategoryModel();
-   $CategoryModel->RebuildTree2();
+   $CategoryModel->RebuildTree();
    unset($CategoryModel);
 }
 

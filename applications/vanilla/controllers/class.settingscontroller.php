@@ -437,7 +437,7 @@ class SettingsController extends Gdn_Controller {
       $this->Title(T('Categories'));
       
       // Get category data
-      $this->SetData('CategoryData', $this->CategoryModel->GetAll('Sort'), TRUE);
+      $this->SetData('CategoryData', $this->CategoryModel->GetAll('TreeLeft'), TRUE);
 		
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
@@ -455,7 +455,8 @@ class SettingsController extends Gdn_Controller {
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Categories.MaxDisplayDepth',
-         'Vanilla.Categories.DoHeadings'
+         'Vanilla.Categories.DoHeadings',
+         'Vanilla.Categories.HideModule'
       ));
       
       // Set the model on the form.

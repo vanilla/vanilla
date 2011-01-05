@@ -320,51 +320,32 @@ class CategoryModel extends Gdn_Model {
     *  
     * @since 2.0.0
     * @access public
-    *
-    * @param $ParentCategoryID int The node of the tree to rebuild. Defaults to
-    * "0" (root of tree).
-    * @param @TreeLeft int The left position of this node of the tree.
     */
-   public function RebuildTree($ParentCategoryID = -1, $TreeLeft = 1, $Depth = 0) {
-      // Update all categories without parents to point at the root node
-      $this->SQL->Update('Category')
-         ->Set('ParentCategoryID', -1)
-         ->Where('ParentCategoryID is null')
-         ->Where('CategoryID >', '0')
-         ->Put();
-      
-      // The right value of this node is the left value + 1  
-      $TreeRight = $TreeLeft + 1;  
-    
-      // Get all children of this node
-      // decho($ParentCategoryID, 'ParentCategoryID');
-      $Data = $this->SQL->Select('CategoryID')->From('Category')->Where('ParentCategoryID', $ParentCategoryID)->Where('CategoryID >', 0)->Get();
-      foreach ($Data->Result() as $Row) {
-         $TreeRight = $this->RebuildTree($Row->CategoryID, $TreeRight, $Depth + 1);
-      }
-    
-      // We've got the left value, and now that we've processed  the children of this node we also know the right value.
-      $this->SQL->Update('Category', array('TreeLeft' => $TreeLeft, 'TreeRight' => $TreeRight, 'Depth' => $Depth), array('CategoryID' => $ParentCategoryID))->Put();
-      // decho('update CategoryID '.$ParentCategoryID.' set TreeLeft = '.$TreeLeft.' TreeRight = '.$TreeRight);
-    
-      // Return the right value of this node + 1  
-      return $TreeRight + 1;
-   }
-
-   public function RebuildTree2() {
+   public function RebuildTree() {
       // Grab all of the categories.
-      $Categories = $this->SQL->Get('Category', 'TreeLeft, Name');
+      $Categories = $this->SQL->Get('Category', 'TreeLeft, Sort, Name');
       $Categories = Gdn_DataSet::Index($Categories->ResultArray(), 'CategoryID');
+
+      // Make sure the tree has a root.
+      if (!isset($Categories[-1])) {
+         $RootCat = array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => 0, 'Sort' => 0, 'ParentCategoryID' => NULL);
+         $Categories[-1] = $RootCat;
+         $this->SQL->Insert('Category', $RootCat);
+      }
 
       // Build a tree structure out of the categories.
       $Root = NULL;
       foreach ($Categories as &$Cat) {
          // Backup category settings for efficient database saving.
-         $Cat['_TreeLeft'] = $Cat['TreeLeft'];
-         $Cat['_TreeRight'] = $Cat['TreeRight'];
-         $Cat['_Depth'] = $Cat['Depth'];
-         $Cat['_PermissionCategoryID'] = $Cat['PermissionCategoryID'];
-         $Cat['_ParentCategoryID'] = $Cat['ParentCategoryID'];
+         try {
+            $Cat['_TreeLeft'] = $Cat['TreeLeft'];
+            $Cat['_TreeRight'] = $Cat['TreeRight'];
+            $Cat['_Depth'] = $Cat['Depth'];
+            $Cat['_PermissionCategoryID'] = $Cat['PermissionCategoryID'];
+            $Cat['_ParentCategoryID'] = $Cat['ParentCategoryID'];
+         } catch (Exception $Ex) {
+            $Foo = 'Bar';
+         }
 
          if ($Cat['CategoryID'] == -1) {
             $Root =& $Cat;
@@ -387,9 +368,9 @@ class CategoryModel extends Gdn_Model {
 
       // Save the tree structure.
       foreach ($Categories as $Cat) {
-         if ($Cat['_TreeLeft'] != $Cat['TreeLeft'] || $Cat['_TreeRight'] != $Cat['TreeRight'] || $Cat['_Depth'] != $Cat['Depth'] || $Cat['PermissionCategoryID'] != $Cat['PermissionCategoryID'] || $Cat['_ParentCategoryID'] != $Cat['ParentCategoryID']) {
+         if ($Cat['_TreeLeft'] != $Cat['TreeLeft'] || $Cat['_TreeRight'] != $Cat['TreeRight'] || $Cat['_Depth'] != $Cat['Depth'] || $Cat['PermissionCategoryID'] != $Cat['PermissionCategoryID'] || $Cat['_ParentCategoryID'] != $Cat['ParentCategoryID'] || $Cat['Sort'] != $Cat['TreeLeft']) {
             $this->SQL->Put('Category',
-               array('TreeLeft' => $Cat['TreeLeft'], 'TreeRight' => $Cat['TreeRight'], 'Depth' => $Cat['Depth'], 'PermissionCategoryID' => $Cat['PermissionCategoryID'], 'ParentCategoryID' => $Cat['ParentCategoryID']),
+               array('TreeLeft' => $Cat['TreeLeft'], 'TreeRight' => $Cat['TreeRight'], 'Depth' => $Cat['Depth'], 'PermissionCategoryID' => $Cat['PermissionCategoryID'], 'ParentCategoryID' => $Cat['ParentCategoryID'], 'Sort' => $Cat['TreeLeft']),
                array('CategoryID' => $Cat['CategoryID']));
          }
       }
@@ -403,7 +384,7 @@ class CategoryModel extends Gdn_Model {
             $Right = $this->_SetTree($Child, $Right, $Depth + 1);
             $Child['ParentCategoryID'] = $Node['CategoryID'];
             if ($Child['PermissionCategoryID'] != $Child['CategoryID']) {
-               $Child['PermissionCategoryID'] = $Node['PermissionCategoryID'];
+               $Child['PermissionCategoryID'] = GetValue('PermissionCategoryID', $Node, $Child['CategoryID']);
             }
          }
          unset($Node['Children']);
@@ -479,7 +460,7 @@ class CategoryModel extends Gdn_Model {
 
          // Only update if the tree doesn't match the database.
          $Row = $PermTree[$CategoryID];
-         if ($Node['left'] != $Row['TreeLeft'] || $Node['right'] != $Row['TreeRight'] || $Node['depth'] != $Row['Depth'] || $ParentCategoryID != $Row['ParentCategoryID'] || $PermCatChanged) {
+         if ($Node['left'] != $Row['TreeLeft'] || $Node['right'] != $Row['TreeRight'] || $Node['depth'] != $Row['Depth'] || $ParentCategoryID != $Row['ParentCategoryID'] || $Node['left'] != $Row['Sort'] || $PermCatChanged) {
             
             $this->SQL->Update(
                'Category',
@@ -487,6 +468,7 @@ class CategoryModel extends Gdn_Model {
                   'TreeLeft' => $Node['left'],
                   'TreeRight' => $Node['right'],
                   'Depth' => $Node['depth'],
+                  'Sort' => $Node['left'],
                   'ParentCategoryID' => $ParentCategoryID,
                   'PermissionCategoryID' => $PermissionCategoryID
                ),

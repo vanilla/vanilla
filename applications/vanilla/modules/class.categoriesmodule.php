@@ -30,7 +30,7 @@ class CategoriesModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (C('Vanilla.Categories.Use') == TRUE)
+      if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule'))
          return parent::ToString();
 
       return '';

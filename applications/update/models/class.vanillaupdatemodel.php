@@ -193,7 +193,10 @@ class VanillaUpdateModel {
    }
    
    public function Progress($GroupName, $TaskName, $NewProgressPercentage = NULL, $Save = FALSE) {
-      $this->SetProperty($GroupName, $TaskName, 'Completion', $NewProgressPercentage, $Save);
+      if (!is_null($NewProgressPercentage))
+         $this->SetProperty($GroupName, $TaskName, 'Completion', $NewProgressPercentage, $Save);
+         
+      return $this->GetProperty($GroupName, $TaskName, 'Completion');
    }
    
    protected function Save() {

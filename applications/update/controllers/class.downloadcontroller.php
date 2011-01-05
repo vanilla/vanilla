@@ -16,11 +16,13 @@ class DownloadController extends UpdateController {
    public function Initialize() {
       parent::Initialize();
       
-      $this->DownloadModel = new DownloadModel();
+      $this->DownloadModel = new DownloadModel($this->Update);
+/*
       $R = $this->DownloadModel->GetAddonArchive('vanilla-core', NULL, TRUE);
       
       print_r($R);
       die();
+*/
    }
 
    public function Index() {
@@ -49,8 +51,12 @@ class DownloadController extends UpdateController {
 
             if ($RequestType == 'perform') {
                // Don't interrupt if another process is already doing this.
-               if ($this->Update->Progress('download','get')) exit();
-               $Results = $this->DownloadModel->GetAddonArchive('vanilla-core');
+               if ($this->Update->Progress('download','get')) {
+                  exit();
+               }
+               
+               $Results = $this->DownloadModel->GetAddonArchive('vanilla-core', NULL, TRUE);
+               $this->Update->SetMeta('download/message', T('Download complete'));
             }
             
             if ($RequestType == 'check') {

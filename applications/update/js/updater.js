@@ -200,9 +200,12 @@ function Gdn_Updater() {
                this.SetProgress(Completion);
             }
             
+            if (Completion == 100) 
+               CheckAgain = false;
+            
          } else if (Completion == -1) {
             
-            // Indefinitely task length
+            // Indefinite task length
             this.SetProgressMode('spin');
             Fade = false;
             

@@ -1413,12 +1413,19 @@ class ImportModel extends Gdn_Model {
       if (!$this->ImportExists('Category', 'UrlCode')) {
          $Categories = Gdn::SQL()->Get('Category')->ResultArray();
          foreach ($Categories as $Category) {
+            $UrlCode = Gdn_Format::Url($Category['Name']);
+            if (strlen($UrlCode) > 50)
+               $UrlCode = $Category['CategoryID'];
+
             Gdn::SQL()->Put(
                'Category',
-               array('UrlCode' => Gdn_Format::Url($Category['Name'])),
+               array('UrlCode' => $UrlCode),
                array('CategoryID' => $Category['CategoryID']));
          }
       }
+      // Rebuild the category tree.
+      $CategoryModel = new CategoryModel();
+      $CategoryModel->RebuildTree();
 
       return TRUE;
 	}

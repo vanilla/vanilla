@@ -28,6 +28,23 @@ class ActivityController extends Gdn_Controller {
       parent::Initialize();
    }
    
+   /**
+    * Display a single activity & comments.
+    * Email notifications regarding activities will be linked to this method.
+    */
+   public function Item($ActivityID = 0) {
+      $this->AddJsFile('activity.js');
+      $this->Title(T('Activity Item'));
+
+      if (!is_numeric($ActivityID) || $ActivityID < 0)
+         $ActivityID = 0;
+         
+      $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $ActivityID);
+      $this->CommentData = $this->ActivityModel->GetComments(array($ActivityID));
+      $this->SetData('ActivityData', $this->ActivityData);
+      $this->Render();
+   }
+   
    public function Index($RoleID = '', $Offset = FALSE) {
       $this->Permission('Garden.Activity.View');
       

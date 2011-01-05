@@ -294,7 +294,7 @@ class ActivityModel extends Gdn_Model {
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
          $CommentActivity = $this->GetID($Activity->CommentActivityID);
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
-         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Gdn_Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+         $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
       $User = $this->SQL->Select('Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 
@@ -371,7 +371,7 @@ class ActivityModel extends Gdn_Model {
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
          $CommentActivity = $this->GetID($Activity->CommentActivityID);
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
-         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Gdn_Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+         $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
       $User = $this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 

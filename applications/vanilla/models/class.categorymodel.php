@@ -350,6 +350,71 @@ class CategoryModel extends Gdn_Model {
       // Return the right value of this node + 1  
       return $TreeRight + 1;
    }
+
+   public function RebuildTree2() {
+      // Grab all of the categories.
+      $Categories = $this->SQL->Get('Category', 'TreeLeft, Name');
+      $Categories = Gdn_DataSet::Index($Categories->ResultArray(), 'CategoryID');
+
+      // Build a tree structure out of the categories.
+      $Root = NULL;
+      foreach ($Categories as &$Cat) {
+         // Backup category settings for efficient database saving.
+         $Cat['_TreeLeft'] = $Cat['TreeLeft'];
+         $Cat['_TreeRight'] = $Cat['TreeRight'];
+         $Cat['_Depth'] = $Cat['Depth'];
+         $Cat['_PermissionCategoryID'] = $Cat['PermissionCategoryID'];
+         $Cat['_ParentCategoryID'] = $Cat['ParentCategoryID'];
+
+         if ($Cat['CategoryID'] == -1) {
+            $Root =& $Cat;
+            continue;
+         }
+
+         $ParentID = $Cat['ParentCategoryID'];
+         if (!$ParentID) {
+            $ParentID = -1;
+            $Cat['ParentCategoryID'] = $ParentID;
+         }
+         if (!isset($Categories[$ParentID]['Children']))
+            $Categories[$ParentID]['Children'] = array();
+         $Categories[$ParentID]['Children'][] =& $Cat;
+      }
+      unset($Cat);
+
+      // Set the tree attributes of the tree.
+      $this->_SetTree($Root);
+
+      // Save the tree structure.
+      foreach ($Categories as $Cat) {
+         if ($Cat['_TreeLeft'] != $Cat['TreeLeft'] || $Cat['_TreeRight'] != $Cat['TreeRight'] || $Cat['_Depth'] != $Cat['Depth'] || $Cat['PermissionCategoryID'] != $Cat['PermissionCategoryID'] || $Cat['_ParentCategoryID'] != $Cat['ParentCategoryID']) {
+            $this->SQL->Put('Category',
+               array('TreeLeft' => $Cat['TreeLeft'], 'TreeRight' => $Cat['TreeRight'], 'Depth' => $Cat['Depth'], 'PermissionCategoryID' => $Cat['PermissionCategoryID'], 'ParentCategoryID' => $Cat['ParentCategoryID']),
+               array('CategoryID' => $Cat['CategoryID']));
+         }
+      }
+   }
+
+   protected function _SetTree(&$Node, $Left = 1, $Depth = 0) {
+      $Right = $Left + 1;
+      
+      if (isset($Node['Children'])) {
+         foreach ($Node['Children'] as &$Child) {
+            $Right = $this->_SetTree($Child, $Right, $Depth + 1);
+            $Child['ParentCategoryID'] = $Node['CategoryID'];
+            if ($Child['PermissionCategoryID'] != $Child['CategoryID']) {
+               $Child['PermissionCategoryID'] = $Node['PermissionCategoryID'];
+            }
+         }
+         unset($Node['Children']);
+      }
+
+      $Node['TreeLeft'] = $Left;
+      $Node['TreeRight'] = $Right;
+      $Node['Depth'] = $Depth;
+
+      return $Right + 1;
+   }
    
    /**
     * Saves the category tree based on a provided tree array. We are using the
@@ -382,7 +447,7 @@ class CategoryModel extends Gdn_Model {
       */
 
       // Grab all of the categories so that permissions can be properly saved.
-      $PermTree = $this->SQL->Select('CategoryID, PermissionCategoryID')->From('Category')->Get();
+      $PermTree = $this->SQL->Select('CategoryID, PermissionCategoryID, TreeLeft, TreeRight, Depth, ParentCategoryID')->From('Category')->Get();
       $PermTree = $PermTree->Index($PermTree->ResultArray(), 'CategoryID');
 
       // The tree must be walked in order for the permissions to save properly.
@@ -398,6 +463,7 @@ class CategoryModel extends Gdn_Model {
             $ParentCategoryID = -1;
 
          $PermissionCategoryID = GetValueR("$CategoryID.PermissionCategoryID", $PermTree, 0);
+         $PermCatChanged = FALSE;
          if ($PermissionCategoryID != $CategoryID) {
             // This category does not have custom permissions so must inherit its parent's permissions.
             $PermissionCategoryID = GetValueR("$ParentCategoryID.PermissionCategoryID", $PermTree, 0);
@@ -405,21 +471,28 @@ class CategoryModel extends Gdn_Model {
                $Foo = 'Bar';
                throw new Exception("Category $ParentCategoryID not touched before touching $CategoryID.");
             }
+            if ($PermTree[$CategoryID]['PermissionCategoryID'] != $PermissionCategoryID)
+               $PermCatChanged = TRUE;
             $PermTree[$CategoryID]['PermissionCategoryID'] = $PermissionCategoryID;
          }
          $PermTree[$CategoryID]['Touched'] = TRUE;
 
-         $this->SQL->Update(
-            'Category',
-            array(
-               'TreeLeft' => $Node['left'],
-               'TreeRight' => $Node['right'],
-               'Depth' => $Node['depth'],
-               'ParentCategoryID' => $ParentCategoryID,
-               'PermissionCategoryID' => $PermissionCategoryID
-            ),
-            array('CategoryID' => $CategoryID)
-         )->Put();
+         // Only update if the tree doesn't match the database.
+         $Row = $PermTree[$CategoryID];
+         if ($Node['left'] != $Row['TreeLeft'] || $Node['right'] != $Row['TreeRight'] || $Node['depth'] != $Row['Depth'] || $ParentCategoryID != $Row['ParentCategoryID'] || $PermCatChanged) {
+            
+            $this->SQL->Update(
+               'Category',
+               array(
+                  'TreeLeft' => $Node['left'],
+                  'TreeRight' => $Node['right'],
+                  'Depth' => $Node['depth'],
+                  'ParentCategoryID' => $ParentCategoryID,
+                  'PermissionCategoryID' => $PermissionCategoryID
+               ),
+               array('CategoryID' => $CategoryID)
+            )->Put();
+         }
       }
    }
 

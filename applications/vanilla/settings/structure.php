@@ -55,7 +55,7 @@ if ($Drop) {
 
 if ($CategoryExists) {
    $CategoryModel = new CategoryModel();
-   $CategoryModel->RebuildTree();
+   $CategoryModel->RebuildTree2();
    unset($CategoryModel);
 }
 

@@ -213,6 +213,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
+         
+         $this->EventArguments['Controller'] =& $Controller;
 
          // Pass along any assets
          if (is_array($this->_AssetCollection)) {

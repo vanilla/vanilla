@@ -121,8 +121,8 @@ class VanillaHooks implements Gdn_IPlugin {
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
          // Add the discussion tab
-         $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
-         $Sender->AddProfileTab(T('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
+         $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Discussions');
+         $Sender->AddProfileTab(T('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Comments');
          // Add the discussion tab's CSS and Javascript
          $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
          $Sender->AddJsFile('jquery.gardenmorepager.js');
@@ -197,6 +197,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Comments_Create(&$Sender) {
+		$View = $Sender->View;
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
@@ -232,7 +233,7 @@ class VanillaHooks implements Gdn_IPlugin {
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
-         $Sender->View = 'results';
+         $Sender->View = 'profilecomments';
       }
 		$Sender->Offset = $Offset;
       

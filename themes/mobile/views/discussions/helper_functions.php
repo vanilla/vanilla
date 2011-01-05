@@ -45,7 +45,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             if ($Discussion->LastCommentID != '')
                echo '<span class="LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
                
-            echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span> ';
+            echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
          ?>
       </div>
    </div>

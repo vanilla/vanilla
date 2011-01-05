@@ -9,6 +9,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
+   $Sender->EventArguments['CssClass'] = &$CssClass;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
    
@@ -52,7 +53,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span>';
             }
          
-            if (C('Vanilla.Categories.Use'))
+            if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
                echo Wrap(Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');

@@ -153,5 +153,10 @@ jQuery(document).ready(function($) {
       return false;
    });
 
+   // Set up paging
+   if ($.morepager)
+      $('.MorePager').morepager({
+         pageContainerSelector: 'ul.DataList:first'
+      });
 
 });

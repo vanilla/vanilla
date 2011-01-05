@@ -64,6 +64,14 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function Get($UserID = '', $Offset = '0', $Limit = '50') {
+      $Offset = is_numeric($Offset) ? $Offset : 0;
+      if ($Offset < 0)
+         $Offset = 0;
+
+      $Limit = is_numeric($Limit) ? $Limit : 0;
+      if ($Limit < 0)
+         $Limit = 0;
+
       $this->ActivityQuery();
       $this->SQL->Where('a.CommentActivityID is null');
       if ($UserID != '') {
@@ -85,9 +93,43 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   public function GetCount($UserID = '') {
+      $this->SQL
+         ->Select('a.ActivityID', 'count', 'ActivityCount')
+         ->From('Activity a')
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
+         ->Where('a.CommentActivityID is null');
+      
+      if ($UserID != '') {
+         $this->SQL
+            ->BeginWhereGroup()
+            ->Where('a.ActivityUserID', $UserID)
+            ->OrWhere('a.RegardingUserID', $UserID)
+            ->EndWhereGroup();
+      }
+      
+      $Session = Gdn::Session();
+      if (!$Session->IsValid() || $Session->UserID != $UserID)
+         $this->SQL->Where('t.Public', '1');
+
+      $this->FireEvent('BeforeGetCount');
+      return $this->SQL
+         ->Get()
+         ->FirstRow()
+         ->ActivityCount;
+   }
+
    public function GetForRole($RoleID = '', $Offset = '0', $Limit = '50') {
       if (!is_array($RoleID))
          $RoleID = array($RoleID);
+      
+      $Offset = is_numeric($Offset) ? $Offset : 0;
+      if ($Offset < 0)
+         $Offset = 0;
+
+      $Limit = is_numeric($Limit) ? $Limit : 0;
+      if ($Limit < 0)
+         $Limit = 0;
       
       $this->ActivityQuery();
       return $this->SQL
@@ -100,6 +142,23 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   public function GetCountForRole($RoleID = '') {
+      if (!is_array($RoleID))
+         $RoleID = array($RoleID);
+      
+      return $this->SQL
+         ->Select('a.ActivityID', 'count', 'ActivityCount')
+         ->From('Activity a')
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
+         ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
+         ->WhereIn('ur.RoleID', $RoleID)
+         ->Where('a.CommentActivityID is null')
+         ->Where('t.Public', '1')
+         ->Get()
+         ->FirstRow()
+         ->ActivityCount;
+   }
+
    public function GetID($ActivityID) {
       $this->ActivityQuery();
       return $this->SQL
@@ -119,6 +178,21 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   public function GetCountNotifications($UserID) {
+      $this->SQL
+         ->Select('a.ActivityID', 'count', 'ActivityCount')
+         ->From('Activity a')
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID');
+         
+      $this->FireEvent('BeforeGetNotificationsCount');
+      return $this->SQL
+         ->Where('RegardingUserID', $UserID)
+         ->Where('t.Notify', '1')
+         ->Get()
+         ->FirstRow()
+         ->ActivityCount;
+   }
+
    public function GetComments($ActivityIDs) {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetComments');
@@ -220,7 +294,7 @@ class ActivityModel extends Gdn_Model {
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
          $CommentActivity = $this->GetID($Activity->CommentActivityID);
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
-         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Gdn_Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+         $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
       $User = $this->SQL->Select('Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 
@@ -297,7 +371,7 @@ class ActivityModel extends Gdn_Model {
       if (is_null($Activity->RegardingUserID) && $Activity->CommentActivityID > 0) {
          $CommentActivity = $this->GetID($Activity->CommentActivityID);
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
-         $Activity->Route = '/profile/'.$CommentActivity->RegardingUserID.'/'.Gdn_Format::Url($CommentActivity->RegardingName).'/#Activity_'.$Activity->CommentActivityID;
+         $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
       $User = $this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 

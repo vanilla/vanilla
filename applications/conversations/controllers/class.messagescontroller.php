@@ -7,21 +7,66 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Messages Controller
+ *
+ * @package Conversations
+ */
+ 
 /**
  * MessagesController handles displaying lists of conversations and conversation messages.
+ *
+ * @since 2.0.0
+ * @package Conversations
  */
 class MessagesController extends ConversationsController {
-   
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
    
+   /**
+    * A dataset of users taking part in this discussion. Used by $this->Index.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var object
+    */
+   public $RecipientData;
+   
+   /**
+    * The current offset of the paged data set. Defined and used by $this->Index and $this->All.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var int
+    */
+   public $Offset;
+   
+   /**
+    * Highlight route and include JS, CSS, and modules used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       $this->Menu->HighlightRoute('/messages/all');
    }
    
    /**
-    * Add a new conversations.
+    * Start a new conversation.
+    *
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $Recipient Username of the recipient.
     */
    public function Add($Recipient = '') {
       $this->Form->SetModel($this->ConversationModel);
@@ -49,6 +94,11 @@ class MessagesController extends ConversationsController {
    
    /**
     * Add a message to a conversation.
+    *
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $ConversationID Unique ID of the conversation.
     */
    public function AddMessage($ConversationID = '') {
       $this->Form->SetModel($this->ConversationMessageModel);
@@ -84,21 +134,33 @@ class MessagesController extends ConversationsController {
    
    /**
     * Show all conversations for the currently authenticated user.
+    *
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $Offset Number to skip.
+    * @param int $Limit Number to show.
+    * @param bool $BookmarkedOnly Whether to limit to only bookmarked conversations.
     */
    public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
-      $this->Title(T('Conversations'));
-      $this->Offset = $Offset;
       $Session = Gdn::Session();
+      $this->Title(T('Conversations'));
+      
+      // Calculate offset
+      $this->Offset = $Offset;
       if (!is_numeric($this->Offset) || $this->Offset < 0)
          $this->Offset = 0;
       
+      // Calculate limit
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
          $Limit = Gdn::Config('Conversations.Conversations.PerPage', 50);
-         
+      
+      // Limit to bookmarks?   
       $Wheres = array();
       if ($BookmarkedOnly !== FALSE)
          $Wheres['Bookmarked'] = '1';
-         
+      
+      // Fetch from model  
       $this->ConversationData = $this->ConversationModel->Get(
          $Session->UserID,
          $this->Offset,
@@ -128,6 +190,7 @@ class MessagesController extends ConversationsController {
          $this->View = 'conversations';
       }
       
+      // Build and display page
       $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
       $this->Render();
@@ -135,49 +198,62 @@ class MessagesController extends ConversationsController {
    
    /**
     * Clear the message history for a specific conversation & user.
+    *
+    * @since 2.0.0
+    * @access public
+    * 
+    * @param int $ConversationID Unique ID of conversation to clear.
     */
    public function Clear($ConversationID = FALSE) {
       $Session = Gdn::Session();
+      
+      // Yes/No response
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      
+      // Clear it
       if (is_numeric($ConversationID) && $ConversationID > 0 && $Session->IsValid())
          $this->ConversationModel->Clear($ConversationID, $Session->UserID);
-         
+      
       $this->StatusMessage = T('The conversation has been cleared.');
       $this->RedirectUrl = Url('/messages/all');
       $this->Render();
    }
    
    /**
-    * A dataset of users taking part in this discussion. Used by $this->Index.
-    */
-   public $RecipientData;
-   
-   /**
-    * The current offset of the paged data set. Defined and used by $this->Index and $this->All.
-    */
-   public $Offset;
-   
-   /**
     * Shows all uncleared messages within a conversation for the viewing user
+    *
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation to view.
+    * @param int $Offset Number to skip.
+    * @param int $Limit Number to show.
     */
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
       $this->Offset = $Offset;
       $Session = Gdn::Session();
+      
+      // Figure out Conversation ID
       if (!is_numeric($ConversationID) || $ConversationID < 0)
          $ConversationID = 0;
 
+      // Form setup for adding comments
       $this->Form->SetModel($this->ConversationMessageModel);
       $this->Form->AddHidden('ConversationID', $ConversationID);
       
+      // Get conversation data
       $this->RecipientData = $this->ConversationModel->GetRecipients($ConversationID);
       $this->Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);
       
+      // Bad conversation? Redirect
       if ($this->Conversation === FALSE)
          Redirect('dashboard/home/filenotfound');
-
+      
+      // Get limit
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
          $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
       
+      // Calculate counts
       if (!is_numeric($this->Offset) || $this->Offset < 0) {
          // Round down to the appropriate offset based on the user's read messages & messages per page
          $CountReadMessages = $this->Conversation->CountMessages - $this->Conversation->CountNewMessages;
@@ -190,7 +266,8 @@ class MessagesController extends ConversationsController {
          // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
          $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
       }
-         
+      
+      // Fetch message data
       $this->MessageData = $this->ConversationMessageModel->Get(
          $ConversationID,
          $Session->UserID,
@@ -198,6 +275,7 @@ class MessagesController extends ConversationsController {
          $Limit
       );
       
+      // Figure out who's participating.
       $this->Participants = '';
       $Count = 0;
       $Users = array();
@@ -241,6 +319,7 @@ class MessagesController extends ConversationsController {
          $this->View = 'messages';
       }
       
+      // Add modules
       $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
 
@@ -254,16 +333,25 @@ class MessagesController extends ConversationsController {
       
       $this->AddModule('AddPeopleModule');
       
+      // Render view
       $this->Render();
    }
    
    /**
     * Allows users to bookmark conversations.
+    *
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation to view.
+    * @param string $TransientKey Single-use hash to prove intent.
     */
    public function Bookmark($ConversationID = '', $TransientKey = '') {
       $Session = Gdn::Session();
       $Success = FALSE;
       $Star = FALSE;
+      
+      // Validate & do bookmarking
       if (
          is_numeric($ConversationID)
          && $ConversationID > 0
@@ -273,6 +361,7 @@ class MessagesController extends ConversationsController {
          $Bookmark = $this->ConversationModel->Bookmark($ConversationID, $Session->UserID);
       }
       
+      // Report success or error
       if ($Bookmark === FALSE)
          $this->Form->AddError('ErrorBool');
       else
@@ -288,14 +377,27 @@ class MessagesController extends ConversationsController {
    /**
     * Show bookmarked conversations for the current user.
     *
-    * @param int
-    * @param string
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $Offset Number to skip.
+    * @param string $Limit Number to show.
     */
    public function Bookmarked($Offset = 0, $Limit = '') {
       $this->View = 'All';
       $this->All($Offset, $Limit, TRUE);
    }
 
+   /**
+    * Show bookmarked conversations for the current user.
+    *
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $Offset Number to skip.
+    * @param string $Limit Number to show.
+    * @param bool $BookmarkedOnly Whether to show only bookmarks
+    */
    public function Inbox($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
       $this->View = 'All';
       $this->All($Offset, $Limit, $BookmarkedOnly);

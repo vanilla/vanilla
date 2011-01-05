@@ -69,9 +69,17 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function UserQuery() {
-      $this->SQL->Select('u.*')
-         ->Select('i.Name', '', 'InviteName')
+   /**
+    * $SafeData makes sure that the query does not return any sensitive
+    * information about the user (password, attributes, preferences, etc).
+    */
+   public function UserQuery($SafeData = FALSE) {
+      if ($SafeData) {
+         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
+      } else {
+         $this->SQL->Select('u.*');
+      }
+      $this->SQL->Select('i.Name', '', 'InviteName')
          ->From('User u')
          ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
@@ -292,6 +300,18 @@ class UserModel extends Gdn_Model {
       $UserCache[$UserID] = $User;
 
       return $User;
+   }
+
+   /**
+    * Retrieve a summary of "safe" user information for external API calls.
+    */
+   public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $this->UserQuery(TRUE);
+      return $this->SQL
+         ->Where('u.Deleted', 0)
+         ->OrderBy($OrderFields, $OrderDirection)
+         ->Limit($Limit, $Offset)
+         ->Get();
    }
    
    public function RemovePicture($UserID) {

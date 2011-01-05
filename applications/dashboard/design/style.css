@@ -158,7 +158,7 @@ textarea.TextBox {
    min-height: 100px;
 }
 #Popup textarea.TextBox {
-   width: 465px;
+   width: 100%;
 }
 input.SmallInput,
 input.InputBox {
@@ -922,6 +922,23 @@ ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
 ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
 ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
 
+div.Box.RecentUsers {
+	float: left;
+}
+div.Icons a {
+	display: block;
+	margin: 0 2px 2px 0;
+	float: left;
+}
+div.Icons img {
+	display: block;
+	height: 44px;
+	width: 44px;
+	overflow: hidden;
+	background: #c4cde0;
+	color: #c4cde0;
+	text-indent: 50px;
+}
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
@@ -947,8 +964,9 @@ ul.DataList div.Options {
 	width:100px;
 }
 ul.DataList div.OptionButton {
-	float: right;
-	*padding: 7px 0; /* IE 7 Fix */
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 ul.DataList a.Title {
    display: block;
@@ -1425,7 +1443,7 @@ div.User h1 {
    padding: 8px 8px 0;
    color: #999;
    font-weight: normal;
-   line-height: 100%;
+   line-height: 1.5;
 }
 #Status p {
    font-size: 120%;
@@ -2114,7 +2132,6 @@ div.CommentForm a.Cancel {
 textarea.MultiComplete {
    height: 20px;
    padding: 3px 0;
-   width: 400px;
    text-align: left;
 }
 .ac_results {
@@ -2231,7 +2248,7 @@ ul.Conversations div.Meta a.Name {
 	text-align: right;
 }
 #MessageForm textarea {
-  width: 655px;
+  width: 99%;
   height: 100px;
   min-height: 100px;
   margin-bottom: 2px;
@@ -2271,11 +2288,7 @@ body.add #Content {
 	font-size:14px;
 	font-weight:bold;	
 }
-#ConversationForm textarea.MultiComplete {
-  width: 910px;
-}
 #ConversationForm .TextBox {
-   width: 910px;
    height: 100px;
    min-height: 100px;
    margin: 8px 0 6px;
@@ -2300,7 +2313,7 @@ div.Popup #ConversationForm h2 {
 }
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {
-	width: 478px;
+	width: 100%;
 }
 
 /* Upload Progress Bar */

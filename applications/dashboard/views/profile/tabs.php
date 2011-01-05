@@ -11,7 +11,7 @@ if (!is_array($SortOrder))
    $SortOrder = array();
    
 // Make sure that all tabs are present in $SortOrder
-foreach ($this->_ProfileTabs as $TabCode => $TabUrl) {
+foreach ($this->_ProfileTabs as $TabCode => $TabInfo) {
    if (!in_array($TabCode, $SortOrder))
       $SortOrder[] = $TabCode;
 }
@@ -21,10 +21,13 @@ foreach ($this->_ProfileTabs as $TabCode => $TabUrl) {
    <?php
    // Get sorted tabs
    foreach ($SortOrder as $TabCode) {
-      $CssClass = $TabCode == $this->_CurrentTab ? ' class="Active"' : '';
-      if (array_key_exists($TabCode, $this->_ProfileTabs)) // Just in case a method was removed but is still present in sortorder
-         echo '<li'.$CssClass.'>'.Anchor($TabCode, $this->_ProfileTabs[$TabCode])."</li>\r\n";
-
+      $CssClass = $TabCode == $this->_CurrentTab ? 'Active ' : '';
+      // array_key_exists: Just in case a method was removed but is still present in sortorder
+      if (array_key_exists($TabCode, $this->_ProfileTabs)) {
+         $TabInfo = GetValue($TabCode, $this->_ProfileTabs, array());
+         $CssClass .= GetValue('CssClass', $TabInfo, '');
+         echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.Anchor($TabCode, GetValue('TabUrl', $TabInfo))."</li>\r\n";
+      }
    }
    ?>
    </ul>

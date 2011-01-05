@@ -782,6 +782,11 @@ ul.PanelInfo li {
    padding: 2px 4px;
    text-align: right;
 }
+ul.PanelInfo li.Heading {
+   text-align: left;
+   color: #000;
+   font-weight: bold;
+}
 ul.PanelInfo {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;

@@ -5,7 +5,7 @@
 	{asset name='Head'}
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
-{asset name='Content'}
+<div id="Content">{asset name='Content'}</div>
 {asset name='Foot'}
 </body>
 </html>

@@ -130,7 +130,7 @@ class DebuggerPlugin extends Gdn_Plugin {
          if (count($Data) == 0)
             return $Result.'EMPTY<br />';
 
-         $Fields = array_keys((array)$Data[0]);
+         $Fields = array_keys((array)reset($Data));
          $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
             .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
          return $Result;

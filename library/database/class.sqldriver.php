@@ -617,7 +617,7 @@ abstract class Gdn_SQLDriver {
     * @param string $OrderDirection The direction of the sort.
     * @param int    $Limit          Adds a limit to the query.
     * @param int    $PageNumber     The page of data to retrieve.
-    * @return DataSet
+    * @return Gdn_DataSet
     */
    public function Get($Table = '', $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
       if ($Table != '') {

@@ -63,6 +63,14 @@ class CategoryModel extends Gdn_Model {
                ->Set('ParentCategoryID', $ReplacementCategoryID)
                ->Where('ParentCategoryID', $Category->CategoryID)
                ->Put();
+
+            // Update permission categories.
+            $this->SQL
+               ->Update('Category')
+               ->Set('PermissionCategoryID', $ReplacementCategoryID)
+               ->Where('PermissionCategoryID', $Category->CategoryID)
+               ->Where('CategoryID <>', $Category->CategoryID)
+               ->Put();
                
             // Update discussions
             $this->SQL
@@ -95,6 +103,14 @@ class CategoryModel extends Gdn_Model {
                
             // Delete discussions in this category
             $this->SQL->Delete('Discussion', array('CategoryID' => $Category->CategoryID));
+
+            // Make inherited permission local permission
+            $this->SQL
+               ->Update('Category')
+               ->Set('PermissionCategoryID', 0)
+               ->Where('PermissionCategoryID', $Category->CategoryID)
+               ->Where('CategoryID <>', $Category->CategoryID)
+               ->Put();
          }
          
          // Delete the category
@@ -144,14 +160,14 @@ class CategoryModel extends Gdn_Model {
     * @param string $OrderDirection Ignored.
     * @param int $Limit Ignored.
     * @param int $Offset Ignored.
-    * @return object SQL results.
+    * @return Gdn_DataSet SQL results.
     */
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->SQL
          ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
          ->From('Category c')
          ->BeginWhereGroup()
-         ->Permission('Vanilla.Discussions.View', 'c', 'CategoryID')
+         ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
          ->EndWhereGroup()
          ->OrWhere('AllowDiscussions', '0')
          ->OrderBy('TreeLeft', 'asc');
@@ -179,7 +195,7 @@ class CategoryModel extends Gdn_Model {
     */
    public function GetAll() {
       $CategoryData = $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode')
+         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode, c.PermissionCategoryID')
          ->From('Category c')
          ->OrderBy('TreeLeft', 'asc')
          ->Get();
@@ -242,7 +258,7 @@ class CategoryModel extends Gdn_Model {
       if (!$Permissions)
          $Permissions = 'Vanilla.Discussions.View';
 
-      $this->SQL->Permission($Permissions, 'c', 'CategoryID');
+      $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
 
       // Single record or full list?
       if (is_numeric($CategoryID) && $CategoryID > 0) {
@@ -271,7 +287,7 @@ class CategoryModel extends Gdn_Model {
          ->Where('c.CategoryID >', 0);
       
       // Require permission   
-      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'CategoryID');
+      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category');
          
       return $this->SQL
          ->Get()
@@ -304,35 +320,81 @@ class CategoryModel extends Gdn_Model {
     *  
     * @since 2.0.0
     * @access public
-    *
-    * @param $ParentCategoryID int The node of the tree to rebuild. Defaults to
-    * "0" (root of tree).
-    * @param @TreeLeft int The left position of this node of the tree.
     */
-   public function RebuildTree($ParentCategoryID = -1, $TreeLeft = 1, $Depth = 0) {
-      // Update all categories without parents to point at the root node
-      $this->SQL->Update('Category')
-         ->Set('ParentCategoryID', -1)
-         ->Where('ParentCategoryID is null')
-         ->Where('CategoryID >', '0')
-         ->Put();
-      
-      // The right value of this node is the left value + 1  
-      $TreeRight = $TreeLeft + 1;  
-    
-      // Get all children of this node
-      // decho($ParentCategoryID, 'ParentCategoryID');
-      $Data = $this->SQL->Select('CategoryID')->From('Category')->Where('ParentCategoryID', $ParentCategoryID)->Where('CategoryID >', 0)->Get();
-      foreach ($Data->Result() as $Row) {
-         $TreeRight = $this->RebuildTree($Row->CategoryID, $TreeRight, $Depth + 1);
+   public function RebuildTree() {
+      // Grab all of the categories.
+      $Categories = $this->SQL->Get('Category', 'TreeLeft, Sort, Name');
+      $Categories = Gdn_DataSet::Index($Categories->ResultArray(), 'CategoryID');
+
+      // Make sure the tree has a root.
+      if (!isset($Categories[-1])) {
+         $RootCat = array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => 0, 'Sort' => 0, 'ParentCategoryID' => NULL);
+         $Categories[-1] = $RootCat;
+         $this->SQL->Insert('Category', $RootCat);
       }
-    
-      // We've got the left value, and now that we've processed  the children of this node we also know the right value.
-      $this->SQL->Update('Category', array('TreeLeft' => $TreeLeft, 'TreeRight' => $TreeRight, 'Depth' => $Depth), array('CategoryID' => $ParentCategoryID))->Put();
-      // decho('update CategoryID '.$ParentCategoryID.' set TreeLeft = '.$TreeLeft.' TreeRight = '.$TreeRight);
-    
-      // Return the right value of this node + 1  
-      return $TreeRight + 1;
+
+      // Build a tree structure out of the categories.
+      $Root = NULL;
+      foreach ($Categories as &$Cat) {
+         // Backup category settings for efficient database saving.
+         try {
+            $Cat['_TreeLeft'] = $Cat['TreeLeft'];
+            $Cat['_TreeRight'] = $Cat['TreeRight'];
+            $Cat['_Depth'] = $Cat['Depth'];
+            $Cat['_PermissionCategoryID'] = $Cat['PermissionCategoryID'];
+            $Cat['_ParentCategoryID'] = $Cat['ParentCategoryID'];
+         } catch (Exception $Ex) {
+            $Foo = 'Bar';
+         }
+
+         if ($Cat['CategoryID'] == -1) {
+            $Root =& $Cat;
+            continue;
+         }
+
+         $ParentID = $Cat['ParentCategoryID'];
+         if (!$ParentID) {
+            $ParentID = -1;
+            $Cat['ParentCategoryID'] = $ParentID;
+         }
+         if (!isset($Categories[$ParentID]['Children']))
+            $Categories[$ParentID]['Children'] = array();
+         $Categories[$ParentID]['Children'][] =& $Cat;
+      }
+      unset($Cat);
+
+      // Set the tree attributes of the tree.
+      $this->_SetTree($Root);
+
+      // Save the tree structure.
+      foreach ($Categories as $Cat) {
+         if ($Cat['_TreeLeft'] != $Cat['TreeLeft'] || $Cat['_TreeRight'] != $Cat['TreeRight'] || $Cat['_Depth'] != $Cat['Depth'] || $Cat['PermissionCategoryID'] != $Cat['PermissionCategoryID'] || $Cat['_ParentCategoryID'] != $Cat['ParentCategoryID'] || $Cat['Sort'] != $Cat['TreeLeft']) {
+            $this->SQL->Put('Category',
+               array('TreeLeft' => $Cat['TreeLeft'], 'TreeRight' => $Cat['TreeRight'], 'Depth' => $Cat['Depth'], 'PermissionCategoryID' => $Cat['PermissionCategoryID'], 'ParentCategoryID' => $Cat['ParentCategoryID'], 'Sort' => $Cat['TreeLeft']),
+               array('CategoryID' => $Cat['CategoryID']));
+         }
+      }
+   }
+
+   protected function _SetTree(&$Node, $Left = 1, $Depth = 0) {
+      $Right = $Left + 1;
+      
+      if (isset($Node['Children'])) {
+         foreach ($Node['Children'] as &$Child) {
+            $Right = $this->_SetTree($Child, $Right, $Depth + 1);
+            $Child['ParentCategoryID'] = $Node['CategoryID'];
+            if ($Child['PermissionCategoryID'] != $Child['CategoryID']) {
+               $Child['PermissionCategoryID'] = GetValue('PermissionCategoryID', $Node, $Child['CategoryID']);
+            }
+         }
+         unset($Node['Children']);
+      }
+
+      $Node['TreeLeft'] = $Left;
+      $Node['TreeRight'] = $Right;
+      $Node['Depth'] = $Depth;
+
+      return $Right + 1;
    }
    
    /**
@@ -364,8 +426,15 @@ class CategoryModel extends Gdn_Model {
         'right' => "3"
       etc...
       */
+
+      // Grab all of the categories so that permissions can be properly saved.
+      $PermTree = $this->SQL->Select('CategoryID, PermissionCategoryID, TreeLeft, TreeRight, Depth, ParentCategoryID')->From('Category')->Get();
+      $PermTree = $PermTree->Index($PermTree->ResultArray(), 'CategoryID');
+
+      // The tree must be walked in order for the permissions to save properly.
+      usort($TreeArray, array('CategoryModel', '_TreeSort'));
       
-      foreach($TreeArray as $Node) {
+      foreach($TreeArray as $I => $Node) {
          $CategoryID = GetValue('item_id', $Node);
          if ($CategoryID == 'root')
             $CategoryID = -1;
@@ -374,17 +443,48 @@ class CategoryModel extends Gdn_Model {
          if ($ParentCategoryID == 'root')
             $ParentCategoryID = -1;
 
-         $this->SQL->Update(
-            'Category',
-            array(
-               'TreeLeft' => $Node['left'],
-               'TreeRight' => $Node['right'],
-               'Depth' => $Node['depth'],
-               'ParentCategoryID' => $ParentCategoryID
-            ),
-            array('CategoryID' => $CategoryID)
-         )->Put();
+         $PermissionCategoryID = GetValueR("$CategoryID.PermissionCategoryID", $PermTree, 0);
+         $PermCatChanged = FALSE;
+         if ($PermissionCategoryID != $CategoryID) {
+            // This category does not have custom permissions so must inherit its parent's permissions.
+            $PermissionCategoryID = GetValueR("$ParentCategoryID.PermissionCategoryID", $PermTree, 0);
+            if ($CategoryID != -1 && !GetValueR("$ParentCategoryID.Touched", $PermTree)) {
+               $Foo = 'Bar';
+               throw new Exception("Category $ParentCategoryID not touched before touching $CategoryID.");
+            }
+            if ($PermTree[$CategoryID]['PermissionCategoryID'] != $PermissionCategoryID)
+               $PermCatChanged = TRUE;
+            $PermTree[$CategoryID]['PermissionCategoryID'] = $PermissionCategoryID;
+         }
+         $PermTree[$CategoryID]['Touched'] = TRUE;
+
+         // Only update if the tree doesn't match the database.
+         $Row = $PermTree[$CategoryID];
+         if ($Node['left'] != $Row['TreeLeft'] || $Node['right'] != $Row['TreeRight'] || $Node['depth'] != $Row['Depth'] || $ParentCategoryID != $Row['ParentCategoryID'] || $Node['left'] != $Row['Sort'] || $PermCatChanged) {
+            
+            $this->SQL->Update(
+               'Category',
+               array(
+                  'TreeLeft' => $Node['left'],
+                  'TreeRight' => $Node['right'],
+                  'Depth' => $Node['depth'],
+                  'Sort' => $Node['left'],
+                  'ParentCategoryID' => $ParentCategoryID,
+                  'PermissionCategoryID' => $PermissionCategoryID
+               ),
+               array('CategoryID' => $CategoryID)
+            )->Put();
+         }
       }
+   }
+
+   protected function _TreeSort($A, $B) {
+      if ($A['left'] > $B['left'])
+         return 1;
+      elseif ($A['left'] < $B['left'])
+         return -1;
+      else
+         return 0;
    }
    
    /**
@@ -405,6 +505,7 @@ class CategoryModel extends Gdn_Model {
       $NewName = ArrayValue('Name', $FormPostValues, '');
       $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
       $AllowDiscussions = ArrayValue('AllowDiscussions', $FormPostValues, '');
+      $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
       
       // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
@@ -433,7 +534,7 @@ class CategoryModel extends Gdn_Model {
       if ($this->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields();
          $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
-         $AllowDiscussions = ArrayValue('AllowDiscussions', $Fields) == '1' ? TRUE : FALSE;
+            $AllowDiscussions = ArrayValue('AllowDiscussions', $Fields) == '1' ? TRUE : FALSE;
          $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
          if ($Insert === FALSE) {
@@ -447,10 +548,45 @@ class CategoryModel extends Gdn_Model {
          }
          
          // Save the permissions
-         if ($AllowDiscussions) {
-            $PermissionModel = Gdn::PermissionModel();
-            $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+         if ($AllowDiscussions && $CategoryID) {
+            // Check to see if this category uses custom permissions.
+            if ($CustomPermissions) {
+               $PermissionModel = Gdn::PermissionModel();
+               $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+               $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+
+               if (!$Insert) {
+                  // Figure out my last permission and tree info.
+                  $Data = $this->SQL->Select('PermissionCategoryID, TreeLeft, TreeRight')->From('Category')->Where('CategoryID', $CategoryID)->Get()->FirstRow(DATASET_TYPE_ARRAY);
+
+                  // Update this category's permission.
+                  $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+
+                  // Update all of my children that shared my last category permission.
+                  $this->SQL->Put('Category',
+                     array('PermissionCategoryID' => $CategoryID),
+                     array('TreeLeft >' => $Data['TreeLeft'], 'TreeRight <' => $Data['TreeRight'], 'PermissionCategoryID' => $Data['PermissionCategoryID']));
+               }
+            } elseif (!$Insert) {
+               // Figure out my parent's permission.
+               $NewPermissionID = $this->SQL
+                  ->Select('p.PermissionCategoryID')
+                  ->From('Category c')
+                  ->Join('Category p', 'c.ParentCategoryID = p.CategoryID')
+                  ->Where('c.CategoryID', $CategoryID)
+                  ->Get()->Value('PermissionCategoryID', 0);
+
+               if ($NewPermissionID != $CategoryID) {
+                  // Update all of my children that shared my last permission.
+                  $this->SQL->Put('Category',
+                     array('PermissionCategoryID' => $NewPermissionID),
+                     array('PermissionCategoryID' => $CategoryID));
+               }
+
+               // Delete my custom permissions.
+               $this->SQL->Delete('Permission',
+                  array('JunctionTable' => 'Category', 'JunctionColumn' => 'PermissionCategoryID', 'JunctionID' => $CategoryID));
+            }
          }
          
          // Force the user permissions to refresh.

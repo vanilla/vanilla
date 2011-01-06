@@ -50,6 +50,18 @@ jQuery(document).ready(function($) {
       $('#DeleteDiscussions').hide();
    }
 
+   // Set custom categories display.
+   var displayCategoryPermissions = function() {
+      var checked = $('#Form_CustomPermissions').attr('checked');
+      if (checked) {
+         $('.CategoryPermissions').show();
+      } else {
+         $('.CategoryPermissions').hide();
+      }
+   };
+   $('#Form_CustomPermissions').click(displayCategoryPermissions);
+   displayCategoryPermissions();
+
    if ($.ui && $.ui.nestedSortable)
       $('ol.Sortable').nestedSortable({
          disableNesting: 'NoNesting',

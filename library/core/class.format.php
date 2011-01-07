@@ -355,7 +355,7 @@ class Gdn_Format {
          $Timestamp = self::ToTimestamp($Timestamp);
          
       if (!$Timestamp)
-         $Timestamp = time(); // return '&nbsp;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+         $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();

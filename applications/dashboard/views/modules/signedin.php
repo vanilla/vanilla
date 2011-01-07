@@ -20,7 +20,7 @@ if (C('Garden.Modules.ShowSignedInModule') && $Session->IsValid()) {
       <li><strong><?php echo Anchor(T('Inbox'), '/messages/all'); ?></strong><span class="Count"><?php echo $CountInbox; ?></span></li>
       <?php } ?>
       <li><strong><?php echo Anchor(T('Notifications'), '/profile/notifications'); ?></strong><span class="Count"><?php echo $CountNotifications; ?></span></li>
-      <li><strong><?php echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl()); ?></strong>&nbsp;</li>
+      <li><strong><?php echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl()); ?></strong>&#160;</li>
       <?php if ($Session->CheckPermission('Garden.Settings.Manage')) { ?>
       <li><strong><?php echo Anchor(T('Dashboard'), '/dashboard/settings'); ?></strong>&#160;</li>
       <?php } ?>

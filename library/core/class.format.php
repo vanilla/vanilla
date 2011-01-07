@@ -582,6 +582,7 @@ EOT;
          } else {
             require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
             $Mixed = Markdown($Mixed);
+            $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
             return $Formatter->Format($Mixed);
          }

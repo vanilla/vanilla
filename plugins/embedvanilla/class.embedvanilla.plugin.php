@@ -17,6 +17,7 @@ $PluginInfo['embedvanilla'] = array(
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
 	'SettingsUrl' => '/plugin/embed',
+	'MobileFriendly' => TRUE
 );
 
 class EmbedVanillaPlugin extends Gdn_Plugin {

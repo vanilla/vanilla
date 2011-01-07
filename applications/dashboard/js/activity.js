@@ -115,7 +115,7 @@ jQuery(document).ready(function($) {
       // Only submit the form if the textarea isn't empty
       if ($(inp).val() != '') {
          $('span.Progress').remove();
-         $(but).after('<span class="Progress">&nbsp;</span>');
+         $(but).after('<span class="Progress">&#160;</span>');
          var postValues = $(frm).serialize();
          postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({

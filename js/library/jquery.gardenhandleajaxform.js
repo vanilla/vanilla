@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
               // Add a spinner
               var btn = $(frm).find('input.Button:last');
               if ($(btn).parent().find('span.Progress').length == 0) {
-                 $(btn).after('<span class="Progress">&nbsp;</span>');
+                 $(btn).after('<span class="Progress">&#160;</span>');
               }
             },
             success: function(json, status, $frm) {

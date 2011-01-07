@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
          var lastMessage = $(messages).get(messages.length - 1);
          var lastMessageID = $(lastMessage).attr('id');
          postValues += '&' + prefix + 'LastMessageID=' + lastMessageID;
-         $(button).before('<span class="TinyProgress">&nbsp;</span>');
+         $(button).before('<span class="TinyProgress">&#160;</span>');
          $.ajax({
             type: "POST",
             url: $(frm).attr('action'),
@@ -107,7 +107,7 @@ jQuery(document).ready(function($) {
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();
-      $(btn).before('<span class="TinyProgress">&nbsp;</span>');
+      $(btn).before('<span class="TinyProgress">&#160;</span>');
       
       var frm = $(btn).parents('form');
       var textbox = $(frm).find('textarea');

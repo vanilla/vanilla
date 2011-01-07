@@ -1312,6 +1312,7 @@ class ImportModel extends Gdn_Model {
       }
 
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
+      $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
 
       if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
          $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');

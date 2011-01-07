@@ -97,7 +97,7 @@ class UserModel extends Gdn_Model {
             if($Value == 0)
                continue;
             
-            if(is_numeric($JunctionID) && $JunctionID > 0) {
+            if(is_numeric($JunctionID) && $JunctionID !== NULL) {
                if (!array_key_exists($PermissionName, $Permissions))
                   $Permissions[$PermissionName] = array();
                   

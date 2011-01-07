@@ -432,7 +432,10 @@ class Gdn_Format {
             $Mixed
          );
 
+      if(Gdn::Config('Vanilla.Comment.ReplaceNewlines') == TRUE)
          return nl2br($Mixed);
+      else
+         return $Mixed;
       }
    }
 
@@ -459,7 +462,12 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Form');
       else
-         return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+      {
+         if(Gdn::Config('Vanilla.Comment.ReplaceNewlines') == TRUE)
+            return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+         else
+            return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
+      }
    }
 
    /**
@@ -497,7 +505,8 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Mentions($Mixed);
 
             // nl2br
-            $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            if(Gdn::Config('Vanilla.Comment.ReplaceNewlines') == TRUE)
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
             $Result = $Formatter->Format($Mixed);
 
@@ -689,7 +698,7 @@ EOT;
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
          $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
-         if ($AddBreaks)
+         if ($AddBreaks && Gdn::Config('Vanilla.Comment.ReplaceNewlines') == TRUE)
             $Result = nl2br(trim($Result));
          return $Result;
       }

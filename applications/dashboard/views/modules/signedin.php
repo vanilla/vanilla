@@ -15,14 +15,14 @@ if (C('Garden.Modules.ShowSignedInModule') && $Session->IsValid()) {
 <div class="Box">
    <h4>My Profile</h4>
    <ul class="PanelInfo">
-      <li><strong><?php echo Anchor($Name, 'profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Name)); ?></strong>&nbsp;</li>
+      <li><strong><?php echo Anchor($Name, 'profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Name)); ?></strong>&#160;</li>
       <?php if (C('EnabledApplications.Conversations')) { ?>
       <li><strong><?php echo Anchor(T('Inbox'), '/messages/all'); ?></strong><span class="Count"><?php echo $CountInbox; ?></span></li>
       <?php } ?>
       <li><strong><?php echo Anchor(T('Notifications'), '/profile/notifications'); ?></strong><span class="Count"><?php echo $CountNotifications; ?></span></li>
       <li><strong><?php echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl()); ?></strong>&nbsp;</li>
       <?php if ($Session->CheckPermission('Garden.Settings.Manage')) { ?>
-      <li><strong><?php echo Anchor(T('Dashboard'), '/dashboard/settings'); ?></strong>&nbsp;</li>
+      <li><strong><?php echo Anchor(T('Dashboard'), '/dashboard/settings'); ?></strong>&#160;</li>
       <?php } ?>
    </ul>
 </div>

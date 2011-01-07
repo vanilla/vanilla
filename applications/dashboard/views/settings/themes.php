@@ -193,7 +193,7 @@ if ($AddonUrl != '')
    }
    // Close the row if it wasn't a full row.
    if ($Col > 0)
-      echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&nbsp;</td></tr>';
+      echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
    ?>
       </tbody>
    </table>

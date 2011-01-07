@@ -70,9 +70,9 @@ jQuery(document).ready(function($) {
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
-      $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&nbsp;</span>');
+      $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
-      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
       $.ajax({
@@ -251,7 +251,7 @@ jQuery(document).ready(function($) {
       $(container).addClass('Editing');
       var parent = $(btn).parents('div.Comment');
       var msg = $(parent).find('div.Message');
-      $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       if ($(msg).is(':visible')) {
          $.ajax({
             type: "POST",

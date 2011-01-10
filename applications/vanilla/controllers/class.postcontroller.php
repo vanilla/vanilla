@@ -81,7 +81,7 @@ class PostController extends VanillaController {
             if ($Category->Depth > 1) {
                $CategoryName = '↳ '.$CategoryName;
                $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
-               $CategoryName = str_replace(' ', '&nbsp;', $CategoryName);
+               $CategoryName = str_replace(' ', '&#160;', $CategoryName);
             }
                
             $aCategoryData[$Category->CategoryID] = $CategoryName;

@@ -277,7 +277,35 @@ if (!function_exists('Asset')) {
             $Result .= '?';
          else
             $Result .= '&';
-         $Result.= 'v='.urlencode(APPLICATION_VERSION);
+
+         // Figure out which version to put after the asset.
+         $Version = APPLICATION_VERSION;
+         if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
+            $Type = $Matches[1];
+            $Key = $Matches[2];
+            static $ThemeVersion = NULL;
+
+            switch ($Type) {
+               case 'plugins':
+                  $PluginInfo = Gdn::PluginManager()->AvailablePlugins($Key);
+                  $Version = GetValue('Version', $PluginInfo, $Version);
+                  break;
+               case 'themes':
+                  if ($ThemeVersion === NULL) {
+                     if (file_exists(PATH_ROOT.'/themes/'.Theme().'/about.php')) {
+                        $ThemeInfo = array();
+                        include PATH_ROOT.'/themes/'.Theme().'/about.php';
+                        $ThemeVersion = GetValueR(Theme().'.Version', $ThemeInfo, $Version);
+                     } else {
+                        $ThemeVersion = $Version;
+                     }
+                  }
+                  $Version = $ThemeVersion;
+                  break;
+            }
+         }
+
+         $Result.= 'v='.urlencode($Version);
       }
       return $Result;
    }

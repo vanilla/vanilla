@@ -1,6 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo '<li>', Anchor(T('Enabling a Locale Pack'), 'http://vanillaforums.org/docs/Localization#Enabling'), '</li>';
+   echo '<li>', Anchor(T('Internaltionalization & Localization'), 'http://vanillaforums.org/docs/Localization'), '</li>';
+   echo '</ul>';
+   ?>
+</div>
+
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Info">
    <?php
@@ -8,6 +18,19 @@ $Session = Gdn::Session();
       T('Locales are in your %s folder.', "Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here."),
       '<code>'.PATH_ROOT.'/locales</code>'
    );
+
+   if ($this->Data('DefaultLocaleWarning'))
+      echo '<div class="Errors"><ul><li>', sprintf(T('Your default locale won\'t display properly', 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.'), $this->Data('MatchingLocalePacks')), '</li></ul></div>';
+
+   echo
+      '<p>',
+         $this->Form->Open(),
+         $this->Form->Errors(),
+         '<b>', T('Default Locale'), '</b> ',
+         $this->Form->DropDown('Locale', $this->Data('Locales')),
+         $this->Form->Button('Save', array('style' => 'margin-bottom: 0px')),
+         ' ', $this->Form->Close(),
+      '</p>';
    ?>
 </div>
 <?php echo $this->Form->Errors(); ?>
@@ -83,7 +106,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
             $InfoString .= sprintf('By %s', Anchor($Author, GetValue('AuthorUrl', $Info, '')));
          }
 
-         echo $InfoString != '' ? $InfoString : '&nbsp;';
+         echo $InfoString != '' ? $InfoString : '&#160;';
 
       ?></td>
    </tr>

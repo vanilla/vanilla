@@ -688,7 +688,7 @@ class CommentModel extends VanillaModel {
          ->GroupBy('d.Sink')
          ->Get()->FirstRow();
       
-      if (!is_null($Data)) {
+      if ($Data != FALSE) {
          $this->SQL->Update('Discussion');
          if ($Data->Sink == '0' && $Data->DateLastComment)
             $this->SQL->Set('DateLastComment', $Data->DateLastComment);

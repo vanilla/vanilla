@@ -468,7 +468,7 @@ class Gdn_Form {
                    '</td>';
             } else {
                $Cells .= '<td' . ($Alt == 0 ? ' class="Alt"' : '') .
-                   '>&nbsp;</td>';
+                   '>&#160;</td>';
             }
          }
          if ($Headings != '') $Return .= "<thead><tr><th>" . T($GroupName) . "</th>" .

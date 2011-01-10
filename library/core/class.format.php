@@ -418,7 +418,7 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Display');
       else {
-         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', ''));
+         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $nofollow = (self::$DisplayNoFollow) ? ' rel=\"nofollow\"' : '';
          $Mixed = preg_replace(
@@ -432,7 +432,10 @@ class Gdn_Format {
             $Mixed
          );
 
+      if(C('Garden.Format.ReplaceNewlines', TRUE))
          return nl2br($Mixed);
+      else
+         return $Mixed;
       }
    }
 
@@ -458,8 +461,12 @@ class Gdn_Format {
    public static function Form($Mixed) {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Form');
-      else
-         return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+      else {
+         if(C('Garden.Format.ReplaceNewlines', TRUE))
+            return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+         else
+            return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
+      }
    }
 
    /**
@@ -497,7 +504,8 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Mentions($Mixed);
 
             // nl2br
-            $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            if(C('Garden.Format.ReplaceNewlines', TRUE))
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
             $Result = $Formatter->Format($Mixed);
 
@@ -510,7 +518,8 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed);
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
-            $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
+            if(C('Garden.Format.ReplaceNewlines', TRUE))
+               $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
          }
          
          return $Result;
@@ -582,6 +591,7 @@ EOT;
          } else {
             require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
             $Mixed = Markdown($Mixed);
+            $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
             return $Formatter->Format($Mixed);
          }
@@ -688,7 +698,7 @@ EOT;
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
          $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
-         if ($AddBreaks)
+         if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
             $Result = nl2br(trim($Result));
          return $Result;
       }

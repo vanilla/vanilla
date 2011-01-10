@@ -80,7 +80,7 @@ class UtilityController extends DashboardController {
    }
    
    public function Structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
-      $this->Permission('Garden.Site.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $Files = array();
       $AppName = $AppName == '' ? 'all': $AppName;
       if ($AppName == 'all') {
@@ -143,7 +143,7 @@ class UtilityController extends DashboardController {
          // Check for flood control.
          $Count = C('Garden.Update.Count', 0) + 1;
          if ($Count > 5) {
-            if (!Gdn::Session()->CheckPermission('Garden.Site.Manage')) {
+            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
                // We are only allowing an update of 5 times every 24 hours.
                throw PermissionException();
             }

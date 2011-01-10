@@ -32,7 +32,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
-   ->Column('PermissionCategoryID', 'int', '0')
+   ->Column('PermissionCategoryID', 'int', '-1') // default to root.
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
@@ -40,11 +40,14 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('LastCommentID', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
-if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0)
+$RootCategoryInserted = FALSE;
+if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {
    $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
+   $RootCategoryInserted = TRUE;
+}
 
 if ($Drop) {
-   $SQL->Insert('Category', array('TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions'));
+   $SQL->Insert('Category', array('TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
    if (!C('Garden.Permissions.Disabled.Category')) {
       // Existing installations need to be set up with per/category permissions.
@@ -217,11 +220,27 @@ $PermissionModel->Define(array(
 
 if ($Drop) {
    // Get the general category so we can assign permissions to it.
-   $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
+   $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
    
    // Set the initial guest permissions.
    $PermissionModel->Save(array(
       'RoleID' => 2,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'PermissionCategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ), TRUE);
+
+   $PermissionModel->Save(array(
+      'RoleID' => 3,
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'PermissionCategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ), TRUE);
+
+   $PermissionModel->Save(array(
+      'RoleID' => 4,
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -304,9 +323,6 @@ if ($Drop) {
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
-   
-   // Make sure that User.Permissions is blank so new permissions for users get applied.
-   $SQL->Update('User', array('Permissions' => ''))->Put();
 }
 
 

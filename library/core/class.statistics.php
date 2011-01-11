@@ -159,10 +159,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
-      $AnalyticsServer = 'http://analytics.vanillaforums.com/vanillastats/analytics';
-      
-      // @TODO: testing, remove before final release
-      $AnalyticsServer = 'http://dev.vanilla.tim/vanillastats/analytics';
+      $AnalyticsServer = C('Vanilla.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
    
       $ApiMethod = $Method.'.json';
       $FinalURL = CombinePaths(array(

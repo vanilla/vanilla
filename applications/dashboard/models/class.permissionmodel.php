@@ -216,7 +216,8 @@ class PermissionModel extends Gdn_Model {
                   continue; // permission not in allowed namespaces
             }
 
-            if ($JunctionColumn != $JunctionTable.'ID')
+            // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
+            if (!$RoleID && $JunctionColumn != $JunctionTable.'ID')
                $DefaultValue = $Value & 1 ? 1 : 0;
             else
                $DefaultValue = 0;
@@ -398,13 +399,21 @@ class PermissionModel extends Gdn_Model {
    /**
     * Get all of the permission columns in the system.
     */
-   public function PermissionColumns() {
+   public function PermissionColumns($JunctionTable = FALSE, $JunctionColumn = FALSE) {
       if(is_null($this->_PermissionColumns)) {
-         $Cols = $this->SQL
+         $this->SQL
             ->Select('*')
             ->From('Permission')
-            ->Limit(1)
-            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            ->Limit(1);
+
+         if ($JunctionTable !== FALSE && $JunctionColumn !== FALSE) {
+            $this->SQL
+               ->Where('JunctionTable', $JunctionTable)
+               ->Where('JunctionColumn', $JunctionColumn)
+               ->Where('RoleID', 0);
+         }
+
+         $Cols = $this->SQL->Get()->FirstRow(DATASET_TYPE_ARRAY);
             
          unset($Cols['RoleID'], $Cols['JunctionTable'], $Cols['JunctionColumn'], $Cols['JunctionID']);
          

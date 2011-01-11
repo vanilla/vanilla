@@ -780,4 +780,35 @@ class UpdateModel extends Gdn_Model {
       }
       return $UpdateAddons;
    }
+
+   public function RunStructure($AddonCode = NULL, $Explicit = FALSE, $Drop = FALSE) {
+      // Get the structure files for all of the enabled applications.
+      $ApplicationManager = new Gdn_ApplicationManager();
+      $Apps = $ApplicationManager->EnabledApplications();
+      $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+      $Paths[] = array();
+      foreach ($Apps as $AppInfo) {
+         $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
+         if (file_exists($Path))
+            $Paths[] = $Path;
+      }
+      
+      // Execute the structures.
+      $Database = Gdn::Database();
+      $SQL = Gdn::SQL();
+      $Structure = Gdn::Structure();
+
+      foreach ($Paths as $Path) {
+         include $Path;
+      }
+
+      // Execute the structures for all of the plugins.
+      $PluginManager = Gdn::PluginManager();
+      $Plugins = $PluginManager->EnabledPlugins();
+      foreach ($Plugins as $Key => $PluginInfo) {
+         $Plugin = $PluginManager->GetPluginInstance($Key, Gdn_PluginManager::ACCESS_PLUGINNAME);
+         if (method_exists($Plugin, 'Structure'))
+            $Plugin->Structure();
+      }
+   }
 }

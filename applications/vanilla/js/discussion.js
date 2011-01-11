@@ -309,8 +309,8 @@ jQuery(document).ready(function($) {
    
       setTimeout(function() {
          discussionID = gdn.definition('DiscussionID', 0);
-         lastCommentID = gdn.definition('LastCommentID', 0);
-         if(lastCommentID <= 0)
+         lastCommentID = gdn.definition('LastCommentID', '');
+         if(lastCommentID == '')
             return;
          
          $.ajax({

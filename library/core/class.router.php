@@ -96,7 +96,7 @@ class Gdn_Router {
             
             // Do we have a back-reference?
             if (strpos($Final['Destination'], '$') !== FALSE && strpos($Final['Route'], '(') !== FALSE) {
-               $Final['FinalDestination'] = preg_replace('#^'.$Final['Route'].'$#', $Final['Destination'], $Request);
+               $Final['FinalDestination'] = preg_replace('#^'.$Final['Route'].'#', $Final['Destination'], $Request);
             }
                
             return $Final;

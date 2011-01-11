@@ -60,19 +60,26 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = C('Vanilla.Analytics.LastSentDate', FALSE);
-      if ($LastSentDate !== FALSE && $LastSentDate < date('Ymd')) {
+      if ($LastSentDate === FALSE || $LastSentDate < date('Ymd')) {
          $Sender->AddDefinition('AnalyticsTask','stats');
          return;
       }
-      
    }
    
-   protected function DoneRegister(&$Sender) {
-   
+   protected function DoneRegister($Response, $Raw) {
+      if (GetValue('Status', $Response, 'false') == 'success') {
+         $VanillaID = GetValue('VanillaID', $Response, FALSE);
+         $Secret = GetValue('Secret', $Response, FALSE);
+         if (($Secret && $VanillaID) !== FALSE) {
+            SaveToConfig('Vanilla.InstallationID', $VanillaID);
+            SaveToConfig('Vanilla.InstallationSecret', $Secret);
+            RemoveFromConfig('Vanilla.Registering');
+         }
+      }
    }
 
-   protected function DoneStats(&$Sender) {
-   
+   protected function DoneStats($Response, $Raw) {
+      SaveToConfig('Vanilla.Analytics.LastSentDate', date('Ymd'));
    }
    
    public function Register(&$Sender) {
@@ -81,7 +88,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
       // Set the time we last attempted to perform registration
-      //SaveToConfig('Vanilla.Registering', time());
+      SaveToConfig('Vanilla.Registering', time());
       
       $Request = array();
       $this->BasicParameters($Request);
@@ -93,28 +100,65 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $Request = array();
       $this->BasicParameters($Request);
       
-      $RequestTime = $Sender->Data('RequestTime');
-      $VanillaSecret = C('Vanilla.InstallationSecret', NULL);
+      $RequestTime = GetValue('RequestTime', $Request);
+      $VanillaID = C('Vanilla.InstallationID', FALSE);
+      $VanillaSecret = C('Vanilla.InstallationSecret', FALSE);
+      if (($VanillaID && $VanillaSecret) === FALSE) return;
+      
       $SecurityHash = sha1(implode('-',array(
          $VanillaSecret,
          $RequestTime
       )));
       
+      $LastMonthSometime = strtotime('last month');
+      $LastMonthSometime = strtotime('today');
+      $TimeSlot = date('Ym00',$LastMonthSometime);
+      
+      $MonthStart = date('Y-m-d 00:00:00');
+      $MonthEnd = date('Y-m-t 23:59:59');
+      
       // Get relevant stats
+      $NumComments = Gdn::SQL()
+         ->Select('DateInserted','COUNT','Hits')
+         ->From('Comment')
+         ->Where('DateInserted>=',$MonthStart)
+         ->Where('DateInserted<',$MonthEnd)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      $NumComments = GetValue('Hits', $NumComments, NULL);
+         
+      $NumDiscussions = Gdn::SQL()
+         ->Select('DateInserted','COUNT','Hits')
+         ->From('Discussion')
+         ->Where('DateInserted>=',$MonthStart)
+         ->Where('DateInserted<',$MonthEnd)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
+         
+      $NumUsers = Gdn::SQL()
+         ->Select('DateInserted','COUNT','Hits')
+         ->From('User')
+         ->Where('DateInserted>=',$MonthStart)
+         ->Where('DateInserted<',$MonthEnd)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      $NumUsers = GetValue('Hits', $NumUsers, NULL);
+      
+      // Assemble Stats
+      
       $Request = array_merge($Request, array(
          'VanillaID'          => $VanillaID,
          'SecurityHash'       => $SecurityHash,
-         'CountUsers'         => 0,
-         'CountDiscussions'   => 0,
-         'CountComments'      => 0,
-         'CountViews'         => 0,
+         'TimeSlot'           => $TimeSlot,
+         'CountComments'      => $NumComments,
+         'CountDiscussions'   => $NumDiscussions,
+         'CountUsers'         => $NumUsers,
+         'CountViews'         => -1,
          'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER)
       ));
       
       $this->SendPing('stats', $Request, 'DoneStats');
    }
    
-   public function SendPing($Method, $RequestParameters, $CompletionCallback) {
+   public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
       $AnalyticsServer = 'http://analytics.vanillaforums.com/vanillastats/analytics';
       
       // @TODO: testing, remove before final release
@@ -125,8 +169,18 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $AnalyticsServer,
          $ApiMethod
       ));
-      ProxyRequest($FinalURL);
+      $FinalURL .= '?'.http_build_query($RequestParameters);
       
+      $Response = ProxyRequest($FinalURL, FALSE, TRUE);
+      if ($Response !== FALSE) {
+         $JsonResponse = json_decode($Response);
+         if ($JsonResponse !== FALSE)
+            $JsonResponse = GetValue('Analytics', $JsonResponse, FALSE);
+             
+         if ($CompletionCallback !== FALSE && $JsonResponse !== FALSE) {
+            call_user_func(array($this, $CompletionCallback), $JsonResponse, $Response);
+         }
+      }
    }
    
 }

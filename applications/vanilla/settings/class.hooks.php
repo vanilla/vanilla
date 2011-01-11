@@ -109,15 +109,17 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE, array('Standard' => TRUE));
       }
       
-      $Gdn_Statistics = Gdn::Factory('Statistics');
-      $Gdn_Statistics->Check($Sender);
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $Gdn_Statistics = Gdn::Factory('Statistics');
+         $Gdn_Statistics->Check($Sender);
+      }
    }
    
    public function SettingsController_AnalyticsRegister_Create(&$Sender) {
       Gdn::Factory('Statistics')->Register($Sender);
    }
    
-   public function SettingsController_AnalyticsSend_Create(&$Sender) {
+   public function SettingsController_AnalyticsStats_Create(&$Sender) {
       Gdn::Factory('Statistics')->Stats($Sender);
    }
    

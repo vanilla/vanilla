@@ -393,7 +393,7 @@ jQuery(document).ready(function($) {
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
    switch (AnalyticsTask) {
 	   case 'register':
-	   case 'send':
+	   case 'stats':
 	     // Send stats ping
 	     gdn.stats(AnalyticsTask);
 	   break;

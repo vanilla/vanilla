@@ -113,7 +113,7 @@ class InvitationModel extends Gdn_Model {
       if ($Invitation === FALSE) {
          throw new Exception(T('ErrorRecordNotFound'));
       } else if ($Session->UserID != $Invitation->SenderUserID) {
-         throw new Exception(T('ErrorPermission'));
+         throw new Exception(T('InviteErrorPermission'));
       } else {
          // Some information for the email
          $RegistrationUrl = Gdn::Request()->Url("entry/register/{$Invitation->Code}", TRUE);
@@ -147,7 +147,7 @@ class InvitationModel extends Gdn_Model {
       
       // Does this user own the invitation?
       if ($UserID != $Invitation->SenderUserID)
-         throw new Exception(T('ErrorPermission'));
+         throw new Exception(T('InviteErrorPermission'));
       
       // Has the invitation been accepted?
       if ($Invitation->AcceptedUserID > 0)

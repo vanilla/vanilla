@@ -553,7 +553,7 @@ class CategoryModel extends Gdn_Model {
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();
                $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-               $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                if (!$Insert) {
                   // Figure out my last permission and tree info.

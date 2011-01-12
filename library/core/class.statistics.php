@@ -110,35 +110,34 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $RequestTime
       )));
       
-      $LastMonthSometime = strtotime('last month');
-      $LastMonthSometime = strtotime('today');
-      $TimeSlot = date('Ym00',$LastMonthSometime);
+      $Yesterday = strtotime('yesterday');
+      $TimeSlot = date('Ymd',$Yesterday);
       
-      $MonthStart = date('Y-m-d 00:00:00');
-      $MonthEnd = date('Y-m-t 23:59:59');
+      $DayStart = date('Y-m-d 00:00:00', $Yesterday);
+      $DayEnd = date('Y-m-d 23:59:59', $Yesterday);
       
       // Get relevant stats
       $NumComments = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('Comment')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumComments = GetValue('Hits', $NumComments, NULL);
          
       $NumDiscussions = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('Discussion')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
          
       $NumUsers = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('User')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumUsers = GetValue('Hits', $NumUsers, NULL);
       
@@ -170,6 +169,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       $Response = ProxyRequest($FinalURL, FALSE, TRUE);
       if ($Response !== FALSE) {
+         echo $Response."\n";
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)
             $JsonResponse = GetValue('Analytics', $JsonResponse, FALSE);

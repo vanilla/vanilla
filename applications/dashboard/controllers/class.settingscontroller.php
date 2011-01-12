@@ -632,7 +632,17 @@ class SettingsController extends DashboardController {
       }
       if ($AddonName != '') {
          $Validation = new Gdn_Validation();
-         $AddonManager->$TestMethod($AddonName, $Validation);
+
+         try {
+            $AddonManager->$TestMethod($AddonName, $Validation);
+         } catch (Exception $Ex) {
+            if (defined('DEBUG'))
+               throw $Ex;
+            else {
+               echo $Ex->getMessage();
+               return;
+            }
+         }
       }
 
       echo 'Success';

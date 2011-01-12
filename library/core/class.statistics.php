@@ -58,7 +58,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       // Don't track things for local sites
       $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
-      $ServerHostname = GetValue('SERVER_NAME', $_SERVER)
+      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
       if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return;
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
 

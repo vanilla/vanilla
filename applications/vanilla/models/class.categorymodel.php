@@ -328,7 +328,7 @@ class CategoryModel extends Gdn_Model {
 
       // Make sure the tree has a root.
       if (!isset($Categories[-1])) {
-         $RootCat = array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => 0, 'Sort' => 0, 'ParentCategoryID' => NULL);
+         $RootCat = array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1, 'Sort' => 0, 'ParentCategoryID' => NULL);
          $Categories[-1] = $RootCat;
          $this->SQL->Insert('Category', $RootCat);
       }
@@ -553,7 +553,7 @@ class CategoryModel extends Gdn_Model {
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();
                $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-               $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID));
+            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                if (!$Insert) {
                   // Figure out my last permission and tree info.

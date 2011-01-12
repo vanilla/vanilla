@@ -35,7 +35,7 @@ $Editing = isset($this->Comment);
       $CommentOptions['Value'] = T('You do not have permission to write new comments.');
    }
    */
-   
+   $this->FireEvent('BeforeBodyField');
    echo $this->Form->TextBox('Body', $CommentOptions);
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');

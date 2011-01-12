@@ -1262,6 +1262,7 @@ ul.MessageList div.Message {
    clear: both;
    line-height: 140%;
    font-size: 100%;
+	word-wrap: break-word;
 }
 div.Preview div.Message,
 div.Preview div.Message p,

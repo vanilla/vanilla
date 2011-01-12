@@ -20,7 +20,7 @@ if ($this->Data !== FALSE) {
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
    
    foreach ($this->Data->Result() as $Category) {
-      if ($Category->CategoryID < 0 || $Category->Depth > $MaxDepth)
+      if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
          continue;
 
       if ($DoHeadings && $Category->Depth == 1)

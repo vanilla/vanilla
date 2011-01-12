@@ -47,7 +47,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
     * a guid), register instead and defer stats till next request.
     */ 
    public function Check(&$Sender) {
-   
+      
       // Add a pageview entry
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
@@ -55,6 +55,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
       on duplicate key update Views = Views+1", array(
          ':TimeSlot'    => $TimeSlot
       ));
+      
+      // Don't track things for local sites
+      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
+      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
+      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return;
+      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
 
       // Check if we're registered with the central server already. If not, 
       // this request is hijacked and used to perform that task.
@@ -184,7 +190,6 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       $Response = ProxyRequest($FinalURL, FALSE, TRUE);
       if ($Response !== FALSE) {
-         echo $Response."\n";
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)
             $JsonResponse = GetValue('Analytics', $JsonResponse, FALSE);

@@ -159,6 +159,12 @@ $Construct->Table('Draft')
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
+   
+$Construct->Table('AnalyticsLocal')
+   ->Engine('InnoDB')
+   ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
+   ->Column('Views', 'int', NULL)
+   ->Set(FALSE, FALSE);
 
 // Insert some activity types
 ///  %1 = ActivityName

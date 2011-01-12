@@ -47,8 +47,16 @@ class Gdn_Statistics extends Gdn_Pluggable {
     * a guid), register instead and defer stats till next request.
     */ 
    public function Check(&$Sender) {
+   
+      // Add a pageview entry
+      $TimeSlot = date('Ymd');
+      $Px = Gdn::Database()->DatabasePrefix;
+      Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+      on duplicate key update Views = Views+1", array(
+         ':TimeSlot'    => $TimeSlot
+      ));
 
-      // First, check if we're registered with the central server already. If not, 
+      // Check if we're registered with the central server already. If not, 
       // this request is hijacked and used to perform that task.
       $VanillaID = C('Vanilla.InstallationID',NULL);
       $Sender->AddDefinition('AnalyticsTask', 'none');
@@ -141,6 +149,13 @@ class Gdn_Statistics extends Gdn_Pluggable {
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumUsers = GetValue('Hits', $NumUsers, NULL);
       
+      $NumViews = Gdn::SQL()
+         ->Select('Views')
+         ->From('AnalyticsLocal')
+         ->Where('TimeSlot',$TimeSlot)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      $NumViews = GetValue('Views', $NumViews, NULL);
+      
       // Assemble Stats
       
       $Request = array_merge($Request, array(
@@ -150,7 +165,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
          'CountComments'      => $NumComments,
          'CountDiscussions'   => $NumDiscussions,
          'CountUsers'         => $NumUsers,
-         'CountViews'         => -1,
+         'CountViews'         => $NumViews,
          'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER)
       ));
       

@@ -520,8 +520,9 @@ class CommentModel extends VanillaModel {
     * @param array $CommentID Unique ID for this comment.
     * @param int $Insert Used as a boolean for whether this is a new comment.
     * @param bool $CheckExisting Not used.
+    * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
     */
-   public function Save2($CommentID, $Insert, $CheckExisting = TRUE) {
+   public function Save2($CommentID, $Insert, $CheckExisting = TRUE, $IncUser = FALSE) {
       $Session = Gdn::Session();
       
       // Load comment data
@@ -557,7 +558,7 @@ class CommentModel extends VanillaModel {
             ->Put();
       }
 
-      $this->UpdateUser($Session->UserID);
+      $this->UpdateUser($Session->UserID, $IncUser && $Insert);
 
       if ($Insert) {
 			$DiscussionModel = new DiscussionModel();
@@ -717,22 +718,31 @@ class CommentModel extends VanillaModel {
     *
     * @param int $UserID Unique ID of the user to be updated.
     */
-   public function UpdateUser($UserID) {
-      // Retrieve a comment count
-      $CountComments = $this->SQL
-         ->Select('c.CommentID', 'count', 'CountComments')
-         ->From('Comment c')
-         ->Where('c.InsertUserID', $UserID)
-         ->Get()
-         ->FirstRow()
-         ->CountComments;
-      
-      // Save to the attributes column of the user table for this user.
-      $this->SQL
-         ->Update('User')
-         ->Set('CountComments', $CountComments)
-         ->Where('UserID', $UserID)
-         ->Put();
+   public function UpdateUser($UserID, $Inc = FALSE) {
+      if ($Inc) {
+         // Just increment the comment count.
+         $this->SQL
+            ->Update('User')
+            ->Set('CountComments', 'CountComments + 1', FALSE)
+            ->Where('UserID', $UserID)
+            ->Put();
+      } else {
+         // Retrieve a comment count
+         $CountComments = $this->SQL
+            ->Select('c.CommentID', 'count', 'CountComments')
+            ->From('Comment c')
+            ->Where('c.InsertUserID', $UserID)
+            ->Get()
+            ->FirstRow()
+            ->CountComments;
+
+         // Save to the attributes column of the user table for this user.
+         $this->SQL
+            ->Update('User')
+            ->Set('CountComments', $CountComments)
+            ->Where('UserID', $UserID)
+            ->Put();
+      }
    }
    
    /**

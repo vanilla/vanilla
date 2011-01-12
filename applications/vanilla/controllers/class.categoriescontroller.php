@@ -69,12 +69,15 @@ class CategoriesController extends VanillaController {
       list($Offset, $Limit) = OffsetLimit($Offset, C('Vanilla.Discussions.PerPage', 30));
       
       if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
+         $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       
-      if ($Category === FALSE)
+      if ($Category === FALSE) {
+         if ($CategoryIdentifier)
+            throw NotFoundException();
          return $this->Discussions();
+      }
 			
 		// Load the Descendant Tree
 		$this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));

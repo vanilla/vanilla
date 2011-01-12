@@ -111,7 +111,7 @@ class CategoriesController extends VanillaController {
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       
       // Check permission
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->PermissionCategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
       
       // Set discussion meta data
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);

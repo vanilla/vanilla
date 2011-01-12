@@ -58,7 +58,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
 
       // Check if we're registered with the central server already. If not, 
       // this request is hijacked and used to perform that task.
-      $VanillaID = C('Vanilla.InstallationID',NULL);
+      $VanillaID = C('Garden.InstallationID',NULL);
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
@@ -67,7 +67,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       }
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
-      $LastSentDate = C('Vanilla.Analytics.LastSentDate', FALSE);
+      $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
       if ($LastSentDate === FALSE || $LastSentDate < date('Ymd')) {
          $Sender->AddDefinition('AnalyticsTask','stats');
          return;
@@ -79,24 +79,24 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $VanillaID = GetValue('VanillaID', $Response, FALSE);
          $Secret = GetValue('Secret', $Response, FALSE);
          if (($Secret && $VanillaID) !== FALSE) {
-            SaveToConfig('Vanilla.InstallationID', $VanillaID);
-            SaveToConfig('Vanilla.InstallationSecret', $Secret);
-            RemoveFromConfig('Vanilla.Registering');
+            SaveToConfig('Garden.InstallationID', $VanillaID);
+            SaveToConfig('Garden.InstallationSecret', $Secret);
+            RemoveFromConfig('Garden.Registering');
          }
       }
    }
 
    protected function DoneStats($Response, $Raw) {
-      SaveToConfig('Vanilla.Analytics.LastSentDate', date('Ymd'));
+      SaveToConfig('Garden.Analytics.LastSentDate', date('Ymd'));
    }
    
    public function Register(&$Sender) {
-      $AttemptedRegistration = C('Vanilla.Registering',FALSE);
+      $AttemptedRegistration = C('Garden.Registering',FALSE);
       // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
       if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
       // Set the time we last attempted to perform registration
-      SaveToConfig('Vanilla.Registering', time());
+      SaveToConfig('Garden.Registering', time());
       
       $Request = array();
       $this->BasicParameters($Request);
@@ -109,8 +109,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $this->BasicParameters($Request);
       
       $RequestTime = GetValue('RequestTime', $Request);
-      $VanillaID = C('Vanilla.InstallationID', FALSE);
-      $VanillaSecret = C('Vanilla.InstallationSecret', FALSE);
+      $VanillaID = C('Garden.InstallationID', FALSE);
+      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
       if (($VanillaID && $VanillaSecret) === FALSE) return;
       
       $SecurityHash = sha1(implode('-',array(
@@ -173,7 +173,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
-      $AnalyticsServer = C('Vanilla.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
    
       $ApiMethod = $Method.'.json';
       $FinalURL = CombinePaths(array(

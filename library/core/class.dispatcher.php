@@ -401,24 +401,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               header( "HTTP/1.1 302 Moved Temporarily" );
-               header( "Location: ".$MatchRoute['FinalDestination'] );
+               header("HTTP/1.1 302 Moved Temporarily" );
+               header("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'Permanent':
-               header( "HTTP/1.1 301 Moved Permanently" );
-               header( "Location: ".$MatchRoute['FinalDestination'] );
+               header("HTTP/1.1 301 Moved Permanently" );
+               header("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'NotAuthorized':
-               header( "HTTP/1.1 401 Not Authorized" );
+               header("HTTP/1.1 401 Not Authorized" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
 
             case 'NotFound':
-               header( "HTTP/1.1 404 Not Found" );
+               header("HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
          }

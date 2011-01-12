@@ -786,7 +786,7 @@ class UpdateModel extends Gdn_Model {
       $ApplicationManager = new Gdn_ApplicationManager();
       $Apps = $ApplicationManager->EnabledApplications();
       $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
-      $Paths[] = array();
+      $Paths = array();
       foreach ($Apps as $AppInfo) {
          $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
          if (file_exists($Path))

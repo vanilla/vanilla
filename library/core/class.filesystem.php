@@ -20,6 +20,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @todo Make this object deliver content with a save as dialogue.
  */
 
+if(!defined('VANILLA_FILE_PUT_FLAGS')) define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
+
 class Gdn_FileSystem {
 
    const O_CREATE = 1;
@@ -253,7 +255,7 @@ class Gdn_FileSystem {
     * @param string $FileName The full path and name of the file to be saved.
     * @param string $FileContents The contents of the file being saved.
     */
-   public static function SaveFile($FileName, $FileContents, $Flags = LOCK_EX) {
+   public static function SaveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
    
       // Check that the folder exists and is writable
       $DirName = dirname($FileName);
@@ -264,7 +266,9 @@ class Gdn_FileSystem {
       if (!IsWritable($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
          
-      file_put_contents($FileName, $FileContents, $Flags);
+      if (file_put_contents($FileName, $FileContents, $Flags) === FALSE)
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!',$FileBaseName));
+
       return TRUE;
    }
    

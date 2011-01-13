@@ -144,6 +144,12 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
+   
+$Construct->Table('AnalyticsLocal')
+   ->Engine('InnoDB')
+   ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
+   ->Column('Views', 'int', NULL)
+   ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();

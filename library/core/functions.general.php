@@ -567,6 +567,19 @@ if (!function_exists('filter_input')) {
    }
 }
 
+if (!function_exists('ExternalUrl')) {
+   function ExternalUrl($Path) {
+      $Format = C('Garden.ExternalUrlFormat');
+
+      if ($Format && !StringBeginsWith($Path, 'http'))
+         $Result = sprintf($Format, ltrim($Path, '/'));
+      else
+         $Result = Url($Path, TRUE);
+
+      return $Result;
+   }
+}
+
 if (!function_exists('ForceBool')) {
    function ForceBool($Value, $DefaultValue = FALSE, $True = TRUE, $False = FALSE) {
       if (is_bool($Value)) {

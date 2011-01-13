@@ -50,6 +50,19 @@ class DashboardHooks implements Gdn_IPlugin {
 			if ($CountApplicants > 0)
 				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span>'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Registration.Manage'));
 		}
+		
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $Gdn_Statistics = Gdn::Factory('Statistics');
+         $Gdn_Statistics->Check($Sender);
+      }
+   }
+   
+   public function SettingsController_AnalyticsRegister_Create(&$Sender) {
+      Gdn::Factory('Statistics')->Register($Sender);
+   }
+   
+   public function SettingsController_AnalyticsStats_Create(&$Sender) {
+      Gdn::Factory('Statistics')->Stats($Sender);
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {

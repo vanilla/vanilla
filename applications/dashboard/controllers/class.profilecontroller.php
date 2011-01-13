@@ -77,11 +77,11 @@ class ProfileController extends Gdn_Controller {
             $Comment,
             $this->User->UserID,
             '',
-            '/profile/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name),
+            '/profile/'.$this->ProfileUrl(),
             $SendNotification);
          
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            Redirect('dashboard/profile/'.$UserReference);
+            Redirect('dashboard/profile/'.$this->ProfileUrl());
          } else {
             // Load just the single new comment
             $this->HideActivity = TRUE;
@@ -365,7 +365,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0)
-            Redirect('dashboard/profile/'.$UserReference);
+            Redirect('dashboard/profile/'.$this->ProfileUrl());
       }
 		if ($this->Form->ErrorCount() > 0)
 			$this->DeliveryType(DELIVERY_TYPE_ALL);
@@ -423,7 +423,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must be authenticated in order to use this form.');
          
       $this->GetUserInfo($UserReference, $Username);
-      $RedirectUrl = 'dashboard/profile/'.$UserReference.'/'.Gdn_Format::Url($Username);
+      $RedirectUrl = 'dashboard/profile/'.$this->ProfileUrl();
       if ($Session->ValidateTransientKey($TransientKey)
          && is_object($this->User)
          && (
@@ -433,7 +433,7 @@ class ProfileController extends Gdn_Controller {
       ) {
          Gdn::UserModel()->RemovePicture($this->User->UserID);
          $this->StatusMessage = T('Your picture has been removed.');
-         $RedirectUrl = 'dashboard/profile/'.Gdn_Format::Url($this->User->Name);
+         $RedirectUrl = 'dashboard/profile/'.$this->ProfileUrl();
       }
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
           Redirect($RedirectUrl);
@@ -536,7 +536,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
-            Redirect('dashboard/profile/'.Gdn_Format::Url($this->User->Name));
+            Redirect('dashboard/profile/'.$this->ProfileUrl());
          }
       }
       $this->Render();
@@ -755,6 +755,19 @@ class ProfileController extends Gdn_Controller {
       
       $this->AddSideMenu();
       return TRUE;
+   }
+
+   public function ProfileUrl($UserReference = NULL, $UserID = NULL) {
+      if ($UserReference === NULL)
+         $UserReference = $this->User->Name;
+      if ($UserID === NULL)
+         $UserID = $this->User->UserID;
+
+      $UserReferenceEnc = urlencode($UserReference);
+      if ($UserReferenceEnc == $UserReference)
+         return $UserReferenceEnc;
+      else
+         return "$UserID/$UserReferenceEnc";
    }
 
    /**

@@ -47,10 +47,24 @@ class Gdn_Statistics extends Gdn_Pluggable {
     * a guid), register instead and defer stats till next request.
     */ 
    public function Check(&$Sender) {
+      
+      // Add a pageview entry
+      $TimeSlot = date('Ymd');
+      $Px = Gdn::Database()->DatabasePrefix;
+      Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+      on duplicate key update Views = Views+1", array(
+         ':TimeSlot'    => $TimeSlot
+      ));
+      
+      // Don't track things for local sites
+      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
+      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
+      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return;
+      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
 
-      // First, check if we're registered with the central server already. If not, 
+      // Check if we're registered with the central server already. If not, 
       // this request is hijacked and used to perform that task.
-      $VanillaID = C('Vanilla.InstallationID',NULL);
+      $VanillaID = C('Garden.InstallationID',NULL);
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
@@ -59,7 +73,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       }
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
-      $LastSentDate = C('Vanilla.Analytics.LastSentDate', FALSE);
+      $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
       if ($LastSentDate === FALSE || $LastSentDate < date('Ymd')) {
          $Sender->AddDefinition('AnalyticsTask','stats');
          return;
@@ -71,24 +85,24 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $VanillaID = GetValue('VanillaID', $Response, FALSE);
          $Secret = GetValue('Secret', $Response, FALSE);
          if (($Secret && $VanillaID) !== FALSE) {
-            SaveToConfig('Vanilla.InstallationID', $VanillaID);
-            SaveToConfig('Vanilla.InstallationSecret', $Secret);
-            RemoveFromConfig('Vanilla.Registering');
+            SaveToConfig('Garden.InstallationID', $VanillaID);
+            SaveToConfig('Garden.InstallationSecret', $Secret);
+            RemoveFromConfig('Garden.Registering');
          }
       }
    }
 
    protected function DoneStats($Response, $Raw) {
-      SaveToConfig('Vanilla.Analytics.LastSentDate', date('Ymd'));
+      SaveToConfig('Garden.Analytics.LastSentDate', date('Ymd'));
    }
    
    public function Register(&$Sender) {
-      $AttemptedRegistration = C('Vanilla.Registering',FALSE);
+      $AttemptedRegistration = C('Garden.Registering',FALSE);
       // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
       if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
       // Set the time we last attempted to perform registration
-      SaveToConfig('Vanilla.Registering', time());
+      SaveToConfig('Garden.Registering', time());
       
       $Request = array();
       $this->BasicParameters($Request);
@@ -101,8 +115,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $this->BasicParameters($Request);
       
       $RequestTime = GetValue('RequestTime', $Request);
-      $VanillaID = C('Vanilla.InstallationID', FALSE);
-      $VanillaSecret = C('Vanilla.InstallationSecret', FALSE);
+      $VanillaID = C('Garden.InstallationID', FALSE);
+      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
       if (($VanillaID && $VanillaSecret) === FALSE) return;
       
       $SecurityHash = sha1(implode('-',array(
@@ -110,37 +124,43 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $RequestTime
       )));
       
-      $LastMonthSometime = strtotime('last month');
-      $LastMonthSometime = strtotime('today');
-      $TimeSlot = date('Ym00',$LastMonthSometime);
+      $Yesterday = strtotime('yesterday');
+      $TimeSlot = date('Ymd',$Yesterday);
       
-      $MonthStart = date('Y-m-d 00:00:00');
-      $MonthEnd = date('Y-m-t 23:59:59');
+      $DayStart = date('Y-m-d 00:00:00', $Yesterday);
+      $DayEnd = date('Y-m-d 23:59:59', $Yesterday);
       
       // Get relevant stats
       $NumComments = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('Comment')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumComments = GetValue('Hits', $NumComments, NULL);
          
       $NumDiscussions = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('Discussion')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
          
       $NumUsers = Gdn::SQL()
          ->Select('DateInserted','COUNT','Hits')
          ->From('User')
-         ->Where('DateInserted>=',$MonthStart)
-         ->Where('DateInserted<',$MonthEnd)
+         ->Where('DateInserted>=',$DayStart)
+         ->Where('DateInserted<',$DayEnd)
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       $NumUsers = GetValue('Hits', $NumUsers, NULL);
+      
+      $NumViews = Gdn::SQL()
+         ->Select('Views')
+         ->From('AnalyticsLocal')
+         ->Where('TimeSlot',$TimeSlot)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      $NumViews = GetValue('Views', $NumViews, NULL);
       
       // Assemble Stats
       
@@ -151,7 +171,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
          'CountComments'      => $NumComments,
          'CountDiscussions'   => $NumDiscussions,
          'CountUsers'         => $NumUsers,
-         'CountViews'         => -1,
+         'CountViews'         => $NumViews,
          'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER)
       ));
       
@@ -159,7 +179,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
-      $AnalyticsServer = C('Vanilla.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
    
       $ApiMethod = $Method.'.json';
       $FinalURL = CombinePaths(array(

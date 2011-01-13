@@ -428,7 +428,7 @@ class CategoryModel extends Gdn_Model {
       */
 
       // Grab all of the categories so that permissions can be properly saved.
-      $PermTree = $this->SQL->Select('CategoryID, PermissionCategoryID, TreeLeft, TreeRight, Depth, ParentCategoryID')->From('Category')->Get();
+      $PermTree = $this->SQL->Select('CategoryID, PermissionCategoryID, TreeLeft, TreeRight, Depth, Sort, ParentCategoryID')->From('Category')->Get();
       $PermTree = $PermTree->Index($PermTree->ResultArray(), 'CategoryID');
 
       // The tree must be walked in order for the permissions to save properly.

@@ -14,6 +14,8 @@ class EntryController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'UserModel');
 	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
 
+   protected $_RealDeliveryType;
+
    /**
     * @var Gdn_Form The current form.
     */
@@ -165,7 +167,7 @@ class EntryController extends Gdn_Controller {
             else
                $Route = $this->RedirectTo();
             
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+            if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
             } else {
                
@@ -413,7 +415,7 @@ class EntryController extends Gdn_Controller {
       $this->MasterView = 'empty';
       $this->View = 'redirect';
 
-      if ($this->DeliveryType() != DELIVERY_TYPE_ALL) {
+      if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->DeliveryType() != DELIVERY_TYPE_ALL) {
          $this->DeliveryMethod(DELIVERY_METHOD_JSON);
          $this->SetHeader('Content-Type', 'application/json');
       } elseif ($CheckPopup) {
@@ -474,6 +476,7 @@ class EntryController extends Gdn_Controller {
 
       // Figure out the current method.
       $DeliveryType = $this->DeliveryType();
+      $this->_RealDeliveryType = $DeliveryType;
       $this->DeliveryType(DELIVERY_TYPE_VIEW);
 
       $DeliveryMethod = $this->DeliveryMethod();

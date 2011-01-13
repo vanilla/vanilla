@@ -311,7 +311,7 @@ class ActivityModel extends Gdn_Model {
                sprintf(
                   T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
                   $ActivityHeadline,
-                  Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+                  ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                   $Story
                )
             );

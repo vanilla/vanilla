@@ -381,6 +381,7 @@ class SettingsController extends Gdn_Controller {
       
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
+      $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
       
       // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
@@ -407,7 +408,7 @@ class SettingsController extends Gdn_Controller {
          }
       }
        
-      // Get all of the currently selected role/permission combinations for this junction
+      // Get all of the currently selected role/permission combinations for this junction.
       $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category');
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
       $this->SetData('PermissionData', $Permissions, TRUE);
@@ -436,7 +437,7 @@ class SettingsController extends Gdn_Controller {
       $this->Title(T('Categories'));
       
       // Get category data
-      $this->CategoryData = $this->CategoryModel->GetAll('Sort');
+      $this->SetData('CategoryData', $this->CategoryModel->GetAll('TreeLeft'), TRUE);
 		
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
@@ -454,7 +455,8 @@ class SettingsController extends Gdn_Controller {
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Categories.MaxDisplayDepth',
-         'Vanilla.Categories.DoHeadings'
+         'Vanilla.Categories.DoHeadings',
+         'Vanilla.Categories.HideModule'
       ));
       
       // Set the model on the form.

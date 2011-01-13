@@ -31,7 +31,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php if ($Discussion->Announce == '1') { ?>
@@ -115,12 +115,12 @@ function WriteFilterTabs(&$Sender) {
    $DescendantData = GetValue('DescendantData', $Sender->Data);
    $Category = GetValue('Category', $Sender->Data);
    if ($DescendantData && $Category) {
-      echo '<div class="SubTab">↳ ';
+      echo '<div class="SubTab"><span class="FirstCrumb">↳ </span>';
       foreach ($DescendantData->Result() as $Descendant) {
          // Ignore the root node
          if ($Descendant->CategoryID > 0) {
             echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
-            echo ' &rarr; ';
+            echo '<span class="BreadCrumb"> &rarr; </span>';
          }
       }
       echo $Category->Name;

@@ -65,7 +65,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     */
    public function __construct(&$Sender = '') {
       if (is_object($Sender)) {
-         $this->_ApplicationFolder = $Sender->Application;
+         $this->_ApplicationFolder = $Sender->ApplicationFolder;
          $this->_ThemeFolder = $Sender->Theme;
       } else {
          $this->_ApplicationFolder = 'dashboard';

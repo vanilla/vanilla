@@ -210,7 +210,7 @@ class UserController extends DashboardController {
       $Available = TRUE;
       if ($Email != '') {
          $UserModel = Gdn::UserModel();
-         if ($UserModel->GetByEmail(urldecode($Email)))
+         if ($UserModel->GetByEmail($Email))
             $Available = FALSE;
       }
       if (!$Available)

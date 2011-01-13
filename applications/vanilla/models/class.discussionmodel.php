@@ -66,6 +66,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('lcu.Name', '', 'LastName')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
+         ->Select('ca.PermissionCategoryID')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
@@ -348,7 +349,7 @@ class DiscussionModel extends VanillaModel {
             $Data = $this->SQL
                ->Select('c.CategoryID')
                ->From('Category c')
-               ->Permission('Vanilla.Discussions.View', 'c', 'CategoryID')
+               ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
                ->Get();
             
             $Data = $Data->ResultArray();
@@ -420,6 +421,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.*')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
+         ->Select('ca.PermissionCategoryID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Select('d.DateLastComment', '', 'LastDate')

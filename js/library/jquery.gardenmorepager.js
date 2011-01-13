@@ -61,7 +61,7 @@
                    
       page: function(anchor) {
          var self = this;
-         $(anchor).html('&nbsp;').addClass(self.pager_loading_class);
+         $(anchor).html('&#160;').addClass(self.pager_loading_class);
          var type = self.pager_row_id.substr(self.pager_row_id.length - 4, self.pager_row_id.length).toLowerCase() == 'more' ? 'more' : 'less';
          $.ajax({
             type: "POST",

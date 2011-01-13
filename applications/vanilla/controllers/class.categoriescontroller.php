@@ -73,8 +73,11 @@ class CategoriesController extends VanillaController {
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       
-      if ($Category === FALSE)
+      if ($Category === FALSE) {
+         if ($CategoryIdentifier)
+            throw NotFoundException();
          return $this->Discussions();
+      }
 			
 		// Load the Descendant Tree
 		$this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
@@ -111,7 +114,7 @@ class CategoriesController extends VanillaController {
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       
       // Check permission
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
       
       // Set discussion meta data
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);

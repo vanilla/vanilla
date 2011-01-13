@@ -190,7 +190,17 @@ class Gdn_PluginManager {
       
       return ($PluginName !== FALSE) ? $this->AvailablePlugins($PluginName) : FALSE;
    }
-   
+
+   /**
+    * Gets an instance of a given plugin.
+    *
+    * @param string $AccessName The key of the plugin.
+    * @param string $AccessType The type of key for the plugin which must be one of the following:
+    *  - Gdn_PluginManager::ACCESS_PLUGINNAME
+    *  - Gdn_PluginManager::ACCESS_CLASSNAME
+    * @param mixed $Sender An object to pass to a new plugin instantiation.
+    * @return Gdn_IPlugin The plugin instance.
+    */
    public function GetPluginInstance($AccessName, $AccessType = self::ACCESS_CLASSNAME, $Sender = NULL) {
       $ClassName = NULL;
       switch ($AccessType) {

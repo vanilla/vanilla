@@ -194,7 +194,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       return true;
     
     $('#'+settings.popupId+' .Content').empty();
-    $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&nbsp;</div>');
+    $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
   }
   
   $.popup.reveal = function(settings, data) {
@@ -308,7 +308,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     onSave:           function(settings) {
       if (settings.sender) {
         $('#'+settings.popupId+' .Button:last').attr('disabled', true);
-        $('#'+settings.popupId+' .Button:last').after('<span class="Progress">&nbsp;</span>');
+        $('#'+settings.popupId+' .Button:last').after('<span class="Progress">&#160;</span>');
       }
     },
     onLoad:           function(settings) {

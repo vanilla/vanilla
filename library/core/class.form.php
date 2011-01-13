@@ -146,7 +146,9 @@ class Gdn_Form {
     * @return string
     */
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
-      $Value = ArrayValueI('value', $Attributes, 'TRUE');
+      //  2010-07-28 - loki_racer - assuming that checkboxes are stored in the db as string 'TRUE' is a bad assumption
+      //  $Value = ArrayValueI('value', $Attributes, 'TRUE');
+      $Value = ArrayValueI('value', $Attributes, true);
       $Attributes['value'] = $Value;
       // 2009-04-02 - mosullivan - cannot consider all checkbox values to be boolean
       // if (ForceBool($this->GetValue($FieldName)) == ForceBool($Value)) $Attributes['checked'] = 'checked';
@@ -468,7 +470,7 @@ class Gdn_Form {
                    '</td>';
             } else {
                $Cells .= '<td' . ($Alt == 0 ? ' class="Alt"' : '') .
-                   '>&nbsp;</td>';
+                   '>&#160;</td>';
             }
          }
          if ($Headings != '') $Return .= "<thead><tr><th>" . T($GroupName) . "</th>" .

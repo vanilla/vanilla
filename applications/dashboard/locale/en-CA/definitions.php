@@ -51,6 +51,7 @@ $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
+$Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email and password you entered.';
 $Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
 $Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';

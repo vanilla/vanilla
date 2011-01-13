@@ -374,40 +374,69 @@ class SettingsController extends DashboardController {
 
       $LocaleModel = new LocaleModel();
 
-      // Get the available locales.
+      // Get the available locale packs.
       $AvailableLocales = $LocaleModel->AvailableLocalePacks();
-      // Get the enabled locales.
+
+      // Get the enabled locale packs.
       $EnabledLocales = $LocaleModel->EnabledLocalePacks();
 
-      // Check to enable/disable a plugin.
-      if ($Op && Gdn::Session()->ValidateTransientKey($TransientKey)) {
-
-         $Refresh = FALSE;
-         switch(strtolower($Op)) {
-            case 'enable':
-               $Locale = GetValue($LocaleKey, $AvailableLocales);
-               if (!is_array($Locale)) {
-                  $this->Form->AddError('@'.sprintf(T('The %s locale pack does not exist.'), htmlspecialchars($LocaleKey)), 'LocaleKey');
-               } elseif (!isset($Locale['Locale'])) {
-                  $this->Form->AddError('ValidateRequired', 'Locale');
-               } else {
-                  SaveToConfig("EnabledLocales.$LocaleKey", $Locale['Locale']);
-                  $EnabledLocales[$LocaleKey] = $Locale['Locale'];
+      // Check to enable/disable a locale.
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+         if ($Op) {
+            $Refresh = FALSE;
+            switch(strtolower($Op)) {
+               case 'enable':
+                  $Locale = GetValue($LocaleKey, $AvailableLocales);
+                  if (!is_array($Locale)) {
+                     $this->Form->AddError('@'.sprintf(T('The %s locale pack does not exist.'), htmlspecialchars($LocaleKey)), 'LocaleKey');
+                  } elseif (!isset($Locale['Locale'])) {
+                     $this->Form->AddError('ValidateRequired', 'Locale');
+                  } else {
+                     SaveToConfig("EnabledLocales.$LocaleKey", $Locale['Locale']);
+                     $EnabledLocales[$LocaleKey] = $Locale['Locale'];
+                     $Refresh = TRUE;
+                  }
+                  break;
+               case 'disable':
+                  RemoveFromConfig("EnabledLocales.$LocaleKey");
+                  unset($EnabledLocales[$LocaleKey]);
                   $Refresh = TRUE;
-               }
-               break;
-            case 'disable':
-               RemoveFromConfig("EnabledLocales.$LocaleKey");
-               unset($EnabledLocales[$LocaleKey]);
-               $Refresh = TRUE;
-               break;
+                  break;
+            }
+         } elseif ($this->Form->IsPostBack()) {
+            // Save the default locale.
+            SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
+            $Refresh = TRUE;
+            $this->StatusMessage = T("Your changes have been saved successfully.");
          }
+
          if ($Refresh)
             Gdn::Locale()->Refresh();
+      } elseif (!$this->Form->IsPostBack()) {
+         $this->Form->SetFormValue('Locale', C('Garden.Locale', 'en-CA'));
+      }
+
+      // Check for the default locale warning.
+      $DefaultLocale = C('Garden.Locale');
+      if ($DefaultLocale != 'en-CA') {
+         $LocaleFound = FALSE;
+         $MatchingLocales = array();
+         foreach ($AvailableLocales as $Key => $LocaleInfo) {
+            $Locale = GetValue('Locale', $LocaleInfo);
+            if ($Locale == $DefaultLocale)
+               $MatchingLocales[] = GetValue('Name', $LocaleInfo, $Key);
+
+            if (GetValue($Key, $EnabledLocales) == $DefaultLocale)
+               $LocaleFound = TRUE;
+               
+         }
+         $this->SetData('DefaultLocaleWarning', !$LocaleFound);
+         $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
       
       $this->SetData('AvailableLocales', $AvailableLocales);
       $this->SetData('EnabledLocales', $EnabledLocales);
+      $this->SetData('Locales', $LocaleModel->AvailableLocales());
       $this->Render();
    }
    
@@ -603,7 +632,17 @@ class SettingsController extends DashboardController {
       }
       if ($AddonName != '') {
          $Validation = new Gdn_Validation();
-         $AddonManager->$TestMethod($AddonName, $Validation);
+
+         try {
+            $AddonManager->$TestMethod($AddonName, $Validation);
+         } catch (Exception $Ex) {
+            if (defined('DEBUG'))
+               throw $Ex;
+            else {
+               echo $Ex->getMessage();
+               return;
+            }
+         }
       }
 
       echo 'Success';

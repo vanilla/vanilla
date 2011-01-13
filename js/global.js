@@ -319,13 +319,23 @@ jQuery(document).ready(function($) {
       }
       return true;
    }
-
+   
+   gdn.stats = function(action, params, callback) {
+      // Call directly back to the deployment and invoke the stats handler
+      var StatsURL = gdn.url('settings/analytics'+action+'.json');
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: StatsURL
+      });
+   }
+   
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
       var urlFormat = gdn.definition("UrlFormat", "");
-
+      
       if (path[0] == "/")
          path = path.substr(1);
 
@@ -352,7 +362,7 @@ jQuery(document).ready(function($) {
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {
-      $(this).before('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
+      $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
    
    // Confirmation for item removals
@@ -378,7 +388,20 @@ jQuery(document).ready(function($) {
 				return false;
 			})
 		}
-	}); 
+	});
+   
+   var AnalyticsTask = gdn.definition('AnalyticsTask', false);
+   switch (AnalyticsTask) {
+	   case 'register':
+	   case 'stats':
+	     // Send stats ping
+	     gdn.stats(AnalyticsTask);
+	   break;
+	   
+	   default:
+	     // Nothing
+	   break;
+	}
    
 });
 

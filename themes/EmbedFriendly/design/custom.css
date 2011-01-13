@@ -95,6 +95,7 @@ form.Activity textarea {
 	width: auto;
 }
 body.Post #Content {
+	width: auto;
 	margin:0 20px;
 }
 #ConversationForm textarea.MultiComplete,

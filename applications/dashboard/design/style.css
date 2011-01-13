@@ -782,6 +782,11 @@ ul.PanelInfo li {
    padding: 2px 4px;
    text-align: right;
 }
+ul.PanelInfo li.Heading {
+   text-align: left;
+   color: #000;
+   font-weight: bold;
+}
 ul.PanelInfo {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;
@@ -1257,6 +1262,7 @@ ul.MessageList div.Message {
    clear: both;
    line-height: 140%;
    font-size: 100%;
+	word-wrap: break-word;
 }
 div.Preview div.Message,
 div.Preview div.Message p,

@@ -51,10 +51,16 @@ class Gdn_Statistics extends Gdn_Pluggable {
       // Add a pageview entry
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
-      Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
-      on duplicate key update Views = Views+1", array(
-         ':TimeSlot'    => $TimeSlot
-      ));
+      
+      try {
+         Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+         on duplicate key update Views = Views+1", array(
+            ':TimeSlot'    => $TimeSlot
+         ));
+      } catch(Exception $e) {
+         // If we get here, insert failed. Try proxyconnect to the utility structure
+         ProxyRequest(Url('utility/update', TRUE));
+      }
       
       // Don't track things for local sites
       $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);

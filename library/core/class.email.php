@@ -86,6 +86,7 @@ class Gdn_Email extends Gdn_Pluggable {
    public function Clear() {
       $this->PhpMailer->ClearAllRecipients();
       $this->PhpMailer->Body = '';
+      $this->PhpMailer->AltBody = '';
       $this->From();
       $this->_IsToSet = FALSE;
       $this->MimeType(Gdn::Config('Garden.Email.MimeType', 'text/plain'));

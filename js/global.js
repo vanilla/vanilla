@@ -155,7 +155,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+         setTimeout(function() { document.location.replace(RedirectUrl); }, 2000);
       }
    }
 

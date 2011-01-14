@@ -353,9 +353,19 @@ class DiscussionModel extends VanillaModel {
                ->Get();
             
             $Data = $Data->ResultArray();
-            $this->_CategoryPermissions = array();
-            foreach($Data as $Row) {
-               $this->_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
+
+            // Check to see if the user has permission to all categories. This is for speed.
+            $CategoryCount = $this->SQL
+               ->Select('c.CategoryID', 'count', 'CategoryCount')
+               ->From('Category c')
+               ->Get()->Value('CategoryCount', 0);
+            if (count($Data) == $CategoryCount)
+               $this->_CategoryPermissions = TRUE;
+            else {
+               $this->_CategoryPermissions = array();
+               foreach($Data as $Row) {
+                  $this->_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
+               }
             }
          }
       }

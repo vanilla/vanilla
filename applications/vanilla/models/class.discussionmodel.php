@@ -23,7 +23,7 @@ class DiscussionModel extends VanillaModel {
    /**
     * @var array
     */
-   protected $_CategoryPermissions = NULL;
+   protected static $_CategoryPermissions = NULL;
    
    /**
     * Class constructor. Defines the related database table name.
@@ -268,28 +268,46 @@ class DiscussionModel extends VanillaModel {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
+
+      // Get the discussion IDs of the announcements.
+      // TODO: Use caching.
+      $this->SQL
+         ->Select('d.DiscussionID')
+         ->From('Discussion d')
+         ->Where('d.Announce', '1');
+      if (is_array($Wheres) && count($Wheres) > 0)
+         $this->SQL->Where($Wheres);
+
+      $AnnouncementIDs = $this->SQL->Get()->ResultArray();
+      $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
+
       $this->DiscussionSummaryQuery();
       $this->SQL
-         ->Select('d.*')
-         ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('d.*');
+
+      if ($UserID) {
+         $this->SQL->Select('w.UserID', '', 'WatchUserID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
+      } else {
+         // Don't join in the user table when we are a guest.
+         $this->SQL->Select('null as WatchUserID, null as DateLastViewed, null as Dismissed, null as Bookmarked, null as CountCommentWatch');
+      }
       
       // Add conditions passed.
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
+//      if (is_array($Wheres))
+//         $this->SQL->Where($Wheres);
+//
+//      $this->SQL
+//         ->Where('d.Announce', '1');
 
-      $this->SQL
-         ->Where('d.Announce', '1');
+      $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
 
       // If we allow users to dismiss discussions, skip ones this user dismissed
-      if (C('Vanilla.Discussions.Dismiss', 1)) {
+      if (C('Vanilla.Discussions.Dismiss', 1) && $UserID) {
          $this->SQL
-            ->BeginWhereGroup()
-            ->Where('w.Dismissed is null')
-            ->OrWhere('w.Dismissed', '0')
-            ->EndWhereGroup();
+            ->Where('coalesce(w.Dismissed, \'0\')', '0', FALSE);
       }
 
       $this->SQL
@@ -303,6 +321,10 @@ class DiscussionModel extends VanillaModel {
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
 		$this->FireEvent('AfterAddColumns');
+
+
+
+
 		
 		return $Data;
    }
@@ -334,19 +356,21 @@ class DiscussionModel extends VanillaModel {
 	 * @param bool $Escape Prepends category IDs with @
 	 * @return array Protected local _CategoryPermissions
 	 */
-   public function CategoryPermissions($Escape = FALSE) {
-      if(is_null($this->_CategoryPermissions)) {
+   public static function CategoryPermissions($Escape = FALSE) {
+      if(is_null(self::$_CategoryPermissions)) {
          $Session = Gdn::Session();
          
          if((is_object($Session->User) && $Session->User->Admin == '1')) {
-            $this->_CategoryPermissions = TRUE;
+            self::$_CategoryPermissions = TRUE;
 			} elseif(C('Garden.Permissions.Disabled.Category')) {
 				if($Session->CheckPermission('Vanilla.Discussions.View'))
-					$this->_CategoryPermissions = TRUE;
+					self::$_CategoryPermissions = TRUE;
 				else
-					$this->_CategoryPermissions = array(); // no permission
+					self::$_CategoryPermissions = array(); // no permission
          } else {
-            $Data = $this->SQL
+            $SQL = Gdn::SQL();
+            
+            $Data = $SQL
                ->Select('c.CategoryID')
                ->From('Category c')
                ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
@@ -355,22 +379,22 @@ class DiscussionModel extends VanillaModel {
             $Data = $Data->ResultArray();
 
             // Check to see if the user has permission to all categories. This is for speed.
-            $CategoryCount = $this->SQL
+            $CategoryCount = $SQL
                ->Select('c.CategoryID', 'count', 'CategoryCount')
                ->From('Category c')
                ->Get()->Value('CategoryCount', 0);
             if (count($Data) == $CategoryCount)
-               $this->_CategoryPermissions = TRUE;
+               self::$_CategoryPermissions = TRUE;
             else {
-               $this->_CategoryPermissions = array();
+               self::$_CategoryPermissions = array();
                foreach($Data as $Row) {
-                  $this->_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
+                  self::$_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
                }
             }
          }
       }
       
-      return $this->_CategoryPermissions;
+      return self::$_CategoryPermissions;
    }
 
    /**

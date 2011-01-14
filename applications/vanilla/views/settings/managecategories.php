@@ -5,8 +5,8 @@ $Session = Gdn::Session();
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Adding & Editing Categories'), 'http://vanillaforums.org/page/Configuration-DashboardForumSettingsCategories'), '</li>';
-   echo '<li>', Anchor(T('Managing Categories'), 'http://vanillaforums.org/docs/configuration-dashboardforumsettingscategoriesmanagecategories'), '</li>';
+   echo '<li>', Anchor(T('Managing Categories'), 'http://vanillaforums.org/docs/managecategories'), '</li>';
+   echo '<li>', Anchor(T('Adding & Editing Categories'), 'http://vanillaforums.org/docs/managecategories#add'), '</li>';
    echo '</ul>';
    ?>
 </div>

@@ -47,7 +47,7 @@ class DiscussionModel extends VanillaModel {
     */
    public function DiscussionSummaryQuery($AdditionalFields = array()) {
       // Verify permissions (restricting by category if necessary)
-      $Perms = $this->CategoryPermissions();
+      $Perms = self::CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
       }
@@ -414,7 +414,7 @@ class DiscussionModel extends VanillaModel {
          $Wheres = '';
       
       // Check permission and limit to categories as necessary  
-      $Perms = $this->CategoryPermissions();
+      $Perms = self::CategoryPermissions();
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);
       }

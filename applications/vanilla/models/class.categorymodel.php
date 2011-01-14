@@ -292,13 +292,17 @@ class CategoryModel extends Gdn_Model {
          ->From('Category c')
          ->Where('c.UrlCode', $UrlCode)
          ->Where('c.CategoryID >', 0);
-      
-      // Require permission   
-      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category');
          
-      return $this->SQL
+      $Data = $this->SQL
          ->Get()
          ->FirstRow();
+
+      // Check to see if the user has permission for this category.
+      // Get the category IDs.
+      $CategoryIDs = DiscussionModel::CategoryPermissions();
+      if (is_array($CategoryIDs) && !in_array(GetValue('CategoryID', $Data), $CategoryIDs))
+         $Data = FALSE;
+      return $Data;
    }
    
    /**

@@ -239,6 +239,19 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetFull($CategoryID = '', $Permissions = FALSE) {
+      // Minimally check for view discussion permission
+      if (!$Permissions)
+         $Permissions = 'Vanilla.Discussions.View';
+
+      // Get the category IDs.
+      if ($Permissions == 'Vanilla.Discussions.View') {
+         $CategoryIDs = DiscussionModel::CategoryPermissions();
+         if ($CategoryIDs !== TRUE)
+            $this->SQL->WhereIn('d.CategoryID', $CategoryIDs);
+      } else {
+         $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
+      }
+
       // Build base query
       $this->SQL
          ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID')
@@ -253,12 +266,6 @@ class CategoryModel extends Gdn_Model {
          ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')
          ->Join('Discussion d', 'd.DiscussionID = co.DiscussionID', 'left')
          ->Where('c.AllowDiscussions', '1');
-
-      // Minimally check for view discussion permission
-      if (!$Permissions)
-         $Permissions = 'Vanilla.Discussions.View';
-
-      $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
 
       // Single record or full list?
       if (is_numeric($CategoryID) && $CategoryID > 0) {
@@ -285,13 +292,17 @@ class CategoryModel extends Gdn_Model {
          ->From('Category c')
          ->Where('c.UrlCode', $UrlCode)
          ->Where('c.CategoryID >', 0);
-      
-      // Require permission   
-      $this->SQL->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category');
          
-      return $this->SQL
+      $Data = $this->SQL
          ->Get()
          ->FirstRow();
+
+      // Check to see if the user has permission for this category.
+      // Get the category IDs.
+      $CategoryIDs = DiscussionModel::CategoryPermissions();
+      if (is_array($CategoryIDs) && !in_array(GetValue('CategoryID', $Data), $CategoryIDs))
+         $Data = FALSE;
+      return $Data;
    }
    
    /**

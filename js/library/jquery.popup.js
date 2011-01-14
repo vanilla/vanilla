@@ -59,7 +59,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   settings.afterConfirm(json, settings.sender);
                   gdn.inform(json.StatusMessage);
                   if (json.RedirectUrl)
-                    setTimeout("document.location='" + gdn.url(json.RedirectUrl) + "';", 300);
+                    setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
 
                 }
              });
@@ -255,7 +255,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          
             if (json.FormSaved == true) {
                if (json.RedirectUrl)
-                  setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                  setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
               
                settings.afterSuccess(settings, json);
                $.popup.close(settings, json);
@@ -273,7 +273,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data, textStatus, xhr) {
              if (typeof(data) == 'object') {
                 if (data.RedirectUrl)
-                    setTimeout("document.location='" + gdn.url(data.RedirectUrl) + "';", 300);
+                    setTimeout(function() { document.location.replace(data.RedirectUrl); }, 300);
 
                 $.postParseJson(data);
              }

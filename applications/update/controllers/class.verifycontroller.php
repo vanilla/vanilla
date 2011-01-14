@@ -18,8 +18,83 @@ class VerifyController extends UpdateController {
    }
 
    public function Index() {
-      $this->AddSideMenu('update/verify');
       $this->Render();
+   }
+   
+   public function Extract() {
+      $RenderController = 'verify';
+      
+      $RequestType = $this->RequestType();
+      switch ($RequestType) {
+         case 'ui':
+            $this->UpdaterTitle = T('Extracting downloaded updates...');
+            $this->UpdaterTasks = array(
+               'update/verify/extract'   => $this->UpdaterTitle
+            );
+            $RenderView = 'extract';
+            break;
+            
+         case 'check':
+         case 'perform':
+
+            $RenderView = 'blank';
+            $RenderController = 'update';
+
+            if ($RequestType == 'perform') {
+               // Don't interrupt if another process is already doing this.
+               if ($this->Update->Progress('verify','extract')) {
+                  exit();
+               }
+               
+               // Unknown task length. Deploy spinner
+               $DownloadModel = new DownloadModel();
+               $AddonFile = $DownloadModel->GetAddonArchive('vanilla-core');
+               
+               if ($AddonFile == FALSE) {
+                  $this->Fail('Could not get the downloaded archive path. Did the download fail?');
+                  break;
+               }
+               
+               $ZipModel = new ZipModel();
+               $OpenStatus = $ZipModel->open($AddonFile);
+               if (!$OpenStatus === TRUE) {
+                  $this->Fail("Could not open the downloaded archive '%s'.", $AddoonFile);
+                  break;
+               }
+               
+               $this->Update->Progress('verify', 'extract', 0, TRUE);
+               $LastProgress = 0; $NumFiles = $ZipModel->numFiles;
+               for ($i = 0; $i < $NumFiles; $i++) {
+                  $FileName = $ZipModel->getNameIndex($i);
+                  //$ZipModel->extractTo(,$FileName);
+                  $Progress = round(($i / $NumFiles) * 100,2);
+                  if (floor($Progress) > floor($LastProgress))
+                     $this->Update->Progress('verify','extract',$Progress,TRUE);
+               }
+               
+               
+
+            }
+            
+            if ($RequestType == 'check') {
+               $ThisAction = $this->Update->GetTask('verify','extract');
+               $this->SetData('Completion', GetValue('Completion',$ThisAction,NULL));
+               $this->SetData('Message', $this->Update->GetMeta('verify/message'));
+               $this->Update->SetMeta('backup/message');
+               $this->SetData('Menu', $this->UpdateModule->ToString());
+            }
+            
+            break;
+      }
+      $this->Render($RenderView,$RenderController);
+   }
+   
+   private Fail($Message) {
+      $Args = func_get_args();
+      array_shift($Args);
+      $MessageFormed = vsprintf(T($Message), $Args);
+      $this->Update->SetMeta('verify/message', $MessageFormed);
+      $this->Update->Progress('verify','extract', -2, TRUE);
    }
    
 }

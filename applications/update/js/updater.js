@@ -191,7 +191,11 @@ function Gdn_Updater() {
          
             if (Completion == 100)
                Fade = 'slow';
-         
+            
+            if (data.Menu) {
+               this.SetMenu(data.Menu);
+            }
+            
             // Defined progress
             this.SetProgressMode('progress');
             

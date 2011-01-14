@@ -74,9 +74,9 @@ class BackupController extends UpdateController {
       $RequestType = $this->RequestType();
       switch ($RequestType) {
          case 'ui':
-            $this->BackupTitle = T('Backing up files...');
-            $this->BackupFilesTasks = array(
-               'update/backup/files'   => $this->BackupTitle
+            $this->UpdaterTitle = T('Backing up files...');
+            $this->UpdaterTasks = array(
+               'update/backup/files'   => $this->UpdaterTitle
             );
             $RenderView = 'files';
             break;
@@ -113,9 +113,9 @@ class BackupController extends UpdateController {
       $RequestType = $this->RequestType();
       switch ($RequestType) {
          case 'ui':
-            $this->BackupTitle = T('Backing up data...');
-            $this->BackupDataTasks = array(
-               'update/backup/data'   => $this->BackupTitle
+            $this->UpdaterTitle = T('Backing up data...');
+            $this->UpdaterTasks = array(
+               'update/backup/data'   => $this->UpdaterTitle
             );
             $RenderView = 'data';
             break;

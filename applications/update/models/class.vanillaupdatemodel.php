@@ -106,9 +106,7 @@ class VanillaUpdateModel {
       
       $this->AddGroup('verify', 'Verify')
          ->AddTask('verify', 'extract',  'Extract Downloaded Archives')
-         ->AddTask('verify', 'signatures',  'Check Signatures')
-         ->AddTask('verify', 'clean', 'Clean Archives')
-         ->AddTask('verify', 'registerchanged', 'Register Changed Files');
+         ->AddTask('verify', 'clean', 'Clean Archives');
          
       $this->AddGroup('apply', 'Apply')
          ->AddTask('apply', 'files', 'Update Filesystem')

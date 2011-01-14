@@ -22,6 +22,8 @@ class UpdateController extends Gdn_Controller {
       parent::Initialize();
       
       $this->Update = new VanillaUpdateModel();
+      $this->Download = new DownloadModel();
+      
 /*
       if (!$this->Update->Active())
          $this->Update->Fresh();
@@ -90,41 +92,17 @@ class UpdateController extends Gdn_Controller {
    
    protected function CheckStatus() {
       // Determine if an update is required.
-      $CurrentVersion = APPLICATION_VERSION;
-      
-      // Require a certain baseline version to start from... this way we're assured some form of basic functionality
-/*
-      if (version_compare($CurrentVersion, '2.1') < 0)
-         return FALSE;
-*/
-      
-      $LatestVersion = $this->GetLatestVersionNumber();
-      
+      $CurrentVersion = APPLICATION_VERSION;  
+   
+      $LatestVersion = $this->LatestVersion();
       return version_compare($CurrentVersion, $LatestVersion);
    }
    
-   protected function GetLatestVersion() {
-      if (is_null($this->Latest)) {
-         $Repository = C('Update.Remote.Repository');
-         $Addon = C('Update.Remote.Addon');
-         $APICall = C('Update.Remote.APICall');
-         $Request = CombinePaths(array($Repository,$APICall,$Addon));
-         
-         $this->Latest = simplexml_load_file($Request);
-         if ($this->Latest === FALSE)
-            throw new Exception("Unable to contact remote addon repository at '{$Request}'.");
-      }
-      
-      $Versions = sizeof($this->Latest->Versions->Item);
-      if (!$Versions) return FALSE;
-      $LatestVersion = (array)$this->Latest->Versions->Item;
+   protected function LatestVersion() {
+      $PreferredMinimumState = C('Update.Remote.PreferredState', NULL);
+      $Addon = C('Update.Remote.Addon');
+      $LatestVersion = $this->Download->LatestVersion($Addon, $PreferredMinimumState);
       return $LatestVersion;
    }
-   
-   protected function GetLatestVersionNumber() {
-      $LatestVersion = $this->GetLatestVersion();
-      $LatestVersionNumber = GetValue('Version', $LatestVersion, 'COULD NOT FIND');
-      return $LatestVersionNumber;
-   }
-   
+      
 }

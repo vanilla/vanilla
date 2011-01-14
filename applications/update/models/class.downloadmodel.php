@@ -27,6 +27,11 @@ class DownloadModel {
    
    protected $RemoteInfo = NULL;
    
+   const STATE_ALPHA = 1;
+   const STATE_BETA = 2;
+   const STATE_RC = 3;
+   const STATE_STABLE = 5;
+   
    public function __construct(&$UpdateModel = NULL) {
       $this->UpdateModel = $UpdateModel;
    
@@ -419,13 +424,35 @@ class DownloadModel {
          if (!GetValue('CurrentVersion', $AddonData))
             throw new Exception(sprintf(T("Requested addon '%s' was not found in the remote repository."),$Addon));
          
-         $this->RemoteInfo[$Addon] = $AddonData;
+         $this->RemoteInfo[$Addon] = array(
+            'XML'       => NULL,
+            'Versions'  => array(),
+            'Stability' => array()
+         );
+         $this->RemoteInfo[$Addon]['XML'] = $AddonData;
+         $this->ParseAddonInfo($Addon);
       }
       
-      return $this->RemoteInfo[$Addon];
+      return $this->RemoteInfo[$Addon]['XML'];
    }
    
-   public function VersionInfo($Addon, $Version = NULL) {
+   protected function ParseAddonInfo($Addon) {
+      if (!array_key_exists($Addon, $this->RemoteInfo)) return FALSE;
+      $AddonInfo = &$this->RemoteInfo[$Addon];
+      foreach ($AddonInfo->Versions->Item as $VersionElement) {
+         $VersionNumber = $VersionElement->Version;
+         $Stability = $this->GetStabilityFromVersion($VersionNumber);
+      }
+   }
+   
+   public function GetStabilityFromVersion($Version) {
+      if (substr($Version,-1) == 'a') return DownloadModel::STATE_ALPHA;
+      if (substr($Version,-1) == 'b') return DownloadModel::STATE_BETA;
+      if (preg_match('/rc[\d]?$/i', $Version)) return DownloadModel::STATE_RC;
+      return DownloadModel::STATE_STABLE;
+   }
+   
+   public function VersionInfo($Addon, $Version = NULL, $MinimumState) {
    
       // Normalize "latest" to NULL
       if ($Version == 'latest')
@@ -448,7 +475,7 @@ class DownloadModel {
       return FALSE;
    }
    
-   public function LatestVersion($Addon) {
+   public function LatestVersion($Addon, $MinimumState = NULL) {
       $LatestVersion = $this->VersionInfo($Addon);
       return GetValue('Version', $LatestVersion, FALSE);
    }

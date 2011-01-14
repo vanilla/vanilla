@@ -15,15 +15,14 @@ class ZipModel extends ZipArchive {
    protected $MaxIncrement = 100;
    
    public function __construct() {
-      echo "Opening new zipmodel\n";
+      
    }
    
-   public function open($ArchiveName, $Flags) {
+   public function open($ArchiveName, $Flags = NULL) {
       $Open = parent::open($ArchiveName, $Flags);
       if ($Open === TRUE) {
          $this->clear();
          $this->ArchiveName = $ArchiveName;
-         echo "Opened archive: {$ArchiveName}\n";
       }
       return $Open;
    }
@@ -37,7 +36,6 @@ class ZipModel extends ZipArchive {
          $this->reopen();
       
       $Filename = func_get_arg(0);
-      echo "Adding file ({$this->IncrementCount}) - {$Filename}... ";
       
       if (func_num_args() == 2)
          $Success = parent::addFile($Filename, func_get_arg(1));
@@ -46,10 +44,7 @@ class ZipModel extends ZipArchive {
          $Success = parent::addFile($Filename);
          
       if ($Success) {
-         echo "ok\n";
          $this->IncrementCount++;
-      } else {
-         echo "failed\n";
       }
          
       return $Success;

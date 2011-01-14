@@ -17,16 +17,9 @@ class DownloadController extends UpdateController {
       parent::Initialize();
       
       $this->DownloadModel = new DownloadModel($this->Update);
-/*
-      $R = $this->DownloadModel->GetAddonArchive('vanilla-core', NULL, TRUE);
-      
-      print_r($R);
-      die();
-*/
    }
 
    public function Index() {
-   
       $this->Render();
    }
    
@@ -36,9 +29,9 @@ class DownloadController extends UpdateController {
       $RequestType = $this->RequestType();
       switch ($RequestType) {
          case 'ui':
-            $this->DownloadTitle = T('Downloading updates...');
-            $this->DownloadGetTasks = array(
-               'update/download/get'   => $this->DownloadTitle
+            $this->UpdaterTitle = T('Downloading updates...');
+            $this->UpdaterTasks = array(
+               'update/download/get'   => $this->UpdaterTitle
             );
             $RenderView = 'get';
             break;

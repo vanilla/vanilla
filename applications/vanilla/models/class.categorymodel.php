@@ -239,6 +239,19 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetFull($CategoryID = '', $Permissions = FALSE) {
+      // Minimally check for view discussion permission
+      if (!$Permissions)
+         $Permissions = 'Vanilla.Discussions.View';
+
+      // Get the category IDs.
+      if ($Permissions == 'Vanilla.Discussions.View') {
+         $CategoryIDs = DiscussionModel::CategoryPermissions();
+         if ($CategoryIDs !== TRUE)
+            $this->SQL->WhereIn('d.CategoryID', $CategoryIDs);
+      } else {
+         $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
+      }
+
       // Build base query
       $this->SQL
          ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID')
@@ -253,12 +266,6 @@ class CategoryModel extends Gdn_Model {
          ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')
          ->Join('Discussion d', 'd.DiscussionID = co.DiscussionID', 'left')
          ->Where('c.AllowDiscussions', '1');
-
-      // Minimally check for view discussion permission
-      if (!$Permissions)
-         $Permissions = 'Vanilla.Discussions.View';
-
-      $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
 
       // Single record or full list?
       if (is_numeric($CategoryID) && $CategoryID > 0) {

@@ -136,9 +136,6 @@ class SettingsController extends Gdn_Controller {
       // Change master template
       $this->MasterView = 'admin';
       parent::Initialize();
-		
-		// Applies db changes in 2.0.17 (if necessary)
-		$this->CategoryModel->ApplyUpdates();
    }   
    
    /**

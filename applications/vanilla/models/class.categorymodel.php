@@ -247,7 +247,7 @@ class CategoryModel extends Gdn_Model {
       if ($Permissions == 'Vanilla.Discussions.View') {
          $CategoryIDs = DiscussionModel::CategoryPermissions();
          if ($CategoryIDs !== TRUE)
-            $this->SQL->WhereIn('d.CategoryID', $CategoryIDs);
+            $this->SQL->WhereIn('c.CategoryID', $CategoryIDs);
       } else {
          $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
       }

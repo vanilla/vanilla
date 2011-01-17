@@ -892,7 +892,7 @@ EOT;
     */
    public static function Seconds($Seconds) {
       $Minutes = floor($Seconds/60);
-      $Hours = floor($Seconds/60/24);
+      $Hours = floor($Seconds/60/60);
       $Days = floor($Seconds/60/60/24);
       $Weeks = floor($Seconds/60/60/24/7);
       $Months = floor($Seconds/60/60/24/30);

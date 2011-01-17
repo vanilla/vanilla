@@ -42,7 +42,7 @@ Vanilla is forum software that powers discussions on over 400,000 sites around t
 
 = Q. How do I install the Vanilla Forums WordPress Plugin =
 
-To install the Plugin you must get it from the [WordPress Plugin Directory](http://wordpress.org/extend/plugins/vanilla-forums/). If you are not a Vanilla Forum owner already, you can create one [here](http://vanillaforums.com). 
+To install the Plugin you must get it from your Vanilla forum's Embed Vanilla page. If you are not a Vanilla Forum owner already, you can create one [here](http://vanillaforums.com). 
 
 
 == Screenshots ==

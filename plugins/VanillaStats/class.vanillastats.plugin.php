@@ -14,7 +14,7 @@ $PluginInfo['VanillaStats'] = array(
    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
    'Version' => '1',
    'MobileFriendly' => FALSE,
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'RequiredApplications' => array('Vanilla' => '2.0.17a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -34,7 +34,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     * Override the default dashboard page with the new stats one.
     */
    public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
-      if (!Gdn::PluginManager()->HasNewMethod('SettingsController', 'Index')) {
+      $Enabled = C('Garden.Analytics.Enabled', TRUE);
+
+      if ($Enabled && !Gdn::PluginManager()->HasNewMethod('SettingsController', 'Index')) {
          Gdn::PluginManager()->RegisterNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
       }
    }
@@ -49,10 +51,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
-      $Sender->AddJsFile('plugins/VanillaStats/js/vanillastats.js');
-      $Sender->AddJsFile('plugins/VanillaStats/js/picker.js');
-      $Sender->AddCSSFile('plugins/VanillaStats/design/style.css');
-      $Sender->AddCSSFile('plugins/VanillaStats/design/picker.css');
       $Sender->Title(T('Dashboard'));
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -69,25 +67,34 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
+
+      if (!Gdn_Statistics::IsEnabled() && Gdn_Statistics::IsLocalhost()) {
+         $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
+      } else {
+         $Sender->AddJsFile('plugins/VanillaStats/js/vanillastats.js');
+         $Sender->AddJsFile('plugins/VanillaStats/js/picker.js');
+         $Sender->AddCSSFile('plugins/VanillaStats/design/style.css');
+         $Sender->AddCSSFile('plugins/VanillaStats/design/picker.css');
+
+         $this->ConfigureRange($Sender);
+         
+         $VanillaID = C('Garden.InstallationID', FALSE);
+         $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
+         
+         $RequestTime = gmmktime();
+         $VanillaSecret = C('Garden.InstallationSecret', FALSE);
+         
+         $SecurityHash = sha1(implode('-',array(
+            $VanillaSecret,
+            $RequestTime
+         )));
+         
+         $Sender->SetData('RequestTime', $RequestTime);
+         $Sender->SetData('SecurityHash', $SecurityHash);
       
-      $this->ConfigureRange($Sender);
-      
-      $VanillaID = C('Garden.InstallationID', FALSE);
-      $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
-      
-      $RequestTime = gmmktime();
-      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
-      
-      $SecurityHash = sha1(implode('-',array(
-         $VanillaSecret,
-         $RequestTime
-      )));
-      
-      $Sender->SetData('RequestTime', $RequestTime);
-      $Sender->SetData('SecurityHash', $SecurityHash);
-      
-      // Render the custom dashboard view
-      $Sender->Render(PATH_PLUGINS.'/VanillaStats/views/dashboard.php');
+         // Render the custom dashboard view
+         $Sender->Render('dashboard', '', 'plugins/VanillaStats');
+      }
    }
    
    public function SettingsController_DashboardRefreshHash_Create($Sender) {

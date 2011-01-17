@@ -48,7 +48,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
     */ 
    public function Check(&$Sender) {
       
-      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      if (!self::IsEnabled()) return;
       
       // Add a pageview entry
       $TimeSlot = date('Ymd');
@@ -76,13 +76,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
       if (C('Garden.Analytics.AutoStructure', FALSE))
          RemoveFromConfig('Garden.Analytics.AutoStructure');
-      
-      // Don't track things for local sites
-      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
-      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
-      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return;
-      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
-
+            
       // Check if we're registered with the central server already. If not, 
       // this request is hijacked and used to perform that task instead of sending stats
       $VanillaID = C('Garden.InstallationID',NULL);
@@ -118,7 +112,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function Register(&$Sender) {
-      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      if (!self::IsEnabled()) return;
       
       $AttemptedRegistration = C('Garden.Registering',FALSE);
       // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
@@ -134,7 +128,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function Stats(&$Sender) {
-      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      if (!self::IsEnabled()) return;
       
       $Request = array();
       $this->BasicParameters($Request);
@@ -223,6 +217,24 @@ class Gdn_Statistics extends Gdn_Pluggable {
             call_user_func(array($this, $CompletionCallback), $JsonResponse, $Response);
          }
       }
+   }
+   
+   public static function IsLocalhost() {
+      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
+      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
+      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return TRUE;
+      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
+      return FALSE;
+   }
+   
+   public static function IsEnabled() {
+      // Enabled if not explicitly disabled via config
+      if (!C('Garden.Analytics.Enabled', TRUE)) return FALSE;
+      
+      // Don't track things for local sites (unless overridden in config)
+      if (self::IsLocalhost() && !C('Garden.Analytics.AllowLocal', FALSE)) return FALSE;
+      
+      return TRUE;
    }
    
 }

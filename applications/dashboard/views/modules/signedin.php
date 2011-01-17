@@ -12,7 +12,7 @@ if (C('Garden.Modules.ShowSignedInModule') && $Session->IsValid()) {
       $CountNotifications = (is_numeric($CountNotifications) && $CountNotifications > 0) ? $CountNotifications : 0;
    }
 ?>
-<div class="Box">
+<div class="Box ProfileBox">
    <h4>My Profile</h4>
    <ul class="PanelInfo">
       <li><strong><?php echo Anchor($Name, 'profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Name)); ?></strong>&#160;</li>

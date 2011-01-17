@@ -27,7 +27,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    
    protected function BasicParameters(&$Request) {
       $Request = array_merge($Request, array(
-         'RequestTime'        => time(),
+         'RequestTime'        => gmmktime(),
          'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER),
          'ServerHostname'     => GetValue('SERVER_NAME', $_SERVER),
          'ServerType'         => GetValue('SERVER_SOFTWARE', $_SERVER),

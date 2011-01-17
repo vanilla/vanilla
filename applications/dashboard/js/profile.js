@@ -18,11 +18,11 @@ jQuery(document).ready(function($) {
    */
    
    // Hijack "clear status" link clicks
-   $('#Status a').live('click', function() {
+   $('#Status a.Change').live('click', function() {
       // hijack the request and clear out the status
       jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
       $('#Status').remove();      
-      return false;      
+      return false;
    });
 
    // Set the max chars in the about form.

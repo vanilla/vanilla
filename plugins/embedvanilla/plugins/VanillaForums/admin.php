@@ -33,7 +33,7 @@ function vf_add_vanilla_menu() {
   if (vf_get_option('url', '') != '') {
 	 add_submenu_page('vf-admin-handle', '&lt;Embed&gt; Vanilla', '&lt;Embed&gt; Vanilla', 'manage_options', 'vf-embed-handle', 'vf_embed_admin_page');
 	 add_submenu_page('vf-admin-handle', 'Widgets', 'Widgets', 'manage_options', 'vf-widgets-handle', 'vf_widgets_admin_page');
-	 add_submenu_page('vf-admin-handle', 'Single Sign-on', 'Single Sign-on', 'manage_options', 'vf-sso-handle', 'vf_sso_admin_page');
+	 // add_submenu_page('vf-admin-handle', 'Single Sign-on', 'Single Sign-on', 'manage_options', 'vf-sso-handle', 'vf_sso_admin_page');
   }
 }
 

@@ -19,5 +19,9 @@ add_filter('the_content', 'vf_embed_content');
 // Handle saving the permalink via ajax
 add_action('wp_ajax_vf_embed_edit_slug', 'vf_embed_edit_slug');
 
-// Add Vanilla Widgets to WordPress
-add_action('widgets_init', 'vf_widgets_init');
+$options = get_option(VF_OPTIONS_NAME);
+$url = vf_get_value('url', $options);
+if ($url != '') {
+	// Add Vanilla Widgets to WordPress
+	add_action('widgets_init', 'vf_widgets_init');
+}

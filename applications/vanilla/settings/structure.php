@@ -218,13 +218,13 @@ $PermissionModel->Define(array(
 	'PermissionCategoryID'
 	);
 
-if ($Drop) {
-   // Get the general category so we can assign permissions to it.
-   $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
+if ($RootCategoryInserted) {
+   // Get the root category so we can assign permissions to it.
+   $GeneralCategoryID = -1; //$SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
    
    // Set the initial guest permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 2,
+      'Role' => 'Guest',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -232,7 +232,7 @@ if ($Drop) {
       ), TRUE);
 
    $PermissionModel->Save(array(
-      'RoleID' => 3,
+      'Role' => 'Confirm Email',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -240,7 +240,7 @@ if ($Drop) {
       ), TRUE);
 
    $PermissionModel->Save(array(
-      'RoleID' => 4,
+      'Role' => 'Applicant',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -249,7 +249,7 @@ if ($Drop) {
    
    // Set the intial member permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 8,
+      'Role' => 'Member',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -260,13 +260,13 @@ if ($Drop) {
       
    // Set the initial moderator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
       ), TRUE);
    
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
@@ -284,31 +284,14 @@ if ($Drop) {
       
    // Set the initial administrator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 16,
+      'Role' => 'Administrator',
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
       ), TRUE);
    
    $PermissionModel->Save(array(
-      'RoleID' => 16,
-      'JunctionTable' => 'Category',
-      'JunctionColumn' => 'PermissionCategoryID',
-      'JunctionID' => $GeneralCategoryID,
-      'Vanilla.Discussions.Add' => 1,
-      'Vanilla.Discussions.Edit' => 1,
-      'Vanilla.Discussions.Announce' => 1,
-      'Vanilla.Discussions.Sink' => 1,
-      'Vanilla.Discussions.Close' => 1,
-      'Vanilla.Discussions.Delete' => 1,
-      'Vanilla.Discussions.View' => 1,
-      'Vanilla.Comments.Add' => 1,
-      'Vanilla.Comments.Edit' => 1,
-      'Vanilla.Comments.Delete' => 1
-      ), TRUE);
-
-   $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Administrator',
       'JunctionTable' => 'Category',
       'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,

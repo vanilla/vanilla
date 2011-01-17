@@ -180,7 +180,7 @@ if (!$PermissionTableExists) {
       'Garden.Applications.Manage',
       'Garden.Plugins.Manage',
       'Garden.Themes.Manage',
-      'Garden.SignIn.Allow',
+      'Garden.SignIn.Allow' => 1,
       'Garden.Registration.Manage',
       'Garden.Applicants.Manage',
       'Garden.Roles.Manage',

@@ -72,8 +72,54 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       
       $this->ConfigureRange($Sender);
       
+      $VanillaID = C('Garden.InstallationID', FALSE);
+      $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
+      
+      $RequestTime = gmmktime();
+      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
+      
+      $SecurityHash = sha1(implode('-',array(
+         $VanillaSecret,
+         $RequestTime
+      )));
+      
+      $Sender->SetData('RequestTime', $RequestTime);
+      $Sender->SetData('SecurityHash', $SecurityHash);
+      
       // Render the custom dashboard view
       $Sender->Render(PATH_PLUGINS.'/VanillaStats/views/dashboard.php');
+   }
+   
+   public function SettingsController_DashboardRefreshHash_Create($Sender) {
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+      $Sender->FireEvent('DefineAdminPermissions');
+      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
+      
+      $VanillaID = C('Garden.InstallationID', FALSE);
+      $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
+      
+      $RequestTime = gmmktime();
+      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
+      
+      $SecurityHash = sha1(implode('-',array(
+         $VanillaSecret,
+         $RequestTime
+      )));
+      
+      $Sender->SetData('RequestTime', $RequestTime);
+      $Sender->SetData('SecurityHash', $SecurityHash);
+      $Sender->Render();
    }
    
    /**

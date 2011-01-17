@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$VanillaID = C('Garden.InstallationID', 'UniqueVanillaInstallationID');
+$VanillaID = $this->Data('VanillaID');
+$RequestTime = $this->Data('RequestTime');
+$SecurityHash = $this->Data('SecurityHash');
 
 function Capitalize($Word) {
    return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
@@ -22,6 +24,8 @@ function WriteRangeTab($Range, $Sender) {
    <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
    <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>" />
    <input type="hidden" name="VanillaID" class="VanillaID" value="<?php echo $VanillaID ?>" />
+   <input type="hidden" name="SecurityHash" class="SecurityHash" value="<?php echo $SecurityHash; ?>" />
+   <input type="hidden" name="RequestTime" class="RequestTime" value="<?php echo $RequestTime; ?>" />
    <ul>
       <?php
       WriteRangeTab(VanillaStatsPlugin::RESOLUTION_DAY, $this);

@@ -23,8 +23,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
 	 */
 	public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
 		// Remove plugins so they don't mess up layout or functionality.
-		if (in_array($Sender->Application(), array('vanilla', 'dashboard', 'conversations')))
+		if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
 			Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+		}
 	}
 	
 	/**

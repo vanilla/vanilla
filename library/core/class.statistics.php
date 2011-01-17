@@ -48,6 +48,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
     */ 
    public function Check(&$Sender) {
       
+      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      
       // Add a pageview entry
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
@@ -58,9 +60,22 @@ class Gdn_Statistics extends Gdn_Pluggable {
             ':TimeSlot'    => $TimeSlot
          ));
       } catch(Exception $e) {
+      
+         // If we just tried to run the structure, and failed, don't blindly try again. Just go to sleep.
+         if (C('Garden.Analytics.AutoStructure', FALSE)) {
+            SaveToConfig('Garden.Analytics.Enabled', FALSE);
+            RemoveFromConfig('Garden.Analytics.AutoStructure');
+            return;
+         }
+         
          // If we get here, insert failed. Try proxyconnect to the utility structure
+         SaveToConfig('Garden.Analytics.AutoStructure', TRUE);
          ProxyRequest(Url('utility/update', TRUE));
       }
+      
+      // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
+      if (C('Garden.Analytics.AutoStructure', FALSE))
+         RemoveFromConfig('Garden.Analytics.AutoStructure');
       
       // Don't track things for local sites
       $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
@@ -69,7 +84,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
 
       // Check if we're registered with the central server already. If not, 
-      // this request is hijacked and used to perform that task.
+      // this request is hijacked and used to perform that task instead of sending stats
       $VanillaID = C('Garden.InstallationID',NULL);
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
@@ -103,6 +118,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function Register(&$Sender) {
+      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      
       $AttemptedRegistration = C('Garden.Registering',FALSE);
       // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
       if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
@@ -117,6 +134,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function Stats(&$Sender) {
+      if (!C('Garden.Analytics.Enabled', TRUE)) return;
+      
       $Request = array();
       $this->BasicParameters($Request);
       

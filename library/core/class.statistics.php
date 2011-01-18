@@ -108,7 +108,9 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
 
    protected function DoneStats($Response, $Raw) {
-      SaveToConfig('Garden.Analytics.LastSentDate', date('Ymd'));
+      $SuccessTimeSlot = GetValue('TimeSlot', $Response, FALSE);
+      if ($SuccessTimeSlot !== FALSE)
+         SaveToConfig('Garden.Analytics.LastSentDate', $SuccessTimeSlot);
    }
    
    public function Register(&$Sender) {
@@ -143,46 +145,75 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $RequestTime
       )));
       
-      $Yesterday = strtotime('yesterday');
-      $TimeSlot = date('Ymd',$Yesterday);
+      // Always look at stats for the day following the previous successful send.
+      $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
+      if ($LastSentDate === FALSE)
+         $StatsDate = strtotime('yesterday');
+      else
+         $StatsDate = strtotime('+1 day', self::TimeFromTimeSlot($LastSentDate));
       
-      $DayStart = date('Y-m-d 00:00:00', $Yesterday);
-      $DayEnd = date('Y-m-d 23:59:59', $Yesterday);
+      $DetectActiveInterval = 0;
+      $MaxIterations = 10; $TimeSlotLimit = date('Ymd');
+      do {
       
-      // Get relevant stats
-      $NumComments = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('Comment')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumComments = GetValue('Hits', $NumComments, NULL);
+         $TimeSlot = date('Ymd',$StatsDate);
          
-      $NumDiscussions = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('Discussion')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
+         // We're caught up to today. Stop looping.
+         if ($TimeSlot >= $TimeSlotLimit) break;
          
-      $NumUsers = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('User')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumUsers = GetValue('Hits', $NumUsers, NULL);
+         $DayStart = date('Y-m-d 00:00:00', $StatsDate);
+         $DayEnd = date('Y-m-d 23:59:59', $StatsDate);
+         
+         // Get relevant stats
+         $NumComments = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('Comment')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumComments = GetValue('Hits', $NumComments, NULL);
+            
+         $NumDiscussions = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('Discussion')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
+            
+         $NumUsers = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('User')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumUsers = GetValue('Hits', $NumUsers, NULL);
+         
+         $NumViews = Gdn::SQL()
+            ->Select('Views')
+            ->From('AnalyticsLocal')
+            ->Where('TimeSlot',$TimeSlot)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumViews = GetValue('Views', $NumViews, NULL);
+         
+         $DetectActiveInterval = array_sum(array(
+            $NumComments,
+            $NumDiscussions,
+            $NumUsers,
+            $NumViews
+         ));
       
-      $NumViews = Gdn::SQL()
-         ->Select('Views')
-         ->From('AnalyticsLocal')
-         ->Where('TimeSlot',$TimeSlot)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumViews = GetValue('Views', $NumViews, NULL);
+         $StatsDate = strtotime('+1 day', $StatsDate);
+         $MaxIterations--;
+      } while($DetectActiveInterval == 0 && $MaxIterations);
+      
+      if ($DetectActiveInterval == 0) {
+         // We've looped $MaxIterations times or up until yesterday and couldn't find any stats. Remember our place and return.
+         SaveToConfig('Garden.Analytics.LastSentDate', $TimeSlot);
+         return;
+      }
       
       // Assemble Stats
-      
       $Request = array_merge($Request, array(
          'VanillaID'          => $VanillaID,
          'SecurityHash'       => $SecurityHash,
@@ -198,11 +229,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
-      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
    
       $ApiMethod = $Method.'.json';
       $FinalURL = CombinePaths(array(
          $AnalyticsServer,
+         'vanillastats/analytics',
          $ApiMethod
       ));
       $FinalURL .= '?'.http_build_query($RequestParameters);
@@ -235,6 +267,19 @@ class Gdn_Statistics extends Gdn_Pluggable {
       if (self::IsLocalhost() && !C('Garden.Analytics.AllowLocal', FALSE)) return FALSE;
       
       return TRUE;
+   }
+   
+   public static function TimeFromTimeSlot($TimeSlot) {
+      $Year = substr($TimeSlot,0,4);
+      $Month = substr($TimeSlot,4,2);
+      $Day = (int)substr($TimeSlot,6,2);
+      if ($Day == 0) $Day = 1;
+      $DateRaw = mktime(0, 0, 1, $Month, $Day, $Year);
+      
+      if ($DateRaw === FALSE)
+         throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");
+      
+      return $DateRaw;
    }
    
 }

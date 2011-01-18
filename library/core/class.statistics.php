@@ -26,11 +26,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    protected function BasicParameters(&$Request) {
+      $ForumAddress = Url('/',TRUE);
       $Request = array_merge($Request, array(
          'RequestTime'        => gmmktime(),
-         'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER),
-         'ServerHostname'     => GetValue('SERVER_NAME', $_SERVER),
-         'ServerType'         => GetValue('SERVER_SOFTWARE', $_SERVER),
+         'ServerIP'           => Gdn::Request()->GetValue('SERVER_ADDR'),
+         'ServerHostname'     => $ForumAddress,
+         'ServerType'         => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
          'PHPVersion'         => phpversion(),
          'VanillaVersion'     => APPLICATION_VERSION
       ));
@@ -83,6 +84,14 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
+         $Conf = CombinePaths(array(PATH_ROOT,'conf/config.php'));
+         if (!is_writable($Conf))
+            return;
+            
+         $AttemptedRegistration = C('Garden.Registering',FALSE);
+         // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
+         if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
+      
          $Sender->AddDefinition('AnalyticsTask', 'register');
          return;
       }
@@ -115,10 +124,6 @@ class Gdn_Statistics extends Gdn_Pluggable {
    
    public function Register(&$Sender) {
       if (!self::IsEnabled()) return;
-      
-      $AttemptedRegistration = C('Garden.Registering',FALSE);
-      // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
-      if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
       // Set the time we last attempted to perform registration
       SaveToConfig('Garden.Registering', time());
@@ -222,7 +227,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
          'CountDiscussions'   => $NumDiscussions,
          'CountUsers'         => $NumUsers,
          'CountViews'         => $NumViews,
-         'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER)
+         'ServerIP'           => Gdn::Request()->GetValue('SERVER_ADDR')
       ));
       
       $this->SendPing('stats', $Request, 'DoneStats');
@@ -241,6 +246,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       $Response = ProxyRequest($FinalURL, FALSE, TRUE);
       if ($Response !== FALSE) {
+         echo $Response;
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)
             $JsonResponse = GetValue('Analytics', $JsonResponse, FALSE);
@@ -252,8 +258,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public static function IsLocalhost() {
-      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
-      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
+      $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
+      $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
       if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return TRUE;
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
       return FALSE;

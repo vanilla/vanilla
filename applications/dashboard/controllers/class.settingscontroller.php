@@ -644,7 +644,8 @@ class SettingsController extends DashboardController {
             }
          }
       }
-
+      
+      ob_clean();
       echo 'Success';
    }
 
@@ -846,4 +847,5 @@ class SettingsController extends DashboardController {
 
       Redirect('/settings/banner');
    }
+   
 }

@@ -260,6 +260,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public static function IsEnabled() {
+      if (!C('Garden.Installed', FALSE)) return FALSE;
+   
       // Enabled if not explicitly disabled via config
       if (!C('Garden.Analytics.Enabled', TRUE)) return FALSE;
       

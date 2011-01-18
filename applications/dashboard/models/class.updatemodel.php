@@ -29,61 +29,145 @@ class UpdateModel extends Gdn_Model {
     * @param bool $Fix Whether or not to fix files that have been zipped incorrectly.
     * @return array An array of addon information.
     */
-   public static function AnalyzeAddon($Path, $Fix = FALSE, $ThrowError = TRUE) {
+   public static function AnalyzeAddon($Path, $ThrowError = TRUE) {
       $Result = array();
 
-      // Extract the zip file so we can make sure it has appropriate information.
-      $Zip = NULL;
+      $InfoPaths = array(
+          '/settings/about.php', // application
+          '/default.php', // plugin
+          '/class.*.plugin.php', // plugin
+          '/about.php', // theme
+          '/definitions.php', // locale
+          '/index.php', // vanilla core
+          'vanilla2export.php' // porter
+          );
 
-      if (class_exists('ZipArchive', FALSE)) {
-         $Zip = new ZipArchive();
-         $ZipOpened = $Zip->open($Path);
-         if ($ZipOpened !== TRUE)
-            $Zip = NULL;
+      // Get the list of potential files to analyze.
+      if (is_dir($Path)) {
+         $Entries = self::_GetInfoFiles($Path, $InfoPaths);
+      } else {
+         $Entries = self::_GetInfoZip($Path, $InfoPaths);
+         $DeleteEntries = TRUE;
       }
 
-      if (!$Zip) {
-         require_once PATH_LIBRARY."/vendors/pclzip/class.pclzipadapter.php";
-         $Zip = new PclZipAdapter();
-         $ZipOpened = $Zip->open($Path);
-      }
+      foreach ($Entries as $Entry) {
+         if ($Entry['Name'] == '/index.php') {
+            // This could be the core vanilla package.
+            $Version = self::ParseCoreVersion($Entry['Path']);
 
-      if ($ZipOpened !== TRUE) {
-         if ($ThrowError) {
-            $Errors = array(ZIPARCHIVE::ER_EXISTS => 'ER_EXISTS', ZIPARCHIVE::ER_INCONS => 'ER_INCONS', ZIPARCHIVE::ER_INVAL => 'ER_INVAL',
-                ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
-               ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
+            if (!$Version)
+               continue;
 
-            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+            // The application was confirmed.
+            $Addon = array(
+                'AddonKey' => 'vanilla',
+                'AddonTypeID' => ADDON_TYPE_CORE,
+                'Name' => 'Vanilla',
+                'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
+                'Version' => $Version,
+                'Path' => $Entry['Path']);
+            break;
+         } elseif ($Entry['Name'] == 'vanilla2export.php') {
+            // This could be the vanilla porter.
+            $Version = self::ParseCoreVersion($Entry['Path']);
+
+            if (!$Version)
+               continue;
+
+            $Addon = array(
+                'AddonKey' => 'porter',
+                'AddonTypeID' => ADDON_TYPE_CORE,
+                'Name' => 'Vanilla Porter',
+                'Description' => 'Drop this script on your existing site and go to it to export your existing forum data to the Vanilla 2 import format. If you want more information on how to use this application go <a href="http://vanillaforums.com/blog/help-topics/importing-data">here</a>.',
+                'Version' => $Version,
+                'Path' => $Entry['Path']);
+            break;
+         } else {
+            // This could be an addon.
+            $Info = self::ParseInfoArray($Entry['Path']);
+            if (!is_array($Info) && count($Info))
+               continue;
+
+            $Key = key($Info);
+            $Variable = $Info['Variable'];
+            $Info = $Info[$Key];
+
+            // Validate the addon.
+            $Name = $Entry['Name'];
+            $Valid = TRUE;
+            if (!GetValue('Name', $Info)) {
+               $Info['Name'] = $Key;
+            }
+            
+            if (!GetValue('Description', $Info)) {
+               $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+               $Valid = FALSE;
+            }
+
+            if (!GetValue('Version', $Info)) {
+               $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+               $Valid = FALSE;
+            }
+
+            if (isset($Entry['Base']) && strcasecmp($Entry['Base'], $Key) != 0 && $Variable != 'ThemeInfo') {
+               $Result[] = "$Name: The addon's key is not the same as its folder name.";
+               $Valid = FALSE;
+            }
+
+            if (!$Valid)
+               continue;
+
+            // The addon is valid.
+            $Addon = array_merge(array('AddonKey' => $Key, 'AddonTypeID' => ''), $Info);
+            switch ($Variable) {
+               case 'ApplicationInfo':
+                  $Addon['AddonTypeID'] = ADDON_TYPE_APPLICATION;
+                  break;
+               case 'LocaleInfo':
+                  $Addon['AddonTypeID'] = ADDON_TYPE_LOCALE;
+                  break;
+               case 'PluginInfo':
+                  $Addon['AddonTypeID'] = ADDON_TYPE_PLUGIN;
+                  break;
+               case 'ThemeInfo':
+                  $Addon['AddonTypeID'] = ADDON_TYPE_THEME;
+                  break;  
+            }
          }
+      }
+
+      if ($DeleteEntries) {
+         $FolderPath = substr($Path, 0, -4);
+         Gdn_FileSystem::RemoveFolder($FolderPath);
+      }
+
+      // Add the addon requirements.
+      if ($Addon) {
+         $Requirements = ArrayTranslate($Addon, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
+         foreach ($Requirements as $Type => $Items) {
+            if (!is_array($Items))
+               unset($Requirements[$Type]);
+         }
+         $Addon['Requirements'] = serialize($Requirements);
+
+         $Addon['Checked'] = TRUE;
+         $UploadsPath = PATH_ROOT.'/uploads/';
+         if (StringBeginsWith($Addon['Path'], $UploadsPath)) {
+            $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
+         }
+
+         if (is_file($Path)) {
+            $Addon['MD5'] = md5_file($Path);
+            $Addon['FileSize'] = filesize($Path);
+         }
+      } elseif ($ThrowError) {
+         $Msg = implode("\n", $Result);
+         throw new Gdn_UserException($Msg, 400);
+      } else {
          return FALSE;
       }
 
-      $Entries = array();
-      for ($i = 0; $i < $Zip->numFiles; $i++) {
-         $Entries[] = $Zip->statIndex($i);
-      }
-
-      // Figure out which system files to delete.
-      $Deletes = array();
-
-      foreach ($Entries as $Index => $Entry) {
-         $Name = $Entry['name'];
-         $Delete = strpos($Name, '__MACOSX') !== FALSE
-            | strpos($Name, '.DS_Store') !== FALSE
-            | strpos($Name, 'thumbs.db') !== FALSE
-            | strpos($Name, '.gitignore') !== FALSE;
-
-         if ($Delete) {
-            $Deletes[] = $Entry;
-            unset($Entries[$Index]);
-         }
-      }
-
-      // Get a folder ready for checking the addon.
-      $FolderPath = dirname($Path).'/'.basename($Path, '.zip').'/';
-      if (file_exists($FolderPath))
-         Gdn_FileSystem::RemoveFolder($FolderPath);
+      return $Addon;
 
       // Figure out what kind of addon this is.
       $Root = '';
@@ -342,29 +426,6 @@ class UpdateModel extends Gdn_Model {
             break;
          }
 
-         // Check to see if the entry is the porter.
-         if (StringEndsWith($Name, 'vanilla2export.php')) {
-            if (count(explode('/', $Folder)) != 2) {
-               continue;
-            }
-
-            $Zip->extractTo($FolderPath, $Entry['name']);
-            $FilePath = CombinePaths(array($FolderPath, $Name));
-            $Version = self::ParseCoreVersion($FilePath, 'VERSION');
-
-            if (!$Version)
-               continue;
-
-            $Addon = array(
-                'AddonKey' => 'porter',
-                'AddonTypeID' => ADDON_TYPE_CORE,
-                'Name' => 'Vanilla Porter',
-                'Description' => 'Drop this script on your existing site and go to it to export your existing forum data to the Vanilla 2 import format. If you want more information on how to use this application go <a href="http://vanillaforums.com/blog/help-topics/importing-data">here</a>',
-                'Version' => $Version,
-                'Path' => $Path);
-            $Info = array();
-            break;
-         }
       }
 
       if ($Addon) {
@@ -411,6 +472,79 @@ class UpdateModel extends Gdn_Model {
       }
    }
 
+   protected static function _GetInfoFiles($Path, $InfoPaths) {
+      $Path = str_replace('\\', '/', rtrim($Path));
+
+      $Result = array();
+      // Check to see if the paths exist.
+      foreach ($InfoPaths as $InfoPath) {
+         $Glob = glob($Path.$InfoPath);
+         if (is_array($Glob)) {
+            foreach ($Glob as $GlobPath) {
+               $Result[] = array('Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath);
+            }
+         }
+      }
+
+      return $Result;
+   }
+
+   protected static function _GetInfoZip($Path, $InfoPaths, $TmpPath = FALSE) {
+      // Extract the zip file so we can make sure it has appropriate information.
+      $Zip = NULL;
+
+      if (class_exists('ZipArchive', FALSE)) {
+         $Zip = new ZipArchive();
+         $ZipOpened = $Zip->open($Path);
+         if ($ZipOpened !== TRUE)
+            $Zip = NULL;
+      }
+
+      if (!$Zip) {
+         require_once PATH_LIBRARY."/vendors/pclzip/class.pclzipadapter.php";
+         $Zip = new PclZipAdapter();
+         $ZipOpened = $Zip->open($Path);
+      }
+
+      if ($ZipOpened !== TRUE) {
+         if ($ThrowError) {
+            $Errors = array(ZIPARCHIVE::ER_EXISTS => 'ER_EXISTS', ZIPARCHIVE::ER_INCONS => 'ER_INCONS', ZIPARCHIVE::ER_INVAL => 'ER_INVAL',
+                ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
+               ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
+
+            throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+         }
+         return FALSE;
+      }
+
+      if ($TmpPath === FALSE)
+         $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
+      if (file_exists($TmpPath))
+         Gdn_FileSystem::RemoveFolder($TmpPath);
+
+      $Result = array();
+      for ($i = 0; $i < $Zip->numFiles; $i++) {
+         $Entry = $Zip->statIndex($i);
+
+         foreach ($InfoPaths as $InfoPath) {
+            $Preg = '`('.str_replace(array('.', '*'), array('\.', '.*'), $InfoPath).')$`';
+            if (preg_match($Preg, $Entry['name'], $Matches)) {
+               $Base = trim(substr($Entry['name'], 0, -strlen($Matches[1])), '/');
+               if (strpos($Base, '/') !== FALSE)
+                  continue; // file nested too deep.
+
+               if (!file_exists($TmpPath))
+                  mkdir($TmpPath, 0777, TRUE);
+
+               $Zip->extractTo($TmpPath, $Entry['name']);
+               $Result[] = array('Name' => $Matches[1], 'Path' => $TmpPath.rtrim($Entry['name'], '/'), 'Base' => $Base);
+            }
+         }
+      }
+
+      return $Result;
+   }
+
    /**
     * Parse the version out of the core's index.php file.
     *
@@ -448,7 +582,7 @@ class UpdateModel extends Gdn_Model {
     * @param string $Variable The name of variable containing the information.
     * @return array|false The info array or false if the file could not be parsed.
     */
-   public static function ParseInfoArray($Path, $Variable) {
+   public static function ParseInfoArray($Path, $Variable = FALSE) {
       $fp = fopen($Path, 'rb');
       $Lines = array();
       $InArray = FALSE;
@@ -460,7 +594,8 @@ class UpdateModel extends Gdn_Model {
          if (!$Line)
             continue;
 
-         if (StringBeginsWith(trim($Line), '$'.trim($Variable, '$'))) {
+         if (!$InArray && preg_match('`\$([A-Za-z]+Info)\s*\[`', trim($Line), $Matches)) {
+            $Variable = $Matches[1];
             if (preg_match('`\[\s*[\'"](.+?)[\'"]\s*\]`', $Line, $Matches)) {
                $GlobalKey = $Matches[1];
                $InArray = TRUE;
@@ -521,7 +656,7 @@ class UpdateModel extends Gdn_Model {
             $Result[$Key] = $Value;
          }
       }
-      $Result = array($GlobalKey => $Result);
+      $Result = array($GlobalKey => $Result, 'Variable' => $Variable);
       return $Result;
    }
 
@@ -644,5 +779,36 @@ class UpdateModel extends Gdn_Model {
          $UpdateAddons = $this->CompareAddons($MyAddons, $SiteAddons);
       }
       return $UpdateAddons;
+   }
+
+   public function RunStructure($AddonCode = NULL, $Explicit = FALSE, $Drop = FALSE) {
+      // Get the structure files for all of the enabled applications.
+      $ApplicationManager = new Gdn_ApplicationManager();
+      $Apps = $ApplicationManager->EnabledApplications();
+      $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+      $Paths = array();
+      foreach ($Apps as $AppInfo) {
+         $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
+         if (file_exists($Path))
+            $Paths[] = $Path;
+      }
+      
+      // Execute the structures.
+      $Database = Gdn::Database();
+      $SQL = Gdn::SQL();
+      $Structure = Gdn::Structure();
+
+      foreach ($Paths as $Path) {
+         include $Path;
+      }
+
+      // Execute the structures for all of the plugins.
+      $PluginManager = Gdn::PluginManager();
+      $Plugins = $PluginManager->EnabledPlugins();
+      foreach ($Plugins as $Key => $PluginInfo) {
+         $Plugin = $PluginManager->GetPluginInstance($Key, Gdn_PluginManager::ACCESS_PLUGINNAME);
+         if (method_exists($Plugin, 'Structure'))
+            $Plugin->Structure();
+      }
    }
 }

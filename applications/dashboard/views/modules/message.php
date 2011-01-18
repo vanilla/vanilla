@@ -7,6 +7,7 @@ if (is_object($this->_Message)) {
       echo Anchor('×', '/dashboard/message/dismiss/'.$this->_Message->MessageID.'/'.$Session->TransientKey().'?Target='.$this->_Sender->SelfUrl, 'Dismiss');
    }
    
-   echo Gdn_Format::To($this->_Message->Content, 'Html');
+   // echo Gdn_Format::To($this->_Message->Content, 'Html');
+   echo $this->_Message->Content;
    echo '</div>';
 }

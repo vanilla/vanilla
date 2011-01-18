@@ -55,8 +55,8 @@ $PhotoExists = $Construct->ColumnExists('Photo');
 
 $Construct
 	->PrimaryKey('UserID')
-   ->Column('Name', 'varchar(20)', FALSE, 'key')
-   ->Column('Password', 'varbinary(50)')
+   ->Column('Name', 'varchar(50)', FALSE, 'key')
+   ->Column('Password', 'varbinary(100)') // keep this longer because of some imports.
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
    ->Column('About', 'text', TRUE)
@@ -144,12 +144,21 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
+   
+$Construct->Table('AnalyticsLocal')
+   ->Engine('InnoDB')
+   ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
+   ->Column('Views', 'int', NULL)
+   ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Database = $Database;
 $PermissionModel->SQL = $SQL;
+$PermissionTableExists = FALSE;
 if($PermissionModel instanceof PermissionModel) {
+   $PermissionTableExists = $Construct->TableExists('Permission');
+
 	// Permission Table
 	$Construct->Table('Permission')
 		->PrimaryKey('PermissionID')
@@ -160,79 +169,81 @@ if($PermissionModel instanceof PermissionModel) {
 		// The actual permissions will be added by PermissionModel::Define()
 		->Set($Explicit, $Drop);
 }
-   
-// Define the set of permissions that garden uses.
-$PermissionModel->Define(array(
-	'Garden.Email.Manage',
-	'Garden.Settings.Manage',
-	'Garden.Routes.Manage',
-   'Garden.Messages.Manage',
-	'Garden.Applications.Manage',
-	'Garden.Plugins.Manage',
-	'Garden.Themes.Manage',
-	'Garden.SignIn.Allow',
-	'Garden.Registration.Manage',
-	'Garden.Applicants.Manage',
-	'Garden.Roles.Manage',
-	'Garden.Users.Add',
-	'Garden.Users.Edit',
-	'Garden.Users.Delete',
-	'Garden.Users.Approve',
-	'Garden.Activity.Delete',
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
-	
-// Set initial guest permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 2,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
-	
-// Set initial applicant permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 4,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
 
-// Set initial member permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 8,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
+if (!$PermissionTableExists) {
+   // Define the set of permissions that garden uses.
+   $PermissionModel->Define(array(
+      'Garden.Email.Manage',
+      'Garden.Settings.Manage',
+      'Garden.Routes.Manage',
+      'Garden.Messages.Manage',
+      'Garden.Applications.Manage',
+      'Garden.Plugins.Manage',
+      'Garden.Themes.Manage',
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Registration.Manage',
+      'Garden.Applicants.Manage',
+      'Garden.Roles.Manage',
+      'Garden.Users.Add',
+      'Garden.Users.Edit',
+      'Garden.Users.Delete',
+      'Garden.Users.Approve',
+      'Garden.Activity.Delete',
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
 
-// Set initial moderator permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 32,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
+   // Set initial guest permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 2,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
 
-// Set initial admininstrator permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 16,
-	'Garden.Settings.Manage' => 1,
-	'Garden.Routes.Manage' => 1,
-	'Garden.Applications.Manage' => 1,
-	'Garden.Plugins.Manage' => 1,
-	'Garden.Themes.Manage' => 1,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Registration.Manage' => 1,
-	'Garden.Applicants.Manage' => 1,
-	'Garden.Roles.Manage' => 1,
-	'Garden.Users.Add' => 1,
-	'Garden.Users.Edit' => 1,
-	'Garden.Users.Delete' => 1,
-	'Garden.Users.Approve' => 1,
-	'Garden.Activity.Delete' => 1,
-	'Garden.Activity.View' => 1,
-   'Garden.Profiles.View' => 1
-	));
+   // Set initial applicant permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 4,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial member permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 8,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial moderator permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 32,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial admininstrator permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 16,
+      'Garden.Settings.Manage' => 1,
+      'Garden.Routes.Manage' => 1,
+      'Garden.Applications.Manage' => 1,
+      'Garden.Plugins.Manage' => 1,
+      'Garden.Themes.Manage' => 1,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Registration.Manage' => 1,
+      'Garden.Applicants.Manage' => 1,
+      'Garden.Roles.Manage' => 1,
+      'Garden.Users.Add' => 1,
+      'Garden.Users.Edit' => 1,
+      'Garden.Users.Delete' => 1,
+      'Garden.Users.Approve' => 1,
+      'Garden.Activity.Delete' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+}
 
 // Photo Table
 $Construct->Table('Photo');
@@ -287,7 +298,7 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinInvite'))->NumRows() == 
 if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinApproved'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinApproved', 'FullHeadline' => '%1$s approved %4$s membership application.', 'ProfileHeadline' => '%1$s approved %4$s membership application.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinCreated'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinCreated', 'FullHeadline' => '%3$s created an account for %1$s.', 'ProfileHeadline' => '%3$s created an account for %1$s.'));
+   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinCreated', 'FullHeadline' => '%1$s created an account for %4$s.', 'ProfileHeadline' => '%1$s created an account for %4$s.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)

@@ -144,9 +144,14 @@ class Gdn_PluginManager {
    
    private function _RemoveFromCollectionByPrefix($Prefix, &$Collection) {
       foreach ($Collection as $Event => $Hooks) {
-         foreach ($Hooks as $Index => $Hook) {
-            if (strpos($Hook, $Prefix.'.') === 0)
-               unset($Collection[$Event][$Index]);
+         if (is_array($Hooks)) {
+            foreach ($Hooks as $Index => $Hook) {
+               if (strpos($Hook, $Prefix.'.') === 0)
+                  unset($Collection[$Event][$Index]);
+            }
+         } elseif (is_string($Hooks)) {
+            if (strpos($Hooks, $Prefix.'.') === 0)
+               unset($Collection[$Event]);
          }
       }
    }
@@ -185,7 +190,17 @@ class Gdn_PluginManager {
       
       return ($PluginName !== FALSE) ? $this->AvailablePlugins($PluginName) : FALSE;
    }
-   
+
+   /**
+    * Gets an instance of a given plugin.
+    *
+    * @param string $AccessName The key of the plugin.
+    * @param string $AccessType The type of key for the plugin which must be one of the following:
+    *  - Gdn_PluginManager::ACCESS_PLUGINNAME
+    *  - Gdn_PluginManager::ACCESS_CLASSNAME
+    * @param mixed $Sender An object to pass to a new plugin instantiation.
+    * @return Gdn_IPlugin The plugin instance.
+    */
    public function GetPluginInstance($AccessName, $AccessType = self::ACCESS_CLASSNAME, $Sender = NULL) {
       $ClassName = NULL;
       switch ($AccessType) {
@@ -543,7 +558,7 @@ class Gdn_PluginManager {
             // Look for an icon.
             $IconFile = SafeGlob(dirname($PluginFile).'/icon.*', array('jpg', 'gif', 'png'));
             if (($IconFile = GetValue(0, $IconFile)))
-               $PluginInfo['IconUrl'] = Url(str_replace(PATH_ROOT, '', $IconFile));
+               $PluginInfo['IconUrl'] = str_replace(PATH_ROOT, '', $IconFile);
 
             $this->_AvailablePlugins[$PluginInfo['Index']] = $PluginInfo;
             $this->_PluginsByClassName[$PluginInfo['ClassName']] = $PluginInfo['Index'];
@@ -620,6 +635,11 @@ class Gdn_PluginManager {
       if (!$Plugin) return;
 
       $PluginName = $Plugin['Index'];
+
+      // Check to see if the plugin is already enabled.
+      if (array_key_exists($PluginName, $this->EnabledPlugins())) {
+         throw new Gdn_UserException(T('The plugin is already enabled.'));
+      }
       
       $this->TestPlugin($PluginName, $Validation, $Setup);
       

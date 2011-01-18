@@ -30,7 +30,7 @@ echo $this->Form->Errors();
          <?php
       }
       ?>
-      <li>
+      <li class="RolePermissions">
          <?php
             echo '<strong>'.T('Check all permissions that apply to this role:').'</strong>';
             echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');

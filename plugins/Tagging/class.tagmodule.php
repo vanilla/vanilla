@@ -60,7 +60,7 @@ class TagModule extends Gdn_Module {
                            } else {
                               echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
                            }
-                        ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
+                        ?></strong><span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
          <?php
             }
          }

@@ -38,6 +38,7 @@ jQuery(document).ready(function($) {
    }
 		
 	gdn = { };
+	gdn.Libraries = {};
 
    // Grab a definition from hidden inputs in the page
    gdn.definition = function(definition, defaultVal, set) {
@@ -59,15 +60,6 @@ jQuery(document).ready(function($) {
       return def;
    }
 
-   // Main Menu dropdowns
-	/*
-   if ($.fn.menu)
-      $('#Menu').menu({
-         showDelay: 0,
-         hideDelay: 0
-      });
-	*/
-	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
       document.location = gdn.url('/profile/notifications');
@@ -163,7 +155,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+         setTimeout(function() { document.location.replace(RedirectUrl); }, 2000);
       }
    }
 
@@ -279,13 +271,71 @@ jQuery(document).ready(function($) {
          }
       }
    };
-
+   
+   gdn.requires = function(Library) {
+      if (!(Library instanceof Array))
+         Library = [Library];
+      
+      var Response = true;
+      
+      $(Library).each(function(i,Lib){
+         // First check if we already have this library
+         var LibAvailable = gdn.available(Lib);
+         
+         if (!LibAvailable) Response = false;
+         
+         // Skip any libs that are ready or processing
+         if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
+            return;
+         
+         // As yet unseen. Try to load
+         gdn.Libraries[Lib] = false;
+         var Src = '/js/'+Lib+'.js';
+         var head = document.getElementsByTagName('head')[0];
+         var script = document.createElement('script');
+         script.type = 'text/javascript';
+         script.src = Src;
+         head.appendChild(script);
+      });
+      
+      if (Response) gdn.loaded(null);
+      return Response;
+   };
+   
+   gdn.loaded = function(Library) {
+      if (Library != null) 
+         gdn.Libraries[Library] = true;
+         
+      $(document).trigger('libraryloaded',[Library])
+   }
+   
+   gdn.available = function(Library) {
+      if (!(Library instanceof Array))
+         Library = [Library];
+         
+      for (var i = 0; i<Library.length; i++) {
+         var Lib = Library[i];
+         if (gdn.Libraries[Lib] !== true) return false;
+      }
+      return true;
+   }
+   
+   gdn.stats = function(action, params, callback) {
+      // Call directly back to the deployment and invoke the stats handler
+      var StatsURL = gdn.url('settings/analytics'+action+'.json');
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: StatsURL
+      });
+   }
+   
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
       var urlFormat = gdn.definition("UrlFormat", "");
-
+      
       if (path[0] == "/")
          path = path.substr(1);
 
@@ -312,7 +362,7 @@ jQuery(document).ready(function($) {
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {
-      $(this).before('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
+      $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
    
    // Confirmation for item removals
@@ -338,7 +388,20 @@ jQuery(document).ready(function($) {
 				return false;
 			})
 		}
-	}); 
+	});
+   
+   var AnalyticsTask = gdn.definition('AnalyticsTask', false);
+   switch (AnalyticsTask) {
+	   case 'register':
+	   case 'stats':
+	     // Send stats ping
+	     gdn.stats(AnalyticsTask);
+	   break;
+	   
+	   default:
+	     // Nothing
+	   break;
+	}
    
 });
 

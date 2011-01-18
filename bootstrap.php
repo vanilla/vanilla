@@ -52,6 +52,8 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.cache.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.dirtycache.php');
 require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
 
+require_once(PATH_LIBRARY_CORE . DS . 'class.statistics.php');
+
 /// Include the core Gdn object.
 require_once(PATH_LIBRARY_CORE . DS . 'class.gdn.php');
 
@@ -121,6 +123,8 @@ Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY
 // Theme manager
 Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
+
+Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY.DS.'core'.DS.'class.statistics.php', Gdn::FactoryInstance);
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);

@@ -550,10 +550,8 @@ class Gdn_Request {
 
          // Check for a filename.
          $Filename = basename($Path);
-         if (strpos($Filename, '.') !== FALSE)
-            $Path = substr($Path, 0, -strlen($Filename));
-         else
-            $Filename = '';
+         if (strpos($Filename, '.') === FALSE)
+            $Filename = 'default';
          $Path = trim($Path, '/');
 
          $Query = GetValue('query', $Parts, '');
@@ -569,6 +567,8 @@ class Gdn_Request {
          }
 
          // Set the parts of the query here.
+         if (!$this->_HaveParsedRequest)
+            $this->_ParseRequest();
          $this->_ParsedRequest['Path'] = $Path;
          $this->_ParsedRequest['Filename'] = $Filename;
          $this->_RequestArguments[self::INPUT_GET] = $Get;

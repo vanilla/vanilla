@@ -213,6 +213,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
+         
+         $this->EventArguments['Controller'] =& $Controller;
 
          // Pass along any assets
          if (is_array($this->_AssetCollection)) {
@@ -384,7 +386,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerName = '';
       $this->_ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
-      $this->Request = $Request->Path(TRUE);
+      $this->Request = $Request->Path(FALSE);
 
       $PathAndQuery = $Request->PathAndQuery();
       //$Router = Gdn::Router();
@@ -399,24 +401,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               header( "HTTP/1.1 302 Moved Temporarily" );
-               header( "Location: ".$MatchRoute['FinalDestination'] );
+               header("HTTP/1.1 302 Moved Temporarily" );
+               header("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'Permanent':
-               header( "HTTP/1.1 301 Moved Permanently" );
-               header( "Location: ".$MatchRoute['FinalDestination'] );
+               header("HTTP/1.1 301 Moved Permanently" );
+               header("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'NotAuthorized':
-               header( "HTTP/1.1 401 Not Authorized" );
+               header("HTTP/1.1 401 Not Authorized" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
 
             case 'NotFound':
-               header( "HTTP/1.1 404 Not Found" );
+               header("HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
          }

@@ -125,6 +125,11 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 14px;
 	margin: 0;
 }
+#Content h1 a {
+	text-shadow: none;
+	font-size: 12px;
+	margin-left: 20px;
+}
 #Content h3 {
 	border-top: 1px solid #8bc1de;
 }
@@ -901,6 +906,9 @@ label.SubLabel {
    display: inline-block;
    width: 321px;
 }
+body.managecategories div.Info div {
+	padding-top: 16px;
+}
 
 /* =================================================================== Header */
 #Head {
@@ -1155,14 +1163,20 @@ ul.PanelInfo li.Active {
 
 
 /* ================================================== Splash Information Page */
-.SplashInfo {
+body.Home #Content {
+	margin: 0 auto;
+}
+#Content .SplashInfo {
 	margin: 80px 0;
 	border-top: 1px solid #a5d0e7;
 	border-bottom: 1px solid #a5d0e7;
 	background: #e2f4ff;
 }
-.SplashInfo h1 {
+#Content .SplashInfo h1 {
+	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+	background: transparent;
 	text-align: center;
+	border: none;
 	border-top: 1px solid #fff;
 	color:#02455B;
 	font-size:300%;
@@ -1171,7 +1185,7 @@ ul.PanelInfo li.Active {
 	margin: 0;
 	line-height: 1;
 }
-.SplashInfo p {
+#Content .SplashInfo p {
 	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 	text-align: center;
 	border-bottom: 1px solid #fff;
@@ -1578,8 +1592,13 @@ table tbody td {
 .CheckBoxGrid td.Alt {
 	background: none;
 }
-body.managecategories table td.Last {
-	white-space: nowrap;
+
+li.RolePermissions table.CheckBoxGrid tbody tr th a {
+	white-space:nowrap;
+}
+
+li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
+	display:inline;
 }
 
 /* Summary Tables */
@@ -1715,4 +1734,77 @@ div.Summary table tbody td {
    z-index: 200;
    position: relative;
    margin: 6px;
+}
+
+/* Homepage Admin */
+.HomeOptions {
+	padding: 0 20px;
+}
+.HomeOptions a {
+	color: #333;
+	font-weight: bold;
+	text-decoration: none;
+	display: inline-block;
+	vertical-align: bottom;
+	width: 180px;
+	margin: 0 10px 10px 0;
+	padding: 0 6px;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border: 1px solid #ddd;
+	background: url('images/homepage-sprites.png') 6px 23px no-repeat #eee;
+	height: 152px;
+}
+.HomeOptions a.categoriesdiscussions { background-position: -184px 23px; }
+.HomeOptions a.categoriesall { background-position: -564px 23px; }
+.HomeOptions a.activity { background-position: -374px 23px; }
+.HomeOptions a:hover {
+	background-color: #f5f5f5;
+	border-color: #ccc;
+}
+
+ol.Sortable, ol.Sortable ol {
+	margin: 0 0 0 25px;
+	padding: 0;
+	list-style-type: none;
+}
+ol.Sortable {
+	margin: 0;
+	background: #f3f3f3;
+}
+.Sortable li {
+	margin: 0;
+	padding: 0;
+}
+.Sortable li div  {
+	padding: 0;
+	margin: 0;
+	cursor: move;
+}
+.Placeholder {
+	background-color: #cfcfcf;
+}
+.SortableError {
+	background:#fbe3e4;
+	color:#8a1f11;
+}
+.Sortable table {
+	border: 1px solid #e0e0e0;
+	border-right: none;
+	margin: -1px 0 0 -1px;
+}
+.Sortable table td {
+	vertical-align: top;
+	padding: 6px;
+	background: #fff;
+	border-bottom: none;
+}
+.Sortable table td strong,
+.Sortable table td blockquote {
+	display: block;
+}
+.Sortable table td.Buttons {
+	text-align: right;
+	padding: 6px 0;
 }

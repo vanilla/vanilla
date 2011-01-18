@@ -22,6 +22,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_Format {
 
    /**
+    * Flag which allows plugins to decide if the output
+	* should include rel="nofollow" on any <a> links.
+	* Example: a plugin can run on "BeforeCommentBody" to
+	* check the current users role and decide if his/her post
+	* should contain rel="nofollow" links.
+	* The default setting is true, meaning all links will contain
+	* the rel="nofollow" attribute.   
+    */
+	public static $DisplayNoFollow = true;
+
+   /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
     * used on this page (the user profile page). The FullHeadline field is to be
@@ -57,6 +68,7 @@ class Gdn_Format {
          $ActivityNameP = FormatPossessive($ActivityName);
          $GenderSuffixCode = 'Third';
       }
+
       if ($ProfileUserID != $Activity->ActivityUserID) {
          // If we're not looking at the activity user's profile, link the name
          $ActivityNameD = urlencode($Activity->ActivityName);
@@ -64,6 +76,7 @@ class Gdn_Format {
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
          $GenderSuffixCode = 'Third';
       }
+      
       $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
@@ -84,6 +97,7 @@ class Gdn_Format {
             $GenderSuffixCode = 'Third';
       }
       $RegardingWall = '';
+      $RegardingWallLink = '';
 
       if ($Activity->ActivityUserID == $Activity->RegardingUserID) {
          // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
@@ -98,18 +112,23 @@ class Gdn_Format {
             $GenderSuffixCode = 'Third';
             $GenderSuffixGender = $Activity->RegardingGender;
          }
-         $RegardingWall = Anchor(T('wall'), '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID);
+         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID;
+         $RegardingWallLink = Url($RegardingWallActivityPath);
+         $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
       }
       if ($RegardingWall == '')
          $RegardingWall = T('wall');
 
       if ($Activity->Route == '') {
+      	 $ActivityRouteLink = '';
          if ($Activity->RouteCode)
             $Route = T($Activity->RouteCode);
          else
             $Route = '';
-      } else
+      } else {
+         $ActivityRouteLink = Url($Activity->Route);
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
+      }
 
       // Translate the gender suffix.
       $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";
@@ -134,7 +153,7 @@ class Gdn_Format {
       $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
       $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $FullHeadline : $ProfileHeadline);
       
-      return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix);
+      return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix, $RegardingWallLink, $ActivityRouteLink);
    }
 
    /**
@@ -310,7 +329,7 @@ class Gdn_Format {
    /**
    * 
    */
-   protected static $Code = array('-','_','&lt;','&gt;','&#039;','&amp;','&quot;','À','Á','Â','Ã','Ä','&Auml;','Å','Ā','Ą','Ă','Æ','Ç','Ć','Č','Ĉ','Ċ','Ď','Đ','Ð','È','É','Ê','Ë','Ē','Ę','Ě','Ĕ','Ė','Ĝ','Ğ','Ġ','Ģ','Ĥ','Ħ','Ì','Í','Î','Ï','Ī','Ĩ','Ĭ','Į','İ','Ĳ','Ĵ','Ķ','Ł','Ľ','Ĺ','Ļ','Ŀ','Ñ','Ń','Ň','Ņ','Ŋ','Ò','Ó','Ô','Õ','Ö','&Ouml;','Ø','Ō','Ő','Ŏ','Œ','Ŕ','Ř','Ŗ','Ś','Š','Ş','Ŝ','Ș','Ť','Ţ','Ŧ','Ț','Ù','Ú','Û','Ü','Ū','&Uuml;','Ů','Ű','Ŭ','Ũ','Ų','Ŵ','Ý','Ŷ','Ÿ','Ź','Ž','Ż','Þ','Þ','à','á','â','ã','ä','&auml;','å','ā','ą','ă','æ','ç','ć','č','ĉ','ċ','ď','đ','ð','è','é','ê','ë','ē','ę','ě','ĕ','ė','ƒ','ĝ','ğ','ġ','ģ','ĥ','ħ','ì','í','î','ï','ī','ĩ','ĭ','į','ı','ĳ','ĵ','ķ','ĸ','ł','ľ','ĺ','ļ','ŀ','ñ','ń','ň','ņ','ŉ','ŋ','ò','ó','ô','õ','ö','&ouml;','ø','ō','ő','ŏ','œ','ŕ','ř','ŗ','š','ù','ú','û','ü','ū','&uuml;','ů','ű','ŭ','ũ','ų','ŵ','ý','ÿ','ŷ','ž','ż','ź','þ','ß','ſ','А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я','а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
+   protected static $Code = array('-','_','&lt;','&gt;','&#039;','&amp;','&quot;','À','Á','Â','Ã','Ä','&Auml;','Å','Ā','Ą','Ă','Æ','Ç','Ć','Č','Ĉ','Ċ','Ď','Đ','Ð','È','É','Ê','Ë','Ē','?','Ě','Ĕ','Ė','Ĝ','Ğ','Ġ','Ģ','Ĥ','Ħ','Ì','Í','Î','Ï','Ī','Ĩ','Ĭ','Į','İ','Ĳ','Ĵ','Ķ','Ł','Ľ','Ĺ','Ļ','Ŀ','Ñ','Ń','Ň','Ņ','Ŋ','Ò','Ó','Ô','Õ','Ö','&Ouml;','?','Ō','Ő','Ŏ','Œ','Ŕ','?','Ŗ','Ś','Š','Ş','Ŝ','?','Ť','Ţ','Ŧ','Ț','Ù','Ú','Û','Ü','Ū','&Uuml;','Ů','Ű','Ŭ','Ũ','Ų','Ŵ','Ý','Ŷ','Ÿ','Ź','Ž','Ż','Þ','Þ','à','á','â','ã','ä','&auml;','å','ā','ą','ă','æ','ç','ć','č','ĉ','ċ','ď','đ','ð','è','é','ê','ë','ē','ę','ě','ĕ','ė','ƒ','ĝ','ğ','ġ','ģ','ĥ','ħ','ì','í','î','ï','ī','ĩ','ĭ','į','ı','ĳ','ĵ','ķ','ĸ','ł','ľ','ĺ','ļ','ŀ','ñ','ń','ň','ņ','ŉ','ŋ','ò','ó','ô','õ','ö','&ouml;','ø','ō','ő','ŏ','œ','ŕ','ř','ŗ','š','ù','ú','û','ü','ū','&uuml;','ů','ű','ŭ','ũ','ų','ŵ','ý','ÿ','ŷ','ž','ż','ź','þ','ß','ſ','А','Б','В','Г','Д','Е','Ё','Ж','З','?','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я','а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
    protected static $Translation = array(' ',' ','','','','','','A','A','A','A','Ae','A','A','A','A','A','Ae','C','C','C','C','C','D','D','D','E','E','E','E','E','E','E','E','E','G','G','G','G','H','H','I','I','I','I','I','I','I','I','I','IJ','J','K','K','K','K','K','K','N','N','N','N','N','O','O','O','O','Oe','Oe','O','O','O','O','OE','R','R','R','S','S','S','S','S','T','T','T','T','U','U','U','Ue','U','Ue','U','U','U','U','U','W','Y','Y','Y','Z','Z','Z','T','T','a','a','a','a','ae','ae','a','a','a','a','ae','c','c','c','c','c','d','d','d','e','e','e','e','e','e','e','e','e','f','g','g','g','g','h','h','i','i','i','i','i','i','i','i','i','ij','j','k','k','l','l','l','l','l','n','n','n','n','n','n','o','o','o','o','oe','oe','o','o','o','o','oe','r','r','r','s','u','u','u','ue','u','ue','u','u','u','u','u','w','y','y','y','z','z','z','t','ss','ss','A','B','V','G','D','E','YO','ZH','Z','I','Y','K','L','M','N','O','P','R','S','T','U','F','H','C','CH','SH','SCH','','Y','','E','YU','YA','a','b','v','g','d','e','yo','zh','z','i','y','k','l','m','n','o','p','r','s','t','u','f','h','c','ch','sh','sch','','y','','e','yu','ya');
 
    public static function Clean($Mixed) {
@@ -336,7 +355,7 @@ class Gdn_Format {
          $Timestamp = self::ToTimestamp($Timestamp);
          
       if (!$Timestamp)
-         $Timestamp = time(); // return '&nbsp;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+         $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
@@ -399,8 +418,9 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Display');
       else {
-         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, Gdn::Config('Garden.Charset', ''));
+         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
+         $nofollow = (self::$DisplayNoFollow) ? ' rel=\"nofollow\"' : '';
          $Mixed = preg_replace(
             "/
             (?<!<a href=\")
@@ -408,11 +428,14 @@ class Gdn_Format {
             ((https?|ftp):\/\/)
             ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
             /msxi",
-            "<a href=\"$0\" target=\"_blank\" rel=\"nofollow\">$0</a>",
+            "<a href=\"$0\" target=\"_blank\"$nofollow>$0</a>",
             $Mixed
          );
 
+      if(C('Garden.Format.ReplaceNewlines', TRUE))
          return nl2br($Mixed);
+      else
+         return $Mixed;
       }
    }
 
@@ -438,8 +461,12 @@ class Gdn_Format {
    public static function Form($Mixed) {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Form');
-      else
-         return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+      else {
+         if(C('Garden.Format.ReplaceNewlines', TRUE))
+            return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+         else
+            return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
+      }
    }
 
    /**
@@ -477,7 +504,8 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Mentions($Mixed);
 
             // nl2br
-            $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            if(C('Garden.Format.ReplaceNewlines', TRUE))
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
             $Result = $Formatter->Format($Mixed);
 
@@ -490,7 +518,8 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed);
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
-            $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
+            if(C('Garden.Format.ReplaceNewlines', TRUE))
+               $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
          }
          
          return $Result;
@@ -527,7 +556,7 @@ class Gdn_Format {
          $Width = 400;
          $Height = 225;
          $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
+<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
@@ -538,8 +567,9 @@ EOT;
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } else {
+		 $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
          $Result = <<<EOT
-<a href="$Pr$Url" target="_blank" rel="nofollow">$Pr$Url</a>
+<a href="$Pr$Url" target="_blank"$nofollow>$Pr$Url</a>
 EOT;
       }
       return $Result;
@@ -561,6 +591,7 @@ EOT;
          } else {
             require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
             $Mixed = Markdown($Mixed);
+            $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
             return $Formatter->Format($Mixed);
          }
@@ -574,7 +605,7 @@ EOT;
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
             $Mixed = preg_replace(
-               '/(^|[\s,\.])@(\w{1,20})\b/i', //{3,20}
+               '/(^|[\s,\.])@(\w{1,50})\b/i', //{3,20}
                '\1'.Anchor('@\2', '/profile/\\2'),
                $Mixed
             );
@@ -667,8 +698,8 @@ EOT;
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
          $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
-         if ($AddBreaks)
-            $Result = nl2br($Result);
+         if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
+            $Result = nl2br(trim($Result));
          return $Result;
       }
    }
@@ -771,7 +802,7 @@ EOT;
       return $Result;
    }
 
-   protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ę' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ø' => 'O', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ř' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ș' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'Ș' => 'S', 'ț' => 't', 'Ț' => 'T',  'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya');
+   protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', '?' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', '?' => 'O', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', '?' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', '?' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', '?' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', '?' => 'S', 'ț' => 't', 'Ț' => 'T',  'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya');
 
    /**
     * Replaces all non-url-friendly characters with dashes.
@@ -861,7 +892,7 @@ EOT;
     */
    public static function Seconds($Seconds) {
       $Minutes = floor($Seconds/60);
-      $Hours = floor($Seconds/60/24);
+      $Hours = floor($Seconds/60/60);
       $Days = floor($Seconds/60/60/24);
       $Weeks = floor($Seconds/60/60/24/7);
       $Months = floor($Seconds/60/60/24/30);

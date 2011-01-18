@@ -80,7 +80,7 @@ class UtilityController extends DashboardController {
    }
    
    public function Structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
-      $this->Permission('Garden.AdminUser.Only');
+      $this->Permission('Garden.Settings.Manage');
       $Files = array();
       $AppName = $AppName == '' ? 'all': $AppName;
       if ($AppName == 'all') {
@@ -131,6 +131,35 @@ class UtilityController extends DashboardController {
 		$this->AddSideMenu('dashboard/settings/configure');
       $this->AddCssFile('admin.css');
       $this->SetData('Title', T('Database Structure Upgrades'));
+      $this->Render();
+   }
+
+   public function Update() {
+      // Check for permission or flood control.
+      $Now = time();
+      $LastTime = C('Garden.Update.LastTimestamp', 0);
+
+      if ($LastTime + (60 * 60 * 24) > $Now) {
+         // Check for flood control.
+         $Count = C('Garden.Update.Count', 0) + 1;
+         if ($Count > 5) {
+            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+               // We are only allowing an update of 5 times every 24 hours.
+               throw PermissionException();
+            }
+         }
+      } else {
+         $Count = 1;
+      }
+      SaveToConfig(array('Garden.Update.LastTimestamp' => $Now, 'Garden.Update.Count' => $Count));
+
+      // Run the structure.
+      $UpdateModel = new UpdateModel();
+      
+      $UpdateModel->RunStructure();
+      $this->SetData('Success', TRUE);
+
+      $this->MasterView = 'none';
       $this->Render();
    }
    

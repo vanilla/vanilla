@@ -65,9 +65,28 @@ class PostController extends VanillaController {
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
+      $this->Category = FALSE;
       if ($UseCategories) {
          $CategoryModel = new CategoryModel();
-         $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $aCategoryData = array();
+         foreach ($CategoryData->Result() as $Category) {
+            if ($Category->CategoryID <= 0)
+               continue;
+            
+            if ($this->CategoryID == $Category->CategoryID)
+               $this->Category = $Category;
+            
+            $CategoryName = $Category->Name;   
+            if ($Category->Depth > 1) {
+               $CategoryName = '↳ '.$CategoryName;
+               $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
+               $CategoryName = str_replace(' ', '&#160;', $CategoryName);
+            }
+               
+            $aCategoryData[$Category->CategoryID] = $CategoryName;
+         }
+         $this->CategoryData = $aCategoryData;
       }
       
       // Check permission 
@@ -233,7 +252,8 @@ class PostController extends VanillaController {
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
             
-      // If invalid $DiscussionID, get from form
+      // If invalid $DiscussionID, get from form.
+      $this->Form->SetModel($this->CommentModel);
       $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
       
       // Set discussion data
@@ -251,7 +271,6 @@ class PostController extends VanillaController {
       
       // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
-      $this->Form->SetModel($this->CommentModel);
       $CommentID = isset($this->Comment) && property_exists($this->Comment, 'CommentID') ? $this->Comment->CommentID : '';
       $DraftID = isset($this->Comment) && property_exists($this->Comment, 'DraftID') ? $this->Comment->DraftID : '';
       $this->EventArguments['CommentID'] = $CommentID;
@@ -308,7 +327,7 @@ class PostController extends VanillaController {
 
             // The comment is now half-saved.
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-               $this->Comment2($CommentID, $Inserted);
+               $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
             } else {
                $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
             }

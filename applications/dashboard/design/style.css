@@ -158,7 +158,7 @@ textarea.TextBox {
    min-height: 100px;
 }
 #Popup textarea.TextBox {
-   width: 465px;
+   width: 100%;
 }
 input.SmallInput,
 input.InputBox {
@@ -782,6 +782,11 @@ ul.PanelInfo li {
    padding: 2px 4px;
    text-align: right;
 }
+ul.PanelInfo li.Heading {
+   text-align: left;
+   color: #000;
+   font-weight: bold;
+}
 ul.PanelInfo {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;
@@ -887,6 +892,58 @@ a.BigButton:focus {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
 }
+/* Category Depths */
+ul.PanelCategories li.Depth2 { padding-left: 8px; }
+ul.PanelCategories li.Depth3 { padding-left: 12px; }
+ul.PanelCategories li.Depth4 { padding-left: 16px; }
+ul.PanelCategories li.Depth5 { padding-left: 20px; }
+ul.PanelCategories li.Depth6 { padding-left: 24px; }
+ul.PanelCategories li.Depth7 { padding-left: 28px; }
+ul.PanelCategories li.Depth8 { padding-left: 32px; }
+ul.PanelCategories li.Depth9 { padding-left: 36px; }
+ul.PanelCategories li.Depth10 { padding-left: 40px; }
+ul.PanelCategories li.Depth11 { padding-left: 44px; }
+ul.PanelCategories li.Depth12 { padding-left: 48px; }
+ul.CategoryList li.Depth2 { padding-left: 25px !important; }
+ul.CategoryList li.Depth3 { padding-left: 50px !important; }
+ul.CategoryList li.Depth4 { padding-left: 75px !important; }
+ul.CategoryList li.Depth5 { padding-left: 100px !important; }
+ul.CategoryList li.Depth6 { padding-left: 125px !important; }
+ul.CategoryList li.Depth7 { padding-left: 150px !important; }
+ul.CategoryList li.Depth8 { padding-left: 175px !important; }
+ul.CategoryList li.Depth9 { padding-left: 200px !important; }
+ul.CategoryList li.Depth10 { padding-left: 225px !important; }
+ul.CategoryList li.Depth11 { padding-left: 250px !important; }
+ul.CategoryList li.Depth12 { padding-left: 275px !important; }
+ul.CategoryListWithHeadings li.Depth2 { padding-left: 0 !important; }
+ul.CategoryListWithHeadings li.Depth3 { padding-left: 25px !important; }
+ul.CategoryListWithHeadings li.Depth4 { padding-left: 50px !important; }
+ul.CategoryListWithHeadings li.Depth5 { padding-left: 75px !important; }
+ul.CategoryListWithHeadings li.Depth6 { padding-left: 100px !important; }
+ul.CategoryListWithHeadings li.Depth7 { padding-left: 125px !important; }
+ul.CategoryListWithHeadings li.Depth8 { padding-left: 150px !important; }
+ul.CategoryListWithHeadings li.Depth9 { padding-left: 175px !important; }
+ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
+ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
+ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
+
+div.Box.RecentUsers {
+	float: left;
+}
+div.Icons a {
+	display: block;
+	margin: 0 2px 2px 0;
+	float: left;
+}
+div.Icons img {
+	display: block;
+	height: 44px;
+	width: 44px;
+	overflow: hidden;
+	background: #c4cde0;
+	color: #c4cde0;
+	text-indent: 50px;
+}
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
@@ -904,14 +961,17 @@ ul.DataList li.Item li.Item {
 ul.DataList li {
    border: 0;
    padding: 0;
+	position: relative;
 }
 ul.DataList div.Options {
-	width: 100px;
-   float: right;
+	position: absolute;
+	right: 0;
+	width:100px;
 }
 ul.DataList div.OptionButton {
-	float: right;
-	*padding: 7px 0; /* IE 7 Fix */
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 ul.DataList a.Title {
    display: block;
@@ -1202,6 +1262,7 @@ ul.MessageList div.Message {
    clear: both;
    line-height: 140%;
    font-size: 100%;
+	word-wrap: break-word;
 }
 div.Preview div.Message,
 div.Preview div.Message p,
@@ -1299,6 +1360,33 @@ links, sign in buttons, etc */
 	font-weight: bold;
 }
 
+/* =============================================================== Categories */
+ul.CategoryList li.Item {
+	margin: 0;
+	padding: 0;
+	border: 0 !important;
+}
+ul.CategoryList .ItemContent {
+	position: relative;
+	margin-top: -1px;
+	border: 1px solid #BEC8CC;
+	border-width: 1px 0;
+	padding: 4px 9px;
+}
+div.Meta span.ChildCategories {
+	border-top: 1px dotted #ddd;
+	display: block;
+}
+ul.DataList div.Meta span.RSS {
+	margin-right: 6px;
+}
+div.Meta span.RSS img {
+	vertical-align: text-bottom;
+}
+ul.CategoryList li.CategoryHeading {
+	font-weight: bold;
+	font-size: 14px;
+}
 
 /* ============================================================= Profile Page */
 body.Profile #Content {
@@ -1361,7 +1449,7 @@ div.User h1 {
    padding: 8px 8px 0;
    color: #999;
    font-weight: normal;
-   line-height: 100%;
+   line-height: 1.5;
 }
 #Status p {
    font-size: 120%;
@@ -1399,11 +1487,12 @@ form.Activity {
 	text-align: right;
 }
 form.Activity textarea {
-   width: 660px;
+   width: 99%;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
 }
+
 /* Invitations Form */
 #Form_Invitation table {
    width: 100%;
@@ -1459,12 +1548,13 @@ body.Profile ul.Notifications {
 }
 
 
-/* ================================================================= Tab Menu */
+/* ================================================= Tabs, Headings & Footers */
 div.MessageForm {
 	text-align: right;
 }
 div.MessageForm,
-div.Tabs {
+div.Tabs,
+div.Headings {
 	display: block;
    border-bottom: 1px solid #abdafb;
    padding: 5px 8px;
@@ -1560,6 +1650,22 @@ div.HeadingTabs div.SubTab {
 div.SearchTabs input.InputBox {
 	width: 560px;
 	margin-right: 10px;
+}
+div.Headings {
+	position: relative;
+	text-align: left;
+}
+div.Headings div {
+	display: inline-block;
+	padding-right: 10px;
+}
+div.Headings div.ItemHeading {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 2;
+}
+div.Headings div.MetaHeading {
+	font-size: 11px;
 }
 
 /* ======================================================== Thumbnail Cropper */
@@ -2032,7 +2138,6 @@ div.CommentForm a.Cancel {
 textarea.MultiComplete {
    height: 20px;
    padding: 3px 0;
-   width: 400px;
    text-align: left;
 }
 .ac_results {
@@ -2149,7 +2254,7 @@ ul.Conversations div.Meta a.Name {
 	text-align: right;
 }
 #MessageForm textarea {
-  width: 655px;
+  width: 99%;
   height: 100px;
   min-height: 100px;
   margin-bottom: 2px;
@@ -2169,7 +2274,6 @@ body.add #Content {
    -webkit-border-radius: 2px;
    border-radius: 2px;
 	background:none repeat scroll 0 0 #c4e1ff;
-	border:1px solid #7caccb;
 	margin:0;
 	padding:20px;
 	text-align: right;
@@ -2190,11 +2294,7 @@ body.add #Content {
 	font-size:14px;
 	font-weight:bold;	
 }
-#ConversationForm textarea.MultiComplete {
-  width: 910px;
-}
 #ConversationForm .TextBox {
-   width: 910px;
    height: 100px;
    min-height: 100px;
    margin: 8px 0 6px;
@@ -2219,7 +2319,7 @@ div.Popup #ConversationForm h2 {
 }
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {
-	width: 478px;
+	width: 100%;
 }
 
 /* Upload Progress Bar */
@@ -2379,19 +2479,22 @@ div.SignInPopup div.Box {
 	-webkit-box-shadow: none;
 }
 body#dashboard_entry_password #Content,
-body#dashboard_entry_signin #Content {
+body#dashboard_entry_signin #Content,
+body#dashboard_entry_index #Content {
 	width: auto;
 }
 div.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }
 body#dashboard_entry_password #Content form,
+body#dashboard_entry_index #Content form,
 body#dashboard_entry_signin #Content form {
 	padding: 0;
 	text-align:left;
 }
 body#dashboard_entry_password #Content form,
 body#dashboard_entry_signin #Content form,
+body#dashboard_entry_index #Content form,
 div.SignInPopup form {
 	width: 270px;
 }
@@ -2405,6 +2508,7 @@ div.MultipleEntryMethods {
 }
 body#dashboard_entry_handshake #Content input.InputBox,
 body#dashboard_entry_signin #Content input.InputBox,
+body#dashboard_entry_index #Content input.InputBox,
 body#dashboard_entry_password #Content input.InputBox,
 div.SignInPopup input.DateBox,
 div.SignInPopup input.InputBox,
@@ -2414,6 +2518,7 @@ div.SignInPopup textarea {
 }
 div.SignInPopup form ul li label,
 body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label,
 body#dashboard_entry_password form ul li label,
 body#dashboard_entry_handshake form ul li label {
 	font-size: 13px;
@@ -2421,11 +2526,13 @@ body#dashboard_entry_handshake form ul li label {
 	padding: 0;
 }
 body#dashboard_entry_password #Content form ul li input#Form_Email,
-body#dashboard_entry_signin #Content form ul li input#Form_Email {
+body#dashboard_entry_signin #Content form ul li input#Form_Email,
+body#dashboard_entry_index #Content form ul li input#Form_Email {
 	margin-bottom: 6px;
 }
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
+body#dashboard_entry_index #Content input.Password,
 div.SignInPopup input.Password {
 	width: 180px;
 }
@@ -2437,6 +2544,7 @@ li.Buttons div a.ForgotPassword {
 }
 body#dashboard_entry_password ul li label.CheckBoxLabel,
 body#dashboard_entry_signin ul li label.CheckBoxLabel,
+body#dashboard_entry_index ul li label.CheckBoxLabel,
 div.SignInPopup ul li label.CheckBoxLabel {
 	color: #777;
 	display: inline;
@@ -2463,7 +2571,8 @@ div.Methods {
 	line-height: 1;
 }
 body#dashboard_entry_password div.Methods,
-body#dashboard_entry_signin div.Methods {
+body#dashboard_entry_signin div.Methods,
+body#dashboard_entry_index div.Methods {
 	padding: 10px 6px 6px;
 	background: none;
 }
@@ -2574,7 +2683,8 @@ div.ConnectInfo h3 {
 div.Connect form ul li label,
 div.SignInPopup form ul li label,
 body#dashboard_entry_password form ul li label,
-body#dashboard_entry_signin form ul li label {
+body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label {
 	font-size: 13px;
 	line-height: 1.5;
 	padding: 0;
@@ -2590,6 +2700,7 @@ div.SignInPopup .FinePrint {
 }
 body#dashboard_entry_password input.InputBox,
 body#dashboard_entry_signin input.InputBox,
+body#dashboard_entry_index input.InputBox,
 div.Connect input.InputBox,
 div.SignInPopup input.InputBox {
 	padding: 3px

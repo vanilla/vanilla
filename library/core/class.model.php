@@ -189,7 +189,7 @@ class Gdn_Model extends Gdn_Pluggable {
       $this->DefineSchema();
 
       // See if a primary key value was posted and decide how to save
-      $PrimaryKeyVal = ArrayValue($this->PrimaryKey, $FormPostValues);
+      $PrimaryKeyVal = GetValue($this->PrimaryKey, $FormPostValues, FALSE);
          
       $Insert = $PrimaryKeyVal === FALSE ? TRUE : FALSE;
       if ($Insert) {
@@ -227,7 +227,7 @@ class Gdn_Model extends Gdn_Pluggable {
          // This is done after validation to allow custom validations to work.
          $SchemaFields = $this->Schema->Fields();
          $Fields = array_intersect_key($Fields, $SchemaFields);
-
+         
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {

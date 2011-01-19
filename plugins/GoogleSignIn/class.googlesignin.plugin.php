@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['GoogleSignIn'] = array(
 	'Name' => 'Google Sign In',
    'Description' => 'This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.',
-   'Version' => '0.1a',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredPlugins' => array('OpenID' => '0.1a'),
    'RequiredTheme' => FALSE,
@@ -36,8 +36,8 @@ class GoogleSignInPlugin extends Gdn_Plugin {
       parse_str(GetValue(1, $UrlParts, ''), $Query);
 
       $Query['url'] = 'https://www.google.com/accounts/o8/id';
-      if (isset($_GET['Target']))
-         $Query['Target'] = $_GET['Target'];
+      $Path = '/'.Gdn::Request()->Path();
+      $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
       if ($Popup)
          $Query['display'] = 'popup';
 

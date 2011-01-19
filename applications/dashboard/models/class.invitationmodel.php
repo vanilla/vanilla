@@ -116,7 +116,7 @@ class InvitationModel extends Gdn_Model {
          throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
       } else {
          // Some information for the email
-         $RegistrationUrl = Gdn::Request()->Url("entry/register/{$Invitation->Code}", TRUE);
+         $RegistrationUrl = ExternalUrl("entry/register/{$Invitation->Code}");
          
          $AppTitle = Gdn::Config('Garden.Title');
          $Email = new Gdn_Email();

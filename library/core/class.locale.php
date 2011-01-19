@@ -78,7 +78,11 @@ class Gdn_Locale extends Gdn_Pluggable {
 
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Path = PATH_CONF . DS . "locale-$LocaleName.php";
-      $Config->Load($Path, 'Save', 'Definition');
+      if (!file_exists($Path)) {
+         touch($Path);
+      } else {
+         $Config->Load($Path, 'Save', 'Definition');
+      }
 
       foreach ($Translations as $k => $v) {
          $Config->Set('Definition.'.$k, $v);

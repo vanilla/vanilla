@@ -38,8 +38,12 @@ echo $this->Form->Errors();
          if (!$this->Category->AllowDiscussions) {
             echo T('This is a parent category that does not allow discussions.');
          } else {
+            echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
+
+            echo '<div class="CategoryPermissions">';
             echo T('Check all permissions that apply for each role');
             echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+            echo '</div>';
          }
 		}
       ?>

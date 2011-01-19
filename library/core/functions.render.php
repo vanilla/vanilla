@@ -211,7 +211,9 @@ if (!function_exists('Img')) {
  */
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return sprintf(T($Number == 1 ? $Singular : $Plural), $Number);
+		// Make sure to fix comma-formatted numbers
+      $WorkingNumber = str_replace(',', '', $Number);
+      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
    }
 }
 
@@ -254,7 +256,7 @@ if (!function_exists('UserPhoto')) {
       if ($User->Photo != '') {
          $IsFullPath = strtolower(substr($User->Photo, 0, 7)) == 'http://' || strtolower(substr($User->Photo, 0, 8)) == 'https://'; 
          $PhotoUrl = ($IsFullPath) ? $User->Photo : 'uploads/'.ChangeBasename($User->Photo, 'n%s');
-         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
+         return '<a title="'.urlencode($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
             .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
             .'</a>';
       } else {

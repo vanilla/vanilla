@@ -29,6 +29,15 @@ class LocaleModel {
       return $this->_AvailableLocalePacks;
    }
 
+   public function AvailableLocales() {
+      // Get the list of locales that are supported.
+      $Locales = array_unique(ConsolidateArrayValuesByKey($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
+      asort($Locales);
+      $Locales = array_combine($Locales, $Locales);
+
+      return $Locales;
+   }
+
    public function CopyDefinitions($SourcePath, $DestPath) {
       // Load the definitions from the source path.
       $Definitions = $this->LoadDefinitions($SourcePath);

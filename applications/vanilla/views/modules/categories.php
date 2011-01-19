@@ -7,32 +7,38 @@ if ($this->Data !== FALSE) {
       $CountDiscussions = $CountDiscussions + $Category->CountDiscussions;
    }
    ?>
-<div class="Box">
-   <h4><?php echo T('Categories'); ?></h4>
-   <ul class="PanelInfo">
+<div class="Box BoxCategories">
+   <h4><?php echo Anchor(T('Categories'), 'categories/all'); ?></h4>
+   <ul class="PanelInfo PanelCategories">
       <li<?php
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <?php echo $CountDiscussions; ?></li>
-      <?php
-   $ParentName = '';
+      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong><span class="Count"><?php echo number_format($CountDiscussions); ?></span></span></li>
+<?php
+   $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
+   $DoHeadings = C('Vanilla.Categories.DoHeadings');
+   
    foreach ($this->Data->Result() as $Category) {
-      if ($Category->ParentName != '' && $Category->ParentName != $ParentName) {
-         $ParentName = $Category->ParentName;
-         ?>
-         <li class="Parent"><?php echo Gdn_Format::Text($Category->ParentName); ?></li>
-         <?php
+      if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
+         continue;
+
+      if ($DoHeadings && $Category->Depth == 1)
+         $CssClass = 'Heading';
+      else
+         $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '');
+      
+      echo '<li class="'.$CssClass.'">';
+
+      if ($DoHeadings && $Category->Depth == 1) {
+         echo Gdn_Format::Text($Category->Name);
+      } else {
+         echo Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode), 'strong')
+            .'<span class="Count">'.number_format($Category->CountAllDiscussions).'</span>';
       }
-      ?>
-      <li<?php
-      if ($CategoryID == $Category->CategoryID)
-         echo ' class="Active"';
-         
-      ?>><strong><?php echo Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode); ?></strong> <?php echo $Category->CountDiscussions; ?></li>
-      <?php
+      echo "</li>\n";
    }
-      ?>
+?>
    </ul>
 </div>
    <?php

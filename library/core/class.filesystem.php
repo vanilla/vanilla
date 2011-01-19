@@ -20,6 +20,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @todo Make this object deliver content with a save as dialogue.
  */
 
+if(!defined('VANILLA_FILE_PUT_FLAGS')) define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
+
 class Gdn_FileSystem {
 
    const O_CREATE = 1;
@@ -253,7 +255,7 @@ class Gdn_FileSystem {
     * @param string $FileName The full path and name of the file to be saved.
     * @param string $FileContents The contents of the file being saved.
     */
-   public static function SaveFile($FileName, $FileContents, $Flags = LOCK_EX) {
+   public static function SaveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
    
       // Check that the folder exists and is writable
       $DirName = dirname($FileName);
@@ -264,7 +266,9 @@ class Gdn_FileSystem {
       if (!IsWritable($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
          
-      file_put_contents($FileName, $FileContents, $Flags);
+      if (file_put_contents($FileName, $FileContents, $Flags) === FALSE)
+         throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!',$FileBaseName));
+
       return TRUE;
    }
    
@@ -282,8 +286,8 @@ class Gdn_FileSystem {
    /**
     * Serves a file to the browser.
     *
-    * @param string $File The full path to the file being served.
-    * @param string $Name The name to give the file being served (don't include file extension, it will be added automatically). Will use file's name on disk if ignored.
+    * @param string $File Full path to the file being served.
+    * @param string $Name Name to give the file being served. Including extension overrides $File extension. Uses $File filename if empty.
     * @param string $MimeType The mime type of the file.
     * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
@@ -294,11 +298,16 @@ class Gdn_FileSystem {
          $Database->CloseConnection();
          
          $Size = filesize($File);
-         $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
-         if ($Name == '') {
-            $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
-         } elseif (!StringEndsWith($Name, '.'.$Extension)) {
-            $Name .= '.'.$Extension;
+         
+         // Determine if Path extension should be appended to Name
+         $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
+         if ($NameExtension == '') {
+            $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
+            if ($Name == '') {
+               $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
+            } elseif (!StringEndsWith($Name, '.'.$Extension)) {
+             $Name .= '.'.$Extension;
+            }
          }
          $Name = rawurldecode($Name);
  

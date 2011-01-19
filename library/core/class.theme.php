@@ -24,6 +24,7 @@ class Gdn_Theme {
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
+      $WithDomain = GetValue('WithDomain', $Options);
 
       switch ($Path) {
          case 'dashboard':
@@ -37,17 +38,63 @@ class Gdn_Theme {
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text)
                $Text = T('Inbox');
-            if ($Session->IsValid() && $Session->User->CountUnreadConversations)
+            if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
+               $Class = trim($Class.' HasCount');
                $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
-            
+            }
             break;
          case 'profile':
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text && $Session->IsValid())
                $Text = $Session->User->Name;
-            if ($Session->IsValid() && $Session->User->CountNotifications)
+            if ($Session->IsValid() && $Session->User->CountNotifications) {
+               $Class = trim($Class.' HasCount');
                $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
+            }
+            break;
+         case 'user':
+            $Path = 'profile';
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text && $Session->IsValid())
+               $Text = $Session->User->Name;
 
+            break;
+         case 'photo':
+            $Path = 'profile';
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text && $Session->IsValid()) {
+               $IsFullPath = strtolower(substr($Session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($Session->User->Photo, 0, 8)) == 'https://';
+               $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : 'uploads/'.ChangeBasename($Session->User->Photo, 'n%s');
+               $Text = Img($PhotoUrl, array('alt' => urlencode($Session->User->Name)));
+            }
+
+            break;
+         case 'drafts':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Drafts');
+            if ($Session->IsValid() && $Session->User->CountDrafts) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountDrafts.'</span>';
+            }
+            break;
+         case 'discussions/bookmarked':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Bookmarks');
+            if ($Session->IsValid() && $Session->User->CountBookmarks) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountBookmarks.'</span>';
+            }
+            break;
+         case 'discussions/mine':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Discussions');
+            if ($Session->IsValid() && $Session->User->CountDiscussions) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span>'.$Session->User->CountDiscussions.'</span>';
+            }
             break;
          case 'signin':
          case 'signinout':
@@ -72,7 +119,7 @@ class Gdn_Theme {
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions']))
          return '';
 
-      $Url = Gdn::Request()->Url($Path, GetValue('WithDomain', $Options));
+      $Url = Gdn::Request()->Url($Path, $WithDomain);
 
       if (strcasecmp(trim($Path, '/'), Gdn::Request()->Path()) == 0)
          $Class = ConcatSep(' ', $Class, 'Selected');

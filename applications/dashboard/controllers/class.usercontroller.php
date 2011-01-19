@@ -210,7 +210,7 @@ class UserController extends DashboardController {
       $Available = TRUE;
       if ($Email != '') {
          $UserModel = Gdn::UserModel();
-         if ($UserModel->GetByEmail(urldecode($Email)))
+         if ($UserModel->GetByEmail($Email))
             $Available = FALSE;
       }
       if (!$Available)
@@ -296,5 +296,30 @@ class UserController extends DashboardController {
          $this->Form->AddError(sprintf(T('%s unavailable'), T('Name')));
          
       $this->Render();
+   }
+   
+   /**
+    * Convenience function for listing users. At time of this writing, it is
+    * being used by wordpress widgets to display recently active users.
+    *
+    * @param string $SortField The field to sort users with. Defaults to DateLastActive. Other options are: DateInserted, Name.
+    * @param string $SortDirection The direction to sort the users.
+    * @param int $Limit The number of users to show.
+    * @param int $Offset The offset to start listing users at.
+    */
+   public function Summary($SortField = 'DateLastActive', $SortDirection = 'desc', $Limit = 30, $Offset = 0) {
+      $this->Title(T('User Summary'));
+
+      // Input Validation
+      $SortField = !in_array($SortField, array('DateLastActive', 'DateInserted', 'Name')) ? 'DateLastActive' : $SortField;
+      $SortDirection = $SortDirection == 'asc' ? 'asc' : 'desc';
+      $Limit = is_numeric($Limit) && $Limit < 100 && $Limit > 0 ? $Limit : 30;
+      $Offset = is_numeric($Offset) ? $Offset : 0;
+
+      $UserModel = new UserModel();
+      $UserData = $UserModel->GetSummary('u.'.$SortField, $SortDirection, $Limit, $Offset);
+      $this->SetData('UserData', $UserData);
+      $this->MasterView = 'empty';
+      $this->Render('filenotfound', 'home');
    }
 }

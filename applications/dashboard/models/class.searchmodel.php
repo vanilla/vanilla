@@ -99,7 +99,7 @@ class SearchModel extends Gdn_Model {
 		$Sql = $this->SQL
 			->Select()
 			->From('_TBL_ s')
-			->OrderBy('s.Relavence', 'desc')
+			->OrderBy('s.DateInserted', 'desc')
 			->Limit($Limit, $Offset)
 			->GetSelect();
 		

@@ -9,14 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 $LocaleInfo['skeleton'] = array( // make sure the key of this array is the same as its folder name.
-   'Locale' => 'en-CA',
-   'Name' => 'Skeleton Locale',
-   'Description' => 'This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.',
-   'Version' => '2.0.1',
-   'Author' => "Your Name",
-   'AuthorEmail' => 'Your Email',
-   'AuthorUrl' => 'http://your.domain.com',
-   'License' => 'Your choice of license'
+   'Locale'       => 'en-CA',
+   'Name'         => 'Skeleton Locale',
+   'Description'  => 'This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.',
+   'Version'      => '2.0.1',
+   'Author'       => "Your Name",
+   'AuthorEmail'  => 'Your Email',
+   'AuthorUrl'    => 'http://your.domain.com',
+   'License'      => 'Your choice of license'
 );
 
 $Definition['Some Code'] = 'Translation goes here.';

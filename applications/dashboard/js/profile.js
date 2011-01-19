@@ -2,25 +2,27 @@
 jQuery(document).ready(function($) {
    
    // Load tab content on tab-click
+   /*
    $('.Tabs li a').click(function() {
       $('.Tabs li').removeAttr('class');
       $(this).parent('li').attr('class', 'Active');
       var tabs = $('div.Tabs');
       tabs.nextAll().remove();
-      tabs.after('<div class="Loading">&nbsp;</div>');
+      tabs.after('<div class="Loading">&#160;</div>');
       $.post(this.href, {'DeliveryType': 'VIEW'}, function(data) {
          tabs.nextAll().remove();
          tabs.after(data);
       });
       return false;
    });
+   */
    
    // Hijack "clear status" link clicks
-   $('#Status a').live('click', function() {
+   $('#Status a.Change').live('click', function() {
       // hijack the request and clear out the status
       jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
       $('#Status').remove();      
-      return false;      
+      return false;
    });
 
    // Set the max chars in the about form.

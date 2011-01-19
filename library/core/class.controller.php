@@ -883,7 +883,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       $Session = Gdn::Session();
 
-      // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));

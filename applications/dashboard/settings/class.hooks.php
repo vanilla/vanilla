@@ -19,7 +19,6 @@ class DashboardHooks implements Gdn_IPlugin {
       // Enable theme previewing
       if ($Session->IsValid()) {
          $PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', '');
-         // echo 'test'.$PreviewThemeFolder;
          if ($PreviewThemeFolder != '') {
             $Sender->Theme = $PreviewThemeFolder;
             $Sender->AddAsset('Foot', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
@@ -36,20 +35,34 @@ class DashboardHooks implements Gdn_IPlugin {
 		else if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
 			
-      if ($Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
+      if (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
             $Sender->AddModule($MessageModule);
          }
+			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
 		// If there are applicants, alert admins by showing in the main menu
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
-			$CountApplicants = Gdn::UserModel()->GetApplicants()->NumRows();
+			$CountApplicants = Gdn::UserModel()->GetApplicantCount();
 			if ($CountApplicants > 0)
 				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span>'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Registration.Manage'));
 		}
+		
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $Gdn_Statistics = Gdn::Factory('Statistics');
+         $Gdn_Statistics->Check($Sender);
+      }
+   }
+   
+   public function SettingsController_AnalyticsRegister_Create(&$Sender) {
+      Gdn::Factory('Statistics')->Register($Sender);
+   }
+   
+   public function SettingsController_AnalyticsStats_Create(&$Sender) {
+      Gdn::Factory('Statistics')->Stats($Sender);
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -58,6 +71,7 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
+		$Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
 		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Themes.Manage');
       if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) 

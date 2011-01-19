@@ -14,6 +14,8 @@ class EntryController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'UserModel');
 	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
 
+   protected $_RealDeliveryType;
+
    /**
     * @var Gdn_Form The current form.
     */
@@ -45,8 +47,11 @@ class EntryController extends Gdn_Controller {
       // Set up controller
       $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
+      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default.
+
+      $Target = $this->Target();
+
+      $this->Form->AddHidden('Target', $Target);
       
       // Import authenticator data source
       switch ($Authenticator->DataSourceType()) {
@@ -162,7 +167,7 @@ class EntryController extends Gdn_Controller {
             else
                $Route = $this->RedirectTo();
             
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+            if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryType != DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url($Route);
             } else {
                
@@ -190,7 +195,7 @@ class EntryController extends Gdn_Controller {
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.
-         $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => GetIncomingValue('Target', '/'));
+         $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
          $this->Form->FormValues($Data);
          $this->Form->AddHidden('Target');
       }
@@ -410,7 +415,7 @@ class EntryController extends Gdn_Controller {
       $this->MasterView = 'empty';
       $this->View = 'redirect';
 
-      if ($this->DeliveryType() != DELIVERY_TYPE_ALL) {
+      if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->DeliveryType() != DELIVERY_TYPE_ALL) {
          $this->DeliveryMethod(DELIVERY_METHOD_JSON);
          $this->SetHeader('Content-Type', 'application/json');
       } elseif ($CheckPopup) {
@@ -471,6 +476,7 @@ class EntryController extends Gdn_Controller {
 
       // Figure out the current method.
       $DeliveryType = $this->DeliveryType();
+      $this->_RealDeliveryType = $DeliveryType;
       $this->DeliveryType(DELIVERY_TYPE_VIEW);
 
       $DeliveryMethod = $this->DeliveryMethod();
@@ -592,13 +598,13 @@ class EntryController extends Gdn_Controller {
       $this->HandshakeScheme = $Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
+      $this->Form->AddHidden('Target', $this->Target());
       
       $PreservedKeys = array(
          'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
       );
       $UserID = 0;
-      $Target = GetIncomingValue('Target', '/');
+      $Target = $this->Target();
    
       if ($this->Form->IsPostBack() === TRUE) {
             
@@ -729,7 +735,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('entry.js');
          
       $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $this->Form->AddHidden('Target', GetIncomingValue('Target', ''));
+      $this->Form->AddHidden('Target', $this->Target());
 
       $RegistrationMethod = $this->_RegistrationView();
       $this->View = $RegistrationMethod;
@@ -750,7 +756,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
@@ -771,7 +777,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
@@ -810,7 +816,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
@@ -856,7 +862,7 @@ class EntryController extends Gdn_Controller {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
-         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
+         $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
@@ -1004,7 +1010,7 @@ class EntryController extends Gdn_Controller {
             // If we're just told to redirect, but not where... try to figure out somewhere that makes sense.
             if ($Reaction == Gdn_Authenticator::REACT_REDIRECT) {
                $Route = '/';
-               $Target = GetIncomingValue('Target', NULL);
+               $Target = $this->Target();
                if (!is_null($Target)) 
                   $Route = $Target;
             } else {
@@ -1027,7 +1033,7 @@ class EntryController extends Gdn_Controller {
    }
    
    public function RedirectTo() {
-      $IncomingTarget = $this->Form->GetValue('Target', '');
+      $IncomingTarget = $this->Target($this->Form->GetValue('Target', ''));
       return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
    }
    
@@ -1042,6 +1048,17 @@ class EntryController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       parent::Initialize();
+   }
+
+   public function Target($Target = FALSE) {
+      if ($Target === FALSE)
+         $Target = GetIncomingValue('Target', '');
+      
+      // Make sure that the target is a valid url.
+      if (!preg_match('`(^https?://)|/`', $Target)) {
+         $Target = '/'.$Target;
+      }
+      return $Target;
    }
 
 }

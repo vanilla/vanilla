@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
          beforeSubmit: function(frm_data, frm) {
            // Hide the submit button & add a spinner
            $(btn).hide();
-           $(btn).after('<span class="Progress">&nbsp;</span>');
+           $(btn).after('<span class="Progress">&#160;</span>');
          },
          success: function(json) {
             json = $.postParseJson(json);

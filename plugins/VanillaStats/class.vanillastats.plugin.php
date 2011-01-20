@@ -14,7 +14,7 @@ $PluginInfo['VanillaStats'] = array(
    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
    'Version' => '1',
    'MobileFriendly' => FALSE,
-   'RequiredApplications' => array('Vanilla' => '2.0.17a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -28,7 +28,10 @@ class VanillaStatsPlugin extends Gdn_Plugin {
    
    const RESOLUTION_DAY = 'day';
    const RESOLUTION_MONTH = 'month';
-   const ANALYTICS_URL = 'http://analytics.vanillaforums.com';
+   
+   public function __construct() {
+      $this->AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+   }
    
    /**
     * Override the default dashboard page with the new stats one.
@@ -47,7 +50,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     */
    public function StatsDashboard($Sender) {
       // Tell the page where to find the Vanilla Analytics provider
-      $Sender->AddDefinition('VanillaStatsUrl', VanillaStatsPlugin::ANALYTICS_URL);
+      $Sender->AddDefinition('VanillaStatsUrl', $this->AnalyticsServer);
+      $Sender->SetData('VanillaStatsUrl', $this->AnalyticsServer);
       
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');

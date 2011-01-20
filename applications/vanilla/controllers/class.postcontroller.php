@@ -168,6 +168,8 @@ class PostController extends VanillaController {
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
             
+            $this->EventArguments['Discussion'] = &$this->Discussion;
+            $this->EventArguments['Comment'] = &$this->Comment;
             $this->FireEvent('BeforeDiscussionPreview');
 
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {

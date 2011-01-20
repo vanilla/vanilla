@@ -257,4 +257,10 @@ class UtilityController extends DashboardController {
          
       $this->Render();
    }
+	
+	public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
+		echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
+		$this->DeliveryType(DELIVERY_TYPE_NONE);
+      $this->Render();
+	}
 }

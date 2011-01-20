@@ -51,3 +51,11 @@ function WriteRangeTab($Range, $Sender) {
       'RangeEnd': '<?php echo $this->DateEnd; ?>' 
    });
 </script>
+<div class="Column Column1 NewsColumn">
+   <h1><?php echo T('Recent News'); ?></h1>
+   <div class="List"></div>
+</div>
+<div class="Column Column2 HelpColumn">
+   <h1><?php echo T('Recent Tutorials'); ?></h1>
+   <div class="List"></div>
+</div>

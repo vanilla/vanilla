@@ -18,7 +18,6 @@ Contact Vanilla Forums Inc at support [at] vanillaforums [dot] com
 define('VF_OPTIONS_NAME', 'vf-options');
 define('VF_PLUGIN_PATH', dirname(__FILE__));
 define('VF_PLUGIN_URL', WP_PLUGIN_URL.'/'.plugin_basename(dirname(__FILE__)));
-define('VF_ADMIN_URL', add_query_arg('page', 'skimlinks-options', admin_url().'options-general.php'));
 
 include_once(VF_PLUGIN_PATH.'/functions.php'); 
 include_once(VF_PLUGIN_PATH.'/admin.php');

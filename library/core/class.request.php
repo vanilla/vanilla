@@ -723,6 +723,11 @@ class Gdn_Request {
       if ($this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
 
+      // Strip out the hash.
+      $Hash = strchr($Path, '#');
+      if (strlen($Hash) > 0)
+         $Path = substr($Path, 0, -strlen($Hash));
+
       // Strip out the querystring.
       $Query = strrchr($Path, '?');
       if (strlen($Query) > 0)
@@ -762,6 +767,9 @@ class Gdn_Request {
 
       if (isset($Query))
          $Result .= $Query;
+
+      if (isset($Hash))
+         $Result .= $Hash;
          
       return $Result;
    }

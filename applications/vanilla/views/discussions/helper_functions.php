@@ -34,6 +34,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
+         <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>
          <?php if ($Discussion->Announce == '1') { ?>
          <span class="Announcement"><?php echo T('Announcement'); ?></span>
          <?php } ?>

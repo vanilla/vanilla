@@ -250,12 +250,11 @@ class PermissionModel extends Gdn_Model {
          foreach($JuncData as $JuncRow) {
             $JuncRow['JunctionTable'] = $JunctionTable;
             $JuncRow['JunctionColumn'] = $JunctionColumn;
-            if(!is_null($JunctionID)) {
+            
+            if (!is_null($JunctionID))
                $JuncRow['JunctionID'] = $JunctionID;
-            }
-            if ($JuncRow['JunctionID'] <= 0) {
+            else
                $JuncRow['Name'] = sprintf(T('Default %s Permissions'), T('Permission.'.$JunctionTable, $JunctionTable));
-            }
             
             if(array_key_exists('CanSession', $JuncRow)) {
                if(!$JuncRow['CanSession']) {

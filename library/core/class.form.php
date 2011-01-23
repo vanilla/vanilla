@@ -169,7 +169,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return = '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($ButtonCode, $Attributes);
       $Return .= $this->_NameAttribute($ButtonCode, $Attributes);
-      $Return .= ' value="' . T($ButtonCode) . '"';
+      $Return .= ' value="' . T($ButtonCode, ArrayValue('value', $Attributes)) . '"';
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= " />\n";
       return $Return;

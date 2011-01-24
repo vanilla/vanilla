@@ -50,8 +50,8 @@ class PostController extends VanillaController {
     */
    public function Discussion($CategoryID = '') {
       // Override CategoryID if categories are disabled
-      $UseCategories = C('Vanilla.Categories.Use');
-      if (!$UseCategories)
+      $UseCategories = $this->ShowCategorySelector = C('Vanilla.Categories.Use');
+      if (!$UseCategories) 
          $CategoryID = 0;
          
       // Setup head
@@ -210,6 +210,8 @@ class PostController extends VanillaController {
       // Add hidden fields for editing
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
+      
+      $this->FireEvent('BeforeDiscussionRender');
       
       // Render view (posts/discussion.php or post/preview.php)
       $this->Render();

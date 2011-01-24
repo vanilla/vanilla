@@ -83,7 +83,7 @@ class SettingsController extends Gdn_Controller {
 				$ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
 				
 				if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
-					$DiscussionModel = new Gdn_DiscussionModel();
+					$DiscussionModel = new DiscussionModel();
 					$DiscussionModel->UpdateDiscussionCount('All');
 				}
             $this->StatusMessage = T("Your changes have been saved.");

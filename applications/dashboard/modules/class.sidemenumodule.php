@@ -197,7 +197,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
             unset($this->Items[$Group]);
       }
 
-      public function ToString($HightlightRoute = '') {
+      public function ToString($HighlightRoute = '') {
          if ($HighlightRoute == '')
             $HighlightRoute = $this->_HighlightRoute;
          if ($HighlightRoute == '')

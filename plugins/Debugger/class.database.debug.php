@@ -63,11 +63,6 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		return $this->_Queries;
 	}
 	
-	/**
-    * @todo Put the query debugging logic into the debug plugin.
-    * 1. Create a subclass of this object where Query() does the debugging stuff.
-    * 2. Install that class to Gdn to override the database.
-    */
    public function Query($Sql, $InputParameters = NULL) {
 		$Trace = debug_backtrace();
 		$Method = '';

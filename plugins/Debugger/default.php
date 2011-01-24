@@ -80,7 +80,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             }
             $String .= $QueryInfo['Method']
                .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
-               .'<pre>'.$Query.';</pre>';
+               .'<pre>'.htmlspecialchars($Query).';</pre>';
          }
       }
       $String .= '<h3>Controller Data</h3><pre>';

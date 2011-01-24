@@ -22,7 +22,7 @@ $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
-$Configuration['Cache']['Method']                               = 'filecache';
+$Configuration['Cache']['Method']                               = 'dirtycache';
 $Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';

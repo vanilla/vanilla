@@ -1119,9 +1119,6 @@ ul.PanelInfo li.Active {
 .Column table th {
 	width: 160px;
 }
-#Content .Column2 h1 {
-	border-top: 0;
-}
 .Col {
 	width: 175px;
 	float: left;
@@ -1594,6 +1591,10 @@ table tbody th,
 table tbody td {
 	border-bottom: 1px solid #e0e0e0;
 }
+table tbody tr:last-child th,
+table tbody tr:last-child td {
+	border-bottom: none;
+}
 .CheckBoxGrid td.Alt {
 	background: none;
 }
@@ -1812,4 +1813,25 @@ ol.Sortable {
 .Sortable table td.Buttons {
 	text-align: right;
 	padding: 6px 0;
+}
+
+/* ==================================================================== Feeds */
+.FeedItem {
+	padding: 6px 10px;
+}
+.FeedItem a {
+	font-size: 13px;
+	display: inline;
+	font-weight: bold;
+	margin-right: 12px;
+}
+.FeedItem .Date {
+	display: inline;
+	font-size: 12px;
+	color: #888;
+}
+.FeedItem em {
+	color: #333;
+	font-size: 12px;
+	display: block;
 }

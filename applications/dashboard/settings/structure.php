@@ -170,28 +170,29 @@ if($PermissionModel instanceof PermissionModel) {
 		->Set($Explicit, $Drop);
 }
 
+// Define the set of permissions that garden uses.
+$PermissionModel->Define(array(
+   'Garden.Email.Manage',
+   'Garden.Settings.Manage',
+   'Garden.Routes.Manage',
+   'Garden.Messages.Manage',
+   'Garden.Applications.Manage',
+   'Garden.Plugins.Manage',
+   'Garden.Themes.Manage',
+   'Garden.SignIn.Allow' => 1,
+   'Garden.Registration.Manage',
+   'Garden.Applicants.Manage',
+   'Garden.Roles.Manage',
+   'Garden.Users.Add',
+   'Garden.Users.Edit',
+   'Garden.Users.Delete',
+   'Garden.Users.Approve',
+   'Garden.Activity.Delete',
+   'Garden.Activity.View' => 1,
+   'Garden.Profiles.View' => 1
+   ));
+
 if (!$PermissionTableExists) {
-   // Define the set of permissions that garden uses.
-   $PermissionModel->Define(array(
-      'Garden.Email.Manage',
-      'Garden.Settings.Manage',
-      'Garden.Routes.Manage',
-      'Garden.Messages.Manage',
-      'Garden.Applications.Manage',
-      'Garden.Plugins.Manage',
-      'Garden.Themes.Manage',
-      'Garden.SignIn.Allow',
-      'Garden.Registration.Manage',
-      'Garden.Applicants.Manage',
-      'Garden.Roles.Manage',
-      'Garden.Users.Add',
-      'Garden.Users.Edit',
-      'Garden.Users.Delete',
-      'Garden.Users.Approve',
-      'Garden.Activity.Delete',
-      'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
-      ));
 
    // Set initial guest permissions.
    $PermissionModel->Save(array(

@@ -2,8 +2,8 @@
 /*
 Plugin Name: Vanilla Forums
 Plugin URI: http://vanillaforums.org/addons/
-Description: Adds deep integration for Vanilla Forums to Wordpress, including: single-sign-on, allowing users to sign into Vanilla through WordPress; the ability to embed the entire forum into a WordPress page; the ability to administer Vanilla from the WordPress dashboard; discussion, category, and activity widgets.
-Version: 1.0.1
+Description: Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets.
+Version: 1.0.2
 Author: Mark O'Sullivan
 Author URI: http://www.vanillaforums.org/
 
@@ -18,11 +18,10 @@ Contact Vanilla Forums Inc at support [at] vanillaforums [dot] com
 define('VF_OPTIONS_NAME', 'vf-options');
 define('VF_PLUGIN_PATH', dirname(__FILE__));
 define('VF_PLUGIN_URL', WP_PLUGIN_URL.'/'.plugin_basename(dirname(__FILE__)));
-define('VF_ADMIN_URL', add_query_arg('page', 'skimlinks-options', admin_url().'options-general.php'));
 
 include_once(VF_PLUGIN_PATH.'/functions.php'); 
 include_once(VF_PLUGIN_PATH.'/admin.php');
 include_once(VF_PLUGIN_PATH.'/embed.php');
 include_once(VF_PLUGIN_PATH.'/widgets.php');
-include_once(VF_PLUGIN_PATH.'/sso.php');
+// include_once(VF_PLUGIN_PATH.'/sso.php');
 include_once(VF_PLUGIN_PATH.'/hooks.php');

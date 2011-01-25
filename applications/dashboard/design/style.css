@@ -2479,19 +2479,22 @@ div.SignInPopup div.Box {
 	-webkit-box-shadow: none;
 }
 body#dashboard_entry_password #Content,
-body#dashboard_entry_signin #Content {
+body#dashboard_entry_signin #Content,
+body#dashboard_entry_index #Content {
 	width: auto;
 }
 div.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }
 body#dashboard_entry_password #Content form,
+body#dashboard_entry_index #Content form,
 body#dashboard_entry_signin #Content form {
 	padding: 0;
 	text-align:left;
 }
 body#dashboard_entry_password #Content form,
 body#dashboard_entry_signin #Content form,
+body#dashboard_entry_index #Content form,
 div.SignInPopup form {
 	width: 270px;
 }
@@ -2505,6 +2508,7 @@ div.MultipleEntryMethods {
 }
 body#dashboard_entry_handshake #Content input.InputBox,
 body#dashboard_entry_signin #Content input.InputBox,
+body#dashboard_entry_index #Content input.InputBox,
 body#dashboard_entry_password #Content input.InputBox,
 div.SignInPopup input.DateBox,
 div.SignInPopup input.InputBox,
@@ -2514,6 +2518,7 @@ div.SignInPopup textarea {
 }
 div.SignInPopup form ul li label,
 body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label,
 body#dashboard_entry_password form ul li label,
 body#dashboard_entry_handshake form ul li label {
 	font-size: 13px;
@@ -2521,11 +2526,13 @@ body#dashboard_entry_handshake form ul li label {
 	padding: 0;
 }
 body#dashboard_entry_password #Content form ul li input#Form_Email,
-body#dashboard_entry_signin #Content form ul li input#Form_Email {
+body#dashboard_entry_signin #Content form ul li input#Form_Email,
+body#dashboard_entry_index #Content form ul li input#Form_Email {
 	margin-bottom: 6px;
 }
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
+body#dashboard_entry_index #Content input.Password,
 div.SignInPopup input.Password {
 	width: 180px;
 }
@@ -2537,6 +2544,7 @@ li.Buttons div a.ForgotPassword {
 }
 body#dashboard_entry_password ul li label.CheckBoxLabel,
 body#dashboard_entry_signin ul li label.CheckBoxLabel,
+body#dashboard_entry_index ul li label.CheckBoxLabel,
 div.SignInPopup ul li label.CheckBoxLabel {
 	color: #777;
 	display: inline;
@@ -2563,7 +2571,8 @@ div.Methods {
 	line-height: 1;
 }
 body#dashboard_entry_password div.Methods,
-body#dashboard_entry_signin div.Methods {
+body#dashboard_entry_signin div.Methods,
+body#dashboard_entry_index div.Methods {
 	padding: 10px 6px 6px;
 	background: none;
 }
@@ -2674,7 +2683,8 @@ div.ConnectInfo h3 {
 div.Connect form ul li label,
 div.SignInPopup form ul li label,
 body#dashboard_entry_password form ul li label,
-body#dashboard_entry_signin form ul li label {
+body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label {
 	font-size: 13px;
 	line-height: 1.5;
 	padding: 0;
@@ -2690,6 +2700,7 @@ div.SignInPopup .FinePrint {
 }
 body#dashboard_entry_password input.InputBox,
 body#dashboard_entry_signin input.InputBox,
+body#dashboard_entry_index input.InputBox,
 div.Connect input.InputBox,
 div.SignInPopup input.InputBox {
 	padding: 3px

@@ -15,12 +15,15 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       
       echo $this->Form->Label('Discussion Title', 'Name');
       echo $this->Form->TextBox('Name', array('maxlength' => 100));
-      if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+      if ($this->ShowCategorySelector === TRUE) {
          echo '<div class="Category">';
          echo $this->Form->Label('Category', 'CategoryID');
          echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
          echo '</div>';
       }
+      
+      $this->FireEvent('BeforeBodyInput');
+      
       echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
 
       echo "<div class=\"PostFormControlPanel\">\n";

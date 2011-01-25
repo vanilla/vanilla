@@ -7,21 +7,50 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Garden Settings Controller
+ * Authentication Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manages user authentication in Dashboard.
+ *
+ * @since 2.0.3
+ * @package Dashboard
  */
 class AuthenticationController extends DashboardController {
-
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.3
+    * @access public
+    * @var array
+    */
    public $Uses = array('Form', 'Database');
+   
+   /**
+    * @see /library/core/class.controller.php
+    */
    public $ModuleSortContainer = 'Dashboard';
 
    /**
+    * Garden's form object.
     *
+    * @since 2.0.3
+    * @access public
     * @var Gdn_Form
     */
    public $Form;
    
+   /**
+    * Highlight route and do authenticator setup.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.3
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
@@ -41,11 +70,27 @@ class AuthenticationController extends DashboardController {
       $this->CurrentAuthenticationAlias = Gdn::Authenticator()->AuthenticateWith('default')->GetAuthenticationSchemeAlias();
    }
 
+   /**
+    * Default method ('Choose' alias).
+    *
+    * @since 2.0.3
+    * @access public
+    *
+    * @param string $AuthenticationSchemeAlias
+    */
    public function Index($AuthenticationSchemeAlias = NULL) {
       $this->View = 'choose';
       $this->Choose($AuthenticationSchemeAlias);
    }
    
+   /**
+    * Select Authentication method.
+    *
+    * @since 2.0.3
+    * @access public
+    *
+    * @param string $AuthenticationSchemeAlias
+    */
    public function Choose($AuthenticationSchemeAlias = NULL) {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/authentication');
@@ -79,7 +124,15 @@ class AuthenticationController extends DashboardController {
       $this->SetData('PreFocusAuthenticationScheme', $PreFocusAuthenticationScheme);
       $this->Render();
    }
-
+   
+   /**
+    * Configure authentication method.
+    *
+    * @since 2.0.3
+    * @access public
+    *
+    * @param string $AuthenticationSchemeAlias
+    */
    public function Configure($AuthenticationSchemeAlias = NULL) {
       $Message = T("Please choose an authenticator to configure.");
       if (!is_null($AuthenticationSchemeAlias)) {

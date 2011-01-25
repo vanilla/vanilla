@@ -317,7 +317,7 @@ class UserModel extends Gdn_Model {
    public function RemovePicture($UserID) {
       $this->SQL
          ->Update('User')
-         ->Set('Photo', 'null', FALSE)
+         ->Set('Photo', 'NULL', FALSE)
          ->Where('UserID', $UserID)
          ->Put();
    }

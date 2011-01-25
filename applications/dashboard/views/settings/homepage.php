@@ -5,9 +5,9 @@ $Session = Gdn::Session();
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Configuring Vanilla\'s Homepage'), 'http://vanillaforums.org/docs/dashboard-homepage'), '</li>';
+   echo '<li>', Anchor(T('Configuring Vanilla\'s Homepage'), 'http://vanillaforums.org/docs/homepage'), '</li>';
    echo '<li>', sprintf(T('Change the look of All Categories', 'You can change the look of the <b>All Categories</b> page <a href="%s">here</a>.'), Url('/vanilla/settings/managecategories')), '</li>';
-   echo '<li>', Anchor(T('Changing the Discussions Menu Link'), 'http://vanillaforums.org/docs/dashboard-homepage#discussionslink'), '</li>';
+   echo '<li>', Anchor(T('Changing the Discussions Menu Link'), 'http://vanillaforums.org/docs/homepage#discussionslink'), '</li>';
    echo '</ul>';
    ?>
 </div>

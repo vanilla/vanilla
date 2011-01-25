@@ -47,7 +47,7 @@ class ConversationsHooks implements Gdn_IPlugin {
       $Session = Gdn::Session();
       if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
          $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', sprintf(T('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name, '', array('class' => 'MessageLink'));
+         $SideMenu->AddLink('Options', sprintf(T('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name, FALSE, array('class' => 'MessageLink'));
          $Sender->EventArguments['SideMenu'] = $SideMenu;
       }
    }

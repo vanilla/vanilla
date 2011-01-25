@@ -26,11 +26,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    protected function BasicParameters(&$Request) {
+      $ForumAddress = Url('/',TRUE);
       $Request = array_merge($Request, array(
          'RequestTime'        => gmmktime(),
-         'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER),
-         'ServerHostname'     => GetValue('SERVER_NAME', $_SERVER),
-         'ServerType'         => GetValue('SERVER_SOFTWARE', $_SERVER),
+         'ServerIP'           => Gdn::Request()->GetValue('SERVER_ADDR'),
+         'ServerHostname'     => $ForumAddress,
+         'ServerType'         => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
          'PHPVersion'         => phpversion(),
          'VanillaVersion'     => APPLICATION_VERSION
       ));
@@ -48,6 +49,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
     */ 
    public function Check(&$Sender) {
       
+      if (!self::IsEnabled()) return;
+      
       // Add a pageview entry
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
@@ -58,22 +61,37 @@ class Gdn_Statistics extends Gdn_Pluggable {
             ':TimeSlot'    => $TimeSlot
          ));
       } catch(Exception $e) {
+      
+         // If we just tried to run the structure, and failed, don't blindly try again. Just go to sleep.
+         if (C('Garden.Analytics.AutoStructure', FALSE)) {
+            SaveToConfig('Garden.Analytics.Enabled', FALSE);
+            RemoveFromConfig('Garden.Analytics.AutoStructure');
+            return;
+         }
+         
          // If we get here, insert failed. Try proxyconnect to the utility structure
+         SaveToConfig('Garden.Analytics.AutoStructure', TRUE);
          ProxyRequest(Url('utility/update', TRUE));
       }
       
-      // Don't track things for local sites
-      $ServerAddress = GetValue('SERVER_ADDR', $_SERVER);
-      $ServerHostname = GetValue('SERVER_NAME', $_SERVER);
-      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return;
-      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return;
-
+      // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
+      if (C('Garden.Analytics.AutoStructure', FALSE))
+         RemoveFromConfig('Garden.Analytics.AutoStructure');
+            
       // Check if we're registered with the central server already. If not, 
-      // this request is hijacked and used to perform that task.
+      // this request is hijacked and used to perform that task instead of sending stats
       $VanillaID = C('Garden.InstallationID',NULL);
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
+         $Conf = CombinePaths(array(PATH_ROOT,'conf/config.php'));
+         if (!is_writable($Conf))
+            return;
+            
+         $AttemptedRegistration = C('Garden.Registering',FALSE);
+         // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
+         if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
+      
          $Sender->AddDefinition('AnalyticsTask', 'register');
          return;
       }
@@ -99,13 +117,13 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
 
    protected function DoneStats($Response, $Raw) {
-      SaveToConfig('Garden.Analytics.LastSentDate', date('Ymd'));
+      $SuccessTimeSlot = GetValue('TimeSlot', $Response, FALSE);
+      if ($SuccessTimeSlot !== FALSE)
+         SaveToConfig('Garden.Analytics.LastSentDate', $SuccessTimeSlot);
    }
    
    public function Register(&$Sender) {
-      $AttemptedRegistration = C('Garden.Registering',FALSE);
-      // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
-      if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
+      if (!self::IsEnabled()) return;
       
       // Set the time we last attempted to perform registration
       SaveToConfig('Garden.Registering', time());
@@ -117,6 +135,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
    }
    
    public function Stats(&$Sender) {
+      if (!self::IsEnabled()) return;
+      
       $Request = array();
       $this->BasicParameters($Request);
       
@@ -130,46 +150,75 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $RequestTime
       )));
       
-      $Yesterday = strtotime('yesterday');
-      $TimeSlot = date('Ymd',$Yesterday);
+      // Always look at stats for the day following the previous successful send.
+      $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
+      if ($LastSentDate === FALSE)
+         $StatsDate = strtotime('yesterday');
+      else
+         $StatsDate = strtotime('+1 day', self::TimeFromTimeSlot($LastSentDate));
       
-      $DayStart = date('Y-m-d 00:00:00', $Yesterday);
-      $DayEnd = date('Y-m-d 23:59:59', $Yesterday);
+      $DetectActiveInterval = 0;
+      $MaxIterations = 10; $TimeSlotLimit = date('Ymd');
+      do {
       
-      // Get relevant stats
-      $NumComments = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('Comment')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumComments = GetValue('Hits', $NumComments, NULL);
+         $TimeSlot = date('Ymd',$StatsDate);
          
-      $NumDiscussions = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('Discussion')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
+         // We're caught up to today. Stop looping.
+         if ($TimeSlot >= $TimeSlotLimit) break;
          
-      $NumUsers = Gdn::SQL()
-         ->Select('DateInserted','COUNT','Hits')
-         ->From('User')
-         ->Where('DateInserted>=',$DayStart)
-         ->Where('DateInserted<',$DayEnd)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumUsers = GetValue('Hits', $NumUsers, NULL);
+         $DayStart = date('Y-m-d 00:00:00', $StatsDate);
+         $DayEnd = date('Y-m-d 23:59:59', $StatsDate);
+         
+         // Get relevant stats
+         $NumComments = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('Comment')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumComments = GetValue('Hits', $NumComments, NULL);
+            
+         $NumDiscussions = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('Discussion')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumDiscussions = GetValue('Hits', $NumDiscussions, NULL);
+            
+         $NumUsers = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From('User')
+            ->Where('DateInserted>=',$DayStart)
+            ->Where('DateInserted<',$DayEnd)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumUsers = GetValue('Hits', $NumUsers, NULL);
+         
+         $NumViews = Gdn::SQL()
+            ->Select('Views')
+            ->From('AnalyticsLocal')
+            ->Where('TimeSlot',$TimeSlot)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumViews = GetValue('Views', $NumViews, NULL);
+         
+         $DetectActiveInterval = array_sum(array(
+            $NumComments,
+            $NumDiscussions,
+            $NumUsers,
+            $NumViews
+         ));
       
-      $NumViews = Gdn::SQL()
-         ->Select('Views')
-         ->From('AnalyticsLocal')
-         ->Where('TimeSlot',$TimeSlot)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-      $NumViews = GetValue('Views', $NumViews, NULL);
+         $StatsDate = strtotime('+1 day', $StatsDate);
+         $MaxIterations--;
+      } while($DetectActiveInterval == 0 && $MaxIterations);
+      
+      if ($DetectActiveInterval == 0) {
+         // We've looped $MaxIterations times or up until yesterday and couldn't find any stats. Remember our place and return.
+         SaveToConfig('Garden.Analytics.LastSentDate', $TimeSlot);
+         return;
+      }
       
       // Assemble Stats
-      
       $Request = array_merge($Request, array(
          'VanillaID'          => $VanillaID,
          'SecurityHash'       => $SecurityHash,
@@ -178,18 +227,19 @@ class Gdn_Statistics extends Gdn_Pluggable {
          'CountDiscussions'   => $NumDiscussions,
          'CountUsers'         => $NumUsers,
          'CountViews'         => $NumViews,
-         'ServerIP'           => GetValue('SERVER_ADDR', $_SERVER)
+         'ServerIP'           => Gdn::Request()->GetValue('SERVER_ADDR')
       ));
       
       $this->SendPing('stats', $Request, 'DoneStats');
    }
    
    public function SendPing($Method, $RequestParameters, $CompletionCallback = FALSE) {
-      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com/vanillastats/analytics');
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
    
       $ApiMethod = $Method.'.json';
       $FinalURL = CombinePaths(array(
          $AnalyticsServer,
+         'vanillastats/analytics',
          $ApiMethod
       ));
       $FinalURL .= '?'.http_build_query($RequestParameters);
@@ -204,6 +254,39 @@ class Gdn_Statistics extends Gdn_Pluggable {
             call_user_func(array($this, $CompletionCallback), $JsonResponse, $Response);
          }
       }
+   }
+   
+   public static function IsLocalhost() {
+      $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
+      $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
+      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return TRUE;
+      if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
+      return FALSE;
+   }
+   
+   public static function IsEnabled() {
+      if (!C('Garden.Installed', FALSE)) return FALSE;
+   
+      // Enabled if not explicitly disabled via config
+      if (!C('Garden.Analytics.Enabled', TRUE)) return FALSE;
+      
+      // Don't track things for local sites (unless overridden in config)
+      if (self::IsLocalhost() && !C('Garden.Analytics.AllowLocal', FALSE)) return FALSE;
+      
+      return TRUE;
+   }
+   
+   public static function TimeFromTimeSlot($TimeSlot) {
+      $Year = substr($TimeSlot,0,4);
+      $Month = substr($TimeSlot,4,2);
+      $Day = (int)substr($TimeSlot,6,2);
+      if ($Day == 0) $Day = 1;
+      $DateRaw = mktime(0, 0, 1, $Month, $Day, $Year);
+      
+      if ($DateRaw === FALSE)
+         throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");
+      
+      return $DateRaw;
    }
    
 }

@@ -231,8 +231,5 @@ class CategoriesController extends VanillaController {
          $this->Menu->HighlightRoute('/categories');
 			
 		$this->AddModule('SignedInModule');
-
-		// Applies db changes in 2.0.17
-		$this->CategoryModel->ApplyUpdates();
    }      
 }

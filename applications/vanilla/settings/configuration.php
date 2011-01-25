@@ -34,7 +34,7 @@ $Configuration['Vanilla']['Categories']['Use']                 = TRUE;
 // Zero means "no max", and categories will be displayed in a nested format indefinitely.
 
 // The max depth of nested categories to display on all category view.
-$Configuration['Vanilla']['Categories']['MaxDisplayDepth']     = 0;
+$Configuration['Vanilla']['Categories']['MaxDisplayDepth']     = 3;
 // The max depth of nested categories to display in the category module (in the panel).
 $Configuration['Vanilla']['Categories']['MaxModuleDisplayDepth'] = 0;
 // Should the first level of category above root be a heading and unclickable?

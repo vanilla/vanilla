@@ -568,6 +568,13 @@ class PermissionModel extends Gdn_Model {
          if(array_key_exists('RoleID', $Values)) {
             $Where['RoleID'] = $Values['RoleID'];
             unset($Values['RoleID']);
+         } elseif (array_key_exists('Role', $Values)) {
+            // Get the RoleID.
+            $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Role']))->Value('RoleID');
+            if (!$RoleID)
+               return;
+            $Where['RoleID'] = $RoleID;
+            unset($Values['Role']);
          } else {
             $Where['RoleID'] = 0; // default role.
          }

@@ -1,51 +1,46 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
-// Use this file to construct tables and views necessary for your application.
-// There are some examples below to get you started.
+<?php if (!defined('APPLICATION')) exit(); // Make sure this file can't get accessed directly
+// Use this file to do any database changes for your application.
 
 if (!isset($Drop))
-   $Drop = FALSE;
+   $Drop = FALSE; // Safe default - Set to TRUE to drop the table if it already exists.
    
 if (!isset($Explicit))
-   $Explicit = TRUE;
-   
-/*
-The Column method (defined in /library/database/class.generic.structure.php) has the following arguments:
-  Column(
-   $Name, // The name of the column to create.
-   $Type, // The data type of the column to be created. Types with a length speecifty the length in barackets.
-          //  * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
-          //  * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
-   $NullOrDefault = FALSE, // A boolean value indicating if the column allows nulls
-   $Default = NULL, //  Whether or not nulls are allowed, if not a default can be specified.
-                    //   * TRUE: Nulls are allowed.
-                    //   * FALSE: Nulls are not allowed.
-                    //   * Any other value: Nulls are not allowed, and the specified value will be used as the default.
-   $KeyType = FALSE, // What type of key is this column on the table? Options are primary, key, and FALSE (not a key).
-  );
+   $Explicit = FALSE; // Safe default - Set to TRUE to remove all other columns from table.
 
-Example table construction:
+$Database = Gdn::Database();
+$SQL = $Database->SQL(); // To run queries.
+$Construct = $Database->Structure(); // To modify and add database tables.
+$Validation = new Gdn_Validation(); // To validate permissions (if necessary).
 
-$Construct = Gdn::Structure();
+// Add your tables or new columns under here (see example below).
 
+
+
+// Example: New table construction.
+/* 
 $Construct->Table('ExampleTable')
 	->PrimaryKey('ExampleTableID')
    ->Column('ExampleUserID', 'int', TRUE)
    ->Column('Field1', 'varchar(50)')
-   ->Set($Explicit, $Drop);
+   ->Set($Explicit, $Drop); // If you omit $Explicit and $Drop they default to false.
+*/ 
 
-Example view construction:
-
-$SQL = $Database->SQL();
-$SQL->Select('e.ExampleTableID, e.ExampleUserID, u.Name as ExampleUser, e.Field1')
-   ->From('ExampleTable e')
-   ->Join('User u', 'e.ExampleUserID = u.UserID');
-*/
+// Example: Add column to existing table.
+/* 
+$Construct->Table('User')
+   ->Column('NewColumnNeeded', 'varchar(255)', TRUE) // Always allow for NULLs unless it's truly required.
+   ->Set(); 
+*/  
+   
+/**
+ * Column() has the following arguments:
+ *
+ * @param string $Name Name of the column to create.
+ * @param string $Type Data type of the column. Length may be specified in parenthesis.
+ *    If an array is provided, the type will be set as "enum" and the array's values will be assigned as the column's enum values.
+ * @param string $NullOrDefault Default is FALSE. Whether or not nulls are allowed, if not a default can be specified.
+ *    TRUE: Nulls allowed. FALSE: Nulls not allowed. Any other value will be used as the default (with nulls disallowed).
+ * @param string $KeyType Default is FALSE. Type of key to make this column. Options are: primary, key, or FALSE (not a key).
+ *
+ * @see /library/database/class.generic.structure.php
+ */

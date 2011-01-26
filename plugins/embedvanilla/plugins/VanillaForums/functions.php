@@ -137,7 +137,7 @@ function vf_validate_options($options) {
 			$url = vf_get_value('url', $options, '');
 			$options = $alloptions;
 			// Make a rest request to Vanilla's API to validate that the forum is at the given location.
-			$resturl = vf_combine_paths(array($url, 'discussions.json'), '/');
+			$resturl = vf_combine_paths(array($url, '?p=discussions.json'), '/');
 			$data = json_decode(vf_rest($resturl));
 			if (!is_object($data)) {
 				$options['url'] = '';

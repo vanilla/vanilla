@@ -391,7 +391,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
          } else {
             $this->Form->AddError('ErrPermission');
@@ -432,7 +432,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Sink');
             } else {
                $State = $Discussion->Sink;
@@ -479,7 +479,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Closed');
             } else {
                $State = $Discussion->Closed;
@@ -522,7 +522,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
             if (!$this->DiscussionModel->Delete($DiscussionID))
                $this->Form->AddError('Failed to delete discussion');
          } else {
@@ -570,7 +570,7 @@ class DiscussionController extends VanillaController {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
             $HasPermission = $Comment->InsertUserID == $Session->UserID;
             if (!$HasPermission && $Discussion)
-               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->CategoryID);
+               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
             
             if ($Discussion && $HasPermission) {
                if (!$this->CommentModel->Delete($CommentID))

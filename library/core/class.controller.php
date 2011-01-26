@@ -1191,6 +1191,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
+            header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');

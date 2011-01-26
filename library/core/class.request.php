@@ -556,12 +556,7 @@ class Gdn_Request {
 
          $Query = GetValue('query', $Parts, '');
          if (strlen($Query) > 0) {
-            $GetParts = explode('&', $Query);
-            $Get = array();
-            foreach ($GetParts as $GetPart) {
-               $GetTuple = explode('=', $GetPart);
-               $Get[urldecode($GetTuple[0])] = urldecode(GetValue(1, $GetTuple, ''));
-            }
+            parse_str($Query, $Get);
          } else {
             $Get = array();
          }

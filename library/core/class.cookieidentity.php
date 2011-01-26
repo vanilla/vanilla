@@ -137,6 +137,26 @@ class Gdn_CookieIdentity {
       return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
    }
    
+
+    /**
+     * Returns True if the two strings are equal, False otherwise.
+     * The time taken is independent of the number of characters that match.
+     */
+    public static function CompareHashDigest($digest_1, $digest_2)
+    {
+        if (strlen($digest_1) !== strlen($digest_2)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = strlen($digest_1) - 1; $i >= 0; $i--) {
+            $result |= ord($digest_1[$i]) ^ ord($digest_2[$i]);
+        }
+
+        return 0 === $result;
+    }
+
+
    /**
     * Generates the user's session cookie.
     *
@@ -252,7 +272,7 @@ class Gdn_CookieIdentity {
       $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
       $GeneratedHash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
-      if ($CookieHash != $GeneratedHash) {
+      if (! self::CompareHashDigest($CookieHash, $GeneratedHash)) {
          self::DeleteCookie($CookieName);
          return FALSE;
       }

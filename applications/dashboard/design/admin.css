@@ -1073,7 +1073,13 @@ ul.PanelInfo li {
 ul.PanelInfo li a {
    position: relative;
 }
-#Panel div.Box h4 a,
+#Panel div.Box h4 {
+	font-size: 14px;
+	font-weight: bold;
+	padding: 10px;
+   color: #000;
+}
+
 ul.PanelInfo li a {
 	font-size: 13px;
 	color: #000;
@@ -1082,10 +1088,9 @@ ul.PanelInfo li a {
 	padding: 2px 10px;
 }
 #Panel div.Box h4 a {
-	font-size: 14px;
-	font-weight: bold;
-	padding: 10px;
+   color: #000;
 }
+
 span.New {
    border-radius: 2px;
    -moz-border-radius: 2px;

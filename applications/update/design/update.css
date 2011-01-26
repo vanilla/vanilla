@@ -1,0 +1,230 @@
+/* ================================================================ Reset CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   font-weight: inherit;
+   font-style: inherit;
+   font-size: 100%;
+   font-family: inherit;
+   vertical-align: baseline;
+}
+/* remember to define focus styles! */
+:focus {
+   outline: 0;
+}
+ol, ul {
+   list-style: none;
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+   border-collapse: separate;
+   border-spacing: 0;
+}
+caption, th, td {
+   text-align: left;
+   font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+   content: "";
+}
+blockquote, q {
+   quotes: "" "";
+}
+
+/* ============================================== General Styles & Typography */
+body {
+   font-family: 'lucida grande','Lucida Sans Unicode', 'Tahoma', sans-serif;
+   font-size: 75%;
+	line-height: 1.7;
+   margin: 0;
+   padding: 0;
+   font-size: small;
+   color: black;
+	background: #878787;
+}
+
+div#Frame div#Head {
+   margin: 25px 0px 13px 0px;
+   height: 273px;
+   background: transparent url('images/update-banner-bg.gif') repeat-x top left;
+}
+
+a, a:hover, a:visited {
+   color: #b0ea2e;
+   text-decoration: none;
+}
+
+a:hover {
+   color: #7ac509;
+}
+
+div#Frame div#Head div.Header {
+   background: transparent url('images/update-banner-image.jpg') no-repeat 40px 15px;
+   font-family: "Arial","Verdana","sans-serif";
+   color: white;
+   padding: 85px 0px 85px 218px;
+}
+
+div#Frame div#Head div.Header h1 {
+   font-size: 90px;
+   line-height: 80px;
+   font-weight: bold;
+   padding: 0px;
+   margin: 0px;
+   clear: right;
+}
+
+div#Frame div#Head div.Header span.About {
+   font-size: 14px;
+   font-weight: normal;
+   margin-left: 14px;
+   color: #8d8d8d;
+}
+
+#Body {
+   width: 1000px;
+   margin: 0px auto;
+   position: relative;
+   height: 100%;
+   overflow: hidden;
+}
+
+/* 
+ * PANEL AND MODULE
+ * 
+ */
+ 
+#Panel {
+   background: transparent url('images/update-panel-bg.gif') repeat-x top left;
+   height: 33px;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   margin-bottom: 20px;
+}
+
+#Content {
+	margin-bottom: 20px;
+}
+
+ul.PanelUpdate li {
+   background: transparent url('images/update-panel-splitter.gif') no-repeat center right;
+   line-height: 33px;
+   padding: 0px 15px;
+   font-size: 14px;
+   font-weight: bold;
+   text-transform: uppercase;
+   display: inline;
+   color: #2f2f2f;
+}
+
+ul.PanelUpdate li.Last {
+   background: none;
+   padding-right: none;
+}
+
+ul.PanelUpdate li span {
+   margin-right: 33px;
+}
+
+ul.PanelUpdate li span.Active {
+   color: white;
+}
+
+ul.PanelUpdate li span.Done {
+   background: transparent url('images/update-panel-done.gif') no-repeat center right;
+   padding-right: 24px;
+   margin-right: 24px;
+}
+
+ul.PanelUpdate li span span.Completion {
+   margin-left: 5px;
+   color: #2f2f2f;
+   margin-right: 0px;
+}
+
+/*
+ * CONTENT
+ * 
+ * 
+ */
+ 
+/** UPDATE **/
+
+div.UpdateBig {
+   text-align: center;
+}
+
+div.UpdateBig h2 {
+   font-size: 24px;
+   margin: 0px;
+   line-height: 22px;
+}
+
+div.UpdatePrompt p {
+   margin-top: 20px;
+}
+
+div.UpdatePrompt p div {
+   padding: 10px;
+}
+
+div#Content div.Group h1 {
+   font-size: 24px;
+   font-weight: bold;
+   
+}
+
+div#Content div.UpdateProgress {
+   margin: 0px auto;
+   width: 400px;
+   margin-top: 50px;
+   color: white;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer {
+   border: 2px solid #29292A;
+   background-color: #29292A;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSlider {
+   background-color: #B0EA2E;
+   width: 0%;
+   height: 30px;
+   text-align: right;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSpinner {
+   background: transparent url('images/spinner.gif') no-repeat center center;
+   width: 100%;
+   height: 30px;
+   text-align: right;
+   overflow: hidden;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer span {
+   line-height: 30px;
+   color: #29292A;
+   margin-right: 3px;
+}
+
+div#Content div.UpdateProgress div.ProgressContainer div.ProgressSpinner span {
+   display: none;
+}
+
+div#Content div.UpdateProgress div.ProgressContinue { 
+   font-size: 18px;
+   margin-top: 10px;
+}

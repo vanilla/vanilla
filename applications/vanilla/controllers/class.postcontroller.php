@@ -50,7 +50,7 @@ class PostController extends VanillaController {
     */
    public function Discussion($CategoryID = '') {
       // Override CategoryID if categories are disabled
-      $UseCategories = $this->ShowCategorySelector = C('Vanilla.Categories.Use');
+      $UseCategories = $this->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if (!$UseCategories) 
          $CategoryID = 0;
          

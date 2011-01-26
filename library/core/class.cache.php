@@ -85,10 +85,12 @@ abstract class Gdn_Cache {
    * 
    * @return Gdn_Cache
    */
-   public static function Initialize() {
-      
+   public static function Initialize($ForceEnable = FALSE, $ForceMethod = FALSE) {
       $AllowCaching = C('Cache.Enabled');
+      $AllowCaching |= $ForceEnable;
+      
       $ActiveCache = C('Cache.Method', FALSE);
+      if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
       
       if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass))

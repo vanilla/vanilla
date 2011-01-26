@@ -47,7 +47,7 @@ if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {
 }
 
 if ($Drop) {
-   $SQL->Insert('Category', array('TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
+   $SQL->Insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
    if (!C('Garden.Permissions.Disabled.Category')) {
       // Existing installations need to be set up with per/category permissions.

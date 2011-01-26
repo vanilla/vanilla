@@ -323,7 +323,7 @@ if (!function_exists('Attribute')) {
       }
       foreach ($Name as $Attribute => $Val) {
          if ($Val != '' && $Attribute != 'Standard') {
-            $Return .= ' '.$Attribute.'="'.$Val.'"';
+            $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val).'"';
          }
       }
       return $Return;

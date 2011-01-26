@@ -3,7 +3,7 @@
 Plugin Name: Vanilla Forums
 Plugin URI: http://vanillaforums.org/addons/
 Description: Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets.
-Version: 1.0.2
+Version: 1.0.3
 Author: Mark O'Sullivan
 Author URI: http://www.vanillaforums.org/
 

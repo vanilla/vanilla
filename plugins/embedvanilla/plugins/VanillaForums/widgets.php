@@ -46,9 +46,9 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
-		$resturl = array($url, 'discussions.json');
+		$resturl = array($url, '?p=discussions.json');
 		if ($categoryid > 0)
-			$resturl = array($url, 'categories/'.$categoryid.'.json');
+			$resturl = array($url, '?p=categories/'.$categoryid.'.json');
 			
 		$DataName = $categoryid > 0 ? 'DiscussionData' : 'Discussions';
 		
@@ -98,7 +98,7 @@ function vf_widgets_init() {
 		
 		// Retrieve & build the category dropdown
 		$resturl = vf_get_value('url', $options, '');
-		$resturl = vf_combine_paths(array($resturl, 'categories.json'), '/');
+		$resturl = vf_combine_paths(array($resturl, '?p=categories.json'), '/');
 		$category_data = json_decode(vf_rest($resturl));
 		$select_options = vf_get_select_option('All Categories', '0', $categoryid);
 		if (is_object($category_data)) {
@@ -136,7 +136,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
-		$resturl = array($url, 'activity.json');
+		$resturl = array($url, '?p=activity.json');
 		// if ($roleid > 0)
 		// 	$resturl = array($url, 'activities/'.$roleid.'.json');
 			
@@ -224,7 +224,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
-		$resturl = array($url, 'user/summary.json');
+		$resturl = array($url, '?p=user/summary.json');
 			
 		// Retrieve the latest discussions from the Vanilla API
 		$resturl = vf_combine_paths($resturl, '/');

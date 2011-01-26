@@ -53,7 +53,7 @@ if (!function_exists('Anchor')) {
       if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
 
-      return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
+      return '<a href="'.htmlspecialchars($Destination).'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 

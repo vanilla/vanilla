@@ -59,7 +59,7 @@ class DebuggerPlugin extends Gdn_Plugin {
 
       // Add the canonical Url.
       if (method_exists($Sender, 'CanonicalUrl')) {
-         $CanonicalUrl = $Sender->CanonicalUrl();
+         $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl());
 
          $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
       }

@@ -556,12 +556,7 @@ class Gdn_Request {
 
          $Query = GetValue('query', $Parts, '');
          if (strlen($Query) > 0) {
-            $GetParts = explode('&', $Query);
-            $Get = array();
-            foreach ($GetParts as $GetPart) {
-               $GetTuple = explode('=', $GetPart);
-               $Get[urldecode($GetTuple[0])] = urldecode(GetValue(1, $GetTuple, ''));
-            }
+            parse_str($Query, $Get);
          } else {
             $Get = array();
          }
@@ -723,6 +718,11 @@ class Gdn_Request {
       if ($this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
 
+      // Strip out the hash.
+      $Hash = strchr($Path, '#');
+      if (strlen($Hash) > 0)
+         $Path = substr($Path, 0, -strlen($Hash));
+
       // Strip out the querystring.
       $Query = strrchr($Path, '?');
       if (strlen($Query) > 0)
@@ -762,6 +762,9 @@ class Gdn_Request {
 
       if (isset($Query))
          $Result .= $Query;
+
+      if (isset($Hash))
+         $Result .= $Hash;
          
       return $Result;
    }

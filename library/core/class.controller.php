@@ -391,7 +391,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    /**
     * Adds a JS file to search for in the application or global js folder(s).
     *
-    * @param string $FileName The CSS file to search for.
+    * @param string $FileName The js file to search for.
     * @param string $AppFolder The application folder that should contain the JS file. Default is to
     * use the application folder that this controller belongs to.
     */
@@ -1191,6 +1191,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
+            header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
@@ -1275,6 +1276,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // The css is coming from a plugin.
                      $AppFolder = substr($AppFolder, strlen('plugins/'));
                      $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
+                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/$CssFile";
                   } else {
                      // Application default. eg. root/applications/app_name/design/
                      $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
@@ -1338,9 +1340,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                   }
 
                   // 3. The application or plugin folder.
-                  if (StringBeginsWith(trim($AppFolder, '/'), 'plugins/'))
+                  if (StringBeginsWith(trim($AppFolder, '/'), 'plugins/')) {
                      $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/js/$JsFile";
-                  else
+                     $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/$JsFile";
+                  } else
                      $JsPaths[] = PATH_APPLICATIONS."/$AppFolder/js/$JsFile";
 
                   // 4. Global JS folder. eg. root/js/

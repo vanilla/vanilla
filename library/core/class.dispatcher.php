@@ -397,7 +397,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          switch ($MatchRoute['Type']) {
             case 'Internal':
                $Request->PathAndQuery($MatchRoute['FinalDestination']);
-               $this->Request = $MatchRoute['FinalDestination'];
+               $this->Request = $Request->Path(FALSE);
                break;
 
             case 'Temporary':

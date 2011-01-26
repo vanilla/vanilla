@@ -59,7 +59,7 @@ class DebuggerPlugin extends Gdn_Plugin {
 
       // Add the canonical Url.
       if (method_exists($Sender, 'CanonicalUrl')) {
-         $CanonicalUrl = $Sender->CanonicalUrl();
+         $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl());
 
          $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
       }
@@ -80,7 +80,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             }
             $String .= $QueryInfo['Method']
                .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
-               .'<pre>'.$Query.';</pre>';
+               .'<pre>'.htmlspecialchars($Query).';</pre>';
          }
       }
       $String .= '<h3>Controller Data</h3><pre>';

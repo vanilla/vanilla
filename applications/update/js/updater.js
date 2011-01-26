@@ -7,7 +7,7 @@ function Gdn_Updater() {
 
    Gdn_Updater.prototype.Ready = function() {
    
-      this.Menu = $('div#Panel div.UpdateModule');
+      this.Menu = $('div#Panel div#UpdateModule');
       this.Frame = $('div.UpdateProgress');
       if (this.Frame.length) {
          this.Action = this.Frame.html();
@@ -70,8 +70,9 @@ function Gdn_Updater() {
    }
    
    Gdn_Updater.prototype.SetMenu = function(MenuHTML) {
-      var Menu = document.createElement(MenuHTML);
-      this.Menu.html($(Menu).html());
+      var Menu = document.createElement('div');
+      $(Menu).html(MenuHTML);
+      this.Menu.html($(Menu).find('div#UpdateModule').html());
    }
    
    Gdn_Updater.prototype.SetStatus = function(StatusText, Decay) {
@@ -84,7 +85,7 @@ function Gdn_Updater() {
       this.Status.html(StatusText);
       
       if (Decay) {
-         var Speed = ((Decay == 'slow') ? 2500 : 1250);
+         var Speed = ((Decay == 'slow') ? 4000 : 2000);
          clearTimeout(this.DecayTimer);
          this.DecayTimer = setTimeout(jQuery.proxy(function(){
             this.Status.fadeOut(500);
@@ -183,18 +184,20 @@ function Gdn_Updater() {
          if (this.Active == false) return;
          this.MonitorQuery();
       } else {
+      
          var CheckAgain = true;
          var Fade = true;
          
          var Completion = parseInt(data.Completion);
          if (Completion >= 0 && Completion <= 100) {
          
-            if (Completion == 100)
+            if (Completion == 100) {
                Fade = 'slow';
-            
-            if (data.Menu) {
-               this.SetMenu(data.Menu);
+               CheckAgain = false;
             }
+            
+            if (data.Menu)
+               this.SetMenu(data.Menu);
             
             // Defined progress
             this.SetProgressMode('progress');
@@ -203,9 +206,6 @@ function Gdn_Updater() {
             if (Completion > this.GetProgress()) {
                this.SetProgress(Completion);
             }
-            
-            if (Completion == 100) 
-               CheckAgain = false;
             
          } else if (Completion == -1) {
             

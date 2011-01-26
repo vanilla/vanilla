@@ -25,6 +25,7 @@ class VanillaUpdateModel {
       // Updater lockfile in a cache key
       $this->UpdateLockKey = 'Update.Local.Lock';
       
+      $this->Cache = Gdn_Cache::Initialize(TRUE, 'filecache');
       $this->Load();
    }
    
@@ -76,7 +77,7 @@ class VanillaUpdateModel {
    
    public function Clear($Hard = TRUE) {
       if ($Hard)
-         Gdn::Cache()->Remove($this->Key);
+         $this->Cache->Remove($this->Key);
       
       $this->Tasks      = array();
       $this->Tag        = array();
@@ -106,7 +107,8 @@ class VanillaUpdateModel {
       
       $this->AddGroup('verify', 'Verify')
          ->AddTask('verify', 'extract',  'Extract Downloaded Archives')
-         ->AddTask('verify', 'clean', 'Clean Archives');
+         ->AddTask('verify', 'clean', 'Clean Archives')
+         ->AddTask('verify', 'changes', 'Check for modified core files');
          
       $this->AddGroup('apply', 'Apply')
          ->AddTask('apply', 'files', 'Update Filesystem')
@@ -170,7 +172,7 @@ class VanillaUpdateModel {
    }
    
    public function Load() {
-      $UpdateStr = Gdn::Cache()->Get($this->Key);
+      $UpdateStr = $this->Cache->Get($this->Key);
       
       if ($UpdateStr === Gdn_Cache::CACHEOP_FAILURE) {
          return FALSE;
@@ -199,7 +201,7 @@ class VanillaUpdateModel {
    
    protected function Save() {
       $Encoded = $this->Deflate();
-      Gdn::Cache()->Store($this->Key, $Encoded);
+      $this->Cache->Store($this->Key, $Encoded);
       $this->LoadHash = md5($Encoded);
    }
    

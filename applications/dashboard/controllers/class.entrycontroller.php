@@ -7,22 +7,44 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Entry Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manages users manually authenticating (signing in).
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class EntryController extends Gdn_Controller {
-   
-   // Make sure the database class is loaded (class.controller.php takes care of this).
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var array
+    */
    public $Uses = array('Database', 'Form', 'UserModel');
-	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
+   
+   /**
+    * Error message for username requirements.
+    * 
+    * @since 2.0.17
+    * @access public
+    * @var string
+    */
+	public $UsernameError = ''; 
 
    protected $_RealDeliveryType;
 
-   /**
-    * @var Gdn_Form The current form.
-    */
-   public $Form;
-
    public function  __construct() {
       parent::__construct();
+      
+      // Resuable, translatable username requirement error message
+      $this->UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
 
       switch (isset($_GET['display'])) {
          case 'popup':
@@ -755,7 +777,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -776,7 +798,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -815,7 +837,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
@@ -861,7 +883,7 @@ class EntryController extends Gdn_Controller {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
-         $this->UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+         $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');

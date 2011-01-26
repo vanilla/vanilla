@@ -85,15 +85,22 @@ jQuery(document).ready(function($) {
             $('.Popup,.Overlay').remove();
             var msg;
             if (XMLHttpRequest.responseText)
-               msg = XMLHttpRequest.responseText;
+               try {
+                  var data = $.parseJSON(XMLHttpRequest.responseText);
+                  if (data.Exception)
+                     msg = data.Exception;
+                  else
+                     msg = 'Unkown error.';
+               } catch (ex) {
+                  msg = XMLHttpRequest.responseText;
+               }
             else {
-               msg = '<h1>Error</h1><p class="Wrap">';
                if(textStatus == 'timeout')
-                  msg += 'Your request took too long to complete and timed out. Please try again.';
+                  msg = 'Your request took too long to complete and timed out. Please try again.';
                else
-                  msg += textStatus;
-               msg += '</div>';
+                  msg = textStatus;
             }
+            msg = '<h1>Error</h1><p class="Wrap">' + msg + '</div>';
 
 
             $.popup({}, msg);

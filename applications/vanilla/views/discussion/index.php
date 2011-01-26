@@ -58,7 +58,7 @@ if ($this->Discussion->Closed == '1') {
       <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
-} else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->CategoryID)) { 
+} else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
    echo $this->FetchView('comment', 'post');
 } else if ($Session->IsValid()) { ?>
    <div class="Foot Closed">

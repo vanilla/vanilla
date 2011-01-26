@@ -93,13 +93,13 @@ class PostController extends VanillaController {
       if (isset($this->Discussion)) {
          // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
 
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
 
          $this->Title(T('Edit Discussion'));
       } else {
@@ -129,16 +129,16 @@ class PostController extends VanillaController {
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
             // Check category permissions
-            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->CategoryID))
+            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->CategoryID))
+            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->CategoryID))
+            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
+            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
                
             // Make sure that the title will not be invisible after rendering
@@ -293,17 +293,17 @@ class PostController extends VanillaController {
       if ($Editing) {
          // Permisssion to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
             
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
-            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
       } else {
          // Permission to add
-         $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->CategoryID);
+         $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
       if ($this->Form->AuthenticatedPostBack() === FALSE) {

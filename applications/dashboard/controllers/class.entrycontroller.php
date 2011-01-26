@@ -1057,6 +1057,16 @@ class EntryController extends Gdn_Controller {
       // Make sure that the target is a valid url.
       if (!preg_match('`(^https?://)|/`', $Target)) {
          $Target = '/'.$Target;
+      } else {
+         $MyHostname = parse_url(Gdn::Request()->Domain(),PHP_URL_HOST);
+         $TargetHostname = parse_url($Target, PHP_URL_HOST);
+         
+         // Dont allow external redirects, but fire an event to allow override
+         $AllowExternalRedirect = C('Garden.Target.AllowExternalRedirect', FALSE);
+         $Sender->EventArguments['AllowExternalRedirect'] = &$AllowExternalRedirect;
+         $this->FireEvent('BeforeTargetReturn');
+         if (!$AllowExternalRedirect && $MyHostname != $TargetHostname) 
+            return '';
       }
       return $Target;
    }

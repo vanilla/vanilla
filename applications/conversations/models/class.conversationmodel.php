@@ -7,15 +7,37 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Conversation Model
+ *
+ * @package Conversations
+ */
+ 
+/**
+ * Manages conversations.
+ *
+ * @since 2.0.0
+ * @package Conversations
+ */
 class ConversationModel extends Gdn_Model {
    /**
-    * Class constructor.
+    * Class constructor. Defines the related database table name.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function __construct() {
       parent::__construct('Conversation');
    }
    
+   /**
+    * Build generic part of conversation query.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ViewingUserID Unique ID of current user.
+    */
    public function ConversationQuery($ViewingUserID) {
       $this->SQL
          ->Select('c.*')
@@ -39,35 +61,70 @@ class ConversationModel extends Gdn_Model {
          //->EndWhereGroup();
    }
    
+   /**
+    * Get list of conversations.
+    * 
+    * Events: BeforeGet.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ViewingUserID Unique ID of current user.
+    * @param int $Offset Number to skip.
+    * @param int $Limit Maximum to return.
+    * @param array $Wheres SQL conditions.
+    * @return Gdn_DataSet SQL results.
+    */
    public function Get($ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
       if ($Limit == '') 
          $Limit = Gdn::Config('Conversations.Conversations.PerPage', 50);
 
       $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
+      
       $this->ConversationQuery($ViewingUserID);
+      
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
       $this->FireEvent('BeforeGet');
+      
       return $this->SQL
          ->OrderBy('c.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
    }
    
+   /**
+    * Get number of conversations involving current user.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ViewingUserID Unique ID of current user.
+    * @param array $Wheres SQL conditions.
+    * @return int Number of messages.
+    */
    public function GetCount($ViewingUserID, $Wheres = '') {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
          
-      $Result = $this->SQL
+      return $this->SQL
          ->Select('uc.UserID', 'count', 'Count')
          ->From('UserConversation uc')
          ->Where('uc.UserID', $ViewingUserID)
-         ->Get()->Value('Count', 0);
-
-      return $Result;
+         ->Get()
+         ->Value('Count', 0);
    }
-
+   
+   /**
+    * Get number of conversations that meet criteria.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $Wheres SQL conditions.
+    * @return int Number of messages.
+    */
    public function GetCountWhere($Wheres = '') {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -82,7 +139,17 @@ class ConversationModel extends Gdn_Model {
       
       return 0;
    }   
-
+   
+   /**
+    * Get meta data of a single conversation.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation.
+    * @param int $ViewingUserID Unique ID of current user.
+    * @return Gdn_DataSet SQL result (single row).
+    */
    public function GetID($ConversationID, $ViewingUserID) {
       $this->ConversationQuery($ViewingUserID);
       return $this->SQL
@@ -91,6 +158,16 @@ class ConversationModel extends Gdn_Model {
          ->FirstRow();
    }
    
+   /**
+    * Get all users involved in conversation.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation.
+    * @param int $IgnoreUserID Ignored.
+    * @return Gdn_DataSet SQL results.
+    */
    public function GetRecipients($ConversationID, $IgnoreUserID = '0') {
       return $this->SQL
          ->Select('uc.UserID, u.Name, uc.Deleted')
@@ -103,7 +180,17 @@ class ConversationModel extends Gdn_Model {
          ->GroupBy('uc.UserID, u.Name')
          ->Get();
    }
-
+   
+   /**
+    * Save conversation from form submission.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $FormPostValues Values submitted via form.
+    * @param object $MessageModel Message starting the conversation.
+    * @return int Unique ID of conversation created or updated.
+    */
    public function Save($FormPostValues, $MessageModel) {
       $Session = Gdn::Session();
       
@@ -209,6 +296,12 @@ class ConversationModel extends Gdn_Model {
    
    /**
     * Clear a conversation for a specific user id.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation effected.
+    * @param int $ClearingUserID Unique ID of current user.
     */
    public function Clear($ConversationID, $ClearingUserID) {
       $this->SQL->Update('UserConversation')
@@ -221,6 +314,12 @@ class ConversationModel extends Gdn_Model {
 
    /**
     * Update a conversation as read for a specific user id.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation effected.
+    * @param int $ReadingUserID Unique ID of current user.
     */
    public function MarkRead($ConversationID, $ReadingUserID) {
       // Update the the read conversation count for the user.
@@ -233,8 +332,6 @@ class ConversationModel extends Gdn_Model {
          ->Where('uc.ConversationID', $ConversationID)
          ->Where('uc.UserID', $ReadingUserID)
          ->Put();
-
-
          
       // Also update the unread conversation count for this user
       $CountUnread = $this->SQL
@@ -249,6 +346,7 @@ class ConversationModel extends Gdn_Model {
          ->Set('CountUnreadConversations', $CountUnread)
          ->Where('UserID', $ReadingUserID)
          ->Put();
+         
       // Also write through to the current session user.
       if($ReadingUserID > 0 && $ReadingUserID == Gdn::Session()->UserID)
          Gdn::Session()->User->CountUnreadConversations = $CountUnread;
@@ -256,6 +354,13 @@ class ConversationModel extends Gdn_Model {
    
    /**
     * Bookmark (or unbookmark) a conversation for a specific user id.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation effected.
+    * @param int $UserID Unique ID of current user.
+    * @return bool Whether it is currently bookmarked.
     */
    public function Bookmark($ConversationID, $UserID) {
       $Bookmark = FALSE;
@@ -272,6 +377,15 @@ class ConversationModel extends Gdn_Model {
       return $Bookmark;
    }
    
+   /**
+    * Add another user to the conversation.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation effected.
+    * @param int $UserID Unique ID of current user.
+    */
    public function AddUserToConversation($ConversationID, $UserID) {
       if (!is_array($UserID))
          $UserID = array($UserID);

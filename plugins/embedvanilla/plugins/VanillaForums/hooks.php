@@ -7,9 +7,6 @@ if (is_admin()) {
 
 	// Add menu options to dashboard
 	add_action('admin_menu', 'vf_add_vanilla_menu');
-
-	// Add admin menu option
-	add_action('admin_menu', 'vf_embed_menu');
 }
 
 // Replace the page content with the vanilla embed code if viewing the page that

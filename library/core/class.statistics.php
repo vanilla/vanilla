@@ -246,7 +246,6 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       $Response = ProxyRequest($FinalURL, FALSE, TRUE);
       if ($Response !== FALSE) {
-         echo $Response;
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)
             $JsonResponse = GetValue('Analytics', $JsonResponse, FALSE);

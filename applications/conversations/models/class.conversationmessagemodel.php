@@ -7,15 +7,44 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Message Model
+ *
+ * @package Conversations
+ */
+ 
+/**
+ * Manages messages in a conversation.
+ *
+ * @since 2.0.0
+ * @package Conversations
+ */
 class ConversationMessageModel extends Gdn_Model {
    /**
-    * Class constructor.
+    * Class constructor. Defines the related database table name.
+    * 
+    * @since 2.0.0
+    * @access public
     */
    public function __construct() {
       parent::__construct('ConversationMessage');
    }
    
+   /**
+    * Get messages by conversation.
+    * 
+    * Events: BeforeGet.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation being viewed.
+    * @param int $ViewingUserID Unique ID of current user.
+    * @param int $Offset Number to skip.
+    * @param int $Limit Maximum to return.
+    * @param array $Wheres SQL conditions.
+    * @return Gdn_DataSet SQL results.
+    */
    public function Get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
       if ($Limit == '') 
          $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
@@ -43,12 +72,33 @@ class ConversationMessageModel extends Gdn_Model {
          ->Get();
    }
    
+   /**
+    * Get only new messages from conversation.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation being viewed.
+    * @param int $LastMessageID Unique ID of last message to be viewed.
+    * @return Gdn_DataSet SQL results.
+    */
    public function GetNew($ConversationID, $LastMessageID) {
       $Session = Gdn::Session();
       $this->SQL->Where('MessageID > ', $LastMessageID);
       return $this->Get($ConversationID, $Session->UserID);
    }
    
+   /**
+    * Get number of messages in a conversation.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $ConversationID Unique ID of conversation being viewed.
+    * @param int $ViewingUserID Unique ID of current user.
+    * @param array $Wheres SQL conditions.
+    * @return int Number of messages.
+    */
    public function GetCount($ConversationID, $ViewingUserID, $Wheres = '') {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -65,12 +115,22 @@ class ConversationMessageModel extends Gdn_Model {
          ->GroupBy('cm.ConversationID')
          ->Where('cm.ConversationID', $ConversationID)
          ->Get();
+         
       if ($Data->NumRows() > 0)
          return $Data->FirstRow()->Count;
       
       return 0;
    }
 
+   /**
+    * Get number of messages that meet criteria.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $Wheres SQL conditions.
+    * @return int Number of messages.
+    */
    public function GetCountWhere($Wheres = '') {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -79,12 +139,22 @@ class ConversationMessageModel extends Gdn_Model {
          ->Select('MessageID', 'count', 'Count')
          ->From('ConversationMessage')
          ->Get();
+         
       if ($Data->NumRows() > 0)
          return $Data->FirstRow()->Count;
       
       return 0;
    }
    
+   /**
+    * Save message from form submission.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param array $FormPostValues Values submitted via form.
+    * @return int Unique ID of message created or updated.
+    */
    public function Save($FormPostValues) {
       $Session = Gdn::Session();
       

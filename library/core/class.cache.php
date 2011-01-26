@@ -30,16 +30,46 @@ abstract class Gdn_Cache {
    */
    protected $Features;
    
+   // Allows items to be internally compressed/decompressed
    const FEATURE_COMPRESS     = 'f_compress';
+   // Allows items to autoexpire
    const FEATURE_EXPIRY       = 'f_expiry';
+   // Allows set/get timeouts
    const FEATURE_TIMEOUT      = 'f_timeout';
    
+   /**
+   * Location - SERVER:IP, Filepath, etc
+   */
    const CONTAINER_LOCATION   = 'c_location';
+   
+   /**
+   * Persistent - IsPersistent Flag
+   */
    const CONTAINER_PERSISTENT = 'c_persistent';
+   
+   /**
+   * Weight - Allows for differently weighted storage locations
+   */
    const CONTAINER_WEIGHT     = 'c_weight';
+   
+   /**
+   * Timeout - How long to wait while connecting to this container
+   */
    const CONTAINER_TIMEOUT    = 'c_timeout';
+   
+   /**
+   * Online - If this container is ready for requests
+   */
    const CONTAINER_ONLINE     = 'c_online';
+   
+   /**
+   * Callback - ??
+   */
    const CONTAINER_CALLBACK   = 'c_callback';
+   
+   /**
+   * Cachefile - ??
+   */
    const CONTAINER_CACHEFILE  = 'c_cachefile';
    
    const CACHEOP_FAILURE = FALSE;
@@ -55,10 +85,12 @@ abstract class Gdn_Cache {
    * 
    * @return Gdn_Cache
    */
-   public static function Initialize() {
-      
+   public static function Initialize($ForceEnable = FALSE, $ForceMethod = FALSE) {
       $AllowCaching = C('Cache.Enabled');
+      $AllowCaching |= $ForceEnable;
+      
       $ActiveCache = C('Cache.Method', FALSE);
+      if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
       
       if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass))

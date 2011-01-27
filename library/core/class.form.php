@@ -25,6 +25,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @todo change formatting of tables in documentation
  */
 class Gdn_Form {
+   /**
+    * @var bool Whether to display inline errors with form elements.
+    * 
+    * @since 2.0.18
+    * @access public
+    */
+   public $InlineErrors = FALSE;
 
    /// =========================================================================
    /// 1. UI Components: Methods that return xhtml form elements.
@@ -895,6 +902,17 @@ class Gdn_Form {
 
          $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
              '" />';
+      }
+      
+      // Append inline validation errors if enabled
+      if ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults)) { 
+         $ErrorClass = C('Garden.Forms.InlineErrorClass', 'InlineError');
+         $AppendError = '<p class="'.$ErrorClass.'">';
+         foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
+            $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
+         }
+         $AppendError .= '</p>';
+         $Return .= $AppendError;
       }
 
       return $Return;

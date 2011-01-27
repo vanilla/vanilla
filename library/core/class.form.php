@@ -888,6 +888,19 @@ class Gdn_Form {
          $CssClass = ArrayValueI('class', $Attributes);
          if ($CssClass == FALSE) $Attributes['class'] = 'InputBox';
       }
+      
+      // Show inline errors?
+      $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
+      
+      if ($ShowErrors) {
+         // Add error class to input element
+         $ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
+         if (isset($Attributes['class']))
+            $Attributes['class'] .= ' '.$ErrorClass;
+         else
+            $Attributes['class'] = $ErrorClass;
+      }
+      
       $Return = '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
@@ -904,9 +917,8 @@ class Gdn_Form {
              '" />';
       }
       
-      // Append inline validation errors if enabled
-      if ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults)) { 
-         $ErrorClass = C('Garden.Forms.InlineErrorClass', 'InlineError');
+      if ($ShowErrors) { 
+         // Append validation error message
          $AppendError = '<p class="'.$ErrorClass.'">';
          foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
             $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';

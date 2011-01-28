@@ -1407,7 +1407,7 @@ if (!function_exists('RemoteIP')) {
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_USER_CONF.DS.'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
       if (!is_array($Name))
          $Name = array($Name);
@@ -1545,7 +1545,7 @@ if (!function_exists('SaveToConfig')) {
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_USER_CONF.DS.'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
 
       if (!is_array($Name))

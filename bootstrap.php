@@ -5,7 +5,7 @@ if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
 	
 /// Define core constants.
 if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.DS.'conf');
-if(!defined('PATH_USER_CONF')) define('PATH_USER_CONF', PATH_CONF);
+if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
 
 // Include default constants if none were defined elsewhere
 if (!defined('VANILLA_CONSTANTS'))
@@ -80,9 +80,9 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 // Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
-if (PATH_USER_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
+if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
    // Load the custom configurations 
-   $Gdn_Config->Load(PATH_USER_CONF.DS.'config.php', 'Use');
+   $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 }
 
 // This header is redundantly set in the controller.
@@ -99,7 +99,7 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 }
 
 /// Load the custom configurations again so that application setting defaults are overridden.
-$Gdn_Config->Load(PATH_USER_CONF.DS.'config.php', 'Use');
+$Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.

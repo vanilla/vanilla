@@ -746,9 +746,9 @@ class Gdn_Form {
     * @return string
     */
    public function Radio($FieldName, $Label = '', $Attributes = FALSE) {
-      $Value = ArrayValueI('value', $Attributes, 'TRUE');
+      $Value = ArrayValueI('Value', $Attributes, 'TRUE');
       $Attributes['value'] = $Value;
-      $FormValue = $this->GetValue($FieldName, ArrayValueI('default', $Attributes));
+      $FormValue = $this->GetValue($FieldName, ArrayValueI('Default', $Attributes));
       
       // Check for 'checked'
       if ($FormValue == $Value) 
@@ -770,16 +770,14 @@ class Gdn_Form {
    }
 
    /**
-    * Returns the xhtml for a radio button list.
+    * Returns XHTML for an unordered list of radio button elements.
     *
-    * @param string $FieldName The name of the field that is being displayed/posted with this input. It
-    * should related directly to a field name in $this->_DataArray. ie. RoleID
-    *
+    * @param string $FieldName The name of the field that is being displayed/posted with this input. 
+    *    It should related directly to a field name in $this->_DataArray. ie. RoleID
     * @param mixed $DataSet The data to fill the options in the select list. Either an associative
-    * array or a database dataset.
-    *
+    *    array or a database dataset.
     * @param array $Attributes An associative array of attributes for the list. Here is a list of
-    * "special" attributes and their default values:
+    *    "special" attributes and their default values:
     *
     *   Attribute   Options                        Default
     *   ------------------------------------------------------------------------
@@ -791,7 +789,6 @@ class Gdn_Form {
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
     *   Default     The default value.             empty
-    *   IncludeNull Include a blank row?           FALSE
     * @return string
     */
    public function RadioList($FieldName, $DataSet, $Attributes = FALSE) {

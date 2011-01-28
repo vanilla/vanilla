@@ -119,6 +119,14 @@ class Gdn_Form {
    public $InlineErrors = FALSE;
    
    /**
+    * @var string Class name to assign to form elements with errors when InlineErrors is enabled.
+    * 
+    * @since 2.0.18
+    * @access public
+    */
+   public $ErrorClass = 'Error';
+   
+   /**
     * Constructor
     *
     * @param string $TableName
@@ -128,6 +136,9 @@ class Gdn_Form {
          $TableModel = new Gdn_Model($TableName);
          $this->SetModel($TableModel);
       }
+      
+      // Get custom error class
+      $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
    }
 
    /// =========================================================================
@@ -988,13 +999,12 @@ class Gdn_Form {
       // Show inline errors?
       $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
       
+      // Add error class to input element
       if ($ShowErrors) {
-         // Add error class to input element
-         $ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
          if (isset($Attributes['class']))
-            $Attributes['class'] .= ' '.$ErrorClass;
+            $Attributes['class'] .= ' '.$this->ErrorClass;
          else
-            $Attributes['class'] = $ErrorClass;
+            $Attributes['class'] = $this->ErrorClass;
       }
       
       $Return = '<input type="' . $Type . '"';
@@ -1013,17 +1023,28 @@ class Gdn_Form {
              '" />';
       }
       
-      if ($ShowErrors) { 
-         // Append validation error message
-         $AppendError = '<p class="'.$ErrorClass.'">';
-         foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
-            $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
-         }
-         $AppendError .= '</p>';
-         $Return .= $AppendError;
-      }
+      // Append validation error message
+      if ($ShowErrors)  
+         $Return .= $this->InlineError($FieldName);
 
       return $Return;
+   }
+   
+   /**
+    * Returns XHTML of inline error for specified field.
+    *
+    * @param string $FieldName The name of the field that is being displayed/posted with this input. It
+    *  should related directly to a field name in $this->_DataArray.
+    * @return string
+    */
+   public function InlineError($FieldName) {
+      $AppendError = '<p class="'.$ErrorClass.'">';
+      foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
+         $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
+      }
+      $AppendError .= '</p>';
+      
+      return $AppendError;
    }
 
 

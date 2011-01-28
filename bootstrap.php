@@ -75,8 +75,6 @@ $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 // This header is redundantly set in the controller.
 //header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
 
-Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
-
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
 Gdn::Request()->FromEnvironment();
@@ -119,11 +117,12 @@ Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
 // Application manager.
 Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
-
+// Cache Layer
+Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
 // Theme manager
 Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
-
+// Remote Statistics
 Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY.DS.'core'.DS.'class.statistics.php', Gdn::FactoryInstance);
 
 // Other objects.

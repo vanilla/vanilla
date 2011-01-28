@@ -849,21 +849,22 @@ class Gdn_Form {
    }
 
    /**
-    * Returns the xhtml for a label element.
+    * Returns XHTML for a label element.
     *
-    * @param string $TranslationCode The code to be translated and presented within the label tag.
-    * @param string $FieldName The name of the field that the label is for.
-    * @param array $Attributes An associative array of attributes for the input that the label is for.
-    * This is only available in case the related input has a custom id
-    * specified in the attributes array.
+    * @param string $TranslationCode Code to be translated and presented within the label tag.
+    * @param string $FieldName Name of the field that the label is for.
+    * @param array $Attributes Associative array of attributes for the input that the label is for.
+    *    This is only available in case the related input has a custom id specified in the attributes array.
     *
     * @return string
     */
    public function Label($TranslationCode, $FieldName = '', $Attributes = FALSE) {
-      if ($FieldName == '')
-         return '<label'.$this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\r\n";
-      else
-         return '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) . '"'.$this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\r\n";
+      // Assume we always want a 'for' attribute because it's Good & Proper.
+      // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
+      $DefaultFor = ($FieldName == '') ? $TranslationCode ? $FieldName;
+      $For = ArrayValueI('for', $Attributes, ArrayValueI('id', $Attributes, $this->EscapeID($DefaultFor, FALSE)));
+
+      return '<label for="' . $For . '"' . $this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\n";
    }
 
    /// <param name="DataObject" type="object">
@@ -1480,6 +1481,7 @@ class Gdn_Form {
                   'method',
                   'action',
                   'type',
+                  'for',
                   'multiline',
                   'default',
                   'textfield',

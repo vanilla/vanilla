@@ -1000,12 +1000,8 @@ class Gdn_Form {
       $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
       
       // Add error class to input element
-      if ($ShowErrors) {
-         if (isset($Attributes['class']))
-            $Attributes['class'] .= ' '.$this->ErrorClass;
-         else
-            $Attributes['class'] = $this->ErrorClass;
-      }
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
       
       $Return = '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
@@ -1033,6 +1029,9 @@ class Gdn_Form {
    /**
     * Returns XHTML of inline error for specified field.
     *
+    * @since 2.0.18
+    * @access public
+    *
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
     *  should related directly to a field name in $this->_DataArray.
     * @return string
@@ -1045,6 +1044,21 @@ class Gdn_Form {
       $AppendError .= '</p>';
       
       return $AppendError;
+   }
+   
+   /**
+    * Add ErrorClass to Attributes['class'].
+    *
+    * @since 2.0.18
+    * @access public
+    *
+    * @param array $Attributes Field attributes passed by reference (property => value).
+    */
+   public function AddErrorClass(&$Attributes) {
+      if (isset($Attributes['class']))
+         $Attributes['class'] .= ' '.$this->ErrorClass;
+      else
+         $Attributes['class'] = $this->ErrorClass;
    }
 
 

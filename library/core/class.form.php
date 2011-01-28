@@ -318,6 +318,9 @@ class Gdn_Form {
     * @return string
     */
    public function CheckBoxList($FieldName, $DataSet, $ValueDataSet, $Attributes) {
+      // Never display individual inline errors for these CheckBoxes
+      $Attributes['InlineErrors'] = FALSE;
+      
       $Return = '';
       // If the form hasn't been posted back, use the provided $ValueDataSet
       if ($this->IsPostBack() === FALSE) {
@@ -400,6 +403,9 @@ class Gdn_Form {
     * @return string
     */
    public function CheckBoxGrid($FieldName, $DataSet, $ValueDataSet, $Attributes) {
+      // Never display individual inline errors for these CheckBoxes
+      $Attributes['InlineErrors'] = FALSE;
+      
       $Return = '';
       $CheckedValues = $ValueDataSet;
       if (is_object($ValueDataSet)) $CheckedValues = ConsolidateArrayValuesByKey(
@@ -493,6 +499,9 @@ class Gdn_Form {
    }
    
    public function CheckBoxGridGroup($GroupName, $Data, $FieldName) {
+        // Never display individual inline errors for these CheckBoxes
+      $Attributes['InlineErrors'] = FALSE;
+      
       // Get the column and row info.
       $Columns = $Data['_Columns'];
       ksort($Columns);

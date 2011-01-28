@@ -790,6 +790,10 @@ class Gdn_Form {
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
     *   Default     The default value.             empty
+    *   InlineErrors  Show inline error message?   TRUE
+    *               Allows disabling per-dropdown
+    *               for multi-fields like Date()
+    *
     * @return string
     */
    public function RadioList($FieldName, $DataSet, $Attributes = FALSE) {
@@ -804,6 +808,13 @@ class Gdn_Form {
          $LiOpen = '';
          $LiClose = '';
       }
+      
+      // Show inline errors?
+      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
+      
+      // Add error class to input element
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
 
       if (is_object($DataSet)) {
          $ValueField = ArrayValueI('ValueField', $Attributes, 'value');
@@ -826,6 +837,10 @@ class Gdn_Form {
 
       if ($List)
          $Return .= '</ul>';
+      
+      // Append validation error message
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+         $Return .= $this->InlineError($FieldName);
 
       return $Return;
    }

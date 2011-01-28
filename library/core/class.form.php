@@ -754,6 +754,9 @@ class Gdn_Form {
       if ($FormValue == $Value) 
          $Attributes['checked'] = 'checked';
       
+      // Never display individual inline errors for this Input
+      $Attributes['InlineErrors'] = FALSE;
+      
       // Get standard radio Input
       $Input = $this->Input($FieldName, 'radio', $Attributes);
       

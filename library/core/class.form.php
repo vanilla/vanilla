@@ -742,7 +742,8 @@ class Gdn_Form {
     * @param string $FieldName Name of the field that is being displayed/posted with this input. 
     *    It should related directly to a field name in $this->_DataArray.
     * @param string $Label Label to place next to the radio.
-    * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)
+    * @param array $Attributes Associative array of attributes for the input (e.g. onclick, class).
+    *    Special values 'Value' and 'Default' (see RadioList).
     * @return string
     */
    public function Radio($FieldName, $Label = '', $Attributes = FALSE) {

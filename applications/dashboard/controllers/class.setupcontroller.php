@@ -14,9 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SetupController extends DashboardController {
    
    public $Uses = array('Form', 'Database');
-   
-	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
-	
+   	
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
@@ -181,7 +179,8 @@ class SetupController extends DashboardController {
             // Create the administrative user
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
-            $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+            $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+            $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
             $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
             $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
@@ -269,7 +268,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF . DS . 'config.php';
+         $ConfigFile = PATH_LOCAL_CONF.DS.'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          

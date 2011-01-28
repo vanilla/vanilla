@@ -171,12 +171,12 @@ class Gdn_Locale extends Gdn_Pluggable {
          }
 
          // Look for a global locale.
-         $ConfigLocale = PATH_CONF.'/locale.php';
+         $ConfigLocale = PATH_LOCAL_CONF.'/locale.php';
          if (file_exists($ConfigLocale))
             $FileContents[$SafeLocaleName][] = $ConfigLocale;
 
          // Look for a config locale that is locale-specific.
-         $ConfigLocale = PATH_CONF."/locale-$LocaleName.php";
+         $ConfigLocale = PATH_LOCAL_CONF."/locale-$LocaleName.php";
          if (file_exists($ConfigLocale))
             $FileContents[$SafeLocaleName][] = $ConfigLocale;
          
@@ -193,7 +193,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if (is_null($SafeLocaleName))
          $LocaleSources = array();
 
-      $ConfLocaleOverride = PATH_CONF . DS . 'locale.php';
+      $ConfLocaleOverride = PATH_LOCAL_CONF . DS . 'locale.php';
       $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
          if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last

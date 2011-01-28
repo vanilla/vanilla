@@ -136,7 +136,7 @@ class Gdn_CookieIdentity {
 
       return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
    }
-   
+
    /**
     * Generates the user's session cookie.
     *
@@ -252,7 +252,7 @@ class Gdn_CookieIdentity {
       $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
       $GeneratedHash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
-      if ($CookieHash != $GeneratedHash) {
+      if (!CompareHashDigest($CookieHash, $GeneratedHash)) {
          self::DeleteCookie($CookieName);
          return FALSE;
       }

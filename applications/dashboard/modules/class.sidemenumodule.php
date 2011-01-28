@@ -24,6 +24,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
        * An array of menu items.
        */
       public $Items;
+
+      protected $_Items;
       
       /**
        * The html id attribute to be applied to the root element of the menu.
@@ -57,26 +59,111 @@ if (!class_exists('SideMenuModule', FALSE)) {
          parent::__construct($Sender);
       }
       
-      public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '') {
+      public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {
          if (!array_key_exists($Group, $this->Items))
-            $this->Items[$Group] = array();
-
-         $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes);
+            $this->Items[$Group] = array('Group' => $Group, 'Links' => array());
+         if ($Text === FALSE) {
+            // This link is the group heading.
+            $this->Items[$Group]['Url'] = $Url;
+            $this->Items[$Group]['Permission'] = $Permission;
+            $this->Items[$Group]['Attributes'] = array_merge($this->Items[$Group]['Attributes'], $Attributes);
+         } else {
+            $Link = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, '_Sort' => count($this->Items[$Group]['Links']));
+            if (isset($Attributes['After'])) {
+               $Link['After'] = $Attributes['After'];
+               unset($Attributes['After']);
+            }
+            $this->Items[$Group]['Links'][$Url] = $Link;
+         }
       }
       
-      public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
-         if (!array_key_exists($Group, $this->Items)) {
-            $this->Items[$Group] = array();
-            $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
+      public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = array()) {
+         if (!array_key_exists($Group, $this->Items))
+            $Item = array('Group' => $Group, 'Links' => array(), '_Sort' => count($this->Items));
+         else
+            $Item = $this->Items[$Group];
+
+
+         if (isset($Attributes['After'])) {
+            $Item['After'] = $Attributes['After'];
+            unset($Attributes['After']);
          }
+
+         $Item['Text'] = $Text;
+         $Item['Permission'] = $Permission;
+         $Item['Attributes'] = $Attributes;
+
+         $this->Items[$Group] = $Item;
       }      
       
       public function AssetTarget() {
          return 'Menu';
       }
+
+      public function CheckPermissions() {
+         $Session = Gdn::Session();
+
+         foreach ($this->Items as $Group => $Item) {
+            if (GetValue('Permission', $Item) && !$Session->CheckPermission($Item['Permission'])) {
+               unset($this->Items[$Group]);
+               continue;
+            }
+
+            foreach ($Item['Links'] as $Key => $Link) {
+               if (GetValue('Permission', $Link) && !$Session->CheckPermission($Link['Permission']))
+                  unset($this->Items[$Group]['Links'][$Key]);
+            }
+            // Remove the item if there are no more links.
+            if (!GetValue('Url', $Item) && !count($this->Items[$Group]['Links']))
+               unset($this->Items[$Group]);
+         }
+      }
       
       public function ClearGroups() {
          $this->Items = array();
+      }
+
+      protected function _Compare($A, $B = NULL) {
+         static $Groups;
+         if ($B === NULL) {
+            $Groups = $A;
+            return;
+         }
+
+         $SortA = $this->_CompareSort($A, $Groups);
+         $SortB = $this->_CompareSort($B, $Groups);
+
+         if ($SortA > $SortB)
+            return 1;
+         elseif ($SortA < $SortB)
+            return -1;
+         elseif ($A['_Sort'] > $B['_Sort']) // fall back to order added
+            return 1;
+         elseif ($A['_Sort'] < $B['_Sort'])
+            return -1;
+         else
+            return 0;
+      }
+
+      /**
+       * The sort is determined by looking at:
+       *  a) The item's sort.
+       *  b) Whether the item is after another.
+       *  c) The order the item was added.
+       * @param array $A
+       * @param array $All
+       * @return int
+       */
+      protected function _CompareSort($A, $All) {
+         if (isset($A['Sort']))
+            return $A['Sort'];
+         if (isset($A['After']) && isset($All[$A['After']])) {
+            $After = $All[$A['After']];
+            if (isset($After['Sort']))
+               return $After['Sort'] + 0.1;
+            return $After['_Sort'] + 0.1;
+         }
+         return $A['_Sort'];
       }
       
       public function HighlightRoute($Route) {
@@ -109,144 +196,58 @@ if (!class_exists('SideMenuModule', FALSE)) {
          if (array_key_exists($Group, $this->Items))
             unset($this->Items[$Group]);
       }
-      
+
       public function ToString($HighlightRoute = '') {
          if ($HighlightRoute == '')
             $HighlightRoute = $this->_HighlightRoute;
          if ($HighlightRoute == '')
             $HighlightRoute = Gdn_Url::Request();
-         
-         $Username = '';
-         $UserID = '';
-         $Session_TransientKey = '';
-         $Permissions = array();
-         $Session = Gdn::Session();
-         $HasPermissions = FALSE;
-         $Admin = FALSE;
-         if ($Session->IsValid() === TRUE) {
-            $UserID = $Session->User->UserID;
-            $Username = $Session->User->Name;
-            $Session_TransientKey = $Session->TransientKey();
-            $Permissions = $Session->GetPermissions();
-            $HasPermissions = count($Permissions) > 0;
-            $Admin = $Session->User->Admin == '1' ? TRUE : FALSE;
+         $HighlightUrl = Url($HighlightRoute);
+
+         // Apply a sort to the items if given.
+         if (is_array($this->Sort)) {
+            $Sort = array_flip($this->Sort);
+            foreach ($this->Items as $Group => &$Item) {
+               if (isset($Sort[$Group]))
+                  $Item['Sort'] = $Sort[$Group];
+               else
+                  $Item['_Sort'] += count($Sort);
+
+               foreach ($Item['Links'] as $Url => &$Link) {
+                  if (isset($Sort[$Url]))
+                     $Link['Sort'] = $Sort[$Url];
+                  elseif (isset($Sort[$Link['Text']]))
+                     $Link['Sort'] = $Sort[$Link['Text']];
+                  else
+                     $Link['_Sort'] += count($Sort);
+               }
+            }
          }
          
-         $Menu = '';
-         if (count($this->Items) > 0) {
-            // Apply the menu sort if present...
-            if (is_array($this->Sort)) {
-               $Items = array();
-               $Count = count($this->Sort);
-               for ($i = 0; $i < $Count; ++$i) {
-                  $Group = $this->Sort[$i];
-                  if (array_key_exists($Group, $this->Items)) {
-                     $Items[$Group] = $this->Items[$Group];
-                     unset($this->Items[$Group]);
-                  }
+         // Sort the groups.
+         $this->_Compare($this->Items);
+         uasort($this->Items, array($this, '_Compare'));
+
+         // Sort the items within the groups.
+         foreach ($this->Items as &$Item) {
+            $this->_Compare($Item['Links']);
+            uasort($Item['Links'], array($this, '_Compare'));
+
+            // Highlight the group.
+            if (GetValue('Url', $Item) && Url($Item['Url']) == $HighlightUrl)
+               $Item['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Item['Attributes']), 'Active');
+
+            // Hightlight the correct item in the group.
+            foreach ($Item['Links'] as &$Link) {
+               if (GetValue('Url', $Link) && Url($Link['Url']) == $HighlightUrl) {
+                  $Link['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Link['Attributes']), 'Active');
+                  $Item['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Item['Attributes']), 'Active');
                }
-               foreach ($this->Items as $Group => $Links) {
-                  $LinkNames = ConsolidateArrayValuesByKey($Links, 'Text');
-                  $SortedLinks = array();
-                  for ($j = 0; $j < $Count; ++$j) {
-                     $SortName = $this->Sort[$j];
-                     $Key = array_search($SortName, $LinkNames);
-                     if ($Key !== FALSE) {
-                        $SortedLinks[] = $Links[$Key];
-                        unset($Links[$Key]);
-                        $LinkNames[$Key] = '-=EMPTY=-';
-                     }
-                  }
-                  $SortedLinks = array_merge($SortedLinks, $Links);
-                  $Items[$Group] = $SortedLinks;
-               }
-            } else {
-               $Items = $this->Items;
             }
-            
-            // Build the menu
-            foreach ($Items as $GroupName => $Links) {
-               $ItemCount = 0;
-               $LinkCount = 0;
-               $OpenGroup = FALSE;
-               $GroupIsActive = FALSE;
-               $GroupAnchor = '';
-               $Group = '';
-               foreach ($Links as $Key => $Link) {
-                  $CurrentLink = FALSE;
-                  $ShowLink = FALSE;
-                  $RequiredPermissions = array_key_exists('Permission', $Link) ? $Link['Permission'] : FALSE;
-                  if ($RequiredPermissions !== FALSE && !is_array($RequiredPermissions))
-                     $RequiredPermissions = explode(',', $RequiredPermissions);
-                     
-                  // Show if there are no permissions or the user has the required permissions or the user is admin
-                  $ShowLink = $Admin || $RequiredPermissions === FALSE || ArrayInArray($RequiredPermissions, $Permissions, FALSE) === TRUE;
-                  
-                  if ($ShowLink === TRUE) {
-                     if ($ItemCount == 1) {
-                        $Group .= '<ul class="PanelInfo">';
-                        $OpenGroup = TRUE;
-                     } else if ($ItemCount > 1) {
-                        $Group .= "</li>\r\n";
-                     }
-                     
-                     $Url = ArrayValue('Url', $Link);
-                     if(substr($Link['Text'], 0, 1) === '\\') {
-                        $Text = substr($Link['Text'], 1);
-                     } else {
-                        $Text = str_replace('{Username}', $Username, $Link['Text']);
-                     }
-                     $Attributes = ArrayValue('Attributes', $Link, array());
-                     if ($Url !== FALSE) {
-                        $Url = str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']);
-                        if (substr($Url, 0, 5) != 'http:') {
-                           if ($GroupAnchor == '' && $this->AutoLinkGroups)
-                              $GroupAnchor = $Url;
-                              
-                           $Url = Url($Url);
-                           $CurrentLink = $Url == Url($HighlightRoute);
-                           if ($CurrentLink && !$GroupIsActive) 
-                              $GroupIsActive = TRUE;
-                        }
-                        
-                        $CssClass = ArrayValue('class', $Attributes, '');
-                        if ($CurrentLink)
-                           $Attributes['class'] = $CssClass . ' Active';
-                           
-                        $Group .= '<li'.Attribute($Attributes).'><a href="'.$Url.'">'.$Text.'</a>';
-                        ++$LinkCount;
-                     }  else {
-                        $GroupAttributes = $Attributes;
-                        $GroupName = $Text;
-                     }
-                     ++$ItemCount;
-                  }
-               }
-               if ($OpenGroup === TRUE) {
-                  $Group .= "</li>\r\n</ul>\r\n";
-                  $GroupAttributes['class'] = 'Box Group '.GetValue('class', $GroupAttributes, '');
-                  if ($GroupIsActive)
-                     $GroupAttributes['class'] .= ' Active';
-                     
-                  if ($GroupName != '') {
-                     if ($LinkCount == 1 && $GroupName == $Text)
-                        $Group = '';
-                        
-                     $GroupUrl = Url($GroupAnchor);
-                     $Group = Wrap(Wrap(($GroupAnchor == '' ? $GroupName : "<a href=\"$GroupUrl\">$GroupName</a>" /*Anchor($GroupName, $GroupAnchor)*/), 'h4').$Group, 'div', $GroupAttributes);
-                  }
-               }
-
-
-               if ($Group != '' && $LinkCount > 0) {
-                  $Menu .= $Group . "\r\n";
-               }
-
-            }
-            if ($Menu != '')
-               $Menu = '<div'.($this->HtmlId == '' ? '' : ' id="'.$this->HtmlId.'"').' class="'.($this->CssClass != '' ? $this->CssClass : '').'">'.$Menu.'</div>';
          }
-         return $Menu;
+
+         $this->_Sender->SetData('_SideMenuModule', array('Items' => $this->Items));
+         return parent::ToString();
       }
    }
 }

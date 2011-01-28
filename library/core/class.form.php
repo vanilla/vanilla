@@ -1387,13 +1387,13 @@ class Gdn_Form {
     * This value is also used to identify fields in the $_POST or $_GET
     * (depending on the forms method) collection when the form is submitted.
     *
-    * @param object $Model The Model that will enforce data rules on $this->_DataArray. This value
+    * @param Gdn_Model $Model The Model that will enforce data rules on $this->_DataArray. This value
     *  is passed by reference so any changes made to the model outside this
     *  object apply when it is referenced here.
     * @param Ressource $DataSet A result resource containing data to be filled in the form.
     */
-   public function SetModel(&$Model, $DataSet = FALSE) {
-      $this->_Model = &$Model;
+   public function SetModel($Model, $DataSet = FALSE) {
+      $this->_Model = $Model;
       $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }

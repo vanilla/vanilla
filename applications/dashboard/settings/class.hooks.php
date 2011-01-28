@@ -68,7 +68,7 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', FALSE, '/dashboard/settings', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
 		$Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
@@ -82,10 +82,11 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
-		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
 			
       if (C('Garden.Registration.Manage', TRUE))
 			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
+      
+		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
@@ -103,7 +104,7 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
-		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
+		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Import');
 		
    }
 }

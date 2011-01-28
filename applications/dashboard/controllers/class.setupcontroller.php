@@ -14,9 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SetupController extends DashboardController {
    
    public $Uses = array('Form', 'Database');
-   
-	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
-	
+   	
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
@@ -48,19 +46,16 @@ class SetupController extends DashboardController {
          }
          
          $ApplicationManager = new Gdn_ApplicationManager();
-         $AvailableApplications = $ApplicationManager->AvailableApplications();
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Step through the available applications, enabling each of them
-            $AppNames = array_keys($AvailableApplications);
+            // Step through the available applications, enabling each of them.
+            $AppNames = array('Conversations', 'Vanilla');
             try {
-               foreach ($AvailableApplications as $AppName => $AppInfo) {
-                  if (strtolower($AppName) != 'dashboard') {
-                     $Validation = new Gdn_Validation();
-                     $ApplicationManager->RegisterPermissions($AppName, $Validation);
-                     $ApplicationManager->EnableApplication($AppName, $Validation);
-                  }
+               foreach ($AppNames as $AppName) {
+                  $Validation = new Gdn_Validation();
+                  $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                  $ApplicationManager->EnableApplication($AppName, $Validation);
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
@@ -184,7 +179,8 @@ class SetupController extends DashboardController {
             // Create the administrative user
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
-            $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+            $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+            $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
             $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
             $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');

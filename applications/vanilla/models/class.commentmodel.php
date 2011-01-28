@@ -773,7 +773,7 @@ class CommentModel extends VanillaModel {
 			// If this is the last comment, get the one before and update the LastCommentID field
 			if ($Data->LastCommentID == $CommentID) {
 				$OldData = $this->SQL
-					->Select('c.CommentID')
+					->Select('c.CommentID, c.InsertUserID, c.DateInserted')
 					->From('Comment c')
 					->Where('c.DiscussionID', $Data->DiscussionID)
 					->OrderBy('c.DateInserted', 'desc')

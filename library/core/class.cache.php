@@ -43,7 +43,7 @@ abstract class Gdn_Cache {
    const CONTAINER_LOCATION   = 'c_location';
    
    /**
-   * Persistent - IsPersistent Flag
+   * Persistent - Whether to use connect() or pconnect() where applicable
    */
    const CONTAINER_PERSISTENT = 'c_persistent';
    
@@ -53,29 +53,24 @@ abstract class Gdn_Cache {
    const CONTAINER_WEIGHT     = 'c_weight';
    
    /**
-   * Persistent - Retry Inverval Flag
+   * Persistent - Retry delay inverval in seconds
    */
    const CONTAINER_RETRYINT = 'c_retryint';
    
    /**
-   * Timeout - How long to wait while connecting to this container
+   * Timeout - How long to wait before timing out while connecting
    */
    const CONTAINER_TIMEOUT    = 'c_timeout';
    
    /**
-   * Online - If this container is ready for requests
+   * Online - If this container is available for requests
    */
    const CONTAINER_ONLINE     = 'c_online';
    
    /**
-   * Callback - Method to call if the location fails
+   * Callback - Method to call if the location fails to be added
    */
    const CONTAINER_CALLBACK   = 'c_callback';
-   
-   /**
-   * Cachefile - ??
-   */
-   const CONTAINER_CACHEFILE  = 'c_cachefile';
    
    const CACHEOP_FAILURE = FALSE;
    const CACHEOP_SUCCESS = TRUE;
@@ -94,9 +89,7 @@ abstract class Gdn_Cache {
       $AllowCaching = C('Cache.Enabled');
       $AllowCaching |= $ForceEnable;
       
-      $ActiveCache = C('Cache.Method', FALSE);
-      Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
-      Gdn::PluginManager()->FireEvent('BeforeActiveCache');
+      $ActiveCache = Gdn_Cache::ActiveCache();
       
       if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
@@ -108,103 +101,155 @@ abstract class Gdn_Cache {
       
       if (method_exists($CacheObject,'Autorun'))
          $CacheObject->Autorun();
-         
+      
+      // This should only fire when cache is loading automatically
+      if (!func_num_args())
+         Gdn::PluginManager()->FireEvent('AfterActiveCache');
+      
       return $CacheObject;
    }
    
    /**
-   * put your comment there...
+   * Gets the shortname of the currently active cache
    * 
-   * @param string $Key
-   * @param mixed $Value
+   * This method retrieves and stores locally, the name of the active cache according
+   * to the config file. It fires an event thereafter, allowing that value to be overridden 
+   * by loaded plugins.
+   * 
+   * @return string shortname of current auto active cache
+   */
+   public static function ActiveCache() {
+      static $ActiveCache = NULL;
+      if (is_null($ActiveCache)) {
+         $ConfigActiveCache = C('Cache.Method', FALSE);
+         
+         // This should only fire when cache is loading automatically
+         if (!func_num_args()) {
+            Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ConfigActiveCache;
+            Gdn::PluginManager()->FireEvent('BeforeActiveCache');
+         }
+         
+         $ActiveCache = $ConfigActiveCache;
+      }
+      return $ActiveCache;
+   }
+   
+   /**
+   * Add a value to the cache
+   * 
+   * This fails if the item already exists in the cache.
+   * 
+   * @param string $Key Cache key used for storage
+   * @param mixed $Value Value to be cached
    * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Add($Key, $Value, $Options = array());
    
    /**
-   * put your comment there...
+   * Store a value in the cache
    * 
-   * @param string $Key
-   * @param mixed $Value
+   * This works regardless of whether the item already exists in the cache.
+   * 
+   * @param string $Key Cache key used for storage
+   * @param mixed $Value Value to be cached
    * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Store($Key, $Value, $Options = array());
    
    /**
-   * put your comment there...
+   * Check if a value exists in the cache
    *
-   * @param string $Key
-   * @return array augmented container struct for existing key or FALSE if not found.
+   * @param string $Key Cache key used for storage
+   * @return array array(key => value) for existing key or FALSE if not found.
    */
    abstract public function Exists($Key);
    
    /**
-   * put your comment there...
+   * Retrieve a key's value from the cache
    * 
-   * @param string $Key
+   * @param string $Key Cache key used for storage
    * @param array $Options
-   * @return mixed key value or FALSE on failure.
+   * @return mixed key value or FALSE on failure or not found.
    */
    abstract public function Get($Key, $Options = array());
    
    /**
-   * put your comment there...
+   * Remove a key/value pair from the cache.
    * 
-   * @param string $Key
+   * @param string $Key Cache key used for storage
    * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Remove($Key, $Options = array());
    
    /**
-   * put your comment there...
+   * Replace an existing key's value with the provided value
    * 
-   * @param string $Key
-   * @param mixed $Value
+   * This will fail if the provided key does not already exist.
+   * 
+   * @param string $Key Cache key used for storage
+   * @param mixed $Value Value to be cached
    * @param array $Options
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Replace($Key, $Value, $Options = array());
    
    /**
-   * put your comment there...
+   * Increment the value of the provided key by $Amount
    * 
-   * @param string $Key
-   * @param mixed $Amount
-   * @return integer new value or FALSE on failure.
+   * This will fail if the key does not already exist. Cannot take the value 
+   * of $Key below 0.
+   * 
+   * @param string $Key Cache key used for storage
+   * @param int $Amount Amount to shift value up
+   * @return int new value or FALSE on failure.
    */
    abstract public function Increment($Key, $Amount = 1, $Options = array());
    
    /**
-   * put your comment there...
+   * Decrement the value of the provided key by $Amount
    * 
-   * @param string $Key
-   * @param mixed $Amount
-   * @return integer new value or FALSE on failure.
+   * This will fail if the key does not already exist. Cannot take the value
+   * of $Key below 0.
+   * 
+   * @param string $Key Cache key used for storage
+   * @param int $Amount Amount to shift value down
+   * @return int new value or FALSE on failure.
    */
    abstract public function Decrement($Key, $Amount = 1, $Options = array());
    
    /**
-   * put your comment there...
+   * Add a container to the cache pool
    * 
    * @param array $Options
+   *  - CONTAINER_LOCATION: required. the location of the container. SERVER:IP, Filepath, etc
+   *  - CONTAINER_PERSISTENT: optional (default true). whether to use connect() or pconnect() where applicable
+   *  - CONTAINER_WEIGHT: optional (default 1). number of buckets to create for this server which in turn control its probability of it being selected
+   *  - CONTAINER_RETRYINT: optional (default 15s). controls how often a failed container will be retried, the default value is 15 seconds
+   *  - CONTAINER_TIMEOUT: optional (default 1s). amount of time to wait for connection to container before timing ou.
+   *  - CONTAINER_CALLBACK: optional (default NULL). callback to execute if container fails to open/connect
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function AddContainer($Options);
    
    /**
-   * put your comment there...
+   * Flag this cache as being capable of perfoming a feature
+   * 
+   *  FEATURE_COMPRESS: this cache can compress and decompress values on the fly
+   *  FEATURE_TIMEOUT: this cache can timeout while reading / writing
+   *  FEATURE_EXPIRY: this cache can expire keys
    * 
    * @param int $Feature feature constant
+   * @param mixed $Meta optional data to return when calling HasFeature. default TRUE
    */
    public function RegisterFeature($Feature, $Meta = TRUE) {
       $this->Features[$Feature] = $Meta;
    }
    
    /**
-   * put your comment there...
+   * Remove feature flag from this cache, for the specific feature
    * 
    * @param int $Feature feature contant
    */
@@ -214,9 +259,10 @@ abstract class Gdn_Cache {
    }
    
    /**
-   * put your comment there...
+   * Check whether this cache supports the specified feature
    * 
    * @param int $Feature feature constant
+   * @return mixed $Meta returns the meta data supplied during RegisterFeature()
    */
    public function HasFeature($Feature) {
       return isset($this->Features[$Feature]) ? $this->Features[$Feature] : Gdn_Cache::CACHEOP_FAILURE;

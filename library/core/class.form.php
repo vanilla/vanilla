@@ -647,21 +647,37 @@ class Gdn_Form {
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
     *   IncludeNull Include a blank row?           FALSE
+    *   InlineErrors  Allow inline errors?         TRUE
+    *               Allows disabling per-dropdown
+    *               for multi-fields like Date()
     *
     * @return string
     */
    public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
+      // Show inline errors?
+      $ShowErrors = ($this->InlineErrors === TRUE 
+         && array_key_exists($FieldName, $this->_ValidationResults) 
+         && ArrayValueI('InlineErrors', $Attributes, TRUE));
+      
+      // Add error class to input element
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
+      
+      // Opening select tag
       $Return = '<select';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ">\n";
+      
+      // Get value from attributes and ensure it's an array
       $Value = ArrayValueI('Value', $Attributes);
-
-      if ($Value === FALSE) $Value = $this->GetValue($FieldName);
-
-      if (!is_array($Value)) $Value = array($Value);
-
+      if ($Value === FALSE) 
+         $Value = $this->GetValue($FieldName);
+      if (!is_array($Value)) 
+         $Value = array($Value);
+      
+      // Start with null option?
       $IncludeNull = ArrayValueI('IncludeNull', $Attributes);
       if ($IncludeNull === TRUE) $Return .= "<option value=\"\"></option>\n";
 
@@ -689,6 +705,11 @@ class Gdn_Form {
          }
       }
       $Return .= '</select>';
+      
+      // Append validation error message
+      if ($ShowErrors)  
+         $Return .= $this->InlineError($FieldName);
+      
       return $Return;
    }
 

@@ -5,6 +5,7 @@ if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
 	
 /// Define core constants.
 if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.DS.'conf');
+if(!defined('PATH_USER_CONF')) define('PATH_USER_CONF', PATH_CONF.DS.'config.php');
 include(PATH_CONF . DS . 'constants.php');
 if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'applications');
 if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.DS.'cache');
@@ -70,7 +71,7 @@ $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 
 // Load the custom configurations so that we know what apps are enabled.
-$Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+$Gdn_Config->Load(PATH_USER_CONF, 'Use');
 
 // This header is redundantly set in the controller.
 //header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
@@ -86,7 +87,7 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 }
 
 /// Load the custom configurations again so that application setting defaults are overridden.
-$Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+$Gdn_Config->Load(PATH_USER_CONF, 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.

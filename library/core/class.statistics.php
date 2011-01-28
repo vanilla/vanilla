@@ -84,7 +84,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
-         $Conf = CombinePaths(array(PATH_ROOT,'conf/config.php'));
+         $Conf = PATH_USER_CONF;
          if (!is_writable($Conf))
             return;
             

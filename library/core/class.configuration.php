@@ -283,8 +283,19 @@ class Gdn_Configuration {
       else
          $this->_File = '';
       
-      if(!file_exists($File)) {
-         return FALSE;
+      $FileKey = 'ConfigFile-'.$File;
+      $LoadedFromCache = FALSE; $UseCache = FALSE;
+      if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
+         $UseCache = TRUE;
+         $CachedConfigData = Gdn::Cache()->Get($FileKey);
+         $LoadedFromCache = ($CachedConfigData !== Gdn_Cache::CACHEOP_FAILURE);
+      }
+      
+      // If we're not loading config from cache, check that the file exists
+      if (!$LoadedFromCache) {
+         if(!file_exists($File)) {
+            return FALSE;
+         }
       }
       
       switch($LoadFor) {
@@ -300,17 +311,29 @@ class Gdn_Configuration {
       // Define the variable properly.
       $$Name = NULL;
       
-      // Include the file.
-      include($File);
+      // If we're not loading config from cache, directly include the conf file
+      if ($LoadedFromCache)
+         $$Name = $CachedConfigData;
+      
+      if (is_null($$Name) || !is_array($$Name)) {
+         // Include the file.
+         include($File);
+      }
       
       // Make sure the config variable is here and is an array.
-      if(is_null($$Name) || !is_array($$Name)) {
-         return TRUE;
+      if (is_null($$Name) || !is_array($$Name))
+         $$Name = array();
+         
+      if (!$LoadedFromCache && $UseCache) {
+         // Not loaded from cache. Write it there now.
+         Gdn::Cache()->Store($FileKey, $$Name);
       }
       
-      if($Name != 'Configuration') {
+      if (!count($$Name))
+         return TRUE;
+      
+      if ($Name != 'Configuration')
          $Configuration[$Name] = $$Name;
-      }
       
       $this->_MergeConfig($Array, $Configuration);
    }
@@ -417,6 +440,10 @@ class Gdn_Configuration {
 
       if ($FileContents === FALSE)
          trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
+
+      $FileKey = 'ConfigFile-'.$File;
+      if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
+         $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data);
 
       // echo 'saving '.$File;
       Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);

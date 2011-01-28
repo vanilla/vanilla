@@ -30,6 +30,12 @@ abstract class Gdn_Cache {
    */
    protected $Features;
    
+   /**
+   * Type of cache this this: one of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL
+   * @var string
+   */
+   protected $CacheType;
+   
    // Allows items to be internally compressed/decompressed
    const FEATURE_COMPRESS     = 'f_compress';
    // Allows items to autoexpire
@@ -74,6 +80,10 @@ abstract class Gdn_Cache {
    
    const CACHEOP_FAILURE = FALSE;
    const CACHEOP_SUCCESS = TRUE;
+   
+   const CACHE_TYPE_MEMORY = 'ct_memory';
+   const CACHE_TYPE_FILE = 'ct_file';
+   const CACHE_TYPE_NULL = 'ct_null';
 
    public function __construct() {
       $this->Containers = array();
@@ -86,9 +96,7 @@ abstract class Gdn_Cache {
    * @return Gdn_Cache
    */
    public static function Initialize($ForceEnable = FALSE, $ForceMethod = FALSE) {
-      $AllowCaching = C('Cache.Enabled');
-      $AllowCaching |= $ForceEnable;
-      
+      $AllowCaching = self::ActiveEnabled($ForceEnable);
       $ActiveCache = Gdn_Cache::ActiveCache();
       
       if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
@@ -103,35 +111,72 @@ abstract class Gdn_Cache {
          $CacheObject->Autorun();
       
       // This should only fire when cache is loading automatically
-      if (!func_num_args())
+      if (!func_num_args() && Gdn::PluginManager() instanceof Gdn_PluginManager)
          Gdn::PluginManager()->FireEvent('AfterActiveCache');
       
       return $CacheObject;
    }
    
+   public static function ActiveEnabled($ForceEnable = FALSE) {
+      $AllowCaching = FALSE;
+      if (defined('CACHE_ENABLED_OVERRIDE'))
+         $AllowCaching = CACHE_ENABLED_OVERRIDE;
+      $AllowCaching |= C('Cache.Enabled', FALSE);
+      $AllowCaching |= $ForceEnable;
+      
+      return $AllowCaching;
+   }
+   
    /**
    * Gets the shortname of the currently active cache
    * 
-   * This method retrieves and stores locally, the name of the active cache according
-   * to the config file. It fires an event thereafter, allowing that value to be overridden 
+   * This method retrieves the name of the active cache according to the config file.
+   * It fires an event thereafter, allowing that value to be overridden 
    * by loaded plugins.
    * 
    * @return string shortname of current auto active cache
    */
    public static function ActiveCache() {
-      static $ActiveCache = NULL;
-      if (is_null($ActiveCache)) {
-         $ConfigActiveCache = C('Cache.Method', FALSE);
-         
-         // This should only fire when cache is loading automatically
-         if (!func_num_args()) {
-            Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ConfigActiveCache;
-            Gdn::PluginManager()->FireEvent('BeforeActiveCache');
-         }
-         
-         $ActiveCache = $ConfigActiveCache;
+      /*
+       * There is a catch 22 with caching the config file. We need
+       * an external way to define the cache layer before needing it 
+       * in the config.
+       */
+      
+      if (defined('CACHE_METHOD_OVERRIDE'))
+         $ActiveCache = CACHE_METHOD_OVERRIDE;
+      else
+         $ActiveCache = C('Cache.Method', FALSE);
+      
+      // This should only fire when cache is loading automatically
+      if (!func_num_args() && Gdn::PluginManager() instanceof Gdn_PluginManager) {
+         Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
+         Gdn::PluginManager()->FireEvent('BeforeActiveCache');
       }
+      
       return $ActiveCache;
+   }
+   
+   public static function ActiveStore($ForceMethod = NULL) {
+      $ActiveCache = self::ActiveCache();
+      if (!is_null($ForceMethod))
+         $ActiveCache = $ForceMethod;
+         
+      if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache) {
+         $ActiveStore = unserialize(CACHE_STORE_OVERRIDE);
+      } else
+         $ActiveStore = C("Cache.{$ActiveCache}.Store", FALSE);
+      
+      return $ActiveStore;
+   }
+   
+   /**
+   * Returns a constant describing the type of cache implementation this object represents.
+   *
+   * @return string Type of cache. One of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL
+   */
+   public function Type() {
+      return $this->CacheType;
    }
    
    /**

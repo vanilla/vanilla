@@ -30,6 +30,7 @@ class Gdn_Filecache extends Gdn_Cache {
    
    public function __construct() {
       parent::__construct();
+      $this->CacheType = Gdn_Cache::CACHE_TYPE_FILE;
       
       $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, array('gzcompress','gzuncompress'));
       $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);

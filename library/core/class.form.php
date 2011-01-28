@@ -735,30 +735,34 @@ class Gdn_Form {
    }
 
    /**
-    * Returns the xhtml for a standard radio input tag.
+    * Returns XHTML for a radio input element.
+    * 
+    * Provides way of wrapping Input() with a label.
     *
-    * @param string $FieldName The name of the field that is being displayed/posted with this input. It
-    * should related directly to a field name in $this->_DataArray.
-    *
-    * @param string $Label A label to place next to the radio.
-    * @param array $Attributes An associative array of attributes for the input. ie. onclick, class, etc
+    * @param string $FieldName Name of the field that is being displayed/posted with this input. 
+    *    It should related directly to a field name in $this->_DataArray.
+    * @param string $Label Label to place next to the radio.
+    * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)
     * @return string
     */
    public function Radio($FieldName, $Label = '', $Attributes = FALSE) {
       $Value = ArrayValueI('value', $Attributes, 'TRUE');
       $Attributes['value'] = $Value;
       $FormValue = $this->GetValue($FieldName, ArrayValueI('default', $Attributes));
-      if ($FormValue == $Value) $Attributes['checked'] = 'checked';
-
-      // DEBUG:
-      // echo '<div>Value: '.$Value.' = FormValue: '.$FormValue.'; Default: '.ArrayValueI('default', $Attributes).'</div>';
-
-
+      
+      // Check for 'checked'
+      if ($FormValue == $Value) 
+         $Attributes['checked'] = 'checked';
+      
+      // Get standard radio Input
       $Input = $this->Input($FieldName, 'radio', $Attributes);
-      if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
-         $this->EscapeID($FieldName, FALSE)) . '" class="RadioLabel">' . $Input . ' ' .
-          T($Label) . '</label>';
-
+      
+      // Wrap with label
+      if ($Label != '') {
+         $Input = '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) . 
+            '" class="RadioLabel">' . $Input . ' ' . T($Label) . '</label>';
+      }
+      
       return $Input;
    }
 

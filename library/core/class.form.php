@@ -966,6 +966,13 @@ class Gdn_Form {
          $Attributes['rows'] = ArrayValueI('rows', $Attributes, '6'); // For xhtml compliance
          $Attributes['cols'] = ArrayValueI('cols', $Attributes, '100'); // For xhtml compliance
       }
+      
+      // Show inline errors?
+      $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
+      
+      // Add error class to input element
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
 
       $CssClass = ArrayValueI('class', $Attributes);
       if ($CssClass == FALSE) $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
@@ -978,6 +985,11 @@ class Gdn_Form {
       $Value = ArrayValueI('value', $Attributes, $this->GetValue($FieldName));
       
       $Return .= $MultiLine === TRUE ? '>' . htmlentities($Value, ENT_COMPAT, 'UTF-8') . '</textarea>' : ' />';
+      
+      // Append validation error message
+      if ($ShowErrors)  
+         $Return .= $this->InlineError($FieldName);
+      
       return $Return;
    }
 

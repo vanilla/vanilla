@@ -7,24 +7,109 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
  * Helps with the rendering of form controls that link directly to a data model.
+ *
  * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
  */
 
 /**
  * Helps with the rendering of form controls that link directly to a data model.
  *
  * @package Garden
- * @todo reviews damien's conversion to phpdoc
  * @todo change formatting of tables in documentation
  */
 class Gdn_Form {
+   /**
+    * A string identifying the action with which the form should be sent. 
+    *
+    * @var string
+    */
+   public $Action = '';
+
+   /**
+    * An associative array of all hidden inputs with their "Name" attribute as
+    * the key.
+    *
+    * @var array
+    */
+   public $HiddenInputs;
+
+   /**
+    * All form related tags (form, input, select, textarea, [etc] will have
+    * this value prefixed on their ID attribute. Default is "Form_". If the
+    * id value is overridden with the Attribute collection for an element, this
+    *  value will not be used.
+    *
+    * @var string
+    */
+   public $IDPrefix = 'Form_';
+
+   /**
+    * All form related tags (form, input, select, textarea, [etc] will have
+    * this value prefixed on their name attribute. Default is "Form".
+    * If a model is assigned, the model name is used instead.
+    *
+    * @var string
+    */
+   public $InputPrefix = 'Form';
+
+   /**
+    * A string identifying the method with which the form should be sent. Valid
+    * choices are: post, get. "post" is default.
+    *
+    * @var string
+    */
+   public $Method = 'post';
+
+   /**
+    * An associative array of $FieldName => $ValidationFunctionName arrays that
+    * describe how each field specified failed validation.
+    *
+    * @var array
+    */
+   protected $_ValidationResults;
+
+   /**
+    * An associative array containing the key => value pairs being placed in
+    * the controls returned by this object. This array is assigned by
+    * $this->Open() or $this->SetData().
+    *
+    * @var object
+    * @todo you probably mean array for type?
+    */
+   protected $_DataArray;
+
+   /**
+    * The model that enforces data rules on $this->_DataArray.
+    *
+    * @var object
+    */
+   protected $_Model;
+
+   /**
+    * A collection of IDs that have been created for form elements. This
+    * private property is used to record all IDs so that duplicate IDs are not
+    * added to the screen.
+    *
+    * @var array
+    */
+   private $_IDCollection = array();
+
+   /**
+    * An associative array of $Field => $Value pairs that represent data posted
+    * from the form in the $_POST or $_GET collection (depending on which
+    * method was specified for sending form data in $this->Method). This array
+    * is populated with and can be accessed by $this->FormValues(), and
+    * individual values can be retrieved from it with
+    * $this->GetFormValue($FieldName).
+    *
+    * @var array
+    */
+   private $_FormValues;
+
    /**
     * @var bool Whether to display inline errors with form elements.
     * 
@@ -32,6 +117,18 @@ class Gdn_Form {
     * @access public
     */
    public $InlineErrors = FALSE;
+   
+   /**
+    * Constructor
+    *
+    * @param string $TableName
+    */
+   public function __construct($TableName = '') {
+      if ($TableName != '') {
+         $TableModel = new Gdn_Model($TableName);
+         $this->SetModel($TableModel);
+      }
+   }
 
    /// =========================================================================
    /// 1. UI Components: Methods that return xhtml form elements.
@@ -95,9 +192,8 @@ class Gdn_Form {
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
     * should related directly to a field name in $this->_DataArray.
     * @param array $Attributes An associative array of attributes for the input. ie. onclick, class,
-    * etc. A special attribute for this field is YearRange, specified in
-    * yyyy-yyyy format. The default value for YearRange is 1900-2008 (aka
-    * current year).
+    * etc. A special attribute for this field is YearRange, specified in yyyy-yyyy format. 
+    * The default value for YearRange is 1900-2008 (aka current year).
     *
     * @return string
     */
@@ -934,57 +1030,7 @@ class Gdn_Form {
    /// =========================================================================
    /// 2. UI Convenience: Convenience methods for adding to UI components.
    /// =========================================================================
-
-   /**
-    * A string identifying the action with which the form should be sent. 
-    *
-    * @var string
-    */
-   public $Action = '';
-
-   /**
-    * An associative array of all hidden inputs with their "Name" attribute as
-    * the key.
-    *
-    * @var array
-    */
-   public $HiddenInputs;
-
-   /**
-    * All form related tags (form, input, select, textarea, [etc] will have
-    * this value prefixed on their ID attribute. Default is "Form_". If the
-    * id value is overridden with the Attribute collection for an element, this
-    *  value will not be used.
-    *
-    * @var string
-    */
-   public $IDPrefix = 'Form_';
-
-   /**
-    * All form related tags (form, input, select, textarea, [etc] will have
-    * this value prefixed on their name attribute. Default is "Form".
-    * If a model is assigned, the model name is used instead.
-    *
-    * @var string
-    */
-   public $InputPrefix = 'Form';
-
-   /**
-    * A string identifying the method with which the form should be sent. Valid
-    * choices are: post, get. "post" is default.
-    *
-    * @var string
-    */
-   public $Method = 'post';
-
-   /**
-    * An associative array of $FieldName => $ValidationFunctionName arrays that
-    * describe how each field specified failed validation.
-    *
-    * @var array
-    */
-   protected $_ValidationResults;
-
+   
    /**
     * Adds a hidden input value to the form.
     *
@@ -1057,60 +1103,8 @@ class Gdn_Form {
 
 
    /// =========================================================================
-   /// 3. Middle Tier: Methods & Properties that are used when interfacing with
-   /// the model & db.
+   /// 3. Middle Tier: Methods for interfacing with the model & db.
    /// =========================================================================
-
-
-   /**
-    * An associative array containing the key => value pairs being placed in
-    * the controls returned by this object. This array is assigned by
-    * $this->Open() or $this->SetData().
-    *
-    * @var object
-    * @todo you probably mean array for type?
-    */
-   protected $_DataArray;
-
-   /**
-    * The model that enforces data rules on $this->_DataArray.
-    *
-    * @var object
-    */
-   protected $_Model;
-
-   /**
-    * A collection of IDs that have been created for form elements. This
-    * private property is used to record all IDs so that duplicate IDs are not
-    * added to the screen.
-    *
-    * @var array
-    */
-   private $_IDCollection = array();
-
-   /**
-    * An associative array of $Field => $Value pairs that represent data posted
-    * from the form in the $_POST or $_GET collection (depending on which
-    * method was specified for sending form data in $this->Method). This array
-    * is populated with and can be accessed by $this->FormValues(), and
-    * individual values can be retrieved from it with
-    * $this->GetFormValue($FieldName).
-    *
-    * @var array
-    */
-   private $_FormValues;
-
-   /**
-    * Constructor
-    *
-    * @param string $TableName
-    */
-   public function __construct($TableName = '') {
-      if ($TableName != '') {
-         $TableModel = new Gdn_Model($TableName);
-         $this->SetModel($TableModel);
-      }
-   }
 
    /**
     * Returns a boolean value indicating if the current page has an

@@ -1041,8 +1041,8 @@ class Gdn_Form {
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
     *  should related directly to a field name in $this->_DataArray.
     * @param string $Type The type attribute for the input.
-    * @param array $Attributes An associative array of attributes for the input. ie. maxlength, onclick,
-    *  class, etc
+    * @param array $Attributes An associative array of attributes for the input. (e.g. maxlength, onclick, class)
+    *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
     * @return string
     */
    public function Input($FieldName, $Type = 'text', $Attributes = FALSE) {
@@ -1075,7 +1075,7 @@ class Gdn_Form {
       }
       
       // Append validation error message
-      if ($ShowErrors)  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
 
       return $Return;

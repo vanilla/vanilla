@@ -1468,26 +1468,27 @@ class Gdn_Form {
     * @return string
     */
    protected function _AttributesToString($Attributes) {
+      $ReservedAttributes = array(
+         'id',
+         'name',
+         'value',
+         'method',
+         'action',
+         'type',
+         'for',
+         'multiline',
+         'default',
+         'textfield',
+         'valuefield',
+         'includenull');
       $Return = '';
+      
+      // Build string from array
       if (is_array($Attributes)) {
          foreach($Attributes as $Attribute => $Value) {
             // Ignore reserved attributes
-            if (!in_array(
-               strtolower($Attribute),
-               array(
-                  'id',
-                  'name',
-                  'value',
-                  'method',
-                  'action',
-                  'type',
-                  'for',
-                  'multiline',
-                  'default',
-                  'textfield',
-                  'valuefield',
-                  'includenull'))) $Return .= ' ' . $Attribute .
-                '="' . $Value . '"';
+            if (!in_array(strtolower($Attribute), $ReservedAttributes)) 
+               $Return .= ' ' . $Attribute . '="' . $Value . '"';
          }
       }
       return $Return;

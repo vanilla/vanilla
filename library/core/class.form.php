@@ -861,7 +861,7 @@ class Gdn_Form {
    public function Label($TranslationCode, $FieldName = '', $Attributes = FALSE) {
       // Assume we always want a 'for' attribute because it's Good & Proper.
       // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
-      $DefaultFor = ($FieldName == '') ? $TranslationCode ? $FieldName;
+      $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
       $For = ArrayValueI('for', $Attributes, ArrayValueI('id', $Attributes, $this->EscapeID($DefaultFor, FALSE)));
 
       return '<label for="' . $For . '"' . $this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\n";

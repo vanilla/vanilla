@@ -98,7 +98,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
-      if ($LastSentDate === FALSE || $LastSentDate < date('Ymd')) {
+      if ($LastSentDate === FALSE || $LastSentDate < date('Ymd', strtotime('-1 day'))) {
          $Sender->AddDefinition('AnalyticsTask','stats');
          return;
       }
@@ -156,6 +156,9 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $StatsDate = strtotime('yesterday');
       else
          $StatsDate = strtotime('+1 day', self::TimeFromTimeSlot($LastSentDate));
+      
+      $StatsTimeSlot = date('Ymd', $StatsDate);
+      if ($StatsTimeSlot >= date('Ymd')) return;
       
       $DetectActiveInterval = 0;
       $MaxIterations = 10; $TimeSlotLimit = date('Ymd');

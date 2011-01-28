@@ -261,7 +261,8 @@ class Gdn_Form {
     * @param string $FieldName Name of the field that is being displayed/posted with this input. 
     *    It should related directly to a field name in $this->_DataArray.
     * @param string $Label Label to place next to the checkbox.
-    * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)
+    * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)\
+    *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
     * @return string
     */
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
@@ -270,11 +271,22 @@ class Gdn_Form {
 
       if ($this->GetValue($FieldName) == $Value)
          $Attributes['checked'] = 'checked';
+         
+      // Show inline errors?
+      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
+      
+      // Add error class to input element
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
 
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
          $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel">' . $Input . ' ' .
           T($Label) . '</label>';
+          
+      // Append validation error message
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+         $Return .= $this->InlineError($FieldName);
 
       return $Input;
    }

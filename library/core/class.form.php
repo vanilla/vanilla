@@ -253,22 +253,21 @@ class Gdn_Form {
    }
 
    /**
-    * Returns the xhtml for a standard checkbox input tag.
+    * Returns XHTML for a checkbox input element.
     *
-    * @param string $FieldName The name of the field that is being displayed/posted with this input. It
-    * should related directly to a field name in $this->_DataArray.
+    * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
+    * Cannot assume checkboxes are stored in database as string 'TRUE'. (2010-07-28 loki_racer)
     *
-    * @param string $Label A label to place next to the checkbox.
-    * @param array $Attributes An associative array of attributes for the input. ie. onclick, class, etc
+    * @param string $FieldName Name of the field that is being displayed/posted with this input. 
+    *    It should related directly to a field name in $this->_DataArray.
+    * @param string $Label Label to place next to the checkbox.
+    * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)
     * @return string
     */
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
-      //  2010-07-28 - loki_racer - assuming that checkboxes are stored in the db as string 'TRUE' is a bad assumption
-      //  $Value = ArrayValueI('value', $Attributes, 'TRUE');
       $Value = ArrayValueI('value', $Attributes, true);
       $Attributes['value'] = $Value;
-      // 2009-04-02 - mosullivan - cannot consider all checkbox values to be boolean
-      // if (ForceBool($this->GetValue($FieldName)) == ForceBool($Value)) $Attributes['checked'] = 'checked';
+
       if ($this->GetValue($FieldName) == $Value)
          $Attributes['checked'] = 'checked';
 

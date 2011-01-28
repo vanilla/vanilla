@@ -650,7 +650,7 @@ class Gdn_Form {
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
     *   IncludeNull Include a blank row?           FALSE
-    *   InlineErrors  Allow inline errors?         TRUE
+    *   InlineErrors  Show inline error message?   TRUE
     *               Allows disabling per-dropdown
     *               for multi-fields like Date()
     *
@@ -658,9 +658,7 @@ class Gdn_Form {
     */
    public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
       // Show inline errors?
-      $ShowErrors = ($this->InlineErrors === TRUE 
-         && array_key_exists($FieldName, $this->_ValidationResults) 
-         && ArrayValueI('InlineErrors', $Attributes, TRUE));
+      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -710,7 +708,7 @@ class Gdn_Form {
       $Return .= '</select>';
       
       // Append validation error message
-      if ($ShowErrors)  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
       
       return $Return;

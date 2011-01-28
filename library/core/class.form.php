@@ -237,6 +237,9 @@ class Gdn_Form {
       for($i = $EndYear; $i >= $StartYear; --$i) {
          $Years[$i] = $i;
       }
+      
+      // Never display individual inline errors for these DropDowns
+      $Attributes['InlineErrors'] = FALSE;
 
       $CssClass = ArrayValueI('class', $Attributes, '');
       $Attributes['class'] = trim($CssClass . ' Month');

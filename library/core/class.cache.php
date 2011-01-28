@@ -53,6 +53,11 @@ abstract class Gdn_Cache {
    const CONTAINER_WEIGHT     = 'c_weight';
    
    /**
+   * Persistent - Retry Inverval Flag
+   */
+   const CONTAINER_RETRYINT = 'c_retryint';
+   
+   /**
    * Timeout - How long to wait while connecting to this container
    */
    const CONTAINER_TIMEOUT    = 'c_timeout';
@@ -63,7 +68,7 @@ abstract class Gdn_Cache {
    const CONTAINER_ONLINE     = 'c_online';
    
    /**
-   * Callback - ??
+   * Callback - Method to call if the location fails
    */
    const CONTAINER_CALLBACK   = 'c_callback';
    
@@ -90,13 +95,21 @@ abstract class Gdn_Cache {
       $AllowCaching |= $ForceEnable;
       
       $ActiveCache = C('Cache.Method', FALSE);
+      Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
+      Gdn::PluginManager()->FireEvent('BeforeActiveCache');
+      
       if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
       
       if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass))
-         return new Gdn_Dirtycache();
+         $CacheObject = new Gdn_Dirtycache();
+      else
+         $CacheObject = new $ActiveCacheClass();
+      
+      if (method_exists($CacheObject,'Autorun'))
+         $CacheObject->Autorun();
          
-      return new $ActiveCacheClass();
+      return $CacheObject;
    }
    
    /**

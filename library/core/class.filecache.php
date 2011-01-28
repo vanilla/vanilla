@@ -30,6 +30,18 @@ class Gdn_Filecache extends Gdn_Cache {
       parent::__construct();
       
       $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, array('gzcompress','gzuncompress'));
+      $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);
+      $this->RegisterFeature(Gdn_Cache::FEATURE_TIMEOUT);
+   }
+   
+   /**
+   * Reads in known/config storage locations and adds them to the instance.
+   * 
+   * This method is called when the cache object is invoked by the framework 
+   * automatically, and needs to configure itself from the values in the global
+   * config file.
+   */
+   public function Autorun() {
       $this->AddContainer(array(
          Gdn_Cache::CONTAINER_LOCATION    => C('Cache.Filecache.Store')
       ));

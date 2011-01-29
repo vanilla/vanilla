@@ -81,14 +81,14 @@ class Gdn_DatabaseDebug extends Gdn_Database {
       $this->_Queries[] = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
       
       // Start the Query Timer
-      $TimeStart = list($sm, $ss) = explode(' ', microtime());
+      $TimeStart = Now();
       
       $Result = parent::Query($Sql, $InputParameters);
       
       // Aggregate the query times
-      $TimeEnd = list($em, $es) = explode(' ', microtime());
-      $this->_ExecutionTime += ($em + $es) - ($sm + $ss);
-      $this->_QueryTimes[] = ($em + $es) - ($sm + $ss);
+      $TimeEnd = Now();
+      $this->_ExecutionTime += ($TimeEnd - $TimeStart);
+      $this->_QueryTimes[] = ($TimeEnd - $TimeStart);
       
       return $Result;
    }

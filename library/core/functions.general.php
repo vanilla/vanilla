@@ -982,8 +982,7 @@ if (!function_exists('MergeArrays')) {
 
 if (!function_exists('Now')) {
    function Now() {
-      list($usec, $sec) = explode(" ", microtime());
-      return ((float)$usec + (float)$sec);
+      return microtime(TRUE);
    }
 }
 

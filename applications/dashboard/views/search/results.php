@@ -13,7 +13,7 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 				echo Anchor(SliceString($Row->Summary, 250), $Row->Url);
 			?></div>
 			<div class="Meta">
-				<span><?php printf(T('Comment by %s'), UserAnchor($Row)); ?></span>
+				<span><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
 				<span><?php echo Gdn_Format::Date($Row->DateInserted); ?></span>
 				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
 			</div>

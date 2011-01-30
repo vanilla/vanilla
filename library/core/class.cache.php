@@ -96,15 +96,16 @@ abstract class Gdn_Cache {
    * @return Gdn_Cache
    */
    public static function Initialize($ForceEnable = FALSE, $ForceMethod = FALSE) {
-      $AllowCaching = self::ActiveEnabled($ForceEnable);
+      $AllowCaching = self::ActiveEnabled($ForceEnable); 
       $ActiveCache = Gdn_Cache::ActiveCache();
       
       if ($ForceMethod !== FALSE) $ActiveCache = $ForceMethod;
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
       
-      if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass))
+      if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass)) {
+         
          $CacheObject = new Gdn_Dirtycache();
-      else
+      } else
          $CacheObject = new $ActiveCacheClass();
       
       if (method_exists($CacheObject,'Autorun'))
@@ -119,12 +120,14 @@ abstract class Gdn_Cache {
    
    public static function ActiveEnabled($ForceEnable = FALSE) {
       $AllowCaching = FALSE;
+      
       if (defined('CACHE_ENABLED_OVERRIDE'))
-         $AllowCaching = CACHE_ENABLED_OVERRIDE;
+         $AllowCaching |= CACHE_ENABLED_OVERRIDE;
+         
       $AllowCaching |= C('Cache.Enabled', FALSE);
       $AllowCaching |= $ForceEnable;
       
-      return $AllowCaching;
+      return (bool)$AllowCaching;
    }
    
    /**
@@ -161,7 +164,9 @@ abstract class Gdn_Cache {
       $ActiveCache = self::ActiveCache();
       if (!is_null($ForceMethod))
          $ActiveCache = $ForceMethod;
-         
+      
+      $ActiveCache = ucfirst($ActiveCache);
+      
       if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache) {
          $ActiveStore = unserialize(CACHE_STORE_OVERRIDE);
       } else

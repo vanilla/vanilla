@@ -80,6 +80,8 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 // Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
+$Gdn_Config->Caching(TRUE);
+
 if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
    // Load the custom configurations 
    $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');

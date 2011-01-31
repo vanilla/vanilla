@@ -262,7 +262,14 @@ class Gdn_Statistics extends Gdn_Pluggable {
    public static function IsLocalhost() {
       $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
       $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
-      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return TRUE;
+      foreach (array(
+         '::1', 
+         '127\.0\.0\.1',
+         '192\.168(\.[\d]{1,3}){2}',
+         '10(\.[\d]{1,3}){3}') as $LocalIP) {
+         if (preg_match("/{$LocalIP}/", $ServerAddress))
+            return TRUE;
+      }
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
       return FALSE;
    }

@@ -30,12 +30,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * enabled plugin.
     */
    public $EnabledPlugins = NULL;
-
+   
+   /**
+    * An array of search paths for plugins and their files
+    */
+   protected $_PluginSearchPaths = NULL;
+   
    /**
     * An associative array of EventHandlerName => PluginName pairs.
     */
    private $_EventHandlerCollection = array();
-
+   
    /**
     * An associative array of MethodOverrideName => PluginName pairs.
     */
@@ -60,6 +65,114 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    protected $_PluginsByClassName = array();
    
    protected $_RegisteredPlugins = array();
+   
+   public function __construct() {
+      $this->_PluginSearchPaths = array();
+      
+      // Add default search path(s) to list
+      $this->_PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 1;
+      $this->_PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 1;
+      
+      // Check for, and load, alternate search paths from config
+      $AlternatePaths = C('Garden.Plugins.SearchPaths', NULL);
+      if (is_null($AlternatePaths)) return;
+      
+      if (!is_array($AlternatePaths))
+         $AlternatePaths = array($AlternatePaths);
+      
+      foreach ($AlternatePaths as $AltPath)
+         if (is_dir($AltPath))
+            $this->_PluginSearchPaths[rtrim($AltPath, '/')] = 1;
+      
+   }
+   
+   /**
+    * Sets up the plugin framework
+    *
+    * This method indexes all available plugins and extracts their information.
+    * It then determines which plugins have been enabled, and includes them.
+    * Finally, it parses all plugin files and extracts their events and plugged
+    * methods.
+    */
+   public function Start() {
+      
+      /**
+       * Index all plugins
+       *
+       * 1) Try loading list from cache
+       * 2) If that fails, manually scan directories
+       */
+       
+      // Check Cache
+      $CachedPluginInfo = Gdn::Cache()->Get('Garden.Plugins.Available');
+      
+      if ($PluginInfo === Gdn_Cache::CACHEOP_FAILURE) {
+         $PluginInfo = array();
+         $PluginPathHashInfo = array();
+      } else {
+         $PluginInfo = GetValue('PluginInfo', $CachedPluginInfo, NULL);
+         $PluginPathHashInfo = GetValue('HashInfo', $CachedPluginInfo, NULL);
+      
+         $PluginPathHashInfo = Gdn::Cache()->Get('Garden.Plugins.Available.Hashes');
+         if ($PluginPathHashInfo === Gdn_Cache::CACHEOP_FAILURE)
+            $PluginPathHashInfo = array();
+      }
+      
+      // Check cache freshness
+      foreach ($this->_PluginSearchPaths as $SearchPath => $Trash) {
+         $PathListing = scandir($SearchPath, 0);
+         $PathHash = md5(serialize($PathListing));
+         
+         if ($KnownHash != $PathHash) {
+            // Need to re-index this folder
+            $PathHash = $this->IndexSearchPath($SearchPath, $PluginInfo);
+            $PluginPathHashInfo[$SearchPath] = $PathHash;
+         }
+      }
+      
+      // Determine list of enabled plugins
+      print_r($PluginInfo);
+      
+      // Include enabled plugins
+      
+      // Register methods
+   }
+   
+   public function IndexSearchPath($SearchPath, &$PluginInfo, $PathListing = NULL) {
+      if (is_null($PathListing) || !is_array($PathListing))
+         $PathListing = scandir($SearchPath);
+      
+      $Info = array();
+      $InverseRelation = array();
+      if ($FolderHandle = opendir(PATH_PLUGINS)) {
+         if ($FolderHandle === FALSE)
+            return $Info;
+         
+         // Loop through subfolders (ie. the actual plugin folders)
+         while (($Item = readdir($FolderHandle)) !== FALSE) {
+            if (in_array($Item, array('.', '..')))
+               continue;
+            
+            $PluginPaths = SafeGlob(PATH_PLUGINS . DS . $Item . DS . '*plugin.php');
+            $PluginPaths[] = PATH_PLUGINS . DS . $Item . DS . 'default.php';
+            
+            foreach ($PluginPaths as $i => $PluginFile) {
+               $this->PluginAvailable($PluginFile);
+            }
+         }
+         closedir($FolderHandle);
+      }
+
+      if (is_null($GetPlugin))
+         return $this->_AvailablePlugins;
+      elseif (ArrayKeyExistsI($GetPlugin, $this->_AvailablePlugins))
+         return ArrayValueI($GetPlugin, $this->_AvailablePlugins);
+      else
+         return FALSE;
+      
+      $PathHash = md5(serialize($PathListing));
+      return $PathHash;
+   }
    
    /**
     * Register all enabled plugins

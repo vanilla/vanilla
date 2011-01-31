@@ -12,11 +12,17 @@ if (!defined('VANILLA_CONSTANTS'))
    include(PATH_CONF . DS . 'constants.php');
    
 if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'applications');
+if(!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
+
 if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.DS.'cache');
 if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.DS.'library');
 if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.DS.'core');
+
 if(!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.DS.'plugins');
+if(!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
+
 if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.DS.'themes');
+if(!defined('PATH_LOCAL_THEMES')) define('PATH_LOCAL_THEMES', PATH_THEMES);
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')
@@ -177,6 +183,7 @@ if (file_exists($ThemeHooks))
 // Set up the plugin manager (doing this early so it has fewer classes to
 // examine to determine if they are plugins).
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY . DS . 'core' . DS . 'class.pluginmanager.php', Gdn::FactorySingleton);
+//Gdn::PluginManager()->Start();
 Gdn::PluginManager()->IncludePlugins();
 Gdn::PluginManager()->RegisterPlugins();
 

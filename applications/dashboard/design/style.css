@@ -1275,10 +1275,8 @@ ul.MessageList div.Message blockquote {
    padding: 4px 16px;
    margin: 4px 0;
 }
-div.Preview div.Message code,
-div.Preview div.Message pre,
-ul.MessageList div.Message code,
-ul.MessageList div.Message pre {
+
+code, pre {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -1289,8 +1287,7 @@ ul.MessageList div.Message pre {
    overflow: auto;
 	border: 1px solid #eec;
 }
-div.Preview div.Message pre,
-ul.MessageList div.Message pre {
+pre {
    display: block;
 }
 div.Preview div.Message strong,

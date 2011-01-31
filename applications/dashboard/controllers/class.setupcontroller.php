@@ -46,19 +46,16 @@ class SetupController extends DashboardController {
          }
          
          $ApplicationManager = new Gdn_ApplicationManager();
-         $AvailableApplications = $ApplicationManager->AvailableApplications();
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Step through the available applications, enabling each of them
-            $AppNames = array_keys($AvailableApplications);
+            // Step through the available applications, enabling each of them.
+            $AppNames = array('Conversations', 'Vanilla');
             try {
-               foreach ($AvailableApplications as $AppName => $AppInfo) {
-                  if (strtolower($AppName) != 'dashboard') {
-                     $Validation = new Gdn_Validation();
-                     $ApplicationManager->RegisterPermissions($AppName, $Validation);
-                     $ApplicationManager->EnableApplication($AppName, $Validation);
-                  }
+               foreach ($AppNames as $AppName) {
+                  $Validation = new Gdn_Validation();
+                  $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                  $ApplicationManager->EnableApplication($AppName, $Validation);
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
@@ -271,7 +268,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF . DS . 'config.php';
+         $ConfigFile = PATH_LOCAL_CONF.DS.'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          

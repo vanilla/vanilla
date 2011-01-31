@@ -829,7 +829,7 @@ EOT;
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation
          $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
          $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
-         $Mixed = urlencode(strtolower($Mixed));
+         $Mixed = rawurlencode(strtolower($Mixed));
 			return $Mixed;
       }
    }

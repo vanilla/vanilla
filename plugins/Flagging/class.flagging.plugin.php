@@ -53,6 +53,30 @@ class FlaggingPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('admin.css');
       $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
       
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Plugins.Flagging.UseDiscussions',
+         'Plugins.Flagging.CategoryID'
+      ));
+      
+      // Set the model on the form.
+      $Sender->Form->SetModel($ConfigurationModel);
+      
+      $CategoryModel = new CategoryModel();
+      $Sender->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+      
+      // If seeing the form for the first time...
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($ConfigurationModel->Data);
+      } else {
+         $Saved = $Sender->Form->Save();
+         if($Saved) {
+            $Sender->StatusMessage = T("Your changes have been saved.");
+         }
+      }
+      
       $FlaggedItems = Gdn::SQL()->Select('*')
          ->From('Flag fl')
          ->OrderBy('DateInserted', 'DESC')
@@ -159,21 +183,72 @@ class FlaggingPlugin extends Gdn_Plugin {
       ));
       
       if ($Sender->Form->AuthenticatedPostBack()) {
+         $SQL = Gdn::SQL();
          $Comment = $Sender->Form->GetValue('Plugin.Flagging.Reason');
+         $CreateDiscussion = C('Plugins.Flagging.UseDiscussions');
+         
+         
+         if ($CreateDiscussion) {
+            // Category
+            $CategoryID = C('Plugins.Flagging.CategoryID');
+                        
+            // New discussion name
+            if ($Context == 'comment') {
+               $Result = $SQL
+                  ->Select('d.Name')
+                  ->Select('c.Body')
+                  ->From('Comment c')
+                  ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID', 'left')
+                  ->Where('c.CommentID', $ElementID)
+                  ->Get()
+                  ->FirstRow();
+            } elseif ($Context == 'discussion') {
+               $DiscussionModel = new DiscussionModel();
+               $Result = $DiscussionModel->GetID($ElementID);
+            }
+            
+            $DiscussionName = GetValue('Name', $Result);
+            
+            $Sender->Report = array(
+               'DiscussionName' => $DiscussionName,
+               'FlaggedContent' => GetValue('Body', $Result),
+               'Reason' => $Comment,
+               'UserID' => $UserID,
+               'UserName' => $UserName
+            );
+            
+            $DiscussionName = T('FlagPrefix', 'FLAG: ') . $DiscussionName;
+            
+            // New discussion body
+            $DiscussionBody = $Sender->FetchView($this->GetView('report.php'));
+         }
          
          try {
-            Gdn::SQL()
-               ->Insert('Flag', array(
-                  'InsertUserID'    => $UserID,
-                  'InsertName'      => $UserName,
-                  'AuthorID'        => $ElementAuthorID,
-                  'AuthorName'      => $ElementAuthor,
-                  'ForeignURL'      => $URL,
-                  'ForeignID'       => $ElementID,
-                  'ForeignType'     => $Context,
-                  'Comment'         => $Comment,
-                  'DateInserted'    => date('Y-m-d H:i:s')
+            $SQL->Insert('Flag', array(
+               'InsertUserID'    => $UserID,
+               'InsertName'      => $UserName,
+               'AuthorID'        => $ElementAuthorID,
+               'AuthorName'      => $ElementAuthor,
+               'ForeignURL'      => $URL,
+               'ForeignID'       => $ElementID,
+               'ForeignType'     => $Context,
+               'Comment'         => $Comment,
+               'DateInserted'    => date('Y-m-d H:i:s')
             ));
+            if ($CreateDiscussion) {
+               $DiscussionID = $SQL->Insert('Discussion', array(
+                  'InsertUserID'    => $UserID,
+                  'UpdateUserID'    => $UserID,
+                  'CategoryID'      => $CategoryID,
+                  'Name'            => $DiscussionName,
+                  'Body'            => $DiscussionBody,
+                  'Format'          => 'Html',
+                  'CountComments'   => 1,
+                  'DateInserted'    => date('Y-m-d H:i:s'),
+                  'DateUpdated'     => date('Y-m-d H:i:s'),
+                  'DateLastComment' => date('Y-m-d H:i:s')
+               ));
+            }
          } catch(Exception $e) {}
          $Sender->StatusMessage = T("Your complaint has been registered.");
       }

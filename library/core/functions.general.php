@@ -30,10 +30,6 @@ function Gdn_Autoload($ClassName) {
    
    $LibraryPath = FALSE;
 
-   // If this is a model, look in the models folder(s)
-   if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
-
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
       // Look for plugin files.
       if ($LibraryPath === FALSE) {
@@ -46,6 +42,10 @@ function Gdn_Autoload($ClassName) {
          $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
       }
    }
+
+   // If this is a model, look in the models folder(s)
+   if (!$LibraryPath && strtolower(substr($ClassName, -5)) == 'model')
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    // Look for the class in the applications' library folders.
    if ($LibraryPath === FALSE) {
@@ -323,7 +323,7 @@ if (!function_exists('Attribute')) {
       }
       foreach ($Name as $Attribute => $Val) {
          if ($Val != '' && $Attribute != 'Standard') {
-            $Return .= ' '.$Attribute.'="'.$Val.'"';
+            $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }
       }
       return $Return;
@@ -465,6 +465,28 @@ if (!function_exists('CombinePaths')) {
          return $Paths;
       }
    }
+}
+
+if (!function_exists('CompareHashDigest')) {
+    /**
+     * Returns True if the two strings are equal, False otherwise.
+     * The time taken is independent of the number of characters that match.
+     *
+     * This snippet prevents HMAC Timing attacks ( http://codahale.com/a-lesson-in-timing-attacks/ )
+     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
+     */
+   function CompareHashDigest($Digest1, $Digest2) {
+        if (strlen($Digest1) !== strlen($Digest2)) {
+            return false;
+        }
+
+        $Result = 0;
+        for ($i = strlen($Digest1) - 1; $i >= 0; $i--) {
+            $Result |= ord($Digest1[$i]) ^ ord($Digest2[$i]);
+        }
+
+        return 0 === $Result;
+    }
 }
 
 if (!function_exists('ConcatSep')) {
@@ -1385,7 +1407,7 @@ if (!function_exists('RemoteIP')) {
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
       if (!is_array($Name))
          $Name = array($Name);
@@ -1523,7 +1545,7 @@ if (!function_exists('SaveToConfig')) {
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
 
       if (!is_array($Name))

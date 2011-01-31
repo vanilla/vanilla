@@ -9,8 +9,27 @@
       echo "<div>".Wrap(Anchor($ToggleName, 'plugin/flagging/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'))."</div>";
    ?>
 </div>
+
 <?php 
 if (C('Plugins.Flagging.Enabled')) {
+   // Settings
+   echo $this->Form->Open();
+   echo $this->Form->Errors();
+   ?>
+   <h3><?php echo T('Flagging Settings'); ?></h3>
+   <ul>
+      <li><?php echo $this->Form->CheckBox('Plugins.Flagging.UseDiscussions', T('Create Discussions')); ?></li>
+      <li>
+         <?php
+            echo $this->Form->Label('Category to Use', 'Plugins.Flagging.CategoryID');
+            echo $this->Form->DropDown('Plugins.Flagging.CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+         ?>
+      </li>
+   </ul>
+   <?php 
+   echo $this->Form->Close('Save');
+   
+   // Flagged Items list   
    echo "<h3>".T('Flagged Items')."</h3>\n";
    echo '<div class="FlaggedContent">';
    $NumFlaggedItems = count($this->FlaggedItems);

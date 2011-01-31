@@ -15,6 +15,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $Id = 'Comment_'.$Object->CommentID;
       $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
    } else {
+      
+//      if (Gdn::Session()->User->Name == 'Tim')
+//         print_r($Sender->Discussion);
+      
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;

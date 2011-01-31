@@ -116,7 +116,7 @@ class Gdn_Form {
     * @since 2.0.18
     * @access public
     */
-   public $InlineErrors = FALSE;
+   protected $_InlineErrors = FALSE;
    
    /**
     * @var string Class name to assign to form elements with errors when InlineErrors is enabled.
@@ -273,7 +273,7 @@ class Gdn_Form {
          $Attributes['checked'] = 'checked';
          
       // Show inline errors?
-      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
+      $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -678,7 +678,7 @@ class Gdn_Form {
     */
    public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
       // Show inline errors?
-      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
+      $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -810,7 +810,7 @@ class Gdn_Form {
       }
       
       // Show inline errors?
-      $ShowErrors = ($this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults));
+      $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -1030,7 +1030,7 @@ class Gdn_Form {
       }
       
       // Show inline errors?
-      $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
+      $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -1072,7 +1072,7 @@ class Gdn_Form {
       }
       
       // Show inline errors?
-      $ShowErrors = $this->InlineErrors === TRUE && array_key_exists($FieldName, $this->_ValidationResults);
+      $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
       
       // Add error class to input element
       if ($ShowErrors) 
@@ -1216,6 +1216,20 @@ class Gdn_Form {
    /// 3. Middle Tier: Methods for interfacing with the model & db.
    /// =========================================================================
 
+   /**
+    * Enable inline errors.
+    */
+   public function ShowErrors() {
+      $this->_InlineErrors = TRUE;
+   }
+   
+   /**
+    * Disable inline errors (this is the default).
+    */
+   public function HideErrors() {
+      $this->_InlineErrors = FALSE;
+   }
+   
    /**
     * Returns a boolean value indicating if the current page has an
     * authenticated postback. It validates the postback by looking at a

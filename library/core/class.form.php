@@ -564,6 +564,13 @@ class Gdn_Form {
          $Years[$i] = $i;
       }
       
+      // Show inline errors?
+      $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
+      
+      // Add error class to input element
+      if ($ShowErrors) 
+         $this->AddErrorClass($Attributes);
+      
       // Never display individual inline errors for these DropDowns
       $Attributes['InlineErrors'] = FALSE;
 
@@ -573,9 +580,15 @@ class Gdn_Form {
       $Attributes['class'] = trim($CssClass . ' Day');
       $Return .= $this->DropDown($FieldName . '_Day', $Days, $Attributes);
       $Attributes['class'] = trim($CssClass . ' Year');
-
-      return $Return . $this->DropDown($FieldName . '_Year', $Years, $Attributes) . '<input type="hidden" name="DateFields[]" value="' .
-          $FieldName . '" />';
+      $Return .= $this->DropDown($FieldName . '_Year', $Years, $Attributes);
+      
+      $Return .= '<input type="hidden" name="DateFields[]" value="' . $FieldName . '" />';
+          
+      // Append validation error message
+      if ($ShowErrors)  
+         $Return .= $this->InlineError($FieldName);
+         
+      return $Return;
    }
    
    /**

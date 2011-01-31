@@ -23,109 +23,92 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Form {
    /**
-    * A string identifying the action with which the form should be sent. 
-    *
-    * @var string
-    */
-   public $Action = '';
-
-   /**
-    * An associative array of all hidden inputs with their "Name" attribute as
-    * the key.
-    *
-    * @var array
-    */
-   public $HiddenInputs;
-
-   /**
-    * All form related tags (form, input, select, textarea, [etc] will have
-    * this value prefixed on their ID attribute. Default is "Form_". If the
-    * id value is overridden with the Attribute collection for an element, this
-    *  value will not be used.
-    *
-    * @var string
-    */
-   public $IDPrefix = 'Form_';
-
-   /**
-    * All form related tags (form, input, select, textarea, [etc] will have
-    * this value prefixed on their name attribute. Default is "Form".
-    * If a model is assigned, the model name is used instead.
-    *
-    * @var string
-    */
-   public $InputPrefix = 'Form';
-
-   /**
-    * A string identifying the method with which the form should be sent. Valid
-    * choices are: post, get. "post" is default.
-    *
-    * @var string
-    */
-   public $Method = 'post';
-
-   /**
-    * An associative array of $FieldName => $ValidationFunctionName arrays that
-    * describe how each field specified failed validation.
-    *
-    * @var array
-    */
-   protected $_ValidationResults;
-
-   /**
-    * An associative array containing the key => value pairs being placed in
-    * the controls returned by this object. This array is assigned by
-    * $this->Open() or $this->SetData().
-    *
-    * @var object
-    * @todo you probably mean array for type?
-    */
-   protected $_DataArray;
-
-   /**
-    * The model that enforces data rules on $this->_DataArray.
-    *
-    * @var object
-    */
-   protected $_Model;
-
-   /**
-    * A collection of IDs that have been created for form elements. This
-    * private property is used to record all IDs so that duplicate IDs are not
-    * added to the screen.
-    *
-    * @var array
-    */
-   private $_IDCollection = array();
-
-   /**
-    * An associative array of $Field => $Value pairs that represent data posted
-    * from the form in the $_POST or $_GET collection (depending on which
-    * method was specified for sending form data in $this->Method). This array
-    * is populated with and can be accessed by $this->FormValues(), and
-    * individual values can be retrieved from it with
-    * $this->GetFormValue($FieldName).
-    *
-    * @var array
-    */
-   private $_FormValues;
-
-   /**
-    * @var bool Whether to display inline errors with form elements.
-    * 
-    * @since 2.0.18
+    * @var string Action with which the form should be sent.
     * @access public
     */
-   protected $_InlineErrors = FALSE;
+   public $Action = '';
    
    /**
     * @var string Class name to assign to form elements with errors when InlineErrors is enabled.
-    * 
     * @since 2.0.18
     * @access public
     */
    public $ErrorClass = 'Error';
    
+   /**
+    * @var array Associative array of hidden inputs with their "Name" attribute as the key.
+    * @access public
+    */
+   public $HiddenInputs;
+
+   /**
+    * @var string All form-related elements (form, input, select, textarea, [etc] will have
+    *    this value prefixed on their ID attribute. Default is "Form_". If the
+    *    id value is overridden with the Attribute collection for an element, this
+    *    value will not be used.
+    * @access public
+    */
+   public $IDPrefix = 'Form_';
+
+   /**
+    * @var string All form-related elements (form, input, select, etc) will have
+    *    this value prefixed on their name attribute. Default is "Form".
+    *    If a model is assigned, the model name is used instead.
+    * @access public
+    */
+   public $InputPrefix = 'Form';
+
+   /**
+    * @var string Form submit method. Options are 'post' or 'get'.
+    * @access public
+    */
+   public $Method = 'post';
+
+   /**
+    * @var array Associative array containing the key => value pairs being placed in the
+    *    controls returned by this object. Assigned by $this->Open() or $this->SetData().
+    * @access protected
+    */
+   protected $_DataArray;
+   
+   /**
+    * @var bool Whether to display inline errors with form elements.
+    *    Set with $this->ShowErrors() and $this->HideErrors().
+    * @since 2.0.18
+    * @access protected
+    */
+   protected $_InlineErrors = FALSE;
+
+   /**
+    * @var object Model that enforces data rules on $this->_DataArray.
+    * @access protected
+    */
+   protected $_Model;
+   
+   /**
+    * @var array Associative array of $FieldName => $ValidationFunctionName arrays that
+    *    describe how each field specified failed validation.
+    * @access protected
+    */
+   protected $_ValidationResults;
+
+   /**
+    * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection 
+    *    (depending on which method was specified for sending form data in $this->Method). 
+    *    Populated & accessed by $this->FormValues(). 
+    *    Values can be retrieved with $this->GetFormValue($FieldName).
+    * @access private
+    */
+   private $_FormValues;
+   
+   /**
+    * @var array Collection of IDs that have been created for form elements. This
+    *    private property is used to record all IDs so that duplicate IDs are not
+    *    added to the screen.
+    * @access private
+    */
+   private $_IDCollection = array();
+
    /**
     * Constructor
     *

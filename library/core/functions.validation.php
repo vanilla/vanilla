@@ -174,7 +174,7 @@ if (!function_exists('ValidateMinimumAge')) {
             || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
             return TRUE;
       }
-      return T('ValidateMinimumAge', 'You must be at least ' . $MinimumAge . ' years old to proceed.');;
+      return T('ValidateMinimumAge', 'You must be at least ' . $MinimumAge . ' years old to proceed.');
    }
 }
 

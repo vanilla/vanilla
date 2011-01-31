@@ -74,6 +74,7 @@ class SettingsController extends DashboardController {
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
             try {
                $ApplicationManager->DisableApplication($ApplicationName);
+               Gdn_LibraryMap::ClearCache();
                $this->FireEvent('AfterDisableApplication');
             } catch (Exception $e) {
                $this->Form->AddError(strip_tags($e->getMessage()));
@@ -88,6 +89,7 @@ class SettingsController extends DashboardController {
                $Validation = new Gdn_Validation();
                $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+               Gdn_LibraryMap::ClearCache();
                $this->Form->SetValidationResults($Validation->Results());
                
                $this->EventArguments['Validation'] = $Validation;
@@ -488,11 +490,14 @@ class SettingsController extends DashboardController {
             $this->EventArguments['PluginName'] = $PluginName;
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                Gdn::PluginManager()->DisablePlugin($PluginName);
+               Gdn_LibraryMap::ClearCache();
                $this->FireEvent('AfterDisablePlugin');
             } else {
                $Validation = new Gdn_Validation();
                if (!Gdn::PluginManager()->EnablePlugin($PluginName, $Validation))
                   $this->Form->SetValidationResults($Validation->Results());
+               else
+                  Gdn_LibraryMap::ClearCache();
                
                $this->EventArguments['Validation'] = $Validation;
                $this->FireEvent('AfterEnablePlugin');

@@ -165,12 +165,13 @@ if (!function_exists('ValidateMinimumAge')) {
          $Month = intval(substr($Value, 5, 2));
          $Day = intval(substr($Value, 8));
          // The minimum age for joining is 13 years before now.
+         $MinimumAge = C('Garden.Validate.MinimumAge', 13);
          $CurrentDay = date('j');
          $CurrentMonth = date('n');
          $CurrentYear = date('Y');
-         if ($Year + 13 < $CurrentYear
-            || ($Year + 13 == $CurrentYear && $Month < $CurrentMonth)
-            || ($Year + 13 == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
+         if ($Year + $MinimumAge < $CurrentYear
+            || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
+            || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
             return TRUE;
 
       }

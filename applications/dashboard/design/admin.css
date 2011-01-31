@@ -1040,6 +1040,7 @@ div.Box h4.Active a {
 #Panel div.Addons h4 { background-position: 166px -240px; }
 #Panel div.SiteSettings h4 { background-position: 164px -92px; }
 #Panel div.Import h4 { background-position: 164px -1139px; }
+#Panel div.Pages h4 { background-position: 166px -1244px; }
 div.Box dl {
    border-bottom: 1px solid #aedefc;
    background: #f0fbff;

@@ -1557,43 +1557,6 @@ class Gdn_Form {
       }
       return $SaveResult;
    }
-
-   /**
-    * @todo add documentation
-    */
-   public function SetValidationResults($ValidationResults) {
-      if (!is_array($this->_ValidationResults)) $this->_ValidationResults = array();
-
-      $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
-   }
-
-   /**
-    * Sets the value associated with $FieldName from the sent form fields.
-    * Essentially overwrites whatever was retrieved from the form.
-    *
-    * @param string $FieldName The name of the field to set the value of.
-    * @param mixed $Value The new value of $FieldName.
-    */
-   public function SetFormValue($FieldName, $Value) {
-      $this->FormValues();
-      $this->_FormValues[$FieldName] = $Value;
-   }
-   
-   /**
-    * Sets the value associated with $FieldName.
-    *
-    * It sets the value in $this->_DataArray rather than in $this->_FormValues.
-    *
-    * @param string $FieldName
-    * @param mixed $Default
-    */
-   public function SetValue($FieldName, $Value) {
-      if (!is_array($this->_DataArray))
-         $this->_DataArray = array();
-      
-      $this->_DataArray[$FieldName] = $Value;
-   }   
-
    
    /**
     * Assign a set of data to be displayed in the form elements.
@@ -1617,6 +1580,18 @@ class Gdn_Form {
          $this->_DataArray = $Data;
       }
    }
+   
+   /**
+    * Sets the value associated with $FieldName from the sent form fields.
+    * Essentially overwrites whatever was retrieved from the form.
+    *
+    * @param string $FieldName The name of the field to set the value of.
+    * @param mixed $Value The new value of $FieldName.
+    */
+   public function SetFormValue($FieldName, $Value) {
+      $this->FormValues();
+      $this->_FormValues[$FieldName] = $Value;
+   }
 
    /**
     * Set the name of the model that will enforce data rules on $this->_DataArray.
@@ -1634,6 +1609,30 @@ class Gdn_Form {
       $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
+   
+   /**
+    * @todo add documentation
+    */
+   public function SetValidationResults($ValidationResults) {
+      if (!is_array($this->_ValidationResults)) $this->_ValidationResults = array();
+
+      $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
+   }
+
+   /**
+    * Sets the value associated with $FieldName.
+    *
+    * It sets the value in $this->_DataArray rather than in $this->_FormValues.
+    *
+    * @param string $FieldName
+    * @param mixed $Default
+    */
+   public function SetValue($FieldName, $Value) {
+      if (!is_array($this->_DataArray))
+         $this->_DataArray = array();
+      
+      $this->_DataArray[$FieldName] = $Value;
+   } 
 
    /**
     * Enable inline errors.

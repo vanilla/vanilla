@@ -159,24 +159,22 @@ if (!function_exists('ValidateDate')) {
 
 if (!function_exists('ValidateMinimumAge')) {
    function ValidateMinimumAge($Value, $Field, $FormPostedValues) {
+      $MinimumAge = C('Garden.Validate.MinimumAge', 13);
       // Dates should be in YYYY-MM-DD format
       if (preg_match("/^[\d]{4}-{1}[\d]{2}-{1}[\d]{2}$/", $Value) == 1) {
          $Year = intval(substr($Value, 0, 4));
          $Month = intval(substr($Value, 5, 2));
          $Day = intval(substr($Value, 8));
-         // The minimum age for joining is 13 years before now.
-         $MinimumAge = C('Garden.Validate.MinimumAge', 13);
          $CurrentDay = date('j');
          $CurrentMonth = date('n');
          $CurrentYear = date('Y');
+         // The minimum age for joining is 13 years before now.
          if ($Year + $MinimumAge < $CurrentYear
             || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
             || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
             return TRUE;
-
       }
-
-      return FALSE;
+      return T('ValidateMinimumAge', 'You must be at least ' . $MinimumAge . ' years old to proceed.');;
    }
 }
 
@@ -319,6 +317,6 @@ if (!function_exists('ValidateZipCode')) {
       if ($Value == '')
          return true; // Do not require by default.
       $Valid = ValidateRegex($Value, '/^([0-9]{5})(-[0-9]{4})?$/');
-      return ($Valid) ? $Valid : T('ValidateZipCode', 'Zipcode is invalid.');
+      return ($Valid) ? $Valid : T('ValidateZipCode', 'Zip code is invalid.');
    }
 }

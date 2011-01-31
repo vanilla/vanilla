@@ -262,12 +262,15 @@ class Gdn_Statistics extends Gdn_Pluggable {
    public static function IsLocalhost() {
       $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
       $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
+      
+      if ($ServerAddress == '::1') return TRUE;
+      
       foreach (array(
-         '::1', 
-         '127\.0\.0\.1',
-         '192\.168(\.[\d]{1,3}){2}',
-         '10(\.[\d]{1,3}){3}') as $LocalIP) {
-         if (preg_match("/{$LocalIP}/", $ServerAddress))
+         '10.0.0.0/8',
+         '127.0.0.1/0',
+         '172.16.0.0/12',
+         '192.168.0.0/16') as $LocalIP) {
+         if (self::CIDRCheck($ServerAddress, $LocalIP))
             return TRUE;
       }
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
@@ -297,6 +300,20 @@ class Gdn_Statistics extends Gdn_Pluggable {
          throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");
       
       return $DateRaw;
+   }
+   
+   // credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
+   public static function CIDRCheck($IP, $CIDR) {
+      list ($net, $mask) = split ("/", $CIDR);
+      
+      $ip_net = ip2long ($net);
+      $ip_mask = ~((1 << (32 - $mask)) - 1);
+      
+      $ip_ip = ip2long ($IP);
+      
+      $ip_ip_net = $ip_ip & $ip_mask;
+      
+      return ($ip_ip_net == $ip_net);
    }
    
 }

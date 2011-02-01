@@ -426,8 +426,39 @@ class Gdn_Model extends Gdn_Pluggable {
             $Fields[$this->UpdateUserID] = $Session->UserID;
    }
 
-	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
-		
+    
+   public function UpdateSerializedColumn($Column, $Values, $Where) {
+       // @param $Where is also work like options here
+       $bReplace = GetValue('Replace', $Where, FALSE, TRUE);
+       if (!$bReplace) {
+          // Load the existing values
+          $Row = $this->SQL
+              ->Select($Column)
+              ->From($this->Name)
+              ->Where($Where)
+              ->Get()
+              ->FirstRow();
+          if (!$Row) throw new Exception(T('ErrorRecordNotFound'), 404);
+          $ColumnData = Gdn_Format::Unserialize($Row->$Column);
+          if (is_string($ColumnData) && $ColumnData != '') throw new Exception(T('Serialized column failed to be unserialized.'));
+          if (!is_array($ColumnData)) $ColumnData = array();
+          $Values = array_merge($ColumnData, $Values);
+       }
+       
+       $Values = Gdn_Format::Serialize($Values);
+       // Save the values back to the db
+       return $this->SQL
+			->Update($this->Name)
+			->Set($Column, $Values)
+			->Where($Where)
+			->Put();
+   }
+   
+
+   public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
+		if (defined('DEBUG') && DEBUG)
+           trigger_error(__METHOD__.' is deprecated. Use UpdateSerializedColumn() instead.', E_USER_DEPRECATED);
+
 		if (!isset($this->Schema)) $this->DefineSchema();
 		// TODO: need to be sure that $this->PrimaryKey is only one primary key
 		$FieldName = $this->PrimaryKey;
@@ -460,7 +491,26 @@ class Gdn_Model extends Gdn_Pluggable {
 	}
     
     
+    public function UpdateField($Field, $Value, $Where) {
+      $Operator = FALSE;
+      if (strlen($Value) > 1) {
+         $Operator = substr($Value, 0, 1);
+         if (in_array($Operator, array('+', '-'))) $Value = substr($Value, 1);
+         else $Operator = FALSE;
+      }
+      if ($Operator !== FALSE) $Value = $Field . ' ' . $Operator . ' ' . $Value;
+      return $this->SQL
+         ->Update($this->Name)
+         ->Set($Field, $Value)
+         ->Where($Where)
+         ->Put();
+    }
+    
+    
 	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
+		if (defined('DEBUG') && DEBUG)
+           trigger_error(__METHOD__.' is deprecated. Use UpdateField() instead.', E_USER_DEPRECATED);
+        
 		if (!isset($this->Schema)) $this->DefineSchema();
 		$PrimaryKey = $this->PrimaryKey;
         

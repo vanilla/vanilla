@@ -38,7 +38,7 @@ class SettingsModule extends Gdn_Module {
             }
          break;
          case self::TYPE_PLUGIN:
-            if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins)) {
+            if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins())) {
                $PluginInfo   = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), FALSE);
                $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
                

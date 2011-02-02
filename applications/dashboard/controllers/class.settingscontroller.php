@@ -454,7 +454,7 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings/plugins');
       
       // Retrieve all available plugins from the plugins directory
-      $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+      $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
       self::SortAddons($this->EnabledPlugins);
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       self::SortAddons($this->AvailablePlugins);

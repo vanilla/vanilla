@@ -183,9 +183,9 @@ if (file_exists($ThemeHooks))
 // Set up the plugin manager (doing this early so it has fewer classes to
 // examine to determine if they are plugins).
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY . DS . 'core' . DS . 'class.pluginmanager.php', Gdn::FactorySingleton);
-//Gdn::PluginManager()->Start();
-Gdn::PluginManager()->IncludePlugins();
-Gdn::PluginManager()->RegisterPlugins();
+Gdn::PluginManager()->Start();
+//Gdn::PluginManager()->IncludePlugins();
+//Gdn::PluginManager()->RegisterPlugins();
 
 Gdn::FactoryOverwrite($FactoryOverwriteBak);
 unset($FactoryOverwriteBak);

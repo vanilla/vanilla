@@ -15,14 +15,16 @@ if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'appl
 if(!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
 
 if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.DS.'cache');
-if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.DS.'library');
-if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.DS.'core');
+if(!defined('PATH_LOCAL_CACHE')) define('PATH_LOCAL_CACHE', PATH_CACHE);
 
 if(!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.DS.'plugins');
 if(!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
 
 if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.DS.'themes');
 if(!defined('PATH_LOCAL_THEMES')) define('PATH_LOCAL_THEMES', PATH_THEMES);
+
+if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.DS.'library');
+if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.DS.'core');
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')

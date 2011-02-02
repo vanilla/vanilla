@@ -76,7 +76,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 1;
       
       // Check for, and load, alternate search paths from config
-      $AlternatePaths = C('Garden.Plugins.SearchPaths', NULL);
+      $AlternatePaths = C('Garden.PluginManager.Search', NULL);
       if (is_null($AlternatePaths)) return;
       
       if (!is_array($AlternatePaths))

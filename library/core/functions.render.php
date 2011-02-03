@@ -198,7 +198,7 @@ if (!function_exists('Img')) {
          $Attributes = array();
 
       if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
-         $Image = Asset($Image, $WithDomain);
+         $Image = SmartAsset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
    }
@@ -255,7 +255,7 @@ if (!function_exists('UserPhoto')) {
       $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
       if ($User->Photo != '') {
          $IsFullPath = strtolower(substr($User->Photo, 0, 7)) == 'http://' || strtolower(substr($User->Photo, 0, 8)) == 'https://'; 
-         $PhotoUrl = ($IsFullPath) ? $User->Photo : 'uploads/'.ChangeBasename($User->Photo, 'n%s');
+         $PhotoUrl = ($IsFullPath) ? $User->Photo : SmartAsset('uploads/'.ChangeBasename($User->Photo, 'n%s'), TRUE);
          return '<a title="'.urlencode($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
             .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
             .'</a>';

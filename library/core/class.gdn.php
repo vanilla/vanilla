@@ -26,7 +26,9 @@ class Gdn {
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
 
+   const AliasApplicationManager = 'ApplicationManager';
    const AliasPluginManager = 'PluginManager';
+   const AliasThemeManager = 'ThemeManager';
 
    const FactoryInstance = 'Instance';
    const FactoryPrototype = 'Prototype';
@@ -362,6 +364,15 @@ class Gdn {
       $Database = self::Database();
       $Result = $Database->Structure();
       return $Result;
+   }
+   
+   /**
+    * Get the plugin manager for the application.
+    *
+    * @return Gdn_PluginManager
+    */
+   public static function ThemeManager() {
+      return self::Factory(self::AliasThemeManager);
    }
    
    /**

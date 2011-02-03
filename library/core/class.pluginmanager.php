@@ -688,6 +688,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return NULL;
    }
    
+   public function SearchPaths() {
+      return $this->PluginSearchPaths;
+   }
+   
    public function EnabledPluginFolders() {
       return array_keys($this->EnabledPlugins());
    }

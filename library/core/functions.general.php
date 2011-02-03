@@ -34,7 +34,9 @@ function Gdn_Autoload($ClassName) {
       // Look for plugin files.
       if ($LibraryPath === FALSE) {
          $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
-         $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+         foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $Trash) {
+            $LibraryPath = Gdn_FileSystem::FindByMapping('library', $SearchPath, $PluginFolders, $LibraryFileName);
+         }
       }
 
       // Look harder for plugin files.
@@ -1575,6 +1577,60 @@ if (!function_exists('SliceString')) {
          $Trim = substr($String, 0, $Length);
          return $Trim . ((strlen($Trim) != strlen($String)) ? $Suffix: ''); 
       }
+   }
+}
+
+if (!function_exists('SmartAsset')) {
+   /**
+    * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
+    */
+   function SmartAsset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
+      $Destination = str_replace('\\', '/', $Destination);
+      if (substr($Destination, 0, 7) == 'http://' || substr($Destination, 0, 8) == 'https://') {
+         $Result = $Destination;
+      } else {
+         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
+         if (!$WithDomain)
+            array_unshift($Parts, '/');
+            
+         $Result = CombinePaths($Parts, '/');
+      }
+
+      if ($AddVersion) {
+         if (strpos($Result, '?') === FALSE)
+            $Result .= '?';
+         else
+            $Result .= '&';
+
+         // Figure out which version to put after the asset.
+         $Version = APPLICATION_VERSION;
+         if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
+            $Type = $Matches[1];
+            $Key = $Matches[2];
+            static $ThemeVersion = NULL;
+
+            switch ($Type) {
+               case 'plugins':
+                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
+                  $Version = GetValue('Version', $PluginInfo, $Version);
+                  break;
+               case 'themes':
+                  if ($ThemeVersion === NULL) {
+                     $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                     if ($ThemeInfo !== FALSE) {
+                        $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
+                     } else {
+                        $ThemeVersion = $Version;
+                     }
+                  }
+                  $Version = $ThemeVersion;
+                  break;
+            }
+         }
+
+         $Result.= 'v='.urlencode($Version);
+      }
+      return $Result;
    }
 }
 

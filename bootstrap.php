@@ -82,6 +82,11 @@ Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRAR
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
+// ThemeManager
+Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
+// PluginManager
+Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
+
 /// Configuration Defaults.
 $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 
@@ -175,12 +180,7 @@ unset($Gdn_EnabledApplications);
 unset($Gdn_Path);
 unset($Hooks_Path);
 
-// Theme manager
-Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
 Gdn::ThemeManager()->Start();
-
-// Set up the plugin manager
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
 Gdn::PluginManager()->Start();
 
 Gdn::FactoryOverwrite($FactoryOverwriteBak);

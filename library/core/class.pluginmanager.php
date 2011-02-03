@@ -243,7 +243,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             continue;
          
          $SearchPluginInfo['RealFile'] = $RealPluginFile;
-         $PluginName = GetValue('Name', $SearchPluginInfo);
          $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
          
          $PluginClassName = GetValue('ClassName', $SearchPluginInfo);

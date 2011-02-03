@@ -31,6 +31,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     */
    protected $PluginCache = NULL;
    protected $PluginsByClass = NULL;
+   protected $PluginFoldersByPath = NULL;
    
    /**
     * A simple list of enabled plugins
@@ -68,6 +69,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     */
    protected $Instances = array();
    
+   protected $Started = FALSE;
+   
    public function __construct() {
       $this->PluginSearchPaths = array();
       
@@ -96,7 +99,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * methods.
     */
    public function Start($Force = FALSE) {
-      
+            
       // Build list of all available plugins
       $this->AvailablePlugins($Force);
       
@@ -109,6 +112,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // Register hooked methods
       $this->RegisterPlugins();
       
+      $this->Started = TRUE;
+      
+   }
+   
+   public function Started() {
+      return (bool)$this->Started;
    }
    
    public function AvailablePlugins($Force = FALSE) {
@@ -117,6 +126,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       
          $this->PluginCache = array();
          $this->PluginsByClass = array();
+         $this->PluginFoldersByPath = array();
          
          // Check cache freshness
          foreach ($this->PluginSearchPaths as $SearchPath => $Trash) {
@@ -157,6 +167,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             
             $this->PluginCache = array_merge($this->PluginCache, $CachePluginInfo);
             $this->PluginsByClass = array_merge($this->PluginsByClass, $CacheClassInfo);
+            $this->PluginFoldersByPath[$SearchPath] = array_keys($CachePluginInfo);
          }
       }
             
@@ -692,8 +703,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return $this->PluginSearchPaths;
    }
    
-   public function EnabledPluginFolders() {
-      return array_keys($this->EnabledPlugins());
+   public function EnabledPluginFolders($SearchPath = NULL) {
+      if (is_null($SearchPath)) {
+         return array_keys($this->EnabledPlugins());
+      } else {
+         return GetValue($SearchPath, $this->PluginFoldersByPath, array());
+      }
    }
    
    /**

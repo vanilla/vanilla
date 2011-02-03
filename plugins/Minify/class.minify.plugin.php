@@ -23,7 +23,7 @@ class MinifyPlugin extends Gdn_Plugin {
    protected $BasePath = "";
 
    public function Setup() {
-      $Folder = PATH_CACHE . DS . 'Minify';
+      $Folder = PATH_LOCAL_CACHE . DS . 'Minify';
       if (!file_exists($Folder))
          @mkdir($Folder);
    }
@@ -37,7 +37,7 @@ class MinifyPlugin extends Gdn_Plugin {
    public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
    
    private function _EmptyCache() {
-      $Files = glob(PATH_CACHE.'/Minify/*', GLOB_MARK);
+      $Files = glob(PATH_LOCAL_CACHE.'/Minify/*', GLOB_MARK);
       foreach ($Files as $File) {
          if (substr($File, -1) != '/')
             unlink($File);
@@ -124,7 +124,7 @@ class MinifyPlugin extends Gdn_Plugin {
       $Query = serialize($Query);
       $token = md5($Query);
       // save file
-      $CacheFile = PATH_CACHE . DS . 'Minify' . DS . 'query_' . $token;
+      $CacheFile = PATH_LOCAL_CACHE . DS . 'Minify' . DS . 'query_' . $token;
       if (!file_exists($CacheFile)) {
 	 file_put_contents($CacheFile, $Query);
       }

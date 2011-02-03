@@ -287,15 +287,14 @@ if (!function_exists('Asset')) {
 
             switch ($Type) {
                case 'plugins':
-                  $PluginInfo = Gdn::PluginManager()->AvailablePlugins($Key);
+                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
                   $Version = GetValue('Version', $PluginInfo, $Version);
                   break;
                case 'themes':
                   if ($ThemeVersion === NULL) {
-                     if (file_exists(PATH_ROOT.'/themes/'.Theme().'/about.php')) {
-                        $ThemeInfo = array();
-                        include PATH_ROOT.'/themes/'.Theme().'/about.php';
-                        $ThemeVersion = GetValueR(Theme().'.Version', $ThemeInfo, $Version);
+                     $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                     if ($ThemeInfo !== FALSE) {
+                        $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
                      } else {
                         $ThemeVersion = $Version;
                      }

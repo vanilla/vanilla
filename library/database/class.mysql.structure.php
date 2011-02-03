@@ -1,25 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
 /**
- * The MySQLStructure class is a MySQL-specific class for manipulating
- * database structure.
- *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Database
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-require_once(dirname(__FILE__).DS.'class.databasestructure.php');
 
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    /// Constructor ///
@@ -190,9 +173,26 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          .$Sql
          .$Keys
       ."\n)";
+
+      // Check to see if there are any fulltext columns, otherwise use innodb.
+      if (!$this->_TableStorageEngine) {
+         $HasFulltext = FALSE;
+         foreach ($this->_Columns as $Column) {
+            $ColumnKeyTypes = (array)$Column->KeyType;
+            array_map('strtolower', $ColumnKeyTypes);
+            if (in_array('fulltext', $ColumnKeyTypes)) {
+               $HasFulltext = TRUE;
+               break;
+            }
+         }
+         if ($HasFulltext)
+            $this->_TableStorageEngine = 'myisam';
+         else
+            $this->_TableStorageEngine = C('Database.DefaultStorageEngine', 'innodb');
+      }
       
-      if (!is_null($this->_TableStorageEngine))
-         $Sql .= ' ENGINE='.$this->_TableStorageEngine;
+      if ($this->_TableStorageEngine)
+         $Sql .= ' engine='.$this->_TableStorageEngine;
 
       if ($this->_CharacterEncoding !== FALSE && $this->_CharacterEncoding != '')
          $Sql .= ' default character set '.$this->_CharacterEncoding;
@@ -330,7 +330,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $Indexes = $this->_IndexSql($this->_Columns);
       $IndexesDb = $this->_IndexSqlDb();
 
-      if(!is_null($this->_TableStorageEngine)) {
+      if($this->_TableStorageEngine) {
 			$CurrentEngine = $this->Database->Query("show table status where name = '".$this->_DatabasePrefix.$this->_TableName."'")->Value('Engine');
 
 			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {

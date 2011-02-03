@@ -99,7 +99,7 @@ if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
 //header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
 
 // Default request object
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY_CORE.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
 Gdn::Request()->FromEnvironment();
 
 /// Load the configurations for the installed items.
@@ -125,7 +125,7 @@ Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'databas
 Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactoryInstance);
 // Form class
-Gdn::FactoryInstall('Form', 'Gdn_Form', PATH_LIBRARY.DS.'core'.DS.'class.form.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('Form', 'Gdn_Form', PATH_LIBRARY_CORE.DS.'class.form.php', Gdn::FactoryInstance);
 
 // Identity, Authenticator & Session.
 Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');
@@ -139,12 +139,11 @@ Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS
 Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6.25'.DS.'libs'.DS.'Smarty.class.php', Gdn::FactorySingleton);
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
 // Application manager.
-Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
-// Theme manager
-Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
+// Slice handler
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
 // Remote Statistics
-Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY.DS.'core'.DS.'class.statistics.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY_CORE.DS.'class.statistics.php', Gdn::FactoryInstance);
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);
@@ -176,18 +175,13 @@ unset($Gdn_EnabledApplications);
 unset($Gdn_Path);
 unset($Hooks_Path);
 
-// If there is a hooks file in the theme folder, include it.
-$ThemeName = C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
-$ThemeHooks = PATH_THEMES . DS . $ThemeName . DS . 'class.' . strtolower($ThemeName) . 'themehooks.php';
-if (file_exists($ThemeHooks))
-	include_once($ThemeHooks);
+// Theme manager
+Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
+Gdn::ThemeManager()->Start();
 
-// Set up the plugin manager (doing this early so it has fewer classes to
-// examine to determine if they are plugins).
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY . DS . 'core' . DS . 'class.pluginmanager.php', Gdn::FactorySingleton);
+// Set up the plugin manager
+Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
 Gdn::PluginManager()->Start();
-//Gdn::PluginManager()->IncludePlugins();
-//Gdn::PluginManager()->RegisterPlugins();
 
 Gdn::FactoryOverwrite($FactoryOverwriteBak);
 unset($FactoryOverwriteBak);

@@ -45,20 +45,23 @@ function vf_configure_embed_container() {
 	$post = get_post($post_id);
 	// PostID not set or not related to an existing page? Generate the page now and apply template.
 	if (!is_numeric($post_id) || $post_id <= 0 || !$post) {
-		// Copy the vanilla template to the current theme
-		$template_to_use = 'embed_template.php';
-		try {
-			copy(__DIR__.'/templates/embed_template.php', get_template_directory().'/embed_template.php');
-		} catch (Exception $e) {
-			$template_to_use = false;
-		}
-		
 		$post_id = wp_insert_post(array('post_name' => 'discussions', 'post_title' => 'Discussions', 'post_type' => 'page', 'post_status' => 'publish', 'comment_status' => 'closed'));
-		if ($template_to_use)
-			update_post_meta($post_id, '_wp_page_template', $template_to_use);
-			
 		vf_update_option('embed-post-id', $post_id);
 	}
+	// Copy the vanilla template to the current theme
+	$template_to_use = 'embed_template.php';
+	try {
+      $filepath = __DIR__.'/templates/'.$template_to_use;
+      if (file_exists($filepath))                                                                                                        
+         copy($filepath, get_template_directory().'/'.$template_to_use);
+		else
+			$template_to_use = false;
+	} catch (Exception $e) {
+		$template_to_use = false;
+	}
+	if ($template_to_use)
+		update_post_meta($post_id, '_wp_page_template', $template_to_use);
+
 	return $post_id;
 }
 

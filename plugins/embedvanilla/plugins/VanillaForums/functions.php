@@ -136,20 +136,22 @@ function vf_validate_options($options) {
 		case 'url-form':
 			$url = vf_get_value('url', $options, '');
 			$options = $alloptions;
-			// Make a rest request to Vanilla's API to validate that the forum is at the given location.
-			$resturl = vf_combine_paths(array($url, '?p=discussions.json'), '/');
-			$data = json_decode(vf_rest($resturl));
-			if (!is_object($data)) {
-				$options['url'] = '';
-				add_settings_error('url', 'url', 'Forum url could not be validated. Are you sure you entered the correct web address of your forum?'); 
-			} else {
-				$options['url'] = $url;
+			// Validate that there is a vanilla installation at the url, and grab the WebRoot from the source.
+			$html = vf_rest($url);
+			$wr_pos = strpos($html, 'WebRoot" value="');
+			if ($wr_pos > 0) {
+				$webroot = substr($html, $wr_pos + 16);
+				$webroot = substr($webroot, 0, strpos($webroot, '"'));
+				$options['url'] = $webroot;
 				if (vf_get_value('embed-code', $options, '') == '') {
 					// Set the embed_code if it is not already defined.
-					$embedurl = vf_combine_paths(array($url, 'plugins/embedvanilla/remote.js'), '/');
+					$embedurl = vf_combine_paths(array($webroot, 'plugins/embedvanilla/remote.js'), '/');
 					$options['embed-code'] = '<script type="text/javascript" src="'.$embedurl.'"></script>';
 				}
 				vf_configure_embed_container();
+			} else {
+				$options['url'] = '';
+				add_settings_error('url', 'url', 'Forum url could not be validated. Are you sure you entered the correct web address of your forum?'); 
 			}
 			break;
 		case 'embed-form':

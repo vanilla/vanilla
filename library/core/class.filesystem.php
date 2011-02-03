@@ -141,7 +141,7 @@ class Gdn_FileSystem {
          $SourceFolders = array($SourceFolders);
 
       foreach ($SourceFolders as $SourceFolder) {
-         if (!is_array($WhiteList)) {
+         if ($WhiteList === FALSE) {
             $Path = CombinePaths(array($SourceFolder, $FileName));
             if (file_exists($Path)) {
                if ($ReturnFirst)
@@ -154,6 +154,10 @@ class Gdn_FileSystem {
                if ($DirectoryHandle === FALSE)
                   trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
 
+               // Search all subfolders
+               if ($WhiteList == TRUE)
+                  $WhiteList = scandir($SourceFolder);
+               
                $SubFolders = array();
                foreach ($WhiteList as $WhiteFolder) {
                   $SubFolder = CombinePaths(array($SourceFolder, $WhiteFolder));
@@ -207,14 +211,15 @@ class Gdn_FileSystem {
          // Once I find it, I need to save the mapping so we don't have to search for it again.
 
          // Attempt to find the file directly off the root (if the app folder was provided in the querystring)
-         if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1) {
+         /*if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1) {
             $LibraryPath = self::Find($SourceFolders, $LibraryName);
          } else {
             $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
-         }
+         }*/
+         $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
 
-         // If the controller was found
-         if($LibraryPath !== FALSE) {
+         // If the mapping was found
+         if ($LibraryPath !== FALSE) {
             Gdn_LibraryMap::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
          }
       }

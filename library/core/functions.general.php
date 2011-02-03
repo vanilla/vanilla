@@ -33,8 +33,10 @@ function Gdn_Autoload($ClassName) {
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
       // Look for plugin files.
       if ($LibraryPath === FALSE) {
-         $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
          foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $Trash) {
+            // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
+            $PluginFolders = (Gdn::PluginManager()->Started()) ? Gdn::PluginManager()->EnabledPluginFolders($SearchPath) : TRUE;
+            
             $LibraryPath = Gdn_FileSystem::FindByMapping('library', $SearchPath, $PluginFolders, $LibraryFileName);
          }
       }
@@ -51,7 +53,7 @@ function Gdn_Autoload($ClassName) {
 
    // Look for the class in the applications' library folders.
    if ($LibraryPath === FALSE) {
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/$LibraryFileName");
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/{$LibraryFileName}");
    }
 
    // Look for the class in the core.
@@ -62,7 +64,7 @@ function Gdn_Autoload($ClassName) {
          array(
             'core',
             'database',
-            'vendors'. DS . 'phpmailer'
+            'vendors/phpmailer'
          ),
          $LibraryFileName
       );

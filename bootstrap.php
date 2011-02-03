@@ -82,16 +82,16 @@ Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRAR
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
-// ThemeManager
-Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
-// PluginManager
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
-
 /// Configuration Defaults.
 $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 
 // Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+
+// ThemeManager
+Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
+// PluginManager
+Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
 
 $Gdn_Config->Caching(TRUE);
 
@@ -99,9 +99,6 @@ if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
    // Load the custom configurations 
    $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 }
-
-// This header is redundantly set in the controller.
-//header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY_CORE.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');

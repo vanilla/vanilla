@@ -19,7 +19,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     if (!settings.confrm)
       $.popup.loading(settings)
       
-    $.isFunction(data) ? data.call() : $.popup.reveal(settings, data)
+    $.isFunction(data) ? data.call(this, settings) : $.popup.reveal(settings, data)
   }
 
   $.fn.popup = function(options) {

@@ -63,7 +63,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @param object $Sender
     */
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       if (is_object($Sender)) {
          $this->_ApplicationFolder = $Sender->ApplicationFolder;
          $this->_ThemeFolder = $Sender->Theme;
@@ -72,7 +72,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
          $this->_ThemeFolder = Gdn::Config('Garden.Theme');
       }
       if (is_object($Sender))
-         $this->_Sender = &$Sender;
+         $this->_Sender = $Sender;
          
       parent::__construct();
    }

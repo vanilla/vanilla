@@ -90,6 +90,10 @@ class DashboardHooks implements Gdn_IPlugin {
 			
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+
+      $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
+      $Menu->AddLink('Moderation', T('Manage Spam'), 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Edit/Delete Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		

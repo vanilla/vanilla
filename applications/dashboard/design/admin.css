@@ -1036,6 +1036,7 @@ div.Box h4.Active a {
 #Panel div.Dashboard h4 { background-position: 166px 7px; }
 #Panel div.Appearance h4 { background-position: 164px -1195px; }
 #Panel div.Users h4 { background-position: 162px -292px; }
+#Panel div.Moderation h4 { background-position: 167px -742px; }
 #Panel div.Forum h4 { background-position: 167px -442px; }
 #Panel div.Addons h4 { background-position: 166px -240px; }
 #Panel div.SiteSettings h4 { background-position: 164px -92px; }
@@ -1249,7 +1250,7 @@ div.Popup div.Body {
 	margin: 0px auto;
 	text-align: left;
 	position: relative;
-	padding: 0px;
+	padding: 0 0 8px 0;
 	max-width: 500px;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -1834,4 +1835,23 @@ ol.Sortable {
 	color: #333;
 	font-size: 12px;
 	display: block;
+}
+.Selected {
+   background: #FFFF99 !Important;
+}
+.CheckboxCell {
+   width: 1em;
+}
+.DateCell {
+   text-align: right;
+   width: 7em;
+}
+.UsernameCell {
+   width: 8em;
+}
+ins {
+   background: #DDFFDD;
+}
+del {
+   background: #FFDDDD;
 }

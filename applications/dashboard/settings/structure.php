@@ -14,6 +14,7 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
 
+$Database = Gdn::Database();
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
 
@@ -189,7 +190,8 @@ $PermissionModel->Define(array(
    'Garden.Users.Approve',
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
-   'Garden.Profiles.View' => 1
+   'Garden.Profiles.View' => 1,
+   'Garden.Moderation.Manage' => 'Garden.Users.Edit'
    ));
 
 if (!$PermissionTableExists) {
@@ -361,5 +363,19 @@ $Construct->Table('Tag')
    ->Column('Name', 'varchar(255)', 'unique')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Log')
+   ->PrimaryKey('LogID')
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity'), FALSE, 'index')
+   ->Column('RecordID', 'int', FALSE, 'index')
+   ->Column('RecordUserID', 'int') // user responsible for the record
+   ->Column('RecordDate', 'datetime')
+   ->Column('InsertUserID', 'int') // user that put record in the log
+   ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('ParentRecordID', 'int', NULL, 'index')
+   ->Column('Data', 'text', NULL) // the data from the record.
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);

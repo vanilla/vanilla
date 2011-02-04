@@ -17,6 +17,11 @@ class PagerModule extends Gdn_Module {
     * The id applied to the div tag that contains the pager.
     */
    public $ClientID;
+
+   /**
+    * @var PagerModule
+    */
+   protected static $_CurrentPager;
    
    /**
     * The name of the stylesheet class to be applied to the pager. Default is
@@ -67,7 +72,7 @@ class PagerModule extends Gdn_Module {
    /**
     * The first record of the current page (the dataset offset).
     */
-   private $Offset;
+   public $Offset;
    
    /**
     * The last offset of the current page. (ie. Offset to LastOffset of TotalRecords)
@@ -89,8 +94,8 @@ class PagerModule extends Gdn_Module {
     */
    private $_Totalled;
 
-   public function __construct(&$Sender = '') {
-      $this->ClientID = '';
+   public function __construct($Sender = '') {
+      $this->ClientID = 'Pager';
       $this->CssClass = 'NumberedPager';
       $this->Offset = 0;
       $this->Limit = 30;
@@ -127,6 +132,14 @@ class PagerModule extends Gdn_Module {
                
          $this->_PropertiesDefined = TRUE;
       }
+   }
+
+   /**
+    * Gets the controller this pager is for.
+    * @return Gdn_Controller.
+    */
+   public function Controller() {
+      return $this->_Sender;
    }
    
    // Builds a string with information about the page list's current position (ie. "1 to 15 of 56").
@@ -271,6 +284,52 @@ class PagerModule extends Gdn_Module {
       $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
       
       return $Pager == '' ? '' : sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
+   }
+
+   public static function Write($Options = array()) {
+      static $WriteCount = 0;
+
+      if (!self::$_CurrentPager) {
+         if (is_a($Options, 'Gdn_Controller')) {
+            self::$_CurrentPager = new PagerModule($Options);
+            $Options = array();
+         } else {
+            self::$_CurrentPager = new PagerModule($Options['Sender']);
+         }
+      }
+      $Pager = self::$_CurrentPager;
+
+		$Pager->MoreCode = GetValue('MoreCode', $Options, $Pager->MoreCode);
+		$Pager->LessCode = GetValue('LessCode', $Options, $Pager->LessCode);
+		
+      $Pager->ClientID = GetValue('ClientID', $Options, $Pager->ClientID);
+
+      $Pager->Limit = GetValue('Limit', $Options, $Pager->Limit);
+
+      // Try and figure out the offset based on the parameters coming in to the controller.
+      if (!$Pager->Offset) {
+         $Page = $Pager->Controller()->Request->Get('Page', 'p1');
+         if (!$Page) {
+            $Page = 'p1';
+         }
+         list($Offset, $Limit) = OffsetLimit($Page, $Pager->Limit);
+         $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', 0));
+         $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}');
+
+         $Pager->Configure($Offset, $Limit, $TotalRecords, $Url);
+      }
+
+      echo $Pager->ToString($WriteCount > 0 ? 'more' : 'less');
+      $WriteCount++;
+
+//      list($Offset, $Limit) = OffsetLimit(GetValue, 20);
+//		$Pager->Configure(
+//			$Offset,
+//			$Limit,
+//			$TotalAddons,
+//			"/settings/addons/$Section?Page={Page}"
+//		);
+//		$Sender->SetData('_Pager', $Pager);
    }
    
    private function _GetCssClass($ThisPage, $HighlightPage) {

@@ -22,14 +22,29 @@ class Gdn_Filecache extends Gdn_Cache {
    const OPT_MOD_SPLIT = 65000;
    const OPT_PASSTHRU_CONTAINER = 'passthru';
    const O_CREATE = 1;
+   
+   const CONTAINER_CACHEFILE = 'c_cachefile';
 
    // Placeholder
    protected $WeightedContainers;
    
    public function __construct() {
       parent::__construct();
+      $this->CacheType = Gdn_Cache::CACHE_TYPE_FILE;
       
       $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, array('gzcompress','gzuncompress'));
+      $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);
+      $this->RegisterFeature(Gdn_Cache::FEATURE_TIMEOUT);
+   }
+   
+   /**
+   * Reads in known/config storage locations and adds them to the instance.
+   * 
+   * This method is called when the cache object is invoked by the framework 
+   * automatically, and needs to configure itself from the values in the global
+   * config file.
+   */
+   public function Autorun() {
       $this->AddContainer(array(
          Gdn_Cache::CONTAINER_LOCATION    => C('Cache.Filecache.Store')
       ));
@@ -105,7 +120,7 @@ class Gdn_Filecache extends Gdn_Cache {
       $CacheFile = rtrim(CombinePaths(array($SplitCacheLocation,$KeyHash)),'/');
       
       return array_merge($Container,array(
-         Gdn_Cache::CONTAINER_CACHEFILE   => $CacheFile
+         Gdn_Filecache::CONTAINER_CACHEFILE   => $CacheFile
       ));
    }
    
@@ -138,7 +153,7 @@ class Gdn_Filecache extends Gdn_Cache {
          if ($Container === Gdn_Cache::CACHEOP_FAILURE)
             return Gdn_Cache::CACHEOP_FAILURE;
       }
-      $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
+      $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
       
       if ($FinalOptions[Gdn_Cache::FEATURE_COMPRESS] && $CompressionMethod = $this->HasFeature(Gdn_Cache::FEATURE_COMPRESS)) {
          $Compressor = $CompressionMethod[0];
@@ -172,7 +187,7 @@ class Gdn_Filecache extends Gdn_Cache {
          if ($Container === Gdn_Cache::CACHEOP_FAILURE)
             return Gdn_Cache::CACHEOP_FAILURE;
       }
-      $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
+      $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
       
       $Cache = @fopen($CacheFile, 'r');
       if (!$Cache) return Gdn_Cache::CACHEOP_FAILURE;
@@ -242,7 +257,7 @@ class Gdn_Filecache extends Gdn_Cache {
       if ($Container === Gdn_Cache::CACHEOP_FAILURE)
          return Gdn_Cache::CACHEOP_FAILURE;
       
-      $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
+      $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
       if (!file_exists($CacheFile))
          return Gdn_Cache::CACHEOP_FAILURE;
          
@@ -257,7 +272,7 @@ class Gdn_Filecache extends Gdn_Cache {
          if ($Container === Gdn_Cache::CACHEOP_FAILURE)
             return Gdn_Cache::CACHEOP_FAILURE;
       }
-      $CacheFile = $Container[Gdn_Cache::CONTAINER_CACHEFILE];
+      $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
       
       $Cache = fopen($CacheFile, 'r');
       $TimeoutMS = $Container[Gdn_Cache::CONTAINER_TIMEOUT] * 1000;
@@ -294,6 +309,7 @@ class Gdn_Filecache extends Gdn_Cache {
       $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER] = $Container;
       $Value = $this->Get($Key, $Options);
       if ($Value !== Gdn_Cache::CACHEOP_FAILURE) {
+         if (($Value + $Amount) < 0) return Gdn_Cache::CACHEOP_FAILURE;
          $Value += $Amount;
          return $this->Store($Key, $Value, $Options);
       }

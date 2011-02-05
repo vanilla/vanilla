@@ -10,8 +10,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class SearchController extends Gdn_Controller {
 
+   public $SearchModel;
+
+   public $Uses = array('Database');
+
 	public function __construct() {
 		parent::__construct();
+
+      $this->SearchModel = new SearchModel();
 		
 		$Form = Gdn::Factory('Form');
 		$Form->Method = 'get';
@@ -35,8 +41,6 @@ class SearchController extends Gdn_Controller {
       $this->AddModule($GuestModule);
       parent::Initialize();
    }
-
-   public $Uses = array('Database', 'SearchModel');
 	
 	public $Form;
 	

@@ -30,10 +30,6 @@ function Gdn_Autoload($ClassName) {
    
    $LibraryPath = FALSE;
 
-   // If this is a model, look in the models folder(s)
-   if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
-
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
       // Look for plugin files.
       if ($LibraryPath === FALSE) {
@@ -46,6 +42,10 @@ function Gdn_Autoload($ClassName) {
          $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
       }
    }
+
+   // If this is a model, look in the models folder(s)
+   if (!$LibraryPath && strtolower(substr($ClassName, -5)) == 'model')
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    // Look for the class in the applications' library folders.
    if ($LibraryPath === FALSE) {
@@ -1406,7 +1406,7 @@ if (!function_exists('RemoteIP')) {
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
       if (!is_array($Name))
          $Name = array($Name);
@@ -1544,7 +1544,7 @@ if (!function_exists('SaveToConfig')) {
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
 
       if (!is_array($Name))

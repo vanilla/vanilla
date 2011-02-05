@@ -16,7 +16,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
  */
-class Gdn_PluginManager {
+class Gdn_PluginManager extends Gdn_Pluggable {
    
    const ACTION_ENABLE  = 1;
    const ACTION_DISABLE = 2;
@@ -487,6 +487,7 @@ class Gdn_PluginManager {
    
    public function ScanPluginFile($PluginFile, $VariableName = NULL) {
       // Find the $PluginInfo array
+      if (!file_exists($PluginFile)) return;
       $Lines = file($PluginFile);
       $InfoBuffer = FALSE;
       $ClassBuffer = FALSE;
@@ -728,7 +729,8 @@ class Gdn_PluginManager {
       // Get a list of files to include.
       $Paths = array();
       foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
-         if (!class_exists($PluginFolder)) {
+         $ClassName = GetValue('ClassName', $this->GetPluginInfo($PluginName), FALSE);
+         if (!class_exists($ClassName)) {
             $Paths[] = PATH_PLUGINS . DS . $PluginFolder . DS . 'default.php';
             $Paths = array_merge($Paths, SafeGlob(PATH_PLUGINS . DS . $PluginFolder . DS . '*plugin.php'));
          }
@@ -744,7 +746,7 @@ class Gdn_PluginManager {
       $PluginManager = &$this;
       $Paths = (array)$Paths;
       foreach($Paths as $Path) {
-         if(file_exists($Path))
+         if(file_exists($Path)) 
             include_once($Path);
       }
    }

@@ -268,7 +268,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF . DS . 'config.php';
+         $ConfigFile = PATH_LOCAL_CONF.DS.'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          

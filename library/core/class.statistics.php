@@ -84,7 +84,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       $Sender->AddDefinition('AnalyticsTask', 'none');
       
       if (is_null($VanillaID)) {
-         $Conf = CombinePaths(array(PATH_ROOT,'conf/config.php'));
+         $Conf = PATH_LOCAL_CONF.DS.'config.php';
          if (!is_writable($Conf))
             return;
             
@@ -98,7 +98,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = C('Garden.Analytics.LastSentDate', FALSE);
-      if ($LastSentDate === FALSE || $LastSentDate < date('Ymd')) {
+      if ($LastSentDate === FALSE || $LastSentDate < date('Ymd', strtotime('-1 day'))) {
          $Sender->AddDefinition('AnalyticsTask','stats');
          return;
       }
@@ -156,6 +156,9 @@ class Gdn_Statistics extends Gdn_Pluggable {
          $StatsDate = strtotime('yesterday');
       else
          $StatsDate = strtotime('+1 day', self::TimeFromTimeSlot($LastSentDate));
+      
+      $StatsTimeSlot = date('Ymd', $StatsDate);
+      if ($StatsTimeSlot >= date('Ymd')) return;
       
       $DetectActiveInterval = 0;
       $MaxIterations = 10; $TimeSlotLimit = date('Ymd');
@@ -259,7 +262,17 @@ class Gdn_Statistics extends Gdn_Pluggable {
    public static function IsLocalhost() {
       $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
       $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
-      if (in_array($ServerAddress,array('::1', '127.0.0.1'))) return TRUE;
+      
+      if ($ServerAddress == '::1') return TRUE;
+      
+      foreach (array(
+         '10.0.0.0/8',
+         '127.0.0.1/0',
+         '172.16.0.0/12',
+         '192.168.0.0/16') as $LocalIP) {
+         if (self::CIDRCheck($ServerAddress, $LocalIP))
+            return TRUE;
+      }
       if ($ServerHostname == 'localhost' || substr($ServerHostname,-6) == '.local') return TRUE;
       return FALSE;
    }
@@ -287,6 +300,20 @@ class Gdn_Statistics extends Gdn_Pluggable {
          throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");
       
       return $DateRaw;
+   }
+   
+   // credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
+   public static function CIDRCheck($IP, $CIDR) {
+      list ($net, $mask) = split ("/", $CIDR);
+      
+      $ip_net = ip2long ($net);
+      $ip_mask = ~((1 << (32 - $mask)) - 1);
+      
+      $ip_ip = ip2long ($IP);
+      
+      $ip_ip_net = $ip_ip & $ip_mask;
+      
+      return ($ip_ip_net == $ip_net);
    }
    
 }

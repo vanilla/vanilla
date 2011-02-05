@@ -11,5 +11,3 @@ Gdn::FactoryInstall('Head', 'HeadModule', PATH_APPLICATIONS.DS.'dashboard'.DS.'m
 // Menu.
 Gdn::FactoryInstall('Menu', 'MenuModule', PATH_APPLICATIONS.DS.'dashboard'.DS.'modules'.DS.'class.menumodule.php', Gdn::FactorySingleton);
 Gdn::Dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));
-// Search.
-Gdn::FactoryInstall('SearchModel', 'SearchModel', PATH_APPLICATIONS.DS.'dashboard'.DS.'models'.DS.'class.searchmodel.php', Gdn::FactorySingleton);

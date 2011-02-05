@@ -5,7 +5,12 @@ if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
 	
 /// Define core constants.
 if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.DS.'conf');
-include(PATH_CONF . DS . 'constants.php');
+if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
+
+// Include default constants if none were defined elsewhere
+if (!defined('VANILLA_CONSTANTS'))
+   include(PATH_CONF . DS . 'constants.php');
+   
 if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'applications');
 if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.DS.'cache');
 if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.DS.'library');
@@ -62,6 +67,9 @@ require_once(PATH_LIBRARY_CORE . DS . 'class.factory.php');
 Gdn::SetFactory(new Gdn_Factory(), FALSE);
 $FactoryOverwriteBak = Gdn::FactoryOverwrite(FALSE);
 
+// Cache Layer
+Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
+
 /// Install the configuration.
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
@@ -69,13 +77,18 @@ $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 /// Configuration Defaults.
 $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 
-// Load the custom configurations so that we know what apps are enabled.
+// Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+
+$Gdn_Config->Caching(TRUE);
+
+if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
+   // Load the custom configurations 
+   $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
+}
 
 // This header is redundantly set in the controller.
 //header('X-Garden-Version: '.APPLICATION.' '.APPLICATION_VERSION);
-
-Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY.DS.'core'.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
@@ -88,7 +101,7 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 }
 
 /// Load the custom configurations again so that application setting defaults are overridden.
-$Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+$Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
@@ -119,11 +132,10 @@ Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
 // Application manager.
 Gdn::FactoryInstall('ApplicationManager', 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
-
 // Theme manager
 Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactoryInstance);
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
-
+// Remote Statistics
 Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY.DS.'core'.DS.'class.statistics.php', Gdn::FactoryInstance);
 
 // Other objects.

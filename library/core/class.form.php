@@ -566,15 +566,23 @@ class Gdn_Form {
       
       // Never display individual inline errors for these DropDowns
       $Attributes['InlineErrors'] = FALSE;
-
+      
+      $DateValue = $this->GetValue($FieldName, ArrayValueI('value', $Attributes));
+      $YearAttributes = $MonthAttributes = $DayAttributes = $Attributes;
+      if ($DateValue) {
+         $YearAttributes['value'] = substr($DateValue, 0, 4);
+         $MonthAttributes['value'] = substr($DateValue, 5, 2);
+         $DayAttributes['value'] = substr($DateValue, 8, 2);
+      }
+      
       $CssClass = ArrayValueI('class', $Attributes, '');
       $Attributes['class'] = trim($CssClass . ' Month');
-      $Return = $this->DropDown($FieldName . '_Month', $Months, $Attributes);
+      $Return = $this->DropDown($FieldName . '_Month', $Months, $MonthAttributes);
       $Attributes['class'] = trim($CssClass . ' Day');
-      $Return .= $this->DropDown($FieldName . '_Day', $Days, $Attributes);
+      $Return .= $this->DropDown($FieldName . '_Day', $Days, $DayAttributes);
       $Attributes['class'] = trim($CssClass . ' Year');
 
-      return $Return . $this->DropDown($FieldName . '_Year', $Years, $Attributes) . '<input type="hidden" name="DateFields[]" value="' .
+      return $Return . $this->DropDown($FieldName . '_Year', $Years, $YearAttributes) . '<input type="hidden" name="DateFields[]" value="' .
           $FieldName . '" />';
    }
    
@@ -1442,11 +1450,10 @@ class Gdn_Form {
                      2,
                      '0',
                      STR_PAD_LEFT);
-                  $this->_FormValues[$DateFields[$i]] = $Year .
-                      '-' .
-                      $Month .
-                      '-' .
-                      $Day;
+                     // S: 5 Feb 2011. Date nothing is selected, return NULL
+                     if ($Year === '0' && $Month === '00' && $Day === '00') $DateValue = NULL;
+                     else $DateValue = $Year . '-' . $Month .'-' .$Day;
+                  $this->_FormValues[$DateFields[$i]] = $DateValue;
                }
             }
          }

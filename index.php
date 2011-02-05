@@ -27,6 +27,11 @@ define('PATH_ROOT', dirname(__FILE__));
 // 2. Include the header.
 require_once(PATH_ROOT.DS.'bootstrap.php');
 
+// 3. Authentication
+Gdn::Authenticator()->StartAuthenticator();
+
+// 4. Start the application.
+
 $Dispatcher = Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::Config('EnabledApplications');

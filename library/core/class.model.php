@@ -142,9 +142,10 @@ class Gdn_Model extends Gdn_Pluggable {
     * the table that this model represents. You can also explicitly set this
     * value with $this->Name.
     */
-   public function __construct($Name = '') {
-      if ($Name == '')
-         $Name = get_class($this);
+   public function __construct($Name = '', $PrimaryKey = NULL) {
+      if ($Name == '') $Name = get_class($this);
+      // S: Set PrimaryKey, will be redefined by DefineSchema()
+      $this->PrimaryKey = ($PrimaryKey) ? $PrimaryKey : $Name.'ID';
 
       $this->Database = Gdn::Database();
       $this->SQL = $this->Database->SQL();
@@ -425,107 +426,72 @@ class Gdn_Model extends Gdn_Pluggable {
          if (!isset($Fields[$this->UpdateUserID]))
             $Fields[$this->UpdateUserID] = $Session->UserID;
    }
+   
+  
+   /**
+   * @todo add doc here
+   */
+   public function SQL() {
+      return $this->SQL;
+   }
 
-    
-   public function UpdateSerializedColumn($Column, $Values, $Where) {
-       // @param $Where is also work like options here
-       $bReplace = GetValue('Replace', $Where, FALSE, TRUE);
-       if (!$bReplace) {
-          // Load the existing values
-          $Row = $this->SQL
-              ->Select($Column)
-              ->From($this->Name)
-              ->Where($Where)
-              ->Get()
-              ->FirstRow();
-          if (!$Row) throw new Exception(T('ErrorRecordNotFound'), 404);
-          $ColumnData = Gdn_Format::Unserialize($Row->$Column);
-          if (is_string($ColumnData) && $ColumnData != '') throw new Exception(T('Serialized column failed to be unserialized.'));
-          if (!is_array($ColumnData)) $ColumnData = array();
-          $Values = array_merge($ColumnData, $Values);
+   /**
+   * @todo add doc here
+   */
+   public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
+        if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
+        // S: 5 Feb 2011. PrimaryKey must be defined
+        // @param array $Name is also work like options in this case
+        $bReplace = GetValue('_Replace', $Name, FALSE, TRUE);
+        if (!$bReplace) {
+           // Load the existing values
+           $Row = $this->SQL
+               ->Select($Column)
+               ->From($this->Name)
+               ->Where($this->PrimaryKey, $RowID)
+               ->Get()
+               ->FirstRow();
+           if (!$Row) throw new Exception(T('ErrorRecordNotFound'), 404);
+           $Values = Gdn_Format::Unserialize($Row->$Column);
+           if (is_string($Values) && $Values != '') throw new Exception(T('Serialized column failed to be unserialized.'));
+           if (!is_array($Values)) $Values = array();
+           $Name = array_merge($Values, $Name);
        }
        
-       $Values = Gdn_Format::Serialize($Values);
+       $Values = Gdn_Format::Serialize($Name);
        // Save the values back to the db
        return $this->SQL
 			->Update($this->Name)
 			->Set($Column, $Values)
-			->Where($Where)
-			->Put();
-   }
-   
-
-   public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
-		if (defined('DEBUG') && DEBUG)
-           trigger_error(__METHOD__.' is deprecated. Use UpdateSerializedColumn() instead.', E_USER_DEPRECATED);
-
-		if (!isset($this->Schema)) $this->DefineSchema();
-		// TODO: need to be sure that $this->PrimaryKey is only one primary key
-		$FieldName = $this->PrimaryKey;
-		
-		// Load the existing values
-		$Row = $this->SQL
-			->Select($Column)
-			->From($this->Name)
-			->Where($FieldName, $RowID)
-			->Get()
-			->FirstRow();
-		
-		if(!$Row) throw new Exception(T('ErrorRecordNotFound'));
-		$Values = Gdn_Format::Unserialize($Row->$Column);
-		
-		if (is_string($Values) && $Values != '')
-			throw new Exception(T('Serialized column failed to be unserialized.'));
-		
-		if (!is_array($Values)) $Values = array();
-		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
-
-		$Values = Gdn_Format::Serialize(array_merge($Values, $Name));
-		
-		// Save the values back to the db
-		return $this->SQL
-			->From($this->Name)
-			->Where($FieldName, $RowID)
-			->Set($Column, $Values)
+			->Where($this->PrimaryKey, $RowID)
 			->Put();
 	}
     
-    
-    public function UpdateField($Field, $Value, $Where) {
-      $Operator = FALSE;
-      if (strlen($Value) > 1) {
-         $Operator = substr($Value, 0, 1);
-         if (in_array($Operator, array('+', '-'))) $Value = substr($Value, 1);
-         else $Operator = FALSE;
-      }
-      if ($Operator !== FALSE) $Value = $Field . ' ' . $Operator . ' ' . $Value;
-      return $this->SQL
-         ->Update($this->Name)
-         ->Set($Field, $Value)
-         ->Where($Where)
-         ->Put();
-    }
-    
-    
-	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
-		if (defined('DEBUG') && DEBUG)
-           trigger_error(__METHOD__.' is deprecated. Use UpdateField() instead.', E_USER_DEPRECATED);
+
+   /**
+   * @todo add doc here
+   */
+	public function SetProperty($RowID, $Field, $Value) {
+        // TODO: operator to set/reset bit fields
+        $Operator = FALSE;
+        $EscapeString = TRUE;
+        if (strlen($Value) > 1) {
+           $Operator = substr($Value, 0, 1);
+           if (in_array($Operator, array('+', '-'))) $Value = substr($Value, 1);
+           else $Operator = FALSE;
+        }
         
-		if (!isset($this->Schema)) $this->DefineSchema();
-		$PrimaryKey = $this->PrimaryKey;
-        
-		if ($ForceValue !== FALSE) {
-            $Value = $ForceValue;
-		} else {
-            $Row = $this->GetID($RowID);
-            $Value = ($Row->$Property == '1' ? '0' : '1');
-		}
-		$this->SQL
-            ->Update($this->Name)
-            ->Set($Property, $Value)
-            ->Where($PrimaryKey, $RowID)
-            ->Put();
-		return $Value;
+        if ($Operator !== FALSE) {
+           $EscapeString = FALSE;
+           $Value = "$Field $Operator $Value";
+        }
+
+        // S: 5 Feb 2011. PrimaryKey must be defined
+        return $this->SQL
+           ->Update($this->Name)
+           ->Set($Field, $Value, $EscapeString)
+           ->Where($this->PrimaryKey, $RowID)
+           ->Put();
    }
 }
 

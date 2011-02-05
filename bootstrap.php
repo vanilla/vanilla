@@ -183,8 +183,6 @@ Gdn::PluginManager()->RegisterPlugins();
 Gdn::FactoryOverwrite($FactoryOverwriteBak);
 unset($FactoryOverwriteBak);
 
-Gdn::Authenticator()->StartAuthenticator();
-
 /// Include a user-defined bootstrap.
 if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))
 	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php');

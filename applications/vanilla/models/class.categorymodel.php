@@ -453,6 +453,8 @@ class CategoryModel extends Gdn_Model {
          $ParentCategoryID = GetValue('parent_id', $Node);
          if ($ParentCategoryID == 'root')
             $ParentCategoryID = -1;
+         else if ($ParentCategoryID == 'none')
+         	$ParentCategoryID = null;
 
          $PermissionCategoryID = GetValueR("$CategoryID.PermissionCategoryID", $PermTree, 0);
          $PermCatChanged = FALSE;

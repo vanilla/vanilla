@@ -66,11 +66,11 @@ class Gdn_Autoloader {
    
       switch ($ExtensionType) {
          case self::CONTEXT_APPLICATION:
-            $EnabledApplications = NULL;
+         
             if (Gdn::ApplicationManager() instanceof Gdn_ApplicationManager) {
                $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
                
-               echo "Adding applications...\n";
+               echo "\nAdding applications folders...\n";
                
                foreach ($EnabledApplications as $EnabledApplication) {
                   $ApplicationPath = CombinePaths(array(PATH_APPLICATIONS."/{$EnabledApplication}"));
@@ -96,27 +96,40 @@ class Gdn_Autoloader {
                   ));
                }
             }
+            
          break;
          
          case self::CONTEXT_PLUGIN:
-/*
+
             if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
-               // Look for plugin files.
-               if ($LibraryPath === FALSE) {
-                  foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $Trash) {
-                     // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
-                     $PluginFolders = (Gdn::PluginManager()->Started()) ? Gdn::PluginManager()->EnabledPluginFolders($SearchPath) : TRUE;
-                     
-                     $LibraryPath = Gdn_FileSystem::FindByMapping('library', $SearchPath, $PluginFolders, $LibraryFileName);
+            
+               echo "\nAdding plugin folders...\n";
+
+               foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
+               
+                  if ($SearchPathName === TRUE || $SearchPathName == 1)
+                     $SearchPathName = md5($SearchPath);
+               
+                  // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
+                  if (Gdn::PluginManager()->Started()) {
+                     $Folders = Gdn::PluginManager()->EnabledPluginFolders($SearchPath);
+                     foreach ($Folders as $PluginFolder) {
+                        $FullPluginPath = CombinePaths(array($SearchPath, $PluginFolder));
+                        self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $FullPluginPath, array(
+                           'SearchSubfolders'      => TRUE,
+                           'Extension'             => $SearchPathName
+                        ));
+                     }
+                  } else {
+                     self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $SearchPath, array(
+                        'SearchSubfolders'      => TRUE,
+                        'Extension'             => $SearchPathName
+                     ));
                   }
                }
-         
-               // Look harder for plugin files.
-               if ($LibraryPath === FALSE) {
-                  $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
-               }
+               
             }
-*/
+
          break;
          
          case self::CONTEXT_THEME:
@@ -313,6 +326,7 @@ class Gdn_Autoloader_Cache {
       
       $this->CacheInfo = array(
          'ondisk'    => $OnDiskCacheFile,
+         'name'      => $CacheName,
          'dirty'     => FALSE
       );
    }
@@ -330,7 +344,8 @@ class Gdn_Autoloader_Cache {
    }
    
    public function Lookup($ClassName, $CacheOnly = TRUE) {
-      echo "    ".__METHOD__."({$ClassName}, ".(($CacheOnly) ? 'cache': 'cache+fs').")\n";
+      $CacheName = GetValue('name', $this->CacheInfo);
+      echo "    ".__METHOD__." [{$CacheName}] ({$ClassName}, ".(($CacheOnly) ? 'cache': 'cache+fs').")\n";
       
       // Lazyload cache data
       if (is_null($this->Cache)) {
@@ -352,9 +367,10 @@ class Gdn_Autoloader_Cache {
       }
    
       $ClassName = strtolower($ClassName);
-      if (array_key_exists($ClassName, $this->Cache))
+      if (array_key_exists($ClassName, $this->Cache)) {
+         echo "      cache hit\n";
          return GetValue($ClassName, $this->Cache);
-      
+      }
       // Look at the filesystem, too
       if (!$CacheOnly) {
          if (substr($ClassName, 0, 4) == 'gdn_')
@@ -381,6 +397,8 @@ class Gdn_Autoloader_Cache {
             if ($File !== FALSE) {
                $this->Cache[$ClassName] = $File;
                $this->CacheInfo['dirty'] = TRUE;
+               
+               echo "      found {$ClassName} @ {$File}. added back to cache {$CacheName}\n";
                return $File;
             }
          }
@@ -418,10 +436,16 @@ class Gdn_Autoloader_Cache {
    }
    
    public function Shutdown() {
+      
       if (!GetValue('dirty', $this->CacheInfo)) return FALSE;
       
       if (!sizeof($this->Cache))
          return FALSE;
+         
+      echo __METHOD__."\n";
+      $CacheName = GetValue('name', $this->CacheInfo);
+      $OnDisk = GetValue('ondisk', $this->CacheInfo);
+      echo "  saving cache [{$CacheName}] @ {$OnDisk}\n";
       
       $FileName = GetValue('ondisk', $this->CacheInfo);
       

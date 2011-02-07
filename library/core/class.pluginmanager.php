@@ -75,19 +75,19 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->PluginSearchPaths = array();
       
       // Add default search path(s) to list
-      $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 1;
-      $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 1;
+      $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 'local';
+      $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 'core';
       
       // Check for, and load, alternate search paths from config
       $AlternatePaths = C('Garden.PluginManager.Search', NULL);
       if (is_null($AlternatePaths)) return;
       
       if (!is_array($AlternatePaths))
-         $AlternatePaths = array($AlternatePaths);
+         $AlternatePaths = array($AlternatePaths   => 'alternate');
       
-      foreach ($AlternatePaths as $AltPath)
+      foreach ($AlternatePaths as $AltPath => $AltName)
          if (is_dir($AltPath))
-            $this->PluginSearchPaths[rtrim($AltPath, '/')] = 1;
+            $this->PluginSearchPaths[rtrim($AltPath, '/')] = $AltName;
    }
    
    /**
@@ -221,7 +221,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $ClassName = GetValue('ClassName', $PluginInfo, FALSE);
          $ClassFile = GetValue('RealFile', $PluginInfo, FALSE);
          
-         if ($ClassName !== FALSE && !class_exists($ClassName))
+         if ($ClassName !== FALSE && !class_exists($ClassName, FALSE))
             if (file_exists($ClassFile))
                include_once($ClassFile);
          

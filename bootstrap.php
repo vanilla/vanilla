@@ -160,5 +160,3 @@ if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))
 	
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.DS.'functions.render.php');
-
-die('FORCE STOP');

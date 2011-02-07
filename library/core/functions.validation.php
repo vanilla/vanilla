@@ -120,7 +120,7 @@ if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       return ValidateRegex(
          $Value,
-         '/^([\d\w_]{3,20})?$/si'
+         '/^([\d\w\.]{3,20})?$/si'
       );
    }
 }
@@ -129,7 +129,7 @@ if (!function_exists('ValidateUrlString')) {
    function ValidateUrlString($Value, $Field = '') {
       return ValidateRegex(
          $Value,
-         '/^([\d\w_\-]+)?$/si'
+         '/^([\d\w\.\-]+)?$/si'
       );
    }
 }

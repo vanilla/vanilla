@@ -180,7 +180,7 @@ class Gdn_Autoloader {
       return self::MAP_LIBRARY;
    }
    
-   public static function Lookup($ClassName) {
+   public static function Lookup($ClassName, $Quiet = FALSE) {
       if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$ClassName})\n";
       
       $MapType = self::GetMapType($ClassName);
@@ -188,8 +188,11 @@ class Gdn_Autoloader {
       
       $File = self::DoLookup($ClassName, $MapType);
       
-      if ($File !== FALSE)
-         include_once($File);
+      if (!$Quiet) {
+         if ($File !== FALSE)
+            include_once($File);
+      }         
+      return $File;
    }
    
    public static function RegisterMap($MapType, $ContextType, $SearchPath, $Options = array()) {

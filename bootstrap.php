@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-/// Include a user-defined bootstrap.
+// Include a user-defined bootstrap.
 if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
 	require_once(PATH_ROOT.'/conf/bootstrap.before.php');
 
 if (!defined('PATH_LOCAL_ROOT')) define('PATH_LOCAL_ROOT', PATH_ROOT);
 
-/// Define core constants.
+// Define core constants.
 if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.'/conf');
 if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
 
@@ -13,26 +13,26 @@ if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
 if (!defined('VANILLA_CONSTANTS'))
    include(PATH_CONF.'/constants.php');
    
-if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
-if(!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
+if (!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
+if (!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
 
-if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.'/cache');
-if(!defined('PATH_LOCAL_CACHE')) define('PATH_LOCAL_CACHE', PATH_CACHE);
+if (!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.'/cache');
+if (!defined('PATH_LOCAL_CACHE')) define('PATH_LOCAL_CACHE', PATH_CACHE);
 
-if(!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.'/plugins');
-if(!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
+if (!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.'/plugins');
+if (!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
 
-if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.'/themes');
-if(!defined('PATH_LOCAL_THEMES')) define('PATH_LOCAL_THEMES', PATH_THEMES);
+if (!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.'/themes');
+if (!defined('PATH_LOCAL_THEMES')) define('PATH_LOCAL_THEMES', PATH_THEMES);
 
-if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.'/library');
-if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.'/core');
+if (!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.'/library');
+if (!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.'/core');
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')
    date_default_timezone_set('America/Montreal');
 
-/// Include the core function definitions
+// Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
@@ -45,16 +45,16 @@ Gdn_Autoloader::Start();
 Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', NULL, Gdn::FactoryRealSingleton, 'Initialize');
 
 /// Install the configuration.
-Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', NULL, Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
-/// Configuration Defaults.
+// Configuration Defaults.
 $Gdn_Config->Load(PATH_CONF.'/config-defaults.php', 'Use');
 
 // Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.'/config.php', 'Use');
 
-// ApplicationManager.
+// ApplicationManager
 Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
 
@@ -77,13 +77,13 @@ if (PATH_LOCAL_CONF != PATH_CONF) {
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', NULL, Gdn::FactoryRealSingleton, 'Create');
 Gdn::Request()->FromEnvironment();
 
-/// Load the configurations for the installed items.
+// Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	$Gdn_Config->Load(PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'configuration.php', 'Use');
 }
 
-/// Load the custom configurations again so that application setting defaults are overridden.
+// Load the custom configurations again so that application setting defaults are overridden.
 $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
@@ -93,7 +93,7 @@ if (!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup
    exit();
 }
 
-/// Install some of the services.
+// Install some of the services.
 // Default database.
 Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', NULL, Gdn::FactorySingleton, array('Database'));
 // Database drivers.
@@ -134,12 +134,12 @@ if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	// Include the application's bootstrap.
-	$Gdn_Path = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'bootstrap.php';
+	$Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
 	if (file_exists($Gdn_Path))
 		include_once($Gdn_Path);
 		
 	// Include the application's hooks.
-	$Hooks_Path = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'class.hooks.php';
+	$Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
    if (file_exists($Hooks_Path))
 		include_once($Hooks_Path);
 }

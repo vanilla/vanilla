@@ -186,7 +186,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $this->FireEvent('BeforeDispatch');
-      $this->_AnalyzeRequest($Request);
+      $this->AnalyzeRequest($Request);
       
       // Send user to login page if this is a private community (with some minor exceptions)
       if (
@@ -198,11 +198,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
          exit();
       }
-      
-      print_r($this);
-      die();
 
       $ControllerName = $this->ControllerName();
+      
+      // If we couldnt look up the application folder from the URL, use the cache path
+      if ($this->_ApplicationFolder == '') {
+         $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, TRUE);
+         $InterimPath = explode('/controllers/', $ControllerPath);
+         array_pop($InterimPath); // Get rid of the end. Useless;
+         $InterimPath = explode('/', trim(array_pop($InterimPath)));
+         $this->_ApplicationFolder = array_pop($InterimPath);
+      }
+      
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
@@ -361,7 +368,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @param int $FolderDepth
     * @todo $folderDepth needs a description.
     */
-   protected function _AnalyzeRequest(&$Request, $FolderDepth = 1) {
+   protected function AnalyzeRequest(&$Request, $FolderDepth = 1) {
       // Here is the basic format of a request:
       // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
 
@@ -371,7 +378,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       // /application/controller/argn
       // /controller/argn
       // /controller
-
 
       // Clear the slate
       $this->_ApplicationFolder = '';
@@ -416,8 +422,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
          }
       }
-
-
+      
       switch ($Request->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
@@ -431,15 +436,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             break;
       }
 
-      if ($this->Request == '')
-      {
+      if ($this->Request == '') {
          $DefaultController = Gdn::Router()->GetRoute('DefaultController');
          $this->Request = $DefaultController['Destination'];
       }
-   
+      
       $Parts = explode('/', $this->Request);
       $Length = count($Parts);
-      if ($Length == 1 || $FolderDepth <= 0) {
+      
+      if ($Length == 1) {
          $FolderDepth = 0;
          list($this->_ControllerName, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[0]);
          $Parts[0] = $this->_ControllerName;
@@ -449,6 +454,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Force a depth of 1 because only one of the two url parts can be a folder.
          $FolderDepth = 1;
       }
+      
       if ($FolderDepth == 2) {
          $this->_ApplicationFolder = $Parts[0];
          $this->_ControllerFolder = $Parts[1];
@@ -480,6 +486,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          }
       }
+      
       if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
          $this->_DeliveryType = DELIVERY_TYPE_DATA;
    }
@@ -497,37 +504,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    private function _FetchController($ThrowErrorOnFailure = FALSE) {
       $ControllerWhiteList = $this->EnabledApplicationFolders();
-      // Don't include it if it's already been included
-      if (!class_exists($this->ControllerName())) {
-         $PathParts = array('controllers');
-         if ($this->_ControllerFolder != '')
-            $PathParts[] = $this->_ControllerFolder;
-
-         $PathParts[] = 'class.'.strtolower($this->_ControllerName).'controller.php';
-         $ControllerFileName = CombinePaths($PathParts);
-
-         // Limit the white list to the specified application folder if it was in the request
-         if ($this->_ApplicationFolder != '' && InArrayI($this->_ApplicationFolder, $ControllerWhiteList))
-            $ControllerWhiteList = array($this->_ApplicationFolder);
-
-         $ControllerPath = Gdn_FileSystem::FindByMapping('controller', PATH_APPLICATIONS, $ControllerWhiteList, $ControllerFileName);
-         if ($ControllerPath !== FALSE) {
-            // Strip the "Application Folder" from the controller path (this is
-            // used by the controller for various purposes. ie. knowing which
-            // application to search in for a view file).
-            $this->_ApplicationFolder = explode(DS, str_replace(PATH_APPLICATIONS . DS, '', $ControllerPath));
-            $this->_ApplicationFolder = $this->_ApplicationFolder[0];
-            $AppControllerName = ucfirst(strtolower($this->_ApplicationFolder)).'Controller';
-
-            // Load the application's master controller
-            if (!class_exists($AppControllerName))
-               require_once(CombinePaths(array(PATH_APPLICATIONS, $this->_ApplicationFolder, 'controllers', 'class.'.strtolower($this->_ApplicationFolder).'controller.php')));
-
-            // Now load the library (no need to check for existence - couldn't
-            // have made it here if it didn't exist).
-            require_once($ControllerPath);
-         }
-      }
+      
       if (!class_exists($this->ControllerName())) {
          if ($ThrowErrorOnFailure === TRUE) {
             if (ForceBool(Gdn::Config('Garden.Debug'))) {

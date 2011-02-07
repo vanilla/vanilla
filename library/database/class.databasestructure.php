@@ -19,7 +19,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Database
  */
-require_once(dirname(__FILE__).DS.'class.database.php');
 
 abstract class Gdn_DatabaseStructure {
 

@@ -55,6 +55,15 @@ class Gdn {
    
    /// METHODS ///
    
+   /**
+    * Get the application manager
+    *
+    * @return Gdn_ApplicationManager
+    */
+   public static function ApplicationManager() {
+      return self::Factory(self::AliasApplicationManager);
+   }
+   
    /** @return Gdn_Auth */
    public static function Authenticator() {
       $Result = self::Factory(self::AliasAuthenticator);
@@ -111,6 +120,11 @@ class Gdn {
     * @see Gdn_Factory::Factory()
     */
    public static function Factory($Alias = FALSE) {
+      if (is_null(self::$_Factory)) {
+         Gdn::SetFactory(new Gdn_Factory(), TRUE);
+         Gdn::FactoryOverwrite(FALSE);
+      }
+
       if ($Alias === FALSE)
          return self::$_Factory;
       
@@ -147,7 +161,7 @@ class Gdn {
       if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
          return;
       
-      self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
+      self::Factory()->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
       
       // Cache some of the more commonly used factory objects as properties.
       switch($Alias) {
@@ -178,7 +192,7 @@ class Gdn {
     * @see Gdn_Factory::InstalDependency()
     */
    public static function FactoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
-      self::$_Factory->InstallDependency($Alias, $PropertyName, $SourceAlias);
+      self::Factory()->InstallDependency($Alias, $PropertyName, $SourceAlias);
    }
    
    /**
@@ -262,7 +276,7 @@ class Gdn {
     * @see Gdn_Factory::Uninstall()
     */
    public static function FactoryUninstall($Alias) {
-      self::$_Factory->Uninstall($Alias);
+      self::Factory()->Uninstall($Alias);
    }
    
    /**
@@ -271,7 +285,7 @@ class Gdn {
     * @see Gdn_Factory::UninstallDependency()
     */
    public static function FactoryUninstallDependency($Alias, $PropertyName = NULL) {
-      self::$_Factory->UninstallDependency($Alias, $PropertyName);
+      self::Factory()->UninstallDependency($Alias, $PropertyName);
    }
    
    /**

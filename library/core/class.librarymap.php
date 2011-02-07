@@ -44,10 +44,12 @@ class Gdn_LibraryMap {
     * @param string $CacheMode optional mode of the cache... defaults to flat
     * @return void
     */
-   public static function PrepareCache($CacheName, $ExistingCacheArray=NULL, $CacheMode = 'flat') {
+   public static function PrepareCache($CacheName, $ExistingCacheArray = NULL, $CacheMode = 'flat') {
       // Onetime initialization of in-memory file cache
       if (!is_array(self::$_Caches)) 
          self::$_Caches = array();
+      
+      if ($CacheName != 'locale') return;
       
       if (!array_key_exists($CacheName,self::$_Caches)) {
          $OnDiskCacheName = sprintf(self::DISK_CACHE_NAME_FORMAT,strtolower($CacheName));
@@ -97,6 +99,8 @@ class Gdn_LibraryMap {
     * @return void
     */
    public static function ClearCache($CacheName) {
+      if ($CacheName != 'locale') return;
+      
       if (!array_key_exists($CacheName,self::$_Caches))
          return self::PrepareCache($CacheName);
          
@@ -130,6 +134,8 @@ class Gdn_LibraryMap {
     * @return mixed cache contents
     */
    public static function Cache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
+      if ($CacheName != 'locale') return;
+      
       if (!array_key_exists($CacheName,self::$_Caches)) 
          return FALSE;
       
@@ -147,6 +153,8 @@ class Gdn_LibraryMap {
    }
    
    public static function SafeCache($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
+      if ($CacheName != 'locale') return;
+      
       self::PrepareCache($CacheName);
       return self::Cache($CacheName, str_replace('.','__',$CacheKey), $CacheContents, $CacheWrite);
    }
@@ -162,6 +170,8 @@ class Gdn_LibraryMap {
     * @return array cache contents
     */
    public static function CacheArray($CacheName, $CacheKey, $CacheContents, $CacheWrite=TRUE) {
+      if ($CacheName != 'locale') return;
+      
       $ExistingCacheData = self::GetCache($CacheName, $CacheKey);
       
       if ($ExistingCacheData === NULL) 
@@ -184,6 +194,8 @@ class Gdn_LibraryMap {
     * @return mixed cache entry or null on failure
     */
    public static function GetCache($CacheName, $CacheKey) {
+      if ($CacheName != 'locale') return;
+      
       if (!array_key_exists($CacheName,self::$_Caches)) 
          self::PrepareCache($CacheName);
          
@@ -206,6 +218,8 @@ class Gdn_LibraryMap {
     * @return void
     */
    public static function SaveCache($CacheName) {
+      if ($CacheName != 'locale') return;
+      
       if (!array_key_exists($CacheName,self::$_Caches)) 
          return FALSE;
       

@@ -9,7 +9,7 @@ if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
 
 // Include default constants if none were defined elsewhere
 if (!defined('VANILLA_CONSTANTS'))
-   include(PATH_CONF . DS . 'constants.php');
+   include(PATH_CONF.DS.'constants.php');
    
 if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'applications');
 if(!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
@@ -30,56 +30,20 @@ if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.DS.'c
 if (ini_get('date.timezone') == '')
    date_default_timezone_set('America/Montreal');
 
-/// Include the error handler.
-require_once(PATH_LIBRARY_CORE . DS . 'functions.error.php');
+/// Include the core function definitions
+require_once(PATH_LIBRARY_CORE.'/functions.error.php');
+require_once(PATH_LIBRARY_CORE.'/functions.general.php');
+require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
-/// Include all the utility libraries.
-
-require_once(PATH_LIBRARY_CORE . DS . 'functions.general.php');
-require_once(PATH_LIBRARY_CORE . DS . 'functions.validation.php');
-
-require_once(PATH_LIBRARY_CORE . DS . 'interface.ihandshake.php');
-require_once(PATH_LIBRARY_CORE . DS . 'interface.iplugin.php');
-require_once(PATH_LIBRARY_CORE . DS . 'interface.isingleton.php');
-require_once(PATH_LIBRARY_CORE . DS . 'interface.imodule.php');
-
-require_once(PATH_LIBRARY_CORE . DS . 'class.sliceprovider.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.pluggable.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.plugin.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.authenticator.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.controller.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.router.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.dispatcher.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.filesystem.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.librarymap.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.format.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.model.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.module.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.modulecollection.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.schema.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.session.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.url.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.validation.php');
-
-require_once(PATH_LIBRARY_CORE . DS . 'class.cache.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.dirtycache.php');
-require_once(PATH_LIBRARY_CORE . DS . 'class.filecache.php');
-
-require_once(PATH_LIBRARY_CORE . DS . 'class.statistics.php');
-
-/// Include the core Gdn object.
-require_once(PATH_LIBRARY_CORE . DS . 'class.gdn.php');
-
-/// Install the factory.
-require_once(PATH_LIBRARY_CORE . DS . 'class.factory.php');
-Gdn::SetFactory(new Gdn_Factory(), FALSE);
-$FactoryOverwriteBak = Gdn::FactoryOverwrite(FALSE);
+// Include and initialize the autoloader
+require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
+Gdn_Autoloader::Start();
 
 // Cache Layer
-Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', CombinePaths(array(PATH_LIBRARY_CORE,'class.cache.php')), Gdn::FactoryRealSingleton, 'Initialize');
+Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', NULL, Gdn::FactoryRealSingleton, 'Initialize');
 
 /// Install the configuration.
-Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', PATH_LIBRARY_CORE.DS.'class.configuration.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', NULL, Gdn::FactorySingleton);
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
 /// Configuration Defaults.
@@ -88,10 +52,17 @@ $Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
 // Load installation-specific static configuration so that we know what apps are enabled.
 $Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
 
-// ThemeManager
-Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'class.thememanager.php', Gdn::FactorySingleton);
+// ApplicationManager.
+Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
+
 // PluginManager
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', PATH_LIBRARY_CORE.DS.'class.pluginmanager.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+
+// ThemeManager
+Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 $Gdn_Config->Caching(TRUE);
 
@@ -101,7 +72,7 @@ if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
 }
 
 // Default request object
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', PATH_LIBRARY_CORE.DS.'class.request.php', Gdn::FactoryRealSingleton, 'Create');
+Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', NULL, Gdn::FactoryRealSingleton, 'Create');
 Gdn::Request()->FromEnvironment();
 
 /// Load the configurations for the installed items.
@@ -122,33 +93,31 @@ if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup'
 
 /// Install some of the services.
 // Default database.
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array('Database'));
+Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', NULL, Gdn::FactorySingleton, array('Database'));
 // Database drivers.
-Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', PATH_LIBRARY.DS.'database'.DS.'class.mysql.driver.php', Gdn::FactoryInstance);
-Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', PATH_LIBRARY.DS.'database'.DS.'class.mysql.structure.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', NULL, Gdn::FactoryInstance);
+Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', NULL, Gdn::FactoryInstance);
 // Form class
-Gdn::FactoryInstall('Form', 'Gdn_Form', PATH_LIBRARY_CORE.DS.'class.form.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('Form', 'Gdn_Form', NULL, Gdn::FactoryInstance);
 
 // Identity, Authenticator & Session.
-Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity', PATH_LIBRARY_CORE.DS.'class.cookieidentity.php');
-Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session', PATH_LIBRARY_CORE.DS.'class.session.php');
-Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth', PATH_LIBRARY_CORE.DS.'class.auth.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity');
+Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session');
+Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 
 // Dispatcher.
-Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router', PATH_LIBRARY_CORE.DS.'class.router.php', Gdn::FactorySingleton);
-Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', PATH_LIBRARY_CORE.DS.'class.dispatcher.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router');
+Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
 // Smarty Templating Engine
-Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.DS.'vendors'.DS.'Smarty-2.6.25'.DS.'libs'.DS.'Smarty.class.php', Gdn::FactorySingleton);
-Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty', PATH_LIBRARY_CORE.DS.'class.smarty.php', Gdn::FactorySingleton);
-// Application manager.
-Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', PATH_LIBRARY_CORE.DS.'class.applicationmanager.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall('Smarty', 'Smarty');
+Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 // Slice handler
-Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
 // Remote Statistics
-Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY_CORE.DS.'class.statistics.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactoryInstance);
 
 // Other objects.
-Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);
+Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	require_once(PATH_LIBRARY_CORE.DS.'class.locale.php');
 	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
@@ -156,7 +125,7 @@ if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
 	setlocale(LC_ALL, $SetLocale);
 	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
-	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', PATH_LIBRARY_CORE.DS.'class.locale.php', Gdn::FactorySingleton, $Gdn_Locale);
+	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
 }
 
@@ -190,4 +159,6 @@ if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))
 	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php');
 	
 // Include "Render" functions now - this way pluggables and custom confs can override them.
-require_once(PATH_LIBRARY_CORE . DS . 'functions.render.php');
+require_once(PATH_LIBRARY_CORE.DS.'functions.render.php');
+
+die('FORCE STOP');

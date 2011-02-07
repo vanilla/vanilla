@@ -48,17 +48,18 @@ class Gdn_Factory {
       $ClassName = $Def['ClassName'];
       
       // Make sure the class has beeen included.
-      if(!class_exists($ClassName, FALSE)) {
+      if (!class_exists($ClassName)) {
          $Path = $Def['Path'];
-         if(substr($Path, 0, 1) == '~') {
+         if (substr($Path, 0, 1) == '~') {
             // Replace the beginning of the path with the root of the application.
             $Path = PATH_ROOT . substr($Path, 1);
             $Def['Path'] = $Path;
          }
+         
          require_once($Path);
       }
       
-      if(!class_exists($ClassName, FALSE)) {
+      if (!class_exists($ClassName, FALSE)) {
          throw new Exception(sprintf('Class %s not found while trying to get an object for %s. Check the path %s.', $ClassName, $Alias, $Def['Path']));
       }
       
@@ -134,7 +135,7 @@ class Gdn_Factory {
     *   You can also pass an array to $Data and it will be used as the arguments for the lazy construction.</li>
     * </ul>
     */
-   public function Install($Alias, $ClassName, $Path, $FactoryType = Gdn::FactorySingleton, $Data = NULL) {
+   public function Install($Alias, $ClassName, $Path = '', $FactoryType = Gdn::FactorySingleton, $Data = NULL) {
       $FactoryType = ucfirst($FactoryType);
       if(!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton))) {
          throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));

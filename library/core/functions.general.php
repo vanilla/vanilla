@@ -77,6 +77,7 @@ function Gdn_Autoload($ClassName) {
       include_once($LibraryPath);
 }
 
+/*
 if (!function_exists('__autoload')) {
    function __autoload($ClassName) {
       trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
@@ -85,6 +86,7 @@ if (!function_exists('__autoload')) {
 }
 
 spl_autoload_register('Gdn_Autoload', FALSE);
+*/
 
 
 if (!function_exists('AddActivity')) {

@@ -19,8 +19,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Database
  */
 
-require_once(dirname(__FILE__).DS.'class.dataset.php');
-
 class Gdn_Database {
    /// CONSTRUCTOR ///
 

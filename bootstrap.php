@@ -1,30 +1,32 @@
 <?php if (!defined('APPLICATION')) exit();
 /// Include a user-defined bootstrap.
-if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php'))
-	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.before.php');
-	
+if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
+	require_once(PATH_ROOT.'/conf/bootstrap.before.php');
+
+if (!defined('PATH_LOCAL_ROOT')) define('PATH_LOCAL_ROOT', PATH_ROOT);
+
 /// Define core constants.
-if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.DS.'conf');
+if(!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.'/conf');
 if(!defined('PATH_LOCAL_CONF')) define('PATH_LOCAL_CONF', PATH_CONF);
 
 // Include default constants if none were defined elsewhere
 if (!defined('VANILLA_CONSTANTS'))
-   include(PATH_CONF.DS.'constants.php');
+   include(PATH_CONF.'/constants.php');
    
-if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.DS.'applications');
+if(!defined('PATH_APPLICATIONS')) define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
 if(!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_APPLICATIONS);
 
-if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.DS.'cache');
+if(!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.'/cache');
 if(!defined('PATH_LOCAL_CACHE')) define('PATH_LOCAL_CACHE', PATH_CACHE);
 
-if(!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.DS.'plugins');
+if(!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.'/plugins');
 if(!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
 
-if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.DS.'themes');
+if(!defined('PATH_THEMES')) define('PATH_THEMES', PATH_ROOT.'/themes');
 if(!defined('PATH_LOCAL_THEMES')) define('PATH_LOCAL_THEMES', PATH_THEMES);
 
-if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.DS.'library');
-if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.DS.'core');
+if(!defined('PATH_LIBRARY')) define('PATH_LIBRARY', PATH_ROOT.'/library');
+if(!defined('PATH_LIBRARY_CORE')) define('PATH_LIBRARY_CORE', PATH_LIBRARY.'/core');
 
 // Make sure a default time zone is set
 if (ini_get('date.timezone') == '')
@@ -47,10 +49,10 @@ Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration', NULL, Gdn::FactorySin
 $Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
 /// Configuration Defaults.
-$Gdn_Config->Load(PATH_CONF.DS.'config-defaults.php', 'Use');
+$Gdn_Config->Load(PATH_CONF.'/config-defaults.php', 'Use');
 
 // Load installation-specific static configuration so that we know what apps are enabled.
-$Gdn_Config->Load(PATH_CONF.DS.'config.php', 'Use');
+$Gdn_Config->Load(PATH_CONF.'/config.php', 'Use');
 
 // ApplicationManager.
 Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
@@ -66,9 +68,9 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 $Gdn_Config->Caching(TRUE);
 
-if (PATH_LOCAL_CONF.DS.'config.php' != PATH_CONF.DS.'config.php') {
+if (PATH_LOCAL_CONF != PATH_CONF) {
    // Load the custom configurations 
-   $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
+   $Gdn_Config->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
 }
 
 // Default request object
@@ -86,7 +88,7 @@ $Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
 unset($Gdn_Config);
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
-if(!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
+if (!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
    header('location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
@@ -133,7 +135,7 @@ if(!Gdn::FactoryExists(Gdn::AliasLocale)) {
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	// Include the application's bootstrap.
 	$Gdn_Path = PATH_APPLICATIONS . DS . $ApplicationFolder . DS . 'settings' . DS . 'bootstrap.php';
-	if(file_exists($Gdn_Path))
+	if (file_exists($Gdn_Path))
 		include_once($Gdn_Path);
 		
 	// Include the application's hooks.
@@ -154,9 +156,9 @@ unset($FactoryOverwriteBak);
 
 Gdn::Authenticator()->StartAuthenticator();
 
-/// Include a user-defined bootstrap.
-if(file_exists(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php'))
-	require_once(PATH_ROOT.DS.'conf'.DS.'bootstrap.after.php');
+// Include a user-defined bootstrap.
+if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
+	require_once(PATH_ROOT.'/conf/bootstrap.after.php');
 	
 // Include "Render" functions now - this way pluggables and custom confs can override them.
-require_once(PATH_LIBRARY_CORE.DS.'functions.render.php');
+require_once(PATH_LIBRARY_CORE.'/functions.render.php');

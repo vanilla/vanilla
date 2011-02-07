@@ -66,8 +66,7 @@ class Gdn {
    
    /** @return Gdn_Auth */
    public static function Authenticator() {
-      $Result = self::Factory(self::AliasAuthenticator);
-      return $Result;
+      return self::Factory(self::AliasAuthenticator);
    }
    
    /**
@@ -100,8 +99,7 @@ class Gdn {
     * @return Gdn_Dispatcher
     */
    public static function Dispatcher() {
-      $Result = self::Factory(self::AliasDispatcher);
-      return $Result;
+      return self::Factory(self::AliasDispatcher);
    }
    
    /**
@@ -109,8 +107,7 @@ class Gdn {
     * @return Gdn_Database
     */
    public static function Database() {
-      $Result = self::Factory(self::AliasDatabase);
-      return $Result;
+      return self::Factory(self::AliasDatabase);
    }
    
    /**
@@ -121,8 +118,8 @@ class Gdn {
     */
    public static function Factory($Alias = FALSE) {
       if (is_null(self::$_Factory)) {
-         Gdn::SetFactory(new Gdn_Factory(), TRUE);
-         Gdn::FactoryOverwrite(FALSE);
+         self::SetFactory(new Gdn_Factory());
+         self::FactoryOverwrite(FALSE);
       }
 
       if ($Alias === FALSE)
@@ -143,8 +140,7 @@ class Gdn {
     * @see Gdn_Factory::Exists()
     */
    public static function FactoryExists($Alias) {
-      $Result = self::$_Factory->Exists($Alias);
-      return $Result;
+      return self::Factory()->Exists($Alias);
    }
    
    /**
@@ -156,7 +152,7 @@ class Gdn {
     * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
     * @see Gdn_Factory::Install()
     */
-   public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL) {
+   public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactorySingleton, $Data = NULL) {
       // Don't overwrite an existing definition.
       if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
          return;

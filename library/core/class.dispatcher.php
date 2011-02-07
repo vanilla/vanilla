@@ -198,16 +198,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
          exit();
       }
-         
-      /*
-      echo "<br />Gdn::Request thinks: ".Gdn::Request()->Path();
-      echo "<br />Gdn::Request also suggests: output=".Gdn::Request()->OutputFormat().", filename=".Gdn::Request()->Filename();
-      echo '<br />Request: '.$this->Request;      
-      echo '<br />App folder: '.$this->_ApplicationFolder;
-      echo '<br />Controller folder: '.$this->_ControllerFolder;
-      echo '<br />ControllerName: '.$this->_ControllerName;
-      echo '<br />ControllerMethod: '.$this->_ControllerMethod;
-      */
+      
+      print_r($this);
+      die();
 
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {

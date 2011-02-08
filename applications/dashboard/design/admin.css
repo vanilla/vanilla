@@ -485,6 +485,12 @@ strong {
 .Alert a:hover {
    text-decoration: underline;
 }
+#Panel .Alert {
+   font-size: 10px;
+   padding: 1px 5px;
+   -moz-border-radius: 8px;
+   -webkit-border-radius: 8px;
+}
 div.EmptyInfo {
    margin: 10px 0;
 }

@@ -64,7 +64,7 @@ class Gdn_Theme {
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text && $Session->IsValid()) {
                $IsFullPath = strtolower(substr($Session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($Session->User->Photo, 0, 8)) == 'https://';
-               $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : 'uploads/'.ChangeBasename($Session->User->Photo, 'n%s');
+               $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : Gdn_Upload::Url(ChangeBasename($Session->User->Photo, 'n%s'));
                $Text = Img($PhotoUrl, array('alt' => urlencode($Session->User->Name)));
             }
 

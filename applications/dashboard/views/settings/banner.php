@@ -22,10 +22,10 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Banner Logo', 'Garden.Logo');
-         $Logo = C('Garden.Logo');
+         $Logo = $this->Data('Logo');
          if ($Logo) {
             echo Wrap(
-               Img($Logo),
+               Img(Gdn_Upload::Url($Logo)),
                'div'
             );
             echo Wrap(Anchor(T('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));

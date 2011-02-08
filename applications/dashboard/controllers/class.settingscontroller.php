@@ -117,6 +117,16 @@ class SettingsController extends DashboardController {
       
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
+
+      // Get the current logo.
+      $Logo = C('Garden.Logo');
+      if ($Logo) {
+         $Logo = ltrim($Logo, '/');
+         // Fix the logo path.
+         if (StringBeginsWith($Logo, 'uploads/'))
+            $Logo = substr($Logo, strlen('uploads/'));
+         $this->SetData('Logo', $Logo);
+      }
       
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -136,21 +146,25 @@ class SettingsController extends DashboardController {
                   $TargetImage = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads');
                   $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
                   
-                  // Delete any previously uploaded images
-                  @unlink(PATH_ROOT . DS . C('Garden.Logo', ''));
+                  // Delete any previously uploaded images.
+                  if ($Logo)
+                     $Upload->Delete($Logo);
                   
                   // Save the uploaded image
-                  $Upload->SaveAs(
+                  $Parts = $Upload->SaveAs(
                      $TmpImage,
-                     PATH_ROOT . DS . 'uploads' . DS . $ImageBaseName
+                     $ImageBaseName
                   );
+                  $ImageBaseName = $Parts['SaveName'];
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
             }
             // If there were no errors, save the path to the logo in the config
-            if ($this->Form->ErrorCount() == 0 && $Upload->GetUploadedFileName() != '')
-               SaveToConfig('Garden.Logo', 'uploads' . DS . $ImageBaseName);
+            if ($this->Form->ErrorCount() == 0 && $Upload->GetUploadedFileName() != '') {
+               SaveToConfig('Garden.Logo', $ImageBaseName);
+               $this->SetData('Logo', $ImageBaseName);
+            }
             
             $this->StatusMessage = T("Your settings have been saved.");
          }

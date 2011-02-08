@@ -314,32 +314,29 @@ class ProfileController extends Gdn_Controller {
             // Validate the upload
             $TmpImage = $UploadImage->ValidateUpload('Picture');
             
-            // Generate the target image name
+            // Generate the target image name.
             $TargetImage = $UploadImage->GenerateTargetName(PATH_ROOT . DS . 'uploads');
             $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
-            // Delete any previously uploaded images
-            @unlink( PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s'));
+            // Delete any previously uploaded images.
+            $UploadImage->Delete(ChangeBasename($this->User->Photo, 'p%s'));
             // Don't delete this one because it hangs around in activity streams:
             // @unlink(PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 't%s'));
-            @unlink(PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'n%s'));
-
-            // Make sure the avatars folder exists.
-            if (!file_exists(PATH_ROOT.'/uploads/userpics'))
-               mkdir(PATH_ROOT.'/uploads/userpics');
+            $UploadImage->Delete(ChangeBasename($this->User->Photo, 'n%s'));
             
-            // Save the uploaded image in profile size
-            $UploadImage->SaveImageAs(
+            // Save the uploaded image in profile size.
+            $Props = $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
+               'userpics/p'.$ImageBaseName,
                Gdn::Config('Garden.Profile.MaxHeight', 1000),
                Gdn::Config('Garden.Profile.MaxWidth', 250)
             );
+            $UserPhoto = sprintf($Props['SaveFormat'], 'userpics/'.$ImageBaseName);
             
             // Save the uploaded image in preview size
             $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
+               'userpics/t'.$ImageBaseName,
                Gdn::Config('Garden.Preview.MaxHeight', 100),
                Gdn::Config('Garden.Preview.MaxWidth', 75)
             );
@@ -348,18 +345,18 @@ class ProfileController extends Gdn_Controller {
             $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
             $UploadImage->SaveImageAs(
                $TmpImage,
-               PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName,
+               'userpics/n'.$ImageBaseName,
                $ThumbSize,
                $ThumbSize,
                TRUE
             );
             
-         } catch (Exception $ex) {
-            $this->Form->AddError($ex->getMessage());
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
          // If there were no errors, associate the image with the user
          if ($this->Form->ErrorCount() == 0) {
-            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => 'userpics/'.$ImageBaseName)))
+            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto)))
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
          }
          // If there were no problems, redirect back to the user account
@@ -481,18 +478,21 @@ class ProfileController extends Gdn_Controller {
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
-      if ($this->User->Photo == '')
+      if (!$this->User->Photo)
          $this->Form->AddError('You must first upload a picture before you can create a thumbnail.');
       
       // Define the thumbnail size
       $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
       
       // Define the source (profile sized) picture & dimensions.
-      if (preg_match('`https?://`i', $this->User->Photo)) {
+      $Basename = ChangeBasename($this->User->Photo, 'p%s');
+      $Upload = new Gdn_UploadImage();
+      $PhotoParsed = Gdn_Upload::Parse($Basename);
+      $Source = $Upload->CopyLocal($Basename);
+
+      if (!$Source) {
          $this->Form->AddError('You cannot edit the thumbnail of an externally linked profile picture.');
-         $this->SourceSize = 0;
       } else {
-         $Source = PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'p%s');
          $this->SourceSize = getimagesize($Source);
       }
       
@@ -506,37 +506,23 @@ class ProfileController extends Gdn_Controller {
       $this->Form->AddHidden('ThumbSize', $this->ThumbSize);      
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          try {
-            // Get the dimensions from the form
-            
-            // Get the source image 
-            $SourceImage = imagecreatefromjpeg($Source);
-            
-            // Create the new target image
-            $TargetImage = imagecreatetruecolor($this->ThumbSize, $this->ThumbSize);
-            
-            // Fill the target thumbnail
-            imagecopyresampled(
-               $TargetImage,
-               $SourceImage,
-               0,
-               0,
-               $this->Form->GetValue('x'),
-               $this->Form->GetValue('y'),
-               $this->ThumbSize,
-               $this->ThumbSize,
-               $this->Form->GetValue('w'),
-               $this->Form->GetValue('h')
-            );
-            
-            // Save the target thumbnail
-            imagejpeg($TargetImage, PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 'n%s'));
-         } catch (Exception $ex) {
-            $this->Form->AddError($ex->getMessage());
+            // Get the dimensions from the form.
+            Gdn_UploadImage::SaveImageAs(
+               $Source,
+               'userpics/'.ChangeBasename(basename($this->User->Photo), 'n%s'),
+               $this->ThumbSize, $this->ThumbSize,
+               array('Crop' => TRUE, 'SourceX' => $this->Form->GetValue('x'), 'SourceY' => $this->Form->GetValue('y'), 'SourceWidth' => $this->Form->GetValue('w'), 'SourceHeight' => $this->Form->GetValue('h')));
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
             Redirect('dashboard/profile/'.$this->ProfileUrl());
          }
+      }
+      // Delete the source image if it is externally hosted.
+      if ($PhotoParsed['Type']) {
+         @unlink($Source);
       }
       $this->Render();
    }

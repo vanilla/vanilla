@@ -45,7 +45,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * The object that constructed this object. Typically this should be a
     * Controller object.
     *
-    * @var object
+    * @var Gdn_Controller
     */
    protected $_Sender;
 

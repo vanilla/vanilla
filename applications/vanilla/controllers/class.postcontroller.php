@@ -330,18 +330,22 @@ class PostController extends VanillaController {
             $CommentID = $this->CommentModel->Save($FormValues);
 
             // The comment is now half-saved.
-            if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-               $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
-            } else {
-               $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+            if (is_numeric($CommentID) && $CommentID > 0) {
+               if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+                  $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
+               } else {
+                  $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+               }
+
+               // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+               $Comment = $this->CommentModel->GetID($CommentID);
+
+               $this->EventArguments['Discussion'] = $Discussion;
+               $this->EventArguments['Comment'] = $Comment;
+               $this->FireEvent('AfterCommentSave');
+            } elseif ($CommentID === SPAM) {
+               $this->StatusMessage = T('Your post has been flagged for moderation.');
             }
-            
-            // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-            $Comment = $this->CommentModel->GetID($CommentID);
-            
-            $this->EventArguments['Discussion'] = $Discussion;
-            $this->EventArguments['Comment'] = $Comment;
-            $this->FireEvent('AfterCommentSave');
             
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());
             if ($CommentID > 0 && $DraftID > 0)
@@ -357,9 +361,14 @@ class PostController extends VanillaController {
                
                // If the comment was not a draft
                if (!$Draft) {
-                  // Redirect to the new comment
-                  // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                  Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
+                  // Redirect to the new comment.
+                  if ($CommentID > 0)
+                     Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
+                  elseif ($CommentID == SPAM) {
+                     $this->SetData('DiscussionUrl', '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->View = 'Spam';
+           
+                  }
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();

@@ -65,7 +65,7 @@ jQuery(document).ready(function($) {
    };
    setExpander();
 
-   $('.CheckboxCell input').live('click', function(e) {
+   $('tbody .CheckboxCell input').live('click', function(e) {
       var selected = $(this).attr('checked');
       $(this).closest('tr').toggleClass('Selected', selected);
    });
@@ -74,7 +74,10 @@ jQuery(document).ready(function($) {
       var selected = $(this).attr('checked');
       var table = $(this).closest('table');
       $('input:checkbox', table).attr('checked', selected);
-      $('tbody tr', table).toggleClass('Selected', selected);
+      if (selected)
+         $('tbody tr', table).addClass('Selected', selected);
+      else
+         $('tbody tr', table).removeClass('Selected', selected);
    });
 
    $('.RestoreButton').click(function(e) {
@@ -102,6 +105,23 @@ jQuery(document).ready(function($) {
       var bar = $.popup({}, function(settings) {
          $.get(
             gdn.url('/dashboard/log/confirm/delete?logids='+IDs),
+            {'DeliveryType': 'VIEW'},
+            function (data) {
+               $.popup.reveal(settings, data);
+            })
+         });
+
+      return false;
+   });
+
+   $('.NotSpamButton').click(function(e) {
+      var IDs = getIDs().join(',');
+      currentAction = restore;
+
+      // Popup the confirm.
+      var bar = $.popup({}, function(settings) {
+         $.get(
+            gdn.url('/dashboard/log/confirm/notspam?logids='+IDs),
             {'DeliveryType': 'VIEW'},
             function (data) {
                $.popup.reveal(settings, data);

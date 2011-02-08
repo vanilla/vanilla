@@ -82,6 +82,7 @@ $Construct
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
    ->Column('Deleted', 'tinyint(1)', '0')
+   ->Column('IPAddress', 'varchar(14)', TRUE)
    ->Set($Explicit, $Drop);
 
 // UserRole Table
@@ -370,8 +371,8 @@ $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity'), FALSE, 'index')
-   ->Column('RecordID', 'int', FALSE, 'index')
-   ->Column('RecordUserID', 'int') // user responsible for the record
+   ->Column('RecordID', 'int', NULL, 'index')
+   ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')
    ->Column('InsertUserID', 'int') // user that put record in the log
    ->Column('DateInserted', 'datetime') // date item added to log

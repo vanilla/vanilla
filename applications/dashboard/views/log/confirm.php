@@ -13,7 +13,7 @@
       switch (strtolower($this->Data('Action'))) {
          case 'delete':
             echo '<p>',
-               T('Deleting forever cannot be undone.', 'When you delete your selection forever then those operations are removed from this list and cannot be undone.'),
+               T('Deleting forever cannot be undone.', 'Deleting is a good way to keep your forum clean. However, when you delete forever then those operations are removed from this list and cannot be undone.'),
                '</p>';
 
             echo '<p>',
@@ -28,6 +28,16 @@
             echo '<p>',
                Plural($ItemCount, T('Are you sure you want to restore 1 item?'), T('Are you sure you want to restore %s items?')),
                '</p>';
+            break;
+         case 'notspam':
+            echo '<p>',
+               T('Marking things as not spam will put them back in your forum.'),
+               '</p>';
+
+            echo '<p>',
+               Plural($ItemCount, T('Are you sure this isn\'t spam?'), T('Are you sure these %s items aren\'t spam?')),
+               '</p>';
+            break;
             break;
       }
 

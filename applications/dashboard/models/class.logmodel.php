@@ -257,7 +257,6 @@ class LogModel extends Gdn_Pluggable {
          case 'Edit':
             // We are restoring an edit so just update the record.
             $IDColumn = $Log['RecordType'].'ID';
-
             $Where = array($IDColumn => $Log['RecordID']);
             unset($Set[$IDColumn]);
             Gdn::SQL()->Put(
@@ -269,6 +268,17 @@ class LogModel extends Gdn_Pluggable {
          case 'Delete':
          case 'Spam':
          case 'Moderate':
+            $IDColumn = $Log['RecordType'].'ID';
+            
+            if (!$Log['RecordID']) {
+               // This log entry was never in the table.
+               unset($Set[$IDColumn]);
+               if (isset($Set['DateInserted'])) {
+                  $Set['DateInserted'] = Gdn_Format::ToDateTime();
+               }
+            }
+
+
             // Insert the record back into the db.
             Gdn::SQL()
                ->Options('Ignore', TRUE)

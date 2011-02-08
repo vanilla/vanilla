@@ -46,7 +46,7 @@ $Definition['ValidateLength'] = '%1$s is %2$s characters too long.';
 $Definition['ValidateEnum'] = '%s is not valid.';
 $Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least one %s.';
 $Definition['ValidateConnection'] = 'The connection parameters you specified failed to open a connection to the database. The database reported the following error: <code>%s</code>';
-$Definition['ValidateMinimumAge'] = 'You must be at least 16 years old to proceed.';
+//$Definition['ValidateMinimumAge'] = 'You are too young to proceed.';
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 

@@ -136,24 +136,27 @@ function vf_validate_options($options) {
 		case 'url-form':
 			$url = vf_get_value('url', $options, '');
 			$options = $alloptions;
-			// Make a rest request to Vanilla's API to validate that the forum is at the given location.
-			$resturl = vf_combine_paths(array($url, '?p=discussions.json'), '/');
-			$data = json_decode(vf_rest($resturl));
-			if (!is_object($data)) {
-				$options['url'] = '';
-				add_settings_error('url', 'url', 'Forum url could not be validated. Are you sure you entered the correct web address of your forum?'); 
-			} else {
-				$options['url'] = $url;
+			// Validate that there is a vanilla installation at the url, and grab the WebRoot from the source.
+			$html = vf_rest($url);
+			$wr_pos = strpos($html, 'WebRoot" value="');
+			if ($wr_pos > 0) {
+				$webroot = substr($html, $wr_pos + 16);
+				$webroot = substr($webroot, 0, strpos($webroot, '"'));
+				$options['url'] = $webroot;
 				if (vf_get_value('embed-code', $options, '') == '') {
 					// Set the embed_code if it is not already defined.
-					$embedurl = vf_combine_paths(array($url, 'plugins/embedvanilla/remote.js'), '/');
+					$embedurl = vf_combine_paths(array($webroot, 'plugins/embedvanilla/remote.js'), '/');
 					$options['embed-code'] = '<script type="text/javascript" src="'.$embedurl.'"></script>';
 				}
 				vf_configure_embed_container();
+			} else {
+				$options['url'] = '';
+				add_settings_error('url', 'url', 'Forum url could not be validated. Are you sure you entered the correct web address of your forum?'); 
 			}
 			break;
 		case 'embed-form':
 			$embed_code = vf_get_value('embed-code', $options, '');
+			$embed_widgets = vf_get_value('embed-widgets', $options, '0');
 			$options = $alloptions;
 			$url = vf_get_value('url', $options, '');
 			if ($embed_code == '') {
@@ -163,6 +166,7 @@ function vf_validate_options($options) {
 			} else {
 				$options['embed-code'] = $embed_code;
 			}
+			$options['embed-widgets'] = $embed_widgets;
 			break;
 		default:
 			$options = array_merge($alloptions, $options);
@@ -284,6 +288,18 @@ function vf_format_possessive($word) {
    return substr($word, -1) == 's' ? $word."'" : $word."'s";
 }
 
+function vf_get_link_url($options) {
+	$embed_widgets = vf_get_value('embed-widgets', $options);
+	if ($embed_widgets == '1') {
+		$post_id = vf_get_option('embed-post-id');
+		$post = get_post($post_id);
+		$url = $post->post_name.'#';
+	} else {
+		$url = vf_get_value('url', $options, '');
+	}
+	return $url;
+}
+
 function vf_user_photo($User, $Url, $CssClass = '') {
 	if ($User->Photo == '')
 		$User->Photo = vf_combine_paths(array($Url, 'applications/dashboard/design/images/usericon.gif'), '/');
@@ -306,4 +322,19 @@ function vf_change_basename($Path, $NewBasename) {
 	$NewBasename = str_replace('%s', '$2', $NewBasename);
 	$Result = preg_replace('/^(.*\/)?(.*?)(\.[^.]+)$/', '$1'.$NewBasename.'$3', $Path);
 	return $Result;
+}
+
+/**
+ * Replaces all non-url-friendly characters with dashes.
+ *
+ * @param mixed $Mixed An object, array, or string to be formatted.
+ * @return mixed
+ */
+function vf_format_url($string) {
+	$string = strip_tags(html_entity_decode($string, ENT_COMPAT, 'UTF-8'));
+	$string = preg_replace('`([^\PP.\-_])`u', '', $string); // get rid of punctuation
+	$string = preg_replace('`([^\PS+])`u', '', $string); // get rid of symbols
+	$string = preg_replace('`[\s\-/+]+`u', '-', $string); // replace certain characters with dashes
+	$string = rawurlencode(strtolower($string));
+	return $string;
 }

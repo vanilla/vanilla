@@ -14,6 +14,7 @@ function vf_embed_admin_page() {
   $post_id = vf_configure_embed_container();
   $options = get_option(VF_OPTIONS_NAME);
   $embed_code = vf_get_value('embed-code', $options);
+  $embed_widgets = vf_get_value('embed-widgets', $options);
   $vanilla_post = get_post($PostID);
 ?>
 <div class="wrap">
@@ -26,6 +27,14 @@ function vf_embed_admin_page() {
 		<div id="edit-slug-box"><?php echo get_sample_permalink_html($post_id); ?></div>
 		<?php wp_nonce_field( 'samplepermalink', 'samplepermalinknonce', false ); ?>
 		<em>You can further customize the page that contains your forum <a href="./post.php?post=<?php echo $post_id; ?>&action=edit">here</a>.</em>
+		
+		<strong>Widget Integration</strong>
+		<p>
+			<label>
+				<input type="checkbox" name="<?php echo vf_get_option_name('embed-widgets'); ?>" value="1"<?php echo $embed_widgets == '1' ? ' checked="checked"' : ''; ?> />
+				Force your widgets to link to the embedded version of your forum instead of going to the actual forum url.
+			</label>
+		</p>
 
 		<strong>Forum &lt;Embed&gt; Code</strong>
 		<textarea id="EmbedCode" name="<?php echo vf_get_option_name('embed-code'); ?>"><?php echo $embed_code; ?></textarea>
@@ -45,20 +54,23 @@ function vf_configure_embed_container() {
 	$post = get_post($post_id);
 	// PostID not set or not related to an existing page? Generate the page now and apply template.
 	if (!is_numeric($post_id) || $post_id <= 0 || !$post) {
-		// Copy the vanilla template to the current theme
-		$template_to_use = 'embed_template.php';
-		try {
-			copy(__DIR__.'/templates/embed_template.php', get_template_directory().'/embed_template.php');
-		} catch (Exception $e) {
-			$template_to_use = false;
-		}
-		
 		$post_id = wp_insert_post(array('post_name' => 'discussions', 'post_title' => 'Discussions', 'post_type' => 'page', 'post_status' => 'publish', 'comment_status' => 'closed'));
-		if ($template_to_use)
-			update_post_meta($post_id, '_wp_page_template', $template_to_use);
-			
 		vf_update_option('embed-post-id', $post_id);
 	}
+	// Copy the vanilla template to the current theme
+	$template_to_use = 'embed_template.php';
+	try {
+      $filepath = __DIR__.'/templates/'.$template_to_use;
+      if (file_exists($filepath))                                                                                                        
+         copy($filepath, get_template_directory().'/'.$template_to_use);
+		else
+			$template_to_use = false;
+	} catch (Exception $e) {
+		$template_to_use = false;
+	}
+	if ($template_to_use)
+		update_post_meta($post_id, '_wp_page_template', $template_to_use);
+
 	return $post_id;
 }
 

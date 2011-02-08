@@ -135,6 +135,9 @@ class Gdn_Validation {
       $this->AddRule('Match', 'function:ValidateMatch');
       $this->AddRule('OldPassword', 'function:ValidateOldPassword');
       $this->AddRule('Version', 'function:ValidateVersion');
+      $this->AddRule('PhoneNA', 'function:ValidatePhoneNA');
+      $this->AddRule('PhoneInt', 'function:ValidatePhoneInt');
+      $this->AddRule('ZipCode', 'function:ValidateZipCode');
    }
 
 

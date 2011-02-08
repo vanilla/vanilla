@@ -40,6 +40,21 @@ class LogController extends DashboardController {
       $this->Render();
    }
 
+   public function Count($Operation) {
+      $this->Permission('Garden.Moderation.Manager');
+
+      if ($Operation == 'edits')
+         $Operation = array('edit', 'delete');
+      else
+         $Operation = explode(',', $Operation);
+      array_map('ucfirst', $Operation);
+
+      $Count = $this->LogModel->GetCountWhere(array('Operation' => $Operation));
+
+      if ($Count > 0)
+         echo '<span class="Alert">', $Count, '</span>';
+   }
+
    public function Delete($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       // Grab the logs.

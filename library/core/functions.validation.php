@@ -159,23 +159,22 @@ if (!function_exists('ValidateDate')) {
 
 if (!function_exists('ValidateMinimumAge')) {
    function ValidateMinimumAge($Value, $Field, $FormPostedValues) {
+      $MinimumAge = C('Garden.Validate.MinimumAge', 13);
       // Dates should be in YYYY-MM-DD format
       if (preg_match("/^[\d]{4}-{1}[\d]{2}-{1}[\d]{2}$/", $Value) == 1) {
          $Year = intval(substr($Value, 0, 4));
          $Month = intval(substr($Value, 5, 2));
          $Day = intval(substr($Value, 8));
-         // The minimum age for joining is 13 years before now.
          $CurrentDay = date('j');
          $CurrentMonth = date('n');
          $CurrentYear = date('Y');
-         if ($Year + 13 < $CurrentYear
-            || ($Year + 13 == $CurrentYear && $Month < $CurrentMonth)
-            || ($Year + 13 == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
+         // The minimum age for joining is 13 years before now.
+         if ($Year + $MinimumAge < $CurrentYear
+            || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
+            || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay))
             return TRUE;
-
       }
-
-      return FALSE;
+      return T('ValidateMinimumAge', 'You must be at least ' . $MinimumAge . ' years old to proceed.');
    }
 }
 
@@ -282,5 +281,42 @@ if (!function_exists('ValidateVersion')) {
          return TRUE;
       }
       return FALSE;
+   }
+}
+
+/**
+ * Validate phone number against North American Numbering Plan.
+ * @link http://blog.stevenlevithan.com/archives/validate-phone-number
+ */
+if (!function_exists('ValidatePhoneNA')) {
+   function ValidatePhoneNA($Value, $Field = '') {
+      if ($Value == '')
+         return true; // Do not require by default.
+      $Valid = ValidateRegex($Value, '/^(?:\+?1[-. ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/');
+      return ($Valid) ? $Valid : T('ValidatePhone', 'Phone number is invalid.');
+   }
+}
+
+/**
+ * Loose validation for international phone number (but must start with a plus sign).
+ */
+if (!function_exists('ValidatePhoneInt')) {
+   function ValidatePhoneInt($Value, $Field = '') {
+      if ($Value == '')
+         return true; // Do not require by default.
+      $Valid = ValidateRegex($Value, '/^\+(?:[0-9] ?){6,14}[0-9]$/');
+      return ($Valid) ? $Valid : T('ValidatePhone', 'Phone number is invalid.');
+   }
+}
+
+/**
+ * Validate US zip code (5-digit or 9-digit with hyphen).
+ */
+if (!function_exists('ValidateZipCode')) {
+   function ValidateZipCode($Value, $Field = '') {
+      if ($Value == '')
+         return true; // Do not require by default.
+      $Valid = ValidateRegex($Value, '/^([0-9]{5})(-[0-9]{4})?$/');
+      return ($Valid) ? $Valid : T('ValidateZipCode', 'Zip code is invalid.');
    }
 }

@@ -1,6 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0.17.7a');
+define('APPLICATION_VERSION', '2.0.17.9a');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.

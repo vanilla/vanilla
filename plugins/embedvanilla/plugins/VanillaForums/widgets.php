@@ -46,6 +46,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=discussions.json');
 		if ($categoryid > 0)
 			$resturl = array($url, '?p=categories/'.$categoryid.'.json');
@@ -68,7 +69,7 @@ function vf_widgets_init() {
 			if ($i > $count)
 				break;
 			
-			echo '<li><a href="'.vf_combine_paths(array($url, 'discussion/'.$Discussion->DiscussionID.'/'.$Discussion->Name), '/').'">'.$Discussion->Name.'</a></li>';
+			echo '<li><a href="'.vf_combine_paths(array($link_url, 'discussion/'.$Discussion->DiscussionID.'/'.vf_format_url($Discussion->Name)), '/').'">'.$Discussion->Name.'</a></li>';
 		}
 		echo '</ul>';
 		echo $after_widget;
@@ -136,6 +137,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=activity.json');
 		// if ($roleid > 0)
 		// 	$resturl = array($url, 'activities/'.$roleid.'.json');
@@ -156,7 +158,7 @@ function vf_widgets_init() {
 			if ($i > $count)
 				break;
 			
-			echo '<li>'.vf_format_activity($Activity, $url).'</li>';
+			echo '<li>'.vf_format_activity($Activity, $link_url).'</li>';
 		}
 		echo '</ul>';
 		echo $after_widget;
@@ -224,6 +226,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=user/summary.json');
 			
 		// Retrieve the latest discussions from the Vanilla API
@@ -243,7 +246,7 @@ function vf_widgets_init() {
 				break;
 			
 			$User->IconWidth = $width;
-			echo vf_user_photo($User, $url).' ';
+			echo vf_user_photo($User, $link_url).' ';
 		}
 		echo '</div>';
 		echo $after_widget;

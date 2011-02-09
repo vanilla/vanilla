@@ -188,6 +188,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->FireEvent('BeforeDispatch');
       $this->AnalyzeRequest($Request);
       
+      print_r($this);
+      die('finish analyze');
+      
       // Send user to login page if this is a private community (with some minor exceptions)
       if (
          C('Garden.PrivateCommunity')
@@ -203,7 +206,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       // If we couldnt look up the application folder from the URL, use the cache path
       if ($this->_ApplicationFolder == '') {
-         $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, TRUE);
+         $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
          $InterimPath = explode('/controllers/', $ControllerPath);
          array_pop($InterimPath); // Get rid of the end. Useless;
          $InterimPath = explode('/', trim(array_pop($InterimPath)));
@@ -442,30 +445,64 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $Parts = explode('/', $this->Request);
-      $Length = count($Parts);
+      
+      /**
+       * The application folder is either the first argument or is not provided. The controller is therefore
+       * either the second argument or the first, depending on the result of the previous statement. Check that.
+       */
+      
+      $ValidAppFolders = $this->EnabledApplicationFolders();
+      
+      $Tries = C('Garden.Dispatcher.MaxAttempts', 5);
+      while ($Tries) {
+         $Tries--;
+         
+         
+      }
+      
+      if (in_array($Parts[0], $ValidAppFolders)) {
+         $ControllerKey = 1;
+         $this->_ApplicationFolder = $Parts[0];
+         
+         Gdn_Autoloader::Priority(
+            Gdn_Autoloader::CONTEXT_APPLICATION, 
+            $this->_ApplicationFolder,
+            Gdn_Autoloader::MAP_CONTROLLER, 
+            Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
+            Gdn_Autoloader::PRIORITY_PERSIST);
+      } else {
+         $ControllerKey = 0;
+      }
+      
+      
       
       if ($Length == 1) {
+         echo " length = 1\n";
          $FolderDepth = 0;
          list($this->_ControllerName, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[0]);
          $Parts[0] = $this->_ControllerName;
          $this->_MapParts($Parts, 0);
          $this->_FetchController(TRUE); // Throw an error if this fails because there's nothing else to check
       } else if ($Length == 2) {
+         echo " length = 2\n";
          // Force a depth of 1 because only one of the two url parts can be a folder.
          $FolderDepth = 1;
       }
       
       if ($FolderDepth == 2) {
+         echo " : folder depth = 2\n";
          $this->_ApplicationFolder = $Parts[0];
          $this->_ControllerFolder = $Parts[1];
          $this->_MapParts($Parts, 2);
 
          if (!$this->_FetchController()) {
             // echo '<div>Failed. AppFolder: '.$this->_ApplicationFolder.'; Cont Folder: '.$this->_ControllerFolder.'; Cont: '.$this->_ControllerName.';</div>';
-            $this->_AnalyzeRequest($Request, 1);
+            $this->AnalyzeRequest($Request, 1);
          }
 
       } else if ($FolderDepth == 1) {
+         echo " : folder depth = 1\n";
+         
          // Try the application folder first
          $Found = FALSE;
          if (in_array($Parts[0], $this->EnabledApplicationFolders())) {
@@ -482,7 +519,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_MapParts($Parts, 1);
             if (!$this->_FetchController()) {
                // echo '<div>Failed. AppFolder: '.$this->_ApplicationFolder.'; Cont Folder: '.$this->_ControllerFolder.'; Cont: '.$this->_ControllerName.';</div>';
-               $this->_AnalyzeRequest($Request, 0);
+               $this->AnalyzeRequest($Request, 0);
             }
          }
       }
@@ -578,7 +615,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Args[] = $MethParam->getDefaultValue();
          else {
             $Args[] = NULL;
-            $MissingArgs[] = "$Index: $ParamName";
+            $MissingArgs[] = "{$Index}: {$ParamName}";
          }
       }
 

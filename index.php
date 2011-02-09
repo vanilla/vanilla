@@ -1,6 +1,9 @@
 <?php
 define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.0.17.9a');
+
+$StartTime = microtime(true);
+
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.

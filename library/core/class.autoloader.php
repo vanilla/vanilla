@@ -31,8 +31,8 @@ class Gdn_Autoloader {
     *
     * @var array
     */
-   protected static $RegisteredMaps;
-   
+   protected static $Maps;
+      
    /**
     * Array of pathname prefixes used to namespace similar libraries
     *
@@ -47,15 +47,39 @@ class Gdn_Autoloader {
     */
    protected static $ContextOrder;
    
-   const CONTEXT_CORE         = 'core';
-   const CONTEXT_APPLICATION  = 'application';
-   const CONTEXT_PLUGIN       = 'plugin';
-   const CONTEXT_LOCALE       = 'locale';
-   const CONTEXT_THEME        = 'theme';
+   /**
+    * Array of maps that pertain to the same CONTEXT+Extension
+    *
+    * @var array
+    */
+   protected static $MapGroups;
    
-   const MAP_LIBRARY          = 'library';
-   const MAP_CONTROLLER       = 'controller';
-   const MAP_PLUGIN           = 'plugin';
+   /**
+    * List of priority/preferred CONTEXT+Extension[+MapType] groups for the next lookup 
+    *
+    * @var array
+    */
+   protected static $Priorities;
+   
+   const CONTEXT_CORE            = 'core';
+   const CONTEXT_APPLICATION     = 'application';
+   const CONTEXT_PLUGIN          = 'plugin';
+   const CONTEXT_LOCALE          = 'locale';
+   const CONTEXT_THEME           = 'theme';
+   
+   const MAP_LIBRARY             = 'library';
+   const MAP_CONTROLLER          = 'controller';
+   const MAP_PLUGIN              = 'plugin';
+   
+   const PRIORITY_TYPE_PREFER    = 'prefer';
+   const PRIORITY_TYPE_RESTRICT  = 'restrict';
+   
+   const PRIORITY_ONCE           = 'once';
+   const PRIORITY_PERSIST        = 'persist';
+   
+   public static function Prio() {
+      print_r(self::$Priorities);
+   }
    
    /**
     * Attach mappings for vanilla extension folders
@@ -145,25 +169,76 @@ class Gdn_Autoloader {
       
       if (defined('AUTOLOADER') && AUTOLOADER) echo '  '.__METHOD__."\n";
       
-      if (!is_array(self::$RegisteredMaps[$MapType]))
-         self::$RegisteredMaps[$MapType] = array();
+      if (!is_array(self::$Maps))
+         return FALSE;
+      
+      $Priorities = array();
       
       // Binary flip - cacheonly or cache+fs
-      foreach (array(TRUE, FALSE) as $CacheOnly) {
+      foreach (array(TRUE, FALSE) as $MapOnly) {
       
+         $SkipHashes = array(); $ContextType = NULL;
+         $SkipTillNextContext = FALSE;
+         
          // Drill to the caches associated with this map type
-         foreach (self::$ContextOrder as $Context) {
-            if (!array_key_exists($Context, self::$RegisteredMaps[$MapType]) || !sizeof(self::$RegisteredMaps[$MapType][$Context])) continue;
+         foreach (self::$Maps as $MapHash => &$Map) {
+            if ($Map->MapType() != $MapType) continue;
             
-            // Search each registered cache at this level
-            foreach (self::$RegisteredMaps[$MapType][$Context] as $CacheHash => &$Cache) {
-               $File = $Cache->Lookup($ClassName, $CacheOnly);
-               if ($File !== FALSE) return $File;
+            $MapContext = self::GetContextType($MapHash);
+            if ($MapContext != $ContextType) {
+               // Hit new context
+               $SkipHashes = array();
+               $ContextType = $MapContext;
+               
+               if (!array_key_exists($ContextType, $Priorities))
+                  $Priorities[$ContextType] = self::Priorities($ContextType, $MapType);
+                  
+               if (is_array($Priorities[$ContextType]) && sizeof($Priorities[$ContextType]) && defined('AUTOLOADER') && AUTOLOADER) {
+                  echo "    Priorities: [{$ContextType} | {$MapType} | ";
+                  if (array_key_exists('FAIL_CONTEXT_IF_NOT_FOUND', $Priorities[$ContextType]))
+                     echo "restrict]\n";
+                  else
+                     echo "prefer]\n";
+               }
+                  
+               foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
+               
+                  // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
+                  if ($PriorityMapHash == 'FAIL_CONTEXT_IF_NOT_FOUND') {
+                     $SkipTillNextContext = TRUE;
+                     break;
+                  }
+                  $PriorityMap = self::Map($PriorityMapHash);
+                  
+                  $File = $PriorityMap->Lookup($ClassName, $MapOnly);
+                  if ($File !== FALSE) return $File;
+                  
+                  // Don't check this again
+                  array_push($PriorityMapHash, $SkipHashes);
+               }
             }
+            
+            // If this map was already checked by a priority, or if we've exhausted a RESTRICT priority, skip maps until the next
+            // context level is reached.
+            if (in_array($MapHash, $SkipHashes) || $SkipTillNextContext === TRUE) continue;
+            
+            // Finally, search this map.
+            $File = $Map->Lookup($ClassName, $MapOnly);
+            if ($File !== FALSE) return $File;
          }
       }
       
       return FALSE;
+   }
+   
+   public static function GetContextType($MapHash) {
+      $Matched = preg_match('/^context:(\d+)_.*/', $MapHash, $Matches);
+      if ($Matched)
+         $ContextIdentifier = GetValue(1, $Matches);
+      else
+         return FALSE;
+         
+      return GetValue($ContextIdentifier, self::$ContextOrder, FALSE);
    }
    
    public static function GetMapType($ClassName) {
@@ -180,19 +255,107 @@ class Gdn_Autoloader {
       return self::MAP_LIBRARY;
    }
    
-   public static function Lookup($ClassName, $Quiet = FALSE) {
+   public static function Lookup($ClassName, $Options = array()) {
       if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$ClassName})\n";
       
       $MapType = self::GetMapType($ClassName);
       if (defined('AUTOLOADER') && AUTOLOADER) echo "  map type: {$MapType}\n";
       
+      $DefaultOptions = array(
+         'Quiet'              => FALSE,
+         'RespectPriorities'  => TRUE
+      );
+      $Options = array_merge($DefaultOptions, $Options);
+      
       $File = self::DoLookup($ClassName, $MapType);
       
-      if (!$Quiet) {
-         if ($File !== FALSE)
+      if ($File !== FALSE) {
+         if (!GetValue("Quiet", $Options) === TRUE)
             include_once($File);
       }         
       return $File;
+   }
+   
+   public static function Map($MapHash) {
+      if (array_key_exists($MapHash, self::$Maps))
+         return self::$Maps[$MapHash];
+         
+      return FALSE;
+   }
+   
+   public static function Priority($ContextType, $Extension, $MapType = NULL, $PriorityType = self::PRIORITY_TYPE_PREFER, $PriorityDuration = self::PRIORITY_ONCE) {
+      $MapGroupIdentifier = implode('|',array(
+         $ContextType,
+         $Extension
+      ));
+      
+      $MapGroupHashes = GetValue($MapGroupIdentifier, self::$MapGroups, array());
+      
+      foreach ($MapGroupHashes as $MapHash => $Trash) {
+         $ThisMapType = self::Map($MapHash)->MapType();
+         // We're restricting this priority to a certain maptype, so exclude non matchers
+         if (!is_null($MapType) && $ThisMapType != $MapType) continue;
+         
+         $PriorityHashes[$MapHash] = array(
+            'maptype'      => $ThisMapType,
+            'duration'     => $PriorityDuration,
+            'prioritytype' => $PriorityType
+         );
+      }
+      
+      if (!sizeof($PriorityHashes)) return FALSE;
+      
+      if (!is_array(self::$Priorities)) 
+         self::$Priorities = array();
+      
+      if (!is_array(self::$Priorities[$ContextType]))
+         self::$Priorities[$ContextType] = array(
+            self::PRIORITY_TYPE_RESTRICT  => array(),
+            self::PRIORITY_TYPE_PREFER    => array()
+         );
+      
+      // Add new priorities to list
+      self::$Priorities[$ContextType][$PriorityType] = array_merge(self::$Priorities[$ContextType][$PriorityType], $PriorityHashes);
+      
+      return TRUE;
+   }
+   
+   public static function Priorities($ContextType, $MapType = NULL) {
+      if (!is_array(self::$Priorities) || !array_key_exists($ContextType,self::$Priorities)) 
+         return FALSE;
+      
+      /**
+       * First, gather the RESTRICT requirements. If these exist, they are the only hashes that will be sent, and a 'FAIL_IF_NOT_FOUND' 
+       * flag will be appended to the list to halt lookups.
+       *
+       * If there are no RESTRICT priorities, check for PREFER priorities and send those.
+       *
+       * Always optionally filter on $MapType if provided.
+       */
+      foreach (array(self::PRIORITY_TYPE_RESTRICT, self::PRIORITY_TYPE_PREFER) as $PriorityType) {
+         if (!sizeof(self::$Priorities[$ContextType][$PriorityType])) continue;
+         
+         $ResultMapHashes = self::$Priorities[$ContextType][$PriorityType];
+         $ResponseHashes = array();
+         foreach ($ResultMapHashes as $MapHash => $PriorityInfo) {
+         
+            if (GetValue('duration', $PriorityInfo) == self::PRIORITY_ONCE)
+               unset(self::$Priorities[$ContextType][$PriorityType][$MapHash]);
+         
+            // If this request is being specific about the required maptype, reject anything that doesnt match
+            if (!is_null($MapType) && GetValue('maptype', $PriorityInfo) != $MapType)
+               continue;
+            
+            $ResponseHashes[$MapHash] = $PriorityInfo;
+         }
+         
+         if ($PriorityType == self::PRIORITY_TYPE_RESTRICT)
+            $ResponseHashes['FAIL_CONTEXT_IF_NOT_FOUND'] = TRUE;
+         
+         return $ResponseHashes;
+      }
+      
+      return FALSE;
    }
    
    public static function RegisterMap($MapType, $ContextType, $SearchPath, $Options = array()) {
@@ -210,33 +373,59 @@ class Gdn_Autoloader {
       
       $Options = array_merge($DefaultOptions, $Options);
       
+      $Extension = GetValue('Extension', $Options, NULL);
+      
       // Determine cache root disk location
       $Hits = 0; str_replace(PATH_LOCAL_ROOT, '', $SearchPath, $Hits);
-      if ($Hits) $CacheRootLocation = PATH_LOCAL_CACHE;
-      else $CacheRootLocation = PATH_CACHE;
+      if ($Hits) $MapRootLocation = PATH_LOCAL_CACHE;
+      else $MapRootLocation = PATH_CACHE;
       
-      $CacheIdentifier = implode('|',array(
+      // Build a unique identifier that refers to this map (same map type, context, extension, and cachefile location)
+      $MapIdentifier = implode('|',array(
          $MapType,
          $ContextType,
-         GetValue('Extension',$Options),
-         $CacheRootLocation
+         $Extension,
+         $MapRootLocation
       ));
-      $CacheHash = md5($CacheIdentifier);
+      $MapHash = md5($MapIdentifier);
       
-      if (!is_array(self::$RegisteredMaps))
-         self::$RegisteredMaps = array();
+      // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
+      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder))."_".$MapHash;
       
-      if (!is_array(self::$RegisteredMaps[$ContextType]))
-         self::$RegisteredMaps[$ContextType] = array();
+      if (!is_array(self::$Maps))
+         self::$Maps = array();
          
-      if (!array_key_exists($CacheHash, self::$RegisteredMaps[$MapType][$ContextType])) {
-         $Cache = Gdn_Autoloader_Cache::Load($MapType, $CacheRootLocation, $Options);
-         self::$RegisteredMaps[$MapType][$ContextType][$CacheHash] = $Cache;
+      if (!array_key_exists($MapHash, self::$Maps)) {
+         $Map = Gdn_Autoloader_Map::Load($MapType, $ContextType, $MapRootLocation, $Options);
+         self::$Maps[$MapHash] = $Map;
       } else {
          if (defined('AUTOLOADER') && AUTOLOADER) echo "  appended path to existing cache\n";
       }
       
-      return self::$RegisteredMaps[$MapType][$ContextType][$CacheHash]->AddPath($SearchPath, $Options);
+      ksort(self::$Maps, SORT_REGULAR);
+      
+      $AddPathResult = self::$Maps[$MapHash]->AddPath($SearchPath, $Options);
+         
+      /*
+       * Build a unique identifier that refers to this cached list (context and extension)
+       *
+       * For example, CONTEXT_APPLICATION and 'dashboard' would refer to all maps that store
+       * information about the dashboard application: its controllers, models, modules, etc.
+       */
+      $MapGroupIdentifier = implode('|',array(
+         $ContextType,
+         $Extension
+      ));
+      
+      if (!is_array(self::$MapGroups))
+         self::$MapGroups = array();
+      
+      if (!is_array(self::$MapGroups[$MapGroupIdentifier]))
+         self::$MapGroups[$MapGroupIdentifier] = array();
+
+      self::$MapGroups[$MapGroupIdentifier][$MapHash] = TRUE;
+      
+      return $AddPathResult;
    }
    
    /**
@@ -248,7 +437,7 @@ class Gdn_Autoloader {
     * @param void
     */
    public static function Start() {
-      self::$RegisteredMaps = array();
+      
       self::$Prefixes = array(
          self::CONTEXT_CORE            => 'c',
          self::CONTEXT_APPLICATION     => 'a',
@@ -262,6 +451,9 @@ class Gdn_Autoloader {
          self::CONTEXT_APPLICATION,
          self::CONTEXT_CORE
       );
+      
+      self::$Maps = array();
+      self::$MapGroups = array();
    
       // Register autoloader with the SPL
       spl_autoload_register(array('Gdn_Autoloader', 'Lookup'));
@@ -282,33 +474,31 @@ class Gdn_Autoloader {
     * @param void
     */
    public static function Shutdown() {
-      foreach (self::$RegisteredMaps as $MapType => $Contexts)
-         foreach ($Contexts as $ContextLevel => $Caches)
-            foreach ($Caches as &$Cache)
-               $Cache->Shutdown();
+      foreach (self::$Maps as $MapHash => &$Map)
+         $Map->Shutdown();
    }
    
 }
 
-class Gdn_Autoloader_Cache {
+class Gdn_Autoloader_Map {
    
    /**
     * Sprintf format string that describes the on-disk name of the mapping caches
     * 
     * @const string
     */
-   const DISK_CACHE_NAME_FORMAT = '%s/%s_map.ini';
+   const DISK_MAP_NAME_FORMAT = '%s/%s_map.ini';
    
    const LOOKUP_CLASS_MASK = 'class.%s.php';
    const LOOKUP_INTERFACE_MASK = 'interface.%s.php';
    
-   protected $CacheInfo;
-   protected $Cache;
+   protected $MapInfo;
+   protected $Map;
    protected $Ignore;
    protected $Paths;
    
-   private function __construct($MapType, $CacheRootLocation, $Options) {
-      $this->Cache = NULL;
+   private function __construct($MapType, $ContextType, $MapRootLocation, $Options) {
+      $this->Map = NULL;
       $this->Ignore = array('.','..');
       $this->Paths = array();
       
@@ -316,98 +506,42 @@ class Gdn_Autoloader_Cache {
       $Recursive = GetValue('SearchSubfolders', $Options, TRUE);
       $ContextPrefix = GetValue('ContextPrefix', $Options, NULL);
       
-      $CacheName = $MapType;
+      $MapName = $MapType;
       if (!is_null($ExtensionName))
-         $CacheName = $ExtensionName.'_'.$CacheName;
+         $MapName = $ExtensionName.'_'.$MapName;
          
       if (!is_null($ContextPrefix))
-         $CacheName = $ContextPrefix.'_'.$CacheName;
+         $MapName = $ContextPrefix.'_'.$MapName;
       
-      $OnDiskCacheFile = sprintf(self::DISK_CACHE_NAME_FORMAT, $CacheRootLocation, strtolower($CacheName));
+      $OnDiskMapFile = sprintf(self::DISK_MAP_NAME_FORMAT, $MapRootLocation, strtolower($MapName));
       
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  cache started: {$CacheName} - {$OnDiskCacheFile}\n";
+      if (defined('AUTOLOADER') && AUTOLOADER) echo "  cache started: {$MapName} - {$OnDiskMapFile}\n";
       
-      $this->CacheInfo = array(
-         'ondisk'    => $OnDiskCacheFile,
-         'name'      => $CacheName,
-         'dirty'     => FALSE
+      $this->MapInfo = array(
+         'ondisk'       => $OnDiskMapFile,
+         'root'         => $MapRootLocation,
+         'name'         => $MapName,
+         'maptype'      => $MapType,
+         'contexttype'  => $ContextType,
+         'extension'    => $ExtensionName,
+         'dirty'        => FALSE
       );
    }
    
    public function AddPath($SearchPath, $Options) {
       $this->Paths[$SearchPath] = array(
-         'path'      => $SearchPath,
-         'recursive' => (bool)GetValue('SearchSubfolders', $Options),
-         'filter'    => GetValue('ClassFilter', $Options)
+         'path'         => $SearchPath,
+         'recursive'    => (bool)GetValue('SearchSubfolders', $Options),
+         'filter'       => GetValue('ClassFilter', $Options)
       );
    }
    
-   public static function Load($MapType, $CacheRootLocation, $Options) {
-      return new Gdn_Autoloader_Cache($MapType, $CacheRootLocation, $Options);
+   public function ContextType() {
+      return GetValue('contexttype', $this->MapInfo);
    }
    
-   public function Lookup($ClassName, $CacheOnly = TRUE) {
-      $CacheName = GetValue('name', $this->CacheInfo);
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "    ".__METHOD__." [{$CacheName}] ({$ClassName}, ".(($CacheOnly) ? 'cache': 'cache+fs').")\n";
-      
-      // Lazyload cache data
-      if (is_null($this->Cache)) {
-         $this->Cache = array();
-         $OnDiskCacheFile = GetValue('ondisk', $this->CacheInfo);
-         
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      load from disk: {$OnDiskCacheFile}... ";
-         // Loading cache data from disk
-         if (file_exists($OnDiskCacheFile)) {
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "exists\n";
-            $CacheContents = parse_ini_file($OnDiskCacheFile, FALSE);
-            if ($CacheContents != FALSE && is_array($CacheContents)) {
-               $this->Cache = $CacheContents;
-            } else
-               @unlink($OnDiskCacheFile);
-         } else {
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "missing\n";
-         }
-      }
-   
-      $ClassName = strtolower($ClassName);
-      if (array_key_exists($ClassName, $this->Cache)) {
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      cache hit\n";
-         return GetValue($ClassName, $this->Cache);
-      }
-      // Look at the filesystem, too
-      if (!$CacheOnly) {
-         if (substr($ClassName, 0, 4) == 'gdn_')
-            $FSClassName = substr($ClassName, 4);
-         else
-            $FSClassName = $ClassName;
-         
-         $Files = array(
-            sprintf(self::LOOKUP_CLASS_MASK, $FSClassName),
-            sprintf(self::LOOKUP_INTERFACE_MASK, $FSClassName)
-         );
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[0]}\n";
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[1]}\n";
-         
-         foreach ($this->Paths as $Path => $PathOptions) {
-            $ClassFilter = GetValue('filter', $PathOptions);
-            if (!fnmatch($ClassFilter, $ClassName)) continue;
-            
-            $Recursive = GetValue('recursive', $PathOptions);
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "      scan: '{$Path}' recurse: ".(($Recursive) ? 'y': 'n')."\n";
-   
-            $File = $this->FindFile($Path, $Files, $Recursive);
-            
-            if ($File !== FALSE) {
-               $this->Cache[$ClassName] = $File;
-               $this->CacheInfo['dirty'] = TRUE;
-               
-               if (defined('AUTOLOADER') && AUTOLOADER) echo "      found {$ClassName} @ {$File}. added back to cache {$CacheName}\n";
-               return $File;
-            }
-         }
-      }
-      
-      return FALSE;
+   public function Extension() {
+      return GetValue('extension', $this->MapInfo);
    }
    
    protected function FindFile($Path, $SearchFiles, $Recursive) {
@@ -438,26 +572,103 @@ class Gdn_Autoloader_Cache {
       return FALSE;
    }
    
+   /**
+    * Autoloader cache static constructor
+    *
+    * @return Gdn_Autoloader_Map
+    */
+   public static function Load($MapType, $ContextType, $MapRootLocation, $Options) {
+      return new Gdn_Autoloader_Map($MapType, $ContextType, $MapRootLocation, $Options);
+   }
+   
+   public function Lookup($ClassName, $MapOnly = TRUE) {
+      $MapName = GetValue('name', $this->MapInfo);
+      if (defined('AUTOLOADER') && AUTOLOADER) echo "    ".__METHOD__." [{$MapName}] ({$ClassName}, ".(($MapOnly) ? 'cache': 'cache+fs').")\n";
+      
+      // Lazyload cache data
+      if (is_null($this->Map)) {
+         $this->Map = array();
+         $OnDiskMapFile = GetValue('ondisk', $this->MapInfo);
+         
+         if (defined('AUTOLOADER') && AUTOLOADER) echo "      load from disk: {$OnDiskMapFile}... ";
+         // Loading cache data from disk
+         if (file_exists($OnDiskMapFile)) {
+            if (defined('AUTOLOADER') && AUTOLOADER) echo "exists\n";
+            $MapContents = parse_ini_file($OnDiskMapFile, FALSE);
+            if ($MapContents != FALSE && is_array($MapContents)) {
+               $this->Map = $MapContents;
+            } else
+               @unlink($OnDiskMapFile);
+         } else {
+            if (defined('AUTOLOADER') && AUTOLOADER) echo "missing\n";
+         }
+      }
+   
+      $ClassName = strtolower($ClassName);
+      if (array_key_exists($ClassName, $this->Map)) {
+         if (defined('AUTOLOADER') && AUTOLOADER) echo "      cache hit\n";
+         return GetValue($ClassName, $this->Map);
+      }
+      // Look at the filesystem, too
+      if (!$MapOnly) {
+         if (substr($ClassName, 0, 4) == 'gdn_')
+            $FSClassName = substr($ClassName, 4);
+         else
+            $FSClassName = $ClassName;
+         
+         $Files = array(
+            sprintf(self::LOOKUP_CLASS_MASK, $FSClassName),
+            sprintf(self::LOOKUP_INTERFACE_MASK, $FSClassName)
+         );
+         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[0]}\n";
+         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[1]}\n";
+         
+         foreach ($this->Paths as $Path => $PathOptions) {
+            $ClassFilter = GetValue('filter', $PathOptions);
+            if (!fnmatch($ClassFilter, $ClassName)) continue;
+            
+            $Recursive = GetValue('recursive', $PathOptions);
+            if (defined('AUTOLOADER') && AUTOLOADER) echo "      scan: '{$Path}' recurse: ".(($Recursive) ? 'y': 'n')."\n";
+   
+            $File = $this->FindFile($Path, $Files, $Recursive);
+            
+            if ($File !== FALSE) {
+               $this->Map[$ClassName] = $File;
+               $this->MapInfo['dirty'] = TRUE;
+               
+               if (defined('AUTOLOADER') && AUTOLOADER) echo "      found {$ClassName} @ {$File}. added back to cache {$MapName}\n";
+               return $File;
+            }
+         }
+      }
+      
+      return FALSE;
+   }
+   
+   public function MapType() {
+      return GetValue('maptype', $this->MapInfo);
+   }
+   
    public function Shutdown() {
       
-      if (!GetValue('dirty', $this->CacheInfo)) return FALSE;
+      if (!GetValue('dirty', $this->MapInfo)) return FALSE;
       
-      if (!sizeof($this->Cache))
+      if (!sizeof($this->Map))
          return FALSE;
          
       if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."\n";
-      $CacheName = GetValue('name', $this->CacheInfo);
-      $OnDisk = GetValue('ondisk', $this->CacheInfo);
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  saving cache [{$CacheName}] @ {$OnDisk}\n";
+      $MapName = GetValue('name', $this->MapInfo);
+      $OnDisk = GetValue('ondisk', $this->MapInfo);
+      if (defined('AUTOLOADER') && AUTOLOADER) echo "  saving cache [{$MapName}] @ {$OnDisk}\n";
       
-      $FileName = GetValue('ondisk', $this->CacheInfo);
+      $FileName = GetValue('ondisk', $this->MapInfo);
       
-      $CacheContents = "[cache]\n";
-      foreach ($this->Cache as $ClassName => $Location) {
-         $CacheContents .= "{$ClassName} = \"{$Location}\"\n";
+      $MapContents = "[cache]\n";
+      foreach ($this->Map as $ClassName => $Location) {
+         $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
       try {
-         Gdn_FileSystem::SaveFile($FileName, $CacheContents, LOCK_EX);
+         Gdn_FileSystem::SaveFile($FileName, $MapContents, LOCK_EX);
       }
       catch (Exception $e) { return FALSE; }
       

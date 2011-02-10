@@ -149,7 +149,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             }
             
             $CachePluginInfo = &$SearchPathCache['PluginInfo'];
+            if (!is_array($CachePluginInfo))
+               var_dump($CachePluginInfo);
+               
             $CacheClassInfo = &$SearchPathCache['ClassInfo'];
+            if (!is_array($CacheClassInfo))
+               var_dump($CacheClassInfo);
             
             $PathListing = scandir($SearchPath, 0);
             sort($PathListing);

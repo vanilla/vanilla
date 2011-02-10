@@ -33,7 +33,7 @@ if (ini_get('date.timezone') == '')
    date_default_timezone_set('America/Montreal');
 
 // Include the core function definitions
-//require_once(PATH_LIBRARY_CORE.'/functions.error.php');
+require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

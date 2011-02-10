@@ -357,9 +357,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * anything useful into this object's Controller properties.
     *
     * @param int $FolderDepth
-    * @todo $folderDepth needs a description.
     */
-   protected function AnalyzeRequest(&$Request, $FolderDepth = 1) {
+   protected function AnalyzeRequest(&$Request) {
    
       if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."\n";
    
@@ -461,7 +460,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
-         return FALSE;
+         $Request->WithRoute('Default404');
+         return $this->AnalyzeRequest($Request);
       }
    }
    

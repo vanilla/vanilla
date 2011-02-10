@@ -70,16 +70,13 @@ class Gdn_Autoloader {
    const MAP_LIBRARY             = 'library';
    const MAP_CONTROLLER          = 'controller';
    const MAP_PLUGIN              = 'plugin';
+   const MAP_VENDORS             = 'vendors';
    
    const PRIORITY_TYPE_PREFER    = 'prefer';
    const PRIORITY_TYPE_RESTRICT  = 'restrict';
    
    const PRIORITY_ONCE           = 'once';
    const PRIORITY_PERSIST        = 'persist';
-   
-   public static function Prio() {
-      print_r(self::$Priorities);
-   }
    
    /**
     * Attach mappings for vanilla extension folders
@@ -460,7 +457,7 @@ class Gdn_Autoloader {
       // Register autoloader with the SPL
       spl_autoload_register(array('Gdn_Autoloader', 'Lookup'));
       
-      // Configure core lookups
+      // Configure core library
       self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY);
       
       // Register shutdown function to auto save changed cache files

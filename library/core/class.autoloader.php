@@ -187,12 +187,12 @@ class Gdn_Autoloader {
             $MapContext = self::GetContextType($MapHash);
             if ($MapContext != $ContextType) {
                // Hit new context
-               $SkipHashes = array();
+               $SkipMaps = array();
                $ContextType = $MapContext;
                
                if (!array_key_exists($ContextType, $Priorities))
                   $Priorities[$ContextType] = self::Priorities($ContextType, $MapType);
-                  
+               
                if (is_array($Priorities[$ContextType]) && sizeof($Priorities[$ContextType]) && defined('AUTOLOADER') && AUTOLOADER) {
                   echo "    Priorities: [{$ContextType} | {$MapType} | ";
                   if (array_key_exists('FAIL_CONTEXT_IF_NOT_FOUND', $Priorities[$ContextType]))
@@ -200,7 +200,7 @@ class Gdn_Autoloader {
                   else
                      echo "prefer]\n";
                }
-                  
+               
                foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
                
                   // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
@@ -213,14 +213,14 @@ class Gdn_Autoloader {
                   $File = $PriorityMap->Lookup($ClassName, $MapOnly);
                   if ($File !== FALSE) return $File;
                   
-                  // Don't check this again
-                  array_push($PriorityMapHash, $SkipHashes);
+                  // Don't check this map again
+                  array_push($PriorityMapHash, $SkipMaps);
                }
             }
             
             // If this map was already checked by a priority, or if we've exhausted a RESTRICT priority, skip maps until the next
             // context level is reached.
-            if (in_array($MapHash, $SkipHashes) || $SkipTillNextContext === TRUE) continue;
+            if (in_array($MapHash, $SkipMaps) || $SkipTillNextContext === TRUE) continue;
             
             // Finally, search this map.
             $File = $Map->Lookup($ClassName, $MapOnly);

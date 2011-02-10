@@ -462,10 +462,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
          // 1] if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
          if (in_array($Parts[0], $ValidAppFolders))
-            $this->FindController(1);
+            $this->FindController(1, $Parts);
          
          // 2] if no match, see if the first argument is a controller
-         $this->FindController(0);
+         $this->FindController(0, $Parts);
          
          throw new GdnDispatcherControllerNotFoundException();
          
@@ -530,9 +530,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
    
    protected function FindController($ControllerKey, $Parts) {
-      echo __METHOD__."\n";
+      echo __METHOD__."(".implode(', ',func_get_args()).")\n";
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
+      
+      echo "  application: {$Application}\n";
+      echo "  controller: {$Controller}\n";
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(
@@ -547,6 +550,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
       
       if ($ControllerPath !== FALSE) {
+         
+         echo "  FINDED CONTROLLER!\n";
+         echo "  {$ControllerPath}\n";
       
          Gdn_Autoloader::Priority(
             Gdn_Autoloader::CONTEXT_APPLICATION, 

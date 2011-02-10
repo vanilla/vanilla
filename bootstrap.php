@@ -111,7 +111,7 @@ Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
 // Smarty Templating Engine
-Gdn::FactoryInstall('Smarty', 'Smarty');
+Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 // Slice handler
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');

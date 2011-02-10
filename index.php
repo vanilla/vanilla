@@ -34,7 +34,7 @@ require_once(PATH_ROOT.DS.'bootstrap.php');
 
 $Dispatcher = Gdn::Dispatcher();
 
-$EnabledApplications = Gdn::Config('EnabledApplications');
+$EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);

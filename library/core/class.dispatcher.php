@@ -372,6 +372,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @todo $folderDepth needs a description.
     */
    protected function AnalyzeRequest(&$Request, $FolderDepth = 1) {
+   
+      echo __METHOD__."\n";
+   
       // Here is the basic format of a request:
       // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
 
@@ -446,6 +449,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $Parts = explode('/', $this->Request);
       
+      print_r($Parts);
+      
       /**
        * The application folder is either the first argument or is not provided. The controller is therefore
        * either the second argument or the first, depending on the result of the previous statement. Check that.
@@ -453,29 +458,27 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $ValidAppFolders = $this->EnabledApplicationFolders();
       
-      $Tries = C('Garden.Dispatcher.MaxAttempts', 5);
-      while ($Tries) {
-         $Tries--;
+      try {
+      
+         // 1] if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
+         if (in_array($Parts[0], $ValidAppFolders))
+            $this->FindController(1);
          
+         // 2] if no match, see if the first argument is a controller
+         $this->FindController(0);
          
+         throw new GdnDispatcherControllerNotFoundException();
+         
+      } catch (GdnDispatcherControllerFoundException $e) {
+
+         // Success!
+         if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
+            $this->_DeliveryType = DELIVERY_TYPE_DATA;
+         
+         return TRUE;
       }
       
-      if (in_array($Parts[0], $ValidAppFolders)) {
-         $ControllerKey = 1;
-         $this->_ApplicationFolder = $Parts[0];
-         
-         Gdn_Autoloader::Priority(
-            Gdn_Autoloader::CONTEXT_APPLICATION, 
-            $this->_ApplicationFolder,
-            Gdn_Autoloader::MAP_CONTROLLER, 
-            Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
-            Gdn_Autoloader::PRIORITY_PERSIST);
-      } else {
-         $ControllerKey = 0;
-      }
-      
-      
-      
+/*
       if ($Length == 1) {
          echo " length = 1\n";
          $FolderDepth = 0;
@@ -523,9 +526,56 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          }
       }
+*/
+   }
+   
+   protected function FindController($ControllerKey, $Parts) {
+      echo __METHOD__."\n";
+      $Application = GetValue($ControllerKey-1, $Parts, NULL);
+      $Controller = GetValue($ControllerKey, $Parts, NULL);
       
-      if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
-         $this->_DeliveryType = DELIVERY_TYPE_DATA;
+      if (!is_null($Application)) {
+         Gdn_Autoloader::Priority(
+            Gdn_Autoloader::CONTEXT_APPLICATION, 
+            $Application,
+            Gdn_Autoloader::MAP_CONTROLLER, 
+            Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
+            Gdn_Autoloader::PRIORITY_ONCE);
+      }
+      
+      $ControllerName = $Controller.'Controller';
+      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
+      
+      if ($ControllerPath !== FALSE) {
+      
+         Gdn_Autoloader::Priority(
+            Gdn_Autoloader::CONTEXT_APPLICATION, 
+            $Application,
+            Gdn_Autoloader::MAP_CONTROLLER, 
+            Gdn_Autoloader::PRIORITY_TYPE_PREFER,
+            Gdn_Autoloader::PRIORITY_PERSIST);
+      
+         $this->_ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
+         $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
+         $this->_ControllerFolder = '';
+         
+         $Length = sizeof($Parts);
+         if ($Length > $ControllerKey + 1)
+            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
+   
+         if ($Length > $ControllerKey + 2) {
+            for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
+               if ($Parts[$i] != '')
+                  $this->_ControllerMethodArgs[] = $Parts[$i];
+            }
+         }
+         
+         require_once($ControllerPath);
+         
+         throw new GdnDispatcherControllerFoundException();
+      }
+      
+      return FALSE;
    }
 
    /**
@@ -636,3 +686,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
    }
 }
+
+class GdnDispatcherControllerNotFoundException extends Exception {}
+class GdnDispatcherControllerFoundException extends Exception {}

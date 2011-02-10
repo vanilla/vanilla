@@ -297,8 +297,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             Gdn::Request()->WithRoute('Default404');
             return $this->Dispatch();
          }
-      } else {
-         die('WHAAAT');
       }
    }
    
@@ -469,9 +467,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    
    protected function FindController($ControllerKey, $Parts) {
       
-      if (defined('AUTOLOADER') && AUTOLOADER) {
-         echo __METHOD__."({$ControllerKey})\n";
-      }
+      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$ControllerKey})\n";
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));

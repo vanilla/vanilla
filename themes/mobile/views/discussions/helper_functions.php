@@ -23,12 +23,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-      if ($Discussion->FirstPhoto != '') {
-         if (strtolower(substr($Discussion->FirstPhoto, 0, 7)) == 'http://' || strtolower(substr($Discussion->FirstPhoto, 0, 8)) == 'https://') { 
-            $PhotoUrl = $Discussion->FirstPhoto;
-         } else {
-            $PhotoUrl = 'uploads/'.ChangeBasename($Discussion->FirstPhoto, 'n%s');
-         }
+      if ($Discussion->FirstPhoto) {
+         $PhotoUrl = Gdn_Upload::Url($Discussion->FirstPhoto);
          echo Img($PhotoUrl, array('alt' => $Discussion->FirstName));
 		}
    ?>

@@ -509,7 +509,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @param string The type of handler being fired (Handler, Before, After).
     * @return bool True if an event was executed.
     */
-   public function CallEventHandlers(&$Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler') {
+   public function CallEventHandlers($Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler', $Options = array()) {
       $Return = FALSE;
       
       // Look through $this->_EventHandlerCollection for relevant handlers
@@ -530,8 +530,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return $Return;
    }
    
-   public function CallEventHandler(&$Sender, $EventClassName, $EventName, $EventHandlerType, $PassedEventKey = NULL) {
+   public function CallEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType, $Options = array()) {
       $Return = FALSE;
+
+      // Backwards compatible for event key.
+      if (is_string($Options)) {
+         $PassedEventKey = $Options;
+         $Options = array();
+      } else {
+         $PassedEventKey = GetValue('EventKey', $Options, NULL);
+      }
       
       $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
       if (is_null($PassedEventKey))
@@ -559,8 +567,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                   
                if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
                   $Sender->Returns[$EventKey] = array();
-               
-               $Sender->Returns[$EventKey][$PluginKey] = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
+
+               $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
+               $Sender->Returns[$EventKey][$PluginKey] = $Return;
                $Return = TRUE;
             }
          }
@@ -589,6 +598,34 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       list($OverrideClassName, $OverrideMethodName) = $OverrideKeyParts;
       
       return $this->GetPluginInstance($OverrideClassName, self::ACCESS_CLASSNAME, $Sender)->$OverrideMethodName($Sender, $Sender->EventArguments);
+   }
+
+   public function GetEventHandlers($Sender, $EventName, $HandlerType = 'Handler', $Options = array()) {
+      // Figure out the classname.
+      if (isset($Options['ClassName']))
+         $ClassName = $Options['ClassName'];
+      elseif (property_exists($Sender, 'ClassName') && $Sender->ClassName)
+         $ClassName = $Sender->ClassName;
+      else
+         $ClassName = get_class($Sender);
+
+      // Build the list of event handler names.
+      $Names = array(
+         "{$ClassName}_{$EventName}_{$HandlerType}",
+         "Base_{$EventName}_{$HandlerType}",
+         "{$ClassName}_{$EventName}_All",
+         "Base_{$EventName}_All");
+
+      // Grab the event handlers.
+      $Handlers = array();
+      foreach ($Names as $Name) {
+         $Name = strtolower($Name);
+         if (isset($this->_EventHandlerCollection[$Name])) {
+            $Handlers = array_merge($Handlers, $this->_EventHandlerCollection[$Name]);
+         }
+      }
+
+      return $Handlers;
    }
    
    /**

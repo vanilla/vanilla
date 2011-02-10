@@ -20,7 +20,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Database
  */
 
-abstract class Gdn_DatabaseStructure {
+abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
 	protected $_DatabasePrefix = '';
 
@@ -30,14 +30,6 @@ abstract class Gdn_DatabaseStructure {
 	 * @var bool
 	 */
 	public $CaptureOnly = FALSE;
-
-   /**
-    * The name of the class that has been instantiated. Typically this will be
-    * a class that has extended this class.
-    *
-    * @var string
-    */
-   public $ClassName = '';
 
    /**
     * The character encoding to set as default for the table being created.
@@ -88,7 +80,8 @@ abstract class Gdn_DatabaseStructure {
     * @todo $Database needs a description.
     */
    public function __construct($Database = NULL) {
-      $this->ClassName = get_class($this);
+      parent::__construct();
+      
       if(is_null($Database))
          $this->Database = Gdn::Database();
       else
@@ -379,6 +372,11 @@ abstract class Gdn_DatabaseStructure {
     * method will drop the table before attempting to re-create it.
     */
    public function Set($Explicit = FALSE, $Drop = FALSE) {
+      /// Throw an event so that the structure can be overridden.
+      $this->EventArguments['Explicit'] = $Explicit;
+      $this->EventArguments['Drop'] = $Drop;
+      $this->FireEvent('BeforeSet');
+
       try {
          // Make sure that table and columns have been defined
          if ($this->_TableName == '')

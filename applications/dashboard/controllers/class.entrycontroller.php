@@ -30,20 +30,33 @@ class EntryController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'UserModel');
    
    /**
-    * Error message for username requirements.
+    * Resuable username requirement error message.
     * 
     * @since 2.0.17
     * @access public
     * @var string
     */
 	public $UsernameError = ''; 
-
+   
+   /**
+    * Place to store DeliveryType.
+    * 
+    * @since 2.0.0
+    * @access protected
+    * @var string
+    */
    protected $_RealDeliveryType;
-
+   
+   /**
+    * Setup error message & override MasterView for popups.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
    public function  __construct() {
       parent::__construct();
       
-      // Resuable, translatable username requirement error message
+      // Set error message here so it can run thru T()
       $this->UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
 
       switch (isset($_GET['display'])) {
@@ -53,6 +66,37 @@ class EntryController extends Gdn_Controller {
       }
    }
    
+   /**
+    * Include JS and CSS used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
+   public function Initialize() {
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('jquery.js');
+      $this->AddJsFile('jquery.livequery.js');
+      $this->AddJsFile('jquery.form.js');
+      $this->AddJsFile('jquery.popup.js');
+      $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('global.js');
+      
+      $this->AddCssFile('style.css');
+      parent::Initialize();
+   }
+   
+   /**
+    * Authenticate the user attempting to sign in.
+    *
+    * Events: BeforeAuth
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $AuthenticationSchemeAlias Type of authentication we're attempting.
+    */
    public function Auth($AuthenticationSchemeAlias = 'default') {
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
       $this->FireEvent('BeforeAuth');
@@ -60,6 +104,7 @@ class EntryController extends Gdn_Controller {
       // Allow hijacking auth type
       $AuthenticationSchemeAlias = $this->EventArguments['AuthenticationSchemeAlias'];
       
+      // Attempt to set Authenticator with requested method or fallback to default
       try {
          $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthenticationSchemeAlias);
       } catch (Exception $e) {
@@ -208,7 +253,14 @@ class EntryController extends Gdn_Controller {
 
    /**
     * Connect the user with an external source.
+    *
     * This controller method is meant to be used with plugins that set its data array to work.
+    * Events: ConnectData
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param string $Method Used to register multiple providers on ConnectData event.
     */
    public function Connect($Method) {
       $this->AddJsFile('entry.js');
@@ -224,6 +276,8 @@ class EntryController extends Gdn_Controller {
 
       // The different providers can check to see if they are being used and modify the data array accordingly.
       $this->EventArguments = array($Method);
+      
+      // Fire ConnectData event & error handling
       try {
          $this->FireEvent('ConnectData');
       } catch (Gdn_UserException $Ex) {
@@ -429,7 +483,15 @@ class EntryController extends Gdn_Controller {
 
       $this->Render();
    }
-
+   
+   /**
+    * After sign in, send them along.
+    *
+    * @since 2.0.0
+    * @access protected
+    *
+    * @param bool $CheckPopup 
+    */
    protected function _SetRedirect($CheckPopup = FALSE) {
       $Url = Url($this->RedirectTo(), TRUE);
 
@@ -447,19 +509,49 @@ class EntryController extends Gdn_Controller {
       }
    }
       
+   /**
+    * Default to SignIn().
+    * 
+    * @access public
+    * @since 2.0.0
+    */
    public function Index() {
       $this->SignIn();
    }
    
+   /**
+    * Auth via password.
+    * 
+    * @access public
+    * @since 2.0.0
+    */
    public function Password() {
       $this->Auth('password');
    }
    
+   /**
+    * Auth via default method. Simpler, old version of SignIn().
+    *
+    * Events: SignIn
+    * 
+    * @access public
+    * @return void
+    */
    public function SignIn2() {
       $this->FireEvent("SignIn");
       $this->Auth('default');
    }
 
+   /**
+    * Good afternoon, good evening, and goodnight.
+    * 
+    * Events: SignOut
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param string $TransientKey (default: "")
+    */
    public function SignOut($TransientKey = "") {
       $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
       $AuthenticationScheme = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
@@ -474,10 +566,16 @@ class EntryController extends Gdn_Controller {
       $this->Leave($AuthenticationScheme, $TransientKey);
    }
   
-   /** A version of signin that supports multiple authentication methods.
-    *  This method should replace EntryController::SignIn() eventually.
+   /**
+    * Signin process that multiple authentication methods.
     *
+    * @access public
+    * @since 2.0.0
+    * @author Tim Gunter
+    * 
     * @param string $Method
+    * @param array $Arg1
+    * @return string Rendered XHTML template.
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
       $this->AddJsFile('entry.js');
@@ -514,10 +612,18 @@ class EntryController extends Gdn_Controller {
       $this->DeliveryType($DeliveryType);
       $this->DeliveryMethod($DeliveryMethod);
 
-
       return $this->Render('signin2');
    }
    
+   /**
+    * Create secure handshake with remote authenticator.
+    * 
+    * @access public
+    * @since 2.0.?
+    * @author Tim Gunter
+    *
+    * @param string $AuthenticationSchemeAlias (default: 'default')
+    */
    public function Handshake($AuthenticationSchemeAlias = 'default') {
       
       try {
@@ -614,6 +720,17 @@ class EntryController extends Gdn_Controller {
       }
    }
    
+   /**
+    * Attempt to syncronize user data from remote system into Dashboard.
+    * 
+    * @access public
+    * @since 2.0.?
+    * @author Tim Gunter
+    *
+    * @param object $Authenticator
+    * @param array $UserInfo
+    * @param array $Payload
+    */
    public function SyncScreen($Authenticator, $UserInfo, $Payload) {
       $this->AddJsFile('entry.js');
       $this->View = 'handshake';
@@ -741,6 +858,13 @@ class EntryController extends Gdn_Controller {
    
    /**
     * Calls the appropriate registration method based on the configuration setting.
+    *
+    * Events: Register
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param string $InvitationCode Unique code given to invited user.
     */
    public function Register($InvitationCode = '') {
       $this->FireEvent("Register");
@@ -764,6 +888,14 @@ class EntryController extends Gdn_Controller {
       $this->$RegistrationMethod($InvitationCode);
    }
    
+   /**
+    * Select view/method to be used for registration (from config).
+    * 
+    * @access protected
+    * @since 2.0.0
+    *
+    * @return string Method name.
+    */
    protected function _RegistrationView() {
       $RegistrationMethod = Gdn::Config('Garden.Registration.Method');
       if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation')))
@@ -772,6 +904,14 @@ class EntryController extends Gdn_Controller {
       return 'Register'.$RegistrationMethod;
    }
    
+   /**
+    * Registration that requires approval.
+    *
+    * Events: RegistrationPending
+    * 
+    * @access private
+    * @since 2.0.0
+    */
    private function RegisterApproval() {
       // If the form has been posted back...
       if ($this->Form->IsPostBack()) {
@@ -794,6 +934,14 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
    
+   /**
+    * Basic/simple registration. Allows immediate access.
+    *
+    * Events: RegistrationSuccessful
+    * 
+    * @access private
+    * @since 2.0.0
+    */
    private function RegisterBasic() {
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
@@ -832,6 +980,14 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
    
+   /**
+    * Captcha-authenticated registration. Used by default.
+    *
+    * Events: RegistrationSuccessful
+    * 
+    * @access private
+    * @since 2.0.0
+    */
    private function RegisterCaptcha() {
       include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
@@ -874,10 +1030,24 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
    
+   /**
+    * Registration not allowed.
+    * 
+    * @access private
+    * @since 2.0.0
+    */
    private function RegisterClosed() {
       $this->Render();
    }
    
+   /**
+    * Invitation-only registration. Requires code.
+    *
+    * Events: RegistrationSuccessful
+    * 
+    * @access private
+    * @since 2.0.0
+    */
    private function RegisterInvitation($InvitationCode) {
       if ($this->Form->IsPostBack() === TRUE) {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');
@@ -914,6 +1084,12 @@ class EntryController extends Gdn_Controller {
       $this->Render();      
    }
    
+   /**
+    * Request password reset.
+    *
+    * @access public
+    * @since 2.0.0
+    */
    public function PasswordRequest() {
       $this->Form->SetModel($this->UserModel);
       if ($this->Form->IsPostBack() === TRUE) {
@@ -937,7 +1113,16 @@ class EntryController extends Gdn_Controller {
       }
       $this->Render();
    }
-
+   
+   /**
+    * Do password reset.
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param int $UserID Unique.
+    * @param string $PasswordResetKey Authenticate with unique, 1-time code sent via email.
+    */
    public function PasswordReset($UserID = '', $PasswordResetKey = '') {
       if (!is_numeric($UserID)
           || $PasswordResetKey == ''
@@ -964,7 +1149,16 @@ class EntryController extends Gdn_Controller {
       }
       $this->Render();
    }
-
+   
+   /**
+    * Confirm email address is valid via sent code.
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param int $UserID Unique.
+    * @param string $EmailKey Authenticate with unique, 1-time code sent via email.
+    */
    public function EmailConfirm($UserID = '', $EmailKey = '') {
       if (!is_numeric($UserID) || $EmailKey != $this->UserModel->GetAttribute($UserID, 'EmailKey', '')) {
          $this->Form->AddError(T('Couldn\'t confirm email.',
@@ -977,7 +1171,16 @@ class EntryController extends Gdn_Controller {
       }
       $this->Render();
    }
-
+   
+   /**
+    * Does actual de-authentication of a user. Used by SignOut().
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param string $AuthenticationSchemeAlias 
+    * @param string $TransientKey Unique value to prove intent.
+    */
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
       $this->FireEvent('BeforeLeave');
@@ -1054,24 +1257,28 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
    
+   /**
+    * Go to requested Target() or the default controller if none was set.
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @return string URL.
+    */
    public function RedirectTo() {
       $IncomingTarget = $this->Target($this->Form->GetValue('Target', ''));
       return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
    }
-   
-   public function Initialize() {
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery.form.js');
-      $this->AddJsFile('jquery.popup.js');
-      $this->AddJsFile('jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('global.js');
       
-      $this->AddCssFile('style.css');
-      parent::Initialize();
-   }
-
+   /**
+    * Set where to go after signin.
+    *
+    * @access public
+    * @since 2.0.0
+    *
+    * @param string $Target Where we're requested to go to.
+    * @return string URL to actually go to (validated & safe).
+    */
    public function Target($Target = FALSE) {
       if ($Target === FALSE)
          $Target = GetIncomingValue('Target', '');

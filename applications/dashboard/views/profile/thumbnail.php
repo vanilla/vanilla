@@ -17,10 +17,10 @@ echo $this->Form->Open(array('class' => 'Thumbnail'));
    <tbody>
       <tr>
          <th>
-            <?php echo Img('uploads/'.ChangeBasename($this->User->Photo,'p%s'), array('id' => 'cropbox')); ?></th>
+            <?php echo Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo,'p%s')), array('id' => 'cropbox')); ?></th>
          <td>
             <div style="<?php echo 'width:'.$this->ThumbSize.'px;height:'.$this->ThumbSize.'px;'; ?>overflow:hidden;">
-               <?php echo Img('uploads/'.ChangeBasename($this->User->Photo, 'p%s'), array('id' => 'preview')); ?>
+               <?php echo Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('id' => 'preview')); ?>
             </div>
          </td>
       </tr>

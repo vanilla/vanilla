@@ -115,7 +115,7 @@ class Gdn_ThemeManager {
                Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache);
             }
             
-            $this->ThemeCache = array_merge($this->ThemeCache, $CachePluginInfo);
+            $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
          }
       }
             

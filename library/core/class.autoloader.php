@@ -177,7 +177,7 @@ class Gdn_Autoloader {
       // Binary flip - cacheonly or cache+fs
       foreach (array(TRUE, FALSE) as $MapOnly) {
       
-         $SkipHashes = array(); $ContextType = NULL;
+         $SkipMaps = array(); $ContextType = NULL;
          $SkipTillNextContext = FALSE;
          
          // Drill to the caches associated with this map type
@@ -201,20 +201,22 @@ class Gdn_Autoloader {
                      echo "prefer]\n";
                }
                
-               foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
-               
-                  // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
-                  if ($PriorityMapHash == 'FAIL_CONTEXT_IF_NOT_FOUND') {
-                     $SkipTillNextContext = TRUE;
-                     break;
+               if (array_key_exists($ContextType, $Priorities) && is_array($Priorities[$ContextType])) {
+                  foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
+                  
+                     // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
+                     if ($PriorityMapHash == 'FAIL_CONTEXT_IF_NOT_FOUND') {
+                        $SkipTillNextContext = TRUE;
+                        break;
+                     }
+                     $PriorityMap = self::Map($PriorityMapHash);
+                     
+                     $File = $PriorityMap->Lookup($ClassName, $MapOnly);
+                     if ($File !== FALSE) return $File;
+                     
+                     // Don't check this map again
+                     array_push($SkipMaps, $PriorityMapHash);
                   }
-                  $PriorityMap = self::Map($PriorityMapHash);
-                  
-                  $File = $PriorityMap->Lookup($ClassName, $MapOnly);
-                  if ($File !== FALSE) return $File;
-                  
-                  // Don't check this map again
-                  array_push($PriorityMapHash, $SkipMaps);
                }
             }
             
@@ -308,7 +310,7 @@ class Gdn_Autoloader {
       if (!is_array(self::$Priorities)) 
          self::$Priorities = array();
       
-      if (!is_array(self::$Priorities[$ContextType]))
+      if (!array_key_exists($ContextType,self::$Priorities))
          self::$Priorities[$ContextType] = array(
             self::PRIORITY_TYPE_RESTRICT  => array(),
             self::PRIORITY_TYPE_PREFER    => array()
@@ -420,7 +422,7 @@ class Gdn_Autoloader {
       if (!is_array(self::$MapGroups))
          self::$MapGroups = array();
       
-      if (!is_array(self::$MapGroups[$MapGroupIdentifier]))
+      if (!array_key_exists($MapGroupIdentifier,self::$MapGroups))
          self::$MapGroups[$MapGroupIdentifier] = array();
 
       self::$MapGroups[$MapGroupIdentifier][$MapHash] = TRUE;

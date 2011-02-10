@@ -152,7 +152,7 @@ class Gdn {
     * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
     * @see Gdn_Factory::Install()
     */
-   public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactorySingleton, $Data = NULL) {
+   public static function FactoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = NULL) {
       // Don't overwrite an existing definition.
       if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
          return;

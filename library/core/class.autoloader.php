@@ -457,8 +457,9 @@ class Gdn_Autoloader {
       // Register autoloader with the SPL
       spl_autoload_register(array('Gdn_Autoloader', 'Lookup'));
       
-      // Configure core library
-      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY);
+      // Configure library/core and library/database
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/core');
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/database');
       
       // Register shutdown function to auto save changed cache files
       register_shutdown_function(array('Gdn_Autoloader', 'Shutdown'));

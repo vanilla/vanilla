@@ -56,7 +56,8 @@ class Gdn_Factory {
             $Def['Path'] = $Path;
          }
          
-         require_once($Path);
+         if (file_exists($Path))
+            require_once($Path);
       }
       
       if (!class_exists($ClassName, FALSE)) {

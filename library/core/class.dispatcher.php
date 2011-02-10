@@ -470,8 +470,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    protected function FindController($ControllerKey, $Parts) {
       
       if (defined('AUTOLOADER') && AUTOLOADER) {
-         $Args = func_get_args(); if (!is_array($Args)) $Args = array();
-         echo __METHOD__."(".implode(', ',$Args).")\n";
+         echo __METHOD__."({$ControllerKey})\n";
       }
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);

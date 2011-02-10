@@ -137,15 +137,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey);
             
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
-            if ($CacheHit && is_array($SearchPathCache)) {
+            $CacheIntegrityCheck = FALSE;
+            if ($CacheHit && is_array($SearchPathCache))
                $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'PluginInfo', 'ClassInfo'))) == 3);
-               if (!$CacheIntegrityCheck) {
-                  $SearchPathCache = array(
-                     'CacheIntegrityHash'    => NULL,
-                     'PluginInfo'            => array(),
-                     'ClassInfo'             => array()
-                  );
-               }
+            
+            if (!$CacheIntegrityCheck) {
+               $SearchPathCache = array(
+                  'CacheIntegrityHash'    => NULL,
+                  'PluginInfo'            => array(),
+                  'ClassInfo'             => array()
+               );
             }
             
             $CachePluginInfo = &$SearchPathCache['PluginInfo'];

@@ -1,10 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.0.17.9a');
-
-$StartTime = microtime(true);
-ob_start();
-
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -43,10 +39,4 @@ $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // 4. Process the request.
 $Dispatcher->Dispatch();
-
-ob_end_clean();
-echo "time taken: ";
-echo round((microtime(true) - $StartTime),5).'s';
-die();
-
 $Dispatcher->Cleanup();

@@ -423,6 +423,21 @@ class Gdn_Configuration {
          $Data = $Data[$Group];
       }
 
+      // Do a sanity check on the config save.
+      if ($File == PATH_CONF.'/config.php') {
+         if (!isset($Data['Database'])) {
+            if ($Pm = Gdn::PluginManager()) {
+               $Pm->EventArguments['Data'] = $Data;
+               $Pm->EventArguments['Backtrace'] = debug_backtrace();
+               $Pm->FireEvent('ConfigError');
+            }
+
+            $this->_SaveData = array();
+            $this->_File = '';
+            return FALSE;
+         }
+      }
+
       $NewLines = array();
       $NewLines[] = "<?php if (!defined('APPLICATION')) exit();";
       $LastName = '';

@@ -21,7 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Garden
  * @todo change formatting of tables in documentation
  */
-class Gdn_Form {
+class Gdn_Form extends Gdn_Pluggable {
    /**
     * @var string Action with which the form should be sent.
     * @access public
@@ -122,6 +122,8 @@ class Gdn_Form {
       
       // Get custom error class
       $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
+      
+      parent::__construct();
    }
    
    

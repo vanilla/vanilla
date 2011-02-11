@@ -222,6 +222,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if(!$ColumnKeyType || ($KeyType && $KeyType != $ColumnKeyType))
                continue;
 
+            // Don't add a fulltext if we don't support.
+            if ($ColumnKeyType == 'fulltext' && !$this->_SupportsFulltext())
+               continue;
+
             if($ColumnKeyType == 'key' || $ColumnKeyType == 'index') {
                $Name = $Prefixes[$ColumnKeyType].$this->_TableName.'_'.$ColumnName;
                $Result[$Name] = $ColumnKeyType." $Name (`$ColumnName`)";
@@ -322,11 +326,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Prepare the alter query
       $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
       
-      // 2. Alter the table storage engine
+      // 2. Alter the table storage engine.
+      $Indexes = $this->_IndexSql($this->_Columns);
+      $IndexesDb = $this->_IndexSqlDb();
+
       if(!is_null($this->_TableStorageEngine)) {
 			$CurrentEngine = $this->Database->Query("show table status where name = '".$this->_DatabasePrefix.$this->_TableName."'")->Value('Engine');
 
 			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
+            // Check to drop a fulltext index if we don't support it.
+            if (!$this->_SupportsFulltext()) {
+               foreach ($IndexesDb as $IndexName => $IndexSql) {
+                  if (StringBeginsWith($IndexSql, 'fulltext', TRUE)) {
+                     $DropIndexQuery = "$AlterSqlPrefix drop index $IndexName;\n";
+                     if (!$this->Query($DropIndexQuery))
+                        throw new Exception(sprintf(T('Failed to drop the index `%1$s` on table `%2$s`.'), $IndexName, $this->_TableName));
+                  }
+               }
+            }
+
 				$EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
 				if (!$this->Query($EngineQuery))
 					throw new Exception(sprintf(T('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
@@ -386,8 +404,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       }
       
       // 4. Update Indexes
-      $Indexes = $this->_IndexSql($this->_Columns);
-      $IndexesDb = $this->_IndexSqlDb();
 
       $IndexSql = array();
       // Go through the indexes to add or modify.
@@ -477,5 +493,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       } else {
          return "'".str_replace("'", "''", $Value)."'";
       }
+   }
+
+   protected function _SupportsFulltext() {
+      return strcasecmp($this->_TableStorageEngine, 'InnoDB') != 0;
    }
 }

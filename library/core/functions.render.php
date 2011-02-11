@@ -253,10 +253,12 @@ if (!function_exists('UserBuilder')) {
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $CssClass = '') {
       $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($User->Photo != '') {
-         $IsFullPath = strtolower(substr($User->Photo, 0, 7)) == 'http://' || strtolower(substr($User->Photo, 0, 8)) == 'https://'; 
-         $PhotoUrl = ($IsFullPath) ? $User->Photo : 'uploads/'.ChangeBasename($User->Photo, 'n%s');
-         return '<a title="'.urlencode($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
+      if ($User->Photo) {
+         if (!preg_match('`^https?://`i', $User->Photo))
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+         else
+            $PhotoUrl = $User->Photo;
+         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'
             .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
             .'</a>';
       } else {

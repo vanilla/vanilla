@@ -5,7 +5,7 @@ if ($this->User->Photo != ''
       && strtolower(substr($this->User->Photo, 0, 8)) != 'https://') {
    ?>
    <div class="Photo">
-      <?php echo Img('uploads/'.ChangeBasename($this->User->Photo, 'p%s')); ?>
+      <?php echo Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s'))); ?>
    </div>
    <?php
 }

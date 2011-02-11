@@ -37,7 +37,9 @@ if(array_key_exists('CapturedSql', $this->Data)) {
 		<div class="Info"><?php echo T('There are no database structure changes required. There may, however, be data changes.'); ?></div>
 		<?php
 	}
-	echo Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;')),
+	echo  '<div class="Info">',
+      Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;')),
       ' ',
-      Anchor(T('Rescan'), 'dashboard/utility/structure/all', 'Button', array('style' => 'font-size: 16px;'));
+      Anchor(T('Rescan'), 'dashboard/utility/structure/all', 'Button', array('style' => 'font-size: 16px;')),
+      '</div>';
 }

@@ -100,6 +100,8 @@ class Gdn_ThemeManager {
             }
             
             $CacheThemeInfo = &$SearchPathCache['ThemeInfo'];
+            if (!is_array($CacheThemeInfo))
+               $CacheThemeInfo = array();
             
             $PathListing = scandir($SearchPath, 0);
             sort($PathListing);
@@ -174,7 +176,7 @@ class Gdn_ThemeManager {
          $ThemePath = CombinePaths(array($SearchPath,$ThemeFolderName));
          $ThemeFiles = $this->FindThemeFiles($ThemePath);
          
-         if ($ThemeFile === FALSE)
+         if (GetValue('about', $ThemeFiles) === FALSE)
             continue;
             
          $ThemeAboutFile = GetValue('about', $ThemeFiles);

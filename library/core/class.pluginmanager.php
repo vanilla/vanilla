@@ -765,14 +765,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       CheckRequirements($PluginName, $RequiredPlugins, $this->EnabledPlugins(), 'plugin');
       
       // Required Themes
-      $ThemeManager = new Gdn_ThemeManager();
-      $EnabledThemes = $ThemeManager->EnabledThemeInfo(TRUE);
+      $EnabledThemes = Gdn::ThemeManager()->EnabledThemeInfo();
       $RequiredThemes = ArrayValue('RequiredTheme', $PluginInfo, FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       
       // Required Applications
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $EnabledApplications = $ApplicationManager->EnabledApplications();
+      $EnabledApplications = Gdn::ApplicationManager()->EnabledApplications();
       $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, FALSE);
       CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
 
@@ -819,9 +817,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $PluginClassName = GetValue('ClassName', $PluginInfo);
       $this->RegisterPlugin($PluginClassName);
       
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $ApplicationManager->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
+      Gdn::Locale()->Set(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
       return TRUE;
    }
    
@@ -869,7 +865,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @return void
     */
    private function _RemovePluginFolder($PluginFolder) {
-      Gdn_FileSystem::RemoveFolder(PATH_PLUGINS . DS . $PluginFolder);
+      Gdn_FileSystem::RemoveFolder(PATH_PLUGINS.DS.$PluginFolder);
    }
    
    /**

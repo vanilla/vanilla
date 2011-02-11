@@ -155,7 +155,7 @@ class Gdn_FileSystem {
                   trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
 
                // Search all subfolders
-               if ($WhiteList == TRUE)
+               if ($WhiteList === TRUE)
                   $WhiteList = scandir($SourceFolder);
                
                $SubFolders = array();

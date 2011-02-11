@@ -760,24 +760,23 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    public function TestPlugin($PluginName, &$Validation, $Setup = FALSE) {
       // Make sure that the plugin's requirements are met
       // Required Plugins
-      $AvailablePlugins = $this->AvailablePlugins();
-      $RequiredPlugins = ArrayValue('RequiredPlugins', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
-      CheckRequirements($PluginName, $RequiredPlugins, $this->EnabledPlugins, 'plugin');
+      $PluginInfo = $this->GetPluginInfo($PluginName);
+      $RequiredPlugins = GetValue('RequiredPlugins', $PluginInfo, FALSE);
+      CheckRequirements($PluginName, $RequiredPlugins, array_intersect_key($this->AvailablePlugins(), $this->EnabledPlugins), 'plugin');
       
       // Required Themes
       $ThemeManager = new Gdn_ThemeManager();
       $EnabledThemes = $ThemeManager->EnabledThemeInfo(TRUE);
-      $RequiredThemes = ArrayValue('RequiredTheme', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
+      $RequiredThemes = ArrayValue('RequiredTheme', $PluginInfo, FALSE);
       CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
       
       // Required Applications
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
-      $RequiredApplications = ArrayValue('RequiredApplications', ArrayValue($PluginName, $AvailablePlugins, array()), FALSE);
+      $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, FALSE);
       CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
 
       // Include the plugin, instantiate it, and call its setup method
-      $PluginInfo = ArrayValue($PluginName, $AvailablePlugins, FALSE);
       $PluginClassName = ArrayValue('ClassName', $PluginInfo, FALSE);
       $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
       if ($PluginFolder == '')
@@ -798,7 +797,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    public function EnablePlugin($PluginName, $Validation, $Setup = FALSE, $EnabledPluginValueIndex = 'Folder') {
       
       // Check that the plugin is in AvailablePlugins...
-      $PluginInfo = $this->GetPluginInfo($PluginName, self::ACCESS_PLUGINNAME);
+      $PluginInfo = $this->GetPluginInfo($PluginName);
       
       // Couldn't load the plugin info.
       if (!$PluginInfo) return FALSE;

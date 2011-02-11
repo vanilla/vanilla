@@ -19,6 +19,9 @@ if (!defined('PATH_LOCAL_APPLICATIONS')) define('PATH_LOCAL_APPLICATIONS', PATH_
 if (!defined('PATH_CACHE')) define('PATH_CACHE', PATH_ROOT.'/cache');
 if (!defined('PATH_LOCAL_CACHE')) define('PATH_LOCAL_CACHE', PATH_CACHE);
 
+if (!defined('PATH_UPLOADS')) define('PATH_UPLOADS', PATH_ROOT.'/uploads');
+if (!defined('PATH_LOCAL_UPLOADS')) define('PATH_LOCAL_UPLOADS', PATH_UPLOADS);
+
 if (!defined('PATH_PLUGINS')) define('PATH_PLUGINS', PATH_ROOT.'/plugins');
 if (!defined('PATH_LOCAL_PLUGINS')) define('PATH_LOCAL_PLUGINS', PATH_PLUGINS);
 

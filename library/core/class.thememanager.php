@@ -32,19 +32,19 @@ class Gdn_ThemeManager {
       $this->ThemeSearchPaths = array();
       
       // Add default search path(s) to list
-      $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 1;
-      $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 1;
+      $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 'local';
+      $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
       
       // Check for, and load, alternate search paths from config
       $AlternatePaths = C('Garden.ThemeManager.Search', NULL);
       if (is_null($AlternatePaths)) return;
       
       if (!is_array($AlternatePaths))
-         $AlternatePaths = array($AlternatePaths);
+         $AlternatePaths = array($AlternatePaths => 'alternate');
       
-      foreach ($AlternatePaths as $AltPath)
+      foreach ($AlternatePaths as $AltPath => $AltName)
          if (is_dir($AltPath))
-            $this->ThemeSearchPaths[rtrim($AltPath, '/')] = 1;
+            $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
    }
    
    /**
@@ -94,7 +94,7 @@ class Gdn_ThemeManager {
                if (!$CacheIntegrityCheck) {
                   $SearchPathCache = array(
                      'CacheIntegrityHash'    => NULL,
-                     'PluginInfo'            => array()
+                     'ThemeInfo'             => array()
                   );
                }
             }
@@ -123,8 +123,6 @@ class Gdn_ThemeManager {
             
       return $this->ThemeCache;
       
-
-            
       /*if (!is_array($this->_AvailableThemes)) {
          $ThemeInfo = array();
          $ThemeFolders = Gdn_FileSystem::Folders(PATH_THEMES);
@@ -183,8 +181,10 @@ class Gdn_ThemeManager {
          $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
          
          // Add the screenshot.
-         if (array_key_exists('screenshot', $ThemeFiles))
-            $SearchThemeInfo['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath), TRUE);
+         if (array_key_exists('screenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('screenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
             
          if (array_key_exists('hooks', $ThemeFiles)) {
             $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
@@ -201,7 +201,9 @@ class Gdn_ThemeManager {
    }
    
    public function FindThemeFiles($ThemePath) {
-      if (!is_dir($ThemePath)) return FALSE;
+      if (!is_dir($ThemePath))
+         return FALSE;
+      
       $ThemeFiles = scandir($ThemePath);
       $TestPatterns = array(
          'about\.php'                           => 'about',
@@ -210,14 +212,15 @@ class Gdn_ThemeManager {
          'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
       );
       
-      $ThemeFiles = array();
-      foreach ($ThemeFiles as $ThemeFile => $FileType) {
-         foreach ($TestPatterns as $TestPattern)
-            if (preg_match('!'.$TestPattern.'!', $ThemeFile)) 
-               $ThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
+      $MatchedThemeFiles = array();
+      foreach ($ThemeFiles as $ThemeFile) {
+         foreach ($TestPatterns as $TestPattern => $FileType) {
+            if (preg_match('!'.$TestPattern.'!', $ThemeFile))
+               $MatchedThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
+         }
       }
       
-      return array_key_exists('about', $ThemeFiles) ? $ThemeFiles : FALSE;
+      return array_key_exists('about', $MatchedThemeFiles) ? $MatchedThemeFiles : FALSE;
    }
    
    public function ScanThemeFile($ThemeFile, $VariableName = NULL) {
@@ -229,13 +232,11 @@ class Gdn_ThemeManager {
       $ClassBuffer = FALSE;
       $ClassName = '';
       $ThemeInfoString = '';
-      if ($VariableName) {
-         $ParseVariableName = '$'.$VariableName;
-         $$VariableName = array();
-      } else {
-         $ParseVariableName = '$ThemeInfo';
-         $ThemeInfo = FALSE;
-      }
+      if (!$VariableName)
+         $VariableName = 'ThemeInfo';
+      
+      $ParseVariableName = '$'.$VariableName;
+      ${$VariableName} = array();
 
       foreach ($Lines as $Line) {
          if ($InfoBuffer && substr(trim($Line), -2) == ');') {
@@ -264,24 +265,24 @@ class Gdn_ThemeManager {
          @eval($ThemeInfoString);
          
       // Define the folder name and assign the class name for the newly added item
-      if (is_array($$VariableName)) {
-         $Item = array_pop($Trash = array_keys($$VariableName));
+      if (isset(${$VariableName}) && is_array(${$VariableName})) {
+         $Item = array_pop($Trash = array_keys(${$VariableName}));
          
-         $$VariableName[$Item]['Index'] = $Item;
-         $$VariableName[$Item]['AboutFile'] = $ThemeFile;
-         $$VariableName[$Item]['RealAboutFile'] = realpath($ThemeFile);
-         $$VariableName[$Item]['ThemeRoot'] = dirname($ThemeFile);
+         ${$VariableName}[$Item]['Index'] = $Item;
+         ${$VariableName}[$Item]['AboutFile'] = $ThemeFile;
+         ${$VariableName}[$Item]['RealAboutFile'] = realpath($ThemeFile);
+         ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
          
-         if (!array_key_exists('Name', $$VariableName[$Item]))
-            $$VariableName[$Item]['Name'] = $Item;
+         if (!array_key_exists('Name', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Name'] = $Item;
             
-         if (!array_key_exists('Folder', $$VariableName[$Item]))
-            $$VariableName[$Item]['Folder'] = $Item;
+         if (!array_key_exists('Folder', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Folder'] = $Item;
          
-         return $$VariableName[$Item];
+         return ${$VariableName}[$Item];
       } elseif ($VariableName !== NULL) {
-         if (isset($$VariableName) && is_array($$VariableName))
-            return $$VariableName;
+         if (isset(${$VariableName}) && is_array(${$VariableName}))
+            return ${$VariableName};
       }
       
       return NULL;

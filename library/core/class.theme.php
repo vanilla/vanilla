@@ -138,12 +138,9 @@ class Gdn_Theme {
     */
    public static function Logo() {
       $Logo = C('Garden.Logo');
-      if ($Logo) {
+      if ($Logo)
          $Logo = ltrim($Logo, '/');
-         // Fix the logo path.
-         if (StringBeginsWith($Logo, 'uploads/'))
-            $Logo = substr($Logo, strlen('uploads/'));;
-      }
+      
       $Title = C('Garden.Title', 'Title');
       echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
    }

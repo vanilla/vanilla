@@ -199,7 +199,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          }
       }
       
-      return $this->EnabledPlugins;
+      return array_intersect_key($this->AvailablePlugins(), $this->EnabledPlugins);
    }
    
    /**
@@ -306,9 +306,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
       foreach (get_declared_classes() as $ClassName) {
       
-         // Only register the plugin if it implements the Gdn_IPlugin interface and
-         // it has it's properties defined in $this->EnabledPlugins.
+         // Only register the plugin if it implements the Gdn_IPlugin interface
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
+         
             // If this plugin was already indexed, skip it.
             if (array_key_exists($ClassName, $this->RegisteredPlugins))
                continue;
@@ -762,7 +762,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // Required Plugins
       $PluginInfo = $this->GetPluginInfo($PluginName);
       $RequiredPlugins = GetValue('RequiredPlugins', $PluginInfo, FALSE);
-      CheckRequirements($PluginName, $RequiredPlugins, array_intersect_key($this->AvailablePlugins(), $this->EnabledPlugins), 'plugin');
+      CheckRequirements($PluginName, $RequiredPlugins, $this->EnabledPlugins(), 'plugin');
       
       // Required Themes
       $ThemeManager = new Gdn_ThemeManager();
@@ -833,7 +833,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // 1. Check to make sure that no other enabled plugins rely on this one
       // Get all available plugins and compile their requirements
-      foreach ($this->EnabledPlugins as $CheckingName => $CheckingInfo) {
+      foreach ($this->EnabledPlugins() as $CheckingName => $Trash) {
+         $CheckingInfo = $this->GetPluginInfo($CheckingName);
          $RequiredPlugins = ArrayValue('RequiredPlugins', $CheckingInfo, FALSE);
          if (is_array($RequiredPlugins) && array_key_exists($PluginName, $RequiredPlugins) === TRUE) {
             throw new Exception(sprintf(T('You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'), $PluginName, $CheckingName));

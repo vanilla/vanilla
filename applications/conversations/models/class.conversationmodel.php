@@ -46,6 +46,7 @@ class ConversationModel extends Gdn_Model {
          ->Select('lm.InsertUserID', '', 'LastMessageUserID')
          ->Select('lm.DateInserted', '', 'DateLastMessage')
          ->Select('lm.Body', '', 'LastMessage')
+         ->Select('lm.Format')
          ->Select('lmu.Name', '', 'LastMessageName')
          ->Select('lmu.Photo', '', 'LastMessagePhoto')
          //->Select('iu.Name', '', 'InsertName')

@@ -10,7 +10,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-   $Message = SliceString(Gdn_Format::Text($Conversation->LastMessage), 100);
+   $Message = nl2br(SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), FALSE), 100));
    if (StringIsNullOrEmpty(trim($Message)))
       $Message = T('Blank Message');
 ?>

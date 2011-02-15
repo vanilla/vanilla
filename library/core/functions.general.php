@@ -533,7 +533,8 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
-			if(is_object($AssociativeArray)) {
+         
+			if (is_object($AssociativeArray)) {
 				if($ValueKey === '') {
 					$Return[] = $AssociativeArray->$Key;
 				} elseif(property_exists($AssociativeArray, $ValueKey)) {
@@ -541,7 +542,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
 				} else {
 					$Return[$AssociativeArray->$Key] = $DefaultValue;
 				}
-			} elseif (array_key_exists($Key, $AssociativeArray)) {
+			} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {

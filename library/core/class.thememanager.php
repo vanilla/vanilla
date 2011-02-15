@@ -122,40 +122,6 @@ class Gdn_ThemeManager {
       }
             
       return $this->ThemeCache;
-      
-      /*if (!is_array($this->_AvailableThemes)) {
-         $ThemeInfo = array();
-         $ThemeFolders = Gdn_FileSystem::Folders(PATH_THEMES);
-         $ThemeAboutFiles = Gdn_FileSystem::FindAll(PATH_THEMES, 'about.php', $ThemeFolders);
-         // Include them all right here and fill the theme info array
-         $ThemeCount = is_array($ThemeAboutFiles) ? count($ThemeAboutFiles) : 0;
-         for ($i = 0; $i < $ThemeCount; ++$i) {
-            include($ThemeAboutFiles[$i]);
-            
-            // Define the folder name for the newly added item
-            foreach ($ThemeInfo as $ThemeName => $Info) {
-               if (array_key_exists('Folder', $ThemeInfo[$ThemeName]) === FALSE) {
-                  $Folder = substr($ThemeAboutFiles[$i], strlen(PATH_THEMES));
-                  if (substr($Folder, 0, 1) == DS)
-                     $Folder = substr($Folder, 1);
-                     
-                  $Folder = substr($Folder, 0, strpos($Folder, DS));
-                  $ThemeInfo[$ThemeName]['Folder'] = $Folder;
-                  $ThemeInfo[$ThemeName]['Index'] = $ThemeName;
-
-                  // Add the screenshot.
-                  $ScreenshotPath = SafeGlob(PATH_THEMES."/$Folder/screenshot.*", array('gif', 'jpg', 'png'));
-                  if (count($ScreenshotPath) > 0) {
-                     $ScreenshotPath = $ScreenshotPath[0];
-                     $ThemeInfo[$ThemeName]['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath), TRUE);
-                  }
-               }
-            }
-         }
-         $this->_AvailableThemes = $ThemeInfo;
-      }
-
-      return $this->_AvailableThemes;*/
    }
    
    public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = NULL) {
@@ -281,7 +247,7 @@ class Gdn_ThemeManager {
          
          return ${$VariableName}[$Item];
       } elseif ($VariableName !== NULL) {
-         if (isset(${$VariableName}) && is_array(${$VariableName}))
+         if (isset(${$VariableName}))
             return ${$VariableName};
       }
       

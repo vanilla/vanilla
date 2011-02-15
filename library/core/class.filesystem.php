@@ -306,12 +306,12 @@ class Gdn_FileSystem {
          
          // Determine if Path extension should be appended to Name
          $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
+         $FileExtension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
          if ($NameExtension == '') {
-            $Extension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
             if ($Name == '') {
-               $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $Extension;
-            } elseif (!StringEndsWith($Name, '.'.$Extension)) {
-             $Name .= '.'.$Extension;
+               $Name = pathinfo($File, PATHINFO_FILENAME) . '.' . $FileExtension;
+            } elseif (!StringEndsWith($Name, '.'.$FileExtension)) {
+             $Name .= '.'.$FileExtension;
             }
          }
          $Name = rawurldecode($Name);
@@ -335,8 +335,8 @@ class Gdn_FileSystem {
          );
          
          if ($MimeType == '') {
-            if (array_key_exists($Extension, $MimeTypes)){
-              $MimeType = $MimeTypes[$Extension];
+            if (array_key_exists($FileExtension, $MimeTypes)){
+              $MimeType = $MimeTypes[$FileExtension];
             } else {
               $MimeType = 'application/force-download';
             };

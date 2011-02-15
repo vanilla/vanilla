@@ -38,7 +38,7 @@ class Gdn_Url {
    public static function WebRoot($WithDomain = FALSE) {
       $WebRoot = Gdn::Request()->WebRoot();
 
-      if($WithDomain)
+      if ($WithDomain)
          $Result = Gdn::Request()->Domain().'/'.$WebRoot;
       else
          $Result = $WebRoot;

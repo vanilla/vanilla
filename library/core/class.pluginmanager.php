@@ -253,13 +253,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          if ($PluginFile === FALSE)
             continue;
             
-         $RealPluginFile = realpath($PluginFile);
-         $SearchPluginInfo = $this->ScanPluginFile($RealPluginFile);
+         $SearchPluginInfo = $this->ScanPluginFile($PluginFile);
          
          if ($SearchPluginInfo === FALSE)
             continue;
          
+         $RealPluginFile = realpath($PluginFile);
          $SearchPluginInfo['RealFile'] = $RealPluginFile;
+         $SearchPluginInfo['RealRoot'] = dirname($RealPluginFile);
          $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
          
          $PluginClassName = GetValue('ClassName', $SearchPluginInfo);
@@ -684,13 +685,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $ClassBuffer = FALSE;
       $ClassName = '';
       $PluginInfoString = '';
-      if ($VariableName) {
-         $ParseVariableName = '$'.$VariableName;
-         $$VariableName = array();
-      } else {
-         $ParseVariableName = '$PluginInfo';
-         $PluginInfo = FALSE;
-      }
+      if (!$VariableName)
+         $VariableName = 'PluginInfo';
+      
+      $ParseVariableName = '$'.$VariableName;
+      ${$VariableName} = array();
 
       foreach ($Lines as $Line) {
          if ($InfoBuffer && substr(trim($Line), -2) == ');') {
@@ -719,23 +718,23 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          @eval($PluginInfoString);
          
       // Define the folder name and assign the class name for the newly added item
-      if (is_array($PluginInfo)) {
-         $Item = array_pop($Trash = array_keys($PluginInfo));
+      if (isset(${$VariableName}) && is_array(${$VariableName})) {
+         $Item = array_pop($Trash = array_keys(${$VariableName}));
          
-         $PluginInfo[$Item]['Index'] = $Item;
-         $PluginInfo[$Item]['ClassName'] = $ClassName;
-         $PluginInfo[$Item]['PluginFilePath'] = $PluginFile;
-         $PluginInfo[$Item]['PluginRoot'] = dirname($PluginFile);
+         ${$VariableName}[$Item]['Index'] = $Item;
+         ${$VariableName}[$Item]['ClassName'] = $ClassName;
+         ${$VariableName}[$Item]['PluginFilePath'] = $PluginFile;
+         ${$VariableName}[$Item]['PluginRoot'] = dirname($PluginFile);
          
-         if (!array_key_exists('Name', $PluginInfo[$Item]))
-            $PluginInfo[$Item]['Name'] = $Item;
+         if (!array_key_exists('Name', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Name'] = $Item;
             
-         if (!array_key_exists('Folder', $PluginInfo[$Item]))
-            $PluginInfo[$Item]['Folder'] = $Item;
+         if (!array_key_exists('Folder', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Folder'] = $Item;
             
-         return $PluginInfo[$Item];
+         return ${$VariableName}[$Item];
       } elseif ($VariableName !== NULL) {
-         if (isset($$VariableName) && is_array($$VariableName))
+         if (isset(${$VariableName}))
             return $$VariableName;
       }
       

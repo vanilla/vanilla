@@ -386,10 +386,11 @@ class Gdn_Autoloader {
          $Extension,
          $MapRootLocation
       ));
+      $Options['MapIdentifier'] = $MapIdentifier;
       $MapHash = md5($MapIdentifier);
       
       // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
-      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder))."_".$MapHash;
+      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
       
       if (!is_array(self::$Maps))
          self::$Maps = array();
@@ -460,6 +461,7 @@ class Gdn_Autoloader {
       // Configure library/core and library/database
       self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/core');
       self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/database');
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/vendors');
       
       // Register shutdown function to auto save changed cache files
       register_shutdown_function(array('Gdn_Autoloader', 'Shutdown'));
@@ -505,6 +507,7 @@ class Gdn_Autoloader_Map {
       $ExtensionName = GetValue('Extension', $Options, NULL);
       $Recursive = GetValue('SearchSubfolders', $Options, TRUE);
       $ContextPrefix = GetValue('ContextPrefix', $Options, NULL);
+      $MapIdentifier = GetValue('MapIdentifier', $Options, NULL);
       
       $MapName = $MapType;
       if (!is_null($ExtensionName))
@@ -519,6 +522,7 @@ class Gdn_Autoloader_Map {
       
       $this->MapInfo = array(
          'ondisk'       => $OnDiskMapFile,
+         'identifier'   => $MapIdentifier,
          'root'         => $MapRootLocation,
          'name'         => $MapName,
          'maptype'      => $MapType,

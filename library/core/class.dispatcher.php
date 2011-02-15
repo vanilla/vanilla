@@ -187,7 +187,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $this->FireEvent('BeforeDispatch');
       $this->AnalyzeRequest($Request);
-      
+            
       // Send user to login page if this is a private community (with some minor exceptions)
       if (
          C('Garden.PrivateCommunity')

@@ -28,7 +28,7 @@ define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
 
 // 2. Include the bootstrap to configure the framework.
-require_once(PATH_ROOT.DS.'bootstrap.php');
+require_once(PATH_ROOT.'/bootstrap.php');
 
 // 3. Create and configure the dispatcher.
 $Dispatcher = Gdn::Dispatcher();

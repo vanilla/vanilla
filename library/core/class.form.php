@@ -839,7 +839,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return string
     */
    public function InlineError($FieldName) {
-      $AppendError = '<p class="'.$ErrorClass.'">';
+      $AppendError = '<p class="'.$this->ErrorClass.'">';
       foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
          $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
       }

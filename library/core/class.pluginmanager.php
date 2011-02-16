@@ -386,6 +386,34 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return FALSE;
    }
    
+   public function GetEventHandlers($Sender, $EventName, $HandlerType = 'Handler', $Options = array()) {
+      // Figure out the classname.
+      if (isset($Options['ClassName']))
+         $ClassName = $Options['ClassName'];
+      elseif (property_exists($Sender, 'ClassName') && $Sender->ClassName)
+         $ClassName = $Sender->ClassName;
+      else
+         $ClassName = get_class($Sender);
+
+      // Build the list of event handler names.
+      $Names = array(
+         "{$ClassName}_{$EventName}_{$HandlerType}",
+         "Base_{$EventName}_{$HandlerType}",
+         "{$ClassName}_{$EventName}_All",
+         "Base_{$EventName}_All");
+
+      // Grab the event handlers.
+      $Handlers = array();
+      foreach ($Names as $Name) {
+         $Name = strtolower($Name);
+         if (isset($this->_EventHandlerCollection[$Name])) {
+            $Handlers = array_merge($Handlers, $this->_EventHandlerCollection[$Name]);
+         }
+      }
+
+      return $Handlers;
+   }
+   
    public function GetPluginInfo($AccessName, $AccessType = self::ACCESS_PLUGINNAME) {
       $PluginName = FALSE;
       
@@ -599,34 +627,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       list($OverrideClassName, $OverrideMethodName) = $OverrideKeyParts;
       
       return $this->GetPluginInstance($OverrideClassName, self::ACCESS_CLASSNAME, $Sender)->$OverrideMethodName($Sender, $Sender->EventArguments);
-   }
-
-   public function GetEventHandlers($Sender, $EventName, $HandlerType = 'Handler', $Options = array()) {
-      // Figure out the classname.
-      if (isset($Options['ClassName']))
-         $ClassName = $Options['ClassName'];
-      elseif (property_exists($Sender, 'ClassName') && $Sender->ClassName)
-         $ClassName = $Sender->ClassName;
-      else
-         $ClassName = get_class($Sender);
-
-      // Build the list of event handler names.
-      $Names = array(
-         "{$ClassName}_{$EventName}_{$HandlerType}",
-         "Base_{$EventName}_{$HandlerType}",
-         "{$ClassName}_{$EventName}_All",
-         "Base_{$EventName}_All");
-
-      // Grab the event handlers.
-      $Handlers = array();
-      foreach ($Names as $Name) {
-         $Name = strtolower($Name);
-         if (isset($this->_EventHandlerCollection[$Name])) {
-            $Handlers = array_merge($Handlers, $this->_EventHandlerCollection[$Name]);
-         }
-      }
-
-      return $Handlers;
    }
    
    /**

@@ -323,11 +323,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ApplicationFolder == '')
          $ApplicationFolder = $this->_ApplicationFolder;
 
-      $EnabledApplication = array_keys($this->_EnabledApplications, $ApplicationFolder);
-      $EnabledApplication = count($EnabledApplication) > 0 ? $EnabledApplication[0] : '';
-      $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-      $this->FireEvent('AfterEnabledApplication');
-      return $EnabledApplication;
+      foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
+         if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
+            $EnabledApplication = $ApplicationName;
+            $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+            $this->FireEvent('AfterEnabledApplication');
+            return $EnabledApplication;
+         }
+      }
+      return FALSE;
    }
 
    /**

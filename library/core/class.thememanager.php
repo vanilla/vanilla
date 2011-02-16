@@ -66,7 +66,6 @@ class Gdn_ThemeManager {
       $ThemeHooks = GetValue('RealHooksFile', $ThemeInfo, NULL);
       if (file_exists($ThemeHooks))
          include_once($ThemeHooks);
-      
    }
    
    /**

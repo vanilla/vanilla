@@ -174,7 +174,7 @@ class Gdn_ThemeManager {
       $TestPatterns = array(
          'about\.php'                           => 'about',
          '.*\.theme\.php'                       => 'about',
-         '.*\.themehooks\.php'                  => 'hooks',
+         'class\..*themehooks\.php'             => 'hooks',
          'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
       );
       

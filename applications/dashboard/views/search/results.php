@@ -10,7 +10,7 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 		<div class="ItemContent">
 			<?php echo Anchor(Gdn_Format::Text($Row->Title), $Row->Url, 'Title'); ?>
 			<div class="Excerpt"><?php
-				echo Anchor(SliceString(Gdn_Format::Text($Row->Summary), 250), $Row->Url);
+				echo Anchor(nl2br(SliceString(Gdn_Format::Text($Row->Summary, FALSE), 250)), $Row->Url);
 			?></div>
 			<div class="Meta">
 				<span><?php printf(T('by %s'), UserAnchor($Row)); ?></span>

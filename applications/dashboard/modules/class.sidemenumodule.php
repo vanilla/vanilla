@@ -173,7 +173,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
       public function RemoveLink($Group, $Text) {
          if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
             foreach ($this->Items[$Group] as $Index => $GroupArray) {
-               if ($this->Items[$Group][$Index]['Text'] == $Text) {
+               if (GetValue('Text',$this->Items[$Group][$Index], NULL) == $Text) {
                   unset($this->Items[$Group][$Index]);
                   array_merge($this->Items[$Group]);
                   break;

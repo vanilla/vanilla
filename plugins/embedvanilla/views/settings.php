@@ -24,7 +24,7 @@ $RecommendedThemeName = 'Embed-Friendly';
       <strong>Forum Embed Plugins</strong>
       <em>Use these custom-built plugins to embed the forum into various other applications without the need to touch any code.</em>
       <ul>
-         <li><?php echo Anchor(T('WordPress Plugin'), 'plugins/embedvanilla/plugins/wordpress.zip', 'WordPress'); ?></li>
+         <li><?php echo Anchor(T('WordPress Plugin'), 'http://wordpress.org/extend/plugins/vanilla-forums/', 'WordPress'); ?></li>
          <li><?php echo Anchor(T('Blogger Gadget'), 'plugin/gadgetinfo', 'Popup'); ?></li>
       </ul>
    </div>

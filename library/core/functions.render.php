@@ -254,7 +254,10 @@ if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $CssClass = '') {
       $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
       if ($User->Photo) {
-         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+         if (!preg_match('`^https?://`i', $User->Photo))
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+         else
+            $PhotoUrl = $User->Photo;
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'
             .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
             .'</a>';

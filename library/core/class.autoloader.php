@@ -142,10 +142,12 @@ class Gdn_Autoloader {
                         ));
                      }
                   } else {
+/*
                      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $SearchPath, array(
                         'SearchSubfolders'      => TRUE,
                         'Extension'             => $SearchPathName
                      ));
+*/
                   }
                }
                

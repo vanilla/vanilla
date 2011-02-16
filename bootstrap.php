@@ -49,46 +49,42 @@ Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', NULL, Gdn::FactoryRealSingleto
 
 /// Install the configuration.
 Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
-$Gdn_Config = Gdn::Factory(Gdn::AliasConfig);
 
 // Configuration Defaults.
-$Gdn_Config->Load(PATH_CONF.'/config-defaults.php', 'Use');
+Gdn::Config()->Load(PATH_CONF.'/config-defaults.php', 'Use');
 
 // Load installation-specific static configuration so that we know what apps are enabled.
-$Gdn_Config->Load(PATH_CONF.'/config.php', 'Use');
+Gdn::Config()->Load(PATH_CONF.'/config.php', 'Use');
 
-// ApplicationManager
-Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
-
-// PluginManager
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
-
-// ThemeManager
-Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
-
-$Gdn_Config->Caching(TRUE);
+Gdn::Config()->Caching(TRUE);
 
 if (PATH_LOCAL_CONF != PATH_CONF) {
    // Load the custom configurations 
-   $Gdn_Config->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
+   Gdn::Config()->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
 }
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', NULL, Gdn::FactoryRealSingleton, 'Create');
 Gdn::Request()->FromEnvironment();
 
+// ApplicationManager
+Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
+
+// ThemeManager
+Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
+
+// PluginManager
+Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
+
 // Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
-	$Gdn_Config->Load(PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'configuration.php', 'Use');
+	Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php", 'Use');
 }
 
 // Load the custom configurations again so that application setting defaults are overridden.
-$Gdn_Config->Load(PATH_LOCAL_CONF.DS.'config.php', 'Use');
-unset($Gdn_Config);
+Gdn::Config()->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
 if (!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
@@ -151,7 +147,10 @@ unset($Gdn_Path);
 unset($Hooks_Path);
 
 Gdn::ThemeManager()->Start();
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
+
 Gdn::PluginManager()->Start();
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 Gdn::Authenticator()->StartAuthenticator();
 

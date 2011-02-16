@@ -4,13 +4,15 @@
 $PluginInfo['Gravatar'] = array(
    'Name' => 'Gravatar',
    'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+	'MobileFriendly' => TRUE
 );
 
 // 1.1 Fixes - Used GetValue to retrieve array props instead of direct references
+// 1.2 Fixes - Make Gravatar work with the mobile theme
 
 class GravatarPlugin extends Gdn_Plugin {
    

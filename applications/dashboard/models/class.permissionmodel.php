@@ -152,7 +152,7 @@ class PermissionModel extends Gdn_Model {
    
    /**
     */
-   public function GetJunctionPermissions($Where, $JunctionTable = NULL, $LimitToSuffix = '') {
+   public function GetJunctionPermissions($Where, $JunctionTable = NULL, $LimitToSuffix = '', $Options = array()) {
       $Namespaces = $this->GetAllowedPermissionNamespaces();
       $RoleID = ArrayValue('RoleID', $Where, NULL);
       $JunctionID = ArrayValue('JunctionID', $Where, NULL);
@@ -217,7 +217,7 @@ class PermissionModel extends Gdn_Model {
             }
 
             // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
-            if (!$RoleID && $JunctionColumn != $JunctionTable.'ID')
+            if (!$RoleID && $JunctionColumn != $JunctionTable.'ID' && GetValue('AddDefaults', $Options))
                $DefaultValue = $Value & 1 ? 1 : 0;
             else
                $DefaultValue = 0;

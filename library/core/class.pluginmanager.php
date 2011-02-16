@@ -749,7 +749,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       if (is_null($SearchPath)) {
          return array_keys($this->EnabledPlugins());
       } else {
-         return GetValue($SearchPath, $this->PluginFoldersByPath, array());
+         $Folders = array_flip(GetValue($SearchPath, $this->PluginFoldersByPath, array()));
+         return array_keys(array_intersect_key($Folders,$this->EnabledPlugins()));
       }
    }
    

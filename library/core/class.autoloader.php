@@ -125,7 +125,6 @@ class Gdn_Autoloader {
             if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
             
                if (defined('AUTOLOADER') && AUTOLOADER) echo "\nAdding plugin folders...\n";
-
                foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
                
                   if ($SearchPathName === TRUE || $SearchPathName == 1)
@@ -141,13 +140,6 @@ class Gdn_Autoloader {
                            'Extension'             => $SearchPathName
                         ));
                      }
-                  } else {
-/*
-                     self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $SearchPath, array(
-                        'SearchSubfolders'      => TRUE,
-                        'Extension'             => $SearchPathName
-                     ));
-*/
                   }
                }
                

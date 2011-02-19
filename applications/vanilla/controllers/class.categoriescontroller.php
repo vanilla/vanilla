@@ -236,7 +236,7 @@ class CategoriesController extends VanillaController {
 	/**
 	 * Generate and return markup for the link to a discussion title
 	 */
-	public function xGenTitleLink(&$Session, &$Discussion, &$DiscussionName) {
+	public function xDiscussionTitle(&$Session, &$Discussion, &$DiscussionName) {
 		return Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title');
 	} 
 }

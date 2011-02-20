@@ -132,3 +132,6 @@ $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
 $Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
+
+// Category configuration
+$Configuration['Vanilla']['Categories']['cascadeDiscussions'] = TRUE;

@@ -1719,7 +1719,9 @@ class Gdn_Form extends Gdn_Pluggable {
          'default',
          'textfield',
          'valuefield',
-         'includenull');
+         'includenull',
+         'yearrange',
+         'inlineerrors');
       $Return = '';
       
       // Build string from array

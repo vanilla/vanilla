@@ -415,15 +415,20 @@ class Gdn_Controller extends Gdn_Pluggable {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
             $Module = $this->$Module;
          } else {
-            $ModuleClassExists = class_exists($Module);
+//            if ($Module == 'BookmarkedModule') {
+//               $Asset = '<div class="Popin" rel="/module/'.htmlspecialchars($Module).'" />';
+//               $this->AddAsset($AssetTarget ? $AssetTarget : 'Panel', $Asset, $Module);
+//            } else {
+               $ModuleClassExists = class_exists($Module);
 
-            if ($ModuleClassExists) {
-               // Make sure that the class implements Gdn_IModule
-               $ReflectionClass = new ReflectionClass($Module);
-               if ($ReflectionClass->implementsInterface("Gdn_IModule"))
-                  $Module = new $Module($this);
+               if ($ModuleClassExists) {
+                  // Make sure that the class implements Gdn_IModule
+                  $ReflectionClass = new ReflectionClass($Module);
+                  if ($ReflectionClass->implementsInterface("Gdn_IModule"))
+                     $Module = new $Module($this);
 
-            }
+               }
+//            }
          }
       }
       if (is_object($Module)) {

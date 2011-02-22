@@ -131,11 +131,14 @@ jQuery(document).ready(function($) {
             } else if (preview) {
                // Pop up the new preview.
                $.popup({}, json.Data);
-               
             } else if (!draft) {
-               $(frm).triggerHandler('complete');
-               // Redirect to the new discussion
-               document.location = json.RedirectUrl;
+               if (json.RedirectUrl) {
+                  $(frm).triggerHandler('complete');
+                  // Redirect to the new discussion
+                  document.location = json.RedirectUrl;
+               } else {
+                  $('#Content').html(json.Data);
+               }
             }
             gdn.inform(json.StatusMessage);
          },

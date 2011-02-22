@@ -622,7 +622,15 @@ class DiscussionModel extends VanillaModel {
             } else {
                // Inserting
 					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
-               $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+
+               // Check for spam.
+               $Spam = SpamModel::IsSpam('Discussion', $Fields);
+
+               if (!$Spam) {
+                  $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+               } else {
+                  return SPAM;
+               }
                
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;

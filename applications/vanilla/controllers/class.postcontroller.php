@@ -155,6 +155,11 @@ class PostController extends VanillaController {
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
                   if ($DiscussionID > 0 && $DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  if ($DiscussionID == SPAM) {
+                     $this->StatusMessage = T('Your post has been flagged for moderation.');
+                     $this->Render('Spam');
+                     return;
+                  }
                }
             }
          } else {

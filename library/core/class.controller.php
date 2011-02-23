@@ -265,6 +265,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    protected $_DeliveryType;
+   
+   /**
+    * @var bool Allows overriding 'FormSaved' property to send with DELIVERY_METHOD_JSON.
+    */
+   protected $_FormSaved;
 
    /**
     * An associative array of header values to be sent to the browser before
@@ -320,6 +325,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Definitions = array();
       $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
       $this->_DeliveryType = DELIVERY_TYPE_ALL;
+      $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
@@ -978,9 +984,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Format the view as JSON with some extra information about the
          // success status of the form so that jQuery knows what to do
          // with the result.
-         $FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
+         if ($this->_FormSaved == '') // Allow for override
+            $this->_FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
          
-         $this->SetJson('FormSaved', $FormSaved);
+         $this->SetJson('FormSaved', $this->_FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
          $this->SetJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->ToString() : $View));
          $this->SetJson('StatusMessage', $this->StatusMessage);
@@ -1483,6 +1490,18 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->$Key = $Value;
       }
       return $Value;
+   }
+   
+   /**
+    * Set $this->_FormSaved for JSON Renders.
+    *
+    * @param string $Key The key that identifies the data.
+    */
+   public function SetFormSaved($Saved = TRUE) {
+      if ($Saved == '') // Allow reset
+         $this->_FormSaved = '';
+      else // Force true/false
+         $this->_FormSaved = ($Saved) ? TRUE : FALSE;
    }
 
    /**

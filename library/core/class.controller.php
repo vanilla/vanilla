@@ -1495,7 +1495,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    /**
     * Set $this->_FormSaved for JSON Renders.
     *
-    * @param string $Key The key that identifies the data.
+    * @param bool $Saved Whether form data was successfully saved.
     */
    public function SetFormSaved($Saved = TRUE) {
       if ($Saved == '') // Allow reset

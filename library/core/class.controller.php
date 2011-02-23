@@ -984,7 +984,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Format the view as JSON with some extra information about the
          // success status of the form so that jQuery knows what to do
          // with the result.
-         if ($this->_FormSaved == '') // Allow for override
+         if ($this->_FormSaved === '') // Allow for override
             $this->_FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
          
          $this->SetJson('FormSaved', $this->_FormSaved);
@@ -1498,7 +1498,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param bool $Saved Whether form data was successfully saved.
     */
    public function SetFormSaved($Saved = TRUE) {
-      if ($Saved == '') // Allow reset
+      if ($Saved === '') // Allow reset
          $this->_FormSaved = '';
       else // Force true/false
          $this->_FormSaved = ($Saved) ? TRUE : FALSE;

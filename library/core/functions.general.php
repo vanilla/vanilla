@@ -11,23 +11,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 function Gdn_Autoload($ClassName) {
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
-      
+
    if (!class_exists('Gdn_LibraryMap', FALSE))
       return false;
 
    if (!class_exists('Gdn', FALSE))
       return false;
-   
+
    if (substr($ClassName, 0, 4) === 'Gdn_')
       $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
    else
       $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
-   
+
    if (!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
       $ApplicationWhiteList = Gdn::Factory('ApplicationManager')->EnabledApplicationFolders();
    else
       $ApplicationWhiteList = NULL;
-   
+
    $LibraryPath = FALSE;
 
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
@@ -101,10 +101,10 @@ if (!function_exists('ArrayCombine')) {
    function ArrayCombine($Array1, $Array2) {
       if (!is_array($Array1))
          $Array1 = array();
-         
+
       if (!is_array($Array2))
          $Array2 = array();
-         
+
       if (count($Array1) > 0 && count($Array2) > 0)
          return array_combine($Array1, $Array2);
       elseif (count($Array1) == 0)
@@ -124,7 +124,7 @@ if (!function_exists('array_fill_keys')) {
 if (!function_exists('ArrayHasValue')) {
    /**
     * Searches $Array (and all arrays it contains) for $Value.
-    */ 
+    */
    function ArrayHasValue($Array, $Value) {
       if (in_array($Value, $Array)) {
          return TRUE;
@@ -268,7 +268,7 @@ if (!function_exists('Asset')) {
          $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
          if (!$WithDomain)
             array_unshift($Parts, '/');
-            
+
          $Result = CombinePaths($Parts, '/');
       }
 
@@ -376,7 +376,7 @@ if (!function_exists('ChangeBasename')) {
    function ChangeBasename($Path, $NewBasename) {
       $NewBasename = str_replace('%s', '$2', $NewBasename);
       $Result = preg_replace('/^(.*\/)?(.*?)(\.[^.]+)$/', '$1'.$NewBasename.'$3', $Path);
-      
+
       return $Result;
    }
 }
@@ -451,7 +451,7 @@ if (!function_exists('CombinePaths')) {
     * array('/path/to/vanilla/', '/applications/dashboard')
     * array('/path', 'to', 'vanilla', 'applications', 'dashboard')
     * array('/path/', '/to/', '/vanilla/', '/applications/', '/dashboard')
-    * 
+    *
     * @param array $Paths The array of paths to concatenate.
     * @param string $Delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
     * @returns The concatentated path.
@@ -561,7 +561,7 @@ if (!function_exists('decho')) {
             echo $Mixed;
          else
             var_dump($Mixed);
-      
+
          echo '</div>';
       }
    }
@@ -585,7 +585,7 @@ if (!function_exists('filter_input')) {
             $Value = stripslashes($Value);
          }
       }
-      return $Value;     
+      return $Value;
    }
 }
 
@@ -709,7 +709,7 @@ if (!function_exists('GetIncomingValue')) {
 if (!function_exists('GetMentions')) {
    function GetMentions($String) {
       $Mentions = array();
-      
+
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
          '/(?:^|[\s,\.])@(\w{3,20})\b/i',
@@ -771,7 +771,7 @@ if (!function_exists('GetValue')) {
          if($Remove)
             unset($Collection->$Key);
       }
-			
+
       return $Result;
 	}
 }
@@ -849,7 +849,7 @@ if (!function_exists('IsMobile')) {
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
       if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
          $Mobile++;
- 
+
       if(
          (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
          || (
@@ -857,10 +857,10 @@ if (!function_exists('IsMobile')) {
             || isset($_SERVER['HTTP_PROFILE'])))
          )
          $Mobile++;
-      
+
       if(strpos($UserAgent,'android') > 0)
          $Mobile++;
- 
+
       $MobileUserAgent = substr($UserAgent, 0, 4);
       $MobileUserAgents = array(
           'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
@@ -872,17 +872,17 @@ if (!function_exists('IsMobile')) {
           'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
           'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
           'webc','winw','winw','xda','xda-');
- 
+
       if (in_array($MobileUserAgent, $MobileUserAgents))
          $Mobile++;
- 
+
       if (strpos($AllHttp, 'operamini') > 0)
          $Mobile++;
- 
+
       // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
       // if (strpos($UserAgent, 'windows') > 0)
       //   $Mobile = 0;
- 
+
       return $Mobile > 0;
    }
 }
@@ -890,18 +890,18 @@ if (!function_exists('IsMobile')) {
 if (!function_exists('IsSearchEngine')) {
    function IsSearchEngine() {
       $Engines = array(
-         'googlebot', 
-         'slurp', 
-         'search.msn.com', 
-         'nutch', 
-         'simpy', 
-         'bot', 
-         'aspseek', 
-         'crawler', 
-         'msnbot', 
-         'libwww-perl', 
-         'fast', 
-         'baidu', 
+         'googlebot',
+         'slurp',
+         'search.msn.com',
+         'nutch',
+         'simpy',
+         'bot',
+         'aspseek',
+         'crawler',
+         'msnbot',
+         'libwww-perl',
+         'fast',
+         'baidu',
       );
       $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
       if ($HttpUserAgent != '') {
@@ -944,12 +944,12 @@ if (!function_exists('IsWritable')) {
       $File = @fopen($Path, 'a');
       if ($File === FALSE)
          return FALSE;
-      
+
       fclose($File);
-      
+
       if (!$KeepPath)
          unlink($Path);
-      
+
       return TRUE;
    }
 }
@@ -1090,11 +1090,11 @@ if (!function_exists('PrefixString')) {
 }
 
 if (!function_exists('ProxyHead')) {
-   
+
    function ProxyHead($Url, $Headers=NULL, $Timeout = FALSE, $FollowRedirects = FALSE) {
       if (is_null($Headers))
          $Headers = array();
-      
+
       $OriginalHeaders = $Headers;
       $OriginalTimeout = $Timeout;
 		if(!$Timeout)
@@ -1106,23 +1106,23 @@ if (!function_exists('ProxyHead')) {
       $Port = GetValue('port', $UrlParts, '80');
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
-      
+
       // Get the cookie.
       $Cookie = '';
       $EncodeCookies = C('Garden.Cookie.Urlencode',TRUE);
-      
+
       foreach($_COOKIE as $Key => $Value) {
          if(strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
-         
+
          if(strlen($Cookie) > 0)
             $Cookie .= '; ';
-            
+
          $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
          $Cookie .= "{$Key}={$EValue}";
       }
       $Cookie = array('Cookie' => $Cookie);
-      
+
       $Response = '';
       if (function_exists('curl_init')) {
          //$Url = $Scheme.'://'.$Host.$Path;
@@ -1135,10 +1135,10 @@ if (!function_exists('ProxyHead')) {
          curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($Handler, CURLOPT_HTTPHEADER, $Headers);
-         
+
          if (strlen($Cookie['Cookie']))
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie['Cookie']);
-            
+
          //if ($Query != '') {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
@@ -1146,18 +1146,18 @@ if (!function_exists('ProxyHead')) {
          $Response = curl_exec($Handler);
          if ($Response == FALSE)
             $Response = curl_error($Handler);
-            
+
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          $Referer = Gdn::Request()->WebRoot();
-      
+
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
-         
+
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
-         
+
          $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
@@ -1167,18 +1167,18 @@ if (!function_exists('ProxyHead')) {
             'Referer'         => $Referer,
             'Connection'      => 'close'
          );
-         
+
          if (strlen($Cookie['Cookie']))
             $Header = array_merge($Header, $Cookie);
-            
+
          $Header = array_merge($Header, $Headers);
-         
+
          $HeaderString = "";
          foreach ($Header as $HeaderName => $HeaderValue) {
             $HeaderString .= "{$HeaderName}: {$HeaderValue}\r\n";
          }
          $HeaderString .= "\r\n";
-                  
+
          // Send the headers and get the response
          fputs($Pointer, $Request);
          fputs($Pointer, $HeaderString);
@@ -1191,17 +1191,17 @@ if (!function_exists('ProxyHead')) {
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
-      
+
       $ResponseLines = explode("\n",trim($Response));
       $Status = array_shift($ResponseLines);
       $Response = array();
       $Response['HTTP'] = trim($Status);
-      
-      /* get the numeric status code. 
-       * - trim off excess edge whitespace, 
-       * - split on spaces, 
-       * - get the 2nd element (as a single element array), 
-       * - pop the first (only) element off it... 
+
+      /* get the numeric status code.
+       * - trim off excess edge whitespace,
+       * - split on spaces,
+       * - get the 2nd element (as a single element array),
+       * - pop the first (only) element off it...
        * - return that.
        */
       $Response['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
@@ -1211,8 +1211,8 @@ if (!function_exists('ProxyHead')) {
          $Value = trim(implode(':',$Line));
          $Response[$Key] = $Value;
       }
-      
-      if ($FollowRedirects) { 
+
+      if ($FollowRedirects) {
          $Code = GetValue('StatusCode',$Response, 200);
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $Response)) {
@@ -1221,10 +1221,39 @@ if (!function_exists('ProxyHead')) {
             }
          }
       }
-      
+
       return $Response;
    }
 
+}
+
+if (!function_exists('CookieToString')) {
+   /**
+    * Converts a Cookie array into a valid HTTP Request string
+    */
+   function CookieToString($CookiesArray, $Parent = '') {
+      $Cookie = '';
+      $EncodeCookies = C('Garden.Cookie.Urlencode', TRUE);
+
+      foreach($CookiesArray as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+
+         $Key = empty($Parent) ? $Key : $Parent . '[' . $Key . ']';
+
+         if(is_array($Value)) {
+            $Cookie .= CookieToString($Value, $Key);
+         } else {
+            if(strlen($Cookie) > 0)
+               $Cookie .= '; ';
+
+            $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+            $Cookie .= "{$Key}={$EValue}";
+         }
+      }
+
+      return $Cookie;
+   }
 }
 
 if (!function_exists('ProxyRequest')) {
@@ -1246,22 +1275,10 @@ if (!function_exists('ProxyRequest')) {
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
       // Get the cookie.
-      $Cookie = '';
-      $EncodeCookies = C('Garden.Cookie.Urlencode',TRUE);
-      
-      foreach($_COOKIE as $Key => $Value) {
-         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
-            continue;
-         
-         if(strlen($Cookie) > 0)
-            $Cookie .= '; ';
-            
-         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
-         $Cookie .= "{$Key}={$EValue}";
-      }
+      $Cookie = CookieToString($_COOKIE);
       $Response = '';
       if (function_exists('curl_init')) {
-         
+
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
@@ -1271,49 +1288,49 @@ if (!function_exists('ProxyRequest')) {
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
-         
+
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
-         // 
+         //
          //if ($Query != '') {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          //}
-         
+
          $Response = curl_exec($Handler);
          $Success = TRUE;
          if ($Response == FALSE) {
             $Success = FALSE;
             $Response = curl_error($Handler);
          }
-         
+
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
-      
+
          // Make the request
          $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
-   
+
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
-         
+
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $Header = "GET $Path?$Query HTTP/1.1\r\n"
             ."Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
-            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
             ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n"
             ."Referer: {$Referer}\r\n"
             ."Connection: close\r\n";
-            
+
          if ($Cookie != '')
             $Header .= $Cookie;
-         
+
          $Header .= "\r\n";
-         
+
          // Send the headers and get the response
          fputs($Pointer, $Header);
          while ($Line = fread($Pointer, 4096)) {
@@ -1325,23 +1342,23 @@ if (!function_exists('ProxyRequest')) {
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
-      
+
       if (!$Success)
          return $Response;
-      
+
       $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
       $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
-      
+
       $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
       $Status = array_shift($ResponseHeaderLines);
       $ResponseHeaders = array();
       $ResponseHeaders['HTTP'] = trim($Status);
-      
-      /* get the numeric status code. 
-       * - trim off excess edge whitespace, 
-       * - split on spaces, 
-       * - get the 2nd element (as a single element array), 
-       * - pop the first (only) element off it... 
+
+      /* get the numeric status code.
+       * - trim off excess edge whitespace,
+       * - split on spaces,
+       * - get the 2nd element (as a single element array),
+       * - pop the first (only) element off it...
        * - return that.
        */
       $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
@@ -1351,8 +1368,8 @@ if (!function_exists('ProxyRequest')) {
          $Value = trim(implode(':',$Line));
          $ResponseHeaders[$Key] = $Value;
       }
-      
-      if ($FollowRedirects) { 
+
+      if ($FollowRedirects) {
          $Code = GetValue('StatusCode',$ResponseHeaders, 200);
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $ResponseHeaders)) {
@@ -1361,7 +1378,7 @@ if (!function_exists('ProxyRequest')) {
             }
          }
       }
-      
+
       return $Response;
    }
 }
@@ -1382,13 +1399,13 @@ if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)
          $Destination = Url('');
-         
+
       // Close any db connections before exit
       $Database = Gdn::Database();
       $Database->CloseConnection();
       // Clear out any previously sent content
       @ob_end_clean();
-      
+
       // assign status code
       $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
@@ -1411,7 +1428,7 @@ if (!function_exists('RemoveFromConfig')) {
       $Config->Load($Path, 'Save');
       if (!is_array($Name))
          $Name = array($Name);
-      
+
       foreach ($Name as $k) {
          $Config->Remove($k);
       }
@@ -1490,7 +1507,7 @@ if (!function_exists('SafeGlob')) {
                unset($Result[$Index]);
          }
       }
-         
+
       return $Result;
    }
 }
@@ -1508,13 +1525,13 @@ if (!function_exists('SafeParseStr')) {
          $Parts = explode('=', $Parameter);
          $Key = $Parts[0];
          $Value = count($Parts) > 1 ? $Parts[1] : '';
-         
+
          if (!is_null($Original)) {
             $Output[$Key] = $FirstValue;
             $Output = array_merge($Output, $Original);
             break;
          }
-         
+
          $Output[$Key] = $Value;
       }
    }
@@ -1540,7 +1557,7 @@ if (!function_exists('SaveToConfig')) {
       if (is_string($Name) && C($Name) == $Value)
          return NULL;
       */
-      
+
       $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
@@ -1574,7 +1591,7 @@ if (!function_exists('SliceString')) {
       	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
       } else {
          $Trim = substr($String, 0, $Length);
-         return $Trim . ((strlen($Trim) != strlen($String)) ? $Suffix: ''); 
+         return $Trim . ((strlen($Trim) != strlen($String)) ? $Suffix: '');
       }
    }
 }
@@ -1711,7 +1728,7 @@ if (!function_exists('TrueStripSlashes')) {
 }
 
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
-if (!function_exists('Url')) {   
+if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Result = Gdn::Request()->Url($Path, $WithDomain);
       return $Result;

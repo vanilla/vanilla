@@ -75,7 +75,15 @@ class CommentModel extends VanillaModel {
     * @return object SQL results.
     */
    public function Get($DiscussionID, $Limit, $Offset = 0) {
+	  $Data = $this->SQL
+	     ->Select('d.CategoryID', '', 'CategoryID')
+         ->From('Discussion d')
+         ->Where('d.DiscussionID', $DiscussionID)
+         ->Get()->FirstRow();
+   	  $this->EventArguments['CategoryID'] = $Data->CategoryID;
+   	  
       $this->CommentQuery();
+      $this->EventArguments['DiscussionID'] = $DiscussionID;
       $this->FireEvent('BeforeGet');
       $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)

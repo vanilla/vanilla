@@ -62,7 +62,7 @@ $Definition['Cancel'] = 'キャンセル';
 $Definition['Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.'] = 'このサイトの定義文を収集します。あなたは定義文を収集したいページを順番に訪れる必要があります。収集された定義文は <code>captured.php</code> と <code>captured_admin.php</code> に出力されます。';
 $Definition['Capture locale pack changes.'] = 'ロケール デベロッパーと、指定されたロケール パックとの相違点を収集します。結果は <code>changes.php</code> ファイルに出力されます。';
 $Definition['Categories'] = 'カテゴリ';
-$Definition['Categories are used to help organize discussions. '] = 'カテゴリはスレッドをまとめるのに役立ちます。';
+$Definition['Categories are used to help organize discussions.'] = 'カテゴリはスレッドをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Category Url:'] = 'カテゴリ URL:';
 $Definition['Change the way that new users register with the site.'] = 'Change the way that new users register with the site.';
@@ -91,7 +91,6 @@ $Definition['Dashboard'] = 'Dashboard';
 $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 $Definition['Decline'] = 'Decline';
-$Definition['Delete'] = 'Delete';
 $Definition['Description'] = '説明';
 $Definition['Disable'] = '無効化';
 $Definition['Disable Google Sign In'] = 'Google アカウントでのログインを無効化';
@@ -323,7 +322,7 @@ $Definition['You can place files in your /uploads folder.'] = 'If your file is t
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.';
 $Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.';
 $Definition['Your changes have been saved.'] = '変更を保存しました。';
-$Definition['Your settings have been saved.'] = 'Your settings have been saved.';
+$Definition['Your settings have been saved.'] = '設定を保存しました。';
 
 /** 以下は、オリジナルに無かったエントリです **/
 $Definition['Search by user or role.'] = 'ユーザー名または役割 (管理者:<input type="text" value="Administrator" size="10" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="6" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="5" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="3" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="5" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="7" onclick="this.select()" />) で検索します。';
@@ -355,4 +354,49 @@ $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'テーマ作�
 $Definition['Allow users to dismiss this message'] = 'このメッセージを閉じることをユーザーに許可する';
 $Definition['Enable this message'] = 'このメッセージを有効化する';
 $Definition['Saved'] = '保存しました';
+$Definition['Organize Categories'] = 'カテゴリ構成';
+$Definition['Category Page Layout'] = 'カテゴリのページ レイアウト';
+$Definition['View Page'] = 'ページを表示';
+$Definition['Did You Know?'] = 'ご存知ですか？';
+$Definition['You can make the categories page your homepage.'] = 'カテゴリ一覧のページを<a href="%s">こちら</a>でホームページとして設定できます。';
+$Definition['Make sure you click View Page'] = '<a href="%s">ページを表示</a>をクリックすると、保存後にカテゴリ ページがどのように見えるかを確認することができます。';
+$Definition['Drag and drop the categories below to sort and nest them.'] = 'カテゴリを並べ替えたりネストするには、この下のカテゴリをドラッグ &amp; ドロップしてください。';
+$Definition['Configure how nested categories are displayed to users.'] = 'ネストされたカテゴリをどのように表示するか、設定してください。';
+$Definition['Vanilla.Categories.MaxDisplayDepth'] = 'ネストされたカテゴリが次の条件に合致する場合は、カンマ区切りのリストとして表示されます: %1$s';
+$Definition['Display root categories as headings.'] = 'ルート カテゴリを見出しとして表示する。';
+$Definition['Do not display the categories in the side panel.'] = 'カテゴリ一覧をサイドパネルに表示しない。';
+$Definition['more than one level deep'] = 'カテゴリ一覧をサイドパネルに表示しない。';
+$Definition['Managing Categories'] = 'カテゴリの管理 (英語)';
+$Definition['Adding & Editing Categories'] = 'カテゴリの追加と編集 (英語)';
+$Definition['Homepage'] = 'ホームページ';
+$Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホームページ設定 (英語)';
+$Definition['Change the look of All Categories'] = '<b>すべてのカテゴリ</b> ページの外観は<a href="%s">こちら</a>から変更できます。';
+$Definition['Changing the Discussions Menu Link'] = 'ディスカッション メニュー リンクの変更 (英語)';
+$Definition['Use the content at this url as your homepage.'] = '"ホームページ" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのスレッド" がホームページになっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
+$Definition['All Categories'] = 'すべてのカテゴリ';
+$Definition['Categories &amp; Discussions'] = 'カテゴリ &amp; スレッド';
+$Definition['Enter the url to the page you would like to use as your homepage:'] = 'ホームページに設定したいページの URL を入力してください:';
+$Definition['TermsOfService'] = '利用規約';
+$Definition['TermsOfServiceText'] = "
+   <p>このサービスを利用する時点で、以下の規約に同意したものとみなします。
+   本コミュニティにおいて、中傷(虚偽かどうかに関わらず)、嘘、暴言、罵倒、悪態、
+   嫌がらせ、わいせつ表現、冒涜表現、性的表現、脅迫、プライバシーの侵害、
+   あるいは違法な内容は投稿できません。あなた自身が著作権者である場合を除き、
+   著作権によって保護された内容は投稿できません。</p>
+   
+   <p>本コミュニティはまた、あなたの投稿によって法律問題や訴訟が発生した場合、
+   個人情報 (あるいは何であれ知り得た情報) を提供する権利を有するものとします。
+   本ウェブ サイトへのアクセスは、いかなるインターネット プロトコルによるもので
+   あれ、記録されます。</p>
+   
+   <p>広告、チェーンレター、マルチ商法、セールスの勧誘は、本コミュニティにおいて
+   不適切な行為とみなされます。</p>
+   
+   <p>本コミュニティは、理由のいかんに関わらず いかなるコンテンツをも削除する
+   権利を有するものとします。また理由のいかんに関わらず いかなる会員資格をも
+   停止する権利を有するものとします。</p>
+   
+   <p>このサービスを利用するには、13 歳以上である必要があります。</p>
+";
+//$Definition[''] = '';
 

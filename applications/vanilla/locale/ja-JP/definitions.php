@@ -182,10 +182,10 @@ You can access the site at {/,url,domain}.
 Have a great day!';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Enter the email address of the person you would like to invite:';
 $Definition['Enter your Email address'] = 'メール アドレスを入力';
-$Definition['Enter your existing account password.'] = 'Enter your existing account password.';
-$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email and password you entered.';
-$Definition['ErrorPermission'] = 'Sorry, permission denied.';
-$Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
+$Definition['Enter your existing account password.'] = '登録済みアカウントのパスワードを入力してください。';
+$Definition['ErrorCredentials'] = '申し訳ありませんが、入力された e メールとパスワードに合致するアカウントが見つかりませんでした。';
+$Definition['ErrorPermission'] = '申し訳ありませんが、承認されませんでした。';
+$Definition['ErrorRecordNotFound'] = 'リクエストされたレコードが見つかりませんでした。';
 $Definition['ErrorTermsOfService'] = '利用規約に同意する必要があります。';
 
 $Definition['Female'] = '女性';
@@ -373,3 +373,4 @@ $Definition['↳ No results for \'%s\''] = '↳ \'%s\' の検索結果はあり�
 $Definition['↳ Search results for \'%s\''] = '↳ \'%s\' の検索結果は以下の通りです。';
 $Definition['%s messages'] = 'メッセージ %s 件';
 $Definition['Edit Discussion'] = 'スレッドを編集';
+$Definition['Activity.Delete'] = '削除';

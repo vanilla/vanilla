@@ -5,7 +5,7 @@ $Report = $this->Data['Plugin.Flagging.Report'];
 $DiscussionID = $this->Data['Plugin.Flagging.DiscussionID'];
 $Reason = $this->Data['Plugin.Flagging.Reason'];
 
-echo T('Discussion'); ?>: <?php echo $Report['DiscussionName']; ?>
+echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Report['DiscussionName']; ?>
 
 <?php echo ExternalUrl($Flag['URL']); ?>
 

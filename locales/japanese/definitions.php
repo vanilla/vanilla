@@ -11,3 +11,33 @@ $LocaleInfo['Japanese'] = array (
   'AuthorUrl' => 'http://www.f3.dion.ne.jp/~element/msaccess/',
   'License' => 'GPL2',
 );
+
+/**
+ * Japanese version of object possession and plural. (there is no plural to Japanese.)
+ * 日本語には所有格と複数形の分岐処理が必要ないので、ここでオーバーライドします。
+ *
+ * @param string The word to format.
+ */
+if (!function_exists('FormatPossessive')) {
+   function FormatPossessive($Word) {
+      //return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+      // "の" の部分にリンクが張られるのを防ぐため、先頭にアンカーの
+      // 終了タグを挿入しておきます。
+      // そのままだと終了タグが余るので、末尾に開始タグを追加しておきます。
+      // 結果的に、次のような感じの HTML が生成されます。
+      //
+      // あなた が <a href="...">田中</a> の<a></a> <a href="...">スレッド</a> にレスしました。
+      //                             ~~~~~~~~~~
+      // もっと良い方法があるかもしれませんが、とりあえず機能するようです。
+      return $Word."</a> の<a>";
+   }
+}
+
+if (!function_exists('Plural')) {
+   function Plural($Number, $Singular, $Plural) {
+		// Make sure to fix comma-formatted numbers
+      //$WorkingNumber = str_replace(',', '', $Number);
+      //return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      return sprintf(T($Singular), $Number);
+   }
+}

@@ -169,6 +169,7 @@ $Definition['Key Value'] = 'Key Value';
 
 $Definition['Last Active'] = 'Last Active';
 $Definition['Last Visit'] = '最終訪問';
+$Definition['Locale'] = 'ja-JP';
 $Definition['Locale Developer'] = 'ロケール デベロッパー';
 $Definition['Locale Developer Settings %s.'] = 'Locale Developer Settings %s.';
 $Definition['Locale info file settings.'] = '<p>When you generate the zip file you can set the information for the locale below.</p> <p>You can download a zip of the locale pack by clicking <a href="%s">here</a>.</p>';
@@ -398,5 +399,17 @@ $Definition['TermsOfServiceText'] = "
    
    <p>このサービスを利用するには、13 歳以上である必要があります。</p>
 ";
+$Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてコピーされなかったかもしれません。続行する前に、<b>.htaccess</b> ファイルがコピー済みであることを確認してください。';
+$Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '入力されたユーザ名とパスワードでは、データベースに接続できません。入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'] = '指定されたデータベースが まだ作成されていないようです。データベースは作成済みですか？　あるいはデータベース名が間違っている可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition["Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"] = 'データベース ホスト名は正しく入力されましたか？　入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['UsernameError'] = 'ユーザー名には 3～20 文字の英数字とアンダースコアのみ使用できます。';
+$Definition['You must specify an admin username.'] = '管理者のユーザー名は省略できません。';
+$Definition['You must specify an admin password.'] = '管理者のパスワードは省略できません。';
+$Definition['You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'] = 'PHP のバージョン %1$s 上で実行中ですが、Vanilla には PHP %2$s 以上が必要です。続行する前に PHP をアップグレードしてください。';
+$Definition['You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、PHP の PDO モジュールを有効にしてください。';
+$Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、MySQL ドライバ for PDO を有効にしてください。';
+$Definition['Some folders don\'t have correct permissions.'] = '<p>適切なアクセス権が設定されていないフォルダがあります。</p><p>FTP クライアントかコマンド ラインを使って、vanilla のインストール フォルダに次のアクセス権を設定してください:</p>';
+$Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なアクセス権が設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
 //$Definition[''] = '';
-

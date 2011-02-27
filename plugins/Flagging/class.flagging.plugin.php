@@ -242,12 +242,15 @@ class FlaggingPlugin extends Gdn_Plugin {
          'ElementID'       => $ElementID,
          'ElementAuthorID' => $ElementAuthorID,
          'ElementAuthor'   => $ElementAuthor,
-         'URL'             => $URL
+         'URL'             => $URL,
+         'UserID'          => $UserID,
+         'UserName'        => $UserName
       ));
       
       if ($Sender->Form->AuthenticatedPostBack()) {
          $SQL = Gdn::SQL();
          $Comment = $Sender->Form->GetValue('Plugin.Flagging.Reason');
+         $Sender->SetData('Plugin.Flagging.Reason', $Comment);
          $CreateDiscussion = C('Plugins.Flagging.UseDiscussions');
          
          if ($CreateDiscussion) {
@@ -275,10 +278,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             // Prep data for the template
             $Sender->SetData('Plugin.Flagging.Report', array(
                'DiscussionName'  => $DiscussionName,
-               'FlaggedContent'  => GetValue('Body', $Result),
-               'Reason'          => $Comment,
-               'UserID'          => $UserID,
-               'UserName'        => $UserName
+               'FlaggedContent'  => GetValue('Body', $Result)
             ));
          
             // Assume no discussion exists

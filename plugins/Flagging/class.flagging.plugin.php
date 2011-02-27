@@ -342,15 +342,16 @@ class FlaggingPlugin extends Gdn_Plugin {
          } catch(Exception $e) {}
          
          // Notify users with permission who've chosen to be notified
-         if (!$FlagResult) {
-            // Only send if this is first time it's being flagged.
+         if (!$FlagResult) { // Only send if this is first time it's being flagged.
             $Sender->SetData('Plugin.Flagging.DiscussionID', $DiscussionID);
             $EmailBody = $Sender->FetchView($this->GetView('reportemail.php'));
             $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
+            
+            // Send emails
             $UserModel = new UserModel();
-            $Email = new Gdn_Email();
             foreach ($NotifyUsers as $UserID) {
                $User = $UserModel->GetID($UserID);
+               $Email = new Gdn_Email();
                $Email->To($User->Email)
                   ->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $PrefixedDiscussionName))
                   ->Message($EmailBody)

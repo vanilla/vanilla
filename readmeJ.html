@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Vanilla ReadMe</title>
+	<link rel="stylesheet" href="applications/dashboard/design/setup.css" type="text/css" />
+</head>
+<body class="ReadMe">
+<div class="Title">
+   <h1>
+      <img src="applications/dashboard/design/images/vanilla_logo.png" alt="Vanilla" />
+      <p>バージョン 2</p>
+   </h1>
+</div>
+<div class="Info">
+   <h1>ようこそ！</h1>
+   <p>Vanilla は、カスタマイズが容易で、他のアプリケーションに簡単に統合できて、使って楽しいコミュニティ ソリューションを目指して開発されました。Vanilla はすでに世界中の 40 万以上のコミュニティ フォーラムで利用されています。あなたが Vanilla を使うと決めたのでしたら、わたしたちにとって こんなに幸せなことはありません。</p>
+   <p style="text-align: right;">- Mark O'Sullivan</p>
+
+   <h1>動作要件</h1>   
+   <ul>
+      <li>PHP バージョン 5.2.0 以上。</li>
+      <li>pdo_mysql モジュールが有効になっていること (既定で有効になっているはずですが、ウェブ ホストによっては無効になっているかもしれません)。</li>
+      <li>MySQL 5 以上。</li>
+   </ul>
+
+   <h1>インストール手順</h1>
+   <ol>
+      <li>このパッケージの全ファイルをウェブ サーバにアップロードします。</li>
+      <li>ウェブ ブラウザ上で、アップロードしたフォルダに移動します。</li>
+      <li>画面に表示される案内に従ってください。</li>
+   </ol>
+   
+   <p>インストール中に何か問題が発生した場合は、サーバのファイル パーミッションに関係している可能性が強いです。PHP が以下のファイルとフォルダに書き込みできるように権限を付与してください:</p>
+   <ul>
+      <li>/cache/*</li>
+      <li>/conf/config.php (このファイルが存在しなくても、心配しないでください)</li>
+      <li>/uploads/*</li>
+   </ul>
+   
+   <h1>Vanilla 1 から Vanilla 2 へのアップグレード手順</h1>
+   <p>Vanilla 1 フォーラムをカスタマイズしている場合 (プラグインやテーマ、翻訳)、そのうちのいくつかは Vanilla 2 へそのまま移行することができないかもしれません。おそらく、あなたのフォーラム向けに新しいテーマを作成する必要があるでしょう。</p>
+   <p><strong><span style="color: #d00;">重要:</span> あなたのデータベースと既存のファイルすべてを必ずバックアップしてください。</strong></p>
+   <ol>
+      <li>Vanilla 1 のファイルをすべて削除します。</li>
+      <li>このパッケージの全ファイルをウェブ サーバにアップロードします。</li>
+      <li>
+         Vanilla 2 では、PHP が以下のファイルとフォルダに読み取り/書き込みできる必要があります:
+         <ul>
+            <li>/conf</li>
+            <li>/cache/*</li>
+            <li>/uploads/*</li>
+         </ul>
+      </li>
+      <li>お気に入りのウェブ ブラウザで Vanilla 2 のフォルダに移動し、インストール手順の案内に従ってください。その際、必ず Vanilla 1 のテーブルが存在するデータベースを使用してください。</li>
+      <li>ブラウザで http://yourdomain.com/path/to/vanilla/import に移動し、案内に従ってください。</li>
+      <li>ロール管理画面 (ダッシュボード) に移動し、各ロールにアクセス権を割り当てなおしてください。</li>
+   </ol>
+   
+   <h1>追加のリソース</h1>
+   <p>もし問題を抱えていたり、エラーに遭遇したり、あるいは初歩的な疑問を持っている場合は、以下のリソースが助けになるでしょう:</p>
+   <ul>
+      <li>
+         <a href="http://vanillaforums.org/docs">Vanilla ドキュメンテーション (英語)</a>
+         <br />Vanilla ドキュメンテーションは、コミュニティによって管理されている一連の文書群です。その内容は、Vanilla のインストールからプラグインやテーマの作成まで、多岐にわたります。
+      </li>
+      <li>
+         <a href="http://vanillaforums.org/discussions">Vanilla コミュニティ フォーラム (英語)</a>
+         <br />Vanilla コミュニティ フォーラムは、フリーのリソースです。そこでは Vanilla に関する疑問について、ユーザや支持者、開発者がお互いに助け合っています。
+      </li>
+   </ul>
+   
+   <h1>見返り</h1>
+   <p>Vanilla があなたのコミュニティの成長をあらゆる側面から後押しすることを一度 体験すると、あなたはそのことに わたしたちと同じくらい興奮することでしょう。わたしたちが期待するのは、あなたがこのソフトウェアの使用と引き換えに、その体験を他の人に話すこと、それだけです。あなたが多くの人々に話せば話すほど、多くの人々がそれを使うようになります。そして、わたしたちはそれをさらに改良するために、より多くの時間を費やすことができるようになるのです。</p>
+   <div style="margin-left:3em;text-indent:-1em;"><p>※ 訳註: Vanilla には<a href="http://vanillaforums.com/plans">商用のホスティング サービス</a>が存在するため、Vanilla の利用者拡大は間接的に Vanilla の開発を財政支援することになります。</p></div>
+   
+   <h1>著作権</h1>
+   <p>Vanilla は <abbr title="GNU Public License">GPL</abbr> ライセンスの下でリリースされています (詳しくは <a href="LICENSE.txt">LICENSE.txt</a> を参照してください)。</p>
+</div>
+</body>
+</html>

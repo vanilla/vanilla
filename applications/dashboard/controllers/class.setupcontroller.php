@@ -224,7 +224,8 @@ class SetupController extends DashboardController {
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HtmLawed' => 'HtmLawed', // Make sure html purifier is enabled so html has a default way of being safely parsed.
-               'EnabledLocales.Japanese' => 'ja-JP' // Make sure the Japanese locale is enabled.
+               'EnabledLocales.Japanese' => 'ja-JP', // Make sure the Japanese locale is enabled.
+               'Garden.Search.Mode' => 'like' // Make sure MySQL search mode is 'like' instead of 'matchboolean'.
             ));
          }
       }

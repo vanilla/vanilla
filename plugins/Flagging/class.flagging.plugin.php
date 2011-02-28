@@ -322,6 +322,10 @@ class FlaggingPlugin extends Gdn_Plugin {
                   'DateUpdated'     => date('Y-m-d H:i:s'),
                   'DateLastComment' => date('Y-m-d H:i:s')
                ));
+               
+               // Update discussion count
+               $DiscussionModel = new DiscussionModel();
+               $DiscussionModel->UpdateDiscussionCount($CategoryID);
             }
          }
          

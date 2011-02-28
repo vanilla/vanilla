@@ -93,10 +93,11 @@ class PermissionModel extends Gdn_Model {
     * @param string $LimitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
     * @param string $JunctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
     * @param string $JunctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $JunctionTable.
-    * @param int $JunctionID Optionally further limit junction to a single ID. Only used if $JunctionTable & $JunctionColumn are present.
+    * @param string $ForeignKey Foreign table column to join on.
+    * @param int $ForeignID Foreign ID to limit join to.
     * @return array Permission records.
     */
-   public function GetUserPermissions($UserID, $LimitToSuffix = '', $JunctionTable = FALSE, $JunctionColumn = FALSE, $JunctionID = FALSE) {
+   public function GetUserPermissions($UserID, $LimitToSuffix = '', $JunctionTable = FALSE, $JunctionColumn = FALSE, $ForeignKey = FALSE, $ForeignID = FALSE) {
       // Get all permissions
       $PermissionColumns = $this->PermissionColumns($JunctionTable, $JunctionColumn);
 
@@ -117,8 +118,11 @@ class PermissionModel extends Gdn_Model {
          $this->SQL
             ->Select(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'))
             ->GroupBy(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'));
-         if ($JunctionID)
-            $this->SQL->Where('p.JunctionID', $JunctionID);
+         if ($ForeignKey && $ForeignID) {
+            $this->SQL
+               ->Join("$JunctionTable j", "j.$JunctionColumn = p.JunctionID")
+               ->Where("j.$ForeignKey", $ForeignID);
+         }
       } else {
          $this->SQL->Where('p.JunctionTable is null');
       }

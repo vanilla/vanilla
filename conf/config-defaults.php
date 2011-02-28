@@ -29,7 +29,7 @@ $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
 // An array of folders the application should never search through when searching for classes. (note: plugins had to be removed so that locale searches could get the locale folder from the plugin's folder).
 $Configuration['Garden']['FolderBlacklist']                     = array('.', '..', '_svn', '.git');
-$Configuration['Garden']['Locale']                              = 'en-CA';
+$Configuration['Garden']['Locale']                              = 'ja-JP';
 $Configuration['Garden']['LocaleCodeset']                       = 'UTF8';
 $Configuration['Garden']['Title']                               = 'Vanilla 2';
 $Configuration['Garden']['Domain']                              = '';

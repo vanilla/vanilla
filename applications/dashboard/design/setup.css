@@ -167,6 +167,10 @@ form ul li input.InputBox {
    width: 480px;
    border: 1px solid #ccc;
    color: #555;
+   ime-mode: inactive;
+}
+form ul li input.InputBox[type=password] {
+   ime-mode: disabled;
 }
 form ul li input.InputBox:focus {
    color: #000;

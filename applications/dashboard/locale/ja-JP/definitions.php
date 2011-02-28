@@ -399,8 +399,21 @@ $Definition['TermsOfServiceText'] = "
    
    <p>このサービスを利用するには、13 歳以上である必要があります。</p>
 ";
+$Definition['Version 2 Installer'] = 'バージョン 2 インストーラ';
+$Definition['Database Host'] = 'データベース ホスト';
+$Definition['Database Name'] = 'データベース名 <span style="font-size:13px;">※ あらかじめ作成しておく必要があります。</span>';
+$Definition['Database User'] = 'データベース ユーザ';
+$Definition['Database Password'] = 'データベース パスワード';
 $Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてコピーされなかったかもしれません。続行する前に、<b>.htaccess</b> ファイルがコピー済みであることを確認してください。';
 $Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['Install Vanilla without a .htaccess file.'] = '.htaccess ファイル無しで Vanilla をインストールします。';
+$Definition['Yes, the following information can be changed later.'] = 'ここから下の情報は、後で変更できます。';
+$Definition['Application Title'] = 'アプリケーション タイトル';
+$Definition['Admin Email'] = '管理者の E メール';
+$Definition['Admin Username'] = '管理者のユーザ名';
+$Definition['Admin Password'] = '管理者のパスワード';
+$Definition['Confirm Password'] = '確認用パスワード(再入力)';
+$Definition['Continue &rarr;'] = '続行 &rarr;';
 $Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '入力されたユーザ名とパスワードでは、データベースに接続できません。入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'] = '指定されたデータベースが まだ作成されていないようです。データベースは作成済みですか？　あるいはデータベース名が間違っている可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition["Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"] = 'データベース ホスト名は正しく入力されましたか？　入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';

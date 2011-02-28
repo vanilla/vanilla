@@ -642,7 +642,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $Value = array($Value);
          
       // Prevent default $Value from matching key of zero
-      $HasValue = ($Value !== array(FALSE)) ? TRUE : FALSE;
+      $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
       $IncludeNull = ArrayValueI('IncludeNull', $Attributes);

@@ -204,14 +204,23 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = '') {
-      // Make sure the user is authenticated
+      static $ActivityTypes = array();
+   
+      // Make sure the user is authenticated.
+
       // Get the ActivityTypeID & see if this is a notification
-      $ActivityTypeRow = $this->SQL
-         ->Select('ActivityTypeID, Name, Notify')
-         ->From('ActivityType')
-         ->Where('Name', $ActivityType)
-         ->Get()
-         ->FirstRow();
+      if (isset($ActivityTypes[$ActivityType])) {
+         $ActivityTypeRow = $ActivityTypes[$ActivityType];
+      } else {
+         $ActivityTypeRow = $this->SQL
+            ->Select('ActivityTypeID, Name, Notify')
+            ->From('ActivityType')
+            ->Where('Name', $ActivityType)
+            ->Get()
+            ->FirstRow();
+
+         $ActivityTypes[$ActivityType] = $ActivityTypeRow;
+      }
          
       if ($ActivityTypeRow !== FALSE) {
          $ActivityTypeID = $ActivityTypeRow->ActivityTypeID;

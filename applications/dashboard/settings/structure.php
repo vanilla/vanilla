@@ -76,13 +76,16 @@ $Construct
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE)
+   ->Column('LastIPAddress', 'varchar(14)', TRUE)
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(14)', TRUE)
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
+   ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
-   ->Column('IPAddress', 'varchar(14)', TRUE)
    ->Set($Explicit, $Drop);
 
 // UserRole Table
@@ -329,6 +332,7 @@ $Construct->Table('Activity')
    ->Column('CountComments', 'int', '0')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
    ->Set($Explicit, $Drop);
 
 // Message Table

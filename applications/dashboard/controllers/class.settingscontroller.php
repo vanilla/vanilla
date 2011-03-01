@@ -171,7 +171,51 @@ class SettingsController extends DashboardController {
       }
       
       $this->Render();      
-   }      
+   }
+
+   public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
+      $this->Permission('Garden.Moderation.Manage');
+      $this->AddSideMenu();
+      $this->Title(T('Ban List'));
+      $this->AddJsFile('bans.js');
+
+      list($Offset, $Limit) = OffsetLimit($Page, 20);
+
+      $BanModel = new BanModel();
+
+      switch (strtolower($Action)) {
+         case 'add':
+         case 'edit':
+            $this->Form->SetModel($BanModel);
+
+            if ($this->Form->AuthenticatedPostBack()) {
+               if ($ID)
+                  $this->Form->SetFormValue('BanID', $ID);
+               try {
+                  // Save the ban.
+                  $this->Form->Save();
+               } catch (Exception $Ex) {
+                  $this->Form->AddError($Ex);
+               }
+            } else {
+               if ($ID)
+               $this->Form->SetData($BanModel->GetID($ID));
+            }
+            $this->SetData('_BanTypes', array('IPAddress' => 'IP Address', 'Email' => 'Email', 'Name' => 'Name'));
+            $this->View = 'Ban';
+            break;
+         case 'delete':
+            $BanModel->Delete(array('BanID' => $ID));
+            $this->View = 'BanDelete';
+            break;
+         default:
+            $Bans = $BanModel->GetWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->ResultArray();
+            $this->SetData('Bans', $Bans);
+            break;
+      }
+
+      $this->Render();
+   }
    
    /**
     * Homepage management screen.

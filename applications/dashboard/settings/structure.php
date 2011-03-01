@@ -327,6 +327,10 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'ActivityComment'))->NumRows(
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'ShowIcon' => '1', 'Name' => 'ActivityComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s', 'RouteCode' => 'activity', 'Notify' => '1'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'Import'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'Import', 'FullHeadline' => '%1$s imported data.', 'ProfileHeadline' => '%1$s imported data.', 'Notify' => '1', 'Public' => '0'));
+//if ($SQL->GetWhere('ActivityType', array('Name' => 'Banned'))->NumRows() == 0)
+$SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s banned %4$s.', 'ProfileHeadline' => '%1$s banned %4$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Banned'), TRUE);
+//if ($SQL->GetWhere('ActivityType', array('Name' => 'Unbanned'))->NumRows() == 0)
+$SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %4$s.', 'ProfileHeadline' => '%1$s un-banned %4$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Unbanned'), TRUE);
 
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
@@ -391,5 +395,16 @@ $Construct->Table('Log')
    ->Column('DateInserted', 'datetime') // date item added to log
    ->Column('ParentRecordID', 'int', NULL, 'index')
    ->Column('Data', 'text', NULL) // the data from the record.
+   ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Ban')
+   ->PrimaryKey('BanID')
+   ->Column('BanType', array('IPAddress', 'Name', 'Email'), FALSE, 'unique')
+   ->Column('BanValue', 'varchar(50)', FALSE, 'unique')
+   ->Column('Notes', 'varchar(255)', NULL)
+   ->Column('CountUsers', 'uint', 0)
+   ->Column('InsertUserID', 'int')
+   ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);

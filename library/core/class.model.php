@@ -416,6 +416,10 @@ class Gdn_Model extends Gdn_Pluggable {
       if ($Session->UserID > 0 && $this->Schema->FieldExists($this->Name, $this->InsertUserID))
          if (!isset($Fields[$this->InsertUserID]))
             $Fields[$this->InsertUserID] = $Session->UserID;
+
+      if ($this->Schema->FieldExists($this->Name, 'InsertIPAddress') && !isset($Fields['InsertIPAddress'])) {
+         $Fields['InsertIPAddress'] = Gdn::Request()->IpAddress();
+      }
    }
 
 
@@ -437,6 +441,10 @@ class Gdn_Model extends Gdn_Pluggable {
       if ($Session->UserID > 0 && $this->Schema->FieldExists($this->Name, $this->UpdateUserID))
          if (!isset($Fields[$this->UpdateUserID]))
             $Fields[$this->UpdateUserID] = $Session->UserID;
+
+      if ($this->Schema->FieldExists($this->Name, 'UpdateIPAddress') && !isset($Fields['UpdateIPAddress'])) {
+         $Fields['UpdateIPAddress'] = Gdn::Request()->IpAddress();
+      }
    }
 
 	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {

@@ -19,9 +19,12 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
          <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
          <td>
             <?php
+               echo '<span class="Expander">', $this->FormatContent($Row), '</span>';
+
+               echo '<div class="Tags">';
                echo '<span class="Tag '.$Row['Operation'].'Tag">'.T($Row['Operation']).'</span> ';
                echo '<span class="Tag '.$Row['RecordType'].'Tag">'.T($Row['RecordType']).'</span> ';
-               echo '<span class="Expander">', $this->FormatContent($Row), '</span>';
+               echo '</div>';
             ?>
          </td>
          <td class="DateCell"><?php echo Gdn_Format::Date($Row['DateInserted']); ?></td>

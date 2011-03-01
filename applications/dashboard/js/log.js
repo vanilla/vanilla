@@ -46,6 +46,9 @@ jQuery(document).ready(function($) {
 
                      $foo.effect('highlight', {}, 'slow');
                   });
+
+               // Update the counts in the sidepanel.
+               $('.Popin').popin();
             }
          });
    }

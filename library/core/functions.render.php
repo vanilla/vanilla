@@ -164,6 +164,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             }
             break;
+         case 'rawurlencode':
+            $Result = rawurlencode($Value);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;
@@ -171,6 +174,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             if (strpos($Field, '/') !== FALSE)
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
+            break;
+         case 'urlencode':
+            $Result = urlencode($Value);
             break;
          default:
             $Result = $Value;

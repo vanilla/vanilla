@@ -360,20 +360,8 @@ jQuery(document).ready(function($) {
          $(this).val('');
    });
 
-   $('.Popin').each(function(index, elem) {
-      var $elem = $(elem);
-      $elem.addClass('TinyProgress');
-      $.ajax({
-         url: gdn.url($elem.attr('rel')),
-         data: {DeliveryType: 'VIEW'},
-         success: function(data) {
-            $elem.html(data);
-         },
-         complete: function() {
-            $elem.removeClass('TinyProgress');
-         }
-      });
-   });
+   if ($.fn.popin)
+      $('.Popin').popin();
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {

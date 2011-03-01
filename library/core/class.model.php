@@ -153,6 +153,12 @@ class Gdn_Model extends Gdn_Pluggable {
       parent::__construct();
    }
 
+   /**
+    * A overridable function called before the various get queries.
+    */
+   protected function _BeforeGet() {
+   }
+
 
    /**
     * Connects to the database and defines the schema associated with
@@ -314,6 +320,8 @@ class Gdn_Model extends Gdn_Pluggable {
     * @todo add doc
     */
    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $this->_BeforeGet();
+
       return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
    
@@ -322,6 +330,8 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param array $Wheres
     */
    public function GetCount($Wheres = '') {
+      $this->_BeforeGet();
+      
       $this->SQL
          ->Select('*', 'count', 'Count')
          ->From($this->Name);
@@ -349,15 +359,18 @@ class Gdn_Model extends Gdn_Pluggable {
    }
 
    /**
-    * @param unknown_type $Where
-    * @param unknown_type $OrderFields
-    * @param unknown_type $OrderDirection
-    * @param unknown_type $Limit
-    * @param unknown_type $Offset
+    * Get a dataset for the model with a where filter.
+    *
+    * @param array $Where A filter suitable for passing to Gdn_SQLDriver::Where().
+    * @param string $OrderFields A comma delimited string to order the data.
+    * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
+    * @param int $Limit
+    * @param int $Offset
     * @return Gdn_DataSet
-    * @todo add doc
     */
    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $this->_BeforeGet();
+      
       return $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
 

@@ -93,6 +93,26 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    /**
+    * Check whether a user has access to view discussions in a particular category.
+    *
+    * @since 2.0.18
+    * @example $UserModel->GetCategoryViewPermission($UserID, $CategoryID).
+    *
+    * @param $Sender UserModel.
+    * @return bool Whether user has permission.
+    */
+   public function UserModel_GetCategoryViewPermission_Create($Sender) {
+      $UserID = ArrayValue(0, $Sender->EventArguments, '');
+		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
+		if ($UserID && $CategoryID) {
+         $PermissionModel = Gdn::Authenticator()->GetPermissionModel();
+         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $CategoryID);
+         return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;
+      }
+      return FALSE;
+   }
+   
+   /**
     * Adds 'Discussion' item to menu.
     * 
     * 'Base_Render_Before' will trigger before every pageload across apps.

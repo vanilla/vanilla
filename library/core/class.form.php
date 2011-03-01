@@ -640,6 +640,9 @@ class Gdn_Form extends Gdn_Pluggable {
          $Value = $this->GetValue($FieldName);
       if (!is_array($Value)) 
          $Value = array($Value);
+         
+      // Prevent default $Value from matching key of zero
+      $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
       $IncludeNull = ArrayValueI('IncludeNull', $Attributes);
@@ -655,7 +658,7 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach($DataSet->Result() as $Data) {
                $Return .= '<option value="' . $Data->$ValueField .
                    '"';
-               if (in_array($Data->$ValueField, $Value)) $Return .= ' selected="selected"';
+               if (in_array($Data->$ValueField, $Value) && $HasValue) $Return .= ' selected="selected"';
 
                $Return .= '>' . $Data->$TextField . "</option>\n";
             }
@@ -663,7 +666,7 @@ class Gdn_Form extends Gdn_Pluggable {
       } elseif (is_array($DataSet)) {
          foreach($DataSet as $ID => $Text) {
             $Return .= '<option value="' . $ID . '"';
-            if (in_array($ID, $Value)) $Return .= ' selected="selected"';
+            if (in_array($ID, $Value) && $HasValue) $Return .= ' selected="selected"';
 
             $Return .= '>' . $Text . "</option>\n";
          }
@@ -839,7 +842,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return string
     */
    public function InlineError($FieldName) {
-      $AppendError = '<p class="'.$ErrorClass.'">';
+      $AppendError = '<p class="'.$this->ErrorClass.'">';
       foreach ($this->_ValidationResults[$FieldName] as $ValidationError) {
          $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
       }
@@ -1719,7 +1722,9 @@ class Gdn_Form extends Gdn_Pluggable {
          'default',
          'textfield',
          'valuefield',
-         'includenull');
+         'includenull',
+         'yearrange',
+         'inlineerrors');
       $Return = '';
       
       // Build string from array

@@ -103,6 +103,9 @@ $Definition['EmailPassword'] = 'Hello %1$s,
   Url: %4$s
 
 Have a great day!';
+$Definition['EmailConfirmEmail'] = 'Hello {User.Name},
+
+You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.Email,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
 
 You have successfully registered for an account at {Title}. Here is your information:

@@ -37,11 +37,15 @@ class Gdn_Memcache extends Gdn_Cache {
       $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, MEMCACHE_COMPRESSED);
       $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);
       $this->RegisterFeature(Gdn_Cache::FEATURE_TIMEOUT);
+      $this->RegisterFeature(Gdn_Cache::FEATURE_NOPREFIX);
+      $this->RegisterFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
       
       $this->StoreDefaults = array(
-         Gdn_Cache::FEATURE_COMPRESS   => FALSE,
-         Gdn_Cache::FEATURE_TIMEOUT    => FALSE,
-         Gdn_Cache::FEATURE_EXPIRY     => FALSE
+         Gdn_Cache::FEATURE_COMPRESS      => FALSE,
+         Gdn_Cache::FEATURE_TIMEOUT       => FALSE,
+         Gdn_Cache::FEATURE_EXPIRY        => FALSE,
+         Gdn_Cache::FEATURE_NOPREFIX      => FALSE,
+         Gdn_Cache::FEATURE_FORCEPREFIX   => NULL
       );
    }
    
@@ -141,6 +145,8 @@ class Gdn_Memcache extends Gdn_Cache {
       $Flags |= $Compress;
       
       $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
+      
+      $Key = $this->MakeKey($Key, $FinalOptions);
       $Stored = $this->Memcache->add($Key, $Value, $Flags, $Expiry);
       return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
@@ -157,6 +163,7 @@ class Gdn_Memcache extends Gdn_Cache {
       
       $Expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
       
+      $Key = $this->MakeKey($Key, $FinalOptions);
       $Stored = $this->Memcache->set($Key, $Value);//, $Flags, $Expiry);
       return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
@@ -170,30 +177,36 @@ class Gdn_Memcache extends Gdn_Cache {
          $Compress = (int)$this->HasFeature(Gdn_Cache::FEATURE_COMPRESS);
          
       $Flags |= $Compress;
-         
+      
+      $Key = $this->MakeKey($Key, $FinalOptions);
       $Data = $this->Memcache->get($Key, $Flags);
       return ($Data === FALSE) ? Gdn_Cache::CACHEOP_FAILURE : $Data;
    }
    
    public function Exists($Key, $Options = array()) {
+      $Key = $this->MakeKey($Key, $FinalOptions);
       return ($this->Get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
    }
    
    public function Remove($Key, $Options = array()) {
+      $Key = $this->MakeKey($Key, $FinalOptions);
       $Deleted = $this->Memcache->delete($Key);
       return ($Deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Replace($Key, $Value, $Options = array()) {
+      $Key = $this->MakeKey($Key, $FinalOptions);
       return $this->Store($Key, $Value, $Options);
    }
    
    public function Increment($Key, $Amount = 1, $Options = array()) {
+      $Key = $this->MakeKey($Key, $FinalOptions);
       $Incremented = $this->Memcache->increment($Key, $Amount);
       return ($Incremented !== FALSE) ? $Incremented : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Decrement($Key, $Amount = 1, $Options = array()) {
+      $Key = $this->MakeKey($Key, $FinalOptions);
       return $this->Memcache->decrement($Key, $Amount);
    }
 }

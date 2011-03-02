@@ -242,12 +242,15 @@ class FlaggingPlugin extends Gdn_Plugin {
          'ElementID'       => $ElementID,
          'ElementAuthorID' => $ElementAuthorID,
          'ElementAuthor'   => $ElementAuthor,
-         'URL'             => $URL
+         'URL'             => $URL,
+         'UserID'          => $UserID,
+         'UserName'        => $UserName
       ));
       
       if ($Sender->Form->AuthenticatedPostBack()) {
          $SQL = Gdn::SQL();
          $Comment = $Sender->Form->GetValue('Plugin.Flagging.Reason');
+         $Sender->SetData('Plugin.Flagging.Reason', $Comment);
          $CreateDiscussion = C('Plugins.Flagging.UseDiscussions');
          
          if ($CreateDiscussion) {
@@ -275,10 +278,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             // Prep data for the template
             $Sender->SetData('Plugin.Flagging.Report', array(
                'DiscussionName'  => $DiscussionName,
-               'FlaggedContent'  => GetValue('Body', $Result),
-               'Reason'          => $Comment,
-               'UserID'          => $UserID,
-               'UserName'        => $UserName
+               'FlaggedContent'  => GetValue('Body', $Result)
             ));
          
             // Assume no discussion exists
@@ -322,6 +322,10 @@ class FlaggingPlugin extends Gdn_Plugin {
                   'DateUpdated'     => date('Y-m-d H:i:s'),
                   'DateLastComment' => date('Y-m-d H:i:s')
                ));
+               
+               // Update discussion count
+               $DiscussionModel = new DiscussionModel();
+               $DiscussionModel->UpdateDiscussionCount($CategoryID);
             }
          }
          
@@ -342,17 +346,19 @@ class FlaggingPlugin extends Gdn_Plugin {
          } catch(Exception $e) {}
          
          // Notify users with permission who've chosen to be notified
-         if (!$FlagResult) {
-            // Only send if this is first time it's being flagged.
+         if (!$FlagResult) { // Only send if this is first time it's being flagged.
             $Sender->SetData('Plugin.Flagging.DiscussionID', $DiscussionID);
+            $Subject = (isset($PrefixedDiscussionName)) ? $PrefixedDiscussionName : T('A discussion was flagged');
             $EmailBody = $Sender->FetchView($this->GetView('reportemail.php'));
             $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
+            
+            // Send emails
             $UserModel = new UserModel();
-            $Email = new Gdn_Email();
             foreach ($NotifyUsers as $UserID) {
                $User = $UserModel->GetID($UserID);
+               $Email = new Gdn_Email();
                $Email->To($User->Email)
-                  ->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $PrefixedDiscussionName))
+                  ->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $Subject))
                   ->Message($EmailBody)
                   ->Send();
             }

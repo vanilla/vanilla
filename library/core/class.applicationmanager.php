@@ -187,7 +187,10 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-
+      
+      // Allow temporary autoloading of app files
+      Gdn::Config()->Set("TemporaryApplications.{$ApplicationName}", $ApplicationFolder, TRUE, FALSE);
+      
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
@@ -195,7 +198,7 @@ class Gdn_ApplicationManager {
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
       if (!class_exists($Hooks)) {
-         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'class.hooks.php';
+         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.'/settings/class.hooks.php';
          if (file_exists($HooksFile))
             include($HooksFile);
       }
@@ -203,7 +206,9 @@ class Gdn_ApplicationManager {
          $Hooks = new $Hooks();
          $Hooks->Setup();
       }
-
+      
+      Gdn::Config()->Remove("TemporaryApplications.{$ApplicationName}");
+      
       return TRUE;
    }
 

@@ -3,15 +3,16 @@
 $Flag = $this->Data['Plugin.Flagging.Data'];
 $Report = $this->Data['Plugin.Flagging.Report'];
 $DiscussionID = $this->Data['Plugin.Flagging.DiscussionID'];
+$Reason = $this->Data['Plugin.Flagging.Reason'];
 
-echo T('Discussion'); ?>: <?php echo $Report['DiscussionName']; ?>
+echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Report['DiscussionName']; ?>
 
 <?php echo ExternalUrl($Flag['URL']); ?>
 
 
-<?php echo T('Reason') . ': ' . $Report['Reason']; ?>
+<?php echo T('Reason') . ': ' . $Reason; ?>
 
 
-<?php echo T('Flagged by') . ': ' . $Report['UserName']; ?>
+<?php echo T('Flagged by') . ': ' . $Flag['UserName']; ?>
 
-<?php echo T('Discuss it') . ': ' . ExternalUrl('discussion/'.$DiscussionID); ?>
+<?php if ($DiscussionID) echo T('Discuss it') . ': ' . ExternalUrl('discussion/'.$DiscussionID); ?>

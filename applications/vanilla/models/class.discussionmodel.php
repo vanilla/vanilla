@@ -143,6 +143,7 @@ class DiscussionModel extends VanillaModel {
       
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
+		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet');
       
 		// Get sorting options from config

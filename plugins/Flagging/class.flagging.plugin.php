@@ -185,8 +185,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       if ($Sender->Form->AuthenticatedPostBack()) {
          $SQL = Gdn::SQL();
          $Comment = $Sender->Form->GetValue('Plugin.Flagging.Reason');
-         $CreateDiscussion = C('Plugins.Flagging.UseDiscussions');
-         
+         $CreateDiscussion = C('Plugins.Flagging.UseDiscussions', FALSE);
          
          if ($CreateDiscussion) {
             // Category

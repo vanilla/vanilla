@@ -8,6 +8,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
+   $DiscussionUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '');
+   $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $First = UserBuilder($Discussion, 'First');
@@ -18,6 +20,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
+      
+   $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 
    static $FirstDiscussion = TRUE;
    if (!$FirstDiscussion)
@@ -31,7 +35,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>

@@ -105,9 +105,7 @@ class CategoriesController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Get a DiscussionModel
       $DiscussionModel = new DiscussionModel();
@@ -171,9 +169,7 @@ class CategoriesController extends VanillaController {
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       $this->Render();
 	}
@@ -208,9 +204,7 @@ class CategoriesController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Set view and render
       $this->View = 'discussions';

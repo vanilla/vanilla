@@ -1751,6 +1751,10 @@ class UserModel extends Gdn_Model {
 
       $this->SQL->Update('User')->Set('Password', $Password)->Set('HashMethod', 'Vanilla')->Where('UserID', $UserID)->Put();
       $this->SaveAttribute($UserID, 'PasswordResetKey', '');
+
+      $this->EventArguments['UserID'] = $UserID;
+      $this->FireEvent('AfterPasswordReset');
+
       return $this->Get($UserID);
    }
 }

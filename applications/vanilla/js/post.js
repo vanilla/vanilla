@@ -67,7 +67,7 @@ jQuery(document).ready(function($) {
                // Redirect to the discussion
                document.location = json.DiscussionUrl;
             }
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
@@ -140,7 +140,7 @@ jQuery(document).ready(function($) {
                   $('#Content').html(json.Data);
                }
             }
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.

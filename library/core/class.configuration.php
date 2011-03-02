@@ -117,6 +117,35 @@ class Gdn_Configuration {
       return $Array;
    }
 
+   public static function Format($Data, $Options = array()) {
+      if (is_string($Options))
+         $Options = array('VariableName' => $Options);
+
+      $Defaults = array('VariableName' => 'Configuration');
+      $Options = array_merge($Defaults, $Options);
+      $VariableName = $Options['VariableName'];
+      
+      $Lines = array("<?php if (!defined('APPLICATION')) exit();".PHP_EOL);
+      
+      if (!is_array($Data))
+         return $Lines[0];
+
+      $LastKey = FALSE;
+      foreach ($Data as $Key => $Value) {
+         if($LastKey != $Key && is_array($Value)) {
+            $Lines[] = '';
+            $Lines[] = '// '.$Key;
+            $LastKey = $Key;
+         }
+
+         $Prefix = '$'.$VariableName."['".addslashes($Key)."']";
+         FormatArrayAssignment($Lines, $Prefix, $Value);
+      }
+
+      $Result = implode(PHP_EOL, $Lines);
+      return $Result;
+   }
+
    /**
     * Gets a setting from the configuration array. Returns $DefaultValue if the value isn't found.
     *
@@ -328,7 +357,7 @@ class Gdn_Configuration {
       if (is_null($$Name) || !is_array($$Name)) {
          $LoadedFromCache = FALSE;
          // Include the file.
-         include($File);
+         require($File);
       }
       
       // Make sure the config variable is here and is an array.
@@ -375,13 +404,28 @@ class Gdn_Configuration {
          return FALSE;
       }
    }
+
+   public static function LoadFile($Path, $Options = array()) {
+      if (is_string($Options))
+         $Options = array('VariableName' => $Options);
+
+      $Defaults = array('VariableName' => 'Configuration');
+      $Options = array_merge($Defaults, $Options);
+      $VariableName = $Options['VariableName'];
+
+      $$VariableName = array();
+      if (file_exists($Path)) {
+         require $Path;
+      }
+      return $$VariableName;
+   }
    
-   protected function _MergeConfig(&$Data, &$Loaded) {
+   protected static function _MergeConfig(&$Data, &$Loaded) {
       foreach($Loaded as $Key => $Value) {
          if(!array_key_exists($Key, $Data)) {
             $Data[$Key] = $Value;
          } elseif(is_array($Data[$Key]) && is_array($Value)) {
-            $this->_MergeConfig($Data[$Key], $Value);
+            self::_MergeConfig($Data[$Key], $Value);
          } else {
             $Data[$Key] = $Value;
          }
@@ -424,7 +468,7 @@ class Gdn_Configuration {
       }
 
       // Do a sanity check on the config save.
-      if ($File == PATH_CONF.'/config.php') {
+      if ($File == PATH_LOCAL_CONF.'/config.php') {
          if (!isset($Data['Database'])) {
             if ($Pm = Gdn::PluginManager()) {
                $Pm->EventArguments['Data'] = $Data;
@@ -472,15 +516,42 @@ class Gdn_Configuration {
          $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data);
 
       // echo 'saving '.$File;
-      Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);
-      
-      // Call the built in method to remove the dependancy to an external object.
-      //file_put_contents($File, $FileContents);
+//      Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);
+
+      $TmpFile = tempnam(PATH_CONF, 'config');
+      $Result = FALSE;
+      if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+         chmod($TmpFile, 0775);
+         $Result = rename($TmpFile, $File);
+      }
 
       // Clear out the save data array
       $this->_SaveData = array();
       $this->_File = '';
-      return TRUE;
+      return $Result;
+   }
+
+   public static function SaveFile($Path, $Data, $Options = array()) {
+      if (is_string($Options))
+         $Options = array('VariableName' => $Options);
+
+      // Load the current data.
+      $Loaded = self::LoadFile($Path, $Options);
+
+      // Merge the save data in.
+      self::_MergeConfig($Data, $Loaded);
+
+      // Save the data back out to the path.
+      $Contents = self::Format($Data, $Options);
+      
+      $TmpFile = tempnam(PATH_CONF, 'config');
+      $Result = FALSE;
+      if (file_put_contents($TmpFile, $Contents) !== FALSE) {
+         chmod($TmpFile, 0775);
+         $Result = rename($TmpFile, $Path);
+      }
+      
+      return $Result;
    }
    
    protected function _Sort(&$Data) {

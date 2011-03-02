@@ -170,9 +170,7 @@ class DiscussionController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();

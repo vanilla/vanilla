@@ -126,7 +126,7 @@ class MessagesController extends ConversationsController {
          } else {
             // Handle ajax based errors...
             if ($this->DeliveryType() != DELIVERY_TYPE_ALL)
-               $this->StatusMessage = $this->Form->Errors();
+               $this->ErrorMessage($this->Form->Errors());
          }
       }
       $this->Render();      
@@ -214,7 +214,7 @@ class MessagesController extends ConversationsController {
       if (is_numeric($ConversationID) && $ConversationID > 0 && $Session->IsValid())
          $this->ConversationModel->Clear($ConversationID, $Session->UserID);
       
-      $this->StatusMessage = T('The conversation has been cleared.');
+      $this->InformMessage(T('The conversation has been cleared.'));
       $this->RedirectUrl = Url('/messages/all');
       $this->Render();
    }

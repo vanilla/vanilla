@@ -120,7 +120,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       } else {
          $Saved = $Sender->Form->Save();
          if($Saved) {
-            $Sender->StatusMessage = T("Your changes have been saved.");
+            $Sender->InformMessage(T("Your changes have been saved."));
          }
       }
       
@@ -364,7 +364,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             }
          }
                   
-         $Sender->StatusMessage = T("Your complaint has been registered.");
+         $Sender->InformMessage(T("Your complaint has been registered."));
       }
       $Sender->Render($this->GetView('flag.php'));
    }

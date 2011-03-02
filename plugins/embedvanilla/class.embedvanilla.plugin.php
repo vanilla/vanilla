@@ -75,7 +75,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Plugins.EmbedVanilla.RemoteUrl', 'WebAddress', 'The remote url you specified could not be validated as a functional url to redirect to.');
          if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = T("Your settings have been saved.");
+            $Sender->InformMessage(T("Your settings have been saved."));
       }
 		
 		// Handle changing the theme to the recommended one

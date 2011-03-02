@@ -86,7 +86,7 @@ class SettingsController extends Gdn_Controller {
 					$DiscussionModel = new DiscussionModel();
 					$DiscussionModel->UpdateDiscussionCount('All');
 				}
-            $this->StatusMessage = T("Your changes have been saved.");
+            $this->InformMessage(T("Your changes have been saved."));
 			}
 		}
 		
@@ -211,7 +211,7 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
          
          if ($this->Form->Save() !== FALSE) {
-            $this->StatusMessage = T("Your changes have been saved.");
+            $this->InformMessage(T("Your changes have been saved."));
          }
       }
       
@@ -252,8 +252,6 @@ class SettingsController extends Gdn_Controller {
 			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {               
-            // $this->StatusMessage = T('The category was created successfully.');
-            // $this->RedirectUrl = Url('vanilla/settings/managecategories');
 				Redirect('vanilla/settings/managecategories');
          } else {
 				unset($CategoryID);
@@ -349,7 +347,7 @@ class SettingsController extends Gdn_Controller {
                }
                if ($this->Form->ErrorCount() == 0) {
                   $this->RedirectUrl = Url('vanilla/settings/managecategories');
-                  $this->StatusMessage = T('Deleting category...');
+                  $this->InformMessage(T('Deleting category...'));
                }
             }
          }
@@ -397,12 +395,8 @@ class SettingsController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($this->Category);
       } else {
-         if ($this->Form->Save()) {
-            // Report success
-            // $this->StatusMessage = T('The category was saved successfully.');
-            // $this->RedirectUrl = Url('vanilla/settings/managecategories');
+         if ($this->Form->Save())
 				Redirect('vanilla/settings/managecategories');
-         }
       }
        
       // Get all of the currently selected role/permission combinations for this junction.
@@ -473,7 +467,7 @@ class SettingsController extends Gdn_Controller {
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
          if ($this->Form->Save() !== FALSE)
-            $this->StatusMessage = T("Your settings have been saved.");
+            $this->InformMessage(T("Your settings have been saved."));
 		}
       
       // Render default view

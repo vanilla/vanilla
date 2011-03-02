@@ -164,7 +164,7 @@ class SettingsController extends DashboardController {
                $this->SetData('Logo', $ImageBaseName);
             }
             
-            $this->StatusMessage = T("Your settings have been saved.");
+            $this->InformMessage(T("Your settings have been saved."));
          }
       }
       
@@ -192,7 +192,7 @@ class SettingsController extends DashboardController {
                'Internal'
             );
 
-            $this->StatusMessage = T("The homepage was saved successfully.");
+            $this->InformMessage(T("The homepage was saved successfully."));
          }
       
       $this->Render();      
@@ -249,7 +249,7 @@ class SettingsController extends DashboardController {
          */
          
          if ($this->Form->Save() !== FALSE)
-            $this->StatusMessage = T("Your settings have been saved.");
+            $this->InformMessage(T("Your settings have been saved."));
 
       }
       
@@ -421,7 +421,7 @@ class SettingsController extends DashboardController {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
             $Refresh = TRUE;
-            $this->StatusMessage = T("Your changes have been saved successfully.");
+            $this->InformMessage(T("Your changes have been saved successfully."));
          }
 
          if ($Refresh)
@@ -605,7 +605,7 @@ class SettingsController extends DashboardController {
          
          // Save!
          if ($this->Form->Save() !== FALSE) {
-            $this->StatusMessage = T("Your settings have been saved.");
+            $this->InformMessage(T("Your settings have been saved."));
             if ($RedirectUrl != '')
                $this->RedirectUrl = $RedirectUrl;
          }
@@ -697,7 +697,7 @@ class SettingsController extends DashboardController {
                }
             }
 
-            $this->StatusMessage = T("Your changes have been saved.");
+            $this->InformMessage(T("Your changes have been saved."));
          } elseif ($Style) {
             SaveToConfig(array(
                'Garden.ThemeOptions.Styles.Key' => $Style,

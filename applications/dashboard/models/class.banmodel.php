@@ -39,7 +39,7 @@ class BanModel extends Gdn_Model {
          $NewUsers = $this->SQL
             ->Select('u.UserID, u.Banned')
             ->From('User u')
-            ->Where($this->_BanWhere($NewBan))
+            ->Where($this->BanWhere($NewBan))
             ->Get()->ResultArray();
          $NewUserIDs = ConsolidateArrayValuesByKey($NewUsers, 'UserID');
       } elseif (isset($OldBan['BanID'])) {
@@ -50,7 +50,7 @@ class BanModel extends Gdn_Model {
          $OldUsers = $this->SQL
             ->Select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
             ->From('User u')
-            ->Where($this->_BanWhere($OldBan))
+            ->Where($this->BanWhere($OldBan))
             ->Get()->ResultArray();
          $OldUserIDs = ConsolidateArrayValuesByKey($OldUsers, 'UserID');
       }
@@ -71,9 +71,9 @@ class BanModel extends Gdn_Model {
       }
    }
    
-   protected function _BanWhere($Ban) {
+   public function BanWhere($Ban) {
       $Result = array('u.Admin' => 0);
-      $Ban['BanValue'] = str_replace('%', '*', $Ban['BanValue']);
+      $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);
 
       switch(strtolower($Ban['BanType'])) {
          case 'email':
@@ -165,7 +165,7 @@ class BanModel extends Gdn_Model {
       $CountUsers = $this->SQL
          ->Select('UserID', 'count', 'CountUsers')
          ->From('User u')
-         ->Where($this->_BanWhere($Data))
+         ->Where($this->BanWhere($Data))
          ->Get()->Value('CountUsers', 0);
 
       $Data['CountUsers'] = $CountUsers;

@@ -102,6 +102,15 @@ class SettingsController extends DashboardController {
       }
       $this->Render();
    }
+
+   protected function _BanFilter($Ban) {
+      $BanModel = $this->_BanModel;
+      $BanWhere = $BanModel->BanWhere($Ban);
+      foreach ($BanWhere as $Name => $Value) {
+         if ($Name != 'u.Admin')
+            return "$Name $Value";
+      }
+   }
    
    /**
     * Banner management screen.
@@ -182,6 +191,7 @@ class SettingsController extends DashboardController {
       list($Offset, $Limit) = OffsetLimit($Page, 20);
 
       $BanModel = new BanModel();
+      $this->_BanModel = $BanModel;
 
       switch (strtolower($Action)) {
          case 'add':

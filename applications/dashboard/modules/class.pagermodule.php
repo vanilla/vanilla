@@ -282,6 +282,10 @@ class PagerModule extends Gdn_Module {
 
       $ClientID = $this->ClientID;
       $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
+
+      if (isset($this->HtmlBefore)) {
+         $Pager = $this->HtmlBefore.$Pager;
+      }
       
       return $Pager == '' ? '' : sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
    }
@@ -305,6 +309,7 @@ class PagerModule extends Gdn_Module {
       $Pager->ClientID = GetValue('ClientID', $Options, $Pager->ClientID);
 
       $Pager->Limit = GetValue('Limit', $Options, $Pager->Limit);
+      $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, $Pager->HtmlBefore);
 
       // Try and figure out the offset based on the parameters coming in to the controller.
       if (!$Pager->Offset) {
@@ -314,7 +319,10 @@ class PagerModule extends Gdn_Module {
          }
          list($Offset, $Limit) = OffsetLimit($Page, $Pager->Limit);
          $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', 0));
-         $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}');
+
+         $Get = $Pager->Controller()->Request->Get();
+         unset($Get['Page']);
+         $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}&'.http_build_query($Get));
 
          $Pager->Configure($Offset, $Limit, $TotalRecords, $Url);
       }

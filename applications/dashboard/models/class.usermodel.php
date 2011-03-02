@@ -687,6 +687,12 @@ class UserModel extends Gdn_Model {
       else
          $ApplicantRoleID = 0;
 
+      if (is_array($Keywords)) {
+         $Where = $Keywords;
+         $Keywords = $Where['Keywords'];
+         unset($Where['Keywords']);
+      }
+
       // Check to see if the search exactly matches a role name.
       $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
 
@@ -695,6 +701,9 @@ class UserModel extends Gdn_Model {
          $this->SQL
             ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
       }
+
+      if (isset($Where))
+         $this->SQL->Where($Where);
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
@@ -726,9 +735,17 @@ class UserModel extends Gdn_Model {
       else
          $ApplicantRoleID = 0;
 
+      if (is_array($Keywords)) {
+         $Where = $Keywords;
+         $Keywords = $Where['Keywords'];
+         unset($Where['Keywords']);
+      }
 
       // Check to see if the search exactly matches a role name.
       $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+
+      if (isset($Where))
+         $this->SQL->Where($Where);
       
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')

@@ -19,7 +19,11 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 20));
       <tr id="<?php echo "BanID_{$Row['BanID']}"; ?>">
          <td><?php echo htmlspecialchars($Row['BanValue']); ?></td>
          <td><?php echo T($Row['BanType']); ?></td>
-         <td><?php echo $Row['CountUsers']; ?></td>
+         <td>
+            <?php
+               echo Anchor($Row['CountUsers'], '/dashboard/user?Filter='.urlencode($this->_BanFilter($Row)));
+            ?>
+         </td>
          <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
          <td><?php echo htmlspecialchars($Row['Notes']); ?></td>
          <td>

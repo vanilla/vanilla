@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
-            $(container).slideUp('fast',function() {
+            $(container).fadeOut('fast',function() {
                $(this).remove();
             });
       });
@@ -122,16 +122,16 @@ jQuery(document).ready(function($) {
       $('.AjaxForm').handleAjaxForm();
    
    // If a message group is clicked, hide it.
-   $('div.Messages').live('click', function() {
+   $('div.Messages.Dismissable').live('click', function() {
       $(this).fadeOut('fast', function() {
          $(this).remove();
       });
    });
    
    // If an information message appears on the screen, hide it after a few moments.
-   $('div.Information').livequery(function() {
+   $('div.Information.AutoDismiss').livequery(function() {
       setTimeout(function(){
-         $('div.Information').fadeOut('fast', function() {
+         $('div.Information.AutoDismiss').fadeOut('fast', function() {
             $(this).remove();
          });
       }, 3000);
@@ -193,6 +193,15 @@ jQuery(document).ready(function($) {
 
    // Notify the user with a message
    gdn.inform = function(message, wrapInfo) {
+		// Was an object containing the message passed instead of a message string?
+		css = '';
+		try {
+			css = message.StatusMessageClass;
+			message = message.StatusMessage;
+		} catch (e) {
+			// Do nothing
+		}
+		
       if(wrapInfo == undefined) {
          wrapInfo = true;
       }
@@ -200,7 +209,7 @@ jQuery(document).ready(function($) {
       if (message && message != null && message != '') {
          $('div.Messages').remove();
          if(wrapInfo)
-            $('<div class="Messages Information"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
+            $('<div class="Messages Information ' + css + '"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
          else
             $(message).appendTo('body').show();
       }

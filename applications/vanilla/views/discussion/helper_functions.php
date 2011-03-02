@@ -24,6 +24,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $Id = 'Discussion_'.$Object->DiscussionID;
       $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
    }
+   $Sender->EventArguments['CssClass'] = &$CssClass;
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
    $Sender->FireEvent('BeforeCommentDisplay');

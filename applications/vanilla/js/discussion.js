@@ -189,7 +189,7 @@ jQuery(document).ready(function($) {
                $(document).trigger('CommentAdded');
                $(frm).triggerHandler('complete');
             }
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
             return false;
          },
          complete: function(XMLHttpRequest, textStatus) {

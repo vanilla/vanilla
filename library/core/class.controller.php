@@ -185,6 +185,13 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $StatusMessage;
 
    /**
+    * Additional/optional CSS class to define for status messages.
+    *
+    * @var string
+    */
+   public $StatusMessageClass;
+
+   /**
     * Defined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or
     * SYNDICATION_NONE (default).
     *
@@ -311,6 +318,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Request = FALSE;
       $this->SelfUrl = '';
       $this->StatusMessage = '';
+      $this->StatusMessageClass = 'Dismissable AutoDismiss';
       $this->SyndicationMethod = SYNDICATION_NONE;
       $this->Theme = Theme();
       $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
@@ -984,6 +992,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->SetJson('DeliveryType', $this->_DeliveryType);
          $this->SetJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->ToString() : $View));
          $this->SetJson('StatusMessage', $this->StatusMessage);
+         $this->SetJson('StatusMessageClass', $this->StatusMessageClass);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 
          // Make sure the database connection is closed before exiting.
@@ -998,7 +1007,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          exit($this->_Json['Data']);
       } else {
          if ($this->StatusMessage != '' && $this->SyndicationMethod === SYNDICATION_NONE)
-            $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
+            $this->AddAsset($AssetName, '<div class="Messages Information '.$this->StatusMessageClass.'"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);

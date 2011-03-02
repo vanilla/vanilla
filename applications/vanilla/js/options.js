@@ -57,7 +57,7 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
          }

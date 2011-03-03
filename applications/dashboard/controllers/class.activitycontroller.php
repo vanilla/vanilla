@@ -236,7 +236,7 @@ class ActivityController extends Gdn_Controller {
             );
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
             if ($this->Form->ErrorCount() > 0)
-               $this->StatusMessage = $this->Form->Errors();
+               $this->ErrorMessage($this->Form->Errors());
          }
       }
       

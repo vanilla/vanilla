@@ -170,9 +170,7 @@ class DiscussionController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
@@ -403,7 +401,7 @@ class DiscussionController extends VanillaController {
          Redirect('discussions');
          
       $this->RedirectUrl = Url('discussions');
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 
@@ -450,7 +448,7 @@ class DiscussionController extends VanillaController {
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
       $this->SetJson('LinkText', T($State ? 'Unsink' : 'Sink'));         
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 
@@ -497,7 +495,7 @@ class DiscussionController extends VanillaController {
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
       $this->SetJson('LinkText', T($State ? 'Reopen' : 'Close'));         
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 

@@ -80,7 +80,7 @@ class RoutesController extends DashboardController {
                ArrayValue('Type', $FormPostValues)
             );
 
-            $this->StatusMessage = T("The route was saved successfully.");
+            $this->InformMessage(T("The route was saved successfully."));
             $this->RedirectUrl = Url('dashboard/routes');
          } else {
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());

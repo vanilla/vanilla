@@ -94,8 +94,8 @@ jQuery(document).ready(function($) {
             $('div.Errors').remove();
 
             if (json.FormSaved == false) {
-               if (json.StatusMessage != null && json.StatusMessage != '')
-                  $(row).prepend(json.StatusMessage);
+               if (json.ErrorMessages)
+                  $(row).prepend(json.ErrorMessages);
             } else {
                $(row).before(json.Data);         
                textbox.val('').blur();

@@ -57,7 +57,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   
                   $.popup.close(settings);
                   settings.afterConfirm(json, settings.sender);
-                  gdn.inform(json.StatusMessage);
+                  gdn.inform(json);
                   if (json.RedirectUrl)
                     setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
 
@@ -210,9 +210,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // This is something other than json, so just put it into the popup directly
       $('#'+settings.popupId+' .Content').append(data);
     } else {
-      if (json.StatusMessage)
-         gdn.inform(json.StatusMessage);
-
+      gdn.inform(json);
       formSaved = json['FormSaved'];
       data = json['Data'];
 
@@ -249,9 +247,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          },  
          success: function(json) {
             json = $.postParseJson(json);
-            
-            if (json.StatusMessage)
-               gdn.inform(json.StatusMessage);
+            gdn.inform(json);
          
             if (json.FormSaved == true) {
                if (json.RedirectUrl)

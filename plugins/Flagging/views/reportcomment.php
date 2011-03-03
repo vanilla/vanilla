@@ -1,9 +1,10 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php 
-$Report = $this->Data['Plugin.Flagging.Report'];
+<?php if (!defined('APPLICATION')) exit();
 
-echo Anchor($Report['UserName'], '/profile/'.$Report['UserID'].'/'.$Report['UserName']) . ' '. T('also reported this.'); ?>
+$Flag = $this->Data['Plugin.Flagging.Data'];
+$Reason = $this->Data['Plugin.Flagging.Reason'];
+
+echo Anchor($Flag['UserName'], '/profile/'.$Flag['UserID'].'/'.$Flag['UserName']) . ' '. T('also reported this.'); ?>
 
 
 <?php echo T('Reason'); ?>:
-   <blockquote rel="<?php echo $Report['UserName']; ?>"><?php echo $Report['Reason']; ?></blockquote>
+   <blockquote rel="<?php echo $Flag['UserName']; ?>"><?php echo $Reason; ?></blockquote>

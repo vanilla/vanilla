@@ -141,14 +141,17 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
+      $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
+		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet');
       
 		// Get sorting options from config
-		$SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+		$SortField = $this->EventArguments['SortField'];
 		if (!in_array($SortField, array('d.DateLastComment', 'd.DateInserted')))
 			$SortField = 'd.DateLastComment';
-			
-		$SortDirection = C('Vanilla.Discussions.SortDirection', 'desc');
+		
+		$SortDirection = $this->EventArguments['SortDirection'];
 		if ($SortDirection != 'asc')
 			$SortDirection = 'desc';
 			

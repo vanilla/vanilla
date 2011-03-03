@@ -137,6 +137,7 @@ Gdn::FactoryInstall('ThemeManager', 'Gdn_ThemeManager', PATH_LIBRARY_CORE.DS.'cl
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice', PATH_LIBRARY_CORE.DS.'class.slice.php', Gdn::FactorySingleton);
 // Remote Statistics
 Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', PATH_LIBRARY.DS.'core'.DS.'class.statistics.php', Gdn::FactoryInstance);
+Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', NULL, Gdn::FactoryInstance);
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy', PATH_LIBRARY_CORE.DS.'class.dummy.php', Gdn::FactorySingleton);

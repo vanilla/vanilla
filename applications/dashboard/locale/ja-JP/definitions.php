@@ -262,7 +262,7 @@ $Definition['Routes can be used to redirect users to various parts of your site 
 $Definition['Save'] = '保存';
 $Definition['Search'] = '検索';
 $Definition['seconds'] = '秒間';
-$Definition['Select the file to import'] = '選択したファイルをインポート';
+$Definition['Select the file to import'] = 'インポートするファイルを選択してください';
 $Definition['Settings'] = '設定';
 $Definition['Sign Out'] = 'ログアウト';
 $Definition['Sink'] = 'Sink';
@@ -278,7 +278,7 @@ $Definition['Target'] = '対象';
 $Definition['Temporary (302)'] = '一時的 (302)';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'The %s Authenticator does not have any custom configuration options.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'The addon could not be enabled because it generated a fatal error: <pre>%s</pre>';
-$Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴをは、フォーラムの先頭に表示されます。';
+$Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴは、フォーラムの先頭に表示されます。';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'バナー タイトルは、すべてのページの左上に表示されます。バナー ロゴをアップロードすると、バナー タイトルは置き換えられます。';
 $Definition['The file failed to upload.'] = 'The file failed to upload.';
 $Definition['ThemeHelp'] = 'テーマはあなたのサイトの外観を変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
@@ -297,7 +297,7 @@ $Definition['Unlimited'] = '無制限';
 $Definition['Upload'] = 'アップロード';
 $Definition['Url'] = 'URL';
 $Definition['User'] = 'ユーザー';
-$Definition['User Registration Settings'] = 'ユーザー設定';
+$Definition['User Registration Settings'] = 'ユーザー登録設定';
 $Definition['Username'] = 'ユーザー名';
 $Definition['Users'] = 'ユーザー';
 

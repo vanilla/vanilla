@@ -1371,26 +1371,36 @@ class ImportModel extends Gdn_Model {
                   and ud.UserID = u.UserID
             )";
       }
-      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
-         $Sqls['User.CountUnreadConversations'] =
-            'update :_User u
-            set u.CountUnreadConversations = (
-              select count(c.ConversationID)
-              from :_Conversation c
-              inner join :_UserConversation uc
-                on c.ConversationID = uc.ConversationID
-              where uc.UserID = u.UserID
-                and uc.CountReadMessages < c.CountMessages
-            )';
-      }
+//      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
+//         $Sqls['User.CountUnreadConversations'] =
+//            'update :_User u
+//            set u.CountUnreadConversations = (
+//              select count(c.ConversationID)
+//              from :_Conversation c
+//              inner join :_UserConversation uc
+//                on c.ConversationID = uc.ConversationID
+//              where uc.UserID = u.UserID
+//                and uc.CountReadMessages < c.CountMessages
+//            )';
+//      }
 
       // The updates start here.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 
       if($CurrentSubstep == 0) {
          // Add the FirstCommentID to the discussion table.
-         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);
+         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL, 'index')->Set(FALSE, FALSE);
       }
+
+      $Sqls2 = array();
+      $i = 1;
+      foreach ($Sqls as $Name => $Sql) {
+         $Sqls2[] = "/* $i. $Name */\n"
+            .str_replace(':_', $this->Database->DatabasePrefix, $Sql)
+            .";\n";
+         $i++;
+      }
+      throw new Exception(implode("\n", $Sqls2));
 
 		// Execute the SQL.
       $Keys = array_keys($Sqls);

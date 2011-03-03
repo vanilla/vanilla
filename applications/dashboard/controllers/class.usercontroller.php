@@ -208,7 +208,8 @@ class UserController extends DashboardController {
 	public function EmailAvailable($Email = '') {
 		$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
-      if ($Email != '') {
+
+      if (C('Garden.Registration.EmailUnique') && $Email != '') {
          $UserModel = Gdn::UserModel();
          if ($UserModel->GetByEmail($Email))
             $Available = FALSE;

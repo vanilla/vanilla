@@ -6,13 +6,16 @@ Garden is free software: you can redistribute it and/or modify it under the term
 Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+
+ChangeLog
+1.0.2 - Moved WordPress plugin to WP.org repository & updated link to http://wordpress.org/extend/plugins/vanilla-forums/
 */
 
 // Define the plugin:
 $PluginInfo['embedvanilla'] = array(
    'Name' => '&lt;Embed&gt; Vanilla',
    'Description' => "Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you've created.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -72,7 +75,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Plugins.EmbedVanilla.RemoteUrl', 'WebAddress', 'The remote url you specified could not be validated as a functional url to redirect to.');
          if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = T("Your settings have been saved.");
+            $Sender->InformMessage(T("Your settings have been saved."));
       }
 		
 		// Handle changing the theme to the recommended one

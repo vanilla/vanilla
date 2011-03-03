@@ -594,7 +594,11 @@ class CommentModel extends VanillaModel {
          $NotifiedUsers = array();
          foreach ($Usernames as $Username) {
             $User = $UserModel->GetByUsername($Username);
-            if ($User && $User->UserID != $Session->UserID) {
+            
+            // Check user can still see the discussion.
+            $UserMayView = $UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID);
+            
+            if ($User && $User->UserID != $Session->UserID && $UserMayView) {
                $NotifiedUsers[] = $User->UserID;
                $ActivityID = $ActivityModel->Add(
                   $Session->UserID,
@@ -612,7 +616,10 @@ class CommentModel extends VanillaModel {
          // Notify users who have bookmarked the discussion
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {
-            if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID) {
+            // Check user can still see the discussion.
+            $UserMayView = $UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID);
+            
+            if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID && $UserMayView) {
                $NotifiedUsers[] = $Bookmark->UserID;
                $ActivityModel = new ActivityModel();   
                $ActivityID = $ActivityModel->Add(
@@ -653,7 +660,11 @@ class CommentModel extends VanillaModel {
     * @param int $SendEmail Passed directly to ActivityModel::Add().
     */  
    public function RecordActivity(&$ActivityModel, $Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
-      if ($Discussion->InsertUserID != $ActivityUserID)
+      // Check InsertUser can still see the discussion.
+      $UserModel = Gdn::UserModel();
+      $UserMayView = $UserModel->GetCategoryViewPermission($Discussion->InsertUserID, $Discussion->CategoryID);
+      
+      if ($Discussion->InsertUserID != $ActivityUserID && $UserMayView)
 			$ActivityModel->Add(
 				$ActivityUserID,
 				'DiscussionComment',

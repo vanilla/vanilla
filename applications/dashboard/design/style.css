@@ -220,65 +220,6 @@ input.Button {
 	padding: 10px 40px 10px 0;
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
-/* Note: Messages are the yellow notices that appear at the top/center of the
-  page to notify users of things like drafts being saved, etc. */
-div.Messages {
-   text-align: center !important;
-   position: fixed;
-   top: 0;
-   left: 0;
-   z-index: 200;
-   margin: 0 !important;
-   padding: 0 !important;
-   list-style: none !important;
-   font-size: 12px;
-   display: block;
-   width: 100%;
-}
-* html div.Messages {
-  position: absolute;
-  width: 100%;/*IE5.5*/
-  top: 0;
-  left: 0;
-  overflow: visible; 
-  top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop);
-}
-div.Messages ul {
-   cursor: pointer;
-   width: auto !important;
-   border: 0 !important;
-   margin: 0 auto !important;
-   padding: 4px 8px !important;
-   border-bottom-left-radius: 2px;
-   border-bottom-right-radius: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   background: #ff9 !important;
-   display:-moz-inline-stack;
-   display:inline-block;
-   zoom:1;
-   *display:inline;
-	box-shadow: 0px 0px 2px #333;
-	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
-}
-div.Messages ul li {
-   text-align: left !important;
-   border: 0 !important;
-   color: #000 !important;
-   padding: 0 !important;
-   margin: 0 !important;
-   list-style-position: outside;
-}
-div.Errors ul {
-   background: #d50a0a !important;
-}
-div.Errors ul li {
-   color: #fff !important;
-   background: #d50a0a !important;
-}
 .Conversations .Deleted {
    text-decoration: line-through;
 }
@@ -591,7 +532,6 @@ ul.Options li.Parent strong {
    margin: 3px 4px 0 0;
    font-size: 10px;
    font-weight: normal;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -624,25 +564,25 @@ ul.Options li.Active {
    background: none;
 }
 ul.Options li.Active ul {
-   border: 1px solid #9c9c9c;
-   background: #fafafa;
    -moz-border-radius-bottomleft: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
    border-bottom-left-radius: 2px;
    border-bottom-right-radius: 2px;
+   background: #444;
+   border: 1px solid #282828;
 }
 ul.Options li.Active ul li a {
    background: none;
 }
 ul.Options li.Active a {
    background: #efefef;
-   color: #595959;
+   color: #fff;
 }
 ul.Options li.Active a:hover {
-   background: #8d8d8d;
    color: #fff;
+   background: #282828;
 }
 ul.Options li.Parent strong:hover,
 ul.Options li.Active strong:hover,
@@ -651,6 +591,33 @@ ul.Options li.Active ul {
   	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0 0 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;     
+}
+
+
+ul.Options li.Active strong,
+ul.Options li.Active strong:hover,
+ul.Options li.Parent strong {
+   padding-right: 18px;
+   font-size: 11px;
+   background: url('images/buttons.png') right -96px no-repeat;
+}
+ul.Options li.Active strong,
+ul.Options li.Active strong:hover {
+   border: 1px solid #282828;
+   color: #fff;
+   background: url('images/buttons.png') right -144px no-repeat #282828 !important;
+}
+ul.Options li.Parent strong:hover {
+   box-shadow:1px 1px 2px #999999;
+   -moz-box-shadow:1px 1px 2px #999999;
+   -webkit-box-shadow:1px 1px 2px #999999;
+}
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+   box-shadow:2px 2px 2px #999999;
+   -moz-box-shadow:2px 2px 2px #999999;
+   -webkit-box-shadow:2px 2px 2px #999999;
 }
 .Center {
    text-align: center;
@@ -2709,4 +2676,121 @@ div.SignInPopup .ExistingUsername {
 	font-size: 13px;
 	color: #000;
 	display: block;
+}
+
+
+/* Do not customize these unless you enjoy pain. */
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+div.InformMessages {
+   text-align: left !important;
+   position: fixed;
+   top: auto;
+   bottom: 20px;
+   left: 20px;
+   z-index: 200;
+   margin: 0 !important;
+   padding: 0 !important;
+   list-style: none !important;
+   font-size: 12px;
+   display: block;
+   width: auto;
+}
+* html div.InformMessages {
+  position: absolute;
+  width: 100%;/*IE5.5*/
+  top: auto;
+  left: 20px;
+  overflow: visible; 
+  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+}
+div.InformMessages div.InformWrapper {
+	display: block;
+}
+div.InformMessages div.InformMessage {
+   color: #fff !important;
+	text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: rgb(0, 0, 0) !important;
+	background: rgba(0, 0, 0, 0.7) !important;
+   border: none !important;
+   width: auto !important;
+	max-width: 400px !important;
+   margin: 10px auto 0 !important;
+   padding: 5px 14px 4px !important;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+	position: relative;
+}
+div.InformMessages div.InformMessage:hover {
+	background: rgba(0, 0, 0, 0.8) !important;
+}
+div.InformMessages div.InformMessage a {
+	color: #fff;
+	text-decoration: underline;
+}
+div.InformMessages div.InformMessage a:hover {
+	text-decoration: none;
+}
+div.InformMessages div.InformMessage a.Close {
+   border-top-right-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -moz-border-radius-topright: 2px;
+	color: #ddd;
+	font-size: 14px;
+	text-align: center;
+	display: none;
+	height: 12px;
+	width: 12px;
+	line-height: 1;
+	text-decoration: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+div.InformMessages div.InformMessage a.Close:hover {
+	background: #000;
+	color: #fff;
+}
+div.InformMessages div.InformMessage:hover a.Close {
+	display: block;
+}
+
+/* Error messages that get displayed on forms throughout the application. */
+div.Errors {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+	margin: 0 0 10px !important;
+}
+* html div.Errors {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; 
+}
+div.Errors ul {
+	border: 1px solid #a00 !important;
+   background: #d50a0a !important;
+	padding: 6px 10px;
+	display: block;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+div.Errors ul li {
+   color: #fff !important;
+   background: #d50a0a !important;
 }

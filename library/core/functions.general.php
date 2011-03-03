@@ -28,6 +28,11 @@ function Gdn_Autoload($ClassName) {
    else
       $ApplicationWhiteList = NULL;
    
+   // If we're turning on an application, temporarily allow it in the autoloader
+   $TemporaryAppFolders = C('TemporaryApplications', FALSE);
+   if ($TemporaryAppFolders !== FALSE && is_array($TemporaryAppFolders) && sizeof($TemporaryAppFolders))
+      $ApplicationWhiteList = array_flip(array_flip(array_merge($ApplicationWhiteList, $TemporaryAppFolders)));
+      
    $LibraryPath = FALSE;
 
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
@@ -49,7 +54,7 @@ function Gdn_Autoload($ClassName) {
 
    // If this is a model, look in the models folder(s)
    if (!$LibraryPath && strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "models/{$LibraryFileName}");
 
    // Look for the class in the applications' library folders.
    if ($LibraryPath === FALSE) {
@@ -71,7 +76,7 @@ function Gdn_Autoload($ClassName) {
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "modules/{$LibraryFileName}");
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
@@ -718,7 +723,7 @@ if (!function_exists('GetMentions')) {
       
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
-         '/(?:^|[\s,\.])@(\w{3,20})\b/i',
+         '/(?:^|[\s,\.>])@(\w{3,20})\b/i',
          $String,
          $Matches
       );

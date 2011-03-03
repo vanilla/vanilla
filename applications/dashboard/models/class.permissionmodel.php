@@ -84,23 +84,50 @@ class PermissionModel extends Gdn_Model {
    }
 
    /**
-    * Return the permissions of a user.
+    * Get the permissions of a user.
     *
-    * @param int $UserID
-    * @return array
+    * If no junction table is specified, will return ONLY non-junction permissions.
+    * If you need every permission regardless of junction & suffix, see CachePermissions.
+    *
+    * @param int $UserID Unique identifier for user.
+    * @param string $LimitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
+    * @param string $JunctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+    * @param string $JunctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $JunctionTable.
+    * @param string $ForeignKey Foreign table column to join on.
+    * @param int $ForeignID Foreign ID to limit join to.
+    * @return array Permission records.
     */
-   public function GetUserPermissions($UserID, $LimitToSuffix = '') {
-      $this->SQL->Select('p.`Garden.SignIn.Allow`', 'MAX')
-         ->From('Permission p')
+   public function GetUserPermissions($UserID, $LimitToSuffix = '', $JunctionTable = FALSE, $JunctionColumn = FALSE, $ForeignKey = FALSE, $ForeignID = FALSE) {
+      // Get all permissions
+      $PermissionColumns = $this->PermissionColumns($JunctionTable, $JunctionColumn);
+
+      // Select any that match $LimitToSuffix
+      foreach($PermissionColumns as $ColumnName => $Value) {
+         if (!empty($LimitToSuffix) && substr($ColumnName, -strlen($LimitToSuffix)) != $LimitToSuffix)
+            continue; // permission not in $LimitToSuffix
+         $this->SQL->Select('p.`'.$ColumnName.'`', 'MAX');
+      }
+      
+      // Generic part of query
+      $this->SQL->From('Permission p')
          ->Join('UserRole ur', 'p.RoleID = ur.RoleID')
-         ->Where('ur.UserID', $UserID)
-         ->Where('p.JunctionTable is null');
-         
-      if ($LimitToSuffix != '')
-         $this->SQL->Like('p.Name', $LimitToSuffix, 'right');
-         
-      $DataSet = $this->SQL->Get();
-      return $DataSet->ResultArray();
+         ->Where('ur.UserID', $UserID);
+      
+      // Either limit to 1 junction or exclude junctions
+      if ($JunctionTable && $JunctionColumn) {
+         $this->SQL
+            ->Select(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'))
+            ->GroupBy(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'));
+         if ($ForeignKey && $ForeignID) {
+            $this->SQL
+               ->Join("$JunctionTable j", "j.$JunctionColumn = p.JunctionID")
+               ->Where("j.$ForeignKey", $ForeignID);
+         }
+      } else {
+         $this->SQL->Where('p.JunctionTable is null');
+      }
+      
+      return $this->SQL->Get()->ResultArray();
    }
    
    /**
@@ -152,7 +179,7 @@ class PermissionModel extends Gdn_Model {
    
    /**
     */
-   public function GetJunctionPermissions($Where, $JunctionTable = NULL, $LimitToSuffix = '') {
+   public function GetJunctionPermissions($Where, $JunctionTable = NULL, $LimitToSuffix = '', $Options = array()) {
       $Namespaces = $this->GetAllowedPermissionNamespaces();
       $RoleID = ArrayValue('RoleID', $Where, NULL);
       $JunctionID = ArrayValue('JunctionID', $Where, NULL);
@@ -217,7 +244,7 @@ class PermissionModel extends Gdn_Model {
             }
 
             // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
-            if (!$RoleID && $JunctionColumn != $JunctionTable.'ID')
+            if (!$RoleID && $JunctionColumn != $JunctionTable.'ID' && GetValue('AddDefaults', $Options))
                $DefaultValue = $Value & 1 ? 1 : 0;
             else
                $DefaultValue = 0;

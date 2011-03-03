@@ -43,10 +43,11 @@ jQuery(document).ready(function($) {
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
-               if (json.StatusMessage) {
-                  $(frm).prepend(json.StatusMessage);
-                  json.StatusMessage = null;
+               if (json.ErrorMessages) {
+                  $(frm).prepend(json.ErrorMessages);
+                  json.ErrorMessages = null;
                }
+               
                if (json.FormSaved) {
                   // Clean up the form
                   clearMessageForm();                
@@ -62,7 +63,7 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
-                  gdn.inform(json.StatusMessage);
+                  gdn.inform(json);
                }
             },
             complete: function(XMLHttpRequest, textStatus) {
@@ -124,7 +125,7 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
          }

@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
             json = $.postParseJson(json);
             
             if (json.FormSaved == true) {
-               gdn.inform(json.StatusMessage);
+               gdn.inform(json);
                if (json.RedirectUrl) {
                   setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                } else {

@@ -1334,6 +1334,14 @@ class UserModel extends Gdn_Model {
 
       if (!is_array($Values))
          $Values = array();
+      
+      // Hook for plugins
+      $this->EventArguments['CurrentValues'] = &$Values;
+      $this->EventArguments['Column'] = &$Column;
+      $this->EventArguments['UserID'] = &$UserID;
+      $this->EventArguments['Name'] = &$Name;
+      $this->EventArguments['Value'] = &$Value;
+      $this->FireEvent('BeforeSaveSerialized');
 
       // Assign the new value(s)
       if (!is_array($Name))
@@ -1598,6 +1606,10 @@ class UserModel extends Gdn_Model {
 
       $this->SQL->Update('User')->Set('Password', $Password)->Set('HashMethod', 'Vanilla')->Where('UserID', $UserID)->Put();
       $this->SaveAttribute($UserID, 'PasswordResetKey', '');
+
+      $this->EventArguments['UserID'] = $UserID;
+      $this->FireEvent('AfterPasswordReset');
+
       return $this->Get($UserID);
    }
 }

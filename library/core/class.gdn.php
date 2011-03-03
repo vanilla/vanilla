@@ -312,6 +312,10 @@ class Gdn {
       return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
    }
    
+   public static function Regarding() {
+      return self::Factory('Regarding');
+   }
+   
    /**
     * Get or set the current request object.
     * @param Gdn_Rewuest $NewRequest The new request or null to just get the request.

@@ -190,7 +190,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->StatusMessage = T('Your changes have been saved successfully.');
+            $this->InformMessage(T('Your changes have been saved successfully.'));
             $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
          }
       }
@@ -210,7 +210,7 @@ class ProfileController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack()) {
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
-            $this->StatusMessage = T('Your invitation has been sent.');
+            $this->InformMessage(T('Your invitation has been sent.'));
             $this->Form->ClearInputs();
          }
       }
@@ -281,7 +281,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          if ($this->Form->Save()) {
-            $this->StatusMessage = T('Your password has been changed.');
+            $this->InformMessage(T('Your password has been changed.'));
             $this->Form->ClearInputs();
          }
       }
@@ -407,7 +407,7 @@ class ProfileController extends Gdn_Controller {
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         $this->StatusMessage = T('Your preferences have been saved.');
+         $this->InformMessage(T('Your preferences have been saved.'));
       }
       $this->Render();
    }
@@ -428,7 +428,7 @@ class ProfileController extends Gdn_Controller {
          )
       ) {
          Gdn::UserModel()->RemovePicture($this->User->UserID);
-         $this->StatusMessage = T('Your picture has been removed.');
+         $this->InformMessage(T('Your picture has been removed.'));
          $RedirectUrl = 'dashboard/profile/'.$this->ProfileUrl();
       }
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
@@ -453,7 +453,7 @@ class ProfileController extends Gdn_Controller {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = T('The invitation was sent successfully.');
+            $this->InformMessage(T('The invitation was sent successfully.'));
 
       }
       
@@ -539,7 +539,7 @@ class ProfileController extends Gdn_Controller {
          }
             
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = T('The invitation was removed successfully.');
+            $this->InformMessage(T('The invitation was removed successfully.'));
 
       }
       

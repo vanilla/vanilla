@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
 				if(textStatus == "timeout")
 					return;
 				// Remove any old popups
-				$('.Popup').remove();
+				$('div.Popup').remove();
 				// Add new popup with error
 				$.popup({}, XMLHttpRequest.responseText);
 			}

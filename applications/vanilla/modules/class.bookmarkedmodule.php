@@ -16,15 +16,28 @@ class BookmarkedModule extends Gdn_Module {
    public function GetData($Limit = 10) {
       $Session = Gdn::Session();
       if ($Session->IsValid()) {
-         $DiscussionModel = new DiscussionModel();
-         $this->Data = $DiscussionModel->Get(
-            0,
-            $Limit,
-            array(
-               'w.Bookmarked' => '1',
-               'w.UserID' => $Session->UserID
-            )
-         );
+         $BookmarkIDs = Gdn::SQL()
+            ->Select('DiscussionID')
+            ->From('UserDiscussion')
+            ->Where('UserID', $Session->UserID)
+            ->Where('Bookmarked', 1)
+            ->Get()->ResultArray();
+         $BookmarkIDs = ConsolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
+
+         if (count($BookmarkIDs)) {
+            $DiscussionModel = new DiscussionModel();
+
+            $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
+            
+            $this->Data = $DiscussionModel->Get(
+               0,
+               $Limit
+            );
+         } else {
+            $this->Data = FALSE;
+         }
+      } else {
+         $this->Data = FALSE;
       }
    }
 
@@ -33,7 +46,10 @@ class BookmarkedModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (isset($this->Data) && is_object($this->Data) && $this->Data->NumRows() > 0)
+      if (!isset($this->Data))
+         $this->GetData();
+
+      if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
 
       return '';

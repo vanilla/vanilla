@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old popups
-            $('.Popup').remove();
+            $('div.Popup').remove();
             $.popup({}, textStatus);
          },
          success: function(json) {
@@ -39,7 +39,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Remove any old popups
-               $('.Popup').remove();
+               $('div.Popup').remove();
                $.popup({}, textStatus);
             },
             success: function(json) {

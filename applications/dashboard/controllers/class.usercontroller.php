@@ -92,7 +92,7 @@ class UserController extends DashboardController {
          if ($NewUserID !== FALSE) {
             $Password = $this->Form->GetValue('Password', '');
             $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');
-            $this->StatusMessage = T('The user has been created successfully');
+            $this->InformMessage(T('The user has been created successfully'));
             $this->RedirectUrl = Url('dashboard/user');
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
@@ -130,7 +130,7 @@ class UserController extends DashboardController {
       if ($Session->ValidateTransientKey($PostBackKey)) {
          $Approved = $this->HandleApplicant('Approve', $UserID);
          if ($Approved) {
-            $this->StatusMessage = T('Your changes have been saved.');
+            $this->InformMessage(T('Your changes have been saved.'));
          }
       }
 
@@ -197,7 +197,7 @@ class UserController extends DashboardController {
             if ($this->Form->GetValue('Password', '') != '')
                $UserModel->SendPasswordEmail($UserID, $NewPassword);
 
-            $this->StatusMessage = T('Your changes have been saved successfully.');
+            $this->InformMessage(T('Your changes have been saved successfully.'));
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
       }
@@ -224,7 +224,7 @@ class UserController extends DashboardController {
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($PostBackKey)) {
          if ($this->HandleApplicant('Decline', $UserID))
-            $this->StatusMessage = T('Your changes have been saved.');
+            $this->InformMessage(T('Your changes have been saved.'));
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {

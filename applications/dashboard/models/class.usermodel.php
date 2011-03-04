@@ -1581,7 +1581,7 @@ class UserModel extends Gdn_Model {
          return FALSE;
 
       $Users = $this->GetWhere(array('Email' => $Email))->ResultObject();
-      if (count($Users) == 0 && C('Garden.Registration.NameUnique')) {
+      if (count($Users) == 0 && C('Garden.Registration.NameUnique', 1)) {
          // Check for the username.
          $Users = $this->GetWhere(array('Name' => $Email))->ResultObject();
       }

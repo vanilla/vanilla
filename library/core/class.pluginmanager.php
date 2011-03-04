@@ -42,6 +42,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * An array of search paths for plugins and their files
     */
    protected $PluginSearchPaths = NULL;
+   protected $AlternatePluginSearchPaths = NULL;
    
    /**
     * A simple list of plugins that have already been registered
@@ -72,22 +73,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    protected $Started = FALSE;
    
    public function __construct() {
-      $this->PluginSearchPaths = array();
       
-      // Add default search path(s) to list
-      $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 'local';
-      $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 'core';
-      
-      // Check for, and load, alternate search paths from config
-      $AlternatePaths = C('Garden.PluginManager.Search', NULL);
-      if (is_null($AlternatePaths)) return;
-      
-      if (!is_array($AlternatePaths))
-         $AlternatePaths = array($AlternatePaths   => 'alternate');
-      
-      foreach ($AlternatePaths as $AltPath => $AltName)
-         if (is_dir($AltPath))
-            $this->PluginSearchPaths[rtrim($AltPath, '/')] = $AltName;
    }
    
    /**
@@ -129,7 +115,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $this->PluginFoldersByPath = array();
          
          // Check cache freshness
-         foreach ($this->PluginSearchPaths as $SearchPath => $Trash) {
+         foreach ($this->SearchPaths() as $SearchPath => $Trash) {
             unset($SearchPathCache);
             
             // Check Cache
@@ -268,6 +254,26 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
       
       return md5(serialize($PathListing));
+   }
+   
+   public function AddSearchPath($SearchPath, $SearchPathName = NULL) {
+      $AlternateSearchPaths = $this->SearchPaths(TRUE);
+      $SearchPath = rtrim($SearchPath, '/');
+      if (array_key_exists($SearchPath, $AlternateSearchPaths)) return TRUE;
+      
+      $this->AlternateSearchPaths[$SearchPath] = $SearchPathName;
+      SaveToConfig('Garden.PluginManager.Search', $this->AlternateSearchPaths);
+      return TRUE;
+   }
+   
+   public function RemoveSearchPath($SearchPath) {
+      $AlternateSearchPaths = $this->SearchPaths(TRUE);
+      $SearchPath = rtrim($SearchPath, '/');
+      if (!array_key_exists($SearchPath, $AlternateSearchPaths)) return TRUE;
+      
+      unset($this->AlternateSearchPaths[$SearchPath]);
+      SaveToConfig('Garden.PluginManager.Search', $this->AlternateSearchPaths);
+      return TRUE;
    }
    
    public function FindPluginFile($PluginPath) {
@@ -741,8 +747,50 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return NULL;
    }
    
-   public function SearchPaths() {
-      return $this->PluginSearchPaths;
+   /**
+    * Get the current search paths
+    *
+    * By default, get all the paths as built by the constructor. Includes the two (or one) default plugin paths
+    * of PATH_PLUGINS and PATH_LOCAL_PLUGINS, as well as any extra paths defined in the config variable.
+    *
+    * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
+    * @return array Search paths
+    */
+   public function SearchPaths($OnlyCustom = FALSE) {
+      if (is_null($this->PluginSearchPaths) || is_null($this->AlternatePluginSearchPaths)) {
+         $this->PluginSearchPaths = array();
+         $this->AlternatePluginSearchPaths = array();
+         
+         // Add default search path(s) to list
+         $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 'local';
+         $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 'core';
+         
+         // Check for, and load, alternate search paths from config
+         $RawAlternatePaths = C('Garden.PluginManager.Search', NULL);
+         if (!is_null($RawAlternatePaths)) {
+         
+/*
+            // Handle serialized and unserialized alternate path arrays
+            $AlternatePaths = unserialize($RawAlternatePaths);
+            if ($AlternatePaths === FALSE && is_array($RawAlternatePaths))
+*/
+               $AlternatePaths = $RawAlternatePaths;
+               
+            if (!is_array($AlternatePaths))
+               $AlternatePaths = array($AlternatePaths   => 'alternate');
+            
+            foreach ($AlternatePaths as $AltPath => $AltName) {
+               $this->AlternatePluginSearchPaths[rtrim($AltPath, '/')] = $AltName;
+               if (is_dir($AltPath))
+                  $this->PluginSearchPaths[rtrim($AltPath, '/')] = $AltName;
+            }
+         }
+      }
+      
+      if (!$OnlyCustom)
+         return $this->PluginSearchPaths;
+         
+      return $this->AlternatePluginSearchPaths;
    }
    
    public function EnabledPluginFolders($SearchPath = NULL) {

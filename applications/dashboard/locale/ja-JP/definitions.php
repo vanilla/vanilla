@@ -48,7 +48,7 @@ $Definition['ApplicationHelp'] = 'アプリケーションは、あなたのサ�
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approve'] = '承認';
 $Definition['Archive Discussions'] = '過去のスレッド';
-$Definition['Are you sure you want to do that?'] = 'Are you sure you want to do that?';
+$Definition['Are you sure you want to do that?'] = 'あなたはそんなことしてもよろしいですか？';
 $Definition['at'] = 'at';
 $Definition['Authentication'] = '認証';
 
@@ -65,7 +65,7 @@ $Definition['Categories'] = 'カテゴリ';
 $Definition['Categories are used to help organize discussions.'] = 'カテゴリはスレッドをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Category Url:'] = 'カテゴリ URL:';
-$Definition['Change the way that new users register with the site.'] = 'Change the way that new users register with the site.';
+$Definition['Change the way that new users register with the site.'] = '新規ユーザーがサイトに登録する方法を変更してください。';
 $Definition['Check all permissions that apply for each role'] = '以下の役割に適用する権限すべてにチェックを入れてください';
 $Definition['Check all roles that apply to this user:'] = 'このユーザーに適用する役割にすべてチェックを入れてください:';
 $Definition['Choose a locale pack'] = 'ロケール パックを選んでください';

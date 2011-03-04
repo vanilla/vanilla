@@ -129,16 +129,16 @@ class PostController extends VanillaController {
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
             // Check category permissions
-            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->PermissionCategoryID))
+            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
                
             // Make sure that the title will not be invisible after rendering
@@ -180,7 +180,7 @@ class PostController extends VanillaController {
          }
          if ($this->Form->ErrorCount() > 0) {
             // Return the form errors
-            $this->StatusMessage = $this->Form->Errors();
+            $this->ErrorMessage($this->Form->Errors());
          } else if ($DiscussionID > 0 || $DraftID > 0) {
             // Make sure that the ajax request form knows about the newly created discussion or draft id
             $this->SetJson('DiscussionID', $DiscussionID);
@@ -201,7 +201,7 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
             }
          }
@@ -371,14 +371,14 @@ class PostController extends VanillaController {
                   $this->AddAsset('Content', $this->FetchView('preview'));
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
             }
          } else {
             // Handle ajax-based requests
             if ($this->Form->ErrorCount() > 0) {
                // Return the form errors
-               $this->StatusMessage = $this->Form->Errors();               
+               $this->ErrorMessage($this->Form->Errors());
             } else {
                // Make sure that the ajax request form knows about the newly created comment or draft id
                $this->SetJson('CommentID', $CommentID);
@@ -445,7 +445,7 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
                // And update the draft count
                $UserModel = Gdn::UserModel();

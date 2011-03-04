@@ -26,7 +26,9 @@ class Gdn {
    const AliasSqlDriver = 'SqlDriver';
    const AliasUserModel = 'UserModel';
 
+   const AliasApplicationManager = 'ApplicationManager';
    const AliasPluginManager = 'PluginManager';
+   const AliasThemeManager = 'ThemeManager';
 
    const FactoryInstance = 'Instance';
    const FactoryPrototype = 'Prototype';
@@ -53,10 +55,18 @@ class Gdn {
    
    /// METHODS ///
    
+   /**
+    * Get the application manager
+    *
+    * @return Gdn_ApplicationManager
+    */
+   public static function ApplicationManager() {
+      return self::Factory(self::AliasApplicationManager);
+   }
+   
    /** @return Gdn_Auth */
    public static function Authenticator() {
-      $Result = self::Factory(self::AliasAuthenticator);
-      return $Result;
+      return self::Factory(self::AliasAuthenticator);
    }
    
    /**
@@ -89,8 +99,7 @@ class Gdn {
     * @return Gdn_Dispatcher
     */
    public static function Dispatcher() {
-      $Result = self::Factory(self::AliasDispatcher);
-      return $Result;
+      return self::Factory(self::AliasDispatcher);
    }
    
    /**
@@ -98,8 +107,7 @@ class Gdn {
     * @return Gdn_Database
     */
    public static function Database() {
-      $Result = self::Factory(self::AliasDatabase);
-      return $Result;
+      return self::Factory(self::AliasDatabase);
    }
    
    /**
@@ -109,6 +117,11 @@ class Gdn {
     * @see Gdn_Factory::Factory()
     */
    public static function Factory($Alias = FALSE) {
+      if (is_null(self::$_Factory)) {
+         self::SetFactory(new Gdn_Factory());
+         self::FactoryOverwrite(FALSE);
+      }
+
       if ($Alias === FALSE)
          return self::$_Factory;
       
@@ -127,8 +140,7 @@ class Gdn {
     * @see Gdn_Factory::Exists()
     */
    public static function FactoryExists($Alias) {
-      $Result = self::$_Factory->Exists($Alias);
-      return $Result;
+      return self::Factory()->Exists($Alias);
    }
    
    /**
@@ -140,12 +152,12 @@ class Gdn {
     * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
     * @see Gdn_Factory::Install()
     */
-   public static function FactoryInstall($Alias, $ClassName, $Path, $FactoryType = self::FactoryInstance, $Data = NULL) {
+   public static function FactoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = NULL) {
       // Don't overwrite an existing definition.
       if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
          return;
       
-      self::$_Factory->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
+      self::Factory()->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
       
       // Cache some of the more commonly used factory objects as properties.
       switch($Alias) {
@@ -176,7 +188,7 @@ class Gdn {
     * @see Gdn_Factory::InstalDependency()
     */
    public static function FactoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
-      self::$_Factory->InstallDependency($Alias, $PropertyName, $SourceAlias);
+      self::Factory()->InstallDependency($Alias, $PropertyName, $SourceAlias);
    }
    
    /**
@@ -260,7 +272,7 @@ class Gdn {
     * @see Gdn_Factory::Uninstall()
     */
    public static function FactoryUninstall($Alias) {
-      self::$_Factory->Uninstall($Alias);
+      self::Factory()->Uninstall($Alias);
    }
    
    /**
@@ -269,7 +281,7 @@ class Gdn {
     * @see Gdn_Factory::UninstallDependency()
     */
    public static function FactoryUninstallDependency($Alias, $PropertyName = NULL) {
-      self::$_Factory->UninstallDependency($Alias, $PropertyName);
+      self::Factory()->UninstallDependency($Alias, $PropertyName);
    }
    
    /**
@@ -298,6 +310,10 @@ class Gdn {
     */
    public static function PluginManager() {
       return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
+   }
+   
+   public static function Regarding() {
+      return self::Factory('Regarding');
    }
    
    /**
@@ -362,6 +378,15 @@ class Gdn {
       $Database = self::Database();
       $Result = $Database->Structure();
       return $Result;
+   }
+   
+   /**
+    * Get the plugin manager for the application.
+    *
+    * @return Gdn_PluginManager
+    */
+   public static function ThemeManager() {
+      return self::Factory(self::AliasThemeManager);
    }
    
    /**

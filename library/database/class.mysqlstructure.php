@@ -19,7 +19,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Database
  */
-require_once(dirname(__FILE__).DS.'class.databasestructure.php');
 
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    /// Constructor ///

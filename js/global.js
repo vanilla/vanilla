@@ -121,22 +121,6 @@ jQuery(document).ready(function($) {
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
    
-   // If a message group is clicked, hide it.
-   $('div.Messages.Dismissable').live('click', function() {
-      $(this).fadeOut('fast', function() {
-         $(this).remove();
-      });
-   });
-   
-   // If an information message appears on the screen, hide it after a few moments.
-   $('div.Information.AutoDismiss').livequery(function() {
-      setTimeout(function(){
-         $('div.Information.AutoDismiss').fadeOut('fast', function() {
-            $(this).remove();
-         });
-      }, 3000);
-   });
-	
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {
@@ -190,30 +174,59 @@ jQuery(document).ready(function($) {
             $(this).val(txt.substr(0, iMaxChars));
       });
    }
+   // If a dismissable InformMessage close button is clicked, hide it.
+   $('div.InformWrapper.Dismissable a.Close').live('click', function() {
+      $(this).parents('div.InformWrapper').fadeOut('fast', function() {
+         $(this).remove();
+      });
+		return false;
+   });
+   
+   // If an autodismiss inform message appears on the screen, hide it after a few moments.
+   $('div.InformWrapper.AutoDismiss').livequery(function() {
+      setTimeout(function(){
+         $('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+            $(this).remove();
+         });
+      }, 3000);
+   });
 
-   // Notify the user with a message
-   gdn.inform = function(message, wrapInfo) {
-		// Was an object containing the message passed instead of a message string?
-		css = '';
-		try {
-			css = message.StatusMessageClass;
-			message = message.StatusMessage;
-		} catch (e) {
-			// Do nothing
+   // Take any "inform" messages out of an ajax response and display them on the screen.
+   gdn.inform = function(response) {
+		// If there is no message container in the page, add one
+		var informMessages = $('div.InformMessages');
+		if (informMessages.length == 0) {
+			$('<div class="InformMessages"></div>').appendTo('body');
+			informMessages = $('div.InformMessages');
 		}
+		var wrappers = $('div.InformMessages div.InformWrapper');
 		
-      if(wrapInfo == undefined) {
-         wrapInfo = true;
-      }
-      
-      if (message && message != null && message != '') {
-         $('div.Messages').remove();
-         if(wrapInfo)
-            $('<div class="Messages Information ' + css + '"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
-         else
-            $(message).appendTo('body').show();
-      }
-   };
+		// Loop through the inform messages and add them to the container
+		for (var i = 0; i < response.InformMessages.length; i++) {
+			css = 'InformWrapper';
+			try {
+				css += ' '+response.InformMessages[i]['CssClass'];
+			} catch (e) {
+			}
+			try {
+				var message = response.InformMessages[i]['Message'];
+				// If the message is dismissable, add a close button
+				if (css.indexOf('Dismissable') > 0)
+					message = '<a class="Close"><span>×</span></a>' + message;
+
+				message = '<div class="InformMessage">'+message+'</div>';
+				var skip = false;
+				for (var j = 0; j < wrappers.length; j++) {
+					if ($(wrappers[j]).html() == message)
+						skip = true;
+				}
+				if (!skip)
+					informMessages.prepend('<div class="'+css+'">'+message+'</div>');
+			} catch (e) {
+			}
+		}
+		informMessages.show();
+   }
    
    // Generate a random string of specified length
    gdn.generateString = function(length) {

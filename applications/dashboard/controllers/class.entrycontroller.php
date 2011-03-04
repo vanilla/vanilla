@@ -693,7 +693,7 @@ class EntryController extends Gdn_Controller {
                // Account not created.
                if ($SyncScreen == 'smart') {
                
-                  $this->StatusMessage = T('There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.');
+                  $this->InformMessage(T('There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'));
                   $this->SyncScreen($Authenticator, $UserInfo, $Payload);
                   
                } else {

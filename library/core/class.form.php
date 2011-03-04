@@ -90,7 +90,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    describe how each field specified failed validation.
     * @access protected
     */
-   protected $_ValidationResults;
+   protected $_ValidationResults = array();
 
    /**
     * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection 

@@ -152,8 +152,8 @@ jQuery(document).ready(function($) {
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
             if (json.FormSaved == false) {
-               $(frm).prepend(json.StatusMessage);
-               json.StatusMessage = null;
+               $(frm).prepend(json.ErrorMessages);
+               json.ErrorMessages = null;
             } else if (preview) {
                $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');

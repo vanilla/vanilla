@@ -984,10 +984,10 @@ class ImportModel extends Gdn_Model {
       $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
 
       // Create a test file to load.
-      if (!file_exists(PATH_UPLOADS.'/import'))
-         mkdir(PATH_UPLOADS.'/import');
+      if (!file_exists(PATH_LOCAL_UPLOADS.'/import'))
+         mkdir(PATH_LOCAL_UPLOADS.'/import');
 
-      $TestPath = PATH_UPLOADS.'/import/test.txt';
+      $TestPath = PATH_LOCAL_UPLOADS.'/import/test.txt';
       $TestValue = 123;
       $TestContents = 'ID'.self::NEWLINE.$TestValue.self::NEWLINE;
       file_put_contents($TestPath, $TestContents, LOCK_EX);

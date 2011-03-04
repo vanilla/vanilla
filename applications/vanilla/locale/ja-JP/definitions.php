@@ -66,7 +66,7 @@ $Definition['Applicants'] = '申請者リスト';
 $Definition['Apply'] = '適用';
 $Definition['Apply for Membership'] = 'アカウントを作成する';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
-$Definition['at'] = 'at';
+// $Definition['at'] = 'at'; // vanilla 側の difinition と重複
 
 $Definition['Back to Discussions'] = 'スレッド一覧に戻る';
 $Definition['Bookmark'] = 'フォロー';
@@ -102,7 +102,7 @@ $Definition['discussion'] = 'スレッド';
 $Definition['Discussion Title'] = 'スレッド タイトル';
 $Definition['Discussions'] = 'スレッド一覧';
 $Definition['Don\'t have an account? %s'] = 'アカウントを お持ちですか？ %s';
-$Definition['dot'] = 'dot';
+// $Definition['dot'] = 'dot'; // vanilla 側の difinition と重複
 $Definition['Drag around and resize the square below to define your thumbnail icon.'] = 'オリジナル画像の使いたい範囲をマウスでドラッグして、下のサムネイル アイコンを編集してください。';
 
 $Definition['Edit'] = '編集';
@@ -113,77 +113,77 @@ $Definition['Edit Preferences'] = '個人設定を編集';
 $Definition['Email'] = 'メール アドレス';
 $Definition['Email Notifications'] = 'メール通知設定';
 $Definition['Email Unavailable'] = 'メール アドレスが登録済みです';
-$Definition['EmailInvitation'] = 'Hello!
+$Definition['EmailInvitation'] = 'こんにちは！
 
-%1$s has invited you to join %2$s. If you want to join, you can do so by clicking this link:
+%1$s さんが、あなたを %2$s に招待しています。参加される場合は、以下のリンクをクリックしてください:
 
   %3$s
 
-Have a great day!';
-$Definition['EmailMembershipApproved'] = 'Hello %1$s,
+では、よい一日をお過ごしください！';
+$Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 
-You have been approved for membership. Sign in now at the following link:
+あなたの会員登録が完了しました。以下のリンクからログインしてください:
 
   %2$s
   
-Have a great day!';
-$Definition['EmailNotification'] = '%1$s
+では、よい一日をお過ごしください！';
+$Definition['EmailNotification'] = '%1$s さん
 
-Follow the link below to check it out:
+フォーラム上で確認するには、以下のリンクから:
 %2$s
 
-Have a great day!';
-$Definition['EmailPassword'] = 'Hello %1$s,
+では、よい一日をお過ごしください！';
+$Definition['EmailPassword'] = '%1$s さん、こんにちは。
 
-%2$s has reset your password at %3$s. Your login credentials are now:
+%2$s さんが、%3$s に あなたのパスワードをリセットしました。あなたの現在の認証情報は、次の通りです:
 
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s
+  E メール: %6$s
+  パスワード: %5$s
+  URL: %4$s
 
-Have a great day!';
+では、よい一日をお過ごしください！';
 $Definition['EmailStoryNotification'] = '%1$s
 
 %3$s
 
 ---
-Follow the link below to check it out:
+フォーラム上で確認するには、以下のリンクから:
 %2$s
 
-Have a great day!';
-$Definition['EmailWelcome'] = 'Hello %1$s,
+では、よい一日をお過ごしください！';
+$Definition['EmailWelcome'] = '%1$s さん、こんにちは。
 
-%2$s has created an account for you at %3$s. Your login credentials are:
+%2$s さんが、%3$s に あなたのアカウントを作成しました。あなたの認証情報は、次の通りです:
 
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s
+  E メール: %6$s
+  パスワード: %5$s
+  URL: %4$s
 
-Have a great day!';
-$Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
+では、よい一日をお過ごしください！';
+$Definition['EmailWelcomeConnect'] = '{User.Name} さん、こんにちは。
 
-You have successfully connected to {Title}. Here is your information:
+あなたは {Title} に接続しました。あなたの情報は、次の通りです:
 
-  Username: {User.Name}
-  Connected With: {ProviderName}
+  ユーザ名: {User.Name}
+  接続プロバイダ: {ProviderName}
 
-You can access the site at {/,url,domain}.
+{/,url,domain} からサイトにアクセスできます。
 
-Have a great day!';
-$Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
+では、よい一日をお過ごしください！';
+$Definition['EmailWelcomeRegister'] = '{User.Name} さん、こんにちは。
 
-You have successfully registered for an account at {Title}. Here is your information:
+あなたは {Title} のアカウントで登録されました。あなたの情報は、次の通りです:
 
-  Username: {User.Name}
-  Email: {User.Email}
+  ユーザ名: {User.Name}
+  E メール: {User.Email}
 
-You can access the site at {/,url,domain}.
+{/,url,domain} からサイトにアクセスできます。
 
-Have a great day!';
-$Definition['Enter the email address of the person you would like to invite:'] = 'Enter the email address of the person you would like to invite:';
+では、よい一日をお過ごしください！';
+$Definition['Enter the email address of the person you would like to invite:'] = '招待したい方の E メール アドレスを入力してください:';
 $Definition['Enter your Email address'] = 'メール アドレスを入力';
 $Definition['Enter your existing account password.'] = '登録済みアカウントのパスワードを入力してください。';
-$Definition['ErrorCredentials'] = '申し訳ありませんが、入力された e メールとパスワードに合致するアカウントが見つかりませんでした。';
+$Definition['ErrorCredentials'] = '申し訳ありませんが、入力された E メールとパスワードに合致するアカウントが見つかりませんでした。';
 $Definition['ErrorPermission'] = '申し訳ありませんが、承認されませんでした。';
 $Definition['ErrorRecordNotFound'] = 'リクエストされたレコードが見つかりませんでした。';
 $Definition['ErrorTermsOfService'] = '利用規約に同意する必要があります。';
@@ -209,9 +209,9 @@ $Definition['I remember now!'] = 'いま思い出しました！';
 $Definition['In this Conversation'] = 'この会話の参加者';
 $Definition['Inbox'] = '受信トレイ';
 $Definition['Internal'] = 'Internal';
-$Definition['Invitation Code'] = 'Invitation Code';
-$Definition['Invite'] = 'Invite';
-$Definition['Invited by'] = 'Invited by';
+$Definition['Invitation Code'] = '招待コード';
+$Definition['Invite'] = '招待';
+$Definition['Invited by'] = '招待者';
 
 $Definition['Joined'] = '登録日';
 
@@ -225,7 +225,7 @@ $Definition['Most recent by %1$s'] = '最新レス by %1$s';
 $Definition['My Bookmarks'] = 'フォロー中のスレッド';
 $Definition['My Discussions'] = '自分のスレッド';
 $Definition['My Drafts'] = '下書き';
-$Definition['My Invitations'] = 'My Invitations';
+$Definition['My Invitations'] = '招待者リスト';
 $Definition['My Preferences'] = '個人設定';
 
 $Definition['Name Unavailable'] = 'ユーザー名が登録済みです';
@@ -246,16 +246,16 @@ $Definition['Options'] = 'オプション設定';
 $Definition['Or you can...'] = 'Or you can...';
 $Definition['Original'] = 'オリジナル';
 
-$Definition['PageDetailsMessage'] = '%1$s to %2$s';
-$Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';
+$Definition['PageDetailsMessage'] = '%1$s ～ %2$s';
+$Definition['PageDetailsMessageFull'] = '%1$s ～ %2$s / %3$s';
 $Definition['Password'] = 'パスワード';
-$Definition['PasswordRequest'] = 'Hello %1$s,
+$Definition['PasswordRequest'] = '%1$s さん、こんにちは。
 
-Someone has requested to reset your password at %2$s. To reset your password, follow this link:
+%2$s に、あなたのパスワードのリセット依頼が出されました。以下のリンクから、あなたのパスワードをリセットできます:
 
   %3$s
 
-If you did not make this request, disregard this email.';
+あなたが依頼した覚えが無い場合は、この E メールを無視してください。';
 $Definition['Passwords don\'t match'] = 'パスワードが一致しません';
 $Definition['Permalink'] = '固定リンク';
 $Definition['Please wait while you are redirected. If you are not redirected, click <a href="%s">here</a>.'] = 'リダイレクト中につき、少々お待ちください。リダイレクトされない場合は、<a href="%s">ここ</a>をクリックしてください。';

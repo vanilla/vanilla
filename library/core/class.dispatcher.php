@@ -364,8 +364,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    protected function AnalyzeRequest(&$Request) {
    
-      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."\n";
-   
       // Here is the basic format of a request:
       // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
 
@@ -438,7 +436,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $Parts = explode('/', $this->Request);
-      if (defined('AUTOLOADER') && AUTOLOADER) print_r($Parts);
       
       /**
        * The application folder is either the first argument or is not provided. The controller is therefore
@@ -471,13 +468,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    
    protected function FindController($ControllerKey, $Parts) {
       
-      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$ControllerKey})\n";
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
-      
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  application: {$Application}\n";
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  controller: {$Controller}\n";
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(
@@ -493,9 +486,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
       
       if ($ControllerPath !== FALSE) {
-         
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "  FINDED CONTROLLER!\n";
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "  {$ControllerPath}\n";
          
          // This was a guess search with no specified application. Look up
          // the application folder from the controller path.

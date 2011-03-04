@@ -1,6 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0.17.9a');
+define('APPLICATION_VERSION', '2.0.18');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -10,8 +10,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-define('DEBUG', TRUE);
-define('AUTOLOADER', FALSE);
+define('DEBUG', FALSE);
 
 // Report and track all errors.
 if (defined('DEBUG'))

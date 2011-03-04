@@ -91,8 +91,6 @@ class Gdn_Autoloader {
             if (Gdn::ApplicationManager() instanceof Gdn_ApplicationManager) {
                $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
                
-               if (defined('AUTOLOADER') && AUTOLOADER) echo "\nAdding applications folders...\n";
-               
                foreach ($EnabledApplications as $EnabledApplication) {
                   $ApplicationPath = CombinePaths(array(PATH_APPLICATIONS."/{$EnabledApplication}"));
                   
@@ -124,7 +122,6 @@ class Gdn_Autoloader {
 
             if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
             
-               if (defined('AUTOLOADER') && AUTOLOADER) echo "\nAdding plugin folders...\n";
                foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
                
                   if ($SearchPathName === TRUE || $SearchPathName == 1)
@@ -158,8 +155,6 @@ class Gdn_Autoloader {
       // We loop over the caches twice. First, hit only their cached data.
       // If all cache hits miss, search filesystem.
       
-      if (defined('AUTOLOADER') && AUTOLOADER) echo '  '.__METHOD__."\n";
-      
       if (!is_array(self::$Maps))
          return FALSE;
       
@@ -183,14 +178,6 @@ class Gdn_Autoloader {
                
                if (!array_key_exists($ContextType, $Priorities))
                   $Priorities[$ContextType] = self::Priorities($ContextType, $MapType);
-               
-               if (is_array($Priorities[$ContextType]) && sizeof($Priorities[$ContextType]) && defined('AUTOLOADER') && AUTOLOADER) {
-                  echo "    Priorities: [{$ContextType} | {$MapType} | ";
-                  if (array_key_exists('FAIL_CONTEXT_IF_NOT_FOUND', $Priorities[$ContextType]))
-                     echo "restrict]\n";
-                  else
-                     echo "prefer]\n";
-               }
                
                if (array_key_exists($ContextType, $Priorities) && is_array($Priorities[$ContextType])) {
                   foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
@@ -249,10 +236,8 @@ class Gdn_Autoloader {
    }
    
    public static function Lookup($ClassName, $Options = array()) {
-      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$ClassName})\n";
       
       $MapType = self::GetMapType($ClassName);
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  map type: {$MapType}\n";
       
       $DefaultOptions = array(
          'Quiet'              => FALSE,
@@ -353,8 +338,6 @@ class Gdn_Autoloader {
    
    public static function RegisterMap($MapType, $ContextType, $SearchPath, $Options = array()) {
    
-      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."({$MapType}, {$ContextType}, {$SearchPath})\n";
-   
       $DefaultOptions = array(
          'SearchSubfolders'      => TRUE,
          'Extension'             => NULL,
@@ -392,8 +375,6 @@ class Gdn_Autoloader {
       if (!array_key_exists($MapHash, self::$Maps)) {
          $Map = Gdn_Autoloader_Map::Load($MapType, $ContextType, $MapRootLocation, $Options);
          self::$Maps[$MapHash] = $Map;
-      } else {
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "  appended path to existing cache\n";
       }
       
       ksort(self::$Maps, SORT_REGULAR);
@@ -512,8 +493,6 @@ class Gdn_Autoloader_Map {
       
       $OnDiskMapFile = sprintf(self::DISK_MAP_NAME_FORMAT, $MapRootLocation, strtolower($MapName));
       
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  cache started: {$MapName} - {$OnDiskMapFile}\n";
-      
       $this->MapInfo = array(
          'ondisk'       => $OnDiskMapFile,
          'identifier'   => $MapIdentifier,
@@ -547,7 +526,7 @@ class Gdn_Autoloader_Map {
          $SearchFiles = array($SearchFiles);
       
       if (!is_dir($Path)) return FALSE;
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "        - findfile: {$Path}\n";
+
       $Files = scandir($Path);
       foreach ($Files as $FileName) {
          if (in_array($FileName, $this->Ignore)) continue;
@@ -581,30 +560,24 @@ class Gdn_Autoloader_Map {
    
    public function Lookup($ClassName, $MapOnly = TRUE) {
       $MapName = GetValue('name', $this->MapInfo);
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "    ".__METHOD__." [{$MapName}] ({$ClassName}, ".(($MapOnly) ? 'cache': 'cache+fs').")\n";
       
       // Lazyload cache data
       if (is_null($this->Map)) {
          $this->Map = array();
          $OnDiskMapFile = GetValue('ondisk', $this->MapInfo);
          
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      load from disk: {$OnDiskMapFile}... ";
          // Loading cache data from disk
          if (file_exists($OnDiskMapFile)) {
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "exists\n";
             $MapContents = parse_ini_file($OnDiskMapFile, FALSE);
             if ($MapContents != FALSE && is_array($MapContents)) {
                $this->Map = $MapContents;
             } else
                @unlink($OnDiskMapFile);
-         } else {
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "missing\n";
          }
       }
    
       $ClassName = strtolower($ClassName);
       if (array_key_exists($ClassName, $this->Map)) {
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      cache hit\n";
          return GetValue($ClassName, $this->Map);
       }
       // Look at the filesystem, too
@@ -618,23 +591,18 @@ class Gdn_Autoloader_Map {
             sprintf(self::LOOKUP_CLASS_MASK, $FSClassName),
             sprintf(self::LOOKUP_INTERFACE_MASK, $FSClassName)
          );
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[0]}\n";
-         if (defined('AUTOLOADER') && AUTOLOADER) echo "      find: {$Files[1]}\n";
-         
+                  
          foreach ($this->Paths as $Path => $PathOptions) {
             $ClassFilter = GetValue('filter', $PathOptions);
             if (!fnmatch($ClassFilter, $ClassName)) continue;
             
             $Recursive = GetValue('recursive', $PathOptions);
-            if (defined('AUTOLOADER') && AUTOLOADER) echo "      scan: '{$Path}' recurse: ".(($Recursive) ? 'y': 'n')."\n";
-   
             $File = $this->FindFile($Path, $Files, $Recursive);
             
             if ($File !== FALSE) {
                $this->Map[$ClassName] = $File;
                $this->MapInfo['dirty'] = TRUE;
                
-               if (defined('AUTOLOADER') && AUTOLOADER) echo "      found {$ClassName} @ {$File}. added back to cache {$MapName}\n";
                return $File;
             }
          }
@@ -654,11 +622,8 @@ class Gdn_Autoloader_Map {
       if (!sizeof($this->Map))
          return FALSE;
          
-      if (defined('AUTOLOADER') && AUTOLOADER) echo __METHOD__."\n";
       $MapName = GetValue('name', $this->MapInfo);
       $OnDisk = GetValue('ondisk', $this->MapInfo);
-      if (defined('AUTOLOADER') && AUTOLOADER) echo "  saving cache [{$MapName}] @ {$OnDisk}\n";
-      
       $FileName = GetValue('ondisk', $this->MapInfo);
       
       $MapContents = "[cache]\n";

@@ -8,14 +8,14 @@ $Definition['%s user(s) found.'] = '%s 人のユーザーが見つかりまし�
 
 $Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
-$Definition['1 month after being sent'] = '1 month after being sent';
-$Definition['1 week after being sent'] = '1 week after being sent';
+$Definition['1 month after being sent'] = '送信一ヶ月後';
+$Definition['1 week after being sent'] = '送信一週間後';
 
-$Definition['2 weeks after being sent'] = '2 weeks after being sent';
+$Definition['2 weeks after being sent'] = '送信二週間後';
 
 $Definition['<General Error>'] = '<General Error>';
 $Definition['<strong>%1$s</strong> (%2$s) %3$s'] = '<strong>%1$s</strong> (%2$s) %3$s';
-$Definition['<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'] = '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:';
+$Definition['<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'] = 'スパマー対策として、<strong>基本登録用のフォームでは</strong>新規ユーザーが "Captcha" 画像からテキストをコピーすることが<strong>必須です</strong>。それには <a href="http://recaptcha.net/">recaptcha.net</a> のアカウントが必要になります。サインアップは無料で簡単に行えます。サインアップしたら、この画面に戻って下記事項を入力してください:';
 
 $Definition['[%1$s] Membership Approved'] = '[%1$s] Membership Approved';
 
@@ -23,7 +23,7 @@ $Definition['_Locale'] = 'ロケール';
 
 $Definition['A url-friendly version of the category name for better SEO.'] = 'A url-friendly version of the category name for better SEO.';
 $Definition['Action'] = 'アクション';
-$Definition['Activate'] = 'アクティベート';
+$Definition['Activate'] = 'アクティベート';  // 認証 画面で使用
 $Definition['Add'] = '追加';
 $Definition['Add Message'] = 'メッセージを追加';
 $Definition['Add Route'] = 'ルートを追加';
@@ -31,18 +31,20 @@ $Definition['Add User'] = 'ユーザーを追加';
 $Definition['Addons'] = 'アドオン';
 $Definition['Administrator'] = '管理者';
 $Definition['Advanced'] = '高度な設定';
-$Definition['Advanced Forum Settings'] = 'Advanced Forum Settings';
-$Definition['All'] = 'すべて';  // T('All %1$s')
+$Definition['Advanced Forum Settings'] = '高度なフォーラム設定';
+$Definition['All'] = 'すべて';
+$Definition['All %1$s'] = 'すべて %1$s';
 $Definition['Announce'] = 'お知らせ';  // vanilla 側の翻訳と統一
 $Definition['Appearance'] = '外観';
 $Definition['Applicant'] = '申請者';
 $Definition['Applicants'] = '申請者';
 $Definition['Application'] = 'アプリケーション';
-$Definition['Application ID'] = 'アプリケーション ID';
-$Definition['Application Secret'] = 'Application Secret';
+$Definition['Application ID'] = 'Application ID';  // Facebook の設定なので、日本語化しないでおく
+$Definition['Application Secret'] = 'Application Secret';  // Facebook の設定なので、日本語化しないでおく
 $Definition['ApplicationHelp'] = 'アプリケーションは、あなたのサイトに大規模な機能群を追加します。<br />%s フォルダに追加されたアプリケーションを、ここで有効化または無効化できます。';
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approve'] = '承認';
+$Definition['Approval'] = '承認制';
 $Definition['Archive Discussions'] = '過去のスレッド';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
 $Definition['at'] = 'アット';
@@ -52,6 +54,7 @@ $Definition['Banned'] = '利用禁止';
 $Definition['Banner'] = 'バナー';
 $Definition['Banner Logo'] = 'バナー ロゴ';
 $Definition['Banner Title'] = 'バナー タイトル';
+$Definition['Basic'] = '基本';
 
 $Definition['Cancel'] = 'キャンセル';
 
@@ -66,7 +69,7 @@ $Definition['Check all permissions that apply for each role'] = '以下の役割
 $Definition['Check all roles that apply to this user:'] = 'このユーザーに適用する役割にすべてチェックを入れてください:';
 $Definition['Choose a locale pack'] = 'ロケール パックを選んでください';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Choose and configure your forum\'s authentication scheme.';
-$Definition['Choose who can send out invitations to new members:'] = 'Choose who can send out invitations to new members:';
+$Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
 $Definition['Close'] = '終了';
 $Definition['comment(s)'] = '件のレスポンス';
 $Definition['Comments'] = 'コメント';
@@ -91,7 +94,8 @@ $Definition['Description'] = '説明';
 $Definition['Disable'] = '無効化';
 $Definition['Disable Google Sign In'] = 'Google アカウントでのログインを無効化';
 $Definition['Disable OpenID'] = 'OpenID を無効化';
-$Definition['Disabled'] = '無効';  // T('Disabled %1$s')
+$Definition['Disabled'] = '無効';
+$Definition['Disabled %1$s'] = '無効 %1$s';
 $Definition['Discussion & Comment Editing'] = 'スレッド & レスポンス編集';
 $Definition['discussion(s)'] = '件のスレッド';
 $Definition['Discussions'] = 'スレッド';
@@ -116,8 +120,9 @@ $Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 $Definition['Enable'] = '有効化';
 $Definition['Enable Google Sign In'] = 'Google アカウントでのログインを有効化';
 $Definition['Enable OpenID'] = 'OpenID を有効化';
-$Definition['Enabled'] = '有効';  // T('Enabled %1$s')
-$Definition['Existing members send invitations to new members.'] = 'Existing members send invitations to new members.';
+$Definition['Enabled'] = '有効';
+$Definition['Enabled %1$s'] = '有効 %1$s';
+$Definition['Existing members send invitations to new members.'] = '既存のメンバーが新規メンバーに招待状を送ります。';
 
 $Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>';
 $Definition['Facebook Settings'] = 'Facebook Settings';
@@ -141,13 +146,14 @@ $Definition['Import'] = 'インポート';
 $Definition['Inbox'] = '受信トレイ';
 $Definition['Information'] = '情報';
 $Definition['Internal'] = 'Internal';
+$Definition['Invitation'] = '招待制';
 $Definition['Invitations can be sent from users\' profile pages.'] = 'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.';
-$Definition['Invitations per month'] = 'Invitations per month';
-$Definition['Invitations will expire'] = 'Invitations will expire';
+$Definition['Invitations per month'] = '一ヶ月あたりの招待状数';
+$Definition['Invitations will expire'] = '招待状の有効期限';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = '投稿できる文字数の上限を適度な数値に抑えることを、推奨します。';
 
-$Definition['Key Type'] = 'Key Type';
-$Definition['Key Value'] = 'Key Value';
+$Definition['Key Type'] = 'キーの種類';
+$Definition['Key Value'] = 'キーの値';
 
 $Definition['Last Active'] = '最終訪問';
 $Definition['Last Visit'] = '最終訪問';
@@ -177,12 +183,12 @@ $Definition['Member'] = 'メンバー';
 $Definition['Message'] = 'メッセージ';
 $Definition['Messages'] = 'メッセージ';
 $Definition['Messages can appear anywhere in your application.'] = 'メッセージはサイトのどこにでも表示でき、ユーザーにニュースやイベントを通知するために使われます。Use this page to re-organize your messages by dragging them up or down.';
-$Definition['Method'] = 'Method';
+$Definition['Method'] = '方法';
 $Definition['minute(s)'] = '分間';
 $Definition['Moderator'] = 'モデレータ';
 
 $Definition['Name'] = '名前';
-$Definition['never'] = 'never';
+$Definition['never'] = 'なし (無期限)';  // 招待の有効期限オプション
 $Definition['New comments in the last day'] = '過去一日間の新規コメント数';
 $Definition['New comments in the last week'] = '過去一週間の新規コメント数';
 $Definition['New conversations in the last day'] = '過去一日間の新規会話数';
@@ -192,8 +198,8 @@ $Definition['New discussions in the last week'] = '過去一週間の新規ス�
 $Definition['New messages in the last day'] = '過去一日間の新規メッセージ数';
 $Definition['New messages in the last week'] = '過去一週間の新規メッセージ数';
 $Definition['New Password'] = '新しいパスワード';
-$Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = 'New users are reviewed and approved by an administrator (that\'s you!).';
-$Definition['New users fill out a simple form and are granted access immediately.'] = 'New users fill out a simple form and are granted access immediately.';
+$Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = '新規メンバーは審査のうえ、管理者 (あなたのことです！) によって承認されます。';
+$Definition['New users fill out a simple form and are granted access immediately.'] = '新規メンバーは簡単なフォームに記入をすれば、すぐにアクセスを許可されます。';
 $Definition['New users in the last day'] = '過去一日間の新規ユーザー数';
 $Definition['New users in the last week'] = '過去一週間の新規ユーザー数';
 $Definition['None'] = 'なし';
@@ -221,7 +227,7 @@ $Definition['PluginHelp'] = 'プラグインは、あなたのサイトに拡張
 $Definition['Plugins'] = 'プラグイン';
 $Definition['Position'] = '表示位置';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'スパムを防ぐため、ユーザーが一定時間内に作成できるスレッドおよび投稿できるレスポンスの数を制限できます。';
-$Definition['Private Key'] = 'プライベートキー';
+$Definition['Private Key'] = 'プライベート キー';
 $Definition['Public Key'] = '公開キー';
 
 $Definition['Recent News'] = '最新ニュース';

@@ -18,54 +18,247 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_ThemeManager {
    
    /**
-    * An array of available themes. Never access this directly, instead
-    * use $this->AvailableThemes();
+    * An array of search paths for themes and their files
     */
-   private $_AvailableThemes = NULL;
+   protected $ThemeSearchPaths = NULL;
+   
+   /**
+    * An array of available plugins. Never access this directly, instead use
+    * $this->AvailablePlugins();
+    */
+   protected $ThemeCache = NULL;
+   
+   public function __construct() {
+      $this->ThemeSearchPaths = array();
+      
+      // Add default search path(s) to list
+      $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 'local';
+      $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
+      
+      // Check for, and load, alternate search paths from config
+      $AlternatePaths = C('Garden.ThemeManager.Search', NULL);
+      if (is_null($AlternatePaths)) return;
+      
+      if (!is_array($AlternatePaths))
+         $AlternatePaths = array($AlternatePaths => 'alternate');
+      
+      foreach ($AlternatePaths as $AltPath => $AltName)
+         if (is_dir($AltPath))
+            $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+   }
+   
+   /**
+    * Sets up the theme framework
+    *
+    * This method indexes all available themes and extracts their information.
+    * It then determines which plugins have been enabled, and includes them.
+    * Finally, it parses all plugin files and extracts their events and plugged
+    * methods.
+    */
+   public function Start($Force = FALSE) {
+      
+      // Build list of all available themes
+      $this->AvailableThemes($Force);
+      
+      // If there is a hooks file in the theme folder, include it.
+      $ThemeName = $this->CurrentTheme();
+      $ThemeInfo = $this->GetThemeInfo($ThemeName);
+      $ThemeHooks = GetValue('RealHooksFile', $ThemeInfo, NULL);
+      if (file_exists($ThemeHooks))
+         include_once($ThemeHooks);
+   }
    
    /**
     * Looks through the themes directory for valid themes and returns them as
     * an associative array of "Theme Name" => "Theme Info Array". It also adds
     * a "Folder" definition to the Theme Info Array for each.
     */
-   public function AvailableThemes() {
-      if (!is_array($this->_AvailableThemes)) {
-         $ThemeInfo = array();
-         $ThemeFolders = Gdn_FileSystem::Folders(PATH_THEMES);
-         $ThemeAboutFiles = Gdn_FileSystem::FindAll(PATH_THEMES, 'about.php', $ThemeFolders);
-         // Include them all right here and fill the theme info array
-         $ThemeCount = is_array($ThemeAboutFiles) ? count($ThemeAboutFiles) : 0;
-         for ($i = 0; $i < $ThemeCount; ++$i) {
-            include($ThemeAboutFiles[$i]);
+   public function AvailableThemes($Force = FALSE) {
+      
+      if (is_null($this->ThemeCache) || $Force) {
+      
+         $this->ThemeCache = array();
+         
+         // Check cache freshness
+         foreach ($this->ThemeSearchPaths as $SearchPath => $Trash) {
+            unset($SearchPathCache);
             
-            // Define the folder name for the newly added item
-            foreach ($ThemeInfo as $ThemeName => $Info) {
-               if (array_key_exists('Folder', $ThemeInfo[$ThemeName]) === FALSE) {
-                  $Folder = substr($ThemeAboutFiles[$i], strlen(PATH_THEMES));
-                  if (substr($Folder, 0, 1) == DS)
-                     $Folder = substr($Folder, 1);
-                     
-                  $Folder = substr($Folder, 0, strpos($Folder, DS));
-                  $ThemeInfo[$ThemeName]['Folder'] = $Folder;
-                  $ThemeInfo[$ThemeName]['Index'] = $ThemeName;
-
-                  // Add the screenshot.
-                  $ScreenshotPath = SafeGlob(PATH_THEMES."/$Folder/screenshot.*", array('gif', 'jpg', 'png'));
-                  if (count($ScreenshotPath) > 0) {
-                     $ScreenshotPath = $ScreenshotPath[0];
-                     $ThemeInfo[$ThemeName]['ScreenshotUrl'] = Asset(str_replace(PATH_ROOT, '', $ScreenshotPath), TRUE);
-                  }
+            // Check Cache
+            $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
+            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey);
+            
+            $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
+            if ($CacheHit && is_array($SearchPathCache)) {
+               $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'ThemeInfo'))) == 2);
+               if (!$CacheIntegrityCheck) {
+                  $SearchPathCache = array(
+                     'CacheIntegrityHash'    => NULL,
+                     'ThemeInfo'             => array()
+                  );
                }
             }
+            
+            $CacheThemeInfo = &$SearchPathCache['ThemeInfo'];
+            if (!is_array($CacheThemeInfo))
+               $CacheThemeInfo = array();
+            
+            $PathListing = scandir($SearchPath, 0);
+            sort($PathListing);
+            
+            $PathIntegrityHash = md5(serialize($PathListing));
+            if (GetValue('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
+               // Need to re-index this folder
+               $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
+               if ($PathIntegrityHash === FALSE)
+                  continue;
+               
+               $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
+               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache);
+            }
+            
+            $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
          }
-         $this->_AvailableThemes = $ThemeInfo;
       }
+            
+      return $this->ThemeCache;
+   }
+   
+   public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = NULL) {
+      if (is_null($PathListing) || !is_array($PathListing)) {
+         $PathListing = scandir($SearchPath, 0);
+         sort($PathListing);
+      }
+      
+      if ($PathListing === FALSE)
+         return FALSE;
+      
+      foreach ($PathListing as $ThemeFolderName) {
+         if (substr($ThemeFolderName, 0, 1) == '.')
+            continue;
+         
+         $ThemePath = CombinePaths(array($SearchPath,$ThemeFolderName));
+         $ThemeFiles = $this->FindThemeFiles($ThemePath);
+         
+         if (GetValue('about', $ThemeFiles) === FALSE)
+            continue;
+            
+         $ThemeAboutFile = GetValue('about', $ThemeFiles);
+         $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
+         
+         // Add the screenshot.
+         if (array_key_exists('screenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('screenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
+            
+         if (array_key_exists('hooks', $ThemeFiles)) {
+            $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
+            $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
+         }
+         
+         if ($SearchThemeInfo === FALSE)
+            continue;
+         
+         $ThemeInfo[$ThemeFolderName] = $SearchThemeInfo;
+      }
+      
+      return md5(serialize($PathListing));
+   }
+   
+   public function FindThemeFiles($ThemePath) {
+      if (!is_dir($ThemePath))
+         return FALSE;
+      
+      $ThemeFiles = scandir($ThemePath);
+      $TestPatterns = array(
+         'about\.php'                           => 'about',
+         '.*\.theme\.php'                       => 'about',
+         'class\..*themehooks\.php'             => 'hooks',
+         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
+      );
+      
+      $MatchedThemeFiles = array();
+      foreach ($ThemeFiles as $ThemeFile) {
+         foreach ($TestPatterns as $TestPattern => $FileType) {
+            if (preg_match('!'.$TestPattern.'!', $ThemeFile))
+               $MatchedThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
+         }
+      }
+      
+      return array_key_exists('about', $MatchedThemeFiles) ? $MatchedThemeFiles : FALSE;
+   }
+   
+   public function ScanThemeFile($ThemeFile, $VariableName = NULL) {
+      // Find the $PluginInfo array
+      if (!file_exists($ThemeFile)) return;
+      $Lines = file($ThemeFile);
+      
+      $InfoBuffer = FALSE;
+      $ClassBuffer = FALSE;
+      $ClassName = '';
+      $ThemeInfoString = '';
+      if (!$VariableName)
+         $VariableName = 'ThemeInfo';
+      
+      $ParseVariableName = '$'.$VariableName;
+      ${$VariableName} = array();
 
-      return $this->_AvailableThemes;
+      foreach ($Lines as $Line) {
+         if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+            $ThemeInfoString .= $Line;
+            $ClassBuffer = TRUE;
+            $InfoBuffer = FALSE;
+         }
+         
+         if (StringBeginsWith(trim($Line), $ParseVariableName))
+            $InfoBuffer = TRUE;
+            
+         if ($InfoBuffer)
+            $ThemeInfoString .= $Line;
+            
+         if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
+            $Parts = explode(' ', $Line);
+            if (count($Parts) > 2)
+               $ClassName = $Parts[1];
+               
+            break;
+         }
+         
+      }
+      unset($Lines);
+      if ($ThemeInfoString != '')
+         @eval($ThemeInfoString);
+         
+      // Define the folder name and assign the class name for the newly added item
+      if (isset(${$VariableName}) && is_array(${$VariableName})) {
+         $Item = array_pop($Trash = array_keys(${$VariableName}));
+         
+         ${$VariableName}[$Item]['Index'] = $Item;
+         ${$VariableName}[$Item]['AboutFile'] = $ThemeFile;
+         ${$VariableName}[$Item]['RealAboutFile'] = realpath($ThemeFile);
+         ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
+         
+         if (!array_key_exists('Name', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Name'] = $Item;
+            
+         if (!array_key_exists('Folder', ${$VariableName}[$Item]))
+            ${$VariableName}[$Item]['Folder'] = $Item;
+         
+         return ${$VariableName}[$Item];
+      } elseif ($VariableName !== NULL) {
+         if (isset(${$VariableName}))
+            return ${$VariableName};
+      }
+      
+      return NULL;
+   }
+   
+   public function GetThemeInfo($ThemeName) {
+      return GetValue($ThemeName, $this->AvailableThemes(), FALSE);
    }
 
    public function CurrentTheme() {
-      return C('Garden.Theme', '');
+      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
    }
 
    public function DisableTheme() {

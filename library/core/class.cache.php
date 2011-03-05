@@ -42,6 +42,10 @@ abstract class Gdn_Cache {
    const FEATURE_EXPIRY       = 'f_expiry';
    // Allows set/get timeouts
    const FEATURE_TIMEOUT      = 'f_timeout';
+   // Allows disabling usage of key prefix
+   const FEATURE_NOPREFIX     = 'f_noprefix';
+   // Allows forcing alternate key prefix
+   const FEATURE_FORCEPREFIX  = 'f_forceprefix';
    
    /**
    * Location - SERVER:IP, Filepath, etc
@@ -283,6 +287,42 @@ abstract class Gdn_Cache {
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function AddContainer($Options);
+   
+   public function GetPrefix($ForcePrefix = NULL) {
+      static $LocalPrefix = FALSE;
+      
+      // Allow overriding the prefix
+      if (!is_null($ForcePrefix))
+         return $ForcePrefix;
+       
+      // Keep searching for the prefix until it is defined
+      if ($LocalPrefix === FALSE) {
+         $ConfigPrefix = NULL;
+         
+         $ConfigPrefix = C('Cache.Prefix', NULL);
+         if (!is_null($ConfigPrefix)) {
+            $CacheRevisionKey = $ConfigPrefix.'.Revision';
+            $CacheRevision = $this->Get($CacheRevisionKey, array(
+               Gdn_Cache::FEATURE_NOPREFIX   => TRUE
+            ));
+            $LocalPrefix = $ConfigPrefix;
+            if ($CacheRevision !== Gdn_Cache::CACHEOP_FAILURE)
+               $LocalPrefix .= '.rev'.$CacheRevision;
+         }
+      }
+      
+      return ($LocalPrefix === FALSE) ? NULL : $LocalPrefix;
+   }
+   
+   public function MakeKey($Key, $Options) {
+      $UsePrefix = !GetValue(Gdn_Cache::FEATURE_NOPREFIX, $Options, FALSE);
+      $ForcePrefix = GetValue(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, NULL);
+      
+      if ($UsePrefix)
+         $Key = $this->GetPrefix($ForcePrefix).'!'.$Key;
+      
+      return $Key;
+   }
    
    /**
    * Flag this cache as being capable of perfoming a feature

@@ -80,9 +80,9 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    public function GetWebResource($Filepath) {
       $WebResource = $this->GetResource($Filepath, FALSE, FALSE);
       
-      if (Gdn::Request()->WebRoot())
-         $WebResource = Gdn::Request()->WebRoot().'/'.$WebResource;
-      return '/'.$WebResource;
+      if (Gdn_Url::WebRoot())
+         $WebResource = CombinePaths(array(Gdn_Url::WebRoot(),$WebResource));
+      return $WebResource;
    }
    
    /**

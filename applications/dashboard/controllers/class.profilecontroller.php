@@ -315,7 +315,7 @@ class ProfileController extends Gdn_Controller {
             $TmpImage = $UploadImage->ValidateUpload('Picture');
             
             // Generate the target image name.
-            $TargetImage = $UploadImage->GenerateTargetName(PATH_ROOT . DS . 'uploads');
+            $TargetImage = $UploadImage->GenerateTargetName(PATH_LOCAL_UPLOADS);
             $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
             // Delete any previously uploaded images.

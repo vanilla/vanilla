@@ -372,6 +372,7 @@ class UserModel extends Gdn_Model {
          if (array_key_exists('Password', $Fields)) {
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+            $Fields['HashMethod'] = 'Vanilla';
          }
          
          $this->EventArguments['Fields'] = $Fields;
@@ -440,7 +441,7 @@ class UserModel extends Gdn_Model {
    
                $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
             }
-         
+
             $this->EventArguments['UserID'] = $UserID;
             $this->FireEvent('AfterSave');
          } else {
@@ -1098,7 +1099,7 @@ class UserModel extends Gdn_Model {
       // Remove photos
       $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
-         @unlink(PATH_UPLOADS.DS.$Photo->Name);
+         @unlink(PATH_LOCAL_UPLOADS.DS.$Photo->Name);
       }
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       
@@ -1576,26 +1577,40 @@ class UserModel extends Gdn_Model {
    }
    
    public function PasswordRequest($Email) {
-      $User = $this->GetWhere(array('Email' => $Email))->FirstRow();
-      if (!is_object($User) || $Email == '')
+      if (!$Email)
          return FALSE;
-      
-      $PasswordResetKey = RandomString(6);
-      $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
-      $AppTitle = C('Garden.Title');
+
+      $Users = $this->GetWhere(array('Email' => $Email))->ResultObject();
+      if (count($Users) == 0 && C('Garden.Registration.NameUnique', 1)) {
+         // Check for the username.
+         $Users = $this->GetWhere(array('Name' => $Email))->ResultObject();
+      }
+
+      if (count($Users) == 0)
+            return FALSE;
+
+      $this->EventArguments['Users'] =& $Users;
+      $this->EventArguments['Email'] = $Email;
+      $this->FireEvent('BeforePasswordRequest');
+
       $Email = new Gdn_Email();
-      $Email->Subject(sprintf(T('[%s] Password Reset Request'), $AppTitle));
-      $Email->To($User->Email);
-      //$Email->From(Gdn::Config('Garden.Support.Email'), Gdn::Config('Garden.Support.Name'));
-      $Email->Message(
-         sprintf(
-            T('PasswordRequest'),
-            $User->Name,
-            $AppTitle,
-            ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
-         )
-      );
-      $Email->Send();
+      foreach ($Users as $User) {
+         $PasswordResetKey = RandomString(6);
+         $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
+         $AppTitle = C('Garden.Title');
+         $Email->Subject(sprintf(T('[%s] Password Reset Request'), $AppTitle));
+         $Email->To($User->Email);
+         
+         $Email->Message(
+            sprintf(
+               T('PasswordRequest'),
+               $User->Name,
+               $AppTitle,
+               ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
+            )
+         );
+         $Email->Send();
+      }
       return TRUE;
    }
 

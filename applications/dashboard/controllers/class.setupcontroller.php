@@ -247,12 +247,14 @@ class SetupController extends DashboardController {
 
       // Make sure the appropriate folders are writeable.
       $ProblemDirectories = array();
-      if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'conf'));
-      if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'uploads'));
-      if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'cache'));
+      if (!is_readable(PATH_LOCAL_CONF) || !IsWritable(PATH_LOCAL_CONF))
+         $ProblemDirectories[] = PATH_LOCAL_CONF;
+         
+      if (!is_readable(PATH_LOCAL_UPLOADS) || !IsWritable(PATH_LOCAL_UPLOADS))
+         $ProblemDirectories[] = PATH_LOCAL_UPLOADS;
+         
+      if (!is_readable(PATH_LOCAL_CACHE) || !IsWritable(PATH_LOCAL_CACHE))
+         $ProblemDirectories[] = PATH_LOCAL_CACHE;
 
       if (count($ProblemDirectories) > 0) {
          $PermissionProblem = TRUE;
@@ -281,9 +283,9 @@ class SetupController extends DashboardController {
 
       // Make sure the cache folder is writeable
       if (!$PermissionProblem) {
-         if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
-         if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
-         if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'cache');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'compile');
       }
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;

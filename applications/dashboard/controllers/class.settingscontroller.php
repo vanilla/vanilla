@@ -457,7 +457,7 @@ class SettingsController extends DashboardController {
    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $this->Title(T('Plugins'));
-         
+      
       $Session = Gdn::Session();
       $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
@@ -468,7 +468,7 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings/plugins');
       
       // Retrieve all available plugins from the plugins directory
-      $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+      $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
       self::SortAddons($this->EnabledPlugins);
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       self::SortAddons($this->AvailablePlugins);
@@ -739,10 +739,10 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings/themes');
 
       $Session = Gdn::Session();
-      $ThemeManager = new Gdn_ThemeManager();
-      $AvailableThemes = $ThemeManager->AvailableThemes();
-      $this->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
-      $this->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
+      
+      $AvailableThemes = Gdn::ThemeManager()->AvailableThemes();
+      $this->SetData('EnabledThemeFolder', Gdn::ThemeManager()->EnabledTheme());
+      $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
       
       // Loop through all of the available themes and mark them if they have an update available
@@ -775,7 +775,7 @@ class SettingsController extends DashboardController {
             foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
                if ($ThemeInfo['Folder'] == $ThemeFolder) {
                   $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
-                  $ThemeManager->EnableTheme($ThemeName);
+                  Gdn::ThemeManager()->EnableTheme($ThemeName);
                   $this->EventArguments['ThemeName'] = $ThemeName;
                   $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                   $this->FireEvent('AfterEnableTheme');

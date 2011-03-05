@@ -363,3 +363,15 @@ $Construct->Table('Tag')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
+
+$Construct->Table('Regarding')
+   ->PrimaryKey('RegardingID')
+   ->Column('Type', 'varchar(255)', TRUE, 'key')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateInserted', 'datetime')
+   ->Column('ForeignURL', 'varchar(255)')
+   ->Column('ForeignID', 'int(11)')
+   ->Column('ForeignType', 'varchar(32)')
+   ->Column('Comment', 'text')
+   ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);

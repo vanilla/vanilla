@@ -237,8 +237,8 @@ class Gdn_ApplicationManager {
       RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
 
       // Clear the object caches.
-      @unlink(PATH_CACHE.'/controller_map.ini');
-      @unlink(PATH_CACHE.'/library_map.ini');
+      @unlink(PATH_LOCAL_CACHE.'/controller_map.ini');
+      @unlink(PATH_LOCAL_CACHE.'/library_map.ini');
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();

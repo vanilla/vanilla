@@ -266,4 +266,36 @@ class DiscussionsController extends VanillaController {
       // Render default view (discussions/mine.php)
       $this->Render();
    }
+
+   public function UserBookmarkCount($UserID = FALSE) {
+      if ($UserID === FALSE) {
+         $UserID = Gdn::Session()->UserID;
+      }
+
+      if (!$UserID) {
+         $CountBookmarks = NULL;
+      } else {
+         if ($UserID == Gdn::Session() && isset(Gdn::Session()->User->CountBookmarks)) {
+            $CountBookmarks = Gdn::Session()->User->CountBookmarks;
+         } else {
+            $UserModel = new UserModel();
+            $User = $UserModel->GetID($ID, DATASET_TYPE_ARRAY);
+            $CountBookmarks = $User['CountBookmarks'];
+         }
+
+         if ($CountBookmarks === NULL) {
+            $CountBookmarks = Gdn::SQL()
+               ->Select('DiscussionID', 'count', 'CountBookmarks')
+               ->From('UserDiscussion')
+               ->Where('Bookmarked', '1')
+               ->Where('UserID', $UserID)
+               ->Get()->Value('CountBookmarks', 0);
+
+            Gdn::SQL()->Put('User', array('CountBookmarks' => $CountBookmarks), array('UserID' => $UserID));
+         }
+      }
+      $this->SetData('CountBookmarks', $CountBookmarks);
+      $this->SetData('_Value', $CountBookmarks);
+      $this->xRender('Value', 'utility', 'dashboard');
+   }
 }

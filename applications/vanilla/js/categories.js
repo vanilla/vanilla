@@ -18,8 +18,6 @@ jQuery(document).ready(function($) {
       $('#Form_CodeIsDefined').val('1')
    });
    $('#UrlCode input, #UrlCode a.Save').hide();
-   if ($('#UrlCode input').val() == '')
-      $('#UrlCode').hide();
    
    // Reveal input when "change" button is clicked
    $('#UrlCode a, #UrlCode span').click(function() {

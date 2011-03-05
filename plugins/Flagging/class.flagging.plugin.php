@@ -61,21 +61,24 @@ class FlaggingPlugin extends Gdn_Plugin {
             // Shorten our arguments
             $UserID = $Sender->EventArguments['UserID'];
             $Prefs = $Sender->EventArguments['Name'];
+            $FlagPref = GetValue('Email.Flag', $Prefs, NULL);
             
-            // Add or remove user from config array
-            $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
-            $IsNotified = array_search($UserID, $NotifyUsers); // beware '0' key
-            if ($IsNotified !== FALSE && !$Prefs['Email.Flag']) {
-               // Remove from NotifyUsers
-               unset($NotifyUsers[$IsNotified]);
+            if ($FlagPref !== NULL) {
+               // Add or remove user from config array
+               $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
+               $IsNotified = array_search($UserID, $NotifyUsers); // beware '0' key
+               if ($IsNotified !== FALSE && !$FlagPref) {
+                  // Remove from NotifyUsers
+                  unset($NotifyUsers[$IsNotified]);
+               }
+               elseif ($IsNotified === FALSE && $FlagPref) {
+                  // Add to NotifyUsers
+                  $NotifyUsers[] = $UserID;
+               }
+               
+               // Save new list of users to notify
+               SaveToConfig('Plugins.Flagging.NotifyUsers', array_values($NotifyUsers));
             }
-            elseif ($IsNotified === FALSE && $Prefs['Email.Flag']) {
-               // Add to NotifyUsers
-               $NotifyUsers[] = $UserID;
-            }
-            
-            // Save new list of users to notify
-            SaveToConfig('Plugins.Flagging.NotifyUsers', array_values($NotifyUsers));
          }
       }
    }

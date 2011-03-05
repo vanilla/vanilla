@@ -190,7 +190,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->InformMessage(T('Your changes have been saved successfully.'));
+            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved successfully.'), 'Dismissable AutoDismiss HasSprite');
             $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
          }
       }
@@ -281,7 +281,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          if ($this->Form->Save()) {
-            $this->InformMessage(T('Your password has been changed.'));
+				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
             $this->Form->ClearInputs();
          }
       }
@@ -407,7 +407,7 @@ class ProfileController extends Gdn_Controller {
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         $this->InformMessage(T('Your preferences have been saved.'));
+			$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
       $this->Render();
    }

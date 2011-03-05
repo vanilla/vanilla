@@ -66,7 +66,7 @@ $Definition['Applicants'] = '申請者リスト';
 $Definition['Apply'] = '適用';
 $Definition['Apply for Membership'] = 'アカウントを作成する';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
-// $Definition['at'] = 'at'; // vanilla 側の difinition と重複
+$Definition['at'] = 'アット';
 
 $Definition['Back to Discussions'] = 'スレッド一覧に戻る';
 $Definition['Bookmark'] = 'フォロー';
@@ -75,7 +75,7 @@ $Definition['Bookmarked Discussions'] = 'フォロー中のスレッド';
 $Definition['By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'] = 'ファイルのアップロードによって、あなたが画像の配布権利者であり、利用規約に違反しないことを保証するものとします。';
 
 $Definition['Cancel'] = 'キャンセル';
-$Definition['Categories'] = 'カテゴリ一覧';
+$Definition['Categories'] = 'カテゴリ';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Change My Password'] = 'パスワードを変更';
 $Definition['Change My Picture'] = 'プロフィール画像を変更';
@@ -102,7 +102,7 @@ $Definition['discussion'] = 'スレッド';
 $Definition['Discussion Title'] = 'スレッド タイトル';
 $Definition['Discussions'] = 'スレッド一覧';
 $Definition['Don\'t have an account? %s'] = 'アカウントを お持ちですか？ %s';
-// $Definition['dot'] = 'dot'; // vanilla 側の difinition と重複
+$Definition['dot'] = 'ドット';
 $Definition['Drag around and resize the square below to define your thumbnail icon.'] = 'オリジナル画像の使いたい範囲をマウスでドラッグして、下のサムネイル アイコンを編集してください。';
 
 $Definition['Edit'] = '編集';
@@ -164,7 +164,7 @@ $Definition['EmailWelcomeConnect'] = '{User.Name} さん、こんにちは。
 
 あなたは {Title} に接続しました。あなたの情報は、次の通りです:
 
-  ユーザ名: {User.Name}
+  ユーザー名: {User.Name}
   接続プロバイダ: {ProviderName}
 
 {/,url,domain} からサイトにアクセスできます。
@@ -174,7 +174,7 @@ $Definition['EmailWelcomeRegister'] = '{User.Name} さん、こんにちは。
 
 あなたは {Title} のアカウントで登録されました。あなたの情報は、次の通りです:
 
-  ユーザ名: {User.Name}
+  ユーザー名: {User.Name}
   E メール: {User.Email}
 
 {/,url,domain} からサイトにアクセスできます。

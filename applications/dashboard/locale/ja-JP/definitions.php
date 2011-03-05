@@ -32,12 +32,8 @@ $Definition['Addons'] = 'アドオン';
 $Definition['Administrator'] = '管理者';
 $Definition['Advanced'] = '高度な設定';
 $Definition['Advanced Forum Settings'] = 'Advanced Forum Settings';
-$Definition['All '] = 'すべて ';
-/*
-$Definition['All <span>16</span>'] = 'すべて <span>16</span>';
-$Definition['All <span>2</span>'] = 'すべて <span>2</span>';
-*/
-$Definition['Announce'] = 'アナウンス';
+$Definition['All'] = 'すべて';  // T('All %1$s')
+$Definition['Announce'] = 'お知らせ';  // vanilla 側の翻訳と統一
 $Definition['Appearance'] = '外観';
 $Definition['Applicant'] = '申請者';
 $Definition['Applicants'] = '申請者';
@@ -48,8 +44,8 @@ $Definition['ApplicationHelp'] = 'アプリケーションは、あなたのサ�
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approve'] = '承認';
 $Definition['Archive Discussions'] = '過去のスレッド';
-$Definition['Are you sure you want to do that?'] = 'あなたはそんなことしてもよろしいですか？';
-$Definition['at'] = 'at';
+$Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
+$Definition['at'] = 'アット';
 $Definition['Authentication'] = '認証';
 
 $Definition['Banned'] = '利用禁止';
@@ -71,7 +67,7 @@ $Definition['Check all roles that apply to this user:'] = 'このユーザーに
 $Definition['Choose a locale pack'] = 'ロケール パックを選んでください';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Choose and configure your forum\'s authentication scheme.';
 $Definition['Choose who can send out invitations to new members:'] = 'Choose who can send out invitations to new members:';
-$Definition['Close'] = 'Close';
+$Definition['Close'] = '終了';
 $Definition['comment(s)'] = '件のレスポンス';
 $Definition['Comments'] = 'コメント';
 $Definition['Comments per Page'] = '1 ページに表示する最大レス数';
@@ -88,21 +84,14 @@ $Definition['Current Theme'] = '現在のテーマ';
 $Definition['Customize your Public Profile'] = '公開プロフィールをカスタマイズ';
 
 $Definition['Dashboard'] = 'ダッシュボード';
-$Definition['Date.DefaultDayFormat'] = '%B %e';
-$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
+$Definition['Date.DefaultDayFormat'] = '%m/%d';
+$Definition['Date.DefaultTimeFormat'] = '%H:%M';
 $Definition['Decline'] = 'Decline';
 $Definition['Description'] = '説明';
 $Definition['Disable'] = '無効化';
 $Definition['Disable Google Sign In'] = 'Google アカウントでのログインを無効化';
 $Definition['Disable OpenID'] = 'OpenID を無効化';
-$Definition['Disabled '] = '無効 ';
-/*
-$Definition['Disabled <span>0</span>'] = '無効 <span>0</span>';
-$Definition['Disabled <span>10</span>'] = '無効 <span>10</span>';
-$Definition['Disabled <span>11</span>'] = '無効 <span>11</span>';
-$Definition['Disabled <span>12</span>'] = '無効 <span>12</span>';
-$Definition['Disabled <span>9</span>'] = '無効 <span>9</span>';
-*/
+$Definition['Disabled'] = '無効';  // T('Disabled %1$s')
 $Definition['Discussion & Comment Editing'] = 'スレッド & レスポンス編集';
 $Definition['discussion(s)'] = '件のスレッド';
 $Definition['Discussions'] = 'スレッド';
@@ -115,26 +104,19 @@ $Definition['Edit Category'] = 'カテゴリを編集';
 $Definition['Edit User'] = 'ユーザーを編集';
 $Definition['EditContentTimeout.Notes'] = 'Note: If a user is in a role that has permission to edit content, those permissions will override any value selected here.';
 $Definition['Email'] = 'メール アドレス';
-$Definition['Email sent from the application will be addressed from the following name and address'] = 'Email sent from the application will be addressed from the following name and address';
+$Definition['Email sent from the application will be addressed from the following name and address'] = 'アプリケーションから送信される E メールの送信元には、以下の名前とメール アドレスが使用されます';
 $Definition['Email visible to other users'] = '他のメンバーにメール アドレスを公開する';
-$Definition['EmailMembershipApproved'] = 'Hello %1$s,
+$Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 
-You have been approved for membership. Sign in now at the following link:
+あなたの会員登録が完了しました。以下のリンクからログインしてください:
 
   %2$s
   
-Have a great day!';
+では、よい一日をお過ごしください！';
 $Definition['Enable'] = '有効化';
 $Definition['Enable Google Sign In'] = 'Google アカウントでのログインを有効化';
 $Definition['Enable OpenID'] = 'OpenID を有効化';
-$Definition['Enabled '] = '有効 ';
-/*
-$Definition['Enabled <span>2</span>'] = '有効 <span>2</span>';
-$Definition['Enabled <span>4</span>'] = '有効 <span>4</span>';
-$Definition['Enabled <span>5</span>'] = '有効 <span>5</span>';
-$Definition['Enabled <span>6</span>'] = '有効 <span>6</span>';
-$Definition['Enabled <span>7</span>'] = '有効 <span>7</span>';
-*/
+$Definition['Enabled'] = '有効';  // T('Enabled %1$s')
 $Definition['Existing members send invitations to new members.'] = 'Existing members send invitations to new members.';
 
 $Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>';
@@ -167,7 +149,7 @@ $Definition['It is a good idea to keep the maximum number of characters allowed 
 $Definition['Key Type'] = 'Key Type';
 $Definition['Key Value'] = 'Key Value';
 
-$Definition['Last Active'] = 'Last Active';
+$Definition['Last Active'] = '最終訪問';
 $Definition['Last Visit'] = '最終訪問';
 $Definition['Locale'] = 'ja-JP';
 $Definition['Locale Developer'] = 'ロケール デベロッパー';
@@ -184,7 +166,7 @@ $Definition['Manage Applications'] = 'アプリケーション管理';
 $Definition['Manage Categories'] = 'カテゴリ管理';
 $Definition['Manage Messages'] = 'メッセージ管理';
 $Definition['Manage Plugins'] = 'プラグイン管理';
-$Definition['Manage Roles & Permissions'] = 'Manage Roles & Permissions';
+$Definition['Manage Roles & Permissions'] = '役割と権限の管理';
 $Definition['Manage Routes'] = 'ルート管理';
 $Definition['Manage Spam'] = 'スパム管理';
 $Definition['Manage Themes'] = 'テーマ管理';
@@ -201,30 +183,30 @@ $Definition['Moderator'] = 'モデレータ';
 
 $Definition['Name'] = '名前';
 $Definition['never'] = 'never';
-$Definition['New comments in the last day'] = 'New comments in the last day';
-$Definition['New comments in the last week'] = 'New comments in the last week';
-$Definition['New conversations in the last day'] = 'New conversations in the last day';
-$Definition['New conversations in the last week'] = 'New conversations in the last week';
-$Definition['New discussions in the last day'] = 'New discussions in the last day';
-$Definition['New discussions in the last week'] = 'New discussions in the last week';
-$Definition['New messages in the last day'] = 'New messages in the last day';
-$Definition['New messages in the last week'] = 'New messages in the last week';
+$Definition['New comments in the last day'] = '過去一日間の新規コメント数';
+$Definition['New comments in the last week'] = '過去一週間の新規コメント数';
+$Definition['New conversations in the last day'] = '過去一日間の新規会話数';
+$Definition['New conversations in the last week'] = '過去一週間の新規会話数';
+$Definition['New discussions in the last day'] = '過去一日間の新規スレッド数';
+$Definition['New discussions in the last week'] = '過去一週間の新規スレッド数';
+$Definition['New messages in the last day'] = '過去一日間の新規メッセージ数';
+$Definition['New messages in the last week'] = '過去一週間の新規メッセージ数';
 $Definition['New Password'] = '新しいパスワード';
 $Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = 'New users are reviewed and approved by an administrator (that\'s you!).';
 $Definition['New users fill out a simple form and are granted access immediately.'] = 'New users fill out a simple form and are granted access immediately.';
-$Definition['New users in the last day'] = 'New users in the last day';
-$Definition['New users in the last week'] = 'New users in the last week';
-$Definition['None'] = 'None';
+$Definition['New users in the last day'] = '過去一日間の新規ユーザー数';
+$Definition['New users in the last week'] = '過去一週間の新規ユーザー数';
+$Definition['None'] = 'なし';
 $Definition['Not Authorized (401)'] = 'Not Authorized (401)';
 $Definition['Not Found (404)'] = '見つかりません (404)';
 
 $Definition['OK'] = 'OK';
-$Definition['Okay'] = 'Okay';
+$Definition['Okay'] = 'Ok';
 $Definition['Only Allow Each User To Post'] = '1 ユーザーにつき投稿可能な件数';
 $Definition['OpenID Settings'] = 'OpenID 設定';
 $Definition['Options'] = 'オプション';
 $Definition['Or Spamblock For'] = '違反時のスパムブロック時間';
-$Definition['Organize your Categories'] = 'Organize your Categories';
+$Definition['Organize your Categories'] = 'カテゴリを編成';
 $Definition['Other Themes'] = '他のテーマ';
 $Definition['Outgoing Email'] = 'Outgoing Email';
 
@@ -242,18 +224,20 @@ $Definition['Prevent spam on your forum by limiting the number of discussions &a
 $Definition['Private Key'] = 'プライベートキー';
 $Definition['Public Key'] = '公開キー';
 
-$Definition['Recently Active Users'] = 'Recently Active Users';
+$Definition['Recent News'] = '最新ニュース';
+$Definition['Recent Tutorials'] = '最新チュートリアル';
+$Definition['Recently Active Users'] = '現在アクティブなユーザー';
 $Definition['Refresh Comments'] = 'Refresh Comments';
 $Definition['Registration'] = '登録';
 $Definition['Remove'] = '削除';
 $Definition['Remove locale developer files.'] = 'ロケール デベロッパーのファイルを削除して、変更をリセットします。';
 $Definition['Requires: '] = '動作要件: ';
 $Definition['Reset Password'] = 'パスワードをリセット';
-$Definition['Reset password and send email notification to user'] = 'Reset password and send email notification to user';
+$Definition['Reset password and send email notification to user'] = 'パスワードをリセットして、ユーザーに E メールで通知';
 $Definition['Reveal Password'] = 'パスワードを表示';
 $Definition['Role'] = '役割';
 $Definition['Roles & Permissions'] = '役割と権限';
-$Definition['Roles determine user\'s permissions.'] = 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.';
+$Definition['Roles determine user\'s permissions.'] = 'あなたのサイトのどのユーザーも、どれか一つ以上の役割に所属します。役割は、どのユーザーが何をしてよいのかを判別する基準に使われます。';
 $Definition['Route'] = 'ルート';
 $Definition['Route Expression'] = 'Route Expression';
 $Definition['Routes'] = 'Routes';
@@ -265,7 +249,7 @@ $Definition['seconds'] = '秒間';
 $Definition['Select the file to import'] = 'インポートするファイルを選択してください';
 $Definition['Settings'] = '設定';
 $Definition['Sign Out'] = 'ログアウト';
-$Definition['Sink'] = 'Sink';
+$Definition['Sink'] = '下げ進行';
 $Definition['SMTP Host'] = 'SMTP サーバー';
 $Definition['SMTP Password'] = 'SMTP パスワード';
 $Definition['SMTP Port'] = 'SMTP ポート';
@@ -288,7 +272,7 @@ $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you c
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.';
 $Definition['This plugin helps locale package development.'] = 'このプラグインは、ロケール パッケージの開発を助けます。The plugin keeps a working locale pack at <code>%s</code>.';
 $Definition['Tools'] = 'ツール';
-$Definition['Transport error: %s'] = 'A fatal error occurred while processing the request.<br />The server returned the following response: %s';
+$Definition['Transport error: %s'] = 'リクエストを処理中に致命的なエラーが発生しました。<br />サーバーは次のように応答しています: %s';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>';
 $Definition['Twitter Settings'] = 'Twitter Settings';
 $Definition['Type'] = 'Type';
@@ -301,7 +285,7 @@ $Definition['User Registration Settings'] = 'ユーザー登録設定';
 $Definition['Username'] = 'ユーザー名';
 $Definition['Users'] = 'ユーザー';
 
-$Definition['ValidateRequired'] = '%s is required.';
+$Definition['ValidateRequired'] = '%sは必須です。';
 $Definition['Vanilla.Archive.Description'] = '特定の日付より古いスレッドをアーカイブ化できます。アーカイブ化されたスレッドは事実上 閉じられ、新しいレスを受け付けなくなります。';
 $Definition['Version'] = 'バージョン';
 $Definition['Version %s'] = 'バージョン %s';
@@ -310,7 +294,7 @@ $Definition['View'] = 'ビュー';
 $Definition['Visit Site'] = 'サイトへ移動';
 
 $Definition['Warning'] = '警告';
-$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.';
+$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '既定では E メールの送信にローカル メール サーバを使用します。独立した SMTP メール サーバを使用する場合は、以下で設定してください。';
 $Definition['Welcome Aboard!'] = 'ようこそ！';
 $Definition['What\'s the Buzz?'] = 'What\'s the Buzz?';
 $Definition['Within'] = '制限時間';
@@ -355,7 +339,7 @@ $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'テーマ作�
 $Definition['Allow users to dismiss this message'] = 'このメッセージを閉じることをユーザーに許可する';
 $Definition['Enable this message'] = 'このメッセージを有効化する';
 $Definition['Saved'] = '保存しました';
-$Definition['Organize Categories'] = 'カテゴリ構成';
+$Definition['Organize Categories'] = 'カテゴリ編成';
 $Definition['Category Page Layout'] = 'カテゴリのページ レイアウト';
 $Definition['View Page'] = 'ページを表示';
 $Definition['Did You Know?'] = 'ご存知ですか？';
@@ -402,19 +386,19 @@ $Definition['TermsOfServiceText'] = "
 $Definition['Version 2 Installer'] = 'バージョン 2 インストーラ';
 $Definition['Database Host'] = 'データベース ホスト';
 $Definition['Database Name'] = 'データベース名 <span style="font-size:13px;">※ あらかじめ作成しておく必要があります。</span>';
-$Definition['Database User'] = 'データベース ユーザ';
+$Definition['Database User'] = 'データベース ユーザー';
 $Definition['Database Password'] = 'データベース パスワード';
 $Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてコピーされなかったかもしれません。続行する前に、<b>.htaccess</b> ファイルがコピー済みであることを確認してください。';
-$Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザーには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['Install Vanilla without a .htaccess file.'] = '.htaccess ファイル無しで Vanilla をインストールします。';
 $Definition['Yes, the following information can be changed later.'] = 'ここから下の情報は、後で変更できます。';
 $Definition['Application Title'] = 'アプリケーション タイトル';
 $Definition['Admin Email'] = '管理者の E メール';
-$Definition['Admin Username'] = '管理者のユーザ名';
+$Definition['Admin Username'] = '管理者のユーザー名';
 $Definition['Admin Password'] = '管理者のパスワード';
 $Definition['Confirm Password'] = '確認用パスワード(再入力)';
 $Definition['Continue &rarr;'] = '続行 &rarr;';
-$Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '入力されたユーザ名とパスワードでは、データベースに接続できません。入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '入力されたユーザー名とパスワードでは、データベースに接続できません。入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'] = '指定されたデータベースが まだ作成されていないようです。データベースは作成済みですか？　あるいはデータベース名が間違っている可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition["Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"] = 'データベース ホスト名は正しく入力されましたか？　入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['UsernameError'] = 'ユーザー名には 3～20 文字の英数字とアンダースコアのみ使用できます。';
@@ -425,4 +409,5 @@ $Definition['You must have the PDO module enabled in PHP in order for Vanilla to
 $Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、MySQL ドライバ for PDO を有効にしてください。';
 $Definition['Some folders don\'t have correct permissions.'] = '<p>適切なアクセス権が設定されていないフォルダがあります。</p><p>FTP クライアントかコマンド ラインを使って、vanilla のインストール フォルダに次のアクセス権を設定してください:</p>';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なアクセス権が設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
+$Definition['Use an SMTP server to send email'] = 'E メールの送信に SMTP サーバを使用';
 //$Definition[''] = '';

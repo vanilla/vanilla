@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Handles install-side statistics gathering and sending.
+ * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Mark O'Sullivan
@@ -21,16 +21,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class Gdn_Regarding {
 
-   private $ForeignType;
-   private $ForeignID;
+   private $Type = NULL;
+   private $ForeignType = NULL;
+   private $ForeignID = NULL;
    
-   private $
+   private $UserID = NULL;
+   private $ForeignURL = NULL;
+   private $Comment = NULL;
    
    public function __construct() {
-
+      
    }
    
-   /* Data sources */
+   /* With regard to... */
    
    public function Comment($CommentID, $Verify = TRUE) {
       return $this->Regarding('Comment', $CommentID, $Verify);
@@ -44,7 +47,7 @@ class Gdn_Regarding {
       $Verified = FALSE;
       if ($Verify) {
          $ModelName = ucfirst($ThingType).'Model';
-         $VerifyModel = new 
+         $VerifyModel = new $ModelName;
       } else {
          $Verified = NULL;
       }
@@ -57,14 +60,13 @@ class Gdn_Regarding {
       return $this;
    }
    
-   /* Actions */
+   /* I'd like to... */
    
    public function PraiseIt() {
       return $this->ActionId('Praise');
    }
    
    public function FlagIt() {
-      $this-
       return $this->ActionIt('Flag');
    }
    
@@ -73,25 +75,70 @@ class Gdn_Regarding {
       return $this;
    }
    
+   /* ... */
+   
+   public function ForDiscussion($InCategory) {
+      $this->CollaborativeAction[] = 'discussion';
+   }
+   
+   public function ForConversation($WithUsers) {
+      $this->CollaborativeAction[] = 'conversation';
+   }
+   
+   public function WithTitle($CollaborativeTitle) {
+   
+   }
+   
+   
+   
    /* Meta data */
    
    public function Located($URL) {
+      $this->ForeignURL = $URL;
       return $this;
    }
    
    public function From($UserID) {
+      $this->UserID = $UserID;
       return $this;
    }
    
    public function Because($Reason) {
+      $this->Comment = $Reason;
+      return $this;
+   }
+   
+   // Filler
+   public function Plus() {
       return $this;
    }
    
    /* Finally... */
    
    public function Commit() {
+      if (is_null($this->Type))
+         throw new Exception(T("Adding a Regarding event requires a type."));
+         
+      if (is_null($this->ForeignType))
+         throw new Exception(T("Adding a Regarding event requires a foreign association type."));
+         
+      if (is_null($this->ForeignID))
+         throw new Exception(T("Adding a Regarding event requires a foreign association id."));
+         
+      if (is_null($this->UserID))
+         $this->UserID = Gdn::Session()->UserID;
+         
       $RegardingModel = new RegardingModel();
-      return FALSE;
+      $RegardingModel->Save(array(
+         'ForeignType'     => $this->ForeignType,
+         'ForeignID'       => $this->ForeignID,
+         'InsertUserID'    => $this->UserID,
+         'DateInserted'    => date('Y-m-d H:i:s')
+         
+         'ForeignURL'      => $this->ForeignURL,
+         'Comment'         => $this->Comment
+      ));
+      return TRUE;
    }
    
 }

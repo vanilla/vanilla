@@ -237,8 +237,8 @@ $Definition['Notify me when people comment on my bookmarked discussions.'] = '�
 $Definition['Notify me when people comment on my discussions.'] = '自分の立てたスレッドにレスが付いたら通知する。';
 $Definition['Notify me when people mention me in comments.'] = 'レスで自分にリプライされたら通知する。';
 $Definition['Notify me when people mention me in discussion titles.'] = 'スレッド タイトルで自分にリプライされたら通知する。';
-$Definition['Notify me when people reply to my wall comments.'] = '掲示板に付けたコメントに返信されたら通知する。';
-$Definition['Notify me when people write on my wall.'] = '自分の掲示板にコメントが付いたら通知する。';
+$Definition['Notify me when people reply to my wall comments.'] = 'ウォールに付けたコメントに返信されたら通知する。';
+$Definition['Notify me when people write on my wall.'] = '自分のウォールにコメントが付いたら通知する。';
 
 $Definition['Okay'] = 'Ok';
 $Definition['On'] = 'On';
@@ -316,20 +316,20 @@ $Definition['ValidateLength'] = '%1$sは%2$s文字 長すぎます。';
 $Definition['ValidateMatch'] = '新しい%sが再入力と一致しません。';
 $Definition['ValidateMinimumAge'] = 'You must be at least 16 years old to proceed.';
 $Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least one %s.';
-$Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
+$Definition['ValidateRegex'] = '%sは不正な形式です。';
 $Definition['ValidateRequired'] = '%sは必須です。';
-$Definition['ValidateRequiredArray'] = 'You must select at least one %s.';
-$Definition['ValidateTime'] = '%s is not a valid time.';
-$Definition['ValidateTimestamp'] = '%s is not a valid timestamp.';
+$Definition['ValidateRequiredArray'] = '少なくとも一つ以上の%sを選択してください。';
+$Definition['ValidateTime'] = '%s は不正な時刻です。';
+$Definition['ValidateTimestamp'] = '%s は不正なタイムスタンプです。';
 $Definition['ValidateUsername'] = 'ユーザー名には 3～20 文字の英数字とアンダースコアのみ使用できます。';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 $Definition['Visits'] = 'ログイン回数';
 
-$Definition['wall'] = '掲示板';
+$Definition['wall'] = 'ウォール';
 $Definition['Why do you want to join?'] = 'Why do you want to join?';
 $Definition['Write a comment'] = 'Write a comment';
 $Definition['Write Comment'] = 'レスを書く';
-$Definition['Write something about yourself...'] = 'Write something about yourself...';
+$Definition['Write something about yourself...'] = 'あなた自身について、何か書いてみましょう…';
 
 $Definition['you'] = 'あなた';
 $Definition['You'] = 'あなた';

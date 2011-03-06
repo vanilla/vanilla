@@ -10,6 +10,20 @@ $Definition['%s message'] = '%s メッセージ';
 $Definition['%s New'] = '未読 %s 件';
 $Definition['%s new'] = '未読 %s 件';
 $Definition['%s New Plural'] = '未読 %s 件';
+$Definition['%s second'] = '%s 秒';	//* class.format.php Seconds()
+//$Definition['%s seconds'] = '%s 秒'; // Japanese plural use only singular.
+$Definition['%s minute'] = '%s 分';
+//$Definition['%s minutes'] = '%s 分';
+$Definition['%s hour'] = '%s 時間';
+//$Definition['%s hours'] = '%s 時間';
+$Definition['%s day'] = '%s 日';
+//$Definition['%s days'] = '%s 日';
+$Definition['%s week'] = '%s 週間';
+//$Definition['%s weeks'] = '%s 週間';
+$Definition['%s month'] = '%s ヶ月';
+//$Definition['%s months'] = '%s ヶ月';
+$Definition['%s year'] = '%s 年';
+//$Definition['%s years'] = '%s 年';	// class.format.php Seconds() */
 
 $Definition['1 message'] = '1 メッセージ';
 

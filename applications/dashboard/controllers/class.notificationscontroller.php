@@ -68,7 +68,7 @@ class NotificationsController extends Gdn_Controller {
 				$UserPhoto
 				.Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
 				.Wrap(Gdn_Format::Display($Notification->Story), 'div', array('class' => 'Excerpt')),
-            'Dismissable'.($UserPhoto == '' ? '' : ' HasIcon')
+            'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
          );
 		}
 	}

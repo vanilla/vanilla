@@ -68,13 +68,13 @@ $Definition['Change the way that new users register with the site.'] = '新規�
 $Definition['Check all permissions that apply for each role'] = '以下の役割に適用する権限すべてにチェックを入れてください';
 $Definition['Check all roles that apply to this user:'] = 'このユーザーに適用する役割にすべてチェックを入れてください:';
 $Definition['Choose a locale pack'] = 'ロケール パックを選んでください';
-$Definition['Choose and configure your forum\'s authentication scheme.'] = 'Choose and configure your forum\'s authentication scheme.';
+$Definition['Choose and configure your forum\'s authentication scheme.'] = 'あなたのフォーラムの認証スキームを選んで設定してください。';
 $Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
 $Definition['Close'] = '終了';
 $Definition['comment(s)'] = '件のレスポンス';
 $Definition['Comments'] = 'コメント';
 $Definition['Comments per Page'] = '1 ページに表示する最大レス数';
-$Definition['Configure an Authenticator'] = 'Configure an Authenticator';
+$Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Confirm'] = '確認';
 $Definition['Confirm Email'] = '電子メールで通知する';
 $Definition['Consumer Key'] = 'Consumer Key';
@@ -82,7 +82,7 @@ $Definition['Consumer Secret'] = 'Consumer Secret';
 $Definition['Conversation Messages'] = 'Conversation Messages';
 $Definition['Copy'] = 'コピー';
 $Definition['Copy locale pack.'] = 'ロケール パックからロケール デベロッパーに定義文をコピーします。定義文は <code>copied.php</code> ファイルに出力されます。';
-$Definition['Current Authenticator'] = 'Current Authenticator';
+$Definition['Current Authenticator'] = '現在の認証方式';
 $Definition['Current Theme'] = '現在のテーマ';
 $Definition['Customize your Public Profile'] = '公開プロフィールをカスタマイズ';
 
@@ -106,7 +106,7 @@ $Definition['Edit'] = '編集';
 $Definition['edit'] = '編集';
 $Definition['Edit Category'] = 'カテゴリを編集';
 $Definition['Edit User'] = 'ユーザーを編集';
-$Definition['EditContentTimeout.Notes'] = 'Note: If a user is in a role that has permission to edit content, those permissions will override any value selected here.';
+$Definition['EditContentTimeout.Notes'] = '註: ユーザーが内容を編集できる役割に属している場合は、ここで選択する値よりも役割の設定の方が優先されます。';
 $Definition['Email'] = 'メール アドレス';
 $Definition['Email sent from the application will be addressed from the following name and address'] = 'アプリケーションから送信される E メールの送信元には、以下の名前とメール アドレスが使用されます';
 $Definition['Email visible to other users'] = '他のメンバーにメール アドレスを公開する';
@@ -177,7 +177,7 @@ $Definition['Manage Routes'] = 'ルート管理';
 $Definition['Manage Spam'] = 'スパム管理';
 $Definition['Manage Themes'] = 'テーマ管理';
 $Definition['Manage Users'] = 'ユーザー管理';
-$Definition['Manage your Plugins'] = 'Manage your Plugins';
+$Definition['Manage your Plugins'] = 'プラグインを管理する';
 $Definition['Max Comment Length'] = '最大投稿文字数';
 $Definition['Member'] = 'メンバー';
 $Definition['Message'] = 'メッセージ';
@@ -203,7 +203,7 @@ $Definition['New users fill out a simple form and are granted access immediately
 $Definition['New users in the last day'] = '過去一日間の新規ユーザー数';
 $Definition['New users in the last week'] = '過去一週間の新規ユーザー数';
 $Definition['None'] = 'なし';
-$Definition['Not Authorized (401)'] = 'Not Authorized (401)';
+$Definition['Not Authorized (401)'] = '認証できません (401)';
 $Definition['Not Found (404)'] = '見つかりません (404)';
 
 $Definition['OK'] = 'OK';
@@ -214,7 +214,7 @@ $Definition['Options'] = 'オプション';
 $Definition['Or Spamblock For'] = '違反時のスパムブロック時間';
 $Definition['Organize your Categories'] = 'カテゴリを編成';
 $Definition['Other Themes'] = '他のテーマ';
-$Definition['Outgoing Email'] = 'Outgoing Email';
+$Definition['Outgoing Email'] = 'E メール送信';
 
 $Definition['Page'] = '表示対象';
 $Definition['Panel Box'] = 'パネル ボックス';
@@ -233,7 +233,7 @@ $Definition['Public Key'] = '公開キー';
 $Definition['Recent News'] = '最新ニュース';
 $Definition['Recent Tutorials'] = '最新チュートリアル';
 $Definition['Recently Active Users'] = '現在アクティブなユーザー';
-$Definition['Refresh Comments'] = 'Refresh Comments';
+$Definition['Refresh Comments'] = 'コメントの自動更新';
 $Definition['Registration'] = '登録';
 $Definition['Remove'] = '削除';
 $Definition['Remove locale developer files.'] = 'ロケール デベロッパーのファイルを削除して、変更をリセットします。';
@@ -246,7 +246,7 @@ $Definition['Roles & Permissions'] = '役割と権限';
 $Definition['Roles determine user\'s permissions.'] = 'あなたのサイトのどのユーザーも、どれか一つ以上の役割に所属します。役割は、どのユーザーが何をしてよいのかを判別する基準に使われます。';
 $Definition['Route'] = 'ルート';
 $Definition['Route Expression'] = 'Route Expression';
-$Definition['Routes'] = 'Routes';
+$Definition['Routes'] = 'ルート';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'ルートは URL に基づきユーザーを適切なページへリダイレクトするために使用されます。';
 
 $Definition['Save'] = '保存';
@@ -266,7 +266,7 @@ $Definition['Start your First Discussion'] = '最初のスレッドを立てる'
 
 $Definition['Target'] = '対象';
 $Definition['Temporary (302)'] = '一時的 (302)';
-$Definition['The %s Authenticator does not have any custom configuration options.'] = 'The %s Authenticator does not have any custom configuration options.';
+$Definition['The %s Authenticator does not have any custom configuration options.'] = '認証方式 %s には設定オプションがありません。';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'The addon could not be enabled because it generated a fatal error: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴは、フォーラムの先頭に表示されます。';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'バナー タイトルは、すべてのページの左上に表示されます。バナー ロゴをアップロードすると、バナー タイトルは置き換えられます。';
@@ -302,16 +302,16 @@ $Definition['Visit Site'] = 'サイトへ移動';
 $Definition['Warning'] = '警告';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '既定では E メールの送信にローカル メール サーバを使用します。独立した SMTP メール サーバを使用する場合は、以下で設定してください。';
 $Definition['Welcome Aboard!'] = 'ようこそ！';
-$Definition['What\'s the Buzz?'] = 'What\'s the Buzz?';
+$Definition['What\'s the Buzz?'] = '最近どう？';
 $Definition['Within'] = '制限時間';
 
-$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>';
+$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メール アドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
 $Definition['You can place files in your /uploads folder.'] = 'If your file is too
 		large to upload directly to this page you can place it in your /uploads
 		folder. Make sure the filename begins with the word <b>export</b> and ends
 		with one of <b>.txt, .gz</b>.';
-$Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.';
-$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.';
+$Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = '%1$s プラグインを無効にできません。%2$s プラグインが動作するために、必要です。';
+//$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'; // 内容的に上と重複しているのでコメントアウト
 $Definition['Your changes have been saved.'] = '変更を保存しました。';
 $Definition['Your settings have been saved.'] = '設定を保存しました。';
 
@@ -416,4 +416,11 @@ $Definition['You must have the MySQL driver for PDO enabled in order for Vanilla
 $Definition['Some folders don\'t have correct permissions.'] = '<p>適切なアクセス権が設定されていないフォルダがあります。</p><p>FTP クライアントかコマンド ラインを使って、vanilla のインストール フォルダに次のアクセス権を設定してください:</p>';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なアクセス権が設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
 $Definition['Use an SMTP server to send email'] = 'E メールの送信に SMTP サーバを使用';
+$Definition['%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'] = '%1$s が%3$s %2$s から削除され、%5$s %4$s に追加されました。';  //* /applications/dashboard/models/class.usermodel.php
+$Definition['%1$s was removed from the %2$s %3$s.'] = '%1$s が%3$s %2$s から削除されました。';
+$Definition['%1$s was added to the %2$s %3$s.'] = '%1$s が%3$s %2$s に追加されました。';
+$Definition['role'] = '役割';
+//$Definition['roles'] = 'roles';  // Japanese plural use only singular.
+$Definition['This forum is currently set to invitation only mode.'] = 'このフォーラムは現在、招待制に設定されています。'; // /applications/dashboard/models/class.usermodel.php */
+$Definition['Please choose an authenticator to configure.'] = '設定したい認証方式を選んでください。';
 //$Definition[''] = '';

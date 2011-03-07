@@ -2746,12 +2746,13 @@ div.InformMessages div.InformMessage {
    width: auto !important;
 	max-width: 400px !important;
    margin: 10px auto 0 !important;
-   padding: 5px 14px 4px !important;
+   padding: 9px 14px 8px !important;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
    *display:inline;
 	position: relative;
+	line-height: 1.6;
 }
 div.InformMessages div.InformMessage:hover {
 	background: rgba(0, 0, 0, 0.8) !important;
@@ -2759,6 +2760,9 @@ div.InformMessages div.InformMessage:hover {
 div.InformMessages div.InformMessage a {
 	color: #fff;
 	text-decoration: underline;
+}
+div.InformMessages div.InformMessage strong {
+	font-weight: bold;
 }
 div.InformMessages div.InformMessage a:hover {
 	text-decoration: none;
@@ -2788,22 +2792,29 @@ div.InformMessages div.InformMessage:hover a.Close {
 }
 /* Inform Sprites */
 div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
-	padding-left: 50px !important;
-	min-height: 40px;
+	padding-left: 42px !important;
+	min-height: 20px;
 }
 div.InformMessages div.InformWrapper.HasSprite div.InformMessage {
 	padding-left: 40px !important;
-	min-height: 29px;
 }
 div.InformMessages div.InformMessage a.Icon {
 	display: block;
 	position: absolute;
+	top: 5px;
 	left: 5px;
+	height: 28px;
+	width: 28px;
+}
+div.InformMessages div.InformMessage a.Icon img {
+	height: 28px;
+	width: 28px;
 }
 span.InformSprite {
 	background: url('images/inform-sprites.png') -9px -9px no-repeat;
 	display: block;
 	position: absolute;
+	top: 4px;
 	left: 5px;
 	height: 30px;
 	width: 30px;
@@ -2847,7 +2858,7 @@ span.InformSprite.Toolcase { background-position: -250px -152px; }
 span.InformSprite.Suitcase { background-position: -298px -152px; }
 span.InformSprite.Airplane { background-position: -346px -152px; }
 span.InformSprite.Spraypaint { background-position: -394px -152px; }
-span.InformSprite.MailInbox { background-position: -442px -152px; }
+span.InformSprite.MailInbox { background-position: -442px -154px; }
 span.InformSprite.WallPicture { background-position: -9px -200px; }
 span.InformSprite.Photos { background-position: -57px -200px; }
 span.InformSprite.FilmRoll { background-position: -105px -200px; }

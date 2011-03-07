@@ -180,15 +180,37 @@ jQuery(document).ready(function($) {
          $(this).remove();
       });
    });
+
+	gdn.setAutoDismiss = function() {
+		var timerId = $('div.InformMessages').attr('autodismisstimerid');
+		if (!timerId) {
+			timerId = setTimeout(function() {
+				$('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+					$(this).remove();
+				});
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}, 5000);
+			$('div.InformMessages').attr('autodismisstimerid', timerId);
+		}
+	}
+	
+	// Handle autodismissals
+	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
+		gdn.setAutoDismiss();
+	});
    
-   // If an autodismiss inform message appears on the screen, hide it after a few moments.
-   $('div.InformWrapper.AutoDismiss').livequery(function() {
-      setTimeout(function(){
-         $('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
-            $(this).remove();
-         });
-      }, 3000);
-   });
+	// Prevent autodismiss if hovering any inform messages
+	$('div.InformWrapper').live('mouseover mouseout', function(e) {
+		if (e.type == 'mouseover') {
+			var timerId = $('div.InformMessages').attr('autodismisstimerid');
+			if (timerId) {
+				clearTimeout(timerId);
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}
+		} else {
+			gdn.setAutoDismiss();
+		}
+	});
 	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
@@ -251,6 +273,23 @@ jQuery(document).ready(function($) {
 		}
 		informMessages.show();
    }
+	
+	// Send an informMessage to the screen (same arguments as controller.InformMessage).
+	gdn.informMessage = function(message, options) {
+		if (!options)
+			options = new Array();
+			
+		if (typeof(options) == 'string') {
+			var css = options;
+			options = new Array();
+			options['CssClass'] = css;
+		}
+		options['Message'] = message;
+		if (!options['CssClass'])
+			options['CssClass'] = 'Dismissable AutoDismiss';
+		
+		gdn.inform({ 'InformMessages' : new Array(options) });
+	}
    
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
@@ -258,6 +297,27 @@ jQuery(document).ready(function($) {
 		informMessageStack = { 'InformMessages' : eval($.base64Decode(informMessageStack))};
 		gdn.inform(informMessageStack);
 	}
+	
+	// Ping for new notifications after 1 minute has passed
+	pingForNotifications = function() {
+		setTimeout(function() {
+			$.ajax({
+				type: "POST",
+				url: gdn.url('dashboard/notifications/inform'),
+				data: 'TransientKey='+gdn.definition('TransientKey'),
+				dataType: 'json',
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+				},
+				success: function(json) {
+					gdn.inform(json);
+					pingForNotifications();
+				}
+			});
+	
+		}, 60000); // Ping once a minute.
+	}
+	pingForNotifications();
 
    // Generate a random string of specified length
    gdn.generateString = function(length) {

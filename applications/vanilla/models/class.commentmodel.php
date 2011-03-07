@@ -98,6 +98,10 @@ class CommentModel extends VanillaModel {
     * @return object SQL results.
     */
    public function GetByUser($UserID, $Limit, $Offset = 0) {
+      // Get category permissions
+      $Perms = DiscussionModel::CategoryPermissions();
+      
+      // Build main query
       $this->CommentQuery();
       $this->FireEvent('BeforeGet');
       $this->SQL
@@ -106,6 +110,13 @@ class CommentModel extends VanillaModel {
          ->Where('c.InsertUserID', $UserID)
 			->OrderBy('c.DateInserted', 'desc')
          ->Limit($Limit, $Offset);
+      
+      // Verify permissions (restricting by category if necessary)
+      if($Perms !== TRUE) {
+         $this->SQL
+            ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
+            ->WhereIn('d.CategoryID', $Perms);
+      }
       
       $this->OrderBy($this->SQL);
 

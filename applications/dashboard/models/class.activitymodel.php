@@ -24,6 +24,7 @@ class ActivityModel extends Gdn_Model {
          ->Select('au.Name', '', 'ActivityName')
          ->Select('au.Gender', '', 'ActivityGender')
          ->Select('au.Photo', '', 'ActivityPhoto')
+         ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Name', '', 'RegardingName')
          ->Select('ru.Gender', '', 'RegardingGender')
          ->From('Activity a')
@@ -174,6 +175,18 @@ class ActivityModel extends Gdn_Model {
          ->Where('RegardingUserID', $UserID)
          ->Where('t.Notify', '1')
          ->Limit($Limit, $Offset)
+         ->OrderBy('a.ActivityID', 'desc')
+         ->Get();
+   }
+   
+   public function GetNotificationsSince($UserID, $DateSince, $Limit = '5') {
+      $this->ActivityQuery();
+      $this->FireEvent('BeforeGetNotificationsSince');
+      return $this->SQL
+         ->Where('RegardingUserID', $UserID)
+         ->Where('t.Notify', '1')
+         ->Where('a.DateInserted >', $DateSince)
+         ->Limit($Limit, 0)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();
    }

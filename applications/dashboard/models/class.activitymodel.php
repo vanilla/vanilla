@@ -29,7 +29,7 @@ class ActivityModel extends Gdn_Model {
          ->Select('ru.Gender', '', 'RegardingGender')
          ->From('Activity a')
          ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
-         ->Join('User au', 'a.ActivityUserID = au.UserID');
+         ->Join('User au', 'a.ActivityUserID = au.UserID')
          ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
    }
    

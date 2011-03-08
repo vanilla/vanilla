@@ -80,7 +80,7 @@ $Definition['Applicants'] = '申請者リスト';
 $Definition['Apply'] = '適用';
 $Definition['Apply for Membership'] = 'アカウントを作成する';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
-$Definition['at'] = 'アット';
+// $Definition['at'] = 'アット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 
 $Definition['Back to Discussions'] = 'スレッド一覧に戻る';
 $Definition['Bookmark'] = 'フォロー';
@@ -116,7 +116,7 @@ $Definition['discussion'] = 'スレッド';
 $Definition['Discussion Title'] = 'スレッド タイトル';
 $Definition['Discussions'] = 'スレッド一覧';
 $Definition['Don\'t have an account? %s'] = 'アカウントを お持ちですか？ %s';
-$Definition['dot'] = 'ドット';
+// $Definition['dot'] = 'ドット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 $Definition['Drag around and resize the square below to define your thumbnail icon.'] = 'オリジナル画像の使いたい範囲をマウスでドラッグして、下のサムネイル アイコンを編集してください。';
 
 $Definition['Edit'] = '編集';

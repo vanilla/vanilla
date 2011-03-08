@@ -47,7 +47,7 @@ $Definition['Approve'] = '承認';
 $Definition['Approval'] = '承認制';
 $Definition['Archive Discussions'] = '過去のスレッド';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
-$Definition['at'] = 'アット';
+// $Definition['at'] = 'アット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 $Definition['Authentication'] = '認証';
 
 $Definition['Banned'] = '利用禁止';
@@ -100,7 +100,7 @@ $Definition['Discussion & Comment Editing'] = 'スレッド & レスポンス編
 $Definition['discussion(s)'] = '件のスレッド';
 $Definition['Discussions'] = 'スレッド';
 $Definition['Discussions per Page'] = '1 ページに表示する最大スレッド数';
-$Definition['dot'] = 'ドット';
+// $Definition['dot'] = 'ドット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 
 $Definition['Edit'] = '編集';
 $Definition['edit'] = '編集';

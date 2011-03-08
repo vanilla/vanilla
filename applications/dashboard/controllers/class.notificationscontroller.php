@@ -24,53 +24,52 @@ class NotificationsController extends Gdn_Controller {
       parent::Initialize();
    }   
    
-	/**
-	 * Adds inform messages to response for inclusion in pages dynamically.
-	 */
+   /**
+    * Adds inform messages to response for inclusion in pages dynamically.
+    */
    public function Inform() {
-		$this->DeliveryType(DELIVERY_TYPE_BOOL);
-		$this->DeliveryMethod(DELIVERY_METHOD_JSON);
-		
-		// Retrieve all notifications and inform them.
-		NotificationsController::InformNotifications($this);
-		
+      $this->DeliveryType(DELIVERY_TYPE_BOOL);
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      
+      // Retrieve all notifications and inform them.
+      NotificationsController::InformNotifications($this);
+      
       $this->Render();
    }
-	
-	/**
-	 * Grabs all new notifications and adds them to the sender's inform queue.
-	 * Note: This method gets called by dashboard's hooks file to display new
-	 * notifications on every pageload.
-	 */
-	public static function InformNotifications($Sender) {
+   
+   /**
+    * Grabs all new notifications and adds them to the sender's inform queue.
+    * Note: This method gets called by dashboard's hooks file to display new
+    * notifications on every pageload.
+    */
+   public static function InformNotifications($Sender) {
       $Session = Gdn::Session();
-		if (!$Session->IsValid())
-			return;
-		
-		// Set the user's DateLastInform attribute to now. This value can be used
-		// by addons to determine if their inform messages have already been sent.
-		$DateLastInform = $Session->GetAttribute('Notifications.DateLastInform', Gdn_Format::ToDateTime());
-		Gdn::UserModel()->SaveAttribute($Session->UserID, 'Notifications.DateLastInform', Gdn_Format::ToDateTime());
-		
-		// Allow pluggability
-		$Sender->EventArguments['DateLastInform'] = &$DateLastInform;
-		$Sender->FireEvent('BeforeInformNotifications');
-		
-		// Retrieve new notifications
-      $ActivityModel = new ActivityModel();
+      if (!$Session->IsValid())
+         return;
+      
+      // Set the user's DateLastInform attribute to now. This value can be used
+      // by addons to determine if their inform messages have already been sent.
+      $DateLastInform = $Session->GetAttribute('Notifications.DateLastInform', Gdn_Format::ToDateTime());
+      Gdn::UserModel()->SaveAttribute($Session->UserID, 'Notifications.DateLastInform', Gdn_Format::ToDateTime());
+      
+      // Allow pluggability
+      $Sender->EventArguments['DateLastInform'] = &$DateLastInform;
+      $Sender->FireEvent('BeforeInformNotifications');
+      
+      // Retrieve new notifications
+      /*$ActivityModel = new ActivityModel();
       $NotificationData = $ActivityModel->GetNotificationsSince($Session->UserID, $DateLastInform);
-		
-		// Add notifications to the inform stack
-		foreach ($NotificationData->Result() as $Notification) {
-			$UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
-		   // Inform the user of new messages
+      
+      // Add notifications to the inform stack
+      foreach ($NotificationData->Result() as $Notification) {
+         $UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
+         // Inform the user of new messages
          $Sender->InformMessage(
-				$UserPhoto
-				.Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
-				.Wrap(Gdn_Format::Display($Notification->Story), 'div', array('class' => 'Excerpt')),
+            $UserPhoto
+            .Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
+            .Wrap(Gdn_Format::Display($Notification->Story), 'div', array('class' => 'Excerpt')),
             'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
          );
-		}
-	}
-   
+      }*/
+   }
 }

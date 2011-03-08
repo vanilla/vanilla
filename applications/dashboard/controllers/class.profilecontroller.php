@@ -707,12 +707,17 @@ class ProfileController extends Gdn_Controller {
 
       $this->Render();
    }
+	
+	protected $_UserInfoRetrieved = FALSE;
 
    /**
     * Retrieve the user to be manipulated. If no params are passed, this will
     * retrieve the current user from the session.
     */
    public function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
+		if ($this->_UserInfoRetrieved)
+			return;
+		
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
          Redirect('dashboard/home/permission');
       
@@ -750,6 +755,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddModule($UserPhotoModule);
       
       $this->AddSideMenu();
+		$this->_UserInfoRetrieved = TRUE;
       return TRUE;
    }
 

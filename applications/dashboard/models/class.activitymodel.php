@@ -190,13 +190,17 @@ class ActivityModel extends Gdn_Model {
             ->Where('t.Notify', '1')
          ->Limit($Limit, 0)
          ->OrderBy('a.ActivityID', 'desc')
-         ->Get()->Result(DATASET_TYPE_ARRAY);
+         ->Get();
       
-      $ActivityIDs = array_values($ActivityIDs);
+      if (!$ActivityIDs->NumRows())
+         $ActivityIDs = array();
+      else
+         $ActivityIDs = array_values($ActivityIDs->Result(DATASET_TYPE_ARRAY));
+      
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
       return $this->SQL
-         ->Where('a.ActivityID', $ActivityIDs)
+         ->WhereIn('a.ActivityID', $ActivityIDs)
          ->Get();
    }
    

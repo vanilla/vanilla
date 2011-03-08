@@ -559,9 +559,14 @@ class ProfileController extends Gdn_Controller {
     * @param mixed The tab name (or array of tab names) to add to the profile tab collection.
     * @param string URL the tab should point to.
     */
-   public function AddProfileTab($TabName, $TabUrl = '', $CssClass = '') {
-      if (!is_array($TabName))
-         $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass));
+   public function AddProfileTab($TabName, $TabUrl = '', $CssClass = '', $TabHtml = '') {
+      if (!is_array($TabName)) {
+			if ($TabHtml == '')
+				$TabHtml = $TabName;
+				
+         $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));
+      }
+
       foreach ($TabName as $Name => $TabInfo) {
 			$Url = GetValue('TabUrl', $TabInfo, '');
          if ($Url == '')
@@ -659,11 +664,12 @@ class ProfileController extends Gdn_Controller {
             
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
+				$NotificationsHtml = $Notifications;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
-               $Notifications .= '<span>'.$CountNotifications.'</span>';
+               $NotificationsHtml .= '<span>'.$CountNotifications.'</span>';
                
-            $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications');
+            $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
 
          $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');

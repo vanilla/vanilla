@@ -308,6 +308,8 @@ class Gdn_FileSystem {
             } elseif (!StringEndsWith($Name, '.'.$Extension)) {
              $Name .= '.'.$Extension;
             }
+         } else {
+            $Extension = $NameExtension;
          }
          $Name = rawurldecode($Name);
  

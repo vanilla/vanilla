@@ -21,15 +21,17 @@ $LocaleInfo['Japanese'] = array (
 if (!function_exists('FormatPossessive')) {
    function FormatPossessive($Word) {
       //return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
-      // "の" の部分にリンクが張られるのを防ぐため、先頭にアンカーの
-      // 終了タグを挿入しておきます。
-      // そのままだと終了タグが余るので、末尾に開始タグを追加しておきます。
-      // 結果的に、次のような感じの HTML が生成されます。
-      //
-      // あなた が <a href="...">田中</a> の<a></a> <a href="...">スレッド</a> にレスしました。
-      //                             ~~~~~~~~~~
-      // もっと良い方法があるかもしれませんが、とりあえず機能するようです。
-      return $Word."</a> の<a>";
+      // 日本語の所有格は単純に "の" を付けるだけでよく、英語のような変化が発生しないので、
+      // 引数 $Word をそのまま返し、翻訳定義の方で "の" を付けることにします。
+      // ここで "の" を付けないのは、"の" の部分にリンクが張られるのを防ぐためです。
+      // この関数を使用しているのは ActivityHeadline() 内の T('Activity...') のみです。
+      // "%2$s" と "%4$s" が所有格のプレースホルダになっています。
+      // 具体例については、
+      // /application/vanilla/locale/ja-JP/definitiion.php
+      // を参照してください。
+      // たとえば次のような定義が該当します。
+      // $Definition['Activity.ActivityComment.FullHeadline'] = '%1$s が%4$sの%8$sにレスしました。';
+      return $Word;
    }
 }
 

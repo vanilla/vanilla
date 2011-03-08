@@ -1064,22 +1064,8 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Json['Data'] = json_encode($this->_Json);
          exit($this->_Json['Data']);
       } else {
-         if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
-            $InformMessages = '<div class="InformMessages">';
-            foreach ($this->_InformMessages as $InformMessage) {
-               $CssClass = 'InformWrapper';
-               if (GetValue('CssClass', $InformMessage))
-                  $CssClass .= ' '.$InformMessage['CssClass'];
-                  
-               $Message = $InformMessage['Message'];
-               if (strpos($CssClass, 'Dismissable') !== false)
-                  $Message = '<a class="Close"><span>×</span></a>' . $Message;
-
-               $InformMessages .= Wrap(Wrap($Message, 'div', array('class' => 'InformMessage')), 'div', array('class' => $CssClass));
-            }
-            $InformMessages .= '</div>';
-            $this->AddAsset($AssetName, $InformMessages);
-         }
+         if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE)
+            $this->AddDefinition('InformMessageStack', base64_encode(json_encode($this->_InformMessages)));
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);

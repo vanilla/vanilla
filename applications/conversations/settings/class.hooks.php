@@ -67,7 +67,6 @@ class ConversationsHooks implements Gdn_IPlugin {
             $Inbox .= ' <span>'.$CountUnreadConversations.'</span>';
             
          $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', FALSE, array('Standard' => TRUE));
-         // $Sender->Menu->AddLink('Conversations', T('New Conversation'), '/messages/add', FALSE);
       }
    }
    

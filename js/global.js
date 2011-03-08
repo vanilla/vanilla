@@ -179,20 +179,44 @@ jQuery(document).ready(function($) {
       $(this).parents('div.InformWrapper').fadeOut('fast', function() {
          $(this).remove();
       });
-		return false;
-   });
-   
-   // If an autodismiss inform message appears on the screen, hide it after a few moments.
-   $('div.InformWrapper.AutoDismiss').livequery(function() {
-      setTimeout(function(){
-         $('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
-            $(this).remove();
-         });
-      }, 3000);
    });
 
+	gdn.setAutoDismiss = function() {
+		var timerId = $('div.InformMessages').attr('autodismisstimerid');
+		if (!timerId) {
+			timerId = setTimeout(function() {
+				$('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+					$(this).remove();
+				});
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}, 5000);
+			$('div.InformMessages').attr('autodismisstimerid', timerId);
+		}
+	}
+	
+	// Handle autodismissals
+	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
+		gdn.setAutoDismiss();
+	});
+   
+	// Prevent autodismiss if hovering any inform messages
+	$('div.InformWrapper').live('mouseover mouseout', function(e) {
+		if (e.type == 'mouseover') {
+			var timerId = $('div.InformMessages').attr('autodismisstimerid');
+			if (timerId) {
+				clearTimeout(timerId);
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}
+		} else {
+			gdn.setAutoDismiss();
+		}
+	});
+	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
+		if (!response.InformMessages)
+			return;
+		
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
 		if (informMessages.length == 0) {
@@ -204,10 +228,11 @@ jQuery(document).ready(function($) {
 		// Loop through the inform messages and add them to the container
 		for (var i = 0; i < response.InformMessages.length; i++) {
 			css = 'InformWrapper';
-			try {
-				css += ' '+response.InformMessages[i]['CssClass'];
-			} catch (e) {
-			}
+			if (response.InformMessages[i]['CssClass'])
+				css += ' ' + response.InformMessages[i]['CssClass'];
+			
+			dismissCallback = response.InformMessages[i]['DismissCallback'];
+			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
 			try {
 				var message = response.InformMessages[i]['Message'];
 				// If the message is dismissable, add a close button
@@ -217,17 +242,83 @@ jQuery(document).ready(function($) {
 				message = '<div class="InformMessage">'+message+'</div>';
 				var skip = false;
 				for (var j = 0; j < wrappers.length; j++) {
-					if ($(wrappers[j]).html() == message)
+					if ($(wrappers[j]).text() == $(message).text()) {
 						skip = true;
+					}
 				}
-				if (!skip)
+				if (!skip) {
 					informMessages.prepend('<div class="'+css+'">'+message+'</div>');
+					// Is there a callback or callback url to request on dismiss of the inform message?
+					if (dismissCallback) {
+						$('div.InformWrapper:first').find('a.Close').live('click', eval(dismissCallback));
+					} else if (dismissCallbackUrl) {
+						$('div.InformWrapper:first').find('a.Close').live('click', function () {
+							$.ajax({
+								type: "POST",
+								url: gdn.url(dismissCallbackUrl),
+								data: 'TransientKey='+gdn.definition('TransientKey'),
+								dataType: 'json',
+								error: function(XMLHttpRequest, textStatus, errorThrown) {
+									gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+								},
+								success: function(json) {
+									gdn.inform(json);
+								}
+							});
+						});
+					}
+				}
 			} catch (e) {
 			}
 		}
 		informMessages.show();
    }
+	
+	// Send an informMessage to the screen (same arguments as controller.InformMessage).
+	gdn.informMessage = function(message, options) {
+		if (!options)
+			options = new Array();
+			
+		if (typeof(options) == 'string') {
+			var css = options;
+			options = new Array();
+			options['CssClass'] = css;
+		}
+		options['Message'] = message;
+		if (!options['CssClass'])
+			options['CssClass'] = 'Dismissable AutoDismiss';
+		
+		gdn.inform({ 'InformMessages' : new Array(options) });
+	}
    
+	// Pick up the inform message stack and display it on page load
+	var informMessageStack = gdn.definition('InformMessageStack', false);
+	if (informMessageStack) {
+		informMessageStack = { 'InformMessages' : eval($.base64Decode(informMessageStack))};
+		gdn.inform(informMessageStack);
+	}
+	
+	// Ping for new notifications after 1 minute has passed
+	pingForNotifications = function() {
+		setTimeout(function() {
+			$.ajax({
+				type: "POST",
+				url: gdn.url('dashboard/notifications/inform'),
+				data: 'TransientKey='+gdn.definition('TransientKey'),
+				dataType: 'json',
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+				},
+				success: function(json) {
+					gdn.inform(json);
+					pingForNotifications();
+				}
+			});
+	
+		}, 60000); // Ping once a minute.
+	}
+	pingForNotifications();
+
    // Generate a random string of specified length
    gdn.generateString = function(length) {
       if (length == null)

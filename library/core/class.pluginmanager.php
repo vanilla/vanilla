@@ -176,7 +176,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $this->EnabledPlugins = array();
          $EnabledPlugins = C('EnabledPlugins', array());
          
-         foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
+         foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
+            // Plugins can be explicitly disabled
+            if ($PluginStatus === FALSE) continue;
+            
             // Check that the plugin is in AvailablePlugins...
             $Plugin = $this->GetPluginInfo($PluginName);
             if ($Plugin === FALSE) continue;
@@ -291,14 +294,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    }
    
    /**
-    * Register all enabled plugins
+    * Register all enabled plugins' event handlers and overrides
     *
     * Examines all declared classes, identifying which ones implement
     * Gdn_IPlugin and registers all of their event handlers and method
     * overrides. It recognizes them because Handlers end with _Handler,
     * _Before, and _After and overrides end with "_Override". They are prefixed
     * with the name of the class and method (or event) to be handled or
-    * overridden. For example:
+    * overridden. 
+    *
+    * For example:
+    *
     *  class MyPlugin implements Gdn_IPlugin {
     *   public function MyController_SignIn_After($Sender) {
     *      // Do something neato

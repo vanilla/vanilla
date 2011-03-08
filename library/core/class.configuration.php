@@ -516,15 +516,18 @@ class Gdn_Configuration {
          $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data);
 
       // echo 'saving '.$File;
-//      Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);
-
-      $TmpFile = tempnam(PATH_CONF, 'config');
-      $Result = FALSE;
-      if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
-         chmod($TmpFile, 0775);
-         $Result = rename($TmpFile, $File);
+      
+      // Infrastructure deployment. Use old method.
+      if (PATH_LOCAL_CONF != PATH_CONF) {
+         $Result = Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);
+      } else {
+         $TmpFile = tempnam(PATH_CONF, 'config');
+         $Result = FALSE;
+         if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+            chmod($TmpFile, 0775);
+            $Result = rename($TmpFile, $File);
+         }
       }
-
       // Clear out the save data array
       $this->_SaveData = array();
       $this->_File = '';

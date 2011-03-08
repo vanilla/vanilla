@@ -24,6 +24,7 @@ class ActivityModel extends Gdn_Model {
          ->Select('au.Name', '', 'ActivityName')
          ->Select('au.Gender', '', 'ActivityGender')
          ->Select('au.Photo', '', 'ActivityPhoto')
+         ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Name', '', 'RegardingName')
          ->Select('ru.Gender', '', 'RegardingGender')
          ->From('Activity a')
@@ -175,6 +176,31 @@ class ActivityModel extends Gdn_Model {
          ->Where('t.Notify', '1')
          ->Limit($Limit, $Offset)
          ->OrderBy('a.ActivityID', 'desc')
+         ->Get();
+   }
+   
+   public function GetNotificationsSince($UserID, $DateSince, $Limit = '5') {
+      
+      $ActivityIDs = $this->SQL
+         ->Select('a.ActivityID')
+         ->From('Activity a')
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
+            ->Where('a.RegardingUserID', $UserID)
+            ->Where('a.DateInserted >', $DateSince)
+            ->Where('t.Notify', '1')
+         ->Limit($Limit, 0)
+         ->OrderBy('a.ActivityID', 'desc')
+         ->Get();
+      
+      if (!$ActivityIDs->NumRows())
+         $ActivityIDs = array();
+      else
+         $ActivityIDs = $ActivityIDs->Result(DATASET_TYPE_ARRAY);
+      
+      $this->ActivityQuery();
+      $this->FireEvent('BeforeGetNotificationsSince');
+      return $this->SQL
+         ->WhereIn('a.ActivityID', $ActivityIDs)
          ->Get();
    }
    

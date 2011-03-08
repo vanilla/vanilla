@@ -192,6 +192,7 @@ class ActivityModel extends Gdn_Model {
          ->OrderBy('a.ActivityID', 'desc')
          ->Get()->Result(DATASET_TYPE_ARRAY);
       
+      $ActivityIDs = array_values($ActivityIDs);
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
       return $this->SQL

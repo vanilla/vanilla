@@ -199,11 +199,9 @@ class ActivityModel extends Gdn_Model {
       
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
-      $Data = $this->SQL
+      return $this->SQL
          ->WhereIn('a.ActivityID', $ActivityIDs)
          ->Get();
-      
-      return $Data;
    }
    
    public function GetCountNotifications($UserID) {

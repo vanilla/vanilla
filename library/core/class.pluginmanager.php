@@ -176,7 +176,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $this->EnabledPlugins = array();
          $EnabledPlugins = C('EnabledPlugins', array());
          
-         foreach ($EnabledPlugins as $PluginName => $PluginFolder) {
+         foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
+            // Plugins can be explicitly disabled
+            if ($PluginStatus === FALSE) continue;
+            
             // Check that the plugin is in AvailablePlugins...
             $Plugin = $this->GetPluginInfo($PluginName);
             if ($Plugin === FALSE) continue;

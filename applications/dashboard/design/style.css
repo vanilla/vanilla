@@ -2786,14 +2786,14 @@ div.InformMessages div.InformMessage:hover {
 	background: rgba(0, 0, 0, 0.8) !important;
 }
 div.InformMessages div.InformMessage a {
-	color: #fff;
+	color: #aff;
+}
+div.InformMessages div.InformMessage a:hover {
+	color: #cff;
 	text-decoration: underline;
 }
 div.InformMessages div.InformMessage strong {
 	font-weight: bold;
-}
-div.InformMessages div.InformMessage a:hover {
-	text-decoration: none;
 }
 div.InformMessages div.InformMessage a.Close {
 	border: none;

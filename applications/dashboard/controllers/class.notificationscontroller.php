@@ -63,11 +63,18 @@ class NotificationsController extends Gdn_Controller {
       // Add notifications to the inform stack
       foreach ($NotificationData->Result() as $Notification) {
          $UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
+			
+			$ActivityType = explode(' ', $Notification->ActivityType);
+			$ActivityType = $ActivityType[0];
+			$Excerpt = $Notification->Story;
+			if (in_array($ActivityType, array('WallComment', 'AboutUpdate')))
+				$Excerpt = Gdn_Format::Display($Excerpt);
+				
          // Inform the user of new messages
          $Sender->InformMessage(
             $UserPhoto
             .Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
-            .Wrap(Gdn_Format::Display($Notification->Story), 'div', array('class' => 'Excerpt')),
+            .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
             'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
          );
 			// Assign the most recent activity id

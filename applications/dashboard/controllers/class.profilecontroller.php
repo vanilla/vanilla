@@ -199,7 +199,11 @@ class ProfileController extends Gdn_Controller {
    }
 
    public function Index($User = '', $Username = '', $UserID = '') {
-      return $this->Activity($User, $Username, $UserID);
+      $this->GetUserInfo($User, $Username, $UserID);
+		if ($this->User->UserID == Gdn::Session()->UserID)
+			return $this->Notifications();
+		else
+			return $this->Activity($User, $Username, $UserID);
    }
    
    public function Invitations() {
@@ -653,7 +657,6 @@ class ProfileController extends Gdn_Controller {
          if ($this->User->UserID != $Session->UserID)
             $ActivityUrl .= $this->User->UserID.'/'.Gdn_Format::Url($this->User->Name);
             
-         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
             $CountNotifications = $Session->User->CountNotifications;
@@ -662,6 +665,8 @@ class ProfileController extends Gdn_Controller {
                
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications');
          }
+
+         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
             
          $this->FireEvent('AddProfileTabs');
       }

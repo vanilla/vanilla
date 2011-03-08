@@ -77,10 +77,11 @@ class ActivityModel extends Gdn_Model {
       $this->SQL->Where('a.CommentActivityID is null');
       if ($UserID != '') {
          $this->SQL
-            ->BeginWhereGroup()
-            ->Where('a.ActivityUserID', $UserID)
-            ->OrWhere('a.RegardingUserID', $UserID)
-            ->EndWhereGroup();
+            //->BeginWhereGroup()
+            ->Where('a.ActivityUserID', $UserID);
+            // ->OrWhere('a.RegardingUserID', $UserID)
+            //->EndWhereGroup();
+            // mosullivan 2011-03-08: "Or" killing query speed
       }
       
       $Session = Gdn::Session();
@@ -179,28 +180,15 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
-   public function GetNotificationsSince($UserID, $DateSince, $Limit = '5') {
-      
-      $ActivityIDs = $this->SQL
-         ->Select('a.ActivityID')
-         ->From('Activity a')
-         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
-            ->Where('a.RegardingUserID', $UserID)
-            ->Where('a.DateInserted >', $DateSince)
-            ->Where('t.Notify', '1')
-         ->Limit($Limit, 0)
-         ->OrderBy('a.ActivityID', 'desc')
-         ->Get();
-      
-      if (!$ActivityIDs->NumRows())
-         $ActivityIDs = array();
-      else
-         $ActivityIDs = $ActivityIDs->Result(DATASET_TYPE_ARRAY);
-      
+   public function GetNotificationsSince($UserID, $LastActivityID, $Limit = '5') {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
       return $this->SQL
-         ->WhereIn('a.ActivityID', $ActivityIDs)
+         ->Where('RegardingUserID', $UserID)
+         ->Where('a.ActivityID >', $LastActivityID)
+         ->Where('t.Notify', '1')
+         ->Limit($Limit, 0)
+         ->OrderBy('a.ActivityID', 'desc')
          ->Get();
    }
    

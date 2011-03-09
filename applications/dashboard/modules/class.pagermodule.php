@@ -29,6 +29,8 @@ class PagerModule extends Gdn_Module {
     */
    public $CssClass;
 
+   public static $DefaultPageSize = 30;
+
    /**
     * Translation code to be used for "Next Page" link.
     */
@@ -98,7 +100,7 @@ class PagerModule extends Gdn_Module {
       $this->ClientID = 'Pager';
       $this->CssClass = 'NumberedPager';
       $this->Offset = 0;
-      $this->Limit = 30;
+      $this->Limit = self::$DefaultPageSize;
       $this->TotalRecords = 0;
       $this->Wrapper = '<div %1$s>%2$s</div>';
       $this->PagerEmpty = '';
@@ -309,7 +311,7 @@ class PagerModule extends Gdn_Module {
       $Pager->ClientID = GetValue('ClientID', $Options, $Pager->ClientID);
 
       $Pager->Limit = GetValue('Limit', $Options, $Pager->Limit);
-      $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, $Pager->HtmlBefore);
+      $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, GetValue('HtmlBefore', $Pager, ''));
 
       // Try and figure out the offset based on the parameters coming in to the controller.
       if (!$Pager->Offset) {

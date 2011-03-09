@@ -80,7 +80,7 @@ class UserModel extends Gdn_Model {
     * A convenience method to be called when inserting users (because users
     * are inserted in various methods depending on registration setups).
     */
-   protected function _Insert($Fields, $Options) {
+   protected function _Insert($Fields, $Options = array()) {
       // Massage the roles for email confirmation.
       if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
          TouchValue('Attributes', $Fields, array());
@@ -560,7 +560,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->Put($this->Name, $Fields);
          } else {
             // Insert the new user
-            $UserID = $this->_Insert($Fields);
+            $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
             AddActivity(
                $UserID,
                'Join',

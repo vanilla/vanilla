@@ -40,5 +40,5 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
    </tbody>
 </table>
 <?php
-PagerModule::Write(array('Sender' => $this, 'Limit' => 30));
+PagerModule::Write(array('Sender' => $this));
 echo $this->Form->Close();

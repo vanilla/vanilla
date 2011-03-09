@@ -30,8 +30,8 @@ class UserController extends DashboardController {
 
       $this->Form->Method = 'get';
 
-      // Input Validation
-      $Offset = is_numeric($Offset) ? $Offset : 0;
+      // Input Validation.
+      list($Offset, $Limit) = OffsetLimit($Page, PagerModule::$DefaultPageSize);
       if (!$Keywords) {
          $Keywords = $this->Form->GetFormValue('Keywords');
          if ($Keywords)
@@ -54,20 +54,6 @@ class UserController extends DashboardController {
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
       $this->UserData = $UserModel->Search($Filter, 'u.Name', 'asc', $Limit, $Offset);
-
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'More';
-      $this->Pager->LessCode = 'Previous';
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Wrapper = '<tr %1$s><td colspan="5">%2$s</td></tr>';
-      $this->Pager->Configure(
-         $Offset,
-         $Limit,
-         $TotalRecords,
-         'user/browse/%1$s/'.urlencode($Keywords)
-      );
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

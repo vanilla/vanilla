@@ -336,7 +336,7 @@ $Definition['ValidateRequiredArray'] = '少なくとも一つ以上の%sを選�
 $Definition['ValidateTime'] = '%s は不正な時刻です。';
 $Definition['ValidateTimestamp'] = '%s は不正なタイムスタンプです。';
 $Definition['ValidateUsername'] = 'ユーザー名には 3～20 文字の英数字とアンダースコアのみ使用できます。';
-$Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
+$Definition['ValidateVersion'] = '%s フィールドは有効なバージョン番号ではありません。 phpのversion_compare()関数の例を見てください。';
 $Definition['Visits'] = 'ログイン回数';
 
 $Definition['wall'] = 'ウォール';
@@ -348,7 +348,7 @@ $Definition['Write something about yourself...'] = 'あなた自身について�
 $Definition['you'] = 'あなた';
 $Definition['You'] = 'あなた';
 $Definition['You already have an account here.'] = 'アカウント作成済みです。';
-$Definition['You are connected as %s through %s.'] = 'You are connected as %s through %s.';
+$Definition['You are connected as %s through %s.'] = '%sから%sに接続しました。';
 $Definition['You do not have any conversations.'] = '会話はありません。';
 $Definition['You do not have any notifications yet.'] = 'お知らせはありません。';
 $Definition['your'] = 'あなたの';

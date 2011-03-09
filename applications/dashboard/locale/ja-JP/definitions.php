@@ -274,14 +274,14 @@ $Definition['The file failed to upload.'] = 'ファイルのアップロード�
 $Definition['ThemeHelp'] = 'テーマはあなたのサイトの外観を変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
 $Definition['Themes'] = 'テーマ';
 $Definition['There are currently no applicants.'] = '申請者はいません。';
-$Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.';
-$Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.';
+$Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'このプラグインで、ユーザはOpenIDと共にサインインできます。<b>このプラグインがOpenID署名集めを可能にするのを可能にした後に、設定を必ずクリックしてください</b>。';
+$Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'このプラグインで、ユーザは彼らのGoogleアカウントでサインインできます。<b>このプラグインがGoogle署名集めを可能にするのを可能にした後に、設定を必ずクリックしてください</b>。';
 $Definition['This plugin helps locale package development.'] = 'このプラグインは、ロケール パッケージの開発を助けます。The plugin keeps a working locale pack at <code>%s</code>.';
 $Definition['Tools'] = 'ツール';
 $Definition['Transport error: %s'] = 'リクエストを処理中に致命的なエラーが発生しました。<br />サーバーは次のように応答しています: %s';
-$Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>';
-$Definition['Twitter Settings'] = 'Twitter Settings';
-$Definition['Type'] = 'Type';
+$Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connectは、彼らのTwitterアカウントを使用することでサインインするためにユーザを許容します。 <b>あなたは、このプラグインが動作するようにTwitterにアプリケーションを登録しなければなりません。</b>';
+$Definition['Twitter Settings'] = 'Twitter 設定';
+$Definition['Type'] = 'タイプ';
 
 $Definition['Unlimited'] = '無制限';
 $Definition['Upload'] = 'アップロード';
@@ -306,10 +306,7 @@ $Definition['What\'s the Buzz?'] = '最近どう？';
 $Definition['Within'] = '制限時間';
 
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メール アドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
-$Definition['You can place files in your /uploads folder.'] = 'If your file is too
-		large to upload directly to this page you can place it in your /uploads
-		folder. Make sure the filename begins with the word <b>export</b> and ends
-		with one of <b>.txt, .gz</b>.';
+$Definition['You can place files in your /uploads folder.'] = 'あなたのファイルが直接あなたが置くことができるこのページにアップロードできないくらい大きいなら、それはあなたの/アップロードフォルダにアップロードできます。 ファイル名が<b>export</b>という単語で始まって、<b>.txt, .gz</b>で終わるのを確実にしてください。';
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = '%1$s プラグインを無効にできません。%2$s プラグインが動作するために、必要です。';
 //$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'; // 内容的に上と重複しているのでコメントアウト
 $Definition['Your changes have been saved.'] = '変更を保存しました。';

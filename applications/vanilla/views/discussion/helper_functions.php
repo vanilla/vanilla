@@ -4,6 +4,8 @@
  * $Object is either a Comment or the original Discussion.
  */
 function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
+   static $Alt = FALSE;
+
    $Author = UserBuilder($Object, 'Insert');
    $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
 	$Sender->EventArguments['Object'] = $Object;
@@ -27,6 +29,11 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
+
+   if ($Alt)
+      $CssClass .= ' Alt';
+   $Alt != $Alt;
+
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">

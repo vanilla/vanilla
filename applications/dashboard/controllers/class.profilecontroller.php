@@ -190,7 +190,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->StatusMessage = T('Your changes have been saved successfully.');
+            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved successfully.'), 'Dismissable AutoDismiss HasSprite');
             $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
          }
       }
@@ -199,7 +199,11 @@ class ProfileController extends Gdn_Controller {
    }
 
    public function Index($User = '', $Username = '', $UserID = '') {
-      return $this->Activity($User, $Username, $UserID);
+      $this->GetUserInfo($User, $Username, $UserID);
+		if ($this->User->UserID == Gdn::Session()->UserID)
+			return $this->Notifications();
+		else
+			return $this->Activity($User, $Username, $UserID);
    }
    
    public function Invitations() {
@@ -210,7 +214,7 @@ class ProfileController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack()) {
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
-            $this->StatusMessage = T('Your invitation has been sent.');
+            $this->InformMessage(T('Your invitation has been sent.'));
             $this->Form->ClearInputs();
          }
       }
@@ -281,7 +285,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          if ($this->Form->Save()) {
-            $this->StatusMessage = T('Your password has been changed.');
+				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
             $this->Form->ClearInputs();
          }
       }
@@ -315,7 +319,7 @@ class ProfileController extends Gdn_Controller {
             $TmpImage = $UploadImage->ValidateUpload('Picture');
             
             // Generate the target image name.
-            $TargetImage = $UploadImage->GenerateTargetName(PATH_ROOT . DS . 'uploads');
+            $TargetImage = $UploadImage->GenerateTargetName(PATH_LOCAL_UPLOADS);
             $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
             // Delete any previously uploaded images.
@@ -407,7 +411,7 @@ class ProfileController extends Gdn_Controller {
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         $this->StatusMessage = T('Your preferences have been saved.');
+			$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
       $this->Render();
    }
@@ -428,7 +432,7 @@ class ProfileController extends Gdn_Controller {
          )
       ) {
          Gdn::UserModel()->RemovePicture($this->User->UserID);
-         $this->StatusMessage = T('Your picture has been removed.');
+         $this->InformMessage(T('Your picture has been removed.'));
          $RedirectUrl = 'dashboard/profile/'.$this->ProfileUrl();
       }
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
@@ -453,7 +457,7 @@ class ProfileController extends Gdn_Controller {
             $this->Form->AddError(strip_tags($ex->getMessage()));
          }
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = T('The invitation was sent successfully.');
+            $this->InformMessage(T('The invitation was sent successfully.'));
 
       }
       
@@ -539,7 +543,7 @@ class ProfileController extends Gdn_Controller {
          }
             
          if ($this->Form->ErrorCount() == 0)
-            $this->StatusMessage = T('The invitation was removed successfully.');
+            $this->InformMessage(T('The invitation was removed successfully.'));
 
       }
       
@@ -555,9 +559,14 @@ class ProfileController extends Gdn_Controller {
     * @param mixed The tab name (or array of tab names) to add to the profile tab collection.
     * @param string URL the tab should point to.
     */
-   public function AddProfileTab($TabName, $TabUrl = '', $CssClass = '') {
-      if (!is_array($TabName))
-         $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass));
+   public function AddProfileTab($TabName, $TabUrl = '', $CssClass = '', $TabHtml = '') {
+      if (!is_array($TabName)) {
+			if ($TabHtml == '')
+				$TabHtml = $TabName;
+				
+         $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));
+      }
+
       foreach ($TabName as $Name => $TabInfo) {
 			$Url = GetValue('TabUrl', $TabInfo, '');
          if ($Url == '')
@@ -653,15 +662,17 @@ class ProfileController extends Gdn_Controller {
          if ($this->User->UserID != $Session->UserID)
             $ActivityUrl .= $this->User->UserID.'/'.Gdn_Format::Url($this->User->Name);
             
-         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
+				$NotificationsHtml = $Notifications;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
-               $Notifications .= '<span>'.$CountNotifications.'</span>';
+               $NotificationsHtml .= '<span>'.$CountNotifications.'</span>';
                
-            $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications');
+            $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
+
+         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
             
          $this->FireEvent('AddProfileTabs');
       }
@@ -696,12 +707,17 @@ class ProfileController extends Gdn_Controller {
 
       $this->Render();
    }
+	
+	protected $_UserInfoRetrieved = FALSE;
 
    /**
     * Retrieve the user to be manipulated. If no params are passed, this will
     * retrieve the current user from the session.
     */
    public function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
+		if ($this->_UserInfoRetrieved)
+			return;
+		
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
          Redirect('dashboard/home/permission');
       
@@ -739,6 +755,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddModule($UserPhotoModule);
       
       $this->AddSideMenu();
+		$this->_UserInfoRetrieved = TRUE;
       return TRUE;
    }
 

@@ -17,9 +17,13 @@ foreach ($this->MessageData->Result() as $Message) {
    if ($Message->InsertPhoto != '')
       $Class .= ' HasPhoto';
       
-   $Class = trim($Class);
    $Format = empty($Message->Format) ? 'Display' : $Message->Format;
    $Author = UserBuilder($Message, 'Insert');
+
+   $this->EventArguments['Message'] = &$Message;
+   $this->EventArguments['Class'] = &$Class;
+   $this->FireEvent('BeforeConversationMessageItem');
+   $Class = trim($Class);
 ?>
 <li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
    <div class="ConversationMessage">
@@ -33,7 +37,12 @@ foreach ($this->MessageData->Result() as $Message) {
          <span class="DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
          <span class="ItemLink"><a name="Item_<?php echo $CurrentOffset;?>" class="Item"></a></span>
       </div>
-      <div class="Message"><?php echo Gdn_Format::To($Message->Body, $Format); ?></div>
+      <div class="Message">
+         <?php
+         $this->FireEvent('BeforeConversationMessageBody');
+         echo Gdn_Format::To($Message->Body, $Format);
+         ?>
+      </div>
    </div>
 </li>
 <?php }

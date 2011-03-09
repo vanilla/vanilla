@@ -55,6 +55,11 @@ class DashboardHooks implements Gdn_IPlugin {
          $Gdn_Statistics = Gdn::Factory('Statistics');
          $Gdn_Statistics->Check($Sender);
       }
+		
+		// Add notifications to the inform stack on page load if not retrieving them via ajax at dashboard/notifications/inform
+		// mosullivan 2011-03-08 - Ajaxing these instead of on pageload (fewer queries per page)
+		// if (!($Sender->ControllerName == 'notificationscontroller' && $Sender->RequestMethod == 'inform'))
+		//	NotificationsController::InformNotifications($Sender);
    }
    
    public function SettingsController_AnalyticsRegister_Create(&$Sender) {

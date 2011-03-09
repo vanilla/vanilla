@@ -27,7 +27,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Database
  */
-require_once(dirname(__FILE__).DS.'class.sqldriver.php');
 
 class Gdn_MySQLDriver extends Gdn_SQLDriver {
 

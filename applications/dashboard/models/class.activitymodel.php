@@ -24,6 +24,7 @@ class ActivityModel extends Gdn_Model {
          ->Select('au.Name', '', 'ActivityName')
          ->Select('au.Gender', '', 'ActivityGender')
          ->Select('au.Photo', '', 'ActivityPhoto')
+         ->Select('au.Email', '', 'ActivityEmail')
          ->Select('ru.Name', '', 'RegardingName')
          ->Select('ru.Gender', '', 'RegardingGender')
          ->From('Activity a')
@@ -76,10 +77,11 @@ class ActivityModel extends Gdn_Model {
       $this->SQL->Where('a.CommentActivityID is null');
       if ($UserID != '') {
          $this->SQL
-            ->BeginWhereGroup()
-            ->Where('a.ActivityUserID', $UserID)
-            ->OrWhere('a.RegardingUserID', $UserID)
-            ->EndWhereGroup();
+            //->BeginWhereGroup()
+            ->Where('a.ActivityUserID', $UserID);
+            // ->OrWhere('a.RegardingUserID', $UserID)
+            //->EndWhereGroup();
+            // mosullivan 2011-03-08: "Or" killing query speed
       }
       
       $Session = Gdn::Session();
@@ -174,6 +176,18 @@ class ActivityModel extends Gdn_Model {
          ->Where('RegardingUserID', $UserID)
          ->Where('t.Notify', '1')
          ->Limit($Limit, $Offset)
+         ->OrderBy('a.ActivityID', 'desc')
+         ->Get();
+   }
+   
+   public function GetNotificationsSince($UserID, $LastActivityID, $Limit = '5') {
+      $this->ActivityQuery();
+      $this->FireEvent('BeforeGetNotificationsSince');
+      return $this->SQL
+         ->Where('RegardingUserID', $UserID)
+         ->Where('a.ActivityID >', $LastActivityID)
+         ->Where('t.Notify', '1')
+         ->Limit($Limit, 0)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();
    }

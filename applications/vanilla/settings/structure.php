@@ -374,3 +374,15 @@ $Construct->Table('TagDiscussion')
 $Construct->Table('Tag')
    ->Column('CountDiscussions', 'int', 0)
    ->Set();
+
+$Categories = Gdn::SQL()->Where("coalesce(UrlCode, '') =", "''", FALSE, FALSE)->Get('Category')->ResultArray();
+foreach ($Categories as $Category) {
+   $UrlCode = Gdn_Format::Url($Category['Name']);
+   if (strlen($UrlCode) > 50)
+      $UrlCode = $Category['CategoryID'];
+
+   Gdn::SQL()->Put(
+      'Category',
+      array('UrlCode' => $UrlCode),
+      array('CategoryID' => $Category['CategoryID']));
+}

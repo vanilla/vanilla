@@ -1,6 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0.17.9a');
+define('APPLICATION_VERSION', '2.0.18a');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -10,8 +10,10 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+define('DEBUG', FALSE);
+
 // Report and track all errors.
-if(defined('DEBUG'))
+if (defined('DEBUG'))
    error_reporting(E_ALL);
 else
    error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -24,16 +26,16 @@ ob_start();
 define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
 
-// 2. Include the header.
-require_once(PATH_ROOT.DS.'bootstrap.php');
+// 2. Include the bootstrap to configure the framework.
+require_once(PATH_ROOT.'/bootstrap.php');
 
+// 3. Create and configure the dispatcher.
 $Dispatcher = Gdn::Dispatcher();
 
-$EnabledApplications = Gdn::Config('EnabledApplications');
+$EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
-
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
-// Process the request.
+// 4. Process the request.
 $Dispatcher->Dispatch();
 $Dispatcher->Cleanup();

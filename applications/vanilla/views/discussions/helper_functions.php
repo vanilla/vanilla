@@ -83,7 +83,9 @@ function WriteFilterTabs(&$Sender) {
       $CountDiscussions = $Session->User->CountDiscussions;
       $CountDrafts = $Session->User->CountDrafts;
    }
-   if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
+   if ($CountBookmarks === NULL) {
+      $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
+   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0)
       $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
    if (is_numeric($CountDiscussions) && $CountDiscussions > 0)

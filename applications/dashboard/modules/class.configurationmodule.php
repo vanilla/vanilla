@@ -86,7 +86,7 @@ class ConfigurationModule extends Gdn_Module {
 
          // Save it to the config.
          SaveToConfig($Data, array('RemoveEmpty' => TRUE));
-         $this->_Sender->StatusMessage = T('Saved');
+         $this->_Sender->InformMessage(T('Saved'));
       } else {
          // Load the form data from the config.
          $Data = array();

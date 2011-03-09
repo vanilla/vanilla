@@ -43,10 +43,11 @@ jQuery(document).ready(function($) {
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
-               if (json.StatusMessage) {
-                  $(frm).prepend(json.StatusMessage);
-                  json.StatusMessage = null;
+               if (json.ErrorMessages) {
+                  $(frm).prepend(json.ErrorMessages);
+                  json.ErrorMessages = null;
                }
+               
                if (json.FormSaved) {
                   // Clean up the form
                   clearMessageForm();                

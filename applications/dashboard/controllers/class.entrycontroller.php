@@ -704,7 +704,7 @@ class EntryController extends Gdn_Controller {
                // Account not created.
                if ($SyncScreen == 'smart') {
                
-                  $this->StatusMessage = T('There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.');
+                  $this->InformMessage(T('There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'));
                   $this->SyncScreen($Authenticator, $UserInfo, $Payload);
                   
                } else {
@@ -982,6 +982,7 @@ class EntryController extends Gdn_Controller {
                $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
                $Authenticator->FetchData($this->Form);
                $AuthUserID = $Authenticator->Authenticate();
+               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                try {
                   $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
@@ -1039,6 +1040,7 @@ class EntryController extends Gdn_Controller {
                $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
                $Authenticator->FetchData($this->Form);
                $AuthUserID = $Authenticator->Authenticate();
+               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                try {
                   $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
@@ -1104,6 +1106,7 @@ class EntryController extends Gdn_Controller {
                $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
                $Authenticator->FetchData($this->Form);
                $AuthUserID = $Authenticator->Authenticate();
+               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                $this->FireEvent('RegistrationSuccessful');
 
@@ -1138,7 +1141,7 @@ class EntryController extends Gdn_Controller {
          if ($this->Form->ValidateModel() == 0) {
             try {
                if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
-                  $this->Form->AddError("Couldn't find an account associated with that email address.");
+                  $this->Form->AddError("Couldn't find an account associated with that email/username.");
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
@@ -1169,6 +1172,14 @@ class EntryController extends Gdn_Controller {
           || $PasswordResetKey == ''
           || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
          ) $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+
+      if ($this->Form->ErrorCount() == 0) {
+         $User = $this->UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
+         if ($User) {
+            $User = ArrayTranslate($User, array('UserID', 'Name', 'Email'));
+            $this->SetData('User', $User);
+         }
+      }
       
       if ($this->Form->ErrorCount() == 0
          && $this->Form->IsPostBack() === TRUE

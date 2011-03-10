@@ -1764,6 +1764,9 @@ ol.Sortable {
 .UsernameCell {
    width: 8em;
 }
+.CenterCell {
+   text-align: center;
+}
 ins {
    background: #DDFFDD;
 }

@@ -49,7 +49,7 @@ $Definition['ValidateConnection'] = 'The connection parameters you specified fai
 //$Definition['ValidateMinimumAge'] = 'You are too young to proceed.';
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
-
+$Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';

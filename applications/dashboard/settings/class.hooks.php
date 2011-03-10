@@ -12,7 +12,11 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }
-   
+
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    */
    public function Base_Render_Before(&$Sender) {
       $Session = Gdn::Session();
 
@@ -60,6 +64,19 @@ class DashboardHooks implements Gdn_IPlugin {
 		// mosullivan 2011-03-08 - Ajaxing these instead of on pageload (fewer queries per page)
 		// if (!($Sender->ControllerName == 'notificationscontroller' && $Sender->RequestMethod == 'inform'))
 		//	NotificationsController::InformNotifications($Sender);
+   }
+
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    */
+   public function NotificationsController_Render_Before($Sender) {
+      $EmailKey = GetValueR('User.Attributes.EmailKey', Gdn::Session());
+
+      if ($EmailKey) {
+         $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+         $Sender->InformMessage($Message, '');
+      }
    }
    
    public function SettingsController_AnalyticsRegister_Create(&$Sender) {

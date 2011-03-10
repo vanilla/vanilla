@@ -72,7 +72,7 @@ class BanModel extends Gdn_Model {
    }
    
    public function BanWhere($Ban) {
-      $Result = array('u.Admin' => 0);
+      $Result = array('u.Admin' => 0, 'u.Deleted' => 0);
       $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);
 
       switch(strtolower($Ban['BanType'])) {
@@ -96,6 +96,40 @@ class BanModel extends Gdn_Model {
          ->Join('User iu', 'Ban.InsertUserID = iu.UserID', 'left');
 
       parent::_BeforeGet();
+   }
+
+   /**
+    * @param Gdn_Validation $Validation
+    */
+   public static function CheckUser($User, $Validation = NULL, $UpdateBlocks = FALSE) {
+      $Bans = self::AllBans();
+      $Fields = array('Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress');
+      $Banned = array();
+
+      foreach ($Bans as $Ban) {
+         // Convert ban to regex.
+         $Parts = explode('*', $Ban['BanValue']);
+         $Parts = array_map('preg_quote', $Parts);
+         $Regex = '`'.implode('.*', $Parts).'`i';
+
+         if (preg_match($Regex, GetValue($Fields[$Ban['BanType']], $User))) {
+            $Banned[$Ban['BanType']] = TRUE;
+
+            if ($UpdateBlocks) {
+               Gdn::SQL()
+                  ->Update('Ban')
+                  ->Set('CountBlockedRegistrations', 'CountBlockedRegistrations + 1', FALSE, FALSE)
+                  ->Where('BanID', $Ban['BanID'])
+                  ->Put();
+            }
+         }
+      }
+
+      // Add the validation results.
+      foreach ($Banned as $BanType => $Value) {
+         $Validation->AddValidationResult($BanType, 'ValidateBanned');
+      }
+      return count($Banned) == 0;
    }
 
    public function  Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {

@@ -390,9 +390,15 @@ class UserModel extends Gdn_Model {
    }
 
    public function Register($FormPostValues, $Options = array()) {
+      $Valid = TRUE;
+      $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
+
+      // Check for banning first.
+      $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
+
       // Throw an event to allow plugins to block the registration.
       $this->EventArguments['User'] = $FormPostValues;
-      $Valid = TRUE;
+      
       $this->EventArguments['Valid'] =& $Valid;
       $this->FireEvent('BeforeRegister');
 
@@ -1107,7 +1113,7 @@ class UserModel extends Gdn_Model {
          throw new Exception('The email or id is required');
 
 		try {
-			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted')
+			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted, Banned')
 				->From('User');
 	
 			if ($ID) {

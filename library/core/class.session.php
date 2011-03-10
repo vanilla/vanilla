@@ -103,8 +103,12 @@ class Gdn_Session {
 	 * * @return boolean
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
-      if (is_object($this->User) && $this->User->Admin == '1')
-         return TRUE;
+      if (is_object($this->User)) {
+         if ($this->User->Admin == '1')
+            return TRUE;
+         elseif ($this->User->Banned)
+            return FALSE;
+      }
       
       $Permissions = $this->GetPermissions();      
       if($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
@@ -261,7 +265,6 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-         
             if ($UserID && $SetIdentity)
                Gdn::Authenticator()->SetIdentity($UserID);
          

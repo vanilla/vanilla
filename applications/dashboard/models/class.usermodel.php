@@ -106,12 +106,25 @@ class UserModel extends Gdn_Model {
          $Fields['Attributes'] = serialize($Fields['Attributes']);
       }
 
+      // Make sure to encrypt the password for saving...
+      if (array_key_exists('Password', $Fields)) {
+         $PasswordHash = new Gdn_PasswordHash();
+         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+         $Fields['HashMethod'] = 'Vanilla';
+      }
+
       $Roles = GetValue('Roles', $Fields);
       unset($Fields['Roles']);
       
       $UserID = $this->SQL->Insert($this->Name, $Fields);
       if ($Roles) {
          $this->SaveRoles($UserID, $Roles, FALSE);
+      }
+
+      // Approval registration requires an email confirmation.
+      if ($UserID && isset($ConfirmationCode) && strtolower(C('Garden.Registration.Method')) == 'approval') {
+         // Send the confirmation email.
+         $this->SendEmailConfirmationEmail($UserID);
       }
 
       // Fire an event for user inserts
@@ -598,7 +611,11 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields['UserID'] = 1;
-         $Fields['Password'] = array('md5' => $Fields['Password']);
+
+         // Make sure to encrypt the password for saving.
+         $PasswordHash = new Gdn_PasswordHash();
+         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+         $Fields['HashMethod'] = 'Vanilla';
          
          if ($this->Get($UserID) !== FALSE) {
             $this->SQL->Put($this->Name, $Fields);
@@ -876,7 +893,6 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          // Make sure the username & email aren't already being used
          if (!$this->ValidateUniqueFields($Username, $Email))
@@ -886,7 +902,12 @@ class UserModel extends Gdn_Model {
          if ($InviteUserID > 0)
             $Fields['InviteUserID'] = $InviteUserID;
 
-         // And insert the new user
+
+         // And insert the new user.
+         if (!isset($Options['NoConfirmEmail']))
+            $Options['NoConfirmEmail'] = TRUE;
+
+         $Fields['Roles'] = $RoleIDs;
          $UserID = $this->_Insert($Fields, $Options);
 
          // Associate the new user id with the invitation (so it cannot be used again)
@@ -903,9 +924,6 @@ class UserModel extends Gdn_Model {
             T('Welcome Aboard!'),
             $InviteUserID
          );
-
-         // Save the user's roles.
-         $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;
       }
@@ -933,20 +951,19 @@ class UserModel extends Gdn_Model {
 
       $this->AddInsertFields($FormPostValues);
 
-      if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+      if ($this->Validate($FormPostValues, TRUE)) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-         $Fields['Roles'] = (array)$RoleIDs;
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          if (!$this->ValidateUniqueFields($Username, $Email))
             return FALSE;
 
          // Define the other required fields:
          $Fields['Email'] = $Email;
+         $Fields['Roles'] = (array)$RoleIDs;
 
          // And insert the new user
          $UserID = $this->_Insert($Fields, $Options);
@@ -986,7 +1003,6 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          // If in Captcha registration mode, check the captcha value
          if ($CheckCaptcha && Gdn::Config('Garden.Registration.Method') == 'Captcha') {
@@ -1073,8 +1089,6 @@ class UserModel extends Gdn_Model {
     * Validate User Credential
     *
     * Fetches a user row by email (or name) and compare the password.
-    * The password can be stored in plain text, in a md5
-    * or a blowfish hash.
     *
     * If the password was not stored as a blowfish hash,
     * the password will be saved again.

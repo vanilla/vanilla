@@ -238,17 +238,15 @@ class Gdn_Form extends Gdn_Pluggable {
    }
 
    /**
-    * Returns the xhtml for a list of checkboxes.
+    * Returns the XHTML for a list of checkboxes.
     *
-    * @param string $FieldName The name of the field that is being displayed/posted with this input. It
-    * should related directly to a field name in a user junction table.
-    * ie. LUM_UserRole.RoleID
+    * @param string $FieldName Name of the field being posted with this input.
     *
-    * @param mixed $DataSet The data to fill the options in the select list. Either an associative
-    * array or a database dataset. ie. RoleID, Name from LUM_Role.
+    * @param mixed $DataSet Data to fill the checkbox list. Either an associative
+    * array or a database dataset. ex: RoleID, Name from GDN_Role.
     *
-    * @param mixed $ValueDataSet The data that should be checked in $DataSet. Either an associative array
-    * or a database dataset. ie. RoleID from LUM_UserRole for a single user.
+    * @param mixed $ValueDataSet Values to be pre-checked in $DataSet. Either an associative array
+    * or a database dataset. ex: RoleID from GDN_UserRole for a single user.
     *
     * @param array $Attributes  An associative array of attributes for the select. Here is a list of
     * "special" attributes and their default values:
@@ -263,7 +261,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *
     * @return string
     */
-   public function CheckBoxList($FieldName, $DataSet, $ValueDataSet, $Attributes) {
+   public function CheckBoxList($FieldName, $DataSet, $ValueDataSet = NULL, $Attributes = FALSE) {
       // Never display individual inline errors for these CheckBoxes
       $Attributes['InlineErrors'] = FALSE;
       
@@ -301,22 +299,25 @@ class Gdn_Form extends Gdn_Pluggable {
          }
       } elseif (is_array($DataSet)) {
          foreach($DataSet as $Text => $ID) {
+            // Set attributes for this instance
             $Instance = $Attributes;
-            $Instance = RemoveKeyFromArray($Instance,
-               array('TextField', 'ValueField'));
+            $Instance = RemoveKeyFromArray($Instance, array('TextField', 'ValueField'));
+            
             $Instance['id'] = $FieldName . $i;
-            if (is_numeric($Text)) $Text = $ID;
-
             $Instance['value'] = $ID;
+            
+            if (is_numeric($Text)) 
+               $Text = $ID;
+            
             if (is_array($CheckedValues) && in_array($ID, $CheckedValues)) {
                $Instance['checked'] = 'checked';
             }
 
-            $Return .= '<li>' . $this->CheckBox($FieldName . '[]', $Text,
-               $Instance) . "</li>\n";
+            $Return .= '<li>' . $this->CheckBox($FieldName . '[]', $Text, $Instance) . "</li>\n";
             ++$i;
          }
       }
+      
       return '<ul class="'.ConcatSep(' ', 'CheckBoxList', GetValue('listclass', $Attributes)).'">' . $Return . '</ul>';
    }
 

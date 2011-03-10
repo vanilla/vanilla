@@ -54,6 +54,7 @@ class UserController extends DashboardController {
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
       $this->UserData = $UserModel->Search($Filter, 'u.Name', 'asc', $Limit, $Offset);
+      RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -92,6 +93,15 @@ class UserController extends DashboardController {
       }
 
       $this->Render();
+   }
+
+   public function ApplicantCount() {
+      $this->Permission('Garden.Applicants.Manage');
+
+      $Count = Gdn::SQL()->GetCount('UserRole', array('RoleID' => C('Garden.Registration.ApplicantRoleID', 0)));
+
+      if ($Count > 0)
+         echo '<span class="Alert">', $Count, '</span>';
    }
 	
 	public function Applicants() {

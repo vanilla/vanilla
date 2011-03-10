@@ -87,7 +87,7 @@ if (!function_exists('FormatPossessive')) {
  * // Hello Frank, It's 12:59PM.
  * </code>
  */
-function FormatString($String, $Args) {
+function FormatString($String, $Args = array()) {
    _FormatStringCallback($Args, TRUE);
    $Result = preg_replace_callback('/{([^}]+?)}/', '_FormatStringCallback', $String);
 

@@ -9,8 +9,17 @@ foreach ($this->UserData->Format('Text')->Result() as $User) {
    <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td><strong><?php echo UserAnchor($User); ?></strong></td>
       <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
-      <td><?php echo Gdn_Format::Date($User->DateFirstVisit); ?></td>
-      <td class="Alt"><?php echo Gdn_Format::Date($User->DateLastActive); ?></td>
+      <td>
+         <?php
+         $Roles = GetValue('Roles', $User, array());
+         foreach ($Roles as $RoleID => $RoleName) {
+            $Query = http_build_query(array('Form/Keywords' => $RoleName));
+            echo '<span class="Tag"><a href="'.Url('/user/browse?'.$Query).'">', htmlspecialchars($RoleName), '</a></span>  ';
+         }
+         ?>
+      </td>
+      <td class="Alt"><?php echo Gdn_Format::Date($User->DateFirstVisit); ?></td>
+      <td><?php echo Gdn_Format::Date($User->DateLastActive); ?></td>
       <?php if ($EditUser || $DeleteUser) { ?>
          <td><?php
          if ($EditUser)

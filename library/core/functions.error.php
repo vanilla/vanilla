@@ -388,6 +388,8 @@ function NotFoundException($Code = 'Page') {
 function PermissionException($Permission = NULL) {
    if (!$Permission)
       $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
+   elseif ($Permission == 'Banned')
+      $Message = T("You've been banned.");
    else
       $Message = sprintf(T('You need the %s permission to do that.'), $Permission);
    return new Exception($Message, 401);

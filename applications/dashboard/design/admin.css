@@ -1591,6 +1591,9 @@ div.Summary table tbody td {
    font-size: 11px;
    padding: 1px 6px !Important;
 }
+.Tag a {
+   color: #fff;
+}
 
 .NumberedPager {
    font-size:16px;

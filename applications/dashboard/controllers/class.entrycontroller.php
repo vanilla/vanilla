@@ -1103,16 +1103,15 @@ class EntryController extends Gdn_Controller {
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
-            $Registered = $this->UserModel->Register($Values);
+            $AuthUserID = $this->UserModel->Register($Values);
 
-            if (!$Registered) {
+            if (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             } else {
-               // The user has been created successfully, so sign in now
-               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-               $Authenticator->FetchData($this->Form);
-               $AuthUserID = $Authenticator->Authenticate();
-               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+               // The user has been created successfully, so sign in now.
+               Gdn::Session()->Start($AuthUserID);
+               if ($this->Form->GetFormValue('RememberMe'))
+                  Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                $this->FireEvent('RegistrationSuccessful');
 

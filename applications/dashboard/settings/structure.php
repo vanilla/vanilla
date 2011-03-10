@@ -322,7 +322,7 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() ==
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
-   $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%4$s permissions were changed.', 'ProfileHeadline' => NULL, 'Notify' => '1'), array('Name' => 'RoleChange'), TRUE);
+   $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%1$s changed %4$s permissions.', 'ProfileHeadline' => NULL, 'Notify' => '1'), array('Name' => 'RoleChange'), TRUE);
 if ($SQL->GetWhere('ActivityType', array('Name' => 'ActivityComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'ShowIcon' => '1', 'Name' => 'ActivityComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s', 'RouteCode' => 'activity', 'Notify' => '1'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'Import'))->NumRows() == 0)

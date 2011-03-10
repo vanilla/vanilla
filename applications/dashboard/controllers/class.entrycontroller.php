@@ -1208,11 +1208,11 @@ class EntryController extends Gdn_Controller {
     * @access public
     * @since 2.0.0
     *
-    * @param string $Email.
+    * @param int $UserID
     * @param string $EmailKey Authenticate with unique, 1-time code sent via email.
     */
-   public function EmailConfirm($Email, $EmailKey = '') {
-      $User = $this->UserModel->GetByEmail($Email);
+   public function EmailConfirm($UserID, $EmailKey = '') {
+      $User = $this->UserModel->GetID($UserID);
 
       $EmailConfirmed = $this->UserModel->ConfirmEmail($User, $EmailKey);
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -1223,12 +1223,16 @@ class EntryController extends Gdn_Controller {
       }
 
       $this->SetData('EmailConfirmed', $EmailConfirmed);
-      $this->SetData('Email', $Email);
+      $this->SetData('Email', $User->Email);
       $this->Render();
    }
 
-   public function EmailConfirmRequest($Email = '') {
-      $this->UserModel->SendEmailConfirmationEmail($Email);
+   public function EmailConfirmRequest($UserID = '') {
+      if ($UserID && !Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+         $UserID = '';
+
+      $this->UserModel->SendEmailConfirmationEmail($UserID);
+      $this->Form->SetValidationResults($this->UserModel->ValidationResults());
       $this->Render();
    }
    

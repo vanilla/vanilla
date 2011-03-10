@@ -234,7 +234,8 @@ class Gdn_Upload extends Gdn_Pluggable {
       static $Urls = NULL;
 
       if ($Urls === NULL) {
-         $Urls = array('' => Gdn::Request()->WebRoot().'/uploads');
+         $Urls = array('' => '/uploads');
+
          
          $Sender = new stdClass();
          $Sender->Returns = array();

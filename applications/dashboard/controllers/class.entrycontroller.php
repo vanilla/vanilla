@@ -28,6 +28,18 @@ class EntryController extends Gdn_Controller {
     * @var array
     */
    public $Uses = array('Database', 'Form', 'UserModel');
+
+
+   /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
+   /**
+    *
+    * @var UserModel
+    */
+   public $UserModel;
    
    /**
     * Resuable username requirement error message.
@@ -324,7 +336,6 @@ class EntryController extends Gdn_Controller {
          Gdn::Session()->Start($UserID);
          $this->_SetRedirect(TRUE);
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
-
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
          if ($this->Form->GetFormValue('Name')) {
@@ -452,13 +463,13 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE);
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
             if ($UserID) {
-               // Add the user to the default roles.
-               $UserModel->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
+//               // Add the user to the default roles.
+//               $UserModel->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
 
                // Send the welcome email.
                $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
@@ -923,13 +934,26 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-         
-         if (!$this->UserModel->InsertForApproval($this->Form->FormValues())) {
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-			} else {
-				$this->FireEvent('RegistrationPending');
-            $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
-			}
+
+         try {
+            $Values = $this->Form->FormValues();
+            unset($Values['Roles']);
+            $AuthUserID = $this->UserModel->Register($Values);
+            if (!$AuthUserID) {
+               $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+            } else {
+               // The user has been created successfully, so sign in now.
+               Gdn::Session()->Start($AuthUserID);
+
+               if ($this->Form->GetFormValue('RememberMe'))
+                  Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+
+               $this->FireEvent('RegistrationPending');
+               $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
+            }
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
+         }
       }
       $this->Render();
    }
@@ -951,31 +975,39 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+
+         try {
+            $Values = $this->Form->FormValues();
+            unset($Values['Roles']);
+            $AuthUserID = $this->UserModel->Register($Values);
          
-         if (!($AuthUserID = $this->UserModel->InsertForBasic($this->Form->FormValues()))) {
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-         } else {
-            // The user has been created successfully, so sign in now.
-            Gdn::Session()->Start($AuthUserID);
-
-            if ($this->Form->GetFormValue('RememberMe'))
-               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
-
-            try {
-               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
-            } catch (Exception $Ex) {
-            }
-				
-				$this->FireEvent('RegistrationSuccessful');
-            
-            // ... and redirect them appropriately
-            $Route = $this->RedirectTo();
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->RedirectUrl = Url($Route);
+            if (!$AuthUserID) {
+               $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             } else {
-               if ($Route !== FALSE)
-                  Redirect($Route);
+               // The user has been created successfully, so sign in now.
+               Gdn::Session()->Start($AuthUserID);
+
+               if ($this->Form->GetFormValue('RememberMe'))
+                  Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+
+               try {
+                  $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+               } catch (Exception $Ex) {
+               }
+
+               $this->FireEvent('RegistrationSuccessful');
+
+               // ... and redirect them appropriately
+               $Route = $this->RedirectTo();
+               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                  $this->RedirectUrl = Url($Route);
+               } else {
+                  if ($Route !== FALSE)
+                     Redirect($Route);
+               }
             }
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
       }
       $this->Render();
@@ -999,34 +1031,41 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-         
-         if (!($AuthUserID = $this->UserModel->InsertForBasic($this->Form->FormValues()))) {
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-            if($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
-            }
-         } else {
-            // The user has been created successfully, so sign in now.
-            Gdn::Session()->Start($AuthUserID);
 
-            if ($this->Form->GetFormValue('RememberMe'))
-               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
-
-            try {
-               $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
-            } catch (Exception $Ex) {
-            }
-				
-				$this->FireEvent('RegistrationSuccessful');
-            
-            // ... and redirect them appropriately
-            $Route = $this->RedirectTo();
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->RedirectUrl = Url($Route);
+         try {
+            $Values = $this->Form->FormValues();
+            unset($Values['Roles']);
+            $AuthUserID = $this->UserModel->Register($Values);
+            if (!$AuthUserID) {
+               $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+               if($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                  $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
+               }
             } else {
-               if ($Route !== FALSE)
-                  Redirect($Route);
+               // The user has been created successfully, so sign in now.
+               Gdn::Session()->Start($AuthUserID);
+
+               if ($this->Form->GetFormValue('RememberMe'))
+                  Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+
+               try {
+                  $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+               } catch (Exception $Ex) {
+               }
+
+               $this->FireEvent('RegistrationSuccessful');
+
+               // ... and redirect them appropriately
+               $Route = $this->RedirectTo();
+               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                  $this->RedirectUrl = Url($Route);
+               } else {
+                  if ($Route !== FALSE)
+                     Redirect($Route);
+               }
             }
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
       }
       $this->Render();
@@ -1060,26 +1099,34 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-         
-         if (!($AuthUserID = $this->UserModel->InsertForInvite($this->Form->FormValues()))) {
-            $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-         } else {
-            // The user has been created successfully, so sign in now.
-            Gdn::Session()->Start($AuthUserID);
 
-            if ($this->Form->GetFormValue('RememberMe'))
-               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
-				
-				$this->FireEvent('RegistrationSuccessful');
-            
-            // ... and redirect them appropriately
-            $Route = $this->RedirectTo();
-            if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-               $this->RedirectUrl = Url($Route);
+         try {
+            $Values = $this->Form->FormValues();
+            unset($Values['Roles']);
+            $Registered = $this->UserModel->Register($Values);
+
+            if (!$Registered) {
+               $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             } else {
-               if ($Route !== FALSE)
-                  Redirect($Route);
+               // The user has been created successfully, so sign in now
+               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+               $Authenticator->FetchData($this->Form);
+               $AuthUserID = $Authenticator->Authenticate();
+               Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+
+               $this->FireEvent('RegistrationSuccessful');
+
+               // ... and redirect them appropriately
+               $Route = $this->RedirectTo();
+               if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                  $this->RedirectUrl = Url($Route);
+               } else {
+                  if ($Route !== FALSE)
+                     Redirect($Route);
+               }
             }
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
          }
       } else {
          $this->InvitationCode = $InvitationCode;
@@ -1167,19 +1214,31 @@ class EntryController extends Gdn_Controller {
     * @access public
     * @since 2.0.0
     *
-    * @param int $UserID Unique.
+    * @param int $UserID
     * @param string $EmailKey Authenticate with unique, 1-time code sent via email.
     */
-   public function EmailConfirm($UserID = '', $EmailKey = '') {
-      if (!is_numeric($UserID) || $EmailKey != $this->UserModel->GetAttribute($UserID, 'EmailKey', '')) {
-         $this->Form->AddError(T('Couldn\'t confirm email.',
-            'We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.'));
+   public function EmailConfirm($UserID, $EmailKey = '') {
+      $User = $this->UserModel->GetID($UserID);
+
+      $EmailConfirmed = $this->UserModel->ConfirmEmail($User, $EmailKey);
+      $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+
+      if ($EmailConfirmed && !Gdn::Session()->IsValid()) {
+         $UserID = GetValue('UserID', $User);
+         Gdn::Session()->Start($UserID);
       }
 
-      if ($this->Form->ErrorCount() == 0) {
-         
+      $this->SetData('EmailConfirmed', $EmailConfirmed);
+      $this->SetData('Email', $User->Email);
+      $this->Render();
+   }
 
-      }
+   public function EmailConfirmRequest($UserID = '') {
+      if ($UserID && !Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+         $UserID = '';
+
+      $this->UserModel->SendEmailConfirmationEmail($UserID);
+      $this->Form->SetValidationResults($this->UserModel->ValidationResults());
       $this->Render();
    }
    

@@ -40,10 +40,16 @@ class PermissionModel extends Gdn_Model {
             $DefaultPermissions[$PermissionName] = 2;
 			} else {
 				$PermissionName = $Key;
-            $DefaultPermissions[$PermissionName] = $Value ? 3 : 2;
+
+            if ($Value === 0)
+               $DefaultPermissions[$PermissionName] = 2;
+            elseif ($Value === 1)
+               $DefaultPermissions[$PermissionName] = 3;
+            else
+               $DefaultPermissions[$PermissionName] = "`{$Value}`"; // default to another field
          }
          if (!$Structure->ColumnExists($PermissionName))
-            $NewColumns[$PermissionName] = $DefaultPermissions[$PermissionName] == 3 ? 1 : 0;
+            $NewColumns[$PermissionName] = is_numeric($DefaultPermissions[$PermissionName]) ? $DefaultPermissions[$PermissionName] - 2 : $DefaultPermissions[$PermissionName];
 
          // Define the column.
          $Structure->Column($PermissionName, $Type, 0);
@@ -52,7 +58,9 @@ class PermissionModel extends Gdn_Model {
       $Structure->Set(FALSE, FALSE);
 
       // Set the default permissions on the placeholder.
-		$this->SQL->Replace('Permission', $this->_Backtick($DefaultPermissions), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn), TRUE);
+		$this->SQL
+         ->Set($this->_Backtick($DefaultPermissions), '', FALSE)
+         ->Replace('Permission', array(), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn), TRUE);
 
       // Set the default permissions for new columns on all roles.
       if (count($NewColumns) > 0) {
@@ -60,7 +68,9 @@ class PermissionModel extends Gdn_Model {
          if (!$JunctionTable)
             $Where['JunctionTable'] = NULL;
 
-         $this->SQL->Put('Permission', $this->_Backtick($NewColumns), $Where);
+         $this->SQL
+            ->Set($this->_Backtick($NewColumns), '', FALSE)
+            ->Put('Permission', array(), $Where);
       }
    }
    

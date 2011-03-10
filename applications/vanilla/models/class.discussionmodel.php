@@ -614,13 +614,26 @@ class DiscussionModel extends VanillaModel {
             if ($DiscussionID > 0) {
                // Updating
                $Stored = $this->GetID($DiscussionID);
+
+               $LogData = (array)$Stored;
+               $LogData['_New'] = (array)$Fields;
+               LogModel::Insert('Edit', 'Discussion', $LogData);
+
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
             } else {
                // Inserting
 					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
-               $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+
+               // Check for spam.
+               $Spam = SpamModel::IsSpam('Discussion', $Fields);
+
+               if (!$Spam) {
+                  $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+               } else {
+                  return SPAM;
+               }
                
                // Assign the new DiscussionID to the comment before saving
                $FormPostValues['IsNewDiscussion'] = TRUE;

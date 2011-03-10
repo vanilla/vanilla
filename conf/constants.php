@@ -45,5 +45,7 @@ define('ENVIRONMENT_PHP_VERSION','5.2.0');
 
 if (!defined('E_USER_DEPRECATED'))
    define('E_USER_DEPRECATED', E_USER_WARNING);
+
+define('SPAM', 'SPAM');
    
 define('VANILLA_CONSTANTS', TRUE);

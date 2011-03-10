@@ -98,7 +98,7 @@ class Gdn_LibraryMap {
     * @param string $CacheName name of cache library
     * @return void
     */
-   public static function ClearCache($CacheName) {
+   public static function ClearCache($CacheName = FALSE) {
       if ($CacheName != 'locale') return;
       
       if (!array_key_exists($CacheName,self::$_Caches))

@@ -13,7 +13,7 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
       echo '<p>';
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button(T('Go'));
-      printf(T('%s user(s) found.'), $this->Pager->TotalRecords);
+      printf(T('%s user(s) found.'), $this->Data('RecordCount'));
       echo '</p>';
       
    ?>
@@ -35,11 +35,10 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
    </thead>
    <tbody>
       <?php
-      echo $this->Pager->ToString('less');
       include($this->FetchViewLocation('users'));
-      echo $this->Pager->ToString('more');
       ?>
    </tbody>
 </table>
 <?php
+PagerModule::Write(array('Sender' => $this));
 echo $this->Form->Close();

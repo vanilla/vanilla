@@ -1121,7 +1121,7 @@ class UserModel extends Gdn_Model {
       $this->SQL->Update('User')
          ->Set(array(
             'Name' => '[Deleted User]',
-            'Photo' => 'null',
+            'Photo' => null,
             'Password' => RandomString('10'),
             'About' => '',
             'Email' => 'user_'.$UserID.'@deleted.email',

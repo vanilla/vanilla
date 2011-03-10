@@ -43,7 +43,7 @@ class UserModel extends Gdn_Model {
 
       // Update the user's roles.
       $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
-      $this->SaveRoles(GetValue('UserID', $User), $Roles);
+      $this->SaveRoles(GetValue('UserID', $User), $Roles, FALSE);
       
       // Remove the email confirmation attributes.
       unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);

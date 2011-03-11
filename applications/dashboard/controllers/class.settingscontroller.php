@@ -107,7 +107,7 @@ class SettingsController extends DashboardController {
       $BanModel = $this->_BanModel;
       $BanWhere = $BanModel->BanWhere($Ban);
       foreach ($BanWhere as $Name => $Value) {
-         if ($Name != 'u.Admin')
+         if (!in_array($Name, array('u.Admin', 'u.Deleted')))
             return "$Name $Value";
       }
    }

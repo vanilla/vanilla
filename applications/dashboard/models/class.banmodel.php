@@ -33,6 +33,7 @@ class BanModel extends Gdn_Model {
       $AllBans = $this->AllBans();
       
       if ($NewBan) {
+         // Get a list of users affected by the new ban.
          if (isset($NewBan['BanID']))
             $AllBans[$NewBan['BanID']] = $NewBan;
 
@@ -47,6 +48,7 @@ class BanModel extends Gdn_Model {
       }
 
       if ($OldBan) {
+         // Get a list of users affected by the old ban.
          $OldUsers = $this->SQL
             ->Select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
             ->From('User u')
@@ -60,14 +62,14 @@ class BanModel extends Gdn_Model {
          if (in_array($User['UserID'], $NewUserIDs))
             continue;
          // TODO check the user against the other bans.
-         $this->SaveUser($User, FALSE, 1);
+         $this->SaveUser($User, FALSE);
       }
 
       // Check users that need to be banned.
       foreach ($NewUsers as $User) {
-         if ($User['Banned'] & 2)
+         if ($User['Banned'])
             continue;
-         $this->SaveUser($User, TRUE, 1);
+         $this->SaveUser($User, TRUE);
       }
    }
    
@@ -170,27 +172,19 @@ class BanModel extends Gdn_Model {
       $this->ApplyBan($FormPostValues, $CurrentBan);
    }
 
-   public function SaveUser($User, $BannedValue, $Position = 0) {
-      $Mask = pow(2, $Position);
-
+   public function SaveUser($User, $BannedValue) {
       $Banned = $User['Banned'];
-      $BannedMasked = $Banned & $Mask;
 
-      if ($BannedMasked == $BannedValue)
-         continue;
+      if ($Banned == $BannedValue)
+         return;
 
       // Add the activity.
       $ActivityType = $BannedValue ? 'Banned' : 'Unbanned';
       AddActivity(Gdn::Session()->UserID, $ActivityType, '', $User['UserID']);
 
-      // Add the new ban.
-      if ($BannedValue)
-         $this->SQL->Set('u.Banned', "u.Banned | $Mask", FALSE, FALSE);
-      else
-         $this->SQL->Set('u.Banned', "u.Banned & ~$Mask", FALSE, FALSE);
-
       $this->SQL
          ->Update('User u')
+         ->Set('u.Banned', $BannedValue)
          ->Where('u.UserID', $User['UserID'])
          ->Put();
    }

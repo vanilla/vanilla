@@ -1349,12 +1349,15 @@ class EntryController extends Gdn_Controller {
     * @return string URL to actually go to (validated & safe).
     */
    public function Target($Target = FALSE) {
-      if ($Target === FALSE)
-         $Target = GetIncomingValue('Target', '');
+      if ($Target === FALSE) {
+         $Target = $this->Form->GetFormValue('Target', FALSE);
+         if (!$Target)
+            $Target = $this->Request->Get('Target', '/');
+      }
       
       // Make sure that the target is a valid url.
-      if (!preg_match('`(^https?://)|/`', $Target)) {
-         $Target = '/'.$Target;
+      if (!preg_match('`(^https?://)`', $Target)) {
+         $Target = '/'.ltrim($Target, '/');
       } else {
          $MyHostname = parse_url(Gdn::Request()->Domain(),PHP_URL_HOST);
          $TargetHostname = parse_url($Target, PHP_URL_HOST);

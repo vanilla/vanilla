@@ -6,7 +6,8 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 20));
       <tr>
          <th><?php echo T('Ban Item', 'Item'); ?></th>
          <th><?php echo T('Ban Type', 'Type'); ?></th>
-         <th><?php echo T('User Count', 'Users'); ?></th>
+         <th class="CenterCell"><?php echo T('User Count', 'Users'); ?></th>
+         <th class="CenterCell"><?php echo '<span title="'.T('Number of blocked registrations').'">', T('Blocked'), '</span>'; ?></th>
          <th class="UsernameCell"><?php echo T('Added By'); ?></th>
          <th><?php echo T('Notes'); ?></th>
          <th><?php echo T('Options'); ?></th>
@@ -19,9 +20,14 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 20));
       <tr id="<?php echo "BanID_{$Row['BanID']}"; ?>">
          <td><?php echo htmlspecialchars($Row['BanValue']); ?></td>
          <td><?php echo T($Row['BanType']); ?></td>
-         <td>
+         <td class="CenterCell">
             <?php
                echo Anchor($Row['CountUsers'], '/dashboard/user?Filter='.urlencode($this->_BanFilter($Row)));
+            ?>
+         </td>
+         <td class="CenterCell">
+            <?php
+               echo $Row['CountBlockedRegistrations'];
             ?>
          </td>
          <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>

@@ -180,9 +180,12 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
-   public function GetNotificationsSince($UserID, $LastActivityID, $Limit = '5') {
+   public function GetNotificationsSince($UserID, $LastActivityID, $FilterToActivityTypeIDs = '', $Limit = '5') {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
+		if (is_array($FilterToActivityTypeIDs))
+			$this->SQL->WhereIn('a.ActivityTypeID', $FilterToActivityTypeIDs);
+		
       return $this->SQL
          ->Where('RegardingUserID', $UserID)
          ->Where('a.ActivityID >', $LastActivityID)

@@ -1264,7 +1264,6 @@ class EntryController extends Gdn_Controller {
             }
          break;
       }
-      
       $this->Render();
    }
    

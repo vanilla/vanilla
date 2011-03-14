@@ -38,6 +38,7 @@ $Construct
    ->Column('DateUpdated', 'datetime')
    ->Column('CountMessages', 'int')
    ->Column('LastMessageID', 'int')
+   ->Column('RegardingID', 'int(11)', TRUE)
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are

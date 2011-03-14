@@ -48,7 +48,8 @@ class FlaggingPlugin extends Gdn_Plugin {
     */
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
       if (Gdn::Session()->CheckPermission('Plugins.Flagging.Notify')) {
-         $Sender->Preferences['Email Notifications']['Email.Flag'] = T('Notify me when a comment is flagged.');
+         $Sender->Preferences['Notifications']['Email.Flag'] = T('Notify me when a comment is flagged.');
+         $Sender->Preferences['Notifications']['Popup.Flag'] = T('Notify me when a comment is flagged.');
       }
    }
    

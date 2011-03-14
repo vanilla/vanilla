@@ -1510,7 +1510,28 @@ body.Profile ul.Notifications {
 	border-top: 0;
 	margin-top: 0;
 }
-
+/* Preferences Form */
+div.Preferences h3 {
+	margin: 0;
+	padding: 10px 0 4px !important;
+}
+table.PreferenceGroup thead td {
+	font-weight: bold;
+	border-top: 1px solid #aaa;
+	border-bottom: 1px solid #ccc;
+	background: #eee;
+	padding: 2px 6px;
+}
+table.PreferenceGroup tbody td {
+	border-bottom: 1px solid #eee;
+	padding: 2px 6px;
+}
+table.PreferenceGroup tbody td.PrefCheckBox {
+	text-align: center;
+}
+table.PreferenceGroup td.Description {
+	font-size: 12px;
+}
 
 /* ================================================= Tabs, Headings & Footers */
 div.MessageForm {

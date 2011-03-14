@@ -343,10 +343,11 @@ class Gdn_Format {
    /**
     * Formats a Mysql DateTime string in the specified format.
     *
+    * For instructions on how the format string works:
+    * @link http://us.php.net/manual/en/function.strftime.php
+    *
     * @param string $Timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
     * @param string $Format The format string to use. Defaults to the application's default format.
-    * For instructions on how the format string works:
-    *  http://ca.php.net/manual/en/function.date.php
     * @return string
     */
    public static function Date($Timestamp = '', $Format = '') {

@@ -383,14 +383,43 @@ class ProfileController extends Gdn_Controller {
 
       // Define the preferences to be managed
       $this->Preferences = array(
-         'Email Notifications' => array(
+         'Notifications' => array(
             'Email.WallComment' => T('Notify me when people write on my wall.'),
-            'Email.ActivityComment' => T('Notify me when people reply to my wall comments.')
+            'Email.ActivityComment' => T('Notify me when people reply to my wall comments.'),
+            'Popup.WallComment' => T('Notify me when people write on my wall.'),
+            'Popup.ActivityComment' => T('Notify me when people reply to my wall comments.')
          )
       );
       
       $this->FireEvent('AfterPreferencesDefined');
-
+		
+		// Loop through the preferences looking for duplicates, and merge into a single row
+		$this->PreferenceGroups = array();
+		$this->PreferenceTypes = array();
+		foreach ($this->Preferences as $PreferenceGroup => $Preferences) {
+			$this->PreferenceGroups[$PreferenceGroup] = array();
+			$this->PreferenceTypes[$PreferenceGroup] = array();
+			foreach ($Preferences as $Name => $Description) {
+				$NameParts = explode('.', $Name);
+				$PrefType = GetValue('0', $NameParts);
+				$SubName = GetValue('1', $NameParts);
+				if ($SubName != FALSE) {
+					// Save an array of all the different types for this group
+					if (!in_array($PrefType, $this->PreferenceTypes[$PreferenceGroup]))
+						$this->PreferenceTypes[$PreferenceGroup][] = $PrefType;
+					
+					// Store all the different subnames for the group	
+					if (!array_key_exists($SubName, $this->PreferenceGroups[$PreferenceGroup])) {
+						$this->PreferenceGroups[$PreferenceGroup][$SubName] = array($Name);
+					} else {
+						$this->PreferenceGroups[$PreferenceGroup][$SubName][] = $Name;
+					}
+				} else {
+					$this->PreferenceGroups[$PreferenceGroup][$Name] = array($Name);
+				}
+			}
+		}
+		
       if ($this->User->UserID != $Session->UserID)
          $this->Permission('Garden.Users.Edit');
          

@@ -116,7 +116,8 @@ Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
 // Remote Statistics
 Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactoryInstance);
-Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', NULL, Gdn::FactoryInstance);
+Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', NULL, Gdn::FactorySingleton);
+Gdn::Regarding();
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');

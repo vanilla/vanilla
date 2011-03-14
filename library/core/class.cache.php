@@ -314,6 +314,14 @@ abstract class Gdn_Cache {
       return ($LocalPrefix === FALSE) ? NULL : $LocalPrefix;
    }
    
+   public function GetRevision() {
+      
+   }
+   
+   public function IncrementRevision() {
+      
+   }
+   
    public function MakeKey($Key, $Options) {
       $UsePrefix = !GetValue(Gdn_Cache::FEATURE_NOPREFIX, $Options, FALSE);
       $ForcePrefix = GetValue(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, NULL);

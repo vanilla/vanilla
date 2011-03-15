@@ -707,7 +707,7 @@ class CategoryModel extends Gdn_Model {
          $Category->Following = $Following;
 
          // Calculate the read field.
-         if (property_exists('DateLastComment', $Category)) {
+         if (property_exists($Category, 'DateLastComment')) {
             $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
             if (!$DateMarkedRead)
                $DateMarkedRead = GetValue('DateMarkedRead', $Category);

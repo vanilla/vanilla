@@ -3,6 +3,7 @@ $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
+$this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
 ?>
 <div class="Tabs Headings CategoryHeadings">
    <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
@@ -10,6 +11,10 @@ $ChildCategories = '';
 <?php
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    foreach ($this->CategoryData->Result() as $Category) {
+      $this->EventArguments['CatList'] = &$CatList;
+      $this->EventArguments['ChildCategories'] = &$ChildCategories;
+      $this->EventArguments['Category'] = &$Category;
+      $this->FireEvent('BeforeCategoryItem');
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
          // in the $ChildCategories variable, do the replacement.
@@ -23,12 +28,12 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth'.$Category->Depth.'">
+            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
                <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
-            $CatList .= '<li class="Item Depth'.$Category->Depth.'">
+            $CatList .= '<li class="Item Unread Depth'.$Category->Depth.'" Category-'.$Category->UrlCode.'>
                <div class="ItemContent Category">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))

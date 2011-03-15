@@ -291,7 +291,7 @@ class CategoryModel extends Gdn_Model {
          $UserID = Gdn::Session()->UserID;
          // Add in user/category stuff.
          $this->SQL
-            ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID")
+            ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID", 'left')
             ->Select('uc.DateMarkedRead')
             ->Select('uc.Archive', '', 'UserArchive');
       }

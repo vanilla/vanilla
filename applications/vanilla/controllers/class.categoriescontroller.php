@@ -91,7 +91,7 @@ class CategoriesController extends VanillaController {
          $this->Head->Title($Category->Name);
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
-			$this->AddJsFile('jquery.menu.js');
+         $this->AddJsFile('jquery.menu.js');
          $this->AddJsFile('options.js');
          $this->AddJsFile('jquery.gardenmorepager.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
@@ -187,7 +187,6 @@ class CategoriesController extends VanillaController {
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
       $this->AddJsFile('jquery.menu.js');
-      $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
       
       // Get category data and discussions

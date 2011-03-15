@@ -12,7 +12,11 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }
-   
+
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    */
    public function Base_Render_Before(&$Sender) {
       $Session = Gdn::Session();
 
@@ -61,6 +65,19 @@ class DashboardHooks implements Gdn_IPlugin {
 		// if (!($Sender->ControllerName == 'notificationscontroller' && $Sender->RequestMethod == 'inform'))
 		//	NotificationsController::InformNotifications($Sender);
    }
+
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    */
+   public function NotificationsController_Render_Before($Sender) {
+      $EmailKey = GetValueR('User.Attributes.EmailKey', Gdn::Session());
+
+      if ($EmailKey) {
+         $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+         $Sender->InformMessage($Message, '');
+      }
+   }
    
    public function SettingsController_AnalyticsRegister_Create(&$Sender) {
       Gdn::Factory('Statistics')->Register($Sender);
@@ -94,7 +111,12 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount" />', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+
+      $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
+      $Menu->AddLink('Moderation', T('Manage Spam').' <span class="Popin" rel="/dashboard/log/count/spam" />', 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Edit/Delete Log').' <span class="Popin" rel="/dashboard/log/count/edits" />', 'dashboard/log/edits', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Ban List'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		

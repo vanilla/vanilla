@@ -49,10 +49,11 @@ $Definition['ValidateConnection'] = 'The connection parameters you specified fai
 //$Definition['ValidateMinimumAge'] = 'You are too young to proceed.';
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
-
+$Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
-$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email and password you entered.';
+$Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';
+$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
 $Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
 $Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
@@ -71,61 +72,49 @@ $Definition['OldPassword'] = 'Old password';
 
 $Definition['RoleID'] = 'role';
 
+$Definition['EmailHeader'] = 'Hello {User.Name}!
+';
+$Definition['EmailFooter'] = '
+Have a great day!';
+
 $Definition['EmailInvitation'] = 'Hello!
 
 %1$s has invited you to join %2$s. If you want to join, you can do so by clicking this link:
 
-  %3$s
-
-Have a great day!';
+  %3$s';
 $Definition['EmailMembershipApproved'] = 'Hello %1$s,
 
 You have been approved for membership. Sign in now at the following link:
 
-  %2$s
-  
-Have a great day!';
-$Definition['EmailWelcome'] = 'Hello %1$s,
-
-%2$s has created an account for you at %3$s. Your login credentials are:
+  %2$s';
+$Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your login credentials are:
 
   Email: %6$s
   Password: %5$s
   Url: %4$s
 
 Have a great day!';
-$Definition['EmailPassword'] = 'Hello %1$s,
-
-%2$s has reset your password at %3$s. Your login credentials are now:
+$Definition['EmailPassword'] = '%2$s has reset your password at %3$s. Your login credentials are now:
 
   Email: %6$s
   Password: %5$s
   Url: %4$s
 
 Have a great day!';
-$Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
-
-You have successfully registered for an account at {Title}. Here is your information:
+$Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+$Definition['EmailWelcomeRegister'] = 'You have successfully registered for an account at {Title}. Here is your information:
 
   Username: {User.Name}
   Email: {User.Email}
 
-You can access the site at {/,url,domain}.
-
-Have a great day!';
-$Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
-
-You have successfully connected to {Title}. Here is your information:
+You can access the site at {/,url,domain}.';
+$Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
 
   Username: {User.Name}
   Connected With: {ProviderName}
 
-You can access the site at {/,url,domain}.
-
-Have a great day!';
-$Definition['PasswordRequest'] = 'Hello %1$s,
-
-Someone has requested to reset your password at %2$s. To reset your password, follow this link:
+You can access the site at {/,url,domain}.';
+$Definition['PasswordRequest'] = 'Someone has requested to reset your password at %2$s. To reset your password, follow this link:
 
   %3$s
 

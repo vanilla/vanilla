@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class UserModel extends Gdn_Model {
-   
+   const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
    public $SessionColumns;
    
    /**
@@ -17,6 +17,38 @@ class UserModel extends Gdn_Model {
     */
    public function __construct() {
       parent::__construct('User');
+   }
+
+   protected function _AddEmailHeaderFooter($Message, $Data) {
+      $Header = T('EmailHeader', '');
+      if ($Header)
+         $Message = FormatString($Header, $Data)."\n".$Message;
+
+      $Footer = T('EmailFooter', '');
+      if ($Footer)
+         $Message .= "\n".FormatString($Footer, $Data);
+
+      return $Message;
+   }
+
+   public function ConfirmEmail($User, $EmailKey) {
+      $Attributes = GetValue('Attributes', $User);
+      $EmailKey2 = GetValue('EmailKey', $Attributes);
+      
+      if (!$EmailKey2 || $EmailKey != $EmailKey2) {
+         $this->Validation->AddValidationResult('EmailKey', '@'.T('Couldn\'t confirm email.',
+            'We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.'));
+         return FALSE;
+      }
+
+      // Update the user's roles.
+      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
+      $this->SaveRoles(GetValue('UserID', $User), $Roles, FALSE);
+      
+      // Remove the email confirmation attributes.
+      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
+      $this->SQL->Put('User', array('Attributes' => serialize($Attributes)), array('UserID' => GetValue('UserID', $User)));
+      return TRUE;
    }
 
    /** Connect a user with a foreign authentication system.
@@ -60,8 +92,41 @@ class UserModel extends Gdn_Model {
     * A convenience method to be called when inserting users (because users
     * are inserted in various methods depending on registration setups).
     */
-   protected function _Insert($Fields) {
+   protected function _Insert($Fields, $Options = array()) {
+      // Massage the roles for email confirmation.
+      if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
+         TouchValue('Attributes', $Fields, array());
+         $ConfirmationCode = RandomString(8);
+         $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
+         
+         if (isset($Fields['Roles'])) {
+            $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
+         }
+         $Fields['Roles'] = (array)C('Garden.Registration.ConfirmEmailRole');
+         $Fields['Attributes'] = serialize($Fields['Attributes']);
+      }
+
+      // Make sure to encrypt the password for saving...
+      if (array_key_exists('Password', $Fields)) {
+         $PasswordHash = new Gdn_PasswordHash();
+         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+         $Fields['HashMethod'] = 'Vanilla';
+      }
+
+      $Roles = GetValue('Roles', $Fields);
+      unset($Fields['Roles']);
+      
       $UserID = $this->SQL->Insert($this->Name, $Fields);
+      if ($Roles) {
+         $this->SaveRoles($UserID, $Roles, FALSE);
+      }
+
+      // Approval registration requires an email confirmation.
+      if ($UserID && isset($ConfirmationCode) && strtolower(C('Garden.Registration.Method')) == 'approval') {
+         // Send the confirmation email.
+         $this->SendEmailConfirmationEmail($UserID);
+      }
+
       // Fire an event for user inserts
       $this->EventArguments['InsertUserID'] = $UserID;
       $this->EventArguments['InsertFields'] = $Fields;
@@ -242,6 +307,14 @@ class UserModel extends Gdn_Model {
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
 
+   public function GetID($ID, $DatasetType = FALSE) {
+      $User = parent::GetID($ID, $DatasetType);
+
+      if ($User)
+         $this->SetCalculatedFields($User);
+      return $User;
+   }
+
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
 
@@ -301,6 +374,8 @@ class UserModel extends Gdn_Model {
       if ($User && $User->Permissions == '')
          $User->Permissions = $this->DefinePermissions($UserID);
 
+      $this->SetCalculatedFields($User);
+
       $UserCache[$UserID] = $User;
 
       return $User;
@@ -316,6 +391,44 @@ class UserModel extends Gdn_Model {
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+   }
+
+   public function Register($FormPostValues, $Options = array()) {
+      $Valid = TRUE;
+      $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
+
+      // Check for banning first.
+      $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
+
+      // Throw an event to allow plugins to block the registration.
+      $this->EventArguments['User'] = $FormPostValues;
+      
+      $this->EventArguments['Valid'] =& $Valid;
+      $this->FireEvent('BeforeRegister');
+
+      if (!$Valid)
+         return FALSE; // plugin blocked registration.
+
+      switch (strtolower(C('Garden.Registration.Method'))) {
+         case 'captcha':
+            $UserID = $this->InsertForBasic($FormPostValues, GetValue('CheckCaptcha', $Options, TRUE), $Options);
+            break;
+         case 'approval':
+            $UserID = $this->InsertForApproval($FormPostValues, $Options);
+            break;
+         case 'invitation':
+            $UserID = $this->InsertForInvite($FormPostValues, $Options);
+            break;
+         case 'closed':
+            $UserID = FALSE;
+            $this->Validation->AddValidationResult('Registration', 'Registration is closed.');
+            break;
+         case 'basic':
+         default:
+            $UserID = $this->InsertForBasic($FormPostValues, GetValue('CheckCaptcha', $Options, FALSE), $Options);
+            break;
+      }
+      return $UserID;
    }
    
    public function RemovePicture($UserID) {
@@ -352,7 +465,7 @@ class UserModel extends Gdn_Model {
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
 
       // Validate the form posted values
-      $UserID = ArrayValue('UserID', $FormPostValues);
+      $UserID = GetValue('UserID', $FormPostValues);
       $Insert = $UserID > 0 ? FALSE : TRUE;
       if ($Insert) {
          $this->AddInsertFields($FormPostValues);
@@ -364,19 +477,39 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('BeforeSaveValidation');
 
       $RecordRoleChange = TRUE;
-      if ($this->Validate($FormPostValues, $Insert) === TRUE) {
+      if ($this->Validate($FormPostValues, $Insert) && $this->ValidateUniqueFields(GetValue('Name', $FormPostValues), GetValue('Email', $FormPostValues), $UserID)) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-         $RoleIDs = ArrayValue('RoleID', $Fields, 0);
-         $Username = ArrayValue('Name', $Fields);
-         $Email = ArrayValue('Email', $Fields);
+         $RoleIDs = GetValue('RoleID', $Fields, 0);
+         $Username = GetValue('Name', $Fields);
+         $Email = GetValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+         
          // Make sure to encrypt the password for saving...
          if (array_key_exists('Password', $Fields)) {
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
             $Fields['HashMethod'] = 'Vanilla';
+         }
+
+         // Check for email confirmation.
+         if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Settings)) {
+            if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
+               $User = Gdn::Session()->User;
+               $Attributes = Gdn::Session()->User->Attributes;
+               $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
+
+               if ($RoleIDs)
+                  $ConfirmedEmailRoles = $RoleIDs;
+               else
+                  $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
+               $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
+
+               $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
+               $SaveRoles = TRUE;
+               $Fields['Attributes'] = serialize($Attributes);
+            } 
          }
          
          $this->EventArguments['Fields'] = $Fields;
@@ -396,7 +529,7 @@ class UserModel extends Gdn_Model {
    
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
    
-               // Record activity if the person changed his/her photo
+               // Record activity if the person changed his/her photo.
                $Photo = ArrayValue('Photo', $FormPostValues);
                if ($Photo !== FALSE) {
                   if (GetValue('CheckExisting', $Settings)) {
@@ -437,13 +570,18 @@ class UserModel extends Gdn_Model {
                   $Session->UserID > 0 ? $Session->UserID : ''
                );
             }
-            // Now update the role settings if necessary
+            // Now update the role settings if necessary.
             if ($SaveRoles) {
                // If no RoleIDs were provided, use the system defaults
                if (!is_array($RoleIDs))
                   $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
    
                $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
+            }
+
+            // Send the confirmation email.
+            if (isset($EmailKey)) {
+               $this->SendEmailConfirmationEmail((array)Gdn::Session()->User);
             }
 
             $this->EventArguments['UserID'] = $UserID;
@@ -483,13 +621,17 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields['UserID'] = 1;
-         $Fields['Password'] = array('md5' => $Fields['Password']);
+
+         // Make sure to encrypt the password for saving.
+         $PasswordHash = new Gdn_PasswordHash();
+         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+         $Fields['HashMethod'] = 'Vanilla';
          
          if ($this->Get($UserID) !== FALSE) {
             $this->SQL->Put($this->Name, $Fields);
          } else {
             // Insert the new user
-            $UserID = $this->_Insert($Fields);
+            $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
             AddActivity(
                $UserID,
                'Join',
@@ -617,6 +759,12 @@ class UserModel extends Gdn_Model {
       else
          $ApplicantRoleID = 0;
 
+      if (is_array($Keywords)) {
+         $Where = $Keywords;
+         $Keywords = $Where['Keywords'];
+         unset($Where['Keywords']);
+      }
+
       // Check to see if the search exactly matches a role name.
       $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
 
@@ -625,6 +773,9 @@ class UserModel extends Gdn_Model {
          $this->SQL
             ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
       }
+
+      if (isset($Where))
+         $this->SQL->Where($Where);
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
@@ -656,9 +807,17 @@ class UserModel extends Gdn_Model {
       else
          $ApplicantRoleID = 0;
 
+      if (is_array($Keywords)) {
+         $Where = $Keywords;
+         $Keywords = $Where['Keywords'];
+         unset($Where['Keywords']);
+      }
 
       // Check to see if the search exactly matches a role name.
       $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+
+      if (isset($Where))
+         $this->SQL->Where($Where);
       
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
@@ -694,7 +853,11 @@ class UserModel extends Gdn_Model {
    /**
     * To be used for invitation registration
     */
-   public function InsertForInvite($FormPostValues) {
+   public function InsertForInvite($FormPostValues, $Options = array()) {
+      $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+      if (!is_array($RoleIDs) || count($RoleIDs) == 0)
+         throw new Exception(T('The default role has not been configured.'), 400);
+
       // Define the primary key in this model's table.
       $this->DefineSchema();
 
@@ -740,7 +903,6 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          // Make sure the username & email aren't already being used
          if (!$this->ValidateUniqueFields($Username, $Email))
@@ -750,8 +912,13 @@ class UserModel extends Gdn_Model {
          if ($InviteUserID > 0)
             $Fields['InviteUserID'] = $InviteUserID;
 
-         // And insert the new user
-         $UserID = $this->_Insert($Fields);
+
+         // And insert the new user.
+         if (!isset($Options['NoConfirmEmail']))
+            $Options['NoConfirmEmail'] = TRUE;
+
+         $Fields['Roles'] = $RoleIDs;
+         $UserID = $this->_Insert($Fields, $Options);
 
          // Associate the new user id with the invitation (so it cannot be used again)
          $this->SQL
@@ -767,10 +934,6 @@ class UserModel extends Gdn_Model {
             T('Welcome Aboard!'),
             $InviteUserID
          );
-
-         // Save the user's roles
-         $RoleIDs = (array)Gdn::Config('Garden.Registration.DefaultRoles', C('Garden.Registration.ApplicantRoleID', array()));
-         $this->SaveRoles($UserID, $RoleIDs, FALSE);
       } else {
          $UserID = FALSE;
       }
@@ -780,7 +943,12 @@ class UserModel extends Gdn_Model {
    /**
     * To be used for approval registration
     */
-   public function InsertForApproval($FormPostValues) {
+   public function InsertForApproval($FormPostValues, $Options = array()) {
+      $RoleIDs = C('Garden.Registration.ApplicantRoleID');
+      if (!$RoleIDs) {
+         throw new Exception(T('The default role has not been configured.'), 400);
+      }
+
       // Define the primary key in this model's table.
       $this->DefineSchema();
 
@@ -793,26 +961,22 @@ class UserModel extends Gdn_Model {
 
       $this->AddInsertFields($FormPostValues);
 
-      if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+      if ($this->Validate($FormPostValues, TRUE)) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          if (!$this->ValidateUniqueFields($Username, $Email))
             return FALSE;
 
          // Define the other required fields:
          $Fields['Email'] = $Email;
+         $Fields['Roles'] = (array)$RoleIDs;
 
          // And insert the new user
-         $UserID = $this->_Insert($Fields);
-
-         // Now update the role for this user
-         $RoleIDs = array(Gdn::Config('Garden.Registration.ApplicantRoleID', 4));
-         $this->SaveRoles($UserID, $RoleIDs, FALSE);
+         $UserID = $this->_Insert($Fields, $Options);
       } else {
          $UserID = FALSE;
       }
@@ -822,7 +986,11 @@ class UserModel extends Gdn_Model {
    /**
     * To be used for basic registration, and captcha registration
     */
-   public function InsertForBasic($FormPostValues, $CheckCaptcha = TRUE) {
+   public function InsertForBasic($FormPostValues, $CheckCaptcha = TRUE, $Options = array()) {
+      $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+      if (!is_array($RoleIDs) || count($RoleIDs) == 0)
+         throw new Exception(T('The default role has not been configured.'), 400);
+
       $UserID = FALSE;
 
       // Define the primary key in this model's table.
@@ -840,11 +1008,11 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
+         $Fields['Roles'] = $RoleIDs;
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         $Fields['Password'] = array('md5' => $Fields['Password']);
 
          // If in Captcha registration mode, check the captcha value
          if ($CheckCaptcha && Gdn::Config('Garden.Registration.Method') == 'Captcha') {
@@ -863,17 +1031,13 @@ class UserModel extends Gdn_Model {
          $Fields['Email'] = $Email;
 
          // And insert the new user
-         $UserID = $this->_Insert($Fields);
+         $UserID = $this->_Insert($Fields, $Options);
 
          AddActivity(
             $UserID,
             'Join',
             T('Welcome Aboard!')
          );
-
-         // Now update the role settings if necessary
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
-         $this->SaveRoles($UserID, $RoleIDs, FALSE);
       }
       return $UserID;
    }
@@ -912,6 +1076,7 @@ class UserModel extends Gdn_Model {
 
       $this->SQL->Update('User')
          ->Set('DateLastActive', Gdn_Format::ToDateTime())
+         ->Set('LastIPAddress', Gdn::Request()->IpAddress())
          ->Set('CountVisits', 'CountVisits + 1', FALSE);
 
       if (isset($Attributes) && is_array($Attributes)) {
@@ -934,8 +1099,6 @@ class UserModel extends Gdn_Model {
     * Validate User Credential
     *
     * Fetches a user row by email (or name) and compare the password.
-    * The password can be stored in plain text, in a md5
-    * or a blowfish hash.
     *
     * If the password was not stored as a blowfish hash,
     * the password will be saved again.
@@ -954,7 +1117,7 @@ class UserModel extends Gdn_Model {
          throw new Exception('The email or id is required');
 
 		try {
-			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted')
+			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted, Banned')
 				->From('User');
 	
 			if ($ID) {
@@ -1019,13 +1182,16 @@ class UserModel extends Gdn_Model {
     * Checks to see if $Username and $Email are already in use by another member.
     */
    public function ValidateUniqueFields($Username, $Email, $UserID = '') {
+      //die(var_dump(array($Username, $Email, $UserID)));
+
+
       $Valid = TRUE;
       $Where = array();
       if (is_numeric($UserID))
          $Where['UserID <> '] = $UserID;
 
       // Make sure the username & email aren't already being used
-      if (C('Garden.Registration.NameUnique', TRUE)) {
+      if (C('Garden.Registration.NameUnique', TRUE) && $Username) {
          $Where['Name'] = $Username;
          $TestData = $this->GetWhere($Where);
          if ($TestData->NumRows() > 0) {
@@ -1034,7 +1200,8 @@ class UserModel extends Gdn_Model {
          }
          unset($Where['Name']);
       }
-      if (C('Garden.Registration.EmailUnique')) {
+      
+      if (C('Garden.Registration.EmailUnique', TRUE) && $Email) {
          $Where['Email'] = $Email;
          $TestData = $this->GetWhere($Where);
          if ($TestData->NumRows() > 0) {
@@ -1441,6 +1608,68 @@ class UserModel extends Gdn_Model {
       return $DefaultValue;
    }
 
+   public function SendEmailConfirmationEmail($User = NULL) {
+      if (!$User)
+         $User = Gdn::Session()->User;
+      elseif (is_numeric($User))
+         $User = $this->GetID($User);
+      elseif (is_string($User)) {
+         $User = $this->GetByEmail($User);
+      }
+
+      if (!$User)
+         throw NotFoundException('User');
+
+      $User = (array)$User;
+
+      if (is_string($User['Attributes']))
+         $User['Attributes'] = @unserialize($User['Attributes']);
+
+      // Make sure the user needs email confirmation.
+      $Roles = $this->GetRoles($User['UserID']);
+      $Roles = ConsolidateArrayValuesByKey($Roles, 'RoleID');
+      if (!in_array(C('Garden.Registration.ConfirmEmailRole'), $Roles)) {
+         $this->Validation->AddValidationResult('Role', 'Your email doesn\'t need confirmation.');
+         
+         // Remove the email key.
+         if (isset($User['Attributes']['EmailKey'])) {
+            unset($User['Attributes']['EmailKey']);
+            $this->SQL->Put('User', array('Attributes' => serialize($User['Attributes'])), array('UserID' => $User['UserID']));
+         }
+
+         return;
+      }
+
+      // Make sure there is a confirmation code.
+      $Code = GetValueR('Attributes.EmailKey', $User);
+      if (!$Code) {
+         $Code = RandomString(8);
+         $Attributes = $User['Attributes'];
+         if (!is_array($Attributes))
+            $Attributes = array('EmailKey' => $Code);
+         else
+            $Attributes['EmailKey'] = $Code;
+         $this->SQL->Put('User', array('Attributes' => serialize($Attributes)), array('UserID' => $User['UserID']));
+      }
+      
+      $AppTitle = Gdn::Config('Garden.Title');
+      $Email = new Gdn_Email();
+      $Email->Subject(sprintf(T('[%s] Confirm Your Email Address'), $AppTitle));
+      $Email->To($User['Email']);
+
+      $EmailFormat = T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL);
+      $Data = array();
+      $Data['EmailKey'] = $Code;
+      $Data['User'] = ArrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
+      $Data['Title'] = $AppTitle;
+
+      $Message = FormatString($EmailFormat, $Data);
+      $Message = $this->_AddEmailHeaderFooter($Message, $Data);
+      $Email->Message($Message);
+
+      $Email->Send();
+   }
+
    public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = NULL) {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
@@ -1450,30 +1679,37 @@ class UserModel extends Gdn_Model {
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
       $Email->To($User->Email);
 
+      $Data = array();
+      $Data['User'] = ArrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
+      $Data['Sender'] = ArrayTranslate((array)$Sender, array('Name', 'Email'));
+      $Data['Title'] = $AppTitle;
+      if (is_array($AdditionalData))
+         $Data = array_merge($Data, $AdditionalData);
+
+      $Data['EmailKey'] = GetValueR('Attributes.EmailKey', $User);
+
       // Check for the new email format.
       if (($EmailFormat = T("EmailWelcome{$RegisterType}", '#')) != '#') {
-         $Data = array();
-         $Data['User'] = ArrayTranslate((array)$User, array('Name', 'Email'));
-         $Data['Sender'] = ArrayTranslate((array)$Sender, array('Name', 'Email'));
-         $Data['Title'] = $AppTitle;
-         if (is_array($AdditionalData))
-            $Data = array_merge($Data, $AdditionalData);
-
          $Message = FormatString($EmailFormat, $Data);
-         $Email->Message($Message);
       } else {
-         $Email->Message(
-            sprintf(
-               T('EmailWelcome'),
-               $User->Name,
-               $Sender->Name,
-               $AppTitle,
-               ExternalUrl('/'),
-               $Password,
-               $User->Email
-            )
+         $Message = sprintf(
+            T('EmailWelcome'),
+            $User->Name,
+            $Sender->Name,
+            $AppTitle,
+            ExternalUrl('/'),
+            $Password,
+            $User->Email
          );
       }
+
+      // Add the email confirmation key.
+      if ($Data['EmailKey']) {
+         $Message .= "\n\n".FormatString(C('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
+      }
+      $Message = $this->_AddEmailHeaderFooter($Message, $Data);
+
+      $Email->Message($Message);
 
       $Email->Send();
    }
@@ -1486,18 +1722,30 @@ class UserModel extends Gdn_Model {
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset'), $AppTitle));
       $Email->To($User->Email);
-      //$Email->From($Sender->Email, $Sender->Name);
-      $Email->Message(
-         sprintf(
-            T('EmailPassword'),
+
+      $Data = array();
+      $Data['User'] = ArrayTranslate((array)$User, array('Name', 'Email'));
+      $Data['Sender'] = ArrayTranslate((array)$Sender, array('Name', 'Email'));
+      $Data['Title'] = $AppTitle;
+
+      $EmailFormat = T('EmailPassword');
+      if (strpos($EmailFormat, '{') === FALSE) {
+         $Message = FormatString($EmailFormat, $Data);
+      } else {
+         $Message = sprintf(
+            $EmailFormat,
             $User->Name,
             $Sender->Name,
             $AppTitle,
             ExternalUrl('/'),
             $Password,
             $User->Email
-         )
-      );
+         );
+      }
+
+      $Message = $this->_AddEmailHeaderFooter($Message, $Data);
+      $Email->Message($Message);
+
       $Email->Send();
    }
    

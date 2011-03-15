@@ -1,9 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
+function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
+   static $Alt = FALSE;
    $CssClass = 'Item';
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt.' ';
+   $CssClass .= $Alt ? ' Alt ' : '';
+   $Alt = !$Alt;
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';

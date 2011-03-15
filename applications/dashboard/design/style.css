@@ -482,6 +482,10 @@ ul.Options ul {
    padding: 0;
    display: none;
 }
+.DataList .Item.Active ul.Options {
+    display:block;
+}
+
 ul.Options {
    z-index: 298;
 }
@@ -619,6 +623,83 @@ ul.Options li.Active ul {
    -moz-box-shadow:2px 2px 2px #999999;
    -webkit-box-shadow:2px 2px 2px #999999;
 }
+
+.DataList .OptionsMenu{
+   display: none;
+}
+.OptionsMenu {
+   font-size: 10px;
+   font-weight: normal;
+   line-height: 100%;
+   z-index: 100;
+}
+.Open.OptionsMenu, .Active .OptionsMenu {
+   display: block;
+}
+.MenuTitle {
+   color: #000;
+   border: 1px solid #bbb;
+   padding: 4px;
+   margin: 3px 4px 0 0;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+   user-select: none;
+   background: url('images/buttons.png') right -96px no-repeat;
+   box-shadow:2px 2px 2px #999999;
+   -moz-box-shadow:2px 2px 2px #999999;
+   -webkit-box-shadow:2px 2px 2px #999999;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -o-user-select: none;
+   
+}
+.Open .MenuTitle {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-radius-bottom-left: 0;
+   -webkit-border-radius-bottom-right: 0;
+   color: #fff;
+   background: url('images/buttons.png') right -144px no-repeat #282828;
+}
+.MenuItems {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft:2px;
+   -moz-border-radius-bottomright:2px;
+   -webkit-border-radius-bottom-left:2px;
+   -webkit-border-radius-bottom-right:2px;
+   box-shadow:2px 2px 2px #999999;
+   -moz-box-shadow:2px 2px 2px #999999;
+   -webkit-box-shadow:2px 2px 2px #999999;
+   background:none repeat scroll 0 0 #444444;
+   border:1px solid #282828;
+   min-width: 125px;
+   line-height: 100%;
+   font-size: 10px;
+   z-index: 1011;
+}
+.MenuItems li {
+   padding: 6px !Important;
+}
+.MenuItems li:hover {
+   background: #282828;
+}
+.MenuItems, .MenuItems a {
+   color: #fff;
+}
+
+.ToggleFlyout {
+   cursor: pointer;
+   position: relative;
+}
+.ToggleFlyout .Flyout {
+   position: absolute;
+   top: 100%;
+   left: 0;
+   display: none;
+}
+
 .Center {
    text-align: center;
 }
@@ -920,19 +1001,17 @@ div.Empty {
 ul.DataList li.Item {
    margin: 0;
    padding: 4px 0;
+   border: 0;
+	position: relative;
    border-bottom: 1px solid #bec8cc;
 }
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList li {
-   border: 0;
-   padding: 0;
-	position: relative;
-}
 ul.DataList div.Options {
 	position: absolute;
 	right: 0;
+   top: 0;
 	width:100px;
 }
 ul.DataList div.OptionButton {

@@ -293,6 +293,10 @@ class Gdn_Request {
       return $this->RequestHost($Hostname);
    }
 
+   public function IpAddress() {
+      return $this->GetValue('REMOTE_ADDR');
+   }
+
    /**
     * Gets/Sets the scheme from the current url. e.g. "http" in
     * "http://foo.com/this/that/garden/index.php?/controller/action/"

@@ -707,13 +707,15 @@ class CategoryModel extends Gdn_Model {
          $Category->Following = $Following;
 
          // Calculate the read field.
-         $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
-         if (!$DateMarkedRead)
-            $DateMarkedRead = GetValue('DateMarkedRead', $Category);
-         if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
-            $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category->DateLastComment);
-         else
-            $Category->Read = FALSE;
+         if (property_exists('DateLastComment', $Category)) {
+            $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
+            if (!$DateMarkedRead)
+               $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+            if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
+               $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category->DateLastComment);
+            else
+               $Category->Read = FALSE;
+         }
 
          foreach ($Result2 as $Category2) {
             if ($Category2->TreeLeft > $Category->TreeLeft && $Category2->TreeRight < $Category->TreeRight) {

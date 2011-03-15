@@ -426,7 +426,7 @@ jQuery(document).ready(function($) {
 	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
-		if (!response.InformMessages)
+		if (!response || !response.InformMessages)
 			return;
 		
 		// If there is no message container in the page, add one

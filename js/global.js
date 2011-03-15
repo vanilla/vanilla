@@ -65,6 +65,16 @@ jQuery(document).ready(function($) {
       document.location = gdn.url('/profile/notifications');
       return false;
    });
+
+   var menuOpen = false;
+   $('.DataList .Item').hover(
+      function() {
+         if (!menuOpen)
+            $(this).addClass('Active');
+      },
+      function() {
+         $(this).removeClass('Active');
+      });
    
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
@@ -330,6 +340,40 @@ jQuery(document).ready(function($) {
 
    if ($.fn.popin)
       $('.Popin').popin();
+
+   $.fn.openToggler = function() {
+     $(this).click(function() {
+        var $flyout = $('.Flyout', this);
+
+        // Dynamically fill the flyout.
+        var rel = $(this).attr('rel');
+        if (rel) {
+           $(this).attr('rel', '');
+           $flyout.addClass('Progress');
+            $.ajax({
+               url: gdn.url(rel),
+               data: { DeliveryType: 'VIEW' },
+               success: function(data) {
+                  $flyout.html(data);
+               },
+               complete: function() {
+                  $flyout.removeClass('Progress');
+               }
+            });
+        }
+
+        if ($flyout.css('display') == 'none') {
+           menuOpen = true;
+           $(this).addClass('Open')
+           $flyout.show();
+        } else {
+           menuOpen = false;
+           $flyout.hide()
+           $(this).removeClass('Open');
+        }
+     });
+   }
+   $('.ToggleFlyout').openToggler();
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {

@@ -1372,7 +1372,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                if ($CssPath !== FALSE) {
                   $CssPath = substr($CssPath, strlen(PATH_ROOT));
                   $CssPath = str_replace(DS, '/', $CssPath);
-                  $this->Head->AddCss($CssPath, 'screen');
+                  $this->Head->AddCss($CssPath, 'all');
                }
             }
 

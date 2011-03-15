@@ -376,6 +376,9 @@ class CategoryModel extends Gdn_Model {
       // Build a tree structure out of the categories.
       $Root = NULL;
       foreach ($Categories as &$Cat) {
+         if (!isset($Cat['CategoryID']))
+            continue;
+         
          // Backup category settings for efficient database saving.
          try {
             $Cat['_TreeLeft'] = $Cat['TreeLeft'];

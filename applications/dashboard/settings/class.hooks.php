@@ -18,9 +18,9 @@ class DashboardHooks implements Gdn_IPlugin {
 
       // Enable theme previewing
       if ($Session->IsValid()) {
-         $PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', '');
-         if ($PreviewThemeFolder != '') {
-            $Sender->Theme = $PreviewThemeFolder;
+         $PreviewThemeName = $Session->GetPreference('PreviewThemeName', '');
+         if ($PreviewThemeName != '') {
+            $Sender->Theme = $PreviewThemeName;
             $Sender->AddAsset('Foot', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
             $Sender->AddCssFile('previewtheme.css');
          }

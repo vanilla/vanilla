@@ -731,19 +731,17 @@ class SettingsController extends DashboardController {
    /**
     * Theme management screen.
     */
-   public function Themes($ThemeFolder = '', $TransientKey = '') {
+   public function Themes($ThemeName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
-
-      $Session = Gdn::Session();
       
-      $AvailableThemes = Gdn::ThemeManager()->AvailableThemes();
-      $this->SetData('EnabledThemeFolder', Gdn::ThemeManager()->EnabledTheme());
+      $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
+      $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
-      $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
+      $this->SetData('EnabledThemeName', GetValue('Index', $ThemeInfo));
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
@@ -756,7 +754,7 @@ class SettingsController extends DashboardController {
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($AvailableThemes as $Theme => $Info) {
+            foreach (Gdn::ThemeManager()->AvailableThemes() as $Theme => $Info) {
                $CurrentName = ArrayValue('Name', $Info, $Theme);
                if (
                   $CurrentName == $Name
@@ -768,22 +766,23 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      $this->SetData('AvailableThemes', $AvailableThemes);
+      $this->SetData('AvailableThemes', Gdn::ThemeManager()->AvailableThemes());
       
-      if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
-            foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
-               if ($ThemeInfo['Folder'] == $ThemeFolder) {
-                  $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
-                  Gdn::ThemeManager()->EnableTheme($ThemeName);
-                  $this->EventArguments['ThemeName'] = $ThemeName;
-                  $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                  $this->FireEvent('AfterEnableTheme');
-               }
-            }
+            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+            if ($ThemeInfo === FALSE)
+               throw new Exception(sprintf(T("Could not find a theme identified by '%s'"), $ThemeName));
+            
+            Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+            Gdn::ThemeManager()->EnableTheme($ThemeName);
+            $this->EventArguments['ThemeName'] = $ThemeName;
+            $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+            $this->FireEvent('AfterEnableTheme');
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
+         
          if ($this->Form->ErrorCount() == 0)
             Redirect('/settings/themes');
 
@@ -791,23 +790,17 @@ class SettingsController extends DashboardController {
       $this->Render();
    }
    
-   public function PreviewTheme($ThemeFolder = '') {
+   public function PreviewTheme($ThemeName = '') {
       $this->Permission('Garden.Themes.Manage');
-      $ThemeManager = new Gdn_ThemeManager();
-      $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $PreviewThemeName = '';
-      $PreviewThemeFolder = $ThemeFolder;
-      foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-         if ($ThemeInfo['Folder'] == $ThemeFolder)
-            $PreviewThemeName = $ThemeName;
-      }
-      // If we failed to get the requested theme, default back to the one currently enabled
-      if ($PreviewThemeName == '') {
-         $this->ThemeName = $ThemeManager->EnabledTheme();
-         foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-            if ($ThemeName == $PreviewThemeName)
-               $PreviewThemeFolder = $ThemeInfo['Folder'];
-         }
+      $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+      
+      $PreviewThemeName = $ThemeName;
+      $PreviewThemeFolder = GetValue('Folder', $ThemeInfo);
+      
+      // If we failed to get the requested theme, cancel preview
+      if ($ThemeInfo === FALSE) {
+         $PreviewThemeName = '';
+         $PreviewThemeFolder = '';
       }
       
       Gdn::Session()->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));

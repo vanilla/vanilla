@@ -515,8 +515,6 @@ class Gdn_Configuration {
       if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
          $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data);
 
-      // echo 'saving '.$File;
-      
       // Infrastructure deployment. Use old method.
       if (PATH_LOCAL_CONF != PATH_CONF) {
          $Result = Gdn_FileSystem::SaveFile($File, $FileContents, LOCK_EX);

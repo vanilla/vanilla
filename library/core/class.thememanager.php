@@ -269,47 +269,47 @@ class Gdn_ThemeManager {
    }
    
    public function EnabledTheme() {
-      $ThemeFolder = Gdn::Config('Garden.Theme', 'default');
-      return $ThemeFolder;
+      $ThemeName = Gdn::Config('Garden.Theme', 'default');
+      return $ThemeName;
    }
    
    public function EnabledThemeInfo($ReturnInSourceFormat = FALSE) {
-      $AvailableThemes = $this->AvailableThemes();
-      $ThemeFolder = $this->EnabledTheme();
-      foreach ($AvailableThemes as $ThemeName => $ThemeInfo) {
-         if (ArrayValue('Folder', $ThemeInfo, '') == $ThemeFolder) {
-            $Info = $ReturnInSourceFormat ? array($ThemeName => $ThemeInfo) : $ThemeInfo;
-            // Update the theme info for a format consumable by views.
-            if (is_array($Info) & isset($Info['Options'])) {
-               $Options =& $Info['Options'];
-               if (isset($Options['Styles'])) {
-                  foreach ($Options['Styles'] as $Key => $Params) {
-                     if (is_string($Params)) {
-                        $Options['Styles'][$Key] = array('Basename' => $Params);
-                     } elseif (is_array($Params) && isset($Params[0])) {
-                        $Params['Basename'] = $Params[0];
-                        unset($Params[0]);
-                        $Options['Styles'][$Key] = $Params;
-                     }
-                  }
-               }
-               if (isset($Options['Text'])) {
-                  foreach ($Options['Text'] as $Key => $Params) {
-                     if (is_string($Params)) {
-                        $Options['Text'][$Key] = array('Type' => $Params);
-                     } elseif (is_array($Params) && isset($Params[0])) {
-                        $Params['Type'] = $Params[0];
-                        unset($Params[0]);
-                        $Options['Text'][$Key] = $Params;
-                     }
-                  }
+      $EnabledThemeName = $this->EnabledTheme();
+      $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
+      
+      if ($ThemeInfo === FALSE)
+         return array();
+      
+      if ($ReturnInSourceFormat)
+         return $ThemeInfo;
+         
+      // Update the theme info for a format consumable by views.
+      if (is_array($ThemeInfo) & isset($ThemeInfo['Options'])) {
+         $Options =& $ThemeInfo['Options'];
+         if (isset($Options['Styles'])) {
+            foreach ($Options['Styles'] as $Key => $Params) {
+               if (is_string($Params)) {
+                  $Options['Styles'][$Key] = array('Basename' => $Params);
+               } elseif (is_array($Params) && isset($Params[0])) {
+                  $Params['Basename'] = $Params[0];
+                  unset($Params[0]);
+                  $Options['Styles'][$Key] = $Params;
                }
             }
-            return $Info;
          }
-
+         if (isset($Options['Text'])) {
+            foreach ($Options['Text'] as $Key => $Params) {
+               if (is_string($Params)) {
+                  $Options['Text'][$Key] = array('Type' => $Params);
+               } elseif (is_array($Params) && isset($Params[0])) {
+                  $Params['Type'] = $Params[0];
+                  unset($Params[0]);
+                  $Options['Text'][$Key] = $Params;
+               }
+            }
+         }
       }
-      return array();
+      return $ThemeInfo;
    }
    
    public function EnableTheme($ThemeName) {
@@ -317,25 +317,24 @@ class Gdn_ThemeManager {
       $this->TestTheme($ThemeName);
       
       // Set the theme.
-      $ThemeInfo = ArrayValueI($ThemeName, $this->AvailableThemes(), array());
-      $ThemeName = GetValue('Index', $ThemeInfo, $ThemeName);
+      $ThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
+      
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
-         $Options = GetValueR("$ThemeName.Options", $this->AvailableThemes());
+         $Options = GetValueR("{$ThemeName}.Options", $this->AvailableThemes());
          if ($Options) {
             SaveToConfig(array(
-               'Garden.Theme' => $ThemeFolder,
-               'Garden.ThemeOptions.Name' => GetValueR("$ThemeName.Name", $this->AvailableThemes(), $ThemeFolder)));
+               'Garden.Theme' => $ThemeName,
+               'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)));
          } else {
-            SaveToConfig('Garden.Theme', $ThemeFolder);
+            SaveToConfig('Garden.Theme', $ThemeName);
             RemoveFromConfig('Garden.ThemeOptions');
          }
       }
 
       // Tell the locale cache to refresh itself.
-      $ApplicationManager = new Gdn_ApplicationManager();
       Gdn::Locale()->Refresh();
       return TRUE;
    }
@@ -349,8 +348,8 @@ class Gdn_ThemeManager {
       // Make sure that the theme's requirements are met
       $ApplicationManager = new Gdn_ApplicationManager();
       $EnabledApplications = $ApplicationManager->EnabledApplications();
-      $AvailableThemes = $this->AvailableThemes();
-      $NewThemeInfo = ArrayValueI($ThemeName, $AvailableThemes, array());
+      
+      $NewThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeName = GetValue('Index', $NewThemeInfo, $ThemeName);
       $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, FALSE);
       $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');

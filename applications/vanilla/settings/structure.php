@@ -97,6 +97,7 @@ $Construct
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
+   ->Column('RegardingID', 'int(11)', TRUE)
    ->Engine('MyISAM')
    ->Set($Explicit, $Drop);
 
@@ -116,8 +117,7 @@ $Construct->Table('UserDiscussion')
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
-   ->Column('Bookmarked', 'tinyint(1)', '0');
-$Construct
+   ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')

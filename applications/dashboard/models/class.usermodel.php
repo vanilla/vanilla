@@ -539,7 +539,7 @@ class UserModel extends Gdn_Model {
                      else
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 't%s'));
 
-                     AddActivity($UserID, 'PictureChange', '<img src="'.$PhotoUrl.'" alt="'.T('Thumbnail').'" />');
+                     AddActivity($UserID, 'PictureChange', Img($PhotoUrl, array('alt' => T('Thumbnail'))));
                   }
                }
    

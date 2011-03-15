@@ -195,10 +195,6 @@ class UserModel extends Gdn_Model {
       return $User;
    }
    
-   public function GetID($UserID) {
-      return $this->Get($UserID);
-   }
-   
    public function GetByUsername($Username) {
 		if ($Username == '')
 		 	return FALSE;

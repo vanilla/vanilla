@@ -146,17 +146,6 @@ function WriteFilterTabs(&$Sender) {
 function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
       echo '<div class="Options">';
-      // Bookmark link
-      $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
-      echo Anchor(
-         '<span class="Star">'
-            .Img('applications/dashboard/design/images/pixel.png', array('alt' => $Title))
-         .'</span>',
-         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-         array('title' => $Title)
-      );
-      
       $Sender->Options = '';
       
       // Dismiss an announcement
@@ -188,16 +177,24 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       
       if ($Sender->Options != '') {
       ?>
-         <ul class="Options">
-            <li>
-               <strong><?php echo T('Options'); ?></strong>
-               <ul>
-                  <?php echo $Sender->Options; ?>
-               </ul>
-            </li>
-         </ul>
+         <div class="ToggleFlyout OptionsMenu">
+            <div class="MenuTitle"><?php echo T('Options'); ?></div>
+            <ul class="Flyout MenuItems">
+               <?php echo $Sender->Options; ?>
+            </ul>
+         </div>
       <?php
       }
+      // Bookmark link
+      $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+      echo Anchor(
+         '<span class="Star">'
+            .Img('applications/dashboard/design/images/pixel.png', array('alt' => $Title))
+         .'</span>',
+         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         array('title' => $Title)
+      );
       echo '</div>';
    }
 }

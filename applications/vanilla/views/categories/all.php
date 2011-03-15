@@ -11,6 +11,8 @@ $ChildCategories = '';
 <?php
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    foreach ($this->CategoryData->Result() as $Category) {
+      $ReadClass = GetValue('Read', $Category) ? 'Read' : 'Unread';
+
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
          // in the $ChildCategories variable, do the replacement.
@@ -25,13 +27,13 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth'.$Category->Depth.'">
-               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>'
+               <div class="ItemContent Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.'">
-               <div class="ItemContent Category">'
+               <div class="ItemContent Category '.$ReadClass.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))

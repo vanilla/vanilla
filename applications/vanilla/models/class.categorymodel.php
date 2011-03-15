@@ -408,9 +408,12 @@ class CategoryModel extends Gdn_Model {
 
       // Set the tree attributes of the tree.
       $this->_SetTree($Root);
+      unset($Root);
 
       // Save the tree structure.
       foreach ($Categories as $Cat) {
+         if (!isset($Cat['CategoryID']))
+            continue;
          if ($Cat['_TreeLeft'] != $Cat['TreeLeft'] || $Cat['_TreeRight'] != $Cat['TreeRight'] || $Cat['_Depth'] != $Cat['Depth'] || $Cat['PermissionCategoryID'] != $Cat['PermissionCategoryID'] || $Cat['_ParentCategoryID'] != $Cat['ParentCategoryID'] || $Cat['Sort'] != $Cat['TreeLeft']) {
             $this->SQL->Put('Category',
                array('TreeLeft' => $Cat['TreeLeft'], 'TreeRight' => $Cat['TreeRight'], 'Depth' => $Cat['Depth'], 'PermissionCategoryID' => $Cat['PermissionCategoryID'], 'ParentCategoryID' => $Cat['ParentCategoryID'], 'Sort' => $Cat['TreeLeft']),

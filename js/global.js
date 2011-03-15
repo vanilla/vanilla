@@ -65,16 +65,6 @@ jQuery(document).ready(function($) {
       document.location = gdn.url('/profile/notifications');
       return false;
    });
-
-   var menuOpen = false;
-   $('.DataList .Item').hover(
-      function() {
-         if (!menuOpen)
-            $(this).addClass('Active');
-      },
-      function() {
-         $(this).removeClass('Active');
-      });
    
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
@@ -363,11 +353,9 @@ jQuery(document).ready(function($) {
         }
 
         if ($flyout.css('display') == 'none') {
-           menuOpen = true;
            $(this).addClass('Open')
            $flyout.show();
         } else {
-           menuOpen = false;
            $flyout.hide()
            $(this).removeClass('Open');
         }

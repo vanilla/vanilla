@@ -246,7 +246,6 @@ if (!class_exists('SideMenuModule', FALSE)) {
             }
          }
 
-         $this->_Sender->SetData('_SideMenuModule', array('Items' => $this->Items));
          return parent::ToString();
       }
    }

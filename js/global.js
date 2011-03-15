@@ -328,20 +328,40 @@ jQuery(document).ready(function($) {
          $(this).val('');
    });
 
-   $('.Popin').each(function(index, elem) {
-      var $elem = $(elem);
-      $elem.addClass('TinyProgress');
-      $.ajax({
-         url: gdn.url($elem.attr('rel')),
-         data: {DeliveryType: 'VIEW'},
-         success: function(data) {
-            $elem.html(data);
-         },
-         complete: function() {
-            $elem.removeClass('TinyProgress');
-         }
-      });
-   });
+   if ($.fn.popin)
+      $('.Popin').popin();
+
+   $.fn.openToggler = function() {
+     $(this).click(function() {
+        var $flyout = $('.Flyout', this);
+
+        // Dynamically fill the flyout.
+        var rel = $(this).attr('rel');
+        if (rel) {
+           $(this).attr('rel', '');
+           $flyout.addClass('Progress');
+            $.ajax({
+               url: gdn.url(rel),
+               data: { DeliveryType: 'VIEW' },
+               success: function(data) {
+                  $flyout.html(data);
+               },
+               complete: function() {
+                  $flyout.removeClass('Progress');
+               }
+            });
+        }
+
+        if ($flyout.css('display') == 'none') {
+           $(this).addClass('Open')
+           $flyout.show();
+        } else {
+           $flyout.hide()
+           $(this).removeClass('Open');
+        }
+     });
+   }
+   $('.ToggleFlyout').openToggler();
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {

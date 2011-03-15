@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @author Mark O'Sullivan
  * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
@@ -176,6 +176,7 @@ class Gdn_ApplicationManager {
       $ApplicationInfo = ArrayValueI($ApplicationName, $this->AvailableApplications(), array());
       $ApplicationName = $ApplicationInfo['Index'];
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
+
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
       return TRUE;
    }
@@ -187,9 +188,6 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-      
-      // Allow temporary autoloading of app files
-      Gdn::Config()->Set("TemporaryApplications.{$ApplicationName}", $ApplicationFolder, TRUE, FALSE);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
@@ -206,8 +204,6 @@ class Gdn_ApplicationManager {
          $Hooks = new $Hooks();
          $Hooks->Setup();
       }
-      
-      Gdn::Config()->Remove("TemporaryApplications.{$ApplicationName}");
       
       return TRUE;
    }

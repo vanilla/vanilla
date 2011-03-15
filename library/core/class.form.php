@@ -578,11 +578,25 @@ class Gdn_Form extends Gdn_Pluggable {
       $Attributes['InlineErrors'] = FALSE;
 
       $CssClass = ArrayValueI('class', $Attributes, '');
+      
+      $SubmittedTimestamp = ($this->GetValue($FieldName) > 0) ? strtotime($this->GetValue($FieldName)) : FALSE;
+      
+      // Month
       $Attributes['class'] = trim($CssClass . ' Month');
+      if ($SubmittedTimestamp)
+         $Attributes['Value'] = date('n', $SubmittedTimestamp);
       $Return = $this->DropDown($FieldName . '_Month', $Months, $Attributes);
+      
+      // Day
       $Attributes['class'] = trim($CssClass . ' Day');
+      if ($SubmittedTimestamp)
+         $Attributes['Value'] = date('j', $SubmittedTimestamp);
       $Return .= $this->DropDown($FieldName . '_Day', $Days, $Attributes);
+      
+      // Year
       $Attributes['class'] = trim($CssClass . ' Year');
+      if ($SubmittedTimestamp)
+         $Attributes['Value'] = date('Y', $SubmittedTimestamp);
       $Return .= $this->DropDown($FieldName . '_Year', $Years, $Attributes);
       
       $Return .= '<input type="hidden" name="DateFields[]" value="' . $FieldName . '" />';

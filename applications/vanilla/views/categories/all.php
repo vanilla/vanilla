@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+include dirname(__FILE__).'/helper_functions.php';
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
@@ -15,6 +16,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
       $this->FireEvent('BeforeCategoryItem');
+      $ReadClass = GetValue('Read', $Category) ? 'Read' : 'Unread';
+
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
          // in the $ChildCategories variable, do the replacement.
@@ -29,13 +32,15 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>
+               <div class="ItemContent Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
+               .GetOptions($Category, $this).'
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
-            $CatList .= '<li class="Item Unread Depth'.$Category->Depth.'" Category-'.$Category->UrlCode.'>
-               <div class="ItemContent Category">'
+            $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.'">
+               <div class="ItemContent Category '.$ReadClass.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                  .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
                   .'<div class="Meta">
                      <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>

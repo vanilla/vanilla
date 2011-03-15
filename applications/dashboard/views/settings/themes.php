@@ -143,15 +143,15 @@ if ($AddonUrl != '')
                   
                   if ($PreviewUrl !== FALSE) {
                      echo Anchor(Img($PreviewUrl, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150')),
-                        'dashboard/settings/previewtheme/'.$ThemeFolder,
+                        'dashboard/settings/previewtheme/'.$ThemeName,
                         '',
                         array('target' => '_top')
                      );
                   }
 
                   echo '<div class="Buttons">';
-                  echo Anchor(T('Apply'), 'dashboard/settings/themes/'.$ThemeFolder.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                  echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeFolder, 'SmallButton PreviewAddon', array('target' => '_top'));
+                  echo Anchor(T('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                  echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
 						$this->EventArguments['ThemeInfo'] = $ThemeInfo;
 						$this->FireEvent('AfterThemeButtons');
                   echo '</div>';

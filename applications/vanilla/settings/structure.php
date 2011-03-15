@@ -27,7 +27,9 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('Depth', 'int', TRUE)
    ->Column('CountDiscussions', 'int', '0')
    ->Column('CountComments', 'int', '0')
+   ->Column('DateMarkedRead', 'datetime', NULL)
    ->Column('AllowDiscussions', 'tinyint', '1')
+   ->Column('Archive', 'tinyint(1)', '0')
    ->Column('Name', 'varchar(255)')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
@@ -89,11 +91,21 @@ $Construct
    ->Column('Sink', 'tinyint(1)', '0')
    ->Column('DateInserted', 'datetime', NULL)
    ->Column('DateUpdated', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(14)', TRUE)
    ->Column('DateLastComment', 'datetime', NULL, 'index')
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
+   ->Column('RegardingID', 'int(11)', TRUE)
    ->Engine('MyISAM')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('UserCategory')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('CategoryID', 'int', FALSE, 'primary')
+   ->Column('DateMarkedRead', 'datetime', NULL)
+   ->Column('Archive', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
    
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
@@ -105,8 +117,7 @@ $Construct->Table('UserDiscussion')
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
-   ->Column('Bookmarked', 'tinyint(1)', '0');
-$Construct
+   ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')
@@ -120,6 +131,8 @@ $Construct->Table('Comment')
 	->Column('DateInserted', 'datetime', NULL, 'key')
 	->Column('DateDeleted', 'datetime', TRUE)
 	->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(14)', TRUE)
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)

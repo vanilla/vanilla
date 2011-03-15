@@ -213,7 +213,25 @@ class RoleModel extends Gdn_Model {
          $RoleID = FALSE;
       }
       return $RoleID;
-   }   
+   }
+
+   public static function SetUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
+      $UserIDs = ConsolidateArrayValuesByKey($Users, $UserIDColumn);
+      $UserRoles = Gdn::SQL()
+         ->Select('ur.UserID, ur.RoleID, r.Name')
+         ->From('UserRole ur')
+         ->Join('Role r', 'ur.RoleID = r.RoleID')
+         ->WhereIn('ur.UserID', $UserIDs)
+         ->Get()->ResultArray();
+
+      $UserRoles = Gdn_DataSet::Index($UserRoles, 'UserID', array('Unique' => FALSE));
+      foreach ($Users as &$User) {
+         $UserID = GetValue($UserIDColumn, $User);
+         $Roles = GetValue($UserID, $UserRoles, array());
+         $Roles = ConsolidateArrayValuesByKey($Roles, 'RoleID', 'Name');
+         SetValue($RolesColumn, $User, $Roles);
+      }
+   }
    
    public function Delete($RoleID, $ReplacementRoleID) {
       // First update users that will be orphaned

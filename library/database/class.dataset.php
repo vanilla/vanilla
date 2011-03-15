@@ -196,9 +196,15 @@ class Gdn_DataSet implements IteratorAggregate {
       return new ArrayIterator($this->Result());
    }
 
-   public static function Index($Data, $Columns, $Sep = '|') {
+   public static function Index($Data, $Columns, $Options = array()) {
       $Columns = (array)$Columns;
       $Result = array();
+
+      if (is_string($Options))
+         $Options = array('Sep' => $Options);
+
+      $Sep = GetValue('Sep', $Options, '|');
+      $Unique = GetValue('Unique', $Options, TRUE);
 
       foreach ($Data as $Row) {
          $IndexValues = array();
@@ -206,7 +212,11 @@ class Gdn_DataSet implements IteratorAggregate {
             $IndexValues[] = GetValue($Column, $Row);
          }
          $Index = implode($Sep, $IndexValues);
-         $Result[$Index] = $Row;
+
+         if ($Unique)
+            $Result[$Index] = $Row;
+         else
+            $Result[$Index][] = $Row;
       }
       return $Result;
    }

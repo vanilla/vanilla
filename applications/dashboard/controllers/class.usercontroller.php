@@ -12,7 +12,7 @@ class UserController extends DashboardController {
 
    public $Uses = array('Database', 'Form');
 
-   public function Index($Offset = FALSE, $Keywords = '') {
+   public function Index($Keywords = '', $Page = '') {
       $this->Permission(
          array(
             'Garden.Users.Add',
@@ -30,8 +30,8 @@ class UserController extends DashboardController {
 
       $this->Form->Method = 'get';
 
-      // Input Validation
-      $Offset = is_numeric($Offset) ? $Offset : 0;
+      // Input Validation.
+      list($Offset, $Limit) = OffsetLimit($Page, PagerModule::$DefaultPageSize);
       if (!$Keywords) {
          $Keywords = $this->Form->GetFormValue('Keywords');
          if ($Keywords)
@@ -44,23 +44,17 @@ class UserController extends DashboardController {
 
       $UserModel = new UserModel();
       //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
-      $Limit = 30;
-      $TotalRecords = $UserModel->SearchCount($Keywords);
-      $this->UserData = $UserModel->Search($Keywords, 'u.Name', 'asc', $Limit, $Offset);
+      list($Offset, $Limit) = OffsetLimit($Page, 30);
 
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'More';
-      $this->Pager->LessCode = 'Previous';
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Wrapper = '<tr %1$s><td colspan="5">%2$s</td></tr>';
-      $this->Pager->Configure(
-         $Offset,
-         $Limit,
-         $TotalRecords,
-         'user/browse/%1$s/'.urlencode($Keywords)
-      );
+      $Filter = $this->_GetFilter();
+      if ($Filter)
+         $Filter['Keywords'] = $Keywords;
+      else
+         $Filter = $Keywords;
+
+      $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
+      $this->UserData = $UserModel->Search($Filter, 'u.Name', 'asc', $Limit, $Offset);
+      RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -99,6 +93,15 @@ class UserController extends DashboardController {
       }
 
       $this->Render();
+   }
+
+   public function ApplicantCount() {
+      $this->Permission('Garden.Applicants.Manage');
+
+      $Count = Gdn::SQL()->GetCount('UserRole', array('RoleID' => C('Garden.Registration.ApplicantRoleID', 0)));
+
+      if ($Count > 0)
+         echo '<span class="Alert">', $Count, '</span>';
    }
 	
 	public function Applicants() {
@@ -152,9 +155,9 @@ class UserController extends DashboardController {
       $this->Render();
    }
 	
-   public function Browse($Offset = FALSE, $Keywords = '') {
+   public function Browse($Keywords = '', $Page = '') {
       $this->View = 'index';
-      $this->Index($Offset, $Keywords);
+      $this->Index($Keywords, $Page);
    }
 
    public function Edit($UserID) {
@@ -209,7 +212,7 @@ class UserController extends DashboardController {
 		$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
 
-      if (C('Garden.Registration.EmailUnique') && $Email != '') {
+      if (C('Garden.Registration.EmailUnique', TRUE) && $Email != '') {
          $UserModel = Gdn::UserModel();
          if ($UserModel->GetByEmail($Email))
             $Available = FALSE;
@@ -219,6 +222,33 @@ class UserController extends DashboardController {
          
       $this->Render();
 	}
+
+   /**
+    * @param Gdn_SQLDriver $SQL
+    */
+   protected function _GetFilter() {
+      $Filter = $this->Request->Get('Filter');
+      if ($Filter) {
+         $Parts = explode(' ', $Filter, 3);
+         if (count($Parts) < 2)
+            return FALSE;
+         
+         $Field = $Parts[0];
+         if (count($Parts) == 2) {
+            $Op = '=';
+            $FilterValue = $Parts[1];
+         } else {
+            $Op = $Parts[1];
+            if (!in_array($Op, array('=', 'like'))) {
+               $Op = '=';
+            }
+            $FilterValue = $Parts[2];
+         }
+
+         return array("$Field $Op" => $FilterValue);
+      }
+      return FALSE;
+   }
 
    public function Decline($UserID = '', $PostBackKey = '') {
       $this->Permission('Garden.Users.Approve');

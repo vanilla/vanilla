@@ -318,7 +318,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       
       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
       foreach (get_declared_classes() as $ClassName) {
-      
+         
          // Only register the plugin if it implements the Gdn_IPlugin interface
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
          
@@ -386,6 +386,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    public function RemoveMobileUnfriendlyPlugins() {
       foreach ($this->EnabledPlugins() as $PluginName => $Trash) {
          $PluginInfo = $this->GetPluginInfo($PluginName);
+         
+         // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
          if (!GetValue('MobileFriendly', $PluginInfo))
             $this->UnRegisterPlugin($PluginName);
       }

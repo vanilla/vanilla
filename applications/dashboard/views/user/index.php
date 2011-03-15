@@ -13,7 +13,7 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
       echo '<p>';
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button(T('Go'));
-      printf(T('%s user(s) found.'), $this->Pager->TotalRecords);
+      printf(T('%s user(s) found.'), $this->Data('RecordCount'));
       echo '</p>';
       
    ?>
@@ -26,8 +26,9 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
       <tr>
          <th><?php echo T('Username'); ?></th>
          <th class="Alt"><?php echo T('Email'); ?></th>
-         <th><?php echo T('First Visit'); ?></th>
-         <th class="Alt"><?php echo T('Last Visit'); ?></th>
+         <th><?php echo T('Roles'); ?></th>
+         <th class="Alt"><?php echo T('First Visit'); ?></th>
+         <th><?php echo T('Last Visit'); ?></th>
          <?php if ($EditUser) { ?>
             <th><?php echo T('Options'); ?></th>
          <?php } ?>
@@ -35,11 +36,10 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
    </thead>
    <tbody>
       <?php
-      echo $this->Pager->ToString('less');
       include($this->FetchViewLocation('users'));
-      echo $this->Pager->ToString('more');
       ?>
    </tbody>
 </table>
 <?php
+PagerModule::Write(array('Sender' => $this));
 echo $this->Form->Close();

@@ -20,6 +20,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class CategoryModel extends Gdn_Model {
+   public $Watching = FALSE;
+
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -226,6 +228,21 @@ class CategoryModel extends Gdn_Model {
          ->Get();
    }
 
+   public function GetSubtree($ParentCategory) {
+      $this->SQL
+         ->Select('c.*')
+         ->From('Category c')
+         ->Join('Category d', 'c.TreeLeft >= d.TreeLeft and c.TreeRight <= d.TreeRight')
+         ->OrderBy('c.TreeLeft', 'asc');
+
+      if (is_numeric($ParentCategory))
+         $this->SQL->Where('d.CategoryID', $ParentCategory);
+      else
+         $this->SQL->Where('d.Code', $ParentCategory);
+
+      return $this->SQL->Get()->ResultArray();
+   }
+
    /**
     * Get full data for a single category or all categories. Respects Permissions.
     *
@@ -245,7 +262,10 @@ class CategoryModel extends Gdn_Model {
 
       // Get the category IDs.
       if ($Permissions == 'Vanilla.Discussions.View') {
-         $CategoryIDs = DiscussionModel::CategoryPermissions();
+         if ($this->Watching)
+            $CategoryIDs = DiscussionModel::CategoryWatch();
+         else
+            $CategoryIDs = DiscussionModel::CategoryPermissions();
          if ($CategoryIDs !== TRUE)
             $this->SQL->WhereIn('c.CategoryID', $CategoryIDs);
       } else {
@@ -254,7 +274,7 @@ class CategoryModel extends Gdn_Model {
 
       // Build base query
       $this->SQL
-         ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID, c.PermissionCategoryID')
+         ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID, c.PermissionCategoryID, c.Archive')
          ->Select('co.DateInserted', '', 'DateLastComment')
          ->Select('co.InsertUserID', '', 'LastCommentUserID')
          ->Select('cu.Name', '', 'LastCommentName')
@@ -266,6 +286,15 @@ class CategoryModel extends Gdn_Model {
          ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')
          ->Join('Discussion d', 'd.DiscussionID = co.DiscussionID', 'left')
          ->Where('c.AllowDiscussions', '1');
+
+      if (Gdn::Session()->UserID > 0) {
+         $UserID = Gdn::Session()->UserID;
+         // Add in user/category stuff.
+         $this->SQL
+            ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID")
+            ->Select('uc.DateMarkedRead')
+            ->Select('uc.Archive', '', 'UserArchive');
+      }
 
       // Single record or full list?
       if (is_numeric($CategoryID) && $CategoryID > 0) {
@@ -609,6 +638,17 @@ class CategoryModel extends Gdn_Model {
       
       return $CategoryID;
    }
+
+   public function SaveUserTree($CategoryID, $Set) {
+      // Grab the Category IDs of the tree.
+      $Categories = $this->GetSubtree($CategoryID);
+      foreach ($Categories as $Category) {
+         $this->SQL->Replace(
+            'UserCategory',
+            $Set,
+            array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
+      }
+   }
    
    public function ApplyUpdates() {
       // If looking at the root node, make sure it exists and that the nested
@@ -655,6 +695,19 @@ class CategoryModel extends Gdn_Model {
             
          if (!property_exists($Category, 'CountAllComments'))
             $Category->CountAllComments = $Category->CountComments;
+
+         // Calculate the following field.
+         $Following = !((bool)GetValue('Archive', $Category) || (bool)GetValue('UserArchive', $Category));
+         $Category->Following = $Following;
+
+         // Calculate the read field.
+         $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
+         if (!$DateMarkedRead)
+            $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+         if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
+            $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category->DateLastComment);
+         else
+            $Category->Read = FALSE;
 
          foreach ($Result2 as $Category2) {
             if ($Category2->TreeLeft > $Category->TreeLeft && $Category2->TreeRight < $Category->TreeRight) {

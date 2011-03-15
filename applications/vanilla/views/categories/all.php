@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+include dirname(__FILE__).'/helper_functions.php';
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
@@ -24,13 +25,15 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth'.$Category->Depth.'">
-               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>
+               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>'
+               .GetOptions($Category, $this).'
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.'">
                <div class="ItemContent Category">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                  .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
                   .'<div class="Meta">
                      <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>

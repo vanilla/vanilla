@@ -203,13 +203,37 @@ class Gdn_Database {
     * @param array $InputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
     */
    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
-		if (isset($Options['Event'])) {
-			// TODO: Raise an event so the query can be overridden.
-         
-		}
-		
       if ($Sql == '')
          trigger_error(ErrorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
+
+      // Get the return type.
+      if (isset($Options['ReturnType']))
+         $ReturnType = $Options['ReturnType'];
+      elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql))
+         $ReturnType = 'ID';
+      elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql))
+         $ReturnType = 'DataSet';
+      else
+         $ReturnType = NULL;
+
+
+		if (isset($Options['Cache'])) {
+         // Check to see if the query is cached.
+         $CacheKeys = (array)$Options['Cache'];
+         foreach ($CacheKeys as $CachKey) {
+            if ($ReturnType == 'DataSet') {
+               $Data = Gdn::Cache()->Get($CacheKey);
+
+               if ($Data !== FALSE)
+                  return new Gdn_DataSet($Data);
+               $StoreCacheKey = $CacheKey;
+               break;
+            } else {
+               // Remove the item from the cache.
+               Gdn::Cache()->Remove($CacheKey);
+            }
+         }
+		}
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
@@ -233,18 +257,20 @@ class Gdn_Database {
       if ($PDOStatement === FALSE) {
          trigger_error(ErrorMessage($this->GetPDOErrorMessage($this->Connection()->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
       }
-
-      $ReturnType = GetValue('ReturnType', $Options);
       
       // Did this query modify data in any way?
-      if ($ReturnType == 'ID' || preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
+      if ($ReturnType == 'ID') {
          $this->_CurrentResultSet = $this->Connection()->lastInsertId();
       } else {
-         if ($ReturnType == 'DataSet' || !preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
+         if ($ReturnType == 'DataSet') {
             // Create a DataSet to manage the resultset
             $this->_CurrentResultSet = new Gdn_DataSet();
             $this->_CurrentResultSet->Connection = $this->Connection();
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
+
+            if (isset($StoreCacheKey)) {
+               Gdn::Cache()->Store($StoreCacheKey, $this->_CurrentResultSet->ResultArray());
+            }
          }
       }
       

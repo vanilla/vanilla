@@ -4,7 +4,7 @@
  * $Object is either a Comment or the original Discussion.
  */
 function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
-   static $Alt = FALSE;
+   $Alt = ($CurrentOffset % 2) != 0;
 
    $Author = UserBuilder($Object, 'Insert');
    $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
@@ -32,7 +32,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 
    if ($Alt)
       $CssClass .= ' Alt';
-   $Alt != $Alt;
+   $Alt = !$Alt;
 
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>

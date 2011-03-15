@@ -19,15 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 
-class Gdn_Regarding {
-
-   private $Type = NULL;
-   private $ForeignType = NULL;
-   private $ForeignID = NULL;
-   
-   private $UserID = NULL;
-   private $ForeignURL = NULL;
-   private $Comment = NULL;
+class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
    
    public function __construct() {
       
@@ -48,27 +40,151 @@ class Gdn_Regarding {
       if ($Verify) {
          $ModelName = ucfirst($ThingType).'Model';
          $VerifyModel = new $ModelName;
+         $Verified = TRUE; // fake it for now
       } else {
          $Verified = NULL;
       }
    
-      if ($Verified || is_null($Verified)) {
-         $this->ForeignType = $ThingType;
-         $this->ForeignID = $ThingID;
+      if ($Verified || is_null($Verified))
+         return new Gdn_RegardingEntity($ThingType, $ThingID);
+      
+      throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $ModelName, $ThingID));
+   }
+   
+   /*
+    * Event system: Provide information for external hooks
+    */
+   
+   public function GetEvent(&$EventArguments) {
+      /**
+      * 1) Entity
+      * 2) Regarding Data
+      * 3) [optional] Options
+      */
+      $Response = array(
+         'EventSender'     => NULL,
+         'Entity'          => NULL,
+         'RegardingData'   => NULL,
+         'Options'         => NULL
+      );
+      
+      if (sizeof($EventArguments) >= 1)
+         $Response['EventSender'] = $EventArguments[0];
+      
+      if (sizeof($EventArguments) >= 2)
+         $Response['Entity'] = $EventArguments[1];
+         
+      if (sizeof($EventArguments) >= 3)
+         $Response['RegardingData'] = $EventArguments[2];
+         
+      if (sizeof($EventArguments) >= 4)
+         $Response['Options'] = $EventArguments[3];
+         
+      return $Response;
+   }
+   
+   public function MatchEvent($RegardingType, $ForeignType, $ForeignID = NULL) {
+      $EventOptions = $Sender->GetEvent($this->EventArguments);
+      
+      return $EventOptions;
+   }
+   
+   /*
+    * Event system: Hook into core events
+    */
+    
+   // Cache regarding data for displayed comments
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+      if (GetValue('RegardingCache', $Sender, NULL) != NULL) return;
+      
+      $Comments = $Sender->Data('CommentData');
+      $CommentIDList = array();
+      if ($Comments && $Comments instanceof Gdn_DataSet) {
+         $Comments->DataSeek(-1);
+         while ($Comment = $Comments->NextRow())
+            $CommentIDList[] = $Comment->CommentID;
       }
       
+      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
+   }
+   
+   protected function CacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
+      
+      $Sender->RegardingCache = array();
+      
+      $ChildRegardingData = $this->RegardingModel()->GetAll($ForeignType, $ForeignIDs);
+      $ParentRegardingData = $this->RegardingModel()->Get($ParentType, $ParentID);
+
+/*
+      $MediaArray = array();
+      if ($MediaData !== FALSE) {
+         $MediaData->DataSeek(-1);
+         while ($Media = $MediaData->NextRow()) {
+            $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
+            $this->MediaCacheById[GetValue('MediaID',$Media)] = $Media;
+         }
+      }
+*/
+            
+      $this->RegardingCache = array();//$MediaArray;
+   }
+   
+   public function DiscusssionController_BeforeCommentBody_Handler($Sender) {
+      $Context = strtolower($Sender->EventArguments['Type']);
+      if ($Context != 'discussion') return;
+      
+      $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], NULL);
+      if (is_null($RegardingID) || $RegardingID < 0) return;
+      
+      try {
+         $RegardingData = $this->RegardingModel()->GetID($RegardingID);
+         $this->EventArguments = array_merge($this->EventArguments,array(
+            'EventSender'     => $Sender,
+            'Entity'          => $Sender->EventArguments['Object'],
+            'RegardingData'   => $RegardingData,
+            'Options'         => NULL
+         ));
+         $this->FireEvent('RegardingDisplay');
+      } catch (Exception $e) {}
+   }
+   
+   public function RegardingModel() {
+      static $RegardingModel = NULL;
+      if (is_null($RegardingModel))
+         $RegardingModel = new RegardingModel();
+      return $RegardingModel;
+   }
+   
+   public function Setup(){}
+   
+}
+
+class Gdn_RegardingEntity extends Gdn_Pluggable implements Gdn_IPlugin {
+
+   private $Type = NULL;
+   private $ForeignType = NULL;
+   private $ForeignID = NULL;
+   
+   private $ParentType = NULL;
+   private $ParentID = NULL;
+   private $UserID = NULL;
+   private $ForeignURL = NULL;
+   private $Comment = NULL;
+   
+   private $CollaborativeActions = array();
+   private $CollaborativeTitle = NULL;
+   
+   public function __construct($ForeignType, $ForeignID) {
+      
+   }
+   
+   public function WithParent($ParentType, $ParentID) {
+      $this->ParentType = $ParentType;
+      $this->ParentID = $ParentID;
       return $this;
    }
    
    /* I'd like to... */
-   
-   public function PraiseIt() {
-      return $this->ActionId('Praise');
-   }
-   
-   public function FlagIt() {
-      return $this->ActionIt('Flag');
-   }
    
    public function ActionIt($ActionType) {
       $this->Type = $ActionType;
@@ -78,18 +194,22 @@ class Gdn_Regarding {
    /* ... */
    
    public function ForDiscussion($InCategory) {
-      $this->CollaborativeAction[] = 'discussion';
+      $this->CollaborativeActions[] = array(
+         'Type'      => 'discussion',
+         'Category'  => $InCategory
+      );
    }
    
    public function ForConversation($WithUsers) {
-      $this->CollaborativeAction[] = 'conversation';
+      $this->CollaborativeActions[] = array(
+         'Type'      => 'conversation',
+         'Users'     => $WithUsers
+      );
    }
    
-   public function WithTitle($CollaborativeTitle) {
-   
+   public function Entitled($CollaborativeTitle) {
+      $this->CollaborativeTitle = $CollaborativeTitle;
    }
-   
-   
    
    /* Meta data */
    
@@ -108,11 +228,6 @@ class Gdn_Regarding {
       return $this;
    }
    
-   // Filler
-   public function Plus() {
-      return $this;
-   }
-   
    /* Finally... */
    
    public function Commit() {
@@ -125,20 +240,42 @@ class Gdn_Regarding {
       if (is_null($this->ForeignID))
          throw new Exception(T("Adding a Regarding event requires a foreign association id."));
          
+      if (is_null($this->Comment))
+         throw new Exception(T("Adding a Regarding event requires a comment."));
+         
       if (is_null($this->UserID))
          $this->UserID = Gdn::Session()->UserID;
          
       $RegardingModel = new RegardingModel();
       $RegardingModel->Save(array(
+         'Type'            => $this->Type,
          'ForeignType'     => $this->ForeignType,
          'ForeignID'       => $this->ForeignID,
          'InsertUserID'    => $this->UserID,
-         'DateInserted'    => date('Y-m-d H:i:s')
+         'DateInserted'    => date('Y-m-d H:i:s'),
          
+         'ParentType'      => $this->ParentType,
+         'ParentID'        => $this->ParentID,
          'ForeignURL'      => $this->ForeignURL,
          'Comment'         => $this->Comment
       ));
+      
+      foreach ($this->CollaborativeActions as $Action) {
+         $ActionType = GetValue('Type', $Action);
+         switch ($ActionType) {
+            case 'discussion':
+               $Category = GetValue('Category', $Action);
+               break;
+               
+            case 'conversation':
+               $Users = GetValue('Users', $Action);
+               break;
+         }
+      }
+      
       return TRUE;
    }
+   
+   public function Setup(){}
    
 }

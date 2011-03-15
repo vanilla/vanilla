@@ -82,7 +82,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       
       if (Gdn_Url::WebRoot())
          $WebResource = CombinePaths(array(Gdn_Url::WebRoot(),$WebResource));
-      return $WebResource;
+      return '/'.$WebResource;
    }
    
    /**
@@ -296,7 +296,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       return C($EnabledKey, FALSE);
    }
    
-   public function Dispatch($Sender, $RequestArgs = array()) {
+   public function Dispatch(&$Sender, $RequestArgs = array()) {
       $Sender->Form = new Gdn_Form();
       
       $ControllerMethod = 'Controller_Index';

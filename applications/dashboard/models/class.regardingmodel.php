@@ -29,11 +29,12 @@ class RegardingModel extends Gdn_Model {
       ))->FirstRow(DATASET_TYPE_ARRAY);
    }
    
-   public function GetAll($ForeignType, $ForeignIDs) {
-      return $this->GetWhere(array(
-         'ForeignType'  => $ForeignType,
-         'ForeignID'    => $ForeignID
-      ))->Get();
+   public function GetAll($ForeignType, $ForeignIDs = array()) {
+      return Gdn::SQL()->Select('*')
+         ->From('Regarding')
+         ->Where('ForeignType', $ForeignType)
+         ->WhereIn('ForeignID', $ForeignIDs)
+         ->Get();
    }
    
 }

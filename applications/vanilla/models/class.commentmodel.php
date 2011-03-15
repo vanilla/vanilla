@@ -499,16 +499,27 @@ class CommentModel extends VanillaModel {
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
             
             if ($Insert === FALSE) {
+               // Log the save.
+               LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+               // Save the new value.
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
                // Make sure that the comments get formatted in the method defined by Garden
                $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
-               $CommentID = $this->SQL->Insert($this->Name, $Fields);
-               $this->EventArguments['CommentID'] = $CommentID;
-               // IsNewDiscussion is passed when the first comment for new discussions are created.
-               $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
-					
-               $this->FireEvent('AfterSaveComment');
+
+               // Check for spam.
+               $Spam = SpamModel::IsSpam('Comment', $Fields);
+
+               if (!$Spam) {
+                  $CommentID = $this->SQL->Insert($this->Name, $Fields);
+                  $this->EventArguments['CommentID'] = $CommentID;
+                  // IsNewDiscussion is passed when the first comment for new discussions are created.
+                  $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
+
+                  $this->FireEvent('AfterSaveComment');
+               } else {
+                  return SPAM;
+               }
             }
          }
       }
@@ -782,40 +793,39 @@ class CommentModel extends VanillaModel {
    public function Delete($CommentID) {
       $this->EventArguments['CommentID'] = $CommentID;
 
-      // Check to see if this is the last comment in the discussion
+      // Grab the comment to check on it.
       $Data = $this->SQL
-         ->Select('d.DiscussionID, d.LastCommentID, c.InsertUserID, d.DateInserted')
-         ->From('Discussion d')
-         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
+         ->Select('c.*, d.LastCommentID, d.DateInserted as DiscussionDateInserted')
+         ->From('Comment c')
+         ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
          ->Where('c.CommentID', $CommentID)
-         ->Get()
-         ->FirstRow();
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
          
       if ($Data) {
 			// If this is the last comment, get the one before and update the LastCommentID field
-			if ($Data->LastCommentID == $CommentID) {
+			if ($Data['LastCommentID'] == $CommentID) {
 				$OldData = $this->SQL
 					->Select('c.CommentID, c.InsertUserID, c.DateInserted')
 					->From('Comment c')
-					->Where('c.DiscussionID', $Data->DiscussionID)
+					->Where('c.DiscussionID', $Data['DiscussionID'])
 					->OrderBy('c.DateInserted', 'desc')
 					->Limit(1, 1)
-					->Get()
-					->FirstRow();
+					->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            
 				if (is_object($OldData)) {
 					$this->SQL->Update('Discussion')
-                  ->Set('LastCommentID', $OldData->CommentID)
-                  ->Set('LastCommentUserID', $OldData->InsertUserID)
-                  ->Set('DateLastComment', $OldData->DateInserted)
-						->Where('DiscussionID', $Data->DiscussionID)
+                  ->Set('LastCommentID', $OldData['CommentID'])
+                  ->Set('LastCommentUserID', $OldData['InsertUserID'])
+                  ->Set('DateLastComment', $OldData['DateInserted'])
+						->Where('DiscussionID', $Data['DiscussionID'])
 						->Put();
 				}
 				else { // It was the ONLY comment
                $this->SQL->Update('Discussion')
                   ->Set('LastCommentID', NULL)
                   ->Set('LastCommentUserID', NULL)
-                  ->Set('DateLastComment', $Data->DateInserted)
-                  ->Where('DiscussionID', $Data->DiscussionID)
+                  ->Set('DateLastComment', $Data['DateInserted'])
+                  ->Where('DiscussionID', $Data['DiscussionID'])
                   ->Put();
             }
 			}
@@ -824,22 +834,27 @@ class CommentModel extends VanillaModel {
 			$Offset = $this->GetOffset($CommentID);
 			$this->SQL->Update('UserDiscussion')
 				->Set('CountComments', 'CountComments - 1', FALSE)
-				->Where('DiscussionID', $Data->DiscussionID)
+				->Where('DiscussionID', $Data['DiscussionID'])
 				->Where('CountComments >', $Offset)
 				->Put();
 				
 			// Decrement the Discussion's Comment Count
 			$this->SQL->Update('Discussion')
 				->Set('CountComments', 'CountComments - 1', FALSE)
-				->Where('DiscussionID', $Data->DiscussionID)
+				->Where('DiscussionID', $Data['DiscussionID'])
 				->Put();
 			
 			$this->FireEvent('DeleteComment');
-			// Delete the comment
+
+         // Log the deletion.
+         unset($Data['LastCommentID'], $Data['DiscussionDateInserted']);
+         LogModel::Insert('Delete', 'Comment', $Data);
+
+			// Delete the comment.
 			$this->SQL->Delete('Comment', array('CommentID' => $CommentID));
 
          // Update the user's comment count
-         $this->UpdateUser($Data->InsertUserID);
+         $this->UpdateUser($Data['InsertUserID']);
       }
       return TRUE;
    }

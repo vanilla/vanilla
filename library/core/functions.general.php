@@ -797,7 +797,7 @@ if (!function_exists('GetValueR')) {
 	 * @param mixed $Default The value to return if the key does not exist.
 	 * @return mixed The value from the array or object.
 	 */
-   function GetValueR($Key, &$Collection, $Default = FALSE) {
+   function GetValueR($Key, $Collection, $Default = FALSE) {
       $Path = explode('.', $Key);
 
       $Value = $Collection;
@@ -1743,6 +1743,8 @@ if (!function_exists('TouchValue')) {
 			$Collection[$Key] = $Default;
 		elseif(is_object($Collection) && !property_exists($Collection, $Key))
 			$Collection->$Key = $Default;
+
+      return GetValue($Key, $Collection);
 	}
 }
 

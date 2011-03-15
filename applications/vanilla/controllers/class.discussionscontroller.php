@@ -90,6 +90,7 @@ class DiscussionsController extends VanillaController {
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
+      $DiscussionModel->Watching = TRUE;
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
       $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
@@ -147,7 +148,6 @@ class DiscussionsController extends VanillaController {
       $this->AddCssFile('vanilla.css');
 		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
-		$this->AddJsFile('jquery.menu.js');
 		$this->AddJsFile('options.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddModule('SignedInModule');

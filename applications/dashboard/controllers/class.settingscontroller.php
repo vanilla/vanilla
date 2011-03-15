@@ -74,6 +74,7 @@ class SettingsController extends DashboardController {
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
             try {
                $ApplicationManager->DisableApplication($ApplicationName);
+               Gdn_LibraryMap::ClearCache();
                $this->FireEvent('AfterDisableApplication');
             } catch (Exception $e) {
                $this->Form->AddError(strip_tags($e->getMessage()));
@@ -88,6 +89,7 @@ class SettingsController extends DashboardController {
                $Validation = new Gdn_Validation();
                $ApplicationManager->RegisterPermissions($ApplicationName, $Validation);
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
+               Gdn_LibraryMap::ClearCache();
                $this->Form->SetValidationResults($Validation->Results());
                
                $this->EventArguments['Validation'] = $Validation;
@@ -99,6 +101,15 @@ class SettingsController extends DashboardController {
             Redirect('settings/applications/'.$this->Filter);
       }
       $this->Render();
+   }
+
+   protected function _BanFilter($Ban) {
+      $BanModel = $this->_BanModel;
+      $BanWhere = $BanModel->BanWhere($Ban);
+      foreach ($BanWhere as $Name => $Value) {
+         if (!in_array($Name, array('u.Admin', 'u.Deleted')))
+            return "$Name $Value";
+      }
    }
    
    /**
@@ -169,7 +180,52 @@ class SettingsController extends DashboardController {
       }
       
       $this->Render();      
-   }      
+   }
+
+   public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
+      $this->Permission('Garden.Moderation.Manage');
+      $this->AddSideMenu();
+      $this->Title(T('Ban List'));
+      $this->AddJsFile('bans.js');
+
+      list($Offset, $Limit) = OffsetLimit($Page, 20);
+
+      $BanModel = new BanModel();
+      $this->_BanModel = $BanModel;
+
+      switch (strtolower($Action)) {
+         case 'add':
+         case 'edit':
+            $this->Form->SetModel($BanModel);
+
+            if ($this->Form->AuthenticatedPostBack()) {
+               if ($ID)
+                  $this->Form->SetFormValue('BanID', $ID);
+               try {
+                  // Save the ban.
+                  $this->Form->Save();
+               } catch (Exception $Ex) {
+                  $this->Form->AddError($Ex);
+               }
+            } else {
+               if ($ID)
+               $this->Form->SetData($BanModel->GetID($ID));
+            }
+            $this->SetData('_BanTypes', array('IPAddress' => 'IP Address', 'Email' => 'Email', 'Name' => 'Name'));
+            $this->View = 'Ban';
+            break;
+         case 'delete':
+            $BanModel->Delete(array('BanID' => $ID));
+            $this->View = 'BanDelete';
+            break;
+         default:
+            $Bans = $BanModel->GetWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->ResultArray();
+            $this->SetData('Bans', $Bans);
+            break;
+      }
+
+      $this->Render();
+   }
    
    /**
     * Homepage management screen.
@@ -502,11 +558,14 @@ class SettingsController extends DashboardController {
             $this->EventArguments['PluginName'] = $PluginName;
             if (array_key_exists($PluginName, $this->EnabledPlugins) === TRUE) {
                Gdn::PluginManager()->DisablePlugin($PluginName);
+               Gdn_LibraryMap::ClearCache();
                $this->FireEvent('AfterDisablePlugin');
             } else {
                $Validation = new Gdn_Validation();
                if (!Gdn::PluginManager()->EnablePlugin($PluginName, $Validation))
                   $this->Form->SetValidationResults($Validation->Results());
+               else
+                  Gdn_LibraryMap::ClearCache();
                
                $this->EventArguments['Validation'] = $Validation;
                $this->FireEvent('AfterEnablePlugin');
@@ -537,10 +596,11 @@ class SettingsController extends DashboardController {
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Garden.Registration.Method' => 'Captcha',
-         // 'Garden.Registration.DefaultRoles',
          'Garden.Registration.CaptchaPrivateKey',
          'Garden.Registration.CaptchaPublicKey',
-         'Garden.Registration.InviteExpiration'
+         'Garden.Registration.InviteExpiration',
+         'Garden.Registration.ConfirmEmail',
+         'Garden.Registration.ConfirmEmailRole'
       ));
       
       // Set the model on the forms.
@@ -549,6 +609,7 @@ class SettingsController extends DashboardController {
       // Load roles with sign-in permission
       $RoleModel = new RoleModel();
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
+      $this->SetData('_Roles', ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'RoleID', 'Name'));
       
       // Get the currently selected default roles
       // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
@@ -596,6 +657,9 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
          // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
          //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
+
+         if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
+            $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
          
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');
@@ -731,19 +795,17 @@ class SettingsController extends DashboardController {
    /**
     * Theme management screen.
     */
-   public function Themes($ThemeFolder = '', $TransientKey = '') {
+   public function Themes($ThemeName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Themes'));
          
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
-
-      $Session = Gdn::Session();
       
-      $AvailableThemes = Gdn::ThemeManager()->AvailableThemes();
-      $this->SetData('EnabledThemeFolder', Gdn::ThemeManager()->EnabledTheme());
+      $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
+      $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
-      $this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
+      $this->SetData('EnabledThemeName', GetValue('Index', $ThemeInfo));
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
@@ -756,7 +818,7 @@ class SettingsController extends DashboardController {
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($AvailableThemes as $Theme => $Info) {
+            foreach (Gdn::ThemeManager()->AvailableThemes() as $Theme => $Info) {
                $CurrentName = ArrayValue('Name', $Info, $Theme);
                if (
                   $CurrentName == $Name
@@ -768,22 +830,23 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      $this->SetData('AvailableThemes', $AvailableThemes);
+      $this->SetData('AvailableThemes', Gdn::ThemeManager()->AvailableThemes());
       
-      if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
-            foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
-               if ($ThemeInfo['Folder'] == $ThemeFolder) {
-                  $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
-                  Gdn::ThemeManager()->EnableTheme($ThemeName);
-                  $this->EventArguments['ThemeName'] = $ThemeName;
-                  $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                  $this->FireEvent('AfterEnableTheme');
-               }
-            }
+            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+            if ($ThemeInfo === FALSE)
+               throw new Exception(sprintf(T("Could not find a theme identified by '%s'"), $ThemeName));
+            
+            Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+            Gdn::ThemeManager()->EnableTheme($ThemeName);
+            $this->EventArguments['ThemeName'] = $ThemeName;
+            $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+            $this->FireEvent('AfterEnableTheme');
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
+         
          if ($this->Form->ErrorCount() == 0)
             Redirect('/settings/themes');
 
@@ -791,23 +854,17 @@ class SettingsController extends DashboardController {
       $this->Render();
    }
    
-   public function PreviewTheme($ThemeFolder = '') {
+   public function PreviewTheme($ThemeName = '') {
       $this->Permission('Garden.Themes.Manage');
-      $ThemeManager = new Gdn_ThemeManager();
-      $this->AvailableThemes = $ThemeManager->AvailableThemes();
-      $PreviewThemeName = '';
-      $PreviewThemeFolder = $ThemeFolder;
-      foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-         if ($ThemeInfo['Folder'] == $ThemeFolder)
-            $PreviewThemeName = $ThemeName;
-      }
-      // If we failed to get the requested theme, default back to the one currently enabled
-      if ($PreviewThemeName == '') {
-         $this->ThemeName = $ThemeManager->EnabledTheme();
-         foreach ($this->AvailableThemes as $ThemeName => $ThemeInfo) {
-            if ($ThemeName == $PreviewThemeName)
-               $PreviewThemeFolder = $ThemeInfo['Folder'];
-         }
+      $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+      
+      $PreviewThemeName = $ThemeName;
+      $PreviewThemeFolder = GetValue('Folder', $ThemeInfo);
+      
+      // If we failed to get the requested theme, cancel preview
+      if ($ThemeInfo === FALSE) {
+         $PreviewThemeName = '';
+         $PreviewThemeFolder = '';
       }
       
       Gdn::Session()->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));

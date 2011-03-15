@@ -553,11 +553,12 @@ class Gdn_Validation {
       return count($this->_ValidationResults) == 0 ? TRUE : FALSE;
    }
 
-
    /**
-    * @param unknown_type $FieldName
-    * @param unknown_type $ErrorCode
-    * @todo add doc
+    * Add a validation result (error) to the validation.
+    *
+    * @param string $FieldName The name of the form field that has the error.
+    * @param string $ErrorCode The translation code of the error.
+    *    Codes thst begin with an '@' symbol are treated as literals and not translated.
     */
    public function AddValidationResult($FieldName, $ErrorCode = '') {
       if (!is_array($this->_ValidationResults))
@@ -573,7 +574,6 @@ class Gdn_Validation {
          $this->_ValidationResults[$FieldName][] = $ErrorCode;
       }
    }
-
 
    /**
     * Returns the $this->_ValidationResults array. You must use this method

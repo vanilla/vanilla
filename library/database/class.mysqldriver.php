@@ -101,6 +101,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * @param string $Table The name of the table to fetch column data from.
     */
    public function FetchColumnSql($Table) {
+      if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix))
+         $Table = $this->Database->DatabasePrefix.$Table;
+      
       return "show columns from ".$this->FormatTableName($Table);
    }
 

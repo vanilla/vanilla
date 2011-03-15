@@ -127,7 +127,7 @@ class Gdn_Autoloader {
                   if ($SearchPathName === TRUE || $SearchPathName == 1)
                      $SearchPathName = md5($SearchPath);
                
-                  // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
+                  // If we have already loaded the plugin manager, use its internal folder list
                   if (Gdn::PluginManager()->Started()) {
                      $Folders = Gdn::PluginManager()->EnabledPluginFolders($SearchPath);
                      foreach ($Folders as $PluginFolder) {
@@ -342,7 +342,8 @@ class Gdn_Autoloader {
          'SearchSubfolders'      => TRUE,
          'Extension'             => NULL,
          'ContextPrefix'         => NULL,
-         'ClassFilter'           => '*'
+         'ClassFilter'           => '*',
+         'SaveToDisk'            => TRUE
       );
       if (array_key_exists($ContextType, self::$Prefixes))
          $DefaultOptions['ContextPrefix'] = GetValue($ContextType, self::$Prefixes);
@@ -483,6 +484,7 @@ class Gdn_Autoloader_Map {
       $Recursive = GetValue('SearchSubfolders', $Options, TRUE);
       $ContextPrefix = GetValue('ContextPrefix', $Options, NULL);
       $MapIdentifier = GetValue('MapIdentifier', $Options, NULL);
+      $SaveToDisk = GetValue('SaveToDisk', $Options, TRUE);
       
       $MapName = $MapType;
       if (!is_null($ExtensionName))
@@ -501,7 +503,8 @@ class Gdn_Autoloader_Map {
          'maptype'      => $MapType,
          'contexttype'  => $ContextType,
          'extension'    => $ExtensionName,
-         'dirty'        => FALSE
+         'dirty'        => FALSE,
+         'save'         => $SaveToDisk
       );
    }
    
@@ -618,6 +621,7 @@ class Gdn_Autoloader_Map {
    public function Shutdown() {
       
       if (!GetValue('dirty', $this->MapInfo)) return FALSE;
+      if (!GetValue('save', $this->MapInfo)) return FALSE;
       
       if (!sizeof($this->Map))
          return FALSE;

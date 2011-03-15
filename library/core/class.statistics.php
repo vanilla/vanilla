@@ -304,7 +304,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
    
    // credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
    public static function CIDRCheck($IP, $CIDR) {
-      list ($net, $mask) = explode ("/", $CIDR);
+      list ($net, $mask) = explode("/", $CIDR);
       
       $ip_net = ip2long ($net);
       $ip_mask = ~((1 << (32 - $mask)) - 1);

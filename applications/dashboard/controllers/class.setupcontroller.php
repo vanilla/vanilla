@@ -86,7 +86,7 @@ class SetupController extends DashboardController {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password'));
+      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
       
       // Set the models on the forms.
       $this->Form->SetModel($ConfigurationModel);
@@ -151,6 +151,10 @@ class SetupController extends DashboardController {
             $ExistingSalt = C('Garden.Cookie.Salt', FALSE);
             $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : RandomString(10);
             $ConfigurationFormValues['Garden.Cookie.Domain'] = ''; // Don't set this to anything by default. # Tim - 2010-06-23
+            // Additional default setup values.
+            $ConfigurationFormValues['Garden.Registration.ConfirmEmail'] = TRUE;
+            $ConfigurationFormValues['Garden.Email.SupportName'] = $ConfigurationFormValues['Garden.Title'];
+
             $ConfigurationModel->Save($ConfigurationFormValues, TRUE);
                     
             // If changing locale, redefine locale sources:

@@ -579,7 +579,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $CssClass = ArrayValueI('class', $Attributes, '');
       
-      $SubmittedTimestamp = strtotime($this->GetValue($FieldName));
+      $SubmittedTimestamp = ($this->GetValue($FieldName) > 0) ? strtotime($this->GetValue($FieldName)) : FALSE;
       
       // Month
       $Attributes['class'] = trim($CssClass . ' Month');

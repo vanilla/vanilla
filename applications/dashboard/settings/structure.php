@@ -260,6 +260,7 @@ if (!$PermissionTableExists) {
       'Garden.Profiles.View' => 1
       ));
 }
+$PermissionModel->ClearPermissions();
 
 // Photo Table
 $Construct->Table('Photo');

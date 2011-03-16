@@ -185,7 +185,11 @@ a.Button,
    margin: 0;
    font-size: 11px;
    padding: 4px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+	background: #f8f8f8;
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -922,7 +926,11 @@ a.BigButton {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+	background: #f8f8f8;
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;

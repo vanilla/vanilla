@@ -248,7 +248,11 @@ input.SmallButton {
    border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
-	background:url("images/bg-button-blue.png") repeat-x scroll left top transparent;
+	background: #3fbcf3;
+	background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
+	background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
+	-pie-background:linear-gradient(top, #aee7fe, #3fbcf3);
+	background:linear-gradient(top, #aee7fe, #3fbcf3);
 	border:1px solid #0F7FE6;
 	color:#003673;
 	cursor:pointer;
@@ -291,7 +295,6 @@ a.SmallButton {
 	font-size:11px;
 	font-weight:normal;
 	padding:2px 4px;
-	background-position: 0 -3px;
 	box-shadow:0 0 0 #999999;
 	-moz-box-shadow:0 0 0 #999999;
 	-webkit-box-shadow:0 0 0 #999999;

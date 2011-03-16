@@ -805,7 +805,7 @@ class SettingsController extends DashboardController {
       $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
       $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
-      $this->SetData('EnabledThemeName', GetValue('Index', $ThemeInfo));
+      $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file

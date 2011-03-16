@@ -356,6 +356,8 @@ class DiscussionModel extends VanillaModel {
    }
 
    public static function CategoryWatch() {
+      return self::CategoryPermissions();
+
       static $CategoryWatch = NULL;
 
       if ($CategoryWatch !== NULL)

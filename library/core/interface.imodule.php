@@ -27,6 +27,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Garden
  */
 interface Gdn_IModule {
+//   public function __construct($Sender);
+
    /**
     * Returns the name of the asset where this component should be rendered.
     */

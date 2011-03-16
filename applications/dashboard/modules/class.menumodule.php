@@ -45,7 +45,7 @@ if (!class_exists('MenuModule', FALSE)) {
        */
       private $_HighlightRoute;
    
-      public function __construct(&$Sender = '') {
+      public function __construct($Sender = '') {
          $this->HtmlId = 'Menu';
          $this->ClearGroups();
          parent::__construct($Sender);

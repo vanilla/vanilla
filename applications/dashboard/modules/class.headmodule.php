@@ -49,7 +49,7 @@ if (!class_exists('HeadModule', FALSE)) {
        */
       protected $_TitleDivider;
       
-      public function __construct(&$Sender = '') {
+      public function __construct($Sender = '') {
          $this->_Tags = array();
          $this->_Strings = array();
          $this->_Title = '';

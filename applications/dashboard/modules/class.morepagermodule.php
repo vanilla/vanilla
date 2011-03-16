@@ -89,7 +89,7 @@ class MorePagerModule extends Gdn_Module {
     */
    private $_Totalled;
 
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $this->ClientID = '';
       $this->CssClass = 'MorePager Foot';
       $this->Offset = 0;

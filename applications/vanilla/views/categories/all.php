@@ -4,6 +4,7 @@ $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
+$this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
 ?>
 <div class="Tabs Headings CategoryHeadings">
    <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
@@ -11,6 +12,10 @@ $ChildCategories = '';
 <?php
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    foreach ($this->CategoryData->Result() as $Category) {
+      $this->EventArguments['CatList'] = &$CatList;
+      $this->EventArguments['ChildCategories'] = &$ChildCategories;
+      $this->EventArguments['Category'] = &$Category;
+      $this->FireEvent('BeforeCategoryItem');
       $ReadClass = GetValue('Read', $Category) ? 'Read' : 'Unread';
 
       if ($Category->CategoryID > 0) {
@@ -26,13 +31,13 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth'.$Category->Depth.'">
+            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
                <div class="ItemContent Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
-            $CatList .= '<li class="Item Depth'.$Category->Depth.'">
+            $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.'">
                <div class="ItemContent Category '.$ReadClass.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)

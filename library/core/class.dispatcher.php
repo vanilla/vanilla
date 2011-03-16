@@ -270,6 +270,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->_ReflectControllerArgs($Controller);
          
          $Controller->Initialize();
+         Gdn::Controller($Controller);
 
          // Call the requested method on the controller - error out if not defined.
          if ($PluginManagerHasReplacementMethod || method_exists($Controller, $ControllerMethod)) {

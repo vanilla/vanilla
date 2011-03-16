@@ -94,6 +94,21 @@ class Gdn {
       return $Result;
    }
 
+   /**
+    * The current controller being targetted.
+    * 
+    * @param Gdn_Controller $Value
+    * @return Gdn_Controller
+    */
+   public static function Controller($Value = NULL) {
+      static $Controller = NULL;
+
+      if ($Value !== NULL)
+         $Controller = $Value;
+
+      return $Controller;
+   }
+
    /** Gets the global dispatcher object.
     *
     * @return Gdn_Dispatcher

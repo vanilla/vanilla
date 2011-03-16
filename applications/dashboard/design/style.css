@@ -126,10 +126,7 @@ h5 {
    font-size: 120%;
    color: #6C6C6C;
 }
-a,
-a:link,
-a:visited,
-a:active {
+a {
    text-decoration: none;
    color: #1e79a7;
 }
@@ -691,7 +688,7 @@ ul.Options li.Active ul {
 .MenuItems li:hover {
    background: #282828;
 }
-.MenuItems, .MenuItems a {
+.MenuItems, .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
    color: #fff;
 }
 

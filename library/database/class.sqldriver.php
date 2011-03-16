@@ -1126,7 +1126,7 @@ abstract class Gdn_SQLDriver {
 
                // We are assuming here that if the existing record doesn't contain the column then it's just been added.
                if (preg_match('/^`(.+)`$/', $Value, $Matches)) {
-                  if (!isset($Row[$Key]) || $Row[$Key] == $Row[$Matches[1]])
+                  if (!isset($Row[$Key]) || $Row[$Key] != $Row[$Matches[1]])
                      $this->Set('`'.$Key.'`', $Value, FALSE);
                } elseif (!isset($Row[$Key]) || $Row[$Key] != $Value) {
                   $this->Set('`'.$Key.'`', $Value);

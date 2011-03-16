@@ -20,6 +20,21 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Theme {
 
+   protected static $_AssetInfo = array();
+   public static function AssetBegin($AssetContainer = 'Panel') {
+      self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
+      ob_start();
+   }
+
+   public static function AssetEnd() {
+      if (count(self::$_AssetInfo) == 0)
+         return;
+
+      $Asset = ob_get_clean();
+      $AssetInfo = array_pop(self::$_AssetInfo);
+
+      Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
+   }
    
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();

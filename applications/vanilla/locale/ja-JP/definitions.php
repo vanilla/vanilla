@@ -405,4 +405,4 @@ $Definition['You have posted %1$s times within %2$s seconds. A spam block is now
 $Definition["You've filled our honeypot! We use honeypots to help prevent spam. If you're  not a spammer or a bot, you should contact the application administrator for help."] = 'ハニーポットに入力しました！ 私たちはスパム防止のためにハニーポットを導入しています。もしあなたがスパマーでもボットでもないのでしたら、管理者に連絡を取ってください。';
 $Definition['You must specify at least one tag.'] = '少なくとも 1 個はタグを指定してください。'; // class.tagging.plugin.php
 $Definition['ValidateTag'] = 'タグにスペースを含むことはできません。'; // class.tagging.plugin.php
-$Definition['You can only specify up to %s tags.'] = '指定できるタグは %s 個までです。' // class.tagging.plugin.php
+$Definition['You can only specify up to %s tags.'] = '指定できるタグは %s 個までです。'; // class.tagging.plugin.php

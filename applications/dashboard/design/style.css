@@ -648,13 +648,14 @@ ul.Options li.Active ul {
    user-select: none;
    background: url('images/buttons.png') right -96px no-repeat;
    padding-right: 18px;
-   box-shadow:2px 2px 2px #999999;
-   -moz-box-shadow:2px 2px 2px #999999;
-   -webkit-box-shadow:2px 2px 2px #999999;
    -webkit-user-select: none;
    -moz-user-select: none;
    -o-user-select: none;
-   
+}
+.MenuTitle:hover {
+   box-shadow:1px 1px 1px #999999;
+   -moz-box-shadow:1px 1px 1px #999999;
+   -webkit-box-shadow:1px 1px 1px #999999;
 }
 .Open .MenuTitle {
    border: 1px solid #282828;
@@ -2060,6 +2061,7 @@ ul.Discussion {
   css for these is in /applications/garden/design/menu.css. Override them here.
 */
 a.Bookmark,
+a.Bookmarked,
 a.Bookmarking {
    display: inline-block;
    background: url('images/star_sprite.png') top center no-repeat;
@@ -2071,10 +2073,10 @@ a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url('images/star_sprite.png') center center no-repeat;
+   background-position: center center;
 }
 a.Bookmarking {
-   background: url('images/star_sprite.png') bottom center no-repeat;
+   background-position: bottom center;
 }
 body.Discussion a.Bookmark {
 	margin: 13px 8px;

@@ -70,6 +70,10 @@ class DiscussionController extends VanillaController {
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
+
+      // Load the category information.
+      $CategoryModel = new CategoryModel();
+      $this->SetData('CategoryBreadcrumbs', $CategoryModel->GetAncestors($this->Data('CategoryID')));
       
       // Setup
       $this->Title($this->Discussion->Name);

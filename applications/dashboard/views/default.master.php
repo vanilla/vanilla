@@ -20,7 +20,7 @@
 							$Name = $Session->User->Name;
 							$CountNotifications = $Session->User->CountNotifications;
 							if (is_numeric($CountNotifications) && $CountNotifications > 0)
-								$Name .= ' <span>'.$CountNotifications.'</span>';
+								$Name .= ' <span class="Alert">'.$CountNotifications.'</span>';
 
                      if (urlencode($Session->User->Name) == $Session->User->Name)
                         $ProfileSlug = $Session->User->Name;

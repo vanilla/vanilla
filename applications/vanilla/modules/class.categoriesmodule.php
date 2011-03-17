@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoriesModule extends Gdn_Module {
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       // Load categories
       $this->Data = FALSE;
       if (Gdn::Config('Vanilla.Categories.Use') == TRUE) {

@@ -20,6 +20,21 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Theme {
 
+   protected static $_AssetInfo = array();
+   public static function AssetBegin($AssetContainer = 'Panel') {
+      self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
+      ob_start();
+   }
+
+   public static function AssetEnd() {
+      if (count(self::$_AssetInfo) == 0)
+         return;
+
+      $Asset = ob_get_clean();
+      $AssetInfo = array_pop(self::$_AssetInfo);
+
+      Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
+   }
    
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();
@@ -40,7 +55,7 @@ class Gdn_Theme {
                $Text = T('Inbox');
             if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
             break;
          case 'profile':
@@ -49,7 +64,7 @@ class Gdn_Theme {
                $Text = $Session->User->Name;
             if ($Session->IsValid() && $Session->User->CountNotifications) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountNotifications.'</span>';
             }
             break;
          case 'user':
@@ -75,7 +90,7 @@ class Gdn_Theme {
                $Text = T('My Drafts');
             if ($Session->IsValid() && $Session->User->CountDrafts) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountDrafts.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountDrafts.'</span>';
             }
             break;
          case 'discussions/bookmarked':
@@ -84,7 +99,7 @@ class Gdn_Theme {
                $Text = T('My Bookmarks');
             if ($Session->IsValid() && $Session->User->CountBookmarks) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountBookmarks.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountBookmarks.'</span>';
             }
             break;
          case 'discussions/mine':
@@ -145,7 +160,11 @@ class Gdn_Theme {
             $Logo = substr($Logo, strlen('uploads/'));
       }
       $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+      if ($Logo) {
+         echo Img(Gdn_Upload::Url($Logo), array('alt' => $Title)), '<span class="WithLogo">'.$Title.'</span>';
+      } else {
+         echo $Title;
+      }
    }
    
    public static function Pagename() {

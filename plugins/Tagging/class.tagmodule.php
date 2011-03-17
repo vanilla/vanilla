@@ -13,7 +13,7 @@ class TagModule extends Gdn_Module {
    protected $_TagData;
    protected $_DiscussionID;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $this->_TagData = FALSE;
       $this->_DiscussionID = 0;
       parent::__construct($Sender);

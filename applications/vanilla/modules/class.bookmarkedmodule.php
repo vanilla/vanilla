@@ -26,6 +26,7 @@ class BookmarkedModule extends Gdn_Module {
 
          if (count($BookmarkIDs)) {
             $DiscussionModel = new DiscussionModel();
+            DiscussionModel::CategoryPermissions();
 
             $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
             

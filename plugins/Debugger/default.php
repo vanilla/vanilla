@@ -55,7 +55,9 @@ class DebuggerPlugin extends Gdn_Plugin {
 
       //$Session = Gdn::Session();
       //if ($Session->CheckPermission('Plugins.Debugger.View')) {
-      $String = '<div id="Sql">';
+      $String = '<div id="Sql" class="DebugInfo">';
+
+      $String .= '<h2>'.T('Debug Information').'</h2>';
 
       // Add the canonical Url.
       if (method_exists($Sender, 'CanonicalUrl')) {

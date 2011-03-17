@@ -12,7 +12,7 @@ class MessageModule extends Gdn_Module {
 
    protected $_Message;
 
-   public function __construct(&$Sender = '', $Message = FALSE) {
+   public function __construct($Sender = '', $Message = FALSE) {
       parent::__construct($Sender);
       $this->_Message = $Message;
    }

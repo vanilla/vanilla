@@ -24,6 +24,16 @@ class PermissionModel extends Gdn_Model {
       }
       return $NewValues;
    }
+
+   public function ClearPermissions() {
+      static $PermissionsCleared = FALSE;
+
+      if (!$PermissionsCleared) {
+         // Remove the cached permissions for all users.
+         $this->SQL->Put('User', array('Permissions' => ''));
+         $PermissionsCleared = TRUE;
+      }
+   }
    
    public function Define($PermissionNames, $Type = 'tinyint', $JunctionTable = NULL, $JunctionColumn = NULL) {
 		$PermissionNames = (array)$PermissionNames;
@@ -643,15 +653,7 @@ class PermissionModel extends Gdn_Model {
 			}
       }
 
-      static $PermissionsCleared = FALSE;
-
-      if (!$PermissionsCleared) {
-         // Remove the cached permissions for all users.
-         $this->SQL->Update('User')
-            ->Set('Permissions', '')
-            ->Put();
-         $PermissionsCleared = TRUE;
-      }
+      $this->ClearPermissions();
    }
    
    public function SaveAll($Permissions, $AllWhere = NULL) {

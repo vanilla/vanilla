@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class RecentUserModule extends Gdn_Module {
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       parent::__construct($Sender);
    }
    

@@ -52,7 +52,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
        */
       private $_HighlightRoute;
    
-      public function __construct(&$Sender = '') {
+      public function __construct($Sender = '') {
          $this->HtmlId = 'SideMenu';
          $this->AutoLinkGroups = TRUE;
          $this->ClearGroups();

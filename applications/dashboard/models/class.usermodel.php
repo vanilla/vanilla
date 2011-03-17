@@ -949,7 +949,7 @@ class UserModel extends Gdn_Model {
          throw new Exception('The email or id is required');
 
 		try {
-			$this->SQL->Select('UserID, Attributes, Admin, Password, HashMethod, Deleted')
+			$this->SQL->Select('UserID, Name, Attributes, Admin, Password, HashMethod, Deleted')
 				->From('User');
 	
 			if ($ID) {
@@ -967,7 +967,7 @@ class UserModel extends Gdn_Model {
          $this->SQL->Reset();
          
 			// Try getting the user information without the new fields.
-			$this->SQL->Select('UserID, Attributes, Admin, Password')
+			$this->SQL->Select('UserID, Name, Attributes, Admin, Password')
 				->From('User');
 	
 			if ($ID) {
@@ -994,7 +994,7 @@ class UserModel extends Gdn_Model {
 		
       $PasswordHash = new Gdn_PasswordHash();
 		$HashMethod = GetValue('HashMethod', $UserData);
-      if(!$PasswordHash->CheckPassword($Password, $UserData->Password, $HashMethod))
+      if(!$PasswordHash->CheckNamePassword($UserData->Name, $Password, $UserData->Password, $HashMethod))
          return FALSE;
 
       if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {

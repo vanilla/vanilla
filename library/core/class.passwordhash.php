@@ -67,11 +67,13 @@ class Gdn_PasswordHash extends PasswordHash {
     * If the password wasn't a phppass hash,
     * the Weak property is set to True.
     *
+    * @param string $User
     * @param string $Password
     * @param string $StoredHash
     * @return boolean
     */
-   function CheckPassword($Password, $StoredHash, $Method = FALSE) {
+
+   function CheckNamePassword($User, $Password, $StoredHash, $Method = FALSE) {
       $Result = FALSE;
 		switch(strtolower($Method)) {
          case 'django':
@@ -80,6 +82,9 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'phpbb':
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);
+            break;
+         case 'smf':
+            $Result = (sha1(strtolower($User).$Password) == $StoredHash);
             break;
          case 'reset':
             throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
@@ -99,6 +104,22 @@ class Gdn_PasswordHash extends PasswordHash {
 		}
 		
 		return $Result;
+   }
+
+   /**
+    * Chech a password against a stored password
+    *
+    * The stored password can be plain, a md5 hash or a phpass hash.
+    *
+    * If the password wasn't a phppass hash,
+    * the Weak property is set to True.
+    *
+    * @param string $Password
+    * @param string $StoredHash
+    * @return boolean
+    */
+   function CheckPassword($Password, $StoredHash, $Method) {
+	return $this->CheckNamePassword(NULL, $Password, $StoredHash, $Method);
    }
 	
 	function CheckVanilla($Password, $StoredHash) {

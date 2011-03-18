@@ -73,7 +73,7 @@ class Gdn_Theme {
                $Text = T('Inbox');
             if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
+               $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
             }
             break;
          case 'profile':
@@ -82,7 +82,7 @@ class Gdn_Theme {
                $Text = $Session->User->Name;
             if ($Session->IsValid() && $Session->User->CountNotifications) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span class="Alert">'.$Session->User->CountNotifications.'</span>';
+               $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
             }
             break;
          case 'user':
@@ -108,7 +108,7 @@ class Gdn_Theme {
                $Text = T('My Drafts');
             if ($Session->IsValid() && $Session->User->CountDrafts) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span class="Alert">'.$Session->User->CountDrafts.'</span>';
+               $Text .= ' <span>'.$Session->User->CountDrafts.'</span>';
             }
             break;
          case 'discussions/bookmarked':
@@ -117,7 +117,7 @@ class Gdn_Theme {
                $Text = T('My Bookmarks');
             if ($Session->IsValid() && $Session->User->CountBookmarks) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span class="Alert">'.$Session->User->CountBookmarks.'</span>';
+               $Text .= ' <span>'.$Session->User->CountBookmarks.'</span>';
             }
             break;
          case 'discussions/mine':
@@ -178,11 +178,7 @@ class Gdn_Theme {
             $Logo = substr($Logo, strlen('uploads/'));
       }
       $Title = C('Garden.Title', 'Title');
-      if ($Logo) {
-         echo Img(Gdn_Upload::Url($Logo), array('alt' => $Title)), '<span class="WithLogo">'.$Title.'</span>';
-      } else {
-         echo $Title;
-      }
+      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
    }
    
    public static function Pagename() {

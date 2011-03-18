@@ -100,7 +100,7 @@ body {
 	text-align: right;
 }
 h1, h2, h3, h4, h5, h6 {
-/*   color: #000;*/
+   color: #000;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
@@ -109,7 +109,8 @@ p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
 }
-h1 {
+h1, h2 {
+   border-bottom:1px solid #bbb;
    font-size:140%;
    font-weight:bold;
    margin-bottom:10px;
@@ -245,8 +246,9 @@ div.Deleted {
 }
 .Alert {
    background: #d00;
+   border: 1px solid #b00;
    color: #fff;
-   padding: 3px 8px;
+   padding: 3px 6px;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
@@ -373,9 +375,6 @@ body #Head h1 {
 }
 #Head h1 a:hover span {
    color:#f3fcff;
-}
-.WithLogo {
-   display: none;
 }
 #Head form {
    float: right;
@@ -1011,12 +1010,6 @@ div.Icons img {
 div.Empty {
    margin: 10px 0;
 }
-.DataList h3 {
-   font-family: inherit;
-}
-.DataHeading {
-   position: relative;
-}
 ul.DataList li.Item {
    margin: 0;
    padding: 4px 0;
@@ -1027,7 +1020,7 @@ ul.DataList li.Item {
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList div.Options, .DataHeading .Options {
+ul.DataList div.Options {
    margin: 2px 4px 0 0;
 	position: absolute;
 	right: 0;
@@ -1653,9 +1646,7 @@ div.MessageForm div.Tabs {
 div.MessageForm div.Tabs ul {
 	display: inline;
 }
-div.Tabs li, div.Tabs li h2 {
-   font-size: inherit;
-   font-family: inherit;
+div.Tabs li {
    display: inline;
    margin: 0;
 }
@@ -1716,10 +1707,6 @@ div.Tabs div.SubTab {
    border-radius: 2px;
    -webkit-border-radius: 2px;
    -moz-border-radius: 2px;
-}
-div.SubTab h1 {
-   font-family: inherit;
-   font-weight: inherit;
 }
 div.HeadingTabs {
 	padding: 8px 8px 8px 12px;
@@ -2090,6 +2077,9 @@ a.Bookmarked {
 }
 a.Bookmarking {
    background-position: bottom center;
+}
+body.Discussion a.Bookmark {
+	margin: 13px 8px;
 }
 
 body.Discussion .Back {

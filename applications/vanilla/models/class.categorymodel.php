@@ -228,22 +228,6 @@ class CategoryModel extends Gdn_Model {
          ->Get();
    }
 
-   public function GetAncestors($Category) {
-      $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode')
-         ->From('Category c')
-         ->Join('Category d', 'c.TreeLeft <= d.TreeLeft and c.TreeRight >= d.TreeRight')
-         ->OrderBy('c.TreeLeft', 'asc')
-         ->Where('c.CategoryID >', 0);
-
-      if (is_numeric($Category))
-         $this->SQL->Where('d.CategoryID', $Category);
-      else
-         $this->SQL->Where('d.Code', $Category);
-
-      return $this->SQL->Get()->ResultArray();
-   }
-
    public function GetSubtree($ParentCategory) {
       $this->SQL
          ->Select('c.*')

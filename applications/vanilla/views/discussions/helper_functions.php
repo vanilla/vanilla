@@ -37,7 +37,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
-      <h3><?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?></h3>
+      <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>
@@ -88,45 +88,33 @@ function WriteFilterTabs(&$Sender) {
    if ($CountBookmarks === NULL) {
       $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
    } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0)
-      $Bookmarked .= '<span class="Alert">'.$CountBookmarks.'</span>';
+      $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
    if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
-      $MyDiscussions .= '<span class="Alert">'.$CountDiscussions.'</span>';
+      $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';
 
    if (is_numeric($CountDrafts) && $CountDrafts > 0)
-      $MyDrafts .= '<span class="Alert">'.$CountDrafts.'</span>';
-
-   if (strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index')
-      $Current = 'All Discussions';
-   elseif ($Sender->RequestMethod == 'bookmarked')
-      $Current = 'My Bookmarks';
-   elseif ($Sender->RequestMethod == 'mine')
-      $Current = "My Discussions";
-   elseif ($Sender->ControllerName == 'draftscontroller')
-      $Current = "My Drafts";
+      $MyDrafts .= '<span>'.$CountDrafts.'</span>';
+      
    ?>
 <div class="Tabs DiscussionsTabs">
    <ul>
       <?php $Sender->FireEvent('BeforeDiscussionTabs'); ?>
-      <li<?php echo $Current == 'All Discussions' ? ' class="Active"' : ''; ?>>
-         <?php
-         echo Wrap(Anchor(T('All Discussions'), '/discussions'), $Current == 'All Discussions' ? 'h2' : 'span');
-         ?>
-      </li>
+      <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions'); ?></li>
       <?php $Sender->FireEvent('AfterAllDiscussionsTab'); ?>
       <?php if ($CountBookmarks > 0 || $Sender->RequestMethod == 'bookmarked') { ?>
-      <li<?php echo $Current == 'My Bookmarks' ? ' class="Active"' : ''; ?>><?php echo Wrap(Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks'), $Current == "My Bookmarks" ? 'h2' : 'span'); ?></li>
+      <li<?php echo $Sender->RequestMethod == 'bookmarked' ? ' class="Active"' : ''; ?>><?php echo Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks'); ?></li>
       <?php
          $Sender->FireEvent('AfterBookmarksTab');
       }
       if ($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') {
       ?>
-      <li<?php echo $Current == "My Discussions" ? ' class="Active"' : ''; ?>><?php echo Wrap(Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions'), $Current == 'My Discussions' ? 'h2' : 'span'); ?></li>
+      <li<?php echo $Sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions'); ?></li>
       <?php
       }
       if ($CountDrafts > 0 || $Sender->ControllerName == 'draftscontroller') {
       ?>
-      <li<?php echo $Current == "My Drafts" ? ' class="Active"' : ''; ?>><?php echo Wrap(Anchor($MyDrafts, '/drafts', 'MyDrafts'), $Current == 'My Drafts' ? 'h2' : 'span'); ?></li>
+      <li<?php echo $Sender->ControllerName == 'draftscontroller' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDrafts, '/drafts', 'MyDrafts'); ?></li>
       <?php
       }
       $Sender->FireEvent('AfterDiscussionTabs');

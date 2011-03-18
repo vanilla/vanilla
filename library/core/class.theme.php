@@ -35,6 +35,24 @@ class Gdn_Theme {
 
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
+
+   public static function Breadcrumbs($Data, $Format, $HomeLink = TRUE) {
+      $Result = '';
+
+      if ($HomeLink) {
+         if (!is_string($HomeLink))
+            $HomeLink = T('Home');
+            $Result .= '<span class="Label"><a href="'.Url('/').'">'.$HomeLink.'</a></span>';
+      }
+
+      foreach ($Data as $Row) {
+         $Label = '<span class="Label">'.FormatString($Format, $Row).'</span>';
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span>', $Result, $Label);
+      }
+
+      $Result ='<span class="BreadCrumbs">'.$Result.'</span>';
+      return $Result;
+   }
    
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();

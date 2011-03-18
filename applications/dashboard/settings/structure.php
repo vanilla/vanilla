@@ -76,11 +76,11 @@ $Construct
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE)
-   ->Column('LastIPAddress', 'varchar(14)', TRUE)
+   ->Column('LastIPAddress', 'varchar(15)', TRUE)
    ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('UpdateIPAddress', 'varchar(14)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
@@ -346,7 +346,7 @@ $Construct->Table('Activity')
    ->Column('CountComments', 'int', '0')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(14)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Set($Explicit, $Drop);
 
 // Message Table
@@ -423,4 +423,10 @@ $Construct->Table('Ban')
    ->Column('InsertUserID', 'int')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Spammer')
+   ->PrimaryKey('UserID', 'int', FALSE, 'primary')
+   ->PrimaryKey('CountSpam', 'usmallint', 0)
+   ->PrimaryKey('CountDeletedSpam', 'usmallint', 0)
    ->Set($Explicit, $Drop);

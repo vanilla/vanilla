@@ -79,6 +79,8 @@ if (!function_exists('FormatPossessive')) {
  *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
  *  - time: Formats the valud as a time. This format has no additional arguments.
  *  - url: Calls Url() function around the value to show a valid url with the site. You can pass a domain to include the domain.
+ *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
+ *  - html: Calls htmlspecialchars.
  * @param array $Args The array of arguments. If you want to nest arrays then the keys to the nested values can be seperated by dots.
  * @return string The formatted string.
  * <code>
@@ -141,6 +143,10 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   $Result = Gdn_Format::Date($Value);
                   break;
             }
+            break;
+         case 'html':
+         case 'htmlspecialchars':
+            $Result = htmlspecialchars($Value);
             break;
          case 'number':
             if(!is_numeric($Value)) {

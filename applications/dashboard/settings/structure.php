@@ -426,7 +426,7 @@ $Construct->Table('Ban')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Spammer')
-   ->PrimaryKey('UserID', 'int', FALSE, 'primary')
-   ->PrimaryKey('CountSpam', 'usmallint', 0)
-   ->PrimaryKey('CountDeletedSpam', 'usmallint', 0)
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('CountSpam', 'usmallint', 0)
+   ->Column('CountDeletedSpam', 'usmallint', 0)
    ->Set($Explicit, $Drop);

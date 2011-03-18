@@ -652,17 +652,20 @@ ul.Options li.Active ul {
    -moz-user-select: none;
    -o-user-select: none;
 }
-.MenuTitle:hover {
-   box-shadow:1px 1px 1px #999999;
-   -moz-box-shadow:1px 1px 1px #999999;
-   -webkit-box-shadow:1px 1px 1px #999999;
-}
+/*.MenuTitle:hover {
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+}*/
 .Open .MenuTitle {
    border: 1px solid #282828;
    -moz-border-radius-bottomleft: 0;
    -moz-border-radius-bottomright: 0;
    -webkit-border-bottom-left-radius: 0;
    -webkit-border-bottom-right-radius: 0;
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    border-bottom-left-radius: 0;
    border-bottom-right-radius: 0;
    color: #fff;
@@ -674,9 +677,9 @@ ul.Options li.Active ul {
    -moz-border-radius-bottomright:2px;
    -webkit-border-radius-bottom-left:2px;
    -webkit-border-radius-bottom-right:2px;
-   box-shadow:2px 2px 2px #999999;
-   -moz-box-shadow:2px 2px 2px #999999;
-   -webkit-box-shadow:2px 2px 2px #999999;
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    background:none repeat scroll 0 0 #444444;
    border:1px solid #282828;
    min-width: 125px;
@@ -2079,6 +2082,7 @@ a.Bookmarking {
    background-position: bottom center;
 }
 body.Discussion a.Bookmark {
+   float: right;
 	margin: 13px 8px;
 }
 

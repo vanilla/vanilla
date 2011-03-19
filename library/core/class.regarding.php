@@ -51,6 +51,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
       throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $ModelName, $ThingID));
    }
    
+   public function That() {
+      call_user_func_array(aray($this,'Regarding'), func_get_args());
+   }
+   
    /*
     * Event system: Provide information for external hooks
     */

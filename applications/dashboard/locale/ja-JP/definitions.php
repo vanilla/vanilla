@@ -77,8 +77,8 @@ $Definition['Comments per Page'] = '1 ページに表示する最大レス数';
 $Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Confirm'] = '確認';
 $Definition['Confirm Email'] = 'E メール確認待ち';
-$Definition['Consumer Key'] = '消費者キー';
-$Definition['Consumer Secret'] = '消費者秘密';
+$Definition['Consumer Key'] = 'Consumer Key';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
+$Definition['Consumer Secret'] = 'Consumer Secret';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
 $Definition['Conversation Messages'] = '会話メッセージ';
 $Definition['Copy'] = 'コピー';
 $Definition['Copy locale pack.'] = 'ロケール パックからロケール デベロッパーに定義文をコピーします。定義文は <code>copied.php</code> ファイルに出力されます。';
@@ -279,7 +279,7 @@ $Definition['This plugin allows users to sign in with their Google accounts. <b>
 $Definition['This plugin helps locale package development.'] = 'このプラグインは、ロケール パッケージの開発を助けます。The plugin keeps a working locale pack at <code>%s</code>.';
 $Definition['Tools'] = 'ツール';
 $Definition['Transport error: %s'] = 'リクエストを処理中に致命的なエラーが発生しました。<br />サーバーは次のように応答しています: %s';
-$Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connectは、彼らのTwitterアカウントを使用することでサインインするためにユーザを許容します。 <b>あなたは、このプラグインが動作するようにTwitterにアプリケーションを登録しなければなりません。</b>';
+$Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect を使うと、Twitter アカウントでログインできます。<b>このプラグインを使うには、Twitter にアプリケーションを登録する必要があります。</b>';
 $Definition['Twitter Settings'] = 'Twitter 設定';
 $Definition['Type'] = 'タイプ';
 
@@ -306,7 +306,7 @@ $Definition['What\'s the Buzz?'] = '最近どう？';
 $Definition['Within'] = '制限時間';
 
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メール アドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
-$Definition['You can place files in your /uploads folder.'] = 'あなたのファイルが直接あなたが置くことができるこのページにアップロードできないくらい大きいなら、それはあなたの/アップロードフォルダにアップロードできます。 ファイル名が<b>export</b>という単語で始まって、<b>.txt, .gz</b>で終わるのを確実にしてください。';
+$Definition['You can place files in your /uploads folder.'] = 'このページに直接アップロードできないくらいファイルサイズが大きな場合は、/uploads フォルダにファイルを配置してください。ファイル名は必ず単語 <b>export</b> で始まり、拡張子 <b>.txt または .gz</b> で終わるようにしてください。';
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = '%1$s プラグインを無効にできません。%2$s プラグインが動作するために、必要です。';
 //$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'; // 内容的に上と重複しているのでコメントアウト
 $Definition['Your changes have been saved.'] = '変更を保存しました。';

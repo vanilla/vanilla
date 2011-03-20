@@ -257,7 +257,7 @@ $Definition['Notify me when people write on my wall.'] = '自分のウォール�
 $Definition['Okay'] = 'Ok';
 $Definition['On'] = 'On';
 $Definition['Options'] = 'オプション設定';
-$Definition['Or you can...'] = 'もしくは、あなたにできることは・・・';
+$Definition['Or you can...'] = 'こちらのアカウントでもログインできます';
 $Definition['Original'] = 'オリジナル';
 
 $Definition['PageDetailsMessage'] = '%1$s ～ %2$s';

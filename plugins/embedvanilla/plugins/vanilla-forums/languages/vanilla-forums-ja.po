@@ -1,0 +1,228 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Vanilla Forums 1.0.5\n"
+"PO-Revision-Date: 2011-03-20 19:35+0900\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"POT-Creation-Date: \n"
+"Last-Translator: Yu-Tang <0011solo@gmail.com>\n"
+"Language-Team: \n"
+
+msgid "Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets."
+msgstr "Vanilla フォーラムを WordPress に緊密に統合します。フォーラム全体を、WordPress のページに埋め込むことができます。またスレッド、カテゴリ、活動履歴ウィジェットも提供します。"
+
+msgid "Vanilla Forum"
+msgstr "Vanilla フォーラム"
+
+msgid "Vanilla Forums"
+msgstr "Vanilla フォーラム"
+
+msgid "Forum Administration"
+msgstr "フォーラム管理"
+
+msgid "Widgets"
+msgstr "ウィジェット"
+
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページへのアクセス権限がありません。"
+
+msgid "Vanilla Forum Administration"
+msgstr "Vanilla フォーラム管理"
+
+msgid "Use this page to configure your Vanilla Forum to work with WordPress."
+msgstr "このページでは、あなたの Vanilla フォーラムを WordPress と連携させるための設定を行います。"
+
+msgid "Don't have a Vanilla Forum yet?"
+msgstr "まだ Vanilla フォーラムを用意していませんか？"
+
+msgid "Get one in under 60 seconds!"
+msgstr "60 秒足らずで入手できます！"
+
+msgid "Tell WordPress where your Vanilla Forum is located"
+msgstr "あなたの Vanilla フォーラムの場所を WordPress に知らせましょう"
+
+msgid "Paste the url to your Vanilla forum here (eg. http://yourdomain.com/forum)"
+msgstr "あなたの Vanilla フォーラムの URL をここに貼り付けてください (例. http://yourdomain.com/forum)"
+
+msgid "Validate &amp; Save"
+msgstr "チェック &amp; 保存"
+
+msgid "Forum url could not be validated. Are you sure you entered the correct web address of your forum?"
+msgstr "フォーラムの URL が不正です。あなたのフォーラムのウェブ アドレスは、正しく入力されていますか？"
+
+msgid "&lt;Embed&gt; Vanilla"
+msgstr "&lt;Embed&gt; Vanilla"
+
+msgid "Use this page to embed your Vanilla Forum into WordPress."
+msgstr "このページでは、あなたの Vanilla フォーラムを WordPress に埋め込むことができます。"
+
+msgid "Forum Location in WordPress"
+msgstr "WordPress におけるフォーラムの場所"
+
+msgid "Define where to access your Vanilla Forum within WordPress."
+msgstr "WordPress の中で、どこに行けば あなたの Vanilla フォーラムにアクセスできるのかを設定してください。"
+
+msgid "You can further customize the page that contains your forum <a href=\"./post.php?post=%d&action=edit\">here</a>."
+msgstr "あなたのフォーラムを表示するページを、<a href=\"./post.php?post=%d&action=edit\">ここ</a>でさらにカスタマイズできます。"
+
+msgid "Widget Integration"
+msgstr "ウィジェットの統合"
+
+msgid "Force your widgets to link to the embedded version of your forum instead of going to the actual forum url."
+msgstr "ウィジェットに、実際のフォーラムの URL ではなく、埋め込みバージョンのフォーラムの方にリンクさせる。"
+
+msgid "Forum &lt;Embed&gt; Code"
+msgstr "フォーラム &lt;埋め込み&gt; コード"
+
+msgid "You can make changes to your forum embed code here (optional)."
+msgstr "フォーラム埋め込み用コードをここで変更できます(オプション)。"
+
+msgid "Discussions"
+msgstr "フォーラム"
+
+msgid "Forum Widgets"
+msgstr "フォーラム ウィジェット"
+
+msgid "Your Vanilla Forum provides some great widgets you can use in your WordPress blog:"
+msgstr "Vanilla フォーラムは、あなたの WordPress ブログで使えるすばらしいウィジェットをいくつか提供します:"
+
+msgid "Vanilla Discussions Widget"
+msgstr "Vanilla スレッド ウィジェット"
+
+msgid "allows you to display recent discussions in your Vanilla Forum in your WordPress site. You define how many discussions to show, and you can even filter to specific discussion categories."
+msgstr "WordPress サイトの中に、Vanilla フォーラムの最新スレッドを表示します。表示するスレッドの数を設定したり、特定のカテゴリに限定することもできます。"
+
+msgid "Vanilla Activity Widget"
+msgstr "Vanilla 活動履歴ウィジェット"
+
+msgid "allows you to display recent activity in your forum (user registrations, status updates, etc). You define how many activities to show, and you can even filter to activities from users in specific roles (administrator activity, for example)."
+msgstr "あなたのフォーラムの最新活動履歴 (ユーザ登録、ステータスの更新等々) を表示します。表示する活動履歴の数を設定したり、特定の役割のユーザに限定することもできます (たとえば管理者の活動履歴だけとか)。"
+
+msgid "Vanilla Recently Active Users Widget"
+msgstr "Vanilla 最新アクティブ ユーザ ウィジェット"
+
+msgid "allows you to display a list of users who have been recently active on your forum. You define how many users to show."
+msgstr "あなたのフォーラムで最近アクティブだったユーザ一覧を表示します。表示するユーザの数を設定できます。"
+
+msgid "All of these widgets are available on your <a href=\"./widgets.php\">WordPress Widget Management page</a>."
+msgstr "これらすべてのウィジェットを、<a href=\"./widgets.php\">WordPress ウィジェット管理ページ</a>で利用できます。"
+
+msgid "Vanilla Discussions"
+msgstr "Vanilla スレッド"
+
+msgid "Recent discussions in your Vanilla Forum."
+msgstr "Vanilla フォーラムの最新スレッドを表示"
+
+msgid "Recent Discussions"
+msgstr "最新スレッド"
+
+msgid "Filter to Category:"
+msgstr "カテゴリ フィルタ:"
+
+msgid "All Categories"
+msgstr "全カテゴリ"
+
+msgid "Number of Discussions to show:"
+msgstr "表示スレッド数:"
+
+msgid "Vanilla Activity"
+msgstr "Vanilla 活動履歴"
+
+msgid "Recent activity happening on your Vanilla Forum (eg. new users, status updates, etc)."
+msgstr "あなたの Vanilla フォーラムで起きた最新の活動を表示 (例. ユーザ登録、ステータスの更新等)"
+
+msgid "Recent Forum Activity"
+msgstr "最新フォーラム活動履歴"
+
+msgid "Number of activities to show:"
+msgstr "表示活動履歴数:"
+
+msgid "Vanilla Users"
+msgstr "Vanilla ユーザ"
+
+msgid "Icons of recently active users in your Vanilla Forum."
+msgstr "あなたの Vanilla フォーラムで最近アクティブだったユーザのアイコンを表示"
+
+msgid "Recently Active Users"
+msgstr "最新アクティブ ユーザ"
+
+msgid "Number of users to show:"
+msgstr "表示ユーザ数:"
+
+msgid "Icon width:"
+msgstr "アイコン幅:"
+
+msgid "%1$s signed in."
+msgstr "%1$s がログインしました。"
+
+msgid "%1$s joined."
+msgstr "%1$s が登録しました。"
+
+msgid "%1$s accepted %4$s invitation for membership."
+msgstr "%1$s が %4$s の招待を承認しました。"
+
+msgid "%1$s approved %4$s membership application."
+msgstr "%1$s が %4$s の登録申請を承認しました。"
+
+msgid "%1$s created an account for %4$s."
+msgstr "%1$s が %4$s のアカウントを作成しました。"
+
+msgid "%1$s updated %6$s profile."
+msgstr "%1$s が %6$s のプロフィールを更新しました。"
+
+msgid "%1$s wrote:"
+msgstr "%1$s がコメントしました。"
+
+msgid "%1$s wrote on %4$s %5$s."
+msgstr "%1$s が %4$s の %5$s にコメントしました。"
+
+msgid "%1$s changed %6$s profile picture."
+msgstr "%1$s が %6$s のプロフィール画像を変更しました。"
+
+msgid "%1$s changed %4$s permissions."
+msgstr "%1$s が %4$s の権限を変更しました。"
+
+msgid "%1$s"
+msgstr "%1$s"
+
+msgid "%1$s commented on %4$s %8$s."
+msgstr "%1$s が %4$s の %8$s にコメントしました。"
+
+msgid "%1$s imported data."
+msgstr "%1$s が データをインポートしました。"
+
+msgid "%1$s sent you a %8$s."
+msgstr "%1$s があなたに %8$s を送信しました。"
+
+msgid "%1$s added %3$s to a %8$s."
+msgstr "%1$s が %3$s を %8$s に追加しました。"
+
+msgid "%1$s started a %8$s."
+msgstr "%1$s が %8$s を開始しました。"
+
+msgid "%1$s mentioned %3$s in a %8$s."
+msgstr "%1$s が %8$s の中で %3$s に返信しました。"
+
+msgid "%1$s commented on your %8$s."
+msgstr "%1$s があなたの %8$s でレスしました。"
+
+msgid "You"
+msgstr "あなた"
+
+msgid "his"
+msgstr "彼"
+
+msgid "her"
+msgstr "彼女"
+
+msgid "he"
+msgstr "彼"
+
+msgid "she"
+msgstr "彼女"
+
+msgid "your"
+msgstr "あなた"
+

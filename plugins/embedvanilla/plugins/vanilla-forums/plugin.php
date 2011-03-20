@@ -3,9 +3,23 @@
 Plugin Name: Vanilla Forums
 Plugin URI: http://vanillaforums.org/addons/
 Description: Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets.
-Version: 1.0.3
+Version: 1.0.5
 Author: Mark O'Sullivan
 Author URI: http://www.vanillaforums.org/
+Text Domain: vanilla-forums
+Domain Path: /languages
+
+ChangeLog:
+1.0.4
+- Fixed validation of Vanilla Url to correct when users incorrectly enter the path to their discussion instead of the actual root of the forum.
+- Fixed a bug that caused Vanilla Admin JS & CSS to be included on all wp dashboard pages.
+- Fixed a bug that caused the copy of the embed template to fail and throw a fatal PHP error.
+- Added an option to the embed form that allows widgets to use the embed url instead of the actual forum url.
+- Changed discussions widget to friendly-url-encode discussion titles.
+- Fixed plugin to work with forums that are not using mod_rewrite.
+1.0.5
+- Fixed css & js includes so the containing folder is no longer hard-coded.
+- Added css file so Vanilla icon displays on all admin pages (not just when looking at a vanilla page).
 
 Copyright 2010 Vanilla Forums Inc
 This file is part of the Vanilla Forums plugin for WordPress.
@@ -18,6 +32,8 @@ Contact Vanilla Forums Inc at support [at] vanillaforums [dot] com
 define('VF_OPTIONS_NAME', 'vf-options');
 define('VF_PLUGIN_PATH', dirname(__FILE__));
 define('VF_PLUGIN_URL', WP_PLUGIN_URL.'/'.plugin_basename(dirname(__FILE__)));
+$lang = dirname(plugin_basename( __FILE__ )) . "/languages";
+load_plugin_textdomain("vanilla-forums", 'wp-content/plugins/'.$lang, $lang);
 
 include_once(VF_PLUGIN_PATH.'/functions.php'); 
 include_once(VF_PLUGIN_PATH.'/admin.php');

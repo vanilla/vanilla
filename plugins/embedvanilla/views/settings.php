@@ -10,9 +10,9 @@ $RecommendedThemeName = 'Embed-Friendly';
 <?php echo $this->Form->Open(); ?>
 <div class="Embeds">
    <div class="EmbedCode">
-      <strong>Forum &lt;Embed&gt; Code</strong>
+      <strong>フォーラム埋め込み用コード</strong>
       <textarea id="EmbedCode"><script type="text/javascript" src="<?php echo Asset('plugins/embedvanilla/remote.js', TRUE); ?>"></script></textarea>
-      <em>Copy and paste this forum embed code into the remote application where you would like the forum to appear.</em>
+      <em>リモート アプリケーションの中のフォーラムを表示したい場所に、このフォーラム埋め込み用コードをコピー &amp; ペーストしてください。</em>
       <script type="text/javascript">
       window.onload = function() {
          var TextBoxID = 'EmbedCode';
@@ -21,8 +21,8 @@ $RecommendedThemeName = 'Embed-Friendly';
       }
       </script>
    </div><div class="EmbedPlugins">
-      <strong>Forum Embed Plugins</strong>
-      <em>Use these custom-built plugins to embed the forum into various other applications without the need to touch any code.</em>
+      <strong>フォーラム埋め込み用プラグイン</strong>
+      <em>以下の専用プラグインを使うと、いかなるコードにも一切ふれることなくフォーラムを様々な他のアプリケーションに埋め込むことができます。</em>
       <ul>
          <li><?php echo Anchor(T('WordPress Plugin'), 'plugins/embedvanilla/plugins/wordpress.zip', 'WordPress'); ?></li>
          <li><?php echo Anchor(T('Blogger Gadget'), 'plugin/gadgetinfo', 'Popup'); ?></li>
@@ -34,7 +34,7 @@ $RecommendedThemeName = 'Embed-Friendly';
 </div>
 <div class="Embeds">
    <div class="EmbedTheme">
-      <strong>Current Theme</strong>
+      <strong>現在のテーマ</strong>
       <?php
       $Author = $this->Data('EnabledTheme.Author');
       $AuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
@@ -43,18 +43,18 @@ $RecommendedThemeName = 'Embed-Friendly';
       if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
          echo Img('/themes/'.$this->Data('EnabledThemeFolder').'/'.$PreviewImage, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
       ?>
-      <em>You are currently using the <?php echo Wrap($this->Data('EnabledThemeName'), 'b'); ?> theme by <?php echo $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author; ?>.</em>
+      <em>現在は <?php echo Wrap($this->Data('EnabledThemeName'), 'b'); ?> テーマ (作者: <?php echo $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author; ?>) が使用されています。</em>
       <em><?php
-         echo Anchor('Browse all installed themes', 'settings/themes');
-         echo ', or ';
-         echo Anchor('find more themes at VanillaForums.org.', 'http://vanillaforums.org/addons');
+         echo Anchor('インストール済みの全テーマを閲覧する', 'settings/themes');
+         echo 'か、または';
+         echo Anchor('VanillaForums.org からもっと他のテーマを探す。', 'http://vanillaforums.org/addons');
       ?></em>
    </div><?php
    $this->FireEvent('BeforeEmbedRecommend');
    // Has the user applied the recommended theme?
    if ($this->Data('EnabledThemeName') != $RecommendedThemeName) {
    ?><div class="EmbedRecommend">
-      <strong>We Recommend</strong>
+      <strong>推奨テーマ</strong>
       <?php
       // Does the user have the recommended theme?
       foreach ($this->Data('AvailableThemes') as $Theme) {
@@ -69,7 +69,7 @@ $RecommendedThemeName = 'Embed-Friendly';
          echo Img('/themes/'.$RecommendedThemeFolder.'/'.$PreviewImage, array('alt' => $RecommendedThemeName, 'height' => '112', 'width' => '150'));
          
       ?>
-      <em>We recommend the <?php echo Wrap($RecommendedThemeName, 'b'); ?> theme. <?php
+      <em><?php echo Wrap($RecommendedThemeName, 'b'); ?> テーマがお勧めです。<?php
       if ($HasRecommendedTheme)
          echo Anchor(T('Click here to apply it.'), 'plugin/embed/'.$RecommendedThemeFolder.'/'.$Session->TransientKey());
       else
@@ -102,8 +102,8 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Remote Url to Forum', 'Plugins.EmbedVanilla.RemoteUrl');
          echo $this->Form->TextBox('Plugins.EmbedVanilla.RemoteUrl');
-         echo ' '.Anchor('View Page', C('Plugins.EmbedVanilla.RemoteUrl'), 'SmallButton', array('target' => '_blank'));
-      ?><span>For SEO purposes, search engine crawlers are excluded from being forced to view the forum in the remote url.</span>
+         echo ' '.Anchor('ページを表示', C('Plugins.EmbedVanilla.RemoteUrl'), 'SmallButton', array('target' => '_blank'));
+      ?><span>SEO の観点から、検索エンジン用クローラはリモート URL でのフォーラム強制表示の対象外になります。</span>
    </li>
    <li>
       <?php echo $this->Form->Button('Save Changes'); ?>

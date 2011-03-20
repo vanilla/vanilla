@@ -1,9 +1,9 @@
-=== Vanilla Forums Integration ===
-Contributors: Vanilla Forums
+=== Vanilla Forums ===
+Contributors: VanillaForums
 Tags: forum, forums, community, vanilla, vanilla forums, single sign-on, sso, widgets, widget, embed, embedded forum
 Requires at least: 3
-Tested up to: 3.0.1
-Stable tag: 1.0.0
+Tested up to: 3.1
+Stable tag: 1.0.5
 
 == Description ==
 
@@ -25,13 +25,11 @@ Migrating to Vanilla from any other forum platform is a breeze, with ready-made 
 
 * **Manage your forum in WordPress**: Manage your Vanilla forum without leaving the comfort of your wordpress dashboard.
 
-
 == Installation ==
 
 1. Upload the `vanilla-forums` folder to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Configure the plugin in the WordPress Settings > Vanilla Forum menu
-
 
 == Frequently Asked Questions ==
 
@@ -42,12 +40,4 @@ Vanilla is forum software that powers discussions on over 400,000 sites around t
 
 = Q. How do I install the Vanilla Forums WordPress Plugin =
 
-To install the Plugin you must get it from your Vanilla forum's Embed Vanilla page. If you are not a Vanilla Forum owner already, you can create one [here](http://vanillaforums.com). 
-
-
-== Screenshots ==
-
-1. The Vanilla Forums settings page
-2. Vanilla dashboard
-3. Vanilla Forum discussion list
-4. Vanilla Forum on a mobile device
+To install the Plugin you must get it from your Vanilla forum's Embed Vanilla page. If you are not a Vanilla Forum owner already, you can create one [here](http://vanillaforums.com).

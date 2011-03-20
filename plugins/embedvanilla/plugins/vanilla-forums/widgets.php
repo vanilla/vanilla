@@ -7,14 +7,14 @@ function vf_widgets_admin_page() {
 	?>
 <div class="wrap">
    <div id="icon-options-general" class="icon32"><br /></div>
-   <h2><?php _e('Forum Widgets'); ?></h2>
-   <p>Your Vanilla Forum provides some great widgets you can use in your WordPress blog:</p>
+   <h2><?php _e('Forum Widgets', 'vanilla-forums'); ?></h2>
+   <p><?php _e('Your Vanilla Forum provides some great widgets you can use in your WordPress blog:', 'vanilla-forums'); ?></p>
 	<ul>
-		<li><strong>Vanilla Discussions Widget</strong> allows you to display recent discussions in your Vanilla Forum in your WordPress site. You define how many discussions to show, and you can even filter to specific discussion categories.</li>
-		<li><strong>Vanilla Activity Widget</strong> allows you to display recent activity in your forum (user registrations, status updates, etc). You define how many activities to show, and you can even filter to activities from users in specific roles (administrator activity, for example).</li>
-		<li><strong>Vanilla Recently Active Users Widget</strong> allows you to display a list of users who have been recently active on your forum. You define how many users to show.</li>
+		<li><strong><?php _e('Vanilla Discussions Widget', 'vanilla-forums'); ?></strong> <?php _e('allows you to display recent discussions in your Vanilla Forum in your WordPress site. You define how many discussions to show, and you can even filter to specific discussion categories.', 'vanilla-forums'); ?></li>
+		<li><strong><?php _e('Vanilla Activity Widget', 'vanilla-forums'); ?></strong> <?php _e('allows you to display recent activity in your forum (user registrations, status updates, etc). You define how many activities to show, and you can even filter to activities from users in specific roles (administrator activity, for example).', 'vanilla-forums'); ?></li>
+		<li><strong><?php _e('Vanilla Recently Active Users Widget', 'vanilla-forums'); ?></strong> <?php _e('allows you to display a list of users who have been recently active on your forum. You define how many users to show.', 'vanilla-forums'); ?></li>
 	</ul>
-	<p>All of these widgets are available on your <a href="./widgets.php">WordPress Widget Management page</a>.</p>
+	<p><?php _e('All of these widgets are available on your <a href="./widgets.php">WordPress Widget Management page</a>.', 'vanilla-forums'); ?></p>
 </div>
 	<?php
 }
@@ -46,6 +46,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=discussions.json');
 		if ($categoryid > 0)
 			$resturl = array($url, '?p=categories/'.$categoryid.'.json');
@@ -68,7 +69,7 @@ function vf_widgets_init() {
 			if ($i > $count)
 				break;
 			
-			echo '<li><a href="'.vf_combine_paths(array($url, 'discussion/'.$Discussion->DiscussionID.'/'.$Discussion->Name), '/').'">'.$Discussion->Name.'</a></li>';
+			echo '<li><a href="'.vf_combine_paths(array($link_url, 'discussion/'.$Discussion->DiscussionID.'/'.vf_format_url($Discussion->Name)), '/').'">'.$Discussion->Name.'</a></li>';
 		}
 		echo '</ul>';
 		echo $after_widget;
@@ -79,7 +80,7 @@ function vf_widgets_init() {
 	function vf_widget_discussions_control() {
 		// Get our options and see if we're handling a form submission.
 		$options = get_option(VF_OPTIONS_NAME);
-		$title = vf_get_value('widget-discussions-title', $options, 'Recent Discussions');
+		$title = vf_get_value('widget-discussions-title', $options, __('Recent Discussions', 'vanilla-forums'));
 		$categoryid = (int)vf_get_value('widget-discussions-categoryid', $options);
 		$count = (int)vf_get_value('widget-discussions-count', $options, 10);
 		if ($_POST['widget-discussions-submit']) {
@@ -100,7 +101,7 @@ function vf_widgets_init() {
 		$resturl = vf_get_value('url', $options, '');
 		$resturl = vf_combine_paths(array($resturl, '?p=categories.json'), '/');
 		$category_data = json_decode(vf_rest($resturl));
-		$select_options = vf_get_select_option('All Categories', '0', $categoryid);
+		$select_options = vf_get_select_option(__('All Categories', 'vanilla-forums'), '0', $categoryid);
 		if (is_object($category_data)) {
 			foreach ($category_data->Categories as $Category) {
 				$select_options .= vf_get_select_option($Category->Name, $Category->CategoryID, $categoryid);
@@ -110,14 +111,14 @@ function vf_widgets_init() {
 		// Here is our little form segment. Notice that we don't need a
 		// complete form. This will be embedded into the existing form.
 		echo '<p><label for="widget-discussions-title">' . __('Title:') . ' <input style="width: 100%;" id="widget-discussions-title" name="widget-discussions-title" type="text" value="'.$title.'" /></label></p>';
-		echo '<p><label for="widget-discussions-categoryid">' . __('Filter to Category:') . ' <select id="widget-discussions-categoryid" name="widget-discussions-categoryid">'.$select_options.'</select></label></p>';
-		echo '<p><label for="widget-discussions-count">' . __('Number of Discussions to show:') . ' <input style="width: 40px;" id="widget-discussions-count" name="widget-discussions-count" type="text" value="'.$count.'" /></label></p>';
+		echo '<p><label for="widget-discussions-categoryid">' . __('Filter to Category:', 'vanilla-forums') . ' <select id="widget-discussions-categoryid" name="widget-discussions-categoryid">'.$select_options.'</select></label></p>';
+		echo '<p><label for="widget-discussions-count">' . __('Number of Discussions to show:', 'vanilla-forums') . ' <input style="width: 40px;" id="widget-discussions-count" name="widget-discussions-count" type="text" value="'.$count.'" /></label></p>';
 		echo '<input type="hidden" id="widget-discussions-submit" name="widget-discussions-submit" value="1" />';
 	}
 	
 	// This registers our widget so it appears with the other available
 	// widgets and can be dragged and dropped into any active sidebars.
-	wp_register_sidebar_widget('vf-widget-discussions', 'Vanilla Discussions', 'vf_widget_discussions', array('description' => 'Recent discussions in your Vanilla Forum.'));
+	wp_register_sidebar_widget('vf-widget-discussions', __('Vanilla Discussions', 'vanilla-forums'), 'vf_widget_discussions', array('description' => __('Recent discussions in your Vanilla Forum.', 'vanilla-forums')));
 
 	// This registers our optional widget control form. Because of this
 	// our widget will have a button that reveals a 300x100 pixel form.
@@ -136,6 +137,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=activity.json');
 		// if ($roleid > 0)
 		// 	$resturl = array($url, 'activities/'.$roleid.'.json');
@@ -156,7 +158,7 @@ function vf_widgets_init() {
 			if ($i > $count)
 				break;
 			
-			echo '<li>'.vf_format_activity($Activity, $url).'</li>';
+			echo '<li>'.vf_format_activity($Activity, $link_url).'</li>';
 		}
 		echo '</ul>';
 		echo $after_widget;
@@ -165,7 +167,8 @@ function vf_widgets_init() {
 	function vf_widget_activities_control() {
 		// Get our options and see if we're handling a form submission.
 		$options = get_option(VF_OPTIONS_NAME);
-		$title = vf_get_value('widget-activities-title', $options, 'Recent Forum Activity');
+echo __('Recent Forum Activity', 'vanilla-forums');
+		$title = vf_get_value('widget-activities-title', $options, __('Recent Forum Activity', 'vanilla-forums'));
 		// $roleid = (int)vf_get_value('widget-activities-roleid', $options);
 		$count = (int)vf_get_value('widget-activities-count', $options, 10);
 		if ($_POST['widget-activities-submit']) {
@@ -199,13 +202,13 @@ function vf_widgets_init() {
 		// complete form. This will be embedded into the existing form.
 		echo '<p><label for="widget-activities-title">' . __('Title:') . ' <input style="width: 100%;" id="widget-activities-title" name="widget-activities-title" type="text" value="'.$title.'" /></label></p>';
 		// echo '<p><label for="widget-activities-roleid">' . __('Filter to Role:') . ' <select id="widget-discussions-categoryid" name="widget-activities-roleid">'.$select_options.'</select></label></p>';
-		echo '<p><label for="widget-activities-count">' . __('Number of activities to show:') . ' <input style="width: 40px;" id="widget-activities-count" name="widget-activities-count" type="text" value="'.$count.'" /></label></p>';
+		echo '<p><label for="widget-activities-count">' . __('Number of activities to show:', 'vanilla-forums') . ' <input style="width: 40px;" id="widget-activities-count" name="widget-activities-count" type="text" value="'.$count.'" /></label></p>';
 		echo '<input type="hidden" id="widget-activities-submit" name="widget-activities-submit" value="1" />';
 	}
 	
 	// This registers our widget so it appears with the other available
 	// widgets and can be dragged and dropped into any active sidebars.
-	wp_register_sidebar_widget('vf-widget-activities', 'Vanilla Activity', 'vf_widget_activities', array('description' => 'Recent activity happening on your Vanilla Forum (eg. new users, status updates, etc).'));
+	wp_register_sidebar_widget('vf-widget-activities', __('Vanilla Activity', 'vanilla-forums'), 'vf_widget_activities', array('description' => __('Recent activity happening on your Vanilla Forum (eg. new users, status updates, etc).', 'vanilla-forums')));
 
 	// This registers our optional widget control form. Because of this
 	// our widget will have a button that reveals a 300x100 pixel form.
@@ -224,6 +227,7 @@ function vf_widgets_init() {
 			$count = 5;
 			
 		$url = vf_get_value('url', $options, '');
+		$link_url = vf_get_link_url($options);
 		$resturl = array($url, '?p=user/summary.json');
 			
 		// Retrieve the latest discussions from the Vanilla API
@@ -243,7 +247,7 @@ function vf_widgets_init() {
 				break;
 			
 			$User->IconWidth = $width;
-			echo vf_user_photo($User, $url).' ';
+			echo vf_user_photo($User, $link_url).' ';
 		}
 		echo '</div>';
 		echo $after_widget;
@@ -252,7 +256,7 @@ function vf_widgets_init() {
 	function vf_widget_users_control() {
 		// Get our options and see if we're handling a form submission.
 		$options = get_option(VF_OPTIONS_NAME);
-		$title = vf_get_value('widget-users-title', $options, 'Recently Active Users');
+		$title = vf_get_value('widget-users-title', $options, __('Recently Active Users', 'vanilla-forums'));
 		$count = (int)vf_get_value('widget-users-count', $options, 10);
 		$width = (int)vf_get_value('widget-users-iconwidth', $options, 32);
 		if ($_POST['widget-users-submit']) {
@@ -270,14 +274,14 @@ function vf_widgets_init() {
 		$title = htmlspecialchars($title, ENT_QUOTES);
 		
 		echo '<p><label for="widget-users-title">' . __('Title:') . ' <input style="width: 100%;" id="widget-users-title" name="widget-users-title" type="text" value="'.$title.'" /></label></p>';
-		echo '<p><label for="widget-users-count">' . __('Number of users to show:') . ' <input style="width: 40px;" id="widget-users-count" name="widget-users-count" type="text" value="'.$count.'" /></label></p>';
-		echo '<p><label for="widget-users-iconwidth">' . __('Icon width:') . ' <input style="width: 40px;" id="widget-users-iconwidth" name="widget-users-iconwidth" type="text" value="'.$width.'" />px</label></p>';
+		echo '<p><label for="widget-users-count">' . __('Number of users to show:', 'vanilla-forums') . ' <input style="width: 40px;" id="widget-users-count" name="widget-users-count" type="text" value="'.$count.'" /></label></p>';
+		echo '<p><label for="widget-users-iconwidth">' . __('Icon width:', 'vanilla-forums') . ' <input style="width: 40px;" id="widget-users-iconwidth" name="widget-users-iconwidth" type="text" value="'.$width.'" />px</label></p>';
 		echo '<input type="hidden" id="widget-users-submit" name="widget-users-submit" value="1" />';
 	}
 	
 	// This registers our widget so it appears with the other available
 	// widgets and can be dragged and dropped into any active sidebars.
-	wp_register_sidebar_widget('vf-widget-users', 'Vanilla Users', 'vf_widget_users', array('description' => 'Icons of recently active users in your Vanilla Forum.'));
+	wp_register_sidebar_widget('vf-widget-users', __('Vanilla Users', 'vanilla-forums'), 'vf_widget_users', array('description' => __('Icons of recently active users in your Vanilla Forum.', 'vanilla-forums')));
 
 	// This registers our optional widget control form. Because of this
 	// our widget will have a button that reveals a 300x100 pixel form.

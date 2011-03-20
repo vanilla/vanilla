@@ -56,7 +56,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
    ?>
    <tr class="More <?php echo $RowClass; ?>">
       <th><?php echo GetValue('Name', $Info, $Key); ?></th>
-      <td class="Alt"><?php echo GetValue('Description', $Info, ''); ?></td>
+      <td class="Alt"><?php echo T(GetValue('Description', $Info, '')); ?></td>
    </tr>
    <tr class="<?php echo $RowClass; ?>">
       <td class="Info"><?php

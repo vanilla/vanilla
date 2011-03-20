@@ -61,7 +61,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
       ?>
       <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
-         <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $PluginInfo, '')); ?></td>
+         <td class="Alt"><?php echo Gdn_Format::Html(T(GetValue('Description', $PluginInfo, ''))); ?></td>
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php

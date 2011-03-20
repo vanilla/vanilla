@@ -60,7 +60,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
       ?>   
       <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
-         <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
+         <td><?php echo T(ArrayValue('Description', $AppInfo, '')); ?></td>
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php

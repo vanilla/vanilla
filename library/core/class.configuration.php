@@ -315,7 +315,7 @@ class Gdn_Configuration {
     */
    public function Load($File, $LoadFor = 'Use', $Name = 'Configuration') {
       // Prevent someone from calling Save and wiping out a config file accidentally.
-      if($LoadFor == 'Save')
+      if ($LoadFor == 'Save')
          $this->_File = $File;
       else
          $this->_File = '';
@@ -332,19 +332,19 @@ class Gdn_Configuration {
       
       // If we're not loading config from cache, check that the file exists
       if (!$LoadedFromCache) {
-         if(!file_exists($File)) {
+         if (!file_exists($File)) {
             return FALSE;
          }
       }
       
-      switch($LoadFor) {
+      switch ($LoadFor) {
          case 'Save':
             $Array = &$this->_SaveData; break;
          case 'Use':
             $Array = &$this->_Data; break;
       }
       
-      if(!is_array($Array))
+      if (!is_array($Array))
          $Array = array();
          
       // Define the variable properly.
@@ -364,8 +364,10 @@ class Gdn_Configuration {
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
+      // We're caching, using the cache, and this data was not loaded from cache.
+      // Write it there now.
       if ($this->Caching() && $UseCache && !$LoadedFromCache) {
-         // Not loaded from cache. Write it there now.
+         
          Gdn::Cache()->Store($FileKey, $$Name);
       }
       

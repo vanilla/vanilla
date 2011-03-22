@@ -150,7 +150,8 @@ class DiscussionsController extends VanillaController {
 		$this->AddJsFile('discussions.js');
 		$this->AddJsFile('options.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
-		$this->AddModule('SignedInModule');
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
 		$this->FireEvent('AfterInitialize');
    }
    

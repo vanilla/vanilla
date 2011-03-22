@@ -113,6 +113,13 @@ class Gdn_Autoloader {
                      'Extension'             => $EnabledApplication,
                      'ClassFilter'           => '*module'
                   ));
+
+                  $AppLibrary = CombinePaths(array($ApplicationPath."/library"));
+                  self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppLibrary, array(
+                     'SearchSubfolders'      => FALSE,
+                     'Extension'             => $EnabledApplication,
+                     'ClassFilter'           => '*'
+                  ));
                }
             }
             

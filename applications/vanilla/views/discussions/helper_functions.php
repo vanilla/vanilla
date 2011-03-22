@@ -124,7 +124,7 @@ function WriteFilterTabs(&$Sender) {
    $DescendantData = GetValue('DescendantData', $Sender->Data);
    $Category = GetValue('Category', $Sender->Data);
    if ($DescendantData && $Category) {
-      echo '<div class="SubTab"><span class="FirstCrumb">↳ </span>';
+      echo '<div class="SubTab"><span class="BreadCrumb FirstCrumb">↳ </span>';
       foreach ($DescendantData->Result() as $Descendant) {
          // Ignore the root node
          if ($Descendant->CategoryID > 0) {

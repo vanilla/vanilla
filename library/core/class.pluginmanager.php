@@ -250,6 +250,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $RealPluginFile = realpath($PluginFile);
          $SearchPluginInfo['RealFile'] = $RealPluginFile;
          $SearchPluginInfo['RealRoot'] = dirname($RealPluginFile);
+         $SearchPluginInfo['SearchPath'] = $SearchPath;
          $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
          
          $PluginClassName = GetValue('ClassName', $SearchPluginInfo);

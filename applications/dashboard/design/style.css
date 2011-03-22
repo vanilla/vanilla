@@ -194,7 +194,8 @@ a.Button,
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+	-webkit-box-shadow: 0px 0px 2px #999;
+	white-space: nowrap;
    }
 input.Button {
 	font-size: 14px;
@@ -1679,6 +1680,7 @@ div.Tabs li a:visited {
    text-decoration: none;
    padding: 5px 10px;
 	line-height: 2.6;
+	white-space: nowrap;
 }
 div.MorePager li a:hover,
 a.TabLink:hover,

@@ -73,7 +73,7 @@ class NotificationsController extends Gdn_Controller {
 						$Preferences[] = $Pref;
 					} else {
 						if (in_array($Pref, $Preferences))
-							unset($Preferences[array_search($Pref)]);
+							unset($Preferences[array_search($Pref, $Preferences)]);
 					}
 				}
 			}

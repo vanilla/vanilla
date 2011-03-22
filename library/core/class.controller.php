@@ -691,8 +691,12 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Define the search paths differently depending on whether or not we are in a plugin or application.
          $ApplicationFolder = trim($ApplicationFolder, '/');
          if (StringBeginsWith($ApplicationFolder, 'plugins/')) {
-            $BasePath = PATH_PLUGINS;
-            $ApplicationFolder = trim(strstr($ApplicationFolder, '/'), '/');
+            $KeyExplode = explode('/',$ApplicationFolder);
+            $PluginName = array_pop($KeyExplode);
+            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginName);
+            
+            $BasePath = GetValue('SearchPath', $PluginInfo);
+            $ApplicationFolder = GetValue('Folder', $PluginInfo);
          } else {
             $BasePath = PATH_APPLICATIONS;
             $ApplicationFolder = strtolower($ApplicationFolder);

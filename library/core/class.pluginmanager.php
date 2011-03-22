@@ -250,6 +250,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $RealPluginFile = realpath($PluginFile);
          $SearchPluginInfo['RealFile'] = $RealPluginFile;
          $SearchPluginInfo['RealRoot'] = dirname($RealPluginFile);
+         $SearchPluginInfo['SearchPath'] = $SearchPath;
          $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
          
          $PluginClassName = GetValue('ClassName', $SearchPluginInfo);
@@ -473,6 +474,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       
       if (!array_key_exists($ClassName, $this->Instances)) {
          $this->Instances[$ClassName] = (is_null($Sender)) ? new $ClassName() : new $ClassName($Sender);
+         $this->Instances[$ClassName]->PluginInfo = $this->GetPluginInfo($AccessName, $AccessType);
       }
       
       return $this->Instances[$ClassName];
@@ -839,7 +841,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->_PluginHook($PluginName, self::ACTION_ENABLE, $Setup);
 
       // If setup succeeded, register any specified permissions
-      $PermissionName = ArrayValue('RegisterPermissions', $PluginInfo, FALSE);
+      $PermissionName = GetValue('RegisterPermissions', $PluginInfo, FALSE);
       if ($PermissionName != FALSE) {
          $PermissionModel = Gdn::PermissionModel();
          $PermissionModel->Define($PermissionName);

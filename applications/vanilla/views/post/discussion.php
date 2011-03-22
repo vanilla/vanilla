@@ -7,26 +7,28 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
 ?>
 <div id="DiscussionForm">
-   <h2><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h2>
+   <h1><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h1>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
       
+      echo '<p>';
       echo $this->Form->Label('Discussion Title', 'Name');
-      echo $this->Form->TextBox('Name', array('maxlength' => 100));
+      echo $this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput'));
       if ($this->ShowCategorySelector === TRUE) {
-         echo '<div class="Category">';
-         echo $this->Form->Label('Category', 'CategoryID');
+         echo '<p><div class="Category">';
+         echo $this->Form->Label('Category', 'CategoryID'), ' ';
          echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
-         echo '</div>';
+         echo '</div></p>';
       }
+      echo '</p>';
       
       $this->FireEvent('BeforeBodyInput');
       
-      echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
+      echo '<p>', $this->Form->TextBox('Body', array('MultiLine' => TRUE)), '</p>';
 
-      echo "<div class=\"PostFormControlPanel\">\n";
+//      echo "<div class=\"PostFormControlPanel\">\n";
       $Options = '';
       // If the user has any of the following permissions (regardless of junction), show the options
       // Note: I need to validate that they have permission in the specified category on the back-end
@@ -41,8 +43,9 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 		$this->FireEvent('DiscussionFormOptions');
 
       if ($Options != '')
-         echo '<ul class="PostOptions">' . $Options .'</ul>';
+         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
 
+      echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
       echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
@@ -51,7 +54,8 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
-      echo "</div>\n";
+      echo '</div>';
+//      echo "</div>\n";
       echo $this->Form->Close();
    ?>
 </div>

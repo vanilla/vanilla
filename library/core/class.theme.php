@@ -73,7 +73,7 @@ class Gdn_Theme {
                $Text = T('Inbox');
             if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
             break;
          case 'profile':
@@ -82,7 +82,7 @@ class Gdn_Theme {
                $Text = $Session->User->Name;
             if ($Session->IsValid() && $Session->User->CountNotifications) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountNotifications.'</span>';
             }
             break;
          case 'user':
@@ -108,7 +108,7 @@ class Gdn_Theme {
                $Text = T('My Drafts');
             if ($Session->IsValid() && $Session->User->CountDrafts) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountDrafts.'</span>';
+               $Text .= ' <span class="Alert">'.$Session->User->CountDrafts.'</span>';
             }
             break;
          case 'discussions/bookmarked':
@@ -117,7 +117,7 @@ class Gdn_Theme {
                $Text = T('My Bookmarks');
             if ($Session->IsValid() && $Session->User->CountBookmarks) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountBookmarks.'</span>';
+               $Text .= ' <span class="Count">'.$Session->User->CountBookmarks.'</span>';
             }
             break;
          case 'discussions/mine':
@@ -126,7 +126,7 @@ class Gdn_Theme {
                $Text = T('My Discussions');
             if ($Session->IsValid() && $Session->User->CountDiscussions) {
                $Class = trim($Class.' HasCount');
-               $Text .= ' <span>'.$Session->User->CountDiscussions.'</span>';
+               $Text .= ' <span class="Count">'.$Session->User->CountDiscussions.'</span>';
             }
             break;
          case 'signin':
@@ -179,6 +179,20 @@ class Gdn_Theme {
       }
       $Title = C('Garden.Title', 'Title');
       echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+   }
+
+   public static function Module($Name) {
+      if (!class_exists($Name)) {
+         $Result = "Error: $Name doesn't exist";
+      } else {
+         try {
+            $Module = new $Name(Gdn::Controller(), '');
+            $Result = $Module->ToString();
+         } catch (Exception $Ex) {
+            $Result = $Ex->getMessage();
+         }
+      }
+      return $Result;
    }
    
    public static function Pagename() {

@@ -263,15 +263,23 @@ if (!function_exists('UserBuilder')) {
  * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
  */
 if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $CssClass = '') {
-      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
+   function UserPhoto($User, $Options = array()) {
+      if (is_string($Options))
+         $Options = array('LinkClass' => $Options);
+      
+      $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
+      
+      $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
       if ($User->Photo) {
          if (!preg_match('`^https?://`i', $User->Photo)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
-         } else
+         } else {
             $PhotoUrl = $User->Photo;
-         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'
-            .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
+         }
+         
+         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
+            .Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

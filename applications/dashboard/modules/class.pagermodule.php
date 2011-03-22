@@ -98,11 +98,11 @@ class PagerModule extends Gdn_Module {
 
    public function __construct($Sender = '') {
       $this->ClientID = 'Pager';
-      $this->CssClass = 'NumberedPager';
+      $this->CssClass = 'Pager NumberedPager';
       $this->Offset = 0;
       $this->Limit = self::$DefaultPageSize;
       $this->TotalRecords = 0;
-      $this->Wrapper = '<div %1$s>%2$s</div>';
+      $this->Wrapper = '<div class="P"><div %1$s>%2$s</div></div>';
       $this->PagerEmpty = '';
       $this->MoreCode = '›';
       $this->LessCode = '‹';
@@ -245,13 +245,13 @@ class PagerModule extends Gdn_Module {
             $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
-         $Pager .= '<span>'.$Separator.'</span>';
+         $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          $Pager .= Anchor($PageCount, self::FormatUrl($this->Url, 'p'.$PageCount, $this->Limit));
          
       } else if ($CurrentPage + $Range >= $PageCount - 1) { // -1 prevents 80 ... 81
          // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
          $Pager .= Anchor(1, self::FormatUrl($this->Url, 'p1'));
-         $Pager .= '<span>'.$Separator.'</span>';
+         $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          
          for ($i = $PageCount - ($PagesToDisplay - 1); $i <= $PageCount; $i++) {
             $PageParam = 'p'.$i;
@@ -261,14 +261,14 @@ class PagerModule extends Gdn_Module {
       } else {
          // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
          $Pager .= Anchor(1, self::FormatUrl($this->Url, 'p1'));
-         $Pager .= '<span>'.$Separator.'</span>';
+         $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          
          for ($i = $CurrentPage - $Range; $i <= $CurrentPage + $Range; $i++) {
             $PageParam = 'p'.$i;
             $Pager .= Anchor($i, self::FormatUrl($this->Url, $PageParam), $this->_GetCssClass($i, $CurrentPage));
          }
 
-         $Pager .= '<span>'.$Separator.'</span>';
+         $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          $Pager .= Anchor($PageCount, self::FormatUrl($this->Url, 'p'.$PageCount));
       }
       
@@ -300,7 +300,7 @@ class PagerModule extends Gdn_Module {
             self::$_CurrentPager = new PagerModule($Options);
             $Options = array();
          } else {
-            self::$_CurrentPager = new PagerModule($Options['Sender']);
+            self::$_CurrentPager = new PagerModule(GetValue('Sender', $Options, Gdn::Controller()));
          }
       }
       $Pager = self::$_CurrentPager;

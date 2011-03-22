@@ -110,7 +110,6 @@ p {
    line-height: 1.6em;
 }
 h1, h2 {
-   border-bottom:1px solid #bbb;
    font-size:140%;
    font-weight:bold;
    margin-bottom:10px;
@@ -2157,10 +2156,6 @@ body.Post #Content {
 }
 #DiscussionForm input.InputBox {
    width: 99%;
-   margin-bottom: 10px;
-}
-#DiscussionForm div.Category {
-   padding: 0 0 10px;   
 }
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;

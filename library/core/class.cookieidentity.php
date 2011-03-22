@@ -263,9 +263,12 @@ class Gdn_CookieIdentity {
       if (!self::CheckCookie($CookieName)) return FALSE;
       
       $Payload = explode('|', $_COOKIE[$CookieName]);
-      $Payload = explode('-', $Payload[0]);
-      if (count($Payload) < 2)
-         $Payload[] = 1; // expire.
+      
+      $Key = explode('-', $Payload[0]);
+      $Expiration = array_pop($Key);
+      $UserID = implode('-', $Key);
+      
+      $Payload = array($UserID, $Expiration);
       
       return $Payload;
    }

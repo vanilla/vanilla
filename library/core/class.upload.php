@@ -199,9 +199,6 @@ class Gdn_Upload extends Gdn_Pluggable {
 	}
 
 	public function SaveAs($Source, $Target) {
-      if (!file_exists(dirname($Target)))
-         mkdir(dirname($Target));
-
       $this->EventArguments['Path'] = $Source;
       $Parsed = self::Parse($Target);
       $this->EventArguments['Parsed'] =& $Parsed;
@@ -211,7 +208,11 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       // Check to see if the event handled the save.
       if (!$Handled) {
-         if (!move_uploaded_file($Source, PATH_LOCAL_UPLOADS.'/'.$Parsed['Name']))
+         $Target = PATH_LOCAL_UPLOADS.'/'.$Parsed['Name'];
+         if (!file_exists(dirname($Target)))
+            mkdir(dirname($Target));
+         
+         if (!move_uploaded_file($Source, $Target))
             throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
       }
       return $Parsed;
@@ -234,8 +235,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       static $Urls = NULL;
 
       if ($Urls === NULL) {
-         $Urls = array('' => '/uploads');
-
+         $Urls = array('' => Url('/uploads', TRUE));
          
          $Sender = new stdClass();
          $Sender->Returns = array();

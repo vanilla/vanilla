@@ -248,7 +248,6 @@ class Gdn_CookieIdentity {
          self::DeleteCookie($CookieName);
          return FALSE;
       }
-      
       $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
       $GeneratedHash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
@@ -264,11 +263,9 @@ class Gdn_CookieIdentity {
       if (!self::CheckCookie($CookieName)) return FALSE;
       
       $Payload = explode('|', $_COOKIE[$CookieName]);
-      
-      // Get rid of check fields like HashKey, HMAC and Time
-      array_shift($Payload);
-      array_shift($Payload);
-      array_shift($Payload);
+      $Payload = explode('-', $Payload[0]);
+      if (count($Payload) < 2)
+         $Payload[] = 1; // expire.
       
       return $Payload;
    }

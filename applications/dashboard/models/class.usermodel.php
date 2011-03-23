@@ -437,6 +437,41 @@ class UserModel extends Gdn_Model {
          ->Put();
    }
 
+   public function ProfileCount($User, $Column) {
+      if (is_numeric($User))
+         $User = $this->SQL->GetWhere('User', array('UserID' => $User))->FirstRow(DATASET_TYPE_ARRAY);
+      elseif (is_string($User))
+         $User = $this->SQL->GetWhere('User', array('Name' => $User))->FirstRow(DATASET_TYPE_ARRAY);
+      elseif (is_object($User))
+         $User = (array)$User;
+
+      if (array_key_exists($Column, $User) && $User[$Column] === NULL) {
+            $UserID = $User['UserID'];
+            switch ($Column) {
+               case 'CountComments':
+                  $Count = $this->SQL->GetCount('Comment', array('InsertUserID' => $UserID));
+                  $this->SQL->Put('User', array('CountComments' => $Count), array('UserID' => $UserID));
+                  break;
+               case 'CountDiscussions':
+                  $Count = $this->SQL->GetCount('Discussion', array('InsertUserID' => $UserID));
+                  $this->SQL->Put('User', array('CountDiscussions' => $Count), array('UserID' => $UserID));
+                  break;
+               case 'CountBookmarks':
+                  $Count = $this->SQL->GetCount('UserDiscussion', array('UserID' => $UserID, 'Bookmarked' => '1'));
+                  $this->SQL->Put('User', array('CountBookmarks', array('UserID' => $UserID)));
+                  break;
+               default:
+                  $Count = FALSE;
+                  break;
+            }
+            return $Count;
+      } elseif ($User[$Column]) {
+         return $User[$Column];
+      } else {
+         return FALSE;
+      }
+   }
+
    /**
     * Generic save procedure.
     */

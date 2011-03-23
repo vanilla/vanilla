@@ -163,7 +163,10 @@ class PermissionModel extends Gdn_Model {
       foreach(Gdn::PluginManager()->EnabledPlugins() as $Plugin) {
          if(!array_key_exists('RegisterPermissions', $Plugin) || !is_array($Plugin['RegisterPermissions']))
             continue;
-         foreach($Plugin['RegisterPermissions'] as $PermissionName) {
+         foreach($Plugin['RegisterPermissions'] as $Index => $PermissionName) {
+            if (is_string($Index))
+               $PermissionName = $Index;
+            
             $Namespace = substr($PermissionName, 0, strrpos($PermissionName, '.'));
             $PluginNamespaces[$Namespace] = TRUE;
          }

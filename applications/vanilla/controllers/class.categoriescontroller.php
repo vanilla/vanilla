@@ -220,7 +220,8 @@ class CategoriesController extends VanillaController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/categories');
-			
-		$this->AddModule('SignedInModule');
+      
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
    }      
 }

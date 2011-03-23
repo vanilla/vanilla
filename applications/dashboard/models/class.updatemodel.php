@@ -30,6 +30,12 @@ class UpdateModel extends Gdn_Model {
     * @return array An array of addon information.
     */
    public static function AnalyzeAddon($Path, $ThrowError = TRUE) {
+      if (!file_exists($Path)) {
+         if ($ThrowError)
+            throw new Exception("$Path not found.", 404);
+         return FALSE;
+      }
+      
       $Result = array();
 
       $InfoPaths = array(
@@ -46,7 +52,7 @@ class UpdateModel extends Gdn_Model {
       if (is_dir($Path)) {
          $Entries = self::_GetInfoFiles($Path, $InfoPaths);
       } else {
-         $Entries = self::_GetInfoZip($Path, $InfoPaths);
+         $Entries = self::_GetInfoZip($Path, $InfoPaths, FALSE, $ThrowError);
          $DeleteEntries = TRUE;
       }
 
@@ -151,7 +157,8 @@ class UpdateModel extends Gdn_Model {
          $Addon['Requirements'] = serialize($Requirements);
 
          $Addon['Checked'] = TRUE;
-         $UploadsPath = PATH_ROOT.'/uploads/';
+         $Addon['Path'] = $Path;
+         $UploadsPath = PATH_LOCAL_UPLOADS.'/';
          if (StringBeginsWith($Addon['Path'], $UploadsPath)) {
             $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
          }
@@ -489,7 +496,7 @@ class UpdateModel extends Gdn_Model {
       return $Result;
    }
 
-   protected static function _GetInfoZip($Path, $InfoPaths, $TmpPath = FALSE) {
+   protected static function _GetInfoZip($Path, $InfoPaths, $TmpPath = FALSE, $ThrowError = TRUE) {
       // Extract the zip file so we can make sure it has appropriate information.
       $Zip = NULL;
 

@@ -209,7 +209,8 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('CategoriesModule');
       
       // Render default view (discussions/bookmarked.php)
-      $this->Render();
+      $this->SetData('Title', T('My Bookmarks'));
+      $this->Render('Index');
    }
    
    /**
@@ -265,7 +266,8 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('BookmarkedModule');
       
       // Render default view (discussions/mine.php)
-      $this->Render();
+      $this->SetData('Title', T('My Discussions'));
+      $this->Render('Index');
    }
 
    public function UserBookmarkCount($UserID = FALSE) {

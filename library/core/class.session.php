@@ -269,7 +269,8 @@ class Gdn_Session {
                Gdn::Authenticator()->SetIdentity($UserID);
          
             if (Gdn::Authenticator()->ReturningUser($this->User)) {
-               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $this->User->Attributes['HourOffset']);
+               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
             
             $UserModel->EventArguments['User'] =& $this->User;

@@ -506,7 +506,7 @@ class Gdn_Format {
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE))
-               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+               $Mixed = wpautop($Mixed); //preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
 
             $Result = $Formatter->Format($Mixed);
 
@@ -514,13 +514,13 @@ class Gdn_Format {
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
 //               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
          } else {
-            // The text does not contain text and does not have to be purified.
+            // The text does not contain html and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
             $Result = htmlspecialchars($Mixed);
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE))
-               $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
+               $Result = wpautop($Result); //preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
          }
          
          return $Result;

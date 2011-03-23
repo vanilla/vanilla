@@ -161,12 +161,18 @@ class MessagesController extends ConversationsController {
          $Wheres['Bookmarked'] = '1';
       
       // Fetch from model  
-      $this->ConversationData = $this->ConversationModel->Get(
+      $ConversationData = $this->ConversationModel->Get(
          $Session->UserID,
          $this->Offset,
          $Limit,
          $Wheres
       );
+      
+      // Join in the participants.
+      $Result = $ConversationData->Result();
+      $this->ConversationModel->JoinParticipants($Result);
+      
+      $this->ConversationData = $ConversationData;
       
       $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
       

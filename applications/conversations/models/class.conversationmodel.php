@@ -182,6 +182,14 @@ class ConversationModel extends Gdn_Model {
          ->Get();
    }
    
+   public function JoinParticipants(&$Data) {
+      $this->SQL
+         ->From('UserConversation uc')
+         ->Join('User u', 'u.UserID = uc.UserID');
+      
+      Gdn_DataSet::Join($Data, array('alias' => 'uc', 'parent' => 'ConversationID', 'column' => 'Participants', 'UserID', 'u.Name', 'u.Photo'), array('sql' => $this->SQL));
+   }
+   
    /**
     * Save conversation from form submission.
     * 

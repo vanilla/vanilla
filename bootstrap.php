@@ -58,6 +58,8 @@ Gdn::Config()->Load(PATH_CONF.'/config.php', 'Use');
 
 Gdn::Config()->Caching(TRUE);
 
+Debug(C('Debug', FALSE));
+
 if (PATH_LOCAL_CONF != PATH_CONF) {
    // Load the custom configurations 
    Gdn::Config()->Load(PATH_LOCAL_CONF.'/config.php', 'Use');

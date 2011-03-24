@@ -64,7 +64,7 @@ class SetupController extends DashboardController {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
                $Config = array('Garden.Installed' => TRUE);
-               if(!defined('DEBUG'))
+               if(!Debug())
                   $Config['Garden.Errors.MasterView'] = 'error.master.php';
 
                SaveToConfig($Config);

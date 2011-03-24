@@ -714,7 +714,7 @@ class SettingsController extends DashboardController {
          try {
             $AddonManager->$TestMethod($AddonName, $Validation);
          } catch (Exception $Ex) {
-            if (defined('DEBUG'))
+            if (Debug())
                throw $Ex;
             else {
                echo $Ex->getMessage();

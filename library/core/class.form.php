@@ -1197,7 +1197,7 @@ class Gdn_Form extends Gdn_Pluggable {
          else
             $FileSuffix = "";
 
-         if(defined('DEBUG')) {
+         if(Debug()) {
             $ErrorCode = '@<pre>'.
                $Message."\n".
                '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".

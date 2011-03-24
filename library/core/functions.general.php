@@ -602,6 +602,20 @@ if (!function_exists('filter_input')) {
    }
 }
 
+if (!function_exists('Debug')) {
+   function Debug($Value = NULL) {
+      static $Debug = FALSE;
+      if ($Value === NULL)
+         return $Debug;
+      
+      $Debug = $Value;
+      if ($Debug)
+         error_reporting(E_ALL);
+      else
+         error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+   }
+}
+
 if (!function_exists('ExternalUrl')) {
    function ExternalUrl($Path) {
       $Format = C('Garden.ExternalUrlFormat');

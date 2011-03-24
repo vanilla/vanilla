@@ -16,7 +16,7 @@ class AddPeopleModule extends Gdn_Module {
    public $Conversation;
    public $Form;
 
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $Session = Gdn::Session();
       if (property_exists($Sender, 'Conversation'))
          $this->Conversation = $Sender->Conversation;
@@ -39,7 +39,7 @@ class AddPeopleModule extends Gdn_Module {
          // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
          //    Redirect('/messages/'.$this->Conversation->ConversationID);
             
-         $Sender->StatusMessage = T('Your changes were saved.');
+         $Sender->InformMessage(T('Your changes were saved.'));
          $Sender->RedirectUrl = Url('/messages/'.$this->Conversation->ConversationID);
       }
       $this->_ApplicationFolder = $Sender->Application;

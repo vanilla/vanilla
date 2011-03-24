@@ -984,10 +984,10 @@ class ImportModel extends Gdn_Model {
       $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
 
       // Create a test file to load.
-      if (!file_exists(PATH_UPLOADS.'/import'))
-         mkdir(PATH_UPLOADS.'/import');
+      if (!file_exists(PATH_LOCAL_UPLOADS.'/import'))
+         mkdir(PATH_LOCAL_UPLOADS.'/import');
 
-      $TestPath = PATH_UPLOADS.'/import/test.txt';
+      $TestPath = PATH_LOCAL_UPLOADS.'/import/test.txt';
       $TestValue = 123;
       $TestContents = 'ID'.self::NEWLINE.$TestValue.self::NEWLINE;
       file_put_contents($TestPath, $TestContents, LOCK_EX);
@@ -1312,6 +1312,7 @@ class ImportModel extends Gdn_Model {
       }
 
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
+      $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
 
       if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
          $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
@@ -1370,26 +1371,36 @@ class ImportModel extends Gdn_Model {
                   and ud.UserID = u.UserID
             )";
       }
-      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
-         $Sqls['User.CountUnreadConversations'] =
-            'update :_User u
-            set u.CountUnreadConversations = (
-              select count(c.ConversationID)
-              from :_Conversation c
-              inner join :_UserConversation uc
-                on c.ConversationID = uc.ConversationID
-              where uc.UserID = u.UserID
-                and uc.CountReadMessages < c.CountMessages
-            )';
-      }
+//      if (!$this->ImportExists('User', 'CountUnreadConversations')) {
+//         $Sqls['User.CountUnreadConversations'] =
+//            'update :_User u
+//            set u.CountUnreadConversations = (
+//              select count(c.ConversationID)
+//              from :_Conversation c
+//              inner join :_UserConversation uc
+//                on c.ConversationID = uc.ConversationID
+//              where uc.UserID = u.UserID
+//                and uc.CountReadMessages < c.CountMessages
+//            )';
+//      }
 
       // The updates start here.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 
       if($CurrentSubstep == 0) {
          // Add the FirstCommentID to the discussion table.
-         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL)->Set(FALSE, FALSE);
+         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL, 'index')->Set(FALSE, FALSE);
       }
+
+      $Sqls2 = array();
+      $i = 1;
+      foreach ($Sqls as $Name => $Sql) {
+         $Sqls2[] = "/* $i. $Name */\n"
+            .str_replace(':_', $this->Database->DatabasePrefix, $Sql)
+            .";\n";
+         $i++;
+      }
+      throw new Exception(implode("\n", $Sqls2));
 
 		// Execute the SQL.
       $Keys = array_keys($Sqls);
@@ -1413,12 +1424,19 @@ class ImportModel extends Gdn_Model {
       if (!$this->ImportExists('Category', 'UrlCode')) {
          $Categories = Gdn::SQL()->Get('Category')->ResultArray();
          foreach ($Categories as $Category) {
+            $UrlCode = Gdn_Format::Url($Category['Name']);
+            if (strlen($UrlCode) > 50)
+               $UrlCode = $Category['CategoryID'];
+
             Gdn::SQL()->Put(
                'Category',
-               array('UrlCode' => Gdn_Format::Url($Category['Name'])),
+               array('UrlCode' => $UrlCode),
                array('CategoryID' => $Category['CategoryID']));
          }
       }
+      // Rebuild the category tree.
+      $CategoryModel = new CategoryModel();
+      $CategoryModel->RebuildTree();
 
       return TRUE;
 	}

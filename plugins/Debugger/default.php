@@ -43,7 +43,7 @@ class DebuggerPlugin extends Gdn_Plugin {
 
    public function Base_AfterBody_Handler($Sender) {
       $Session = Gdn::Session();
-      if(!defined('DEBUG') && !$Session->CheckPermission('Garden.Settings.Manage')) {
+      if(!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
          return;
       }
       
@@ -55,11 +55,13 @@ class DebuggerPlugin extends Gdn_Plugin {
 
       //$Session = Gdn::Session();
       //if ($Session->CheckPermission('Plugins.Debugger.View')) {
-      $String = '<div id="Sql">';
+      $String = '<div id="Sql" class="DebugInfo">';
+
+      $String .= '<h2>'.T('Debug Information').'</h2>';
 
       // Add the canonical Url.
       if (method_exists($Sender, 'CanonicalUrl')) {
-         $CanonicalUrl = $Sender->CanonicalUrl();
+         $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, 'UTF-8');
 
          $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
       }
@@ -80,7 +82,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             }
             $String .= $QueryInfo['Method']
                .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
-               .'<pre>'.$Query.';</pre>';
+               .'<pre>'.htmlspecialchars($Query).';</pre>';
          }
       }
       $String .= '<h3>Controller Data</h3><pre>';
@@ -113,7 +115,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             $Result .= "$Indent<b>$Key</b>: ";
 
             if ($Value === NULL) {
-               $Result .= 'NULL';
+               $Result .= "NULL\n";
             } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
                $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
             } else {
@@ -130,7 +132,7 @@ class DebuggerPlugin extends Gdn_Plugin {
          if (count($Data) == 0)
             return $Result.'EMPTY<br />';
 
-         $Fields = array_keys((array)$Data[0]);
+         $Fields = array_keys((array)reset($Data));
          $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
             .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
          return $Result;

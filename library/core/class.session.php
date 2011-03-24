@@ -103,11 +103,15 @@ class Gdn_Session {
 	 * * @return boolean
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
-      if (is_object($this->User) && $this->User->Admin == '1')
-         return TRUE;
+      if (is_object($this->User)) {
+         if ($this->User->Admin == '1')
+            return TRUE;
+         elseif ($this->User->Banned)
+            return FALSE;
+      }
       
       $Permissions = $this->GetPermissions();      
-      if(is_numeric($JunctionID) && $JunctionID > 0 && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+      if($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
@@ -121,9 +125,15 @@ class Gdn_Session {
             }
             return TRUE;
          } else {
-            return array_key_exists($Permission, $Permissions)
-               && is_array($Permissions[$Permission])
-               && in_array($JunctionID, $Permissions[$Permission]);
+            if ($JunctionID > 0) {
+               return array_key_exists($Permission, $Permissions)
+                  && is_array($Permissions[$Permission])
+                  && in_array($JunctionID, $Permissions[$Permission]);
+            } else {
+               return array_key_exists($Permission, $Permissions)
+                  && is_array($Permissions[$Permission])
+                  && count($Permissions[$Permission]);
+            }
          }
       } else {
          // Non-junction permission ($Permissions = array(PermissionNames))
@@ -163,9 +173,9 @@ class Gdn_Session {
 	* @return NULL
 	*/
 	
-	public function SetPermission($PermissionName, $Value = FALSE) {
+	public function SetPermission($PermissionName, $Value = NULL) {
 		if (is_string($PermissionName)) {
-			if ($Value === FALSE) $this->_Permissions[] = $PermissionName;
+			if ($Value === NULL) $this->_Permissions[] = $PermissionName;
 			elseif (is_array($Value)) $this->_Permissions[$PermissionName] = $Value;
 		} elseif (is_array($PermissionName)) {
 			if (array_key_exists(0, $PermissionName))
@@ -255,12 +265,12 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-         
             if ($UserID && $SetIdentity)
                Gdn::Authenticator()->SetIdentity($UserID);
          
             if (Gdn::Authenticator()->ReturningUser($this->User)) {
-               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $this->User->Attributes['HourOffset']);
+               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
             
             $UserModel->EventArguments['User'] =& $this->User;

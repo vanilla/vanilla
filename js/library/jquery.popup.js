@@ -19,7 +19,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     if (!settings.confrm)
       $.popup.loading(settings)
       
-    $.isFunction(data) ? data.call() : $.popup.reveal(settings, data)
+    $.isFunction(data) ? data.call(this, settings) : $.popup.reveal(settings, data)
   }
 
   $.fn.popup = function(options) {
@@ -57,9 +57,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   
                   $.popup.close(settings);
                   settings.afterConfirm(json, settings.sender);
-                  gdn.inform(json.StatusMessage);
+                  gdn.inform(json);
                   if (json.RedirectUrl)
-                    setTimeout("document.location='" + gdn.url(json.RedirectUrl) + "';", 300);
+                    setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
 
                 }
              });
@@ -194,7 +194,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       return true;
     
     $('#'+settings.popupId+' .Content').empty();
-    $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&nbsp;</div>');
+    $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
   }
   
   $.popup.reveal = function(settings, data) {
@@ -210,9 +210,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // This is something other than json, so just put it into the popup directly
       $('#'+settings.popupId+' .Content').append(data);
     } else {
-      if (json.StatusMessage)
-         gdn.inform(json.StatusMessage);
-
+      gdn.inform(json);
       formSaved = json['FormSaved'];
       data = json['Data'];
 
@@ -249,13 +247,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          },  
          success: function(json) {
             json = $.postParseJson(json);
-            
-            if (json.StatusMessage)
-               gdn.inform(json.StatusMessage);
+            gdn.inform(json);
          
             if (json.FormSaved == true) {
                if (json.RedirectUrl)
-                  setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                  setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
               
                settings.afterSuccess(settings, json);
                $.popup.close(settings, json);
@@ -273,7 +269,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data, textStatus, xhr) {
              if (typeof(data) == 'object') {
                 if (data.RedirectUrl)
-                    setTimeout("document.location='" + gdn.url(data.RedirectUrl) + "';", 300);
+                    setTimeout(function() { document.location.replace(data.RedirectUrl); }, 300);
 
                 $.postParseJson(data);
              }
@@ -308,7 +304,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     onSave:           function(settings) {
       if (settings.sender) {
         $('#'+settings.popupId+' .Button:last').attr('disabled', true);
-        $('#'+settings.popupId+' .Button:last').after('<span class="Progress">&nbsp;</span>');
+        $('#'+settings.popupId+' .Button:last').after('<span class="Progress">&#160;</span>');
       }
     },
     onLoad:           function(settings) {
@@ -394,6 +390,24 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       }
     }
     return {'top':t, 'left':scroll.left};
+  };
+
+  $.fn.popin = function(options) {
+     this.each(function(i, elem) {
+        var url = $(elem).attr('rel');
+         var $elem = $(elem);
+         $elem.addClass('TinyProgress');
+         $.ajax({
+            url: gdn.url(url),
+            data: {DeliveryType: 'VIEW'},
+            success: function(data) {
+               $elem.html(data);
+            },
+            complete: function() {
+               $elem.removeClass('TinyProgress');
+            }
+         });
+     });
   };
 
 })(jQuery);

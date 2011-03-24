@@ -22,8 +22,8 @@ $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
-$Configuration['Cache']['Method']                               = 'filecache';
-$Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
+$Configuration['Cache']['Method']                               = 'dirtycache';
+$Configuration['Cache']['Filecache']['Store']                   = PATH_LOCAL_CACHE.'/Filecache';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
@@ -60,6 +60,8 @@ $Configuration['Garden']['Registration']['DefaultRoles']        = array('8'); //
 $Configuration['Garden']['Registration']['ApplicantRoleID']     = 4; // The "Applicant" RoleID.
 $Configuration['Garden']['Registration']['InviteExpiration']    = '-1 week'; // The time before now that an invitation expires. ie. If an invitation was sent within the last week, it is still valid. This value will be plugged directly into strtotime()
 $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
+$Configuration['Garden']['Registration']['ConfirmEmail']        = FALSE;
+$Configuration['Garden']['Registration']['ConfirmEmailRole']    = 3;
 $Configuration['Garden']['TermsOfService']                      = '/dashboard/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';
@@ -85,7 +87,7 @@ $Configuration['Garden']['Preview']['MaxHeight']                = 100;
 $Configuration['Garden']['Preview']['MaxWidth']                 = 75;
 $Configuration['Garden']['Thumbnail']['Size']                   = 50;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User');
-$Configuration['Garden']['DashboardMenu']['Sort']               = array('Dashboard', 'Appearance', 'Banner', 'Themes', 'Theme Options', 'Custom Theme', 'Messages', 'Custom Domain', 'Users', 'Roles & Permissions', 'Registration', 'Applicants', 'Authentication', 'Forum', 'Forum Settings', 'Categories', 'Tagging', 'Voting', 'Spam', 'Flagging', 'Flagged Content', 'Media', 'Signatures', 'Add-ons', 'Addons', 'Plugins', 'Applications', '&lt;Embed&t; Vanilla', 'Locales', 'Site Settings', 'Import');
+//$Configuration['Garden']['DashboardMenu']['Sort']               = array('Dashboard', 'Appearance', 'Banner', 'Themes', 'Theme Options', 'Custom Theme', 'Messages', 'Custom Domain', 'Users', 'Roles & Permissions', 'Registration', 'Applicants', 'Authentication', 'Forum', 'Forum Settings', 'Categories', 'Tagging', 'Voting', 'Spam', 'Flagging', 'Flagged Content', 'Media', 'Signatures', 'Add-ons', 'Addons', 'Plugins', 'Applications', '&lt;Embed&t; Vanilla', 'Locales', 'Site Settings', 'Import');
 $Configuration['Garden']['InputFormatter']                      = 'Html';
 $Configuration['Garden']['Html']['SafeStyles']                  = TRUE; // disallow style/class attributes in html to prevent click jacking
 $Configuration['Garden']['Search']['Mode']                      = 'matchboolean'; // matchboolean, match, boolean, like
@@ -100,6 +102,7 @@ $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
+$Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 
 // Formatting
 $Configuration['Garden']['Format']['Mentions']                  = TRUE;
@@ -117,6 +120,14 @@ $Configuration['Preferences']['Email']['ActivityComment']       = '0';
 $Configuration['Preferences']['Email']['DiscussionComment']     = '0';
 $Configuration['Preferences']['Email']['DiscussionMention']     = '0';
 $Configuration['Preferences']['Email']['CommentMention']        = '0';
+$Configuration['Preferences']['Popup']['ConversationMessage']   = '1';
+$Configuration['Preferences']['Popup']['AddedToConversation']   = '1';
+$Configuration['Preferences']['Popup']['BookmarkComment']       = '1';
+$Configuration['Preferences']['Popup']['WallComment']           = '1';
+$Configuration['Preferences']['Popup']['ActivityComment']       = '1';
+$Configuration['Preferences']['Popup']['DiscussionComment']     = '1';
+$Configuration['Preferences']['Popup']['DiscussionMention']     = '1';
+$Configuration['Preferences']['Popup']['CommentMention']        = '1';
 
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');

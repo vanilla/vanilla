@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @author Mark O'Sullivan
  * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
@@ -176,6 +176,7 @@ class Gdn_ApplicationManager {
       $ApplicationInfo = ArrayValueI($ApplicationName, $this->AvailableApplications(), array());
       $ApplicationName = $ApplicationInfo['Index'];
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
+
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
       return TRUE;
    }
@@ -187,7 +188,7 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-
+      
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
@@ -195,7 +196,7 @@ class Gdn_ApplicationManager {
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
       if (!class_exists($Hooks)) {
-         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.DS.'settings'.DS.'class.hooks.php';
+         $HooksFile = PATH_APPLICATIONS.DS.$ApplicationFolder.'/settings/class.hooks.php';
          if (file_exists($HooksFile))
             include($HooksFile);
       }
@@ -203,7 +204,7 @@ class Gdn_ApplicationManager {
          $Hooks = new $Hooks();
          $Hooks->Setup();
       }
-
+      
       return TRUE;
    }
 
@@ -232,8 +233,8 @@ class Gdn_ApplicationManager {
       RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
 
       // Clear the object caches.
-      @unlink(PATH_CACHE.'/controller_map.ini');
-      @unlink(PATH_CACHE.'/library_map.ini');
+      @unlink(PATH_LOCAL_CACHE.'/controller_map.ini');
+      @unlink(PATH_LOCAL_CACHE.'/library_map.ini');
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();

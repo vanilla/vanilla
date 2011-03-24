@@ -136,7 +136,7 @@ class Gdn_CookieIdentity {
 
       return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
    }
-   
+
    /**
     * Generates the user's session cookie.
     *
@@ -248,11 +248,10 @@ class Gdn_CookieIdentity {
          self::DeleteCookie($CookieName);
          return FALSE;
       }
-      
       $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
       $GeneratedHash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
 
-      if ($CookieHash != $GeneratedHash) {
+      if (!CompareHashDigest($CookieHash, $GeneratedHash)) {
          self::DeleteCookie($CookieName);
          return FALSE;
       }
@@ -265,10 +264,11 @@ class Gdn_CookieIdentity {
       
       $Payload = explode('|', $_COOKIE[$CookieName]);
       
-      // Get rid of check fields like HashKey, HMAC and Time
-      array_shift($Payload);
-      array_shift($Payload);
-      array_shift($Payload);
+      $Key = explode('-', $Payload[0]);
+      $Expiration = array_pop($Key);
+      $UserID = implode('-', $Key);
+      
+      $Payload = array($UserID, $Expiration);
       
       return $Payload;
    }

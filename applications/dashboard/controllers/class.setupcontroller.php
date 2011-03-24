@@ -14,9 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SetupController extends DashboardController {
    
    public $Uses = array('Form', 'Database');
-   
-	const UsernameError = 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.';
-	
+   	
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
@@ -48,19 +46,16 @@ class SetupController extends DashboardController {
          }
          
          $ApplicationManager = new Gdn_ApplicationManager();
-         $AvailableApplications = $ApplicationManager->AvailableApplications();
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Step through the available applications, enabling each of them
-            $AppNames = array_keys($AvailableApplications);
+            // Step through the available applications, enabling each of them.
+            $AppNames = array('Conversations', 'Vanilla');
             try {
-               foreach ($AvailableApplications as $AppName => $AppInfo) {
-                  if (strtolower($AppName) != 'dashboard') {
-                     $Validation = new Gdn_Validation();
-                     $ApplicationManager->RegisterPermissions($AppName, $Validation);
-                     $ApplicationManager->EnableApplication($AppName, $Validation);
-                  }
+               foreach ($AppNames as $AppName) {
+                  $Validation = new Gdn_Validation();
+                  $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                  $ApplicationManager->EnableApplication($AppName, $Validation);
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
@@ -69,7 +64,7 @@ class SetupController extends DashboardController {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
                $Config = array('Garden.Installed' => TRUE);
-               if(!defined('DEBUG'))
+               if(!Debug())
                   $Config['Garden.Errors.MasterView'] = 'error.master.php';
 
                SaveToConfig($Config);
@@ -91,7 +86,7 @@ class SetupController extends DashboardController {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password'));
+      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
       
       // Set the models on the forms.
       $this->Form->SetModel($ConfigurationModel);
@@ -156,6 +151,10 @@ class SetupController extends DashboardController {
             $ExistingSalt = C('Garden.Cookie.Salt', FALSE);
             $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : RandomString(10);
             $ConfigurationFormValues['Garden.Cookie.Domain'] = ''; // Don't set this to anything by default. # Tim - 2010-06-23
+            // Additional default setup values.
+            $ConfigurationFormValues['Garden.Registration.ConfirmEmail'] = TRUE;
+            $ConfigurationFormValues['Garden.Email.SupportName'] = $ConfigurationFormValues['Garden.Title'];
+
             $ConfigurationModel->Save($ConfigurationFormValues, TRUE);
                     
             // If changing locale, redefine locale sources:
@@ -184,7 +183,8 @@ class SetupController extends DashboardController {
             // Create the administrative user
             $UserModel = Gdn::UserModel();
             $UserModel->DefineSchema();
-            $UserModel->Validation->ApplyRule('Name', 'Username', self::UsernameError);
+            $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+            $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
             $UserModel->Validation->ApplyRule('Name', 'Required', T('You must specify an admin username.'));
             $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
@@ -251,12 +251,14 @@ class SetupController extends DashboardController {
 
       // Make sure the appropriate folders are writeable.
       $ProblemDirectories = array();
-      if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'conf'));
-      if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'uploads'));
-      if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE))
-         $ProblemDirectories[] = CombinePaths(array(PATH_ROOT, 'cache'));
+      if (!is_readable(PATH_LOCAL_CONF) || !IsWritable(PATH_LOCAL_CONF))
+         $ProblemDirectories[] = PATH_LOCAL_CONF;
+         
+      if (!is_readable(PATH_LOCAL_UPLOADS) || !IsWritable(PATH_LOCAL_UPLOADS))
+         $ProblemDirectories[] = PATH_LOCAL_UPLOADS;
+         
+      if (!is_readable(PATH_LOCAL_CACHE) || !IsWritable(PATH_LOCAL_CACHE))
+         $ProblemDirectories[] = PATH_LOCAL_CACHE;
 
       if (count($ProblemDirectories) > 0) {
          $PermissionProblem = TRUE;
@@ -272,7 +274,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF . DS . 'config.php';
+         $ConfigFile = PATH_LOCAL_CONF.DS.'config.php';
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          
@@ -285,9 +287,9 @@ class SetupController extends DashboardController {
 
       // Make sure the cache folder is writeable
       if (!$PermissionProblem) {
-         if (!file_exists(PATH_CACHE.DS.'Smarty')) mkdir(PATH_CACHE.DS.'Smarty');
-         if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'cache');
-         if (!file_exists(PATH_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_CACHE.DS.'Smarty'.DS.'compile');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'cache')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'cache');
+         if (!file_exists(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'compile')) mkdir(PATH_LOCAL_CACHE.DS.'Smarty'.DS.'compile');
       }
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;

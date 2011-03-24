@@ -13,26 +13,56 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
    
-$SQL = $Database->SQL();
-$Construct = $Database->Structure();
+$SQL = Gdn::Database()->SQL();
+$Construct = Gdn::Database()->Structure();
 
-$Construct->Table('Category')
-   ->PrimaryKey('CategoryID')
+$Construct->Table('Category');
+$CategoryExists = $Construct->TableExists();
+$PermissionCategoryIDExists = $Construct->ColumnExists('PermissionCategoryID');
+
+$Construct->PrimaryKey('CategoryID')
    ->Column('ParentCategoryID', 'int', TRUE)
+   ->Column('TreeLeft', 'int', TRUE)
+   ->Column('TreeRight', 'int', TRUE)
+   ->Column('Depth', 'int', TRUE)
    ->Column('CountDiscussions', 'int', '0')
+   ->Column('CountComments', 'int', '0')
+   ->Column('DateMarkedRead', 'datetime', NULL)
    ->Column('AllowDiscussions', 'tinyint', '1')
-   ->Column('Name', 'varchar(30)')
-   ->Column('UrlCode', 'varchar(30)', TRUE)
-   ->Column('Description', 'varchar(250)', TRUE)
+   ->Column('Archive', 'tinyint(1)', '0')
+   ->Column('Name', 'varchar(255)')
+   ->Column('UrlCode', 'varchar(255)', TRUE)
+   ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
+   ->Column('PermissionCategoryID', 'int', '-1') // default to root.
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime')
+   ->Column('LastCommentID', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
-if ($Drop)
-   $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'Sort' => '1'));
+$RootCategoryInserted = FALSE;
+if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {
+   $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
+   $RootCategoryInserted = TRUE;
+}
+
+if ($Drop) {
+   $SQL->Insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
+} elseif ($CategoryExists && !$PermissionCategoryIDExists) {
+   if (!C('Garden.Permissions.Disabled.Category')) {
+      // Existing installations need to be set up with per/category permissions.
+      $SQL->Update('Category')->Set('PermissionCategoryID', 'CategoryID', FALSE)->Put();
+      $SQL->Update('Permission')->Set('JunctionColumn', 'PermissionCategoryID')->Where('JunctionColumn', 'CategoryID')->Put();
+   }
+}
+
+if ($CategoryExists) {
+   $CategoryModel = new CategoryModel();
+   $CategoryModel->RebuildTree();
+   unset($CategoryModel);
+}
 
 // Construct the discussion table.
 $Construct->Table('Discussion');
@@ -61,11 +91,21 @@ $Construct
    ->Column('Sink', 'tinyint(1)', '0')
    ->Column('DateInserted', 'datetime', NULL)
    ->Column('DateUpdated', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('DateLastComment', 'datetime', NULL, 'index')
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
+   ->Column('RegardingID', 'int(11)', TRUE)
    ->Engine('MyISAM')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('UserCategory')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('CategoryID', 'int', FALSE, 'primary')
+   ->Column('DateMarkedRead', 'datetime', NULL)
+   ->Column('Archive', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
    
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
@@ -77,8 +117,7 @@ $Construct->Table('UserDiscussion')
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
-   ->Column('Bookmarked', 'tinyint(1)', '0');
-$Construct
+   ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment')
@@ -92,6 +131,8 @@ $Construct->Table('Comment')
 	->Column('DateInserted', 'datetime', NULL, 'key')
 	->Column('DateDeleted', 'datetime', TRUE)
 	->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
@@ -187,27 +228,43 @@ $PermissionModel->Define(array(
 	'Vanilla.Comments.Delete' => 0),
 	'tinyint',
 	'Category',
-	'CategoryID'
+	'PermissionCategoryID'
 	);
 
-if ($Drop) {
-   // Get the general category so we can assign permissions to it.
-   $GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('CategoryID', 0);
+if ($RootCategoryInserted) {
+   // Get the root category so we can assign permissions to it.
+   $GeneralCategoryID = -1; //$SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
    
    // Set the initial guest permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 2,
+      'Role' => 'Guest',
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ), TRUE);
+
+   $PermissionModel->Save(array(
+      'Role' => 'Confirm Email',
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'PermissionCategoryID',
+      'JunctionID' => $GeneralCategoryID,
+      'Vanilla.Discussions.View' => 1
+      ), TRUE);
+
+   $PermissionModel->Save(array(
+      'Role' => 'Applicant',
+      'JunctionTable' => 'Category',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
       ), TRUE);
    
    // Set the intial member permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 8,
+      'Role' => 'Member',
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.View' => 1,
@@ -216,15 +273,15 @@ if ($Drop) {
       
    // Set the initial moderator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
       ), TRUE);
    
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.Edit' => 1,
@@ -240,16 +297,16 @@ if ($Drop) {
       
    // Set the initial administrator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 16,
+      'Role' => 'Administrator',
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1,
       'Vanilla.Spam.Manage' => 1,
       ), TRUE);
    
    $PermissionModel->Save(array(
-      'RoleID' => 16,
+      'Role' => 'Administrator',
       'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
+      'JunctionColumn' => 'PermissionCategoryID',
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.Add' => 1,
       'Vanilla.Discussions.Edit' => 1,
@@ -262,26 +319,6 @@ if ($Drop) {
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
-
-   $PermissionModel->Save(array(
-      'RoleID' => 32,
-      'JunctionTable' => 'Category',
-      'JunctionColumn' => 'CategoryID',
-      'JunctionID' => $GeneralCategoryID,
-      'Vanilla.Discussions.Add' => 1,
-      'Vanilla.Discussions.Edit' => 1,
-      'Vanilla.Discussions.Announce' => 1,
-      'Vanilla.Discussions.Sink' => 1,
-      'Vanilla.Discussions.Close' => 1,
-      'Vanilla.Discussions.Delete' => 1,
-      'Vanilla.Discussions.View' => 1,
-      'Vanilla.Comments.Add' => 1,
-      'Vanilla.Comments.Edit' => 1,
-      'Vanilla.Comments.Delete' => 1
-      ), TRUE);
-   
-   // Make sure that User.Permissions is blank so new permissions for users get applied.
-   $SQL->Update('User', array('Permissions' => ''))->Put();
 }
 
 
@@ -346,3 +383,15 @@ $Construct->Table('TagDiscussion')
 $Construct->Table('Tag')
    ->Column('CountDiscussions', 'int', 0)
    ->Set();
+
+$Categories = Gdn::SQL()->Where("coalesce(UrlCode, '') =", "''", FALSE, FALSE)->Get('Category')->ResultArray();
+foreach ($Categories as $Category) {
+   $UrlCode = Gdn_Format::Url($Category['Name']);
+   if (strlen($UrlCode) > 50)
+      $UrlCode = $Category['CategoryID'];
+
+   Gdn::SQL()->Put(
+      'Category',
+      array('UrlCode' => $UrlCode),
+      array('CategoryID' => $Category['CategoryID']));
+}

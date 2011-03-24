@@ -85,13 +85,12 @@ class DiscussionsController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
+      $DiscussionModel->Watching = TRUE;
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
       $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
@@ -149,10 +148,10 @@ class DiscussionsController extends VanillaController {
       $this->AddCssFile('vanilla.css');
 		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
-		$this->AddJsFile('jquery.menu.js');
 		$this->AddJsFile('options.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
-		$this->AddModule('SignedInModule');
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
 		$this->FireEvent('AfterInitialize');
    }
    
@@ -210,7 +209,8 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('CategoriesModule');
       
       // Render default view (discussions/bookmarked.php)
-      $this->Render();
+      $this->SetData('Title', T('My Bookmarks'));
+      $this->Render('Index');
    }
    
    /**
@@ -263,11 +263,42 @@ class DiscussionsController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Render default view (discussions/mine.php)
-      $this->Render();
+      $this->SetData('Title', T('My Discussions'));
+      $this->Render('Index');
+   }
+
+   public function UserBookmarkCount($UserID = FALSE) {
+      if ($UserID === FALSE) {
+         $UserID = Gdn::Session()->UserID;
+      }
+
+      if (!$UserID) {
+         $CountBookmarks = NULL;
+      } else {
+         if ($UserID == Gdn::Session() && isset(Gdn::Session()->User->CountBookmarks)) {
+            $CountBookmarks = Gdn::Session()->User->CountBookmarks;
+         } else {
+            $UserModel = new UserModel();
+            $User = $UserModel->GetID($ID, DATASET_TYPE_ARRAY);
+            $CountBookmarks = $User['CountBookmarks'];
+         }
+
+         if ($CountBookmarks === NULL) {
+            $CountBookmarks = Gdn::SQL()
+               ->Select('DiscussionID', 'count', 'CountBookmarks')
+               ->From('UserDiscussion')
+               ->Where('Bookmarked', '1')
+               ->Where('UserID', $UserID)
+               ->Get()->Value('CountBookmarks', 0);
+
+            Gdn::SQL()->Put('User', array('CountBookmarks' => $CountBookmarks), array('UserID' => $UserID));
+         }
+      }
+      $this->SetData('CountBookmarks', $CountBookmarks);
+      $this->SetData('_Value', $CountBookmarks);
+      $this->xRender('Value', 'utility', 'dashboard');
    }
 }

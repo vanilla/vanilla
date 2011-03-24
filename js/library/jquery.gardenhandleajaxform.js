@@ -14,14 +14,14 @@ jQuery(document).ready(function($) {
               // Add a spinner
               var btn = $(frm).find('input.Button:last');
               if ($(btn).parent().find('span.Progress').length == 0) {
-                 $(btn).after('<span class="Progress">&nbsp;</span>');
+                 $(btn).after('<span class="Progress">&#160;</span>');
               }
             },
             success: function(json, status, $frm) {
                json = $.postParseJson(json);
                
                if (json.FormSaved == true) {
-                  gdn.inform(json.StatusMessage);
+                  gdn.inform(json);
                   if (json.RedirectUrl) {
                      setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                   } else if(json.DeliveryType == 'ASSET') {

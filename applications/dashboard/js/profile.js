@@ -1,26 +1,12 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
    
-   // Load tab content on tab-click
-   $('.Tabs li a').click(function() {
-      $('.Tabs li').removeAttr('class');
-      $(this).parent('li').attr('class', 'Active');
-      var tabs = $('div.Tabs');
-      tabs.nextAll().remove();
-      tabs.after('<div class="Loading">&nbsp;</div>');
-      $.post(this.href, {'DeliveryType': 'VIEW'}, function(data) {
-         tabs.nextAll().remove();
-         tabs.after(data);
-      });
-      return false;
-   });
-   
    // Hijack "clear status" link clicks
-   $('#Status a').live('click', function() {
+   $('#Status a.Change').live('click', function() {
       // hijack the request and clear out the status
       jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
       $('#Status').remove();      
-      return false;      
+      return false;
    });
 
    // Set the max chars in the about form.
@@ -100,5 +86,52 @@ jQuery(document).ready(function($) {
    $('a.RemovePictureLink').popup({
       confirm: true,
       followConfirm: false
+   });
+   
+   // Handle heading clicks on preferences form
+   $('table.PreferenceGroup thead td.PrefCheckBox').livequery(function() {
+      var cell = this;
+      var columnIndex = $(cell).attr('cellIndex');
+      $(cell).css('cursor', 'pointer');
+      cell.onclick = function() {
+        var rows = $(this).parents('table').find('tbody tr');
+        var checkbox = false;
+        var state = false;
+        for (i = 0; i < rows.length; i++) {
+          checkbox = $(rows[i]).find('td:eq(' + (columnIndex) + ') :checkbox');
+          if (checkbox) {
+            if (i == 0)
+               state = $(checkbox).attr('checked');
+               
+            if (state) {
+              checkbox.removeAttr('checked');
+            } else {
+              checkbox.attr('checked', 'checked');
+            }
+          }
+        }
+        return false;
+      }
+   });
+
+   // Handle description clicks on preferences form
+   $('table.PreferenceGroup tbody td.Description').livequery(function() {
+      var cell = this;
+      var columnIndex = $(cell).attr('cellIndex');
+      $(cell).css('cursor', 'pointer');
+      cell.onclick = function() {
+         var checkboxes = $(this).parents('tr').find('td.PrefCheckBox :checkbox');
+         var state = false;
+         for (i = 0; i < checkboxes.length; i++) {
+            if (i == 0)
+               state = $(checkboxes[0]).attr('checked');
+            
+            if (state)
+               $(checkboxes[i]).removeAttr('checked');
+            else
+               $(checkboxes[i]).attr('checked', 'checked');
+         }
+         return false;
+      }
    });
 });

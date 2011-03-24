@@ -3,15 +3,17 @@
 if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 	foreach ($this->SearchResults as $Key => $Row) {
 		$Row = Gdn_Format::ArrayAsObject($Row);
+		$this->EventArguments['Row'] = $Row;
 ?>
 	<li class="Item">
+		<?php $this->FireEvent('BeforeItemContent'); ?>
 		<div class="ItemContent">
 			<?php echo Anchor(Gdn_Format::Text($Row->Title), $Row->Url, 'Title'); ?>
 			<div class="Excerpt"><?php
-				echo Anchor(SliceString($Row->Summary, 250), $Row->Url);
+				echo Anchor(nl2br(SliceString(Gdn_Format::Text($Row->Summary, FALSE), 250)), $Row->Url);
 			?></div>
 			<div class="Meta">
-				<span><?php printf(T('Comment by %s'), UserAnchor($Row)); ?></span>
+				<span><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
 				<span><?php echo Gdn_Format::Date($Row->DateInserted); ?></span>
 				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
 			</div>

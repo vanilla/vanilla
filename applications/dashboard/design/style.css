@@ -110,7 +110,6 @@ p {
    line-height: 1.6em;
 }
 h1, h2 {
-   border-bottom:1px solid #bbb;
    font-size:140%;
    font-weight:bold;
    margin-bottom:10px;
@@ -126,10 +125,7 @@ h5 {
    font-size: 120%;
    color: #6C6C6C;
 }
-a,
-a:link,
-a:visited,
-a:active {
+a {
    text-decoration: none;
    color: #1e79a7;
 }
@@ -158,7 +154,7 @@ textarea.TextBox {
    min-height: 100px;
 }
 #Popup textarea.TextBox {
-   width: 465px;
+   width: 100%;
 }
 input.SmallInput,
 input.InputBox {
@@ -185,7 +181,11 @@ a.Button,
    margin: 0;
    font-size: 11px;
    padding: 4px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+	background: #f8f8f8;
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -194,7 +194,8 @@ a.Button,
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+	-webkit-box-shadow: 0px 0px 2px #999;
+	white-space: nowrap;
    }
 input.Button {
 	font-size: 14px;
@@ -220,65 +221,6 @@ input.Button {
 	padding: 10px 40px 10px 0;
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
-/* Note: Messages are the yellow notices that appear at the top/center of the
-  page to notify users of things like drafts being saved, etc. */
-div.Messages {
-   text-align: center !important;
-   position: fixed;
-   top: 0;
-   left: 0;
-   z-index: 200;
-   margin: 0 !important;
-   padding: 0 !important;
-   list-style: none !important;
-   font-size: 12px;
-   display: block;
-   width: 100%;
-}
-* html div.Messages {
-  position: absolute;
-  width: 100%;/*IE5.5*/
-  top: 0;
-  left: 0;
-  overflow: visible; 
-  top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop);
-}
-div.Messages ul {
-   cursor: pointer;
-   width: auto !important;
-   border: 0 !important;
-   margin: 0 auto !important;
-   padding: 4px 8px !important;
-   border-bottom-left-radius: 2px;
-   border-bottom-right-radius: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   background: #ff9 !important;
-   display:-moz-inline-stack;
-   display:inline-block;
-   zoom:1;
-   *display:inline;
-	box-shadow: 0px 0px 2px #333;
-	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
-}
-div.Messages ul li {
-   text-align: left !important;
-   border: 0 !important;
-   color: #000 !important;
-   padding: 0 !important;
-   margin: 0 !important;
-   list-style-position: outside;
-}
-div.Errors ul {
-   background: #d50a0a !important;
-}
-div.Errors ul li {
-   color: #fff !important;
-   background: #d50a0a !important;
-}
 .Conversations .Deleted {
    text-decoration: line-through;
 }
@@ -302,19 +244,18 @@ div.Deleted {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert {
+span.Alert {
    background: #d00;
-   border: 1px solid #b00;
    color: #fff;
    padding: 3px 6px;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert a {
+span.Alert a {
    color: #fff;
 }
-.Alert a:hover {
+span.Alert a:hover {
    text-decoration: underline;
 }
 div.Info {
@@ -541,6 +482,10 @@ ul.Options ul {
    padding: 0;
    display: none;
 }
+.DataList .Item.Active ul.Options {
+    display:block;
+}
+
 ul.Options {
    z-index: 298;
 }
@@ -591,7 +536,6 @@ ul.Options li.Parent strong {
    margin: 3px 4px 0 0;
    font-size: 10px;
    font-weight: normal;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    border: 1px solid #bbb;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -624,25 +568,25 @@ ul.Options li.Active {
    background: none;
 }
 ul.Options li.Active ul {
-   border: 1px solid #9c9c9c;
-   background: #fafafa;
    -moz-border-radius-bottomleft: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-bottom-left-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
    border-bottom-left-radius: 2px;
    border-bottom-right-radius: 2px;
+   background: #444;
+   border: 1px solid #282828;
 }
 ul.Options li.Active ul li a {
    background: none;
 }
 ul.Options li.Active a {
    background: #efefef;
-   color: #595959;
+   color: #fff;
 }
 ul.Options li.Active a:hover {
-   background: #8d8d8d;
    color: #fff;
+   background: #282828;
 }
 ul.Options li.Parent strong:hover,
 ul.Options li.Active strong:hover,
@@ -652,6 +596,120 @@ ul.Options li.Active ul {
 	-moz-box-shadow: 0 0 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;     
 }
+
+
+ul.Options li.Active strong,
+ul.Options li.Active strong:hover,
+ul.Options li.Parent strong {
+   padding-right: 18px;
+   font-size: 11px;
+   background: url('images/buttons.png') right -96px no-repeat;
+}
+ul.Options li.Active strong,
+ul.Options li.Active strong:hover {
+   border: 1px solid #282828;
+   color: #fff;
+   background: url('images/buttons.png') right -144px no-repeat #282828 !important;
+}
+ul.Options li.Parent strong:hover {
+   box-shadow:1px 1px 2px #999999;
+   -moz-box-shadow:1px 1px 2px #999999;
+   -webkit-box-shadow:1px 1px 2px #999999;
+}
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+   box-shadow:2px 2px 2px #999999;
+   -moz-box-shadow:2px 2px 2px #999999;
+   -webkit-box-shadow:2px 2px 2px #999999;
+}
+
+.OptionsMenu {
+   display: inline-block;
+   font-size: 10px;
+   font-weight: normal;
+   line-height: 100%;
+}
+.Item .OptionsMenu {
+   vertical-align: top;
+   visibility: hidden;
+}
+.Open.OptionsMenu, .Item:hover .OptionsMenu {
+   visibility: visible;
+}
+.MenuTitle {
+   color: #000;
+   border: 1px solid #bbb;
+   padding: 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+   user-select: none;
+   background: url('images/buttons.png') right -96px no-repeat;
+   padding-right: 18px;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -o-user-select: none;
+}
+/*.MenuTitle:hover {
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+}*/
+.Open .MenuTitle {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+   color: #fff;
+   background: url('images/buttons.png') right -144px no-repeat #282828;
+}
+.MenuItems {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft:2px;
+   -moz-border-radius-bottomright:2px;
+   -webkit-border-radius-bottom-left:2px;
+   -webkit-border-radius-bottom-right:2px;
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   background:none repeat scroll 0 0 #444444;
+   border:1px solid #282828;
+   min-width: 125px;
+   line-height: 100%;
+   font-size: 10px;
+}
+.MenuItems li {
+   padding: 6px !Important;
+}
+.MenuItems li:hover {
+   background: #282828;
+}
+.MenuItems, .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+   color: #fff;
+}
+
+.ToggleFlyout {
+   cursor: pointer;
+   position: relative;
+}
+.ToggleFlyout.Open {
+   z-index: 100;
+}
+.ToggleFlyout .Flyout {
+   position: absolute;
+   top: 100%;
+   left: 0;
+   display: none;
+   z-index: 100;
+}
+
 .Center {
    text-align: center;
 }
@@ -782,6 +840,11 @@ ul.PanelInfo li {
    padding: 2px 4px;
    text-align: right;
 }
+ul.PanelInfo li.Heading {
+   text-align: left;
+   color: #000;
+   font-weight: bold;
+}
 ul.PanelInfo {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;
@@ -863,7 +926,11 @@ a.BigButton {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+	background: #f8f8f8;
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
@@ -887,6 +954,58 @@ a.BigButton:focus {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
 }
+/* Category Depths */
+ul.PanelCategories li.Depth2 { padding-left: 8px; }
+ul.PanelCategories li.Depth3 { padding-left: 12px; }
+ul.PanelCategories li.Depth4 { padding-left: 16px; }
+ul.PanelCategories li.Depth5 { padding-left: 20px; }
+ul.PanelCategories li.Depth6 { padding-left: 24px; }
+ul.PanelCategories li.Depth7 { padding-left: 28px; }
+ul.PanelCategories li.Depth8 { padding-left: 32px; }
+ul.PanelCategories li.Depth9 { padding-left: 36px; }
+ul.PanelCategories li.Depth10 { padding-left: 40px; }
+ul.PanelCategories li.Depth11 { padding-left: 44px; }
+ul.PanelCategories li.Depth12 { padding-left: 48px; }
+ul.CategoryList li.Depth2 { padding-left: 25px !important; }
+ul.CategoryList li.Depth3 { padding-left: 50px !important; }
+ul.CategoryList li.Depth4 { padding-left: 75px !important; }
+ul.CategoryList li.Depth5 { padding-left: 100px !important; }
+ul.CategoryList li.Depth6 { padding-left: 125px !important; }
+ul.CategoryList li.Depth7 { padding-left: 150px !important; }
+ul.CategoryList li.Depth8 { padding-left: 175px !important; }
+ul.CategoryList li.Depth9 { padding-left: 200px !important; }
+ul.CategoryList li.Depth10 { padding-left: 225px !important; }
+ul.CategoryList li.Depth11 { padding-left: 250px !important; }
+ul.CategoryList li.Depth12 { padding-left: 275px !important; }
+ul.CategoryListWithHeadings li.Depth2 { padding-left: 0 !important; }
+ul.CategoryListWithHeadings li.Depth3 { padding-left: 25px !important; }
+ul.CategoryListWithHeadings li.Depth4 { padding-left: 50px !important; }
+ul.CategoryListWithHeadings li.Depth5 { padding-left: 75px !important; }
+ul.CategoryListWithHeadings li.Depth6 { padding-left: 100px !important; }
+ul.CategoryListWithHeadings li.Depth7 { padding-left: 125px !important; }
+ul.CategoryListWithHeadings li.Depth8 { padding-left: 150px !important; }
+ul.CategoryListWithHeadings li.Depth9 { padding-left: 175px !important; }
+ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
+ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
+ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
+
+div.Box.RecentUsers {
+	float: left;
+}
+div.Icons a {
+	display: block;
+	margin: 0 2px 2px 0;
+	float: left;
+}
+div.Icons img {
+	display: block;
+	height: 44px;
+	width: 44px;
+	overflow: hidden;
+	background: #c4cde0;
+	color: #c4cde0;
+	text-indent: 50px;
+}
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
@@ -896,22 +1015,23 @@ div.Empty {
 ul.DataList li.Item {
    margin: 0;
    padding: 4px 0;
+   border: 0;
+	position: relative;
    border-bottom: 1px solid #bec8cc;
 }
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList li {
-   border: 0;
-   padding: 0;
-}
 ul.DataList div.Options {
-	width: 100px;
-   float: right;
+   margin: 2px 4px 0 0;
+	position: absolute;
+	right: 0;
+   top: 0;
 }
 ul.DataList div.OptionButton {
-	float: right;
-	*padding: 7px 0; /* IE 7 Fix */
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 ul.DataList a.Title {
    display: block;
@@ -931,6 +1051,7 @@ ul.DataList div.Meta {
    font-size: 11px;
    color: #70727c;
 }
+
 ul.DataList div.Excerpt {
    font-size: 12px;
 	line-height: 1.4;
@@ -947,6 +1068,9 @@ ul.DataList div.Excerpt p {
 ul.DataList div.Meta span,
 ul.DataList div.Meta strong {
    margin-right: 12px;
+}
+ul.DataList div.Meta .MetaLabel {
+   margin-right: 2px;
 }
 ul.DataList div.Meta strong {
    border-radius: 2px;
@@ -967,27 +1091,27 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta a {
    color: #2b2d33;
 }
-ul.DataList a.Delete {
-   width: auto;
-   padding: 0 5px;
-   margin: 0 1px 0 0;
-   font-size: 11px;
-   font-weight: normal;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   color: #555;
-   cursor: pointer;
-   line-height: 1;
+ul.DataList a.Delete,
+ul.DataList a.Delete:hover {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   color: #333;
+   display: block;
+   height:14px;
+   margin:0;
+   padding:2px 4px;
+   width:auto;
+   font-family:arial;
+   font-size:16px;
+   font-weight:bold;
+	line-height: 1;
 }
 ul.DataList a.Delete:hover {
-	padding: 4px;
-   color: #333;
-   border: 1px solid #888;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
-}
-ul.DataList a.Delete:focus {
-   background: #f8f8f8;
+   text-decoration: none;
+   border: none;
+   background: #333;
+   color: #fff;
 }
 /* Condensed datalists make the main link & excerpt inline. */
 ul.DataList div.Photo {
@@ -1202,6 +1326,7 @@ ul.MessageList div.Message {
    clear: both;
    line-height: 140%;
    font-size: 100%;
+	word-wrap: break-word;
 }
 div.Preview div.Message,
 div.Preview div.Message p,
@@ -1214,10 +1339,8 @@ ul.MessageList div.Message blockquote {
    padding: 4px 16px;
    margin: 4px 0;
 }
-div.Preview div.Message code,
-div.Preview div.Message pre,
-ul.MessageList div.Message code,
-ul.MessageList div.Message pre {
+
+code, pre {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -1228,8 +1351,7 @@ ul.MessageList div.Message pre {
    overflow: auto;
 	border: 1px solid #eec;
 }
-div.Preview div.Message pre,
-ul.MessageList div.Message pre {
+pre {
    display: block;
 }
 div.Preview div.Message strong,
@@ -1299,6 +1421,33 @@ links, sign in buttons, etc */
 	font-weight: bold;
 }
 
+/* =============================================================== Categories */
+ul.CategoryList li.Item {
+	margin: 0;
+	padding: 0;
+	border: 0 !important;
+}
+ul.CategoryList .ItemContent {
+	position: relative;
+	margin-top: -1px;
+	border: 1px solid #BEC8CC;
+	border-width: 1px 0;
+	padding: 4px 9px;
+}
+div.Meta span.ChildCategories {
+	border-top: 1px dotted #ddd;
+	display: block;
+}
+ul.DataList div.Meta span.RSS {
+	margin-right: 6px;
+}
+div.Meta span.RSS img {
+	vertical-align: text-bottom;
+}
+ul.CategoryList li.CategoryHeading {
+	font-weight: bold;
+	font-size: 14px;
+}
 
 /* ============================================================= Profile Page */
 body.Profile #Content {
@@ -1361,7 +1510,7 @@ div.User h1 {
    padding: 8px 8px 0;
    color: #999;
    font-weight: normal;
-   line-height: 100%;
+   line-height: 1.5;
 }
 #Status p {
    font-size: 120%;
@@ -1399,11 +1548,12 @@ form.Activity {
 	text-align: right;
 }
 form.Activity textarea {
-   width: 660px;
+   width: 99%;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
 }
+
 /* Invitations Form */
 #Form_Invitation table {
    width: 100%;
@@ -1457,14 +1607,36 @@ body.Profile ul.Notifications {
 	border-top: 0;
 	margin-top: 0;
 }
+/* Preferences Form */
+div.Preferences h3 {
+	margin: 0;
+	padding: 10px 0 4px !important;
+}
+table.PreferenceGroup thead td {
+	font-weight: bold;
+	border-top: 1px solid #aaa;
+	border-bottom: 1px solid #ccc;
+	background: #eee;
+	padding: 2px 6px;
+}
+table.PreferenceGroup tbody td {
+	border-bottom: 1px solid #eee;
+	padding: 2px 6px;
+}
+table.PreferenceGroup tbody td.PrefCheckBox {
+	text-align: center;
+}
+table.PreferenceGroup td.Description {
+	font-size: 12px;
+}
 
-
-/* ================================================================= Tab Menu */
+/* ================================================= Tabs, Headings & Footers */
 div.MessageForm {
 	text-align: right;
 }
 div.MessageForm,
-div.Tabs {
+div.Tabs,
+div.Headings {
 	display: block;
    border-bottom: 1px solid #abdafb;
    padding: 5px 8px;
@@ -1511,6 +1683,7 @@ div.Tabs li a:visited {
    text-decoration: none;
    padding: 5px 10px;
 	line-height: 2.6;
+	white-space: nowrap;
 }
 div.MorePager li a:hover,
 a.TabLink:hover,
@@ -1560,6 +1733,22 @@ div.HeadingTabs div.SubTab {
 div.SearchTabs input.InputBox {
 	width: 560px;
 	margin-right: 10px;
+}
+div.Headings {
+	position: relative;
+	text-align: left;
+}
+div.Headings div {
+	display: inline-block;
+	padding-right: 10px;
+}
+div.Headings div.ItemHeading {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 2;
+}
+div.Headings div.MetaHeading {
+	font-size: 11px;
 }
 
 /* ======================================================== Thumbnail Cropper */
@@ -1621,33 +1810,6 @@ form.Thumbnail table td {
 
 
 /* =================================================================== Popups */
-div.Popup div.Errors ul {
-	border: 1px solid #a00 !important;
-}
-div.Popup div.Messages {
-   text-align: left;
-   position: inherit;
-   top: auto;
-   left: auto;
-   z-index: auto;
-	margin: 10px 0 !important;
-}
-div.Popup div.Messages ul {
-	display: block;
-   border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-}
-* html div.Popup div.Messages {
-  position: inherit;
-  width: auto;
-  top: auto;
-  left: auto;
-  overflow: auto; 
-}
 div.Popup .Info {
 	margin-top: 10px;
 }
@@ -1906,25 +2068,25 @@ ul.Discussion {
   css for these is in /applications/garden/design/menu.css. Override them here.
 */
 a.Bookmark,
+a.Bookmarked,
 a.Bookmarking {
-	float: right;
-   display: block;
+   display: inline-block;
    background: url('images/star_sprite.png') top center no-repeat;
    height: 22px;
    width: 22px;
-   margin: 2px 4px 0 4px;
 }
 a.Bookmark span,
 a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url('images/star_sprite.png') center center no-repeat;
+   background-position: center center;
 }
 a.Bookmarking {
-   background: url('images/star_sprite.png') bottom center no-repeat;
+   background-position: bottom center;
 }
 body.Discussion a.Bookmark {
+   float: right;
 	margin: 13px 8px;
 }
 
@@ -1999,10 +2161,6 @@ body.Post #Content {
 }
 #DiscussionForm input.InputBox {
    width: 99%;
-   margin-bottom: 10px;
-}
-#DiscussionForm div.Category {
-   padding: 0 0 10px;   
 }
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
@@ -2032,7 +2190,6 @@ div.CommentForm a.Cancel {
 textarea.MultiComplete {
    height: 20px;
    padding: 3px 0;
-   width: 400px;
    text-align: left;
 }
 .ac_results {
@@ -2149,7 +2306,7 @@ ul.Conversations div.Meta a.Name {
 	text-align: right;
 }
 #MessageForm textarea {
-  width: 655px;
+  width: 99%;
   height: 100px;
   min-height: 100px;
   margin-bottom: 2px;
@@ -2169,7 +2326,6 @@ body.add #Content {
    -webkit-border-radius: 2px;
    border-radius: 2px;
 	background:none repeat scroll 0 0 #c4e1ff;
-	border:1px solid #7caccb;
 	margin:0;
 	padding:20px;
 	text-align: right;
@@ -2190,11 +2346,7 @@ body.add #Content {
 	font-size:14px;
 	font-weight:bold;	
 }
-#ConversationForm textarea.MultiComplete {
-  width: 910px;
-}
 #ConversationForm .TextBox {
-   width: 910px;
    height: 100px;
    min-height: 100px;
    margin: 8px 0 6px;
@@ -2219,7 +2371,7 @@ div.Popup #ConversationForm h2 {
 }
 div.Popup #ConversationForm textarea.MultiComplete,
 div.Popup #ConversationForm .TextBox {
-	width: 478px;
+	width: 100%;
 }
 
 /* Upload Progress Bar */
@@ -2365,33 +2517,23 @@ span.Incorrect {
    color: red;
 }
 
-/* Sign In Page & Popup */
-div.SignInPopup div.Box {
-	margin: 0;
-	padding: 0;
-	background: none;
-	border: 0;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-}
 body#dashboard_entry_password #Content,
-body#dashboard_entry_signin #Content {
+body#dashboard_entry_signin #Content,
+body#dashboard_entry_index #Content {
 	width: auto;
 }
 div.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }
 body#dashboard_entry_password #Content form,
+body#dashboard_entry_index #Content form,
 body#dashboard_entry_signin #Content form {
 	padding: 0;
 	text-align:left;
 }
 body#dashboard_entry_password #Content form,
 body#dashboard_entry_signin #Content form,
+body#dashboard_entry_index #Content form,
 div.SignInPopup form {
 	width: 270px;
 }
@@ -2403,8 +2545,13 @@ div.MultipleEntryMethods {
 	width: 500px;
 	margin: 0 auto;
 }
+.MultipleEntryMethods .Methods {
+   border-left: solid 1px #BEC8CC;
+}
+
 body#dashboard_entry_handshake #Content input.InputBox,
 body#dashboard_entry_signin #Content input.InputBox,
+body#dashboard_entry_index #Content input.InputBox,
 body#dashboard_entry_password #Content input.InputBox,
 div.SignInPopup input.DateBox,
 div.SignInPopup input.InputBox,
@@ -2414,6 +2561,7 @@ div.SignInPopup textarea {
 }
 div.SignInPopup form ul li label,
 body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label,
 body#dashboard_entry_password form ul li label,
 body#dashboard_entry_handshake form ul li label {
 	font-size: 13px;
@@ -2421,11 +2569,13 @@ body#dashboard_entry_handshake form ul li label {
 	padding: 0;
 }
 body#dashboard_entry_password #Content form ul li input#Form_Email,
-body#dashboard_entry_signin #Content form ul li input#Form_Email {
+body#dashboard_entry_signin #Content form ul li input#Form_Email,
+body#dashboard_entry_index #Content form ul li input#Form_Email {
 	margin-bottom: 6px;
 }
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
+body#dashboard_entry_index #Content input.Password,
 div.SignInPopup input.Password {
 	width: 180px;
 }
@@ -2437,6 +2587,7 @@ li.Buttons div a.ForgotPassword {
 }
 body#dashboard_entry_password ul li label.CheckBoxLabel,
 body#dashboard_entry_signin ul li label.CheckBoxLabel,
+body#dashboard_entry_index ul li label.CheckBoxLabel,
 div.SignInPopup ul li label.CheckBoxLabel {
 	color: #777;
 	display: inline;
@@ -2463,7 +2614,8 @@ div.Methods {
 	line-height: 1;
 }
 body#dashboard_entry_password div.Methods,
-body#dashboard_entry_signin div.Methods {
+body#dashboard_entry_signin div.Methods,
+body#dashboard_entry_index div.Methods {
 	padding: 10px 6px 6px;
 	background: none;
 }
@@ -2531,18 +2683,7 @@ div.Connect h1,
 div.Connect h2 {
 	text-align: left;
 }
-body.connect div.Box {
-	border-radius: none;
-	-moz-border-radius: none;
-	-webkit-border-radius: none;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	width: 320px;
-	margin: 0 auto;
-	text-align: left;
-	background: none;
-}
+
 div.ConnectInfo {
 	margin: 10px 0 0;
 	position: relative;
@@ -2574,7 +2715,8 @@ div.ConnectInfo h3 {
 div.Connect form ul li label,
 div.SignInPopup form ul li label,
 body#dashboard_entry_password form ul li label,
-body#dashboard_entry_signin form ul li label {
+body#dashboard_entry_signin form ul li label,
+body#dashboard_entry_index form ul li label {
 	font-size: 13px;
 	line-height: 1.5;
 	padding: 0;
@@ -2590,6 +2732,7 @@ div.SignInPopup .FinePrint {
 }
 body#dashboard_entry_password input.InputBox,
 body#dashboard_entry_signin input.InputBox,
+body#dashboard_entry_index input.InputBox,
 div.Connect input.InputBox,
 div.SignInPopup input.InputBox {
 	padding: 3px
@@ -2602,3 +2745,336 @@ div.SignInPopup .ExistingUsername {
 	color: #000;
 	display: block;
 }
+
+
+/* Do not customize these unless you enjoy pain. */
+
+/* Error messages that get displayed on forms throughout the application. */
+div.Errors {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+	margin: 0 0 10px !important;
+}
+* html div.Errors {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; 
+}
+div.Errors ul {
+	border: 1px solid #a00 !important;
+   background: #d50a0a !important;
+	padding: 6px 10px;
+	display: block;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+div.Errors ul li {
+   color: #fff !important;
+   background: #d50a0a !important;
+	text-align: left;
+}
+div.Popup div.Errors ul {
+	display: block;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	border: 1px solid #a00 !important;
+}
+div.Popup div.Errors {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+	margin: 10px 0 !important;
+}
+div.Errors pre {
+	margin: 10px 0 5px;
+	padding: 4px 8px;
+	display: block;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   white-space: pre;
+   overflow: auto;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
+}
+
+div.Errors pre,
+div.Errors pre * {
+	background: #ffa !important;
+	font-size: 12px !important;
+	font-weight: normal !important;
+	font-family: monospace !important;
+	text-shadow: none !important;
+	color: #333  !important;
+	line-height: 1.4 !important;
+}
+div.Errors pre * {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+div.InformMessages {
+   text-align: left !important;
+   position: fixed;
+   top: auto;
+   bottom: 20px;
+   left: 20px;
+   z-index: 200;
+   margin: 0 !important;
+   padding: 0 !important;
+   list-style: none !important;
+   font-size: 12px;
+   display: block;
+   width: auto;
+}
+* html div.InformMessages {
+  position: absolute;
+  width: 100%;/*IE5.5*/
+  top: auto;
+  left: 20px;
+  overflow: visible; 
+  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+}
+div.InformMessages div.InformWrapper {
+	display: block;
+}
+div.InformMessages div.InformMessage {
+   color: #fff !important;
+	text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: rgb(0, 0, 0) !important;
+	background: rgba(0, 0, 0, 0.7) !important;
+   border: none !important;
+   width: auto !important;
+	max-width: 400px !important;
+   margin: 10px auto 0 !important;
+   padding: 9px 14px 8px !important;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+	position: relative;
+	line-height: 1.6;
+}
+div.InformMessages div.InformMessage:hover {
+	background: rgba(0, 0, 0, 0.8) !important;
+}
+div.InformMessages div.InformMessage a {
+	color: #aff;
+}
+div.InformMessages div.InformMessage a:hover {
+	color: #cff;
+	text-decoration: underline;
+}
+div.InformMessages div.InformMessage strong {
+	font-weight: bold;
+}
+div.InformMessages div.InformMessage a.Close {
+	border: none;
+	background: transparent;
+   border-top-right-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -moz-border-radius-topright: 2px;
+	color: #ddd;
+	font-size: 14px;
+	text-align: center;
+	display: none;
+	height: 12px;
+	width: 12px;
+	line-height: 1;
+	text-decoration: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+div.InformMessages div.InformMessage a.Close span {
+	display: inline;
+}
+div.InformMessages div.InformMessage a.Close:hover {
+	background: #000;
+	color: #fff;
+}
+div.InformMessages div.InformMessage:hover a.Close {
+	display: block;
+}
+/* Inform Sprites */
+div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
+	padding-left: 42px !important;
+	min-height: 20px;
+}
+div.InformMessages div.InformWrapper.HasSprite div.InformMessage {
+	padding-left: 40px !important;
+}
+div.InformMessages div.InformMessage a.Icon {
+	display: block;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	height: 28px;
+	width: 28px;
+}
+div.InformMessages div.InformMessage a.Icon img {
+	height: 28px;
+	width: 28px;
+}
+span.InformSprite {
+	background: url('images/inform-sprites.png') -9px -9px no-repeat;
+	display: block;
+	position: absolute;
+	top: 4px;
+	left: 5px;
+	height: 30px;
+	width: 30px;
+}
+span.InformSprite.Refresh { background-position: -9px -9px; }
+span.InformSprite.Recycle { background-position: -57px -9px; }
+span.InformSprite.Infinity { background-position: -105px -9px; }
+span.InformSprite.Squiggle { background-position: -153px -9px; }
+span.InformSprite.Random { background-position: -200px -9px; }
+span.InformSprite.Magnify { background-position: -250px -9px; }
+span.InformSprite.Location { background-position: -298px -9px; }
+span.InformSprite.Bubble { background-position: -346px -9px; }
+span.InformSprite.ElipsisBubble { background-position: -394px -9px; }
+span.InformSprite.Plus { background-position: -442px -9px; }
+span.InformSprite.Time { background-position: -9px -57px; }
+span.InformSprite.Eye { background-position: -57px -57px; }
+span.InformSprite.Target { background-position: -105px -57px; }
+span.InformSprite.Redflag { background-position: -153px -57px; }
+span.InformSprite.Flags { background-position: -200px -57px; }
+span.InformSprite.Graph { background-position: -250px -57px; }
+span.InformSprite.Chart { background-position: -298px -57px; }
+span.InformSprite.Envelope { background-position: -346px -57px; }
+span.InformSprite.Gear { background-position: -394px -57px; }
+span.InformSprite.Gears { background-position: -442px -57px; }
+span.InformSprite.Skull { background-position: -9px -106px; }
+span.InformSprite.SkullBones { background-position: -57px -106px; }
+span.InformSprite.Bird { background-position: -105px -106px; }
+span.InformSprite.Present { background-position: -153px -106px; }
+span.InformSprite.Thundercloud { background-position: -200px -106px; }
+span.InformSprite.Bandaid { background-position: -250px -106px; }
+span.InformSprite.Saturn { background-position: -298px -106px; }
+span.InformSprite.Star { background-position: -346px -106px; }
+span.InformSprite.Heart { background-position: -394px -106px; }
+span.InformSprite.Key { background-position: -442px -106px; }
+span.InformSprite.Ipod { background-position: -9px -152px; }
+span.InformSprite.Iphone { background-position: -57px -152px; }
+span.InformSprite.Cabinet { background-position: -105px -152px; }
+span.InformSprite.Coffee { background-position: -153px -152px; }
+span.InformSprite.Briefcase { background-position: -200px -152px; }
+span.InformSprite.Toolcase { background-position: -250px -152px; }
+span.InformSprite.Suitcase { background-position: -298px -152px; }
+span.InformSprite.Airplane { background-position: -346px -152px; }
+span.InformSprite.Spraypaint { background-position: -394px -152px; }
+span.InformSprite.MailInbox { background-position: -442px -154px; }
+span.InformSprite.WallPicture { background-position: -9px -200px; }
+span.InformSprite.Photos { background-position: -57px -200px; }
+span.InformSprite.FilmRoll { background-position: -105px -200px; }
+span.InformSprite.Drawer { background-position: -153px -200px; }
+span.InformSprite.FilmStrip { background-position: -200px -200px; }
+span.InformSprite.FilmStrip2 { background-position: -250px -200px; }
+span.InformSprite.Gas { background-position: -298px -200px; }
+span.InformSprite.Cutlery { background-position: -346px -200px; }
+span.InformSprite.Battery { background-position: -394px -200px; }
+span.InformSprite.Beaker { background-position: -442px -200px; }
+span.InformSprite.Outlet { background-position: -9px -250px; }
+span.InformSprite.Pinetree { background-position: -57px -250px; }
+span.InformSprite.House { background-position: -105px -250px; }
+span.InformSprite.Padlock { background-position: -153px -250px; }
+span.InformSprite.Network { background-position: -200px -250px; }
+span.InformSprite.Cloud { background-position: -250px -250px; }
+span.InformSprite.Download { background-position: -298px -250px; }
+span.InformSprite.BookmarkRibbon { background-position: -346px -250px; }
+span.InformSprite.Flag { background-position: -394px -250px; }
+span.InformSprite.Signpost { background-position: -442px -250px; }
+span.InformSprite.Brightness { background-position: -9px -298px; }
+span.InformSprite.Contrast { background-position: -57px -298px; }
+span.InformSprite.Runner { background-position: -105px -298px; }
+span.InformSprite.Zap { background-position: -153px -298px; }
+span.InformSprite.MusicNote { background-position: -200px -298px; }
+span.InformSprite.Microphone { background-position: -250px -298px; }
+span.InformSprite.Tshirt { background-position: -298px -298px; }
+span.InformSprite.Paperclip { background-position: -346px -298px; }
+span.InformSprite.Monitor { background-position: -394px -298px; }
+span.InformSprite.Tv { background-position: -442px -297px; }
+span.InformSprite.Compass { background-position: -9px -346px; }
+span.InformSprite.Pin { background-position: -57px -346px; }
+span.InformSprite.Radar { background-position: -105px -346px; }
+span.InformSprite.Location { background-position: -153px -346px; }
+span.InformSprite.Telephone { background-position: -200px -346px; }
+span.InformSprite.Baby { background-position: -250px -346px; }
+span.InformSprite.Ekg { background-position: -298px -346px; }
+span.InformSprite.Stopwatch { background-position: -346px -346px; }
+span.InformSprite.MedicalBag { background-position: -394px -346px; }
+span.InformSprite.ShoppingCart { background-position: -442px -346px; }
+span.InformSprite.Dashboard { background-position: -9px -393px; }
+span.InformSprite.Dogpaw { background-position: -57px -393px; }
+span.InformSprite.Calendar { background-position: -105px -393px; }
+span.InformSprite.Lightbulb { background-position: -153px -393px; }
+span.InformSprite.Trophy { background-position: -200px -393px; }
+span.InformSprite.Camera { background-position: -250px -393px; }
+span.InformSprite.Wineglass { background-position: -298px -393px; }
+span.InformSprite.Beerglass { background-position: -346px -391px; }
+span.InformSprite.Dumbbells { background-position: -394px -393px; }
+span.InformSprite.Buoy { background-position: -442px -393px; }
+span.InformSprite.Beaker2 { background-position: -9px -440px; }
+span.InformSprite.Testtube { background-position: -57px -440px; }
+span.InformSprite.Thermometer { background-position: -105px -440px; }
+span.InformSprite.Pill { background-position: -153px -440px; }
+span.InformSprite.Equalizer { background-position: -200px -440px; }
+span.InformSprite.Book { background-position: -250px -440px; }
+span.InformSprite.Puzzle { background-position: -298px -440px; }
+span.InformSprite.Palette { background-position: -346px -440px; }
+span.InformSprite.Umbrella { background-position: -394px -440px; }
+span.InformSprite.CoffeeCup { background-position: -442px -440px; }
+span.InformSprite.Gameplan { background-position: -9px -490px; }
+span.InformSprite.Walk { background-position: -57px -490px; }
+span.InformSprite.Map { background-position: -105px -490px; }
+span.InformSprite.IndexCards { background-position: -153px -490px; }
+span.InformSprite.Piano { background-position: -200px -490px; }
+span.InformSprite.Sliders { background-position: -250px -490px; }
+span.InformSprite.Widescreen { background-position: -298px -490px; }
+span.InformSprite.Badge { background-position: -346px -490px; }
+span.InformSprite.Chicken { background-position: -394px -490px; }
+span.InformSprite.Bug { background-position: -442px -490px; }
+span.InformSprite.SingleUser { background-position: -9px -539px; }
+span.InformSprite.Group { background-position: -57px -537px; }
+span.InformSprite.Navigation { background-position: -105px -537px; }
+span.InformSprite.Balloon { background-position: -153px -537px; }
+span.InformSprite.Bowandarrow { background-position: -200px -537px; }
+span.InformSprite.Controller { background-position: -250px -537px; }
+span.InformSprite.Check { background-position: -298px -537px; }
+span.InformSprite.Hanger { background-position: -346px -537px; }
+span.InformSprite.Piggybank { background-position: -394px -537px; }
+span.InformSprite.Headphones { background-position: -442px -537px; }
+span.InformSprite.Landscape { background-position: -9px -586px; }
+span.InformSprite.Stats { background-position: -57px -586px; }
+span.InformSprite.Idcard { background-position: -105px -586px; }
+span.InformSprite.Bullhorn { background-position: -153px -586px; }
+span.InformSprite.Food { background-position: -200px -586px; }
+span.InformSprite.Moon { background-position: -250px -586px; }
+span.InformSprite.Sock { background-position: -298px -586px; }
+span.InformSprite.Bone { background-position: -346px -586px; }
+span.InformSprite.Golf { background-position: -394px -586px; }
+span.InformSprite.Dice { background-position: -442px -586px; }

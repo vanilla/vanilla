@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
          
       if (addonType != 'Theme') {
          $('.TinyProgress').remove();
-         $(this).after('<span class="TinyProgress">&nbsp;</span>');
+         $(this).after('<span class="TinyProgress">&#160;</span>');
       }
       var addonName = urlParts[urlParts.length - 2];
       var testUrl = gdn.url('/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey'));

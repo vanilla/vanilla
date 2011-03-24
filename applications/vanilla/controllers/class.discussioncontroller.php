@@ -68,7 +68,7 @@ class DiscussionController extends VanillaController {
       }
       
       // Check permissions
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
       // Setup
@@ -170,9 +170,7 @@ class DiscussionController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
@@ -191,7 +189,7 @@ class DiscussionController extends VanillaController {
       $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
       
       // Check permissions.
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
       // Get the comments.
@@ -228,7 +226,8 @@ class DiscussionController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
-      $this->AddModule('SignedInModule');
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 
@@ -391,7 +390,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
          } else {
             $this->Form->AddError('ErrPermission');
@@ -403,7 +402,7 @@ class DiscussionController extends VanillaController {
          Redirect('discussions');
          
       $this->RedirectUrl = Url('discussions');
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 
@@ -432,7 +431,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Sink');
             } else {
                $State = $Discussion->Sink;
@@ -450,7 +449,7 @@ class DiscussionController extends VanillaController {
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
       $this->SetJson('LinkText', T($State ? 'Unsink' : 'Sink'));         
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 
@@ -479,7 +478,7 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->CategoryID)) {
+            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
                $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Closed');
             } else {
                $State = $Discussion->Closed;
@@ -497,7 +496,7 @@ class DiscussionController extends VanillaController {
       $State = $State == '1' ? TRUE : FALSE;   
       $this->SetJson('State', $State);
       $this->SetJson('LinkText', T($State ? 'Reopen' : 'Close'));         
-      $this->StatusMessage = T('Your changes have been saved.');
+      $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
 
@@ -522,7 +521,7 @@ class DiscussionController extends VanillaController {
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID)) {
+         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
             if (!$this->DiscussionModel->Delete($DiscussionID))
                $this->Form->AddError('Failed to delete discussion');
          } else {
@@ -570,7 +569,7 @@ class DiscussionController extends VanillaController {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
             $HasPermission = $Comment->InsertUserID == $Session->UserID;
             if (!$HasPermission && $Discussion)
-               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->CategoryID);
+               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
             
             if ($Discussion && $HasPermission) {
                if (!$this->CommentModel->Delete($CommentID))

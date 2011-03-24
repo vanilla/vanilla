@@ -1,0 +1,43 @@
+/* Begin Page Customizations */
+#VanillaStatsGraph {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+.DateRangeTabs {
+   position: relative;
+}
+body div.Tabs {
+   background: #f3fcff;
+}
+body div.Tabs li.Active a {
+   background: #fff;
+	border-bottom: 1px solid #fff;
+}
+
+/* Summary Data & Tables */
+div.Summary {
+   clear: left;
+   margin: 20px 0 20px 20px;
+   width: 46%;
+   display: inline-block;
+   vertical-align: top;
+}
+div.Summary table {
+   margin: 0;
+   padding: 0;
+}
+div.Summary table th,
+div.Summary table td {
+   font-size: 11px;
+   padding: 4px 6px;
+}
+div.Summary table tbody th {
+   font-weight: normal;
+}
+div.Summary table thead td,
+div.Summary table tbody td {
+   text-align: right;
+   width: 80px;
+   padding: 4px 6px 4px 0;
+}

@@ -29,6 +29,9 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       $Title = UserAnchor($Author, 'Title Name');
       $Excerpt = Gdn_Format::Display($Excerpt);
    }
+   $Sender->EventArguments['Activity'] = &$Activity;
+   $Sender->EventArguments['CssClass'] = &$CssClass;
+   $Sender->FireEvent('BeforeActivity');
    ?>
 <li id="Activity_<?php echo $Activity->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php
@@ -37,7 +40,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       && ($Session->UserID == $Activity->InsertUserID
          || $Session->CheckPermission('Garden.Activity.Delete'))
       )
-      echo '<div class="OptionButton">'.Anchor(T('Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
+      echo '<div class="OptionButton">'.Anchor(T('Activity.Delete', 'Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
 
    if ($PhotoAnchor != '') {
    ?>

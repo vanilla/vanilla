@@ -8,6 +8,8 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
+
 function Gdn_Autoload($ClassName) {
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
@@ -28,17 +30,22 @@ function Gdn_Autoload($ClassName) {
    else
       $ApplicationWhiteList = NULL;
    
+   // If we're turning on an application, temporarily allow it in the autoloader
+   $TemporaryAppFolders = C('TemporaryApplications', FALSE);
+   if ($TemporaryAppFolders !== FALSE && is_array($TemporaryAppFolders) && sizeof($TemporaryAppFolders))
+      $ApplicationWhiteList = array_flip(array_flip(array_merge($ApplicationWhiteList, $TemporaryAppFolders)));
+      
    $LibraryPath = FALSE;
-
-   // If this is a model, look in the models folder(s)
-   if (strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'models' . DS . $LibraryFileName);
 
    if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
       // Look for plugin files.
       if ($LibraryPath === FALSE) {
-         $PluginFolders = Gdn::PluginManager()->EnabledPluginFolders();
-         $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_PLUGINS, $PluginFolders, $LibraryFileName);
+         foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $Trash) {
+            // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
+            $PluginFolders = (Gdn::PluginManager()->Started()) ? Gdn::PluginManager()->EnabledPluginFolders($SearchPath) : TRUE;
+            
+            $LibraryPath = Gdn_FileSystem::FindByMapping('library', $SearchPath, $PluginFolders, $LibraryFileName);
+         }
       }
 
       // Look harder for plugin files.
@@ -47,9 +54,13 @@ function Gdn_Autoload($ClassName) {
       }
    }
 
+   // If this is a model, look in the models folder(s)
+   if (!$LibraryPath && strtolower(substr($ClassName, -5)) == 'model')
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "models/{$LibraryFileName}");
+
    // Look for the class in the applications' library folders.
    if ($LibraryPath === FALSE) {
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/$LibraryFileName");
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/{$LibraryFileName}");
    }
 
    // Look for the class in the core.
@@ -60,19 +71,20 @@ function Gdn_Autoload($ClassName) {
          array(
             'core',
             'database',
-            'vendors'. DS . 'phpmailer'
+            'vendors/phpmailer'
          ),
          $LibraryFileName
       );
 
    // If it still hasn't been found, check for modules
    if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, 'modules' . DS . $LibraryFileName);
+      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "modules/{$LibraryFileName}");
 
    if ($LibraryPath !== FALSE)
       include_once($LibraryPath);
 }
 
+/*
 if (!function_exists('__autoload')) {
    function __autoload($ClassName) {
       trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
@@ -81,6 +93,7 @@ if (!function_exists('__autoload')) {
 }
 
 spl_autoload_register('Gdn_Autoload', FALSE);
+*/
 
 
 if (!function_exists('AddActivity')) {
@@ -177,6 +190,19 @@ if (!function_exists('ArrayInArray')) {
          }
       }
       return $Return;
+   }
+}
+
+if (!function_exists('ArraySearchI')) {
+   /**
+    * Case-insensitive version of array_search.
+    *
+    * @param array $Value The value to find in array.
+    * @param array $Search The array to search in for $Value.
+    * @return mixed Key of $Value in the $Search array.
+    */
+   function ArraySearchI($Value, $Search) {
+      return array_search(strtolower($Value), array_map('strtolower', $Search)); 
    }
 }
 
@@ -277,7 +303,34 @@ if (!function_exists('Asset')) {
             $Result .= '?';
          else
             $Result .= '&';
-         $Result.= 'v='.urlencode(APPLICATION_VERSION);
+
+         // Figure out which version to put after the asset.
+         $Version = APPLICATION_VERSION;
+         if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
+            $Type = $Matches[1];
+            $Key = $Matches[2];
+            static $ThemeVersion = NULL;
+
+            switch ($Type) {
+               case 'plugins':
+                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
+                  $Version = GetValue('Version', $PluginInfo, $Version);
+                  break;
+               case 'themes':
+                  if ($ThemeVersion === NULL) {
+                     $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                     if ($ThemeInfo !== FALSE) {
+                        $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
+                     } else {
+                        $ThemeVersion = $Version;
+                     }
+                  }
+                  $Version = $ThemeVersion;
+                  break;
+            }
+         }
+
+         $Result.= 'v='.urlencode($Version);
       }
       return $Result;
    }
@@ -295,7 +348,7 @@ if (!function_exists('Attribute')) {
       }
       foreach ($Name as $Attribute => $Val) {
          if ($Val != '' && $Attribute != 'Standard') {
-            $Return .= ' '.$Attribute.'="'.$Val.'"';
+            $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }
       }
       return $Return;
@@ -415,7 +468,19 @@ if (!function_exists('check_utf8')){
 }
 
 if (!function_exists('CombinePaths')) {
-   // filesystem input/output functions that deal with loading libraries, application paths, etc.
+   /**
+    * Takes an array of path parts and concatenates them using the specified
+    * delimiter. Delimiters will not be duplicated. Example: all of the
+    * following arrays will generate the path "/path/to/vanilla/applications/dashboard"
+    * array('/path/to/vanilla', 'applications/dashboard')
+    * array('/path/to/vanilla/', '/applications/dashboard')
+    * array('/path', 'to', 'vanilla', 'applications', 'dashboard')
+    * array('/path/', '/to/', '/vanilla/', '/applications/', '/dashboard')
+    * 
+    * @param array $Paths The array of paths to concatenate.
+    * @param string $Delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
+    * @returns The concatentated path.
+    */
    function CombinePaths($Paths, $Delimiter = DS) {
       if (is_array($Paths)) {
          $MungedPath = implode($Delimiter, $Paths);
@@ -425,6 +490,28 @@ if (!function_exists('CombinePaths')) {
          return $Paths;
       }
    }
+}
+
+if (!function_exists('CompareHashDigest')) {
+    /**
+     * Returns True if the two strings are equal, False otherwise.
+     * The time taken is independent of the number of characters that match.
+     *
+     * This snippet prevents HMAC Timing attacks ( http://codahale.com/a-lesson-in-timing-attacks/ )
+     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
+     */
+   function CompareHashDigest($Digest1, $Digest2) {
+        if (strlen($Digest1) !== strlen($Digest2)) {
+            return false;
+        }
+
+        $Result = 0;
+        for ($i = strlen($Digest1) - 1; $i >= 0; $i--) {
+            $Result |= ord($Digest1[$i]) ^ ord($Digest2[$i]);
+        }
+
+        return 0 === $Result;
+    }
 }
 
 if (!function_exists('ConcatSep')) {
@@ -466,7 +553,8 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
    function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = NULL) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
-			if(is_object($AssociativeArray)) {
+         
+			if (is_object($AssociativeArray)) {
 				if($ValueKey === '') {
 					$Return[] = $AssociativeArray->$Key;
 				} elseif(property_exists($AssociativeArray, $ValueKey)) {
@@ -474,7 +562,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
 				} else {
 					$Return[$AssociativeArray->$Key] = $DefaultValue;
 				}
-			} elseif (array_key_exists($Key, $AssociativeArray)) {
+			} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
@@ -524,6 +612,33 @@ if (!function_exists('filter_input')) {
          }
       }
       return $Value;     
+   }
+}
+
+if (!function_exists('Debug')) {
+   function Debug($Value = NULL) {
+      static $Debug = FALSE;
+      if ($Value === NULL)
+         return $Debug;
+      
+      $Debug = $Value;
+      if ($Debug)
+         error_reporting(E_ALL);
+      else
+         error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+   }
+}
+
+if (!function_exists('ExternalUrl')) {
+   function ExternalUrl($Path) {
+      $Format = C('Garden.ExternalUrlFormat');
+
+      if ($Format && !StringBeginsWith($Path, 'http'))
+         $Result = sprintf($Format, ltrim($Path, '/'));
+      else
+         $Result = Url($Path, TRUE);
+
+      return $Result;
    }
 }
 
@@ -637,7 +752,7 @@ if (!function_exists('GetMentions')) {
       
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
-         '/(?:^|[\s,\.])@(\w{3,20})\b/i',
+         '/(?:^|[\s,\.>])@(\w{3,20})\b/i',
          $String,
          $Matches
       );
@@ -711,7 +826,7 @@ if (!function_exists('GetValueR')) {
 	 * @param mixed $Default The value to return if the key does not exist.
 	 * @return mixed The value from the array or object.
 	 */
-   function GetValueR($Key, &$Collection, $Default = FALSE) {
+   function GetValueR($Key, $Collection, $Default = FALSE) {
       $Path = explode('.', $Key);
 
       $Value = $Collection;
@@ -1332,7 +1447,7 @@ if (!function_exists('RemoteIP')) {
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
       if (!is_array($Name))
          $Name = array($Name);
@@ -1470,7 +1585,7 @@ if (!function_exists('SaveToConfig')) {
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_CONF . DS . 'config.php';
+      $Path = PATH_LOCAL_CONF.DS.'config.php';
       $Config->Load($Path, 'Save');
 
       if (!is_array($Name))
@@ -1504,21 +1619,80 @@ if (!function_exists('SliceString')) {
    }
 }
 
+if (!function_exists('SmartAsset')) {
+   /**
+    * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
+    */
+   function SmartAsset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
+      $Destination = str_replace('\\', '/', $Destination);
+      if (substr($Destination, 0, 7) == 'http://' || substr($Destination, 0, 8) == 'https://') {
+         $Result = $Destination;
+      } else {
+         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
+         if (!$WithDomain)
+            array_unshift($Parts, '/');
+            
+         $Result = CombinePaths($Parts, '/');
+      }
+
+      if ($AddVersion) {
+         if (strpos($Result, '?') === FALSE)
+            $Result .= '?';
+         else
+            $Result .= '&';
+
+         // Figure out which version to put after the asset.
+         $Version = APPLICATION_VERSION;
+         if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
+            $Type = $Matches[1];
+            $Key = $Matches[2];
+            static $ThemeVersion = NULL;
+
+            switch ($Type) {
+               case 'plugins':
+                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
+                  $Version = GetValue('Version', $PluginInfo, $Version);
+                  break;
+               case 'themes':
+                  if ($ThemeVersion === NULL) {
+                     $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                     if ($ThemeInfo !== FALSE) {
+                        $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
+                     } else {
+                        $ThemeVersion = $Version;
+                     }
+                  }
+                  $Version = $ThemeVersion;
+                  break;
+            }
+         }
+
+         $Result.= 'v='.urlencode($Version);
+      }
+      return $Result;
+   }
+}
+
 if (!function_exists('StringBeginsWith')) {
    /** Checks whether or not string A begins with string B.
     *
     * @param string $A The main string to check.
     * @param string $B The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-    * @return bool
+    * @param bool Whether or not to trim $B off of $A if it is found.
+    * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE) {
+   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
       elseif (strlen($B) == 0)
          return TRUE;
-      else
-         return substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+      else {
+         $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+         if ($Result && $Trim)
+            $Result = substr($A, strlen($B));
+         return $Result;
+      }
    }
 }
 
@@ -1528,15 +1702,20 @@ if (!function_exists('StringEndsWith')) {
     * @param string $A The main string to check.
     * @param string $B The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-    * @return bool
+    * @param bool Whether or not to trim $B off of $A if it is found.
+    * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringEndsWith($A, $B, $CaseInsensitive = FALSE) {
+   function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
       elseif (strlen($B) == 0)
          return TRUE;
-      else
-         return substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+      else {
+         $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+         if ($Result && $Trim)
+            $Result = substr($A, 0, -strlen($B));
+         return $Result;
+      }
    }
 }
 
@@ -1603,6 +1782,8 @@ if (!function_exists('TouchValue')) {
 			$Collection[$Key] = $Default;
 		elseif(is_object($Collection) && !property_exists($Collection, $Key))
 			$Collection->$Key = $Default;
+
+      return GetValue($Key, $Collection);
 	}
 }
 

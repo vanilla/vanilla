@@ -13,13 +13,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class RecentUserModule extends Gdn_Module {
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       parent::__construct($Sender);
    }
    
-   public function GetData($Limit = 5, $DiscussionID = '') {
+   public function GetData($Limit = 20) {
       $UserModel = new UserModel();
-      $this->_Sender->SetData('RecentUserData', $UserModel->GetActiveUsers($Limit));
+      $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);
    }
 
    public function AssetTarget() {
@@ -27,7 +27,10 @@ class RecentUserModule extends Gdn_Module {
    }
 
    public function ToString() {
-      $Data = $this->_Sender->Data['RecentUserData'];
+      if (!C('Garden.Modules.ShowRecentUserModule'))
+         return '';
+
+      $Data = $this->_Sender->RecentUserData;
       if ($Data !== FALSE && $Data->NumRows() > 0)
          return parent::ToString();
 

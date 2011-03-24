@@ -1,7 +1,3 @@
-.Tags h4 {
-    background: url('tag.png') left 4px no-repeat;
-    padding: 0 0 6px 20px !important;
-}
 .TaggedHeading {
     padding: 3px;
     font-weight: bold;

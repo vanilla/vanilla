@@ -24,6 +24,26 @@ if (!function_exists('Alternate')) {
    }
 }
 
+if (!function_exists('CountString')) {
+   function CountString($Number, $Url = '', $Options = array()) {
+      if (is_string($Options))
+         $Options = array('cssclass' => $Options);
+      $Options = array_change_key_case($Options);
+//      $CssClass = GetValue('cssclass', $Options, 'Count');
+
+      if ($Number === NULL && $Url) {
+         $CssClass = ConcatSep(' ', $CssClass, 'Popin TinyProgress');
+         $Url = htmlspecialchars(Url($Url));
+         $Result = "<span class=\"$CssClass\" rel=\"$Url\"></span>";
+      } elseif ($Number) {
+         $Result = " <span class=\"Count\">$Number</span>";
+      } else {
+         $Result = '';
+      }
+      return $Result;
+   }
+}
+
 /**
  * Writes an anchor tag
  */
@@ -53,7 +73,7 @@ if (!function_exists('Anchor')) {
       if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
          $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
 
-      return '<a href="'.$Destination.'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
+      return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 
@@ -79,6 +99,8 @@ if (!function_exists('FormatPossessive')) {
  *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
  *  - time: Formats the valud as a time. This format has no additional arguments.
  *  - url: Calls Url() function around the value to show a valid url with the site. You can pass a domain to include the domain.
+ *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
+ *  - html: Calls htmlspecialchars.
  * @param array $Args The array of arguments. If you want to nest arrays then the keys to the nested values can be seperated by dots.
  * @return string The formatted string.
  * <code>
@@ -87,7 +109,7 @@ if (!function_exists('FormatPossessive')) {
  * // Hello Frank, It's 12:59PM.
  * </code>
  */
-function FormatString($String, $Args) {
+function FormatString($String, $Args = array()) {
    _FormatStringCallback($Args, TRUE);
    $Result = preg_replace_callback('/{([^}]+?)}/', '_FormatStringCallback', $String);
 
@@ -142,6 +164,10 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   break;
             }
             break;
+         case 'html':
+         case 'htmlspecialchars':
+            $Result = htmlspecialchars($Value);
+            break;
          case 'number':
             if(!is_numeric($Value)) {
                $Result = $Value;
@@ -164,6 +190,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             }
             break;
+         case 'rawurlencode':
+            $Result = rawurlencode($Value);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;
@@ -171,6 +200,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             if (strpos($Field, '/') !== FALSE)
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
+            break;
+         case 'urlencode':
+            $Result = urlencode($Value);
             break;
          default:
             $Result = $Value;
@@ -198,7 +230,7 @@ if (!function_exists('Img')) {
          $Attributes = array();
 
       if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
-         $Image = Asset($Image, $WithDomain);
+         $Image = SmartAsset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
    }
@@ -211,7 +243,9 @@ if (!function_exists('Img')) {
  */
 if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
-      return sprintf(T($Number == 1 ? $Singular : $Plural), $Number);
+		// Make sure to fix comma-formatted numbers
+      $WorkingNumber = str_replace(',', '', $Number);
+      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
    }
 }
 
@@ -220,6 +254,8 @@ if (!function_exists('Plural')) {
  */
 if (!function_exists('UserAnchor')) {
    function UserAnchor($User, $CssClass = '') {
+      $User = (object)$User;
+      
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
@@ -249,13 +285,23 @@ if (!function_exists('UserBuilder')) {
  * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
  */
 if (!function_exists('UserPhoto')) {
-   function UserPhoto($User, $CssClass = '') {
-      $CssClass = $CssClass == '' ? '' : ' class="'.$CssClass.'"';
-      if ($User->Photo != '') {
-         $IsFullPath = strtolower(substr($User->Photo, 0, 7)) == 'http://' || strtolower(substr($User->Photo, 0, 8)) == 'https://'; 
-         $PhotoUrl = ($IsFullPath) ? $User->Photo : 'uploads/'.ChangeBasename($User->Photo, 'n%s');
-         return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'
-            .Img($PhotoUrl, array('alt' => urlencode($User->Name)))
+   function UserPhoto($User, $Options = array()) {
+      if (is_string($Options))
+         $Options = array('LinkClass' => $Options);
+      
+      $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
+      
+      $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
+      if ($User->Photo) {
+         if (!preg_match('`^https?://`i', $User->Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+         } else {
+            $PhotoUrl = $User->Photo;
+         }
+         
+         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
+            .Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

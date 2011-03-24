@@ -9,7 +9,7 @@
    <ul>
       <li>
          <?php
-            echo $this->Form->Label('Enter your email address', 'Email');
+            echo $this->Form->Label('Enter your email address or username', 'Email');
             echo $this->Form->TextBox('Email');
          ?>
       </li>

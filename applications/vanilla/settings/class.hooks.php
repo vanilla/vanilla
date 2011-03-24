@@ -93,6 +93,26 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    /**
+    * Check whether a user has access to view discussions in a particular category.
+    *
+    * @since 2.0.18
+    * @example $UserModel->GetCategoryViewPermission($UserID, $CategoryID).
+    *
+    * @param $Sender UserModel.
+    * @return bool Whether user has permission.
+    */
+   public function UserModel_GetCategoryViewPermission_Create($Sender) {
+      $UserID = ArrayValue(0, $Sender->EventArguments, '');
+		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
+		if ($UserID && $CategoryID) {
+         $PermissionModel = Gdn::Authenticator()->GetPermissionModel();
+         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $CategoryID);
+         return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;
+      }
+      return FALSE;
+   }
+   
+   /**
     * Adds 'Discussion' item to menu.
     * 
     * 'Base_Render_Before' will trigger before every pageload across apps.
@@ -119,11 +139,12 @@ class VanillaHooks implements Gdn_IPlugin {
     * @param object $Sender ProfileController.
     */ 
    public function ProfileController_AddProfileTabs_Handler(&$Sender) {
-      if (is_object($Sender->User) && $Sender->User->UserID > 0 && $Sender->User->CountDiscussions > 0) {
+      if (is_object($Sender->User) && $Sender->User->UserID > 0) {
+         $UserID = $Sender->User->UserID;
          // Add the discussion tab
-         $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
-         // Add the discussion tab's CSS and Javascript
-         $Sender->AddCssFile('vanillaprofile.css', 'vanilla');
+         $Sender->AddProfileTab(T('Discussions').CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Discussions');
+         $Sender->AddProfileTab(T('Comments').CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"), 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Comments');
+         // Add the discussion tab's CSS and Javascript.
          $Sender->AddJsFile('jquery.gardenmorepager.js');
          $Sender->AddJsFile('discussions.js');
       }
@@ -137,11 +158,15 @@ class VanillaHooks implements Gdn_IPlugin {
     * 
     * @param object $Sender ProfileController.
     */ 
-   public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
-      $Sender->Preferences['Email Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
-      $Sender->Preferences['Email Notifications']['Email.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
-      $Sender->Preferences['Email Notifications']['Email.CommentMention'] = T('Notify me when people mention me in comments.');
-      $Sender->Preferences['Email Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
+   public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
+      $Sender->Preferences['Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
+      $Sender->Preferences['Notifications']['Email.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
+      $Sender->Preferences['Notifications']['Email.CommentMention'] = T('Notify me when people mention me in comments.');
+      $Sender->Preferences['Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
+      $Sender->Preferences['Notifications']['Popup.DiscussionComment'] = T('Notify me when people comment on my discussions.');
+      $Sender->Preferences['Notifications']['Popup.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
+      $Sender->Preferences['Notifications']['Popup.CommentMention'] = T('Notify me when people mention me in comments.');
+      $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
    }
 	
 	/**
@@ -185,6 +210,65 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->BuzzData[T('New comments in the last day')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Comments in the last week
       $Sender->BuzzData[T('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
+   }
+   
+   /**
+	 * Creates virtual 'Comments' method in ProfileController.
+	 * 
+    * @since 2.0.0
+    * @package Vanilla
+	 *
+	 * @param object $Sender ProfileController.
+	 */
+   public function ProfileController_Comments_Create(&$Sender) {
+		$View = $Sender->View;
+      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
+		$Username = ArrayValue(1, $Sender->RequestArgs, '');
+      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
+      // Tell the ProfileController what tab to load
+		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
+      
+      // Load the data for the requested tab.
+      if (!is_numeric($Offset) || $Offset < 0)
+         $Offset = 0;
+      
+      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      $CommentModel = new CommentModel();
+      $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
+      $CountComments = $Offset + $Sender->CommentData->NumRows();
+      if ($Sender->CommentData->NumRows() == $Limit)
+         $CountComments = $Offset + $Limit + 1;
+      
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+      $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
+      $Sender->Pager->MoreCode = 'More Comments';
+      $Sender->Pager->LessCode = 'Newer Comments';
+      $Sender->Pager->ClientID = 'Pager';
+      $Sender->Pager->Configure(
+         $Offset,
+         $Limit,
+         $CountComments,
+         'profile/comments/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+      );
+      
+      // Deliver JSON data if necessary
+      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
+         $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
+         $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
+         $Sender->View = 'profilecomments';
+      }
+		$Sender->Offset = $Offset;
+      
+      // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
+      $Sender->HandlerType = HANDLER_TYPE_NORMAL;
+      
+      // Do not show discussion options
+      $Sender->ShowOptions = FALSE;
+      
+      // Render the ProfileController
+      $Sender->Render();
    }
    
    /**

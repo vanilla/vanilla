@@ -17,9 +17,9 @@ $DisabledCount = $PluginCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All ').Wrap($PluginCount), 'settings/plugins/all'); ?></li>
-      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Enabled ').Wrap($EnabledCount), 'settings/plugins/enabled'); ?></li>
-      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Disabled ').Wrap($DisabledCount), 'settings/plugins/disabled'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('All %1$s'), Wrap($PluginCount)), 'settings/plugins/all'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Enabled %1$s'), Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Disabled %1$s'), Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
       <?php
       if ($AddonUrl != '')
          echo Wrap(Anchor(T('Get More Plugins'), $AddonUrl), 'li');
@@ -124,7 +124,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
                $Info .= Anchor(T('Visit Site'), $PluginUrl);
             }
             
-            echo $Info != '' ? $Info : '&nbsp;';
+            echo $Info != '' ? $Info : '&#160;';
                
          ?></td>
       </tr>

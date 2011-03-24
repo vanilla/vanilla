@@ -14,6 +14,7 @@ if (!isset($Drop))
 if (!isset($Explicit))
    $Explicit = TRUE;
 
+$Database = Gdn::Database();
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
 
@@ -39,11 +40,11 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel->SQL = $SQL;
    $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
    $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
-   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
+   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
    $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
    $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
    $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
-   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
+   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
    unset($RoleModel);
 }
 
@@ -55,8 +56,8 @@ $PhotoExists = $Construct->ColumnExists('Photo');
 
 $Construct
 	->PrimaryKey('UserID')
-   ->Column('Name', 'varchar(20)', FALSE, 'key')
-   ->Column('Password', 'varbinary(50)')
+   ->Column('Name', 'varchar(50)', FALSE, 'key')
+   ->Column('Password', 'varbinary(100)') // keep this longer because of some imports.
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
    ->Column('About', 'text', TRUE)
@@ -75,11 +76,15 @@ $Construct
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE)
+   ->Column('LastIPAddress', 'varchar(15)', TRUE)
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
+   ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
@@ -126,6 +131,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('SignOutUrl', 'varchar(255)', TRUE)
    ->Column('PasswordUrl', 'varchar(255)', TRUE)
    ->Column('ProfileUrl', 'varchar(255)', TRUE)
+   ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')
@@ -144,12 +150,21 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
+   
+$Construct->Table('AnalyticsLocal')
+   ->Engine('InnoDB')
+   ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
+   ->Column('Views', 'int', NULL)
+   ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Database = $Database;
 $PermissionModel->SQL = $SQL;
+$PermissionTableExists = FALSE;
 if($PermissionModel instanceof PermissionModel) {
+   $PermissionTableExists = $Construct->TableExists('Permission');
+
 	// Permission Table
 	$Construct->Table('Permission')
 		->PrimaryKey('PermissionID')
@@ -160,79 +175,93 @@ if($PermissionModel instanceof PermissionModel) {
 		// The actual permissions will be added by PermissionModel::Define()
 		->Set($Explicit, $Drop);
 }
-   
+
 // Define the set of permissions that garden uses.
 $PermissionModel->Define(array(
-	'Garden.Email.Manage',
-	'Garden.Settings.Manage',
-	'Garden.Routes.Manage',
+   'Garden.Email.Manage',
+   'Garden.Settings.Manage',
+   'Garden.Routes.Manage',
    'Garden.Messages.Manage',
-	'Garden.Applications.Manage',
-	'Garden.Plugins.Manage',
-	'Garden.Themes.Manage',
-	'Garden.SignIn.Allow',
-	'Garden.Registration.Manage',
-	'Garden.Applicants.Manage',
-	'Garden.Roles.Manage',
-	'Garden.Users.Add',
-	'Garden.Users.Edit',
-	'Garden.Users.Delete',
-	'Garden.Users.Approve',
-	'Garden.Activity.Delete',
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
-	
-// Set initial guest permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 2,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
-	
-// Set initial applicant permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 4,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
+   'Garden.Applications.Manage',
+   'Garden.Plugins.Manage',
+   'Garden.Themes.Manage',
+   'Garden.SignIn.Allow' => 1,
+   'Garden.Registration.Manage',
+   'Garden.Applicants.Manage',
+   'Garden.Roles.Manage',
+   'Garden.Users.Add',
+   'Garden.Users.Edit',
+   'Garden.Users.Delete',
+   'Garden.Users.Approve',
+   'Garden.Activity.Delete',
+   'Garden.Activity.View' => 1,
+   'Garden.Profiles.View' => 1,
+   'Garden.Moderation.Manage' => 'Garden.Users.Edit'
+   ));
 
-// Set initial member permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 8,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
+if (!$PermissionTableExists) {
 
-// Set initial moderator permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 32,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Activity.View' => 1,
-	'Garden.Profiles.View' => 1
-	));
+   // Set initial guest permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 2,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
 
-// Set initial admininstrator permissions.
-$PermissionModel->Save(array(
-	'RoleID' => 16,
-	'Garden.Settings.Manage' => 1,
-	'Garden.Routes.Manage' => 1,
-	'Garden.Applications.Manage' => 1,
-	'Garden.Plugins.Manage' => 1,
-	'Garden.Themes.Manage' => 1,
-	'Garden.SignIn.Allow' => 1,
-	'Garden.Registration.Manage' => 1,
-	'Garden.Applicants.Manage' => 1,
-	'Garden.Roles.Manage' => 1,
-	'Garden.Users.Add' => 1,
-	'Garden.Users.Edit' => 1,
-	'Garden.Users.Delete' => 1,
-	'Garden.Users.Approve' => 1,
-	'Garden.Activity.Delete' => 1,
-	'Garden.Activity.View' => 1,
-   'Garden.Profiles.View' => 1
-	));
+   // Set initial confirm email permissions.
+   $PermissionModel->Save(array(
+       'RoleID' => 3,
+       'Garden.Signin.Allow' => 1,
+       'Garden.Activity.View' => 1,
+       'Garden.Profiles.View' => 1
+       ));
+
+   // Set initial applicant permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 4,
+      'Garden.Signin.Allow' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial member permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 8,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial moderator permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 32,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+
+   // Set initial admininstrator permissions.
+   $PermissionModel->Save(array(
+      'RoleID' => 16,
+      'Garden.Settings.Manage' => 1,
+      'Garden.Routes.Manage' => 1,
+      'Garden.Applications.Manage' => 1,
+      'Garden.Plugins.Manage' => 1,
+      'Garden.Themes.Manage' => 1,
+      'Garden.SignIn.Allow' => 1,
+      'Garden.Registration.Manage' => 1,
+      'Garden.Applicants.Manage' => 1,
+      'Garden.Roles.Manage' => 1,
+      'Garden.Users.Add' => 1,
+      'Garden.Users.Edit' => 1,
+      'Garden.Users.Delete' => 1,
+      'Garden.Users.Approve' => 1,
+      'Garden.Activity.Delete' => 1,
+      'Garden.Activity.View' => 1,
+      'Garden.Profiles.View' => 1
+      ));
+}
+$PermissionModel->ClearPermissions();
 
 // Photo Table
 $Construct->Table('Photo');
@@ -294,12 +323,16 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() ==
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:')); 
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
-if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'RoleChange', 'FullHeadline' => '%1$s changed %4$s permissions.', 'ProfileHeadline' => '%1$s changed %4$s permissions.', 'Notify' => '1'));
+//if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
+   $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%1$s changed %4$s permissions.', 'ProfileHeadline' => '%1$s changed %4$s permissions.', 'Notify' => '1'), array('Name' => 'RoleChange'), TRUE);
 if ($SQL->GetWhere('ActivityType', array('Name' => 'ActivityComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'ShowIcon' => '1', 'Name' => 'ActivityComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s', 'RouteCode' => 'activity', 'Notify' => '1'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'Import'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'Import', 'FullHeadline' => '%1$s imported data.', 'ProfileHeadline' => '%1$s imported data.', 'Notify' => '1', 'Public' => '0'));
+//if ($SQL->GetWhere('ActivityType', array('Name' => 'Banned'))->NumRows() == 0)
+$SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s banned %3$s.', 'ProfileHeadline' => '%1$s banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Banned'), TRUE);
+//if ($SQL->GetWhere('ActivityType', array('Name' => 'Unbanned'))->NumRows() == 0)
+$SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %3$s.', 'ProfileHeadline' => '%1$s un-banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Unbanned'), TRUE);
 
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
@@ -308,12 +341,13 @@ $Construct->Table('Activity')
    ->Column('CommentActivityID', 'int', TRUE, 'key')
    ->Column('ActivityTypeID', 'int')
    ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE)
+   ->Column('RegardingUserID', 'int', TRUE, 'key')
    ->Column('Story', 'text', TRUE)
    ->Column('Route', 'varchar(255)', TRUE)
    ->Column('CountComments', 'int', '0')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Set($Explicit, $Drop);
 
 // Message Table
@@ -350,4 +384,50 @@ $Construct->Table('Tag')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Log')
+   ->PrimaryKey('LogID')
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity'), FALSE, 'index')
+   ->Column('RecordID', 'int', NULL, 'index')
+   ->Column('RecordUserID', 'int', NULL) // user responsible for the record
+   ->Column('RecordDate', 'datetime')
+   ->Column('InsertUserID', 'int') // user that put record in the log
+   ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('ParentRecordID', 'int', NULL, 'index')
+   ->Column('Data', 'text', NULL) // the data from the record.
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Regarding')
+   ->PrimaryKey('RegardingID')
+   ->Column('Type', 'varchar(255)', FALSE, 'key')
+   ->Column('InsertUserID', 'int', FALSE)
+   ->Column('DateInserted', 'datetime', FALSE)
+   ->Column('ForeignType', 'varchar(32)', FALSE)
+   ->Column('ForeignID', 'int(11)', FALSE)
+   ->Column('ParentType', 'varchar(32)', TRUE)
+   ->Column('ParentID', 'int(11)', TRUE)
+   ->Column('ForeignURL', 'varchar(255)', TRUE)
+   ->Column('Comment', 'text', FALSE)
+   ->Engine('InnoDB')
+   ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Ban')
+   ->PrimaryKey('BanID')
+   ->Column('BanType', array('IPAddress', 'Name', 'Email'), FALSE, 'unique')
+   ->Column('BanValue', 'varchar(50)', FALSE, 'unique')
+   ->Column('Notes', 'varchar(255)', NULL)
+   ->Column('CountUsers', 'uint', 0)
+   ->Column('CountBlockedRegistrations', 'uint', 0)
+   ->Column('InsertUserID', 'int')
+   ->Column('DateInserted', 'datetime')
+   ->Engine('InnoDB')
+   ->Set($Explicit, $Drop);
+
+$Construct->Table('Spammer')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('CountSpam', 'usmallint', 0)
+   ->Column('CountDeletedSpam', 'usmallint', 0)
    ->Set($Explicit, $Drop);

@@ -21,6 +21,7 @@ class Gdn_Dirtycache extends Gdn_Cache {
    
    public function __construct() {
       parent::__construct();
+      $this->CacheType = Gdn_Cache::CACHE_TYPE_NULL;
    }
    
    public function AddContainer($Options) {

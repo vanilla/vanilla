@@ -50,8 +50,8 @@ class PostController extends VanillaController {
     */
    public function Discussion($CategoryID = '') {
       // Override CategoryID if categories are disabled
-      $UseCategories = C('Vanilla.Categories.Use');
-      if (!$UseCategories)
+      $UseCategories = $this->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
+      if (!$UseCategories) 
          $CategoryID = 0;
          
       // Setup head
@@ -65,22 +65,41 @@ class PostController extends VanillaController {
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
+      $this->Category = FALSE;
       if ($UseCategories) {
          $CategoryModel = new CategoryModel();
-         $this->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $aCategoryData = array();
+         foreach ($CategoryData->Result() as $Category) {
+            if ($Category->CategoryID <= 0)
+               continue;
+            
+            if ($this->CategoryID == $Category->CategoryID)
+               $this->Category = $Category;
+            
+            $CategoryName = $Category->Name;   
+            if ($Category->Depth > 1) {
+               $CategoryName = '↳ '.$CategoryName;
+               $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
+               $CategoryName = str_replace(' ', '&#160;', $CategoryName);
+            }
+               
+            $aCategoryData[$Category->CategoryID] = $CategoryName;
+         }
+         $this->CategoryData = $aCategoryData;
       }
       
       // Check permission 
       if (isset($this->Discussion)) {
          // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
 
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Discussion->CategoryID);
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
 
          $this->Title(T('Edit Discussion'));
       } else {
@@ -109,19 +128,24 @@ class PostController extends VanillaController {
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
-            // Check category permissions
-            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->CategoryID))
-               $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
+            if (!is_object($this->Category) && isset($FormValues['CategoryID']))
+               $this->Category = $aCategoryData[$FormValues['CategoryID']];
 
-            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->CategoryID))
-               $this->Form->AddError('You do not have permission to close in this category', 'Close');
+            if (is_object($this->Category)) {
+               // Check category permissions.
+               if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
+                  $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->CategoryID))
-               $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
-               
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->CategoryID))
-               $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
-               
+               if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
+                  $this->Form->AddError('You do not have permission to close in this category', 'Close');
+
+               if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
+                  $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
+
+               if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
+                  $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
+            }
+
             // Make sure that the title will not be invisible after rendering
             $Name = $this->Form->GetFormValue('Name', '');
             if ($Name != '' && Gdn_Format::Text($Name) == '')
@@ -136,6 +160,11 @@ class PostController extends VanillaController {
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
                   if ($DiscussionID > 0 && $DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  if ($DiscussionID == SPAM) {
+                     $this->StatusMessage = T('Your post has been flagged for moderation.');
+                     $this->Render('Spam');
+                     return;
+                  }
                }
             }
          } else {
@@ -149,6 +178,8 @@ class PostController extends VanillaController {
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
             
+            $this->EventArguments['Discussion'] = &$this->Discussion;
+            $this->EventArguments['Comment'] = &$this->Comment;
             $this->FireEvent('BeforeDiscussionPreview');
 
             if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
@@ -159,7 +190,7 @@ class PostController extends VanillaController {
          }
          if ($this->Form->ErrorCount() > 0) {
             // Return the form errors
-            $this->StatusMessage = $this->Form->Errors();
+            $this->ErrorMessage($this->Form->Errors());
          } else if ($DiscussionID > 0 || $DraftID > 0) {
             // Make sure that the ajax request form knows about the newly created discussion or draft id
             $this->SetJson('DiscussionID', $DiscussionID);
@@ -180,7 +211,7 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
             }
          }
@@ -189,6 +220,8 @@ class PostController extends VanillaController {
       // Add hidden fields for editing
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
+      
+      $this->FireEvent('BeforeDiscussionRender');
       
       // Render view (posts/discussion.php or post/preview.php)
       $this->Render();
@@ -233,7 +266,8 @@ class PostController extends VanillaController {
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
             
-      // If invalid $DiscussionID, get from form
+      // If invalid $DiscussionID, get from form.
+      $this->Form->SetModel($this->CommentModel);
       $DiscussionID = is_numeric($DiscussionID) ? $DiscussionID : $this->Form->GetFormValue('DiscussionID', 0);
       
       // Set discussion data
@@ -251,7 +285,6 @@ class PostController extends VanillaController {
       
       // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
-      $this->Form->SetModel($this->CommentModel);
       $CommentID = isset($this->Comment) && property_exists($this->Comment, 'CommentID') ? $this->Comment->CommentID : '';
       $DraftID = isset($this->Comment) && property_exists($this->Comment, 'DraftID') ? $this->Comment->DraftID : '';
       $this->EventArguments['CommentID'] = $CommentID;
@@ -270,17 +303,17 @@ class PostController extends VanillaController {
       if ($Editing) {
          // Permisssion to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
             
          // Make sure that content can (still) be edited.
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
-            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->CategoryID);
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
       } else {
          // Permission to add
-         $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->CategoryID);
+         $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -307,18 +340,22 @@ class PostController extends VanillaController {
             $CommentID = $this->CommentModel->Save($FormValues);
 
             // The comment is now half-saved.
-            if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-               $this->Comment2($CommentID, $Inserted);
-            } else {
-               $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+            if (is_numeric($CommentID) && $CommentID > 0) {
+               if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+                  $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
+               } else {
+                  $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+               }
+
+               // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+               $Comment = $this->CommentModel->GetID($CommentID);
+
+               $this->EventArguments['Discussion'] = $Discussion;
+               $this->EventArguments['Comment'] = $Comment;
+               $this->FireEvent('AfterCommentSave');
+            } elseif ($CommentID === SPAM) {
+               $this->StatusMessage = T('Your post has been flagged for moderation.');
             }
-            
-            // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-            $Comment = $this->CommentModel->GetID($CommentID);
-            
-            $this->EventArguments['Discussion'] = $Discussion;
-            $this->EventArguments['Comment'] = $Comment;
-            $this->FireEvent('AfterCommentSave');
             
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());
             if ($CommentID > 0 && $DraftID > 0)
@@ -334,9 +371,14 @@ class PostController extends VanillaController {
                
                // If the comment was not a draft
                if (!$Draft) {
-                  // Redirect to the new comment
-                  // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-                  Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
+                  // Redirect to the new comment.
+                  if ($CommentID > 0)
+                     Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
+                  elseif ($CommentID == SPAM) {
+                     $this->SetData('DiscussionUrl', '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->View = 'Spam';
+           
+                  }
                } elseif ($Preview) {
                   // If this was a preview click, create a comment shell with the values for this comment
                   $this->Comment = new stdClass();
@@ -348,14 +390,14 @@ class PostController extends VanillaController {
                   $this->AddAsset('Content', $this->FetchView('preview'));
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
             }
          } else {
             // Handle ajax-based requests
             if ($this->Form->ErrorCount() > 0) {
                // Return the form errors
-               $this->StatusMessage = $this->Form->Errors();               
+               $this->ErrorMessage($this->Form->Errors());
             } else {
                // Make sure that the ajax request form knows about the newly created comment or draft id
                $this->SetJson('CommentID', $CommentID);
@@ -422,7 +464,7 @@ class PostController extends VanillaController {
                   }
                } else {
                   // If this was a draft save, notify the user about the save
-                  $this->StatusMessage = sprintf(T('Draft saved at %s'), Gdn_Format::Date());
+                  $this->InformMessage(sprintf(T('Draft saved at %s'), Gdn_Format::Date()));
                }
                // And update the draft count
                $UserModel = Gdn::UserModel();

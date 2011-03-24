@@ -70,9 +70,9 @@ jQuery(document).ready(function($) {
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
-      $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&nbsp;</span>');
+      $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
-      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
       $.ajax({
@@ -85,15 +85,22 @@ jQuery(document).ready(function($) {
             $('.Popup,.Overlay').remove();
             var msg;
             if (XMLHttpRequest.responseText)
-               msg = XMLHttpRequest.responseText;
+               try {
+                  var data = $.parseJSON(XMLHttpRequest.responseText);
+                  if (data.Exception)
+                     msg = data.Exception;
+                  else
+                     msg = 'Unkown error.';
+               } catch (ex) {
+                  msg = XMLHttpRequest.responseText;
+               }
             else {
-               msg = '<h1>Error</h1><p class="Wrap">';
                if(textStatus == 'timeout')
-                  msg += 'Your request took too long to complete and timed out. Please try again.';
+                  msg = 'Your request took too long to complete and timed out. Please try again.';
                else
-                  msg += textStatus;
-               msg += '</div>';
+                  msg = textStatus;
             }
+            msg = '<h1>Error</h1><p class="Wrap">' + msg + '</div>';
 
 
             $.popup({}, msg);
@@ -145,8 +152,8 @@ jQuery(document).ready(function($) {
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
             if (json.FormSaved == false) {
-               $(frm).prepend(json.StatusMessage);
-               json.StatusMessage = null;
+               $(frm).prepend(json.ErrorMessages);
+               json.ErrorMessages = null;
             } else if (preview) {
                $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');
@@ -182,7 +189,7 @@ jQuery(document).ready(function($) {
                $(document).trigger('CommentAdded');
                $(frm).triggerHandler('complete');
             }
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
             return false;
          },
          complete: function(XMLHttpRequest, textStatus) {
@@ -251,7 +258,7 @@ jQuery(document).ready(function($) {
       $(container).addClass('Editing');
       var parent = $(btn).parents('div.Comment');
       var msg = $(parent).find('div.Message');
-      $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&nbsp;</span>');
+      $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       if ($(msg).is(':visible')) {
          $.ajax({
             type: "POST",
@@ -309,8 +316,8 @@ jQuery(document).ready(function($) {
    
       setTimeout(function() {
          discussionID = gdn.definition('DiscussionID', 0);
-         lastCommentID = gdn.definition('LastCommentID', 0);
-         if(lastCommentID <= 0)
+         lastCommentID = gdn.definition('LastCommentID', '');
+         if(lastCommentID == '')
             return;
          
          $.ajax({

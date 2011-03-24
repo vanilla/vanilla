@@ -10,7 +10,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-   $Message = SliceString(Gdn_Format::Text($Conversation->LastMessage), 100);
+   $Message = nl2br(SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), FALSE), 100));
    if (StringIsNullOrEmpty(trim($Message)))
       $Message = T('Blank Message');
 ?>
@@ -29,6 +29,21 @@ foreach ($this->ConversationData->Result() as $Conversation) {
             echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
          }
          ?>
+         <span class="MetaItem">
+            <span class="MetaLabel"><?php echo T('Participants'); ?></span>
+            <span class="MetaValue">
+               <?php
+               $First = TRUE;
+               foreach ($Conversation->Participants as $User) {
+                  if ($First)
+                     $First = FALSE;
+                  else
+                     echo ', ';
+                  echo UserAnchor($User, 'Name');
+               }
+               ?>
+            <span>
+         </span>
       </div>
    </div>
 </li>

@@ -94,8 +94,8 @@ jQuery(document).ready(function($) {
             $('div.Errors').remove();
 
             if (json.FormSaved == false) {
-               if (json.StatusMessage != null && json.StatusMessage != '')
-                  $(row).prepend(json.StatusMessage);
+               if (json.ErrorMessages)
+                  $(row).prepend(json.ErrorMessages);
             } else {
                $(row).before(json.Data);         
                textbox.val('').blur();
@@ -115,7 +115,7 @@ jQuery(document).ready(function($) {
       // Only submit the form if the textarea isn't empty
       if ($(inp).val() != '') {
          $('span.Progress').remove();
-         $(but).after('<span class="Progress">&nbsp;</span>');
+         $(but).after('<span class="Progress">&#160;</span>');
          var postValues = $(frm).serialize();
          postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({
@@ -153,5 +153,10 @@ jQuery(document).ready(function($) {
       return false;
    });
 
+   // Set up paging
+   if ($.morepager)
+      $('.MorePager').morepager({
+         pageContainerSelector: 'ul.DataList:first'
+      });
 
 });

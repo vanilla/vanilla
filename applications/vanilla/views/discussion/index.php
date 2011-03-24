@@ -43,8 +43,8 @@ if ($Session->IsValid()) {
 if($this->Pager->LastPage()) {
    $this->AddDefinition('DiscussionID', $this->Data['Discussion']->DiscussionID);
    $LastCommentID = $this->AddDefinition('LastCommentID');
-   if(is_null($LastCommentID) || $this->Data['Discussion']->LastCommentID > $LastCommentID)
-      $this->AddDefinition('LastCommentID', $this->Data['Discussion']->LastCommentID);
+   if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+      $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
    $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
 }
 
@@ -58,7 +58,7 @@ if ($this->Discussion->Closed == '1') {
       <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
-} else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->CategoryID)) { 
+} else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
    echo $this->FetchView('comment', 'post');
 } else if ($Session->IsValid()) { ?>
    <div class="Foot Closed">
@@ -70,7 +70,7 @@ if ($this->Discussion->Closed == '1') {
    ?>
    <div class="Foot">
       <?php
-      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl.'#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
+      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
       ?> 
    </div>
    <?php 

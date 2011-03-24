@@ -116,7 +116,7 @@ class FacebookPlugin extends Gdn_Plugin {
              'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'));
 
          SaveToConfig($Settings);
-         $Sender->StatusMessage = T("Your settings have been saved.");
+         $Sender->InformMessage(T("Your settings have been saved."));
 
       } else {
          $Sender->Form->SetFormValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));

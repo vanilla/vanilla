@@ -14,7 +14,7 @@ foreach ($this->DraftData->Result() as $Draft) {
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    ?>
    <li class="Item Draft<?php echo $Alt; ?>">
-      <div class="OptionButton"><?php echo Anchor(T('Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
+      <div class="OptionButton"><?php echo Anchor(T('Draft.Delete', 'Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
       <div class="ItemContent">
          <?php echo Anchor($Draft->Name, $EditUrl, 'Title DraftLink'); ?>
          <div class="Excerpt"><?php

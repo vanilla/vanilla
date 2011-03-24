@@ -66,7 +66,7 @@ class OpenIDPlugin extends Gdn_Plugin {
       $Url = Url('/entry/connect/openid', TRUE);
       $UrlParts = explode('?', $Url);
       parse_str(GetValue(1, $UrlParts, ''), $Query);
-      $Query = array_merge($Query, ArrayTranslate($_GET, array('display')));
+      $Query = array_merge($Query, ArrayTranslate($_GET, array('display', 'Target')));
 
       $OpenID->returnUrl = $UrlParts[0].'?'.http_build_query($Query);
       $OpenID->required = array('contact/email', 'namePerson/first', 'namePerson/last', 'pref/language');

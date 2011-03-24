@@ -15,7 +15,7 @@ class InThisDiscussionModule extends Gdn_Module {
    
    protected $_UserData;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $this->_UserData = FALSE;
       parent::__construct($Sender);
    }

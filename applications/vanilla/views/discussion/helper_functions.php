@@ -4,6 +4,8 @@
  * $Object is either a Comment or the original Discussion.
  */
 function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
+   $Alt = ($CurrentOffset % 2) != 0;
+
    $Author = UserBuilder($Object, 'Insert');
    $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
 	$Sender->EventArguments['Object'] = $Object;
@@ -15,13 +17,23 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $Id = 'Comment_'.$Object->CommentID;
       $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
    } else {
+      
+//      if (Gdn::Session()->User->Name == 'Tim')
+//         print_r($Sender->Discussion);
+      
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;
       $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
    }
+   $Sender->EventArguments['CssClass'] = &$CssClass;
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
+
+   if ($Alt)
+      $CssClass .= ' Alt';
+   $Alt = !$Alt;
+
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
@@ -77,37 +89,38 @@ function WriteOptionList($Object, $Sender, $Session) {
 	$CategoryID = GetValue('CategoryID', $Object);
 	if(!$CategoryID && property_exists($Sender, 'Discussion'))
 		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
+   $PermissionCategoryID = GetValue('PermissionCategoryID', $Object, GetValue('PermissionCategoryID', $Sender->Discussion));
 		
    // Show discussion options if this is the discussion / first comment
    if ($Sender->EventArguments['Type'] == 'Discussion') {
       // Can the user edit the discussion?
-      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $CategoryID))
+      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').$TimeLeft.'</span>';
          
       // Can the user announce?
-      if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</span>';
 
       // Can the user sink?
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</span>';
 
       // Can the user close?
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</span>';
       
       // Can the user delete?
-      if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $CategoryID))
+      if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Delete Discussion'), 'vanilla/discussion/delete/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</span>';
    } else {
       // And if this is just another comment in the discussion ...
       
       // Can the user edit the comment?
-      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $Sender->Discussion->CategoryID))
+      if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').$TimeLeft.'</span>';
 
       // Can the user delete the comment?
-      if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $CategoryID))
+      if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
          $Sender->Options .= '<span>'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode($Sender->SelfUrl), 'DeleteComment') . '</span>';
    }
    

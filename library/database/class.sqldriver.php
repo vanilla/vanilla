@@ -22,7 +22,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Database
  */
-require_once(dirname(__FILE__).DS.'class.database.php');
 
 abstract class Gdn_SQLDriver {
    
@@ -617,7 +616,7 @@ abstract class Gdn_SQLDriver {
     * @param string $OrderDirection The direction of the sort.
     * @param int    $Limit          Adds a limit to the query.
     * @param int    $PageNumber     The page of data to retrieve.
-    * @return DataSet
+    * @return Gdn_DataSet
     */
    public function Get($Table = '', $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
       if ($Table != '') {
@@ -690,7 +689,7 @@ abstract class Gdn_SQLDriver {
       if ($Where !== FALSE)
          $this->Where($Where);
 
-      $this->Select('*', 'count', 'RowCount');
+      $this->Select('*', 'count', 'RowCount'); // count * slow on innodb
       $Sql = $this->GetSelect();
       $Result = $this->Query($Sql);
 
@@ -1110,22 +1109,34 @@ abstract class Gdn_SQLDriver {
       // Check to see if there is a row in the table like this.
       if ($CheckExisting) {
          $Row = $this->GetWhere($Table, $Where)->FirstRow(DATASET_TYPE_ARRAY);
-         
+
          $Update = FALSE;
          if ($Row) {
+            $Update = TRUE;
             foreach ($Set as $Key => $Value) {
+               unset($Set[$Key]);
                $Key = trim($Key, '`');
+               
+               if (!$this->CaptureModifications && !isset($Row[$Key]))
+                  continue;
 
                if (in_array($Key, array('DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID')))
                   continue;
 
-               if ($Row[$Key] != $Value) {
-                  $Update = TRUE;
-                  break;
+
+               // We are assuming here that if the existing record doesn't contain the column then it's just been added.
+               if (preg_match('/^`(.+)`$/', $Value, $Matches)) {
+                  if (!isset($Row[$Key]) || $Row[$Key] != $Row[$Matches[1]])
+                     $this->Set('`'.$Key.'`', $Value, FALSE);
+               } elseif (!isset($Row[$Key]) || $Row[$Key] != $Value) {
+                  $this->Set('`'.$Key.'`', $Value);
                }
+               
             }
-            if (!$Update)
+            if (count($this->_Sets) == 0) {
+               $this->Reset();
                return;
+            }
          }
       } else {
          $Count = $this->GetCount($Table, $Where);

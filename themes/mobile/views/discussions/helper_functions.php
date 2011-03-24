@@ -23,12 +23,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-      if ($Discussion->FirstPhoto != '') {
-         if (strtolower(substr($Discussion->FirstPhoto, 0, 7)) == 'http://' || strtolower(substr($Discussion->FirstPhoto, 0, 8)) == 'https://') { 
-            $PhotoUrl = $Discussion->FirstPhoto;
-         } else {
-            $PhotoUrl = 'uploads/'.ChangeBasename($Discussion->FirstPhoto, 'n%s');
-         }
+      if ($Discussion->FirstPhoto) {
+         $PhotoImage = 'n'.basename($Discussion->FirstPhoto);
+         $PhotoUrl = Gdn_Upload::Url(dirname($Discussion->FirstPhoto).'/'.$PhotoImage);
          echo Img($PhotoUrl, array('alt' => $Discussion->FirstName));
 		}
    ?>
@@ -45,7 +42,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             if ($Discussion->LastCommentID != '')
                echo '<span class="LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
                
-            echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span> ';
+            echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
          ?>
       </div>
    </div>

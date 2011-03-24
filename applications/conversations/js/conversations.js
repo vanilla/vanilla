@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
          var lastMessage = $(messages).get(messages.length - 1);
          var lastMessageID = $(lastMessage).attr('id');
          postValues += '&' + prefix + 'LastMessageID=' + lastMessageID;
-         $(button).before('<span class="TinyProgress">&nbsp;</span>');
+         $(button).before('<span class="TinyProgress">&#160;</span>');
          $.ajax({
             type: "POST",
             url: $(frm).attr('action'),
@@ -43,10 +43,11 @@ jQuery(document).ready(function($) {
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
-               if (json.StatusMessage) {
-                  $(frm).prepend(json.StatusMessage);
-                  json.StatusMessage = null;
+               if (json.ErrorMessages) {
+                  $(frm).prepend(json.ErrorMessages);
+                  json.ErrorMessages = null;
                }
+               
                if (json.FormSaved) {
                   // Clean up the form
                   clearMessageForm();                
@@ -62,7 +63,7 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
-                  gdn.inform(json.StatusMessage);
+                  gdn.inform(json);
                }
             },
             complete: function(XMLHttpRequest, textStatus) {
@@ -107,7 +108,7 @@ jQuery(document).ready(function($) {
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();
-      $(btn).before('<span class="TinyProgress">&nbsp;</span>');
+      $(btn).before('<span class="TinyProgress">&#160;</span>');
       
       var frm = $(btn).parents('form');
       var textbox = $(frm).find('textarea');
@@ -124,7 +125,7 @@ jQuery(document).ready(function($) {
             $.popup({}, XMLHttpRequest.responseText);
          },
          success: function(json) {
-            gdn.inform(json.StatusMessage);
+            gdn.inform(json);
             if (json.RedirectUrl)
               setTimeout("document.location='" + json.RedirectUrl + "';", 300);
          }

@@ -1,14 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
+function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
+   static $Alt = FALSE;
    $CssClass = 'Item';
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt.' ';
+   $CssClass .= $Alt ? ' Alt ' : '';
+   $Alt = !$Alt;
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
+   $DiscussionUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '');
+   $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
+   $Sender->EventArguments['CssClass'] = &$CssClass;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
    
@@ -17,6 +22,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
+      
+   $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 
    static $FirstDiscussion = TRUE;
    if (!$FirstDiscussion)
@@ -30,9 +37,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
+         <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>
          <?php if ($Discussion->Announce == '1') { ?>
          <span class="Announcement"><?php echo T('Announcement'); ?></span>
          <?php } ?>
@@ -52,7 +60,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span>';
             }
          
-            if (C('Vanilla.Categories.Use'))
+            if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
                echo Wrap(Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');
@@ -77,7 +85,9 @@ function WriteFilterTabs(&$Sender) {
       $CountDiscussions = $Session->User->CountDiscussions;
       $CountDrafts = $Session->User->CountDrafts;
    }
-   if (is_numeric($CountBookmarks) && $CountBookmarks > 0)
+   if ($CountBookmarks === NULL) {
+      $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
+   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0)
       $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
    if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
@@ -111,10 +121,19 @@ function WriteFilterTabs(&$Sender) {
       ?>
    </ul>
    <?php
-   if (property_exists($Sender, 'Category') && is_object($Sender->Category)) {
-      ?>
-      <div class="SubTab">↳ <?php echo $Sender->Category->Name; ?></div>
-      <?php
+   $DescendantData = GetValue('DescendantData', $Sender->Data);
+   $Category = GetValue('Category', $Sender->Data);
+   if ($DescendantData && $Category) {
+      echo '<div class="SubTab"><span class="BreadCrumb FirstCrumb">↳ </span>';
+      foreach ($DescendantData->Result() as $Descendant) {
+         // Ignore the root node
+         if ($Descendant->CategoryID > 0) {
+            echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
+            echo '<span class="BreadCrumb"> &rarr; </span>';
+         }
+      }
+      echo $Category->Name;
+      echo '</div>';
    }
    ?>
 </div>
@@ -127,6 +146,45 @@ function WriteFilterTabs(&$Sender) {
 function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
       echo '<div class="Options">';
+      $Sender->Options = '';
+      
+      // Dismiss an announcement
+      if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
+         $Sender->Options .= '<li>'.Anchor(T('Dismiss'), 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
+      
+      // Edit discussion
+      if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
+
+      // Announce discussion
+      if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</li>';
+
+      // Sink discussion
+      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</li>';
+
+      // Close discussion
+      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
+      
+      // Delete discussion
+      if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         $Sender->Options .= '<li>'.Anchor(T('Delete'), 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'DeleteDiscussion') . '</li>';
+      
+      // Allow plugins to add options
+      $Sender->FireEvent('DiscussionOptions');
+      
+      if ($Sender->Options != '') {
+      ?>
+         <div class="ToggleFlyout OptionsMenu">
+            <div class="MenuTitle"><?php echo T('Options'); ?></div>
+            <ul class="Flyout MenuItems">
+               <?php echo $Sender->Options; ?>
+            </ul>
+         </div>
+      <?php
+      }
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
@@ -137,48 +195,6 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
-      
-      $Sender->Options = '';
-      
-      // Dismiss an announcement
-      if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
-         $Sender->Options .= '<li>'.Anchor(T('Dismiss'), 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
-      
-      // Edit discussion
-      if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
-
-      // Announce discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</li>';
-
-      // Sink discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</li>';
-
-      // Close discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
-      
-      // Delete discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Delete'), 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'DeleteDiscussion') . '</li>';
-      
-      // Allow plugins to add options
-      $Sender->FireEvent('DiscussionOptions');
-      
-      if ($Sender->Options != '') {
-      ?>
-         <ul class="Options">
-            <li>
-               <strong><?php echo T('Options'); ?></strong>
-               <ul>
-                  <?php echo $Sender->Options; ?>
-               </ul>
-            </li>
-         </ul>
-      <?php
-      }
       echo '</div>';
    }
 }

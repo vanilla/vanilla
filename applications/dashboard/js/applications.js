@@ -12,13 +12,13 @@ jQuery(document).ready(function($) {
          beforeSubmit: function(frm_data, frm) {
            // Hide the submit button & add a spinner
            $(btn).hide();
-           $(btn).after('<span class="Progress">&nbsp;</span>');
+           $(btn).after('<span class="Progress">&#160;</span>');
          },
          success: function(json) {
             json = $.postParseJson(json);
             
             if (json.FormSaved == true) {
-               gdn.inform(json.StatusMessage);
+               gdn.inform(json);
                if (json.RedirectUrl) {
                   setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                } else {

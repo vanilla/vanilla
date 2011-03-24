@@ -180,6 +180,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     * The message to be displayed on the screen by ajax'd forms after the form
     * is successfully saved.
     *
+    * @deprecated since 2.0.18; $this->ErrorMessage() and $this->InformMessage()
+    * are to be used going forward.
+    * 
     * @var string
     */
    public $StatusMessage;
@@ -225,14 +228,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_CssFiles;
 
    /**
-    * An array of JS file names to search for in app folders & include in
-    * the page.
-    *
-    * @var array
-    */
-   protected $_JsFiles;
-
-   /**
     * A collection of definitions that will be written to the screen in a
     * hidden unordered list so that JavaScript has access to them (ie. for
     * language translations, web root, etc).
@@ -265,6 +260,19 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    protected $_DeliveryType;
+   
+   /**
+    * A string of html containing error messages to be displayed to the user.
+    *
+    * @since 2.0.18
+    * @var string
+    */
+   protected $_ErrorMessages;
+
+   /**
+    * @var bool Allows overriding 'FormSaved' property to send with DELIVERY_METHOD_JSON.
+    */
+   protected $_FormSaved;
 
    /**
     * An associative array of header values to be sent to the browser before
@@ -273,6 +281,22 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var array
     */
    protected $_Headers;
+
+   /**
+    * A collection of "inform" messages to be displayed to the user.
+    *
+    * @since 2.0.18
+    * @var array
+    */
+   protected $_InformMessages;
+
+   /**
+    * An array of JS file names to search for in app folders & include in
+    * the page.
+    *
+    * @var array
+    */
+   protected $_JsFiles;
 
    /**
     * If JSON is going to be delivered to the client (see the render method),
@@ -310,7 +334,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->RequestArgs = FALSE;
       $this->Request = FALSE;
       $this->SelfUrl = '';
-      $this->StatusMessage = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
       $this->Theme = Theme();
       $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
@@ -320,6 +343,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Definitions = array();
       $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
       $this->_DeliveryType = DELIVERY_TYPE_ALL;
+      $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
@@ -329,7 +353,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          // $Dispatcher->Header('Cache-Control', 'no-cache, must-revalidate'); // PREVENT PAGE CACHING: HTTP/1.1
          // $Dispatcher->Header('Pragma', 'no-cache'); // PREVENT PAGE CACHING: HTTP/1.0
       );
-
+      $this->_ErrorMessages = '';
+      $this->_InformMessages = array();
+      $this->StatusMessage = '';
+      
       parent::__construct();
       $this->ControllerName = strtolower($this->ClassName);
    }
@@ -391,7 +418,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    /**
     * Adds a JS file to search for in the application or global js folder(s).
     *
-    * @param string $FileName The CSS file to search for.
+    * @param string $FileName The js file to search for.
     * @param string $AppFolder The application folder that should contain the JS file. Default is to
     * use the application folder that this controller belongs to.
     */
@@ -415,15 +442,20 @@ class Gdn_Controller extends Gdn_Pluggable {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
             $Module = $this->$Module;
          } else {
-            $ModuleClassExists = class_exists($Module);
+//            if ($Module == 'BookmarkedModule') {
+//               $Asset = '<div class="Popin" rel="/module/'.htmlspecialchars($Module).'" />';
+//               $this->AddAsset($AssetTarget ? $AssetTarget : 'Panel', $Asset, $Module);
+//            } else {
+               $ModuleClassExists = class_exists($Module);
 
-            if ($ModuleClassExists) {
-               // Make sure that the class implements Gdn_IModule
-               $ReflectionClass = new ReflectionClass($Module);
-               if ($ReflectionClass->implementsInterface("Gdn_IModule"))
-                  $Module = new $Module($this);
+               if ($ModuleClassExists) {
+                  // Make sure that the class implements Gdn_IModule
+                  $ReflectionClass = new ReflectionClass($Module);
+                  if ($ReflectionClass->implementsInterface("Gdn_IModule"))
+                     $Module = new $Module($this);
 
-            }
+               }
+//            }
          }
       }
       if (is_object($Module)) {
@@ -565,6 +597,17 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * Add error messages to be displayed to the user.
+    *
+    * @since 2.0.18
+    *
+    * @param string $Messages The html of the errors to be display.
+    */
+   public function ErrorMessage($Messages) {
+      $this->_ErrorMessages = $Messages;
+   }
+
+   /**
     * Fetches the contents of a view into a string and returns it. Returns
     * false on failure.
     *
@@ -648,8 +691,12 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Define the search paths differently depending on whether or not we are in a plugin or application.
          $ApplicationFolder = trim($ApplicationFolder, '/');
          if (StringBeginsWith($ApplicationFolder, 'plugins/')) {
-            $BasePath = PATH_PLUGINS;
-            $ApplicationFolder = trim(strstr($ApplicationFolder, '/'), '/');
+            $KeyExplode = explode('/',$ApplicationFolder);
+            $PluginName = array_pop($KeyExplode);
+            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginName);
+            
+            $BasePath = GetValue('SearchPath', $PluginInfo);
+            $ApplicationFolder = GetValue('Folder', $PluginInfo);
          } else {
             $BasePath = PATH_APPLICATIONS;
             $ApplicationFolder = strtolower($ApplicationFolder);
@@ -806,6 +853,25 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
+    * Add an "inform" message to be displayed to the user.
+    *
+    * @since 2.0.18
+    * 
+    * @param string $Message The message to be displayed.
+    * @param mixed $Options An array of options for the message. If not an array, it is assumed to be a string of CSS classes to apply to the message.
+    */
+   public function InformMessage($Message, $Options = 'Dismissable AutoDismiss') {
+      // If $Options isn't an array of options, accept it as a string of css classes to be assigned to the message.
+      if (!is_array($Options))
+         $Options = array('CssClass' => $Options);
+      
+      if ($Message != '') {
+         $Options['Message'] = $Message;
+         $this->_InformMessages[] = $Options;
+      }
+   }
+
+   /**
     * The initialize method is called by the dispatcher after the constructor
     * has completed, objects have been passed along, assets have been
     * retrieved, and before the requested method fires. Use it in any extended
@@ -883,7 +949,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       $Session = Gdn::Session();
 
-      // TODO: Make this work with different delivery types.
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
@@ -935,6 +1000,9 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
+      
+      // Handle deprecated StatusMessage values that may have been added by plugins
+      $this->InformMessage($this->StatusMessage);
 
       // If there were uncontrolled errors above the json data, wipe them out
       // before fetching it (otherwise the json will not be properly parsed
@@ -979,12 +1047,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Format the view as JSON with some extra information about the
          // success status of the form so that jQuery knows what to do
          // with the result.
-         $FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
+         if ($this->_FormSaved === '') // Allow for override
+            $this->_FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? TRUE : FALSE;
          
-         $this->SetJson('FormSaved', $FormSaved);
+         $this->SetJson('FormSaved', $this->_FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
          $this->SetJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->ToString() : $View));
-         $this->SetJson('StatusMessage', $this->StatusMessage);
+         $this->SetJson('InformMessages', $this->_InformMessages);
+         $this->SetJson('ErrorMessages', $this->_ErrorMessages);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
 
          // Make sure the database connection is closed before exiting.
@@ -998,8 +1068,8 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Json['Data'] = json_encode($this->_Json);
          exit($this->_Json['Data']);
       } else {
-         if ($this->StatusMessage != '' && $this->SyndicationMethod === SYNDICATION_NONE)
-            $this->AddAsset($AssetName, '<div class="Messages Information"><ul><li>'.$this->StatusMessage.'</li></ul></div>');
+         if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE)
+            $this->AddDefinition('InformMessageStack', base64_encode(json_encode($this->_InformMessages)));
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
@@ -1179,7 +1249,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
-      if (defined('DEBUG'))
+      if (Debug())
          $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
       else
          $Message = $Ex->getMessage();
@@ -1192,6 +1262,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Data = array('Code' => $Code, 'Exception' => $Message);
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
+            header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
@@ -1276,6 +1347,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // The css is coming from a plugin.
                      $AppFolder = substr($AppFolder, strlen('plugins/'));
                      $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
+                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/$CssFile";
                   } else {
                      // Application default. eg. root/applications/app_name/design/
                      $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
@@ -1304,7 +1376,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                if ($CssPath !== FALSE) {
                   $CssPath = substr($CssPath, strlen(PATH_ROOT));
                   $CssPath = str_replace(DS, '/', $CssPath);
-                  $this->Head->AddCss($CssPath, 'screen');
+                  $this->Head->AddCss($CssPath, 'all');
                }
             }
 
@@ -1339,9 +1411,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                   }
 
                   // 3. The application or plugin folder.
-                  if (StringBeginsWith(trim($AppFolder, '/'), 'plugins/'))
+                  if (StringBeginsWith(trim($AppFolder, '/'), 'plugins/')) {
                      $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/js/$JsFile";
-                  else
+                     $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/$JsFile";
+                  } else
                      $JsPaths[] = PATH_APPLICATIONS."/$AppFolder/js/$JsFile";
 
                   // 4. Global JS folder. eg. root/js/
@@ -1481,6 +1554,18 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->$Key = $Value;
       }
       return $Value;
+   }
+   
+   /**
+    * Set $this->_FormSaved for JSON Renders.
+    *
+    * @param bool $Saved Whether form data was successfully saved.
+    */
+   public function SetFormSaved($Saved = TRUE) {
+      if ($Saved === '') // Allow reset
+         $this->_FormSaved = '';
+      else // Force true/false
+         $this->_FormSaved = ($Saved) ? TRUE : FALSE;
    }
 
    /**

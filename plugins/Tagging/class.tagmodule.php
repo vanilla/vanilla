@@ -13,7 +13,7 @@ class TagModule extends Gdn_Module {
    protected $_TagData;
    protected $_DiscussionID;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $this->_TagData = FALSE;
       $this->_DiscussionID = 0;
       parent::__construct($Sender);
@@ -60,7 +60,7 @@ class TagModule extends Gdn_Module {
                            } else {
                               echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
                            }
-                        ?></strong> <?php echo $Tag->CountDiscussions; ?></li>
+                        ?></strong><span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
          <?php
             }
          }

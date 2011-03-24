@@ -16,7 +16,7 @@ class UserInfoModule extends Gdn_Module {
    public $User;
    public $Roles;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       $this->User = FALSE;
       parent::__construct($Sender);
    }

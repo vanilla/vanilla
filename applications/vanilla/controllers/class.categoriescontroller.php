@@ -73,8 +73,14 @@ class CategoriesController extends VanillaController {
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       
-      if ($Category === FALSE)
-         return $this->All();
+      if ($Category === FALSE) {
+         if ($CategoryIdentifier)
+            throw NotFoundException();
+         return $this->Discussions();
+      }
+			
+		// Load the Descendant Tree
+		$this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
       
       $this->SetData('Category', $Category, TRUE);
 
@@ -85,7 +91,6 @@ class CategoriesController extends VanillaController {
          $this->Head->Title($Category->Name);
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
-			$this->AddJsFile('jquery.menu.js');
          $this->AddJsFile('options.js');
          $this->AddJsFile('jquery.gardenmorepager.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
@@ -99,16 +104,14 @@ class CategoriesController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Get a DiscussionModel
       $DiscussionModel = new DiscussionModel();
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       
       // Check permission
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->CategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
       
       // Set discussion meta data
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
@@ -142,10 +145,33 @@ class CategoriesController extends VanillaController {
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Render default view
       $this->Render();
    }
+	
+	/**
+	 * Show all (nested) categories.
+	 *
+	 * @since 2.0.17
+	 * @access public
+	 */
+	public function All() {
+      // Setup head
+      $this->AddCssFile('vanilla.css');
+      $this->Menu->HighlightRoute('/discussions');
+      $this->Title(T('All Categories'));
+      
+      // Get category data
+      $this->CategoryData = $this->CategoryModel->GetFull();
+		$this->SetData('Categories', $this->CategoryData);
+      
+      // Add modules
+      $this->AddModule('NewDiscussionModule');
+      $this->AddModule('BookmarkedModule');
+      
+      $this->Render();
+	}
 
    /**
     * Show all categories and few discussions from each.
@@ -153,14 +179,12 @@ class CategoriesController extends VanillaController {
     * @since 2.0.0
     * @access public
     */
-   public function All() {
+   public function Discussions() {
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->AddJsFile('jquery.menu.js');
-      $this->AddJsFile('options.js');
       $this->Title(T('All Categories'));
       
       // Get category data and discussions
@@ -170,18 +194,17 @@ class CategoriesController extends VanillaController {
 		$this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
-         $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));
+			if ($Category->CategoryID > 0)
+				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));
       }
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($this);
-      $BookmarkedModule->GetData();
-      $this->AddModule($BookmarkedModule);
+      $this->AddModule('BookmarkedModule');
       
       // Set view and render
-      $this->View = 'all';
+      $this->View = 'discussions';
       $this->Render();
    }
    
@@ -197,5 +220,8 @@ class CategoriesController extends VanillaController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/categories');
+      
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
    }      
 }

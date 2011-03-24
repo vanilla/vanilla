@@ -5,7 +5,8 @@
    $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
    $TermsOfServiceText = sprintf(T('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
    $CaptchaPublicKey = Gdn::Config('Garden.Registration.CaptchaPublicKey');
-   $CaptchaSSL = (strlen(trim($_SERVER['HTTPS'])) > 0 || $_SERVER['SERVER_PORT'] == 443) ? TRUE : FALSE;
+   $Request = Gdn::Request();
+   $CaptchaSSL = (StringBeginsWith(Url('/', TRUE), 'https') || Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'SERVER_PORT') == 443) ? TRUE : FALSE;
    
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):

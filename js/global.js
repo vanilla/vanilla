@@ -60,15 +60,6 @@ jQuery(document).ready(function($) {
       return def;
    }
 
-   // Main Menu dropdowns
-	/*
-   if ($.fn.menu)
-      $('#Menu').menu({
-         showDelay: 0,
-         hideDelay: 0
-      });
-	*/
-	
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
       document.location = gdn.url('/profile/notifications');
@@ -117,7 +108,7 @@ jQuery(document).ready(function($) {
       var data = 'DeliveryType=BOOL&TransientKey=' + transientKey;
       $.post($(anchor).attr('href'), data, function(response) {
          if (response == 'TRUE')
-            $(container).slideUp('fast',function() {
+            $(container).fadeOut('fast',function() {
                $(this).remove();
             });
       });
@@ -130,22 +121,6 @@ jQuery(document).ready(function($) {
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
    
-   // If a message group is clicked, hide it.
-   $('div.Messages').live('click', function() {
-      $(this).fadeOut('fast', function() {
-         $(this).remove();
-      });
-   });
-   
-   // If an information message appears on the screen, hide it after a few moments.
-   $('div.Information').livequery(function() {
-      setTimeout(function(){
-         $('div.Information').fadeOut('fast', function() {
-            $(this).remove();
-         });
-      }, 3000);
-   });
-	
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {
@@ -164,7 +139,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout("document.location = '"+RedirectUrl+"';", 2000);
+         setTimeout(function() { document.location.replace(RedirectUrl); }, 2000);
       }
    }
 
@@ -200,21 +175,6 @@ jQuery(document).ready(function($) {
       });
    }
 
-   // Notify the user with a message
-   gdn.inform = function(message, wrapInfo) {
-      if(wrapInfo == undefined) {
-         wrapInfo = true;
-      }
-      
-      if (message && message != null && message != '') {
-         $('div.Messages').remove();
-         if(wrapInfo)
-            $('<div class="Messages Information"><ul><li>' + message + '</li></ul></div>').appendTo('body').show();
-         else
-            $(message).appendTo('body').show();
-      }
-   };
-   
    // Generate a random string of specified length
    gdn.generateString = function(length) {
       if (length == null)
@@ -328,21 +288,30 @@ jQuery(document).ready(function($) {
       }
       return true;
    }
-
+   
+   gdn.stats = function(action, params, callback) {
+      // Call directly back to the deployment and invoke the stats handler
+      var StatsURL = gdn.url('settings/analytics'+action+'.json');
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: StatsURL
+      });
+   }
+   
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
       var urlFormat = gdn.definition("UrlFormat", "");
-
+      
       if (path[0] == "/")
          path = path.substr(1);
 
       if (urlFormat.indexOf("?") >= 0)
          path = path.replace("?", "&");
 
-      var result = urlFormat.replace("{Path}", path);
-      return result;
+      return urlFormat.replace("{Path}", path);
    };
 
    // Fill the search input with "search" if empty and blurred
@@ -358,10 +327,45 @@ jQuery(document).ready(function($) {
       if ($(this).val() == searchText)
          $(this).val('');
    });
+
+   if ($.fn.popin)
+      $('.Popin').popin();
+
+   $.fn.openToggler = function() {
+     $(this).click(function() {
+        var $flyout = $('.Flyout', this);
+
+        // Dynamically fill the flyout.
+        var rel = $(this).attr('rel');
+        if (rel) {
+           $(this).attr('rel', '');
+           $flyout.addClass('Progress');
+            $.ajax({
+               url: gdn.url(rel),
+               data: { DeliveryType: 'VIEW' },
+               success: function(data) {
+                  $flyout.html(data);
+               },
+               complete: function() {
+                  $flyout.removeClass('Progress');
+               }
+            });
+        }
+
+        if ($flyout.css('display') == 'none') {
+           $(this).addClass('Open')
+           $flyout.show();
+        } else {
+           $flyout.hide()
+           $(this).removeClass('Open');
+        }
+     });
+   }
+   $('.ToggleFlyout').openToggler();
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {
-      $(this).before('<span class="AfterButtonLoading">&nbsp;</span>').removeClass('SpinOnClick');
+      $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
    
    // Confirmation for item removals
@@ -387,8 +391,174 @@ jQuery(document).ready(function($) {
 				return false;
 			})
 		}
-	}); 
+	});
    
+   var AnalyticsTask = gdn.definition('AnalyticsTask', false);
+   switch (AnalyticsTask) {
+	   case 'register':
+	   case 'stats':
+	     // Send stats ping
+	     gdn.stats(AnalyticsTask);
+	   break;
+	   
+	   default:
+	     // Nothing
+	   break;
+	}
+   
+   // If a dismissable InformMessage close button is clicked, hide it.
+   $('div.InformWrapper.Dismissable a.Close').live('click', function() {
+      $(this).parents('div.InformWrapper').fadeOut('fast', function() {
+         $(this).remove();
+      });
+   });
+
+	gdn.setAutoDismiss = function() {
+		var timerId = $('div.InformMessages').attr('autodismisstimerid');
+		if (!timerId) {
+			timerId = setTimeout(function() {
+				$('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+					$(this).remove();
+				});
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}, 5000);
+			$('div.InformMessages').attr('autodismisstimerid', timerId);
+		}
+	}
+	
+	// Handle autodismissals
+	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
+		gdn.setAutoDismiss();
+	});
+   
+	// Prevent autodismiss if hovering any inform messages
+	$('div.InformWrapper').live('mouseover mouseout', function(e) {
+		if (e.type == 'mouseover') {
+			var timerId = $('div.InformMessages').attr('autodismisstimerid');
+			if (timerId) {
+				clearTimeout(timerId);
+				$('div.InformMessages').removeAttr('autodismisstimerid');
+			}
+		} else {
+			gdn.setAutoDismiss();
+		}
+	});
+	
+   // Take any "inform" messages out of an ajax response and display them on the screen.
+   gdn.inform = function(response) {
+		if (!response || !response.InformMessages)
+			return;
+		
+		// If there is no message container in the page, add one
+		var informMessages = $('div.InformMessages');
+		if (informMessages.length == 0) {
+			$('<div class="InformMessages"></div>').appendTo('body');
+			informMessages = $('div.InformMessages');
+		}
+		var wrappers = $('div.InformMessages div.InformWrapper');
+		
+		// Loop through the inform messages and add them to the container
+		for (var i = 0; i < response.InformMessages.length; i++) {
+			css = 'InformWrapper';
+			if (response.InformMessages[i]['CssClass'])
+				css += ' ' + response.InformMessages[i]['CssClass'];
+			
+			dismissCallback = response.InformMessages[i]['DismissCallback'];
+			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
+			if (dismissCallbackUrl)
+				dismissCallbackUrl = gdn.url(dismissCallbackUrl);
+				
+			try {
+				var message = response.InformMessages[i]['Message'];
+				// If the message is dismissable, add a close button
+				if (css.indexOf('Dismissable') > 0)
+					message = '<a class="Close"><span>×</span></a>' + message;
+
+				message = '<div class="InformMessage">'+message+'</div>';
+				var skip = false;
+				for (var j = 0; j < wrappers.length; j++) {
+					if ($(wrappers[j]).text() == $(message).text()) {
+						skip = true;
+					}
+				}
+				if (!skip) {
+					informMessages.prepend('<div class="'+css+'">'+message+'</div>');
+					// Is there a callback or callback url to request on dismiss of the inform message?
+					if (dismissCallback) {
+						$('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+					} else if (dismissCallbackUrl) {
+						var closeAnchor = $('div.InformWrapper:first').find('a.Close');
+						closeAnchor.attr('callbackurl', dismissCallbackUrl);
+						closeAnchor.click(function () {
+							$.ajax({
+								type: "POST",
+								url: $(this).attr('callbackurl'),
+								data: 'TransientKey='+gdn.definition('TransientKey'),
+								dataType: 'json',
+								error: function(XMLHttpRequest, textStatus, errorThrown) {
+									gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+								},
+								success: function(json) {
+									gdn.inform(json);
+								}
+							});
+						});
+					}
+				}
+			} catch (e) {
+			}
+		}
+		informMessages.show();
+   }
+	
+	// Send an informMessage to the screen (same arguments as controller.InformMessage).
+	gdn.informMessage = function(message, options) {
+		if (!options)
+			options = new Array();
+			
+		if (typeof(options) == 'string') {
+			var css = options;
+			options = new Array();
+			options['CssClass'] = css;
+		}
+		options['Message'] = message;
+		if (!options['CssClass'])
+			options['CssClass'] = 'Dismissable AutoDismiss';
+		
+		gdn.inform({ 'InformMessages' : new Array(options) });
+	}
+   
+	// Pick up the inform message stack and display it on page load
+	var informMessageStack = gdn.definition('InformMessageStack', false);
+	if (informMessageStack) {
+		informMessageStack = { 'InformMessages' : eval($.base64Decode(informMessageStack))};
+		gdn.inform(informMessageStack);
+	}
+	
+	// Ping for new notifications on pageload, and subsequently every 1 minute.
+	pingForNotifications = function(wait) {
+		if (!wait)
+			wait = 60000;
+			
+		setTimeout(function() {
+			$.ajax({
+				type: "POST",
+				url: gdn.url('dashboard/notifications/inform'),
+				data: 'TransientKey='+gdn.definition('TransientKey'),
+				dataType: 'json',
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+				},
+				success: function(json) {
+					gdn.inform(json);
+					pingForNotifications();
+				}
+			});
+	
+		}, wait); // Ping once a minute.
+	}
+	pingForNotifications(1);
+
 });
 
 	

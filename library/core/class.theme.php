@@ -20,10 +20,44 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_Theme {
 
+   protected static $_AssetInfo = array();
+   public static function AssetBegin($AssetContainer = 'Panel') {
+      self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
+      ob_start();
+   }
+
+   public static function AssetEnd() {
+      if (count(self::$_AssetInfo) == 0)
+         return;
+
+      $Asset = ob_get_clean();
+      $AssetInfo = array_pop(self::$_AssetInfo);
+
+      Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
+   }
+
+   public static function Breadcrumbs($Data, $Format, $HomeLink = TRUE) {
+      $Result = '';
+
+      if ($HomeLink) {
+         if (!is_string($HomeLink))
+            $HomeLink = T('Home');
+            $Result .= '<span class="Label"><a href="'.Url('/').'">'.$HomeLink.'</a></span>';
+      }
+
+      foreach ($Data as $Row) {
+         $Label = '<span class="Label">'.FormatString($Format, $Row).'</span>';
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span>', $Result, $Label);
+      }
+
+      $Result ='<span class="BreadCrumbs">'.$Result.'</span>';
+      return $Result;
+   }
    
    public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
+      $WithDomain = GetValue('WithDomain', $Options);
 
       switch ($Path) {
          case 'dashboard':
@@ -37,17 +71,63 @@ class Gdn_Theme {
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text)
                $Text = T('Inbox');
-            if ($Session->IsValid() && $Session->User->CountUnreadConversations)
-               $Text .= ' <span>'.$Session->User->CountUnreadConversations.'</span>';
-            
+            if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
+            }
             break;
          case 'profile':
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text && $Session->IsValid())
                $Text = $Session->User->Name;
-            if ($Session->IsValid() && $Session->User->CountNotifications)
-               $Text .= ' <span>'.$Session->User->CountNotifications.'</span>';
+            if ($Session->IsValid() && $Session->User->CountNotifications) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span class="Alert">'.$Session->User->CountNotifications.'</span>';
+            }
+            break;
+         case 'user':
+            $Path = 'profile';
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text && $Session->IsValid())
+               $Text = $Session->User->Name;
 
+            break;
+         case 'photo':
+            $Path = 'profile';
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text && $Session->IsValid()) {
+               $IsFullPath = strtolower(substr($Session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($Session->User->Photo, 0, 8)) == 'https://';
+               $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : Gdn_Upload::Url(ChangeBasename($Session->User->Photo, 'n%s'));
+               $Text = Img($PhotoUrl, array('alt' => urlencode($Session->User->Name)));
+            }
+
+            break;
+         case 'drafts':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Drafts');
+            if ($Session->IsValid() && $Session->User->CountDrafts) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span class="Alert">'.$Session->User->CountDrafts.'</span>';
+            }
+            break;
+         case 'discussions/bookmarked':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Bookmarks');
+            if ($Session->IsValid() && $Session->User->CountBookmarks) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span class="Count">'.$Session->User->CountBookmarks.'</span>';
+            }
+            break;
+         case 'discussions/mine':
+            TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
+            if (!$Text)
+               $Text = T('My Discussions');
+            if ($Session->IsValid() && $Session->User->CountDiscussions) {
+               $Class = trim($Class.' HasCount');
+               $Text .= ' <span class="Count">'.$Session->User->CountDiscussions.'</span>';
+            }
             break;
          case 'signin':
          case 'signinout':
@@ -72,7 +152,7 @@ class Gdn_Theme {
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions']))
          return '';
 
-      $Url = Gdn::Request()->Url($Path, GetValue('WithDomain', $Options));
+      $Url = Gdn::Request()->Url($Path, $WithDomain);
 
       if (strcasecmp(trim($Path, '/'), Gdn::Request()->Path()) == 0)
          $Class = ConcatSep(' ', $Class, 'Selected');
@@ -91,8 +171,28 @@ class Gdn_Theme {
     */
    public static function Logo() {
       $Logo = C('Garden.Logo');
+      if ($Logo) {
+         $Logo = ltrim($Logo, '/');
+         // Fix the logo path.
+         if (StringBeginsWith($Logo, 'uploads/'))
+            $Logo = substr($Logo, strlen('uploads/'));
+      }
       $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img($Logo, array('alt' => $Title)) : $Title;
+      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+   }
+
+   public static function Module($Name) {
+      if (!class_exists($Name)) {
+         $Result = "Error: $Name doesn't exist";
+      } else {
+         try {
+            $Module = new $Name(Gdn::Controller(), '');
+            $Result = $Module->ToString();
+         } catch (Exception $Ex) {
+            $Result = $Ex->getMessage();
+         }
+      }
+      return $Result;
    }
    
    public static function Pagename() {

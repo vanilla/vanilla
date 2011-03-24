@@ -193,6 +193,19 @@ if (!function_exists('ArrayInArray')) {
    }
 }
 
+if (!function_exists('ArraySearchI')) {
+   /**
+    * Case-insensitive version of array_search.
+    *
+    * @param array $Value The value to find in array.
+    * @param array $Search The array to search in for $Value.
+    * @return mixed Key of $Value in the $Search array.
+    */
+   function ArraySearchI($Value, $Search) {
+      return array_search(strtolower($Value), array_map('strtolower', $Search)); 
+   }
+}
+
 if (!function_exists('ArrayTranslate')) {
    /**
     * Take all of the items specified in an array and make a new array with them specified by mappings.

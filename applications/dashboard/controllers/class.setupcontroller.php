@@ -18,6 +18,8 @@ class SetupController extends DashboardController {
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
+      // Make sure all errors are displayed.
+      SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
    }
    
    /**
@@ -64,9 +66,6 @@ class SetupController extends DashboardController {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
                $Config = array('Garden.Installed' => TRUE);
-               if(!Debug())
-                  $Config['Garden.Errors.MasterView'] = 'error.master.php';
-
                SaveToConfig($Config);
                
                // Go to the dashboard

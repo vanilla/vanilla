@@ -110,6 +110,10 @@ function Gdn_ExceptionHandler($Exception) {
             $MasterViewPaths = array();
             $MasterViewName = 'error.master.php';
             $MasterViewCss = 'error.css';
+
+            if (function_exists('Debug') && Debug()) {
+               $MasterViewName = 'deverror.master.php';
+            }
                
             if(class_exists('Gdn', FALSE)) {
                $CurrentTheme = ''; // The currently selected theme

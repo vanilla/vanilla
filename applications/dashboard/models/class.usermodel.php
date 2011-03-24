@@ -1878,12 +1878,12 @@ class UserModel extends Gdn_Model {
          $Users = $this->GetWhere(array('Name' => $Email))->ResultObject();
       }
 
-      if (count($Users) == 0)
-            return FALSE;
-
       $this->EventArguments['Users'] =& $Users;
       $this->EventArguments['Email'] = $Email;
       $this->FireEvent('BeforePasswordRequest');
+      
+      if (count($Users) == 0)
+            return FALSE;
 
       $Email = new Gdn_Email();
       foreach ($Users as $User) {

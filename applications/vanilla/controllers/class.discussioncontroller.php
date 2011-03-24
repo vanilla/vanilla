@@ -226,7 +226,8 @@ class DiscussionController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
-      $this->AddModule('SignedInModule');
+      if (C('Garden.Modules.ShowSignedInModule'))
+         $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 

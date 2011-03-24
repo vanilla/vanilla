@@ -1249,7 +1249,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
-      if (defined('DEBUG'))
+      if (Debug())
          $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
       else
          $Message = $Ex->getMessage();

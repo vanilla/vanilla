@@ -22,6 +22,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Database
  */
 
+define('JOIN_INNER', 'inner');
+define('JOIN_LEFT', 'left');
+
+
 class Gdn_DataSet implements IteratorAggregate {
 
    /**
@@ -196,15 +200,27 @@ class Gdn_DataSet implements IteratorAggregate {
       return new ArrayIterator($this->Result());
    }
 
+   /**
+    * Index a result array.
+    * @param array $Data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
+    * @param string|array $Columns The name of the column to index on or an array of columns to index on.
+    * @param array $Options An array of options for the method.
+    *  - <b>Sep</b>: The string to seperate index columns by. Default '|'.
+    *  - <b>Unique</b>: Whether or not the results are unique.
+    *   - <b>true</b> (default): The index is unique.
+    *   - <b>false</b>: The index is not unique and each indexed row will be an array or arrays.
+    * @return type 
+    */
    public static function Index($Data, $Columns, $Options = array()) {
       $Columns = (array)$Columns;
       $Result = array();
+      $Options = array_change_key_case($Options);
 
       if (is_string($Options))
-         $Options = array('Sep' => $Options);
+         $Options = array('sep' => $Options);
 
-      $Sep = GetValue('Sep', $Options, '|');
-      $Unique = GetValue('Unique', $Options, TRUE);
+      $Sep = GetValue('sep', $Options, '|');
+      $Unique = GetValue('unique', $Options, TRUE);
 
       foreach ($Data as $Row) {
          $IndexValues = array();
@@ -219,6 +235,163 @@ class Gdn_DataSet implements IteratorAggregate {
             $Result[$Index][] = $Row;
       }
       return $Result;
+   }
+   
+   /**
+    *
+    * @param array $Data
+    * @param array $Columns The columns/table information for the join. Depending on the argument's index it will be interpreted differently.
+    *  - <b>numeric</b>: This column will come be added to the resulting join. The value can be either a string or a two element array where the second element specifies an alias.
+    *  - <b>alias</b>: The alias of the child table in the query.
+    *  - <b>child</b>: The name of the child column.
+    *  - <b>column</b>: The name of the column to put the joined data into. Can't be used with <b>prefix</b>.
+    *  - <b>parent</b>: The name of the parent column.
+    *  - <b>table</b>: The name of the child table in the join.
+    *  - <b>prefix</b>: The name of the prefix to give the columns. Can't be used with <b>column</b>.
+    * @param array $Options An array of extra options.
+    *  - <b>sql</b>: A Gdn_SQLDriver with the child query.
+    *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_INNER.
+    */
+   public static function Join($Data, $Columns, $Options = array()) {
+      $Options = array_change_key_case($Options);
+      
+      $Sql = Gdn::SQL(); //GetValue('sql', $Options, Gdn::SQL());
+      $ResultColumns = array();
+      
+      // Grab the columns.
+      foreach ($Columns as $Index => $Name) {
+         if (is_numeric($Index)) {
+            // This is a column being selected.
+            if (is_array($Name)) {
+               $Column = $Name[0];
+               $ColumnAlias = $Name[1];
+            } else {
+               $Column = $Name;
+               $ColumnAlias = '';
+            }
+            
+            if (($Pos = strpos($Column, '.')) !== FALSE) {
+               $Sql->Select($Column, '', $ColumnAlias);
+               $Column = substr($Column, $Pos + 1);
+            } else {
+               $Sql->Select(isset($TableAlias) ? $TableAlias.'.'.$Column : $Column, '', $ColumnAlias);
+            }
+            if ($ColumnAlias)
+               $ResultColumns[] = $ColumnAlias;
+            else
+               $ResultColumns = $Column;
+         } else {
+            switch (strtolower($Index)) {
+               case 'alias':
+                  $TableAlias = $Name;
+                  break;
+               case 'child':
+                  $ChildColumn = $Name;
+                  break;
+               case 'column':
+                  $JoinColumn = $Name;
+                  break;
+               case 'parent':
+                  $ParentColumn = $Name;
+                  break;
+               case 'prefix':
+                  $ColumnPrefix = $Name;
+                  break;
+               case 'table':
+                  $Sql->From("$Table $TableAlias"); 
+               case 'type':
+                  // The type shouldn't be here, but handle it.
+                  $Options['Type'] = $Name;
+                  break;
+               default:
+                  throw new Exception("Gdn_DataSet::Join(): Unknown column option '$Index'.");
+            }
+         }
+      }
+      
+      if (!isset($TableAlias)) {
+         if (isset($Table))
+            $TableAlias = 'c';
+         else
+            $TableAlias = 'c';
+      }
+      
+      
+      if (!isset($ParentColumn)) {
+         if (isset($ChildColumn))
+            $ParentColumn = $ChildColumn;
+         elseif (isset($Table))
+            $ChildColumn = $Table.'ID';
+         else
+            throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
+      }
+      
+      // Figure out some options if they weren't specified.
+      if (!isset($ChildColumn)) {
+         if (isset($ParentColumn))
+            $ChildColumn = $ParentColumn;
+         elseif (isset($Table))
+            $ChildColumn = $Table.'ID';
+         else
+            throw Exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
+      }
+      
+      if (!isset($ColumnPrefix) && !isset($JoinColumn)) {
+         $ColumnPrefix = StringEndsWith($ParentColumn, 'ID', TRUE, TRUE);
+      }
+      
+      $JoinType = strtolower(GetValue('Type', $Options, JOIN_LEFT));
+      
+      // Start augmenting the sql for the join.
+      if (isset($Table))
+         $Sql->From("$Table $TableAlias");
+      $Sql->Select("$TableAlias.$ChildColumn");
+      
+      // Get the IDs to generate an in clause with.
+      $IDs = ConsolidateArrayValuesByKey($Data, $ParentColumn);
+      $Sql->WhereIn($ChildColumn, $IDs);
+      
+      $ChildData = $Sql->Get()->ResultArray();
+      $ChildData = self::Index($ChildData, $ChildColumn, array('unique' => isset($ColumnPrefix)));
+      
+      $NotFound = array();
+
+      // Join the data in.
+      foreach ($Data as $Index => &$Row) {
+         $ParentID = GetValue($ParentColumn, $Row);
+         if (isset($ChildData[$ParentID])) {
+            $ChildRow = $ChildData[$ParentID];
+            
+            if (isset($ColumnPrefix)) {
+               // Add the data to the columns.
+               foreach ($ChildRow as $Name => $Value) {
+                  SetValue($ColumnPrefix.$Name, $Row, $Value);
+               }
+            } else {
+               // Add the result data.
+               SetValue($JoinColumn, $Row, $ChildRow);
+            }
+         } else {
+            if ($JoinType == JOIN_LEFT) {
+               if (isset($ColumnPrefix)) {
+                  foreach ($ResultColumns as $Name) {
+                     SetValue($ColumnPrefix.$Name, $Row, NULL);
+                  }
+               } else {
+                  SetValue($JoinColumn, $Row, array());
+               }
+            } else {
+               $NotFound[] = $Index;
+            }
+         }
+      }
+      
+      // Remove inner join rows.
+      if ($JoinType == JOIN_INNER) {
+         foreach ($NotFound as $Index) {
+            unset($Data[$Index]);
+         }
+      }
    }
 
    /**

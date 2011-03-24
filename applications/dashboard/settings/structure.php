@@ -131,6 +131,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('SignOutUrl', 'varchar(255)', TRUE)
    ->Column('PasswordUrl', 'varchar(255)', TRUE)
    ->Column('ProfileUrl', 'varchar(255)', TRUE)
+   ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')

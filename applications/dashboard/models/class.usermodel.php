@@ -117,7 +117,7 @@ class UserModel extends Gdn_Model {
       unset($Fields['Roles']);
       
       $UserID = $this->SQL->Insert($this->Name, $Fields);
-      if ($Roles) {
+      if (is_array($Roles)) {
          $this->SaveRoles($UserID, $Roles, FALSE);
       }
 
@@ -369,6 +369,8 @@ class UserModel extends Gdn_Model {
 
       if ($User && $User->Permissions == '')
          $User->Permissions = $this->DefinePermissions($UserID);
+      
+      unset($User->Password, $User->HashMethod);
 
       $this->SetCalculatedFields($User);
 
@@ -433,6 +435,41 @@ class UserModel extends Gdn_Model {
          ->Set('Photo', 'NULL', FALSE)
          ->Where('UserID', $UserID)
          ->Put();
+   }
+
+   public function ProfileCount($User, $Column) {
+      if (is_numeric($User))
+         $User = $this->SQL->GetWhere('User', array('UserID' => $User))->FirstRow(DATASET_TYPE_ARRAY);
+      elseif (is_string($User))
+         $User = $this->SQL->GetWhere('User', array('Name' => $User))->FirstRow(DATASET_TYPE_ARRAY);
+      elseif (is_object($User))
+         $User = (array)$User;
+
+      if (array_key_exists($Column, $User) && $User[$Column] === NULL) {
+            $UserID = $User['UserID'];
+            switch ($Column) {
+               case 'CountComments':
+                  $Count = $this->SQL->GetCount('Comment', array('InsertUserID' => $UserID));
+                  $this->SQL->Put('User', array('CountComments' => $Count), array('UserID' => $UserID));
+                  break;
+               case 'CountDiscussions':
+                  $Count = $this->SQL->GetCount('Discussion', array('InsertUserID' => $UserID));
+                  $this->SQL->Put('User', array('CountDiscussions' => $Count), array('UserID' => $UserID));
+                  break;
+               case 'CountBookmarks':
+                  $Count = $this->SQL->GetCount('UserDiscussion', array('UserID' => $UserID, 'Bookmarked' => '1'));
+                  $this->SQL->Put('User', array('CountBookmarks', array('UserID' => $UserID)));
+                  break;
+               default:
+                  $Count = FALSE;
+                  break;
+            }
+            return $Count;
+      } elseif ($User[$Column]) {
+         return $User[$Column];
+      } else {
+         return FALSE;
+      }
    }
 
    /**
@@ -1004,10 +1041,10 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-         $Fields['Roles'] = $RoleIDs;
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
+         $Fields['Roles'] = $RoleIDs;
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
          // If in Captcha registration mode, check the captcha value
@@ -1577,8 +1614,15 @@ class UserModel extends Gdn_Model {
          SetValue('Permissions', $User, @unserialize($v));
       if ($v = GetValue('Preferences', $User))
          SetValue('Preferences', $User, @unserialize($v));
-      if ($v = GetValue('Photo', $User))
-         SetValue('PhotoUrl', $User, Asset('uploads/'.$v, TRUE));
+      if ($v = GetValue('Photo', $User)) {
+         if (!preg_match('`^https?://`i', $v)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($v, 'n%s'));
+         } else {
+            $PhotoUrl = $v;
+         }
+         
+         SetValue('PhotoUrl', $User, $PhotoUrl);
+      }
    }
 
    public function SetTransientKey($UserID, $ExplicitKey = '') {

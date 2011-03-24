@@ -689,7 +689,7 @@ abstract class Gdn_SQLDriver {
       if ($Where !== FALSE)
          $this->Where($Where);
 
-      $this->Select('*', 'count', 'RowCount');
+      $this->Select('*', 'count', 'RowCount'); // count * slow on innodb
       $Sql = $this->GetSelect();
       $Result = $this->Query($Sql);
 

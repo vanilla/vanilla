@@ -156,6 +156,18 @@ class ProfileController extends Gdn_Controller {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
          Redirect('/profile');
    }
+
+   public function Count($Column, $UserID = FALSE) {
+      $Column = 'Count'.ucfirst($Column);
+      if (!$UserID)
+         $UserID = Gdn::Session()->UserID;
+
+      $Count = $this->UserModel->ProfileCount($UserID, $Column);
+      $this->SetData($Column, $Count);
+      $this->SetData('_Value', $Count);
+      $this->SetData('_CssClass', 'Count');
+      $this->Render('Value', 'Utility');
+   }
    
    public function Edit($UserReference = '') {
       $this->Permission('Garden.SignIn.Allow');

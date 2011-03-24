@@ -244,19 +244,18 @@ div.Deleted {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert {
+span.Alert {
    background: #d00;
-   border: 1px solid #b00;
    color: #fff;
    padding: 3px 6px;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert a {
+span.Alert a {
    color: #fff;
 }
-.Alert a:hover {
+span.Alert a:hover {
    text-decoration: underline;
 }
 div.Info {

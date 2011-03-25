@@ -105,7 +105,7 @@ $Construct->Table('UserCategory')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('CategoryID', 'int', FALSE, 'primary')
    ->Column('DateMarkedRead', 'datetime', NULL)
-   ->Column('Archive', 'tinyint(1)', 0)
+   ->Column('Unfollow', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
    
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)

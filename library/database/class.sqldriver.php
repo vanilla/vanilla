@@ -689,7 +689,7 @@ abstract class Gdn_SQLDriver {
       if ($Where !== FALSE)
          $this->Where($Where);
 
-      $this->Select('*', 'count', 'RowCount');
+      $this->Select('*', 'count', 'RowCount'); // count * slow on innodb
       $Sql = $this->GetSelect();
       $Result = $this->Query($Sql);
 
@@ -1920,7 +1920,14 @@ abstract class Gdn_SQLDriver {
       // Build up the in clause.
       $In = array();
       foreach ($Values as $Value) {
-         $ValueExpr = $this->_ParseExpr($Value, $Field, $Escape);
+         if (!$Value)
+            continue;
+
+         if ($Escape)
+            $ValueExpr = $this->Database->Connection()->quote($Value);
+         else
+            $ValueExpr = (string)$Value;
+
          if(strlen($ValueExpr) > 0)
             $In[] = $ValueExpr;
       }

@@ -261,7 +261,7 @@ class Minify_CSS_UriRewriter {
      */
     protected static function _realpath($path)
     {
-        $realPath = realpath($path);
+        $realPath = realpath2($path);
         if ($realPath !== false) {
             $path = $realPath;
         }

@@ -108,7 +108,7 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
             }
             foreach ($files as $file) {
                 $path = $_SERVER['DOCUMENT_ROOT'] . $base . $file;
-                $file = realpath($path);
+                $file = realpath2($path);
                 if (false === $file) {
                     $this->log("Path \"{$path}\" failed realpath()");
                     return $options;

@@ -364,7 +364,9 @@ class Gdn_Session {
     * @param string $ForeignKey The key to validate.
     * @return unknown
     */
-   public function ValidateTransientKey($ForeignKey) {
+   public function ValidateTransientKey($ForeignKey, $ValidateUser = TRUE) {
+      if ($ValidateUser && $this->UserID <= 0)
+         return FALSE;
       return $ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE;
    }
 

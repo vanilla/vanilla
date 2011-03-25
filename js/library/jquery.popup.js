@@ -392,22 +392,4 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     return {'top':t, 'left':scroll.left};
   };
 
-  $.fn.popin = function(options) {
-     this.each(function(i, elem) {
-        var url = $(elem).attr('rel');
-         var $elem = $(elem);
-         $elem.addClass('TinyProgress');
-         $.ajax({
-            url: gdn.url(url),
-            data: {DeliveryType: 'VIEW'},
-            success: function(data) {
-               $elem.html(data);
-            },
-            complete: function() {
-               $elem.removeClass('TinyProgress');
-            }
-         });
-     });
-  };
-
 })(jQuery);

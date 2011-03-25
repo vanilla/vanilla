@@ -905,6 +905,41 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();
    }
+
+   public static function SplitAuthors($AuthorsString, $Format = 'html') {
+      $Authors = explode(';', $AuthorsString);
+      $Result = array();
+      foreach ($Authors as $AuthorString) {
+         $Parts = explode(',', $AuthorString, 3);
+         $Author = array();
+         $Author['Name'] = trim($Author[0]);
+         for ($i = 1; $i < count($Parts); $i++) {
+            if (strpos($Parts[$i], '@') !== FALSE)
+               $Author['Email'] = $Parts[$i];
+            elseif (preg_match('`^https?://`', $Parts[$i]))
+               $Author['Url'] = $Parts[$i];
+         }
+         $Result[] = $Author;
+      }
+
+      if (strtolower($Format) == 'html') {
+         // Build the html for the authors.
+         $Htmls = array();
+         foreach ($Result as $Author) {
+            $Name = $Author['Name'];
+            if (isset($Author['Url']))
+               $Url = $Author['Url'];
+            elseif (isset($Author['Email']))
+               $Url = "mailto:{$Author['Email']}";
+
+            if (isset($Url))
+               $Htmls[] = '<a href="'.htmlspecialchars($Url).'">'.htmlspecialchars($Name).'</a>';
+         }
+         $Result = implode(', ', $Htmls);
+      }
+      return $Result;
+      
+   }
    
     /**
     * Remove the plugin.

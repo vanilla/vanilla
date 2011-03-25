@@ -18,6 +18,8 @@ class SetupController extends DashboardController {
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
+      // Make sure all errors are displayed.
+      SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
    }
    
    /**
@@ -49,9 +51,11 @@ class SetupController extends DashboardController {
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Step through the available applications, enabling each of them.
-            $AppNames = array('Conversations', 'Vanilla');
+            // Get list of applications to enable during install
+            // Override by creating conf/config.php and adding this setting before install begins
+            $AppNames = C('Garden.Install.Applications', array('Conversations', 'Vanilla'));
             try {
+               // Step through the available applications, enabling each of them.
                foreach ($AppNames as $AppName) {
                   $Validation = new Gdn_Validation();
                   $ApplicationManager->RegisterPermissions($AppName, $Validation);
@@ -64,9 +68,6 @@ class SetupController extends DashboardController {
                // Save a variable so that the application knows it has been installed.
                // Now that the application is installed, select a more user friendly error page.
                $Config = array('Garden.Installed' => TRUE);
-               if(!defined('DEBUG'))
-                  $Config['Garden.Errors.MasterView'] = 'error.master.php';
-
                SaveToConfig($Config);
                
                // Go to the dashboard

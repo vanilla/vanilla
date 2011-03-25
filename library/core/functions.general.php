@@ -193,6 +193,19 @@ if (!function_exists('ArrayInArray')) {
    }
 }
 
+if (!function_exists('ArraySearchI')) {
+   /**
+    * Case-insensitive version of array_search.
+    *
+    * @param array $Value The value to find in array.
+    * @param array $Search The array to search in for $Value.
+    * @return mixed Key of $Value in the $Search array.
+    */
+   function ArraySearchI($Value, $Search) {
+      return array_search(strtolower($Value), array_map('strtolower', $Search)); 
+   }
+}
+
 if (!function_exists('ArrayTranslate')) {
    /**
     * Take all of the items specified in an array and make a new array with them specified by mappings.
@@ -599,6 +612,20 @@ if (!function_exists('filter_input')) {
          }
       }
       return $Value;     
+   }
+}
+
+if (!function_exists('Debug')) {
+   function Debug($Value = NULL) {
+      static $Debug = FALSE;
+      if ($Value === NULL)
+         return $Debug;
+      
+      $Debug = $Value;
+      if ($Debug)
+         error_reporting(E_ALL);
+      else
+         error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
    }
 }
 
@@ -1652,15 +1679,20 @@ if (!function_exists('StringBeginsWith')) {
     * @param string $A The main string to check.
     * @param string $B The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-    * @return bool
+    * @param bool Whether or not to trim $B off of $A if it is found.
+    * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE) {
+   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
       elseif (strlen($B) == 0)
          return TRUE;
-      else
-         return substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+      else {
+         $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+         if ($Result && $Trim)
+            $Result = substr($A, strlen($B));
+         return $Result;
+      }
    }
 }
 
@@ -1670,15 +1702,20 @@ if (!function_exists('StringEndsWith')) {
     * @param string $A The main string to check.
     * @param string $B The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-    * @return bool
+    * @param bool Whether or not to trim $B off of $A if it is found.
+    * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringEndsWith($A, $B, $CaseInsensitive = FALSE) {
+   function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
       elseif (strlen($B) == 0)
          return TRUE;
-      else
-         return substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+      else {
+         $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+         if ($Result && $Trim)
+            $Result = substr($A, 0, -strlen($B));
+         return $Result;
+      }
    }
 }
 

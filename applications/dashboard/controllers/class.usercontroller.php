@@ -90,6 +90,9 @@ class UserController extends DashboardController {
             $this->RedirectUrl = Url('dashboard/user');
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
+      } else {
+         // Set the default roles.
+         $this->UserRoleData = C('Garden.Registration.DefaultRoles', array());
       }
 
       $this->Render();

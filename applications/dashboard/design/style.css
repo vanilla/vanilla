@@ -684,15 +684,18 @@ ul.Options li.Active ul {
    min-width: 125px;
    line-height: 100%;
    font-size: 10px;
+	color: #fff;
 }
 .MenuItems li {
    padding: 6px !Important;
 }
+.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+   color: #fff;
+	display: block;
+	text-decoration: none;
+}
 .MenuItems li:hover {
    background: #282828;
-}
-.MenuItems, .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
-   color: #fff;
 }
 
 .ToggleFlyout {

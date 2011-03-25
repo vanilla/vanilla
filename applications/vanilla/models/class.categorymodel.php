@@ -293,7 +293,7 @@ class CategoryModel extends Gdn_Model {
          $this->SQL
             ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID", 'left')
             ->Select('uc.DateMarkedRead')
-            ->Select('uc.Archive', '', 'UserArchive');
+            ->Select('uc.Unfollow');
       }
 
       // Single record or full list?
@@ -703,7 +703,7 @@ class CategoryModel extends Gdn_Model {
             $Category->CountAllComments = $Category->CountComments;
 
          // Calculate the following field.
-         $Following = !((bool)GetValue('Archive', $Category) || (bool)GetValue('UserArchive', $Category));
+         $Following = !((bool)GetValue('Archive', $Category) || (bool)GetValue('Unfollow', $Category));
          $Category->Following = $Following;
 
          // Calculate the read field.

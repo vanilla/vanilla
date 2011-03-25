@@ -356,14 +356,13 @@ class DiscussionModel extends VanillaModel {
    }
 
    public static function CategoryWatch() {
-      return self::CategoryPermissions();
-
       static $CategoryWatch = NULL;
 
       if ($CategoryWatch !== NULL)
          return $CategoryWatch;
 
-      $SQL = Gdn::SQL();
+      $SQL = clone Gdn::SQL();
+      $SQL->Reset();
       $SQL->Select('c.CategoryID')->From('Category c');
 
       // Add the permissions first.
@@ -377,7 +376,6 @@ class DiscussionModel extends VanillaModel {
             return;
          }
       } else {
-         $SQL = Gdn::SQL();
          $Data = $SQL->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category');
       }
 
@@ -385,7 +383,7 @@ class DiscussionModel extends VanillaModel {
       $UserID = $Session->UserID;
       $SQL
          ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID", 'left')
-         ->Where('coalesce(uc.Archive, c.Archive, 0)', '0', FALSE, TRUE);
+         ->Where('coalesce(uc.Unfollow, c.Archive, 0)', '0', FALSE, TRUE);
 
       $CategoryWatch = $SQL->Get()->ResultArray();
       $CategoryWatch = ConsolidateArrayValuesByKey($CategoryWatch, 'CategoryID', 'CategoryID');

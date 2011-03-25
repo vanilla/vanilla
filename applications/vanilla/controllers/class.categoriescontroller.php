@@ -113,7 +113,7 @@ class CategoriesController extends VanillaController {
       // Check permission
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
       
-      // Set discussion meta data
+      // Set discussion meta data.
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();

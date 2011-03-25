@@ -1769,7 +1769,7 @@ class UserModel extends Gdn_Model {
       $Data['Title'] = $AppTitle;
 
       $EmailFormat = T('EmailPassword');
-      if (strpos($EmailFormat, '{') === FALSE) {
+      if (strpos($EmailFormat, '{') !== FALSE) {
          $Message = FormatString($EmailFormat, $Data);
       } else {
          $Message = sprintf(

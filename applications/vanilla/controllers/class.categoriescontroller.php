@@ -66,7 +66,9 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Offset = '0') {
-      list($Offset, $Limit) = OffsetLimit($Offset, C('Vanilla.Discussions.PerPage', 30));
+	  $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
+	  $this->FireEvent('BeforeCategoryIndex');
+      list($Offset, $Limit) = OffsetLimit($Offset, $this->EventArguments['PerPage']);
       
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));

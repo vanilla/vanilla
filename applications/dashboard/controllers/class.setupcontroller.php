@@ -51,9 +51,11 @@ class SetupController extends DashboardController {
          
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
-            // Step through the available applications, enabling each of them.
-            $AppNames = array('Conversations', 'Vanilla');
+            // Get list of applications to enable during install
+            // Override by creating conf/config.php and adding this setting before install begins
+            $AppNames = C('Garden.Install.Applications', array('Conversations', 'Vanilla'));
             try {
+               // Step through the available applications, enabling each of them.
                foreach ($AppNames as $AppName) {
                   $Validation = new Gdn_Validation();
                   $ApplicationManager->RegisterPermissions($AppName, $Validation);

@@ -77,8 +77,8 @@ class CategoriesController extends VanillaController {
          return $this->Discussions();
       }
 			
-		// Load the Descendant Tree
-		$this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
+		// Load the Descendant Tree.
+      $this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
       
       $this->SetData('Category', $Category, TRUE);
 
@@ -111,7 +111,7 @@ class CategoriesController extends VanillaController {
       
       // Set discussion meta data.
       $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
-	  $this->FireEvent('BeforeGetDiscussions');
+      $this->FireEvent('BeforeGetDiscussions');
       list($Offset, $Limit) = OffsetLimit($Offset, $this->EventArguments['PerPage']);
       
       if (!is_numeric($Offset) || $Offset < 0)

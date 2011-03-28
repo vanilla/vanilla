@@ -16,7 +16,7 @@ if ($Session->IsValid()) {
 <div class="Tabs HeadingTabs DiscussionTabs">
    <ul>
       <li><?php
-         if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+         if (Gdn::Config('Vanilla.Categories.Use') == TRUE) {
             echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
          } else {
             echo Anchor(T('All Discussions'), 'discussions');

@@ -858,7 +858,7 @@ if (!function_exists('IsMobile')) {
          )
          $Mobile++;
       
-      if(strpos($UserAgent,'android') > 0)
+      if(strpos($UserAgent,'android') > 0 && strpos($UserAgent,'mobile') > 0)
          $Mobile++;
  
       $MobileUserAgent = substr($UserAgent, 0, 4);

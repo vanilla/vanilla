@@ -1920,9 +1920,6 @@ abstract class Gdn_SQLDriver {
       // Build up the in clause.
       $In = array();
       foreach ($Values as $Value) {
-         if (!$Value)
-            continue;
-
          if ($Escape)
             $ValueExpr = $this->Database->Connection()->quote($Value);
          else

@@ -518,13 +518,6 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         
-         // Make sure to encrypt the password for saving...
-         if (array_key_exists('Password', $Fields)) {
-            $PasswordHash = new Gdn_PasswordHash();
-            $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
-            $Fields['HashMethod'] = 'Vanilla';
-         }
 
          // Check for email confirmation.
          if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Settings)) {

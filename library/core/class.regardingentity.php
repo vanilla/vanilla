@@ -1,0 +1,173 @@
+<?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+*/
+
+/**
+ * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Mark O'Sullivan
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @version @@GARDEN-VERSION@@
+ * @namespace Garden.Core
+ */
+
+class Gdn_RegardingEntity extends Gdn_Pluggable {
+
+   private $Type = NULL;
+   private $ForeignType = NULL;
+   private $ForeignID = NULL;
+
+   private $ParentType = NULL;
+   private $ParentID = NULL;
+   private $UserID = NULL;
+   private $ForeignURL = NULL;
+   private $Comment = NULL;
+
+   private $CollaborativeActions = array();
+   private $CollaborativeTitle = NULL;
+
+   public function __construct($ForeignType, $ForeignID) {
+      $this->ForeignType = $ForeignType;
+      $this->ForeignID = $ForeignID;
+      parent::__construct();
+   }
+
+   public function WithParent($ParentType, $ParentID) {
+      $this->ParentType = $ParentType;
+      $this->ParentID = $ParentID;
+      return $this;
+   }
+
+   /* I'd like to... */
+
+   public function ActionIt($ActionType) {
+      $this->Type = $ActionType;
+      return $this;
+   }
+
+   /* ... */
+
+   public function ForDiscussion($InCategory) {
+      return $this->ForCollaboration('discussion', $InCategory);
+   }
+
+   public function ForConversation($WithUsers) {
+      return $this->ForCollaboration('conversation', $WithUsers);
+   }
+
+   public function ForCollaboration($CollaborationType, $CollaborationParameters = NULL) {
+      if ($CollaborationType !== FALSE) {
+         $this->CollaborativeActions[] = array(
+            'Type'         => $CollaborationType,
+            'Parameters'   => $CollaborationParameters
+         );
+      }
+      return $this;
+   }
+
+   public function Entitled($CollaborativeTitle) {
+      $this->CollaborativeTitle = $CollaborativeTitle;
+      return $this;
+   }
+
+   /* Meta data */
+
+   public function Located($URL) {
+      $this->ForeignURL = $URL;
+      return $this;
+   }
+
+   public function From($UserID) {
+      $this->UserID = $UserID;
+      return $this;
+   }
+
+   public function Because($Reason) {
+      $this->Comment = $Reason;
+      return $this;
+   }
+
+   /* Finally... */
+
+   public function Commit() {
+      
+      if (is_null($this->Type))
+         throw new Exception(T("Adding a Regarding event requires a type."));
+
+      if (is_null($this->ForeignType))
+         throw new Exception(T("Adding a Regarding event requires a foreign association type."));
+
+      if (is_null($this->ForeignID))
+         throw new Exception(T("Adding a Regarding event requires a foreign association id."));
+
+      if (is_null($this->Comment))
+         throw new Exception(T("Adding a Regarding event requires a comment."));
+
+      if (is_null($this->UserID))
+         $this->UserID = Gdn::Session()->UserID;
+
+      $RegardingModel = new RegardingModel();
+      $RegardingModel->Save(array(
+         'Type'            => $this->Type,
+         'ForeignType'     => $this->ForeignType,
+         'ForeignID'       => $this->ForeignID,
+         'InsertUserID'    => $this->UserID,
+         'DateInserted'    => date('Y-m-d H:i:s'),
+
+         'ParentType'      => $this->ParentType,
+         'ParentID'        => $this->ParentID,
+         'ForeignURL'      => $this->ForeignURL,
+         'Comment'         => $this->Comment
+      ));
+
+      // Don't error on foreach
+      if (!is_array($this->CollaborativeActions))
+         $this->CollaborativeActions = array();
+         
+      foreach ($this->CollaborativeActions as $Action) {
+         $ActionType = GetValue('Type', $Action);
+         switch ($ActionType) {
+            case 'discussion':
+               $CategoryID = GetValue('Parameters', $Action);
+               $DiscussionModel = new DiscussionModel();
+               
+               $DiscussionModel->Save(array(
+                  'Name'         => $this->CollaborativeTitle,
+                  'CategoryID'   => $CategoryID,
+                  'Body'         => T('This discussion was automatically created by the system to encourage moderator collaboration.'),
+                  'InsertUserID' => $this->UserID,
+                  'Announce'     => 0,
+                  'Close'        => 0
+               ));
+               break;
+
+            case 'conversation':
+               $Users = GetValue('Parameters', $Action);
+               $UserList = explode(',', $Users);
+               if (!sizeof($UserList))
+                  throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
+               $ConversationModel = new ConversationModel();
+               
+               $ConversationMessageModel = new ConversationMessageModel();
+               $ConversationModel->Save(array(
+                  
+               ), $ConversationMessageModel);
+               
+               break;
+         }
+      }
+
+      return TRUE;
+   }
+
+   public function Setup(){}
+
+}

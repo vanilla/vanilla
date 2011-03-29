@@ -31,6 +31,74 @@ class CategoryModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('Category');
    }
+
+   public static function CategoryWatch() {
+      $Categories = self::Categories();
+      
+      $Watch = array();
+      $All = TRUE;
+      
+      foreach ($Categories as $CategoryID => $Category) {
+         if ($CategoryID == -1)
+            continue; // no root
+         
+         if ($Category['PermsDiscussionsView'] && $Category['Following']) {
+            $Watch[] = $CategoryID;
+         } else {
+            $All = FALSE;
+         }
+      }
+      if ($All)
+         return TRUE;
+
+      return $Watch;
+   }
+
+   public static function &Categories($ID = FALSE) {
+      static $Categories = NULL;
+
+      if ($Categories == NULL) {
+         $Sql = Gdn::SQL();
+         $Sql = clone $Sql;
+         $Session = Gdn::Session();
+
+         $Sql->Select('c.*')
+            ->Select('lc.DateInserted', '', 'DateLastComment')
+            ->From('Category c')
+            ->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+            ->OrderBy('c.TreeLeft');
+
+         if ($Session->UserID > 0) {
+            $Sql->Select('uc.DateMarkedRead as UserDateMarkedRead, uc.Unfollow')
+               ->Join('UserCategory uc', 'c.CategoryID = uc.CategoryID and uc.UserID = '.Gdn::Session()->UserID, 'left');
+         }
+
+         $Categories = $Sql->Get()->ResultArray();
+         $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
+         self::CalculateData($Categories);
+
+         // Add permissions.
+         foreach ($Categories as $CategoryID => &$Category) {
+            $Category['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
+            $Category['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+            $Category['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+         }
+      }
+
+      if ($ID !== FALSE) {
+         if (isset($Categories[$ID])) {
+            $Result =& $Categories[$ID];
+            return $Result;
+         } else {
+            $NotFound = NULL;
+            $Result =& $NotFound;
+            return $Result;
+         }
+      } else {
+         $Result =& $Categories;
+         return $Result;
+      }
+   }
    
    /**
     * Delete a single category and assign its discussions to another.
@@ -263,7 +331,7 @@ class CategoryModel extends Gdn_Model {
       // Get the category IDs.
       if ($Permissions == 'Vanilla.Discussions.View') {
          if ($this->Watching)
-            $CategoryIDs = DiscussionModel::CategoryWatch();
+            $CategoryIDs = self::CategoryWatch();
          else
             $CategoryIDs = DiscussionModel::CategoryPermissions();
          if ($CategoryIDs !== TRUE)
@@ -274,7 +342,7 @@ class CategoryModel extends Gdn_Model {
 
       // Build base query
       $this->SQL
-         ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID, c.PermissionCategoryID, c.Archive')
+         ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID, c.PermissionCategoryID, c.Archived')
          ->Select('co.DateInserted', '', 'DateLastComment')
          ->Select('co.InsertUserID', '', 'LastCommentUserID')
          ->Select('cu.Name', '', 'LastCommentName')
@@ -692,7 +760,7 @@ class CategoryModel extends Gdn_Model {
     *
     * @param object $Data SQL result.
     */
-	public function AddCategoryColumns($Data) {
+	public static function AddCategoryColumns($Data) {
 		$Result = &$Data->Result();
       $Result2 = $Result;
 		foreach ($Result as &$Category) {
@@ -703,7 +771,7 @@ class CategoryModel extends Gdn_Model {
             $Category->CountAllComments = $Category->CountComments;
 
          // Calculate the following field.
-         $Following = !((bool)GetValue('Archive', $Category) || (bool)GetValue('Unfollow', $Category));
+         $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
          $Category->Following = $Following;
 
          // Calculate the read field.
@@ -724,6 +792,41 @@ class CategoryModel extends Gdn_Model {
             }
          }
 		}
+	}
+
+   protected static function CalculateData(&$Data) {
+		foreach ($Data as &$Category) {
+         $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
+         $Category['CountAllComments'] = $Category['CountComments'];
+
+         // Calculate the following field.
+         $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
+         $Category['Following'] = $Following;
+
+         // Calculate the read field.
+         if (isset($Category['DateLastComment'])) {
+            $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
+            if (!$DateMarkedRead)
+               $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+            if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
+               $Category['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
+            else
+               $Category['Read'] = FALSE;
+         }
+         $Category['Children'] = array();
+		}
+      
+      $Keys = array_reverse(array_keys($Data));
+      foreach ($Keys as $Key) {
+         $Cat = $Data[$Key];
+         $ParentID = $Cat['ParentCategoryID'];
+
+         if (isset($Data[$ParentID])) {
+            $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
+            $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+            $Data[$ParentID]['Children'][] =& $Data[$Key];
+         }
+      }
 	}
    
 }

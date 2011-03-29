@@ -793,6 +793,7 @@ div.Box dl dt {
    float: left;
    width: 80px;
    color: #555;
+	overflow: hidden;
 }
 div.Box dl dd {
 	font-size: 12px;

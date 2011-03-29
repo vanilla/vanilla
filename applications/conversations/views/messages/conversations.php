@@ -29,6 +29,21 @@ foreach ($this->ConversationData->Result() as $Conversation) {
             echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
          }
          ?>
+         <span class="MetaItem">
+            <span class="MetaLabel"><?php echo T('Participants'); ?></span>
+            <span class="MetaValue">
+               <?php
+               $First = TRUE;
+               foreach ($Conversation->Participants as $User) {
+                  if ($First)
+                     $First = FALSE;
+                  else
+                     echo ', ';
+                  echo UserAnchor($User, 'Name');
+               }
+               ?>
+            <span>
+         </span>
       </div>
    </div>
 </li>

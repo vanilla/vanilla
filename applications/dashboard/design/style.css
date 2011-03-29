@@ -244,19 +244,18 @@ div.Deleted {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert {
+span.Alert {
    background: #d00;
-   border: 1px solid #b00;
    color: #fff;
    padding: 3px 6px;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-.Alert a {
+span.Alert a {
    color: #fff;
 }
-.Alert a:hover {
+span.Alert a:hover {
    text-decoration: underline;
 }
 div.Info {
@@ -685,15 +684,18 @@ ul.Options li.Active ul {
    min-width: 125px;
    line-height: 100%;
    font-size: 10px;
+	color: #fff;
 }
 .MenuItems li {
    padding: 6px !Important;
 }
+.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+   color: #fff;
+	display: block;
+	text-decoration: none;
+}
 .MenuItems li:hover {
    background: #282828;
-}
-.MenuItems, .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
-   color: #fff;
 }
 
 .ToggleFlyout {
@@ -1052,6 +1054,7 @@ ul.DataList div.Meta {
    font-size: 11px;
    color: #70727c;
 }
+
 ul.DataList div.Excerpt {
    font-size: 12px;
 	line-height: 1.4;
@@ -1068,6 +1071,9 @@ ul.DataList div.Excerpt p {
 ul.DataList div.Meta span,
 ul.DataList div.Meta strong {
    margin-right: 12px;
+}
+ul.DataList div.Meta .MetaLabel {
+   margin-right: 2px;
 }
 ul.DataList div.Meta strong {
    border-radius: 2px;
@@ -1122,6 +1128,12 @@ ul.DataList div.Photo img {
 	width: 43px;
 	overflow: hidden;
 	background: #eee;
+}
+ul.DataList .Unfollow {
+   background: #eee;
+}
+ul.DataList .Unfollow a {
+   color: #888;
 }
 ul.Condensed li,
 li.Condensed {
@@ -2514,19 +2526,6 @@ span.Incorrect {
    color: red;
 }
 
-/* Sign In Page & Popup */
-div.SignInPopup div.Box {
-	margin: 0;
-	padding: 0;
-	background: none;
-	border: 0;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-}
 body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
@@ -2555,6 +2554,10 @@ div.MultipleEntryMethods {
 	width: 500px;
 	margin: 0 auto;
 }
+.MultipleEntryMethods .Methods {
+   border-left: solid 1px #BEC8CC;
+}
+
 body#dashboard_entry_handshake #Content input.InputBox,
 body#dashboard_entry_signin #Content input.InputBox,
 body#dashboard_entry_index #Content input.InputBox,
@@ -2689,18 +2692,7 @@ div.Connect h1,
 div.Connect h2 {
 	text-align: left;
 }
-body.connect div.Box {
-	border-radius: none;
-	-moz-border-radius: none;
-	-webkit-border-radius: none;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	width: 320px;
-	margin: 0 auto;
-	text-align: left;
-	background: none;
-}
+
 div.ConnectInfo {
 	margin: 10px 0 0;
 	position: relative;
@@ -2830,6 +2822,7 @@ div.Errors pre {
 	-moz-box-shadow: 0px 0px 2px #333;
 	-webkit-box-shadow: 0px 0px 2px #333;  
 }
+
 div.Errors pre,
 div.Errors pre * {
 	background: #ffa !important;

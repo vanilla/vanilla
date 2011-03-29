@@ -182,15 +182,19 @@ class Gdn_Theme {
    }
 
    public static function Module($Name) {
-      if (!class_exists($Name)) {
-         $Result = "Error: $Name doesn't exist";
-      } else {
-         try {
-            $Module = new $Name(Gdn::Controller(), '');
-            $Result = $Module->ToString();
-         } catch (Exception $Ex) {
-            $Result = $Ex->getMessage();
+      try {
+         if (!class_exists($Name)) {
+            $Result = "Error: $Name doesn't exist";
+         } else {
+               $Module = new $Name(Gdn::Controller(), '');
+               $Result = $Module->ToString();
+
          }
+      } catch (Exception $Ex) {
+         if (Debug())
+            $Result = '<pre class="Exception">'.htmlspecialchars($Ex->getMessage()."\n".$Ex->getTraceAsString()).'</pre>';
+         else
+            $Result = $Ex->getMessage();
       }
       return $Result;
    }

@@ -522,7 +522,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return = "</div>\n</form>";
       if ($Xhtml != '') $Return = $Xhtml . $Return;
 
-      if ($ButtonCode != '') $Return = $this->Button($ButtonCode, $Attributes) . $Return;
+      if ($ButtonCode != '') $Return = '<div class="Buttons">'.$this->Button($ButtonCode, $Attributes).'</div>'.$Return;
 
       return $Return;
    }
@@ -1197,7 +1197,7 @@ class Gdn_Form extends Gdn_Pluggable {
          else
             $FileSuffix = "";
 
-         if(defined('DEBUG')) {
+         if(Debug()) {
             $ErrorCode = '@<pre>'.
                $Message."\n".
                '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".

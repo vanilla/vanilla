@@ -156,6 +156,18 @@ class ProfileController extends Gdn_Controller {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
          Redirect('/profile');
    }
+
+   public function Count($Column, $UserID = FALSE) {
+      $Column = 'Count'.ucfirst($Column);
+      if (!$UserID)
+         $UserID = Gdn::Session()->UserID;
+
+      $Count = $this->UserModel->ProfileCount($UserID, $Column);
+      $this->SetData($Column, $Count);
+      $this->SetData('_Value', $Count);
+      $this->SetData('_CssClass', 'Count');
+      $this->Render('Value', 'Utility');
+   }
    
    public function Edit($UserReference = '') {
       $this->Permission('Garden.SignIn.Allow');
@@ -776,6 +788,11 @@ class ProfileController extends Gdn_Controller {
 			
 			$this->SetData('Profile', $this->User);
 			$this->SetData('UserRoles', $this->Roles);
+			
+			// If the photo contains an http://, it is just an icon (probably from facebook or some external service), don't show it here because the Photo property is used to define logic around allowing thumbnail edits, etc.
+			if ($this->User->Photo != '' && in_array(strtolower(substr($this->User->Photo, 0, 7)), array('http://', 'https:/')))
+				$this->User->Photo = '';
+			
       }
       
       // Make sure the userphoto module gets added to the page

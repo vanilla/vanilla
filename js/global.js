@@ -328,8 +328,23 @@ jQuery(document).ready(function($) {
          $(this).val('');
    });
 
-   if ($.fn.popin)
-      $('.Popin').popin();
+   $.fn.popin = function(options) {
+     this.each(function(i, elem) {
+        var url = $(elem).attr('rel');
+         var $elem = $(elem);
+         $.ajax({
+            url: gdn.url(url),
+            data: {DeliveryType: 'VIEW'},
+            success: function(data) {
+               $elem.html(data);
+            },
+            complete: function() {
+               $elem.removeClass('Progress TinyProgress');
+            }
+         });
+     });
+   };
+   $('.Popin').popin();
 
    $.fn.openToggler = function() {
      $(this).click(function() {

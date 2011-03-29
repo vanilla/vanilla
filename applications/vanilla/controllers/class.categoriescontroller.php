@@ -65,9 +65,7 @@ class CategoriesController extends VanillaController {
     * @param string $CategoryIdentifier Unique category slug or ID.
     * @param int $Offset Number of discussions to skip.
     */
-   public function Index($CategoryIdentifier = '', $Offset = '0') {
-      list($Offset, $Limit) = OffsetLimit($Offset, C('Vanilla.Discussions.PerPage', 30));
-      
+   public function Index($CategoryIdentifier = '', $Offset = '0') {      
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
       else
@@ -79,8 +77,8 @@ class CategoriesController extends VanillaController {
          return $this->Discussions();
       }
 			
-		// Load the Descendant Tree
-		$this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
+		// Load the Descendant Tree.
+      $this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
       
       $this->SetData('Category', $Category, TRUE);
 
@@ -95,12 +93,10 @@ class CategoriesController extends VanillaController {
          $this->AddJsFile('jquery.gardenmorepager.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
-         
+      
       // Set CategoryID
       $this->SetData('CategoryID', $this->Category->CategoryID, TRUE);
-
+      
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
@@ -113,7 +109,14 @@ class CategoriesController extends VanillaController {
       // Check permission
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
       
-      // Set discussion meta data
+      // Set discussion meta data.
+      $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
+      $this->FireEvent('BeforeGetDiscussions');
+      list($Offset, $Limit) = OffsetLimit($Offset, $this->EventArguments['PerPage']);
+      
+      if (!is_numeric($Offset) || $Offset < 0)
+         $Offset = 0;
+         
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();

@@ -24,6 +24,26 @@ if (!function_exists('Alternate')) {
    }
 }
 
+if (!function_exists('CountString')) {
+   function CountString($Number, $Url = '', $Options = array()) {
+      if (is_string($Options))
+         $Options = array('cssclass' => $Options);
+      $Options = array_change_key_case($Options);
+//      $CssClass = GetValue('cssclass', $Options, 'Count');
+
+      if ($Number === NULL && $Url) {
+         $CssClass = ConcatSep(' ', $CssClass, 'Popin TinyProgress');
+         $Url = htmlspecialchars(Url($Url));
+         $Result = "<span class=\"$CssClass\" rel=\"$Url\"></span>";
+      } elseif ($Number) {
+         $Result = " <span class=\"Count\">$Number</span>";
+      } else {
+         $Result = '';
+      }
+      return $Result;
+   }
+}
+
 /**
  * Writes an anchor tag
  */
@@ -234,6 +254,8 @@ if (!function_exists('Plural')) {
  */
 if (!function_exists('UserAnchor')) {
    function UserAnchor($User, $CssClass = '') {
+      $User = (object)$User;
+      
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 

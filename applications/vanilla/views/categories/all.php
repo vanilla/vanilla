@@ -16,7 +16,12 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
       $this->FireEvent('BeforeCategoryItem');
-      $ReadClass = GetValue('Read', $Category) ? 'Read' : 'Unread';
+      $CssClasses = array(GetValue('Read', $Category) ? 'Read' : 'Unread');
+      if (GetValue('Archive', $Category))
+         $CssClasses[] = 'Archive';
+      if (GetValue('Unfollow', $Category))
+         $CssClasses[] = 'Unfollow';
+      $CssClasses = implode(' ', $CssClasses);
 
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
@@ -32,13 +37,13 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
+               <div class="ItemContent Category '.$CssClasses.'">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category '.$ReadClass.'">'
+               <div class="ItemContent Category '.$CssClasses.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))

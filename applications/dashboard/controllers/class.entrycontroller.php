@@ -296,7 +296,7 @@ class EntryController extends Gdn_Controller {
          $this->Form->AddError($Ex);
          return $this->Render('ConnectError');
       } catch (Exception $Ex) {
-         if (defined('DEBUG'))
+         if (Debug())
             $this->Form->AddError($Ex);
          else
             $this->Form->AddError('There was an error fetching the connection data.');

@@ -165,11 +165,10 @@ class SetupController extends DashboardController {
                $Locale = Gdn::Locale();
                $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
             }
-            
-            Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', PATH_LIBRARY.DS.'database'.DS.'class.database.php', Gdn::FactorySingleton, array(Gdn::Config('Database')));
-            
+
             // Install db structure & basic data.
             $Database = Gdn::Database();
+            $Database->Init();
             $Drop = FALSE; // Gdn::Config('Garden.Version') === FALSE ? TRUE : FALSE;
             $Explicit = FALSE;
             try {

@@ -125,15 +125,16 @@ class Gdn_Session {
             }
             return TRUE;
          } else {
-            if ($JunctionID > 0) {
-               return array_key_exists($Permission, $Permissions)
+            if ($JunctionID !== '') {
+               $Result = array_key_exists($Permission, $Permissions)
                   && is_array($Permissions[$Permission])
                   && in_array($JunctionID, $Permissions[$Permission]);
             } else {
-               return array_key_exists($Permission, $Permissions)
+               $Result = array_key_exists($Permission, $Permissions)
                   && is_array($Permissions[$Permission])
                   && count($Permissions[$Permission]);
             }
+            return $Result;
          }
       } else {
          // Non-junction permission ($Permissions = array(PermissionNames))

@@ -50,7 +50,7 @@ class DiscussionModel extends VanillaModel {
    public function DiscussionSummaryQuery($AdditionalFields = array()) {
       // Verify permissions (restricting by category if necessary)
       if ($this->Watching)
-         $Perms = self::CategoryWatch();
+         $Perms = CategoryModel::CategoryWatch();
       else
          $Perms = self::CategoryPermissions();
       if($Perms !== TRUE) {
@@ -354,57 +354,6 @@ class DiscussionModel extends VanillaModel {
          ->Where('Bookmarked', '1')
          ->Get();
    }
-
-   public static function CategoryWatch() {
-      static $CategoryWatch = NULL;
-
-      if ($CategoryWatch !== NULL)
-         return $CategoryWatch;
-
-      $SQL = clone Gdn::SQL();
-      $SQL->Reset();
-      $SQL->Select('c.CategoryID')->From('Category c');
-
-      // Add the permissions first.
-      $Session = Gdn::Session();
-      if((is_object($Session->User) && $Session->User->Admin == '1')) {
-        // Don't filter admins.
-      } elseif(C('Garden.Permissions.Disabled.Category')) {
-         if(!$Session->CheckPermission('Vanilla.Discussions.View')) {
-            $CategoryWatch = array();
-            $SQL->Reset();
-            return;
-         }
-      } else {
-         $Data = $SQL->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category');
-      }
-
-      // Add in user category permissions.
-      $UserID = $Session->UserID;
-      $SQL
-         ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID", 'left')
-         ->Where('coalesce(uc.Unfollow, c.Archive, 0)', '0', FALSE, TRUE);
-
-      $CategoryWatch = $SQL->Get()->ResultArray();
-      $CategoryWatch = ConsolidateArrayValuesByKey($CategoryWatch, 'CategoryID', 'CategoryID');
-      return $CategoryWatch;
-
-
-      // Check to see if the user has permission to all categories. This is for speed.
-//      $CategoryCount = $SQL
-//         ->Select('c.CategoryID', 'count', 'CategoryCount')
-//         ->From('Category c')
-//         ->Get()->Value('CategoryCount', 0);
-//      if (count($Data) == $CategoryCount)
-//         self::$_CategoryPermissions = TRUE;
-//      else {
-//         self::$_CategoryPermissions = array();
-//         foreach($Data as $Row) {
-//            self::$_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
-//         }
-//      }
-
-   }
    
    /**
     * Identify current user's category permissions and set as local array.
@@ -474,7 +423,7 @@ class DiscussionModel extends VanillaModel {
       
       // Check permission and limit to categories as necessary
       if ($this->Watching)
-         $Perms = self::CategoryWatch();
+         $Perms = CategoryModel::CategoryWatch();
       else
          $Perms = self::CategoryPermissions();
       if($Perms !== TRUE) {
@@ -1150,5 +1099,12 @@ class DiscussionModel extends VanillaModel {
 		}
 			
       return TRUE;
+   }
+
+   public static function IsNew($Discussion) {
+      // Check for a user category.
+
+
+      // Check for user discussion.
    }
 }

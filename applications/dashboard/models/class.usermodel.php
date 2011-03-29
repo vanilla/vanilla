@@ -518,13 +518,6 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         
-         // Make sure to encrypt the password for saving...
-         if (array_key_exists('Password', $Fields)) {
-            $PasswordHash = new Gdn_PasswordHash();
-            $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
-            $Fields['HashMethod'] = 'Vanilla';
-         }
 
          // Check for email confirmation.
          if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Settings)) {
@@ -654,11 +647,6 @@ class UserModel extends Gdn_Model {
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields['UserID'] = 1;
-
-         // Make sure to encrypt the password for saving.
-         $PasswordHash = new Gdn_PasswordHash();
-         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
-         $Fields['HashMethod'] = 'Vanilla';
          
          if ($this->Get($UserID) !== FALSE) {
             $this->SQL->Put($this->Name, $Fields);
@@ -1769,7 +1757,7 @@ class UserModel extends Gdn_Model {
       $Data['Title'] = $AppTitle;
 
       $EmailFormat = T('EmailPassword');
-      if (strpos($EmailFormat, '{') === FALSE) {
+      if (strpos($EmailFormat, '{') !== FALSE) {
          $Message = FormatString($EmailFormat, $Data);
       } else {
          $Message = sprintf(

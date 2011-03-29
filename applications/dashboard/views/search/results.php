@@ -2,7 +2,7 @@
 <?php
 if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 	foreach ($this->SearchResults as $Key => $Row) {
-		$Row = Gdn_Format::ArrayAsObject($Row);
+		$Row = (object)$Row;
 		$this->EventArguments['Row'] = $Row;
 ?>
 	<li class="Item">
@@ -15,6 +15,15 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 			<div class="Meta">
 				<span><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
 				<span><?php echo Gdn_Format::Date($Row->DateInserted); ?></span>
+            <?php
+            if (isset($Row->CategoryID)) {
+               $Category = CategoryModel::Categories($Row->CategoryID);
+               if ($Category !== NULL) {
+                  $Url = Url('categories/'.$Category['UrlCode']);
+                  echo "<span><a class='Category' href='{$Url}'>{$Category['Name']}</a></span>";
+               }
+            }
+            ?>
 				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
 			</div>
 		</div>

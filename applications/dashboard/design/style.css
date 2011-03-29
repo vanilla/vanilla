@@ -1130,6 +1130,12 @@ ul.DataList div.Photo img {
 	overflow: hidden;
 	background: #eee;
 }
+ul.DataList .Unfollow {
+   background: #eee;
+}
+ul.DataList .Unfollow a {
+   color: #888;
+}
 ul.Condensed li,
 li.Condensed {
 	clear: left;

@@ -419,6 +419,24 @@ class CategoryModel extends Gdn_Model {
          ->Get();
       return $ChildData->NumRows() > 0 ? TRUE : FALSE;
    }
+
+   public static function JoinModerators($Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
+      $Moderators = Gdn::SQL()
+         ->Select('u.UserID, u.Name, u.Photo')
+         ->Select('p.JunctionID as CategoryID')
+         ->From('User u')
+         ->Join('UserRole ur', 'ur.UserID = u.UserID')
+         ->Join('Permission p', 'ur.RoleID = p.RoleID')
+         ->Where('`'.$Permission.'`', 1)
+         ->Get()->ResultArray();
+
+      $Moderators = Gdn_DataSet::Index($Moderators, 'CategoryID', array('Unique' => FALSE));
+
+      foreach ($Data as &$Category) {
+         $ID = GetValue('PermissionCategoryID', $Category);
+         SetValue($Column, $Category, GetValue($ID, $Moderators, array()));
+      }
+   }
    
    /**
     * Rebuilds the category tree. We are using the Nested Set tree model.

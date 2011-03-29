@@ -172,7 +172,9 @@ class CategoriesController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('BookmarkedModule');
-      
+
+      CategoryModel::JoinModerators($this->CategoryData);
+
       $this->Render();
 	}
 

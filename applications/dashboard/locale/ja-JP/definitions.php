@@ -21,7 +21,7 @@ $Definition['[%1$s] Membership Approved'] = '[%1$s] 承認済みメンバー';
 
 $Definition['_Locale'] = 'ロケール';
 
-$Definition['A url-friendly version of the category name for better SEO.'] = 'より良いSEOのためのカテゴリ名のurlに優しいバージョン';
+$Definition['A url-friendly version of the category name for better SEO.'] = 'SEO に適したカテゴリ名の URL フレンドリー バージョン';
 $Definition['Action'] = 'アクション';
 $Definition['Activate'] = 'アクティベート';  // 認証 画面で使用
 $Definition['Add'] = '追加';
@@ -89,7 +89,7 @@ $Definition['Customize your Public Profile'] = '公開プロフィールをカ�
 $Definition['Dashboard'] = 'ダッシュボード';
 $Definition['Date.DefaultDayFormat'] = '%m/%d';
 $Definition['Date.DefaultTimeFormat'] = '%H:%M';
-$Definition['Decline'] = '衰退';
+$Definition['Decline'] = '却下';
 $Definition['Description'] = '説明';
 $Definition['Disable'] = '無効化';
 $Definition['Disable Google Sign In'] = 'Google アカウントでのログインを無効化';
@@ -124,15 +124,15 @@ $Definition['Enabled'] = '有効';
 $Definition['Enabled %1$s'] = '有効 %1$s';
 $Definition['Existing members send invitations to new members.'] = '既存のメンバーが新規メンバーに招待状を送ります。';
 
-$Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connectは、彼らのFacebookアカウントを使用することでサインインするためにユーザを許容します。<b>あなたは、このプラグインが動作するようにFacebookにアプリケーションを登録しなければなりません。</b>';
-$Definition['Facebook Settings'] = 'Facebook設定';
+$Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect を使うと、Facebook アカウントでログインできます。<b>このプラグインを使うには、Facebook にアプリケーションを登録する必要があります。</b>';
+$Definition['Facebook Settings'] = 'Facebook 設定';
 $Definition['First Visit'] = '訪問開始';
-$Definition['For more help on localization check out the page <a href="%s">here</a>.'] = 'ローカライズの、より多くの助けには、<a href="%s">ここ</a>でページを調べてください。';
+$Definition['For more help on localization check out the page <a href="%s">here</a>.'] = 'ローカライゼーションについて、詳しくは<a href="%s">ここ</a>を参照してください。';
 $Definition['Forum Settings'] = 'フォーラム設定';
 
 $Definition['Garden.Email.SupportAddress'] = 'サポートメール';
-$Definition['Garden.Import.Description'] = 'このページを使用して、Vanillaのエクスポート機能を使用することでエクスポートされた別のフォーラムからデータをインポートしてください。 詳しい情報に関しては、<a href="%s">インポートについて</a>を参照してください。';
-$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータから管理者ユーザのメールアドレスとパスワードを入力してください。';
+$Definition['Garden.Import.Description'] = 'このページを使用して、Vanilla のエクスポート機能を使用してエクスポートされた別のフォーラムからのデータをインポートしてください。 詳しくは<a href="%s">インポートについて (英語)</a> を参照してください。';
+$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメール アドレスとパスワードを入力してください。';
 $Definition['Garden.Import.Overwrite.Description'] = '警告: このフォーラムのすべてのデータが上書きされます。';
 $Definition['Generate'] = '生成';
 $Definition['Generate Password'] = 'パスワードを生成';
@@ -147,7 +147,7 @@ $Definition['Inbox'] = '受信トレイ';
 $Definition['Information'] = '情報';
 $Definition['Internal'] = 'Internal';
 $Definition['Invitation'] = '招待制';
-$Definition['Invitations can be sent from users\' profile pages.'] = 'あなたが招待で登録を使用するとき、ユーザは、彼らのプロフィールページに<a href="%s" class="Popup">My Invitations</a>と呼ばれるリンクを持つでしょう。';
+$Definition['Invitations can be sent from users\' profile pages.'] = 'ユーザー登録を招待制にした場合、各ユーザーのプロフィール ページには<a href="%s" class="Popup">招待者リスト</a>と呼ばれるリンクが作成されます。';
 $Definition['Invitations per month'] = '一ヶ月あたりの招待状数';
 $Definition['Invitations will expire'] = '招待状の有効期限';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = '投稿できる文字数の上限を適度な数値に抑えることを、推奨します。';
@@ -159,8 +159,8 @@ $Definition['Last Active'] = '最終訪問';
 $Definition['Last Visit'] = '最終訪問';
 $Definition['Locale'] = 'ja-JP';
 $Definition['Locale Developer'] = 'ロケール デベロッパー';
-$Definition['Locale Developer Settings %s.'] = '現場開発者設定 %s.';
-$Definition['Locale info file settings.'] = '<p>zipファイルを作るとき、あなたは、下の現場のための情報を設定できます。 </p> <p>あなたは、<a href="%s">ここ</a>をクリックすることによって、現場パックのzipファイルをダウンロードできます。</p>';
+$Definition['Locale Developer Settings %s.'] = 'ロケール デベロッパー設定 %s。';
+$Definition['Locale info file settings.'] = '<p>zip ファイル作成時に含めるロケール情報を、下記で設定できます。 </p> <p><a href="%s">ここ</a>をクリックすると、ロケール パックの zip ファイルをダウンロードできます。</p>';
 $Definition['Locale Key (Folder)'] = 'ロケール キー (フォルダ名)';
 $Definition['Locale Name'] = 'ロケール名';
 $Definition['Locales'] = 'ロケール';
@@ -221,7 +221,7 @@ $Definition['Panel Box'] = 'パネル ボックス';
 $Definition['Password'] = 'パスワード';
 $Definition['Password Options'] = 'パスワード オプション';
 $Definition['Permanent (301)'] = 'Permanent (301)';
-$Definition['Please choose an authenticator to configure.'] = '構成する固有識別文字を選んでください。';
+$Definition['Please choose an authenticator to configure.'] = '設定するユーザー認証方式を選んでください。';
 $Definition['Plugin'] = 'プラグイン';
 $Definition['PluginHelp'] = 'プラグインは、あなたのサイトに拡張機能を追加します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
 $Definition['Plugins'] = 'プラグイン';
@@ -238,7 +238,7 @@ $Definition['Registration'] = '登録';
 $Definition['Remove'] = '削除';
 $Definition['Remove locale developer files.'] = 'ロケール デベロッパーのファイルを削除して、変更をリセットします。';
 $Definition['Requires: '] = '動作要件: ';
-$Definition['Reset Password'] = 'パスワードをリセット';
+$Definition['Reset Password'] = 'パスワードのリセット';
 $Definition['Reset password and send email notification to user'] = 'パスワードをリセットして、ユーザーに E メールで通知';
 $Definition['Reveal Password'] = 'パスワードを表示';
 $Definition['Role'] = '役割';
@@ -266,7 +266,7 @@ $Definition['Start your First Discussion'] = '最初のスレッドを立てる'
 
 $Definition['Target'] = '対象';
 $Definition['Temporary (302)'] = '一時的 (302)';
-$Definition['The %s Authenticator does not have any custom configuration options.'] = '認証方式 %s には設定オプションがありません。';
+$Definition['The %s Authenticator does not have any custom configuration options.'] = 'ユーザー認証方式 %s には設定オプションがありません。';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '致命的なエラーが発生したため、アドオンを有効にすることができませんでした: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴは、フォーラムの先頭に表示されます。';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'バナー タイトルは、すべてのページの左上に表示されます。バナー ロゴをアップロードすると、バナー タイトルは置き換えられます。';
@@ -296,7 +296,7 @@ $Definition['Vanilla.Archive.Description'] = '特定の日付より古いスレ�
 $Definition['Version'] = 'バージョン';
 $Definition['Version %s'] = 'バージョン %s';
 $Definition['version %s'] = 'バージョン %s';
-$Definition['View'] = 'ビュー';
+$Definition['View'] = '表示';
 $Definition['Visit Site'] = 'サイトへ移動';
 
 $Definition['Warning'] = '警告';
@@ -341,7 +341,7 @@ $Definition['Theming Overview'] = 'テーマの概要 (英語)';
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'テーマ作成のためのクイック スタート ガイド (英語)';
 $Definition['Allow users to dismiss this message'] = 'このメッセージを閉じることをユーザーに許可する';
 $Definition['Enable this message'] = 'このメッセージを有効化する';
-$Definition['Saved'] = '保存しました';
+$Definition['Saved'] = '変更を保存しました。';
 $Definition['Organize Categories'] = 'カテゴリ編成';
 $Definition['Category Page Layout'] = 'カテゴリのページ レイアウト';
 $Definition['View Page'] = 'ページを表示';
@@ -353,7 +353,6 @@ $Definition['Configure how nested categories are displayed to users.'] = 'ネス
 $Definition['Vanilla.Categories.MaxDisplayDepth'] = 'ネストされたカテゴリが次の条件に合致する場合は、カンマ区切りのリストとして表示されます: %1$s';
 $Definition['Display root categories as headings.'] = 'ルート カテゴリを見出しとして表示する。';
 $Definition['Do not display the categories in the side panel.'] = 'カテゴリ一覧をサイドパネルに表示しない。';
-$Definition['more than one level deep'] = 'カテゴリ一覧をサイドパネルに表示しない。';
 $Definition['Managing Categories'] = 'カテゴリの管理 (英語)';
 $Definition['Adding & Editing Categories'] = 'カテゴリの追加と編集 (英語)';
 $Definition['Homepage'] = 'ホームページ';
@@ -434,8 +433,46 @@ $Definition['Although the invitation was created successfully, the email failed 
 $Definition['ErrorBadInvitationCode'] = '招待コードが正しくありません。';
 $Definition['The reCAPTCHA value was not entered correctly. Please try again.'] = 'reCAPTCHA の値が正しくありません。再入力してください。';
 $Definition['The email you entered is in use by another member.'] = '入力された E メールは他のメンバーが使用済みです。';
+$Definition['Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'] = '注意してください！　これはアクティブなセッションには適用されない、特殊な役割です。そのため、権限のオプションは "表示" 権限のみに限定されています。';
+$Definition['You are now signed in.'] = '登録されました。'; // connect.php
+$Definition['Choose a name to identify yourself on the site.'] = 'このサイトで使用する あなたの名前を決めてください。'; // connect.php
+$Definition['Other'] = 'その他'; // connect.php
+$Definition['Leave blank unless connecting to an exising account.'] = '既存のアカウントに接続しない場合は、空白のままにしておいてください。'; // connect.php
+$Definition['You cannot remove an invitation that has been accepted.'] = '受信済みの招待状は削除できません。'; // class.invitationmodel.php
+$Definition['[%s] Invitation'] = '[%s] 招待状'; // class.invitationmodel.php
+$Definition['Reset my password'] = 'パスワードのリセット';
+$Definition['Enter your email address'] = 'あなたのメール アドレスを入力してください';
+$Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメール アドレス宛に送信しました。';
+$Definition['Save your password'] = 'パスワードを保存';
+$Definition['Could not instantiate mail function'] = 'メール機能をインスタンス化できません。';
+$Definition['Security Check'] = 'セキュリティ チェック';
+$Definition["Passwords don't match"] = 'パスワードが一致しません';
+$Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'あなたのメール アドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
+$Definition['%s (Current)'] = '%s (現在)';
 
-// Plugins - <Embed> Vanilla
+
+// Addons descriptions
+$Definition['An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.'] = '既存の個人メッセージ ツールの改良版です。Conversations は複数のユーザーだけで個人的な会話を楽しむことができます。'; // Conversations
+$Definition['Vanilla is the sweetest discussion forum on the web.'] = 'Vanilla は Web 上における最高のフォーラム アプリケーションです。'; // Vanilla
+$Definition['Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you\'ve created.'] = 'Embed Vanilla を使って、あなたの Vanilla フォーラムを他のアプリケーションに埋め込むことができます。WordPress や Drupal、そして あなたが作った専用のウェブサイトにも！'; // <Embed> Vanilla
+$Definition['<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.'] = 'Vanilla 2 用の <a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG プラグインです。'; // CLEditor jQuery WYSIWYG
+$Definition['The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.'] = 'Debugger プラグインはデータベース クエリ、そのベンチマーク、ページ処理ベンチマークをアプリケーションの各画面下部に表示します。'; // Debugger
+$Definition['Replaces emoticons in forum comments with images.'] = 'フォーラムのコメント中の絵文字を画像に置き換えて表示します。'; // Emotify :)
+$Definition['This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>'] = 'このプラグインは、Vanilla を Facebook に統合します。<b>このプラグインを使うには、Facebook にアプリケーションを登録する必要があります。</b>'; // Facebook 0.1a
+$Definition['This plugin allows users to report content that violates forum rules.'] = 'このプラグインは、フォーラムの規則に違反している投稿を、ユーザーが報告できるようにします。'; // Flagging 1.0.1
+$Definition['Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.'] = '独自のプロフィール画像とアイコンをアップロードしていないすべてのユーザーに、Gravatar アバターを代替表示します。'; // Gravatar 1.1
+$Definition['Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.'] = 'Vanilla のスレッド ページのサイドパネルに、そのスレッドの参加者リストを表示します。'; // In This Discussion 1
+$Definition['Allows users to mark all discussions as viewed.'] = '全スレッドを既読扱いにできます。'; // Mark All Viewed 1.1
+$Definition['Analyzes each page request for js & css files, merging and minifying them where applicable.'] = 'ページごとに js と css ファイルのリクエストを分析して、送信時にそれらを結合・最適化します。'; // Minify 1.0.1b
+$Definition['Allows a reply to be made to a specific comment, supporting nested comments.'] = '特定のコメントに対して返信できるようになります。ツリー構造もサポートします。'; // ReplyTo 0.1.8
+$Definition['Allow tagging of discussions.'] = 'スレッドにタグ付けを可能にします。'; // Tagging 1.0.1
+$Definition['Adds TinyMCE visual (WYSIWYG) editor to comment forms on discussion pages.'] = 'TinyMCE ビジュアル (WYSIWYG) エディタをスレッド ページの投稿フォームに追加します。'; // TinyMCE Visual Editor 0.1
+$Definition['Collects undefined translation codes and save it for translating.'] = '翻訳作業のために、未定義の翻訳コードを収集・保存します。'; // Translation collector 1.5.8
+$Definition['This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>'] = 'このプラグインは、Vanilla を Twitter に統合します。<b>このプラグインを使うには、Twitter にアプリケーションを登録する必要があります。</b>'; // Twitter 0.1a
+$Definition['Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).'] = 'あなたのフォーラムのアクティビティ (新規ユーザー、スレッド、コメント、ページビュー) に関する情報を時系列でグラフ化します。'; // Vanilla Statistics 2.0.17
+$Definition['This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.'] = 'これはロケール パックのスケルトンです。あなたが独自のロケール パックを作成したければ、このフォルダをコピーして、あなたのロケール フォルダにリネームしてください。'; // Skeleton Locale 2.0.1
+
+// Plugins - <Embed> Vanilla 1.0.1
 $Definition['&lt;Embed&gt; Vanilla'] = '&lt;Embed&gt; Vanilla';
 $Definition['To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'] = 'あなたの Vanilla コミュニティ フォーラムをリモート Web アプリケーションに埋め込むには、以下のフォーラム埋め込み用コードまたは いずれかのフォーラム埋め込み用プラグインを使ってください。';
 $Definition['WordPress Plugin'] = 'WordPress プラグイン';
@@ -443,7 +480,7 @@ $Definition['Blogger Gadget'] = 'Blogger ガジェット';
 $Definition['Make sure to use a forum theme that meshes well with the look and feel of the remote site.'] = 'フォーラムのテーマがリモート サイトのデザインと調和しているかどうか、確認してください。';
 $Definition['Click here to apply it.'] = '適用するには、ここをクリックしてください。';
 $Definition['Click here to get it.'] = '入手するには、ここをクリックしてください。';
-$Definition['The "Remote Url" is the web address of the place where your embedded forum should be viewed from.'] = '';
+$Definition['The "Remote Url" is the web address of the place where your embedded forum should be viewed from.'] = '"リモート URL" は、埋め込まれたフォーラムが表示される場所を指すウェブ アドレスです。';
 $Definition['Dashboard Embed'] = 'ダッシュボードの埋め込み';
 $Definition["Don't embed your forum admin dashboard (pop it out to full-screen)"] = 'フォーラムの管理用ダッシュボードを埋め込まない (全画面でポップアップさせます)';
 $Definition['Remote Url'] = 'リモート URL';
@@ -452,6 +489,17 @@ $Definition['Remote Url to Forum'] = 'フォーラムへのリモート URL';
 $Definition['Save Changes'] = '変更を保存';
 $Definition['You can embed your Vanilla Forum into Blogger with this Google Gadget. When in design mode in Blogger, click to "Add a Gadget", and when prompted to search for one, select "Add your own".'] = 'この Google ガジェットで、あなたの Vanilla フォーラムを Blogger に埋め込むことができます。Blogger のデザイン モードで "ガジェットを追加" をクリックし、検索用ポップアップ画面が表示されたら "独自に追加" をクリックしてください。';
 $Definition['Finally, enter this gadget url and click "Add by Url":'] = '後は、このガジェット URL を入力して "追加" をクリックするだけです:';
+
+// Plugins - ReplyTo 0.1.8
+$Definition['Reply to'] = '返信先';
+$Definition['Reply to @%s: '] = '@%s さんへの返信: '; // 将来のバージョンで、上の翻訳コードと入れ替えの予定
+$Definition['Reply'] = '返信';
+$Definition['In Reply To'] = '親投稿'; // 親投稿が前のページにある場合のみ表示
+$Definition['Reply To'] = 'Reply To';	// 設定画面の見出し
+$Definition['Options to apply to the ReplyTo plugin.'] = 'ReplyTo プラグインに適用されるオプション設定です。';
+$Definition['Option'] = 'オプション';
+$Definition['Mention'] = '@リプライ';
+$Definition['Mention of the user being replied to in new replies.'] = '新規返信時に、返信先ユーザーへの@リプライを自動挿入する。';
 
 // Theme - EmbedFriendly
 $Definition['This theme allows you to hide the side panel next to your forum and conversations. This is super handy if the website you are embedding in does not have a lot of width to squeeze into.'] = 'このテーマはあなたのフォーラムと会話からサイドパネルを隠すことができます。もしあなたがフォーラムを埋め込んだウェブサイトがあまり横幅を広く取れないデザインだった場合は、これが役に立つことでしょう。';

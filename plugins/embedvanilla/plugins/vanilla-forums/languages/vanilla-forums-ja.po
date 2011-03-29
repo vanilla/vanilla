@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Vanilla Forums 1.0.5\n"
-"PO-Revision-Date: 2011-03-20 19:35+0900\n"
+"PO-Revision-Date: 2011-03-30 03:24+0900\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Language-Team: \n"
 
 msgid "Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets."
-msgstr "Vanilla フォーラムを WordPress に緊密に統合します。フォーラム全体を、WordPress のページに埋め込むことができます。またスレッド、カテゴリ、活動履歴ウィジェットも提供します。"
+msgstr "Vanilla フォーラムを WordPress に緊密に統合します。フォーラム全体を、WordPress のページに埋め込むことができます。またスレッド、カテゴリ、アクティビティ ウィジェットも提供します。"
 
 msgid "Vanilla Forum"
 msgstr "Vanilla フォーラム"
@@ -95,10 +95,10 @@ msgid "allows you to display recent discussions in your Vanilla Forum in your Wo
 msgstr "WordPress サイトの中に、Vanilla フォーラムの最新スレッドを表示します。表示するスレッドの数を設定したり、特定のカテゴリに限定することもできます。"
 
 msgid "Vanilla Activity Widget"
-msgstr "Vanilla 活動履歴ウィジェット"
+msgstr "Vanilla アクティビティ ウィジェット"
 
 msgid "allows you to display recent activity in your forum (user registrations, status updates, etc). You define how many activities to show, and you can even filter to activities from users in specific roles (administrator activity, for example)."
-msgstr "あなたのフォーラムの最新活動履歴 (ユーザ登録、ステータスの更新等々) を表示します。表示する活動履歴の数を設定したり、特定の役割のユーザに限定することもできます (たとえば管理者の活動履歴だけとか)。"
+msgstr "あなたのフォーラムの最近のアクティビティ (ユーザ登録、ステータスの更新等々) を表示します。表示するアクティビティの数を設定したり、特定の役割のユーザに限定することもできます (たとえば管理者のアクティビティだけとか)。"
 
 msgid "Vanilla Recently Active Users Widget"
 msgstr "Vanilla 最新アクティブ ユーザ ウィジェット"
@@ -128,16 +128,16 @@ msgid "Number of Discussions to show:"
 msgstr "表示スレッド数:"
 
 msgid "Vanilla Activity"
-msgstr "Vanilla 活動履歴"
+msgstr "Vanilla アクティビティ"
 
 msgid "Recent activity happening on your Vanilla Forum (eg. new users, status updates, etc)."
-msgstr "あなたの Vanilla フォーラムで起きた最新の活動を表示 (例. ユーザ登録、ステータスの更新等)"
+msgstr "あなたの Vanilla フォーラムで起きた最近のアクティビティを表示 (例. ユーザ登録、ステータスの更新等)"
 
 msgid "Recent Forum Activity"
-msgstr "最新フォーラム活動履歴"
+msgstr "最新フォーラム アクティビティ"
 
 msgid "Number of activities to show:"
-msgstr "表示活動履歴数:"
+msgstr "アクティビティ表示数:"
 
 msgid "Vanilla Users"
 msgstr "Vanilla ユーザ"

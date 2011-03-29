@@ -29,7 +29,7 @@ $Definition['%s year'] = '%s 年';
 
 $Definition['About'] = 'ユーザー情報';
 $Definition['Accepted'] = '承認済み';
-$Definition['Activity'] = '活動履歴';
+$Definition['Activity'] = 'アクティビティ'; // translation follows facebook. See http://www.facebook.com/help/?faq=15699&hloc=ja_JP
 $Definition['Activity.AboutUpdate.FullHeadline'] = '%1$s が %6$s のプロファイルを更新しました。';
 $Definition['Activity.AboutUpdate.ProfileHeadline'] = '%1$s が %6$s のプロファイルを更新しました。';
 $Definition['Activity.ActivityComment.FullHeadline'] = '%1$s が%4$sの%8$sにレスしました。';
@@ -65,8 +65,8 @@ $Definition['Activity.RoleChange.FullHeadline'] = '%1$s が%4$sの権限を変�
 $Definition['Activity.RoleChange.ProfileHeadline'] = '%1$s が%4$sの権限を変更しました。';
 $Definition['Activity.SignIn.FullHeadline'] = '%1$s がログインしました。';
 $Definition['Activity.SignIn.ProfileHeadline'] = '%1$s がログインしました。';
-$Definition['Activity.WallComment.FullHeadline'] = '%1$s が%4$sの%5$sに書きました。';
-$Definition['Activity.WallComment.ProfileHeadline'] = '%1$s が書きました。';
+$Definition['Activity.WallComment.FullHeadline'] = '%1$s が%4$sの%5$sにコメントしました。';
+$Definition['Activity.WallComment.ProfileHeadline'] = '%1$s がコメントしました。';
 $Definition['Add'] = '投稿';
 $Definition['Add Comment'] = 'コメントする';
 $Definition['Add Info &amp; Create Account'] = '情報追加とアカウント作成';
@@ -279,7 +279,7 @@ $Definition['Powered by Vanilla'] = 'Powered by Vanilla';
 $Definition['Preview'] = 'プレビュー';
 $Definition['Profile Picture'] = 'プロフィール画像';
 
-$Definition['Recent Activity'] = '最近の活動履歴';
+$Definition['Recent Activity'] = '最近のアクティビティ'; // translation follows facebook. See http://www.facebook.com/help/?faq=15699&hloc=ja_JP
 $Definition['Recipients'] = '宛先';
 $Definition['Redirecting...'] = 'リダイレクト中…';
 $Definition['Remember me on this computer'] = 'このコンピュータに自分を覚えさせます';
@@ -406,3 +406,5 @@ $Definition["You've filled our honeypot! We use honeypots to help prevent spam. 
 $Definition['You must specify at least one tag.'] = '少なくとも 1 個はタグを指定してください。'; // class.tagging.plugin.php
 $Definition['ValidateTag'] = 'タグにスペースを含むことはできません。'; // class.tagging.plugin.php
 $Definition['You can only specify up to %s tags.'] = '指定できるタグは %s 個までです。'; // class.tagging.plugin.php
+$Definition['You have entered an invalid discussion title'] = 'スレッド タイトルが不正です。'; // class.postcontroller.php
+$Definition['You do not have any drafts.'] = '下書きはありません。'; // applications/vanilla/views/drafts/index.php

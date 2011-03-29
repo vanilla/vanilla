@@ -270,6 +270,7 @@ if (!function_exists('UserAnchor')) {
  */
 if (!function_exists('UserBuilder')) {
    function UserBuilder($Object, $UserPrefix = '') {
+		$Object = (object)$Object;
       $User = new stdClass();
       $UserID = $UserPrefix.'UserID';
       $Name = $UserPrefix.'Name';
@@ -286,6 +287,7 @@ if (!function_exists('UserBuilder')) {
  */
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Options = array()) {
+		$User = (object)$User;
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
       

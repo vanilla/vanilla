@@ -252,7 +252,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>sql</b>: A Gdn_SQLDriver with the child query.
     *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_INNER.
     */
-   public static function Join($Data, $Columns, $Options = array()) {
+   public static function Join(&$Data, $Columns, $Options = array()) {
       $Options = array_change_key_case($Options);
       
       $Sql = Gdn::SQL(); //GetValue('sql', $Options, Gdn::SQL());
@@ -279,7 +279,7 @@ class Gdn_DataSet implements IteratorAggregate {
             if ($ColumnAlias)
                $ResultColumns[] = $ColumnAlias;
             else
-               $ResultColumns = $Column;
+               $ResultColumns[] = $Column;
          } else {
             switch (strtolower($Index)) {
                case 'alias':
@@ -298,7 +298,8 @@ class Gdn_DataSet implements IteratorAggregate {
                   $ColumnPrefix = $Name;
                   break;
                case 'table':
-                  $Sql->From("$Table $TableAlias"); 
+                  $Table = $Name;
+                  break;
                case 'type':
                   // The type shouldn't be here, but handle it.
                   $Options['Type'] = $Name;
@@ -315,7 +316,6 @@ class Gdn_DataSet implements IteratorAggregate {
          else
             $TableAlias = 'c';
       }
-      
       
       if (!isset($ParentColumn)) {
          if (isset($ChildColumn))

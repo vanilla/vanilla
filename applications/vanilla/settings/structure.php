@@ -29,7 +29,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('CountComments', 'int', '0')
    ->Column('DateMarkedRead', 'datetime', NULL)
    ->Column('AllowDiscussions', 'tinyint', '1')
-   ->Column('Archive', 'tinyint(1)', '0')
+   ->Column('Archived', 'tinyint(1)', '0')
    ->Column('Name', 'varchar(255)')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
@@ -75,6 +75,7 @@ $CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 
 $Construct
    ->PrimaryKey('DiscussionID')
+   ->Column('Type', 'varchar(10)', NULL, 'index')
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')

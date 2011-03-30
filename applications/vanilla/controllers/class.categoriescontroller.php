@@ -172,7 +172,7 @@ class CategoriesController extends VanillaController {
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('BookmarkedModule');
-      
+
       $this->Render();
 	}
 

@@ -77,7 +77,7 @@ class ProfileController extends Gdn_Controller {
             '',
             '/profile/'.$this->ProfileUrl(),
             $SendNotification);
-         
+
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('dashboard/profile/'.$this->ProfileUrl());
          } else {

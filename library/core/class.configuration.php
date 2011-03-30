@@ -455,17 +455,17 @@ class Gdn_Configuration {
       if (!is_writable($File))
          throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."),$File));
 
-      if($Group == '')
+      if ($Group == '')
          $Group = $this->CurrentGroup;
 
-      if($Group == '')
+      if ($Group == '')
          $Group = 'Configuration';
          
       $Data = &$this->_SaveData;
       $this->_Sort($Data);
       
       // Check for the case when the configuration is the group.
-      if(is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
+      if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
          $Data = $Data[$Group];
       }
 

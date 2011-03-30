@@ -75,7 +75,7 @@ class Gdn_Session {
     * @var object
     */
    protected $_TransientKey;
-   
+
 
    /**
     * Private constructor prevents direct instantiation of object
@@ -109,9 +109,13 @@ class Gdn_Session {
          elseif ($this->User->Banned)
             return FALSE;
       }
-      
-      $Permissions = $this->GetPermissions();      
-      if($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+
+      // Allow wildcard permission checks (e.g. 'any' Category)
+      if ($JunctionID == 'any')
+         $JunctionID = '';
+
+      $Permissions = $this->GetPermissions();
+      if ($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
@@ -125,15 +129,16 @@ class Gdn_Session {
             }
             return TRUE;
          } else {
-            if ($JunctionID > 0) {
-               return array_key_exists($Permission, $Permissions)
+            if ($JunctionID !== '') {
+               $Result = array_key_exists($Permission, $Permissions)
                   && is_array($Permissions[$Permission])
                   && in_array($JunctionID, $Permissions[$Permission]);
             } else {
-               return array_key_exists($Permission, $Permissions)
+               $Result = array_key_exists($Permission, $Permissions)
                   && is_array($Permissions[$Permission])
                   && count($Permissions[$Permission]);
             }
+            return $Result;
          }
       } else {
          // Non-junction permission ($Permissions = array(PermissionNames))
@@ -163,16 +168,16 @@ class Gdn_Session {
    public function GetPermissions() {
       return is_array($this->_Permissions) ? $this->_Permissions : array();
    }
-   
+
 	/**
-    * 
-    * 
+    *
+    *
 	* @todo Add description.
 	* @param string|array $PermissionName
 	* @param mixed $Value
 	* @return NULL
 	*/
-	
+
 	public function SetPermission($PermissionName, $Value = NULL) {
 		if (is_string($PermissionName)) {
 			if ($Value === NULL) $this->_Permissions[] = $PermissionName;
@@ -260,30 +265,30 @@ class Gdn_Session {
 
       // Now retrieve user information
       if ($this->UserID > 0) {
-      
+
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
             if ($UserID && $SetIdentity)
                Gdn::Authenticator()->SetIdentity($UserID);
-         
+
             if (Gdn::Authenticator()->ReturningUser($this->User)) {
                $HourOffset = GetValue('HourOffset', $this->User->Attributes);
                $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
-            
+
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
-         
+
             $this->_Permissions = Gdn_Format::Unserialize($this->User->Permissions);
             $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
             $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
             $this->_TransientKey = is_array($this->_Attributes) ? ArrayValue('TransientKey', $this->_Attributes) : FALSE;
-               
+
             if ($this->_TransientKey === FALSE)
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
-               
+
             // If the user hasn't been active in the session-time, update their date last active
             $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
             if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
@@ -334,7 +339,7 @@ class Gdn_Session {
       foreach($Name as $Key => $Val) {
          $this->_Preferences[$Key] = $Val;
       }
-      
+
       if ($SaveToDatabase && $this->UserID > 0) {
          $UserModel = Gdn::UserModel();
          $UserModel->SavePreference($this->UserID, $Name);
@@ -351,7 +356,7 @@ class Gdn_Session {
       if (!is_null($NewKey)) {
          $this->_TransientKey = Gdn::Authenticator()->GetUserModel()->SetTransientKey($this->UserID, $NewKey);
       }
-      
+
       if ($this->_TransientKey !== FALSE)
          return $this->_TransientKey;
       else

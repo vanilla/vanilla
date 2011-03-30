@@ -680,10 +680,17 @@ class Gdn_Form extends Gdn_Pluggable {
          }
       } elseif (is_array($DataSet)) {
          foreach($DataSet as $ID => $Text) {
+            if (is_array($Text)) {
+               $Attribs = $Text;
+               $Text = GetValue('Text', $Attribs, '');
+               unset($Attribs['Text']);
+            } else {
+               $Attribs = array();
+            }
             $Return .= '<option value="' . $ID . '"';
             if (in_array($ID, $Value) && $HasValue) $Return .= ' selected="selected"';
 
-            $Return .= '>' . $Text . "</option>\n";
+            $Return .= Attribute($Attribs).'>' . $Text . "</option>\n";
          }
       }
       $Return .= '</select>';

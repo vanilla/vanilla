@@ -109,6 +109,9 @@ p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
 }
+.P {
+   margin: 0.5em 0;
+}
 h1, h2 {
    font-size:140%;
    font-weight:bold;
@@ -196,7 +199,8 @@ a.Button,
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;
 	white-space: nowrap;
-   }
+}
+
 input.Button {
 	font-size: 14px;
    font-weight: bold;
@@ -344,6 +348,19 @@ div.MorePager a.Loading {
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
 	margin-right: 6px;
+}
+/* Small UserPhoto() images */
+a.Small:hover {
+	text-decoration: none;
+}
+a.Small img {
+	background: none;
+	text-indent: -100px;
+	background: #ddd;
+	display: inline-block;
+	height: 24px;
+	width: 24px;
+	overflow: hidden;
 }
 
 
@@ -793,6 +810,7 @@ div.Box dl dt {
    float: left;
    width: 80px;
    color: #555;
+	overflow: hidden;
 }
 div.Box dl dd {
 	font-size: 12px;
@@ -859,6 +877,16 @@ ul.PanelInfo li strong {
 }
 ul.PanelInfo li a {
    float: left;
+}
+div.Moderators ul.PanelInfo li {
+	text-align: left;
+}
+div.Moderators ul.PanelInfo li a {
+   float: none;
+	font-weight: bold;
+}
+div.Moderators ul.PanelInfo li a img {
+	vertical-align: middle;
 }
 ul.PanelInfo div.Meta {
    font-size: 11px;
@@ -1135,6 +1163,12 @@ ul.DataList .Unfollow {
 ul.DataList .Unfollow a {
    color: #888;
 }
+
+.Item .Inset {
+   border-top: 1px solid #bec8cc;
+   padding: 5px 0;
+}
+
 ul.Condensed li,
 li.Condensed {
 	clear: left;
@@ -2041,6 +2075,14 @@ ul.DataList div.Meta a.Category {
 }
 ul.DataList li.Mine div.Meta a.Category {
    background: #eff7ff;
+}
+
+.Tag {
+   background: #777777;
+   border-radius: 2px;
+   color: #FFFFFF;
+   font-weight: bold;
+   padding: 1px 4px;
 }
 
 ul.DataList div.Meta span.Announcement {

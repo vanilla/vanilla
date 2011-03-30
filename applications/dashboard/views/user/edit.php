@@ -61,4 +61,6 @@ echo $this->Form->Errors();
       </div>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php
+$this->FireEvent('AfterFormInputs');
+echo $this->Form->Close('Save');

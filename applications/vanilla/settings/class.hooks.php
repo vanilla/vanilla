@@ -142,8 +142,8 @@ class VanillaHooks implements Gdn_IPlugin {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
          // Add the discussion tab
-         $Sender->AddProfileTab(T('Discussions').CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"), 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Discussions');
-         $Sender->AddProfileTab(T('Comments').CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"), 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Comments');
+         $Sender->AddProfileTab('Discussions', 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Discussions', T('Discussions').CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"));
+         $Sender->AddProfileTab('Comments', 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Comments', T('Comments').CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"));
          // Add the discussion tab's CSS and Javascript.
          $Sender->AddJsFile('jquery.gardenmorepager.js');
          $Sender->AddJsFile('discussions.js');

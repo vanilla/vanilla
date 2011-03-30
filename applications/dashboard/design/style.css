@@ -109,6 +109,9 @@ p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
 }
+.P {
+   margin: 0.5em 0;
+}
 h1, h2 {
    font-size:140%;
    font-weight:bold;
@@ -196,7 +199,8 @@ a.Button,
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;
 	white-space: nowrap;
-   }
+}
+
 input.Button {
 	font-size: 14px;
    font-weight: bold;
@@ -1135,6 +1139,12 @@ ul.DataList .Unfollow {
 ul.DataList .Unfollow a {
    color: #888;
 }
+
+.Item .Inset {
+   border-top: 1px solid #bec8cc;
+   padding: 5px 0;
+}
+
 ul.Condensed li,
 li.Condensed {
 	clear: left;
@@ -2041,6 +2051,14 @@ ul.DataList div.Meta a.Category {
 }
 ul.DataList li.Mine div.Meta a.Category {
    background: #eff7ff;
+}
+
+.Tag {
+   background: #777777;
+   border-radius: 2px;
+   color: #FFFFFF;
+   font-weight: bold;
+   padding: 1px 4px;
 }
 
 ul.DataList div.Meta span.Announcement {

@@ -83,8 +83,10 @@ class PostController extends VanillaController {
                $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
                $CategoryName = str_replace(' ', '&#160;', $CategoryName);
             }
-               
             $aCategoryData[$Category->CategoryID] = $CategoryName;
+            $this->EventArguments['aCategoryData'] = &$aCategoryData;
+				$this->EventArguments['Category'] = &$Category;
+				$this->FireEvent('AfterCategoryItem');
          }
          $this->CategoryData = $aCategoryData;
       }

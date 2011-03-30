@@ -349,6 +349,19 @@ div.MorePager a.Loading {
 .NumberedPager span.Previous {
 	margin-right: 6px;
 }
+/* Small UserPhoto() images */
+a.Small:hover {
+	text-decoration: none;
+}
+a.Small img {
+	background: none;
+	text-indent: -100px;
+	background: #ddd;
+	display: inline-block;
+	height: 24px;
+	width: 24px;
+	overflow: hidden;
+}
 
 
 /* =================================================================== Header */
@@ -797,6 +810,7 @@ div.Box dl dt {
    float: left;
    width: 80px;
    color: #555;
+	overflow: hidden;
 }
 div.Box dl dd {
 	font-size: 12px;
@@ -863,6 +877,16 @@ ul.PanelInfo li strong {
 }
 ul.PanelInfo li a {
    float: left;
+}
+div.Moderators ul.PanelInfo li {
+	text-align: left;
+}
+div.Moderators ul.PanelInfo li a {
+   float: none;
+	font-weight: bold;
+}
+div.Moderators ul.PanelInfo li a img {
+	vertical-align: middle;
 }
 ul.PanelInfo div.Meta {
    font-size: 11px;

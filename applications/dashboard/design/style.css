@@ -2900,9 +2900,8 @@ div.InformMessages {
 }
 * html div.InformMessages {
   position: absolute;
-  width: 100%;/*IE5.5*/
   top: auto;
-  left: 20px;
+  margin-left: 20px;
   overflow: visible; 
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }

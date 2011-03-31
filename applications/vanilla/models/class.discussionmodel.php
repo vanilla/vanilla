@@ -59,6 +59,7 @@ class DiscussionModel extends VanillaModel {
       
       // Buid main query
       $this->SQL
+         ->Select('d.Type')
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
 			->Select('d.CountBookmarks')
@@ -143,13 +144,13 @@ class DiscussionModel extends VanillaModel {
 		
 		$this->AddArchiveWhere($this->SQL);
       
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
-      
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet');
+
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
       
 		// Get sorting options from config
 		$SortField = $this->EventArguments['SortField'];

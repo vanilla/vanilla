@@ -13,20 +13,21 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
       
-      echo '<p>';
+      echo '<div class="P">';
       echo $this->Form->Label('Discussion Title', 'Name');
       echo $this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput'));
+      echo '</div>';
+
       if ($this->ShowCategorySelector === TRUE) {
-         echo '<p><div class="Category">';
+         echo '<div class="P"><div class="Category">';
          echo $this->Form->Label('Category', 'CategoryID'), ' ';
          echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
-         echo '</div></p>';
+         echo '</div></div>';
       }
-      echo '</p>';
       
       $this->FireEvent('BeforeBodyInput');
       
-      echo '<p>', $this->Form->TextBox('Body', array('MultiLine' => TRUE)), '</p>';
+      echo '<div class="P">', $this->Form->TextBox('Body', array('MultiLine' => TRUE)), '</div>';
 
 //      echo "<div class=\"PostFormControlPanel\">\n";
       $Options = '';

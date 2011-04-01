@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Title(T('Start a New Discussion'));
 $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
 if (C('Vanilla.Categories.Use') && is_object($this->Category))
@@ -7,7 +6,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
 ?>
 <div id="DiscussionForm">
-   <h1><?php echo T(property_exists($this, 'Discussion') ? 'Edit Discussion' : 'Start a New Discussion'); ?></h1>
+   <h1><?php echo $this->Data('Title'); ?></h1>
    <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();

@@ -63,28 +63,32 @@ class NotificationsController extends Gdn_Controller {
 				$Preferences[] = $Preference;
 		}
 		
-		$User = Gdn::Database()->SQL()->Select('Preferences')->From('User')->Where('UserID', $Session->UserID)->Get()->FirstRow();
-      if ($User) {
-         $PrefData = Gdn_Format::Unserialize($User->Preferences);
-			foreach ($PrefData as $Pref => $Val) {
-				if (substr($Pref, 0, 6) == 'Popup.') {
-					$Pref = substr($Pref, 6);
-					if ($Val) {
-						$Preferences[] = $Pref;
-					} else {
-						if (in_array($Pref, $Preferences))
-							unset($Preferences[array_search($Pref, $Preferences)]);
-					}
-				}
-			}
-		}
+//		$User = Gdn::Database()->SQL()->Select('Preferences')->From('User')->Where('UserID', $Session->UserID)->Get()->FirstRow();
+//      if ($User) {
+//         $PrefData = Gdn_Format::Unserialize($User->Preferences);
+//			foreach ($PrefData as $Pref => $Val) {
+//				if (substr($Pref, 0, 6) == 'Popup.') {
+//					$Pref = substr($Pref, 6);
+//					if ($Val) {
+//						$Preferences[] = $Pref;
+//					} else {
+//						if (in_array($Pref, $Preferences))
+//							unset($Preferences[array_search($Pref, $Preferences)]);
+//					}
+//				}
+//			}
+//		}
 		
-		if (count($Preferences) > 0) {
-			// Grab the activity type ids for the desired notification prefs
+//		if (count($Preferences) > 0) {
+			// Grab the activity type ids for the desired notification prefs.
 			$ActivityTypeIDs = array();
-			$Data = Gdn::Database()->SQL()->Select('ActivityTypeID')->From('ActivityType')->WhereIn('Name', $Preferences)->Get();
-			foreach ($Data->Result() as $ActivityType) {
-				$ActivityTypeIDs[] = $ActivityType->ActivityTypeID;
+//         $ActivityTypes = array();
+			$Data = Gdn::Database()->SQL()->GetWhere('ActivityType', array('Notify' => TRUE))->ResultArray(); //  ->WhereIn('Name', $Preferences)->Get();
+			foreach ($Data as $ActivityType) {
+            if (Gdn::Session()->GetPreference("Popup.{$ActivityType['Name']}", C("Preferences.Popup.{$ActivityType['Name']}", TRUE))) {
+               $ActivityTypeIDs[] = $ActivityType['ActivityTypeID'];
+//               $ActivityTypes[] = $ActivityType['Name'];
+            }
 			}
 			
 			if (count($ActivityTypeIDs) > 0) {
@@ -96,29 +100,31 @@ class NotificationsController extends Gdn_Controller {
 				// Add (no more than 5) notifications to the inform stack
 				foreach ($NotificationData->Result() as $Notification) {
 					// Make sure the user wants to be notified of this
-					if (in_array($Notification->ActivityType, $Preferences)) {
-						$UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
-						
-						$ActivityType = explode(' ', $Notification->ActivityType);
-						$ActivityType = $ActivityType[0];
-						$Excerpt = $Notification->Story;
-						if (in_array($ActivityType, array('WallComment', 'AboutUpdate')))
-							$Excerpt = Gdn_Format::Display($Excerpt);
-							
-						// Inform the user of new messages
-						$Sender->InformMessage(
-							$UserPhoto
-							.Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
-							.Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
-							'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
-						);
-						// Assign the most recent activity id
-						if ($InformLastActivityID == -1)
-							$InformLastActivityID = $Notification->ActivityID;
-					}
+   //					if (!in_array($Notification->ActivityType, $Preferences)) {
+   //                  continue;
+   //               }
+               
+               $UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
+
+               $ActivityType = explode(' ', $Notification->ActivityType);
+               $ActivityType = $ActivityType[0];
+               $Excerpt = $Notification->Story;
+               if (in_array($ActivityType, array('WallComment', 'AboutUpdate')))
+                  $Excerpt = Gdn_Format::Display($Excerpt);
+
+               // Inform the user of new messages
+               $Sender->InformMessage(
+                  $UserPhoto
+                  .Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
+                  .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
+                  'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
+               );
+               // Assign the most recent activity id
+               if ($InformLastActivityID == -1)
+                  $InformLastActivityID = $Notification->ActivityID;
 				}
 			}
-		}
+//		}
 		if ($InformLastActivityID > 0)
 			Gdn::UserModel()->SaveAttribute($Session->UserID, 'Notifications.InformLastActivityID', $InformLastActivityID);
    }

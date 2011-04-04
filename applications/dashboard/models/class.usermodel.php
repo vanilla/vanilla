@@ -398,6 +398,10 @@ class UserModel extends Gdn_Model {
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
 
+      // Check for spam.
+      if ($Valid)
+         $Valid = SpamModel::IsSpam('User', $FormPostValues);
+
       // Throw an event to allow plugins to block the registration.
       $this->EventArguments['User'] = $FormPostValues;
       
@@ -405,7 +409,7 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('BeforeRegister');
 
       if (!$Valid)
-         return FALSE; // plugin blocked registration.
+         return FALSE; // plugin blocked registration
 
       switch (strtolower(C('Garden.Registration.Method'))) {
          case 'captcha':

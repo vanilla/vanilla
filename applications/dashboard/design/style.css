@@ -251,10 +251,11 @@ div.Deleted {
 span.Alert {
    background: #d00;
    color: #fff;
-   padding: 3px 6px;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   padding: 1px 4px;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 span.Alert a {
    color: #fff;
@@ -2899,9 +2900,8 @@ div.InformMessages {
 }
 * html div.InformMessages {
   position: absolute;
-  width: 100%;/*IE5.5*/
   top: auto;
-  left: 20px;
+  margin-left: 20px;
   overflow: visible; 
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }

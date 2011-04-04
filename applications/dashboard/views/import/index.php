@@ -57,7 +57,7 @@ echo $this->Form->Errors();
          echo '</div>';
 
          if($OriginalFilename) {
-				echo ' ', T('Current File: '.htmlspecialchars($OriginalFilename));
+				echo ' ', T('Current File:').' '.htmlspecialchars($OriginalFilename);
 			}
 		?>
 	</li>

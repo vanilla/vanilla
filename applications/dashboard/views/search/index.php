@@ -1,10 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Tabs SearchTabs"><?php
-	$Form = Gdn::Factory('Form');
+	$Form = $this->Form;
 	$Form->InputPrefix = '';
 	echo  $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
 		$Form->TextBox('Search'),
 		$Form->Button('Search', array('Name' => '')),
+      $Form->Errors(),
 		$Form->Close();
 	
 	if ($this->SearchResults) {

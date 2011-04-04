@@ -27,32 +27,95 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
    /* With regard to... */
 
-   public function Comment($CommentID, $Verify = TRUE) {
-      return $this->Regarding('Comment', $CommentID, $Verify);
+   /**
+    * Start a RegardingEntity for a comment
+    *
+    * Able to autoparent to its discussion owner if verfied.
+    *
+    * @param $CommentID int ID of the comment
+    * @param $Verify optional boolean whether or not to verify this. default true.
+    * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
+    * @return Gdn_RegardingEntity
+    */
+   public function Comment($CommentID, $Verify = TRUE, $AutoParent = TRUE) {
+      $Regarding = $this->Regarding('Comment', $CommentID, $Verify);
+      if ($Verify && $AutoParent) $Regarding->AutoParent('discussion');
+      return $Regarding;
    }
 
+   /**
+    * Start a RegardingEntity for a discussion
+    *
+    * @param $DiscussionID int ID of the discussion
+    * @param $Verify optional boolean whether or not to verify this. default true.
+    * @return Gdn_RegardingEntity
+    */
    public function Discussion($DiscussionID, $Verify = TRUE) {
       return $this->Regarding('Discussion', $DiscussionID, $Verify);
    }
 
-   public function Regarding($ThingType, $ThingID, $Verify = TRUE) {
+   /**
+    * Start a RegardingEntity for a conversation message
+    *
+    * Able to autoparent to its conversation owner if verfied.
+    *
+    * @param $MessageID int ID of the conversation message
+    * @param $Verify optional boolean whether or not to verify this. default true.
+    * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
+    * @return Gdn_RegardingEntity
+    */
+   public function Message($MessageID, $Verify = TRUE, $AutoParent = TRUE) {
+      $Regarding = $this->Regarding('ConversationMessage', $MessageID, $Verify);
+      if ($Verify && $AutoParent) $Regarding->AutoParent('conversation');
+      return $Regarding;
+   }
+
+   /**
+    * Start a RegardingEntity for a conversation
+    *
+    * @param $ConversationID int ID of the conversation
+    * @param $Verify optional boolean whether or not to verify this. default true.
+    * @return Gdn_RegardingEntity
+    */
+   public function Conversation($ConversationID, $Verify = TRUE) {
+      return $this->Regarding('Conversation', $ConversationID, $Verify);
+   }
+
+   protected function Regarding($ThingType, $ThingID, $Verify = TRUE) {
       $Verified = FALSE;
       if ($Verify) {
          $ModelName = ucfirst($ThingType).'Model';
+
+         if (!class_exists($ModelName))
+            throw new Exception(sprintf(T("Could not find a model for %s objects."), ucfirst($ThingType)));
+
+         // If we can lookup this object, it is verified
          $VerifyModel = new $ModelName;
-         $Verified = TRUE; // fake it for now
+         $SourceElement = $VerifyModel->GetID($ThingID);
+         if ($SourceElement !== FALSE)
+            $Verified = TRUE;
+
       } else {
          $Verified = NULL;
       }
 
-      if ($Verified || is_null($Verified))
-         return new Gdn_RegardingEntity($ThingType, $ThingID);
+      if ($Verified !== FALSE) {
+         $Regarding = new Gdn_RegardingEntity($ThingType, $ThingID);
+         if ($Verify)
+            $Regarding->VerifiedAs($SourceElement);
+
+         return $Regarding;
+      }
 
       throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $ModelName, $ThingID));
    }
 
+   // Transparent forwarder to built-in starter methods
    public function That() {
-      return call_user_func_array(array($this,'Regarding'), func_get_args());
+      $Args = func_get_args();
+      $ThingType = array_shift($Args);
+
+      return call_user_func_array(array($this, $ThingType), $Args);
    }
 
    /*
@@ -133,12 +196,15 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
       $this->RegardingCache = array();
    }
 
-   public function DiscusssionController_BeforeCommentBody_Handler($Sender) {
+   public function DiscussionController_BeforeCommentBody_Handler($Sender) {
+      echo "beforecommentbody\n";
       $Context = strtolower($Sender->EventArguments['Type']);
       if ($Context != 'discussion') return;
+      echo "post context\n";
 
       $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], NULL);
       if (is_null($RegardingID) || $RegardingID < 0) return;
+      echo "post regardingID\n";
 
       try {
          $RegardingData = $this->RegardingModel()->GetID($RegardingID);

@@ -24,6 +24,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    private $Type = NULL;
    private $ForeignType = NULL;
    private $ForeignID = NULL;
+   private $SourceElement = NULL;
 
    private $ParentType = NULL;
    private $ParentID = NULL;
@@ -38,6 +39,27 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       $this->ForeignType = $ForeignType;
       $this->ForeignID = $ForeignID;
       parent::__construct();
+   }
+   
+   public function VerifiedAs($SourceElement = NULL) {
+      if (is_null($SourceElement))
+         return $this->SourceElement;
+      else
+         $this->SourceElement = $SourceElement;
+         
+      return $this;
+   }
+   
+   public function AutoParent($ParentType, $ParentIDKey = NULL) {
+      if (!is_null($this->SourceElement)) {
+         if (is_null($ParentIDKey))
+            $ParentIDKey = ucfirst($ParentType).'ID';
+         $ParentID = GetValue($ParentIDKey, $this->SourceElement, FALSE);
+         if ($ParentID !== FALSE)
+            $this->WithParent($ParentType, $ParentID);
+      }
+      
+      return $this;
    }
 
    public function WithParent($ParentType, $ParentID) {
@@ -81,6 +103,28 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    /* Meta data */
 
    public function Located($URL) {
+      // Try to auto generate URL from known information
+      if ($URL === TRUE) {
+         switch ($this->ForeignType) {
+            case 'discussion':
+               $URL = sprintf('discussion/%d', $this->ForeignID);
+               break;
+               
+            case 'comment':
+               $URL = sprintf('discussion/comment/%d', $this->ForeignID);
+               break;
+            
+            case 'conversation':
+               $URL = sprintf('messages/%d', $this->ForeignID);
+               break;
+               
+            case 'conversationmessage':
+               $URL = sprintf('messages/%d', $this->ParentID);
+               break;
+         }
+         $URL = Url($URL);
+      }
+      
       $this->ForeignURL = $URL;
       return $this;
    }
@@ -115,7 +159,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          $this->UserID = Gdn::Session()->UserID;
 
       $RegardingModel = new RegardingModel();
-      $RegardingModel->Save(array(
+      $RegardingID = $RegardingModel->Save(array(
          'Type'            => $this->Type,
          'ForeignType'     => $this->ForeignType,
          'ForeignID'       => $this->ForeignID,
@@ -127,7 +171,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          'ForeignURL'      => $this->ForeignURL,
          'Comment'         => $this->Comment
       ));
-
+      
+      // Handle collaborations
+      
       // Don't error on foreach
       if (!is_array($this->CollaborativeActions))
          $this->CollaborativeActions = array();
@@ -139,14 +185,16 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                $CategoryID = GetValue('Parameters', $Action);
                $DiscussionModel = new DiscussionModel();
                
-               $DiscussionModel->Save(array(
+               $DiscussionID = $DiscussionModel->Save(array(
                   'Name'         => $this->CollaborativeTitle,
                   'CategoryID'   => $CategoryID,
                   'Body'         => T('This discussion was automatically created by the system to encourage moderator collaboration.'),
                   'InsertUserID' => $this->UserID,
                   'Announce'     => 0,
-                  'Close'        => 0
+                  'Close'        => 0,
+                  'RegardingID'  => $RegardingID
                ));
+               
                break;
 
             case 'conversation':
@@ -154,11 +202,15 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                $UserList = explode(',', $Users);
                if (!sizeof($UserList))
                   throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
-               $ConversationModel = new ConversationModel();
-               
-               $ConversationMessageModel = new ConversationMessageModel();
-               $ConversationModel->Save(array(
                   
+               $ConversationModel = new ConversationModel();
+               $ConversationMessageModel = new ConversationMessageModel();
+               
+               $ConversationID = $ConversationModel->Save(array(
+                  'To'              => 'Admins',
+                  'Body'            => $this->CollaborativeTitle,
+                  'RecipientUserID' => $UserList,
+                  'RegardingID'     => $RegardingID
                ), $ConversationMessageModel);
                
                break;

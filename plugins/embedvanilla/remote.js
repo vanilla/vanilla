@@ -13,6 +13,16 @@ window.vanilla.embed = function(host) {
       disablePath = currentPath && currentPath[0] != "/";
       disablePath |= (window != top);
 
+   var optStr = function(name, defaultValue, definedValue) {
+      if (window['vanilla_'+name]) {
+         if (definedValue == undefined)
+            return window['vanilla_'+name];
+         else
+            return definedValue.replace('%s', window['vanilla_'+name]);
+      }
+      return defaultValue;
+   }
+
    if (!currentPath || disablePath)
       currentPath = "/";
 
@@ -129,6 +139,9 @@ window.vanilla.embed = function(host) {
    }
 
    setHeight = function(height) {
+      if (optStr('height'))
+         return;
+
       document.getElementById('vanilla'+id).style['height'] = height + "px";
       if (window.gadgets)
          gadgets.window.adjustHeight();
@@ -138,7 +151,7 @@ window.vanilla.embed = function(host) {
       return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
    }
 
-   document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'" scrolling="no" frameborder="0" border="0" width="100%" height="1000" style="width: 100%; height: 1000px; border: 0; display: block;"></iframe>');
+   document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'"'+optStr('height', ' scrolling="no"', '')+' frameborder="0" border="0" width="'+optStr('width', '100%')+'" height="'+optStr('height', 1000)+'" style="width: '+optStr('width', '100%', '%spx')+'; height: '+optStr('height', 1000)+'px; border: 0; display: block;"></iframe>');
    return this;
 };
 try {

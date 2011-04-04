@@ -31,11 +31,13 @@ class SpamModel extends Gdn_Pluggable {
    public static function IsSpam($RecordType, $Data, $Options = array()) {
       // Set some information about the user in the data.
       TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
-      TouchValue('Email', $Data, Gdn::Session()->User->Email);
-      if ($RecordType == 'User')
+      
+      if ($RecordType == 'User') {
          TouchValue('Username', $Data, $Data['Name']);
-      else
+      } else {
          TouchValue('Username', $Data, Gdn::Session()->User->Name);
+         TouchValue('Email', $Data, Gdn::Session()->User->Email);
+      }
 
       $Sp = self::_Instance();
       

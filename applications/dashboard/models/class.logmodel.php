@@ -32,6 +32,11 @@ class LogModel extends Gdn_Pluggable {
          case 'Comment':
             $Result = $this->FormatKey('Body', $Data);
             break;
+         case 'User':
+            $Result = $this->FormatRecord(array('Email', 'Name', 'DiscoveryText'), $Data);
+            break;
+         default:
+            $Result = '';
       }
       return $Result;
    }
@@ -45,6 +50,17 @@ class LogModel extends Gdn_Pluggable {
          $Result = Gdn_Format::Text(GetValue($Key, $Data, ''), FALSE);
       }
       return nl2br(trim(($Result)));
+   }
+
+   public function FormatRecord($Keys, $Data) {
+      $Result = array();
+      foreach ($Keys as $Key) {
+         if (!GetValue($Key, $Data))
+            continue;
+         $Result[] = '<b>'.htmlspecialchars($Key).'</b>: '.htmlspecialchars(GetValue($Key, $Data));
+      }
+      $Result = implode('<br />', $Result);
+      return $Result;
    }
 
    public function FormatDiff($Old, $New) {
@@ -88,8 +104,8 @@ class LogModel extends Gdn_Pluggable {
          ->Select('l.*')
          ->Select('ru.Name as RecordName, iu.Name as InsertName')
          ->From('Log l')
-         ->Join('User ru', 'l.RecordUserID = ru.UserID')
-         ->Join('User iu', 'l.InsertUserID = iu.UserID')
+         ->Join('User ru', 'l.RecordUserID = ru.UserID', 'left')
+         ->Join('User iu', 'l.InsertUserID = iu.UserID', 'left')
          ->Where($Where)
          ->Limit($Limit, $Offset)
          ->OrderBy($OrderFields, $OrderDirection)
@@ -161,6 +177,8 @@ class LogModel extends Gdn_Pluggable {
           'ParentRecordID' => $ParentRecordID,
           'Data' => serialize($Data)
       );
+      if ($LogRow['RecordDate'] == NULL)
+         $LogRow['RecordDate'] = Gdn_Format::ToDateTime();
 
       // Insert the log entry.
       $LogID = Gdn::SQL()->Insert('Log', $LogRow);
@@ -277,7 +295,6 @@ class LogModel extends Gdn_Pluggable {
                   $Set['DateInserted'] = Gdn_Format::ToDateTime();
                }
             }
-
 
             // Insert the record back into the db.
             Gdn::SQL()

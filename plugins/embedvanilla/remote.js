@@ -13,14 +13,14 @@ window.vanilla.embed = function(host) {
       disablePath = currentPath && currentPath[0] != "/";
       disablePath |= (window != top);
 
-   var optStr = function(name, defaultValue, definedValue) {
+   var optStr = function(name, undefinedValue, definedValue) {
       if (window['vanilla_'+name]) {
          if (definedValue == undefined)
             return window['vanilla_'+name];
          else
             return definedValue.replace('%s', window['vanilla_'+name]);
       }
-      return defaultValue;
+      return undefinedValue;
    }
 
    if (!currentPath || disablePath)

@@ -572,7 +572,8 @@ jQuery(document).ready(function($) {
 	
 		}, wait); // Ping once a minute.
 	}
-	pingForNotifications(1);
+   if (gdn.definition('SignedIn') == '1')
+      pingForNotifications(1);
 
 });
 

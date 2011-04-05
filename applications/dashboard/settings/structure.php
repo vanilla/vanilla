@@ -237,6 +237,7 @@ if (!$PermissionTableExists) {
       'RoleID' => 32,
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
+      'Garden.Moderation.Manage' => 1,
       'Garden.Profiles.View' => 1
       ));
 

@@ -3,6 +3,7 @@
    <h4><?php echo T('In this Conversation'); ?></h4>
    <ul class="PanelInfo">
    <?php
+   $Result = $this->Data->Result();
    foreach ($this->Data->Result() as $User) {
       if($User->Deleted)
          echo '<li class="Deleted">';

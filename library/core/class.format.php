@@ -351,6 +351,9 @@ class Gdn_Format {
     * @return string
     */
    public static function Date($Timestamp = '', $Format = '') {
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
+
       // Was a mysqldatetime passed?
       if (!is_numeric($Timestamp))
          $Timestamp = self::ToTimestamp($Timestamp);
@@ -702,7 +705,7 @@ EOT;
          return self::To($Mixed, 'Text');
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
-         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
+         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_QUOTES, $Charset)), ENT_QUOTES, $Charset);
          if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
             $Result = nl2br(trim($Result));
          return $Result;

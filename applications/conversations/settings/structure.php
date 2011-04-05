@@ -127,3 +127,9 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumR
 // X added Y to a conversation   
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'AddedToConversation', 'FullHeadline' => '%1$s added %3$s to a %8$s.', 'ProfileHeadline' => '%1$s added %3$s to a %8$s.', 'RouteCode' => 'conversation', 'Notify' => '1', 'Public' => '0'));
+
+$PermissionMoel = Gdn::PermissionModel();
+
+$PermissionModel->Define(array(
+   'Conversations.Moderation.Manage' => 'Garden.Moderation.Manage'
+   ));

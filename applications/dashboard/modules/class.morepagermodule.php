@@ -156,11 +156,12 @@ class MorePagerModule extends Gdn_Module {
       return $Result;
    }
 
-   public static function FormatUrl($Url, $Page, $Limit = '') {
+   public static function FormatUrl($Url, $Offset, $Limit = '') {
       // Check for new style page.
-      if (strpos($Url, '{Page}') !== FALSE)
-         return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
-      else
+      if (strpos($Url, '{Page}') !== FALSE || strpos($Url, '{Offset}') !== FALSE) {
+         $Page = PageNumber($Offset, $Limit, TRUE);
+         return str_replace(array('{Offset}', '{Page}', '{Size}'), array($Offset, $Page, $Limit), $Url);
+      } else
          return self::FormatUrl($Url, $Page, $Limit);
 
    }
@@ -185,7 +186,7 @@ class MorePagerModule extends Gdn_Module {
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
       
       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
-      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), array('{Page}', '{Size}', '{Page}'), $this->Url);
+      $this->Url = str_replace(array('%1$s', '%2$s', '%s'), array('{Offset}', '{Size}', '{Offset}'), $this->Url);
 
       $Pager = '';
       if ($Type == 'more') {

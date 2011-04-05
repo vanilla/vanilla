@@ -103,7 +103,8 @@ class UserModel extends Gdn_Model {
             $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
          }
          $Fields['Roles'] = (array)C('Garden.Registration.ConfirmEmailRole');
-         $Fields['Attributes'] = serialize($Fields['Attributes']);
+         if (!is_string($Fields['Attributes']))
+            $Fields['Attributes'] = serialize($Fields['Attributes']);
       }
 
       // Make sure to encrypt the password for saving...

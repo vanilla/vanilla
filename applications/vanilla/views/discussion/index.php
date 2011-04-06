@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+$DiscussionName = Gdn_Format::Text($this->Discussion->Name);;
+if ($DiscussionName == '')
+   $DiscussionName = T('Blank Discussion Topic');
+
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 
@@ -16,32 +20,27 @@ if ($Session->IsValid()) {
 <div class="Tabs HeadingTabs DiscussionTabs">
    <ul>
       <li><?php
-         if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+         if (C('Vanilla.Categories.Use') === TRUE) {
             echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
          } else {
             echo Anchor(T('All Discussions'), 'discussions');
          }
       ?></li>
    </ul>
-   <div class="SubTab"><?php
-      $DiscussionName = Gdn_Format::Text($this->Discussion->Name);
-      if ($DiscussionName == '')
-         $DiscussionName = T('Blank Discussion Topic');
-         
-      echo $DiscussionName;
-   ?></div>
+   <div class="SubTab"><?php echo $DiscussionName; ?></div>
+   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any')) { ?>
+      <div class="Administration">
+         <input type="checkbox" name="Toggle" />
+      </div>
+   <?php } ?>
 </div>
-<?php
-   $this->FireEvent('BeforeDiscussion');
-   echo $this->RenderAsset('DiscussionBefore');
-?>
+<?php $this->FireEvent('BeforeDiscussion'); ?>
 <ul class="MessageList Discussion">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
 
 if($this->Pager->LastPage()) {
-   $this->AddDefinition('DiscussionID', $this->Data['Discussion']->DiscussionID);
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
       $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);

@@ -348,4 +348,34 @@ jQuery(document).ready(function($) {
    // Load new comments like a chat.
    autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
    getNewTimeout();
+   
+   /* Comment Checkboxes */
+   $('.HeadingTabs .Administration :checkbox').click(function() {
+      if ($(this).attr('checked'))
+         $('.MessageList .Administration :checkbox').attr('checked', 'checked');
+      else
+         $('.MessageList .Administration :checkbox').removeAttr('checked');
+   });
+   $('.Administration :checkbox').click(function() {
+      // retrieve all checked ids
+      var checkIDs = $('.MessageList .Administration :checkbox');
+      var aCheckIDs = new Array();
+      var discussionID = gdn.definition('DiscussionID');
+      checkIDs.each(function() {
+         item = $(this);
+         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+      });
+      $.ajax({
+         type: "POST",
+         url: gdn.url('/moderation/checkedcomments'),
+         data: { 'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey') },
+         dataType: "json",
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            gdn.informMessage(XMLHttpRequest.responseText, { 'CssClass' : 'Dismissable' });
+         },
+         success: function(json) {
+            gdn.inform(json);
+         }
+      });
+   });
 });

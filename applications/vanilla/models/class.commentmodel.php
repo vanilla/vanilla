@@ -749,8 +749,16 @@ class CommentModel extends VanillaModel {
 				->Update('Comment c')
 				->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE)
 				->Where('d.DiscussionID', $DiscussionID)
-				->Where('c.CommentID', 'd.LastCommentID', FALSE, FALSE);
-			$this->SQL->Put();
+				->Where('c.CommentID', 'd.LastCommentID', FALSE, FALSE)
+            ->Put();
+         
+         // Update UserDiscussion so users don't have incorrect counts
+         $this->SQL
+            ->Update('UserDiscussion ud')
+            ->Set('CountComments', $Data->CountComments + 1)
+            ->Where('DiscussionID', $DiscussionID)
+            ->Where('CountComments <', $Data->CountComments + 1)
+            ->Put();
       }
    }
    

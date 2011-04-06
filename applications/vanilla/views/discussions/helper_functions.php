@@ -35,6 +35,14 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    <?php
    $Sender->FireEvent('BeforeDiscussionContent');
    WriteOptions($Discussion, $Sender, $Session);
+         
+   if ($Sender->CanEditDiscussions) {
+      if (!property_exists($Sender, 'CheckedDiscussions'))
+         $Sender->CheckedDiscussions = $Session->GetAttribute('CheckedDiscussions', array());
+
+      $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+      echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
+   }
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
@@ -135,7 +143,15 @@ function WriteFilterTabs(&$Sender) {
       echo $Category->Name;
       echo '</div>';
    }
+   if (!property_exists($Sender, 'CanEditDiscussions'))
+      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any');
+   
+   if ($Sender->CanEditDiscussions) {
    ?>
+   <div class="Administration">
+      <input type="checkbox" name="Toggle" />
+   </div>
+   <?php } ?>
 </div>
    <?php
 }
@@ -195,6 +211,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
+      
       echo '</div>';
    }
 }

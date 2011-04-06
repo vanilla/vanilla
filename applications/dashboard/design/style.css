@@ -22,7 +22,7 @@ html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, font, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
+small, strike, sub, sup, tt, var,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td {
@@ -362,7 +362,6 @@ a.Small img {
 	width: 24px;
 	overflow: hidden;
 }
-
 
 /* =================================================================== Header */
 #Head {
@@ -811,6 +810,7 @@ div.Box dl dt {
    width: 80px;
    color: #555;
 	overflow: hidden;
+	white-space: nowrap;
 }
 div.Box dl dd {
 	font-size: 12px;
@@ -1309,7 +1309,7 @@ ul.MessageList li {
    padding: 0;
 }
 ul.MessageList li.Item {
-   border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid #BEC8CC;
 	padding: 10px 4px 4px 10px;
 }
 ul.MessageList div.Meta {
@@ -1794,6 +1794,30 @@ div.Headings div.MetaHeading {
 	font-size: 11px;
 }
 
+/* ================================================ Administration Checkboxes */
+.MessageList .Item,
+body.Discussion #Content,
+.DiscussionsTabs {
+	position: relative;
+}
+.Administration {
+	width: 32px;
+	text-align: center;
+	padding: 4px 0 5px;
+	position: absolute;
+	left: -32px;
+	top: 0;
+}
+.Item .Administration {
+	background: #f5f5f5;
+	border: 1px solid #BEC8CC;
+	border-width: 1px 0 0;
+}
+.DataList.Discussions .Item .Administration,
+.MessageList .Item .Administration {
+	top: -1px;
+}
+
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {
    width: 100%;
@@ -1980,6 +2004,9 @@ div.Popup input.Button {
 div.Popup #Form_User div.Warning,
 #dashboard_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
+}
+div.Popup form ul li label.RadioLabel {
+	font-size: 12px;
 }
 
 /* Serious Ajax Error Styles */
@@ -2970,6 +2997,10 @@ div.InformMessages div.InformMessage a.Close:hover {
 div.InformMessages div.InformMessage:hover a.Close {
 	display: block;
 }
+div.InformMessages div.Actions a { margin-right: 4px; }
+div.InformMessages div.Actions a:last-child { margin-right: 0; }
+div.InformMessages div.Actions a.CancelAction {	color: #aaa; }
+
 /* Inform Sprites */
 div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
 	padding-left: 42px !important;

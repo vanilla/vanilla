@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
 WriteFilterTabs($this);

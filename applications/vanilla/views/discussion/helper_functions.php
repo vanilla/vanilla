@@ -17,10 +17,6 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $Id = 'Comment_'.$Object->CommentID;
       $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
    } else {
-      
-//      if (Gdn::Session()->User->Name == 'Tim')
-//         print_r($Sender->Discussion);
-      
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;
@@ -33,7 +29,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    if ($Alt)
       $CssClass .= ' Alt';
    $Alt = !$Alt;
-
+	
+	if (!property_exists($Sender, 'CanEditComments'))
+		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any');
+		
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
@@ -48,13 +47,19 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          </span>
          <span class="DateCreated">
             <?php
-            echo Gdn_Format::Date($Object->DateInserted);
+            echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow'));
             ?>
          </span>
-         <span class="Permalink">
-            <?php echo Anchor(T('Permalink'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
-         </span>
-         <?php WriteOptionList($Object, $Sender, $Session); ?>
+         <?php
+			WriteOptionList($Object, $Sender, $Session);
+			if ($Type == 'Comment' && $Sender->CanEditComments) {
+				if (!property_exists($Sender, 'CheckedComments'))
+					$Sender->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+					
+				$ItemSelected = InSubArray($Id, $Sender->CheckedComments);
+				echo '<div class="Administration"><input type="checkbox" name="'.$Type.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
+			}
+			?>
          <div class="CommentInfo">
             <?php $Sender->FireEvent('CommentInfo'); ?>
          </div>

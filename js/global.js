@@ -477,6 +477,16 @@ jQuery(document).ready(function($) {
 			css = 'InformWrapper';
 			if (response.InformMessages[i]['CssClass'])
 				css += ' ' + response.InformMessages[i]['CssClass'];
+				
+			elementId = '';
+			if (response.InformMessages[i]['id'])
+				elementId = response.InformMessages[i]['id'];
+				
+			sprite = '';
+			if (response.InformMessages[i]['Sprite']) {
+				css += ' HasSprite';
+				sprite = response.InformMessages[i]['Sprite'];
+			}
 			
 			dismissCallback = response.InformMessages[i]['DismissCallback'];
 			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
@@ -485,11 +495,22 @@ jQuery(document).ready(function($) {
 				
 			try {
 				var message = response.InformMessages[i]['Message'];
+				var emptyMessage = message == '';
+				
+				// Is there a sprite?
+				if (sprite != '')
+					message = '<span class="InformSprite '+sprite+'"></span>' + message;
+				
 				// If the message is dismissable, add a close button
 				if (css.indexOf('Dismissable') > 0)
 					message = '<a class="Close"><span>×</span></a>' + message;
 
 				message = '<div class="InformMessage">'+message+'</div>';
+				// Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
+				message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+				// Insert the current url as a target for inform anchors
+				message = message.replace(/{SelfUrl}/g, document.URL);
+				
 				var skip = false;
 				for (var j = 0; j < wrappers.length; j++) {
 					if ($(wrappers[j]).text() == $(message).text()) {
@@ -497,27 +518,34 @@ jQuery(document).ready(function($) {
 					}
 				}
 				if (!skip) {
-					informMessages.prepend('<div class="'+css+'">'+message+'</div>');
-					// Is there a callback or callback url to request on dismiss of the inform message?
-					if (dismissCallback) {
-						$('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
-					} else if (dismissCallbackUrl) {
-						var closeAnchor = $('div.InformWrapper:first').find('a.Close');
-						closeAnchor.attr('callbackurl', dismissCallbackUrl);
-						closeAnchor.click(function () {
-							$.ajax({
-								type: "POST",
-								url: $(this).attr('callbackurl'),
-								data: 'TransientKey='+gdn.definition('TransientKey'),
-								dataType: 'json',
-								error: function(XMLHttpRequest, textStatus, errorThrown) {
-									gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
-								},
-								success: function(json) {
-									gdn.inform(json);
-								}
+					if (elementId != '') {
+						$('#'+elementId).remove();
+						elementId = ' id="'+elementId+'"';
+					}
+					if (!emptyMessage) {
+						informMessages.prepend('<div class="'+css+'"'+elementId+'>'+message+'</div>');
+						// Is there a callback or callback url to request on dismiss of the inform message?
+						if (dismissCallback) {
+							$('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+						} else if (dismissCallbackUrl) {
+							dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+							var closeAnchor = $('div.InformWrapper:first').find('a.Close');
+							closeAnchor.attr('callbackurl', dismissCallbackUrl);
+							closeAnchor.click(function () {
+								$.ajax({
+									type: "POST",
+									url: $(this).attr('callbackurl'),
+									data: 'TransientKey='+gdn.definition('TransientKey'),
+									dataType: 'json',
+									error: function(XMLHttpRequest, textStatus, errorThrown) {
+										gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+									},
+									success: function(json) {
+										gdn.inform(json);
+									}
+								});
 							});
-						});
+						}
 					}
 				}
 			} catch (e) {
@@ -573,7 +601,7 @@ jQuery(document).ready(function($) {
 		}, wait); // Ping once a minute.
 	}
 	pingForNotifications(1);
-
+	
 });
 
 	

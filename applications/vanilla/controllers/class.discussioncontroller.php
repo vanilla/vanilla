@@ -135,16 +135,6 @@ class DiscussionController extends VanillaController {
          'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s' //'discussions/%1$s'
       );
       $this->FireEvent('AfterBuildPager');
-
-      /*$this->Pager->MoreCode = '%1$s more comments';
-      $this->Pager->LessCode = '%1$s older comments';
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Configure(
-         $this->Offset,
-         $Limit,
-         $ActualResponses,
-         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s/%2$s/'
-      );*/
       
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
@@ -166,11 +156,19 @@ class DiscussionController extends VanillaController {
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'comments';
       }
+      
+		// Inform moderator of checked comments in this discussion
+		$CheckedComments = $Session->GetAttribute('CheckedComments', array());
+		if (count($CheckedComments) > 0)
+			ModerationController::InformCheckedComments($this);
 
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+
+      // Report the discussion id so js can use it.      
+      $this->AddDefinition('DiscussionID', $DiscussionID);
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
@@ -558,6 +556,7 @@ class DiscussionController extends VanillaController {
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
+      $DefaultTarget = '/vanilla/discussions/';
       if (
          is_numeric($CommentID)
          && $CommentID > 0
@@ -567,6 +566,7 @@ class DiscussionController extends VanillaController {
          $Comment = $this->CommentModel->GetID($CommentID);
          if ($Comment) {
             $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
+            $DefaultTarget = '/vanilla/discussions/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
             $HasPermission = $Comment->InsertUserID == $Session->UserID;
             if (!$HasPermission && $Discussion)
                $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
@@ -584,7 +584,7 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', '/vanilla/discussions');
+         $Target = GetIncomingValue('Target', $DefaultTarget);
          Redirect($Target);
       }
          
@@ -593,5 +593,4 @@ class DiscussionController extends VanillaController {
          
       $this->Render();         
    }
-
 }

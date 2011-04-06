@@ -190,14 +190,13 @@ class SetupController extends DashboardController {
             $UserModel->Validation->ApplyRule('Password', 'Match');
             $UserModel->Validation->ApplyRule('Email', 'Email');
             
-            if (!$UserModel->SaveAdminUser($ConfigurationFormValues)) {
+            if (!($AdminUserID = $UserModel->SaveAdminUser($ConfigurationFormValues))) {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
-               // The user has been created successfully, so sign in now
-               Gdn::Authenticator()->Identity()->Init();
-               $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-               $Authenticator->FetchData($this->Form);
-               $AuthUserID = $Authenticator->Authenticate();
+               // The user has been created successfully, so sign in now.
+               SaveToConfig('Garden.Installed', TRUE, array('Save' => FALSE));
+               Gdn::Session()->Start($AdminUserID, TRUE);
+               SaveToConfig('Garden.Installed', FALSE, array('Save' => FALSE));
             }
             
             if ($this->Form->ErrorCount() > 0)

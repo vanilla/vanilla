@@ -45,7 +45,7 @@ $Definition['ApplicationHelp'] = 'アプリケーションは、あなたのサ�
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approve'] = '承認';
 $Definition['Approval'] = '承認制';
-$Definition['Archive Discussions'] = '過去のスレッド';
+$Definition['Archive Discussions'] = '過去のディスカッション';
 $Definition['Are you sure you want to do that?'] = '本当に実行してよいですか？';
 // $Definition['at'] = 'アット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 $Definition['Authentication'] = '認証';
@@ -61,7 +61,7 @@ $Definition['Cancel'] = 'キャンセル';
 $Definition['Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.'] = 'このサイトの定義文を収集します。あなたは定義文を収集したいページを順番に訪れる必要があります。収集された定義文は <code>captured.php</code> と <code>captured_admin.php</code> に出力されます。';
 $Definition['Capture locale pack changes.'] = 'ロケール デベロッパーと、指定されたロケール パックとの相違点を収集します。結果は <code>changes.php</code> ファイルに出力されます。';
 $Definition['Categories'] = 'カテゴリ';
-$Definition['Categories are used to help organize discussions.'] = 'カテゴリはスレッドをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
+$Definition['Categories are used to help organize discussions.'] = 'カテゴリはディスカッションをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Category Url:'] = 'カテゴリ URL:';
 $Definition['Change the way that new users register with the site.'] = '新規ユーザーがサイトに登録する方法を変更してください。';
@@ -71,15 +71,15 @@ $Definition['Choose a locale pack'] = 'ロケール パックを選んでくだ�
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'あなたのフォーラムの認証スキームを選んで設定してください。';
 $Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
 $Definition['Close'] = '終了';
-$Definition['comment(s)'] = '件のレスポンス';
+$Definition['comment(s)'] = '件のコメント';
 $Definition['Comments'] = 'コメント';
-$Definition['Comments per Page'] = '1 ページに表示する最大レス数';
+$Definition['Comments per Page'] = '1 ページに表示する最大コメント数';
 $Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Confirm'] = '確認';
 $Definition['Confirm Email'] = 'E メール確認待ち';
 $Definition['Consumer Key'] = 'Consumer Key';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
 $Definition['Consumer Secret'] = 'Consumer Secret';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
-$Definition['Conversation Messages'] = '会話メッセージ';
+$Definition['Conversation Messages'] = 'プライベート メッセージ数';
 $Definition['Copy'] = 'コピー';
 $Definition['Copy locale pack.'] = 'ロケール パックからロケール デベロッパーに定義文をコピーします。定義文は <code>copied.php</code> ファイルに出力されます。';
 $Definition['Current Authenticator'] = '現在の認証方式';
@@ -96,10 +96,10 @@ $Definition['Disable Google Sign In'] = 'Google アカウントでのログイ�
 $Definition['Disable OpenID'] = 'OpenID を無効化';
 $Definition['Disabled'] = '無効';
 $Definition['Disabled %1$s'] = '無効 %1$s';
-$Definition['Discussion & Comment Editing'] = 'スレッド & レスポンス編集';
-$Definition['discussion(s)'] = '件のスレッド';
-$Definition['Discussions'] = 'スレッド';
-$Definition['Discussions per Page'] = '1 ページに表示する最大スレッド数';
+$Definition['Discussion & Comment Editing'] = 'ディスカッション & コメント編集';
+$Definition['discussion(s)'] = '件のディスカッション';
+$Definition['Discussions'] = 'ディスカッション';
+$Definition['Discussions per Page'] = '1 ページに表示する最大ディスカッション数';
 // $Definition['dot'] = 'ドット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 
 $Definition['Edit'] = '編集';
@@ -131,9 +131,9 @@ $Definition['For more help on localization check out the page <a href="%s">here<
 $Definition['Forum Settings'] = 'フォーラム設定';
 
 $Definition['Garden.Email.SupportAddress'] = 'サポートメール';
-$Definition['Garden.Import.Description'] = 'このページを使用して、Vanilla のエクスポート機能を使用してエクスポートされた別のフォーラムからのデータをインポートしてください。 詳しくは<a href="%s">インポートについて (英語)</a> を参照してください。';
-$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメール アドレスとパスワードを入力してください。';
-$Definition['Garden.Import.Overwrite.Description'] = '警告: このフォーラムのすべてのデータが上書きされます。';
+$Definition['Garden.Import.Description'] = 'このページを使用して、Vanilla のエクスポート機能を使用してエクスポートされた別のフォーラムからのデータをインポートしてください。 詳しくは<a href="%s">インポートについて (英語)</a> を参照してください。'; // 'Use this page to import data from another forum that was exported using Vanilla\'s exporter. For more information <a href="%s">see our importing documentation</a>.'
+$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメール アドレスとパスワードを入力してください。'; // 'Enter the email and password of the admin user from the data being imported.'
+$Definition['Garden.Import.Overwrite.Description'] = '警告: このフォーラムのすべてのデータが上書きされます。'; // 'Warning: All data in this forum will be overwritten.'
 $Definition['Generate'] = '生成';
 $Definition['Generate Password'] = 'パスワードを生成';
 $Definition['Go'] = '検索';
@@ -143,7 +143,7 @@ $Definition['Guest'] = 'ゲスト';
 $Definition['here'] = 'ここ';
 
 $Definition['Import'] = 'インポート';
-$Definition['Inbox'] = '受信トレイ';
+$Definition['Inbox'] = 'プライベート メッセージ';
 $Definition['Information'] = '情報';
 $Definition['Internal'] = 'Internal';
 $Definition['Invitation'] = '招待制';
@@ -178,7 +178,7 @@ $Definition['Manage Spam'] = 'スパム管理';
 $Definition['Manage Themes'] = 'テーマ管理';
 $Definition['Manage Users'] = 'ユーザー管理';
 $Definition['Manage your Plugins'] = 'プラグインを管理する';
-$Definition['Max Comment Length'] = '最大投稿文字数';
+$Definition['Max Comment Length'] = 'コメント最大文字数';
 $Definition['Member'] = 'メンバー';
 $Definition['Message'] = 'メッセージ';
 $Definition['Messages'] = 'メッセージ';
@@ -191,14 +191,14 @@ $Definition['Name'] = '名前';
 $Definition['never'] = 'なし (無期限)';  // 招待の有効期限オプション
 $Definition['New comments in the last day'] = '過去一日間の新規コメント数';
 $Definition['New comments in the last week'] = '過去一週間の新規コメント数';
-$Definition['New conversations in the last day'] = '過去一日間の新規会話数';
-$Definition['New conversations in the last week'] = '過去一週間の新規会話数';
-$Definition['New discussions in the last day'] = '過去一日間の新規スレッド数';
-$Definition['New discussions in the last week'] = '過去一週間の新規スレッド数';
+$Definition['New conversations in the last day'] = '過去一日間の新規プライベート メッセージ (グループ) 数';
+$Definition['New conversations in the last week'] = '過去一週間の新規プライベート メッセージ (グループ) 数';
+$Definition['New discussions in the last day'] = '過去一日間の新規ディスカッション数';
+$Definition['New discussions in the last week'] = '過去一週間の新規ディスカッション数';
 $Definition['New messages in the last day'] = '過去一日間の新規メッセージ数';
 $Definition['New messages in the last week'] = '過去一週間の新規メッセージ数';
 $Definition['New Password'] = '新しいパスワード';
-$Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = '新規メンバーは審査のうえ、管理者 (あなたのことです！) によって承認されます。';
+$Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = '新規メンバーは審査のうえ、管理者 (あなたのことです) によって承認されます。';
 $Definition['New users fill out a simple form and are granted access immediately.'] = '新規メンバーは簡単なフォームに記入をすれば、すぐにアクセスを許可されます。';
 $Definition['New users in the last day'] = '過去一日間の新規ユーザー数';
 $Definition['New users in the last week'] = '過去一週間の新規ユーザー数';
@@ -226,7 +226,7 @@ $Definition['Plugin'] = 'プラグイン';
 $Definition['PluginHelp'] = 'プラグインは、あなたのサイトに拡張機能を追加します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
 $Definition['Plugins'] = 'プラグイン';
 $Definition['Position'] = '表示位置';
-$Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'スパムを防ぐため、ユーザーが一定時間内に作成できるスレッドおよび投稿できるレスポンスの数を制限できます。';
+$Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'スパムを防ぐため、ユーザーが一定時間内に作成できるディスカッションおよび投稿できるコメントの数を制限できます。';
 $Definition['Private Key'] = 'プライベート キー';
 $Definition['Public Key'] = '公開キー';
 
@@ -262,7 +262,7 @@ $Definition['SMTP Port'] = 'SMTP ポート';
 $Definition['SMTP Security'] = 'SMTP セキュリティ';
 $Definition['SMTP User'] = 'SMTP ユーザー';
 $Definition['Spam'] = 'スパム';
-$Definition['Start your First Discussion'] = '最初のスレッドを立てる';
+$Definition['Start your First Discussion'] = '最初のディスカッションを開始する';
 
 $Definition['Target'] = '対象';
 $Definition['Temporary (302)'] = '一時的 (302)';
@@ -292,7 +292,7 @@ $Definition['Username'] = 'ユーザー名';
 $Definition['Users'] = 'ユーザー';
 
 $Definition['ValidateRequired'] = '%sは必須です。';
-$Definition['Vanilla.Archive.Description'] = '特定の日付より古いスレッドをアーカイブ化できます。アーカイブ化されたスレッドは事実上 閉じられ、新しいレスを受け付けなくなります。';
+$Definition['Vanilla.Archive.Description'] = '特定の日付より古いディスカッションをアーカイブ化できます。アーカイブ化されたディスカッションは事実上 閉じられ、新しいコメントを受け付けなくなります。';
 $Definition['Version'] = 'バージョン';
 $Definition['Version %s'] = 'バージョン %s';
 $Definition['version %s'] = 'バージョン %s';
@@ -306,7 +306,10 @@ $Definition['What\'s the Buzz?'] = '最近どう？';
 $Definition['Within'] = '制限時間';
 
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メール アドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
-$Definition['You can place files in your /uploads folder.'] = 'このページに直接アップロードできないくらいファイルサイズが大きな場合は、/uploads フォルダにファイルを配置してください。ファイル名は必ず単語 <b>export</b> で始まり、拡張子 <b>.txt または .gz</b> で終わるようにしてください。';
+$Definition['You can place files in your /uploads folder.'] = 'このページに直接アップロードできないくらいファイルサイズが大きな場合は、/uploads フォルダにファイルを配置してください。ファイル名は必ず単語 <b>export</b> で始まり、拡張子 <b>.txt または .gz</b> で終わるようにしてください。'; /* 'If your file is too
+		large to upload directly to this page you can place it in your /uploads
+		folder. Make sure the filename begins with the word <b>export</b> and ends
+		with one of <b>.txt, .gz</b>.'*/
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = '%1$s プラグインを無効にできません。%2$s プラグインが動作するために、必要です。';
 //$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'; // 内容的に上と重複しているのでコメントアウト
 $Definition['Your changes have been saved.'] = '変更を保存しました。';
@@ -359,9 +362,9 @@ $Definition['Homepage'] = 'ホームページ';
 $Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホームページ設定 (英語)';
 $Definition['Change the look of All Categories'] = '<b>すべてのカテゴリ</b> ページの外観は<a href="%s">こちら</a>から変更できます。';
 $Definition['Changing the Discussions Menu Link'] = 'ディスカッション メニュー リンクの変更 (英語)';
-$Definition['Use the content at this url as your homepage.'] = '"ホームページ" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのスレッド" がホームページになっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
+$Definition['Use the content at this url as your homepage.'] = '"ホームページ" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのディスカッション" がホームページになっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
 $Definition['All Categories'] = 'すべてのカテゴリ';
-$Definition['Categories &amp; Discussions'] = 'カテゴリ &amp; スレッド';
+$Definition['Categories &amp; Discussions'] = 'カテゴリ &amp; ディスカッション';
 $Definition['Enter the url to the page you would like to use as your homepage:'] = 'ホームページに設定したいページの URL を入力してください:';
 $Definition['TermsOfService'] = '利用規約';
 $Definition['TermsOfServiceText'] = "
@@ -449,11 +452,55 @@ $Definition['Security Check'] = 'セキュリティ チェック';
 $Definition["Passwords don't match"] = 'パスワードが一致しません';
 $Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'あなたのメール アドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
 $Definition['%s (Current)'] = '%s (現在)';
-
+$Definition['There was an error fetching the connection data.'] = '接続データの取得でエラーが発生しました。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['The connection data has not been verified.'] = '接続データが認証されませんでした。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['The password you entered is incorrect.'] = '入力されたパスワードが正しくありません。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['You must agree to the terms of service.'] = '利用規約に同意してください。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Tell us why you want to join!'] = '参加理由をご記入ください。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Success!'] = '成功しました'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Failed to authenticate your password reset request. Try using the reset request form again.'] = 'パスワード リセット リクエストの認証に失敗しました。もう一度リセット リクエスト フォームから送信してください。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Your new password is invalid'] = '新しいパスワードが不正です'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Your passwords did not match.'] = 'パスワードが一致しませんでした。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Couldn\'t confirm email.'] = 'E メールの確認が取れていません。あなたに送信した E メールに記載されたリンクを確認するか、改めて確認用 E メールを送信してください。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Use My Current Password'] = '自分の現在のパスワードを使用する'; // applications/dashboard/views/import/credentials.php & index.php
+$Definition['Importing to Vanilla'] = 'Vanilla へのデータ移行 (英語)'; // applications/dashboard/views/import/index.php
+$Definition['The Vanilla 2 Exporter'] = 'Vanilla Porter プラグイン (英語)'; // applications/dashboard/views/import/index.php
+$Definition['Warning: Loading tables can be slow.'] = '<b>警告</b>: 現在のサーバ設定では、高速なデータ読み取りができません。とてもサイズの大きなファイル (例. 200,000 コメント以上) をインポートする場合は、設定の変更を検討するといいでしょう。詳しい情報を参照する場合は、<a href="http://vanillaforums.com/blog/help/importing-data/">ここ</a>をクリックしてください。'; /*'<b>Warning</b>: Your server configuration does not support fast data loading.
+If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.'*/
+$Definition['Current File:'] = '現在のファイル:'; // applications/dashboard/views/import/index.php
+$Definition['Garden.Import.Complete.Description'] = 'インポートに成功しました。<a href="%s">ダッシュボード &gt; 役割と権限</a>に移動して、あなたの役割に忘れず権限を設定してください。準備ができたら、<b>完了</b>をクリックしてください。'; /* 'You have successfully completed an import.
+   Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
+   Click <b>Finished</b> when you are ready.' */
+$Definition['Finished'] = '完了'; // applications/dashboard/views/import/go.php
+$Definition['Continue'] = '続行'; // applications/dashboard/views/import/go.php
+$Definition['You must select a file to import.'] = 'インポートするファイルを選択してください。'; // applications/dashboard/controllers/class.importcontroller.php
+$Definition['Garden.Import.Steps.Initialize'] = '初期化'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.ProcessImportFile'] = 'ファイル インポート処理'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.DefineTables'] = 'テーブル作成'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.LoadTables'] = 'テーブル読み込み'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.DefineIndexes'] = 'インデックス作成'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.AssignUserIDs'] = 'ユーザー ID 割り当て'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.AssignOtherIDs'] = 'その他 ID 割り当て'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.InsertTables'] = 'テーブル挿入'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.UpdateCounts'] = 'カウント更新'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.CustomFinalization'] = 'カスタム終了処理'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.AddActivity'] = 'アクティビティ追加'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.LoadUserTable'] = 'ユーザーテーブル読み込み'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.AuthenticateAdminUser'] = '管理者ユーザー認証'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.InsertUserTable'] = 'ユーザーテーブル挿入'; // applications/dashboard/models/class.importmodel.php
+$Definition['Garden.Import.Steps.DeleteOverwriteTables'] = '上書きテーブル削除'; // applications/dashboard/models/class.importmodel.php
+$Definition['Vanilla Export: %s, Source: %s'] = 'Vanilla エクスポート: %s, ソース: %s'; // applications/dashboard/models/class.importmodel.php
+$Definition['The %s table is not in the correct format.'] = '%s テーブルの形式が不正です。'; // applications/dashboard/models/class.importmodel.php
+$Definition['There was an error while trying to create the %s table (%s).'] = '%s テーブルの作成中にエラーが発生しました (%s)。'; // applications/dashboard/models/class.importmodel.php
+$Definition['The import file is not in the correct format.'] = 'インポート ファイルの形式が不正です。'; // applications/dashboard/models/class.importmodel.php
+$Definition['%s of %s'] = '%s / %s'; // applications/dashboard/models/class.importmodel.php
+$Definition['The user table was not in the import file.'] = 'ユーザーテーブルはインポートファイルに含まれていませんでした。'; // applications/dashboard/models/class.importmodel.php
+$Definition['Could not parse import file. The problem is near line %s.'] = 'インポートファイルを解析できません。%s 行付近で問題が発生しました。'; // applications/dashboard/models/class.importmodel.php
+$Definition['The import file does not contain any data.'] = 'インポートファイルにデータがありません。'; // applications/dashboard/models/class.importmodel.php
 
 // Addons descriptions
-$Definition['An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.'] = '既存の個人メッセージ ツールの改良版です。Conversations は複数のユーザーだけで個人的な会話を楽しむことができます。'; // Conversations
-$Definition['Vanilla is the sweetest discussion forum on the web.'] = 'Vanilla は Web 上における最高のフォーラム アプリケーションです。'; // Vanilla
+$Definition['An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.'] = '既存のプライベート メッセージ ツールの改良版です。Conversations は複数のユーザーだけで個人的な会話を楽しむことができます。'; // Conversations
+$Definition['Vanilla is the sweetest discussion forum on the web.'] = 'Vanilla は Web 上における最高のディスカッション フォーラムです。'; // Vanilla
 $Definition['Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you\'ve created.'] = 'Embed Vanilla を使って、あなたの Vanilla フォーラムを他のアプリケーションに埋め込むことができます。WordPress や Drupal、そして あなたが作った専用のウェブサイトにも！'; // <Embed> Vanilla
 $Definition['<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.'] = 'Vanilla 2 用の <a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG プラグインです。'; // CLEditor jQuery WYSIWYG
 $Definition['The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.'] = 'Debugger プラグインはデータベース クエリ、そのベンチマーク、ページ処理ベンチマークをアプリケーションの各画面下部に表示します。'; // Debugger
@@ -461,15 +508,15 @@ $Definition['Replaces emoticons in forum comments with images.'] = 'フォーラ
 $Definition['This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>'] = 'このプラグインは、Vanilla を Facebook に統合します。<b>このプラグインを使うには、Facebook にアプリケーションを登録する必要があります。</b>'; // Facebook 0.1a
 $Definition['This plugin allows users to report content that violates forum rules.'] = 'このプラグインは、フォーラムの規則に違反している投稿を、ユーザーが報告できるようにします。'; // Flagging 1.0.1
 $Definition['Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.'] = '独自のプロフィール画像とアイコンをアップロードしていないすべてのユーザーに、Gravatar アバターを代替表示します。'; // Gravatar 1.1
-$Definition['Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.'] = 'Vanilla のスレッド ページのサイドパネルに、そのスレッドの参加者リストを表示します。'; // In This Discussion 1
-$Definition['Allows users to mark all discussions as viewed.'] = '全スレッドを既読扱いにできます。'; // Mark All Viewed 1.1
+$Definition['Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.'] = 'Vanilla のディスカッション ページのサイドパネルに、そのディスカッションの参加者リストを表示します。'; // In This Discussion 1
+$Definition['Allows users to mark all discussions as viewed.'] = '全ディスカッションを既読扱いにできます。'; // Mark All Viewed 1.1
 $Definition['Analyzes each page request for js & css files, merging and minifying them where applicable.'] = 'ページごとに js と css ファイルのリクエストを分析して、送信時にそれらを結合・最適化します。'; // Minify 1.0.1b
 $Definition['Allows a reply to be made to a specific comment, supporting nested comments.'] = '特定のコメントに対して返信できるようになります。ツリー構造もサポートします。'; // ReplyTo 0.1.8
-$Definition['Allow tagging of discussions.'] = 'スレッドにタグ付けを可能にします。'; // Tagging 1.0.1
-$Definition['Adds TinyMCE visual (WYSIWYG) editor to comment forms on discussion pages.'] = 'TinyMCE ビジュアル (WYSIWYG) エディタをスレッド ページの投稿フォームに追加します。'; // TinyMCE Visual Editor 0.1
+$Definition['Allow tagging of discussions.'] = 'ディスカッションにタグ付けを可能にします。'; // Tagging 1.0.1
+$Definition['Adds TinyMCE visual (WYSIWYG) editor to comment forms on discussion pages.'] = 'TinyMCE ビジュアル (WYSIWYG) エディタをディスカッション ページの投稿フォームに追加します。'; // TinyMCE Visual Editor 0.1
 $Definition['Collects undefined translation codes and save it for translating.'] = '翻訳作業のために、未定義の翻訳コードを収集・保存します。'; // Translation collector 1.5.8
 $Definition['This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>'] = 'このプラグインは、Vanilla を Twitter に統合します。<b>このプラグインを使うには、Twitter にアプリケーションを登録する必要があります。</b>'; // Twitter 0.1a
-$Definition['Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).'] = 'あなたのフォーラムのアクティビティ (新規ユーザー、スレッド、コメント、ページビュー) に関する情報を時系列でグラフ化します。'; // Vanilla Statistics 2.0.17
+$Definition['Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).'] = 'あなたのフォーラムのアクティビティ (新規ユーザー、ディスカッション、コメント、ページビュー) に関する情報を時系列でグラフ化します。'; // Vanilla Statistics 2.0.17
 $Definition['This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.'] = 'これはロケール パックのスケルトンです。あなたが独自のロケール パックを作成したければ、このフォルダをコピーして、あなたのロケール フォルダにリネームしてください。'; // Skeleton Locale 2.0.1
 
 // Plugins - <Embed> Vanilla 1.0.1
@@ -502,6 +549,6 @@ $Definition['Mention'] = '@リプライ';
 $Definition['Mention of the user being replied to in new replies.'] = '新規返信時に、返信先ユーザーへの@リプライを自動挿入する。';
 
 // Theme - EmbedFriendly
-$Definition['This theme allows you to hide the side panel next to your forum and conversations. This is super handy if the website you are embedding in does not have a lot of width to squeeze into.'] = 'このテーマはあなたのフォーラムと会話からサイドパネルを隠すことができます。もしあなたがフォーラムを埋め込んだウェブサイトがあまり横幅を広く取れないデザインだった場合は、これが役に立つことでしょう。';
+$Definition['This theme allows you to hide the side panel next to your forum and conversations. This is super handy if the website you are embedding in does not have a lot of width to squeeze into.'] = 'このテーマはあなたのフォーラムとプライベート メッセージからサイドパネルを隠すことができます。もしあなたがフォーラムを埋め込んだウェブサイトがあまり横幅を広く取れないデザインだった場合は、これが役に立つことでしょう。';
 $Definition['Show the side panel'] = 'サイドパネルを表示する';
 $Definition['Hide the side panel'] = 'サイドパネルを隠す';

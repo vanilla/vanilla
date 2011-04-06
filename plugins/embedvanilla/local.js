@@ -89,10 +89,10 @@ $(function() {
    if (inIframe) {
       setHeight = function() {
          var newHeight = document.body.offsetHeight;
+         if (newHeight < minHeight)
+            newHeight = minHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
-            if (currentHeight < minHeight)
-               currentHeight = minHeight;
                
             remotePostMessage('height:'+currentHeight, '*');
          }

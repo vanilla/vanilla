@@ -151,7 +151,7 @@ class Gdn_Format {
 
       $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
       $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
-      $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' ? $FullHeadline : $ProfileHeadline);
+      $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' || !$ProfileHeadline ? $FullHeadline : $ProfileHeadline);
       
       return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix, $RegardingWallLink, $ActivityRouteLink);
    }
@@ -505,8 +505,10 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Mentions($Mixed);
 
             // nl2br
-            if(C('Garden.Format.ReplaceNewlines', TRUE))
-               $Mixed = wpautop($Mixed); //preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+            if(C('Garden.Format.ReplaceNewlines', TRUE)) {
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+//               $Mixed = wpautop($Mixed);
+            }
 
             $Result = $Formatter->Format($Mixed);
 
@@ -519,8 +521,10 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed);
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
-            if(C('Garden.Format.ReplaceNewlines', TRUE))
-               $Result = wpautop($Result); //preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
+            if(C('Garden.Format.ReplaceNewlines', TRUE)) {
+               $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
+//               $Result = wpautop($Result);
+            }
          }
          
          return $Result;

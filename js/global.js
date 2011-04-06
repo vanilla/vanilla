@@ -587,7 +587,7 @@ jQuery(document).ready(function($) {
 			$.ajax({
 				type: "POST",
 				url: gdn.url('dashboard/notifications/inform'),
-				data: 'TransientKey='+gdn.definition('TransientKey'),
+				data: { 'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path') },
 				dataType: 'json',
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');

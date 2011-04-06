@@ -193,6 +193,7 @@ class CategoriesController extends VanillaController {
       // Get category data and discussions
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
+      $this->CategoryModel->Watching = TRUE;
       $this->CategoryData = $this->CategoryModel->GetFull();
 		$this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();

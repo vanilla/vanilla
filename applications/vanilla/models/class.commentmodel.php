@@ -605,11 +605,11 @@ class CommentModel extends VanillaModel {
 					->Put();
 			}
 			
-			// Prepare the notification queue
+			// Prepare the notification queue.
          $ActivityModel = new ActivityModel();
 			$ActivityModel->ClearNotificationQueue();
 
-         // Notify any users who were mentioned in the comment
+         // Notify any users who were mentioned in the comment.
          $Usernames = GetMentions($Fields['Body']);
          $UserModel = Gdn::UserModel();
          $Story = '['.$Discussion->Name."]\n".ArrayValue('Body', $Fields, '');
@@ -635,7 +635,7 @@ class CommentModel extends VanillaModel {
             }
          }
          
-         // Notify users who have bookmarked the discussion
+         // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {
             // Check user can still see the discussion.
@@ -643,7 +643,7 @@ class CommentModel extends VanillaModel {
             
             if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID && $UserMayView) {
                $NotifiedUsers[] = $Bookmark->UserID;
-               $ActivityModel = new ActivityModel();   
+               $ActivityModel = new ActivityModel();
                $ActivityID = $ActivityModel->Add(
                   $Session->UserID,
                   'BookmarkComment',
@@ -657,13 +657,19 @@ class CommentModel extends VanillaModel {
             }
          }
 
-         // Record user-comment activity
+         // Record user-comment activity.
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
             $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
 				$ActivityModel->QueueNotification($ActivityID, $Story);
 			}
+
+         // Throw an event for users to add their own events.
+         $this->EventArguments['Comment'] = $Fields;
+         $this->EventArguments['Discussion'] = $Discussion;
+         $this->EventArguments['ActivityModel'] = $ActivityModel;
+         $this->FireEvent('BeforeNotification');
 				
-			// Send all notifications
+			// Send all notifications.
 			$ActivityModel->SendNotificationQueue();
       }
    }
@@ -682,6 +688,9 @@ class CommentModel extends VanillaModel {
     * @param int $SendEmail Passed directly to ActivityModel::Add().
     */  
    public function RecordActivity(&$ActivityModel, $Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
+      if (!in_array(GetValue('Type', $Discussion, ''), array('', 'Discussion')))
+         return;
+
       // Check InsertUser can still see the discussion.
       $UserModel = Gdn::UserModel();
       $UserMayView = $UserModel->GetCategoryViewPermission($Discussion->InsertUserID, $Discussion->CategoryID);
@@ -709,26 +718,28 @@ class CommentModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of the discussion we are updating.
     */
    public function UpdateCommentCount($DiscussionID) {
-      $this->FireEvent('BeforeUpdateCommentCount');
-      
+      // Get the discussion.
+      $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->FirstRow(DATASET_TYPE_ARRAY);
+
       $Data = $this->SQL
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')
          ->Select('c.CommentID', 'count', 'CountComments')
-         ->Select('d.Sink')
          ->From('Comment c')
-         ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
          ->Where('c.DiscussionID', $DiscussionID)
-         ->GroupBy('d.Sink')
-         ->Get()->FirstRow();
-      
-      if ($Data != FALSE) {
-         $this->SQL->Update('Discussion');
-         if ($Data->Sink == '0' && $Data->DateLastComment)
-            $this->SQL->Set('DateLastComment', $Data->DateLastComment);
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
 
-         $this->SQL->Set('LastCommentID', $Data->LastCommentID)
-            ->Set('CountComments', $Data->CountComments + 1)
+      $this->EventArguments['Discussion'] =& $Discussion;
+      $this->EventArguments['Counts'] =& $Data;
+      $this->FireEvent('BeforeUpdateCommentCount');
+      
+      if ($Discussion && $Data) {
+         $this->SQL->Update('Discussion');
+         if (!$Discussion['Sink'] && $Data['DateLastComment'])
+            $this->SQL->Set('DateLastComment', $Data['DateLastComment']);
+
+         $this->SQL->Set('LastCommentID', $Data['LastCommentID'])
+            ->Set('CountComments', $Data['CountComments'] + 1)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
 				

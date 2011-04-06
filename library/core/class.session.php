@@ -155,7 +155,10 @@ class Gdn_Session {
     *
     * @param Gdn_Authenticator $Authenticator
     */
-   public function End($Authenticator) {
+   public function End($Authenticator = NULL) {
+      if ($Authenticator == NULL)
+         $Authenticator = Gdn::Authenticator();
+
       $Authenticator->AuthenticateWith()->DeAuthenticate();
    }
 
@@ -256,7 +259,7 @@ class Gdn_Session {
     * @param int $UserID The UserID to start the session with.
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
-   public function Start($UserID = FALSE, $SetIdentity = TRUE) {
+   public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
       if (!Gdn::Config('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
@@ -271,7 +274,7 @@ class Gdn_Session {
 
          if ($this->User) {
             if ($UserID && $SetIdentity)
-               Gdn::Authenticator()->SetIdentity($UserID);
+               Gdn::Authenticator()->SetIdentity($UserID, $Persist);
 
             if (Gdn::Authenticator()->ReturningUser($this->User)) {
                $HourOffset = GetValue('HourOffset', $this->User->Attributes);

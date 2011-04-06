@@ -431,7 +431,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       // Ask the authenticator for this URLType
       $Return = $Authenticator->GetURL($URLType);
       // If it doesn't know, get the default from our config file
-      if (!$Return) $Return = Gdn::Config('Garden.Authenticator.'.$URLType);
+      if (!$Return) $Return = C('Garden.Authenticator.'.$URLType);
       
       $ExtraReplacementParameters = array(
          'Path'   => $Redirect,

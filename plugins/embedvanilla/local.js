@@ -30,13 +30,28 @@ $(function() {
    
          messageUrl = function(message) {
             var id = Math.floor(Math.random() * 100000);
-            if (remoteUrl.substr(-1))
+//            var remoteDomain = window.parent.location;
+//            remoteDomain = remoteDomain.protocol+'//'+remoteDomain.hostname+(remoteDomain.port ? ':'+remoteDomain.port:'')+'/';
+            if (remoteUrl[remoteUrl.length - 1] != '/')
                remoteUrl += '/';
-               
-            return remoteUrl + "/poll.html#poll:" + id + ":" + message;
+            return remoteUrl + "poll.html#poll:" + id + ":" + message;
+//            return remoteUrl + "#poll:" + id + ":" + message;
          }
         
          remotePostMessage = function(message, target) {
+            if (message.indexOf(':') >= 0) {
+               // Check to replace a similar message.
+               var messageType = message.split(':')[0];
+               for (var i = 0; i < messages.length; i++) {
+                  var messageI = messages[i];
+                  if (messageI.length >= messageType.length && messageI.substr(0, messageType.length) == messageType) {
+                     messages[i] = message;
+//                     console.log('Set message: '+message + ', ('+messageI+')' + messages.length);
+                     return;
+                  }
+               }
+            }
+//            console.log('Push message: '+message + ', ' + messages.length);
             messages.push(message);
          }
         
@@ -49,13 +64,24 @@ $(function() {
                },500);
             }
          }
-         
+
+         var nextMessageTime = new Date();
          setMessage = function() {
             if (messages.length == 0)
                return;
-            
+
+            var messageTime = new Date();
+            if (messageTime < nextMessageTime)
+               return;
+//            console.log('Polling. messageTime: '+messageTime.toString()+', nextMessageTime: '+nextMessageTime);
+
+            messageTime.setSeconds(messageTime.getSeconds() + 2);
+            nextMessageTime = messageTime;
+
             var message = messages.splice(0, 1)[0];
-            document.getElementById('messageFrame').src = messageUrl(message);
+            var url = messageUrl(message);
+
+            document.getElementById('messageFrame').src = url;
          }
            
          $(function() {
@@ -132,4 +158,12 @@ $(function() {
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
    }
+
+   var path = gdn.definition('Path', '');
+   if (path.length > 0 && path[0] != '/')
+      path = '/'+path;
+   remotePostMessage('location:' + path, '*');
+
+//   var foo = true;
+//   setInterval(function() { foo = !foo; if (foo) $('h1').hide(); else $('h1').show(); }, 100);
 });

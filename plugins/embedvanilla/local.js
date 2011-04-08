@@ -33,10 +33,9 @@ $(function() {
    
          messageUrl = function(message) {
             var id = Math.floor(Math.random() * 100000);
-//            var remoteDomain = window.parent.location;
-//            remoteDomain = remoteDomain.protocol+'//'+remoteDomain.hostname+(remoteDomain.port ? ':'+remoteDomain.port:'')+'/';
-            if (remoteUrl[remoteUrl.length - 1] != '/')
+            if (remoteUrl.substr(remoteUrl.length - 1) != '/')
                remoteUrl += '/';
+            
             return remoteUrl + "poll.html#poll:" + id + ":" + message;
 //            return remoteUrl + "#poll:" + id + ":" + message;
          }

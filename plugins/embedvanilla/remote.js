@@ -13,14 +13,14 @@ window.vanilla.embed = function(host) {
       disablePath = currentPath && currentPath[0] != "/";
       disablePath |= (window != top);
 
-   var optStr = function(name, undefinedValue, definedValue) {
+   var optStr = function(name, defaultValue, definedValue) {
       if (window['vanilla_'+name]) {
          if (definedValue == undefined)
             return window['vanilla_'+name];
          else
             return definedValue.replace('%s', window['vanilla_'+name]);
       }
-      return undefinedValue;
+      return defaultValue;
    }
 
    if (!currentPath || disablePath)
@@ -108,7 +108,7 @@ window.vanilla.embed = function(host) {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {
                currentPath = message[1];
-               location.href = embedUrl + "#" + currentPath;
+               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
             }
          }
       } else if (message[0] == 'unload') {

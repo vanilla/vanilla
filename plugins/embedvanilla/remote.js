@@ -49,7 +49,8 @@ window.vanilla.embed = function(host) {
       setInterval(function() {
          try {
             var vid = 'vanilla' + id;
-            var hash = window.frames[vid].frames['messageFrame'].location.hash.substr(6);
+            var hash = window.frames[vid].frames['messageFrame'].location.hash;
+            hash = hash.substr(6);
          } catch(e) {
             return;
          }
@@ -62,7 +63,7 @@ window.vanilla.embed = function(host) {
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
-      }, 300);
+      }, 200);
    }
 
    checkHash = function() {
@@ -87,11 +88,12 @@ window.vanilla.embed = function(host) {
    }
 
    processMessage = function(message) {
+//      console.log('processMessage: '+message);
       if (message[0] == 'height') {
          setHeight(message[1]);
       } else if (message[0] == 'location') {
          if (disablePath) {
-            currentPath = cmd[1];
+            //currentPath = cmd[1];
          } else {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {

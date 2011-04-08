@@ -359,7 +359,7 @@ class Gdn_Autoloader {
       
       $Extension = GetValue('Extension', $Options, NULL);
       
-      // Determine cache root disk location
+      // Determine cache root on-disk location
       $Hits = 0; str_replace(PATH_LOCAL_ROOT, '', $SearchPath, $Hits);
       if ($Hits) $MapRootLocation = PATH_LOCAL_CACHE;
       else $MapRootLocation = PATH_CACHE;
@@ -409,6 +409,73 @@ class Gdn_Autoloader {
       self::$MapGroups[$MapGroupIdentifier][$MapHash] = TRUE;
       
       return $AddPathResult;
+   }
+
+   public static function MakeMapHash($MapType,$ContextType,$Extension,$MapRootLocation) {
+      $MapIdentifier = implode('|',array(
+         $MapType,
+         $ContextType,
+         $Extension,
+         $MapRootLocation
+      ));
+
+      $MapHash = md5($MapIdentifier);
+
+      // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
+      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
+
+      return $MapHash;
+   }
+
+   /**
+    * This method frees the map storing information about the specified resource
+    *
+    * Takes a maptype, and an array of information about the resource in question:
+    * a plugininfo array, in the case of a plugin, or
+    *
+    * @param string $ContextType type of map to consider (one of the MAP_ constants)
+    * @param array $MapResourceArray array of information about the mapped resource
+    */
+   public static function SmartFree($ContextType, $MapResourceArray) {
+
+      $CacheFolder = @opendir(PATH_LOCAL_CACHE);
+      if (!$CacheFolder) return TRUE;
+      while ($File = readdir($CacheFolder)) {
+         $Extension = pathinfo($File, PATHINFO_EXTENSION);
+         if ($Extension == 'ini' && $File != 'locale_map.ini')
+            @unlink(CombinePaths(array(PATH_LOCAL_CACHE, $File)));
+      }
+
+//      echo __METHOD__."\n";
+//      echo "context: {$ContextType}\n";
+//      echo "resource:\n";
+//      print_r($MapResourceArray);
+//
+//      echo "mapgroups:\n";
+//      print_r(self::$MapGroups);
+//
+//      switch ($ContextType) {
+//         case 'plugin':
+//            $MapRootLocation = GetValue('SearchPath', $MapResourceArray);
+//            break;
+//         case 'application':
+//            $MapRootLocation = GetValue('SearchPath', $MapResourceArray);
+//            break;
+//      }
+//
+//
+//      foreach (array(
+//
+//
+//      ) as $MapType) {
+//
+//      }
+//      //echo
+//
+//
+//      echo "maps:\n";
+//      print_r(self::$Maps);
+//      die();
    }
    
    /**

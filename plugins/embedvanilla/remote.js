@@ -108,7 +108,7 @@ window.vanilla.embed = function(host) {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {
                currentPath = message[1];
-               location.href = embedUrl + "#" + currentPath;
+               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
             }
          }
       } else if (message[0] == 'unload') {

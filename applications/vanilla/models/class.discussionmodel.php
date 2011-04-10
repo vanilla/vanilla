@@ -147,7 +147,7 @@ class DiscussionModel extends VanillaModel {
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
-		$this->FireEvent('BeforeGet');
+		$this->FireEvent('BeforeGet'); // Also fires in GetCount() for consistency
 
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -430,6 +430,9 @@ class DiscussionModel extends VanillaModel {
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);
       }
+      
+      $this->EventArguments['Wheres'] = &$Wheres;
+		$this->FireEvent('BeforeGet'); // Also fires in Get() for consistency
          
       // Small optimization for basic queries
       if ($Wheres == '') {

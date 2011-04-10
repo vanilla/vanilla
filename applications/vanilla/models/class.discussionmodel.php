@@ -147,7 +147,7 @@ class DiscussionModel extends VanillaModel {
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
-		$this->FireEvent('BeforeGet'); // Also fires in GetCount() for consistency
+		$this->FireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -432,7 +432,7 @@ class DiscussionModel extends VanillaModel {
       }
       
       $this->EventArguments['Wheres'] = &$Wheres;
-		$this->FireEvent('BeforeGet'); // Also fires in Get() for consistency
+		$this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
          
       // Small optimization for basic queries
       if ($Wheres == '') {

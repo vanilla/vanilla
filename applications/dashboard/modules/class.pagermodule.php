@@ -146,13 +146,15 @@ class PagerModule extends Gdn_Module {
    
    // Builds a string with information about the page list's current position (ie. "1 to 15 of 56").
    // Returns the built string.
-   public function Details() {
+   public function Details($FormatString = '') {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
          
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
-         if ($this->_Totalled === TRUE) {
+         if ($FormatString != '') {
+            $Details = sprintf(T($FormatString), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+         } else if ($this->_Totalled === TRUE) {
             $Details = sprintf(T('%1$s to %2$s of %3$s'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
          } else {
             $Details = sprintf(T('%1$s to %2$s'), $this->Offset, $this->_LastOffset);
@@ -186,8 +188,7 @@ class PagerModule extends Gdn_Module {
     * @return bool True if this is the last page.
     */
    public function LastPage() {
-      $Result = $this->Offset + $this->Limit >= $this->TotalRecords;
-      return $Result;
+      return $this->Offset + $this->Limit >= $this->TotalRecords;
    }
 
    /**

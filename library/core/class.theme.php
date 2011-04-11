@@ -58,6 +58,7 @@ class Gdn_Theme {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
       $WithDomain = GetValue('WithDomain', $Options);
+      $Target = GetValue('Target', $Options, '');
 
       switch ($Path) {
          case 'dashboard':
@@ -135,14 +136,14 @@ class Gdn_Theme {
             if ($Session->IsValid()) {
                if(!$Text)
                   $Text = T('Sign Out');
-               $Path = Gdn::Authenticator()->SignOutUrl();
+               $Path = Gdn::Authenticator()->SignOutUrl($Target);
                $Class = ConcatSep(' ', $Class, 'SignOut');
             } else {
                if(!$Text)
                   $Text = T('Sign In');
                $Attribs = array();
 
-               $Path = Gdn::Authenticator()->SignInUrl('');
+               $Path = Gdn::Authenticator()->SignInUrl($Target);
                if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
                   $Class = ConcatSep(' ', $Class, 'SignInPopup');
             }

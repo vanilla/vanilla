@@ -374,5 +374,91 @@ class Gdn_Session {
          return FALSE;
       return $ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE;
    }
+	
+	/**
+	 * Place a name/value pair into the user's session stash.
+	 */
+	public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
+		if ($Name == '')
+			return;
+		
+      // Grab the user's session
+      $Session = $this->_GetStashSession();
+      if (!$Session)
+         return;
+      
+      $Attributes = unserialize($Session->Attributes);
+      if (!is_array($Attributes))
+         $Attributes = array();
+
+      // Stash or unstash the value depending on inputs
+      if ($Name != '' && $Value != '') {
+         $Attributes[$Name] = $Value;
+      } else if ($Name != '') {
+         $Value = GetValue($Name, $Attributes);
+			if ($UnsetOnRetrieve)
+				unset($Attributes[$Name]);
+      }
+      // Update the attributes
+      if ($Name != '') {
+         Gdn::SQL()->Update(
+            'Session',
+            array(
+               'Attributes' => serialize($Attributes)
+            ),
+            array(
+               'SessionID' => $Session->SessionID
+            )
+         )->Put();
+      }
+      return $Value;
+	}
+	   
+	/**
+	 * Used by $this->Stash() to create & manage sessions for users & guests.
+	 * This is a stop-gap solution until full session management for users &
+	 * guests can be imlemented.
+	 */
+   private function _GetStashSession() {
+      // Grab the entire session record
+      $SessionID = GetValue('VanillaSessionID', $_COOKIE, '');
+      $Session = Gdn::SQL()
+         ->Select()
+         ->From('Session')
+         ->Where('SessionID', $SessionID)
+         ->Get()
+         ->FirstRow();
+
+      if (!$Session) {
+         $SessionID = md5(mt_rand());
+         $TransientKey = substr(md5(mt_rand()), 0, 12);
+         // Save the session information to the database.
+         Gdn::SQL()->Insert(
+            'Session',
+            array(
+               'SessionID' => $SessionID,
+               'UserID' => Gdn::Session()->UserID,
+               'TransientKey' => $TransientKey,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'DateUpdated' => Gdn_Format::ToDateTime()
+            )
+         );
+         $Session = Gdn::SQL()
+            ->Select()
+            ->From('Session')
+            ->Where('SessionID', $SessionID)
+            ->Get()
+            ->FirstRow();
+            
+         // Save a session cookie
+         $Name = 'VanillaSessionID';
+         $Path = C('Garden.Cookie.Path', '/');
+         $Domain = C('Garden.Cookie.Domain', '');
+         $Expire = 0;
+         setcookie($Name, $SessionID, $Expire, $Path, $Domain);
+      }
+      return $Session;
+   }
+
 
 }

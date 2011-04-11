@@ -1420,7 +1420,7 @@ class Gdn_Form extends Gdn_Pluggable {
                   $this->_FormValues[$FieldName] = filter_input(
                      $InputType,
                      $Field,
-                     FILTER_SANITIZE_STRING,
+                     FILTER_DEFAULT,
                      FILTER_REQUIRE_ARRAY
                   );
                } else {

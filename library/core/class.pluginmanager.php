@@ -73,7 +73,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    protected $Started = FALSE;
 
    public function __construct() {
-
+      parent::__construct();
    }
 
    /**
@@ -884,6 +884,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $Plugin = $this->GetPluginInfo($PluginName);
       if ($Plugin)
          $PluginName = $Plugin['Index'];
+
+      Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_PLUGIN, $Plugin);
 
       // 1. Check to make sure that no other enabled plugins rely on this one
       // Get all available plugins and compile their requirements

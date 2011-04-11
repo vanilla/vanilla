@@ -20,4 +20,33 @@ jQuery(document).ready(function($) {
          });
       });
 
+   /* Discussion Checkboxes */
+   $('.DiscussionsTabs .Administration :checkbox').click(function() {
+      if ($(this).attr('checked'))
+         $('.DataList .Administration :checkbox').attr('checked', 'checked');
+      else
+         $('.DataList .Administration :checkbox').removeAttr('checked');
+   });
+   $('.Administration :checkbox').click(function() {
+      // retrieve all checked ids
+      var checkIDs = $('.DataList .Administration :checkbox');
+      var aCheckIDs = new Array();
+      checkIDs.each(function() {
+         item = $(this);
+         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+      });
+      $.ajax({
+         type: "POST",
+         url: gdn.url('/moderation/checkeddiscussions'),
+         data: { 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey') },
+         dataType: "json",
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            gdn.informMessage(XMLHttpRequest.responseText, { 'CssClass' : 'Dismissable' });
+         },
+         success: function(json) {
+            gdn.inform(json);
+         }
+      });
+   });
+
 });

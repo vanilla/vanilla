@@ -152,6 +152,12 @@ class DiscussionsController extends VanillaController {
       $this->AddJsFile('jquery.gardenmorepager.js');
       if (C('Garden.Modules.ShowSignedInModule'))
          $this->AddModule('SignedInModule');
+			
+		// Inform moderator of checked comments in this discussion
+		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
+		if (count($CheckedDiscussions) > 0)
+			ModerationController::InformCheckedDiscussions($this);
+			
 		$this->FireEvent('AfterInitialize');
    }
    

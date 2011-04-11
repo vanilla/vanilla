@@ -887,6 +887,19 @@ if (!function_exists('InArrayI')) {
    }
 }
 
+if (!function_exists('InSubArray')) {
+   /**
+    * Loop through $Haystack looking for subarrays that contain $Needle.
+    */
+   function InSubArray($Needle, $Haystack) {
+      foreach ($Haystack as $Key => $Val) {
+         if (is_array($Val) && in_array($Needle, $Val))
+            return TRUE;
+      }
+      return FALSE;
+   }
+}
+
 if (!function_exists('IsMobile')) {
    function IsMobile() {
       $Mobile = 0;
@@ -1519,6 +1532,17 @@ if (!function_exists('RemoveQuoteSlashes')) {
  	function RemoveQuoteSlashes($String) {
 		return str_replace("\\\"", '"', $String);
 	}
+}
+
+if (!function_exists('RemoveValueFromArray')) {
+   function RemoveValueFromArray(&$Array, $Value) {
+      foreach ($Array as $key => $val) {
+         if ($val == $Value) {
+            unset($Array[$key]);
+            break;
+         }
+      }
+   }
 }
 
 if (!function_exists('SafeGlob')) {

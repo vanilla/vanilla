@@ -1537,10 +1537,10 @@ class UserModel extends Gdn_Model {
       if (!$UserData)
          throw new Exception(T('ErrorRecordNotFound'));
 
-      $Values = Gdn_Format::Unserialize($UserData->$Column);
+      $Values = unserialize($UserData->$Column);
       // Throw an exception if the field was not empty but is also not an object or array
       if (is_string($Values) && $Values != '')
-         throw new Exception(T('Serialized column failed to be unserialized.'));
+         throw new Exception(sprintf(T('Serialized column "%s" failed to be unserialized.'),$Column));
 
       if (!is_array($Values))
          $Values = array();
@@ -1805,6 +1805,9 @@ class UserModel extends Gdn_Model {
       $UserID = 0;
       
       $Attributes = ArrayValue('Attributes', $Data);
+      if (is_string($Attributes))
+         $Attributes = @unserialize($Attributes);
+
       if (!is_array($Attributes))
          $Attributes = array();
 
@@ -1820,7 +1823,7 @@ class UserModel extends Gdn_Model {
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Attributes, 0);
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;
-         $UserData['Attributes'] = Gdn_Format::Serialize($Attributes);
+         $UserData['Attributes'] = $Attributes;
          if ($UserData['DateOfBirth'] == '')
             $UserData['DateOfBirth'] = '1975-09-16';
             

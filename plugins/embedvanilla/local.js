@@ -30,7 +30,6 @@ $(function() {
          }
       } else {
          var messages = [];
-   
          messageUrl = function(message) {
             var id = Math.floor(Math.random() * 100000);
             if (remoteUrl.substr(remoteUrl.length - 1) != '/')

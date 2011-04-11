@@ -31,7 +31,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Alt = !$Alt;
 	
 	if (!property_exists($Sender, 'CanEditComments'))
-		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any');
+		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
 		
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>

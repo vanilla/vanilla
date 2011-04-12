@@ -121,39 +121,35 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
    /*
     * Event system: Provide information for external hooks
     */
-
-   public function GetEvent(&$EventArguments) {
-      /**
-      * 1) Entity
-      * 2) Regarding Data
-      * 3) [optional] Options
-      */
-      $Response = array(
-         'EventSender'     => NULL,
-         'Entity'          => NULL,
-         'RegardingData'   => NULL,
-         'Options'         => NULL
-      );
-
-      if (sizeof($EventArguments) >= 1)
-         $Response['EventSender'] = $EventArguments[0];
-
-      if (sizeof($EventArguments) >= 2)
-         $Response['Entity'] = $EventArguments[1];
-
-      if (sizeof($EventArguments) >= 3)
-         $Response['RegardingData'] = $EventArguments[2];
-
-      if (sizeof($EventArguments) >= 4)
-         $Response['Options'] = $EventArguments[3];
-
-      return $Response;
-   }
-
+   
    public function MatchEvent($RegardingType, $ForeignType, $ForeignID = NULL) {
-      $EventOptions = $Sender->GetEvent($this->EventArguments);
-
-      return $EventOptions;
+      $RegardingData = GetValue('RegardingData', $this->EventArguments);
+      
+      $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
+      if (!is_array($RegardingType))
+         $RegardingType = array($RegardingType);
+      $Found = FALSE;
+      foreach ($RegardingType as $RegardingTypeInstance)
+         if (fnmatch($RegardingTypeInstance, $FoundRegardingType))
+            $Found = TRUE;
+      if (!$Found) return FALSE;
+      
+      $FoundForeignType = strtolower(GetValue('ForeignType', $RegardingData));
+      if (!is_array($ForeignType))
+         $ForeignType = array($ForeignType);
+      $Found = FALSE;
+      foreach ($ForeignType as $ForeignTypeInstance)
+         if (fnmatch($ForeignTypeInstance, $FoundForeignType))
+            $Found = TRUE;
+      if (!$Found) return FALSE;
+      
+      if (!is_null($ForeignID)) {
+         $FoundForeignID = GetValue('ForeignID', $RegardingData);
+         if ($FoundForeignID != $ForeignID)
+            return FALSE;
+      }
+      
+      return $this->EventArguments;
    }
 
    /*
@@ -171,7 +167,6 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
          while ($Comment = $Comments->NextRow())
             $CommentIDList[] = $Comment->CommentID;
       }
-
       $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
    }
 

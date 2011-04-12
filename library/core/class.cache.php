@@ -294,6 +294,10 @@ abstract class Gdn_Cache {
       // Allow overriding the prefix
       if (!is_null($ForcePrefix))
          return $ForcePrefix;
+      
+      // Allow vfcom-infrastructure to set the prefix automatically
+      if (defined('FORCE_CACHE_PREFIX') && FORCE_CACHE_PREFIX)
+         return $LocalPrefix = FORCE_CACHE_PREFIX;
        
       // Keep searching for the prefix until it is defined
       if ($LocalPrefix === FALSE) {

@@ -600,7 +600,8 @@ jQuery(document).ready(function($) {
 	
 		}, wait); // Ping once a minute.
 	}
-	pingForNotifications(1);
+   if (gdn.definition('SignedIn') == '1')
+      pingForNotifications(1);
 	
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value) {

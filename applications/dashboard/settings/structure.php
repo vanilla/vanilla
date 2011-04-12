@@ -246,6 +246,7 @@ if (!$PermissionTableExists) {
       'RoleID' => 32,
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
+      'Garden.Moderation.Manage' => 1,
       'Garden.Profiles.View' => 1
       ));
 
@@ -415,6 +416,7 @@ $Construct->Table('Regarding')
    ->Column('DateInserted', 'datetime', FALSE)
    ->Column('ForeignType', 'varchar(32)', FALSE)
    ->Column('ForeignID', 'int(11)', FALSE)
+   ->Column('OriginalContent', 'text', TRUE)
    ->Column('ParentType', 'varchar(32)', TRUE)
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)

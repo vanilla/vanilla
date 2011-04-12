@@ -629,6 +629,12 @@ if (!function_exists('Debug')) {
    }
 }
 
+if (!function_exists('Deprecated')) {
+   function Deprecated($Name) {
+      trigger_error($Name.' is deprecated.', E_USER_DEPRECATED);
+   }
+}
+
 if (!function_exists('ExternalUrl')) {
    function ExternalUrl($Path) {
       $Format = C('Garden.ExternalUrlFormat');

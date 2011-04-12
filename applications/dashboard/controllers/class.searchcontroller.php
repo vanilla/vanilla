@@ -10,6 +10,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class SearchController extends Gdn_Controller {
 
+   /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
    public $SearchModel;
 
    public $Uses = array('Database');
@@ -42,8 +47,6 @@ class SearchController extends Gdn_Controller {
       parent::Initialize();
    }
 	
-	public $Form;
-	
 	public function Index($Offset = 0, $Limit = NULL) {
 		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
@@ -56,7 +59,14 @@ class SearchController extends Gdn_Controller {
       $Mode = $this->Form->GetFormValue('Mode');
       if ($Mode)
          $this->SearchModel->ForceSearchMode = $Mode;
-		$ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
+      try {
+         $ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+         $ResultSet = array();
+      } catch (Exception $Ex) {
+         $ResultSet = array();
+      }
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
 		if($ResultSet)

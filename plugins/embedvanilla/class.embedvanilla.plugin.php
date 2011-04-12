@@ -15,7 +15,7 @@ ChangeLog
 $PluginInfo['embedvanilla'] = array(
    'Name' => '&lt;Embed&gt; Vanilla',
    'Description' => "Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you've created.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -41,6 +41,8 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		$Sender->AddDefinition('RemoteUrl', $RemoteUrl);
 		if (!IsSearchEngine() && !$InDashboard && C('Plugins.EmbedVanilla.ForceRemoteUrl'))
 			$Sender->AddDefinition('ForceRemoteUrl', TRUE);
+
+      $Sender->AddDefinition('Path', Gdn::Request()->Path());
 			
 		if ($InDashboard)
 			$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));

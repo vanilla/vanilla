@@ -351,6 +351,9 @@ class Gdn_Format {
     * @return string
     */
    public static function Date($Timestamp = '', $Format = '') {
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
+
       // Was a mysqldatetime passed?
       if (!is_numeric($Timestamp))
          $Timestamp = self::ToTimestamp($Timestamp);
@@ -468,6 +471,107 @@ class Gdn_Format {
          else
             return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
       }
+   }
+   
+   /**
+   * Show times relative to now
+   * 
+   * e.g. "4 hours ago"
+   * 
+   * Credit goes to: http://byteinn.com/res/426/Fuzzy_Time_function/
+   * 
+   * @param int optional $Timestamp, otherwise time() is used
+   * @return string
+   */
+   public static function FuzzyTime($Timestamp = NULL) {
+      if (is_null($Timestamp))
+         $Timestamp = time();
+      
+      $time = $Timestamp;
+      //echo $time." is: ";
+      if ( ( $time = strtotime( $time ) ) == false ) {
+         return T('an unknown time');
+      }
+      define( 'NOW',        time() );
+      define( 'ONE_MINUTE', 60 );
+      define( 'ONE_HOUR',   3600 );
+      define( 'ONE_DAY',    86400 );
+      define( 'ONE_WEEK',   ONE_DAY*7 );
+      define( 'ONE_MONTH',  ONE_WEEK*4 );
+      define( 'ONE_YEAR',   ONE_MONTH*12 );
+
+      // sod = start of day :)
+      $sod = mktime( 0, 0, 0, date( 'm', $time ), date( 'd', $time ), date( 'Y', $time ) );
+      $sod_now = mktime( 0, 0, 0, date( 'm', NOW ), date( 'd', NOW ), date( 'Y', NOW ) );
+
+      // used to convert numbers to strings
+      $convert = array( 1 => T('one'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven') );
+
+      // today
+      if ( $sod_now == $sod ) {
+         if ( $time > NOW-(ONE_MINUTE*3) ) {
+            return T('just a moment ago');
+         } else if ( $time > NOW-(ONE_MINUTE*7) ) {
+            return T('a few minutes ago');
+         } else if ( $time > NOW-(ONE_HOUR) ) {
+            return T('less than an hour ago');
+         }
+         return sprintf(T('today at %s'), date( 'g:ia', $time ));
+      }
+
+      // yesterday
+      if ( ($sod_now-$sod) <= ONE_DAY ) {
+         if ( date( 'i', $time ) > (ONE_MINUTE+30) ) {
+            $time += ONE_HOUR/2;
+         }
+         return sprintf(T('yesterday around %s'), date( 'ga', $time ));
+      }
+
+      // within the last 5 days
+      if ( ($sod_now-$sod) <= (ONE_DAY*5) ) {
+         $str = date( 'l', $time );
+         $hour = date( 'G', $time );
+         if ( $hour < 12 ) {
+            $str .= T(' morning');
+         } else if ( $hour < 17 ) {
+            $str .= T(' afternoon');
+         } else if ( $hour < 20 ) {
+            $str .= T(' evening');
+         } else {
+            $str .= T(' night');
+         }
+         return $str;
+      }
+
+      // number of weeks (between 1 and 3)...
+      if ( ($sod_now-$sod) < (ONE_WEEK*3.5) ) {
+         if ( ($sod_now-$sod) < (ONE_WEEK*1.5) ) {
+            return T('about a week ago');
+         } else if ( ($sod_now-$sod) < (ONE_DAY*2.5) ) {
+            return T('about two weeks ago');
+         } else {
+            return T('about three weeks ago');
+         }
+      }
+
+      // number of months (between 1 and 11)...
+      if ( ($sod_now-$sod) < (ONE_MONTH*11.5) ) {
+         for ( $i = (ONE_WEEK*3.5), $m=0; $i < ONE_YEAR; $i += ONE_MONTH, $m++ ) {
+            if ( ($sod_now-$sod) <= $i ) {
+               return sprintf(T('about %s month%s ago'),$convert[$m],(($m>1)?'s':''));
+            }
+         }
+      }
+
+      // number of years...
+      for ( $i = (ONE_MONTH*11.5), $y=0; $i < (ONE_YEAR*10); $i += ONE_YEAR, $y++ ) {
+         if ( ($sod_now-$sod) <= $i ) {
+            return sprintf(T('about %s year%s ago'),$convert[$y],(($y>1)?'s':''));
+         }
+      }
+
+      // more than ten years...
+      return T('more than ten years ago');
    }
 
    /**
@@ -702,7 +806,7 @@ EOT;
          return self::To($Mixed, 'Text');
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
-         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_COMPAT, $Charset)), ENT_QUOTES, $Charset);
+         $Result = htmlspecialchars(strip_tags(html_entity_decode($Mixed, ENT_QUOTES, $Charset)), ENT_QUOTES, $Charset);
          if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
             $Result = nl2br(trim($Result));
          return $Result;

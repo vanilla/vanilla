@@ -5,9 +5,9 @@
 ?>
 <div class="Info">
 <?php
-echo '<div>', T('Your post will appear once it\'s been approved.'), '</div>';
+echo '<div>', T("Your post will appear once it's been approved."), '</div>';
 
 if ($this->Data('DiscussionUrl'))
-   echo '<div>', sprintf(T('Click <a href="%s">here</a> to go back to the discussion.'), $this->Data('DiscussionUrl')), '</div>';
+   echo '<div>', sprintf(T('Click <a href="%s">here</a> to go back to the discussion.'), Url($this->Data('DiscussionUrl'))), '</div>';
 ?>
 </div>

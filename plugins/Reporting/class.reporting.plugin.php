@@ -31,7 +31,7 @@ class ReportingPlugin extends Gdn_Plugin {
 
    public function __construct() {
       $this->ReportEnabled = C('Plugins.Reporting.ReportEnabled', TRUE);
-      $this->AwesomeEnabled = C('Plugins.Reporting.AwesomeEnabled', FALSE);
+      $this->AwesomeEnabled = C('Plugins.Reporting.AwesomeEnabled', TRUE);
 
       $this->DrawButtons = C('Plugins.Reporting.DrawButtons', TRUE);
    }
@@ -72,9 +72,9 @@ class ReportingPlugin extends Gdn_Plugin {
    * @param mixed $Sender
    */
    public function Controller_Report($Sender) {
-
       if (!($UserID = Gdn::Session()->UserID))
          throw new Exception(T('Cannot report content while not logged in.'));
+         
       $UserName = Gdn::Session()->User->Name;
 
       $Arguments = $Sender->RequestArgs;
@@ -126,25 +126,6 @@ class ReportingPlugin extends Gdn_Plugin {
       $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-/*
-         switch (strtolower($Context)) {
-            case 'comment':
-               $Regarding->WithParent('discussion', GetValue('DiscussionID', $ReportElement));
-               break;
-
-            case 'discussion':
-               break;
-
-            case 'conversationmessage':
-               $Regarding->WithParent('conversation', GetValue('ConversationID', $ReportElement));
-               break;
-
-            case 'conversation':
-               break;
-
-         }
-*/
-         
          $RegardingTitle = sprintf(T("Reported: '%s' by %s"), $ElementShortTitle, $ElementAuthorName);
          $Regarding = Gdn::Regarding()
             ->That($Context, $ElementID, $ReportElement)
@@ -169,6 +150,75 @@ class ReportingPlugin extends Gdn_Plugin {
    * @param mixed $Sender
    */
    public function Controller_Awesome($Sender) {
+      if (!($UserID = Gdn::Session()->UserID))
+         throw new Exception(T('Cannot report content while not logged in.'));
+         
+      $UserName = Gdn::Session()->User->Name;
+
+      $Arguments = $Sender->RequestArgs;
+      if (sizeof($Arguments) != 4)
+         throw new Exception(sprintf(T("Incorrect arg-count. Doesn't look like a legit request. Got %s arguments, expected 4."),sizeof($Arguments)));
+
+      list($EventType, $Context, $ElementID, $EncodedURL) = $Arguments;
+      $URL = base64_decode(str_replace('-','=',$EncodedURL));
+
+      $ReportElementModelName = ucfirst($Context).'Model';
+      if (!class_exists($ReportElementModelName))
+         throw new Exception(T('Cannot report on an entity with no model.'));
+
+      // Ok we're good to go for sure now
+
+      $ReportElementModel = new $ReportElementModelName();
+      $ReportElement = $ReportElementModel->GetID($ElementID);
+
+      $ElementTitle = Gdn_Format::Text(GetValue('Name', $ReportElement, NULL), FALSE);
+      $ElementExcerpt = Gdn_Format::Text(GetValue('Body', $ReportElement, NULL), FALSE);
+      if (!is_null($ElementExcerpt)) {
+         $Original = strlen($ElementExcerpt);
+         $ElementExcerpt = substr($ElementExcerpt, 0, 140);
+         if ($Original > strlen($ElementExcerpt))
+            $ElementExcerpt .= "...";
+      }
+      
+      if (is_null($ElementTitle))
+         $ElementTitle = $ElementExcerpt;
+         
+      $ElementShortTitle = (strlen($ElementTitle) <= 143) ? $ElementTitle : substr($ElementTitle, 0, 140).'...';
+
+      $ElementAuthorID = GetValue('InsertUserID', $ReportElement);
+      $ElementAuthor = Gdn::UserModel()->GetID($ElementAuthorID);
+      $ElementAuthorName = GetValue('Name', $ElementAuthor);
+
+      $ReportingData = array(
+         'Context'         => $Context,
+         'ElementID'       => $ElementID,
+         'ElementTitle'    => $ElementTitle,
+         'ElementExcerpt'  => $ElementExcerpt,
+         'ElementAuthor'   => $ElementAuthor,
+         'URL'             => $URL,
+         'UserID'          => $UserID,
+         'UserName'        => $UserName
+      );
+
+      $RegardingAction = C('Plugins.Reporting.AwesomeAction', FALSE);
+      $RegardingActionSupplement = C('Plugins.Reporting.AwesomeActionSupplement', FALSE);
+
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $RegardingTitle = sprintf(T("Awesome: '%s' by %s"), $ElementShortTitle, $ElementAuthorName);
+         $Regarding = Gdn::Regarding()
+            ->That($Context, $ElementID, $ReportElement)
+            ->ItsAwesome()
+            ->ForCollaboration($RegardingAction, $RegardingActionSupplement)
+            ->Entitled($RegardingTitle)
+            ->From(Gdn::Session()->UserID)
+            ->Because($Sender->Form->GetValue('Plugin.Reporting.Reason'))
+            ->Located(TRUE) // build URL automatically
+            ->Commit();
+
+         $Sender->InformMessage('<span class="InformSprite Heart"></span>'.T('Your suggestion has been registered. Thankyou!'), 'HasSprite Dismissable AutoDismiss');
+      }
+
+      $Sender->SetData('Plugin.Reporting.Data', $ReportingData);
       $Sender->Render($this->GetView('awesome.php'));
    }
 
@@ -177,7 +227,7 @@ class ReportingPlugin extends Gdn_Plugin {
     */
 
    public function DiscussionController_CommentOptions_Handler($Sender) {
-      if (!C('Plugins.Reporting.DrawButtons', TRUE)) return;
+      if (!$this->DrawButtons) return;
       
       // You can't report or 'awesome' your own posts
       if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
@@ -230,10 +280,40 @@ class ReportingPlugin extends Gdn_Plugin {
     */
 
    public function Gdn_Regarding_RegardingDisplay_Handler($Sender) {
-      echo "passthrough\n";
-      list($EventSender, $Entity, $RegardingData, $Options) = $Sender->MatchEvent('*', 'discussion');
-      echo "matched regarding data.";
-      print_r($RegardingData);
+      $Event = $Sender->MatchEvent(array('report', 'awesome'), '*');
+      if ($Event === FALSE)
+         return;
+      
+      $Entity = GetValue('Entity', $Event);
+      $RegardingData = GetValue('RegardingData', $Event);
+      $RegardingType = GetValue('Type', $RegardingData);
+      $ReportInfo = array(
+         'ReportingUser'         => Gdn::UserModel()->GetID(GetValue('InsertUserID', $RegardingData)),
+         'EntityType'            => T(ucfirst(GetValue('ForeignType', $RegardingData))),
+         'ReportedUser'          => Gdn::UserModel()->GetID(GetValue('InsertUserID', $Entity)),
+         'ReportedTime'          => GetValue('DateInserted', $RegardingData),
+         'EntityURL'             => GetValue('ForeignURL', $RegardingData, NULL)
+      );
+      
+      if (!is_null($ReportedReason = GetValue('Comment', $RegardingData, NULL)))
+         $ReportInfo['ReportedReason'] = $ReportedReason;
+         
+      if (!is_null($ReportedContent = GetValue('OriginalContent', $RegardingData, NULL)))
+         $ReportInfo['OriginalContent'] = $ReportedContent;
+      
+      Gdn::Controller()->SetData('RegardingSender', $Sender);
+      Gdn::Controller()->SetData('Entity', $Entity);
+      Gdn::Controller()->SetData('RegardingData', $RegardingData);
+      Gdn::Controller()->SetData('ReportInfo', $ReportInfo);
+      echo Gdn::Controller()->FetchView("{$RegardingType}-regarding",'','plugins/Reporting');
+   }
+   
+   public function Gdn_Regarding_RegardingActions_Handler($Sender) {
+      $Event = $Sender->MatchEvent('report', '*');
+      if ($Event === FALSE)
+         return;
+      
+      // Add buttonz hurr?
    }
 
    /*

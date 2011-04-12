@@ -147,7 +147,7 @@ class DiscussionModel extends VanillaModel {
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
-		$this->FireEvent('BeforeGet');
+		$this->FireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -430,6 +430,9 @@ class DiscussionModel extends VanillaModel {
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);
       }
+      
+      $this->EventArguments['Wheres'] = &$Wheres;
+		$this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
          
       // Small optimization for basic queries
       if ($Wheres == '') {
@@ -449,6 +452,46 @@ class DiscussionModel extends VanillaModel {
          ->Get()
          ->FirstRow()
          ->CountDiscussions;
+   }
+
+   /**
+    * Get data for a single discussion by ForeignID.
+    * 
+    * @since 2.0.18
+    * @access public
+    * 
+	 * @param int $ForeignID Foreign ID of discussion to get.
+	 * @return object SQL result.
+	 */
+   public function GetForeignID($ForeignID, $Type = '') {
+      $Session = Gdn::Session();
+      $this->FireEvent('BeforeGetForeignID');
+      $this->SQL
+         ->Select('d.*')
+         ->Select('ca.Name', '', 'Category')
+         ->Select('ca.UrlCode', '', 'CategoryUrlCode')
+         ->Select('ca.PermissionCategoryID')
+         ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+         ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('d.DateLastComment', '', 'LastDate')
+         ->Select('d.LastCommentUserID', '', 'LastUserID')
+         ->Select('lcu.Name', '', 'LastName')
+			->Select('iu.Name', '', 'InsertName')
+			->Select('iu.Photo', '', 'InsertPhoto')
+         ->From('Discussion d')
+         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
+         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
+			->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // Insert user
+			->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
+         ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
+         ->Where('d.ForeignID', $ForeignID);
+		
+		if ($Type != '')
+			$this->SQL->Where('d.Type', $Type);
+			
+		return $this->SQL
+         ->Get()
+         ->FirstRow();
    }
 
    /**

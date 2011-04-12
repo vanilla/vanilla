@@ -76,6 +76,7 @@ $CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 $Construct
    ->PrimaryKey('DiscussionID')
    ->Column('Type', 'varchar(10)', NULL, 'index')
+   ->Column('ForeignID', 'varchar(30)', NULL, 'index') // For relating foreign records to discussions
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')

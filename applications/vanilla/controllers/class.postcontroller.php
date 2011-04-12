@@ -431,6 +431,7 @@ class PostController extends VanillaController {
                      // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                      $OrderBy = GetValueR('0.0', $this->CommentModel->OrderBy());
                      $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
+							$DisplayNewCommentOnly = $this->Form->GetFormValue('DisplayNewCommentOnly');
 
                      if (!$Redirect) {
                         // Otherwise load all new comments that the user hasn't seen yet
@@ -444,7 +445,7 @@ class PostController extends VanillaController {
                         $Limit = C('Vanilla.Comments.PerPage', 50);
 
                         // Redirect if the new new comment isn't on the same page.
-                        $Redirect |= PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
+                        $Redirect |= !$DisplayNewCommentOnly && PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
                      }
 
                      if ($Redirect) {
@@ -453,7 +454,11 @@ class PostController extends VanillaController {
                         $this->CommentData = NULL;
                      } else {
                         // Make sure to load all new comments since the page was last loaded by this user
-                        $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+								if ($DisplayNewCommentOnly)
+									$this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
+								else 
+									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+
                         $this->SetData('NewComments', TRUE);
                         $this->ControllerName = 'discussion';
                         $this->View = 'comments';

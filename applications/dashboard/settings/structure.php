@@ -151,6 +151,15 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
    
+$Construct->Table('Session')
+	->Column('SessionID', 'char(32)', FALSE, 'primary')
+	->Column('UserID', 'int', 0)
+	->Column('DateInserted', 'datetime', FALSE)
+	->Column('DateUpdated', 'datetime', FALSE)
+	->Column('TransientKey', 'varchar(12)', FALSE)
+	->Column('Attributes', 'text', NULL)
+	->Set($Explicit, $Drop);
+
 $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
    ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')

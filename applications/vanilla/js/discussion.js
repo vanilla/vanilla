@@ -73,7 +73,6 @@ jQuery(document).ready(function($) {
       $(parent).find('div.Tabs ul:first').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
       $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
-      
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
       $.ajax({
          type: "POST",
@@ -149,6 +148,7 @@ jQuery(document).ready(function($) {
                   
                $('ul#Menu li.MyDrafts a').html(json.MyDrafts);
             }
+
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
             if (json.FormSaved == false) {
@@ -179,8 +179,13 @@ jQuery(document).ready(function($) {
                } else {
                   gdn.definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
-                  $(json.Data).appendTo('ul.Discussion');
-                  $('ul.Discussion li:last').effect("highlight", {}, "slow");
+                  if (gdn.definition('PrependNewComments') == '1') {
+                     $(json.Data).prependTo('ul.Discussion');
+                     $('ul.Discussion li:first').effect("highlight", {}, "slow");
+                  } else {
+                     $(json.Data).appendTo('ul.Discussion');
+                     $('ul.Discussion li:last').effect("highlight", {}, "slow");
+                  }
                }
                // Remove any "More" pager links
                $('#PagerMore').remove();

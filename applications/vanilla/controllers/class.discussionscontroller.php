@@ -91,10 +91,16 @@ class DiscussionsController extends VanillaController {
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->Watching = TRUE;
+      
+      // Get Discussion Count
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
+      
+      // Get Announcements
       $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
+      
+      // Get Discussions
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);

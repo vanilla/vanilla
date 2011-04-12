@@ -436,7 +436,7 @@ class Gdn_Autoloader {
     * @param string $ContextType type of map to consider (one of the MAP_ constants)
     * @param array $MapResourceArray array of information about the mapped resource
     */
-   public static function SmartFree($ContextType, $MapResourceArray) {
+   public static function SmartFree($ContextType = NULL, $MapResourceArray = NULL) {
 
       $CacheFolder = @opendir(PATH_LOCAL_CACHE);
       if (!$CacheFolder) return TRUE;
@@ -470,12 +470,6 @@ class Gdn_Autoloader {
 //      ) as $MapType) {
 //
 //      }
-//      //echo
-//
-//
-//      echo "maps:\n";
-//      print_r(self::$Maps);
-//      die();
    }
    
    /**

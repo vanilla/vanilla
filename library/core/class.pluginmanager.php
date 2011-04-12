@@ -120,7 +120,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
             // Check Cache
             $SearchPathCacheKey = 'Garden.Plugins.PathCache.'.$SearchPath;
-            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey);
+            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
 
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
             $CacheIntegrityCheck = FALSE;
@@ -154,7 +154,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                   continue;
 
                $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache);
+               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
             }
 
             $this->PluginCache = array_merge($this->PluginCache, $CachePluginInfo);
@@ -878,7 +878,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       Gdn::Locale()->Set(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
       return TRUE;
    }
-
+   
    public function DisablePlugin($PluginName) {
       // Get the plugin and make sure it's name is the correct case.
       $Plugin = $this->GetPluginInfo($PluginName);

@@ -24,6 +24,7 @@ $Definition['_Locale'] = 'ロケール';
 $Definition['A url-friendly version of the category name for better SEO.'] = 'SEO に適したカテゴリ名の URL フレンドリー バージョン';
 $Definition['Action'] = 'アクション';
 $Definition['Activate'] = 'アクティベート';  // 認証 画面で使用
+$Definition['Activity'] = 'アクティビティ'; // translation follows facebook. See http://www.facebook.com/help/?faq=15699&hloc=ja_JP
 $Definition['Add'] = '追加';
 $Definition['Add Message'] = 'メッセージを追加';
 $Definition['Add Route'] = 'ルートを追加';
@@ -34,6 +35,8 @@ $Definition['Advanced'] = '高度な設定';
 $Definition['Advanced Forum Settings'] = '高度なフォーラム設定';
 $Definition['All'] = 'すべて';
 $Definition['All %1$s'] = 'すべて %1$s';
+$Definition['All Conversations'] = 'すべてのプライベート メッセージ';
+$Definition['All Discussions'] = 'すべてのディスカッション';
 $Definition['Announce'] = 'お知らせ';  // vanilla 側の翻訳と統一
 $Definition['Appearance'] = '外観';
 $Definition['Applicant'] = '申請者';
@@ -64,6 +67,39 @@ $Definition['Categories'] = 'カテゴリ';
 $Definition['Categories are used to help organize discussions.'] = 'カテゴリはディスカッションをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Category Url:'] = 'カテゴリ URL:';
+$Definition['Welcome to Vanilla!'] = 'ようこそ Vanilla へ！';
+$Definition['About'] = 'ユーザー情報';
+$Definition['Change My Picture'] = 'プロフィール画像を変更';
+$Definition['Change My Password'] = 'パスワードを変更';
+$Definition['My Preferences'] = '個人設定';
+$Definition['My Bookmarks'] = 'フォロー中のディスカッション';
+$Definition['My Discussions'] = '自分のディスカッション';
+$Definition['Announcement'] = 'お知らせ';
+$Definition['Started by %1$s'] = '開始ユーザー %1$s';
+$Definition['Roles'] = '役割';
+$Definition['Joined'] = '登録日';
+$Definition['Gender'] = '性別';
+$Definition['Male'] = '男性';
+$Definition['Female'] = '女性';
+$Definition['Old Password'] = '古いパスワード';
+$Definition['Change Password'] = 'パスワードを変更';
+$Definition['Visits'] = 'ログイン回数';
+$Definition['Email Notifications'] = 'メール通知設定';
+$Definition['Notifications'] = '通知';
+$Definition['Notify me of private messages.'] = '個人メッセージを通知する。';
+$Definition['Recipients'] = '宛先';
+$Definition['Notify me when I am added to private conversations.'] = 'プライベート メッセージに自分が追加されたら通知する。';
+$Definition['Notify me when people comment on my bookmarked discussions.'] = 'フォロー中のディスカッションにコメントが付いたら通知する。';
+$Definition['Notify me when people comment on my discussions.'] = '自分のディスカッションにコメントが付いたら通知する。';
+$Definition['Notify me when people mention me in comments.'] = 'コメントで自分に@リプライされたら通知する。';
+$Definition['Notify me when people mention me in discussion titles.'] = 'ディスカッション タイトルで自分に@リプライされたら通知する。';
+$Definition['Notify me when people reply to my wall comments.'] = 'ウォールに付けたコメントに返信されたら通知する。';
+$Definition['Notify me when people write on my wall.'] = '自分のウォールにコメントが付いたら通知する。';
+$Definition['You do not have any notifications yet.'] = '通知はありません。';
+$Definition['Save Preferences'] = '個人設定を保存';
+$Definition['Select an image on your computer (2mb max)'] = 'コンピュータ内から画像を選んでください (2MBまで)';
+$Definition['By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'] = 'ファイルのアップロードによって、あなたが画像の配布権利者であり、利用規約に違反しないことを保証するものとします。';
+$Definition['Allow other members to see your email?'] = '他のメンバーにメールアドレスを公開する';
 $Definition['Change the way that new users register with the site.'] = '新規ユーザーがサイトに登録する方法を変更してください。';
 $Definition['Check all permissions that apply for each role'] = '以下の役割に適用する権限すべてにチェックを入れてください';
 $Definition['Check all roles that apply to this user:'] = 'このユーザーに適用する役割にすべてチェックを入れてください:';
@@ -71,12 +107,14 @@ $Definition['Choose a locale pack'] = 'ロケール パックを選んでくだ�
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'あなたのフォーラムの認証スキームを選んで設定してください。';
 $Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
 $Definition['Close'] = '終了';
+
 $Definition['comment(s)'] = '件のコメント';
 $Definition['Comments'] = 'コメント';
 $Definition['Comments per Page'] = '1 ページに表示する最大コメント数';
+$Definition['Comment'] = 'コメントを投稿';
 $Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Confirm'] = '確認';
-$Definition['Confirm Email'] = 'E メール確認待ち';
+$Definition['Confirm Email'] = 'メール確認待ち';
 $Definition['Consumer Key'] = 'Consumer Key';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
 $Definition['Consumer Secret'] = 'Consumer Secret';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
 $Definition['Conversation Messages'] = 'プライベート メッセージ数';
@@ -99,17 +137,31 @@ $Definition['Disabled %1$s'] = '無効 %1$s';
 $Definition['Discussion & Comment Editing'] = 'ディスカッション & コメント編集';
 $Definition['discussion(s)'] = '件のディスカッション';
 $Definition['Discussions'] = 'ディスカッション';
+$Definition['Discussion Title'] = 'ディスカッション タイトル';
 $Definition['Discussions per Page'] = '1 ページに表示する最大ディスカッション数';
+$Definition['Post Discussion'] = 'ディスカッションを投稿';
+$Definition['Save Draft'] = '下書きとして保存';
+$Definition['Preview'] = 'プレビュー';
+$Definition['My Drafts'] = '下書き';
+$Definition['Write Comment'] = 'コメントを書く';
+$Definition['Back to Discussions'] = 'ディスカッション一覧に戻る';
+$Definition['Permalink'] = '固定リンク';
+$Definition['permalink'] = '固定リンク';
+$Definition['Bookmarked Discussions'] = 'フォロー中のディスカッション';
+$Definition['Post Comment'] = 'コメントを投稿';
+$Definition['Delete Discussion'] = 'ディスカッションを削除';
+$Definition['Delete'] = '削除する';
 // $Definition['dot'] = 'ドット';  // JavaScript でメールアドレス変換する都合上、翻訳しません。
 
 $Definition['Edit'] = '編集';
 $Definition['edit'] = '編集';
 $Definition['Edit Category'] = 'カテゴリを編集';
+$Definition['Edit My Account'] = 'アカウントを編集';
 $Definition['Edit User'] = 'ユーザーを編集';
 $Definition['EditContentTimeout.Notes'] = '註: ユーザーが内容を編集できる役割に属している場合は、ここで選択する値よりも役割の設定の方が優先されます。';
-$Definition['Email'] = 'メール アドレス';
-$Definition['Email sent from the application will be addressed from the following name and address'] = 'アプリケーションから送信される E メールの送信元には、以下の名前とメール アドレスが使用されます';
-$Definition['Email visible to other users'] = '他のメンバーにメール アドレスを公開する';
+$Definition['Email'] = 'メールアドレス';
+$Definition['Email sent from the application will be addressed from the following name and address'] = 'アプリケーションから送信されるメールの送信元には、以下の名前とメールアドレスが使用されます';
+$Definition['Email visible to other users'] = '他のメンバーにメールアドレスを公開する';
 $Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 
 あなたの会員登録が完了しました。以下のリンクからログインしてください:
@@ -132,7 +184,7 @@ $Definition['Forum Settings'] = 'フォーラム設定';
 
 $Definition['Garden.Email.SupportAddress'] = 'サポートメール';
 $Definition['Garden.Import.Description'] = 'このページを使用して、Vanilla のエクスポート機能を使用してエクスポートされた別のフォーラムからのデータをインポートしてください。 詳しくは<a href="%s">インポートについて (英語)</a> を参照してください。'; // 'Use this page to import data from another forum that was exported using Vanilla\'s exporter. For more information <a href="%s">see our importing documentation</a>.'
-$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメール アドレスとパスワードを入力してください。'; // 'Enter the email and password of the admin user from the data being imported.'
+$Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメールアドレスとパスワードを入力してください。'; // 'Enter the email and password of the admin user from the data being imported.'
 $Definition['Garden.Import.Overwrite.Description'] = '警告: このフォーラムのすべてのデータが上書きされます。'; // 'Warning: All data in this forum will be overwritten.'
 $Definition['Generate'] = '生成';
 $Definition['Generate Password'] = 'パスワードを生成';
@@ -202,6 +254,7 @@ $Definition['New users are reviewed and approved by an administrator (that\'s yo
 $Definition['New users fill out a simple form and are granted access immediately.'] = '新規メンバーは簡単なフォームに記入をすれば、すぐにアクセスを許可されます。';
 $Definition['New users in the last day'] = '過去一日間の新規ユーザー数';
 $Definition['New users in the last week'] = '過去一週間の新規ユーザー数';
+$Definition['No discussions were found.'] = 'ディスカッションは見つかりませんでした。';
 $Definition['None'] = 'なし';
 $Definition['Not Authorized (401)'] = '認証できません (401)';
 $Definition['Not Found (404)'] = '見つかりません (404)';
@@ -214,7 +267,7 @@ $Definition['Options'] = 'オプション';
 $Definition['Or Spamblock For'] = '違反時のスパムブロック時間';
 $Definition['Organize your Categories'] = 'カテゴリを編成';
 $Definition['Other Themes'] = '他のテーマ';
-$Definition['Outgoing Email'] = 'E メール送信';
+$Definition['Outgoing Email'] = 'メール送信';
 
 $Definition['Page'] = '表示対象';
 $Definition['Panel Box'] = 'パネル ボックス';
@@ -230,6 +283,7 @@ $Definition['Prevent spam on your forum by limiting the number of discussions &a
 $Definition['Private Key'] = 'プライベート キー';
 $Definition['Public Key'] = '公開キー';
 
+$Definition['Recent Activity'] = '最近のアクティビティ'; // translation follows facebook. See http://www.facebook.com/help/?faq=15699&hloc=ja_JP
 $Definition['Recent News'] = '最新ニュース';
 $Definition['Recent Tutorials'] = '最新チュートリアル';
 $Definition['Recently Active Users'] = '最近 活動したユーザー';
@@ -239,7 +293,7 @@ $Definition['Remove'] = '削除';
 $Definition['Remove locale developer files.'] = 'ロケール デベロッパーのファイルを削除して、変更をリセットします。';
 $Definition['Requires: '] = '動作要件: ';
 $Definition['Reset Password'] = 'パスワードのリセット';
-$Definition['Reset password and send email notification to user'] = 'パスワードをリセットして、ユーザーに E メールで通知';
+$Definition['Reset password and send email notification to user'] = 'パスワードをリセットして、ユーザーにメールで通知';
 $Definition['Reveal Password'] = 'パスワードを表示';
 $Definition['Role'] = '役割';
 $Definition['Roles & Permissions'] = '役割と権限';
@@ -251,6 +305,7 @@ $Definition['Routes can be used to redirect users to various parts of your site 
 
 $Definition['Save'] = '保存';
 $Definition['Search'] = '検索';
+$Definition['↳ Search results for \'%s\''] = '「<b class="search_term">%s</b>」の検索結果';
 $Definition['seconds'] = '秒間';
 $Definition['Select the file to import'] = 'インポートするファイルを選択してください';
 $Definition['Settings'] = '設定';
@@ -262,6 +317,9 @@ $Definition['SMTP Port'] = 'SMTP ポート';
 $Definition['SMTP Security'] = 'SMTP セキュリティ';
 $Definition['SMTP User'] = 'SMTP ユーザー';
 $Definition['Spam'] = 'スパム';
+$Definition['Start Conversation'] = 'プライベート メッセージを作成する';
+$Definition['Start a New Conversation'] = '新しいPM(グループ)を作成';
+$Definition['Start a New Discussion'] = '新しいディスカッションを開始';
 $Definition['Start your First Discussion'] = '最初のディスカッションを開始する';
 
 $Definition['Target'] = '対象';
@@ -290,22 +348,25 @@ $Definition['User'] = 'ユーザー';
 $Definition['User Registration Settings'] = 'ユーザー登録設定';
 $Definition['Username'] = 'ユーザー名';
 $Definition['Users'] = 'ユーザー';
+$Definition['Just you!'] = '自分宛てです。';
 
 $Definition['ValidateRequired'] = '%sは必須です。';
+$Definition['ValidateOneOrMoreArrayItemRequired'] = 'ユーザーを１人以上指定してください。';
 $Definition['Vanilla.Archive.Description'] = '特定の日付より古いディスカッションをアーカイブ化できます。アーカイブ化されたディスカッションは事実上 閉じられ、新しいコメントを受け付けなくなります。';
 $Definition['Version'] = 'バージョン';
 $Definition['Version %s'] = 'バージョン %s';
 $Definition['version %s'] = 'バージョン %s';
 $Definition['View'] = '表示';
+$Definition['Clear'] = 'クリア';
 $Definition['Visit Site'] = 'サイトへ移動';
 
 $Definition['Warning'] = '警告';
-$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '既定では E メールの送信にローカル メール サーバを使用します。独立した SMTP メール サーバを使用する場合は、以下で設定してください。';
+$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '既定ではメールの送信にローカルメールサーバを使用します。独立した SMTP メールサーバを使用する場合は、以下で設定してください。';
 $Definition['Welcome Aboard!'] = 'ようこそ！';
 $Definition['What\'s the Buzz?'] = '最近どう？';
 $Definition['Within'] = '制限時間';
 
-$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メール アドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
+$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メールアドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
 $Definition['You can place files in your /uploads folder.'] = 'このページに直接アップロードできないくらいファイルサイズが大きな場合は、/uploads フォルダにファイルを配置してください。ファイル名は必ず単語 <b>export</b> で始まり、拡張子 <b>.txt または .gz</b> で終わるようにしてください。'; /* 'If your file is too
 		large to upload directly to this page you can place it in your /uploads
 		folder. Make sure the filename begins with the word <b>export</b> and ends
@@ -316,7 +377,7 @@ $Definition['Your changes have been saved.'] = '変更を保存しました。';
 $Definition['Your settings have been saved.'] = '設定を保存しました。';
 
 /** 以下は、オリジナルに無かったエントリです **/
-$Definition['Search by user or role.'] = 'ユーザー名または役割 (管理者:<input type="text" value="Administrator" size="10" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="6" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="5" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="3" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="5" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="7" onclick="this.select()" />, E メール確認待ち:<input type="text" value="Confirm Email" size="11" onclick="this.select()" />) で検索します。';
+$Definition['Search by user or role.'] = 'ユーザー名または役割 (管理者:<input type="text" value="Administrator" size="10" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="6" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="5" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="3" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="5" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="7" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="11" onclick="this.select()" />) で検索します。';
 $Definition['Add Category'] = 'カテゴリを追加';
 $Definition['Don\'t use Categories'] = 'カテゴリを使用しない';
 $Definition['Role Name'] = '役割名';
@@ -389,20 +450,20 @@ $Definition['TermsOfServiceText'] = "
    <p>このサービスを利用するには、13 歳以上である必要があります。</p>
 ";
 $Definition['Version 2 Installer'] = 'バージョン 2 インストーラ';
-$Definition['Database Host'] = 'データベース ホスト';
+$Definition['Database Host'] = 'データベースのホスト名';
 $Definition['Database Name'] = 'データベース名 <span style="font-size:13px;">※ あらかじめ作成しておく必要があります。</span>';
-$Definition['Database User'] = 'データベース ユーザー';
-$Definition['Database Password'] = 'データベース パスワード';
-$Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてコピーされなかったかもしれません。続行する前に、<b>.htaccess</b> ファイルがコピー済みであることを確認してください。';
+$Definition['Database User'] = 'データベースのユーザー名';
+$Definition['Database Password'] = 'データベースユーザのパスワード';
+$Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてサーバに転送されなかったかもしれません。インストールをする前に、<b>.htaccess</b> ファイルが転送済みであることを確認してください。';
 $Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザーには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['Install Vanilla without a .htaccess file.'] = '.htaccess ファイル無しで Vanilla をインストールします。';
 $Definition['Yes, the following information can be changed later.'] = 'ここから下の情報は、後で変更できます。';
-$Definition['Application Title'] = 'アプリケーション タイトル';
-$Definition['Admin Email'] = '管理者の E メール';
-$Definition['Admin Username'] = '管理者のユーザー名';
+$Definition['Application Title'] = 'サイトのタイトル';
+$Definition['Admin Email'] = '管理者のメールアドレス';
+$Definition['Admin Username'] = '管理者のログインユーザー名(※半角英数)';
 $Definition['Admin Password'] = '管理者のパスワード';
 $Definition['Confirm Password'] = '確認用パスワード(再入力)';
-$Definition['Continue &rarr;'] = '続行 &rarr;';
+$Definition['Continue &rarr;'] = 'インストール実行 &rarr;';
 $Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '入力されたユーザー名とパスワードでは、データベースに接続できません。入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition['It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'] = '指定されたデータベースが まだ作成されていないようです。データベースは作成済みですか？　あるいはデータベース名が間違っている可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
 $Definition["Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"] = 'データベース ホスト名は正しく入力されましたか？　入力ミスの可能性はありませんか？　データベースの報告は次の通りです: <code>%s</code>';
@@ -414,7 +475,7 @@ $Definition['You must have the PDO module enabled in PHP in order for Vanilla to
 $Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、MySQL ドライバ for PDO を有効にしてください。';
 $Definition['Some folders don\'t have correct permissions.'] = '<p>適切なアクセス権が設定されていないフォルダがあります。</p><p>FTP クライアントかコマンド ラインを使って、vanilla のインストール フォルダに次のアクセス権を設定してください:</p>';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なアクセス権が設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
-$Definition['Use an SMTP server to send email'] = 'E メールの送信に SMTP サーバを使用';
+$Definition['Use an SMTP server to send email'] = 'メールの送信に SMTP サーバを使用';
 $Definition['%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'] = '%1$s が%3$s %2$s から削除され、%5$s %4$s に追加されました。';  //* /applications/dashboard/models/class.usermodel.php
 $Definition['%1$s was removed from the %2$s %3$s.'] = '%1$s が%3$s %2$s から削除されました。';
 $Definition['%1$s was added to the %2$s %3$s.'] = '%1$s が%3$s %2$s に追加されました。';
@@ -429,13 +490,14 @@ $Definition['Enabling a Locale Pack'] = 'ロケール パックを有効化す�
 $Definition['Internaltionalization & Localization'] = '国際化と地域化(英語)';
 $Definition['Default Locale'] = '既定のロケール';
 $Definition['You must provide a comment.'] = 'コメントは必須です。';
+$Definition['You do not have any conversations.'] = 'プライベート メッセージはありません。';
 $Definition['You do not have enough invitations left.'] = '招待状が残っていません。';
-$Definition['The email you have entered is already related to an existing account.'] = '入力された E メールは、既存のアカウントで使用済みです。';
-$Definition['An invitation has already been sent to the email you entered.'] = '入力された E メールには、既に招待状を送信済みです。';
-$Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = '招待状の作成は成功しましたが、E メールの送信に失敗しました。サーバのエラー報告は次の通りです: %s';
+$Definition['The email you have entered is already related to an existing account.'] = '入力されたメールアドレスは、既存のアカウントで使用済みです。';
+$Definition['An invitation has already been sent to the email you entered.'] = '入力されたメールアドレスには、すでに招待状を送信済みです。';
+$Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = '招待状の作成は成功しましたが、メールの送信に失敗しました。サーバのエラー報告は次の通りです: %s';
 $Definition['ErrorBadInvitationCode'] = '招待コードが正しくありません。';
 $Definition['The reCAPTCHA value was not entered correctly. Please try again.'] = 'reCAPTCHA の値が正しくありません。再入力してください。';
-$Definition['The email you entered is in use by another member.'] = '入力された E メールは他のメンバーが使用済みです。';
+$Definition['The email you entered is in use by another member.'] = '入力されたメールアドレスは他のメンバーが使用済みです。';
 $Definition['Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'] = '注意してください！　これはアクティブなセッションには適用されない、特殊な役割です。そのため、権限のオプションは "表示" 権限のみに限定されています。';
 $Definition['You are now signed in.'] = '登録されました。'; // connect.php
 $Definition['Choose a name to identify yourself on the site.'] = 'このサイトで使用する あなたの名前を決めてください。'; // connect.php
@@ -444,13 +506,13 @@ $Definition['Leave blank unless connecting to an exising account.'] = '既存の
 $Definition['You cannot remove an invitation that has been accepted.'] = '受信済みの招待状は削除できません。'; // class.invitationmodel.php
 $Definition['[%s] Invitation'] = '[%s] 招待状'; // class.invitationmodel.php
 $Definition['Reset my password'] = 'パスワードのリセット';
-$Definition['Enter your email address'] = 'あなたのメール アドレスを入力してください';
-$Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメール アドレス宛に送信しました。';
+$Definition['Enter your email address'] = 'あなたのメールアドレスを入力してください';
+$Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメールアドレス宛てに送信しました。';
 $Definition['Save your password'] = 'パスワードを保存';
 $Definition['Could not instantiate mail function'] = 'メール機能をインスタンス化できません。';
 $Definition['Security Check'] = 'セキュリティ チェック';
 $Definition["Passwords don't match"] = 'パスワードが一致しません';
-$Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'あなたのメール アドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
+$Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'あなたのメールアドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
 $Definition['%s (Current)'] = '%s (現在)';
 $Definition['There was an error fetching the connection data.'] = '接続データの取得でエラーが発生しました。'; // applications/dashboard/controllers/class.entrycontroller.php
 $Definition['The connection data has not been verified.'] = '接続データが認証されませんでした。'; // applications/dashboard/controllers/class.entrycontroller.php
@@ -461,7 +523,7 @@ $Definition['Success!'] = '成功しました'; // applications/dashboard/contro
 $Definition['Failed to authenticate your password reset request. Try using the reset request form again.'] = 'パスワード リセット リクエストの認証に失敗しました。もう一度リセット リクエスト フォームから送信してください。'; // applications/dashboard/controllers/class.entrycontroller.php
 $Definition['Your new password is invalid'] = '新しいパスワードが不正です'; // applications/dashboard/controllers/class.entrycontroller.php
 $Definition['Your passwords did not match.'] = 'パスワードが一致しませんでした。'; // applications/dashboard/controllers/class.entrycontroller.php
-$Definition['Couldn\'t confirm email.'] = 'E メールの確認が取れていません。あなたに送信した E メールに記載されたリンクを確認するか、改めて確認用 E メールを送信してください。'; // applications/dashboard/controllers/class.entrycontroller.php
+$Definition['Couldn\'t confirm email.'] = 'メールアドレスの確認が取れていません。あなたに送信したメールに記載されたリンクを確認するか、確認メールを送信し直してください。'; // applications/dashboard/controllers/class.entrycontroller.php
 $Definition['Use My Current Password'] = '自分の現在のパスワードを使用する'; // applications/dashboard/views/import/credentials.php & index.php
 $Definition['Importing to Vanilla'] = 'Vanilla へのデータ移行 (英語)'; // applications/dashboard/views/import/index.php
 $Definition['The Vanilla 2 Exporter'] = 'Vanilla Porter プラグイン (英語)'; // applications/dashboard/views/import/index.php
@@ -550,5 +612,6 @@ $Definition['Mention of the user being replied to in new replies.'] = '新規返
 
 // Theme - EmbedFriendly
 $Definition['This theme allows you to hide the side panel next to your forum and conversations. This is super handy if the website you are embedding in does not have a lot of width to squeeze into.'] = 'このテーマはあなたのフォーラムとプライベート メッセージからサイドパネルを隠すことができます。もしあなたがフォーラムを埋め込んだウェブサイトがあまり横幅を広く取れないデザインだった場合は、これが役に立つことでしょう。';
+$Definition['Share'] = 'シェア';
 $Definition['Show the side panel'] = 'サイドパネルを表示する';
 $Definition['Hide the side panel'] = 'サイドパネルを隠す';

@@ -74,7 +74,7 @@ $Definition['Add Message'] = 'メッセージを追加';
 $Definition['Add People to this Conversation'] = 'この PM にメンバーを追加';
 $Definition['All Conversations'] = 'すべてのプライベート メッセージ';
 $Definition['All Discussions'] = 'すべてのディスカッション';
-$Definition['Allow other members to see your email?'] = '他のメンバーにメール アドレスを公開する';
+$Definition['Allow other members to see your email?'] = '他のメンバーにメールアドレスを公開する';
 $Definition['Announce'] = 'お知らせ';
 $Definition['Applicants'] = '申請者リスト';
 $Definition['Apply'] = '申請'; // このコードはテーマの「適用」ボタン(ダッシュボード)と、審査制の場合のアカウント作成フォームの「申請」ボタンの両方に使われている。日本語の場合は本来単語が異なるが、使い分けができないため、管理者しか見ないダッシュボード用の「適用」を犠牲にして、「申請」を採用するものとする。
@@ -124,9 +124,9 @@ $Definition['Edit Account'] = 'アカウントを編集';
 $Definition['Edit My Account'] = 'アカウントを編集';
 $Definition['Edit My Thumbnail'] = 'サムネイルを編集';
 $Definition['Edit Preferences'] = '個人設定を編集';
-$Definition['Email'] = 'メール アドレス';
+$Definition['Email'] = 'メールアドレス';
 $Definition['Email Notifications'] = 'メール通知設定';
-$Definition['Email Unavailable'] = 'メール アドレスが登録済みです';
+$Definition['Email Unavailable'] = 'メールアドレスは登録済みです';
 $Definition['EmailInvitation'] = 'こんにちは！
 
 %1$s さんが、あなたを %2$s に招待しています。参加される場合は、以下のリンクをクリックしてください:
@@ -194,8 +194,8 @@ $Definition['EmailWelcomeRegister'] = '{User.Name} さん、こんにちは。
 {/,url,domain} からサイトにアクセスできます。
 
 では、よい一日をお過ごしください！';
-$Definition['Enter the email address of the person you would like to invite:'] = '招待したい方の E メール アドレスを入力してください:';
-$Definition['Enter your Email address'] = 'メール アドレスを入力';
+$Definition['Enter the email address of the person you would like to invite:'] = '招待したい方の E メールアドレスを入力してください:';
+$Definition['Enter your Email address'] = 'メールアドレスを入力';
 $Definition['Enter your existing account password.'] = '登録済みアカウントのパスワードを入力してください。';
 $Definition['ErrorCredentials'] = '申し訳ありませんが、入力された E メールとパスワードに合致するアカウントが見つかりませんでした。';
 $Definition['ErrorPermission'] = '申し訳ありませんが、権限が不足しています。';
@@ -243,7 +243,6 @@ $Definition['My Invitations'] = '招待者リスト';
 $Definition['My Preferences'] = '個人設定';
 
 $Definition['Name Unavailable'] = 'ユーザー名が登録済みです';
-$Definition['No discussions were found.'] = 'ディスカッションは見つかりませんでした。';
 $Definition['Notifications'] = '通知';
 $Definition['Notify me of private messages.'] = '個人メッセージを通知する。';
 $Definition['Notify me when I am added to private conversations.'] = 'プライベート メッセージに自分が追加されたら通知する。';

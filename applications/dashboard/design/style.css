@@ -1311,7 +1311,7 @@ ul.MessageList li {
 }
 ul.MessageList li.Item {
    border-bottom: 1px solid #BEC8CC;
-	padding: 10px 4px 4px 10px;
+	padding: 10px 10px 4px 10px;
 }
 ul.MessageList div.Meta {
    font-size: 11px;
@@ -3160,3 +3160,74 @@ span.InformSprite.Sock { background-position: -298px -586px; }
 span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
+
+/* ============================================================ Regarding */
+
+div.RegardingEvent {
+   padding: 10px;
+   
+   position: relative;
+   padding-left: 38px;
+   
+   color: #fff !important;
+   text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+}
+
+div.RegardingEvent span.InformSprite {
+   top: 5px;
+   left: 5px;
+}
+
+div.RegardingEvent a.ReportedUser,
+div.RegardingEvent a.ReportingUser {
+   color: #CFECFF;
+}
+
+div.RegardingEvent div.ReportedReason {
+   padding: 5px;
+   font-style: italic;
+}
+
+div.RegardingEvent div.RegardingTime {
+   font-size: 9px;
+   text-transform: uppercase;
+   color: #B1B1B1;
+}
+
+div.RegardingActions {
+   position: relative;
+   overflow: hidden;
+   height: 100%;
+   padding: 0px 10px;
+   margin-bottom: 10px;
+}
+
+div.RegardingActions div.ActionButton {
+   padding: 0px 5px 2px 5px;
+   display: inline-block;
+   margin-right: 4px;
+   
+   color: #fff !important;
+   text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   -webkit-border-bottom-right-radius: 4px;
+   -webkit-border-bottom-left-radius: 4px;
+   -moz-border-radius-bottomright: 4px;
+   -moz-border-radius-bottomleft: 4px;
+   border-bottom-right-radius: 4px;
+   border-bottom-left-radius: 4px;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+}
+
+div.RegardingActions div.ActionButton a {
+   color: #CFECFF;
+   font-size: 10px;
+   text-transform: uppercase;
+}

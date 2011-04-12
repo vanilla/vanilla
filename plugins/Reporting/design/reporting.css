@@ -1,7 +1,14 @@
+div.AwesomePost div.Warning,
 div.ReportPost div.Warning {
    margin: 10px 0px;
 }
 
+div.AwesomePost div.Warning {
+   background: #d6ffcf;
+   border-color: #d6ffcf;
+}
+
+div.AwesomePost div.Excerpt,
 div.ReportPost div.Excerpt {
    margin: 10px 0px;
    

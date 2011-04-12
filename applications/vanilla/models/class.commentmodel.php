@@ -755,9 +755,9 @@ class CommentModel extends VanillaModel {
          // Update UserDiscussion so users don't have incorrect counts
          $this->SQL
             ->Update('UserDiscussion ud')
-            ->Set('CountComments', $Data->CountComments + 1)
+            ->Set('CountComments', $Data['CountComments'] + 1)
             ->Where('DiscussionID', $DiscussionID)
-            ->Where('CountComments <', $Data->CountComments + 1)
+            ->Where('CountComments <', $Data['CountComments'] + 1)
             ->Put();
       }
    }

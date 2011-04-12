@@ -37,7 +37,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    public function Base_BeforeCheckDiscussions_Handler($Sender) {
       $ActionMessage = &$Sender->EventArguments['ActionMessage'];
       if (Gdn::Session()->CheckPermission('Vanilla.Discussion.Edit', TRUE, 'Category', 'any'))
-         $ActionMessage .= ' '.Anchor(T('Merge'), 'vanilla/moderation/mergediscussions/'.$Discussion->DiscussionID.'/', 'Merge Popup');
+         $ActionMessage .= ' '.Anchor(T('Merge'), 'vanilla/moderation/mergediscussions/', 'Merge Popup');
    }
 
    /**
@@ -142,10 +142,6 @@ class SplitMergePlugin extends Gdn_Plugin {
       $Sender->Title(T('Merge Discussions'));
 
       $DiscussionModel = new DiscussionModel();
-      
-      // Verify that the user has permission to perform the merge
-      $Sender->Permission('Vanilla.Discussion.Edit', TRUE, 'Category', $Discussion->CategoryID);
-      
       $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
       if (!is_array($CheckedDiscussions))
          $CheckedDiscussions = array();
@@ -169,6 +165,9 @@ class SplitMergePlugin extends Gdn_Plugin {
             }
          }
          if ($MergeDiscussion) {
+            // Verify that the user has permission to perform the merge
+            $Sender->Permission('Vanilla.Discussion.Edit', TRUE, 'Category', $MergeDiscussion->CategoryID);
+            
             // Assign the comments to the new discussion record
             $DiscussionModel->SQL
                ->Update('Comment')

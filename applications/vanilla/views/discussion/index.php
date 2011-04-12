@@ -28,7 +28,7 @@ if ($Session->IsValid()) {
       ?></li>
    </ul>
    <div class="SubTab"><?php echo $DiscussionName; ?></div>
-   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any')) { ?>
+   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use')) { ?>
       <div class="Administration">
          <input type="checkbox" name="Toggle" />
       </div>

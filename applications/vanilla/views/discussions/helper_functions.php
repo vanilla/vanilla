@@ -40,8 +40,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID));
          
    if ($Sender->CanEditDiscussions) {
-      if (!property_exists($Sender, 'CheckedDiscussions'))
+      if (!property_exists($Sender, 'CheckedDiscussions')) {
          $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+         if (!is_array($Sender->CheckedDiscussions))
+            $Sender->CheckedDiscussions = array();
+      }
 
       $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
       echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
@@ -147,7 +150,7 @@ function WriteFilterTabs(&$Sender) {
       echo '</div>';
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))
-      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any');
+      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
    
    if ($Sender->CanEditDiscussions) {
    ?>

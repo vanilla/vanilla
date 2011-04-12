@@ -25,7 +25,7 @@ echo $this->Form->Errors();
             <div>"<?php echo $ElementExcerpt; ?>"</div>
          </div>
          <div class="Warning">
-            <?php echo sprintf(T("You are about to report this <b>%s</b> for moderator review. If you're sure you want to do this, please enter a brief reason/explanation below, then press 'Report this!'."), $Context); ?>
+            <?php echo sprintf(T("You are about to report this <b>%s</b> for moderator review. If you're sure you want to do this, please enter a brief reason/explanation below."), $Context); ?>
          </div>
       </li>
       <li>

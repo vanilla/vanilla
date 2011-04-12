@@ -26,12 +26,14 @@ function smarty_function_link($Params, &$Smarty) {
    $Path = GetValue('path', $Params, '', TRUE);
    $Text = GetValue('text', $Params, '', TRUE);
    $NoTag = GetValue('notag', $Params, FALSE, TRUE);
+   $CustomFormat = GetValue('format', $Params, FALSE, TRUE);
 
    if(!$Text && $Path != 'signinout' && $Path != 'signin')
       $NoTag = TRUE;
 
-
-   if ($NoTag)
+   if ($CustomFormat)
+      $Format = $CustomFormat;
+   else if ($NoTag)
       $Format = '%url';
    else
       $Format = '<a href="%url" class="%class">%text</a>';

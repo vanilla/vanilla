@@ -1318,7 +1318,7 @@ ul.MessageList li {
 }
 ul.MessageList li.Item {
    border-bottom: 1px solid #BEC8CC;
-	padding: 10px 4px 4px 10px;
+	padding: 10px 10px 4px 10px;
 }
 ul.MessageList div.Meta {
    font-size: 11px;
@@ -3167,3 +3167,186 @@ span.InformSprite.Sock { background-position: -298px -586px; }
 span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
+
+/* ============================= Embedded Discussion & Comment Customizations */
+body.embed {
+	text-align: left;
+}
+body.embed #Content {
+   float: none;
+   margin: 0;
+   width: auto;
+}
+body.embed .InformMessages {
+	display: none;
+}
+body.embed div.Popup h1,
+body.embed div.Popup h2,
+body.embed div.Connect h1,
+body.embed div.Connect h2 {
+	background: #3B5998;
+	border-bottom: 1px solid #2E4778;
+}
+.Embed a {
+	color: #3B5998 !important;
+}
+.Embed a:hover {
+	text-decoration: underline !important;
+}
+.Embed a.Button,
+.Embed a.Button:hover {
+	color: #333 !important;
+	text-decoration: none !important;
+	font-weight: bold;
+}
+.Embed h3 {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	border-bottom: 1px solid #BEC8CC;
+}
+.Embed .MessageForm {
+   background: #f2f2f2;
+   border-top: 1px solid #ffffff;
+   border-bottom: 1px solid #BEC8CC;
+   padding: 7px 8px;
+}
+.TextBoxWrapper {
+	padding: 0 8px 0 0;
+}
+.Embed .TextBox {
+	width: 100%;
+	height: 50px;
+	min-height: 50px;
+	padding: 3px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	font-size: 12px;
+}
+.Embed .Author {
+	display: inline-block;
+	font-size: 11px;
+	color: #777;
+	padding: 0 8px 0 0;
+}
+.Embed input.Button {
+	font-size: 12px;
+}
+.Embed .Foot {
+   background: none;
+   border: none;
+   text-align: right;
+}
+.Embed .MorePager a,
+.Embed .MorePager a:link,
+.Embed .MorePager a:hover,
+.Embed .MorePager a:active,
+.Embed .MorePager a:visited {
+	background: none;
+	border: none;
+	padding: 0;
+}
+.Embed .MorePager a.Loading,
+.Embed .MorePager a.Loading:hover {
+	text-decoration: none !important;
+}
+.Embed .Administration {
+	display: none;
+}
+.Embed .MorePager {
+	border-bottom: 1px solid #BEC8CC;
+	padding: 2px 8px 4px;
+	background: #f2f2f2;
+}
+.Credit {
+	padding: 0 8px;
+}
+.Credit a,
+.Credit a:hover {
+	font-size: 9px;
+	color: #888 !important;
+	text-decoration: none !important;
+}
+.Credit a:hover {
+	color: #333 !important;
+}
+.Credit .Logo {
+	line-height: 25px;
+	text-indent: -1000px;
+	vertical-align: baseline;
+	display: inline-block;
+	height: 22px;
+	width: 46px;
+	background: url('images/vanilla-logo-46px.png') 0 0 no-repeat;
+}
+/* ============================================================ Regarding */
+
+div.RegardingEvent {
+   padding: 10px;
+   
+   position: relative;
+   padding-left: 38px;
+   
+   color: #fff !important;
+   text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+}
+
+div.RegardingEvent span.InformSprite {
+   top: 5px;
+   left: 5px;
+}
+
+div.RegardingEvent a.ReportedUser,
+div.RegardingEvent a.ReportingUser {
+   color: #CFECFF;
+}
+
+div.RegardingEvent div.ReportedReason {
+   padding: 5px;
+   font-style: italic;
+}
+
+div.RegardingEvent div.RegardingTime {
+   font-size: 9px;
+   text-transform: uppercase;
+   color: #B1B1B1;
+}
+
+div.RegardingActions {
+   position: relative;
+   overflow: hidden;
+   height: 100%;
+   padding: 0px 10px;
+   margin-bottom: 10px;
+}
+
+div.RegardingActions div.ActionButton {
+   padding: 0px 5px 2px 5px;
+   display: inline-block;
+   margin-right: 4px;
+   
+   color: #fff !important;
+   text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   -webkit-border-bottom-right-radius: 4px;
+   -webkit-border-bottom-left-radius: 4px;
+   -moz-border-radius-bottomright: 4px;
+   -moz-border-radius-bottomleft: 4px;
+   border-bottom-right-radius: 4px;
+   border-bottom-left-radius: 4px;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+}
+
+div.RegardingActions div.ActionButton a {
+   color: #CFECFF;
+   font-size: 10px;
+   text-transform: uppercase;
+}

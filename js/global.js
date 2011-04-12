@@ -538,7 +538,7 @@ jQuery(document).ready(function($) {
 									data: 'TransientKey='+gdn.definition('TransientKey'),
 									dataType: 'json',
 									error: function(XMLHttpRequest, textStatus, errorThrown) {
-										gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+										gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
 									},
 									success: function(json) {
 										gdn.inform(json);
@@ -590,7 +590,7 @@ jQuery(document).ready(function($) {
 				data: { 'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path') },
 				dataType: 'json',
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
-					gdn.inform(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+					gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
 				},
 				success: function(json) {
 					gdn.inform(json);
@@ -603,6 +603,31 @@ jQuery(document).ready(function($) {
    if (gdn.definition('SignedIn') == '1')
       pingForNotifications(1);
 	
+	// Stash something in the user's session (or unstash the value if it was not provided)
+	stash = function(name, value) {
+		$.ajax({
+			type: "POST",
+			url: gdn.url('session/stash'),
+			data: { 'TransientKey' : gdn.definition('TransientKey'), 'Name' : name, 'Value' : value },
+			dataType: 'json',
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+			},
+			success: function(json) {
+				gdn.inform(json);
+				return json.Unstash;
+			}
+		});
+		
+		return '';
+	}
+	
+	// When a stash anchor is clicked, look for inputs with values to stash
+	$('a.Stash').click(function() {
+		var comment = $('#Form_Comment textarea').val();
+		if (comment != '')
+			stash('CommentForDiscussionID_' + gdn.definition('DiscussionID'), comment);
+	});
 });
 
 	

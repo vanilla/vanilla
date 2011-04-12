@@ -549,6 +549,9 @@ class CommentModel extends VanillaModel {
       
       // Load comment data
       $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
+      
+      // Clear any session stashes related to this discussion
+      $Session->Stash('CommentForDiscussionID_'.GetValue('DiscussionID', $Fields));
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.

@@ -31,12 +31,13 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    private $UserID = NULL;
    private $ForeignURL = NULL;
    private $Comment = NULL;
+   private $OriginalContent = NULL;
 
    private $CollaborativeActions = array();
    private $CollaborativeTitle = NULL;
 
    public function __construct($ForeignType, $ForeignID) {
-      $this->ForeignType = $ForeignType;
+      $this->ForeignType = strtolower($ForeignType);
       $this->ForeignID = $ForeignID;
       parent::__construct();
    }
@@ -46,7 +47,32 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          return $this->SourceElement;
       else
          $this->SourceElement = $SourceElement;
+      
+      switch ($this->ForeignType) {
+         case 'discussion':
+            $OCField = "Body";
+            break;
+            
+         case 'comment':
+            $OCField = "Body";
+            break;
          
+         case 'conversation':
+            $OCField = NULL;
+            break;
+            
+         case 'conversationmessage':
+            $OCField = "Body";
+            break;
+            
+         default:
+            $OCField = "Body";
+            break;
+      }
+      
+      if (!is_null($OCField) && !is_null($OCData = GetValue($OCField, $this->SourceElement, NULL)))
+         $this->OriginalContent = $OCData;
+      
       return $this;
    }
    
@@ -71,7 +97,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    /* I'd like to... */
 
    public function ActionIt($ActionType) {
-      $this->Type = $ActionType;
+      $this->Type = strtolower($ActionType);
       return $this;
    }
 
@@ -121,6 +147,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             case 'conversationmessage':
                $URL = sprintf('messages/%d', $this->ParentID);
                break;
+               
+            default:
+               $URL = "/";
+               break;
          }
          $URL = Url($URL);
       }
@@ -169,7 +199,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          'ParentType'      => $this->ParentType,
          'ParentID'        => $this->ParentID,
          'ForeignURL'      => $this->ForeignURL,
-         'Comment'         => $this->Comment
+         'Comment'         => $this->Comment,
+         'OriginalContent' => $this->OriginalContent
       ));
       
       // Handle collaborations
@@ -188,7 +219,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                $DiscussionID = $DiscussionModel->Save(array(
                   'Name'         => $this->CollaborativeTitle,
                   'CategoryID'   => $CategoryID,
-                  'Body'         => T('This discussion was automatically created by the system to encourage moderator collaboration.'),
+                  'Body'         => $this->OriginalContent,
                   'InsertUserID' => $this->UserID,
                   'Announce'     => 0,
                   'Close'        => 0,

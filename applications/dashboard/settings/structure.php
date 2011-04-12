@@ -151,6 +151,15 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
    
+$Construct->Table('Session')
+	->Column('SessionID', 'char(32)', FALSE, 'primary')
+	->Column('UserID', 'int', 0)
+	->Column('DateInserted', 'datetime', FALSE)
+	->Column('DateUpdated', 'datetime', FALSE)
+	->Column('TransientKey', 'varchar(12)', FALSE)
+	->Column('Attributes', 'text', NULL)
+	->Set($Explicit, $Drop);
+
 $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
    ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
@@ -407,6 +416,7 @@ $Construct->Table('Regarding')
    ->Column('DateInserted', 'datetime', FALSE)
    ->Column('ForeignType', 'varchar(32)', FALSE)
    ->Column('ForeignID', 'int(11)', FALSE)
+   ->Column('OriginalContent', 'text', TRUE)
    ->Column('ParentType', 'varchar(32)', TRUE)
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)

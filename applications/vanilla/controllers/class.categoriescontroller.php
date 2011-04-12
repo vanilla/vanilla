@@ -166,6 +166,8 @@ class CategoriesController extends VanillaController {
       $this->Title(T('All Categories'));
       
       // Get category data
+      $CategoryModel = new CategoryModel();
+      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ViewAllCategories');
       $this->CategoryData = $this->CategoryModel->GetFull();
 		$this->SetData('Categories', $this->CategoryData);
       

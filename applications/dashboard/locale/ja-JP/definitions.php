@@ -81,7 +81,7 @@ $Definition['Basic'] = '基本';
 $Definition['Cancel'] = 'キャンセル';
 
 $Definition['Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.'] = 'このサイトの定義文を収集します。あなたは定義文を収集したいページを順番に訪れる必要があります。収集された定義文は <code>captured.php</code> と <code>captured_admin.php</code> に出力されます。';
-$Definition['Capture locale pack changes.'] = 'ロケール デベロッパーと、指定されたロケール パックとの相違点を収集します。結果は <code>changes.php</code> ファイルに出力されます。';
+$Definition['Capture locale pack changes.'] = 'ロケールデベロッパーと、指定されたロケールパックとの相違点を収集します。結果は <code>changes.php</code> ファイルに出力されます。';
 $Definition['Categories'] = 'カテゴリ';
 $Definition['Categories are used to help organize discussions.'] = 'カテゴリはディスカッションをまとめるのに役立ちます。ドラッグ &amp; ドロップで、並べ替えやネストもできます。';
 $Definition['Category'] = 'カテゴリ';
@@ -145,7 +145,7 @@ $Definition['Consumer Key'] = 'Consumer Key';  // Twitter アプリ登録申請�
 $Definition['Consumer Secret'] = 'Consumer Secret';  // Twitter アプリ登録申請で使用するので、英語のままにしておく
 $Definition['Conversation Messages'] = 'プライベートメッセージ数';
 $Definition['Copy'] = 'コピー';
-$Definition['Copy locale pack.'] = 'ロケール パックからロケール デベロッパーに定義文をコピーします。定義文は <code>copied.php</code> ファイルに出力されます。';
+$Definition['Copy locale pack.'] = 'ロケールパックからロケールデベロッパーに定義文をコピーします。定義文は <code>copied.php</code> ファイルに出力されます。';
 $Definition['Current Authenticator'] = '現在の認証方式';
 $Definition['Current Theme'] = '現在のテーマ';
 $Definition['Customize your Public Profile'] = '公開プロフィールをカスタマイズ';
@@ -239,8 +239,8 @@ $Definition['Last Visit'] = '最終訪問';
 $Definition['Locale'] = 'ja-JP';
 $Definition['Locale Developer'] = 'ロケール デベロッパー';
 $Definition['Locale Developer Settings %s.'] = 'ロケール デベロッパー設定 %s。';
-$Definition['Locale info file settings.'] = '<p>zip ファイル作成時に含めるロケール情報を、下記で設定できます。 </p> <p><a href="%s">ここ</a>をクリックすると、ロケール パックの zip ファイルをダウンロードできます。</p>';
-$Definition['Locale Key (Folder)'] = 'ロケール キー (フォルダ名)';
+$Definition['Locale info file settings.'] = '<p>zipファイル作成時に含めるロケール情報を、下記で設定できます。 </p> <p><a href="%s">ここ</a>をクリックすると、ロケールパックの zip ファイルをダウンロードできます。</p>';
+$Definition['Locale Key (Folder)'] = 'ロケールキー (フォルダ名)';
 $Definition['Locale Name'] = 'ロケール名';
 $Definition['Locales'] = 'ロケール';
 $Definition['Locales are in your %s folder.'] = 'ロケールは、サイトを既定以外の言語で表示できるようにします。%s フォルダに追加されたロケールを、ここで有効化または無効化できます。';
@@ -479,7 +479,7 @@ $Definition['TermsOfServiceText'] = "
    
    <p>本コミュニティはまた、あなたの投稿によって法律問題や訴訟が発生した場合、
    個人情報 (あるいは何であれ知り得た情報) を提供する権利を有するものとします。
-   本ウェブ サイトへのアクセスは、いかなるインターネット プロトコルによるもので
+   本ウェブサイトへのアクセスは、いかなるインターネットプロトコルによるもので
    あれ、記録されます。</p>
    
    <p>広告、チェーンレター、マルチ商法、セールスの勧誘は、本コミュニティにおいて
@@ -497,7 +497,7 @@ $Definition['Database Name'] = 'データベース名 <span style="font-size:13p
 $Definition['Database User'] = 'データベースのユーザー名';
 $Definition['Database Password'] = 'データベースユーザのパスワード';
 $Definition['You are missing Vanilla\'s .htaccess file.'] = 'Vanilla の <b>.htaccess</b> ファイルが見つかりません。ファイルのアップロードに FTP を使用している場合、このファイルは非表示になっていてサーバに転送されなかったかもしれません。インストールをする前に、<b>.htaccess</b> ファイルが転送済みであることを確認してください。';
-$Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベース ユーザーには、このデータベースへのアクセス権がありません。データベースは作成済みですか？　データベースの報告は次の通りです: <code>%s</code>';
+$Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '指定されたデータベースユーザーには、このデータベースへのアクセス権がありません。データベースは作成済みですか？データベースの報告は次の通りです: <code>%s</code>';
 $Definition['Install Vanilla without a .htaccess file.'] = '.htaccess ファイル無しで Vanilla をインストールします。';
 $Definition['Yes, the following information can be changed later.'] = 'ここから下の情報は、後で変更できます。';
 $Definition['Application Title'] = 'サイトのタイトル';
@@ -528,7 +528,7 @@ $Definition['Please choose an authenticator to configure.'] = '設定したい�
 $Definition['Add Role'] = '役割を追加';
 $Definition['This category has custom permissions.'] = 'このカテゴリの権限をカスタマイズする';
 $Definition['Your default locale won\'t display properly'] = '既定のロケールは、下記にて有効化されるまで正しく表示されません。%s を有効化してください。';
-$Definition['Enabling a Locale Pack'] = 'ロケール パックを有効化する(英語)';
+$Definition['Enabling a Locale Pack'] = 'ロケールパックを有効化する(英語)';
 $Definition['Internaltionalization & Localization'] = '国際化と地域化(英語)';
 $Definition['Default Locale'] = '既定のロケール';
 $Definition['You must provide a comment.'] = 'コメントは必須です。';

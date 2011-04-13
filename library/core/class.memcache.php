@@ -184,28 +184,38 @@ class Gdn_Memcache extends Gdn_Cache {
    }
    
    public function Exists($Key, $Options = array()) {
+      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      
       $Key = $this->MakeKey($Key, $FinalOptions);
-      return ($this->Get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
+      return ($this->Get($Key, $FinalOptions) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
    }
    
    public function Remove($Key, $Options = array()) {
+      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      
       $Key = $this->MakeKey($Key, $FinalOptions);
       $Deleted = $this->Memcache->delete($Key);
       return ($Deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Replace($Key, $Value, $Options = array()) {
+      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      
       $Key = $this->MakeKey($Key, $FinalOptions);
-      return $this->Store($Key, $Value, $Options);
+      return $this->Store($Key, $Value, $FinalOptions);
    }
    
    public function Increment($Key, $Amount = 1, $Options = array()) {
+      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      
       $Key = $this->MakeKey($Key, $FinalOptions);
       $Incremented = $this->Memcache->increment($Key, $Amount);
       return ($Incremented !== FALSE) ? $Incremented : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Decrement($Key, $Amount = 1, $Options = array()) {
+      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      
       $Key = $this->MakeKey($Key, $FinalOptions);
       return $this->Memcache->decrement($Key, $Amount);
    }

@@ -18,6 +18,7 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
+$Definition['Change Picture'] = 'プロフィール画像を変更';
 $Definition['%s and you'] = '%s とあなた';
 $Definition['%s comment'] = '投稿数 %s 件';
 $Definition['%s comments'] = '投稿数 %s 件';

@@ -114,7 +114,7 @@ $Definition['Email Notifications'] = 'メール通知設定';
 $Definition['Notifications'] = '通知';
 $Definition['Notify me of private messages.'] = 'プライベートメッセージを通知する。';
 $Definition['Recipients'] = '宛先';
-$Definition['Notify me when I am added to private conversations.'] = 'プライベートメッセージに自分が追加されたら通知する。';
+$Definition['Notify me when I am added to private conversations.'] = 'プライベートミーティングに自分が追加されたら通知する。';
 $Definition['Notify me when people comment on my bookmarked discussions.'] = 'フォロー中のディスカッションにコメントが付いたら通知する。';
 $Definition['Notify me when people comment on my discussions.'] = '自分のディスカッションにコメントが付いたら通知する。';
 $Definition['Notify me when people mention me in comments.'] = 'コメントで自分に@リプライされたら通知する。';
@@ -603,7 +603,7 @@ $Definition['Could not parse import file. The problem is near line %s.'] = 'イ�
 $Definition['The import file does not contain any data.'] = 'インポートファイルにデータがありません。'; // applications/dashboard/models/class.importmodel.php
 
 // Addons descriptions
-$Definition['An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.'] = '既存のプライベートメッセージ ツールの改良版です。Conversations は複数のユーザーだけで個人的な会話を楽しむことができます。'; // Conversations
+$Definition['An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.'] = '既存のプライベートメッセージツールの改良版です。Conversations は複数のユーザー間で非公開の会話(プライベートミーティング)を楽しむことができます。'; // Conversations
 $Definition['Vanilla is the sweetest discussion forum on the web.'] = 'Vanilla は Web 上における最高のディスカッション フォーラムです。'; // Vanilla
 $Definition['Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you\'ve created.'] = 'Embed Vanilla を使って、あなたの Vanilla フォーラムを他のアプリケーションに埋め込むことができます。WordPress や Drupal、そして あなたが作った専用のウェブサイトにも！'; // <Embed> Vanilla
 $Definition['<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.'] = 'Vanilla 2 用の <a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG プラグインです。'; // CLEditor jQuery WYSIWYG

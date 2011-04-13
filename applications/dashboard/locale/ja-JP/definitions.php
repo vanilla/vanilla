@@ -444,7 +444,7 @@ $Definition['Organize Categories'] = 'カテゴリ編成';
 $Definition['Category Page Layout'] = 'カテゴリのページ レイアウト';
 $Definition['View Page'] = 'ページを表示';
 $Definition['Did You Know?'] = 'ご存知ですか？';
-$Definition['You can make the categories page your homepage.'] = 'カテゴリ一覧のページを<a href="%s">こちら</a>でホームページとして設定できます。';
+$Definition['You can make the categories page your homepage.'] = 'カテゴリ一覧のページを<a href="%s">こちら</a>でホーム画面として設定できます。';
 $Definition['Make sure you click View Page'] = '<a href="%s">ページを表示</a>をクリックすると、保存後にカテゴリ ページがどのように見えるかを確認することができます。';
 $Definition['Drag and drop the categories below to sort and nest them.'] = 'カテゴリを並べ替えたりネストするには、この下のカテゴリをドラッグ &amp; ドロップしてください。';
 $Definition['Configure how nested categories are displayed to users.'] = 'ネストされたカテゴリをどのように表示するか、設定してください。';
@@ -453,11 +453,11 @@ $Definition['Display root categories as headings.'] = 'ルート カテゴリを
 $Definition['Do not display the categories in the side panel.'] = 'カテゴリ一覧をサイドパネルに表示しない。';
 $Definition['Managing Categories'] = 'カテゴリの管理 (英語)';
 $Definition['Adding & Editing Categories'] = 'カテゴリの追加と編集 (英語)';
-$Definition['Homepage'] = 'ホームページ';
-$Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホームページ設定 (英語)';
+$Definition['Homepage'] = 'ホーム画面';
+$Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホーム画面設定 (英語)';
 $Definition['Change the look of All Categories'] = '<b>すべてのカテゴリ</b> ページの外観は<a href="%s">こちら</a>から変更できます。';
 $Definition['Changing the Discussions Menu Link'] = 'ディスカッション メニュー リンクの変更 (英語)';
-$Definition['Use the content at this url as your homepage.'] = '"ホームページ" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのディスカッション" がホームページになっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
+$Definition['Use the content at this url as your homepage.'] = '"ホーム画面" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのディスカッション" がホーム画面になっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
 $Definition['Use categories to organize discussions'] = 'ディスカッションを整理するためカテゴリを使用する';
 $Definition['Exclude archived discussions from the discussions list'] = 'アーカイブ化したディスカッションをディスカッション一覧に表示しない'; //advanced.php *
 $Definition['All Categories'] = 'すべてのカテゴリ';
@@ -468,7 +468,7 @@ $Definition['Every 10 seconds'] = '10秒間隔';
 $Definition['Every 30 seconds'] = '30秒間隔';
 $Definition['Every 1 minute'] = '1分間隔';
 $Definition['Every 5 minutes'] = '5分間隔';
-$Definition['Enter the url to the page you would like to use as your homepage:'] = 'ホームページに設定したいページの URL を入力してください:';
+$Definition['Enter the url to the page you would like to use as your homepage:'] = 'ホーム画面に設定したいページの URL を入力してください:';
 $Definition['TermsOfService'] = '利用規約';
 $Definition['TermsOfServiceText'] = "
    <p>このサービスを利用する時点で、以下の規約に同意したものとみなします。

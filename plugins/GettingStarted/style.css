@@ -30,7 +30,7 @@ div.GettingStarted ul li {
 div.GettingStarted ul li.Done,
 div.GettingStarted ul li.Done a,
 div.GettingStarted ul li.Done p {
-	color: #888;
+	color: #333;
 }
 div.GettingStarted ul li strong {
 	padding: 3px 0;

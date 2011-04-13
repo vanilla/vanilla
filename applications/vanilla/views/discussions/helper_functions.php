@@ -37,7 +37,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    WriteOptions($Discussion, $Sender, $Session);
 
    if (!property_exists($Sender, 'CanEditDiscussions'))
-      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID));
+      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
          
    if ($Sender->CanEditDiscussions) {
       if (!property_exists($Sender, 'CheckedDiscussions')) {

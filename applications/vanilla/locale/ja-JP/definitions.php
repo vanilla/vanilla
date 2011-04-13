@@ -146,14 +146,14 @@ $Definition['Email Notifications'] = 'メール通知設定';
 $Definition['Email Unavailable'] = 'メールアドレスは登録済みです';
 $Definition['EmailInvitation'] = 'こんにちは！
 
-%1$s さんが、あなたを %2$s に招待しています。参加される場合は、以下のリンクをクリックしてください:
+%1$s さんから %2$s に招待されています。参加する場合は、以下のリンクをクリックしてください:
 
   %3$s
 
 では、よい一日をお過ごしください！';
 $Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 
-あなたの会員登録が完了しました。以下のリンクからログインしてください:
+ユーザー登録が完了しました。以下のリンクからログインしてください:
 
   %2$s
   
@@ -166,7 +166,7 @@ $Definition['EmailNotification'] = '%1$s さん
 では、よい一日をお過ごしください！';
 $Definition['EmailPassword'] = '%1$s さん、こんにちは。
 
-%2$s さんが、%3$s に あなたのパスワードをリセットしました。あなたの現在の認証情報は、次の通りです:
+%2$s さんが %3$s に パスワードをリセットしました。あなたの現在の認証情報は、次の通りです:
 
   E メール: %6$s
   パスワード: %5$s
@@ -193,7 +193,7 @@ $Definition['EmailWelcome'] = '%1$s さん、こんにちは。
 では、よい一日をお過ごしください！';
 $Definition['EmailWelcomeConnect'] = '{User.Name} さん、こんにちは。
 
-あなたは {Title} に接続しました。あなたの情報は、次の通りです:
+{Title} に接続しました。あなたの情報は、次の通りです:
 
   ユーザー名: {User.Name}
   接続プロバイダ: {ProviderName}
@@ -203,7 +203,7 @@ $Definition['EmailWelcomeConnect'] = '{User.Name} さん、こんにちは。
 では、よい一日をお過ごしください！';
 $Definition['EmailWelcomeRegister'] = '{User.Name} さん、こんにちは。
 
-あなたは {Title} のアカウントで登録されました。あなたの情報は、次の通りです:
+{Title} のアカウントで登録されました。あなたの情報は、次の通りです:
 
   ユーザー名: {User.Name}
   E メール: {User.Email}
@@ -281,11 +281,11 @@ $Definition['PageDetailsMessageFull'] = '%1$s ～ %2$s / %3$s';
 $Definition['Password'] = 'パスワード';
 $Definition['PasswordRequest'] = '%1$s さん、こんにちは。
 
-%2$s に、あなたのパスワードのリセット依頼が出されました。以下のリンクから、あなたのパスワードをリセットできます:
+%2$s に、パスワードのリセット依頼が出されました。以下のリンクから、パスワードをリセットできます:
 
   %3$s
 
-あなたが依頼した覚えが無い場合は、この E メールを無視してください。';
+依頼した覚えが無い場合は、このメールを無視してください。';
 $Definition['Passwords don\'t match'] = 'パスワードが一致しません';
 $Definition['Permalink'] = '固定リンク';
 $Definition['Please wait while you are redirected. If you are not redirected, click <a href="%s">here</a>.'] = 'リダイレクト中につき、少々お待ちください。リダイレクトされない場合は、<a href="%s">ここ</a>をクリックしてください。';
@@ -307,7 +307,7 @@ $Definition['Save'] = '保存';
 $Definition['Save Draft'] = '下書きを保存';
 $Definition['Save Preferences'] = '個人設定を保存';
 $Definition['Search'] = '検索';
-$Definition['Select an image on your computer (2mb max)'] = 'あなたのコンピュータ上の画像を選んでください (2 MBまで)';
+$Definition['Select an image on your computer (2mb max)'] = 'コンピュータ上の画像を選んでください (2 MBまで)';
 $Definition['Send %s a Message'] = '%s にメッセージを送信';
 $Definition['Send Message'] = 'メッセージを送信';
 $Definition['Sent To'] = '送信';
@@ -359,7 +359,7 @@ $Definition['wall'] = 'ウォール';
 $Definition['Why do you want to join?'] = '参加を希望する理由は？';
 $Definition['Write a comment'] = 'コメントを書く';
 $Definition['Write Comment'] = 'コメントを書く';
-$Definition['Write something about yourself...'] = 'あなた自身について、何か書いてみましょう…';
+$Definition['Write something about yourself...'] = '自分自身について、何か書いてみましょう…';
 
 $Definition['you'] = 'あなた';
 $Definition['You'] = 'あなた';
@@ -368,8 +368,8 @@ $Definition['You are connected as %s through %s.'] = '%sから%sに接続しま�
 $Definition['You do not have any conversations.'] = 'プライベートメッセージはありません。';
 $Definition['You do not have any notifications yet.'] = '通知はありません。';
 $Definition['your'] = 'あなたの';
-$Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = '管理者があなたの申請を審査します。承認されましたら、電子メールでお知らせします。';
-$Definition['Your registered username: <strong>%s</strong>'] = 'あなたのユーザー名: <strong>%s</strong>';
+$Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = '管理者が申請を審査します。承認されましたら、電子メールでお知らせします。';
+$Definition['Your registered username: <strong>%s</strong>'] = 'ユーザー名: <strong>%s</strong>';
 
 /** 以下は、オリジナルに無かったエントリです **/
 $Definition['Add a Comment'] = 'コメントを書く';

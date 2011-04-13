@@ -43,7 +43,7 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Member (メンバー) はスレッドに参加できます。'));
    $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderator (モデレータ) は、ほとんどの内容を編集できます。'));
    $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrator (管理者) は、何でもできます。'));
-   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '0', 'Description' => '正式メンバーになる前に、E メールによる招待状の確認が必要なユーザーです。'));
+   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '0', 'Description' => '正式メンバーになる前に、メールによる招待状の確認が必要なユーザーです。'));
    unset($RoleModel);
 }
 

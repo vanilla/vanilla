@@ -178,11 +178,15 @@ if (!class_exists('HeadModule', FALSE)) {
        * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
        */
       public function SetFavIcon($HRef) {
-         $this->AddTag('link', 
-            array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
-            NULL,
-            'favicon');
+         if (!$this->_FavIconSet) {
+            $this->_FavIconSet = TRUE;
+            $this->AddTag('link', 
+               array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
+               NULL,
+               'favicon');
+         }
       }
+      private $_FavIconSet = FALSE;
 
       /**
        * Gets or sets the tags collection.

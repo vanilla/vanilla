@@ -63,7 +63,7 @@ $Definition['Applicants'] = '申請者';
 $Definition['Application'] = 'アプリケーション';
 $Definition['Application ID'] = 'Application ID';  // Facebook の設定なので、日本語化しないでおく
 $Definition['Application Secret'] = 'Application Secret';  // Facebook の設定なので、日本語化しないでおく
-$Definition['ApplicationHelp'] = 'アプリケーションは、あなたのサイトに大規模な機能群を追加します。<br />%s フォルダに追加されたアプリケーションを、ここで有効化または無効化できます。';
+$Definition['ApplicationHelp'] = '「アプリケーション」は、このサイトに規模が大きめの拡張機能を追加します。<br />%s フォルダに追加されたアプリケーションを、ここで有効化または無効化できます。';
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approve'] = '承認';
 $Definition['Approval'] = '承認制';
@@ -129,8 +129,8 @@ $Definition['Allow other members to see your email?'] = '他のメンバーに�
 $Definition['Change the way that new users register with the site.'] = '新規ユーザーがサイトに登録する方法を変更してください。';
 $Definition['Check all permissions that apply for each role'] = '以下の役割に適用する権限すべてにチェックを入れてください';
 $Definition['Check all roles that apply to this user:'] = 'このユーザーに適用する役割にすべてチェックを入れてください:';
-$Definition['Choose a locale pack'] = 'ロケール パックを選んでください';
-$Definition['Choose and configure your forum\'s authentication scheme.'] = 'あなたのフォーラムの認証スキームを選んで設定してください。';
+$Definition['Choose a locale pack'] = 'ロケールパックを選んでください';
+$Definition['Choose and configure your forum\'s authentication scheme.'] = 'フォーラムの認証スキームを選んで設定してください。';
 $Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
 $Definition['Close'] = '終了';
 
@@ -191,7 +191,7 @@ $Definition['Email sent from the application will be addressed from the followin
 $Definition['Email visible to other users'] = '他のメンバーにメールアドレスを公開する';
 $Definition['EmailMembershipApproved'] = '%1$s さん、こんにちは。
 
-あなたの会員登録が完了しました。以下のリンクからログインしてください:
+会員登録が完了しました。以下のリンクからログインしてください:
 
   %2$s
   
@@ -243,7 +243,7 @@ $Definition['Locale info file settings.'] = '<p>zip ファイル作成時に含�
 $Definition['Locale Key (Folder)'] = 'ロケール キー (フォルダ名)';
 $Definition['Locale Name'] = 'ロケール名';
 $Definition['Locales'] = 'ロケール';
-$Definition['Locales are in your %s folder.'] = 'ロケールは、あなたのサイトを既定以外の言語で表示できるようにします。%s フォルダに追加されたロケールを、ここで有効化または無効化できます。';
+$Definition['Locales are in your %s folder.'] = 'ロケールは、サイトを既定以外の言語で表示できるようにします。%s フォルダに追加されたロケールを、ここで有効化または無効化できます。';
 $Definition['Location'] = '場所';
 
 $Definition['Manage Applicants'] = '申請者管理';
@@ -303,7 +303,7 @@ $Definition['Password Options'] = 'パスワード オプション';
 $Definition['Permanent (301)'] = 'Permanent (301)';
 $Definition['Please choose an authenticator to configure.'] = '設定するユーザー認証方式を選んでください。';
 $Definition['Plugin'] = 'プラグイン';
-$Definition['PluginHelp'] = 'プラグインは、あなたのサイトに拡張機能を追加します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
+$Definition['PluginHelp'] = '「プラグイン」は、このサイトの機能を拡張します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
 $Definition['Plugins'] = 'プラグイン';
 $Definition['Position'] = '表示位置';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'スパムを防ぐため、ユーザーが一定時間内に作成できるディスカッションおよび投稿できるコメントの数を制限できます。';
@@ -324,7 +324,7 @@ $Definition['Reset password and send email notification to user'] = 'パスワ�
 $Definition['Reveal Password'] = 'パスワードを表示';
 $Definition['Role'] = '役割';
 $Definition['Roles & Permissions'] = '役割と権限';
-$Definition['Roles determine user\'s permissions.'] = 'あなたのサイトのどのユーザーも、どれか一つ以上の役割に所属します。役割は、どのユーザーが何をしてよいのかを判別する基準に使われます。';
+$Definition['Roles determine user\'s permissions.'] = '当サイトに参加する全てのユーザは、いずれか一つ以上の役割に所属します。役割は、どのユーザーが何をしてよいのかを判別する基準に使われます。';
 $Definition['Route'] = 'ルート';
 $Definition['Route Expression'] = 'ルート式';
 $Definition['Routes'] = 'ルート';
@@ -357,7 +357,7 @@ $Definition['The addon could not be enabled because it generated a fatal error: 
 $Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴは、フォーラムの先頭に表示されます。';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'バナー タイトルは、すべてのページの左上に表示されます。バナー ロゴをアップロードすると、バナー タイトルは置き換えられます。';
 $Definition['The file failed to upload.'] = 'ファイルのアップロードに失敗しました。';
-$Definition['ThemeHelp'] = 'テーマはあなたのサイトの外観を変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
+$Definition['ThemeHelp'] = '「テーマ」はサイトのデザインを変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
 $Definition['Themes'] = 'テーマ';
 $Definition['There are currently no applicants.'] = '申請者はいません。';
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'このプラグインを使うと、OpenID でログインできます。<b>このプラグインを有効にした後、OpenID を有効化する設定を、必ずクリックしてください</b>。';
@@ -397,7 +397,7 @@ $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" 
 $Definition['Remember me on this computer'] = 'ログイン状態を記憶する';
 $Definition['Sign Up'] = 'アカウントを作成';
 
-$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'もしあなたがフォーラムから締め出されるようなことがあったら、あなたの元々の E メールアドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
+$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'メールアドレスとパスワードを使って、いつでも <a href="%1$s">%1$s</a> からログインできます。';
 $Definition['You can place files in your /uploads folder.'] = 'このページに直接アップロードできないくらいファイルサイズが大きな場合は、/uploads フォルダにファイルを配置してください。ファイル名は必ず単語 <b>export</b> で始まり、拡張子 <b>.txt または .gz</b> で終わるようにしてください。'; /* 'If your file is too
 		large to upload directly to this page you can place it in your /uploads
 		folder. Make sure the filename begins with the word <b>export</b> and ends
@@ -513,8 +513,8 @@ $Definition['UsernameError'] = 'ユーザー名には 3～20 文字の英数字�
 $Definition['You must specify an admin username.'] = '管理者のユーザー名は省略できません。';
 $Definition['You must specify an admin password.'] = '管理者のパスワードは省略できません。';
 $Definition['You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'] = 'PHP のバージョン %1$s 上で実行中ですが、Vanilla には PHP %2$s 以上が必要です。続行する前に PHP をアップグレードしてください。';
-$Definition['You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、PHP の PDO モジュールを有効にしてください。';
-$Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = 'Vanilla があなたのデータベースに接続できるよう、MySQL ドライバ for PDO を有効にしてください。';
+$Definition['You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'] = 'PHP の PDO モジュールを有効にする必要があります。';
+$Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = 'MySQL ドライバ for PDO を有効にする必要があります。';
 $Definition['Some folders don\'t have correct permissions.'] = '<p>適切なアクセス権が設定されていないフォルダがあります。</p><p>FTP クライアントかコマンド ラインを使って、vanilla のインストール フォルダに次のアクセス権を設定してください:</p>';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なアクセス権が設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
 $Definition['Use an SMTP server to send email'] = 'メールの送信に SMTP サーバを使用';
@@ -548,13 +548,13 @@ $Definition['Leave blank unless connecting to an exising account.'] = '既存の
 $Definition['You cannot remove an invitation that has been accepted.'] = '受信済みの招待状は削除できません。'; // class.invitationmodel.php
 $Definition['[%s] Invitation'] = '[%s] 招待状'; // class.invitationmodel.php
 $Definition['Reset my password'] = 'パスワードのリセット';
-$Definition['Enter your email address'] = 'あなたのメールアドレスを入力してください';
+$Definition['Enter your email address'] = 'メールアドレスを入力してください';
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメールアドレス宛てに送信しました。';
 $Definition['Save your password'] = 'パスワードを保存';
 $Definition['Could not instantiate mail function'] = 'メール機能をインスタンス化できません。';
 $Definition['Security Check'] = 'セキュリティ チェック';
 $Definition["Passwords don't match"] = 'パスワードが一致しません';
-$Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'あなたのメールアドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
+$Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'このメールアドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
 $Definition['%s (Current)'] = '%s (現在)';
 $Definition['There was an error fetching the connection data.'] = '接続データの取得でエラーが発生しました。'; // applications/dashboard/controllers/class.entrycontroller.php
 $Definition['The connection data has not been verified.'] = '接続データが認証されませんでした。'; // applications/dashboard/controllers/class.entrycontroller.php
@@ -621,11 +621,11 @@ $Definition['Adds TinyMCE visual (WYSIWYG) editor to comment forms on discussion
 $Definition['Collects undefined translation codes and save it for translating.'] = '翻訳作業のために、未定義の翻訳コードを収集・保存します。'; // Translation collector 1.5.8
 $Definition['This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>'] = 'このプラグインは、Vanilla を Twitter に統合します。<b>このプラグインを使うには、Twitter にアプリケーションを登録する必要があります。</b>'; // Twitter 0.1a
 $Definition['Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).'] = 'あなたのフォーラムのアクティビティ (新規ユーザー、ディスカッション、コメント、ページビュー) に関する情報を時系列でグラフ化します。'; // Vanilla Statistics 2.0.17
-$Definition['This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.'] = 'これはロケール パックのスケルトンです。あなたが独自のロケール パックを作成したければ、このフォルダをコピーして、あなたのロケール フォルダにリネームしてください。'; // Skeleton Locale 2.0.1
+$Definition['This is a skeleton of a locale pack. If you want to create your own locale pack copy and rename this folder into your locales folder.'] = 'これはロケールパックのスケルトンです。独自のロケールパックを作成したい場合は、このフォルダをコピーしてロケールフォルダにリネームしてください。'; // Skeleton Locale 2.0.1
 
 // Plugins - <Embed> Vanilla 1.0.1
 $Definition['&lt;Embed&gt; Vanilla'] = '&lt;Embed&gt; Vanilla';
-$Definition['To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'] = 'あなたの Vanilla コミュニティ フォーラムをリモート Web アプリケーションに埋め込むには、以下のフォーラム埋め込み用コードまたは いずれかのフォーラム埋め込み用プラグインを使ってください。';
+$Definition['To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'] = 'Vanillaフォーラムをリモート Web アプリケーションに埋め込むには、以下のフォーラム埋め込み用コードまたは いずれかのフォーラム埋め込み用プラグインを使ってください。';
 $Definition['WordPress Plugin'] = 'WordPress プラグイン';
 $Definition['Blogger Gadget'] = 'Blogger ガジェット';
 $Definition['Make sure to use a forum theme that meshes well with the look and feel of the remote site.'] = 'フォーラムのテーマがリモート サイトのデザインと調和しているかどうか、確認してください。';
@@ -635,10 +635,10 @@ $Definition['The "Remote Url" is the web address of the place where your embedde
 $Definition['Dashboard Embed'] = 'ダッシュボードの埋め込み';
 $Definition["Don't embed your forum admin dashboard (pop it out to full-screen)"] = 'フォーラムの管理用ダッシュボードを埋め込まない (全画面でポップアップさせます)';
 $Definition['Remote Url'] = 'リモート URL';
-$Definition['Force your forum to be viewed through the Remote Url'] = 'あなたのフォーラムをリモート URL 経由でのみ表示する';
+$Definition['Force your forum to be viewed through the Remote Url'] = 'フォーラムをリモート URL 経由でのみ表示する';
 $Definition['Remote Url to Forum'] = 'フォーラムへのリモート URL';
 $Definition['Save Changes'] = '変更を保存';
-$Definition['You can embed your Vanilla Forum into Blogger with this Google Gadget. When in design mode in Blogger, click to "Add a Gadget", and when prompted to search for one, select "Add your own".'] = 'この Google ガジェットで、あなたの Vanilla フォーラムを Blogger に埋め込むことができます。Blogger のデザイン モードで "ガジェットを追加" をクリックし、検索用ポップアップ画面が表示されたら "独自に追加" をクリックしてください。';
+$Definition['You can embed your Vanilla Forum into Blogger with this Google Gadget. When in design mode in Blogger, click to "Add a Gadget", and when prompted to search for one, select "Add your own".'] = 'この Google ガジェットで、Vanilla フォーラムを Blogger に埋め込むことができます。Blogger のデザイン モードで "ガジェットを追加" をクリックし、検索用ポップアップ画面が表示されたら "独自に追加" をクリックしてください。';
 $Definition['Finally, enter this gadget url and click "Add by Url":'] = '後は、このガジェット URL を入力して "追加" をクリックするだけです:';
 
 // Plugins - ReplyTo 0.1.8

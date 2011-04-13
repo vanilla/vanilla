@@ -168,7 +168,7 @@ $Definition['EmailPassword'] = '%1$s さん、こんにちは。
 
 %2$s さんが %3$s に パスワードをリセットしました。あなたの現在の認証情報は、次の通りです:
 
-  E メール: %6$s
+  メールアドレス: %6$s
   パスワード: %5$s
   URL: %4$s
 
@@ -186,7 +186,7 @@ $Definition['EmailWelcome'] = '%1$s さん、こんにちは。
 
 %2$s さんが、%3$s に あなたのアカウントを作成しました。あなたの認証情報は、次の通りです:
 
-  E メール: %6$s
+  メールアドレス: %6$s
   パスワード: %5$s
   URL: %4$s
 
@@ -206,15 +206,15 @@ $Definition['EmailWelcomeRegister'] = '{User.Name} さん、こんにちは。
 {Title} のアカウントで登録されました。あなたの情報は、次の通りです:
 
   ユーザー名: {User.Name}
-  E メール: {User.Email}
+  メールアドレス: {User.Email}
 
 {/,url,domain} からサイトにアクセスできます。
 
 では、よい一日をお過ごしください！';
-$Definition['Enter the email address of the person you would like to invite:'] = '招待したい方の E メールアドレスを入力してください:';
+$Definition['Enter the email address of the person you would like to invite:'] = '招待したい方のメールアドレスを入力してください:';
 $Definition['Enter your Email address'] = 'メールアドレスを入力';
 $Definition['Enter your existing account password.'] = '登録済みアカウントのパスワードを入力してください。';
-$Definition['ErrorCredentials'] = '申し訳ありませんが、入力された E メールとパスワードに合致するアカウントが見つかりませんでした。';
+$Definition['ErrorCredentials'] = '申し訳ありませんが、入力されたメールアドレスとパスワードに合致するアカウントが見つかりませんでした。';
 $Definition['ErrorPermission'] = '申し訳ありませんが、権限が不足しています。';
 $Definition['ErrorRecordNotFound'] = 'リクエストされたレコードが見つかりませんでした。';
 $Definition['ErrorTermsOfService'] = '利用規約に同意する必要があります。';
@@ -237,8 +237,8 @@ $Definition['Howdy, Stranger!'] = 'ようこそ！';
 
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '<a id="TermsOfService" class="Popup" target="terms" href="%s">利用規約</a>に同意します';
 $Definition['I remember now!'] = 'いま思い出しました！';
-$Definition['In this Conversation'] = 'このプライベート メッセージの参加者';
-$Definition['Inbox'] = 'プライベート メッセージ';
+$Definition['In this Conversation'] = 'このプライベートメッセージの参加者';
+$Definition['Inbox'] = 'プライベートメッセージ';
 $Definition['Internal'] = 'Internal';
 $Definition['Invitation Code'] = '招待コード';
 $Definition['Invite'] = '招待';
@@ -261,8 +261,8 @@ $Definition['My Preferences'] = '個人設定';
 
 $Definition['Name Unavailable'] = 'ユーザー名が登録済みです';
 $Definition['Notifications'] = '通知';
-$Definition['Notify me of private messages.'] = '個人メッセージを通知する。';
-$Definition['Notify me when I am added to private conversations.'] = 'プライベート メッセージに自分が追加されたら通知する。';
+$Definition['Notify me of private messages.'] = 'プライベートメッセージを通知する。';
+$Definition['Notify me when I am added to private conversations.'] = 'プライベートメッセージに自分が追加されたら通知する。';
 $Definition['Notify me when people comment on my bookmarked discussions.'] = 'フォロー中のディスカッションにコメントが付いたら通知する。';
 $Definition['Notify me when people comment on my discussions.'] = '自分のディスカッションにコメントが付いたら通知する。';
 $Definition['Notify me when people mention me in comments.'] = 'コメントで自分に@リプライされたら通知する。';

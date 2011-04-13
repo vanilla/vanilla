@@ -110,7 +110,7 @@ $Definition['Categories'] = 'カテゴリ';
 $Definition['Category'] = 'カテゴリ';
 $Definition['Change My Password'] = 'パスワードを変更';
 $Definition['Change My Picture'] = 'プロフィール画像を変更';
-$Definition['Close'] = '終了';
+$Definition['Close'] = '終了する';
 $Definition['comment'] = 'コメント';
 $Definition['Comment'] = 'コメントを投稿';
 $Definition['Confirm'] = '確認';
@@ -220,7 +220,7 @@ $Definition['ErrorRecordNotFound'] = 'リクエストされたレコードが見
 $Definition['ErrorTermsOfService'] = '利用規約に同意する必要があります。';
 
 $Definition['Female'] = '女性';
-$Definition['Forgot?'] = '忘れました？';
+$Definition['Forgot?'] = '<br />パスワードを忘れた';
 
 $Definition['Gender'] = '性別';
 $Definition['GenderSuffix.First.f'] = '';
@@ -236,7 +236,7 @@ $Definition['his'] = '彼の';
 $Definition['Howdy, Stranger!'] = 'ようこそ！';
 
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '<a id="TermsOfService" class="Popup" target="terms" href="%s">利用規約</a>に同意します';
-$Definition['I remember now!'] = 'いま思い出しました！';
+$Definition['I remember now!'] = '思い出した！戻る。';
 $Definition['In this Conversation'] = 'このプライベートメッセージの参加者';
 $Definition['Inbox'] = 'プライベートメッセージ';
 $Definition['Internal'] = 'Internal';
@@ -246,7 +246,7 @@ $Definition['Invited by'] = '招待者';
 
 $Definition['Joined'] = '登録日';
 
-$Definition['Keep me signed in'] = 'ログイン状態を保持する';
+$Definition['Keep me signed in'] = 'ログイン状態を記憶する';
 
 $Definition['Last Active'] = '最終訪問';
 $Definition['Login with Facebook'] = 'Facebook アカウントでログイン';
@@ -298,9 +298,9 @@ $Definition['Profile Picture'] = 'プロフィール画像';
 $Definition['Recent Activity'] = '最近のアクティビティ'; // translation follows facebook. See http://www.facebook.com/help/?faq=15699&hloc=ja_JP
 $Definition['Recipients'] = '宛先';
 $Definition['Redirecting...'] = 'リダイレクト中…';
-$Definition['Remember me on this computer'] = 'このコンピュータに自分を覚えさせます';
+$Definition['Remember me on this computer'] = 'ログイン状態を記憶する';
 $Definition['Remove My Picture'] = 'プロフィール画像を削除';
-$Definition['Request a new password'] = '新しいパスワードをリクエストする';
+$Definition['Request a new password'] = 'パスワードをリセットする';
 $Definition['Roles'] = '役割';
 
 $Definition['Save'] = '保存';
@@ -311,7 +311,7 @@ $Definition['Select an image on your computer (2mb max)'] = 'コンピュータ�
 $Definition['Send %s a Message'] = '%s にメッセージを送信';
 $Definition['Send Message'] = 'メッセージを送信';
 $Definition['Sent To'] = '送信';
-$Definition['Share'] = 'シェア';
+$Definition['Share'] = 'つぶやく';
 $Definition['she'] = '彼女';
 $Definition['Sign In'] = 'ログイン';
 $Definition['Sign In with Google'] = 'Google アカウントでログイン';
@@ -358,7 +358,7 @@ $Definition['Visits'] = 'ログイン回数';
 $Definition['wall'] = 'ウォール';
 $Definition['Why do you want to join?'] = '参加を希望する理由は？';
 $Definition['Write a comment'] = 'コメントを書く';
-$Definition['Write Comment'] = 'コメントを書く';
+$Definition['Write Comment'] = '投稿内容';
 $Definition['Write something about yourself...'] = '自分自身について、何か書いてみましょう…';
 
 $Definition['you'] = 'あなた';

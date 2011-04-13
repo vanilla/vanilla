@@ -22,10 +22,15 @@ class CategoryFollowToggleModule extends Gdn_Module {
       if (!$Session->IsValid())
          return;
       
-      $ShowAllCategories = GetIncomingValue('ShowAllCategories') == 'true' ? TRUE : FALSE;
-      $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-      if ($ShowAllCategories != $ShowAllCategoriesPref)
-         $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+      $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
+      if ($ShowAllCategories != '') {
+         $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
+         $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
+         if ($ShowAllCategories != $ShowAllCategoriesPref)
+            $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+            
+         Redirect(Gdn::Request()->Path());
+      }
    }
    
    public function AssetTarget() {

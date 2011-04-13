@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-$ShowAllCategories = Gdn::Session()->GetPreference('ShowAllCategories');
+$ShowAllCategoriesPref = Gdn::Session()->GetPreference('ShowAllCategories');
 $Url = Gdn::Request()->Path();
 ?>
 <div class="Box CategoryFollowToggleBox">
    <h4><?php echo T('Category Management'); ?></h4>
-   <?php if ($ShowAllCategories) { ?>
+   <?php if ($ShowAllCategoriesPref) { ?>
       <p>You are currently viewing all categories.<p>
    <?php
       echo Wrap(Anchor('Only show followed categories', $Url.'?ShowAllCategories=false'), 'p');

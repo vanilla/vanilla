@@ -169,7 +169,7 @@ $Definition['Post Discussion'] = 'ディスカッションを投稿';
 $Definition['Save Draft'] = '下書きとして保存';
 $Definition['Preview'] = 'プレビュー';
 $Definition['My Drafts'] = '下書き';
-$Definition['Write Comment'] = 'コメントを書く';
+$Definition['Write Comment'] = 'コメント内容';
 $Definition['Back to Discussions'] = 'ディスカッション一覧に戻る';
 $Definition['Permalink'] = '固定リンク';
 $Definition['permalink'] = '固定リンク';
@@ -551,7 +551,7 @@ $Definition['Reset my password'] = 'パスワードのリセット';
 $Definition['Enter your email address'] = 'メールアドレスを入力してください';
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメールアドレス宛てに送信しました。';
 $Definition['Save your password'] = 'パスワードを保存';
-$Definition['Could not instantiate mail function'] = 'メール機能をインスタンス化できません。';
+$Definition['Could not instantiate mail function.'] = 'メールを送信できません。サーバ側の設定に問題があります。';
 $Definition['Security Check'] = 'セキュリティ チェック';
 $Definition["Passwords don't match"] = 'パスワードが一致しません';
 $Definition['There is already an account in this forum using your email address. Please create a new account, or enter the credentials for the existing account.'] = 'このメールアドレスを使用したアカウントがすでに存在しています。新しいアカウントを作成するか、既存のアカウントの認証情報を入力してください。';
@@ -572,7 +572,7 @@ $Definition['The Vanilla 2 Exporter'] = 'Vanilla Porter プラグイン (英語)
 $Definition['Warning: Loading tables can be slow.'] = '<b>警告</b>: 現在のサーバ設定では、高速なデータ読み取りができません。とてもサイズの大きなファイル (例. 200,000 コメント以上) をインポートする場合は、設定の変更を検討するといいでしょう。詳しい情報を参照する場合は、<a href="http://vanillaforums.com/blog/help/importing-data/">ここ</a>をクリックしてください。'; /*'<b>Warning</b>: Your server configuration does not support fast data loading.
 If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.'*/
 $Definition['Current File:'] = '現在のファイル:'; // applications/dashboard/views/import/index.php
-$Definition['Garden.Import.Complete.Description'] = 'インポートに成功しました。<a href="%s">ダッシュボード &gt; 役割と権限</a>に移動して、あなたの役割に忘れず権限を設定してください。準備ができたら、<b>完了</b>をクリックしてください。'; /* 'You have successfully completed an import.
+$Definition['Garden.Import.Complete.Description'] = 'インポートに成功しました。<a href="%s">ダッシュボード &gt; 役割と権限</a>に移動して、あなたの「役割」に権限を設定してください。準備ができたら、<b>完了</b>をクリックしてください。'; /* 'You have successfully completed an import.
    Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
    Click <b>Finished</b> when you are ready.' */
 $Definition['Finished'] = '完了'; // applications/dashboard/views/import/go.php

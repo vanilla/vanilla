@@ -73,9 +73,9 @@ $Definition['Are you sure you want to do that?'] = '本当に実行してよい�
 $Definition['Authentication'] = '認証';
 
 $Definition['Banned'] = '利用禁止';
-$Definition['Banner'] = 'バナー';
-$Definition['Banner Logo'] = 'バナー ロゴ';
-$Definition['Banner Title'] = 'バナー タイトル';
+$Definition['Banner'] = 'サイトのタイトル';
+$Definition['Banner Logo'] = 'タイトルロゴ';
+$Definition['Banner Title'] = 'タイトル';
 $Definition['Basic'] = '基本';
 
 $Definition['Cancel'] = 'キャンセル';
@@ -354,8 +354,8 @@ $Definition['Target'] = '対象';
 $Definition['Temporary (302)'] = '一時的 (302)';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'ユーザー認証方式 %s には設定オプションがありません。';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '致命的なエラーが発生したため、アドオンを有効にすることができませんでした: <pre>%s</pre>';
-$Definition['The banner logo appears at the top of your forum.'] = 'バナー ロゴは、フォーラムの先頭に表示されます。';
-$Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'バナー タイトルは、すべてのページの左上に表示されます。バナー ロゴをアップロードすると、バナー タイトルは置き換えられます。';
+$Definition['The banner logo appears at the top of your forum.'] = 'タイトルロゴはヘッダの左上に表示されます。タイトル文字列と置き換えます。';
+$Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'タイトルはヘッダの左上に表示されます。タイトルロゴ画像をアップロードすると、タイトル文字列と置き換えます。';
 $Definition['The file failed to upload.'] = 'ファイルのアップロードに失敗しました。';
 $Definition['ThemeHelp'] = '「テーマ」はサイトのデザインを変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
 $Definition['Themes'] = 'テーマ';

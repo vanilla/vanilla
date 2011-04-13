@@ -408,7 +408,7 @@ $Definition['Your changes have been saved.'] = '変更を保存しました。';
 $Definition['Your settings have been saved.'] = '設定を保存しました。';
 
 /** 以下は、オリジナルに無かったエントリです **/
-$Definition['Search by user or role.'] = 'ユーザー名または役割 (管理者:<input type="text" value="Administrator" size="10" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="6" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="5" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="3" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="5" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="7" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="11" onclick="this.select()" />) で検索します。';
+$Definition['Search by user or role.'] = 'ユーザー名または役割 (管理者:<input type="text" value="Administrator" size="13" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="9" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="6" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="5" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="6" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="9" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="13" onclick="this.select()" />) で検索します。';
 $Definition['Add Category'] = 'カテゴリを追加';
 $Definition['Don\'t use Categories'] = 'カテゴリを使用しない';
 $Definition['Role Name'] = '役割名';

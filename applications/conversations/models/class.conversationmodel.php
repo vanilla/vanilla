@@ -41,25 +41,32 @@ class ConversationModel extends Gdn_Model {
    public function ConversationQuery($ViewingUserID) {
       $this->SQL
          ->Select('c.*')
-         ->Select('uc.LastMessageID, uc.CountReadMessages, uc.DateLastViewed, uc.Bookmarked')
-         ->Select('c.CountMessages - uc.CountReadMessages', '', 'CountNewMessages')
          ->Select('lm.InsertUserID', '', 'LastMessageUserID')
          ->Select('lm.DateInserted', '', 'DateLastMessage')
          ->Select('lm.Body', '', 'LastMessage')
          ->Select('lm.Format')
          ->Select('lmu.Name', '', 'LastMessageName')
          ->Select('lmu.Photo', '', 'LastMessagePhoto')
-         //->Select('iu.Name', '', 'InsertName')
-         // ->Select('uu.Name', '', 'UpdateName')
-         ->From('Conversation c')
-         //->Join('User iu', 'c.InsertUserID = iu.UserID')
-         ->Join('UserConversation uc', "c.ConversationID = uc.ConversationID and uc.UserID = $ViewingUserID and uc.Deleted = 0")
-         ->Join('ConversationMessage lm', 'uc.LastMessageID = lm.MessageID')
-         ->Join('User lmu', 'lm.InsertUserID = lmu.UserID');
-         //->BeginWhereGroup()
-         //->Where('uc.DateCleared is null')
-         //->OrWhere('c.DateUpdated >', 'uc.DateCleared', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.
-         //->EndWhereGroup();
+         ->From('Conversation c');
+
+
+      if ($ViewingUserID) {
+         $this->SQL
+            ->Select('c.CountMessages - uc.CountReadMessages', '', 'CountNewMessages')
+            ->Select('uc.LastMessageID, uc.CountReadMessages, uc.DateLastViewed, uc.Bookmarked')
+            ->Join('UserConversation uc', "c.ConversationID = uc.ConversationID and uc.UserID = $ViewingUserID")
+            ->Join('ConversationMessage lm', 'uc.LastMessageID = lm.MessageID')
+            ->Join('User lmu', 'lm.InsertUserID = lmu.UserID')
+            ->Where('uc.Deleted', 0);
+      } else {
+         $this->SQL
+            ->Select('0', '', 'CountNewMessages')
+            ->Select('c.CountMessages', '', 'CountReadMessages')
+            ->Select('lm.DateInserted', '', 'DateLastViewed')
+            ->Select('0', '', 'Bookmarked')
+            ->Join('ConversationMessage lm', 'c.LastMessageID = lm.MessageID')
+            ->Join('User lmu', 'lm.InsertUserID = lmu.UserID');
+      }
    }
    
    /**
@@ -151,7 +158,7 @@ class ConversationModel extends Gdn_Model {
     * @param int $ViewingUserID Unique ID of current user.
     * @return Gdn_DataSet SQL result (single row).
     */
-   public function GetID($ConversationID, $ViewingUserID) {
+   public function GetID($ConversationID, $ViewingUserID = FALSE) {
       $this->ConversationQuery($ViewingUserID);
       return $this->SQL
          ->Where('c.ConversationID', $ConversationID)

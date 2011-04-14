@@ -29,11 +29,11 @@ if (!function_exists('CountString')) {
       if (is_string($Options))
          $Options = array('cssclass' => $Options);
       $Options = array_change_key_case($Options);
-//      $CssClass = GetValue('cssclass', $Options, 'Count');
+      $CssClass = GetValue('cssclass', $Options, '');
 
       if ($Number === NULL && $Url) {
          $CssClass = ConcatSep(' ', $CssClass, 'Popin TinyProgress');
-         $Url = htmlspecialchars(Url($Url));
+         $Url = htmlspecialchars($Url);
          $Result = "<span class=\"$CssClass\" rel=\"$Url\"></span>";
       } elseif ($Number) {
          $Result = " <span class=\"Count\">$Number</span>";

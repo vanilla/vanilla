@@ -150,7 +150,7 @@ class UserModel extends Gdn_Model {
          ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
 
-   public function DefinePermissions($UserID) {
+   public function DefinePermissions($UserID, $Serialize = TRUE) {
       $Data = Gdn::PermissionModel()->CachePermissions($UserID);
       $Permissions = array();
       foreach($Data as $i => $Row) {
@@ -181,11 +181,11 @@ class UserModel extends Gdn_Model {
       //    trigger_error(ErrorMessage('The requested user ('.$this->UserID.') has no permissions.', 'Session', 'Start'), E_USER_ERROR);
 
       // Save the permissions to the user table
-      $Permissions = Gdn_Format::Serialize($Permissions);
+      $Permissions2 = Gdn_Format::Serialize($Permissions);
       if ($UserID > 0)
-         $this->SQL->Put('User', array('Permissions' => $Permissions), array('UserID' => $UserID));
+         $this->SQL->Put('User', array('Permissions' => $Permissions2), array('UserID' => $UserID));
 
-      return $Permissions;
+      return $Serialize ? $Permissions2 : $Permissions;
    }
 
    public function Get($UserID) {
@@ -400,8 +400,13 @@ class UserModel extends Gdn_Model {
       $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
 
       // Check for spam.
-      if ($Valid)
-         $Valid = SpamModel::IsSpam('User', $FormPostValues);
+      if ($Valid) {
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $Valid = FALSE;
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+         }
+      }
 
       // Throw an event to allow plugins to block the registration.
       $this->EventArguments['User'] = $FormPostValues;

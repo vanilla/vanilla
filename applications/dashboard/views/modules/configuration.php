@@ -17,20 +17,27 @@ echo $Form->Errors();
       echo "<li>\n  ";
 
       $LabelCode = $Sf->LabelCode($Row);
+      $Description = GetValue('Description', $Row, '');
+      if ($Description)
+         $Description = '<div class="Info">'.$Description.'</div>';
 
       switch (strtolower($Row['Control'])) {
          case 'checkbox':
+            echo $Description;
             echo $Form->CheckBox($Row['Name'], T($LabelCode));
             break;
          case 'dropdown':
             echo $Form->Label($LabelCode, $Row['Name']);
+            echo $Description;
             echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
             break;
          case 'radiolist':
+            echo $Description;
             echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
             break;
          case 'textbox':
             echo $Form->Label($LabelCode, $Row['Name']);
+            echo $Description;
             echo $Form->TextBox($Row['Name'], $Row['Options']);
             break;
          default:

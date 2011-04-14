@@ -2,7 +2,7 @@
 ?>
 <div class="Tabs ConversationsTabs">
    <ul>
-      <li class="Active"><?php echo Anchor(T('All Conversations'), '/messages/all'); ?></li>
+      <li class="Active"><?php echo Anchor(T('Inbox'), '/messages/inbox'); ?></li>
    </ul>
 </div>
 <?php

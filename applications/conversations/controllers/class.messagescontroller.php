@@ -138,31 +138,29 @@ class MessagesController extends ConversationsController {
     * @since 2.0.0
     * @access public
     * 
-    * @param int $Offset Number to skip.
-    * @param int $Limit Number to show.
-    * @param bool $BookmarkedOnly Whether to limit to only bookmarked conversations.
+    * @param string $Page
     */
-   public function All($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
+   public function All($Page = '') {
       $Session = Gdn::Session();
       $this->Title(T('Conversations'));
+
+      list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
       
       // Calculate offset
       $this->Offset = $Offset;
-      if (!is_numeric($this->Offset) || $this->Offset < 0)
-         $this->Offset = 0;
-      
-      // Calculate limit
-      if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
-         $Limit = Gdn::Config('Conversations.Conversations.PerPage', 50);
       
       // Limit to bookmarks?   
       $Wheres = array();
-      if ($BookmarkedOnly !== FALSE)
+      if ($this->Request->Get('Bookmarked'))
          $Wheres['Bookmarked'] = '1';
+
+      $UserID = $this->Request->Get('userid', Gdn::Session()->UserID);
+      if ($UserID != Gdn::Session()->UserID)
+         $this->Permission('Conversations.Moderation.Manage');
       
       // Fetch from model  
       $ConversationData = $this->ConversationModel->Get(
-         $Session->UserID,
+         $UserID,
          $this->Offset,
          $Limit,
          $Wheres
@@ -186,7 +184,7 @@ class MessagesController extends ConversationsController {
          $this->Offset,
          $Limit,
          $CountConversations,
-         'messages/all/%1$s/%2$s/'
+         'messages/all/{Page}' //'messages/all/%1$s/%2$s/'
       );
       
       // Deliver json data if necessary
@@ -250,11 +248,25 @@ class MessagesController extends ConversationsController {
       
       // Get conversation data
       $this->RecipientData = $this->ConversationModel->GetRecipients($ConversationID);
-      $this->Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);
+      $this->SetData('Recipients', $this->RecipientData);
+
+      // Check permissions on the recipients.
+      $InConversation = FALSE;
+      foreach($this->RecipientData->Result() as $Recipient) {
+         if ($Recipient->UserID == Gdn::Session()->UserID) {
+            $InConversation = TRUE;
+            break;
+         }
+      }
+      if (!$InConversation)
+         $this->Permission('Conversations.Moderation.Manage');
+
+      $this->Conversation = $this->ConversationModel->GetID($ConversationID);
+      $this->SetData('Conversation', $this->Conversation);
       
       // Bad conversation? Redirect
       if ($this->Conversation === FALSE)
-         Redirect('dashboard/home/filenotfound');
+         throw NotFoundException('Conversation');
       
       // Get limit
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
@@ -286,18 +298,25 @@ class MessagesController extends ConversationsController {
       $this->Participants = '';
       $Count = 0;
       $Users = array();
+      $InConversation = FALSE;
       foreach($this->RecipientData->Result() as $User) {
          if($User->Deleted)
             continue;
          $Count++;
-         if($User->UserID == $Session->UserID)
+         if($User->UserID == $Session->UserID) {
+            $InConversation = TRUE;
             continue;
+         }
          $Users[] = UserAnchor($User);
       }
-      if(count($Users) == 0)
-         $this->Participants = T('Just you!');
-      else
-         $this->Participants = sprintf(T('%s and you'), implode(', ', $Users));
+      if ($InConversation) {
+         if(count($Users) == 0)
+            $this->Participants = T('Just you!');
+         else
+            $this->Participants = sprintf(T('%s and you'), implode(', ', $Users));
+      } else {
+         $this->Participants = implode(', ', $Users);
+      }
       
       $this->Title(strip_tags($this->Participants));
 
@@ -391,10 +410,10 @@ class MessagesController extends ConversationsController {
     * @param int $Offset Number to skip.
     * @param string $Limit Number to show.
     */
-   public function Bookmarked($Offset = 0, $Limit = '') {
-      $this->View = 'All';
-      $this->All($Offset, $Limit, TRUE);
-   }
+//   public function Bookmarked($Offset = 0, $Limit = '') {
+//      $this->View = 'All';
+//      $this->All($Offset, $Limit, TRUE);
+//   }
 
    /**
     * Show bookmarked conversations for the current user.
@@ -404,10 +423,9 @@ class MessagesController extends ConversationsController {
     *
     * @param int $Offset Number to skip.
     * @param string $Limit Number to show.
-    * @param bool $BookmarkedOnly Whether to show only bookmarks
     */
-   public function Inbox($Offset = 0, $Limit = '', $BookmarkedOnly = FALSE) {
+   public function Inbox($Page = '') {
       $this->View = 'All';
-      $this->All($Offset, $Limit, $BookmarkedOnly);
+      $this->All($Page);
    }
 }

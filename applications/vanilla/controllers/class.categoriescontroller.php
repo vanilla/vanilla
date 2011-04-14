@@ -164,14 +164,21 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $this->Title(T('All Categories'));
-      
+     
+		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
+		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
+		$CategoryFollowToggleModule->SetToggle();
+	   
       // Get category data
+      $CategoryModel = new CategoryModel();
+      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       $this->CategoryData = $this->CategoryModel->GetFull();
 		$this->SetData('Categories', $this->CategoryData);
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('BookmarkedModule');
+		$this->AddModule($CategoryFollowToggleModule);
 
       $this->Render();
 	}
@@ -190,10 +197,14 @@ class CategoriesController extends VanillaController {
       $this->AddJsFile('discussions.js');
       $this->Title(T('All Categories'));
       
+		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
+		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
+		$CategoryFollowToggleModule->SetToggle();
+		
       // Get category data and discussions
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
-      $this->CategoryModel->Watching = TRUE;
+      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       $this->CategoryData = $this->CategoryModel->GetFull();
 		$this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();
@@ -206,6 +217,7 @@ class CategoriesController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+		$this->AddModule($CategoryFollowToggleModule);
       
       // Set view and render
       $this->View = 'discussions';

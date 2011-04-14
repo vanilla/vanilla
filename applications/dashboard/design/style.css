@@ -205,13 +205,20 @@ input.Button {
 	font-size: 14px;
    font-weight: bold;
 }
+
 .Button:hover {
    color: #111;
    border: 1px solid #666;
 }
+
 .Button:focus {
    background: #eee;
 }
+
+.Buttons {
+   margin-top: 10px;
+}
+
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -2227,10 +2234,13 @@ body.Post #Content {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   background: #c4e1ff none repeat scroll 0 0;
+   background: #CFECFF none repeat scroll 0 0;
    border: 1px solid #7caccb;
    margin: 0;
    padding: 20px;
+}
+#DiscussionForm .Tabs {
+   margin: 0 -20px;
 }
 #DiscussionForm textarea {
    width: 99%;
@@ -2250,9 +2260,6 @@ div.CommentForm a.Cancel {
 }
 #DiscussionForm a.Cancel {
 	margin-left: 18px;
-}
-#DiscussionForm ul {
-   margin: 0 0 20px;
 }
 #DiscussionForm ul.PostOptions li {
    display: inline;

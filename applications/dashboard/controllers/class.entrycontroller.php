@@ -564,17 +564,15 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "") {
-      $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
-      $AuthenticationScheme = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
-
-      try {
-         $Authenticator = Gdn::Authenticator()->GetAuthenticator($AuthenticationScheme);
-      } catch (Exception $e) {
-         $Authenticator = Gdn::Authenticator()->GetAuthenticator();
-      }
-   
       $this->FireEvent("SignOut");
-      $this->Leave($AuthenticationScheme, $TransientKey);
+
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+         // Sign the user right out.
+         Gdn::Session()->End();
+         $this->_SetRedirect();
+      }
+      $this->Leaving = FALSE;
+      $this->Render();
    }
   
    /**
@@ -590,14 +588,10 @@ class EntryController extends Gdn_Controller {
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
       $this->AddJsFile('entry.js');
+      $this->SetData('Title', T('Sign In'));
 
       // Additional signin methods are set up with plugins.
       $Methods = array();
-
-      if (in_array($Method, array('connect', 'password')))
-         $this->SetData('MainFormMethod', array($this, ucfirst($Method)));
-      else
-         $this->SetData('MainFormMethod', array($this, 'Password'));
 
       $this->SetData('MainFormArgs', array($Arg1));
       $this->SetData('Methods', $Methods);
@@ -605,25 +599,36 @@ class EntryController extends Gdn_Controller {
 
       $this->FireEvent('SignIn');
 
-      // Figure out the current method.
-      $DeliveryType = $this->DeliveryType();
-      $this->_RealDeliveryType = $DeliveryType;
-      $this->DeliveryType(DELIVERY_TYPE_VIEW);
+      if ($this->Form->IsPostBack()) {
+         $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T('Email/Username')));
+         $this->Form->ValidateRule('Password', 'ValidateRequired');
 
-      $DeliveryMethod = $this->DeliveryMethod();
-      $this->DeliveryMethod(DELIVERY_METHOD_XHTML);
+         // Check the user.
+         if ($this->Form->ErrorCount() == 0) {
+            $Email = $this->Form->GetFormValue('Email');
+            $User = Gdn::UserModel()->GetByEmail($Email);
+            if (!$User)
+               $User = Gdn::UserModel()->GetByUsername($Email);
 
-      // Capture the appropriate method.
-      ob_start();
-      call_user_func_array($this->Data('MainFormMethod'), $this->Data('MainFormArgs', array()));
-      $View = ob_get_clean();
+            if (!$User) {
+               $this->Form->AddError('ErrorCredentials');
+            } else {
+               // Check the password.
+               $PasswordHash = new Gdn_PasswordHash();
+               if ($PasswordHash->CheckPassword($this->Form->GetFormValue('Password'), GetValue('Password', $User), GetValue('HashMethod', $User))) {
+                  Gdn::Session()->Start(GetValue('UserID', $User), TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
+                  $this->_SetRedirect();
+               } else {
+                  $this->Form->AddError('ErrorCredentials');
+               }
+            }
+         }
 
-      $this->SetData('MainForm', $View);
+      } else {
+         $this->Form->SetValue('RememberMe', TRUE);
+      }
 
-      $this->DeliveryType($DeliveryType);
-      $this->DeliveryMethod($DeliveryMethod);
-
-      return $this->Render('signin2');
+      return $this->Render();
    }
    
    /**
@@ -1043,10 +1048,7 @@ class EntryController extends Gdn_Controller {
                }
             } else {
                // The user has been created successfully, so sign in now.
-               Gdn::Session()->Start($AuthUserID);
-
-               if ($this->Form->GetFormValue('RememberMe'))
-                  Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+               Gdn::Session()->Start($AuthUserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
 
                try {
                   $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
@@ -1198,9 +1200,10 @@ class EntryController extends Gdn_Controller {
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
-            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
-            $AuthUserID = $Authenticator->Authenticate();
+            Gdn::Session()->Start($User->UserID, TRUE);
+//            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
+//            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
+//            $AuthUserID = $Authenticator->Authenticate();
 				Redirect('/');
          }
       }
@@ -1251,6 +1254,7 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey Unique value to prove intent.
     */
    public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
+      Deprecated(__FUNCTION__);
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
       $this->FireEvent('BeforeLeave');
       

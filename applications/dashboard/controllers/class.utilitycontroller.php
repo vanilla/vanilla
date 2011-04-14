@@ -120,11 +120,21 @@ class UtilityController extends DashboardController {
 			      $this->Form->AddError($Ex);
 			   }
 			}
-			if (property_exists($Structure->Database, 'CapturedSql'))
-			   $this->SetData('CapturedSql', (array)$Structure->Database->CapturedSql);
-			else
-			   $this->SetData('CapturedSql', array());
       }
+
+      // Run the structure of all of the plugins.
+      $Plugins = Gdn::PluginManager()->EnabledPlugins();
+      foreach ($Plugins as $PluginKey => $Plugin) {
+         $PluginInstance = Gdn::PluginManager()->GetPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
+         if (method_exists($PluginInstance, 'Structure'))
+            $PluginInstance->Structure();
+      }
+
+      if (property_exists($Structure->Database, 'CapturedSql'))
+         $this->SetData('CapturedSql', (array)$Structure->Database->CapturedSql);
+      else
+         $this->SetData('CapturedSql', array());
+
       if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
          $this->SetData('Status', 'The structure was successfully executed.');
 

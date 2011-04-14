@@ -1,54 +1,16 @@
-/* A banner that appears when user is previewing their custom css definitions */
-body {
-   margin-top: 40px !important;
-}
-body div.PreviewTheme {
-   position: absolute !important;
-   top: 0 !important;
-   left: 0 !important;
-   width: 100% !important;
-   text-align: left !important;
-   height: 40px !important;
-   overflow: hidden !important;
-   background: #464646 !important;
-   border-bottom: 1px solid #333 !important;
+/* Style the buttons that appear in the inform message when previewing */
+input.PreviewThemeButton {
+   background: none !important;
+   border: none !important;
+	color: #aff !important;
+   text-decoration: none !important;
+   font-size: 12px !important;
+   cursor: pointer !important;
+   display: inline !important;
    padding: 0 !important;
    margin: 0 !important;
 }
-body div.PreviewTheme p {
-   font: 14px 'lucida grande', "Helvetica Neue",Helvetica,arial,sans-serif !important;
-   padding: 11px 11px 0 !important;
-   margin: 0 !important;
-   color: #fff !important;
-}
-body div.PreviewTheme div.PreviewButtons a.PreviewButton,
-body div.PreviewTheme form#Form_Form div input.PreviewButton {
-   cursor: pointer !important;
-   margin: 0 !important;
-   padding: 4px !important;
-   margin: 6px 8px 0 0 !important;
-   font-size: 12px !important;
-   color: #000 !important;
-   text-decoration: none !important;
-   border: 1px solid #000 !important;
-   text-shadow: 0 1px 0 #fff !important;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8 !important;
-   border-radius: 3px !important;
-   -moz-border-radius: 3px !important;
-   -webkit-border-radius: 3px !important;
-}
-body #Foot div.PreviewTheme div.PreviewButtons {
-   position: absolute;
-   top: 7px;
-   right: 6px;
-   margin: 0 !important;
-   text-align: right !important;
-   padding: 6px !important;
-}
-body div.PreviewTheme div.PreviewButtons a.PreviewButton {
-   padding: 6px !important;
-   margin: 0 0 0 8px !important;
-}
-body div.PreviewTheme div.PreviewButtons {
-   padding: 8px 8px 0 0;
+input.PreviewThemeButton:hover {
+	color: #cff !important;
+	text-decoration: underline !important;
 }

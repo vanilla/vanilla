@@ -301,7 +301,7 @@ $Definition['Redirecting...'] = 'リダイレクト中…';
 $Definition['Remember me on this computer'] = 'ログイン状態を記憶する';
 $Definition['Remove My Picture'] = 'プロフィール画像を削除';
 $Definition['Request a new password'] = 'パスワードをリセットする';
-$Definition['Roles'] = '役割';
+$Definition['Roles'] = 'ロール';
 
 $Definition['Save'] = '保存';
 $Definition['Save Draft'] = '下書きを保存';

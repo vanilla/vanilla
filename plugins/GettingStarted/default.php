@@ -52,7 +52,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
          <strong>'.Anchor('ダッシュボードへ ようこそ', 'settings').'</strong>
          <p>これは、コミュニティを管理・運用するためのダッシュボードです。
          左側の設定オプションを試してみてください: ここで、このコミュニティが
-         どのように機能するかを設定できます。<b>役割 "Administrator" に属するユーザーだけが、
+         どのように機能するかを設定できます。<b>「Administrator」ロールに属するユーザーだけが、
          ダッシュボードにアクセスすることができます。</b></p>
       </li>
       <li class="Two'.(C('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">

@@ -64,7 +64,16 @@ class PostController extends VanillaController {
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
-      $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
+
+      $this->Form->SetModel($this->DiscussionModel);
+
+      if (isset($this->Discussion))
+         $this->CategoryID = $this->Discussion->CategoryID;
+      elseif ($CategoryID)
+         $this->CategoryID = $CategoryID;
+      elseif ($UseCategories)
+         $this->CategoryID = $this->Form->GetFormValue('CategoryID');
+      
       $this->Category = FALSE;
       if ($UseCategories) {
          $CategoryModel = new CategoryModel();
@@ -107,8 +116,7 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Discussions.Add');
       }
       
-      // Set the model on the form
-      $this->Form->SetModel($this->DiscussionModel);
+      // Set the model on the form.
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Prep form with current data for editing
          if (isset($this->Discussion))
@@ -129,16 +137,16 @@ class PostController extends VanillaController {
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
             // Check category permissions
-            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->PermissionCategoryID))
+            if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->PermissionCategoryID))
+            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
                $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
                
             // Make sure that the title will not be invisible after rendering

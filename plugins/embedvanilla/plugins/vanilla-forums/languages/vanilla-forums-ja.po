@@ -1,17 +1,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Vanilla Forums 1.0.5\n"
-"PO-Revision-Date: 2011-04-07 02:41+0900\n"
+"PO-Revision-Date: 2011-04-12 23:00+0900\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "POT-Creation-Date: \n"
-"Last-Translator: Yu-Tang <0011solo@gmail.com>\n"
-"Language-Team: \n"
+"Last-Translator: yama <yamamoto@kyms.ne.jp>\n"
+"Language-Team: Yu-Tang <0011solo@gmail.com>\n"
 
 msgid "Adds deep integration for Vanilla Forums to Wordpress, including: the ability to embed the entire forum into a WordPress page; Discussion, category, and activity widgets."
-msgstr "Vanilla フォーラムを WordPress に緊密に統合します。フォーラム全体を、WordPress のページに埋め込むことができます。またディスカッション、カテゴリ、アクティビティ ウィジェットも提供します。"
+msgstr "Vanilla フォーラムを WordPress と統合します。フォーラム全体を、WordPress のページに埋め込むことができます。またディスカッション・カテゴリ・アクティビティウィジェットも提供します。"
 
 msgid "Vanilla Forum"
 msgstr "Vanilla フォーラム"
@@ -32,7 +32,7 @@ msgid "Vanilla Forum Administration"
 msgstr "Vanilla フォーラム管理"
 
 msgid "Use this page to configure your Vanilla Forum to work with WordPress."
-msgstr "このページでは、あなたの Vanilla フォーラムを WordPress と連携させるための設定を行います。"
+msgstr "このページでは、Vanilla フォーラムを WordPress と連携させるための設定を行います。"
 
 msgid "Don't have a Vanilla Forum yet?"
 msgstr "まだ Vanilla フォーラムを用意していませんか？"
@@ -41,10 +41,10 @@ msgid "Get one in under 60 seconds!"
 msgstr "60 秒足らずで入手できます！"
 
 msgid "Tell WordPress where your Vanilla Forum is located"
-msgstr "あなたの Vanilla フォーラムの場所を WordPress に知らせましょう"
+msgstr "Vanilla フォーラムの場所を WordPress に知らせましょう"
 
 msgid "Paste the url to your Vanilla forum here (eg. http://yourdomain.com/forum)"
-msgstr "あなたの Vanilla フォーラムの URL をここに貼り付けてください (例. http://yourdomain.com/forum)"
+msgstr "Vanilla フォーラムの URL をここに貼り付けてください (例. http://yourdomain.com/forum)"
 
 msgid "Validate &amp; Save"
 msgstr "チェック &amp; 保存"
@@ -56,7 +56,7 @@ msgid "&lt;Embed&gt; Vanilla"
 msgstr "&lt;Embed&gt; Vanilla"
 
 msgid "Use this page to embed your Vanilla Forum into WordPress."
-msgstr "このページでは、あなたの Vanilla フォーラムを WordPress に埋め込むことができます。"
+msgstr "このページでは、Vanilla フォーラムを WordPress に埋め込むことができます。"
 
 msgid "Forum Location in WordPress"
 msgstr "WordPress におけるフォーラムの場所"
@@ -65,7 +65,7 @@ msgid "Define where to access your Vanilla Forum within WordPress."
 msgstr "WordPress の中で、どこに行けば あなたの Vanilla フォーラムにアクセスできるのかを設定してください。"
 
 msgid "You can further customize the page that contains your forum <a href=\"./post.php?post=%d&action=edit\">here</a>."
-msgstr "あなたのフォーラムを表示するページを、<a href=\"./post.php?post=%d&action=edit\">ここ</a>でさらにカスタマイズできます。"
+msgstr "フォーラムを表示するページを、<a href=\"./post.php?post=%d&action=edit\">ここ</a>でさらにカスタマイズできます。"
 
 msgid "Widget Integration"
 msgstr "ウィジェットの統合"
@@ -86,7 +86,7 @@ msgid "Forum Widgets"
 msgstr "フォーラム ウィジェット"
 
 msgid "Your Vanilla Forum provides some great widgets you can use in your WordPress blog:"
-msgstr "Vanilla フォーラムは、あなたの WordPress ブログで使えるすばらしいウィジェットをいくつか提供します:"
+msgstr "Vanilla フォーラムは、WordPress ブログで使えるすばらしいウィジェットをいくつか提供します:"
 
 msgid "Vanilla Discussions Widget"
 msgstr "Vanilla ディスカッション ウィジェット"
@@ -98,13 +98,13 @@ msgid "Vanilla Activity Widget"
 msgstr "Vanilla アクティビティ ウィジェット"
 
 msgid "allows you to display recent activity in your forum (user registrations, status updates, etc). You define how many activities to show, and you can even filter to activities from users in specific roles (administrator activity, for example)."
-msgstr "あなたのフォーラムの最近のアクティビティ (ユーザー登録、ステータスの更新等々) を表示します。表示するアクティビティの数を設定したり、特定の役割のユーザーに限定することもできます (たとえば管理者のアクティビティだけとか)。"
+msgstr "フォーラムの最近のアクティビティ (ユーザー登録、ステータスの更新等々) を表示します。表示するアクティビティの数を設定したり、特定の役割のユーザーに限定することもできます (たとえば管理者のアクティビティだけとか)。"
 
 msgid "Vanilla Recently Active Users Widget"
 msgstr "Vanilla 最新アクティブ ユーザー ウィジェット"
 
 msgid "allows you to display a list of users who have been recently active on your forum. You define how many users to show."
-msgstr "あなたのフォーラムで最近アクティブだったユーザー一覧を表示します。表示するユーザーの数を設定できます。"
+msgstr "フォーラムで最近アクティブだったユーザー一覧を表示します。表示するユーザーの数を設定できます。"
 
 msgid "All of these widgets are available on your <a href=\"./widgets.php\">WordPress Widget Management page</a>."
 msgstr "これらすべてのウィジェットを、<a href=\"./widgets.php\">WordPress ウィジェット管理ページ</a>で利用できます。"
@@ -131,7 +131,7 @@ msgid "Vanilla Activity"
 msgstr "Vanilla アクティビティ"
 
 msgid "Recent activity happening on your Vanilla Forum (eg. new users, status updates, etc)."
-msgstr "あなたの Vanilla フォーラムで起きた最近のアクティビティを表示 (例. ユーザー登録、ステータスの更新等)"
+msgstr "Vanilla フォーラムで起きた最近のアクティビティを表示 (例. ユーザー登録、ステータスの更新等)"
 
 msgid "Recent Forum Activity"
 msgstr "最新フォーラム アクティビティ"
@@ -143,7 +143,7 @@ msgid "Vanilla Users"
 msgstr "Vanilla ユーザー"
 
 msgid "Icons of recently active users in your Vanilla Forum."
-msgstr "あなたの Vanilla フォーラムで最近アクティブだったユーザーのアイコンを表示"
+msgstr "Vanilla フォーラムで最近アクティブだったユーザーのアイコンを表示"
 
 msgid "Recently Active Users"
 msgstr "最新アクティブ ユーザー"

@@ -203,7 +203,7 @@ class UserController extends DashboardController {
             if ($this->Form->GetValue('Password', '') != '')
                $UserModel->SendPasswordEmail($UserID, $NewPassword);
 
-            $this->InformMessage(T('Your changes have been saved successfully.'));
+            $this->InformMessage(T('Your changes have been saved.'));
          }
          $this->UserRoleData = $this->Form->GetFormValue('RoleID');
       }

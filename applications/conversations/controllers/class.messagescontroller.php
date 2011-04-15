@@ -195,8 +195,7 @@ class MessagesController extends ConversationsController {
       }
       
       // Build and display page.
-      if (C('Garden.Modules.ShowSignedInModule'))
-         $this->AddModule('SignedInModule');
+      $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
       $this->Render();
    }
@@ -346,8 +345,7 @@ class MessagesController extends ConversationsController {
       }
       
       // Add modules.
-      if (C('Garden.Modules.ShowSignedInModule'))
-         $this->AddModule('SignedInModule');
+      $this->AddModule('SignedInModule');
       $this->AddModule('NewConversationModule');
 
       $ClearHistoryModule = new ClearHistoryModule($this);

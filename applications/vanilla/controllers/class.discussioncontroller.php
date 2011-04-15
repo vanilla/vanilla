@@ -216,7 +216,7 @@ class DiscussionController extends VanillaController {
    }
    
    /**
-    * Highlight route; include SignedIn module.
+    * Highlight route.
     *
     * Always called by dispatcher before controller's requested method.
     * 
@@ -226,8 +226,6 @@ class DiscussionController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
-      if (C('Garden.Modules.ShowSignedInModule'))
-         $this->AddModule('SignedInModule');
       $this->Menu->HighlightRoute('/discussions');
    }
 

@@ -16,12 +16,11 @@ class CategoriesModule extends Gdn_Module {
    public function __construct($Sender = '') {
       // Load categories
       $this->Data = FALSE;
-      if (Gdn::Config('Vanilla.Categories.Use') == TRUE) {
+      if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule')) {
          if (!property_exists($Sender, 'CategoryModel') || !is_object($Sender->CategoryModel)) {
             $Sender->CategoryModel = new CategoryModel();
          }
          $Sender->CategoryModel->Watching = TRUE;
-            
          $this->Data = $Sender->CategoryModel->GetFull();
       }
       parent::__construct($Sender);
@@ -32,7 +31,7 @@ class CategoriesModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule'))
+      if ($this->Data)
          return parent::ToString();
 
       return '';

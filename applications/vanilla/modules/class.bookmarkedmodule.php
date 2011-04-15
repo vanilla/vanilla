@@ -15,7 +15,8 @@ class BookmarkedModule extends Gdn_Module {
    
    public function GetData($Limit = 10) {
       $Session = Gdn::Session();
-      if ($Session->IsValid()) {
+      $this->Data = FALSE;
+      if ($Session->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule')) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')
             ->From('UserDiscussion')
@@ -37,8 +38,6 @@ class BookmarkedModule extends Gdn_Module {
          } else {
             $this->Data = FALSE;
          }
-      } else {
-         $this->Data = FALSE;
       }
    }
 

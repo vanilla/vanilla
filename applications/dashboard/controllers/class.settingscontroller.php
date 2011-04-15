@@ -477,7 +477,7 @@ class SettingsController extends DashboardController {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
             $Refresh = TRUE;
-            $this->InformMessage(T("Your changes have been saved successfully."));
+            $this->InformMessage(T("Your changes have been saved."));
          }
 
          if ($Refresh)

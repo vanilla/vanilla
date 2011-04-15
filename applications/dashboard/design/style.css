@@ -151,6 +151,10 @@ textarea {
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
+.TextBoxWrapper {
+	width: auto;
+	padding-right: 8px;
+}
 textarea.TextBox {
    width: 500px;
    height: 100px;
@@ -1599,7 +1603,7 @@ form.Activity {
 	text-align: right;
 }
 form.Activity textarea {
-   width: 99%;
+   width: 100%;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
@@ -2197,7 +2201,7 @@ li.Editing {
 	background: #E3F4FF;
 }
 div.CommentForm textarea {
-   width: 99%;
+   width: 100%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
@@ -2243,13 +2247,15 @@ body.Post #Content {
    margin: 0 -20px;
 }
 #DiscussionForm textarea {
-   width: 99%;
+   width: 100%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
+#DiscussionForm div.Category,
 #DiscussionForm input.InputBox {
-   width: 99%;
+   width: 100%;
+	margin-bottom: 10px;
 }
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
@@ -2274,8 +2280,8 @@ div.CommentForm a.Cancel {
 
 /* ============================== Conversations ============================= */
 textarea.MultiComplete {
+	width: 100%;
    height: 20px;
-   padding: 3px 0;
    text-align: left;
 }
 .ac_results {
@@ -2333,7 +2339,7 @@ div.AddPeople h4 {
 }
 #Panel input.InputBox,
 div.AddPeople textarea.MultiComplete {
-  width: 228px;
+  width: 100%;
   margin-bottom: 2px;
 }
 div.AddPeople form div {
@@ -2392,7 +2398,7 @@ ul.Conversations div.Meta a.Name {
 	text-align: right;
 }
 #MessageForm textarea {
-  width: 99%;
+  width: 100%;
   height: 100px;
   min-height: 100px;
   margin-bottom: 2px;
@@ -2433,10 +2439,10 @@ body.add #Content {
 	font-weight:bold;	
 }
 #ConversationForm .TextBox {
+	width: 100%;
    height: 100px;
    min-height: 100px;
    margin: 8px 0 6px;
-	padding: 0;
 }
 body.Conversations a.Cancel {
    margin-left: 20px;
@@ -3210,9 +3216,6 @@ body.embed div.Connect h2 {
    border-top: 1px solid #ffffff;
    border-bottom: 1px solid #BEC8CC;
    padding: 7px 8px;
-}
-.TextBoxWrapper {
-	padding: 0 8px 0 0;
 }
 .Embed .TextBox {
 	width: 100%;

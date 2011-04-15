@@ -13,7 +13,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoryFollowToggleModule extends Gdn_Module {
    
-
    /**
     * Set the preference in the user's session.
     */

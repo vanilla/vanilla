@@ -7,7 +7,7 @@ echo $this->Form->Open();
    <li>
       <?php
          echo $this->Form->Label('Message', 'Body');
-         echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
+         echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       ?>
    </li>
 </ul>

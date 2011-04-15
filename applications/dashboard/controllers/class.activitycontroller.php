@@ -48,13 +48,9 @@ class ActivityController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       
-      // Guest module
-      $GuestModule = new GuestModule($this);
-      $this->AddModule($GuestModule);
-      
-      // SignedIn module.
-      if (C('Garden.Modules.ShowSignedInModule'))
-         $this->AddModule('SignedInModule');
+      // Add Modules
+      $this->AddModule('GuestModule');
+      $this->AddModule('SignedInModule');
       
       parent::Initialize();
    }

@@ -261,7 +261,7 @@ $Definition['My Preferences'] = '個人設定';
 
 $Definition['Name Unavailable'] = 'ユーザー名が登録済みです';
 $Definition['Notifications'] = '通知';
-$Definition['Notify me of private messages.'] = 'プライベートメッセージを通知する。';
+$Definition['Notify me of private messages.'] = '会話(PM)の更新を通知する。';
 $Definition['Notify me when I am added to private conversations.'] = '会話に自分が追加されたら通知する。';
 $Definition['Notify me when people comment on my bookmarked discussions.'] = 'フォロー中のディスカッションにコメントが付いたら通知する。';
 $Definition['Notify me when people comment on my discussions.'] = '自分のディスカッションにコメントが付いたら通知する。';

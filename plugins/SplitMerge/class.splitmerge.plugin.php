@@ -120,6 +120,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             // Update counts on both discussions
             $CommentModel = new CommentModel();
             $CommentModel->UpdateCommentCount($DiscussionID);
+            $CommentModel->UpdateUserCommentCounts($DiscussionID);
             $CommentModel->UpdateCommentCount($NewDiscussionID);
    
             // Clear selections
@@ -195,6 +196,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    
                // Update counts on all affected discussions
                $CommentModel->UpdateCommentCount($DiscussionID);
+               $CommentModel->UpdateUserCommentCounts($DiscussionID);
             }
    
             // Clear selections

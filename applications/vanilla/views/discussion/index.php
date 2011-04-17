@@ -20,7 +20,7 @@ if ($Session->IsValid()) {
 <div class="Tabs HeadingTabs DiscussionTabs">
    <ul>
       <li><?php
-         if (C('Vanilla.Categories.Use') === TRUE) {
+         if (C('Vanilla.Categories.Use') == TRUE) {
             echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
          } else {
             echo Anchor(T('All Discussions'), 'discussions');

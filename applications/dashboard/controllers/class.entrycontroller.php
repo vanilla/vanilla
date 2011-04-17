@@ -447,7 +447,7 @@ class EntryController extends Gdn_Controller {
             if (!$User['UserID'] == Gdn::Session()->UserID) {
 
                if ($this->Form->ValidateRule('ConnectPassword', 'ValidateRequired', sprintf(T('ValidateRequired'), T('Password')))
-                  && !$PasswordHash->CheckPassword($this->Form->GetFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'])) {
+                  && !$PasswordHash->CheckPassword($this->Form->GetFormValue('ConnectPassword'), $User['Password'], $User['HashMethod']), $this->Form->GetFormValue('ConnectName')) {
 
                   if ($ConnectNameEntered) {
                      $this->Form->AddError('The username you entered has already been taken.');

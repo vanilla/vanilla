@@ -60,18 +60,18 @@ class Gdn_PasswordHash extends PasswordHash {
    }
 
    /**
-    * Chech a password against a stored password
+    * Check a password against a stored password.
     *
     * The stored password can be plain, a md5 hash or a phpass hash.
-    *
-    * If the password wasn't a phppass hash,
-    * the Weak property is set to True.
+    * If the password wasn't a phppass hash, the Weak property is set to True.
     *
     * @param string $Password
     * @param string $StoredHash
+    * @param string $Method
+    * @param string $Username
     * @return boolean
     */
-   function CheckPassword($Password, $StoredHash, $Method = FALSE) {
+   function CheckPassword($Password, $StoredHash, $Method = FALSE, $Username = NULL) {
       $Result = FALSE;
 		switch(strtolower($Method)) {
          case 'django':
@@ -83,6 +83,9 @@ class Gdn_PasswordHash extends PasswordHash {
             break;
          case 'reset':
             throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
+            break;
+         case 'smf':
+            $Result = (sha1(strtolower($Username).$Password) == $StoredHash);
             break;
 			case 'vbulletin':
             // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4

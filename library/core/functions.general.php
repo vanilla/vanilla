@@ -1108,10 +1108,10 @@ if (!function_exists('parse_ini_string')) {
     * PHP 5.2.0.
     */
    function parse_ini_string ($Ini) {
-      $Lines = split("\n", $Ini);
+      $Lines = explode("\n", $Ini);
       $Result = array();
       foreach($Lines as $Line) {
-         $Parts = split('=', $Line, 2);
+         $Parts = explode('=', $Line, 2);
          if(count($Parts) == 1) {
             $Result[trim($Parts[0])] = '';
          } elseif(count($Parts) >= 2) {

@@ -219,7 +219,7 @@ if (!function_exists('ValidateTimestamp')) {
 
 if (!function_exists('ValidateLength')) {
    function ValidateLength($Value, $Field) {
-      $Diff = strlen($Value) - $Field->Length;
+      $Diff = mb_strlen($Value) - $Field->Length;
       if ($Diff <= 0) {
          return TRUE;
       } else {

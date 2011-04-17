@@ -426,7 +426,7 @@ class Gdn_Format {
       else {
          $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
-         $nofollow = (self::$DisplayNoFollow) ? ' rel=\"nofollow\"' : '';
+         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
          $Mixed = preg_replace(
             "/
             (?<!<a href=\")

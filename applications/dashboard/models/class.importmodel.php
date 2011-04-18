@@ -1392,15 +1392,15 @@ class ImportModel extends Gdn_Model {
          Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL, 'index')->Set(FALSE, FALSE);
       }
 
-      $Sqls2 = array();
-      $i = 1;
-      foreach ($Sqls as $Name => $Sql) {
-         $Sqls2[] = "/* $i. $Name */\n"
-            .str_replace(':_', $this->Database->DatabasePrefix, $Sql)
-            .";\n";
-         $i++;
-      }
-      throw new Exception(implode("\n", $Sqls2));
+//      $Sqls2 = array();
+//      $i = 1;
+//      foreach ($Sqls as $Name => $Sql) {
+//         $Sqls2[] = "/* $i. $Name */\n"
+//            .str_replace(':_', $this->Database->DatabasePrefix, $Sql)
+//            .";\n";
+//         $i++;
+//      }
+//      throw new Exception(implode("\n", $Sqls2));
 
 		// Execute the SQL.
       $Keys = array_keys($Sqls);

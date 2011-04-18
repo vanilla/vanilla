@@ -150,6 +150,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
             if ($CacheIntegrityHash != $PathIntegrityHash) {
                // Need to re-index this folder
+               
+               // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 
+               // so that the merge below does what was intended
+               $this->PluginCache = array_diff_key($this->PluginCache, $CachePluginInfo);
+               $this->PluginsByClass = array_diff_key($this->PluginsByClass, $CacheClassInfo);
+               
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CachePluginInfo, $CacheClassInfo, $PathListing);
                if ($PathIntegrityHash === FALSE)
                   continue;

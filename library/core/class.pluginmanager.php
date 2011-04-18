@@ -156,6 +156,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                $this->PluginCache = array_diff_key($this->PluginCache, $CachePluginInfo);
                $this->PluginsByClass = array_diff_key($this->PluginsByClass, $CacheClassInfo);
                
+               $CachePluginInfo = array();
+               $CacheClassInfo = array();
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CachePluginInfo, $CacheClassInfo, $PathListing);
                if ($PathIntegrityHash === FALSE)
                   continue;

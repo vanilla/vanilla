@@ -1378,13 +1378,13 @@ if (!function_exists('ProxyRequest')) {
             $Response .= $Line;
          }
          @fclose($Pointer);
-         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         $Response = trim($Response);
          $Success = TRUE;
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
       
-      if ($Success)
+      if (!$Success)
          return $Response;
       
       $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));

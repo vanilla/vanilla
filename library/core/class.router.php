@@ -1,12 +1,13 @@
 <?php
 
-class Gdn_Router {
+class Gdn_Router extends Gdn_Pluggable {
 
    public $Routes;
    public $ReservedRoutes;
    public $RouteTypes;
 
    public function __construct() {
+      parent::__construct();
       $this->RouteTypes = array(
          'Internal'     => 'Internal',
          'Temporary'    => 'Temporary (302)',
@@ -116,6 +117,8 @@ class Gdn_Router {
    
    private function _LoadRoutes() {
       $Routes = Gdn::Config('Routes', array());
+      $this->EventArguments['Routes'] = &$Routes;
+      $this->FireEvent("BeforeLoadRoutes");
       foreach ($Routes as $Key => $Destination) {
          $Route = $this->_DecodeRouteKey($Key);
          $RouteData = $this->_ParseRoute($Destination);
@@ -126,6 +129,7 @@ class Gdn_Router {
             'Reserved'     => in_array($Route,$this->ReservedRoutes)
          ), $RouteData);
       }
+      $this->FireEvent("AfterLoadRoutes");
    }
    
    private function _ParseRoute($Destination) {

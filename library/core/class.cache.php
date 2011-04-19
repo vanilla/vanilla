@@ -352,7 +352,7 @@ abstract class Gdn_Cache {
       ));
       
       if (!$Incremented) {
-         return $this->Store($CacheRevisionKey, 1, array(
+         return $this->Store($CacheRevisionKey, 2, array(
             Gdn_Cache::FEATURE_NOPREFIX   => TRUE
          ));
       }

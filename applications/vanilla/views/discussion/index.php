@@ -39,7 +39,7 @@ if ($Session->IsValid()) {
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
-
+$this->FireEvent('AfterDiscussion');
 if($this->Pager->LastPage()) {
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)

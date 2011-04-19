@@ -280,7 +280,7 @@ class ModerationController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       
       // Verify that the user has permission to perform the deletes
-      $this->Permission('Vanilla.Comment.Delete', TRUE, 'Category', $Discussion->CategoryID);
+      $this->Permission('Vanilla.Comment.Delete', TRUE, 'Category', 'any');
       $this->Title(T('Confirm'));
       
       $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());

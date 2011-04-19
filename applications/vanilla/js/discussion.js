@@ -261,7 +261,7 @@ jQuery(document).ready(function($) {
       var btn = this;
       var container = $(btn).parents('li.Comment');
       $(container).addClass('Editing');
-      var parent = $(btn).parents('div.Comment');
+      var parent = $(container).find('div.Comment');
       var msg = $(parent).find('div.Message');
       $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       if ($(msg).is(':visible')) {

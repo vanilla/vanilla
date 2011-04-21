@@ -1607,14 +1607,6 @@ li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
 	display:inline;
 }
 
-li.RolePermissions table.CheckBoxGrid tbody tr th a {
-	white-space:nowrap;
-}
-
-li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
-	display:inline;
-}
-
 /* Summary Tables */
 div.Summary {
    clear: left;
@@ -1842,4 +1834,8 @@ ol.Sortable {
 	color: #333;
 	font-size: 12px;
 	display: block;
+}
+
+#dashboard_utility_structure #Content table tbody tr td pre {
+	white-space:pre-wrap;
 }

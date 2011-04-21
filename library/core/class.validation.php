@@ -452,7 +452,7 @@ class Gdn_Validation {
             $Args = substr($Rule, 6);
          } elseif (StringBeginsWith($Rule, 'function:', TRUE)) {
             $RuleName = substr($Rule, 9);
-         } elseif (function_exists($Rule)) {
+         } else {
             $RuleName = $Rule;
          }
       } elseif (is_array($Rule)) {

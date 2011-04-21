@@ -11,24 +11,25 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
-      
-      echo '<div class="P">';
-      echo $this->Form->Label('Discussion Title', 'Name');
-      echo $this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput'));
-      echo '</div>';
+		echo '<div class="P">';
+			echo $this->Form->Label('Discussion Title', 'Name');
+			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
+		echo '</div>';
 
       if ($this->ShowCategorySelector === TRUE) {
-         echo '<div class="P"><div class="Category">';
-         echo $this->Form->Label('Category', 'CategoryID'), ' ';
-         echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
-         echo '</div></div>';
+			echo '<div class="P">';
+				echo '<div class="Category">';
+				echo $this->Form->Label('Category', 'CategoryID'), ' ';
+				echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+				echo '</div>';
+			echo '</div>';
       }
       
       $this->FireEvent('BeforeBodyInput');
-      
-      echo '<div class="P">', $this->Form->TextBox('Body', array('MultiLine' => TRUE)), '</div>';
+		echo '<div class="P">';
+	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+		echo '</div>';
 
-//      echo "<div class=\"PostFormControlPanel\">\n";
       $Options = '';
       // If the user has any of the following permissions (regardless of junction), show the options
       // Note: I need to validate that they have permission in the specified category on the back-end
@@ -42,8 +43,11 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 		$this->EventArguments['Options'] = &$Options;
 		$this->FireEvent('DiscussionFormOptions');
 
-      if ($Options != '')
-         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
+      if ($Options != '') {
+			echo '<div class="P">';
+	         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
+			echo '</div>';
+      }
 
       echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
@@ -55,7 +59,6 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
-//      echo "</div>\n";
       echo $this->Form->Close();
    ?>
 </div>

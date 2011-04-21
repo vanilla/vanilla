@@ -201,7 +201,7 @@ class ImportModel extends Gdn_Model {
          if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0 || $this->Data('UseCurrentPassword')) {
             $Result = TRUE;
          } else {
-            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod());
+            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod(), GetValue('Name',$Data));
          }
 		}
 		if(!$Result) {

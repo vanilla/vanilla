@@ -7,10 +7,15 @@ $this->Title(T('Start a New Conversation'));
    echo $this->Form->Open();
    echo $this->Form->Errors();
    
-   echo '<p>', $this->Form->Label('Recipients', 'To');
-   echo $this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), '</p>';
+   echo '<div class="P">';
+      echo $this->Form->Label('Recipients', 'To');
+      echo Wrap($this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
+   echo '</div>';
    
-   echo '<p>', $this->Form->TextBox('Body', array('MultiLine' => TRUE)), '</p>';
+   echo '<div class="P">';
+      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+   echo '</div>';
+   
    echo $this->Form->Close('Start Conversation');
    ?>
 </div>

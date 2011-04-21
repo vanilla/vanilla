@@ -324,7 +324,7 @@ class TaggingPlugin extends Gdn_Plugin {
          }
          
          if ($Sender->Form->Save())
-            $Sender->InformMessage(T('Your changes have been saved successfully.'));
+            $Sender->InformMessage(T('Your changes have been saved.'));
       }
 
       $Sender->Render('EditTag', '', 'plugins/Tagging');

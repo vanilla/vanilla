@@ -754,15 +754,26 @@ class CommentModel extends VanillaModel {
 				->Where('d.DiscussionID', $DiscussionID)
 				->Where('c.CommentID', 'd.LastCommentID', FALSE, FALSE)
             ->Put();
-         
-         // Update UserDiscussion so users don't have incorrect counts
-         $this->SQL
-            ->Update('UserDiscussion ud')
-            ->Set('CountComments', $Data['CountComments'] + 1)
-            ->Where('DiscussionID', $DiscussionID)
-            ->Where('CountComments <', $Data['CountComments'] + 1)
-            ->Put();
       }
+   }
+   
+   /**
+    * Update UserDiscussion so users don't have incorrect counts. 
+    * 
+    * @since 2.0.18
+    * @access public
+    *
+    * @param int $DiscussionID Unique ID of the discussion we are updating.
+    */
+   public function UpdateUserCommentCounts($DiscussionID) {
+      $Sql = "update ".$this->Database->DatabasePrefix."UserDiscussion ud
+         set CountComments = (
+            select count(c.CommentID)+1 
+            from ".$this->Database->DatabasePrefix."Comment c 
+            where c.DateInserted < ud.DateLastViewed
+         )
+         where DiscussionID = $DiscussionID";
+      $this->SQL->Query($Sql);
    }
    
    /**

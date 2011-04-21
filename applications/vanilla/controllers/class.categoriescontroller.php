@@ -237,7 +237,5 @@ class CategoriesController extends VanillaController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/categories');
       
-      if (C('Garden.Modules.ShowSignedInModule'))
-         $this->AddModule('SignedInModule');
    }      
 }

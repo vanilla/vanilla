@@ -69,7 +69,7 @@ class Gdn_UploadImage extends Gdn_Upload {
     *  - <b>SourceHeight. SourceWidth</b>: If you want to create a thumbnail that is a crop of the image these are it's dimensions.
     */
    public static function SaveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
-      $Crop = FALSE; $OutputType = ''; $ImageQuality = 75;
+      $Crop = FALSE; $OutputType = ''; $ImageQuality = C('Garden.UploadImage.Quality', 75);
       
       // Make function work like it used to.
       $Args = func_get_args();

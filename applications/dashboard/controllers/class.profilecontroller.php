@@ -40,8 +40,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
-      $GuestModule = new GuestModule($this);
-      $this->AddModule($GuestModule);
+      $this->AddModule('GuestModule');
       parent::Initialize();
    }   
    
@@ -202,7 +201,7 @@ class ProfileController extends Gdn_Controller {
          $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
-            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved successfully.'), 'Dismissable AutoDismiss HasSprite');
+            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
          }
       }

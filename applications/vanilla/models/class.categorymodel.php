@@ -423,7 +423,7 @@ class CategoryModel extends Gdn_Model {
 
    public static function JoinModerators($Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
       $Moderators = Gdn::SQL()
-         ->Select('u.UserID, u.Name, u.Photo')
+         ->Select('u.UserID, u.Name, u.Photo, u.Email')
          ->Select('p.JunctionID as CategoryID')
          ->From('User u')
          ->Join('UserRole ur', 'ur.UserID = u.UserID')
@@ -435,7 +435,17 @@ class CategoryModel extends Gdn_Model {
 
       foreach ($Data as &$Category) {
          $ID = GetValue('PermissionCategoryID', $Category);
-         SetValue($Column, $Category, GetValue($ID, $Moderators, array()));
+         $Mods = GetValue($ID, $Moderators, array());
+         $ModIDs = array();
+         $UniqueMods = array();
+         foreach ($Mods as $Mod) {
+            if (!in_array($Mod['UserID'], $ModIDs)) {
+               $ModIDs[] = $Mod['UserID'];
+               $UniqueMods[] = $Mod;
+            }
+            
+         }
+         SetValue($Column, $Category, $UniqueMods);
       }
    }
    

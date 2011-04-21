@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-if ($Session->IsValid()) {
+if ($Session->IsValid() && C('Garden.Modules.ShowSignedInModule')) {
    $Authenticator = Gdn::Authenticator();
 	$Name = $Session->User->Name;
 

@@ -147,8 +147,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             sort($PathListing);
 
             $PathIntegrityHash = md5(serialize($PathListing));
-            if (GetValue('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
+            $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
+            if ($CacheIntegrityHash != $PathIntegrityHash) {
                // Need to re-index this folder
+               
+               // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 
+               // so that the merge below does what was intended
+               $this->PluginCache = array_diff_key($this->PluginCache, $CachePluginInfo);
+               $this->PluginsByClass = array_diff_key($this->PluginsByClass, $CacheClassInfo);
+               
+               $CachePluginInfo = array();
+               $CacheClassInfo = array();
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CachePluginInfo, $CacheClassInfo, $PathListing);
                if ($PathIntegrityHash === FALSE)
                   continue;
@@ -164,6 +173,20 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       return $this->PluginCache;
+   }
+   
+   public function ClearPluginCache($SearchPaths = NULL) {
+      if (!is_null($SearchPaths)) {
+         if (!is_array($SearchPaths))
+            $SearchPaths = array($SearchPaths);
+      } else {
+         $SearchPaths = $this->SearchPaths();
+      }
+      
+      foreach ($SearchPaths as $SearchPath => $SearchPathName) {
+         $SearchPathCacheKey = "Garden.Plugins.PathCache.{$SearchPath}";
+         $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+      }
    }
 
    public function EnabledPlugins($Force = FALSE) {
@@ -809,6 +832,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       } else {
          $Folders = array_flip(GetValue($SearchPath, $this->PluginFoldersByPath, array()));
          return array_keys(array_intersect_key($Folders,$this->EnabledPlugins()));
+      }
+   }
+   
+   public function AvailablePluginFolders($SearchPath = NULL) {
+      if (is_null($SearchPath)) {
+         return array_keys($this->AvailablePlugins());
+      } else {
+         return GetValue($SearchPath, $this->PluginFoldersByPath, array());
       }
    }
 

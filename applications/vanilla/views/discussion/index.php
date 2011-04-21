@@ -20,7 +20,7 @@ if ($Session->IsValid()) {
 <div class="Tabs HeadingTabs DiscussionTabs">
    <ul>
       <li><?php
-         if (C('Vanilla.Categories.Use') === TRUE) {
+         if (C('Vanilla.Categories.Use') == TRUE) {
             echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
          } else {
             echo Anchor(T('All Discussions'), 'discussions');
@@ -39,7 +39,7 @@ if ($Session->IsValid()) {
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
-
+$this->FireEvent('AfterDiscussion');
 if($this->Pager->LastPage()) {
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)

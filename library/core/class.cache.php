@@ -288,42 +288,76 @@ abstract class Gdn_Cache {
    */
    abstract public function AddContainer($Options);
    
-   public function GetPrefix($ForcePrefix = NULL) {
-      static $LocalPrefix = FALSE;
+   public function GetPrefix($ForcePrefix = NULL, $WithRevision = TRUE) {
+      static $ConfigPrefix = FALSE;
       
       // Allow overriding the prefix
       if (!is_null($ForcePrefix))
          return $ForcePrefix;
-      
-      // Allow vfcom-infrastructure to set the prefix automatically
-      if (defined('FORCE_CACHE_PREFIX') && FORCE_CACHE_PREFIX)
-         return $LocalPrefix = FORCE_CACHE_PREFIX;
        
       // Keep searching for the prefix until it is defined
-      if ($LocalPrefix === FALSE) {
-         $ConfigPrefix = NULL;
+      if ($ConfigPrefix === FALSE) {
          
-         $ConfigPrefix = C('Cache.Prefix', NULL);
-         if (!is_null($ConfigPrefix)) {
-            $CacheRevisionKey = $ConfigPrefix.'.Revision';
-            $CacheRevision = $this->Get($CacheRevisionKey, array(
-               Gdn_Cache::FEATURE_NOPREFIX   => TRUE
-            ));
-            $LocalPrefix = $ConfigPrefix;
-            if ($CacheRevision !== Gdn_Cache::CACHEOP_FAILURE)
-               $LocalPrefix .= '.rev'.$CacheRevision;
-         }
+         // Allow vfcom-infrastructure to set the prefix automatically
+         if (defined('FORCE_CACHE_PREFIX'))
+            $ConfigPrefix = FORCE_CACHE_PREFIX;
+         
+         if ($ConfigPrefix === FALSE)
+            $ConfigPrefix = C('Cache.Prefix', FALSE);
+         
       }
       
-      return ($LocalPrefix === FALSE) ? NULL : $LocalPrefix;
+      // Lookup Revision if we have a prefix
+      if ($WithRevision && $ConfigPrefix !== FALSE) {
+         $RevisionNumber = FALSE;
+         $CacheRevision = $this->GetRevision($ConfigPrefix);
+         if (!is_null($CacheRevision))
+            $RevisionNumber = $CacheRevision;
+      }
+      
+      $Response = $ConfigPrefix;
+      if ($WithRevision && $RevisionNumber !== FALSE && $ConfigPrefix !== FALSE)
+         $Response .= ".rev{$RevisionNumber}";
+         
+      return ($ConfigPrefix === FALSE) ? NULL : $Response;
    }
    
-   public function GetRevision() {
+   public function GetRevision($ForcePrefix = NULL, $Force = FALSE) {
+      static $CacheRevision = FALSE;
       
+      if ($CacheRevision === FALSE || $Force) {
+         $ConfigPrefix = $ForcePrefix;
+         if (is_null($ConfigPrefix))
+            $ConfigPrefix = $this->GetPrefix(NULL, FALSE);
+
+         $CacheRevisionKey = "{$ConfigPrefix}.Revision";
+         $CacheRevision = $this->Get($CacheRevisionKey, array(
+            Gdn_Cache::FEATURE_NOPREFIX   => TRUE
+         ));
+         
+         if ($CacheRevision === Gdn_Cache::CACHEOP_FAILURE)
+            $CacheRevision = 1;
+      }
+      
+      return $CacheRevision;
    }
    
    public function IncrementRevision() {
+      $CachePrefix = $this->GetPrefix(NULL, FALSE);
+      if ($CachePrefix === FALSE) return FALSE;
       
+      $CacheRevisionKey = "{$CachePrefix}.Revision";
+      $Incremented = $this->Increment($CacheRevisionKey, 1, array(
+         Gdn_Cache::FEATURE_NOPREFIX   => TRUE
+      ));
+      
+      if (!$Incremented) {
+         return $this->Store($CacheRevisionKey, 2, array(
+            Gdn_Cache::FEATURE_NOPREFIX   => TRUE
+         ));
+      }
+      
+      return TRUE;
    }
    
    public function MakeKey($Key, $Options) {

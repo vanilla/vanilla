@@ -303,7 +303,7 @@ if (!function_exists('UserPhoto')) {
          }
          
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

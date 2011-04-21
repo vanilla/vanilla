@@ -115,10 +115,10 @@ function Gdn_ExceptionHandler($Exception) {
                $MasterViewName = 'deverror.master.php';
             }
                
-            if(class_exists('Gdn', FALSE)) {
+            if (class_exists('Gdn', FALSE)) {
                $CurrentTheme = ''; // The currently selected theme
-               $CurrentTheme = Gdn::Config('Garden.Theme', '');
-               $MasterViewName = Gdn::Config('Garden.Errors.MasterView', $MasterViewName);
+               $CurrentTheme = C('Garden.Theme', '');
+               $MasterViewName = C('Garden.Errors.MasterView', $MasterViewName);
                $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
                if ($MasterViewCss == '')
                   $MasterViewCss = 'error';

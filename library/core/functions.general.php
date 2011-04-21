@@ -1041,8 +1041,7 @@ if (!function_exists('MergeArrays')) {
 
 if (!function_exists('Now')) {
    function Now() {
-      list($usec, $sec) = explode(" ", microtime());
-      return ((float)$usec + (float)$sec);
+      return microtime(TRUE);
    }
 }
 
@@ -1109,10 +1108,10 @@ if (!function_exists('parse_ini_string')) {
     * PHP 5.2.0.
     */
    function parse_ini_string ($Ini) {
-      $Lines = split("\n", $Ini);
+      $Lines = explode("\n", $Ini);
       $Result = array();
       foreach($Lines as $Line) {
-         $Parts = split('=', $Line, 2);
+         $Parts = explode('=', $Line, 2);
          if(count($Parts) == 1) {
             $Result[trim($Parts[0])] = '';
          } elseif(count($Parts) >= 2) {
@@ -1379,7 +1378,7 @@ if (!function_exists('ProxyRequest')) {
             $Response .= $Line;
          }
          @fclose($Pointer);
-         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         $Response = trim($Response);
          $Success = TRUE;
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));

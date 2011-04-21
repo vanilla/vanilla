@@ -512,6 +512,7 @@ abstract class Gdn_SQLDriver {
 	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
 	 *  - <b>FALSE</b>: All tables will be fetched. Default.
 	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
+    * @return array
     */
    public function FetchTables($LimitToPrefix = FALSE) {
       $Sql = $this->FetchTableSql($LimitToPrefix);
@@ -1319,6 +1320,14 @@ abstract class Gdn_SQLDriver {
       }
          
       return $NiceName;
+   }
+
+   public function &NamedParameters($NewValue = NULL) {
+      if ($NewValue !== NULL) {
+         $this->_NamedParameters = $NewValue;
+      }
+      $Result =& $this->_NamedParameters;
+      return $Result;
    }
    
    /**

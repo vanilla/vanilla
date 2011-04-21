@@ -9,7 +9,7 @@
       $Filename = '';
    //$Filename = GetValue('OriginalFilename', $this->Data);
    if($Filename)
-      $Header[T('Filename')] = $Filename;
+      $Header[T('Source')] = $Filename;
 
    $Header = array_merge($Header, (array)GetValue('Header', $this->Data, array()));
    $Stats = (array)GetValue('Stats', $this->Data, array());
@@ -24,5 +24,9 @@
 
 		echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
 	}
+
+   if ($this->Data('GenerateSQL')) {
+      echo "<tr><th>Special</th><td class=\"Alt\">Generate Import SQL only</td></tr>\n";
+   }
 	?>
 </table>

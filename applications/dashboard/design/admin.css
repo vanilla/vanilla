@@ -1835,3 +1835,7 @@ ol.Sortable {
 	font-size: 12px;
 	display: block;
 }
+
+#dashboard_utility_structure #Content table tbody tr td pre {
+	white-space:pre-wrap;
+}

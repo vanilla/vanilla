@@ -202,7 +202,7 @@ class ProfileController extends Gdn_Controller {
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
             $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
+            $this->RedirectUrl = Url('/profile/'.$this->ProfileUrl($User->Name));
          }
       }
       
@@ -810,7 +810,7 @@ class ProfileController extends Gdn_Controller {
       if ($UserID === NULL)
          $UserID = $this->User->UserID;
 
-      $UserReferenceEnc = urlencode($UserReference);
+      $UserReferenceEnc = rawurlencode($UserReference);
       if ($UserReferenceEnc == $UserReference)
          return $UserReferenceEnc;
       else

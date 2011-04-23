@@ -17,6 +17,12 @@ ini_set('track_errors', 1);
 
 ob_start();
 
+// 0. Start profiling if requested in the querystring
+if (isset($_GET['xhprof']) && $_GET['xhprof'] == 'yes')
+   define('PROFILER', TRUE);
+
+if (defined('PROFILER') && PROFILER) xhprof_enable();
+
 // 1. Define the constants we need to get going.
 define('DS', '/');
 define('PATH_ROOT', dirname(__FILE__));
@@ -34,3 +40,34 @@ $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 // 4. Process the request.
 $Dispatcher->Dispatch();
 $Dispatcher->Cleanup();
+
+// 5. Finish profiling and save results to disk, if requested
+if (defined('PROFILER') && PROFILER) {
+   $xhprof_data = xhprof_disable();
+
+   //
+   // Saving the XHProf run
+   // using the default implementation of iXHProfRuns.
+   //
+   include_once("{$XHPROF_ROOT}/xhprof_lib/utils/xhprof_lib.php");
+   include_once("{$XHPROF_ROOT}/xhprof_lib/utils/xhprof_runs.php");
+
+   $xhprof_runs = new XHProfRuns_Default();
+   $xhprof_namespace = 'vanilla';
+
+   // Save the run under a namespace              
+   //
+   // **NOTE**:
+   // By default save_run() will automatically generate a unique
+   // run id for you. [You can override that behavior by passing
+   // a run id (optional arg) to the save_run() method instead.]
+   //
+   $run_id = $xhprof_runs->save_run($xhprof_data, $xhprof_namespace);
+
+   echo "---------------\n".
+      "Assuming you have set up the http based UI for \n".
+      "XHProf at some address, you can view run at \n".
+      "http://<xhprof-ui-address>/index.php?run={$run_id}&source={$xhprof_namespace}\n".
+      "---------------\n";
+
+}

@@ -99,14 +99,14 @@ class SettingsController extends Gdn_Controller {
 	}
 	
    /**
-    * Alias for General method.
+    * Alias for ManageCategories method.
     * 
     * @since 2.0.0
     * @access public
     */
    public function Index() {
-      $this->View = 'general';
-      $this->General();
+      $this->View = 'managecategories';
+      $this->ManageCategories();
    }
    
    /**

@@ -112,6 +112,7 @@ class DashboardHooks implements Gdn_IPlugin {
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		
+		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
 		
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');

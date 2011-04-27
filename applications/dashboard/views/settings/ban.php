@@ -5,6 +5,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <ul>
+   <?php $this->FireEvent("BeforeAddBanForm"); ?>
    <li>
       <?php
          echo $this->Form->Label('BanType', 'Ban Type');
@@ -23,5 +24,6 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Notes');
       ?>
    </li>
+   <?php $this->FireEvent("AfterAddBanForm"); ?>
 </ul>
 <?php echo $this->Form->Close('Save'); ?>

@@ -610,6 +610,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
+      
+      if (!array_key_exists($EventKey, $this->_EventHandlerCollection))
+         return FALSE;
+      
       if (is_null($PassedEventKey))
          $PassedEventKey = $EventKey;
 
@@ -625,23 +629,22 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $EventCaller = array_shift($Stack);
          $Sender->EventArguments['WildEventStack'] = $EventCaller;
       }
+      
+      // Loop through the handlers and execute them
+      foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
+         $PluginKeyParts = explode('.', $PluginKey);
+         if (count($PluginKeyParts) == 2) {
+            list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
 
-      if (array_key_exists($EventKey, $this->_EventHandlerCollection)) {
-         // Loop through the handlers and execute them
-         foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
-            $PluginKeyParts = explode('.', $PluginKey);
-            if (count($PluginKeyParts) == 2) {
-               list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
+            if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
+               $Sender->Returns[$EventKey] = array();
 
-               if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
-                  $Sender->Returns[$EventKey] = array();
-
-               $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-               $Sender->Returns[$EventKey][$PluginKey] = $Return;
-               $Return = TRUE;
-            }
+            $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
+            $Sender->Returns[$EventKey][$PluginKey] = $Return;
+            $Return = TRUE;
          }
       }
+      
       return $Return;
    }
 

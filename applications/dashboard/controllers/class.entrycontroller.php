@@ -1142,12 +1142,14 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function PasswordRequest() {
-      $this->Form->SetModel($this->UserModel);
+      Gdn::Locale()->SetTranslation('Email', T('Email/Username'));
       if ($this->Form->IsPostBack() === TRUE) {
+         $this->Form->ValidateRule('Email', 'ValidateRequired');
 
-         if ($this->Form->ValidateModel() == 0) {
+         if ($this->Form->ErrorCount() == 0) {
             try {
-               if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
+               $Email = $this->Form->GetFormValue('Email');
+               if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->AddError("Couldn't find an account associated with that email/username.");
                }
             } catch (Exception $ex) {
@@ -1159,7 +1161,7 @@ class EntryController extends Gdn_Controller {
             }
          } else {
             if ($this->Form->ErrorCount() == 0)
-               $this->Form->AddError('That email address was not found.');
+               $this->Form->AddError("Couldn't find an account associated with that email/username.");
          }
       }
       $this->Render();

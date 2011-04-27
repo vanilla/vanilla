@@ -1194,6 +1194,11 @@ if (!function_exists('OffsetLimit')) {
          $Limit = $Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
+      } elseif (preg_match('/(\d+)lin(\d*)/i', $OffsetOrPage, $Matches)) {
+         $Offset = $Matches[1] - 1;
+         $Limit = $Matches[2];
+         if (!is_numeric($Limit))
+            $Limit = $LimitOrPageSize;
       } else {
          $Offset = 0;
          $Limit = $LimitOrPageSize;

@@ -220,7 +220,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
    public static function Url($Name) {
       $Parsed = self::Parse($Name);
-      return $Parsed['Url']; // remove of after debugging.
+      return $Parsed['Url'];
    }
 
    /**

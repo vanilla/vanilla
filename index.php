@@ -44,7 +44,13 @@ $Dispatcher->Cleanup();
 // 5. Finish profiling and save results to disk, if requested
 if (defined('PROFILER') && PROFILER) {
    $xhprof_data = xhprof_disable();
+   
+   if (is_null($XHPROF_ROOT))
+      die("Unable to save XHProf data. \$XHPROF_ROOT not defined in index.php");
 
+   if (is_null($XHPROF_SERVER_NAME))
+      die("Unable to save XHProf data. \$XHPROF_SERVER_NAME not defined in index.php");
+   
    //
    // Saving the XHProf run
    // using the default implementation of iXHProfRuns.
@@ -67,7 +73,7 @@ if (defined('PROFILER') && PROFILER) {
    echo "---------------\n".
       "Assuming you have set up the http based UI for \n".
       "XHProf at some address, you can view run at \n".
-      "http://<xhprof-ui-address>/index.php?run={$run_id}&source={$xhprof_namespace}\n".
+      "http://{$XHPROF_SERVER_NAME}/index.php?run={$run_id}&source={$xhprof_namespace}\n".
       "---------------\n";
 
 }

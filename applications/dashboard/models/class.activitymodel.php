@@ -254,10 +254,10 @@ class ActivityModel extends Gdn_Model {
 
       // Massage $SendEmail to allow for only sending an email.
       $QueueEmail = FALSE;
-      if ($SendEmail == 'Only') {
+      if ($SendEmail === 'Only') {
          $SendEmail = '';
          $AddActivity = FALSE;
-      } else if ($SendEmail == 'QueueOnly') {
+      } else if ($SendEmail === 'QueueOnly') {
          $SendEmail = '';
          $QueueEmail = TRUE;
          $AddActivity = FALSE;

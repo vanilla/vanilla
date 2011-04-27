@@ -108,7 +108,7 @@ if (!$UserRoleExists) {
 // User Meta Table
 $Construct->Table('UserMeta')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('Name', 'varchar(255)', FALSE, 'primary')
+   ->Column('Name', 'varchar(255)', FALSE, array('primary', 'index'))
    ->Column('Value', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
@@ -205,7 +205,8 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
-   'Garden.Moderation.Manage' => 'Garden.Users.Edit'
+   'Garden.Moderation.Manage' => 'Garden.Users.Edit',
+   'Garden.AdvancedNotifcatons.Allow' => 'Garden.Settings.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -268,7 +269,8 @@ if (!$PermissionTableExists) {
       'Garden.Users.Approve' => 1,
       'Garden.Activity.Delete' => 1,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.AdvancedNotifications.Allow' => 1
       ));
 }
 $PermissionModel->ClearPermissions();

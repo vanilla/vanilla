@@ -12,8 +12,10 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
       <thead>
          <tr>
          <?php
+         $CountTypes = 0;
          foreach ($this->PreferenceTypes[$PreferenceGroup] as $PreferenceType) {
             echo Wrap(T($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
+            $CountTypes++;
          }
          echo Wrap('&nbsp;', 'td');
          ?>
@@ -24,11 +26,20 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
             foreach ($Preferences as $Names) {
                echo '<tr>';
                $LastName = '';
+               $i = 0;
                foreach ($Names as $Name) {
                   echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
                   $LastName = $Name;
+                  $i++;
                }
-               echo Wrap($this->Preferences[$PreferenceGroup][$LastName], 'td', array('class' => 'Description'));
+               for(;$i < $CountTypes; $i++) {
+                  echo Wrap('&#160;', 'td', array('class' => 'PrefCheckBox'));
+               }
+
+               $Desc = $this->Preferences[$PreferenceGroup][$LastName];
+               if (is_array($Desc))
+                  $Desc = $Desc[0];
+               echo Wrap($Desc, 'td', array('class' => 'Description'));
                echo '</tr>';
             }
          ?>

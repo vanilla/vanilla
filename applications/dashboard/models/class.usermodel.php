@@ -334,6 +334,63 @@ class UserModel extends Gdn_Model {
          ->Get();
    }
 
+   /**
+    * Retries UserMeta information for a UserID / Key pair
+    *
+    * This method takes a $UserID or array of $UserIDs, and a $Key. It converts the
+    * $Key to fully qualified format and then queries for the associated value(s). $Key
+    * can contain SQL wildcards, in which case multiple results can be returned.
+    *
+    * If $UserID is an array, the return value will be a multi dimensional array with the first
+    * axis containing UserIDs and the second containing fully qualified UserMetaKeys, associated with
+    * their values.
+    *
+    * If $UserID is a scalar, the return value will be a single dimensional array of $UserMetaKey => $Value
+    * pairs.
+    *
+    * @param $UserID integer UserID or array of UserIDs.
+    * @param $Key string relative user meta key.
+    * @return array results or $Default
+    */
+   public static function GetMeta($UserID, $Key, $Prefix = '') {;
+      $Sql = Gdn::SQL()
+         ->Select('*')
+         ->From('UserMeta u');
+
+      if (is_array($UserID))
+         $Sql->WhereIn('u.UserID', $UserID);
+      else
+         $Sql->Where('u.UserID', $UserID);
+
+      if (strpos($Key, '%') !== FALSE)
+         $Sql->Like('u.Name', $Key);
+      else
+         $Sql->Where('u.Name', $Key);
+
+      $Data = $Sql->Get()->ResultArray();
+
+      if (is_array($UserID))
+         $Result = array_fill_keys($UserID, array());
+      else {
+         if (strpos($Key, '%') === FALSE)
+            $Result = array(StringBeginsWith($Key, $Prefix, FALSE, TRUE) => $Default);
+         else
+            $Result = array();
+      }
+
+      foreach ($Data as $Row) {
+         $Name = StringBeginsWith($Row['Name'], $Prefix, FALSE, TRUE);
+
+         if (is_array($UserID)) {
+            $Result[$Row['UserID']][$Name] = $Row['Value'];
+         } else {
+            $Result[$Name] = $Row['Value'];
+         }
+      }
+
+      return $Result;
+   }
+
    public function GetRoles($UserID) {
       return $this->SQL->Select('r.RoleID, r.Name')
          ->From('UserRole ur')
@@ -1628,6 +1685,22 @@ class UserModel extends Gdn_Model {
          
          SetValue('PhotoUrl', $User, $PhotoUrl);
       }
+   }
+
+   public static function SetMeta($UserID, $Meta, $Prefix = '') {
+      $Deletes = array();
+      $Px = Gdn::Database()->DatabasePrefix;
+      $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";
+
+      foreach ($Meta as $Name => $Value) {
+         $Name = $Prefix.$Name;
+         if ($Value === NULL)
+            $Deletes[] = $Name;
+         else
+            Gdn::Database()->Query($Sql, array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value));
+      }
+      if (count($Deletes))
+         Gdn::SQL()->WhereIn('Name', $Deletes)->Delete('UserMeta');
    }
 
    public function SetTransientKey($UserID, $ExplicitKey = '') {

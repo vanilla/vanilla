@@ -21,7 +21,17 @@ ob_start();
 if (isset($_GET['xhprof']) && $_GET['xhprof'] == 'yes')
    define('PROFILER', TRUE);
 
-if (defined('PROFILER') && PROFILER) xhprof_enable();
+if (defined('PROFILER') && PROFILER) {
+   $ProfileWhat = 0;
+   
+   if (isset($_GET['memory']) && $_GET['memory'] == 'yes')
+      $ProfileWhat += XHPROF_FLAGS_MEMORY;
+   
+   if (isset($_GET['cpu']) && $_GET['cpu'] == 'yes')
+      $ProfileWhat += XHPROF_FLAGS_CPU;
+   
+   xhprof_enable($ProfileWhat);
+}
 
 // 1. Define the constants we need to get going.
 define('DS', '/');

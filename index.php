@@ -70,10 +70,6 @@ if (defined('PROFILER') && PROFILER) {
    //
    $run_id = $xhprof_runs->save_run($xhprof_data, $xhprof_namespace);
 
-   echo "---------------\n".
-      "Assuming you have set up the http based UI for \n".
-      "XHProf at some address, you can view run at \n".
-      "http://{$XHPROF_SERVER_NAME}/index.php?run={$run_id}&source={$xhprof_namespace}\n".
-      "---------------\n";
+   echo "http://{$XHPROF_SERVER_NAME}/index.php?run={$run_id}&source={$xhprof_namespace}\n";
 
 }

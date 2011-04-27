@@ -28,7 +28,7 @@ class CategoryFollowToggleModule extends Gdn_Module {
          if ($ShowAllCategories != $ShowAllCategoriesPref)
             $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
             
-         Redirect(Gdn::Request()->Path());
+         Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
       }
    }
    

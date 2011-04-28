@@ -116,6 +116,17 @@ function WriteFilterTabs(&$Sender) {
       <?php $Sender->FireEvent('BeforeDiscussionTabs'); ?>
       <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions'); ?></li>
       <?php $Sender->FireEvent('AfterAllDiscussionsTab'); ?>
+
+      <?php
+      if (C('Vanilla.Categories.ShowTabs')) {
+         $CssClass = '';
+         if (strtolower($Sender->ControllerName) == 'categoriescontroller' && strtolower($Sender->RequestMethod) == 'all') {
+            $CssClass = 'Active';
+         }
+
+         echo "<li class=\"$CssClass\">".Anchor(T('Categories'), '/categories/all').'</li>';
+      }
+      ?>
       <?php if ($CountBookmarks > 0 || $Sender->RequestMethod == 'bookmarked') { ?>
       <li<?php echo $Sender->RequestMethod == 'bookmarked' ? ' class="Active"' : ''; ?>><?php echo Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks'); ?></li>
       <?php

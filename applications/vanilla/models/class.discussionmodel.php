@@ -766,7 +766,10 @@ class DiscussionModel extends VanillaModel {
                }
 					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
-               $this->NotifyNewDiscussion(array('DiscussionID' => $DiscussionID, 'Name' => $DiscussionName, 'InsertUserID' => $Session->UserID));
+               try {
+                  $this->NotifyNewDiscussion(array('DiscussionID' => $DiscussionID, 'Name' => $DiscussionName, 'InsertUserID' => $Session->UserID));
+               } catch(Exception $Ex) {
+               }
             }
             
             // Get CategoryID of this discussion

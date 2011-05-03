@@ -673,6 +673,11 @@ class CategoryModel extends Gdn_Model {
             
       }
       
+		//	Prep and fire event
+		$this->EventArguments['FormPostValues'] = &$FormPostValues;
+		$this->EventArguments['CategoryID'] = $CategoryID;
+		$this->FireEvent('BeforeSaveCategory');
+      
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields();

@@ -1111,7 +1111,7 @@ class DiscussionModel extends VanillaModel {
             Gdn::Cache()->Store($CacheKey, $Views);
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback',10)) == 0) {
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
             Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
             SET CountViews={$Views}
             WHERE DiscussionID={$DiscussionID}");

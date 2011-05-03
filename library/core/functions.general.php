@@ -1844,8 +1844,8 @@ if (!function_exists('StringBeginsWith')) {
          return TRUE;
       else {
          $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, strlen($B));
+         if ($Trim)
+            $Result = $Result ? substr($A, strlen($B)) : $A;
          return $Result;
       }
    }
@@ -1867,8 +1867,8 @@ if (!function_exists('StringEndsWith')) {
          return TRUE;
       else {
          $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, 0, -strlen($B));
+         if ($Trim)
+            $Result = $Result ? substr($A, 0, -strlen($B)) : $A;
          return $Result;
       }
    }

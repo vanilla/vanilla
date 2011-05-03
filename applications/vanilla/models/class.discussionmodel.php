@@ -624,15 +624,8 @@ class DiscussionModel extends VanillaModel {
          ->Get()->FirstRow(DATASET_TYPE_ARRAY), NULL);
       
       // Found. Insert into denormalized table and return.
-      if (!is_null($Views)) {
-         Gdn::SQL()
-            ->Insert('View', array(
-                'ViewType' => 'Discussion',
-                'ViewID'   => $DiscussionID,
-                'Count'    => $Views
-            ));
+      if (!is_null($Views))
          return $Views;
-      }
       
       return NULL;
    }

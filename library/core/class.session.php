@@ -106,7 +106,7 @@ class Gdn_Session {
       if (is_object($this->User)) {
          if ($this->User->Admin == '1')
             return TRUE;
-         elseif ($this->User->Banned)
+         elseif ($this->User->Banned || GetValue('Deleted', $this->User))
             return FALSE;
       }
 
@@ -160,6 +160,13 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
+      
+      $this->UserID = 0;
+      $this->User = FALSE;
+      $this->_Attributes = array();
+      $this->_Permissions = array();
+      $this->_Preferences = array();
+      $this->_TransientKey = FALSE;
    }
 
    /**

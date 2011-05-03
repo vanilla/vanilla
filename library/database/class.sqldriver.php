@@ -64,6 +64,14 @@ abstract class Gdn_SQLDriver {
    public $Database;
    
    /**
+    * The name of the cache key associated with this query.
+    * 
+    * @var string
+    */
+   protected $_CacheKey = NULL;
+   protected $_CacheOperation = NULL;
+   
+   /**
     * An associative array of information about the database to which the
     * application is connected. Values include: Engine, Version, DatabaseName.
     *
@@ -354,6 +362,21 @@ abstract class Gdn_SQLDriver {
       }
       
       return $Expr;
+   }
+   
+   /**
+    * Set the cache key for this transaction
+    * 
+    * @param string $Key The cache key that this query will save into
+    */
+   public function Cache($Key, $Operation = NULL, $Backing = NULL) {
+      $this->_CacheKey = 'QueryCache.'.$Key;
+      
+      if (!is_null($Operation))
+         $this->_CacheOperation = $Operation;
+      
+      if (!is_null($Backing))
+         $this->_CacheBacking = $Backing;
    }
 
    /**
@@ -1587,9 +1610,17 @@ abstract class Gdn_SQLDriver {
    public function Query($Sql, $Type = 'select') {
       switch ($Type) {
          case 'insert': $ReturnType = 'ID'; break;
+         case 'update': $ReturnType = NULL; break;
          default: $ReturnType = 'DataSet'; break;
       }
 
+      $QueryOptions = array('ReturnType' => $ReturnType);
+      if (!is_null($this->_CacheKey))
+         $QueryOptions['Cache'] = $this->_CacheKey;
+      
+      if (!is_null($this->_CacheKey))
+         $QueryOptions['CacheOperation'] = $this->_CacheOperation;
+      
       try {
          if ($this->CaptureModifications && strtolower($Type) != 'select') {
             if(!property_exists($this->Database, 'CapturedSql'))
@@ -1601,7 +1632,7 @@ abstract class Gdn_SQLDriver {
             return TRUE;
          }
 
-         $Result = $this->Database->Query($Sql, $this->_NamedParameters, array('ReturnType' => $ReturnType));
+         $Result = $this->Database->Query($Sql, $this->_NamedParameters, $QueryOptions);
       } catch (Exception $Ex) {
          $this->Reset();
          throw $Ex;
@@ -1642,6 +1673,8 @@ abstract class Gdn_SQLDriver {
       $this->_OrderBys        = array();
       $this->_AliasMap        = array();
       
+      $this->_CacheKey        = NULL;
+      $this->_CacheOperation  = NULL;
       $this->_Distinct        = FALSE;
       $this->_Limit           = FALSE;
       $this->_Offset          = FALSE;
@@ -1649,7 +1682,7 @@ abstract class Gdn_SQLDriver {
       
       $this->_Sets            = array();
       $this->_NamedParameters = array();
-      $this->_Options = array();
+      $this->_Options         = array();
    }
 
    /**

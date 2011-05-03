@@ -216,22 +216,42 @@ class Gdn_Database {
       else
          $ReturnType = NULL;
 
-
 		if (isset($Options['Cache'])) {
          // Check to see if the query is cached.
-         $CacheKeys = (array)$Options['Cache'];
-         foreach ($CacheKeys as $CachKey) {
-            if ($ReturnType == 'DataSet') {
+         $CacheKey = GetValue('Cache',$Options,NULL);
+         $CacheOperation = GetValue('CacheOperation',$Options,NULL);
+         if (is_null($CacheOperation))
+            switch ($ReturnType) {
+               case 'DataSet':
+                  $CacheOperation = 'get';
+                  break;
+               case 'ID':
+               case NULL:
+                  $CacheOperation = 'remove';
+                  break;
+            }
+         
+         switch ($CacheOperation) {
+            case 'get':
                $Data = Gdn::Cache()->Get($CacheKey);
 
-               if ($Data !== FALSE)
+               // Cache hit. Return.
+               if ($Data !== Gdn_Cache::CACHEOP_FAILURE)
                   return new Gdn_DataSet($Data);
+               
+               // Cache miss. Save later.
                $StoreCacheKey = $CacheKey;
                break;
-            } else {
-               // Remove the item from the cache.
+            
+            case 'increment':
+            case 'decrement':
+               $CacheMethod = ucfirst($CacheOperation);
+               $CacheResult = Gdn::Cache()->$CacheMethod($CacheKey);
+               break;
+            
+            case 'remove':
                Gdn::Cache()->Remove($CacheKey);
-            }
+               break;
          }
 		}
 
@@ -267,11 +287,12 @@ class Gdn_Database {
             $this->_CurrentResultSet = new Gdn_DataSet();
             $this->_CurrentResultSet->Connection = $this->Connection();
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
-
-            if (isset($StoreCacheKey)) {
-               Gdn::Cache()->Store($StoreCacheKey, $this->_CurrentResultSet->ResultArray());
-            }
          }
+      }
+      
+      if (isset($StoreCacheKey)) {
+         if ($CacheOperation == 'get')
+            Gdn::Cache()->Store($StoreCacheKey, (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet));
       }
       
       return $this->_CurrentResultSet;

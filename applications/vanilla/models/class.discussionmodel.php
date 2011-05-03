@@ -616,18 +616,6 @@ class DiscussionModel extends VanillaModel {
    
    public static function GetViewsFallback($DiscussionID) {
       
-      // Check denormalized table
-      $Views = GetValue('Count', Gdn::SQL()
-         ->Select('Count')
-         ->From('View')
-         ->Where('ViewType', 'Discussion')
-         ->Where('ViewID', $DiscussionID)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY), NULL);
-      
-      // Found
-      if (!is_null($Views))
-         return $Views;
-      
       // Not found. Check main table.
       $Views = GetValue('CountViews', Gdn::SQL()
          ->Select('CountViews')

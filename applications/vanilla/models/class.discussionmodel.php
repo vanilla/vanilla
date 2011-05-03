@@ -175,6 +175,9 @@ class DiscussionModel extends VanillaModel {
 		// Change discussions returned based on additional criteria	
 		$this->AddDiscussionColumns($Data);
 		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
 		$this->FireEvent('AfterAddColumns');
@@ -196,6 +199,30 @@ class DiscussionModel extends VanillaModel {
          if ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
             // Unset discussions that are announced and not dismissed
             unset($Result[$Key]);
+         }
+      }
+   }
+   
+   public function AddDenormalizedViews(&$Discussions) {
+      if ($Discussions instanceof Gdn_DataSet) {
+         $Result = $Discussions->Result();
+         foreach($Result as &$Discussion) {
+            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
+            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
+                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
+            ));
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews = $CacheViews;
+         }
+      } else {
+         if (isset($Discussions->DiscussionID)) {
+            $Discussion = $Discussions;
+            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
+            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
+                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
+            ));
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews = $CacheViews;
          }
       }
    }
@@ -326,15 +353,14 @@ class DiscussionModel extends VanillaModel {
       $Data = $this->SQL->Get();
 			
 		$this->AddDiscussionColumns($Data);
-		
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
 		$this->FireEvent('AfterAddColumns');
 
-
-
-
-		
 		return $Data;
    }
    
@@ -489,9 +515,14 @@ class DiscussionModel extends VanillaModel {
 		if ($Type != '')
 			$this->SQL->Where('d.Type', $Type);
 			
-		return $this->SQL
+		$Discussion = $this->SQL
          ->Get()
          ->FirstRow();
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Discussion);
+              
+      return $Discussion;
    }
 
    /**
@@ -536,6 +567,9 @@ class DiscussionModel extends VanillaModel {
 		) {
 			$Data->Closed = '1';
 		}
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
 		
 		return $Data;
    }
@@ -552,7 +586,7 @@ class DiscussionModel extends VanillaModel {
    public function GetIn($DiscussionIDs) {
       $Session = Gdn::Session();
       $this->FireEvent('BeforeGetIn');
-      return $this->SQL
+      $Result = $this->SQL
          ->Select('d.*')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
@@ -572,6 +606,28 @@ class DiscussionModel extends VanillaModel {
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->WhereIn('d.DiscussionID', $DiscussionIDs)
          ->Get();
+      
+      // Spliting views off to side table. Aggregate cached keys here.
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Result);
+      
+      return $Result;
+   }
+   
+   public static function GetViewsFallback($DiscussionID) {
+      
+      // Not found. Check main table.
+      $Views = GetValue('CountViews', Gdn::SQL()
+         ->Select('CountViews')
+         ->From('Discussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY), NULL);
+      
+      // Found. Insert into denormalized table and return.
+      if (!is_null($Views))
+         return $Views;
+      
+      return NULL;
    }
    
    /**
@@ -1025,12 +1081,29 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID) {
-      $this->SQL
-         ->Update('Discussion')
-         ->Set('CountViews', 'CountViews + 1', FALSE)
-         ->Where('DiscussionID', $DiscussionID)
-         ->Put();
+	public function AddView($DiscussionID, $Views = 0) {
+      $Views++;
+      if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+         $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
+         
+         // Increment. If not success, create key.
+         $Incremented = Gdn::Cache()->Increment($CacheKey);
+         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+            Gdn::Cache()->Store($CacheKey, $Views);
+         
+         // Every X views, writeback to Discussions
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
+            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
+            SET CountViews={$Views}
+            WHERE DiscussionID={$DiscussionID}");
+         }
+      } else {
+         $this->SQL
+            ->Update('Discussion')
+            ->Set('CountViews', 'CountViews + 1', FALSE)
+            ->Where('DiscussionID', $DiscussionID)
+            ->Put();
+      }
 	}
 
    /**

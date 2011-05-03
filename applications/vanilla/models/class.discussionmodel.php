@@ -841,6 +841,10 @@ class DiscussionModel extends VanillaModel {
                }
 					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
+               try {
+                  $this->NotifyNewDiscussion(array('DiscussionID' => $DiscussionID, 'Name' => $DiscussionName, 'InsertUserID' => $Session->UserID));
+               } catch(Exception $Ex) {
+               }
             }
             
             // Get CategoryID of this discussion
@@ -864,7 +868,6 @@ class DiscussionModel extends VanillaModel {
 				$this->EventArguments['Fields'] = $Fields;
 				$this->EventArguments['DiscussionID'] = $DiscussionID;
 				$this->FireEvent('AfterSaveDiscussion');
-
          }
       }
       
@@ -902,6 +905,28 @@ class DiscussionModel extends VanillaModel {
          ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
          ->Where('UserID', $UserID)
          ->Put();
+   }
+
+   public function NotifyNewDiscussion($Discussion) {
+      if (is_numeric($Discussion)) {
+         $Discussion = $this->GetID($Discussion);
+      }
+
+      // Grab all of the users that are need to be notified.
+      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+
+      foreach ($Data as $Row) {
+         $UserID = $Row['UserID'];
+         if ($UserID == $Discussion['InsertUserID'])
+            continue;
+
+         AddActivity($Discussion['InsertUserID'],
+            'NewDiscussion',
+            Anchor(Gdn_Format::Text($Discussion['Name']), ExternalUrl('discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']))),
+            $UserID,
+            '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']),
+            TRUE);
+      }
    }
    
    /**

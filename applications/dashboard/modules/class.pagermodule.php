@@ -316,9 +316,15 @@ class PagerModule extends Gdn_Module {
 
       // Try and figure out the offset based on the parameters coming in to the controller.
       if (!$Pager->Offset) {
-         $Page = $Pager->Controller()->Request->Get('Page', 'p1');
+         $Page = $Pager->Controller()->Request->Get('Page', FALSE);
          if (!$Page) {
             $Page = 'p1';
+            foreach($Pager->Controller()->RequestArgs as $Arg) {
+               if (preg_match('`p\d+`', $Arg)) {
+                  $Page = $Arg;
+                  break;
+               }
+            }
          }
          list($Offset, $Limit) = OffsetLimit($Page, $Pager->Limit);
          $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', 0));

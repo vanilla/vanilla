@@ -65,7 +65,7 @@ class CategoriesController extends VanillaController {
     * @param string $CategoryIdentifier Unique category slug or ID.
     * @param int $Offset Number of discussions to skip.
     */
-   public function Index($CategoryIdentifier = '', $Offset = '0') {      
+   public function Index($CategoryIdentifier = '', $Page = '0') {
       if (!is_numeric($CategoryIdentifier))
          $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
       else
@@ -112,7 +112,7 @@ class CategoriesController extends VanillaController {
       // Set discussion meta data.
       $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
       $this->FireEvent('BeforeGetDiscussions');
-      list($Offset, $Limit) = OffsetLimit($Offset, $this->EventArguments['PerPage']);
+      list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
       
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
@@ -133,6 +133,8 @@ class CategoriesController extends VanillaController {
          $CountDiscussions,
          'categories/'.$CategoryIdentifier.'/%1$s'
       );
+      $this->SetData('_PagerUrl', 'categories/'.rawurlencode($CategoryIdentifier).'/{Page}');
+      $this->SetData('_Page', $Page);
 
       // Set the canonical Url.
       $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE)), TRUE));

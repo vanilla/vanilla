@@ -692,6 +692,11 @@ class CategoryModel extends Gdn_Model {
             $this->Update($Fields, array('CategoryID' => $CategoryID));
          } else {
             $CategoryID = $this->Insert($Fields);
+
+            if ($CustomPermissions && $CategoryID) {
+               $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+            }
+
             $this->RebuildTree(); // Safeguard to make sure that treeleft and treeright cols are added
          }
          

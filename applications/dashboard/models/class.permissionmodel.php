@@ -187,9 +187,9 @@ class PermissionModel extends Gdn_Model {
       
       $this->SQL->From('Permission p');
       
-      if(!is_null($RoleID))
+      if (!is_null($RoleID))
          $this->SQL->Where('p.RoleID', $RoleID);
-      elseif(!is_null($UserID))
+      elseif (!is_null($UserID))
          $this->SQL->Join('UserRole ur', 'p.RoleID = ur.RoleID')->Where('ur.UserID', $UserID);
       
       $this->SQL
@@ -445,12 +445,14 @@ class PermissionModel extends Gdn_Model {
 		}
 	}
    
-   protected $_PermissionColumns = NULL;
+   protected $_PermissionColumns = array();
    /**
     * Get all of the permission columns in the system.
     */
    public function PermissionColumns($JunctionTable = FALSE, $JunctionColumn = FALSE) {
-      if(is_null($this->_PermissionColumns)) {
+      $Key = "{$JunctionTable}__{$JunctionColumn}";
+
+      if (!isset($this->_PermissionColumns[$Key])) {
          $this->SQL
             ->Select('*')
             ->From('Permission')
@@ -467,9 +469,9 @@ class PermissionModel extends Gdn_Model {
             
          unset($Cols['RoleID'], $Cols['JunctionTable'], $Cols['JunctionColumn'], $Cols['JunctionID']);
          
-         $this->_PermissionColumns = $Cols;
+         $this->_PermissionColumns[$Key] = $Cols;
       }
-      return $this->_PermissionColumns;
+      return $this->_PermissionColumns[$Key];
    }
    
    public static function PermissionNamespace($PermissionName) {

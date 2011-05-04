@@ -241,7 +241,7 @@ class DiscussionController extends VanillaController {
       // Get the discussionID
       $Comment = $this->CommentModel->GetID($CommentID);
       if (!$Comment)
-         Redirect('dashboard/home/filenotfound');
+         throw NotFoundException('Comment');
          
       $DiscussionID = $Comment->DiscussionID;
       

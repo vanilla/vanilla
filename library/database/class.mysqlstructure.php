@@ -249,6 +249,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       return $Result;
    }
    
+   public function IndexSqlDb() {
+      return $this->_IndexSqlDb();
+   }
+
    protected function _IndexSqlDb() {
       // We don't want this to be captured so send it directly.
       $Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);

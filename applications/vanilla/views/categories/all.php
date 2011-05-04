@@ -1,15 +1,25 @@
 <?php if (!defined('APPLICATION')) exit();
 include dirname(__FILE__).'/helper_functions.php';
+
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
 ?>
-<div class="Tabs Headings CategoryHeadings">
-   <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
-</div>
 <?php
+
+if (C('Vanilla.Categories.ShowTabs')) {
+   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
+   include_once $ViewLocation;
+   WriteFilterTabs($this);
+} else {
+   ?>
+   <div class="Tabs Headings CategoryHeadings">
+      <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
+   </div>
+   <?php
+}
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    foreach ($this->CategoryData->Result() as $Category) {
       $this->EventArguments['CatList'] = &$CatList;

@@ -220,7 +220,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                   'Name'         => $this->CollaborativeTitle,
                   'CategoryID'   => $CategoryID,
                   'Body'         => $this->OriginalContent,
-                  'InsertUserID' => $this->UserID,
+                  'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
                   'Announce'     => 0,
                   'Close'        => 0,
                   'RegardingID'  => $RegardingID

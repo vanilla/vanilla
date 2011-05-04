@@ -15,12 +15,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Manages available themes, enabling and disabling them.
  */
-class Gdn_ThemeManager {
+class Gdn_ThemeManager extends Gdn_Pluggable {
    
    /**
     * An array of search paths for themes and their files
     */
    protected $ThemeSearchPaths = NULL;
+   protected $AlternateThemeSearchPaths = NULL;
    
    /**
     * An array of available plugins. Never access this directly, instead use
@@ -29,22 +30,7 @@ class Gdn_ThemeManager {
    protected $ThemeCache = NULL;
    
    public function __construct() {
-      $this->ThemeSearchPaths = array();
-      
-      // Add default search path(s) to list
-      $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 'local';
-      $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
-      
-      // Check for, and load, alternate search paths from config
-      $AlternatePaths = C('Garden.ThemeManager.Search', NULL);
-      if (is_null($AlternatePaths)) return;
-      
-      if (!is_array($AlternatePaths))
-         $AlternatePaths = array($AlternatePaths => 'alternate');
-      
-      foreach ($AlternatePaths as $AltPath => $AltName)
-         if (is_dir($AltPath))
-            $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+      parent::__construct();
    }
    
    /**
@@ -80,7 +66,7 @@ class Gdn_ThemeManager {
          $this->ThemeCache = array();
          
          // Check cache freshness
-         foreach ($this->ThemeSearchPaths as $SearchPath => $Trash) {
+         foreach ($this->SearchPaths() as $SearchPath => $Trash) {
             unset($SearchPathCache);
             
             // Check Cache
@@ -163,6 +149,67 @@ class Gdn_ThemeManager {
       }
       
       return md5(serialize($PathListing));
+   }
+   
+   public function ClearThemeCache($SearchPaths = NULL) {
+      if (!is_null($SearchPaths)) {
+         if (!is_array($SearchPaths))
+            $SearchPaths = array($SearchPaths);
+      } else {
+         $SearchPaths = $this->SearchPaths();
+      }
+      
+      foreach ($SearchPaths as $SearchPath => $SearchPathName) {
+         $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
+         $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+      }
+   }
+   
+   /**
+    * Get the current search paths
+    *
+    * By default, get all the paths as built by the constructor. Includes the two (or one) default plugin paths
+    * of PATH_PLUGINS and PATH_LOCAL_PLUGINS, as well as any extra paths defined in the config variable.
+    *
+    * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
+    * @return array Search paths
+    */
+   public function SearchPaths($OnlyCustom = FALSE) {
+      if (is_null($this->ThemeSearchPaths) || is_null($this->AlternateThemeSearchPaths)) {
+         
+         $this->ThemeSearchPaths = array();
+         $this->AlternateThemeSearchPaths = array();
+
+         // Add default search path(s) to list
+         $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 'local';
+         $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
+
+                  // Check for, and load, alternate search paths from config
+         $RawAlternatePaths = C('Garden.PluginManager.Search', NULL);
+         if (!is_null($RawAlternatePaths)) {
+
+/*
+            // Handle serialized and unserialized alternate path arrays
+            $AlternatePaths = unserialize($RawAlternatePaths);
+            if ($AlternatePaths === FALSE && is_array($RawAlternatePaths))
+*/
+               $AlternatePaths = $RawAlternatePaths;
+
+            if (!is_array($AlternatePaths))
+               $AlternatePaths = array($AlternatePaths   => 'alternate');
+
+            foreach ($AlternatePaths as $AltPath => $AltName) {
+               $this->AlternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+               if (is_dir($AltPath))
+                  $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+            }
+         }
+      }
+
+      if (!$OnlyCustom)
+         return $this->ThemeSearchPaths;
+
+      return $this->AlternateThemeSearchPaths;
    }
    
    public function FindThemeFiles($ThemePath) {
@@ -356,9 +403,9 @@ class Gdn_ThemeManager {
       CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
 
       // If there is a hooks file, include it and run the setup method.
-      $ClassName = $ThemeFolder . 'ThemeHooks';
-      $HooksFile = PATH_THEMES . DS . $ThemeFolder . DS . 'class.' . strtolower($ClassName) . '.php';
-      if (file_exists($HooksFile)) {
+      $ClassName = "{$ThemeFolder}ThemeHooks";
+      $HooksFile = GetValue("HooksFile", $NewThemeInfo, NULL);
+      if (!is_null($HooksFile) && file_exists($HooksFile)) {
          include_once($HooksFile);
          if (class_exists($ClassName)) {
             $ThemeHooks = new $ClassName();

@@ -617,7 +617,12 @@ class EntryController extends Gdn_Controller {
                $PasswordHash = new Gdn_PasswordHash();
                if ($PasswordHash->CheckPassword($this->Form->GetFormValue('Password'), GetValue('Password', $User), GetValue('HashMethod', $User))) {
                   Gdn::Session()->Start(GetValue('UserID', $User), TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
-                  $this->_SetRedirect();
+                  if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+                     $this->Form->AddError('ErrorPermission');
+                     Gdn::Session()->End();
+                  } else {
+                     $this->_SetRedirect();
+                  }
                } else {
                   $this->Form->AddError('ErrorCredentials');
                }
@@ -668,6 +673,10 @@ class EntryController extends Gdn_Controller {
          'UserName'     => $Authenticator->GetUserNameFromHandshake($Payload),
          'UserEmail'    => $Authenticator->GetUserEmailFromHandshake($Payload)
       );
+
+      if (method_exists($Authenticator, 'GetRolesFromHandshake')) {
+         $UserInfo['Roles'] = $Authenticator->GetRolesFromHandshake($Payload);
+      }
       
       // Manual user sync is disabled. No hand holding will occur for users.
       $SyncScreen = C('Garden.Authenticator.SyncScreen', 'on');
@@ -683,7 +692,8 @@ class EntryController extends Gdn_Controller {
          case 'smart':
             $UserID = $this->UserModel->Synchronize($UserInfo['UserKey'], array(
                'Name'   => $UserInfo['UserName'],
-               'Email'  => $UserInfo['UserEmail']
+               'Email'  => $UserInfo['UserEmail'],
+               'Roles'  => GetValue('Roles', $Usernfo)
             ));
             
             if ($UserID > 0) {
@@ -1142,12 +1152,14 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function PasswordRequest() {
-      $this->Form->SetModel($this->UserModel);
+      Gdn::Locale()->SetTranslation('Email', T('Email/Username'));
       if ($this->Form->IsPostBack() === TRUE) {
+         $this->Form->ValidateRule('Email', 'ValidateRequired');
 
-         if ($this->Form->ValidateModel() == 0) {
+         if ($this->Form->ErrorCount() == 0) {
             try {
-               if (!$this->UserModel->PasswordRequest($this->Form->GetFormValue('Email', ''))) {
+               $Email = $this->Form->GetFormValue('Email');
+               if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->AddError("Couldn't find an account associated with that email/username.");
                }
             } catch (Exception $ex) {
@@ -1159,7 +1171,7 @@ class EntryController extends Gdn_Controller {
             }
          } else {
             if ($this->Form->ErrorCount() == 0)
-               $this->Form->AddError('That email address was not found.');
+               $this->Form->AddError("Couldn't find an account associated with that email/username.");
          }
       }
       $this->Render();

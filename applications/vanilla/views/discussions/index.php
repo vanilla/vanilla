@@ -9,7 +9,11 @@ if ($this->DiscussionData->NumRows() > 0 || (is_object($this->AnnounceData) && $
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php
-   echo PagerModule::Write(array('RecordCount' => $this->Data('CountDiscussions')));
+   $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'));
+   if ($this->Data('_PagerUrl')) {
+      $PagerOptions['Url'] = $this->Data('_PagerUrl');
+   }
+   echo PagerModule::Write($PagerOptions);
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

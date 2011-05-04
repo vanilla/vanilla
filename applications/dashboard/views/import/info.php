@@ -8,7 +8,7 @@ $Complete = FALSE;
 if($CurrentStep < 1) {
 	// The import hasn't started yet.
 	echo '<div class="Info">',
-		T('Garden.Import.Info', 'You\'ve successfully uploaded an import file.
+		T('Garden.Import.Info', 'You\'re almost ready to start the import.
 Please review the information below and click <b>Start Import</b> to begin the import.'),
 		  '</div>';
 } else {

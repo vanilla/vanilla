@@ -61,6 +61,9 @@ class Gdn_Theme {
       $Target = GetValue('Target', $Options, '');
 
       switch ($Path) {
+         case 'activity':
+            TouchValue('Permissions', $Options, 'Garden.Activity.View');
+            break;
          case 'dashboard':
             $Path = 'dashboard/settings';
             TouchValue('Permissions', $Options, 'Garden.Settings.Manage');

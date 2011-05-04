@@ -38,7 +38,6 @@ if (ini_get('date.timezone') == '')
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
-require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
@@ -155,6 +154,8 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+
+require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
 Gdn::Authenticator()->StartAuthenticator();
 

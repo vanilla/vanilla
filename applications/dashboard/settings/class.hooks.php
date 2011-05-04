@@ -57,7 +57,7 @@ class DashboardHooks implements Gdn_IPlugin {
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
 			$CountApplicants = Gdn::UserModel()->GetApplicantCount();
 			if ($CountApplicants > 0)
-				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Registration.Manage'));
+				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
 		}
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
@@ -101,15 +101,16 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount" />', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
-      $Menu->AddLink('Moderation', T('Manage Spam').' <span class="Popin" rel="/dashboard/log/count/spam" />', 'dashboard/log/spam', 'Garden.Moderation.Manage');
-      $Menu->AddLink('Moderation', T('Edit/Delete Log').' <span class="Popin" rel="/dashboard/log/count/edits" />', 'dashboard/log/edits', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Manage Spam').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Edit/Delete Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Ban List'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		
+		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
 		
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');

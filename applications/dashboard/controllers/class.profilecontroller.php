@@ -202,7 +202,7 @@ class ProfileController extends Gdn_Controller {
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
             $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            $this->RedirectUrl = Url('/profile/'.Gdn_Format::Url($User->Name));
+            $this->RedirectUrl = Url('/profile/'.$this->ProfileUrl($User->Name));
          }
       }
       
@@ -391,6 +391,8 @@ class ProfileController extends Gdn_Controller {
 		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
+      $MetaPrefs = UserModel::GetMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
+
 
       // Define the preferences to be managed
       $this->Preferences = array(
@@ -411,6 +413,10 @@ class ProfileController extends Gdn_Controller {
 			$this->PreferenceGroups[$PreferenceGroup] = array();
 			$this->PreferenceTypes[$PreferenceGroup] = array();
 			foreach ($Preferences as $Name => $Description) {
+            $Location = 'Prefs';
+            if (is_array($Description))
+               list($Description, $Location) = $Description;
+
 				$NameParts = explode('.', $Name);
 				$PrefType = GetValue('0', $NameParts);
 				$SubName = GetValue('1', $NameParts);
@@ -433,24 +439,49 @@ class ProfileController extends Gdn_Controller {
 		
       if ($this->User->UserID != $Session->UserID)
          $this->Permission('Garden.Users.Edit');
+
+      // Loop the preferences, setting defaults from the configuration.
+      $Defaults = array();
+      foreach ($this->Preferences as $PrefGroup => $Prefs) {
+         foreach ($Prefs as $Pref => $Desc) {
+            $Location = 'Prefs';
+            if (is_array($Desc))
+               list($Desc, $Location) = $Desc;
+
+            if ($Location == 'Meta')
+               $Defaults[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
+            else
+               $Defaults[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
+         }
+      }
          
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Loop the preferences, setting defaults from the configuration
-         $Defaults = array();
-         foreach ($this->Preferences as $PrefGroup => $Prefs) {
-            foreach ($Prefs as $Pref => $Desc) {
-               $Defaults[$Pref] = ArrayValue($Pref, $UserPrefs, Gdn::Config('Preferences.'.$Pref, '0'));
-            }
-         }
          $this->Form->SetData($Defaults);
       } else {
-         // Get, assign, and save the preferences
+         // Get, assign, and save the preferences.
+         $Meta = array();
          foreach ($this->Preferences as $PrefGroup => $Prefs) {
             foreach ($Prefs as $Pref => $Desc) {
-               $UserPrefs[$Pref] = $this->Form->GetValue($Pref, '0');
+               $Location = 'Prefs';
+               if (is_array($Desc))
+                  list($Desc, $Location) = $Desc;
+
+               $Value = $this->Form->GetValue($Pref, FALSE);
+
+               if ($Location == 'Meta') {
+                  $Meta[$Pref] = $Value ? $Value : NULL;
+                  if ($Value)
+                     $UserPrefs[$Pref] = $Value; // dup for notifications code.
+               } else {
+                  if (!$Defaults[$Pref] && !$Value)
+                     unset($UserPrefs[$Pref]); // save some space
+                  else
+                     $UserPrefs[$Pref] = $Value;
+               }
             }
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
+         UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
 			$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
       $this->Render();
@@ -810,7 +841,7 @@ class ProfileController extends Gdn_Controller {
       if ($UserID === NULL)
          $UserID = $this->User->UserID;
 
-      $UserReferenceEnc = urlencode($UserReference);
+      $UserReferenceEnc = rawurlencode($UserReference);
       if ($UserReferenceEnc == $UserReference)
          return $UserReferenceEnc;
       else

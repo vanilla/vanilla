@@ -711,6 +711,3 @@ class Gdn_Autoloader_Map {
    }
    
 }
-
-
-

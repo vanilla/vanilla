@@ -46,6 +46,8 @@ abstract class Gdn_Cache {
    const FEATURE_NOPREFIX     = 'f_noprefix';
    // Allows forcing alternate key prefix
    const FEATURE_FORCEPREFIX  = 'f_forceprefix';
+   // Allows querying DB for missing keys, or firing a callback
+   const FEATURE_FALLBACK     = 'f_fallback';
    
    /**
    * Location - SERVER:IP, Filepath, etc
@@ -122,6 +124,14 @@ abstract class Gdn_Cache {
       return $CacheObject;
    }
    
+   /**
+    * Get the status of the active cache
+    * 
+    * Return whether or not the current cache method is enabled.
+    * 
+    * @param type $ForceEnable
+    * @return bool status of active cache
+    */
    public static function ActiveEnabled($ForceEnable = FALSE) {
       $AllowCaching = FALSE;
       
@@ -164,6 +174,14 @@ abstract class Gdn_Cache {
       return $ActiveCache;
    }
    
+   /**
+    * Returns the storage data for the active cache
+    * 
+    * For FileCache, the folder. For Memcache, the server(s).
+    * 
+    * @param type $ForceMethod
+    * @return mixed Active Store Location
+    */
    public static function ActiveStore($ForceMethod = NULL) {
       $ActiveCache = self::ActiveCache();
       if (!is_null($ForceMethod))
@@ -288,6 +306,34 @@ abstract class Gdn_Cache {
    */
    abstract public function AddContainer($Options);
    
+   protected function Fallback($Key, $Options) {
+      $Fallback = GetValue(Gdn_Cache::FEATURE_FALLBACK, $Options, NULL);
+      if (is_null($Fallback))
+         return Gdn_Cache::CACHEOP_FAILURE;
+      
+      $FallbackType = array_shift($Fallback);
+      switch ($FallbackType) {
+         case 'query':
+            $QueryFallbackField = array_shift($Fallback);
+            $QueryFallbackCode = array_shift($Fallback);
+            $FallbackResult = Gdn::Database()->Query($QueryFallbackCode);
+            if ($FallbackResult->NumRows()) {
+               if (!is_null($QueryFallbackField))
+                  $FallbackResult = GetValue($QueryFallbackField, $FallbackResult->FirstRow(DATASET_TYPE_ARRAY));
+               else
+                  $FallbackResult = $FallbackResult->ResultArray();
+            }
+            break;
+         case 'callback':
+            $CallbackFallbackMethod = array_shift($Fallback);
+            $CallbackFallbackArgs = $Fallback;
+            $FallbackResult = call_user_func_array($CallbackFallbackMethod, $CallbackFallbackArgs);
+            break;
+      }
+      Gdn::Cache()->Store($Key, $FallbackResult);
+      return $FallbackResult;
+   }
+   
    public function GetPrefix($ForcePrefix = NULL, $WithRevision = TRUE) {
       static $ConfigPrefix = FALSE;
       
@@ -352,7 +398,7 @@ abstract class Gdn_Cache {
       ));
       
       if (!$Incremented) {
-         return $this->Store($CacheRevisionKey, 1, array(
+         return $this->Store($CacheRevisionKey, 2, array(
             Gdn_Cache::FEATURE_NOPREFIX   => TRUE
          ));
       }

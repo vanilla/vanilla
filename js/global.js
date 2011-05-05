@@ -316,14 +316,13 @@ jQuery(document).ready(function($) {
 
    // Fill the search input with "search" if empty and blurred
    var searchText = gdn.definition('Search', 'Search');
-   $('#Search input.InputBox').val(searchText);
-   $('#Search input.InputBox').blur(function() {
-      var searchText = gdn.definition('Search', 'Search');
+   if (!$('.Search input.InputBox').val())
+      $('.Search input.InputBox').val(searchText);
+   $('.Search input.InputBox').blur(function() {
       if (typeof $(this).val() == 'undefined' || $(this).val() == '')
          $(this).val(searchText);
    });
-   $('#Search input.InputBox').focus(function() {
-      var searchText = gdn.definition('Search', 'Search');
+   $('.Search input.InputBox').focus(function() {
       if ($(this).val() == searchText)
          $(this).val('');
    });

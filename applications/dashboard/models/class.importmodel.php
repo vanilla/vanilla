@@ -263,16 +263,18 @@ class ImportModel extends Gdn_Model {
 
                $Name = $Type;
                $StructureType = $DestStructure->ColumnTypeString($DestStructure->Columns($Type));
-            } else {
+            } elseif (!StringBeginsWith($Name, '_')) {
 					$StructureType = $Type;
 
 					if(!$StructureType)
-						$StructureType = 'int';
+						$StructureType = 'varchar(255)';
 
 					// This is a new column so it needs to be added to the destination table too.
 					$DestStructure->Column($Name, $StructureType, NULL);
 					$DestModified = TRUE;
-				}
+            } elseif ($Type) {
+               $StructureType = $Type;
+            }
 
 				$St->Column($Name, $StructureType, NULL);
 			}
@@ -626,9 +628,20 @@ class ImportModel extends Gdn_Model {
 				$this->Data['CurrentStepMessage'] = sprintf(T('%s of %s'), $InsertedCount, count($Tables));
 
             if(strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
-               $RowCount = $this->_InsertTable($TableName);
+               switch ($TableName) {
+                  case 'Permission':
+                     $this->InsertPermissionTable();
+                     break;
+                  default:
+                     $RowCount = $this->_InsertTable($TableName);
+                     break;
+               }
+               
             } else {
                switch($TableName) {
+                  case 'Permission':
+                     $this->InsertPermissionTable();
+                     break;
                   case 'UserDiscussion':
                      $Sql = "insert ignore :_UserDiscussion ( UserID, DiscussionID, DateLastViewed, Bookmarked )
                         select zUserID._NewID, zDiscussionID._NewID, max(i.DateLastViewed) as DateLastViewed, max(i.Bookmarked) as Bookmarked
@@ -771,6 +784,56 @@ class ImportModel extends Gdn_Model {
          return FALSE;
       }
 	}
+
+   public function InsertPermissionTable() {
+      if ($this->ImportExists('Permission', 'JunctionTable')) {
+         $this->_InsertTable('Permission');
+         return TRUE;
+      }
+
+      // Clear the permission table in case the step was only half done before.
+      $this->SQL->Delete('Permission', array('RoleID <>' => 0));
+
+      // Grab all of the permission columns.
+      $PM = new PermissionModel();
+      $GlobalColumns = array_filter($PM->PermissionColumns());
+      unset($GlobalColumns['PermissionID']);
+      $JunctionColumns = array_filter($PM->PermissionColumns('Category', 'PermissionCategoryID'));
+      unset($JunctionColumns['PermissionID']);
+      $JunctionColumns = array_merge(array('JunctionTable' => 'Category', 'JunctionColumn' => 'PermissionCategoryID', 'JunctionID' => -1), $JunctionColumns);
+      $ColumnSets = array($GlobalColumns, $JunctionColumns);
+
+
+
+      $Data = $this->SQL->Get('zPermission')->ResultArray();
+      foreach ($Data as $Row) {
+         $Preset = strtolower(GetValue('_Permissions', $Row));
+
+         foreach ($ColumnSets as $ColumnSet) {
+            $Set = array();
+            $Set['RoleID'] = $Row['RoleID'];
+            
+            foreach ($ColumnSet as $ColumnName => $Default) {
+               if (isset($Row[$ColumnName]))
+                  $Value = $Row[$ColumnName];
+               elseif (strpos($ColumnName, '.') === FALSE)
+                  $Value = $Default;
+               elseif ($Preset == 'all')
+                  $Value = 1;
+               elseif ($Preset == 'view')
+                  $Value = StringEndsWith($ColumnName, 'View', TRUE);
+               else
+                  $Value = $Default & 1;
+
+               $Set["`$ColumnName`"] = $Value;
+            }
+            $this->SQL->Insert('Permission', $Set);
+            unset($Set);
+         }
+      }
+
+      return TRUE;
+   }
 
 	public function InsertUserTable() {
       $UserCurrentPassword = $this->Data('UseCurrentPassword');

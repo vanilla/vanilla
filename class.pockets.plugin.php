@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Allows site admins to add free-form HTML to various places around the application.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -45,6 +45,7 @@ class PocketsPlugin extends Gdn_Plugin {
     * @var array
     */
    protected $_Pockets = array();
+   protected $_PocketNames = array();
 
    /** Whether or not to display test items for all pockets. */
    public $TestMode = NULL;
@@ -286,7 +287,9 @@ class PocketsPlugin extends Gdn_Plugin {
    public function AddPocket($Pocket) {
       if (!isset($this->_Pockets[$Pocket->Location]))
          $this->_Pockets[$Pocket->Location] = array();
+
       $this->_Pockets[$Pocket->Location][] = $Pocket;
+      $this->_PocketNames[$Pocket->Name][] = $Pocket;
    }
 
    public function GetLocationsArray() {
@@ -295,6 +298,11 @@ class PocketsPlugin extends Gdn_Plugin {
          $Result[$Key] = GetValue('Name', $Value, $Key);
       }
       return $Result;
+   }
+
+   public function GetPockets($Name) {
+      $this->_LoadState();
+      return GetValue($Name, $this->_PocketNames, array());
    }
 
    protected function _LoadState() {
@@ -373,6 +381,17 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $this->_SaveState();
+   }
+
+   public static function PocketString($Name) {
+      $Inst = Gdn::PluginManager()->GetPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+      $Pockets = $Inst->GetPockets($Name);
+      
+      $Result = '';
+      foreach ($Pockets as $Pocket) {
+         $Result .= $Pocket->ToString();
+      }
+      return $Result;
    }
 
    protected function _SaveState() {

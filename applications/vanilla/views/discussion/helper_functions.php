@@ -66,8 +66,8 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
       <div class="Message">
-			<?php $Sender->FireEvent('BeforeCommentBody'); ?>
 			<?php 
+            $Sender->FireEvent('BeforeCommentBody'); 
 			   $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
 			   $Sender->FireEvent('AfterCommentFormat');
 			   $Object = $Sender->EventArguments['Object'];

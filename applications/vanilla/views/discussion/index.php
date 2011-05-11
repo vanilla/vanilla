@@ -12,8 +12,13 @@ if ($Session->IsValid()) {
       array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
    );
 }
+
+$PageClass = '';
+if($this->Pager->FirstPage()) 
+	$PageClass = 'FirstPage'; 
+	
 ?>
-<div class="Tabs HeadingTabs DiscussionTabs">
+<div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
    <ul>
       <li><?php
          if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
@@ -35,7 +40,7 @@ if ($Session->IsValid()) {
    $this->FireEvent('BeforeDiscussion');
    echo $this->RenderAsset('DiscussionBefore');
 ?>
-<ul class="MessageList Discussion">
+<ul class="MessageList Discussion <?php echo $PageClass; ?>">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php

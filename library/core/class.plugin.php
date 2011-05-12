@@ -165,8 +165,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       $MetaKey = $this->MakeMetaKey($Key);
       
       if (is_null($Value)) {  // Delete
-         $UserMetaQuery = Gdn::SQL()
-            ->From('UserMeta u');
+         $UserMetaQuery = Gdn::SQL();
             
          if (is_array($UserID))
             $UserMetaQuery->WhereIn('UserID', $UserID);
@@ -178,7 +177,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          else
             $UserMetaQuery->Where('Name', $MetaKey);      
          
-         $UserMetaQuery->Delete();
+         $UserMetaQuery->Delete('UserMeta');
       } else {                // Set
          if (!is_array($UserID))
             $UserID = array($UserID);

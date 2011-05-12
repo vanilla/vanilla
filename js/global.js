@@ -289,16 +289,6 @@ jQuery(document).ready(function($) {
       return true;
    }
    
-   gdn.stats = function(action, params, callback) {
-      // Call directly back to the deployment and invoke the stats handler
-      var StatsURL = gdn.url('settings/analytics'+action+'.json');
-      jQuery.ajax({
-         dataType: 'json',
-         type: 'post',
-         url: StatsURL
-      });
-   }
-   
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
@@ -407,18 +397,24 @@ jQuery(document).ready(function($) {
 		}
 	});
    
+   gdn.stats = function() {
+      // Call directly back to the deployment and invoke the stats handler
+      var StatsURL = gdn.url('settings/analyticstick.json');
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: StatsURL,
+         success: function(json) {
+            gdn.inform(json);
+         }
+      });
+   }
+   
+   // Ping back to the deployment server to track views, and trigger
+   // conditional stats tasks
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
-   switch (AnalyticsTask) {
-	   case 'register':
-	   case 'stats':
-	     // Send stats ping
-	     gdn.stats(AnalyticsTask);
-	   break;
-	   
-	   default:
-	     // Nothing
-	   break;
-	}
+   if (AnalyticsTask == 'tick')
+	     gdn.stats();
    
    // If a dismissable InformMessage close button is clicked, hide it.
    $('div.InformWrapper.Dismissable a.Close').live('click', function() {

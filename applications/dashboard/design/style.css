@@ -118,7 +118,8 @@ h1, h2 {
    margin-bottom:10px;
 }
 h3 {
-   font-size:140%;
+   font-size:120%;
+   font-weight: bold;
 }
 h4 {
    font-size: 120%;
@@ -512,6 +513,10 @@ ul.Options ul {
 }
 .DataList .Item.Active ul.Options {
     display:block;
+}
+
+.Item h3 {
+   font-size: 14px;
 }
 
 ul.Options {
@@ -1686,9 +1691,6 @@ table.PreferenceGroup td.Description {
 }
 
 /* ================================================= Tabs, Headings & Footers */
-div.MessageForm {
-	text-align: right;
-}
 div.MessageForm,
 div.Tabs,
 div.Headings {
@@ -1931,9 +1933,7 @@ div.Popup .Loading {
   text-align: center;
 }
 div.Popup h1,
-div.Popup h2,
-div.Connect h1,
-div.Connect h2 {
+div.Popup h2 {
 	font-size:120%;
 	font-weight:bold;
 	margin-bottom: 0;
@@ -2200,7 +2200,7 @@ ul.Discussions div.ItemContent a.Title {
 li.Editing {
 	background: #E3F4FF;
 }
-div.CommentForm textarea {
+div.CommentForm textarea.TextBox {
    width: 100%;
    height: 100px;
    min-height: 100px;

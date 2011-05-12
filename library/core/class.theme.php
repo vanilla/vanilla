@@ -139,14 +139,14 @@ class Gdn_Theme {
             if ($Session->IsValid()) {
                if(!$Text)
                   $Text = T('Sign Out');
-               $Path = Gdn::Authenticator()->SignOutUrl($Target);
+               $Path =  SignOutUrl($Target);
                $Class = ConcatSep(' ', $Class, 'SignOut');
             } else {
                if(!$Text)
                   $Text = T('Sign In');
                $Attribs = array();
 
-               $Path = Gdn::Authenticator()->SignInUrl($Target);
+               $Path = SignInUrl($Target);
                if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
                   $Class = ConcatSep(' ', $Class, 'SignInPopup');
             }
@@ -220,7 +220,7 @@ class Gdn_Theme {
             
          case 'profile':
             $Args = Gdn::Dispatcher()->ControllerArguments();
-            if (!sizeof($Args) || ( sizeof($Args) && $Args[0] == Gdn::Authenticator()->GetIdentity()))
+            if (!sizeof($Args) || (sizeof($Args) && $Args[0] == Gdn::Session()->UserID))
                return 'profile';
             break;
       }

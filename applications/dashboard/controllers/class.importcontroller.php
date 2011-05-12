@@ -37,7 +37,7 @@ class ImportController extends DashboardController {
    }
 
    public function Go() {
-      $this->Permission('Garden.Import');
+      $this->Permission('Garden.Settings.Manage');
 
       $Imp = new ImportModel();
       $Imp->LoadState();

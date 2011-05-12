@@ -37,6 +37,7 @@ $Editing = isset($this->Comment);
    */
    $this->FireEvent('BeforeBodyField');
    echo Wrap($this->Form->TextBox('Body', $CommentOptions), 'div', array('class' => 'TextBoxWrapper'));
+   $this->FireEvent('AfterBodyField');
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');
    $CancelText = 'Back to Discussions';

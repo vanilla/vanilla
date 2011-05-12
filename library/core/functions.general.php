@@ -341,12 +341,18 @@ if (!function_exists('Attribute')) {
     * Takes an attribute (or array of attributes) and formats them in
     * attribute="value" format.
     */
-   function Attribute($Name, $Value = '') {
+   function Attribute($Name, $ValueOrExclude = '') {
       $Return = '';
       if (!is_array($Name)) {
-         $Name = array($Name => $Value);
+         $Name = array($Name => $ValueOrExclude);
+         $Exclude = '';
+      } else {
+         $Exclude = $ValueOrExclude;
       }
       foreach ($Name as $Attribute => $Val) {
+         if ($Exclude && StringBeginsWith($Attribute, $Exclude))
+            continue;
+         
          if ($Val != '' && $Attribute != 'Standard') {
             $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }
@@ -1579,6 +1585,55 @@ if (!function_exists('Redirect')) {
       header("location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
+   }
+}
+
+if (!function_exists('ReflectArgs')) {
+   /**
+    * Reflect the arguments on a callback and returns them as an associative array.
+    * @param callback $Callback A callback to the function.
+    * @param array $Args1 An array of arguments.
+    * @param array $Args2 An optional other array of arguments.
+    * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
+    */
+   function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
+      $Result = array();
+
+      if (!method_exists($Controller, $Method))
+         return;
+      
+      if ($Args2 !== NULL)
+         $Args1 = array_merge($Args2, $Args1);
+      $Args1 = array_change_key_case($Args1);
+
+      if (is_string($Callback))
+         $Meth = new ReflectionFunction($Callback);
+      else
+         $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+      
+      $MethArgs = $Meth->getParameters();
+      
+      $Args = array();
+      $MissingArgs = array();
+
+      // Set all of the parameters.
+      foreach ($MethArgs as $Index => $MethParam) {
+         $ParamName = $MethParam->getName();
+         $ParamNameL = strtolower($ParamName);
+
+         if (isset($Args1[$ParamNameL]))
+            $Args[$ParamName] = $Args1[$ParamNameL];
+         elseif (isset($Args1[$Index]))
+            $Args[$ParamName] = $Args1[$Index];
+         elseif ($MethParam->isDefaultValueAvailable())
+            $Args[$ParamName] = $MethParam->getDefaultValue();
+         else {
+            $Args[$ParamName] = NULL;
+            $MissingArgs[] = "{$Index}: {$ParamName}";
+         }
+      }
+
+      return $Args;
    }
 }
 

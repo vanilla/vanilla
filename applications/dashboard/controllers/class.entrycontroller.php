@@ -277,12 +277,12 @@ class EntryController extends Gdn_Controller {
    public function Connect($Method) {
       $this->AddJsFile('entry.js');
       $this->View = 'connect';
-      $IsPostBack = $this->Form->IsPostBack();
+      $IsPostBack = $this->Form->IsPostBack() && $this->Form->GetFormValue('Connect') == 'Connect';
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.
          $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
-         $this->Form->FormValues($Data);
+         $this->Form->SetData($Data);
          $this->Form->AddHidden('Target');
       }
 
@@ -570,7 +570,8 @@ class EntryController extends Gdn_Controller {
          // Sign the user right out.
          Gdn::Session()->End();
          $this->_SetRedirect();
-      }
+      } elseif (!Gdn::Session()->IsValid())
+         $this->_SetRedirect();
       $this->Leaving = FALSE;
       $this->Render();
    }
@@ -630,6 +631,8 @@ class EntryController extends Gdn_Controller {
          }
 
       } else {
+         if ($Target = $this->Request->Get('Target'))
+            $this->Form->AddHidden('Target', $Target);
          $this->Form->SetValue('RememberMe', TRUE);
       }
 

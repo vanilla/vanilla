@@ -1336,7 +1336,7 @@ class UserModel extends Gdn_Model {
          $User = $this->Get($UserID);
          if ($User) {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
-				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(Gdn::Authenticator()->SignInUrl())));
+				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
 				$Email->To($User->Email);
 				//$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
 				$Email->Send();

@@ -63,7 +63,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		return $this->_Queries;
 	}
 	
-   public function Query($Sql, $InputParameters = NULL) {
+   public function Query($Sql, $InputParameters = NULL, $Options = array()) {
 		$Trace = debug_backtrace();
 		$Method = '';
 		foreach($Trace as $Info) {
@@ -78,12 +78,24 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		
       // Save the query for debugging
       // echo '<br />adding to queries: '.$Sql;
-      $this->_Queries[] = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
+      $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
+      if (isset($Options['Cache'])) {
+         $CacheKeys = (array)$Options['Cache'];
+         $Cache = array();
+
+         foreach ($CacheKeys as $CacheKey) {
+            $Value = Gdn::Cache()->Get($CacheKey);
+            $Cache[$CacheKey] = $Value !== Gdn_Cache::CACHEOP_FAILURE;
+         }
+         $Query['Cache'] = $Cache;
+      }
       
+      $this->_Queries[] = $Query;
+
       // Start the Query Timer
       $TimeStart = Now();
       
-      $Result = parent::Query($Sql, $InputParameters);
+      $Result = parent::Query($Sql, $InputParameters, $Options);
       
       // Aggregate the query times
       $TimeEnd = Now();

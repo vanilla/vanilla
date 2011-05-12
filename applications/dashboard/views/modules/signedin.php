@@ -1,7 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 if ($Session->IsValid() && C('Garden.Modules.ShowSignedInModule')) {
-   $Authenticator = Gdn::Authenticator();
 	$Name = $Session->User->Name;
 
    if (C('EnabledApplications.Conversations')) {
@@ -20,7 +19,7 @@ if ($Session->IsValid() && C('Garden.Modules.ShowSignedInModule')) {
       <li><strong><?php echo Anchor(T('Inbox'), '/messages/all'); ?></strong><span class="Count"><?php echo $CountInbox; ?></span></li>
       <?php } ?>
       <li><strong><?php echo Anchor(T('Notifications'), '/profile/notifications'); ?></strong><span class="Count"><?php echo $CountNotifications; ?></span></li>
-      <li><strong><?php echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl()); ?></strong>&#160;</li>
+      <li><strong><?php echo Anchor(T('Sign Out'), SignOutUrl()); ?></strong>&#160;</li>
       <?php if ($Session->CheckPermission('Garden.Settings.Manage')) { ?>
       <li><strong><?php echo Anchor(T('Dashboard'), '/dashboard/settings'); ?></strong>&#160;</li>
       <?php } ?>

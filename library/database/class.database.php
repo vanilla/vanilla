@@ -218,7 +218,7 @@ class Gdn_Database {
 
 		if (isset($Options['Cache'])) {
          // Check to see if the query is cached.
-         $CacheKey = GetValue('Cache',$Options,NULL);
+         $CacheKeys = (array)GetValue('Cache',$Options,NULL);
          $CacheOperation = GetValue('CacheOperation',$Options,NULL);
          if (is_null($CacheOperation))
             switch ($ReturnType) {
@@ -233,7 +233,9 @@ class Gdn_Database {
          
          switch ($CacheOperation) {
             case 'get':
-               $Data = Gdn::Cache()->Get($CacheKey);
+               foreach ($CacheKeys as $CacheKey) {
+                  $Data = Gdn::Cache()->Get($CacheKey);
+               }
 
                // Cache hit. Return.
                if ($Data !== Gdn_Cache::CACHEOP_FAILURE)
@@ -246,11 +248,15 @@ class Gdn_Database {
             case 'increment':
             case 'decrement':
                $CacheMethod = ucfirst($CacheOperation);
-               $CacheResult = Gdn::Cache()->$CacheMethod($CacheKey);
+               foreach ($CacheKeys as $CacheKey) {
+                  $CacheResult = Gdn::Cache()->$CacheMethod($CacheKey);
+               }
                break;
             
             case 'remove':
-               Gdn::Cache()->Remove($CacheKey);
+               foreach ($CacheKeys as $CacheKey) {
+                  Gdn::Cache()->Remove($CacheKey);
+               }
                break;
          }
 		}

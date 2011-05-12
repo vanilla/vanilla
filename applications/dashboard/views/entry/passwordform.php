@@ -43,7 +43,7 @@
    <ul>
       <li>
          <?php
-            echo $this->Form->Label('Enter your Email address', 'Email');
+            echo $this->Form->Label('Enter your Email address or username', 'Email');
             echo $this->Form->TextBox('Email');
          ?>
       </li>

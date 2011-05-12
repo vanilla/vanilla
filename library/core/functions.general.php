@@ -1514,6 +1514,7 @@ if (!function_exists('ProxyRequest')) {
             $Response .= $Line;
          }
          @fclose($Pointer);
+         $Bytes = strlen($Response);
          $Response = trim($Response);
          $Success = TRUE;
          

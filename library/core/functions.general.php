@@ -341,12 +341,18 @@ if (!function_exists('Attribute')) {
     * Takes an attribute (or array of attributes) and formats them in
     * attribute="value" format.
     */
-   function Attribute($Name, $Value = '') {
+   function Attribute($Name, $ValueOrExclude = '') {
       $Return = '';
       if (!is_array($Name)) {
-         $Name = array($Name => $Value);
+         $Name = array($Name => $ValueOrExclude);
+         $Exclude = '';
+      } else {
+         $Exclude = $ValueOrExclude;
       }
       foreach ($Name as $Attribute => $Val) {
+         if ($Exclude && StringBeginsWith($Attribute, $Exclude))
+            continue;
+         
          if ($Val != '' && $Attribute != 'Standard') {
             $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }

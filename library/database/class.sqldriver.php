@@ -367,16 +367,27 @@ abstract class Gdn_SQLDriver {
    /**
     * Set the cache key for this transaction
     * 
-    * @param string $Key The cache key that this query will save into
+    * @param string $Key The cache key that this query will save into.
+    * @return Gdn_SQLDriver $this
     */
    public function Cache($Key, $Operation = NULL, $Backing = NULL) {
-      $this->_CacheKey = 'QueryCache.'.$Key;
+      if (!$Key) {
+         $this->_CacheKey = NULL;
+         $this->_CacheOperation = NULL;
+         $this->_CacheBacking = NULL;
+
+         return $this;
+      }
+
+      $this->_CacheKey = $Key;
       
       if (!is_null($Operation))
          $this->_CacheOperation = $Operation;
       
       if (!is_null($Backing))
          $this->_CacheBacking = $Backing;
+
+      return $this;
    }
 
    /**
@@ -1615,8 +1626,10 @@ abstract class Gdn_SQLDriver {
       }
 
       $QueryOptions = array('ReturnType' => $ReturnType);
-      if (!is_null($this->_CacheKey))
+      if (!is_null($this->_CacheKey)) {
+         $Foo = 'bar';
          $QueryOptions['Cache'] = $this->_CacheKey;
+      }
       
       if (!is_null($this->_CacheKey))
          $QueryOptions['CacheOperation'] = $this->_CacheOperation;

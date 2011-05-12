@@ -209,6 +209,7 @@ class ImportModel extends Gdn_Model {
          $this->ErrorType = 'Credentials';
 		}
 		return $Result;
+      
 	}
 
    public function CustomFinalization() {
@@ -836,7 +837,13 @@ class ImportModel extends Gdn_Model {
    }
 
 	public function InsertUserTable() {
-      $UserCurrentPassword = $this->Data('UseCurrentPassword');
+      $UseCurrentPassword = $this->Data('UseCurrentPassword');
+
+      if ($UseCurrentPassword) {
+         $CurrentUser = $this->SQL->GetWhere('User', array('UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+         $CurrentPassword = $CurrentUser['Password'];
+         $CurrentHashMethod = $CurrentUser['HashMethod'];
+      }
 
 		// Delete the current user table.
 		$this->SQL->Truncate('User');
@@ -853,9 +860,9 @@ class ImportModel extends Gdn_Model {
       $SqlArgs = array(':Email' => $AdminEmail);
       $SqlSet = '';
 
-      if ($UserCurrentPassword) {
-         $SqlArgs[':Password'] = Gdn::Session()->User->Password;
-         $SqlArgs[':HashMethod'] = Gdn::Session()->User->HashMethod;
+      if ($UseCurrentPassword) {
+         $SqlArgs[':Password'] = $CurrentPassword;
+         $SqlArgs[':HashMethod'] = $CurrentHashMethod;
          $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
       }
 
@@ -870,18 +877,21 @@ class ImportModel extends Gdn_Model {
          }
 
          // Write it out.
-         
          $this->Query("update :_User set Admin = 1{$SqlSet} where Email = :Email", $SqlArgs);
       } else {
          // Set the admin user flag.
          $this->Query("update :_User set Admin = 1{$SqlSet} where Email = :Email", $SqlArgs);
       }
 
-		// Authenticate the admin user as the current user.
-		$PasswordAuth = Gdn::Authenticator()->AuthenticateWith('password');
-		//$PasswordAuth->FetchData($PasswordAuth, array('Email' => GetValue('OverwriteEmail', $this->Data), 'Password' => GetValue('OverwritePassword', $this->Data)));
-		$PasswordAuth->Authenticate(GetValue('OverwriteEmail', $this->Data), GetValue('OverwritePassword', $this->Data));
-		Gdn::Session()->Start();
+		// Start the new session.
+      $User = Gdn::UserModel()->GetByEmail(GetValue('OverwriteEmail', $this->Data));
+      if (!$User)
+         $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
+
+      $PasswordHash = new Gdn_PasswordHash();
+      if ($PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
+         Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
+      }
 
 		return TRUE;
 	}
@@ -1499,6 +1509,9 @@ class ImportModel extends Gdn_Model {
             $Sqls['Conversation.CountMessages'] = $this->GetCountSQL('count', 'Conversation', 'ConversationMessage', 'CountMessages', 'MessageID');
          if(!$this->ImportExists('Conversation', 'LastMessageID'))
             $Sqls['Conversation.LastMessageID'] = $this->GetCountSQL('max', 'Conversation', 'ConversationMessage', 'LastMessageID', 'MessageID');
+
+         if (!$this->ImportExists('Conversation', 'DateUpdated'))
+            $Sqls['Converstation.DateUpdated'] = "update :_Conversation c join :_ConversationMessage m on c.LastMessageID = m.MessageID set c.DateUpdated = m.DateInserted";
 
          if($this->ImportExists('UserConversation')) {
             if(!$this->ImportExists('UserConversation', 'LastMessageID')) {

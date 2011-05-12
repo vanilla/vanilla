@@ -353,9 +353,9 @@ abstract class Gdn_Cache {
          
       }
       
-      // Lookup Revision if we have a prefix
+      // Lookup Revision if we have a prefix.
+      $RevisionNumber = FALSE;
       if ($WithRevision && $ConfigPrefix !== FALSE) {
-         $RevisionNumber = FALSE;
          $CacheRevision = $this->GetRevision($ConfigPrefix);
          if (!is_null($CacheRevision))
             $RevisionNumber = $CacheRevision;

@@ -195,7 +195,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          && !Gdn::Session()->IsValid()
          && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
       ) {
-         Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
+         Redirect('/entry/signin?Target='.urlencode($this->Request));
          exit();
       }
 

@@ -377,6 +377,8 @@ abstract class Gdn_SQLDriver {
       
       if (!is_null($Backing))
          $this->_CacheBacking = $Backing;
+      
+      return $this;
    }
 
    /**

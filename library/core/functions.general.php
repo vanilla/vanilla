@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
+/*
 function Gdn_Autoload($ClassName) {
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
@@ -84,7 +85,6 @@ function Gdn_Autoload($ClassName) {
       include_once($LibraryPath);
 }
 
-/*
 if (!function_exists('__autoload')) {
    function __autoload($ClassName) {
       trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
@@ -1426,7 +1426,7 @@ if (!function_exists('ProxyRequest')) {
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if(!$Timeout)
+		if (!$Timeout)
 			$Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
@@ -1462,6 +1462,9 @@ if (!function_exists('ProxyRequest')) {
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
+         if ($Timeout !== FALSE)
+            curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+         
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
          // 
          //if ($Query != '') {
@@ -1481,11 +1484,12 @@ if (!function_exists('ProxyRequest')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
       
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
-         if(strlen($Cookie) > 0)
+         stream_set_timeout($Pointer, $Timeout);
+         if (strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
@@ -1512,6 +1516,12 @@ if (!function_exists('ProxyRequest')) {
          @fclose($Pointer);
          $Response = trim($Response);
          $Success = TRUE;
+         
+         $StreamInfo = stream_get_meta_data($Pointer);
+         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
+            $Success = FALSE;
+            $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
+         }
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }

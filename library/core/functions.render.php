@@ -221,3 +221,21 @@ if (!function_exists('DiscussionLink')) {
 		return Url(implode('/',$Parts), TRUE);
    }
 }
+
+if (!function_exists('RegisterUrl')) {
+   function RegisterUrl($Target = '') {
+      return '/entry/register'.($Target ? '?Target='.urlencode($Target) : '');
+   }
+}
+
+if (!function_exists('SignInUrl')) {
+   function SignInUrl($Target = '') {
+      return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
+   }
+}
+
+if (!function_exists('SignOutUrl')) {
+   function SignOutUrl($Target = '') {
+      return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
+   }
+}

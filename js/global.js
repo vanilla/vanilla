@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
          def = defaultVal;
       } else {
          def = $def.val();
-         if (typeof def == 'undefined' || def == '')
+         if ($def.length == 0)
             def = defaultVal;
       }
          

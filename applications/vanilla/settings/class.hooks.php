@@ -360,7 +360,7 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Forum', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
    }
    

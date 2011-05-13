@@ -110,13 +110,19 @@ Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 // Dispatcher.
 Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
+
 // Smarty Templating Engine
 Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
+
 // Slice handler
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
+
 // Remote Statistics
-Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactoryInstance);
+Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactorySingleton);
+Gdn::Statistics();
+
+// Regarding
 Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', NULL, Gdn::FactorySingleton);
 Gdn::Regarding();
 

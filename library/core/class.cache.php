@@ -226,6 +226,11 @@ abstract class Gdn_Cache {
    * @param string $Key Cache key used for storage
    * @param mixed $Value Value to be cached
    * @param array $Options
+   *   - FEATURE_COMPRESS: Allows items to be internally compressed/decompressed (bool)
+   *   - FEATURE_EXPIRY: Allows items to autoexpire (seconds)
+   *   - FEATURE_NOPREFIX: Allows disabling usage of key prefix (bool)
+   *   - FEATURE_FORCEPREFIX: Allows forcing alternate key prefix (string)
+   *   - FEATURE_FALLBACK: Allows querying DB for missing keys, or firing a callback (see Gdn_Cache->Fallback)
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Store($Key, $Value, $Options = array());
@@ -306,6 +311,13 @@ abstract class Gdn_Cache {
    */
    abstract public function AddContainer($Options);
    
+   /**
+    * 
+    * 
+    * @param type $Key Cache key
+    * @param type $Options
+    * @return mixed
+    */
    protected function Fallback($Key, $Options) {
       $Fallback = GetValue(Gdn_Cache::FEATURE_FALLBACK, $Options, NULL);
       if (is_null($Fallback))
@@ -353,9 +365,9 @@ abstract class Gdn_Cache {
          
       }
       
-      // Lookup Revision if we have a prefix
+      // Lookup Revision if we have a prefix.
+      $RevisionNumber = FALSE;
       if ($WithRevision && $ConfigPrefix !== FALSE) {
-         $RevisionNumber = FALSE;
          $CacheRevision = $this->GetRevision($ConfigPrefix);
          if (!is_null($CacheRevision))
             $RevisionNumber = $CacheRevision;

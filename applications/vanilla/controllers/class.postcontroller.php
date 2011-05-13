@@ -21,6 +21,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class PostController extends VanillaController {
    /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
+   /**
     * Models to include.
     * 
     * @since 2.0.0
@@ -265,7 +270,7 @@ class PostController extends VanillaController {
     */
    public function Comment($DiscussionID = '') {
       // Get $DiscussionID from RequestArgs if valid
-      if ($DiscussionID == '' && sizeof($this->RequestArgs))
+      if ($DiscussionID == '' && count($this->RequestArgs))
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
             

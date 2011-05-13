@@ -27,10 +27,15 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	public function DiscussionController_Render_Before($Sender) {
 		$this->_Emotify($Sender);
 	}
-	
+
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    */
 	private function _Emotify($Sender) {
-		$Sender->AddJsFile('plugins/Emotify/emotify.js');
-		$Sender->AddCssFile('plugins/Emotify/emotify.css');
+		$Sender->AddJsFile('plugins/Emotify/emotify.js');   
+      $Sender->AddCssFile('plugins/Emotify/emotify.css');
+      $Sender->AddDefinition('FormatEmoticons', C('Plugins.Emotify.FormatEmoticons', TRUE));
 	}
 	
 	public function Setup() { }

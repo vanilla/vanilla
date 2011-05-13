@@ -1336,7 +1336,7 @@ class UserModel extends Gdn_Model {
          $User = $this->Get($UserID);
          if ($User) {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
-				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(Gdn::Authenticator()->SignInUrl())));
+				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
 				$Email->To($User->Email);
 				//$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
 				$Email->Send();
@@ -1614,7 +1614,14 @@ class UserModel extends Gdn_Model {
       if (!is_array($Name))
          $Name = array($Name => $Value);
 
-      $Values = Gdn_Format::Serialize(array_merge($Values, $Name));
+      
+      $RawValues = array_merge($Values, $Name);
+      $Values = array();
+      foreach ($RawValues as $Key => $RawValue)
+         if (!is_null($RawValue))
+            $Values[$Key] = $RawValue;
+      
+      $Values = Gdn_Format::Serialize($Values);
 
       // Save the values back to the db
       return $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));

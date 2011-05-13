@@ -86,7 +86,7 @@ class Gdn {
     */
    public static function Config($Name = FALSE, $Default = FALSE) {
       $Config = self::$_Config;
-      if($Name === FALSE)
+      if ($Name === FALSE)
          $Result = $Config;
       else
          $Result = $Config->Get($Name, $Default);
@@ -169,13 +169,13 @@ class Gdn {
     */
    public static function FactoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = NULL) {
       // Don't overwrite an existing definition.
-      if(self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
+      if (self::$_FactoryOverwrite === FALSE && self::FactoryExists($Alias))
          return;
       
       self::Factory()->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
       
       // Cache some of the more commonly used factory objects as properties.
-      switch($Alias) {
+      switch ($Alias) {
          case self::AliasConfig:
             self::$_Config = self::Factory($Alias);
             break;
@@ -222,9 +222,9 @@ class Gdn {
     * All of these values are passed to the corresponding argument in inline{@link Gdn::FactoryInstallDependency()}.
     */
    public static function FactoryInstallDependencyFromConfig($Config, $Alias = NULL) {
-      if(is_string($Config))
+      if (is_string($Config))
          $Config = self::Config($Config);
-      if(is_null($Alias))
+      if (is_null($Alias))
          $Alias = $Config['Alias'];
          
       $PropertyName = $Config['PropertyName'];
@@ -251,9 +251,9 @@ class Gdn {
     * All of these values (except Dependencies) are passed to the corresponding argument in inline{@link Gdn::FactoryInstall()}.
     */
    public static function FactoryInstallFromConfig($Config, $Alias = NULL) {
-      if(is_string($Config))
+      if (is_string($Config))
          $Config = self::Config($Config);
-      if(is_null($Alias))
+      if (is_null($Alias))
          $Alias = $Config['Alias'];
          
       $FactoryType = $Config['FactoryType'];
@@ -262,7 +262,7 @@ class Gdn {
          
       self::FactoryInstall($Alias, $Config['ClassName'], $Config['Path'], $FactoryType, $Data, $Override);
       
-      if(array_key_exists('Dependencies', $Config)) {
+      if (array_key_exists('Dependencies', $Config)) {
          $Dependencies = $Config['Dependencies'];
          foreach($Dependencies as $Index => $DependencyConfig) {
             self::FactoryInstallFromConfig($DependencyConfig, $Alias);
@@ -273,7 +273,7 @@ class Gdn {
    public static function FactoryOverwrite($Value = NULL) {
       $Result = (self::$_FactoryOverwrite & 1 > 0);
       
-      if(!is_null($Value)) {
+      if (!is_null($Value)) {
          self::$_FactoryOverwrite = $Value;
       }
       
@@ -303,7 +303,7 @@ class Gdn {
     * @return Gdn_Locale
     */
    public static function Locale() {
-      if(is_null(self::$_Locale))
+      if (is_null(self::$_Locale))
          self::$_Locale = self::Factory(self::AliasLocale);
       
       return self::$_Locale;
@@ -339,9 +339,9 @@ class Gdn {
    public static function Request($NewRequest = NULL) {
       $Request = self::$_Request; //self::Factory(self::AliasRequest);
       if (!is_null($NewRequest)) {
-			if(is_string($NewRequest))
+			if (is_string($NewRequest))
 				$Request->WithURI($NewRequest);
-			elseif(is_object($NewRequest))
+			elseif (is_object($NewRequest))
 				$Request->FromImport($NewRequest);
 		}
       
@@ -363,7 +363,7 @@ class Gdn {
     * @return Gdn_Session
     */
    public static function Session() {
-      if(is_null(self::$_Session))
+      if (is_null(self::$_Session))
          self::$_Session = self::Factory(self::AliasSession);
       return self::$_Session;
    }
@@ -383,6 +383,10 @@ class Gdn {
       $Database = self::Database();
       $Result = $Database->SQL();
       return $Result;
+   }
+   
+   public static function Statistics() {
+      return self::Factory('Statistics');
    }
    
    /**

@@ -28,6 +28,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
    private $ParentType = NULL;
    private $ParentID = NULL;
+   private $ParentElement = NULL;
+   
    private $UserID = NULL;
    private $ForeignURL = NULL;
    private $Comment = NULL;
@@ -89,8 +91,21 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    }
 
    public function WithParent($ParentType, $ParentID) {
-      $this->ParentType = $ParentType;
-      $this->ParentID = $ParentID;
+      $ModelName = ucfirst($ParentType).'Model';
+
+      if (!class_exists($ModelName))
+         throw new Exception(sprintf(T("Could not find a model for %s objects (parent type for %s objects)."), ucfirst($ParentType), ucfirst($this->ForeignType)));
+
+      // If we can lookup this object, it is verified
+      $VerifyModel = new $ModelName;
+      $ParentElement = $VerifyModel->GetID($ParentID);
+      
+      if ($ParentElement !== FALSE) {
+         $this->ParentType = $ParentType;
+         $this->ParentID = $ParentID;
+         $this->ParentElement = $ParentElement;
+      }
+         
       return $this;
    }
 
@@ -122,6 +137,40 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    }
 
    public function Entitled($CollaborativeTitle) {
+      $this->CollaborativeTitle = $CollaborativeTitle;
+      
+      // Figure out how much space we have for the title
+      $MaxLength = 100;
+      $Stripped = FormatString($CollaborativeTitle,array(
+         'RegardingTitle'     => ''
+      ));
+      $UsedLength = strlen($Stripped);
+      $AvailableLength = $MaxLength - $UsedLength;
+      
+      // Check if the SourceElement contains a 'Name'
+      $Name = GetValue('Name', $this->SourceElement, FALSE);
+      
+      // If not...
+      if ($Name === FALSE) {
+         // ...and we have a parent element...
+         if (!is_null($this->ParentElement)) {
+            // ...try to get a 'Name' from the parent
+            $Name = GetValue('Name', $this->ParentElement, FALSE);
+         }
+      }
+      
+      // If all that failed, use the 'Body' of the source
+      if ($Name === FALSE)
+         $Name = GetValue('Body', $this->SourceElement, '');
+      
+      // Trim it if it is too long
+      if (strlen($Name) > $AvailableLength)
+         $Name = substr($Name, 0, $AvailableLength-3).'...';
+      
+      $CollaborativeTitle = FormatString($CollaborativeTitle,array(
+         'RegardingTitle'     => $Name
+      ));
+      
       $this->CollaborativeTitle = $CollaborativeTitle;
       return $this;
    }

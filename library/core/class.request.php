@@ -739,7 +739,7 @@ class Gdn_Request {
 
       if (!$RewriteUrls) {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
-         $Query = str_replace('?', '&amp;', $Query);
+         $Query = str_replace('?', '&', $Query);
       }
 
       if($Path == '') {

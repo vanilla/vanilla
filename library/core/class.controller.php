@@ -1060,7 +1060,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->SetJson('InformMessages', $this->_InformMessages);
          $this->SetJson('ErrorMessages', $this->_ErrorMessages);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
-
+         
          // Make sure the database connection is closed before exiting.
          $Database = Gdn::Database();
          $Database->CloseConnection();

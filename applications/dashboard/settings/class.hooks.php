@@ -30,9 +30,26 @@ class DashboardHooks implements Gdn_IPlugin {
          }
       }
 
-      if ($EmailKey = Gdn::Session()->GetAttribute('EmailKey')) {
-         $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
-         $Sender->InformMessage($Message, '');
+      if ($Session->IsValid() && $EmailKey = Gdn::Session()->GetAttribute('EmailKey')) {
+         $NotifyEmailConfirm = TRUE;
+         
+         // If this user was manually moved out of the confirmation role, get rid of their 'awaiting confirmation' flag
+         $ConfirmEmailRole = C('Garden.Registration.ConfirmEmailRole', FALSE);
+         
+         $UserRoles = array();
+         $RoleData = Gdn::UserModel()->GetRoles($Session->UserID);
+         if ($RoleData !== FALSE && $RoleData->NumRows() > 0) 
+            $UserRoles = ConsolidateArrayValuesByKey($RoleData->Result(DATASET_TYPE_ARRAY), 'RoleID','Name');
+         
+         if ($ConfirmEmailRole !== FALSE && !array_key_exists($ConfirmEmailRole, $UserRoles)) {
+            Gdn::UserModel()->SaveAttribute($Session->UserID, "EmailKey", NULL);
+            $NotifyEmailConfirm = FALSE;
+         }
+         
+         if ($NotifyEmailConfirm) {
+            $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+            $Sender->InformMessage($Message, '');
+         }
       }
 
       // Add Message Modules (if necessary)
@@ -67,14 +84,6 @@ class DashboardHooks implements Gdn_IPlugin {
 		
 		// Allow forum embedding
 		$Sender->AddJsFile('js/embed_local.js');
-   }
-   
-   public function SettingsController_AnalyticsRegister_Create(&$Sender) {
-      Gdn::Factory('Statistics')->Register($Sender);
-   }
-   
-   public function SettingsController_AnalyticsStats_Create(&$Sender) {
-      Gdn::Factory('Statistics')->Stats($Sender);
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -124,6 +133,6 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
-		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Import');
+		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
    }
 }

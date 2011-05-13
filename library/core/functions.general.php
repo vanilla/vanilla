@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
+/*
 function Gdn_Autoload($ClassName) {
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
@@ -84,7 +85,6 @@ function Gdn_Autoload($ClassName) {
       include_once($LibraryPath);
 }
 
-/*
 if (!function_exists('__autoload')) {
    function __autoload($ClassName) {
       trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
@@ -341,12 +341,18 @@ if (!function_exists('Attribute')) {
     * Takes an attribute (or array of attributes) and formats them in
     * attribute="value" format.
     */
-   function Attribute($Name, $Value = '') {
+   function Attribute($Name, $ValueOrExclude = '') {
       $Return = '';
       if (!is_array($Name)) {
-         $Name = array($Name => $Value);
+         $Name = array($Name => $ValueOrExclude);
+         $Exclude = '';
+      } else {
+         $Exclude = $ValueOrExclude;
       }
       foreach ($Name as $Attribute => $Val) {
+         if ($Exclude && StringBeginsWith($Attribute, $Exclude))
+            continue;
+         
          if ($Val != '' && $Attribute != 'Standard') {
             $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }
@@ -1420,7 +1426,7 @@ if (!function_exists('ProxyRequest')) {
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if(!$Timeout)
+		if (!$Timeout)
 			$Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
@@ -1456,6 +1462,9 @@ if (!function_exists('ProxyRequest')) {
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
+         if ($Timeout !== FALSE)
+            curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+         
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
          // 
          //if ($Query != '') {
@@ -1475,11 +1484,12 @@ if (!function_exists('ProxyRequest')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
       
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
-         if(strlen($Cookie) > 0)
+         stream_set_timeout($Pointer, $Timeout);
+         if (strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
@@ -1504,8 +1514,15 @@ if (!function_exists('ProxyRequest')) {
             $Response .= $Line;
          }
          @fclose($Pointer);
+         $Bytes = strlen($Response);
          $Response = trim($Response);
          $Success = TRUE;
+         
+         $StreamInfo = stream_get_meta_data($Pointer);
+         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
+            $Success = FALSE;
+            $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
+         }
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
@@ -1579,6 +1596,55 @@ if (!function_exists('Redirect')) {
       header("location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
+   }
+}
+
+if (!function_exists('ReflectArgs')) {
+   /**
+    * Reflect the arguments on a callback and returns them as an associative array.
+    * @param callback $Callback A callback to the function.
+    * @param array $Args1 An array of arguments.
+    * @param array $Args2 An optional other array of arguments.
+    * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
+    */
+   function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
+      $Result = array();
+
+      if (!method_exists($Controller, $Method))
+         return;
+      
+      if ($Args2 !== NULL)
+         $Args1 = array_merge($Args2, $Args1);
+      $Args1 = array_change_key_case($Args1);
+
+      if (is_string($Callback))
+         $Meth = new ReflectionFunction($Callback);
+      else
+         $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+      
+      $MethArgs = $Meth->getParameters();
+      
+      $Args = array();
+      $MissingArgs = array();
+
+      // Set all of the parameters.
+      foreach ($MethArgs as $Index => $MethParam) {
+         $ParamName = $MethParam->getName();
+         $ParamNameL = strtolower($ParamName);
+
+         if (isset($Args1[$ParamNameL]))
+            $Args[$ParamName] = $Args1[$ParamNameL];
+         elseif (isset($Args1[$Index]))
+            $Args[$ParamName] = $Args1[$Index];
+         elseif ($MethParam->isDefaultValueAvailable())
+            $Args[$ParamName] = $MethParam->getDefaultValue();
+         else {
+            $Args[$ParamName] = NULL;
+            $MissingArgs[] = "{$Index}: {$ParamName}";
+         }
+      }
+
+      return $Args;
    }
 }
 
@@ -1844,8 +1910,8 @@ if (!function_exists('StringBeginsWith')) {
          return TRUE;
       else {
          $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, strlen($B));
+         if ($Trim)
+            $Result = $Result ? substr($A, strlen($B)) : $A;
          return $Result;
       }
    }
@@ -1867,8 +1933,8 @@ if (!function_exists('StringEndsWith')) {
          return TRUE;
       else {
          $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, 0, -strlen($B));
+         if ($Trim)
+            $Result = $Result ? substr($A, 0, -strlen($B)) : $A;
          return $Result;
       }
    }

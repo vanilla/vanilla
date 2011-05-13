@@ -243,7 +243,7 @@ class SettingsController extends Gdn_Controller {
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
       
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->AuthenticatedPostBack() == FALSE) {
 			$this->Form->AddHidden('CodeIsDefined', '0');
       } else {
 			// Form was validly submitted

@@ -72,7 +72,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
 
-      if (!Gdn_Statistics::IsEnabled() && Gdn_Statistics::IsLocalhost()) {
+      if (!Gdn_Statistics::CheckIsEnabled() && Gdn_Statistics::CheckIsLocalhost()) {
          $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
       } else {
          $Sender->AddJsFile('plugins/VanillaStats/js/vanillastats.js');
@@ -82,11 +82,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
          $this->ConfigureRange($Sender);
          
-         $VanillaID = C('Garden.InstallationID', FALSE);
-         $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
+         $VanillaID = C('Garden.Analytics.InstallationID', FALSE);
+         $Sender->SetData('VanillaID', C('Garden.Analytics.InstallationID', 'UniqueVanillaInstallationID'));
          
          $RequestTime = gmmktime();
-         $VanillaSecret = C('Garden.InstallationSecret', FALSE);
+         $VanillaSecret = C('Garden.Analytics.InstallationSecret', FALSE);
          
          $SecurityHash = sha1(implode('-',array(
             $VanillaSecret,
@@ -117,11 +117,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       
-      $VanillaID = C('Garden.InstallationID', FALSE);
-      $Sender->SetData('VanillaID', C('Garden.InstallationID', 'UniqueVanillaInstallationID'));
+      $VanillaID = C('Garden.Analytics.InstallationID', FALSE);
+      $Sender->SetData('VanillaID', C('Garden.Analytics.InstallationID', 'UniqueVanillaInstallationID'));
       
       $RequestTime = gmmktime();
-      $VanillaSecret = C('Garden.InstallationSecret', FALSE);
+      $VanillaSecret = C('Garden.Analytics.InstallationSecret', FALSE);
       
       $SecurityHash = sha1(implode('-',array(
          $VanillaSecret,

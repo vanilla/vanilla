@@ -580,8 +580,13 @@ class Gdn_Request {
 //      if ($Filename && $Filename != 'default')
 //         $Result .= ConcatSep('/', $Result, $Filename);
       $Get = $this->GetRequestArguments(self::INPUT_GET);
-      if (count($Get) > 0)
-         $Result .= '?'.http_build_query($Get);
+      if (count($Get) > 0) {
+         // mosullivan 2011-05-04 - There is a bug in this code that causes a qs
+         // param to be present in the path, which makes appending with a ?
+         // invalid. This code is too nasty to figure out. Kludge.
+         $Result .= strpos($Result, '?') === FALSE ? '?' : '&';
+         $Result .= http_build_query($Get);
+      }
 
       return $Result;
    }

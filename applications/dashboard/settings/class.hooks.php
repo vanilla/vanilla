@@ -90,6 +90,8 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
+		$Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
+		
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -123,6 +125,5 @@ class DashboardHooks implements Gdn_IPlugin {
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Import');
-		
    }
 }

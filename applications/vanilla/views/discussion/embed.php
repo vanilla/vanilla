@@ -17,20 +17,21 @@ if (!function_exists('WriteComment'))
       echo $this->Form->Errors();
       echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       echo "<div class=\"Buttons\">\n";
-      echo Gdn::Request()->Url('');
       if ($Session->IsValid()) {
+         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl(Gdn::Request()->PathAndQuery());
          echo Wrap(
             sprintf(
                T('Commenting as %1$s (%2$s)'),
                Gdn_Format::Text($Session->User->Name),
-               Gdn_Theme::Link('signinout', T('Sign Out'), '<a href="%url" class="%class">%text</a>', array('Target' => Gdn::Request()->Url('')))
+               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut')
             ),
             'div',
             array('class' => 'Author')
          );
          echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         echo Gdn_Theme::Link('signinout', T('Comment As ...'), '<a href="%url" class="%class">%text</a>', array('class' => 'Button Stash', 'Target' => Gdn::Request()->Url('')));
+         $AuthenticationUrl = Gdn::Authenticator()->SignInUrl(Gdn::Request()->PathAndQuery());
+         echo Anchor(T('Comment As ...'), $AuthenticationUrl, 'SignInPopup Button Stash');
       }
       echo "</div>\n";
       echo $this->Form->Close();

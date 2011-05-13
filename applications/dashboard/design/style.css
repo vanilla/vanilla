@@ -2207,13 +2207,9 @@ div.CommentForm textarea {
    margin: 0 0 6px;
 }
 div.Comment div.CommentForm {
-	width: 98%;
 	background: none;
-	padding: 6px 4px;
+	padding: 6px 0px;
 	border: 0;
-}
-div.Comment div.CommentForm textarea {
-	width: 99%;	
 }
 #DiscussionForm label {
    font-size: 14px;

@@ -1614,7 +1614,14 @@ class UserModel extends Gdn_Model {
       if (!is_array($Name))
          $Name = array($Name => $Value);
 
-      $Values = Gdn_Format::Serialize(array_merge($Values, $Name));
+      
+      $RawValues = array_merge($Values, $Name);
+      $Values = array();
+      foreach ($RawValues as $Key => $RawValue)
+         if (!is_null($RawValue))
+            $Values[$Key] = $RawValue;
+      
+      $Values = Gdn_Format::Serialize($Values);
 
       // Save the values back to the db
       return $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));

@@ -296,7 +296,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      $CommentModel = new CommentModel();
                      $CommentID = $CommentModel->Save(array(
                         'DiscussionID' => GetValue('DiscussionID', $Discussion),
-                        'Body'         => '-',
+                        'Body'         => T("> Duplicate report"),
                         'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
                         'RegardingID'  => $RegardingID
                      ));

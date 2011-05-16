@@ -140,7 +140,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       $this->CollaborativeTitle = $CollaborativeTitle;
       
       // Figure out how much space we have for the title
-      $MaxLength = 100;
+      $MaxLength = 90;
       $Stripped = FormatString($CollaborativeTitle,array(
          'RegardingTitle'     => ''
       ));
@@ -257,7 +257,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       // Don't error on foreach
       if (!is_array($this->CollaborativeActions))
          $this->CollaborativeActions = array();
-         
+      
       foreach ($this->CollaborativeActions as $Action) {
          $ActionType = GetValue('Type', $Action);
          switch ($ActionType) {

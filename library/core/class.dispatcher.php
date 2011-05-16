@@ -472,6 +472,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
+
+      // Check for a file extension on the controller.
+      $Ext = strrchr($Controller, '.');
+      if ($Ext) {
+         $Controller = substr($Controller, 0, -strlen($Ext));
+         $Ext = trim($Ext, '.');
+         $this->_DeliveryMethod = strtoupper($Ext);
+      }
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(

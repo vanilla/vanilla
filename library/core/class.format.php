@@ -273,7 +273,6 @@ class Gdn_Format {
                $Mixed2 = str_ireplace('[/font]', '</font>', $Mixed2);
 
                $Mixed2 = preg_replace('#\[/?left\]#si', '', $Mixed2);
-               $Mixed2 = Gdn_Format::Links($Mixed2);
                $Mixed2 = Gdn_Format::Mentions($Mixed2);
 					$Result = Gdn_Format::Html($Mixed2);
 					return $Result;
@@ -646,13 +645,10 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
+         $Regex = "`(</?a)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+
          $Mixed = preg_replace_callback(
-            "/
-            (?<!<a href=\")
-            (?<!\")(?<!\">)
-            ((?:https?|ftp):\/\/)
-            ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
-            /msxi",
+            $Regex,
          array('Gdn_Format', 'LinksCallback'),
          $Mixed);
 
@@ -660,26 +656,43 @@ class Gdn_Format {
       }
    }
    protected static function LinksCallback($Matches) {
-      static $Width, $Height;
+      static $Width, $Height, $InAnchor = FALSE;
       if (!isset($Width)) {
          list($Width, $Height) = Gdn_Format::GetEmbedSize();
       }
-      $Pr = $Matches[1];
+
+      $Tag = strtolower($Matches[1]);
+      if ($Tag == '<a')
+         $InAnchor = TRUE;
+      elseif ($Tag == '</a')
+         $InAnchor = FALSE;
+
+      if (!isset($Matches[2]) || $InAnchor)
+         return $Matches[0];
+
       $Url = $Matches[2];
-      if (preg_match('/www.youtube.com\/watch\?v=([^&]+)/', $Url, $Matches) && C('Garden.Format.YouTube')) {
+      if (preg_match('`(?:https?|ftp)://www.youtube.com\/watch\?v=([^&]+)`', $Url, $Matches) && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
-      } elseif (preg_match('/vimeo.com\/(\d+)/', $Url, $Matches) && C('Garden.Format.Vimeo')) {
+      } elseif (preg_match('`(?:https?|ftp)://vimeo.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } else {
-		 $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+
+         // Strip punctuation off of the end of the url.
+         $Punc = '';
+         if (preg_match('`^(.+)([.?,;:])$`', $Url, $Matches)) {
+            $Url = $Matches[1];
+            $Punc = $Matches[2];
+         }
+
          $Result = <<<EOT
-<a href="$Pr$Url" target="_blank"$nofollow>$Pr$Url</a>
+<a href="$Url" target="_blank"$nofollow>$Url</a>$Punc
 EOT;
       }
       return $Result;

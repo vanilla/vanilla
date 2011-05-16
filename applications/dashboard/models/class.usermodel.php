@@ -1383,6 +1383,9 @@ class UserModel extends Gdn_Model {
       // Remove role associations
       $this->SQL->Delete('UserRole', array('UserID' => $UserID));
 
+      // Remove foreign account associations
+      $this->SQL->Delete('UserAuthentication', array('UserID' => $UserID));
+      
       // Remove the user's information
       $this->SQL->Update('User')
          ->Set(array(
@@ -1915,11 +1918,14 @@ class UserModel extends Gdn_Model {
          }
 
          if ($UserID) {
-            $RoleID = $this->NewUserRoleIDs();
+            $NewUserRoleIDs = $this->NewUserRoleIDs();
             
             // Save the roles.
-            $Roles = (array)GetValue('Roles', $Data, $RoleID);
-            $this->SaveRoles($UserID, $Roles, FALSE);
+            $Roles = GetValue('Roles', $Data, FALSE);
+            if (empty($Roles))
+               $Roles = $NewUserRoleIDs;
+            
+            $this->SaveRoles($UserID, (array)$Roles, FALSE);
          }
       } else {
          $UserID = $Data['UserID'];

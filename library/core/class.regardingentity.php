@@ -238,6 +238,17 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          $this->UserID = Gdn::Session()->UserID;
 
       $RegardingModel = new RegardingModel();
+      
+      $CollapseMode = C('Garden.Regarding.AutoCollapse', TRUE);
+      $Collapse = FALSE;
+      if ($CollapseMode) {
+         // Check for an existing report of this type
+         $ExistingRegardingEntity = $RegardingModel->GetRelated($this->Type, $this->ForeignType, $this->ForeignID);
+         if ($ExistingRegardingEntity !== FALSE)
+            $Collapse = TRUE;
+      }
+      
+      // Create a new Regarding entry
       $RegardingID = $RegardingModel->Save(array(
          'Type'            => $this->Type,
          'ForeignType'     => $this->ForeignType,
@@ -265,15 +276,32 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                $CategoryID = GetValue('Parameters', $Action);
                $DiscussionModel = new DiscussionModel();
                
-               $DiscussionID = $DiscussionModel->Save(array(
-                  'Name'         => $this->CollaborativeTitle,
-                  'CategoryID'   => $CategoryID,
-                  'Body'         => $this->OriginalContent,
-                  'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
-                  'Announce'     => 0,
-                  'Close'        => 0,
-                  'RegardingID'  => $RegardingID
-               ));
+               if (!$Collapse) {
+                  // Make a new discussion
+                  $DiscussionID = $DiscussionModel->Save(array(
+                     'Name'         => $this->CollaborativeTitle,
+                     'CategoryID'   => $CategoryID,
+                     'Body'         => $this->OriginalContent,
+                     'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
+                     'Announce'     => 0,
+                     'Close'        => 0,
+                     'RegardingID'  => $RegardingID
+                  ));
+               } else {
+                  // Add a comment to the existing discussion
+                  
+                  // First, find out which discussion it was, based on RegardingID
+                  $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
+                  if ($Discussion !== FALSE) {
+                     $CommentModel = new CommentModel();
+                     $CommentID = $CommentModel->Save(array(
+                        'DiscussionID' => GetValue('DiscussionID', $Discussion),
+                        'Body'         => T("> Duplicate report"),
+                        'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
+                        'RegardingID'  => $RegardingID
+                     ));
+                  }
+               }
                
                break;
 

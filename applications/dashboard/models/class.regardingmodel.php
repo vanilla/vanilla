@@ -29,6 +29,14 @@ class RegardingModel extends Gdn_Model {
       ))->FirstRow(DATASET_TYPE_ARRAY);
    }
    
+   public function GetRelated($Type, $ForeignType, $ForeignID) {
+      return $this->GetWhere(array(
+         'Type'         => $Type,
+         'ForeignType'  => $ForeignType,
+         'ForeignID'    => $ForeignID
+      ))->FirstRow(DATASET_TYPE_ARRAY);
+   }
+   
    public function GetAll($ForeignType, $ForeignIDs = array()) {
       return Gdn::SQL()->Select('*')
          ->From('Regarding')

@@ -41,7 +41,7 @@ $Construct
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('CountMessages', 'int')
    ->Column('LastMessageID', 'int')
-   ->Column('RegardingID', 'int(11)', TRUE)
+   ->Column('RegardingID', 'int(11)', TRUE, 'index')
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are

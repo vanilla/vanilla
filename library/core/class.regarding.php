@@ -196,7 +196,6 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
    public function DiscussionController_BeforeCommentBody_Handler($Sender) {
       $Context = strtolower($Sender->EventArguments['Type']);
-      if ($Context != 'discussion') return;
 
       $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], NULL);
       if (is_null($RegardingID) || $RegardingID < 0) return;

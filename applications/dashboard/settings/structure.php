@@ -410,6 +410,7 @@ $Construct->Table('Log')
    ->Column('DateInserted', 'datetime') // date item added to log
    ->Column('ParentRecordID', 'int', NULL, 'index')
    ->Column('Data', 'text', NULL) // the data from the record.
+   ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Regarding')
@@ -424,7 +425,6 @@ $Construct->Table('Regarding')
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)
    ->Column('Comment', 'text', FALSE)
-   ->Engine('InnoDB')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

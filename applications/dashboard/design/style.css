@@ -2269,6 +2269,9 @@ body.Post #Content {
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
 }
+div.CommentForm .Buttons {
+   text-align: right;
+}
 div.CommentForm a.Back,
 div.CommentForm a.Cancel {
    float: left;
@@ -2705,8 +2708,6 @@ div.Entry {
 }
 div.Methods {
 	text-align: left;
-	font-size: 14px;
-	font-weight: bold;
 	position: absolute;
 	top: 33px;
 	bottom: 0;

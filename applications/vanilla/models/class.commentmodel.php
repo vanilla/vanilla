@@ -344,6 +344,7 @@ class CommentModel extends VanillaModel {
     * @return object SQL result.
 	 */
    public function GetIDData($CommentID) {
+      $this->FireEvent('BeforeGetIDData');
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
       return $this->SQL
          ->Where('c.CommentID', $CommentID)

@@ -14,7 +14,8 @@ class UserMetaModel extends Gdn_Model {
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
-      parent::__construct('UserMeta');
+      // We don't need this yet
+      //parent::__construct('UserMeta');
    }
    
    /**

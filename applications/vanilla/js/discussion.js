@@ -158,8 +158,8 @@ jQuery(document).ready(function($) {
                $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');
                $(btn).parents('li').addClass('Active');
-               $(frm).find('textarea').after(json.Data);
-               $(frm).find('textarea').hide();
+               $(frm).find('#Form_Body').after(json.Data);
+               $(frm).find('#Form_Body').hide();
                
             } else if (!draft) {
                // Clean up the form
@@ -236,7 +236,7 @@ jQuery(document).ready(function($) {
          
       draftInp.val('');
       frm.find('div.Errors').remove();
-      $('div.Information').fadeOut('fast', function() { $(this).remove(); });
+      $('div.Information').fadeOut('fast', function() {$(this).remove();});
       $(frm).trigger('clearCommentForm');
    }
    
@@ -244,13 +244,13 @@ jQuery(document).ready(function($) {
    if ($.morepager)
       $('.MorePager').morepager({
          pageContainerSelector: 'ul.Discussion',
-         afterPageLoaded: function() { $(document).trigger('CommentPagingComplete'); }
+         afterPageLoaded: function() {$(document).trigger('CommentPagingComplete');}
       });
       
    // Autosave comments
    $('a.DraftButton').livequery(function() {
       var btn = this;
-      $('div.CommentForm textarea').autosave({ button: btn });
+      $('div.CommentForm textarea').autosave({button: btn});
    });
 
 
@@ -310,7 +310,7 @@ jQuery(document).ready(function($) {
             $.popup({}, json.ErrorMessage);
          } else {
             // Remove the affected row
-            $(row).slideUp('fast', function() { $(this).remove(); });
+            $(row).slideUp('fast', function() {$(this).remove();});
          }
       }
    });
@@ -368,15 +368,15 @@ jQuery(document).ready(function($) {
       var discussionID = gdn.definition('DiscussionID');
       checkIDs.each(function() {
          item = $(this);
-         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+         aCheckIDs[aCheckIDs.length] = {'checkId' : item.val() , 'checked' : item.attr('checked')};
       });
       $.ajax({
          type: "POST",
          url: gdn.url('/moderation/checkedcomments'),
-         data: { 'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey') },
+         data: {'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey')},
          dataType: "json",
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            gdn.informMessage(XMLHttpRequest.responseText, { 'CssClass' : 'Dismissable' });
+            gdn.informMessage(XMLHttpRequest.responseText, {'CssClass' : 'Dismissable'});
          },
          success: function(json) {
             gdn.inform(json);

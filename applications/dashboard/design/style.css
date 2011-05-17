@@ -497,6 +497,7 @@ body #Head h1 {
    font-size: 9px;
    line-height: 12px;
    font-weight: normal;
+	text-shadow: none;
 }
 
 /* Option (dropdown) Menus
@@ -1088,6 +1089,7 @@ ul.DataList a.Title {
    font-weight: bold;
 }
 ul.DataList div.Title {
+   font-size: 14px;
    display: block;
    margin: 0;
 }

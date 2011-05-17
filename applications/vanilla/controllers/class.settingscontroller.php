@@ -49,7 +49,6 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
-         'Vanilla.Categories.Use',
          'Vanilla.Archive.Date',
 			'Vanilla.Archive.Exclude',
 			'Garden.EditContentTimeout'
@@ -160,18 +159,18 @@ class SettingsController extends Gdn_Controller {
    }
    
    /**
-    * Display spam management options.
+    * Display flood control options.
     * 
     * @since 2.0.0
     * @access public
     */
-   public function Spam() {
+   public function FloodControl() {
       // Check permission
       $this->Permission('Vanilla.Spam.Manage');
       
       // Display options
       $this->Title(T('Spam'));
-      $this->AddSideMenu('vanilla/settings/spam');
+      $this->AddSideMenu('vanilla/settings/floodcontrol');
       
       // Load up config options we'll be setting
       $Validation = new Gdn_Validation();

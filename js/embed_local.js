@@ -1,4 +1,5 @@
-$(function() {
+jQuery(document).ready(function($) {
+   
    if (typeof(gdn) == "undefined") {
       gdn = {};
       gdn.definition = function() {
@@ -14,6 +15,7 @@ $(function() {
       embedDashboard = gdn.definition('EmbedDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
+      pagePath = gdn.definition('Path', ''),
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
       
@@ -102,10 +104,17 @@ $(function() {
     
       $('a').live('click', function() {
          var href = $(this).attr('href'),
-            isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
+            isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
+            isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
+            noTop = $(this).hasClass('SignOut');
                 
          if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
+         } else if (isEmbeddedComments) {
+            // Target the top of the page if clicking an anchor in a list of embedded comments
+            if (!noTop)
+               $(this).attr('target', '_top');
+               
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);

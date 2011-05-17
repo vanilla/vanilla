@@ -156,6 +156,17 @@ code {
 	-moz-box-shadow: 0px 0px 1px #999;
 	-webkit-box-shadow: 0px 0px 1px #999;  
 }
+pre {
+	background: #F0F0F0;
+	border: 1px solid #C0C0C0;
+	color: #333;
+	font-family: 'Inconsolata',Courier,monospace;
+	font-size: 0.8em;
+	line-height: 1.5em;
+	margin: 2em 0;
+	overflow: auto;
+	padding: 0.5em;
+}
 h1, h2 {
    font-size:140%;
    font-weight:bold;
@@ -189,7 +200,7 @@ a:hover {
 input.DateBox,
 input.InputBox,
 input.SmallInput,
-textarea {
+textarea.TextBox {
    font-family: arial;
    color: #444;
    font-size: 16px;
@@ -211,6 +222,10 @@ textarea.TextBox {
 #Popup textarea.TextBox {
    width: 465px;
 }
+.TextBoxWrapper {
+	width: auto;
+	padding-right: 8px;
+}
 input.SmallInput,
 input.InputBox {
    font-size: 15px;
@@ -218,12 +233,12 @@ input.InputBox {
 }
 input.SmallInput:focus,
 input.InputBox:focus,
-textarea:focus {
+textarea.TextBox:focus {
    background: #ffd;
 	color: #333;
 	border: 1px solid #aaa;
 }
-textarea {
+textarea.TextBox {
    line-height: 128%;
 }
 select {
@@ -2090,3 +2105,68 @@ span.InformSprite.Sock { background-position: -298px -586px; }
 span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
+
+/* Welcome Screen */
+.Welcome {
+	position: relative;
+	min-height: 165px;
+	background: #00346d;
+	background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
+	background:-moz-linear-gradient(top, #00346d, #014a8a);
+	-pie-background:linear-gradient(top, #00346d, #014a8a);
+	background:linear-gradient(top, #00346d, #014a8a);
+	padding: 20px 400px 20px 20px;
+	color: #fff;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+.Welcome strong {
+	color: #d4e9ff;
+}
+.Welcome h2 {
+	overflow: hidden;
+	text-indent: -400px;
+	height: 42px;
+	width: 341px;
+	background: url('images/welcome-message.png') top left no-repeat transparent;
+}
+.Welcome a {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+.Step {
+	background: #efefef;
+	border: 1px solid #dfdfdf;
+	margin: 20px 0 0;
+	padding: 16px 20px 20px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+.Step textarea,
+.Step .RecipientBox {
+   font-family: arial;
+   color: #666;
+   font-size: 14px;
+	width: 100%;
+	padding: 3px;
+	margin-bottom: 10px;
+}
+.Step textarea:focus,
+.Step .RecipientBox:focus {
+	color: #222;
+}
+.Step textarea {
+	height: 85px;
+}
+.Step .RecipientBox {
+	padding: 3px 1px;
+}
+.Step h2 {
+	font-size: 14px;
+}
+#Content form .Step input.Button {
+   margin: 0;
+}

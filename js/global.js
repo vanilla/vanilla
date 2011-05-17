@@ -69,8 +69,10 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
-   if ($.fn.popup)
+   if ($.fn.popup) {
       $('a.Popup').popup();
+		$('a.PopConfirm').popup({ 'confirm' : true, 'followConfirm' : true});
+   }
 
    $(".PopupWindow").live('click', function() {
       var $this = $(this);

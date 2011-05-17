@@ -590,6 +590,7 @@ class EntryController extends Gdn_Controller {
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
       $this->AddJsFile('entry.js');
       $this->SetData('Title', T('Sign In'));
+		$this->Form->AddHidden('Target', $this->Target());
 
       // Additional signin methods are set up with plugins.
       $Methods = array();
@@ -1355,8 +1356,8 @@ class EntryController extends Gdn_Controller {
     * @return string URL.
     */
    public function RedirectTo() {
-      $IncomingTarget = $this->Target($this->Form->GetValue('Target', ''));
-      return $IncomingTarget == '' ? Gdn::Router()->GetDestination('DefaultController') : $IncomingTarget;
+      $Target = $this->Target();
+		return $Target == '' ? Gdn::Router()->GetDestination('DefaultController') : $Target;
    }
       
    /**

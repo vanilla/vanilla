@@ -1141,6 +1141,11 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta a {
    color: #2b2d33;
 }
+
+ul.DataList div.Meta .Tag a {
+   color: #ffffff;
+}
+
 ul.DataList a.Delete,
 ul.DataList a.Delete:hover {
    border-radius: 0;
@@ -2124,6 +2129,10 @@ ul.DataList li.Mine div.Meta a.Category {
    color: #FFFFFF;
    font-weight: bold;
    padding: 1px 4px;
+}
+
+.Tag a {
+   color: #FFFFFF;
 }
 
 ul.DataList div.Meta span.Announcement {

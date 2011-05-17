@@ -140,7 +140,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       $this->CollaborativeTitle = $CollaborativeTitle;
       
       // Figure out how much space we have for the title
-      $MaxLength = 100;
+      $MaxLength = 90;
       $Stripped = FormatString($CollaborativeTitle,array(
          'RegardingTitle'     => ''
       ));
@@ -238,53 +238,84 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          $this->UserID = Gdn::Session()->UserID;
 
       $RegardingModel = new RegardingModel();
-      $RegardingID = $RegardingModel->Save(array(
-         'Type'            => $this->Type,
-         'ForeignType'     => $this->ForeignType,
-         'ForeignID'       => $this->ForeignID,
-         'InsertUserID'    => $this->UserID,
-         'DateInserted'    => date('Y-m-d H:i:s'),
+      
+      $CollapseMode = C('Garden.Regarding.AutoCollapse', TRUE);
+      $Collapse = FALSE;
+      if ($CollapseMode) {
+         // Check for an existing report of this type
+         $ExistingRegardingEntity = $RegardingModel->GetRelated($this->Type, $this->ForeignType, $this->ForeignID);
+         if ($ExistingRegardingEntity !== FALSE)
+            $Collapse = TRUE;
+      }
+      
+      if (!$Collapse) {
+         // Create a new Regarding entry
+         $RegardingID = $RegardingModel->Save(array(
+            'Type'            => $this->Type,
+            'ForeignType'     => $this->ForeignType,
+            'ForeignID'       => $this->ForeignID,
+            'InsertUserID'    => $this->UserID,
+            'DateInserted'    => date('Y-m-d H:i:s'),
 
-         'ParentType'      => $this->ParentType,
-         'ParentID'        => $this->ParentID,
-         'ForeignURL'      => $this->ForeignURL,
-         'Comment'         => $this->Comment,
-         'OriginalContent' => $this->OriginalContent
-      ));
+            'ParentType'      => $this->ParentType,
+            'ParentID'        => $this->ParentID,
+            'ForeignURL'      => $this->ForeignURL,
+            'Comment'         => $this->Comment,
+            'OriginalContent' => $this->OriginalContent
+         ));
+      }
       
       // Handle collaborations
       
       // Don't error on foreach
       if (!is_array($this->CollaborativeActions))
          $this->CollaborativeActions = array();
-         
+      
       foreach ($this->CollaborativeActions as $Action) {
          $ActionType = GetValue('Type', $Action);
          switch ($ActionType) {
             case 'discussion':
-               $CategoryID = GetValue('Parameters', $Action);
                $DiscussionModel = new DiscussionModel();
                
-               $DiscussionID = $DiscussionModel->Save(array(
-                  'Name'         => $this->CollaborativeTitle,
-                  'CategoryID'   => $CategoryID,
-                  'Body'         => $this->OriginalContent,
-                  'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
-                  'Announce'     => 0,
-                  'Close'        => 0,
-                  'RegardingID'  => $RegardingID
-               ));
+               if (!$Collapse) {
+                  $CategoryID = GetValue('Parameters', $Action);
+               
+                  // Make a new discussion
+                  $DiscussionID = $DiscussionModel->Save(array(
+                     'Name'         => $this->CollaborativeTitle,
+                     'CategoryID'   => $CategoryID,
+                     'Body'         => $this->OriginalContent,
+                     'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
+                     'Announce'     => 0,
+                     'Close'        => 0,
+                     'RegardingID'  => $RegardingID
+                  ));
+               } else {
+                  // Add a comment to the existing discussion
+                  
+                  // First, find out which discussion it was, based on RegardingID
+                  $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
+                  if ($Discussion !== FALSE) {
+                     $CommentModel = new CommentModel();
+                     $CommentID = $CommentModel->Save(array(
+                        'DiscussionID' => GetValue('DiscussionID', $Discussion),
+                        'Body'         => $this->Comment,
+                        'InsertUserID' => $this->UserID
+                     ));
+                  }
+               }
                
                break;
 
             case 'conversation':
+                  
+               $ConversationModel = new ConversationModel();
+               $ConversationMessageModel = new ConversationMessageModel();
+               
                $Users = GetValue('Parameters', $Action);
                $UserList = explode(',', $Users);
                if (!sizeof($UserList))
                   throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
-                  
-               $ConversationModel = new ConversationModel();
-               $ConversationMessageModel = new ConversationMessageModel();
                
                $ConversationID = $ConversationModel->Save(array(
                   'To'              => 'Admins',

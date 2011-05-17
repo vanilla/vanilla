@@ -679,7 +679,9 @@ class EntryController extends Gdn_Controller {
       );
 
       if (method_exists($Authenticator, 'GetRolesFromHandshake')) {
-         $UserInfo['Roles'] = $Authenticator->GetRolesFromHandshake($Payload);
+         $RemoteRoles = $Authenticator->GetRolesFromHandshake($Payload);
+         if (!empty($RemoteRoles))
+            $UserInfo['Roles'] = $RemoteRoles;
       }
       
       // Manual user sync is disabled. No hand holding will occur for users.
@@ -697,7 +699,7 @@ class EntryController extends Gdn_Controller {
             $UserID = $this->UserModel->Synchronize($UserInfo['UserKey'], array(
                'Name'   => $UserInfo['UserName'],
                'Email'  => $UserInfo['UserEmail'],
-               'Roles'  => GetValue('Roles', $Usernfo)
+               'Roles'  => GetValue('Roles', $UserInfo)
             ));
             
             if ($UserID > 0) {

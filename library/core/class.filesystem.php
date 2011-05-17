@@ -374,6 +374,9 @@ class Gdn_FileSystem {
     * @return void
     */
    public static function RemoveFolder($Path) {
+      if (!file_exists($Path))
+         return;
+
       if (is_file($Path)) {
          unlink($Path);
          return;

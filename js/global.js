@@ -1,7 +1,6 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
-   
    // Set the ClientHour if there is an input looking for it.
    $('input:hidden[name$=ClientHour]').livequery(function() {
       var d = new Date();
@@ -396,6 +395,11 @@ jQuery(document).ready(function($) {
 			})
 		}
 	});
+
+   // Jump to the hash if desired.
+   if (gdn.definition('LocationHash', 0) && window.location.hash == '') {
+      window.location.hash = gdn.definition('LocationHash');
+   }
    
    gdn.stats = function() {
       // Call directly back to the deployment and invoke the stats handler

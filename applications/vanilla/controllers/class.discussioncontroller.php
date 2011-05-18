@@ -91,6 +91,9 @@ class DiscussionController extends VanillaController {
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
+         if ($this->Discussion->CountCommentWatch > 0 && $OffsetProvided == '')
+            $this->AddDefinition('LocationHash', '#Item_'.$this->Discussion->CountCommentWatch);
+
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;

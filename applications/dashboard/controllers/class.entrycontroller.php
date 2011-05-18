@@ -929,7 +929,7 @@ class EntryController extends Gdn_Controller {
     */
    protected function _RegistrationView() {
       $RegistrationMethod = Gdn::Config('Garden.Registration.Method');
-      if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation')))
+      if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation','Connect')))
          $RegistrationMethod = 'Basic';
          
       return 'Register'.$RegistrationMethod;
@@ -1031,6 +1031,10 @@ class EntryController extends Gdn_Controller {
          }
       }
       $this->Render();
+   }
+
+   private function RegisterConnect() {
+      throw NotFoundException();
    }
    
    /**

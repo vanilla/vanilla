@@ -207,8 +207,8 @@ a.Button,
 }
 a.Button {
    display: inline-block;
-   padding: 0.35em 4px;
-   line-height: 1em;
+   padding: 4px;
+   line-height: 100%;
    margin: 3px auto;
 }
 

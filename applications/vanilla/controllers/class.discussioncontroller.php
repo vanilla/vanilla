@@ -389,7 +389,12 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
+
+            $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+
+            $Announce = GetValue('Announce', $Discussion);
+            $this->DiscussionModel->SQL->Cache($CacheKeys);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', !$Announce);
          } else {
             $this->Form->AddError('ErrPermission');
          }

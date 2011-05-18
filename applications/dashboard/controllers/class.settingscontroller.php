@@ -919,8 +919,9 @@ class SettingsController extends DashboardController {
       Redirect('/settings/banner');
    }
    
-   public function Welcome() {
-      $this->AddSideMenu('dashboard/settings/welcome');
+   public function GettingStarted() {
+      $this->SetData('Title', T('Getting Started'));
+      $this->AddSideMenu('dashboard/settings/gettingstarted');
       $this->TextEnterEmails = T('Type email addresses separated by commas here...');
       
       if ($this->Form->AuthenticatedPostBack()) {

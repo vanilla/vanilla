@@ -8,7 +8,7 @@ window.vanilla.embed = function(host) {
    var scripts = document.getElementsByTagName('script'),
       id = Math.floor((Math.random()) * 100000).toString(),
       embedUrl = window.location.href.split('#')[0],
-      jsPath = '/plugins/embedvanilla/remote.js',
+      jsPath = '/js/embed.js',
       currentPath = window.location.hash.substr(1),
       disablePath = currentPath && currentPath[0] != "/";
       disablePath |= (window != top);
@@ -138,19 +138,19 @@ window.vanilla.embed = function(host) {
       // Are we loading a particular discussion based on discussion_id?
       var discussion_id = typeof(vanilla_discussion_id) == 'undefined' ? 0 : vanilla_discussion_id;
       // Are we loading a particular discussion based on foreign_id?
-      var foreign_id = typeof(vanilla_foreign_id) == 'undefined' ? '' : vanilla_foreign_id;
+      var foreign_id = typeof(vanilla_identifier) == 'undefined' ? '' : vanilla_identifier;
       // Is there a foreign type defined? Possibly used to render the discussion
       // body a certain way in the forum? Also used to filter down to foreign
       // types so that matching foreign_id's across type don't clash.
-      var foreign_type = typeof(vanilla_foreign_type) == 'undefined' ? '' : vanilla_foreign_type;
+      var foreign_type = typeof(vanilla_type) == 'undefined' ? '' : vanilla_type;
       // If embedding comments, should the newly created discussion be placed in a specific category?
       var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
       // If embedding comments, this value will be used as the newly created discussion title.
-      var foreign_name = typeof(vanilla_foreign_name) == 'undefined' ? '' : vanilla_foreign_name;
+      var foreign_name = typeof(vanilla_name) == 'undefined' ? '' : vanilla_name;
       // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
-      var foreign_url = typeof(vanilla_foreign_url) == 'undefined' ? document.URL : vanilla_foreign_url;
+      var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
       // If embedding comments, this value will be used as the first comment body related to the discussion.
-      var foreign_body = typeof(vanilla_foreign_body) == 'undefined' ? '' : vanilla_foreign_body;
+      var foreign_body = typeof(vanilla_body) == 'undefined' ? '' : vanilla_body;
       
       // Force type based on incoming variables
       if (discussion_id != '' || foreign_id != '')
@@ -158,23 +158,42 @@ window.vanilla.embed = function(host) {
          
       if (embed_type == 'comments') {
          return 'http://' + host + '/vanilla/discussion/embed/'
-            +'?DiscussionID='+encodeURIComponent(discussion_id)
-            +'&ForeignID='+encodeURIComponent(foreign_id)
-            +'&ForeignType='+encodeURIComponent(foreign_type)
-            +'&ForeignName='+encodeURIComponent(foreign_name)
-            +'&ForeignUrl='+encodeURIComponent(foreign_url)
-            +'&ForeignBody='+encodeURIComponent(foreign_body)
-            +'&CategoryID='+encodeURIComponent(category_id);
+            +'?vanilla_discussion_id='+encodeURIComponent(discussion_id)
+            +'&vanilla_identifier='+encodeURIComponent(foreign_id)
+            +'&vanilla_type='+encodeURIComponent(foreign_type)
+            +'&vanilla_name='+encodeURIComponent(foreign_name)
+            +'&vanilla_url='+encodeURIComponent(foreign_url)
+            +'&vanilla_body='+encodeURIComponent(foreign_body)
+            +'&vanilla_category_id='+encodeURIComponent(category_id);
       } else 
          return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
    }
-
-   document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'" scrolling="no" frameborder="0" border="0" width="100%" height="1000" style="width: 100%; height: 1000px; border: 0; display: block;"></iframe>');
+   var vanillaIframe = document.createElement('iframe');
+   vanillaIframe.id = "vanilla"+id;
+   vanillaIframe.name = "vanilla"+id;
+   vanillaIframe.src = vanillaUrl(currentPath);
+   vanillaIframe.scrolling = "no";
+   vanillaIframe.frameborder = "0";
+   vanillaIframe.border = "0";
+   vanillaIframe.width = "100%";
+   vanillaIframe.height = "1000";
+   vanillaIframe.style.width = "100%";
+   vanillaIframe.style.height = "1000px";
+   vanillaIframe.style.border = "0";
+   vanillaIframe.style.display = "block";
+   (document.getElementById('vanilla-embed')).appendChild(vanillaIframe);
    return this;
 };
 try {
    if (window.location.hash.substr(0, 6) != "#poll:")
       window.vanilla.embed();
 } catch(e) {
-   document.write("<div style=\"padding: 10px; font-size: 12px; font-family: 'lucida grande'; background: #fff; color:#000;\">Failed to embed Vanilla: " + e + "</div>");
+   var error = document.createElement('div');
+   error.style.padding = "10px";
+   error.style.fontSize = "12px";
+   error.style.fontFamily = "lucida grande";
+   error.style.background = "#ffffff";
+   error.style.color = "#000000";
+   error.appendChild(document.createTextNode("Failed to embed Vanilla: " + e));
+   (document.getElementById('vanilla-embed')).appendChild(error);
 }

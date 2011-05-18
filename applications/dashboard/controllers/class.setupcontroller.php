@@ -71,7 +71,7 @@ class SetupController extends DashboardController {
                SaveToConfig($Config);
                
                // Go to the dashboard
-               Redirect('/settings');
+               Redirect('/settings/gettingstarted');
             }
          }
       }

@@ -138,7 +138,6 @@ $Construct->Table('Comment')
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
-   ->Column('RegardingID', 'int(11)', TRUE, 'index')
 	->Engine('MyISAM')
 	->Set($Explicit, $Drop);
 

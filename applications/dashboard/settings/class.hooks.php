@@ -77,10 +77,13 @@ class DashboardHooks implements Gdn_IPlugin {
 				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
 		}
 		
-		// Add notifications to the inform stack on page load if not retrieving them via ajax at dashboard/notifications/inform
-		// mosullivan 2011-03-08 - Ajaxing these instead of on pageload (fewer queries per page)
-		// if (!($Sender->ControllerName == 'notificationscontroller' && $Sender->RequestMethod == 'inform'))
-		//	NotificationsController::InformNotifications($Sender);
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $Gdn_Statistics = Gdn::Factory('Statistics');
+         $Gdn_Statistics->Check($Sender);
+      }
+		
+		// Allow forum embedding
+		$Sender->AddJsFile('js/embed_local.js');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -96,6 +99,9 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
+		// May 18, 2011 - Not quite ready for prime time - mosullivan
+		// $Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
+		
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -129,6 +135,5 @@ class DashboardHooks implements Gdn_IPlugin {
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
-		
    }
 }

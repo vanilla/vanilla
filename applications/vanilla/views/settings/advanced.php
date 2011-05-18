@@ -48,11 +48,6 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('Vanilla.Categories.Use', 'Use categories to organize discussions');
-      ?>
-   </li>
-   <li>
-      <?php
          echo $this->Form->Label('Archive Discussions', 'Vanilla.Archive.Date');
 			echo '<div class="Info">',
 				T('Vanilla.Archive.Description', 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.'),

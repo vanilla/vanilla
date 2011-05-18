@@ -248,20 +248,22 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             $Collapse = TRUE;
       }
       
-      // Create a new Regarding entry
-      $RegardingID = $RegardingModel->Save(array(
-         'Type'            => $this->Type,
-         'ForeignType'     => $this->ForeignType,
-         'ForeignID'       => $this->ForeignID,
-         'InsertUserID'    => $this->UserID,
-         'DateInserted'    => date('Y-m-d H:i:s'),
+      if (!$Collapse) {
+         // Create a new Regarding entry
+         $RegardingID = $RegardingModel->Save(array(
+            'Type'            => $this->Type,
+            'ForeignType'     => $this->ForeignType,
+            'ForeignID'       => $this->ForeignID,
+            'InsertUserID'    => $this->UserID,
+            'DateInserted'    => date('Y-m-d H:i:s'),
 
-         'ParentType'      => $this->ParentType,
-         'ParentID'        => $this->ParentID,
-         'ForeignURL'      => $this->ForeignURL,
-         'Comment'         => $this->Comment,
-         'OriginalContent' => $this->OriginalContent
-      ));
+            'ParentType'      => $this->ParentType,
+            'ParentID'        => $this->ParentID,
+            'ForeignURL'      => $this->ForeignURL,
+            'Comment'         => $this->Comment,
+            'OriginalContent' => $this->OriginalContent
+         ));
+      }
       
       // Handle collaborations
       
@@ -273,10 +275,11 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          $ActionType = GetValue('Type', $Action);
          switch ($ActionType) {
             case 'discussion':
-               $CategoryID = GetValue('Parameters', $Action);
                $DiscussionModel = new DiscussionModel();
                
                if (!$Collapse) {
+                  $CategoryID = GetValue('Parameters', $Action);
+               
                   // Make a new discussion
                   $DiscussionID = $DiscussionModel->Save(array(
                      'Name'         => $this->CollaborativeTitle,
@@ -296,9 +299,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      $CommentModel = new CommentModel();
                      $CommentID = $CommentModel->Save(array(
                         'DiscussionID' => GetValue('DiscussionID', $Discussion),
-                        'Body'         => T("> Duplicate report"),
-                        'InsertUserID' => GetValue('InsertUserID', $this->SourceElement),
-                        'RegardingID'  => $RegardingID
+                        'Body'         => $this->Comment,
+                        'InsertUserID' => $this->UserID
                      ));
                   }
                }
@@ -306,13 +308,14 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                break;
 
             case 'conversation':
+                  
+               $ConversationModel = new ConversationModel();
+               $ConversationMessageModel = new ConversationMessageModel();
+               
                $Users = GetValue('Parameters', $Action);
                $UserList = explode(',', $Users);
                if (!sizeof($UserList))
                   throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
-                  
-               $ConversationModel = new ConversationModel();
-               $ConversationMessageModel = new ConversationMessageModel();
                
                $ConversationID = $ConversationModel->Save(array(
                   'To'              => 'Admins',

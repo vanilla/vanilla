@@ -920,4 +920,50 @@ class SettingsController extends DashboardController {
       Redirect('/settings/banner');
    }
    
+   public function GettingStarted() {
+      $this->SetData('Title', T('Getting Started'));
+      $this->AddSideMenu('dashboard/settings/gettingstarted');
+      $this->TextEnterEmails = T('Type email addresses separated by commas here...');
+      
+      if ($this->Form->AuthenticatedPostBack()) {
+         $Message = $this->Form->GetFormValue('InvitationMessage');
+         $Message .= "\n\n".Gdn::Request()->Url('/', TRUE);
+         $Message = trim($Message);
+         $Recipients = $this->Form->GetFormValue('Recipients');
+         if ($Recipients == $this->TextEnterEmails)
+            $Recipients = '';
+            
+         $Recipients = explode(',', $Recipients);
+         $CountRecipients = 0;
+         foreach ($Recipients as $Recipient) {
+            if (trim($Recipient) != '') {
+               $CountRecipients++;
+               if (!ValidateEmail($Recipient))
+                  $this->Form->AddError(sprintf(T('%s is not a valid email address'), $Recipient));
+            }
+         }
+         if ($CountRecipients == 0)
+            $this->Form->AddError(T('You must provide at least one recipient'));
+         if ($this->Form->ErrorCount() == 0) {
+            $Email = new Gdn_Email();
+            $Email->Subject(T('Check out my new community!'));
+            $Email->Message($Message);
+            foreach ($Recipients as $Recipient) {
+               if (trim($Recipient) != '') {
+                  $Email->To($Recipient);
+                  try {
+                     $Email->Send();
+                  } catch (Exception $ex) {
+                     $this->Form->AddError($ex);
+                  }
+               }
+            }
+         }
+         if ($this->Form->ErrorCount() == 0)
+            $this->InformMessage(T('Your invitations were sent successfully.'));
+      }
+      
+      $this->Render();
+   }
+   
 }

@@ -616,15 +616,15 @@ class DiscussionController extends VanillaController {
       
       // Define incoming variables (prefer querystring parameters over method parameters)
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-      $DiscussionID = GetIncomingValue('DiscussionID', $DiscussionID);
+      $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
-      $ForeignID = GetIncomingValue('ForeignID', '');
-      $ForeignType = GetIncomingValue('ForeignType', '');
-      $ForeignName = GetIncomingValue('ForeignName', '');
-      $ForeignUrl = GetIncomingValue('ForeignUrl', '');
-      $ForeignBody = GetIncomingValue('ForeignBody', '');
-      $CategoryID = GetIncomingValue('CategoryID', '');
+      $ForeignID = GetIncomingValue('vanilla_identifier', '');
+      $ForeignType = GetIncomingValue('vanilla_type', '');
+      $ForeignName = GetIncomingValue('vanilla_name', '');
+      $ForeignUrl = GetIncomingValue('vanilla_url', '');
+      $ForeignBody = GetIncomingValue('vanilla_body', '');
+      $CategoryID = GetIncomingValue('vanilla_category_id', '');
       
       // Retrieve the discussion record.
       $Discussion = FALSE;

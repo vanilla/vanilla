@@ -386,7 +386,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail', FALSE));
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

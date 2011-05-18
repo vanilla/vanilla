@@ -66,6 +66,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
                echo '<strong>'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
 
+            $Sender->FireEvent('AfterCountMeta');
+
             if ($Discussion->LastCommentID != '') {
                echo '<span class="LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span>';
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';

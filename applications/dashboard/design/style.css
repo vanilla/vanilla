@@ -205,6 +205,12 @@ a.Button,
 	-webkit-box-shadow: 0px 0px 2px #999;
 	white-space: nowrap;
 }
+a.Button {
+   display: inline-block;
+   padding: 0.35em 4px;
+   line-height: 1em;
+   margin: 3px auto;
+}
 
 input.Button {
 	font-size: 14px;
@@ -2714,6 +2720,7 @@ div.Methods {
 	right: 0;
 	padding: 12px 20px 6px;
 	line-height: 1;
+   width: 170px;
 }
 body#dashboard_entry_password div.Methods,
 body#dashboard_entry_signin div.Methods,

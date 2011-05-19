@@ -24,6 +24,7 @@ class Gdn {
    const AliasSession = 'Session';
    const AliasSlice = 'Slice';
    const AliasSqlDriver = 'SqlDriver';
+   const AliasUserMetaModel = 'UserMetaModel';
    const AliasUserModel = 'UserModel';
 
    const AliasApplicationManager = 'ApplicationManager';
@@ -300,6 +301,54 @@ class Gdn {
    }
    
    /**
+    * Gets/Sets the Garden InstallationID
+    * 
+    * @staticvar string $InstallationID
+    * @param string $SetInstallationID
+    * @return string Installation ID or NULL
+    */
+   public static function InstallationID($SetInstallationID = NULL) {
+      static $InstallationID = FALSE;
+      if (!is_null($SetInstallationID)) {
+         if ($SetInstallationID !== FALSE) {
+            SaveToConfig ('Garden.InstallationID', $SetInstallationID);
+         } else {
+            RemoveFromConfig('Garden.InstallationID');
+         }
+         $InstallationID = $SetInstallationID;
+      }
+      
+      if ($InstallationID === FALSE)
+         $InstallationID = C('Garden.InstallationID', NULL);
+      
+      return $InstallationID;
+   }
+   
+   /**
+    * Gets/Sets the Garden Installation Secret
+    * 
+    * @staticvar string $InstallationSecret
+    * @param string $SetInstallationSecret
+    * @return string Installation Secret or NULL
+    */
+   public static function InstallationSecret($SetInstallationSecret = NULL) {
+      static $InstallationSecret = FALSE;
+      if (!is_null($SetInstallationSecret)) {
+         if ($SetInstallationSecret !== FALSE) {
+            SaveToConfig ('Garden.InstallationSecret', $SetInstallationSecret);
+         } else {
+            RemoveFromConfig('Garden.InstallationSecret');
+         }
+         $InstallationSecret = $SetInstallationSecret;
+      }
+      
+      if ($InstallationSecret === FALSE)
+         $InstallationSecret = C('Garden.InstallationSecret', NULL);
+      
+      return $InstallationSecret;
+   }
+   
+   /**
     * @return Gdn_Locale
     */
    public static function Locale() {
@@ -333,7 +382,7 @@ class Gdn {
    
    /**
     * Get or set the current request object.
-    * @param Gdn_Rewuest $NewRequest The new request or null to just get the request.
+    * @param Gdn_Request $NewRequest The new request or null to just get the request.
     * @return Gdn_Request
     */
    public static function Request($NewRequest = NULL) {
@@ -368,9 +417,28 @@ class Gdn {
       return self::$_Session;
    }
    
+   /**
+    * Get a reference to the Gdn_Slice
+    * 
+    * @param string $Slice Slice to execute
+    * @return Gdn_Slice
+    */
    public static function Slice($Slice) {
       $Result = self::Factory(self::AliasSlice);
       return $Result->Execute($Slice);
+   }
+   
+   public static function Set($Key, $Value = NULL) {
+      $Key = 'Garden.'.StringBeginsWith($Key, 'Garden.', TRUE, TRUE);
+      return Gdn::UserMetaModel()->SetUserMeta(0, $Key, $Value);
+   }
+   
+   public static function Get($Key, $Default = NULL) {
+      $Key = 'Garden.'.StringBeginsWith($Key, 'Garden.', TRUE, TRUE);
+      $Response = Gdn::UserMetaModel()->GetUserMeta(0, $Key, $Default);
+      if (sizeof($Response) == 1)
+         return GetValue($Key, $Response, NULL);
+      return $Default;
    }
    
    /**
@@ -385,6 +453,10 @@ class Gdn {
       return $Result;
    }
    
+   /**
+    * Get a reference to the Statistics object.
+    * @return Gdn_Statistics
+    */
    public static function Statistics() {
       return self::Factory('Statistics');
    }
@@ -426,6 +498,18 @@ class Gdn {
     */
    public static function UserModel() {
       return self::Factory(self::AliasUserModel);
+   }
+   
+   /**
+    * Get a reference to the user meta model.
+    * 
+    * @return UserMetaModel
+    */
+   public static function UserMetaModel() {
+      static $UserMetaModel = NULL;
+      if (is_null($UserMetaModel))
+         $UserMetaModel = new UserMetaModel();
+      return $UserMetaModel;
    }
    
    /**

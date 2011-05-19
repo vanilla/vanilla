@@ -11,9 +11,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class UserMetaModel extends Gdn_Model {
    
    /**
+    * Store in-memory copies of everything retrieved from and set to the DB.
+    * Reference this if available, instead of querying
+    * @TODO
+    * @var array
+    */
+   protected static $MemoryCache;
+   
+   /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
+      
+      self::$MemoryCache = array();
+      
       // We don't need this yet
       //parent::__construct('UserMeta');
    }
@@ -64,7 +75,8 @@ class UserMetaModel extends Gdn_Model {
                $UserMeta[$MetaRow->Name] = $MetaRow->Value;
          }
       else
-         return $Default;
+         self::$MemoryCache[$Key] = $Default;
+      
       unset($UserMetaData);
       return $UserMeta;
    }

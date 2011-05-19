@@ -112,8 +112,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     */
    protected function GetUserMeta($UserID, $Key, $Default = NULL) {
       $MetaKey = $this->MakeMetaKey($Key);
-      $UserMetaModel = new UserMetaModel();
-      return $UserMetaModel->GetUserMeta($UserID, $MetaKey, $Default);
+      return $this->UserMetaModel()->GetUserMeta($UserID, $MetaKey, $Default);
    }
    
    /**
@@ -135,8 +134,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     */
    protected function SetUserMeta($UserID, $Key, $Value = NULL) {
       $MetaKey = $this->MakeMetaKey($Key);
-      $UserMetaModel = new UserMetaModel();
-      $UserMetaModel->SetUserMeta($UserID, $MetaKey, $Value);
+      $this->UserMetaModel()->SetUserMeta($UserID, $MetaKey, $Value);
    }
    
    /**
@@ -250,5 +248,12 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          $PluginName = get_class($this);
          throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
       }
+   }
+   
+   public function UserMetaModel() {
+      static $UserMetaModel = NULL;
+      if (is_null($UserMetaModel))
+         $UserMetaModel = new UserMetaModel();
+      return $UserMetaModel;
    }
 }

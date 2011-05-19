@@ -76,7 +76,9 @@ class CommentModel extends VanillaModel {
     */
    public function Get($DiscussionID, $Limit, $Offset = 0) {
       $this->CommentQuery();
-      $this->EventArguments['DiscussionID'] = $DiscussionID;
+      $this->EventArguments['DiscussionID'] =& $DiscussionID;
+      $this->EventArguments['Limit'] =& $Limit;
+      $this->EventArguments['Offset'] =& $Offset;
       $this->FireEvent('BeforeGet');
       $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)

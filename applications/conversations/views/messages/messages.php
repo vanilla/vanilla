@@ -25,7 +25,7 @@ foreach ($this->MessageData->Result() as $Message) {
    $this->FireEvent('BeforeConversationMessageItem');
    $Class = trim($Class);
 ?>
-<li id="<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
+<li id="Message_<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
    <div class="ConversationMessage">
       <div class="Meta">
          <span class="Author">

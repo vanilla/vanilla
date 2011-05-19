@@ -243,8 +243,12 @@ class CommentModel extends VanillaModel {
             $CountWatch = $TotalComments;
             
          if (is_numeric($Discussion->CountCommentWatch)) {
-            // Update the watch data
-				if($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch) {
+            $NewComment = FALSE;
+            if (isset($Discussion->DateLastViewed))
+               $NewComment |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
+
+            // Update the watch data.
+				if ($NewComment || ($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch)) {
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',

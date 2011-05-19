@@ -216,7 +216,7 @@ class ConversationModel extends Gdn_Model {
 
       if (!GetValue('RecipientUserIDs', $FormPostValues) && isset($FormPostValues['To'])) {
             $To = explode(',', $FormPostValues['To']);
-            array_map('trim', $To);
+            $To = array_map('trim', $To);
 
             $RecipientUserIDs = $this->SQL
                ->Select('UserID')

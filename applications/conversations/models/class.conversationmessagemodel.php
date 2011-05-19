@@ -172,6 +172,7 @@ class ConversationMessageModel extends Gdn_Model {
          $Fields['Format'] = C('Conversations.Message.Format','Ham');
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
+         $this->LastMessageID = $MessageID;
          $ConversationID = ArrayValue('ConversationID', $Fields, 0);
          $Px = $this->SQL->Database->DatabasePrefix;
 

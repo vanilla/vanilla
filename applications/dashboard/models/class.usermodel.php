@@ -1803,6 +1803,10 @@ class UserModel extends Gdn_Model {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
+
+      if (!ValidateEmail($User->Email))
+         return;
+
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));

@@ -173,6 +173,9 @@ input.InputBox:focus,
 textarea:focus {
    background: #ffe;
 }
+input.BigInput {
+   width: 100%;
+}
 textarea {
    line-height: 128%;
 }

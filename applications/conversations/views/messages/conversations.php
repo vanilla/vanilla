@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $Alt = FALSE;
+$SubjectsVisible = C('Conversations.Subjects.Visible');
+
 foreach ($this->ConversationData->Result() as $Conversation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $LastAuthor = UserBuilder($Conversation, 'LastMessage');
@@ -43,7 +45,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
       if ($Names) {
          echo '<h3 class="Users">', Anchor(htmlspecialchars($Names), $Url), '</h3>';
       }
-      if ($Subject = GetValue('Subject', $Conversation)) {
+      if ($SubjectsVisible && $Subject = GetValue('Subject', $Conversation)) {
          echo '<div class="Subject"><b>'.Anchor(htmlspecialchars($Subject), $Url).'</b></div>';
       }
       ?>

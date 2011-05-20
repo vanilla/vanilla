@@ -645,7 +645,10 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
-         $Regex = "`(</?a)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         $Regex = "`((?:</?(?:a|img))|/\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+
+//         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
+//         var_dump($Parts);
 
          $Mixed = preg_replace_callback(
             $Regex,
@@ -656,7 +659,7 @@ class Gdn_Format {
       }
    }
    protected static function LinksCallback($Matches) {
-      static $Width, $Height, $InAnchor = FALSE;
+      static $Width, $Height, $InAnchor = FALSE, $InImg = FALSE;
       if (!isset($Width)) {
          list($Width, $Height) = Gdn_Format::GetEmbedSize();
       }
@@ -666,8 +669,14 @@ class Gdn_Format {
          $InAnchor = TRUE;
       elseif ($Tag == '</a')
          $InAnchor = FALSE;
+      elseif ($Tag == '<img')
+         $InImg = TRUE;
+      elseif ($Tag == '</img')
+         $InImg = FALSE;
+      elseif ($Tag == '/>' && $InImg)
+         $InImg = FALSE;
 
-      if (!isset($Matches[2]) || $InAnchor)
+      if (!isset($Matches[2]) || $InAnchor || $InImg)
          return $Matches[0];
 
       $Url = $Matches[2];

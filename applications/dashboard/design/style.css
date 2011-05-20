@@ -2365,36 +2365,6 @@ div.AddPeople form div {
 	text-align: right;
 }
 
-
-/* ============================================================ Conversations */
-fieldset {
-  padding: 0px !important;
-}
-h2.NewConversation {
-  float: right;
-}
-h2.NewConversation a {
-  font-weight: bold;
-}
-body.Conversations h2 {
-  margin: 0;
-}
-ul.Conversations li.Active {
-  cursor: pointer;
-  background: #ffe;
-}
-ul.Conversations li.Item {
-	padding: 4px 5px;
-}
-ul.Conversations div.ItemContent {
-   margin:0 0 0 5px;
-}
-ul.Conversations div.Meta a.Name {
-	color: #1E79A7;
-	font-weight: bold;
-}
-
-
 /* ========================================================= Add Message Form */
 #MessageForm {
 	background: #E9F9FF;

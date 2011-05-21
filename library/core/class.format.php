@@ -242,44 +242,49 @@ class Gdn_Format {
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-				try {
-					$Mixed2 = $Mixed;
-					//$Mixed2 = str_replace("\n", '<br />', $Mixed2);
+            try {
+               $Mixed2 = $Mixed;
+               //$Mixed2 = str_replace("\n", '<br />', $Mixed2);
 
+               $Mixed2 = preg_replace("#\[noparse\](.*?)\[/noparse\]#sie","str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1'))",$Mixed2);
+               $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
+               $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
+               $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#sie","'<div class=\"PreContainer\"><pre>'.str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1')).'</pre></div>'",$Mixed2);
                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
-               $Mixed2 = preg_replace("#\[quote=[\"']?(.*?)[\"']?\](.*?)\[/quote\]#si",'<p><cite>\\1</cite>:</p><blockquote>\\2</blockquote>',$Mixed2);
-               $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
-               $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote>\\1</blockquote>',$Mixed2);
-               $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#si",'<code>\\1</code>',$Mixed2);
+               $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si",'<s>\\1</s>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote=[\"']?(.*?)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si",'<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">\\1 said:</div><div class="QuoteText">\\3</div></blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote class="Quote">\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
-               $Mixed2 = preg_replace("#\[url\]([^/]*?)\[/url\]#si",'<a href="http://\\1">\\1</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si",'<a rel="nofollow" target="_blank" href="\\1">\\1</a>',$Mixed2);
                $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si",'\\1',$Mixed2);
-               $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si",'<a href="\\1">\\2</a>',$Mixed2);
-               $Mixed2 = preg_replace("#\[php\](.*?)\[/php\]#si",'<code>\\1</code>',$Mixed2);
-               $Mixed2 = preg_replace("#\[mysql\](.*?)\[/mysql\]#si",'<code>\\1</code>',$Mixed2);
-               $Mixed2 = preg_replace("#\[css\](.*?)\[/css\]#si",'<code>\\1</code>',$Mixed2);
-               $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si",'<img src="\\1" alt="\\2" />',$Mixed2);
-               $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed2);
-               $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
-
-               $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#i",'<span style="font-family:\\1;">',$Mixed2);
-               $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#i",'<span style="color:\\1">',$Mixed2);
-               $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</span>", $Mixed2);
-               
+               $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si",'<a rel="nofollow" target="_blank" href="\\1">\\3</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si",'\\2',$Mixed2);
+               $Mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si",'<img src="\\1" border="0" />',$Mixed2);
+               $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si",'\\1',$Mixed2);
+               $Mixed2 = preg_replace("#\[img=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/img\]#si",'<img src=\\1" border="0" alt="\\3" />',$Mixed2);
+               $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si",'\\2',$Mixed2);
+               $Mixed2 = preg_replace("#\[thread\]([\d]+)\[/thread\]#si",'<a href="/discussion/\\1">/discussion/\\1</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[thread=[\"']?([\d]+)[\"']?\](.*?)\[/thread\]#si",'<a href="/discussion/\\1">\\2</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[post\]([\d]+)\[/post\]#si",'<a href="/discussion/comment/\\1#Comment_\\1">/discussion/comment/\\1</a>',$Mixed2);
+               $Mixed2 = preg_replace("#\[post=[\"']?([\d]+)[\"']?\](.*?)\[/post\]#si",'<a href="/discussion/comment/\\1#Comment_\\1">\\2</a>',$Mixed2);
                $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si",'<font size="\\1">',$Mixed2);
-               $Mixed2 = str_ireplace('[/font]', '</font>', $Mixed2);
+               $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si",'<font face="\\1">',$Mixed2);
+               $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si",'<font color="\\1">',$Mixed2);
+               $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</font>", $Mixed2);
+               $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
+               $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
+               $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si",array('Gdn_Format', 'ListCallback'),$Mixed2);
 
-               $Mixed2 = preg_replace('#\[/?left\]#si', '', $Mixed2);
-               $Mixed2 = Gdn_Format::Mentions($Mixed2);
-					$Result = Gdn_Format::Html($Mixed2);
-					return $Result;
-				} catch(Exception $Ex) {
-					return self::Display($Mixed);
-				}
-         }         
+               $Result = Gdn_Format::Html($Mixed2);
+               return $Result;
+            } catch(Exception $Ex) {
+               return self::Display($Mixed);
+            }
+         }
       }
    }
 
@@ -704,6 +709,21 @@ EOT;
 <a href="$Url" target="_blank"$nofollow>$Url</a>$Punc
 EOT;
       }
+      return $Result;
+   }
+   
+   /** Formats BBCode list items.
+    *
+    * @param array $Matches
+    * @return string
+    */
+   protected static function ListCallback($Matches) {
+      $Content = explode("[*]", $Matches[1]);
+      $Result = '';
+      foreach ($Content as $Item) {
+         if (trim($Item) != '') $Result .= '<li>'.$Item.'</li>';
+      }
+      $Result = '<ul>'.$Result.'</ul>';
       return $Result;
    }
    

@@ -48,6 +48,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
    }
 	
 	public function PluginController_Embed_Create($Sender) {
+	  $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Embed Vanilla');
 		$Sender->AddCssFile($this->GetResource('design/settings.css', FALSE, FALSE));
       $Sender->AddSideMenu('plugin/embed');

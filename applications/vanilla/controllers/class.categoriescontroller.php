@@ -119,6 +119,7 @@ class CategoriesController extends VanillaController {
          
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
+      $this->SetData('_Limit', $Limit);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
       $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);

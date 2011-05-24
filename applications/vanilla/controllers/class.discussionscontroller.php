@@ -119,6 +119,7 @@ class DiscussionsController extends VanillaController {
       );
       $this->SetData('_PagerUrl', 'discussions/{Page}');
       $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');
       
       // Deliver JSON data if necessary

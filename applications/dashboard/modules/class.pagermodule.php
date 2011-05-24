@@ -311,7 +311,7 @@ class PagerModule extends Gdn_Module {
 		
       $Pager->ClientID = GetValue('ClientID', $Options, $Pager->ClientID);
 
-      $Pager->Limit = GetValue('Limit', $Options, $Pager->Limit);
+      $Pager->Limit = GetValue('Limit', $Options, $Pager->Controller()->Data('_Limit', $Pager->Limit));
       $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, GetValue('HtmlBefore', $Pager, ''));
 
       // Try and figure out the offset based on the parameters coming in to the controller.

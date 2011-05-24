@@ -30,6 +30,7 @@ $UpdateLastMessageID = $Construct->TableExists() && !$Construct->ColumnExists('L
 
 $Construct
    ->PrimaryKey('ConversationID')
+   ->Column('Subject', 'varchar(100)', NULL)
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')

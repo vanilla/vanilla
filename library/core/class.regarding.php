@@ -164,8 +164,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
       $CommentIDList = array();
       if ($Comments && $Comments instanceof Gdn_DataSet) {
          $Comments->DataSeek(-1);
-         while ($Comment = $Comments->NextRow())
+         while ($Comment = $Comments->NextRow()) {
+            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
+               continue;
             $CommentIDList[] = $Comment->CommentID;
+         }
       }
       $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
    }

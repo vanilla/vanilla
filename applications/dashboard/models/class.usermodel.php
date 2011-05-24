@@ -1091,8 +1091,9 @@ class UserModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
 
-      // Add & apply any extra validation rules:
-      $this->Validation->ApplyRule('Email', 'Email');
+      // Add & apply any extra validation rules.
+      if (GetValue('ValidateEmail', $Options, TRUE))
+         $this->Validation->ApplyRule('Email', 'Email');
 
       // TODO: DO I NEED THIS?!
       // Make sure that the checkbox val for email is saved as the appropriate enum
@@ -1802,6 +1803,10 @@ class UserModel extends Gdn_Model {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
+
+      if (!ValidateEmail($User->Email))
+         return;
+
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));

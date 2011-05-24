@@ -630,7 +630,8 @@ class SettingsController extends DashboardController {
          // 'Basic' => "The applicants are granted access immediately.",
          'Captcha' => "New users fill out a simple form and are granted access immediately.",
          'Approval' => "New users are reviewed and approved by an administrator (that's you!).",
-         'Invitation' => "Existing members send invitations to new members."
+         'Invitation' => "Existing members send invitations to new members.",
+         'Connect' => "New users are only registered through SSO plugins."
       );
 
       // Options for how many invitations a role can send out per month.
@@ -919,8 +920,9 @@ class SettingsController extends DashboardController {
       Redirect('/settings/banner');
    }
    
-   public function Welcome() {
-      $this->AddSideMenu('dashboard/settings/welcome');
+   public function GettingStarted() {
+      $this->SetData('Title', T('Getting Started'));
+      $this->AddSideMenu('dashboard/settings/gettingstarted');
       $this->TextEnterEmails = T('Type email addresses separated by commas here...');
       
       if ($this->Form->AuthenticatedPostBack()) {

@@ -76,6 +76,9 @@ class CommentModel extends VanillaModel {
     */
    public function Get($DiscussionID, $Limit, $Offset = 0) {
       $this->CommentQuery();
+      $this->EventArguments['DiscussionID'] =& $DiscussionID;
+      $this->EventArguments['Limit'] =& $Limit;
+      $this->EventArguments['Offset'] =& $Offset;
       $this->FireEvent('BeforeGet');
       $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
@@ -83,7 +86,11 @@ class CommentModel extends VanillaModel {
       
       $this->OrderBy($this->SQL);
 
-      return $this->SQL->Get();
+      $Result = $this->SQL->Get();
+      $this->EventArguments['Comments'] =& $Result;
+      $this->FireEvent('AfterGet');
+      
+      return $Result;
    }
   
    /**
@@ -238,8 +245,12 @@ class CommentModel extends VanillaModel {
             $CountWatch = $TotalComments;
             
          if (is_numeric($Discussion->CountCommentWatch)) {
-            // Update the watch data
-				if($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch) {
+            $NewComment = FALSE;
+            if (isset($Discussion->DateLastViewed))
+               $NewComment |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
+
+            // Update the watch data.
+				if ($NewComment || ($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch)) {
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',
@@ -421,6 +432,21 @@ class CommentModel extends VanillaModel {
          ->Get()
          ->FirstRow()
          ->CountComments;
+   }
+
+   public function GetUnreadOffset($DiscussionID, $UserID = NULL) {
+      if ($UserID == NULL) {
+         $UserID = Gdn::Session()->UserID;
+      }
+      if ($UserID == 0)
+         return 0;
+
+      // See of the user has read the discussion.
+      $UserDiscussion = $this->SQL->GetWhere('UserDiscussion', array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+      if (empty($UserDiscussion))
+         return 0;
+
+      return $UserDiscussion['CountComments'];
    }
    
    /**

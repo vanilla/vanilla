@@ -477,8 +477,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Ext = strrchr($Controller, '.');
       if ($Ext) {
          $Controller = substr($Controller, 0, -strlen($Ext));
-         $Ext = trim($Ext, '.');
-         $this->_DeliveryMethod = strtoupper($Ext);
+         $Ext = strtoupper(trim($Ext, '.'));
+         if (in_array($Ext, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
+            $this->_DeliveryMethod = strtoupper($Ext);
+         }
       }
       
       if (!is_null($Application)) {

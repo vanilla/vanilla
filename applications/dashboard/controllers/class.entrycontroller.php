@@ -386,7 +386,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE);
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -400,7 +400,13 @@ class EntryController extends Gdn_Controller {
                Gdn::Session()->Start($UserID);
 
                // Send the welcome email.
-               $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
+               if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+                  try {
+                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
+                  } catch (Exception $Ex) {
+                     // Do nothing if emailing doesn't work.
+                  }
+               }
 
                $this->_SetRedirect(TRUE);
             }
@@ -930,7 +936,7 @@ class EntryController extends Gdn_Controller {
     */
    protected function _RegistrationView() {
       $RegistrationMethod = Gdn::Config('Garden.Registration.Method');
-      if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation')))
+      if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation','Connect')))
          $RegistrationMethod = 'Basic';
          
       return 'Register'.$RegistrationMethod;
@@ -1032,6 +1038,10 @@ class EntryController extends Gdn_Controller {
          }
       }
       $this->Render();
+   }
+
+   private function RegisterConnect() {
+      throw NotFoundException();
    }
    
    /**

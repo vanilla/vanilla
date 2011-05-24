@@ -112,7 +112,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $Limit Max number of discussions to return.
     * @param array $Wheres SQL conditions.
     * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
-    * @return object SQL result.
+    * @return Gdn_DataSet SQL result.
     */
    public function Get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = NULL) {
       if ($Limit == '') 
@@ -306,8 +306,14 @@ class DiscussionModel extends VanillaModel {
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
 
       // Get the discussion IDs of the announcements.
-      // TODO: Use caching.
+      $CacheKey = FALSE;
+      if (!$Wheres)
+         $CacheKey = 'Announcements';
+      elseif (is_array($Wheres) && isset($Wheres['d.CategoryID'])) {
+         $CacheKey = 'Announcements_'.$Wheres['d.CategoryID'];
+      }
       $this->SQL
+         ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
          ->Where('d.Announce', '1');
@@ -316,6 +322,10 @@ class DiscussionModel extends VanillaModel {
 
       $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
+
+      // Short circuit querying when there are no announcements.
+      if (count($AnnouncementIDs) == 0)
+         return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery();
       $this->SQL
@@ -999,8 +1009,8 @@ class DiscussionModel extends VanillaModel {
     * @param mixed $ForceValue If set, overrides toggle behavior with this value.
     * @return mixed Value that was ultimately set for the field.
     */
-   public function SetProperty($DiscussionID, $Property, $ForceValue = FALSE) {
-      if ($ForceValue !== FALSE) {
+   public function SetProperty($DiscussionID, $Property, $ForceValue = NULL) {
+      if ($ForceValue !== NULL) {
          $Value = $ForceValue;
       } else {
          $Value = '1';

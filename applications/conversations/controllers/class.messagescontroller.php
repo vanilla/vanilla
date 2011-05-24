@@ -170,7 +170,8 @@ class MessagesController extends ConversationsController {
       $Result = $ConversationData->Result();
       $this->ConversationModel->JoinParticipants($Result);
       
-      $this->ConversationData = $ConversationData;
+      $this->ConversationData =& $ConversationData;
+      $this->SetData('Conversations', $Result);
       
       $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
       

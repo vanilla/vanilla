@@ -91,6 +91,9 @@ class DiscussionController extends VanillaController {
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
+         if ($this->Discussion->CountCommentWatch > 0 && $OffsetProvided == '')
+            $this->AddDefinition('LocationHash', '#Item_'.$this->Discussion->CountCommentWatch);
+
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
@@ -116,12 +119,12 @@ class DiscussionController extends VanillaController {
       // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
 
-      // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
-
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
+
+      // Make sure to set the user's discussion watch records
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -389,7 +392,12 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
+
+            $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+
+            $Announce = GetValue('Announce', $Discussion);
+            $this->DiscussionModel->SQL->Cache($CacheKeys);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', !$Announce);
          } else {
             $this->Form->AddError('ErrPermission');
          }

@@ -11,6 +11,16 @@ $this->Title(T('Start a New Conversation'));
       echo $this->Form->Label('Recipients', 'To');
       echo Wrap($this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
+
+   if (C('Conversations.Subjects.Visible')) {
+      echo '<div class="P">';
+         echo $this->Form->Label('Subject', 'Subject');
+         echo Wrap(
+            $this->Form->TextBox('Subject', array('class' => 'InputBox BigInput')),
+            'div',
+            array('class' => 'TextBoxWrapper'));
+      echo '</div>';
+   }
    
    echo '<div class="P">';
       echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));

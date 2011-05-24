@@ -1,4 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+
+if ($this->Data('Conversation.Subject')) {
+   echo '<h1>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h1>';
+}
+?>
 <div class="Tabs HeadingTabs ConversationTabs">
    <ul>
       <li><?php echo Anchor(T('Inbox'), '/messages/inbox'); ?></li>
@@ -6,6 +11,7 @@
    <div class="SubTab"><?php echo $this->Participants; ?></div>
 </div>
 <?php
+$this->FireEvent('BeforeConversation');
 echo $this->Pager->ToString('less');
 ?>
 <ul class="MessageList Conversation">

@@ -87,6 +87,13 @@ class CategoryModel extends Gdn_Model {
       }
 
       if ($ID !== FALSE) {
+         if (!is_numeric($ID)) {
+            foreach ($Categories as $Category) {
+               if ($Category['UrlCode'] == $ID)
+                  $ID = $Category['CategoryID'];
+            }
+         }
+
          if (isset($Categories[$ID])) {
             $Result =& $Categories[$ID];
             return $Result;
@@ -285,8 +292,61 @@ class CategoryModel extends Gdn_Model {
 
       return 0;
    }
+
+   /**
+    * Get all of the ancestor categorie above this one.
+    * @param int|string $Category The category ID or url code.
+    * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @return array
+    */
+   public static function GetAncestors($Category, $CheckPermissions = TRUE) {
+      $Categories = self::Categories();
+      $Result = array();
+      
+      if (is_numeric($Category)) {
+         if (isset($Categories[$Category]))
+            $Category2 = $Categories[$Category];
+      } else {
+         foreach ($Categories as $ID => $Value) {
+            if ($Value['UrlCode'] == $Category) {
+               $Category2 = $Categories[$ID];
+               break;
+            }
+         }
+      }
+
+      if (!isset($Category2))
+         return $Result;
+
+      // Build up the ancestor array by tracing back through parents.
+      $Result[$Category2['CategoryID']] = $Category2;
+      $Max = 20;
+      while (isset($Category2['Parent'])) {
+         if ($CheckPermissions && !$Category2['PermsDiscussionsView'])
+            return;
+
+         if (is_numeric($Category))
+            $ID = $Category2['CategoryID'];
+         else
+            $ID = $Category2['UrlCode'];
+
+         $Result[$ID] = $Category2;
+         unset($Result[$ID]['Parent'], $Result[$ID]['Children']);
+
+         $Category2 = $Category2['Parent'];
+
+         // Check for an infinite loop.
+         if ($Max <= 0)
+            break;
+         $Max--;
+      }
+      $Result = array_reverse($Result, TRUE); // order for breadcrumbs
+      return $Result;
+   }
    
    public function GetDescendantsByCode($Code) {
+      Deprecated('CategoryModel::GetDescendantsByCode', 'CategoryModel::GetAncestors');
+
       // SELECT title FROM tree WHERE lft < 4 AND rgt > 5 ORDER BY lft ASC;
       return $this->SQL
          ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode')
@@ -298,6 +358,8 @@ class CategoryModel extends Gdn_Model {
    }
 
    public function GetSubtree($ParentCategory) {
+
+
       $this->SQL
          ->Select('c.*')
          ->From('Category c')
@@ -837,6 +899,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
+         $Category['Url'] = '/categories/'.rawurlencode($Category['UrlCode']);
 
          // Calculate the following field.
          $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
@@ -864,6 +927,9 @@ class CategoryModel extends Gdn_Model {
             $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
             $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
             $Data[$ParentID]['Children'][] =& $Data[$Key];
+
+            if ($ParentID != $Cat['CategoryID'])
+               $Data[$Key]['Parent'] =& $Data[$ParentID];
          }
       }
 	}

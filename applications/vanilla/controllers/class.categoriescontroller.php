@@ -77,8 +77,8 @@ class CategoriesController extends VanillaController {
          return $this->Discussions();
       }
 			
-		// Load the Descendant Tree.
-      $this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
+		// Load the breadcrumbs
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
       
       $this->SetData('Category', $Category, TRUE);
 

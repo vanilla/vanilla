@@ -148,18 +148,21 @@ function WriteFilterTabs(&$Sender) {
       ?>
    </ul>
    <?php
-   $DescendantData = GetValue('DescendantData', $Sender->Data);
-   $Category = GetValue('Category', $Sender->Data);
-   if ($DescendantData && $Category) {
-      echo '<div class="SubTab"><span class="BreadCrumb FirstCrumb">↳ </span>';
-      foreach ($DescendantData->Result() as $Descendant) {
-         // Ignore the root node
-         if ($Descendant->CategoryID > 0) {
-            echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
-            echo '<span class="BreadCrumb"> &rarr; </span>';
+   $Breadcrumbs = Gdn::Controller()->Data('Breadcrumbs');
+   if ($Breadcrumbs) {
+      echo '<div class="SubTab Breadcrumbs">';
+      $First = TRUE;
+      foreach ($Breadcrumbs as $Breadcrumb) {
+         if ($First) {
+            $Class = 'Breadcrumb FirstCrumb';
+            $First = FALSE;
+         } else {
+            $Class = 'Breadcrumb';
+            echo '<span class="Crumb"> &raquo; </span>';
          }
+         
+         echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
       }
-      echo $Category->Name;
       echo '</div>';
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))

@@ -462,6 +462,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
+         header("HTTP/1.1 404 Not Found" );
          $Request->WithRoute('Default404');
          return $this->AnalyzeRequest($Request);
       }

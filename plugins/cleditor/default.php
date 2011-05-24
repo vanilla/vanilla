@@ -43,7 +43,7 @@ v0.5: 02NOV2010 - by Tim @ Vanilla
 $PluginInfo['cleditor'] = array(
    'Name' => 'CLEditor jQuery WYSIWYG',
    'Description' => '<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.',
-   'Version' => '0.5',
+   'Version' => '1.0',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -73,8 +73,8 @@ class cleditorPlugin extends Gdn_Plugin {
 		
 		// Add the CLEditor to the form
 		$Sender->RemoveJsFile('jquery.autogrow.js');
-		$Sender->AddJsFile($this->GetResource('jquery.cleditor.min.js', FALSE, FALSE));
-		$Sender->AddCssFile($this->GetResource('jquery.cleditor.css', FALSE, FALSE));
+		$Sender->AddJsFile('jquery.cleditor.min.js', 'plugins/cleditor');
+		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
 		$Sender->Head->AddString('
 <style type="text/css">
 a.PreviewButton {

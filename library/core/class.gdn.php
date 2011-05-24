@@ -429,12 +429,10 @@ class Gdn {
    }
    
    public static function Set($Key, $Value = NULL) {
-      $Key = 'Garden.'.StringBeginsWith($Key, 'Garden.', TRUE, TRUE);
       return Gdn::UserMetaModel()->SetUserMeta(0, $Key, $Value);
    }
    
    public static function Get($Key, $Default = NULL) {
-      $Key = 'Garden.'.StringBeginsWith($Key, 'Garden.', TRUE, TRUE);
       $Response = Gdn::UserMetaModel()->GetUserMeta(0, $Key, $Default);
       if (sizeof($Response) == 1)
          return GetValue($Key, $Response, NULL);

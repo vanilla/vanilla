@@ -583,7 +583,7 @@ class CategoryModel extends Gdn_Model {
             $CategoryID = -1;
             
          $ParentCategoryID = GetValue('parent_id', $Node);
-         if ($ParentCategoryID == 'root')
+         if (in_array($ParentCategoryID, array('root', 'none')))
             $ParentCategoryID = -1;
 
          $PermissionCategoryID = GetValueR("$CategoryID.PermissionCategoryID", $PermTree, 0);

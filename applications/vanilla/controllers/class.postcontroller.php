@@ -104,7 +104,7 @@ class PostController extends VanillaController {
          $this->Title(T('Edit Discussion'));
       } else {
          // Permission to add
-         $this->Permission('Vanilla.Discussions.Add');
+         $this->Permission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       }
       
       // Set the model on the form

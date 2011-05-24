@@ -453,6 +453,8 @@ class CategoryModel extends Gdn_Model {
          $ParentCategoryID = GetValue('parent_id', $Node);
          if ($ParentCategoryID == 'root')
             $ParentCategoryID = -1;
+         else if ($ParentCategoryID == 'none')
+         	$ParentCategoryID = null;
 
          $PermissionCategoryID = GetValueR("$CategoryID.PermissionCategoryID", $PermTree, 0);
          $PermCatChanged = FALSE;
@@ -664,5 +666,41 @@ class CategoryModel extends Gdn_Model {
          }
 		}
 	}
-   
+     /**
+    * Get category subtree ids (respecting user permission).
+    * 
+    * @access public
+    *
+    * @param string $CategoryID the root of the subtree.
+    * @return Gdn_DataSet SQL results.
+    */
+   public function GetSubTreeIds($CategoryID) {
+   	  $mainCat = $this->GetID($CategoryID);
+   	  if(!$mainCat){
+   	  	//Category not found
+   	  	return array();
+   	  }
+   	  elseif ($mainCat->TreeLeft+1 >= $mainCat->TreeRight){
+   	  	//Category is leaf
+   	  	return array($mainCat->CategoryID);
+   	  }
+   	  else{
+   	  	 $this->SQL
+         ->Select('c.CategoryID')
+         ->From('Category c')
+         ->BeginWhereGroup()
+         ->Where('c.TreeLeft >=', $mainCat->TreeLeft)
+         ->Where('c.TreeRight <=', $mainCat->TreeRight)
+         ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
+         ->EndWhereGroup()
+         ->OrWhere('AllowDiscussions', '0')
+         ->OrderBy('TreeLeft', 'asc');
+         $subTreeQuery = $this->SQL->Get();
+         $subTree = $subTreeQuery->ResultArray();
+         for($i = 0; $i < count($subTree); $i++){
+         	$subTree[$i] = $subTree[$i]['CategoryID'];
+         }
+         return $subTree;
+   	  }
+   }
 }

@@ -111,7 +111,13 @@ class CategoriesController extends VanillaController {
       
       // Get a DiscussionModel
       $DiscussionModel = new DiscussionModel();
-      $Wheres = array('d.CategoryID' => $this->CategoryID);
+      if(C('Vanilla.Categories.cascadeDiscussions')){
+      	$catTree = $this->CategoryModel->GetSubTreeIds($this->CategoryID);
+      	$Wheres = array('d.CategoryID' => $catTree);
+      }
+      else{
+      	$Wheres = array('d.CategoryID' => $this->CategoryID);
+      }
       
       // Check permission
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);

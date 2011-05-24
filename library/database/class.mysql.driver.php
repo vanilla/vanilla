@@ -293,9 +293,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     * @param array $Data An associative array of FieldName => Value pairs that should be inserted
     * $Table.
     * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
-    * to the where portion of the update statement.
+    * to the where portion of the update statement
+    * @param array OrderBys Should not be used and will be ignored if sent.
+    * @param int   $Limit Adds a limit to the query..
     */
-   public function GetUpdate($Tables, $Data, $Where) {
+   public function GetUpdate($Tables, $Data, $Where, $OrderBys = FALSE, $Limit = FALSE) {
       if (!is_array($Data))
          trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
 
@@ -325,6 +327,10 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $this->_OpenWhereGroupCount = 0;
       } else if (is_string($Where) && !StringIsNullOrEmpty($Where)) {
          $sql .= ' where '.$Where;
+      }
+      if (is_numeric($Limit)) {
+         $sql .= "\n";
+         $sql = $this->GetLimit($sql, $this->_Limit);
       }
       return $sql;
    }

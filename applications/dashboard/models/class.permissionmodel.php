@@ -253,7 +253,8 @@ class PermissionModel extends Gdn_Model {
             if(!is_null($JunctionID)) {
                $JuncRow['JunctionID'] = $JunctionID;
             }
-            if ($JuncRow['JunctionID'] <= 0) {
+
+            if ($JuncRow['JunctionID'] < 0) {
                $JuncRow['Name'] = sprintf(T('Default %s Permissions'), T('Permission.'.$JunctionTable, $JunctionTable));
             }
             

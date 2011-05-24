@@ -668,10 +668,13 @@ class CommentModel extends VanillaModel {
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {
+            if (in_array($Bookmark->UserID, $NotifiedUsers) || $Bookmark->UserID == $Session->UserID)
+               continue;
+
             // Check user can still see the discussion.
             $UserMayView = $UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID);
-            
-            if (!in_array($Bookmark->UserID, $NotifiedUsers) && $Bookmark->UserID != $Session->UserID && $UserMayView) {
+
+            if ($UserMayView) {
                $NotifiedUsers[] = $Bookmark->UserID;
                $ActivityModel = new ActivityModel();
                $ActivityID = $ActivityModel->Add(

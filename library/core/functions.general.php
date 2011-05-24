@@ -636,8 +636,18 @@ if (!function_exists('Debug')) {
 }
 
 if (!function_exists('Deprecated')) {
-   function Deprecated($Name) {
-      trigger_error($Name.' is deprecated.', E_USER_DEPRECATED);
+   /**
+    * Mark a function deprecated.
+    *
+    * @param string $Name The name of the deprecated function.
+    * @param string $NewName The name of the new function that should be used instead.
+    */
+   function Deprecated($Name, $NewName = FALSE) {
+      $Msg = $Name.' is deprecated.';
+      if ($NewName)
+         $Msg .= " Use $NewName instead.";
+
+      trigger_error($Msg, E_USER_DEPRECATED);
    }
 }
 

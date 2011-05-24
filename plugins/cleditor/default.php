@@ -82,7 +82,7 @@ a.PreviewButton {
 }
 </style>
 <script type="text/javascript">
-	(function(jQuery) {
+	jQuery(document).ready(function($) {
 		// Make sure the removal of autogrow does not break anything
 		jQuery.fn.autogrow = function(o) { return; }
 		// Attach the editor to comment boxes

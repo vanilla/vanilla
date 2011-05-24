@@ -711,6 +711,9 @@ class ImportModel extends Gdn_Model {
 		if(!array_key_exists($TableName, $this->Tables()))
 			return;
 
+      if (!Gdn::Structure()->TableExists($TableName))
+         return 0;
+
 		$TableInfo =& $this->Tables($TableName);
 		$Columns = $TableInfo['Columns'];
 

@@ -946,34 +946,38 @@ class DiscussionModel extends VanillaModel {
             left join (
               select
                 d.CategoryID,
-                count(d.DiscussionID) as CountDiscussions
+                count(d.DiscussionID) as CountDiscussions,
+                sum(d.CountComments) as CountComments
               from :_Discussion d
               $Where
               group by d.CategoryID
             ) d
               on c.CategoryID = d.CategoryID
-            set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
+            set 
+               c.CountDiscussions = coalesce(d.CountDiscussions, 0)
+               c.CountComments = coalesce(d.CountComments, 0)";
 			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
 			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');
 			
 		} elseif (is_numeric($CategoryID) && $CategoryID > 0) {
          $this->SQL
             ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->Select('d.CountComments', 'sum', 'CountComments')
             ->From('Discussion d')
             ->Where('d.CategoryID', $CategoryID);
          
 			$this->AddArchiveWhere();
 			
 			$Data = $this->SQL->Get()->FirstRow();
-         $Count = $Data ? $Data->CountDiscussions : 0;
+         $CountDiscussions = GetValue('CountDiscussions', $Data, 0);
+         $CountComments = GetValue('CountComments', $Data, 0);
          
-         if ($Count >= 0) {
-            $this->SQL
-               ->Update('Category')
-               ->Set('CountDiscussions', $Count)
-               ->Where('CategoryID', $CategoryID)
-               ->Put();
-         }
+         $this->SQL
+            ->Update('Category')
+            ->Set('CountDiscussions', $CountDiscussions)
+            ->Set('CountComments', $CountComments)
+            ->Where('CategoryID', $CategoryID)
+            ->Put();
       }
    }
 	

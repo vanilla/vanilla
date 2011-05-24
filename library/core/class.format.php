@@ -1001,7 +1001,8 @@ EOT;
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Url');
       } elseif (preg_replace('`([^\PP])`u', '', 'Test') == '') {
-         // No Unicode PCRE support
+         // No Unicode PCRE support.
+         $Mixed = trim($Mixed);
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('/([^\w\d_:.])/', ' ', $Mixed); // get rid of punctuation and symbols
@@ -1010,7 +1011,8 @@ EOT;
          $Mixed = urlencode(strtolower($Mixed));
          return $Mixed;
       } else {
-         // Better Unicode support
+         // Better Unicode support.
+         $Mixed = trim($Mixed);
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation

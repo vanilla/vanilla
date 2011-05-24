@@ -155,9 +155,14 @@ class PostController extends VanillaController {
             }
 
             // Make sure that the title will not be invisible after rendering
-            $Name = $this->Form->GetFormValue('Name', '');
+            $Name = trim($this->Form->GetFormValue('Name', ''));
             if ($Name != '' && Gdn_Format::Text($Name) == '')
                $this->Form->AddError(T('You have entered an invalid discussion title'), 'Name');
+            else {
+               // Trim the name.
+               $FormValues['Name'] = $Name;
+               $this->Form->SetFormValue('Name', $Name);
+            }
 
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {

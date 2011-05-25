@@ -13,23 +13,24 @@
    ?>
 </div>
 <?php if (C('Plugins.Tagging.Enabled')) { ?>
-<h3><?php printf(T('%s tags in the system'), $this->TagData->NumRows()); ?></h3>
+<h3><?php printf(T('%s tags in the system'), $this->Data('RecordCount')); ?></h3>
 <div class="Info">
    <?php echo T('Click a tag name to edit. Click x to remove.'); ?>
 </div>
 <div class="Tags">
    <?php
       $Session = Gdn::Session();
-      $TagCount = $this->TagData->NumRows();
+      $TagCount = $this->Data('RecordCount');
       if ($TagCount == 0) {
          echo T("There are no tags in the system yet.");
       } else {
-         foreach ($this->TagData->Result() as $Tag) {
+         $Tags = $this->Data('Tags');
+         foreach ($Tags as $Tag) {
             ?>
             <div class="Tag">
                <?php
-               echo Anchor(htmlspecialchars($Tag->Name).' '.Wrap($Tag->CountDiscussions), 'settings/edittag/'.$Tag->TagID, 'TagName');
-               echo ' '.Anchor('×', 'settings/deletetag/'.$Tag->TagID.'/'.$Session->TransientKey(), 'Delete');
+               echo Anchor(htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions']), 'settings/edittag/'.$Tag['TagID'], 'TagName');
+               echo ' '.Anchor('×', 'settings/deletetag/'.$Tag['TagID'].'/'.$Session->TransientKey(), 'Delete');
                ?>
             </div>
             <?php
@@ -38,4 +39,7 @@
    ?>
 </div>
 <?php
+
+PagerModule::Write();
+
 }

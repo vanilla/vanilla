@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -350,22 +350,30 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Tag management (let admins rename tags, remove tags, etc).
     * TODO: manage the Plugins.Tagging.Required boolean setting that makes tagging required or not.
+    * @param Gdn_Controller $Sender
     */
-   public function SettingsController_Tagging_Create($Sender) {
+   public function SettingsController_Tagging_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
       $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
       $Sender->AddJSFile('plugins/Tagging/admin.js');
       $SQL = Gdn::SQL();
-      $Sender->TagData = $SQL
+
+      list($Offset, $Limit) = OffsetLimit($Sender->Request->Get('Page'), 100);
+      $Sender->SetData('_Limit', $Limit);
+
+      $Sender->SetData('Tags', $SQL
          ->Select('t.*')
          ->From('Tag t')
          ->OrderBy('t.Name', 'asc')
          ->OrderBy('t.CountDiscussions', 'desc')
-         ->Get();
+         ->Limit($Limit, $Offset)
+         ->Get()->ResultArray());
+
+      $Sender->SetData('RecordCount', $SQL->GetCount('Tag'));
          
-      $Sender->Render('plugins/Tagging/views/tagging.php');
+      $Sender->Render('Tagging', '', 'plugins/Tagging');
    }
 
    /**

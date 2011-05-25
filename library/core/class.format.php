@@ -1080,12 +1080,12 @@ EOT;
     * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
     */
    public static function Seconds($Seconds) {
-      $Minutes = floor($Seconds/60);
-      $Hours = floor($Seconds/60/60);
-      $Days = floor($Seconds/60/60/24);
-      $Weeks = floor($Seconds/60/60/24/7);
-      $Months = floor($Seconds/60/60/24/30);
-      $Years = floor($Seconds/60/60/24/365);
+      $Minutes = round($Seconds/60);
+      $Hours = round($Seconds/3600);
+      $Days = round($Seconds/86400);
+      $Weeks = round($Seconds/604800);
+      $Months = round($Seconds/2629743.83);
+      $Years = round($Seconds/31556926);
 
       if ($Seconds < 60)
          return sprintf(Plural($Seconds, '%s second', '%s seconds'), $Seconds);

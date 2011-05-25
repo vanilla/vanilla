@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['VanillaStats'] = array(
    'Name' => 'Vanilla Statistics',
    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
-   'Version' => '1',
+   'Version' => '2.0.0b',
    'MobileFriendly' => FALSE,
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -30,7 +30,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
    const RESOLUTION_MONTH = 'month';
    
    public function __construct() {
-      $this->AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+      $this->AnalyticsServer = C('Garden.Analytics.Remote', 'http://analytics.vanillaforums.com');
+      $this->VanillaID = Gdn::InstallationID();
    }
    
    /**
@@ -42,6 +43,28 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       if ($Enabled && !Gdn::PluginManager()->HasNewMethod('SettingsController', 'Index')) {
          Gdn::PluginManager()->RegisterNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
       }
+   }
+   
+   public function SecurityTokenCallback($JsonResponse, $RawResponse) {
+      $SecurityToken = GetValue('SecurityToken', $JsonResponse, NULL);
+      if (!is_null($SecurityToken))
+         $this->SecurityToken($SecurityToken);
+   }
+   
+   protected function SecurityToken($SetSecurityToken = NULL) {
+      static $SecurityToken = NULL;
+   
+      if (!is_null($SetSecurityToken))
+         $SecurityToken = $SetSecurityToken;
+      
+      if (is_null($SecurityToken)) {
+         $Request = array('VanillaID' => $this->VanillaID);
+         Gdn::Statistics()->BasicParameters($Request);
+         $Response = Gdn::Statistics()->Analytics('graph/getsecuritytoken.json', $Request, array(
+             'Success'  => array($this, 'SecurityTokenCallback')
+         ));
+      }
+      return $SecurityToken;
    }
    
    /**
@@ -82,55 +105,14 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
          $this->ConfigureRange($Sender);
          
-         $VanillaID = C('Garden.Analytics.InstallationID', FALSE);
-         $Sender->SetData('VanillaID', C('Garden.Analytics.InstallationID', 'UniqueVanillaInstallationID'));
-         
-         $RequestTime = gmmktime();
-         $VanillaSecret = C('Garden.Analytics.InstallationSecret', FALSE);
-         
-         $SecurityHash = sha1(implode('-',array(
-            $VanillaSecret,
-            $RequestTime
-         )));
-         
-         $Sender->SetData('RequestTime', $RequestTime);
-         $Sender->SetData('SecurityHash', $SecurityHash);
+         $VanillaID = Gdn::InstallationID();
+         $Sender->SetData('VanillaID', $VanillaID);
+         $Sender->SetData('VanillaVersion', APPLICATION_VERSION);
+         $Sender->SetData('SecurityToken', $this->SecurityToken());
       
          // Render the custom dashboard view
          $Sender->Render('dashboard', '', 'plugins/VanillaStats');
       }
-   }
-   
-   public function SettingsController_DashboardRefreshHash_Create($Sender) {
-      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
-      $Sender->FireEvent('DefineAdminPermissions');
-      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
-      
-      $VanillaID = C('Garden.Analytics.InstallationID', FALSE);
-      $Sender->SetData('VanillaID', C('Garden.Analytics.InstallationID', 'UniqueVanillaInstallationID'));
-      
-      $RequestTime = gmmktime();
-      $VanillaSecret = C('Garden.Analytics.InstallationSecret', FALSE);
-      
-      $SecurityHash = sha1(implode('-',array(
-         $VanillaSecret,
-         $RequestTime
-      )));
-      
-      $Sender->SetData('RequestTime', $RequestTime);
-      $Sender->SetData('SecurityHash', $SecurityHash);
-      $Sender->Render();
    }
    
    /**
@@ -189,7 +171,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       );
       
       // Render the custom dashboard view
-      $Sender->Render(PATH_PLUGINS.'/VanillaStats/views/dashboardsummaries.php');
+      $Sender->Render('dashboardsummaries', '', 'plugins/VanillaStats');
    }
    
    private function ConfigureRange($Sender) {

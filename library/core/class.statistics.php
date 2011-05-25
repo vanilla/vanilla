@@ -26,13 +26,21 @@ class Gdn_Statistics extends Gdn_Plugin {
       parent::__construct();
    }
    
-   protected function Analytics($Method, $RequestParameters, $Callback = FALSE) {
+   public function Analytics($Method, $RequestParameters, $Callback = FALSE) {
+      
       $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
    
-      $ApiMethod = strtolower($Method).'.json';
+      $FullMethod = explode('/',$Method);
+      if (sizeof($FullMethod) < 2)
+         array_unshift($FullMethod, "analytics");
+      
+      list($ApiController, $ApiMethod) = $FullMethod;
+      $ApiController = strtolower($ApiController);
+      $ApiMethod = StringEndsWith(strtolower($ApiMethod), '.json', TRUE, TRUE).'.json';
+      
       $FinalURL = CombinePaths(array(
          $AnalyticsServer,
-         'analytics',
+         $ApiController,
          $ApiMethod
       ));
       
@@ -77,7 +85,7 @@ class Gdn_Statistics extends Gdn_Plugin {
     * @param array $Request Reference to the existing request array
     * @return void
     */
-   protected function BasicParameters(&$Request) {
+   public function BasicParameters(&$Request) {
       $Request = array_merge($Request, array(
          'ServerHostname'     => Url('/', TRUE),
          'ServerType'         => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
@@ -206,8 +214,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       if (($Secret && $VanillaID) !== FALSE) {
          Gdn::InstallationID($VanillaID);
          Gdn::InstallationSecret($Secret);
-         Gdn::Set('Analytics.Registering', NULL);
-         Gdn::Set('Analytics.LastSentDate', NULL);
+         Gdn::Set('Garden.Analytics.Registering', NULL);
+         Gdn::Set('Garden.Analytics.LastSentDate', NULL);
       }
    }
 
@@ -223,12 +231,12 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Set
       if (!is_null($SetLastSentDate)) {
          $LastSentDate = $SetLastSentDate;
-         Gdn::Set('Analytics.LastSentDate', $LastSentDate);
+         Gdn::Set('Garden.Analytics.LastSentDate', $LastSentDate);
       }
       
       // Lazy Load
       if ($LastSentDate === NULL)
-         $LastSentDate = Gdn::Get('Analytics.LastSentDate', FALSE);
+         $LastSentDate = Gdn::Get('Garden.Analytics.LastSentDate', FALSE);
       
       return $LastSentDate;
    }
@@ -262,7 +270,7 @@ class Gdn_Statistics extends Gdn_Plugin {
 
                case 'DoCall':
                   // Call the admin's attention to the statistics
-                  Gdn::Set('Analytics.Notify', $CommandValue);
+                  Gdn::Set('Garden.Analytics.Notify', $CommandValue);
                   break;
 
                default:
@@ -285,14 +293,19 @@ class Gdn_Statistics extends Gdn_Plugin {
             $CallbackMethod = array($this, $CallbackMethod);
       
       $ResponseCode = GetValue('Status', $JsonResponse, 500);
+      $CallbackExecute = NULL;
       switch ($ResponseCode) {
+         case FALSE:
+         case 500:
+            if (array_key_exists('Failure', $Callbacks))
+               $CallbackExecute = $Callbacks['Failure'];
+            break;
+            
+         case TRUE:
          case 200:
             self::Throttled(FALSE);
-            $CallbackExecute = GetValue('Success', $Callbacks, NULL);
-            break;
-         
-         case 500:
-            $CallbackExecute = GetValue('Failure', $Callbacks, NULL);
+            if (array_key_exists('Success', $Callbacks))
+               $CallbackExecute = $Callbacks['Success'];
             break;
       }
       
@@ -303,7 +316,7 @@ class Gdn_Statistics extends Gdn_Plugin {
    protected function Register() {
       
       // Set the time we last attempted to perform registration
-      Gdn::Set('Analytics.Registering', time());
+      Gdn::Set('Garden.Analytics.Registering', time());
       
       // Request registration from remote server
       $Request = array();
@@ -342,7 +355,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $SignatureArray = $Request;
       
       // Build the request time
-      $RequestTime = gmmktime();
+      $RequestTime = Gdn_Statistics::Time();
       // Get the secret key
       $RequestSecret = Gdn::InstallationSecret();
       
@@ -481,12 +494,12 @@ class Gdn_Statistics extends Gdn_Plugin {
             $ThrottleValue = NULL;
          }
          $Throttled = (!is_null($ThrottleValue)) ? $ThrottleValue : 0;
-         Gdn::Set('Analytics.Throttle', $ThrottleValue);
+         Gdn::Set('Garden.Analytics.Throttle', $ThrottleValue);
       }
       
       // Lazy Load
       if ($Throttled === NULL)
-         $Throttled = Gdn::Get('Analytics.Throttle', 0);
+         $Throttled = Gdn::Get('Garden.Analytics.Throttle', 0);
       
       return ($Throttled > time());
    }
@@ -507,7 +520,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       if (!self::CheckIsEnabled()) return;
       
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-         if (Gdn::Get('Analytics.Notify', FALSE) !== FALSE) {
+         if (Gdn::Get('Garden.Analytics.Notify', FALSE) !== FALSE) {
             $CallMessage = '<span class="InformSprite Bandaid"></span> ';
             $CallMessage .= sprintf(T("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"),Url('dashboard/statistics'));
             Gdn::Controller()->InformMessage($CallMessage,array('CssClass' => 'HasSprite'));
@@ -524,7 +537,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Check if we're registered with the central server already. If not, this request is 
       // hijacked and used to perform that task instead of sending stats or recording a tick.
       if (is_null($InstallationID)) {
-         $AttemptedRegistration = Gdn::Get('Analytics.Registering',FALSE);
+         $AttemptedRegistration = Gdn::Get('Garden.Analytics.Registering',FALSE);
          // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
          if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
@@ -544,25 +557,29 @@ class Gdn_Statistics extends Gdn_Plugin {
       
          // If we just tried to run the structure, and failed, don't blindly try again. 
          // Just disable ourselves quietly.
-         if (Gdn::Get('Analytics.AutoStructure', FALSE)) {
+         if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE)) {
             SaveToConfig('Garden.Analytics.Enabled', FALSE);
             Gdn::Set('Garden.Analytics.AutoStructure', NULL);
             return;
          }
          
          // If we get here, insert failed. Try proxyconnect to the utility structure
-         Gdn::Set('Analytics.AutoStructure', TRUE);
+         Gdn::Set('Garden.Analytics.AutoStructure', TRUE);
          ProxyRequest(Url('utility/update', TRUE), 0, FALSE);
       }
       
       // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
-      if (Gdn::Get('Analytics.AutoStructure', FALSE))
-         Gdn::Set('Analytics.AutoStructure', NULL);
+      if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE))
+         Gdn::Set('Garden.Analytics.AutoStructure', NULL);
 
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = self::LastSentDate();
       if (empty($LastSentDate) || $LastSentDate < date('Ymd', strtotime('-1 day')))
          return $this->Stats();
+   }
+   
+   public static function Time() {
+      return time();
    }
    
    public static function TimeFromTimeSlot($TimeSlot) {
@@ -629,7 +646,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          return NULL;
       
       // Calculate clock desync
-      $CurrentGmTime = gmmktime();
+      $CurrentGmTime = Gdn_Statistics::Time();
       $RequestTime = GetValue('RequestTime', $Request, 0);
       $TimeDiff = abs($CurrentGmTime - $RequestTime);
       $AllowedTimeDiff = C('Garden.Analytics.RequestTimeout', 1440);

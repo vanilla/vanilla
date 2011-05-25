@@ -132,6 +132,7 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddItem('Site Settings', T('Settings'), FALSE, array('class' => 'SiteSettings'));
       $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
+      $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage');
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');

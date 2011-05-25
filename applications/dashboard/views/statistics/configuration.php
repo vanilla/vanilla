@@ -54,18 +54,18 @@
    <div class="ConfigurationForm">
       <ul>
          <li>
-            <?php echo $this->Form->Label('Installation Status'); ?>
+            <?php echo $this->Form->Label('API Status'); ?>
             <div class="Slice Async" rel="statistics/verify"></div>
          </li>
          <li>
             <?php
-               echo $this->Form->Label('Installation ID', 'InstallationID');
+               echo $this->Form->Label('Application ID', 'InstallationID');
                echo $this->Form->TextBox('InstallationID');
             ?>
          </li>
          <li>
             <?php
-               echo $this->Form->Label('Installation Secret', 'InstallationSecret');
+               echo $this->Form->Label('Application Secret', 'InstallationSecret');
                echo $this->Form->TextBox('InstallationSecret');
             ?>
          </li>

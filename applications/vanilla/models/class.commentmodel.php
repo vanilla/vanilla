@@ -875,15 +875,14 @@ class CommentModel extends VanillaModel {
 					->Limit(1, 1)
 					->Get()->FirstRow(DATASET_TYPE_ARRAY);
             
-				if (is_object($OldData)) {
+				if (is_array($OldData)) {
 					$this->SQL->Update('Discussion')
                   ->Set('LastCommentID', $OldData['CommentID'])
                   ->Set('LastCommentUserID', $OldData['InsertUserID'])
                   ->Set('DateLastComment', $OldData['DateInserted'])
 						->Where('DiscussionID', $Data['DiscussionID'])
 						->Put();
-				}
-				else { // It was the ONLY comment
+				} else { // It was the ONLY comment
                $this->SQL->Update('Discussion')
                   ->Set('LastCommentID', NULL)
                   ->Set('LastCommentUserID', NULL)

@@ -579,7 +579,7 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
    
    public static function Time() {
-      return time() + date("Z");
+      return time();
    }
    
    public static function TimeFromTimeSlot($TimeSlot) {

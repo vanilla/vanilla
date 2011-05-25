@@ -208,7 +208,7 @@ class PagerModule extends Gdn_Module {
       $Range = C('Garden.Modules.PagerRange', 3);
       
       // String to represent skipped pages
-      $Separator = C('Garden.Modules.PagerSeparator', '&hellip;'); 
+      $Separator = C('Garden.Modules.PagerSeparator', '&#8230;');
       
       // Show current page plus $Range pages on either side
       $PagesToDisplay = ($Range * 2) + 1; 

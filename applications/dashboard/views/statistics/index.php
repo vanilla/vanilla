@@ -1,7 +1,4 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php
-   $NotifyMessage = Gdn::Get('Analytics.Notify', FALSE);
-?>
 <style type="text/css">
    body .NotifyMessage {
       margin: 0 20px 20px;

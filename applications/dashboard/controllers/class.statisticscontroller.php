@@ -65,10 +65,10 @@ class StatisticsController extends DashboardController {
       
       $this->SetData('AnalyticsEnabled', $AnalyticsEnabled);
       
-      $NotifyMessage = Gdn::Get('Analytics.Notify', FALSE);
+      $NotifyMessage = Gdn::Get('Garden.Analytics.Notify', FALSE);
       $this->SetData('NotifyMessage', $NotifyMessage);
       if ($NotifyMessage !== FALSE)
-         Gdn::Set('Analytics.Notify', NULL);
+         Gdn::Set('Garden.Analytics.Notify', NULL);
       
       $this->Form->SetFormValue('InstallationID', Gdn::InstallationID());
       $this->Form->SetFormValue('InstallationSecret', Gdn::InstallationSecret());

@@ -5,6 +5,7 @@
       float: left;
    }
    .ConfigurationForm {
+      border-right: 1px solid #aaa;
       padding: 20px;
       float: left;
    }
@@ -18,7 +19,6 @@
       margin: 0;
    }
    .ConfigurationHelp {
-      border-left: 1px solid #aaa;
       margin-left: 400px;
       padding: 20px;
    }

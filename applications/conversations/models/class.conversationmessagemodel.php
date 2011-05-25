@@ -227,6 +227,9 @@ class ConversationMessageModel extends Gdn_Model {
 
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
+            if ($Session->UserID == $User->UserID)
+               continue; // don't notify self.
+
             // Notify the users of the new message.
             $ActivityID = $ActivityModel->Add(
                $Session->UserID,

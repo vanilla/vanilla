@@ -355,7 +355,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $SignatureArray = $Request;
       
       // Build the request time
-      $RequestTime = gmmktime();
+      $RequestTime = Gdn_Statistics::Time();
       // Get the secret key
       $RequestSecret = Gdn::InstallationSecret();
       
@@ -578,6 +578,10 @@ class Gdn_Statistics extends Gdn_Plugin {
          return $this->Stats();
    }
    
+   public static function Time() {
+      return time() + date("Z");
+   }
+   
    public static function TimeFromTimeSlot($TimeSlot) {
       $Year = substr($TimeSlot,0,4);
       $Month = substr($TimeSlot,4,2);
@@ -642,7 +646,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          return NULL;
       
       // Calculate clock desync
-      $CurrentGmTime = gmmktime();
+      $CurrentGmTime = Gdn_Statistics::Time();
       $RequestTime = GetValue('RequestTime', $Request, 0);
       $TimeDiff = abs($CurrentGmTime - $RequestTime);
       $AllowedTimeDiff = C('Garden.Analytics.RequestTimeout', 1440);

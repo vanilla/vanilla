@@ -87,18 +87,19 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 
 function WriteOptionList($Object, $Sender, $Session) {
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+	$CategoryID = GetValue('CategoryID', $Object);
+	if(!$CategoryID && property_exists($Sender, 'Discussion'))
+		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
+   $PermissionCategoryID = GetValue('PermissionCategoryID', $Object, GetValue('PermissionCategoryID', $Sender->Discussion));
+
 	$CanEdit = $EditContentTimeout == -1 || strtotime($Object->DateInserted) + $EditContentTimeout > time();
 	$TimeLeft = '';
-	if ($CanEdit && $EditContentTimeout > 0) {
+	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
 		$TimeLeft = strtotime($Object->DateInserted) + $EditContentTimeout - time();
 		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
 	}
 
    $Sender->Options = '';
-	$CategoryID = GetValue('CategoryID', $Object);
-	if(!$CategoryID && property_exists($Sender, 'Discussion'))
-		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
-   $PermissionCategoryID = GetValue('PermissionCategoryID', $Object, GetValue('PermissionCategoryID', $Sender->Discussion));
 		
    // Show discussion options if this is the discussion / first comment
    if ($Sender->EventArguments['Type'] == 'Discussion') {

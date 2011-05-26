@@ -482,21 +482,9 @@ class Gdn_Format {
       else {
          $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
-         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
-         $Mixed = preg_replace(
-            "/
-            (?<!<a href=\")
-            (?<!\")(?<!\">)
-            ((https?|ftp):\/\/)
-            ([\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)
-            /msxi",
-            "<a href=\"$0\" target=\"_blank\"$nofollow>$0</a>",
-            $Mixed
-         );
-
-      if(C('Garden.Format.ReplaceNewlines', TRUE))
-         return nl2br($Mixed);
-      else
+         $Mixed = self::Mentions($Mixed);
+         $Mixed = self::Links($Mixed);
+         
          return $Mixed;
       }
    }

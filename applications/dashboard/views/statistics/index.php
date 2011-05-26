@@ -11,6 +11,15 @@
       color: #252525;
    }
 </style>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo '<li>', Anchor(T('Vanilla Statistics Plugin'), '/settings/plugins#vanillastats-plugin'), '</li>';
+   echo '<li>', Anchor(T('Statistics Documentation'), 'http://vanillaforums.org/docs/vanillastatistics'), '</li>';
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 echo $this->Form->Open();

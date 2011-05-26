@@ -376,7 +376,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Sort for consistency
       ksort($SignatureArray);
       
-      $RealHash = sha1(serialize($SignatureArray));
+      $RealHash = sha1(http_build_query($SignatureArray));
       
       if ($Modify) {
          $Request['RequestTime'] = $RequestTime;
@@ -673,7 +673,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       ksort($Request);
       
       // Calculate the hash
-      $RealHash = sha1(serialize($Request));
+      $RealHash = sha1(http_build_query($Request));
       
       if ($RealHash == $SecurityHash)
          return TRUE;

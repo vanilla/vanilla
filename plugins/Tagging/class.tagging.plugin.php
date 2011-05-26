@@ -241,7 +241,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Get List of tags to reduce count for
       $TagDataSet = Gdn::SQL()->Select('TagID')
-         ->From('tagdiscussion')
+         ->From('TagDiscussion')
          ->Where('DiscussionID',$DiscussionID)
          ->Get()->ResultArray();
 

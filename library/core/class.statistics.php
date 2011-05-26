@@ -369,14 +369,19 @@ class Gdn_Statistics extends Gdn_Plugin {
       $SignatureArray['Secret'] = $RequestSecret;
       $SignatureArray['RequestTime'] = $RequestTime;
       
-      // Convert parameters to strings for consistency
-      foreach ($SignatureArray as $SignatureKey => &$SignatureValue)
-         $SignatureValue = (string)$SignatureValue;
-
-      // Sort for consistency
-      ksort($SignatureArray);
+      $SignData = array_intersect_key($SignatureArray, array_fill_keys(array(
+          'VanillaID',
+          'Secret',
+          'RequestTime',
+          'TimeSlot'
+      ), NULL));
       
-      $RealHash = sha1(http_build_query($SignatureArray));
+      // ksort the array to preserve a known order
+      $SignData = array_change_key_case($SignData, CASE_LOWER);
+      ksort($SignData);
+      
+      // Calculate the hash
+      $RealHash = sha1(http_build_query($SignData));
       
       if ($Modify) {
          $Request['RequestTime'] = $RequestTime;
@@ -665,15 +670,19 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Add the real secret
       $Request['Secret'] = $VanillaSecret;
       
-      // Convert all parameters to strings for consistency
-      foreach ($Request as $RequestKey => &$RequestValue)
-         $RequestValue = (string)$RequestValue;
+      $SignData = array_intersect_key($Request, array_fill_keys(array(
+          'VanillaID',
+          'Secret',
+          'RequestTime',
+          'TimeSlot'
+      ), NULL));
       
       // ksort the array to preserve a known order
-      ksort($Request);
+      $SignData = array_change_key_case($SignData, CASE_LOWER);
+      ksort($SignData);
       
       // Calculate the hash
-      $RealHash = sha1(http_build_query($Request));
+      $RealHash = sha1(http_build_query($SignData));
       
       if ($RealHash == $SecurityHash)
          return TRUE;

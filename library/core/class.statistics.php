@@ -287,6 +287,9 @@ class Gdn_Statistics extends Gdn_Plugin {
          );
       }
       
+      if (!is_array($Callbacks))
+         $Callbacks = array();
+      
       // Assume strings are local methods
       foreach ($Callbacks as $Event => &$CallbackMethod)
          if (is_string($CallbackMethod))

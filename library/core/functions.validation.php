@@ -277,7 +277,7 @@ if (!function_exists('ValidateVersion')) {
       if (empty($Value))
          return TRUE;
 
-      if (preg_match('`(?:\d+\.)*\d+\s*(\w*)\d*`', $Value, $Matches)) {
+      if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $Value, $Matches)) {
          // Get the version word out of the matches and validate it.
          $Word = $Matches[1];
          if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p')))

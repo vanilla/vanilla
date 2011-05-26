@@ -274,10 +274,21 @@ if (!class_exists('HeadModule', FALSE)) {
          foreach ($this->_Tags as $Index => $Attributes) {
             $Tag = $Attributes[self::TAG_KEY];
 
+            // Inline the content of the tag, if necessary.
             if (GetValue('_hint', $Attributes) == 'inline') {
                $Path = GetValue('_path', $Attributes);
-               if (!StringBeginsWith($Path, 'http'))
+               if (!StringBeginsWith($Path, 'http')) {
                   $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
+
+                  if (isset($Attributes['src'])) {
+                     $Attributes['_src'] = $Attributes['src'];
+                     unset($Attributes['src']);
+                  }
+                  if (isset($Attributes['href'])) {
+                     $Attributes['_href'] = $Attributes['href'];
+                     unset($Attributes['href']);
+                  }
+               }
             }
             
             $TagString = '<'.$Tag.Attribute($Attributes, '_');

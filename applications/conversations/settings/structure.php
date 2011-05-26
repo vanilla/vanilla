@@ -39,8 +39,8 @@ $Construct
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
-   ->Column('CountMessages', 'int')
-   ->Column('LastMessageID', 'int')
+   ->Column('CountMessages', 'int', 0)
+   ->Column('LastMessageID', 'int', NULL)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
    ->Set($Explicit, $Drop);
 

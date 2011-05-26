@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -232,6 +232,28 @@ class TaggingPlugin extends Gdn_Plugin {
          } elseif (count($Tags) > $NumTagsMax) {
             $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
          }
+      }
+   }
+
+   public function DiscussionModel_DeleteDiscussion_Handler($Sender) {
+      // Get discussionID that is being deleted
+      $DiscussionID = $Sender->EventArguments['DiscussionID'];
+
+      // Get List of tags to reduce count for
+      $TagDataSet = Gdn::SQL()->Select('TagID')
+         ->From('tagdiscussion')
+         ->Where('DiscussionID',$DiscussionID)
+         ->Get()->ResultArray();
+
+      $RemovedTagIDs = ConsolidateArrayValuesByKey($TagDataSet, 'TagID');
+
+      // Check if there are even any tags to delete
+      if (count($RemovedTagIDs) > 0) {
+         // Step 1: Reduce count
+         Gdn::SQL()->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', $RemovedTagIDs)->Put();
+
+         // Step 2: Delete mapping data between discussion and tag (tagdiscussion table)
+         $Sender->SQL->Where('DiscussionID', $DiscussionID)->Delete('TagDiscussion');
       }
    }
 

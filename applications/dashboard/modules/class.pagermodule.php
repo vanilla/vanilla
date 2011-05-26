@@ -211,7 +211,11 @@ class PagerModule extends Gdn_Module {
       $Separator = C('Garden.Modules.PagerSeparator', '&#8230;');
       
       // Show current page plus $Range pages on either side
-      $PagesToDisplay = ($Range * 2) + 1; 
+      $PagesToDisplay = ($Range * 2) + 1;
+      if ($PagesToDisplay + 2 >= $PageCount) {
+         // Don't display an ellipses if the page count is only a little bigger that the number of pages.
+         $PagesToDisplay = $PageCount;
+      }
 
       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
       $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);

@@ -19,6 +19,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
+   
+   public function __construct() {
+      parent::__construct();
+   }
 
    public function GetPluginName() {
       return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));

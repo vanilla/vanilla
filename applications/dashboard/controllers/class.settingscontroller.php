@@ -679,9 +679,14 @@ class SettingsController extends DashboardController {
       $this->Render();
    }
 
-   public static function SortAddons(&$Array) {
+   public static function SortAddons(&$Array, $Filter = TRUE) {
       // Make sure every addon has a name.
       foreach ($Array as $Key => $Value) {
+         if ($Filter && GetValue('Hidden', $Value)) {
+            unset($Array[$Key]);
+            continue;
+         }
+
          $Name = GetValue('Name', $Value, $Key);
          SetValue('Name', $Array[$Key], $Name);
       }

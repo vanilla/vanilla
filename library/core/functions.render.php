@@ -132,13 +132,13 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '') {
+   function UserAnchor($User, $CssClass = '', $Options = array()) {
       $User = (object)$User;
       
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+      return '<a href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
    }
 }
 

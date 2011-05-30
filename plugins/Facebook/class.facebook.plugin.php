@@ -275,7 +275,10 @@ class FacebookPlugin extends Gdn_Plugin {
       if ($Error)
          throw new Gdn_UserException($Error, 400);
 
+      $this->Structure();
+   }
 
+   public function Structure() {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),

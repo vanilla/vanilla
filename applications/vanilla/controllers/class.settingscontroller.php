@@ -454,10 +454,10 @@ class SettingsController extends Gdn_Controller {
       
 		// Define MaxDepthOptions
       $DepthData = array();
-      $DepthData['2'] = 'more than one level deep';
-      $DepthData['3'] = 'more than two levels deep';
-      $DepthData['4'] = 'more than three levels deep';
-      $DepthData['0'] = 'never';
+      $DepthData['2'] = sprintf(T('more than %s deep'), Plural(1, '%s level', '%s levels'));
+      $DepthData['3'] = sprintf(T('more than %s deep'), Plural(2, '%s level', '%s levels'));
+      $DepthData['4'] = sprintf(T('more than %s deep'), Plural(3, '%s level', '%s levels')) ;
+      $DepthData['0'] = T('never');
 		$this->SetData('MaxDepthData', $DepthData);
       
       // If seeing the form for the first time...

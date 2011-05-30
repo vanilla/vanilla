@@ -19,6 +19,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @namespace Garden.Core
  */
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
+   
+   public function __construct() {
+      parent::__construct();
+   }
 
    public function GetPluginName() {
       return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
@@ -85,6 +89,12 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       return '/'.$WebResource;
    }
    
+   /** Implementaion of Gdn_IPlugin::Setup().
+    */
+   public function Setup() {
+      // Do nothing...
+   }
+   
    /**
     * Retries UserMeta information for a UserID / Key pair
     * 
@@ -106,42 +116,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     */
    protected function GetUserMeta($UserID, $Key, $Default = NULL) {
       $MetaKey = $this->MakeMetaKey($Key);
-      
-      $UserMetaQuery = Gdn::SQL()
-         ->Select('*')
-         ->From('UserMeta u');
-         
-      if (is_array($UserID))
-         $UserMetaQuery->WhereIn('u.UserID', $UserID);
-      else
-         $UserMetaQuery->Where('u.UserID', $UserID);
-      
-      if (stristr($Key, '%'))
-         $UserMetaQuery->Like('u.Name', $MetaKey);
-      else
-         $UserMetaQuery->Where('u.Name', $MetaKey);
-      
-      $UserMetaData = $UserMetaQuery->Get();
-      
-      $UserMeta = array();
-      if ($UserMetaData->NumRows())
-         if (is_array($UserID)) {
-            while ($MetaRow = $UserMetaData->NextRow())
-               $UserMeta[$MetaRow->UserID][$MetaRow->Name] = $MetaRow->Value;
-         } else {
-            while ($MetaRow = $UserMetaData->NextRow())
-               $UserMeta[$MetaRow->Name] = $MetaRow->Value;
-         }
-      else
-         return $Default;
-      unset($UserMetaData);
-      return $UserMeta;
-   }
-
-   /** Implementaion of Gdn_IPlugin::Setup().
-    */
-   public function Setup() {
-      // Do nothing...
+      return $this->UserMetaModel()->GetUserMeta($UserID, $MetaKey, $Default);
    }
    
    /**
@@ -163,43 +138,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     */
    protected function SetUserMeta($UserID, $Key, $Value = NULL) {
       $MetaKey = $this->MakeMetaKey($Key);
-      
-      if (is_null($Value)) {  // Delete
-         $UserMetaQuery = Gdn::SQL();
-            
-         if (is_array($UserID))
-            $UserMetaQuery->WhereIn('UserID', $UserID);
-         else
-            $UserMetaQuery->Where('UserID', $UserID);
-         
-         if (stristr($Key, '%'))
-            $UserMetaQuery->Like('Name', $MetaKey);
-         else
-            $UserMetaQuery->Where('Name', $MetaKey);      
-         
-         $UserMetaQuery->Delete('UserMeta');
-      } else {                // Set
-         if (!is_array($UserID))
-            $UserID = array($UserID);
-         
-         foreach ($UserID as $UID) {
-            try {
-               Gdn::SQL()->Insert('UserMeta',array(
-                  'UserID'    => $UID,
-                  'Name'      => $MetaKey,
-                  'Value'     => $Value
-               ));
-            } catch (Exception $e) {
-               Gdn::SQL()->Update('UserMeta',array(
-                  'Value'     => $Value
-               ),array(
-                  'UserID'    => $UID,
-                  'Name'      => $MetaKey
-               ))->Put();
-            }
-         }
-      }
-      return;
+      $this->UserMetaModel()->SetUserMeta($UserID, $MetaKey, $Value);
    }
    
    /**
@@ -313,5 +252,12 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          $PluginName = get_class($this);
          throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
       }
+   }
+   
+   public function UserMetaModel() {
+      static $UserMetaModel = NULL;
+      if (is_null($UserMetaModel))
+         $UserMetaModel = new UserMetaModel();
+      return $UserMetaModel;
    }
 }

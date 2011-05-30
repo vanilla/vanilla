@@ -18,18 +18,21 @@
    white-space: nowrap;
    text-align: right;
 }
+.Tag a {
+   color: #1e79a7;
+}
 a.TagName {
     margin: 0;
     padding: 4px 0 0 0;
     display: inline-block;
     text-align: left;
     float: left;
-    width: 186px; /* 200px - 6px - 6px (padding) - 1px - 1px (border) */
+    width: 186px;
 }
 .Tag:hover {
    background: #f3fcff;
 }
-.Tag span {
+.Tag .Count {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;

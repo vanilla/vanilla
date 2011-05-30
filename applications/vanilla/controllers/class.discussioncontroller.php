@@ -119,12 +119,12 @@ class DiscussionController extends VanillaController {
       // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
 
-      // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
-
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
+
+      // Make sure to set the user's discussion watch records
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();

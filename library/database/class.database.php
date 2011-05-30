@@ -45,10 +45,13 @@ class Gdn_Database {
    
    protected $_Structure = NULL;
    
+   protected $_IsPersistent = FALSE;
+   
    /** Get the PDO connection to the database.
     * @return PDO The connection to the database.
     */
    public function Connection() {
+      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
       if(!is_object($this->_Connection)) {
          try {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
@@ -99,7 +102,7 @@ class Gdn_Database {
    }
    
    public function CloseConnection() {
-      if (!Gdn::Config('Database.PersistentConnection')) {
+      if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
       }

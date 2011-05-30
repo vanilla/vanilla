@@ -213,6 +213,19 @@ class ConversationModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       $MessageModel->DefineSchema();
+
+      if (!GetValue('RecipientUserIDs', $FormPostValues) && isset($FormPostValues['To'])) {
+            $To = explode(',', $FormPostValues['To']);
+            $To = array_map('trim', $To);
+
+            $RecipientUserIDs = $this->SQL
+               ->Select('UserID')
+               ->From('User')
+               ->WhereIn('Name', $To)
+               ->Get();
+            $RecipientUserIDs = ConsolidateArrayValuesByKey($RecipientUserIDs, 'UserID');
+            $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
+         }
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
@@ -232,9 +245,11 @@ class ConversationModel extends Gdn_Model {
          && $MessageModel->Validate($FormPostValues)
       ) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that relate to the schema
+         
 
          // Define the recipients, and make sure that the sender is in the list
-         $RecipientUserIDs = ArrayValue('RecipientUserID', $Fields, 0);
+         $RecipientUserIDs = GetValue('RecipientUserID', $Fields, 0);
+
          if (!in_array($Session->UserID, $RecipientUserIDs))
             $RecipientUserIDs[] = $Session->UserID;
             
@@ -267,7 +282,7 @@ class ConversationModel extends Gdn_Model {
          // And update the CountUnreadConversations count on each user related to the discussion.
          $this->SQL
             ->Update('User')
-            ->Set('CountUnreadConversations', 'CountUnreadConversations + 1', FALSE)
+            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
             ->WhereIn('UserID', $RecipientUserIDs)
             ->Where('UserID <>', $Session->UserID)
             ->Put();
@@ -326,6 +341,29 @@ class ConversationModel extends Gdn_Model {
          ->Where('UserID', $ClearingUserID)
          ->Where('ConversationID', $ConversationID)
          ->Put();
+
+      $this->CountUnread($ClearingUserID);
+   }
+
+   public function CountUnread($UserID, $Save = TRUE) {
+      // Also update the unread conversation count for this user
+      $CountUnread = $this->SQL
+         ->Select('c.ConversationID', 'count', 'CountUnread')
+         ->From('UserConversation uc')
+         ->Join('Conversation c', 'c.ConversationID = uc.ConversationID and uc.CountReadMessages < c.CountMessages')
+         ->Where('uc.UserID', $UserID)
+         ->Where('uc.Deleted', 0)
+         ->Get()->Value('CountUnread', 0);
+
+      if ($Save) {
+         $this->SQL
+            ->Update('User')
+            ->Set('CountUnreadConversations', $CountUnread)
+            ->Where('UserID', $UserID)
+            ->Put();
+      }
+
+      return $CountUnread;
    }
 
    /**
@@ -350,18 +388,7 @@ class ConversationModel extends Gdn_Model {
          ->Put();
          
       // Also update the unread conversation count for this user
-      $CountUnread = $this->SQL
-         ->Select('c.ConversationID', 'count', 'CountUnread')
-         ->From('UserConversation uc')
-         ->Join('Conversation c', 'c.ConversationID = uc.ConversationID and uc.CountReadMessages < c.CountMessages')
-         ->Where('uc.UserID', $ReadingUserID)
-         ->Get()->Value('CountUnread', 0);
-         
-      $this->SQL
-         ->Update('User')
-         ->Set('CountUnreadConversations', $CountUnread)
-         ->Where('UserID', $ReadingUserID)
-         ->Put();
+      $CountUnread = $this->CountUnread($ReadingUserID);
          
       // Also write through to the current session user.
       if($ReadingUserID > 0 && $ReadingUserID == Gdn::Session()->UserID)
@@ -458,7 +485,7 @@ class ConversationModel extends Gdn_Model {
          // Update the unread conversation count for each affected user
          $this->SQL
             ->Update('User')
-            ->Set('CountUnreadConversations', 'CountUnreadConversations + 1', FALSE)
+            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
             ->WhereIn('UserID', $AddedUserIDs)
             ->Put();
       }

@@ -64,10 +64,10 @@ if (!class_exists('HeadModule', FALSE)) {
        * @param string The location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
        * @param string Type media for the stylesheet. ie. "screen", "print", etc.
        */
-      public function AddCss($HRef, $Media = '') {
+      public function AddCss($HRef, $Media = '', $AddVersion = TRUE) {
          $this->AddTag('link', array('rel' => 'stylesheet',
             'type' => 'text/css',
-            'href' => Asset($HRef, FALSE, TRUE),
+            'href' => Asset($HRef, FALSE, $AddVersion),
             'media' => $Media));
       }
 
@@ -107,11 +107,27 @@ if (!class_exists('HeadModule', FALSE)) {
        *
        * @param string The location of the script relative to the web root. ie. "/js/jquery.js"
        * @param string The type of script being added. ie. "text/javascript"
+       * @param mixed Additional options to add to the tag. The following values are accepted:
+       *  - numeric: This will be the script's sort.
+       *  - string: This will hint the script (inline will inline the file in the page.
+       *  - array: An array of options (ex. sort, hint, version).
+       *
        */
-      public function AddScript($Src, $Type = 'text/javascript', $Sort = NULL) {
-         $Attributes = array('src' => Asset($Src, FALSE, TRUE), 'type' => $Type);
-         if ($Sort !== NULL)
-            $Attributes[self::SORT_KEY] = $Sort;
+      public function AddScript($Src, $Type = 'text/javascript', $Options = array()) {
+         if (is_numeric($Options)) {
+            $Options = array('sort' => $Options);
+         } elseif (is_string($Options)) {
+            $Options = array('hint' => $Options);
+         } elseif (!is_array($Options)) {
+            $Options = array();
+         }
+
+         $Attributes = array('src' => Asset($Src, FALSE, GetValue('version', $Options)), 'type' => $Type);
+
+         foreach ($Options as $Key => $Value) {
+            $Attributes['_'.strtolower($Key)] = $Value;
+         }
+         
          $this->AddTag('script', $Attributes);
       }
       
@@ -258,17 +274,30 @@ if (!class_exists('HeadModule', FALSE)) {
          foreach ($this->_Tags as $Index => $Attributes) {
             $Tag = $Attributes[self::TAG_KEY];
 
-            unset($Attributes[self::CONTENT_KEY], $Attributes[self::SORT_KEY], $Attributes[self::TAG_KEY]);
-            
-            $TagString = '';
+            // Inline the content of the tag, if necessary.
+            if (GetValue('_hint', $Attributes) == 'inline') {
+               $Path = GetValue('_path', $Attributes);
+               if (!StringBeginsWith($Path, 'http')) {
+                  $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
 
-            $TagString .= '<'.$Tag.Attribute($Attributes);
+                  if (isset($Attributes['src'])) {
+                     $Attributes['_src'] = $Attributes['src'];
+                     unset($Attributes['src']);
+                  }
+                  if (isset($Attributes['href'])) {
+                     $Attributes['_href'] = $Attributes['href'];
+                     unset($Attributes['href']);
+                  }
+               }
+            }
+            
+            $TagString = '<'.$Tag.Attribute($Attributes, '_');
 
             if (array_key_exists(self::CONTENT_KEY, $Attributes))
                $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
-            elseif ($Tag == 'script')
+            elseif ($Tag == 'script') {
                $TagString .= '></script>';
-            else
+            } else
                $TagString .= ' />';
 
             $TagStrings[] = $TagString;

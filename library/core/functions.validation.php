@@ -198,7 +198,7 @@ if (!function_exists('ValidateBoolean')) {
 
 if (!function_exists('ValidateDecimal')) {
    function ValidateDecimal($Value, $Field) {
-       if (is_object($Field) && $Field->AllowNull && trim($Value) === '') return TRUE;
+       if (is_object($Field) && $Field->AllowNull && $Value === '') return TRUE;
        return is_numeric($Value);
    }
 }
@@ -277,7 +277,7 @@ if (!function_exists('ValidateVersion')) {
       if (empty($Value))
          return TRUE;
 
-      if (preg_match('`(?:\d+\.)*\d+\s*(\w*)\d*`', $Value, $Matches)) {
+      if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $Value, $Matches)) {
          // Get the version word out of the matches and validate it.
          $Word = $Matches[1];
          if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p')))

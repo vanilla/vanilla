@@ -400,8 +400,13 @@ class EntryController extends Gdn_Controller {
                Gdn::Session()->Start($UserID);
 
                // Send the welcome email.
-               if (C('Garden.Registration.SendConnectEmail', TRUE))
-                  $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
+               if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+                  try {
+                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
+                  } catch (Exception $Ex) {
+                     // Do nothing if emailing doesn't work.
+                  }
+               }
 
                $this->_SetRedirect(TRUE);
             }

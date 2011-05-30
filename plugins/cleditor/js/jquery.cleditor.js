@@ -12,7 +12,7 @@
 // @output_file_name jquery.cleditor.min.js
 // ==/ClosureCompiler==
 
-(function($) {
+jQuery(document).ready(function($) {
 
   //==============
   // jQuery Plugin

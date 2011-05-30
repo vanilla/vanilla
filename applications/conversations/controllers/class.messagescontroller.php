@@ -84,11 +84,18 @@ class MessagesController extends ConversationsController {
          }
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
-         if ($ConversationID !== FALSE)
-            $this->RedirectUrl = Url('messages/'.$ConversationID);
-      } else if ($Recipient != '') {
-         $this->Form->SetFormValue('To', $Recipient);
+         if ($ConversationID !== FALSE) {
+            $Target = $this->Form->GetFormValue('Target', 'messages/'.$ConversationID);
+            
+            $this->RedirectUrl = Url($Target);
+         }
+      } else {
+         if ($Recipient != '')
+            $this->Form->SetFormValue('To', $Recipient);
       }
+      if ($Target = Gdn::Request()->Get('Target'))
+            $this->Form->AddHidden('Target', $Target);
+
       $this->Render();      
    }
    
@@ -170,7 +177,8 @@ class MessagesController extends ConversationsController {
       $Result = $ConversationData->Result();
       $this->ConversationModel->JoinParticipants($Result);
       
-      $this->ConversationData = $ConversationData;
+      $this->ConversationData =& $ConversationData;
+      $this->SetData('Conversations', $Result);
       
       $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
       

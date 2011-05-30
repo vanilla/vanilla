@@ -1947,10 +1947,14 @@ abstract class Gdn_SQLDriver {
          $Field = array($Field => $Value);
 
       foreach ($Field as $SubField => $SubValue) {
-         $WhereExpr = $this->ConditionExpr($SubField, $SubValue, $EscapeFieldSql, $EscapeValueSql);
-         if(strlen($WhereExpr) > 0) {
-            $this->_Where($WhereExpr);
-         }
+         if(is_array($SubValue) && isset($SubValue[0])) {
+            $this->WhereIn($SubField, $SubValue);
+      	} else {
+            $WhereExpr = $this->ConditionExpr($SubField, $SubValue, $EscapeFieldSql, $EscapeValueSql);
+            if(strlen($WhereExpr) > 0) {
+              $this->_Where($WhereExpr);
+            }
+        }
       }
       return $this;
    }

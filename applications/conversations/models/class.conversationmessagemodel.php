@@ -172,6 +172,7 @@ class ConversationMessageModel extends Gdn_Model {
          $Fields['Format'] = C('Conversations.Message.Format','Ham');
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
+         $this->LastMessageID = $MessageID;
          $ConversationID = ArrayValue('ConversationID', $Fields, 0);
          $Px = $this->SQL->Database->DatabasePrefix;
 
@@ -226,6 +227,9 @@ class ConversationMessageModel extends Gdn_Model {
 
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
+            if ($Session->UserID == $User->UserID)
+               continue; // don't notify self.
+
             // Notify the users of the new message.
             $ActivityID = $ActivityModel->Add(
                $Session->UserID,

@@ -419,11 +419,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * Adds a JS file to search for in the application or global js folder(s).
     *
     * @param string $FileName The js file to search for.
-    * @param string $AppFolder The application folder that should contain the JS file. Default is to
-    * use the application folder that this controller belongs to.
+    * @param string $AppFolder The application folder that should contain the JS file. Default is to use the application folder that this controller belongs to.
     */
-   public function AddJsFile($FileName, $AppFolder = '') {
-      $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
+   public function AddJsFile($FileName, $AppFolder = '', $Options = NULL) {
+      $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
    }
 
    /**
@@ -955,7 +954,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-           Redirect(Gdn::Authenticator()->SignInUrl($this->SelfUrl));
+           Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         } else {
            Gdn::Dispatcher()->Dispatch('DefaultPermission');
            exit();
@@ -1067,9 +1066,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          
          if (!check_utf8($this->_Json['Data']))
             $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
-   			
-         //$Result = json_encode($this->_Json);
-         $this->_Json['Data'] = json_encode($this->_Json);
+
+         $Json = json_encode($this->_Json);
+         // Check for jsonp call.
+         if ($Callback = $this->Request->Get('callback', FALSE)) {
+            $Json = $Callback.'('.$Json.')';
+         }
+
+         $this->_Json['Data'] = $Json;
          exit($this->_Json['Data']);
       } else {
          if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE)
@@ -1182,7 +1186,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          case DELIVERY_METHOD_JSON:
          default:
-            if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+            if ($Callback = $this->Request->Get('callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
@@ -1438,12 +1442,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
                
                if ($JsPath !== FALSE) {
-                  $JsPath = str_replace(
+                  $JsSrc = str_replace(
                      array(PATH_ROOT, DS),
                      array('', '/'),
                      $JsPath
                   );
-                  $this->Head->AddScript($JsPath);
+
+                  $Options = (array)$JsInfo['Options'];
+                  $Options['path'] = $JsPath;
+
+                  $this->Head->AddScript($JsSrc, 'text/javascript', $Options);
                }
             }
          }

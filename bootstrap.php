@@ -128,15 +128,6 @@ Gdn::Regarding();
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
-if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
-	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
-	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA'); 
-	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
-	setlocale(LC_ALL, $SetLocale);
-	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
-	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
-	unset($Gdn_Locale);
-}
 
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
@@ -160,6 +151,16 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+
+if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
+	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
+	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
+	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
+	setlocale(LC_ALL, $SetLocale);
+	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
+	unset($Gdn_Locale);
+}
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

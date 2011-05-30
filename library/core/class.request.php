@@ -198,9 +198,9 @@ class Gdn_Request {
    }
 
    /**
-    * Get a value from the post array or return the entire post array.
+    * Get a value from the GET array or return the entire GET array.
     *
-    * @param string|null $Key The key of the post item or null to return the entire post array.
+    * @param string|null $Key The key of the get item or null to return the entire get array.
     * @param mixed $Default The value to return if the item isn't set.
     * @return mixed
     */

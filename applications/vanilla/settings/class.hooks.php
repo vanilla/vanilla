@@ -102,14 +102,14 @@ class VanillaHooks implements Gdn_IPlugin {
     * @return bool Whether user has permission.
     */
    public function UserModel_GetCategoryViewPermission_Create($Sender) {
-      static $PermissonModel = NULL;
+      static $PermissionModel = NULL;
 
 
       $UserID = ArrayValue(0, $Sender->EventArguments, '');
 		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
 		if ($UserID && $CategoryID) {
-         if ($PermissonModel === NULL)
-            $PermissonModel = new PermissionModel();
+         if ($PermissionModel === NULL)
+            $PermissionModel = new PermissionModel();
          
          $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $CategoryID);
          return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;

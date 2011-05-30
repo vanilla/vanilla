@@ -636,8 +636,18 @@ if (!function_exists('Debug')) {
 }
 
 if (!function_exists('Deprecated')) {
-   function Deprecated($Name) {
-      trigger_error($Name.' is deprecated.', E_USER_DEPRECATED);
+   /**
+    * Mark a function deprecated.
+    *
+    * @param string $Name The name of the deprecated function.
+    * @param string $NewName The name of the new function that should be used instead.
+    */
+   function Deprecated($Name, $NewName = FALSE) {
+      $Msg = $Name.' is deprecated.';
+      if ($NewName)
+         $Msg .= " Use $NewName instead.";
+
+      trigger_error($Msg, E_USER_DEPRECATED);
    }
 }
 
@@ -1423,10 +1433,13 @@ if (!function_exists('ProxyRequest')) {
     * response.
     *
     * @param string $Url The full url to the page being requested (including http://)
+    * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout
+    * @param boolean $FollowRedirects Whether or not to follow 301 and 302 redirects. Defaults false.
+    * @return string Response (no headers)
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if (!$Timeout)
+		if ($Timeout === FALSE)
 			$Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
@@ -1462,7 +1475,7 @@ if (!function_exists('ProxyRequest')) {
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
-         if ($Timeout !== FALSE)
+         if ($Timeout > 0)
             curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above

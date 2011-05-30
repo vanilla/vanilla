@@ -12,15 +12,19 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Sender->EventArguments['Type'] = $Type;
    $Sender->EventArguments['Author'] = $Author;
    $CssClass = 'Item Comment';
+   $Permalink = GetValue('Url', $Object, FALSE);
+
    if ($Type == 'Comment') {
       $Sender->EventArguments['Comment'] = $Object;   
       $Id = 'Comment_'.$Object->CommentID;
-      $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
+      if ($Permalink === FALSE)
+         $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
    } else {
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;
-      $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
+      if ($Permalink === FALSE)
+         $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
    }
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $Sender->Options = '';
@@ -83,18 +87,19 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 
 function WriteOptionList($Object, $Sender, $Session) {
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+	$CategoryID = GetValue('CategoryID', $Object);
+	if(!$CategoryID && property_exists($Sender, 'Discussion'))
+		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
+   $PermissionCategoryID = GetValue('PermissionCategoryID', $Object, GetValue('PermissionCategoryID', $Sender->Discussion));
+
 	$CanEdit = $EditContentTimeout == -1 || strtotime($Object->DateInserted) + $EditContentTimeout > time();
 	$TimeLeft = '';
-	if ($CanEdit && $EditContentTimeout > 0) {
+	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
 		$TimeLeft = strtotime($Object->DateInserted) + $EditContentTimeout - time();
 		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
 	}
 
    $Sender->Options = '';
-	$CategoryID = GetValue('CategoryID', $Object);
-	if(!$CategoryID && property_exists($Sender, 'Discussion'))
-		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
-   $PermissionCategoryID = GetValue('PermissionCategoryID', $Object, GetValue('PermissionCategoryID', $Sender->Discussion));
 		
    // Show discussion options if this is the discussion / first comment
    if ($Sender->EventArguments['Type'] == 'Discussion') {
@@ -126,7 +131,7 @@ function WriteOptionList($Object, $Sender, $Session) {
 
       // Can the user delete the comment?
       if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode($Sender->SelfUrl), 'DeleteComment') . '</span>';
+         $Sender->Options .= '<span>'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Object->DiscussionID}/x"), 'DeleteComment') . '</span>';
    }
    
    // Allow plugins to add options

@@ -528,6 +528,12 @@ class Gdn_Configuration {
             $Result = rename($TmpFile, $File);
          }
       }
+
+      if ($Result && function_exists('apc_delete_file')) {
+         // This fixes a bug with some configurations of apc.
+         @apc_delete_file($File);
+      }
+
       // Clear out the save data array
       $this->_SaveData = array();
       $this->_File = '';

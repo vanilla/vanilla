@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $Alt = FALSE;
+$SubjectsVisible = C('Conversations.Subjects.Visible');
+
 foreach ($this->ConversationData->Result() as $Conversation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $LastAuthor = UserBuilder($Conversation, 'LastMessage');
@@ -17,37 +19,49 @@ foreach ($this->ConversationData->Result() as $Conversation) {
 
    if (StringIsNullOrEmpty(trim($Message)))
       $Message = T('Blank Message');
+
+
+   $this->EventArguments['Conversation'] = $Conversation;
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <?php if ($LastPhoto != '') { ?>
-   <div class="Photo"><?php echo $LastPhoto; ?></div>
+   <?php
+   $Names = '';
+   $PhotoUser = NULL;
+   foreach ($Conversation->Participants as $User) {
+      if (GetValue('UserID', $User) == Gdn::Session()->UserID)
+         continue;
+      $Names = ConcatSep(', ', $Names, GetValue('Name', $User));
+      if (!$PhotoUser && GetValue('Photo', $User))
+         $PhotoUser = $User;
+   }
+   ?>
+   <?php if ($PhotoUser) { ?>
+   <div class="Photo"><?php echo UserPhoto($PhotoUser); ?></div>
    <?php } ?>
    <div class="ItemContent Conversation">
-      <div class="Excerpt"><?php echo Anchor($Message, '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
+      <?php
+      $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
+
+      if ($Names) {
+         echo '<h3 class="Users">', Anchor(htmlspecialchars($Names), $Url), '</h3>';
+      }
+      if ($SubjectsVisible && $Subject = GetValue('Subject', $Conversation)) {
+         echo '<div class="Subject"><b>'.Anchor(htmlspecialchars($Subject), $Url).'</b></div>';
+      }
+      ?>
+      <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
       <div class="Meta">
-         <span><?php echo UserAnchor($LastAuthor, 'Name'); ?></span>
-         <span><?php echo Gdn_Format::Date($Conversation->DateLastMessage); ?></span>
-         <span><?php printf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages); ?></span>
-         <?php
+         <?php 
+         $this->FireEvent('BeforeConversationMeta');
+
+         echo '<span class="MetaItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span>';
+
          if ($Conversation->CountNewMessages > 0) {
-            echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
+            echo '<strong class="MetaItem">'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
          }
+         
+         echo '<span class="MetaItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span>';
          ?>
-         <span class="MetaItem">
-            <span class="MetaLabel"><?php echo T('Participants'); ?></span>
-            <span class="MetaValue">
-               <?php
-               $First = TRUE;
-               foreach ($Conversation->Participants as $User) {
-                  if ($First)
-                     $First = FALSE;
-                  else
-                     echo ', ';
-                  echo UserAnchor($User, 'Name');
-               }
-               ?>
-            <span>
-         </span>
       </div>
    </div>
 </li>

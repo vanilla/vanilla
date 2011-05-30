@@ -208,10 +208,14 @@ class PagerModule extends Gdn_Module {
       $Range = C('Garden.Modules.PagerRange', 3);
       
       // String to represent skipped pages
-      $Separator = C('Garden.Modules.PagerSeparator', '&hellip;'); 
+      $Separator = C('Garden.Modules.PagerSeparator', '&#8230;');
       
       // Show current page plus $Range pages on either side
-      $PagesToDisplay = ($Range * 2) + 1; 
+      $PagesToDisplay = ($Range * 2) + 1;
+      if ($PagesToDisplay + 2 >= $PageCount) {
+         // Don't display an ellipses if the page count is only a little bigger that the number of pages.
+         $PagesToDisplay = $PageCount;
+      }
 
       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
       $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
@@ -311,7 +315,7 @@ class PagerModule extends Gdn_Module {
 		
       $Pager->ClientID = GetValue('ClientID', $Options, $Pager->ClientID);
 
-      $Pager->Limit = GetValue('Limit', $Options, $Pager->Limit);
+      $Pager->Limit = GetValue('Limit', $Options, $Pager->Controller()->Data('_Limit', $Pager->Limit));
       $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, GetValue('HtmlBefore', $Pager, ''));
 
       // Try and figure out the offset based on the parameters coming in to the controller.

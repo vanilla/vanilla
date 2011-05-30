@@ -90,7 +90,8 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			</ul>
 	
 		<?php
-		echo Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer'));
+
+		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer')), '</div>';
 	
 		endif;
 		

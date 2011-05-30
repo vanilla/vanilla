@@ -40,7 +40,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       if ($Extension === NULL)
          $this->_AllowedFileExtensions = array();
 		elseif (is_array($Extension))
-			array_merge($this->_AllowedFileExtensions, $Extension);
+			$this->_AllowedFileExtensions = array_merge($this->_AllowedFileExtensions, $Extension);
 		else
 			$this->_AllowedFileExtensions[] = $Extension;
 	}

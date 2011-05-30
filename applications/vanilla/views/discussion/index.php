@@ -16,8 +16,13 @@ if ($Session->IsValid()) {
       array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
    );
 }
+
+$PageClass = '';
+if($this->Pager->FirstPage()) 
+	$PageClass = 'FirstPage'; 
+	
 ?>
-<div class="Tabs HeadingTabs DiscussionTabs">
+<div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
    <ul>
       <li><?php
          if (C('Vanilla.Categories.Use') == TRUE) {
@@ -35,7 +40,7 @@ if ($Session->IsValid()) {
    <?php } ?>
 </div>
 <?php $this->FireEvent('BeforeDiscussion'); ?>
-<ul class="MessageList Discussion">
+<ul class="MessageList Discussion <?php echo $PageClass; ?>">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php

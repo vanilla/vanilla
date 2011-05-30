@@ -308,13 +308,16 @@ class MessagesController extends ConversationsController {
       $InConversation = FALSE;
       foreach($this->RecipientData->Result() as $User) {
          if($User->Deleted)
-            continue;
+            $CssClass = 'Deleted';
+         else
+            $CssClass = '';
+         
          $Count++;
          if($User->UserID == $Session->UserID) {
             $InConversation = TRUE;
             continue;
          }
-         $Users[] = UserAnchor($User);
+         $Users[] = UserAnchor($User, $CssClass);
       }
       if ($InConversation) {
          if(count($Users) == 0)

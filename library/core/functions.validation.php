@@ -116,11 +116,28 @@ if (!function_exists('ValidateWebAddress')) {
    }
 }
 
+if (!function_exists('ValidateUsernameRegex')) {
+   function ValidateUsernameRegex() {
+      static $ValidateUsernameRegex;
+      
+      if (is_null($ValidateUsernameRegex) || $Rebuild) {
+         $ValidateUsernameRegex = sprintf("[%s]%s",
+            C("Garden.User.ValidationRegex","\d\w_"),
+            C("Garden.User.ValidationLength","{3,20}"));
+         
+      }
+      
+      return $ValidateUsernameRegex;
+   }
+}
+
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
+      $ValidateUsernameRegex = ValidateUsernameRegex();
+      
       return ValidateRegex(
          $Value,
-         '/^([\d\w_]{3,20})?$/si'
+         "/^({$ValidateUsernameRegex})?$/siu"
       );
    }
 }

@@ -76,7 +76,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $Sender->SQL
                ->Update('Discussion')
                ->Set('CountComments', "CountComments - {$Row['CountComments']}", FALSE)
-               ->Where('DiscussionID', $DiscussionID)
+               ->Where('DiscussionID', $Row['DiscussionID'])
                ->Put();
          }
 

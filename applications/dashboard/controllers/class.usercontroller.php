@@ -112,6 +112,8 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user/applicants');
       $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
+      
+      $this->FireEvent('BeforeApplicants');
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');

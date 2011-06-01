@@ -223,7 +223,7 @@ class Gdn_Database {
          // Check to see if the query is cached.
          $CacheKeys = (array)GetValue('Cache',$Options,NULL);
          $CacheOperation = GetValue('CacheOperation',$Options,NULL);
-         if (is_null($CacheOperation))
+         if (is_null($CacheOperation)) {
             switch ($ReturnType) {
                case 'DataSet':
                   $CacheOperation = 'get';
@@ -233,6 +233,7 @@ class Gdn_Database {
                   $CacheOperation = 'remove';
                   break;
             }
+         }
          
          switch ($CacheOperation) {
             case 'get':
@@ -258,7 +259,7 @@ class Gdn_Database {
             
             case 'remove':
                foreach ($CacheKeys as $CacheKey) {
-                  Gdn::Cache()->Remove($CacheKey);
+                  $Res = Gdn::Cache()->Remove($CacheKey);
                }
                break;
          }

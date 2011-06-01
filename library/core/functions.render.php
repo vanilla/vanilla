@@ -191,6 +191,19 @@ if (!function_exists('UserPhoto')) {
       }
    }
 }
+
+if (!function_exists('UserUrl')) {
+   /**
+    * Return the url for a user.
+    * @param array|object $User The user to get the url for.
+    * @return string The url suitable to be passed into the Url() function.
+    */
+   function UserUrl($User) {
+      return '/profile/'.rawurlencode(GetValue('Name', $User));
+   }
+}
+
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */

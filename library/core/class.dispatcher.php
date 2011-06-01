@@ -263,13 +263,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
-         
-         $this->FireEvent('BeforeControllerMethod');
 
          // Set special controller method options for REST APIs.
          $this->_ReflectControllerArgs($Controller);
-         
          Gdn::Controller($Controller);
+         
+         $this->FireEvent('BeforeControllerMethod');
+         
          $Controller->Initialize();
 
          // Call the requested method on the controller - error out if not defined.

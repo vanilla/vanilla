@@ -155,7 +155,7 @@ class ConversationMessageModel extends Gdn_Model {
     * @param array $FormPostValues Values submitted via form.
     * @return int Unique ID of message created or updated.
     */
-   public function Save($FormPostValues) {
+   public function Save($FormPostValues, $Conversation = NULL) {
       $Session = Gdn::Session();
       
       // Define the primary key in this model's table.
@@ -174,7 +174,9 @@ class ConversationMessageModel extends Gdn_Model {
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
          $this->LastMessageID = $MessageID;
          $ConversationID = ArrayValue('ConversationID', $Fields, 0);
-         $Px = $this->SQL->Database->DatabasePrefix;
+
+         if (!$Conversation)
+            $Conversation = $this->SQL->GetWhere('Conversation', array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
 
          // Get the new message count for the conversation.
          $SQLR = $this->SQL
@@ -240,7 +242,11 @@ class ConversationMessageModel extends Gdn_Model {
                "/messages/$ConversationID#$MessageID",
                FALSE
             );
-            $Story = ArrayValue('Body', $Fields, '');
+            $Story = GetValue('Body', $Fields, '');
+            
+            if (C('Conversations.Subjects.Visible')) {
+               $Story = ConcatSep("\n\n", GetValue('Subject', $Conversation, ''), $Story);
+            }
             $ActivityModel->SendNotification($ActivityID, $Story);
          }
       }

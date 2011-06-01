@@ -290,6 +290,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      'Close'        => 0,
                      'RegardingID'  => $RegardingID
                   ));
+                  
+                  $DiscussionModel->UpdateDiscussionCount($CategoryID);
                } else {
                   // Add a comment to the existing discussion
                   
@@ -302,6 +304,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         'Body'         => $this->Comment,
                         'InsertUserID' => $this->UserID
                      ));
+                     
+                     $CommentModel->Save2($CommentID, TRUE);
                   }
                }
                

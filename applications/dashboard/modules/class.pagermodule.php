@@ -334,7 +334,7 @@ class PagerModule extends Gdn_Module {
          $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', 0));
 
          $Get = $Pager->Controller()->Request->Get();
-         unset($Get['Page']);
+         unset($Get['Page'], $Get['DeliveryType'], $Get['DeliveryMethod']);
          $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}&'.http_build_query($Get));
 
          $Pager->Configure($Offset, $Limit, $TotalRecords, $Url);

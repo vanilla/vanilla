@@ -112,8 +112,13 @@ p {
 .P {
    margin: 0.5em 0;
 }
-h1, h2 {
+h1 {
    font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
+}
+h2 {
+   font-size:130%;
    font-weight:bold;
    margin-bottom:10px;
 }
@@ -2207,8 +2212,7 @@ body.Discussion .Back {
 
 
 /* =================================================================== Drafts */
-ul.Discussions div.ItemContent,
-ul.Drafts div.ItemContent {
+.DataList .ItemContent {
    margin: 0 0 0 9px;
 }
 ul.Drafts div.ItemContent a.Title,

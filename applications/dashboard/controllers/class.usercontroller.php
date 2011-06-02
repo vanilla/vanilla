@@ -112,6 +112,8 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user/applicants');
       $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
+      
+      $this->FireEvent('BeforeApplicants');
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');
@@ -302,8 +304,13 @@ class UserController extends DashboardController {
          $UserModel = new UserModel();
          if (is_numeric($UserID)) {
             try {
+               $this->EventArguments['UserID'] = $UserID;
+               $this->FireEvent("Before{$Action}User");
+               
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
+               
+               $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;
                $this->Form->AddError(strip_tags($ex->getMessage()));

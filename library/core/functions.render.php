@@ -132,13 +132,13 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '') {
+   function UserAnchor($User, $CssClass = '', $Options = array()) {
       $User = (object)$User;
       
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+      return '<a href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
    }
 }
 
@@ -184,11 +184,26 @@ if (!function_exists('UserPhoto')) {
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
             .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
             .'</a>';
+      } elseif (function_exists('UserPhotoDefault')) {
+         return UserPhotoDefault($User, $Options);
       } else {
          return '';
       }
    }
 }
+
+if (!function_exists('UserUrl')) {
+   /**
+    * Return the url for a user.
+    * @param array|object $User The user to get the url for.
+    * @return string The url suitable to be passed into the Url() function.
+    */
+   function UserUrl($User) {
+      return '/profile/'.rawurlencode(GetValue('Name', $User));
+   }
+}
+
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */

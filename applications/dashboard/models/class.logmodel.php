@@ -191,6 +191,10 @@ class LogModel extends Gdn_Pluggable {
       // Grab the record from the DB.
       $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
       foreach ($OldData as $Row) {
+         // Don't log the change if it's right after an insert.
+         if (isset($Row['DateInserted']) && (time() - Gdn_Format::ToTimestamp($Row['DateInserted'])) < 2 * 60)
+            continue;
+
          $Row['_New'] = $NewData;
          self::Insert($Operation, $RecordType, $Row);
       }

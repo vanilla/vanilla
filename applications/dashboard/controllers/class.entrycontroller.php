@@ -975,6 +975,7 @@ class EntryController extends Gdn_Controller {
                if ($this->Form->GetFormValue('RememberMe'))
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
+               $this->EventArguments['AuthUserID'] = $AuthUserID;
                $this->FireEvent('RegistrationPending');
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
             }

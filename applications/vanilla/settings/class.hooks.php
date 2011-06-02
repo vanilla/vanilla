@@ -63,6 +63,23 @@ class VanillaHooks implements Gdn_IPlugin {
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
+         // Grab all of the discussions that the user has engaged in.
+         $DiscussionIDs = $Sender->SQL
+            ->Select('DiscussionID')
+            ->Select('CommentID', 'count', 'CountComments')
+            ->From('Comment')
+            ->Where('InsertUserID', $UserID)
+            ->Get()->ResultArray();
+
+         // Update the comment counts.
+         foreach ($DiscussionIDs as $Row) {
+            $Sender->SQL
+               ->Update('Discussion')
+               ->Set('CountComments', "CountComments - {$Row['CountComments']}", FALSE)
+               ->Where('DiscussionID', $Row['DiscussionID'])
+               ->Put();
+         }
+
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
 			$Sender->SQL->From('Comment')

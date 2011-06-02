@@ -5,13 +5,15 @@ echo $this->Form->Open(array('action' => Url('/dashboard/user/applicants')));
 ?>
 <h1><?php echo T('Manage Applicants'); ?></h1>
 <?php
-echo $this->Form->Errors();
-if ($this->UserData->NumRows() == 0) {
-   ?>
-<div class="Info"><?php echo T('There are currently no applicants.'); ?></div>
-   <?php
-} else {
-   ?>
+   echo $this->Form->Errors();
+   $NumApplicants = $this->UserData->NumRows();
+   if ($NumApplicants == 0) { ?>
+      <div class="Info"><?php echo T('There are currently no applicants.'); ?></div>
+   <?php } else { ?>
+<?php
+   $AppText = Plural($NumApplicants, 'There is currently %s applicant', 'There are currently %s applicants');
+?>
+<div class="Info"><?php echo sprintf($AppText, $NumApplicants); ?></div>
 <table class="CheckColumn">
    <thead>
       <tr>
@@ -29,9 +31,13 @@ if ($this->UserData->NumRows() == 0) {
          <td class="Alt">
             <?php
             printf(T('<strong>%1$s</strong> (%2$s) %3$s'), $User->Name, Gdn_Format::Email($User->Email), Gdn_Format::Date($User->DateInserted));
+            
             $this->EventArguments['User'] = $User;
             $this->FireEvent("ApplicantInfo");
             echo '<blockquote>'.$User->DiscoveryText.'</blockquote>';
+            
+            $this->EventArguments['User'] = $User;
+            $this->FireEvent("AppendApplicantInfo");
          ?></td>
          <td><?php
          echo Anchor(T('Approve'), '/user/approve/'.$User->UserID.'/'.$Session->TransientKey())
@@ -41,8 +47,10 @@ if ($this->UserData->NumRows() == 0) {
    <?php } ?>
    </tbody>
 </table>
-   <?php
+<div class="Info">
+<?php
    echo $this->Form->Button('Approve', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
    echo $this->Form->Button('Decline', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
+?></div><?php
 }
 echo $this->Form->Close();

@@ -397,7 +397,7 @@ class DiscussionController extends VanillaController {
 
             $Announce = GetValue('Announce', $Discussion);
             $this->DiscussionModel->SQL->Cache($CacheKeys);
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', !$Announce);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)!$Announce);
          } else {
             $this->Form->AddError('ErrPermission');
          }

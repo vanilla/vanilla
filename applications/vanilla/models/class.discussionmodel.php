@@ -242,6 +242,9 @@ class DiscussionModel extends VanillaModel {
 		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
+         $Discussion->Name = Gdn_Format::Text($Discussion->Name);
+         $Discussion->Url = Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
 				if ($Discussion->CountCommentWatch) {
@@ -946,8 +949,8 @@ class DiscussionModel extends VanillaModel {
             left join (
               select
                 d.CategoryID,
-                count(d.DiscussionID) as CountDiscussions,
-                sum(d.CountComments) as CountComments
+                coalesce(count(d.DiscussionID), 0) as CountDiscussions,
+                coalesce(sum(d.CountComments), 0) as CountComments
               from :_Discussion d
               $Where
               group by d.CategoryID
@@ -969,8 +972,8 @@ class DiscussionModel extends VanillaModel {
 			$this->AddArchiveWhere();
 			
 			$Data = $this->SQL->Get()->FirstRow();
-         $CountDiscussions = GetValue('CountDiscussions', $Data, 0);
-         $CountComments = GetValue('CountComments', $Data, 0);
+         $CountDiscussions = (int)GetValue('CountDiscussions', $Data, 0);
+         $CountComments = (int)GetValue('CountComments', $Data, 0);
          
          $this->SQL
             ->Update('Category')
@@ -1246,16 +1249,16 @@ class DiscussionModel extends VanillaModel {
 		$BookmarkData = $this->GetBookmarkUsers($DiscussionID);
 
       $Data = $this->SQL
-         ->Select('CategoryID,InsertUserID')
+         ->Select('*')
          ->From('Discussion')
          ->Where('DiscussionID', $DiscussionID)
-         ->Get();
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       
       $UserID = FALSE;
       $CategoryID = FALSE;
-      if ($Data->NumRows() > 0) {
-         $UserID = $Data->FirstRow()->InsertUserID;
-         $CategoryID = $Data->FirstRow()->CategoryID;
+      if ($Data) {
+         $UserID = $Data['InsertUserID'];
+         $CategoryID = $Data['CategoryID'];
       }
       
       // Prep and fire event
@@ -1264,22 +1267,32 @@ class DiscussionModel extends VanillaModel {
       
       // Execute deletion of discussion and related bits
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
+
+      // Log all of the comment deletes.
+      $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
+      foreach ($Comments as $Comment) {
+         LogModel::Insert('Delete', 'Comment', $Comment);
+      }
+
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
+
+      LogModel::Insert('Delete', 'Discussion', $Data);
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
+      
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
       // Get the user's discussion count
-      $Data = $this->SQL
+      $CountDiscussions = $this->SQL
          ->Select('DiscussionID', 'count', 'CountDiscussions')
          ->From('Discussion')
          ->Where('InsertUserID', $UserID)
-         ->Get();
+         ->Get()->Value('CountDiscussions', 0);
       
       // Save the count to the user table
       $this->SQL
          ->Update('User')
-         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
+         ->Set('CountDiscussions', $CountDiscussions)
          ->Where('UserID', $UserID)
          ->Put();
 

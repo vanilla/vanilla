@@ -211,6 +211,28 @@ class UserModel extends Gdn_Model {
       $this->SetCalculatedFields($User);
       return $User;
    }
+   
+   public function GetByRole($Role) {
+      $RoleID = $Role; // Optimistic
+      if (is_string($Role)) {
+         $RoleModel = new RoleModel();
+         $Roles = $RoleModel->GetArray();
+         $RolesByName = array_flip($Roles);
+         
+         $RoleID = GetValue($Role, $RolesByName, NULL);
+         
+         // No such role
+         if (is_null($RoleID)) return new Gdn_DataSet();
+      }
+
+      return $this->SQL->Select('u.*')
+         ->From('User u')
+         ->Join('UserRole ur', 'u.UserID = ur.UserID')
+         ->Where('ur.RoleID', $RoleID, TRUE, FALSE)
+//         ->GroupBy('UserID')
+         ->OrderBy('DateInserted', 'desc')
+         ->Get();
+   }
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();

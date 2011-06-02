@@ -250,7 +250,7 @@ class CommentModel extends VanillaModel {
                $NewComment |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
             // Update the watch data.
-				if ($NewComment || ($CountWatch != $Discussion->CountCommentWatch && $CountWatch > $Discussion->CountCommentWatch)) {
+				if ($NewComment || ($CountWatch != $Discussion->CountCommentWatch)) {
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',

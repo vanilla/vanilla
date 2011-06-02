@@ -3250,27 +3250,6 @@ body.embed div.Connect h2 {
 	padding: 2px 8px 4px;
 	background: #f2f2f2;
 }
-.Credit {
-	padding: 0 8px;
-}
-.Credit a,
-.Credit a:hover {
-	font-size: 9px;
-	color: #888 !important;
-	text-decoration: none !important;
-}
-.Credit a:hover {
-	color: #333 !important;
-}
-.Credit .Logo {
-	line-height: 25px;
-	text-indent: -1000px;
-	vertical-align: baseline;
-	display: inline-block;
-	height: 22px;
-	width: 46px;
-	background: url('images/vanilla-logo-46px.png') 0 0 no-repeat;
-}
 /* ============================================================ Regarding */
 
 div.RegardingEvent {

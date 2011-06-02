@@ -29,9 +29,9 @@
       <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
       <li class="CreateAccount">
          <?php
-            $Target = GetIncomingValue('Target', '');
+            $Target = $this->Target();
             if ($Target != '')
-               $Target = '?Target='.$Target;
+               $Target = '?Target='.urlencode($Target);
 
             printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
          ?>

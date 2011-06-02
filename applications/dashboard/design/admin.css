@@ -146,6 +146,10 @@ p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
 }
+small {
+	font-size: 12px;
+	color: #555;
+}
 code {
    border-radius: 2px;
    -moz-border-radius: 2px;

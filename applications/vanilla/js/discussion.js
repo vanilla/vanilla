@@ -66,7 +66,11 @@ jQuery(document).ready(function($) {
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id');
-      lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      if (lastCommentID)
+         lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      else
+         lastCommentID = 0;
+         
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
@@ -187,8 +191,9 @@ jQuery(document).ready(function($) {
                      $('ul.Discussion li:last').effect("highlight", {}, "slow");
                   }
                }
-               // Remove any "More" pager links
-               $('#PagerMore').remove();
+               // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
+               if (gdn.definition('PrependNewComments') != '1') // If prepending the latest comment, don't remove the pager.
+                  $('#PagerMore').remove();
 
                // Let listeners know that the comment was added.
                $(document).trigger('CommentAdded');

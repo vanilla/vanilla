@@ -59,5 +59,4 @@ if ($this->Pager->LastPage()) {
 }
 echo $this->Pager->ToString('more');
 ?>
-<div class="Credit"><a href="http://vanillaforums.com">Comments by <span class="Logo">Vanilla</span></a></div>
 </div>

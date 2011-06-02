@@ -417,6 +417,7 @@ class CategoryModel extends Gdn_Model {
          ->Select('cu.Photo', '', 'LastCommentPhoto')
          ->Select('co.DiscussionID', '', 'LastDiscussionID')
          ->Select('d.Name', '', 'LastDiscussionName')
+         ->Select('d.CountComments', '', 'LastDiscussionCountComments')
          ->From('Category c')
          ->Join('Comment co', 'c.LastCommentID = co.CommentID', 'left')
          ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')

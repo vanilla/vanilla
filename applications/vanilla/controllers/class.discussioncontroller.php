@@ -607,6 +607,13 @@ class DiscussionController extends VanillaController {
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
       $this->Theme = 'default'; // Force the default theme on embedded comments
+      // Add some css to help with the transparent bg on embedded comments
+      if ($this->Head)
+         $this->Head->AddString('<style type="text/css">
+body { background: transparent !important; }
+ul.MessageList li.Item { background: #fff; }
+ul.MessageList li.Item.Mine { background: #E3F4FF; }
+</style>');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
@@ -624,6 +631,8 @@ class DiscussionController extends VanillaController {
       $ForeignType = GetIncomingValue('vanilla_type', '');
       $ForeignName = GetIncomingValue('vanilla_name', '');
       $ForeignUrl = GetIncomingValue('vanilla_url', '');
+      $this->SetData('ForeignUrl', $ForeignUrl);
+      $this->AddDefinition('ForeignUrl', $ForeignUrl);
       $ForeignBody = GetIncomingValue('vanilla_body', '');
       $CategoryID = GetIncomingValue('vanilla_category_id', '');
       
@@ -633,7 +642,7 @@ class DiscussionController extends VanillaController {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       else if ($ForeignID != '' && $ForeignType != '')
          $Discussion = $this->DiscussionModel->GetForeignID($ForeignID, $ForeignType);
-      
+         
       // If no discussion record was found, but foreign id was provided, create it now
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
          $Body = $ForeignBody;
@@ -662,9 +671,15 @@ class DiscussionController extends VanillaController {
                }
             }
          }
-
-         $DiscussionID = $this->DiscussionModel->Save(
+         
+         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $DiscussionID = $this->DiscussionModel->SQL->Insert(
+            'Discussion',
             array(
+               'InsertUserID' => $SystemUserID,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'UpdateUserID' => $SystemUserID,
+               'DateUpdated' => Gdn_Format::ToDateTime(),
                'CategoryID' => $CategoryID == '' ? NULL : $CategoryID,
                'ForeignID' => $ForeignID,
                'Type' => $ForeignType,
@@ -764,4 +779,5 @@ class DiscussionController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
+   
 }

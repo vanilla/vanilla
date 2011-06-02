@@ -425,7 +425,7 @@ $Construct->Table('Regarding')
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)
    ->Column('Comment', 'text', FALSE)
-   ->Column('Reports', 'int(11)', FALSE)
+   ->Column('Reports', 'int(11)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

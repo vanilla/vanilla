@@ -314,4 +314,39 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Value', $CountBookmarks);
       $this->xRender('Value', 'utility', 'dashboard');
    }
+	
+	/**
+	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
+	 */
+	public function GetCommentCounts() {
+		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
+		if (!is_array($vanilla_identifier))
+			$vanilla_identifier = array($vanilla_identifier);
+			
+		$CountData = Gdn::SQL()
+			->Select('ForeignID, CountComments')
+			->From('Discussion')
+			->WhereIn('ForeignID', $vanilla_identifier)
+			->Get();
+		
+		$FinalData = array();
+		$i = 0;
+		foreach ($CountData->Result() as $Row) {
+			while ($Row->ForeignID != $vanilla_identifier[$i]) {
+				$FinalData[$vanilla_identifier[$i]] = 0;
+				$i++;
+			}
+			$Row->CountComments--;
+			if ($Row->CountComments < 0)
+				$Row->CountComments = 0;
+
+			$FinalData[$Row->ForeignID] = $Row->CountComments;
+			$i++;
+		}
+
+		$this->SetData('CountData', $FinalData);
+		$this->DeliveryMethod = DELIVERY_METHOD_JSON;
+		$this->DeliveryType = DELIVERY_TYPE_DATA;
+		$this->Render();
+	}
 }

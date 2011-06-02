@@ -115,6 +115,22 @@ jQuery(document).ready(function($) {
             if (!noTop)
                $(this).attr('target', '_top');
                
+            // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
+            if ($(this).parents('.CreateAccount').length > 0) {
+               // Examine querystring parameters for a target & replace it with the embed page
+               var href = $(this).attr('href');
+               var targetIndex = href.indexOf('Target=');
+               if (targetIndex > 0) {
+                  var target = href.substring(targetIndex + 7);
+                  var afterTarget = '';
+                  if (target.indexOf('&') > 0)
+                     afterTarget = target.substring(target.indexOf('&'));
+                  
+                  $(this).attr('href', href.substring(0, targetIndex + 7)
+                     + encodeURIComponent(gdn.definition('ForeignUrl', ''))
+                     + afterTarget);
+               }
+            }
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);

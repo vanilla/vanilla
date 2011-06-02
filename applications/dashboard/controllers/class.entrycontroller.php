@@ -1062,19 +1062,19 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
             $AuthUserID = $this->UserModel->Register($Values);
             if (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-               if($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+               if ($this->_DeliveryType != DELIVERY_TYPE_ALL)
                   $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
-               }
+
             } else {
                // The user has been created successfully, so sign in now.
-               Gdn::Session()->Start($AuthUserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
+					if (!Gdn::Session()->IsValid())
+						Gdn::Session()->Start($AuthUserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
 
                try {
                   $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
@@ -1393,12 +1393,30 @@ class EntryController extends Gdn_Controller {
          $MyHostname = parse_url(Gdn::Request()->Domain(),PHP_URL_HOST);
          $TargetHostname = parse_url($Target, PHP_URL_HOST);
          
-         // Dont allow external redirects, but fire an event to allow override
-         $AllowExternalRedirect = C('Garden.Target.AllowExternalRedirect', FALSE);
-         $Sender->EventArguments['AllowExternalRedirect'] = &$AllowExternalRedirect;
+         // Only allow external redirects to trusted domains.
+         $TrustedDomains = C('Garden.TrustedDomains');
+			if (!is_array($TrustedDomains))
+				$TrustedDomains = array();
+			
+			// Add this domain to the trusted hosts
+			$TrustedDomains[] = $MyHostname;
+         $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
          $this->FireEvent('BeforeTargetReturn');
-         if (!$AllowExternalRedirect && $MyHostname != $TargetHostname) 
-            return '';
+			
+			if (count($TrustedDomains) == 0) {
+				// Only allow http redirects if they are to the same host name.
+				if ($MyHostname != $TargetHostname)
+					$Target = '';
+			} else {
+				// Loop the trusted domains looking for a match
+				$Match = FALSE;
+				foreach ($TrustedDomains as $TrustedDomain) {
+					if (StringEndsWith($TargetHostname, $TrustedDomain, TRUE))
+						$Match = TRUE;
+				}
+				if (!$Match)
+					$Target = '';
+			}
       }
       return $Target;
    }

@@ -78,7 +78,7 @@ class CategoryModel extends Gdn_Model {
 
          $Categories = $Sql->Get()->ResultArray();
          $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
-         unset($Categories[-1]);
+//         unset($Categories[-1]); Don't unset, may need for counts later
          self::CalculateData($Categories);
 
          // Add permissions.

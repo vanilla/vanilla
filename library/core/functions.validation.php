@@ -124,7 +124,6 @@ if (!function_exists('ValidateUsernameRegex')) {
          $ValidateUsernameRegex = sprintf("[%s]%s",
             C("Garden.User.ValidationRegex","\d\w_"),
             C("Garden.User.ValidationLength","{3,20}"));
-         
       }
       
       return $ValidateUsernameRegex;

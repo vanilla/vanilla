@@ -337,18 +337,24 @@ class DiscussionsController extends VanillaController {
 			->Get();
 		
 		$FinalData = array();
-		$i = 0;
-		foreach ($CountData->Result() as $Row) {
-			while ($Row->ForeignID != $vanilla_identifier[$i]) {
-				$FinalData[$vanilla_identifier[$i]] = 0;
+		if ($CountData->NumRows() == 0) {
+			foreach ($vanilla_identifier as $identifier) {
+				$FinalData[$identifier] = 0;
+			}
+		} else {
+			$i = 0;
+			foreach ($CountData->Result() as $Row) {
+				while ($Row->ForeignID != $vanilla_identifier[$i]) {
+					$FinalData[$vanilla_identifier[$i]] = 0;
+					$i++;
+				}
+				$Row->CountComments--;
+				if ($Row->CountComments < 0)
+					$Row->CountComments = 0;
+	
+				$FinalData[$Row->ForeignID] = $Row->CountComments;
 				$i++;
 			}
-			$Row->CountComments--;
-			if ($Row->CountComments < 0)
-				$Row->CountComments = 0;
-
-			$FinalData[$Row->ForeignID] = $Row->CountComments;
-			$i++;
 		}
 
 		$this->SetData('CountData', $FinalData);

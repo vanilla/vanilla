@@ -13,6 +13,16 @@ window.vanilla.embed = function(host) {
       disablePath = currentPath && currentPath[0] != "/";
       disablePath |= (window != top);
 
+   var optStr = function(name, defaultValue, definedValue) {
+      if (window['vanilla_'+name]) {
+         if (definedValue == undefined)
+            return window['vanilla_'+name];
+         else
+            return definedValue.replace('%s', window['vanilla_'+name]);
+      }
+      return defaultValue;
+   }
+
    if (!currentPath || disablePath)
       currentPath = "/";
 
@@ -49,7 +59,8 @@ window.vanilla.embed = function(host) {
       setInterval(function() {
          try {
             var vid = 'vanilla' + id;
-            var hash = window.frames[vid].frames['messageFrame'].location.hash.substr(6);
+            var hash = window.frames[vid].frames['messageFrame'].location.hash;
+            hash = hash.substr(6);
          } catch(e) {
             return;
          }
@@ -62,7 +73,7 @@ window.vanilla.embed = function(host) {
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
-      }, 300);
+      }, 200);
    }
 
    checkHash = function() {
@@ -91,12 +102,12 @@ window.vanilla.embed = function(host) {
          setHeight(message[1]);
       } else if (message[0] == 'location') {
          if (disablePath) {
-            currentPath = cmd[1];
+            //currentPath = cmd[1];
          } else {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {
                currentPath = message[1];
-               location.href = embedUrl + "#" + currentPath;
+               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
             }
          }
       } else if (message[0] == 'unload') {
@@ -127,8 +138,11 @@ window.vanilla.embed = function(host) {
    }
 
    setHeight = function(height) {
+      if (optStr('height'))
+         return;
+
       document.getElementById('vanilla'+id).style['height'] = height + "px";
-      if (window.gadgets)
+      if (window.gadgets && gadgets.window.adjustHeight)
          gadgets.window.adjustHeight();
    }
 
@@ -142,7 +156,7 @@ window.vanilla.embed = function(host) {
       // Is there a foreign type defined? Possibly used to render the discussion
       // body a certain way in the forum? Also used to filter down to foreign
       // types so that matching foreign_id's across type don't clash.
-      var foreign_type = typeof(vanilla_type) == 'undefined' ? '' : vanilla_type;
+      var foreign_type = typeof(vanilla_type) == 'undefined' ? 'page' : vanilla_type;
       // If embedding comments, should the newly created discussion be placed in a specific category?
       var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
       // If embedding comments, this value will be used as the newly created discussion title.

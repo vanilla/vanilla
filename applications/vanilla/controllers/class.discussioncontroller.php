@@ -645,6 +645,20 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          
       // If no discussion record was found, but foreign id was provided, create it now
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
+         if ($ForeignName == '' || $ForeignBody == '') {
+            $PageInfo = FetchPageInfo($ForeignUrl);
+            if (!$PageInfo['Exception']) {
+               $ForeignName = $PageInfo['Title'];
+               $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
+                  .'<br />'
+                  .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
+                  .Wrap($PageInfo['Description'], 'p');
+                  
+               if (count($PageInfo['Images']) > 0)
+                  $ForeignBody = Anchor(Img($PageInfo['Images'][0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
+                     .$ForeignBody;
+            }
+         }
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')
             $Body = $ForeignUrl;
@@ -779,5 +793,20 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
+   
+   /*
+    Used for debugging FetchPageInfo() (used above when creating a discussion for embedded comments).
+   public function FetchPage() {
+      $Url = GetIncomingValue('Url', 'http://markosullivan.ca');
+      $PageInfo = FetchPageInfo($Url);
+      if (GetValue('Exception', $PageInfo)) {
+         echo $PageInfo['Exception']->getMessage();
+      } else {
+         var_dump($PageInfo);
+      }
+         
+      die();
+   }
+   */
    
 }

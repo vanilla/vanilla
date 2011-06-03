@@ -260,7 +260,6 @@ class LogModel extends Gdn_Pluggable {
          }
       }
 
-
       $Data = $Log['Data'];
       if (!isset($Columns[$Log['RecordType']])) {
          $Columns[$Log['RecordType']] = Gdn::SQL()->FetchColumns($Log['RecordType']);
@@ -301,9 +300,16 @@ class LogModel extends Gdn_Pluggable {
             }
 
             // Insert the record back into the db.
-            Gdn::SQL()
+            $ID = Gdn::SQL()
                ->Options('Ignore', TRUE)
                ->Insert($Log['RecordType'], $Set);
+            if (!$ID && isset($Log['RecordID']))
+               $ID = $Log['RecordID'];
+
+            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'User') {
+               Gdn::UserModel()->SaveRoles($ID, Gdn::UserModel()->NewUserRoleIDs());
+            }
+
             break;
       }
 

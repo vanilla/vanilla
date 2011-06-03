@@ -142,6 +142,12 @@ a:hover {
    text-decoration: none;
    color: #ff0084;
 }
+img.Thumbnail {
+	max-height: 300px;
+	max-width: 100px;
+	float: left;
+	margin: 0 16px 0 0;
+}
 input.DateBox,
 input.InputBox,
 input.SmallInput,
@@ -1419,6 +1425,10 @@ div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
    padding: 4px 16px;
    margin: 4px 0;
+}
+ul.MessageList div.Message small {
+	font-size: 11px;
+	color: #777;
 }
 
 code, pre {

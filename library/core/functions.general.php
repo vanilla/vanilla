@@ -95,6 +95,47 @@ if (!function_exists('__autoload')) {
 spl_autoload_register('Gdn_Autoload', FALSE);
 */
 
+if (!function_exists('AbsoluteSource')) {
+   /**
+    * Takes a source path (ie. an image src from an html page), and an
+    * associated URL (ie. the page that the image appears on), and returns the
+    * absolute source (including url & protocol) path.
+    * @param string $SrcPath The source path to make absolute (if not absolute already).
+    * @param string $Url The full url to the page containing the src reference.
+    * @return string Absolute source path.
+    */
+   function AbsoluteSource($SrcPath, $Url) {
+      // If there is a scheme in the srcpath already, just return it.
+      if (!is_null(parse_url($SrcPath, PHP_URL_SCHEME)))
+         return $SrcPath;
+      
+      // Does SrcPath assume root?
+      if (in_array(substr($SrcPath, 0, 1), array('/', '\\')))
+         return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .$SrcPath;
+   
+      // Work with the path in the url & the provided src path to backtrace if necessary
+      $UrlPathParts = explode('/', str_replace('\\', '/', parse_url($Url, PHP_URL_PATH)));
+      $SrcParts = explode('/', str_replace('\\', '/', $SrcPath));
+      $Result = array();
+      foreach ($SrcParts as $Part) {
+         if (!$Part || $Part == '.')
+            continue;
+         
+         if ($Part == '..')
+            array_pop($UrlPathParts);
+         else
+            $Result[] = $Part;
+      }
+      // Put it all together & return
+      return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .'/'.implode('/', array_filter(array_merge($UrlPathParts, $Result)));
+   }
+}
 
 if (!function_exists('AddActivity')) {
    /**
@@ -661,6 +702,59 @@ if (!function_exists('ExternalUrl')) {
          $Result = Url($Path, TRUE);
 
       return $Result;
+   }
+}
+
+
+if (!function_exists('FetchPageInfo')) {
+   /**
+    * Examines the page at $Url for title, description & images. Be sure to check the resultant array for any Exceptions that occurred while retrieving the page. 
+    * @param string $Url The url to examine.
+    * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+    * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
+    */
+   function FetchPageInfo($Url, $Timeout = 0) {
+      $PageInfo = array(
+         'Url' => $Url,
+         'Title' => '',
+         'Description' => '',
+         'Images' => array(),
+         'Exception' => FALSE
+      );
+      try {
+         $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
+         $Dom = new DOMDocument();
+         @$Dom->loadHTML($PageHtml);
+         // Page Title
+         $TitleNodes = $Dom->getElementsByTagName('title');
+         $PageInfo['Title'] = $TitleNodes->length > 0 ? $TitleNodes->item(0)->nodeValue : '';
+         // Page Description
+         $MetaNodes = $Dom->getElementsByTagName('meta');
+         foreach($MetaNodes as $MetaNode) {
+            if (strtolower($MetaNode->getAttribute('name')) == 'description')
+               $PageInfo['Description'] = $MetaNode->getAttribute('content');
+         }
+         // Keep looking for page description?
+         if ($PageInfo['Description'] == '') {
+            $PNodes = $Dom->getElementsByTagName('p');
+            foreach($PNodes as $PNode) {
+               $PVal = $PNode->nodeValue;
+               if (strlen($PVal) > 90) {
+                  $PageInfo['Description'] = $PVal;
+                  break;
+               }
+            }
+         }
+         // Page Images
+         $PageInfo['Images'] = array();
+         $ImageNodes = $Dom->getElementsByTagName('img');
+         foreach ($ImageNodes as $ImageNode) {
+            $PageInfo['Images'][] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
+         }
+      } catch (Exception $ex) {
+         $PageInfo['Exception'] = $ex;
+      }
+      return $PageInfo;
    }
 }
 
@@ -1464,7 +1558,6 @@ if (!function_exists('ProxyRequest')) {
       }
       $Response = '';
       if (function_exists('curl_init')) {
-         
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
@@ -1484,12 +1577,12 @@ if (!function_exists('ProxyRequest')) {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          //}
-         
          $Response = curl_exec($Handler);
          $Success = TRUE;
          if ($Response == FALSE) {
             $Success = FALSE;
-            $Response = curl_error($Handler);
+            $Response = '';
+            throw new Exception(curl_error($Handler));
          }
          
          curl_close($Handler);
@@ -1570,7 +1663,7 @@ if (!function_exists('ProxyRequest')) {
          $Code = GetValue('StatusCode',$ResponseHeaders, 200);
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $ResponseHeaders)) {
-               $Location = GetValue('Location', $ResponseHeaders);
+               $Location = AbsoluteSource(GetValue('Location', $ResponseHeaders), $Url);
                return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
             }
          }

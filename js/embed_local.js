@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
    }
       
    var currentHeight = null,
-      minHeight = 400,
+      minHeight = 300,
       remotePostMessage = function(message, target) {},
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',

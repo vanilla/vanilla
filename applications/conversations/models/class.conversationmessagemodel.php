@@ -169,7 +169,7 @@ class ConversationMessageModel extends Gdn_Model {
       $MessageID = FALSE;
       if($this->Validate($FormPostValues)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         $Fields['Format'] = C('Conversations.Message.Format','Ham');
+         $Fields['Format'] = C('Garden.InputFormatter', '');
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
          $this->LastMessageID = $MessageID;

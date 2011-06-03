@@ -153,7 +153,7 @@ if (!function_exists('ValidateUrlString')) {
 if (!function_exists('ValidateDate')) {
    function ValidateDate($Value) {
       // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
-      if (strlen($Value) == 0) {
+      if (empty($Value)) {
 			return TRUE; // blank dates validated through required.
 		} else {
 			$Matches = array();

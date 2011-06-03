@@ -470,10 +470,34 @@ class UserModel extends Gdn_Model {
          ->Limit($Limit, $Offset)
          ->Get();
    }
+   
+   /**
+    * Retrieves a "system user" id that can be used to perform non-real-person tasks.
+    */
+   public function GetSystemUserID() {
+      $SystemUserID = C('Garden.SystemUserID');
+      if ($SystemUserID > 0)
+         return $SystemUserID;
+      
+      $SystemUserID = $this->SQL->Insert($this->Name, array(
+         'Name' => T('System'),
+         'Password' => RandomString('20'),
+         'Email' => 'system@domain.com',
+         'DateInserted' => Gdn_Format::ToDateTime(),
+         'Admin' => '2'
+      ));
+      
+      SaveToConfig('Garden.SystemUserID', $SystemUserID);
+      return $SystemUserID;
+   }
 
    public function Register($FormPostValues, $Options = array()) {
       $Valid = TRUE;
       $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
+      
+      // Throw an error if the registering user has an active session
+      if (Gdn::Session()->IsValid())
+         $this->Validation->AddValidationResult('Name', 'You are already registered.');
 
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
@@ -488,8 +512,8 @@ class UserModel extends Gdn_Model {
       }
 
       // Throw an event to allow plugins to block the registration.
+      unset($this->EventArguments['User']);
       $this->EventArguments['User'] = $FormPostValues;
-      
       $this->EventArguments['Valid'] =& $Valid;
       $this->FireEvent('BeforeRegister');
 

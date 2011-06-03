@@ -174,6 +174,7 @@ window.vanilla.embed = function(host) {
    vanillaIframe.src = vanillaUrl(currentPath);
    vanillaIframe.scrolling = "no";
    vanillaIframe.frameborder = "0";
+   vanillaIframe.allowtransparency = true;
    vanillaIframe.border = "0";
    vanillaIframe.width = "100%";
    vanillaIframe.height = "1000";
@@ -181,7 +182,15 @@ window.vanilla.embed = function(host) {
    vanillaIframe.style.height = "1000px";
    vanillaIframe.style.border = "0";
    vanillaIframe.style.display = "block";
-   (document.getElementById('vanilla-embed')).appendChild(vanillaIframe);
+   (document.getElementById('vanilla-comments')).appendChild(vanillaIframe);
+   
+   // Include our embed css into the page
+   var vanilla_embed_css = document.createElement('link');
+   vanilla_embed_css.rel = 'stylesheet';
+   vanilla_embed_css.type = 'text/css';
+   vanilla_embed_css.href = vanilla_forum_url + (vanilla_forum_url.substring(vanilla_forum_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
+   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
+   
    return this;
 };
 try {
@@ -195,5 +204,5 @@ try {
    error.style.background = "#ffffff";
    error.style.color = "#000000";
    error.appendChild(document.createTextNode("Failed to embed Vanilla: " + e));
-   (document.getElementById('vanilla-embed')).appendChild(error);
+   (document.getElementById('vanilla-comments')).appendChild(error);
 }

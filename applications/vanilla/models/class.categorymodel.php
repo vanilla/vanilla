@@ -36,19 +36,22 @@ class CategoryModel extends Gdn_Model {
       $Categories = self::Categories();
       
       $Watch = array();
-      $All = TRUE;
+      $AllCount = count($Categories);
       
       foreach ($Categories as $CategoryID => $Category) {
-         if ($CategoryID == -1)
-            continue; // no root
+         if ($CategoryID == -1) {
+            $AllCount--; // no root
+         }
          
          if ($Category['PermsDiscussionsView'] && $Category['Following']) {
             $Watch[] = $CategoryID;
-         } else {
-            $All = FALSE;
          }
       }
-      if ($All)
+
+      Gdn::PluginManager()->EventArguments['CategoryIDs'] =& $Watch;
+      Gdn::PluginManager()->FireEvent('CategoryWatch');
+
+      if ($AllCount == count($Watch))
          return TRUE;
 
       return $Watch;
@@ -75,6 +78,7 @@ class CategoryModel extends Gdn_Model {
 
          $Categories = $Sql->Get()->ResultArray();
          $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
+         unset($Categories[-1]);
          self::CalculateData($Categories);
 
          // Add permissions.
@@ -84,6 +88,7 @@ class CategoryModel extends Gdn_Model {
             $Category['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
             $Category['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          }
+         unset($Category);
       }
 
       if ($ID !== FALSE) {
@@ -412,6 +417,7 @@ class CategoryModel extends Gdn_Model {
          ->Select('cu.Photo', '', 'LastCommentPhoto')
          ->Select('co.DiscussionID', '', 'LastDiscussionID')
          ->Select('d.Name', '', 'LastDiscussionName')
+         ->Select('d.CountComments', '', 'LastDiscussionCountComments')
          ->From('Category c')
          ->Join('Comment co', 'c.LastCommentID = co.CommentID', 'left')
          ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')

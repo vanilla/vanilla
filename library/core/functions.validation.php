@@ -151,6 +151,14 @@ if (!function_exists('ValidateUrlString')) {
    }
 }
 
+if (!function_exists('ValidateUrlStringRelaxed')) {
+   function ValidateUrlStringRelaxed($Value, $Field = '') {
+      if (preg_match('`[/\\\<>\'"]`', $Value))
+         return FALSE;
+      return TRUE;
+   }
+}
+
 if (!function_exists('ValidateDate')) {
    function ValidateDate($Value) {
       // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format

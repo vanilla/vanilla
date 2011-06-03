@@ -142,7 +142,7 @@ window.vanilla.embed = function(host) {
       // Is there a foreign type defined? Possibly used to render the discussion
       // body a certain way in the forum? Also used to filter down to foreign
       // types so that matching foreign_id's across type don't clash.
-      var foreign_type = typeof(vanilla_type) == 'undefined' ? '' : vanilla_type;
+      var foreign_type = typeof(vanilla_type) == 'undefined' ? 'page' : vanilla_type;
       // If embedding comments, should the newly created discussion be placed in a specific category?
       var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
       // If embedding comments, this value will be used as the newly created discussion title.

@@ -745,12 +745,33 @@ if (!function_exists('FetchPageInfo')) {
                }
             }
          }
-         // Page Images
-         $PageInfo['Images'] = array();
+         if (strlen($PageInfo['Description']) > 400)
+            $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+            
+         // Page Images (retrieve first 3 if bigger than 100w x 300h)
+         $Images = array();
          $ImageNodes = $Dom->getElementsByTagName('img');
+         $i = 0;
          foreach ($ImageNodes as $ImageNode) {
-            $PageInfo['Images'][] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
+            $Images[] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
          }
+
+         // Sort by size, biggest one first
+         $ImageSort = array();
+         // Only look at first 10 images (speed!)
+         $i = 0;
+         foreach ($Images as $Image) {
+            $i++;
+            if ($i > 10)
+               break;
+            
+            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            if (!array_key_exists($Diag, $ImageSort))
+               $ImageSort[$Diag] = $Image;
+         }
+         krsort($ImageSort);
+         $PageInfo['Images'] = array_values($ImageSort);
       } catch (Exception $ex) {
          $PageInfo['Exception'] = $ex;
       }
@@ -1859,6 +1880,29 @@ if (!function_exists('SafeGlob')) {
       }
          
       return $Result;
+   }
+}
+
+if (!function_exists('SafeImage')) {
+   /**
+    * Examines the provided url & checks to see if there is a valid image on the other side. Optionally you can specify minimum dimensions.
+    * @param string $ImageUrl Full url (including http) of the image to examine.
+    * @param int $MinHeight Minimum height (in pixels) of image. 0 means any height.
+    * @param int $MinWidth Minimum width (in pixels) of image. 0 means any width.
+    * @return mixed The url of the image if safe, FALSE otherwise.
+    */
+   function SafeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
+      try {
+         list($Width, $Height, $Type, $Attributes) = getimagesize($ImageUrl);
+         if ($MinHeight > 0 && $MinHeight < $Height)
+            return FALSE;
+         
+         if ($MinWidth > 0 && $MinWidth < $Width)
+            return FALSE;
+      } catch (Exception $ex) {
+         return FALSE;
+      }
+      return $ImageUrl;
    }
 }
 

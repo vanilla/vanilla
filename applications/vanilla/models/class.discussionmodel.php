@@ -726,7 +726,7 @@ class DiscussionModel extends VanillaModel {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
          if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', '', '', 1)->FirstRow()->CategoryID;
+            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
@@ -962,7 +962,7 @@ class DiscussionModel extends VanillaModel {
 			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
 			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');
 			
-		} elseif (is_numeric($CategoryID) && $CategoryID > 0) {
+		} elseif (is_numeric($CategoryID)) {
          $this->SQL
             ->Select('d.DiscussionID', 'count', 'CountDiscussions')
             ->Select('d.CountComments', 'sum', 'CountComments')

@@ -270,7 +270,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Form->SetFormValue('ProviderName', 'Twitter');
       $Form->SetFormValue('Name', GetValue('screen_name', $Profile));
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
-      $Form->SetFormValue('Email', GetValue('screen_name', $Profile).'@foo.com');
+      $Form->SetFormValue('Email', GetValue('screen_name', $Profile).'@via.twitter.com');
       $Form->SetFormValue('Photo', GetValue('profile_image_url', $Profile));
       $Sender->SetData('Verified', TRUE);
    }

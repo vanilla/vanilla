@@ -128,14 +128,7 @@ jQuery(document).ready(function($) {
       });
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
-   }
-   
-   var path = gdn.definition('Path', '~');
-   if (path != '~') {
-      if (path.length > 0 && path[0] != '/')
-         path = '/'+path;
-      remotePostMessage('location:' + path, '*');
-   } else {
+
       $('a').live('click', function() {
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
@@ -180,5 +173,13 @@ jQuery(document).ready(function($) {
 
          }
       });
+
+   }
+   
+   var path = gdn.definition('Path', '~');
+   if (path != '~') {
+      if (path.length > 0 && path[0] != '/')
+         path = '/'+path;
+      remotePostMessage('location:' + path, '*');
    }
 });

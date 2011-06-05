@@ -1041,6 +1041,9 @@ class EntryController extends Gdn_Controller {
       $this->Render();
    }
 
+   /**
+    * Deprecated since 2.0.18.
+    */
    private function RegisterConnect() {
       throw NotFoundException();
    }
@@ -1263,7 +1266,15 @@ class EntryController extends Gdn_Controller {
       $this->SetData('Email', $User->Email);
       $this->Render();
    }
-
+   
+   /**
+    * Send email confirmation message to user.
+    *
+    * @access public
+    * @since 2.0.?
+    *
+    * @param int $UserID
+    */
    public function EmailConfirmRequest($UserID = '') {
       if ($UserID && !Gdn::Session()->CheckPermission('Garden.Users.Edit'))
          $UserID = '';

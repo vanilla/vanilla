@@ -27,7 +27,7 @@ class HomeController extends Gdn_Controller {
    }
 
    /**
-    * The dashboard welcome message.
+    * Display dashboard welcome message.
     */
    public function Index() {
       $this->View = 'FileNotFound';
@@ -45,22 +45,37 @@ class HomeController extends Gdn_Controller {
          $this->RenderException(NotFoundException());
    }
    
+   /**
+    * Display 'site down for maintenance' page.
+    */
    public function UpdateMode() {
       $this->Render();
    }
-
+   
+   /**
+    * Display 'content deleted' page.
+    */
    public function Deleted() {
       $this->Render();
    }
    
+   /**
+    * Display TOS page.
+    */
    public function TermsOfService() {
       $this->Render();
    }
    
+   /**
+    * Display privacy info page.
+    */
    public function PrivacyPolicy() {
       $this->Render();
    }
    
+   /**
+    * Display 'no permission' page.
+    */
    public function Permission() {
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML)
          $this->Render();

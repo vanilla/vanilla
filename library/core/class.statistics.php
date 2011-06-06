@@ -48,7 +48,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $this->Sign($RequestParameters, TRUE);
       
       $FinalURL .= '?'.http_build_query($RequestParameters);
-      $Response = ProxyRequest($FinalURL, 10, TRUE);
+      try {
+         $Response = ProxyRequest($FinalURL, 10, TRUE);
+      } catch (Exception $e) {
+         $Response = FALSE;
+      }
       if ($Response !== FALSE) {
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)

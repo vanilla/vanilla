@@ -360,15 +360,15 @@ jQuery(document).ready(function($) {
    getNewTimeout();
    
    /* Comment Checkboxes */
-   $('.HeadingTabs .Administration :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.MessageList .Administration :checkbox').attr('checked', 'checked');
+         $('.MessageList .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.MessageList .Administration :checkbox').removeAttr('checked');
+         $('.MessageList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.Administration :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.MessageList .Administration :checkbox');
+      var checkIDs = $('.MessageList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       var discussionID = gdn.definition('DiscussionID');
       checkIDs.each(function() {

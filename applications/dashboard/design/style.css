@@ -1091,7 +1091,7 @@ ul.DataList li.Item {
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList div.Options {
+ul.DataList div.Options, .MessageList .Options {
    margin: 2px 4px 0 0;
 	position: absolute;
 	right: 0;
@@ -1730,6 +1730,7 @@ div.Headings {
    padding: 5px 8px;
    margin: 0;
    background: #cfecff;
+   position: relative;
 }
 div.MessageForm div.Tabs {
 	padding: 0;
@@ -1845,23 +1846,36 @@ body.Discussion #Content,
 .DiscussionsTabs {
 	position: relative;
 }
-.Administration {
+
+.Tabs .AdminCheck {
+   position: absolute;
+   right: 26px;
+   top: 0;
+}
+
+.AdminCheck {
+   display: inline-block;
+   height: 22px;
+   vertical-align: top;
+}
+
+/*.Administration {
 	width: 32px;
 	text-align: center;
 	padding: 4px 0 5px;
 	position: absolute;
 	left: -32px;
 	top: 0;
-}
-.Item .Administration {
+}*/
+/*.Item .Administration {
 	background: #f5f5f5;
 	border: 1px solid #BEC8CC;
 	border-width: 1px 0 0;
-}
-.DataList.Discussions .Item .Administration,
+}*/
+/*.DataList.Discussions .Item .Administration,
 .MessageList .Item .Administration {
 	top: -1px;
-}
+}*/
 
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {

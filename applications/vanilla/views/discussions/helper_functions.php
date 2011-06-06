@@ -38,17 +38,6 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
-         
-   if ($Sender->CanEditDiscussions) {
-      if (!property_exists($Sender, 'CheckedDiscussions')) {
-         $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
-         if (!is_array($Sender->CheckedDiscussions))
-            $Sender->CheckedDiscussions = array();
-      }
-
-      $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
-      echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
-   }
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
@@ -170,9 +159,9 @@ function WriteFilterTabs(&$Sender) {
    
    if ($Sender->CanEditDiscussions) {
    ?>
-   <div class="Administration">
+   <span class="AdminCheck">
       <input type="checkbox" name="Toggle" />
-   </div>
+   </span>
    <?php } ?>
 </div>
    <?php
@@ -223,6 +212,18 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          </div>
       <?php
       }
+      // Admin check.
+      if ($Sender->CanEditDiscussions) {
+         if (!property_exists($Sender, 'CheckedDiscussions')) {
+            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+            if (!is_array($Sender->CheckedDiscussions))
+               $Sender->CheckedDiscussions = array();
+         }
+
+         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
+
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(

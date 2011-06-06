@@ -122,7 +122,7 @@ class CategoriesController extends VanillaController {
       $this->SetData('_Limit', $Limit);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();

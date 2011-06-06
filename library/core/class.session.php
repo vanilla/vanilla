@@ -280,14 +280,15 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($UserID && $SetIdentity)
+            if ($UserID && $SetIdentity) {
                Gdn::Authenticator()->SetIdentity($UserID, $Persist);
 
-            if (Gdn::Authenticator()->ReturningUser($this->User)) {
-               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
+               if (Gdn::Authenticator()->ReturningUser($this->User)) {
+                  $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+                  $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
+               }
             }
-
+            
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
 

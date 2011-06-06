@@ -502,15 +502,6 @@ class UserModel extends Gdn_Model {
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
 
-      // Check for spam.
-      if ($Valid) {
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
-         if ($Spam) {
-            $Valid = FALSE;
-            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
-         }
-      }
-
       // Throw an event to allow plugins to block the registration.
       unset($this->EventArguments['User']);
       $this->EventArguments['User'] = $FormPostValues;
@@ -1039,6 +1030,13 @@ class UserModel extends Gdn_Model {
       }
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1103,6 +1101,13 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE)) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1149,6 +1154,13 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);

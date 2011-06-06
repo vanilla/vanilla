@@ -27,7 +27,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    public function Base_BeforeCheckComments_Handler($Sender) {
       $ActionMessage = &$Sender->EventArguments['ActionMessage'];
       $Discussion = $Sender->EventArguments['Discussion'];
-      if (Gdn::Session()->CheckPermission('Vanilla.Discussion.Edit', TRUE, 'Category', $Discussion->CategoryID))
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussion.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $ActionMessage .= ' '.Anchor(T('Split'), 'vanilla/moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
    }
    
@@ -210,7 +210,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
-      // Do nothing
+      SaveToConfig('Vanilla.AdminCheckboxes.Use', TRUE);
    }
    
 }

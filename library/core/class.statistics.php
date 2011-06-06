@@ -156,7 +156,7 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
    
    public static function CheckIsLocalhost() {
-      $ServerAddress = Gdn::Request()->GetValue('SERVER_ADDR');
+      $ServerAddress = Gdn::Request()->IpAddress();
       $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
       
       // IPv6 Localhost

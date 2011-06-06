@@ -33,11 +33,6 @@ if($this->Pager->FirstPage())
       ?></li>
    </ul>
    <div class="SubTab"><?php echo $DiscussionName; ?></div>
-   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use')) { ?>
-      <div class="Administration">
-         <input type="checkbox" name="Toggle" />
-      </div>
-   <?php } ?>
 </div>
 <?php $this->FireEvent('BeforeDiscussion'); ?>
 <ul class="MessageList Discussion <?php echo $PageClass; ?>">

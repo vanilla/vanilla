@@ -42,7 +42,11 @@ function vanilla_assign_comment_counts(data) {
             var cssClass = (anchors[i].className + ' vanilla-comment-count-anchor').trim();
             anchors[i].className = cssClass;
             // Add our button html
-            anchors[i].innerHTML = tpl.replace('{count}', data.CountData[anchors[i].attributes[j].value]);
+            var count = data.CountData[anchors[i].attributes[j].value.toString()];
+            if (typeof(count) == "undefined")
+               count = 0;
+
+            anchors[i].innerHTML = tpl.replace('{count}', count);
             // Add our hashtag to the href so we jump to comments
             var href = anchors[i].href.split('#')[0];
             anchors[i].href = href+'#vanilla-comments';

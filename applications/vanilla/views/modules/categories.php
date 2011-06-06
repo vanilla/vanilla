@@ -33,7 +33,7 @@ if ($this->Data !== FALSE) {
       if ($DoHeadings && $Category->Depth == 1) {
          echo Gdn_Format::Text($Category->Name);
       } else {
-         echo Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode), 'strong')
+         echo Wrap(Anchor(($Category->Depth > 1 ? '↳ ' : '').Gdn_Format::Text($Category->Name), '/categories/'.rawurlencode($Category->UrlCode)), 'strong')
             .'<span class="Count">'.number_format($Category->CountAllDiscussions).'</span>';
       }
       echo "</li>\n";

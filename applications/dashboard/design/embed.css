@@ -7,6 +7,9 @@ applications.
 a.vanilla-comment-count-anchor {
 	text-decoration: none !important;
 }
+a.vanilla-comment-count-anchor:hover {
+	background: transparent;
+}
 .vanilla-credit,
 .vanilla-count-text,
 .vanilla-count {

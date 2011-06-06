@@ -19,11 +19,22 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
          <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
          <td>
             <?php
+               $Url = FALSE;
+               if ($Row['Operation'] == 'Edit') {
+                  switch (strtolower($Row['RecordType'])) {
+                     case 'discussion':
+                        $Url = "/discussion/{$Row['RecordID']}/x/p1";
+                        break;
+                     case 'comment':
+                        $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
+                  }
+               }
+
                echo '<span class="Expander">', $this->FormatContent($Row), '</span>';
 
                echo '<div class="Tags">';
                echo '<span class="Tag '.$Row['Operation'].'Tag">'.T($Row['Operation']).'</span> ';
-               echo '<span class="Tag '.$Row['RecordType'].'Tag">'.T($Row['RecordType']).'</span> ';
+               echo '<span class="Tag '.$Row['RecordType'].'Tag">'.Anchor(T($Row['RecordType']), $Url).'</span> ';
                echo '</div>';
             ?>
          </td>

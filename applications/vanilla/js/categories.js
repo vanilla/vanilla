@@ -1,13 +1,10 @@
 jQuery(document).ready(function($) {
-
-   if ($.fn.alphanumeric)
-      $('#Form_UrlCode').alphanumeric({allow:"-"});
-
    // Map plain text category to url code
    $("#Form_Name").keyup(function(event) {
       if ($('#Form_CodeIsDefined').val() == '0') {
          $('#UrlCode').show();
-         val = $(this).val().replace(/[ ]+/g, '-').replace(/[^a-z0-9\-]+/gi,'').toLowerCase();
+         var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-')
+         val = val.replace(/\-+/g, '-').toLowerCase();
          $("#Form_UrlCode").val(val);
          $("#UrlCode span").text(val);
       }

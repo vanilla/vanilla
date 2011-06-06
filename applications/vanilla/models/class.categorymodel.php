@@ -78,7 +78,7 @@ class CategoryModel extends Gdn_Model {
 
          $Categories = $Sql->Get()->ResultArray();
          $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
-         unset($Categories[-1]);
+//         unset($Categories[-1]); Don't unset, may need for counts later
          self::CalculateData($Categories);
 
          // Add permissions.
@@ -724,23 +724,20 @@ class CategoryModel extends Gdn_Model {
          $this->AddInsertFields($FormPostValues);               
 
       $this->AddUpdateFields($FormPostValues);
-      if ($AllowDiscussions == '1') {
-         $this->Validation->ApplyRule('UrlCode', 'Required');
-         $this->Validation->ApplyRule('UrlCode', 'UrlString', 'Url code can only contain letters, numbers, underscores and dashes.');
-      
-         // Make sure that the UrlCode is unique among categories.
-         $this->SQL->Select('CategoryID')
-            ->From('Category')
-            ->Where('UrlCode', $UrlCode);
-         
-         if ($CategoryID)
-            $this->SQL->Where('CategoryID <>', $CategoryID);
-         
-         if ($this->SQL->Get()->NumRows())
-            $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
-            
-      }
-      
+      $this->Validation->ApplyRule('UrlCode', 'Required');
+      $this->Validation->ApplyRule('UrlCode', 'UrlStringRelaxed');
+
+      // Make sure that the UrlCode is unique among categories.
+      $this->SQL->Select('CategoryID')
+         ->From('Category')
+         ->Where('UrlCode', $UrlCode);
+
+      if ($CategoryID)
+         $this->SQL->Where('CategoryID <>', $CategoryID);
+
+      if ($this->SQL->Get()->NumRows())
+         $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+
 		//	Prep and fire event
 		$this->EventArguments['FormPostValues'] = &$FormPostValues;
 		$this->EventArguments['CategoryID'] = $CategoryID;
@@ -750,7 +747,7 @@ class CategoryModel extends Gdn_Model {
       if ($this->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields();
          $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
-            $AllowDiscussions = ArrayValue('AllowDiscussions', $Fields) == '1' ? TRUE : FALSE;
+         $AllowDiscussions = ArrayValue('AllowDiscussions', $Fields) == '1' ? TRUE : FALSE;
          $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
          if ($Insert === FALSE) {

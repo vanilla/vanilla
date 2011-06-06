@@ -127,8 +127,6 @@ $(function() {
    
       setHeight();
       setInterval(setHeight, 300);
-    
-      
       
       // Simulate a page unload when popups are opened (so they are scrolled into view).
       $('body').bind('popupReveal', function() {

@@ -117,7 +117,7 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/%1$s'
       );
-      if (!$this->Data('_PageUrl'))
+      if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'discussions/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
@@ -239,10 +239,6 @@ class DiscussionsController extends VanillaController {
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
       
-      // Validate $Offset
-      if (!is_numeric($Page) || $Page < 0)
-         $Page = 'p1';
-      
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Session = Gdn::Session();
@@ -337,18 +333,24 @@ class DiscussionsController extends VanillaController {
 			->Get();
 		
 		$FinalData = array();
-		$i = 0;
-		foreach ($CountData->Result() as $Row) {
-			while ($Row->ForeignID != $vanilla_identifier[$i]) {
-				$FinalData[$vanilla_identifier[$i]] = 0;
+		if ($CountData->NumRows() == 0) {
+			foreach ($vanilla_identifier as $identifier) {
+				$FinalData[$identifier] = 0;
+			}
+		} else {
+			$i = 0;
+			foreach ($CountData->Result() as $Row) {
+				while ($Row->ForeignID != $vanilla_identifier[$i]) {
+					$FinalData[$vanilla_identifier[$i]] = 0;
+					$i++;
+				}
+				$Row->CountComments--;
+				if ($Row->CountComments < 0)
+					$Row->CountComments = 0;
+	
+				$FinalData[$Row->ForeignID] = $Row->CountComments;
 				$i++;
 			}
-			$Row->CountComments--;
-			if ($Row->CountComments < 0)
-				$Row->CountComments = 0;
-
-			$FinalData[$Row->ForeignID] = $Row->CountComments;
-			$i++;
 		}
 
 		$this->SetData('CountData', $FinalData);

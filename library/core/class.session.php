@@ -280,8 +280,8 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($UserID && $SetIdentity) {
-               Gdn::Authenticator()->SetIdentity($UserID, $Persist);
+            if ($SetIdentity) {
+               Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
 
                if (Gdn::Authenticator()->ReturningUser($this->User)) {
                   $HourOffset = GetValue('HourOffset', $this->User->Attributes);

@@ -213,7 +213,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       <?php
       }
       // Admin check.
-      if ($Sender->CanEditDiscussions) {
+      if (GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID))) {
          if (!property_exists($Sender, 'CheckedDiscussions')) {
             $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
             if (!is_array($Sender->CheckedDiscussions))

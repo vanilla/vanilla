@@ -1850,7 +1850,7 @@ body.Discussion #Content,
 .Tabs .AdminCheck {
    position: absolute;
    right: 26px;
-   top: 0;
+   bottom: 2px;
 }
 
 .AdminCheck {

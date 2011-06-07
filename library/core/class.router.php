@@ -106,6 +106,41 @@ class Gdn_Router extends Gdn_Pluggable {
       
       return FALSE; // No route matched
    }
+
+   public function ReverseRoute($Url) {
+      $Root = rtrim(Gdn::Request()->Domain().'/'.Gdn::Request()->WebRoot(), '/');
+
+      if (StringBeginsWith($Url, $Root)) {
+         $Url = StringBeginsWith($Url, $Root, TRUE, TRUE);
+         $WithDomain = TRUE;
+      } else {
+         $WithDomain = FALSE;
+      }
+
+      $Url = '/'.ltrim($Url, '/');
+
+      foreach ($this->Routes as $Route => $RouteData) {
+         if ($RouteData['Type'] != 'Internal' || ($RouteData['Reserved'] && $RouteData['Route'] != 'DefaultController'))
+            continue;
+
+         $Destination = '/'.ltrim($RouteData['Destination'], '/');
+         if ($Destination == $Url) {
+            $Route = '/'.ltrim($RouteData['Route'], '/');
+            
+            if ($Route == '/DefaultController')
+               $Route = '/';
+
+            if ($WithDomain)
+               return $Root.$Route;
+            else
+               return $Route;
+         }
+      }
+      if ($WithDomain)
+         return $Root.$Url;
+      else
+         return $Url;
+   }
    
    public function GetRouteTypes() {
       $RT = array();

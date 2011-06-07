@@ -291,6 +291,10 @@ class MessagesController extends ConversationsController {
          
          // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
          $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
+
+         // Send the hash link in.
+         if ($CountReadMessages > 1)
+            $this->AddDefinition('LocationHash', '#Item_'.$CountReadMessages);
       }
       
       // Fetch message data

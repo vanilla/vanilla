@@ -32,8 +32,8 @@ jQuery(document).ready(function($) {
       var checkIDs = $('.DataList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       checkIDs.each(function() {
-         item = $(this);
-         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+         checkID = $(this);
+         aCheckIDs[aCheckIDs.length] = { 'checkId' : checkID.val() , 'checked' : checkID.attr('checked') };
       });
       $.ajax({
          type: "POST",

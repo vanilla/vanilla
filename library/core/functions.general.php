@@ -1349,12 +1349,21 @@ if (!function_exists('PageNumber')) {
     *
     * @param int $Offset The database offset, starting at zero.
     * @param int $Limit The database limit, otherwise known as the page size.
-    * @param bool $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    * @param bool|string $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    *  - bool: true means yes, false means no.
+    *  - string: The prefix for the page number.
+    * @param bool $First Whether or not to return the page number if it is the first page.
     */
-   function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
+   function PageNumber($Offset, $Limit, $UrlParam = FALSE, $First = TRUE) {
       $Result = floor($Offset / $Limit) + 1;
-      if ($UrlParam)
+
+      if ($UrlParam !== FALSE && !$First && $Result == 1)
+         $Result = '';
+      elseif ($UrlParam === TRUE)
          $Result = 'p'.$Result;
+      elseif (is_string($UrlParam))
+         $Result = $UrlParam.$Result;
+
       return $Result;
    }
 }
@@ -2057,9 +2066,11 @@ if (!function_exists('StringBeginsWith')) {
    function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
-      elseif (strlen($B) == 0)
+      elseif (strlen($B) == 0) {
+         if ($Trim)
+            return $A;
          return TRUE;
-      else {
+      } else {
          $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
          if ($Trim)
             $Result = $Result ? substr($A, strlen($B)) : $A;
@@ -2080,9 +2091,11 @@ if (!function_exists('StringEndsWith')) {
    function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($A) < strlen($B))
          return FALSE;
-      elseif (strlen($B) == 0)
+      elseif (strlen($B) == 0) {
+         if ($Trim)
+            return $A;
          return TRUE;
-      else {
+      } else {
          $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
          if ($Trim)
             $Result = $Result ? substr($A, 0, -strlen($B)) : $A;

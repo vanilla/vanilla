@@ -77,6 +77,8 @@ class PermissionModel extends Gdn_Model {
          $Where = array('RoleID <>' => 0);
          if (!$JunctionTable)
             $Where['JunctionTable'] = NULL;
+         else
+            $Where['JunctionTable'] = $JunctionTable;
 
          $this->SQL
             ->Set($this->_Backtick($NewColumns), '', FALSE)

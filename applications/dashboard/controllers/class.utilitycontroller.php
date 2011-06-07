@@ -167,11 +167,16 @@ class UtilityController extends DashboardController {
 
       // Run the structure.
       $UpdateModel = new UpdateModel();
-      
       $UpdateModel->RunStructure();
+
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         SaveToConfig('Garden.Version', APPLICATION_VERSION);
+      }
+
       $this->SetData('Success', TRUE);
 
-      $this->MasterView = 'none';
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
       $this->Render();
    }
    

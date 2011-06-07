@@ -56,6 +56,10 @@ class GravatarPlugin extends Gdn_Plugin {
    public function CommentModel_BeforeGetNew_Handler(&$Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
    }
+	
+	public function CommentModel_BeforeGetIDData_Handler($Sender) {
+		$Sender->SQL->Select('iu.Email', '', 'InsertEmail');
+	}
 
    public function Setup() {
       // No setup required.

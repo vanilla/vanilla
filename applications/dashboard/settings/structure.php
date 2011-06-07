@@ -88,6 +88,24 @@ $Construct
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
+// Make sure the system user is okay.
+$SystemUserID = C('Garden.SystemUserID');
+if ($SystemUserID) {
+   $SysUser = Gdn::UserModel()->Get($SystemUserID);
+
+   if (!$SysUser || GetValue('Deleted', $SysUser)) {
+      $SystemUserID = FALSE;
+      RemoveFromConfig('Garden.SystemUserID');
+   }
+}
+
+if (!$SystemUserID) {
+   // Try and find a system user.
+   $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
+   if ($SystemUserID)
+      SaveToConfig('Garden.SystemUserID', $SystemUserID);
+}
+
 // UserRole Table
 $Construct->Table('UserRole');
 

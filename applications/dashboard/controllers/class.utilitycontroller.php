@@ -180,6 +180,13 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
    
+   public function Alive() {
+      $this->SetData('Success', TRUE);
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
+      $this->Render();
+   }
+   
    // Because you cannot send xmlhttprequests across domains, we need to use
    // a proxy to check for updates.
    public function UpdateProxy() {

@@ -37,7 +37,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    ?>
    <div class="ItemContent Conversation">
       <?php
-      $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
+      $Url = '/messages/'.$Conversation->ConversationID;
 
       if ($Names) {
          echo '<h3 class="Users">';

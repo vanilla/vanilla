@@ -2226,7 +2226,7 @@ a.Bookmarking {
 }
 body.Discussion a.Bookmark {
    float: right;
-	margin: 13px 8px;
+	margin: 5px 0 0 8px;
 }
 
 body.Discussion .Back {

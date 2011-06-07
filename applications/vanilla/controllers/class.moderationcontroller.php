@@ -242,7 +242,7 @@ class ModerationController extends VanillaController {
        
       $CommentIDs = array();
       $DiscussionIDs = array();
-      foreach ($CheckedComments as $DiscD => $Comments) {
+      foreach ($CheckedComments as $DiscID => $Comments) {
          foreach ($Comments as $Comment) {
             if (substr($Comment, 0, 11) == 'Discussion_')
                $DiscussionIDs[] = str_replace('Discussion_', '', $Comment);

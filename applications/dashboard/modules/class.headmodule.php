@@ -252,9 +252,12 @@ if (!class_exists('HeadModule', FALSE)) {
          // Add the canonical Url if necessary.
          if (method_exists($this->_Sender, 'CanonicalUrl')) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
-            $CurrentUrl = Gdn::Request()->Url('', TRUE);
-            if ($CurrentUrl != $CanonicalUrl)
+            $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
+            $this->_Sender->CanonicalUrl($CanonicalUrl);
+            $CurrentUrl = Url('', TRUE);
+            if ($CurrentUrl != $CanonicalUrl) {
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+            }
          }
 
          $this->FireEvent('BeforeToString');

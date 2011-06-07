@@ -106,6 +106,24 @@ class Gdn_Router extends Gdn_Pluggable {
       
       return FALSE; // No route matched
    }
+
+   public function ReverseRoute($Url) {
+      foreach ($this->Routes as $Route => $RouteData) {
+         if ($RouteData['Type'] != 'Internal' || ($RouteData['Reserved'] && $RouteData['Route'] != 'DefaultController'))
+            continue;
+
+         $FullDestUrl = Url($RouteData['Destination'], TRUE);
+         if ($FullDestUrl == Url($Url, TRUE)) {
+            $Route = $RouteData['Route'];
+            
+            if ($Route == 'DefaultController')
+               $Route = '/';
+            
+            return Url($Route, StringBeginsWith($Url, 'http'));
+         }
+      }
+      return $Url;
+   }
    
    public function GetRouteTypes() {
       $RT = array();

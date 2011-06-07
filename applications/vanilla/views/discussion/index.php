@@ -7,22 +7,24 @@ if ($DiscussionName == '')
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 
-if ($Session->IsValid()) {
-   // Bookmark link
-   echo Anchor(
-      '<span>*</span>',
-      '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-      'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-      array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-   );
-}
-
 $PageClass = '';
 if($this->Pager->FirstPage()) 
 	$PageClass = 'FirstPage'; 
 	
 ?>
 <div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
+   <?php
+   if ($Session->IsValid()) {
+      // Bookmark link
+      echo Anchor(
+         '<span>*</span>',
+         '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
+         'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+      );
+   }
+   ?>
+
    <ul>
       <li><?php
          if (C('Vanilla.Categories.Use') == TRUE) {

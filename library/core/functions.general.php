@@ -1006,6 +1006,12 @@ if (!function_exists('GetIncomingValue')) {
 
 if (!function_exists('GetMentions')) {
    function GetMentions($String) {
+      // Check for a custom mentions formatter and use it.
+      $Formatter = Gdn::Factory('MentionsFormatter');
+      if (is_object($Formatter)) {
+         return $Formatter->GetMentions($String);
+      }
+
       $Mentions = array();
       
       // This one grabs mentions that start at the beginning of $String

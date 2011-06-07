@@ -2057,23 +2057,23 @@ if (!function_exists('SmartAsset')) {
 if (!function_exists('StringBeginsWith')) {
    /** Checks whether or not string A begins with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0) {
+      elseif (strlen($Needle) == 0) {
          if ($Trim)
-            return $A;
+            return $Haystack;
          return TRUE;
       } else {
-         $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+         $Result = substr_compare($Haystack, $Needle, 0, strlen($Needle), $CaseInsensitive) == 0;
          if ($Trim)
-            $Result = $Result ? substr($A, strlen($B)) : $A;
+            $Result = $Result ? substr($Haystack, strlen($Needle)) : $Haystack;
          return $Result;
       }
    }
@@ -2082,23 +2082,23 @@ if (!function_exists('StringBeginsWith')) {
 if (!function_exists('StringEndsWith')) {
    /** Checks whether or not string A ends with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringEndsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0) {
+      elseif (strlen($Needle) == 0) {
          if ($Trim)
-            return $A;
+            return $Haystack;
          return TRUE;
       } else {
-         $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+         $Result = substr_compare($Haystack, $Needle, -strlen($Needle), strlen($Needle), $CaseInsensitive) == 0;
          if ($Trim)
-            $Result = $Result ? substr($A, 0, -strlen($B)) : $A;
+            $Result = $Result ? substr($Haystack, 0, -strlen($Needle)) : $Haystack;
          return $Result;
       }
    }

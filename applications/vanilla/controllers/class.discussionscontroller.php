@@ -71,7 +71,7 @@ class DiscussionsController extends VanillaController {
    public function Index($Page = '0') {
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE)), TRUE));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
       
       // Validate $Page
       if (!is_numeric($Page) || $Page < 0)

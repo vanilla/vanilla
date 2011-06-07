@@ -26,7 +26,7 @@ foreach ($this->MessageData->Result() as $Message) {
    $Class = trim($Class);
 ?>
 <li id="Message_<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
-   <div class="ConversationMessage">
+   <div id="Item_<?php echo $CurrentOffset ?>" class="ConversationMessage">
       <div class="Meta">
          <span class="Author">
             <?php
@@ -35,7 +35,6 @@ foreach ($this->MessageData->Result() as $Message) {
             ?>
          </span>
          <span class="DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
-         <span class="ItemLink"><a name="Item_<?php echo $CurrentOffset;?>" class="Item"></a></span>
       </div>
       <div class="Message">
          <?php

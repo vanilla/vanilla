@@ -34,15 +34,11 @@ class CategoryModel extends Gdn_Model {
 
    public static function CategoryWatch() {
       $Categories = self::Categories();
-      
-      $Watch = array();
       $AllCount = count($Categories);
       
+      $Watch = array();
+      
       foreach ($Categories as $CategoryID => $Category) {
-         if ($CategoryID == -1) {
-            $AllCount--; // no root
-         }
-         
          if ($Category['PermsDiscussionsView'] && $Category['Following']) {
             $Watch[] = $CategoryID;
          }
@@ -50,7 +46,7 @@ class CategoryModel extends Gdn_Model {
 
       Gdn::PluginManager()->EventArguments['CategoryIDs'] =& $Watch;
       Gdn::PluginManager()->FireEvent('CategoryWatch');
-
+      
       if ($AllCount == count($Watch))
          return TRUE;
 

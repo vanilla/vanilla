@@ -293,7 +293,8 @@ class MessagesController extends ConversationsController {
          $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
 
          // Send the hash link in.
-         $this->AddDefinition('LocationHash', '#Item_'.$CountReadMessages);
+         if ($CountReadMessages > 1)
+            $this->AddDefinition('LocationHash', '#Item_'.$CountReadMessages);
       }
       
       // Fetch message data

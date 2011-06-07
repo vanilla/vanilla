@@ -69,6 +69,7 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Select('CommentID', 'count', 'CountComments')
             ->From('Comment')
             ->Where('InsertUserID', $UserID)
+            ->GroupBy('DiscussionID')
             ->Get()->ResultArray();
 
          // Update the comment counts.

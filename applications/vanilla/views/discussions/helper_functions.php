@@ -33,11 +33,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-   $Sender->FireEvent('BeforeDiscussionContent');
-   WriteOptions($Discussion, $Sender, $Session);
-
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
+
+   $Sender->FireEvent('BeforeDiscussionContent');
+
+   WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>

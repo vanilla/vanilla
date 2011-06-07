@@ -152,6 +152,8 @@ class CategoriesController extends VanillaController {
          $this->View = 'discussions';
       }
 
+      $this->CanonicalUrl(Url('/categories', TRUE));
+
       // Render default view
       $this->Render();
    }
@@ -182,6 +184,8 @@ class CategoriesController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);
+
+      $this->CanonicalUrl(Url('/categories/all', TRUE));
 
       $this->Render();
 	}
@@ -224,6 +228,9 @@ class CategoriesController extends VanillaController {
       
       // Set view and render
       $this->View = 'discussions';
+
+      $this->CanonicalUrl(Url('/categories', TRUE));
+      
       $this->Render();
    }
    

@@ -1563,8 +1563,8 @@ if (!function_exists('ProxyRequest')) {
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if ($Timeout === FALSE)
-			$Timeout = C('Garden.SocketTimeout', 1.0);
+      if ($Timeout === FALSE)
+         $Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');

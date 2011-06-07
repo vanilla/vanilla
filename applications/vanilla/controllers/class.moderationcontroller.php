@@ -263,7 +263,7 @@ class ModerationController extends VanillaController {
          // Clear selections
          unset($CheckedComments[$DiscussionID]);
          Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
-         ModerationController::InformCheckSelections($this);
+         ModerationController::InformCheckedComments($this);
          $this->RedirectUrl = 'discussions';
       }
       

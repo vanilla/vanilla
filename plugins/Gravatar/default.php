@@ -19,14 +19,30 @@ class GravatarPlugin extends Gdn_Plugin {
    
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.
+	private function _JoinInsertEmail($Sender) {
+		$Sender->SQL->Select('iu.Email', '', 'InsertEmail');
+	}
    public function AddonCommentModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
-   }
-   public function ConversationModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail');
+		$this->_JoinInsertEmail($Sender);
    }
    public function ConversationMessageModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
+		$this->_JoinInsertEmail($Sender);
+   }
+	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
+		$this->_JoinInsertEmail($Sender);
+	}
+   public function CommentModel_BeforeGet_Handler(&$Sender) {
+		$this->_JoinInsertEmail($Sender);
+   }
+   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
+		$this->_JoinInsertEmail($Sender);
+   }
+	public function CommentModel_BeforeGetIDData_Handler($Sender) {
+		$this->_JoinInsertEmail($Sender);
+	}
+
+   public function ConversationModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail');
    }
    public function ActivityModel_BeforeGet_Handler(&$Sender) {
       $Sender->SQL
@@ -45,17 +61,7 @@ class GravatarPlugin extends Gdn_Plugin {
       $Sender->SQL->Select('u.Email');
    }
 	
-	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
-		$Sender->SQL->Select('iu.Email', '', 'InsertEmail');
-	}
 	
-   public function CommentModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
-   }
-
-   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail');
-   }
 
    public function Setup() {
       // No setup required.

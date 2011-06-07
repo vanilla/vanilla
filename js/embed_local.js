@@ -15,6 +15,7 @@ jQuery(document).ready(function($) {
       remoteUrl = gdn.definition('RemoteUrl', ''),
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       pagePath = gdn.definition('Path', ''),
+      isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
       
@@ -128,11 +129,9 @@ jQuery(document).ready(function($) {
       });
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
-
       $('a').live('click', function() {
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
-            isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
             noTop = $(this).hasClass('SignOut');
                 
          if (isHttp && href.substr(0, webroot.length) != webroot) {
@@ -177,7 +176,7 @@ jQuery(document).ready(function($) {
    }
    
    var path = gdn.definition('Path', '~');
-   if (path != '~') {
+   if (path != '~' && !isEmbeddedComments) {
       if (path.length > 0 && path[0] != '/')
          path = '/'+path;
       remotePostMessage('location:' + path, '*');

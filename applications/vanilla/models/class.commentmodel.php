@@ -674,9 +674,9 @@ class CommentModel extends VanillaModel {
             // Check user can still see the discussion.
             $UserMayView = $UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID);
 
-            if ($UserMayView) {
+            if ($UserMayView && !in_array($Bookmark->UserID, $NotifiedUsers)) {
                $NotifiedUsers[] = $Bookmark->UserID;
-               $ActivityModel = new ActivityModel();
+//               $ActivityModel = new ActivityModel();
                $ActivityID = $ActivityModel->Add(
                   $Session->UserID,
                   'BookmarkComment',

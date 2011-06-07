@@ -169,6 +169,8 @@ class ActivityController extends Gdn_Controller {
       $this->AddModule($RecentUserModule);
       
       $this->SetData('ActivityData', $this->ActivityData);
+
+      $this->CanonicalUrl(Url('/activity', TRUE));
       
       $this->Render();
    }

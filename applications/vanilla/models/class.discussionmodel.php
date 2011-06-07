@@ -408,7 +408,7 @@ class DiscussionModel extends VanillaModel {
       if(is_null(self::$_CategoryPermissions)) {
          $Session = Gdn::Session();
          
-         if((is_object($Session->User) && $Session->User->Admin == '1')) {
+         if((is_object($Session->User) && $Session->User->Admin)) {
             self::$_CategoryPermissions = TRUE;
 			} elseif(C('Garden.Permissions.Disabled.Category')) {
 				if($Session->CheckPermission('Vanilla.Discussions.View'))

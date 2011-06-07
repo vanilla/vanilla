@@ -202,10 +202,19 @@ class ConversationMessageModel extends Gdn_Model {
          $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.LastMessageID', $MessageID)
-            ->Set('uc.CountReadMessages', "case uc.UserID when {$Session->UserID} then $CountMessages else uc.CountReadMessages end", FALSE)
             ->Where('uc.ConversationID', $ConversationID)
             ->Where('uc.Deleted', '0')
             ->Where('uc.CountReadMessages', $CountMessages - 1)
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Put();
+
+         // Update the sending user.
+         $this->SQL
+            ->Update('UserConversation uc')
+            ->Set('uc.CountReadMessages', $CountMessages)
+            ->Set('Deleted', 0)
+            ->Where('ConversationID', $ConversationID)
+            ->Where('UserID', $Session->UserID)
             ->Put();
 
          // Incrememnt the users' inbox counts.

@@ -702,10 +702,10 @@ class UserModel extends Gdn_Model {
                // Report that the user was created
                $Session = Gdn::Session();
                AddActivity(
-                  $UserID,
+                  $Session->UserID,
                   GetValue('ActivityType', $Settings, 'JoinCreated'),
                   T('Welcome Aboard!'),
-                  $Session->UserID > 0 ? $Session->UserID : ''
+                  $UserID
                );
             }
             // Now update the role settings if necessary.
@@ -877,12 +877,12 @@ class UserModel extends Gdn_Model {
             );
          }
 
-         AddActivity(
-            $Session->UserID != 0 ? $Session->UserID : $UserID,
-            'RoleChange',
-            $Story,
-            $UserID
-         );
+//         AddActivity(
+//            $Session->UserID != 0 ? $Session->UserID : $UserID,
+//            'RoleChange',
+//            $Story,
+//            $UserID
+//         );
       }
    }
 

@@ -606,6 +606,7 @@ class DiscussionController extends VanillaController {
     * Alternate version of Index that uses the embed master view.
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
       $this->Theme = 'default'; // Force the default theme on embedded comments
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)

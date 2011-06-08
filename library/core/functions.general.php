@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
+/*
 function Gdn_Autoload($ClassName) {
    if (!class_exists('Gdn_FileSystem', FALSE))
       return false;
@@ -84,7 +85,6 @@ function Gdn_Autoload($ClassName) {
       include_once($LibraryPath);
 }
 
-/*
 if (!function_exists('__autoload')) {
    function __autoload($ClassName) {
       trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
@@ -95,6 +95,47 @@ if (!function_exists('__autoload')) {
 spl_autoload_register('Gdn_Autoload', FALSE);
 */
 
+if (!function_exists('AbsoluteSource')) {
+   /**
+    * Takes a source path (ie. an image src from an html page), and an
+    * associated URL (ie. the page that the image appears on), and returns the
+    * absolute source (including url & protocol) path.
+    * @param string $SrcPath The source path to make absolute (if not absolute already).
+    * @param string $Url The full url to the page containing the src reference.
+    * @return string Absolute source path.
+    */
+   function AbsoluteSource($SrcPath, $Url) {
+      // If there is a scheme in the srcpath already, just return it.
+      if (!is_null(parse_url($SrcPath, PHP_URL_SCHEME)))
+         return $SrcPath;
+      
+      // Does SrcPath assume root?
+      if (in_array(substr($SrcPath, 0, 1), array('/', '\\')))
+         return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .$SrcPath;
+   
+      // Work with the path in the url & the provided src path to backtrace if necessary
+      $UrlPathParts = explode('/', str_replace('\\', '/', parse_url($Url, PHP_URL_PATH)));
+      $SrcParts = explode('/', str_replace('\\', '/', $SrcPath));
+      $Result = array();
+      foreach ($SrcParts as $Part) {
+         if (!$Part || $Part == '.')
+            continue;
+         
+         if ($Part == '..')
+            array_pop($UrlPathParts);
+         else
+            $Result[] = $Part;
+      }
+      // Put it all together & return
+      return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .'/'.implode('/', array_filter(array_merge($UrlPathParts, $Result)));
+   }
+}
 
 if (!function_exists('AddActivity')) {
    /**
@@ -341,12 +382,18 @@ if (!function_exists('Attribute')) {
     * Takes an attribute (or array of attributes) and formats them in
     * attribute="value" format.
     */
-   function Attribute($Name, $Value = '') {
+   function Attribute($Name, $ValueOrExclude = '') {
       $Return = '';
       if (!is_array($Name)) {
-         $Name = array($Name => $Value);
+         $Name = array($Name => $ValueOrExclude);
+         $Exclude = '';
+      } else {
+         $Exclude = $ValueOrExclude;
       }
       foreach ($Name as $Attribute => $Val) {
+         if ($Exclude && StringBeginsWith($Attribute, $Exclude))
+            continue;
+         
          if ($Val != '' && $Attribute != 'Standard') {
             $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
          }
@@ -630,8 +677,18 @@ if (!function_exists('Debug')) {
 }
 
 if (!function_exists('Deprecated')) {
-   function Deprecated($Name) {
-      trigger_error($Name.' is deprecated.', E_USER_DEPRECATED);
+   /**
+    * Mark a function deprecated.
+    *
+    * @param string $Name The name of the deprecated function.
+    * @param string $NewName The name of the new function that should be used instead.
+    */
+   function Deprecated($Name, $NewName = FALSE) {
+      $Msg = $Name.' is deprecated.';
+      if ($NewName)
+         $Msg .= " Use $NewName instead.";
+
+      trigger_error($Msg, E_USER_DEPRECATED);
    }
 }
 
@@ -645,6 +702,80 @@ if (!function_exists('ExternalUrl')) {
          $Result = Url($Path, TRUE);
 
       return $Result;
+   }
+}
+
+
+if (!function_exists('FetchPageInfo')) {
+   /**
+    * Examines the page at $Url for title, description & images. Be sure to check the resultant array for any Exceptions that occurred while retrieving the page. 
+    * @param string $Url The url to examine.
+    * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+    * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
+    */
+   function FetchPageInfo($Url, $Timeout = 0) {
+      $PageInfo = array(
+         'Url' => $Url,
+         'Title' => '',
+         'Description' => '',
+         'Images' => array(),
+         'Exception' => FALSE
+      );
+      try {
+         $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
+         $Dom = new DOMDocument();
+         @$Dom->loadHTML($PageHtml);
+         // Page Title
+         $TitleNodes = $Dom->getElementsByTagName('title');
+         $PageInfo['Title'] = $TitleNodes->length > 0 ? $TitleNodes->item(0)->nodeValue : '';
+         // Page Description
+         $MetaNodes = $Dom->getElementsByTagName('meta');
+         foreach($MetaNodes as $MetaNode) {
+            if (strtolower($MetaNode->getAttribute('name')) == 'description')
+               $PageInfo['Description'] = $MetaNode->getAttribute('content');
+         }
+         // Keep looking for page description?
+         if ($PageInfo['Description'] == '') {
+            $PNodes = $Dom->getElementsByTagName('p');
+            foreach($PNodes as $PNode) {
+               $PVal = $PNode->nodeValue;
+               if (strlen($PVal) > 90) {
+                  $PageInfo['Description'] = $PVal;
+                  break;
+               }
+            }
+         }
+         if (strlen($PageInfo['Description']) > 400)
+            $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+            
+         // Page Images (retrieve first 3 if bigger than 100w x 300h)
+         $Images = array();
+         $ImageNodes = $Dom->getElementsByTagName('img');
+         $i = 0;
+         foreach ($ImageNodes as $ImageNode) {
+            $Images[] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
+         }
+
+         // Sort by size, biggest one first
+         $ImageSort = array();
+         // Only look at first 10 images (speed!)
+         $i = 0;
+         foreach ($Images as $Image) {
+            $i++;
+            if ($i > 10)
+               break;
+            
+            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            if (!array_key_exists($Diag, $ImageSort))
+               $ImageSort[$Diag] = $Image;
+         }
+         krsort($ImageSort);
+         $PageInfo['Images'] = array_values($ImageSort);
+      } catch (Exception $ex) {
+         $PageInfo['Exception'] = $ex;
+      }
+      return $PageInfo;
    }
 }
 
@@ -875,6 +1006,12 @@ if (!function_exists('GetIncomingValue')) {
 
 if (!function_exists('GetMentions')) {
    function GetMentions($String) {
+      // Check for a custom mentions formatter and use it.
+      $Formatter = Gdn::Factory('MentionsFormatter');
+      if (is_object($Formatter)) {
+         return $Formatter->GetMentions($String);
+      }
+
       $Mentions = array();
       
       // This one grabs mentions that start at the beginning of $String
@@ -1218,12 +1355,21 @@ if (!function_exists('PageNumber')) {
     *
     * @param int $Offset The database offset, starting at zero.
     * @param int $Limit The database limit, otherwise known as the page size.
-    * @param bool $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    * @param bool|string $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    *  - bool: true means yes, false means no.
+    *  - string: The prefix for the page number.
+    * @param bool $First Whether or not to return the page number if it is the first page.
     */
-   function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
+   function PageNumber($Offset, $Limit, $UrlParam = FALSE, $First = TRUE) {
       $Result = floor($Offset / $Limit) + 1;
-      if ($UrlParam)
+
+      if ($UrlParam !== FALSE && !$First && $Result == 1)
+         $Result = '';
+      elseif ($UrlParam === TRUE)
          $Result = 'p'.$Result;
+      elseif (is_string($UrlParam))
+         $Result = $UrlParam.$Result;
+
       return $Result;
    }
 }
@@ -1417,11 +1563,14 @@ if (!function_exists('ProxyRequest')) {
     * response.
     *
     * @param string $Url The full url to the page being requested (including http://)
+    * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout
+    * @param boolean $FollowRedirects Whether or not to follow 301 and 302 redirects. Defaults false.
+    * @return string Response (no headers)
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if(!$Timeout)
-			$Timeout = C('Garden.SocketTimeout', 1.0);
+      if ($Timeout === FALSE)
+         $Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -1445,7 +1594,6 @@ if (!function_exists('ProxyRequest')) {
       }
       $Response = '';
       if (function_exists('curl_init')) {
-         
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
@@ -1453,8 +1601,12 @@ if (!function_exists('ProxyRequest')) {
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+         
+         if ($Timeout > 0)
+            curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
          // 
@@ -1462,12 +1614,12 @@ if (!function_exists('ProxyRequest')) {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          //}
-         
          $Response = curl_exec($Handler);
          $Success = TRUE;
          if ($Response == FALSE) {
             $Success = FALSE;
-            $Response = curl_error($Handler);
+            $Response = '';
+            throw new Exception(curl_error($Handler));
          }
          
          curl_close($Handler);
@@ -1475,11 +1627,12 @@ if (!function_exists('ProxyRequest')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
       
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
-         if(strlen($Cookie) > 0)
+         stream_set_timeout($Pointer, $Timeout);
+         if (strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
@@ -1504,8 +1657,15 @@ if (!function_exists('ProxyRequest')) {
             $Response .= $Line;
          }
          @fclose($Pointer);
+         $Bytes = strlen($Response);
          $Response = trim($Response);
          $Success = TRUE;
+         
+         $StreamInfo = stream_get_meta_data($Pointer);
+         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
+            $Success = FALSE;
+            $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
+         }
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
@@ -1540,7 +1700,7 @@ if (!function_exists('ProxyRequest')) {
          $Code = GetValue('StatusCode',$ResponseHeaders, 200);
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $ResponseHeaders)) {
-               $Location = GetValue('Location', $ResponseHeaders);
+               $Location = AbsoluteSource(GetValue('Location', $ResponseHeaders), $Url);
                return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
             }
          }
@@ -1579,6 +1739,55 @@ if (!function_exists('Redirect')) {
       header("location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
+   }
+}
+
+if (!function_exists('ReflectArgs')) {
+   /**
+    * Reflect the arguments on a callback and returns them as an associative array.
+    * @param callback $Callback A callback to the function.
+    * @param array $Args1 An array of arguments.
+    * @param array $Args2 An optional other array of arguments.
+    * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
+    */
+   function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
+      $Result = array();
+
+      if (!method_exists($Controller, $Method))
+         return;
+      
+      if ($Args2 !== NULL)
+         $Args1 = array_merge($Args2, $Args1);
+      $Args1 = array_change_key_case($Args1);
+
+      if (is_string($Callback))
+         $Meth = new ReflectionFunction($Callback);
+      else
+         $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+      
+      $MethArgs = $Meth->getParameters();
+      
+      $Args = array();
+      $MissingArgs = array();
+
+      // Set all of the parameters.
+      foreach ($MethArgs as $Index => $MethParam) {
+         $ParamName = $MethParam->getName();
+         $ParamNameL = strtolower($ParamName);
+
+         if (isset($Args1[$ParamNameL]))
+            $Args[$ParamName] = $Args1[$ParamNameL];
+         elseif (isset($Args1[$Index]))
+            $Args[$ParamName] = $Args1[$Index];
+         elseif ($MethParam->isDefaultValueAvailable())
+            $Args[$ParamName] = $MethParam->getDefaultValue();
+         else {
+            $Args[$ParamName] = NULL;
+            $MissingArgs[] = "{$Index}: {$ParamName}";
+         }
+      }
+
+      return $Args;
    }
 }
 
@@ -1687,6 +1896,29 @@ if (!function_exists('SafeGlob')) {
       }
          
       return $Result;
+   }
+}
+
+if (!function_exists('SafeImage')) {
+   /**
+    * Examines the provided url & checks to see if there is a valid image on the other side. Optionally you can specify minimum dimensions.
+    * @param string $ImageUrl Full url (including http) of the image to examine.
+    * @param int $MinHeight Minimum height (in pixels) of image. 0 means any height.
+    * @param int $MinWidth Minimum width (in pixels) of image. 0 means any width.
+    * @return mixed The url of the image if safe, FALSE otherwise.
+    */
+   function SafeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
+      try {
+         list($Width, $Height, $Type, $Attributes) = getimagesize($ImageUrl);
+         if ($MinHeight > 0 && $MinHeight < $Height)
+            return FALSE;
+         
+         if ($MinWidth > 0 && $MinWidth < $Width)
+            return FALSE;
+      } catch (Exception $ex) {
+         return FALSE;
+      }
+      return $ImageUrl;
    }
 }
 
@@ -1831,21 +2063,23 @@ if (!function_exists('SmartAsset')) {
 if (!function_exists('StringBeginsWith')) {
    /** Checks whether or not string A begins with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0)
+      elseif (strlen($Needle) == 0) {
+         if ($Trim)
+            return $Haystack;
          return TRUE;
-      else {
-         $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, strlen($B));
+      } else {
+         $Result = substr_compare($Haystack, $Needle, 0, strlen($Needle), $CaseInsensitive) == 0;
+         if ($Trim)
+            $Result = $Result ? substr($Haystack, strlen($Needle)) : $Haystack;
          return $Result;
       }
    }
@@ -1854,21 +2088,23 @@ if (!function_exists('StringBeginsWith')) {
 if (!function_exists('StringEndsWith')) {
    /** Checks whether or not string A ends with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringEndsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0)
+      elseif (strlen($Needle) == 0) {
+         if ($Trim)
+            return $Haystack;
          return TRUE;
-      else {
-         $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
-         if ($Result && $Trim)
-            $Result = substr($A, 0, -strlen($B));
+      } else {
+         $Result = substr_compare($Haystack, $Needle, -strlen($Needle), strlen($Needle), $CaseInsensitive) == 0;
+         if ($Trim)
+            $Result = $Result ? substr($Haystack, 0, -strlen($Needle)) : $Haystack;
          return $Result;
       }
    }

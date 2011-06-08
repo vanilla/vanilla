@@ -110,6 +110,7 @@ class FacebookPlugin extends Gdn_Plugin {
    }
 	
    public function SettingsController_Facebook_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
       if ($Sender->Form->IsPostBack()) {
          $Settings = array(
              'Plugins.Facebook.ApplicationID' => $Sender->Form->GetFormValue('ApplicationID'),
@@ -274,7 +275,10 @@ class FacebookPlugin extends Gdn_Plugin {
       if ($Error)
          throw new Gdn_UserException($Error, 400);
 
+      $this->Structure();
+   }
 
+   public function Structure() {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),

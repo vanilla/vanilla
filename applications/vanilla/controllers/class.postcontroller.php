@@ -21,6 +21,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class PostController extends VanillaController {
    /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
+   /**
     * Models to include.
     * 
     * @since 2.0.0
@@ -150,9 +155,14 @@ class PostController extends VanillaController {
             }
 
             // Make sure that the title will not be invisible after rendering
-            $Name = $this->Form->GetFormValue('Name', '');
+            $Name = trim($this->Form->GetFormValue('Name', ''));
             if ($Name != '' && Gdn_Format::Text($Name) == '')
                $this->Form->AddError(T('You have entered an invalid discussion title'), 'Name');
+            else {
+               // Trim the name.
+               $FormValues['Name'] = $Name;
+               $this->Form->SetFormValue('Name', $Name);
+            }
 
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {
@@ -265,7 +275,7 @@ class PostController extends VanillaController {
     */
    public function Comment($DiscussionID = '') {
       // Get $DiscussionID from RequestArgs if valid
-      if ($DiscussionID == '' && sizeof($this->RequestArgs))
+      if ($DiscussionID == '' && count($this->RequestArgs))
          if (is_numeric($this->RequestArgs[0]))
             $DiscussionID = $this->RequestArgs[0];
             

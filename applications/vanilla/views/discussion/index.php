@@ -7,17 +7,24 @@ if ($DiscussionName == '')
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 
-if ($Session->IsValid()) {
-   // Bookmark link
-   echo Anchor(
-      '<span>*</span>',
-      '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-      'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-      array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-   );
-}
+$PageClass = '';
+if($this->Pager->FirstPage()) 
+	$PageClass = 'FirstPage'; 
+	
 ?>
-<div class="Tabs HeadingTabs DiscussionTabs">
+<div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
+   <?php
+   if ($Session->IsValid()) {
+      // Bookmark link
+      echo Anchor(
+         '<span>*</span>',
+         '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
+         'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+      );
+   }
+   ?>
+
    <ul>
       <li><?php
          if (C('Vanilla.Categories.Use') == TRUE) {
@@ -28,14 +35,9 @@ if ($Session->IsValid()) {
       ?></li>
    </ul>
    <div class="SubTab"><?php echo $DiscussionName; ?></div>
-   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use')) { ?>
-      <div class="Administration">
-         <input type="checkbox" name="Toggle" />
-      </div>
-   <?php } ?>
 </div>
 <?php $this->FireEvent('BeforeDiscussion'); ?>
-<ul class="MessageList Discussion">
+<ul class="MessageList Discussion <?php echo $PageClass; ?>">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php
@@ -69,7 +71,7 @@ if ($this->Discussion->Closed == '1') {
    ?>
    <div class="Foot">
       <?php
-      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
+      echo Anchor(T('Add a Comment'), SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
       ?> 
    </div>
    <?php 

@@ -178,12 +178,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
    
-      if (Gdn::Config('Garden.UpdateMode', FALSE)) {
-         if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
-            // Updatemode, and this user is not root admin
+      try {
+         if (Gdn::Config('Garden.UpdateMode', FALSE) && !Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            // Updatemode, and this user is not an admin
+            $UpdateModeExceptions = array(
+                'utility'
+            );
+            $PathRequest = Gdn::Request()->Path();
+            foreach ($UpdateModeExceptions as $UpdateModeException)
+               if (StringBeginsWith ($PathRequest, $UpdateModeException))
+                  throw new Exception();
+                  
             $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
          }
-      }
+      } catch (Exception $e) {}
       
       $this->FireEvent('BeforeDispatch');
       $this->AnalyzeRequest($Request);
@@ -195,7 +203,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          && !Gdn::Session()->IsValid()
          && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
       ) {
-         Redirect(Gdn::Authenticator()->SignInUrl($this->Request));
+         Redirect('/entry/signin?Target='.urlencode($this->Request));
          exit();
       }
 
@@ -263,14 +271,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
-         
-         $this->FireEvent('BeforeControllerMethod');
 
          // Set special controller method options for REST APIs.
          $this->_ReflectControllerArgs($Controller);
+         Gdn::Controller($Controller);
+         
+         $this->FireEvent('BeforeControllerMethod');
          
          $Controller->Initialize();
-         Gdn::Controller($Controller);
 
          // Call the requested method on the controller - error out if not defined.
          if ($PluginManagerHasReplacementMethod || method_exists($Controller, $ControllerMethod)) {
@@ -436,7 +444,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->Request = $DefaultController['Destination'];
       }
       
-      $Parts = explode('/', $this->Request);
+      $Parts = explode('/', str_replace('\\', '/', $this->Request));
       
       /**
        * The application folder is either the first argument or is not provided. The controller is therefore
@@ -462,6 +470,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
+         header("HTTP/1.1 404 Not Found" );
          $Request->WithRoute('Default404');
          return $this->AnalyzeRequest($Request);
       }
@@ -472,6 +481,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
+
+      // Check for a file extension on the controller.
+      $Ext = strrchr($Controller, '.');
+      if ($Ext) {
+         $Controller = substr($Controller, 0, -strlen($Ext));
+         $Ext = strtoupper(trim($Ext, '.'));
+         if (in_array($Ext, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
+            $this->_DeliveryMethod = strtoupper($Ext);
+         }
+      }
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(

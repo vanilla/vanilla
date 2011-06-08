@@ -98,7 +98,6 @@ window.vanilla.embed = function(host) {
    }
 
    processMessage = function(message) {
-//      console.log('processMessage: '+message);
       if (message[0] == 'height') {
          setHeight(message[1]);
       } else if (message[0] == 'location') {

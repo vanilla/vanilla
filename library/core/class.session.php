@@ -104,9 +104,9 @@ class Gdn_Session {
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Admin == '1')
+         if ($this->User->Admin)
             return TRUE;
-         elseif ($this->User->Banned)
+         elseif ($this->User->Banned || GetValue('Deleted', $this->User))
             return FALSE;
       }
 
@@ -115,7 +115,7 @@ class Gdn_Session {
          $JunctionID = '';
 
       $Permissions = $this->GetPermissions();
-      if ($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+      if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
@@ -160,6 +160,13 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
+      
+      $this->UserID = 0;
+      $this->User = FALSE;
+      $this->_Attributes = array();
+      $this->_Permissions = array();
+      $this->_Preferences = array();
+      $this->_TransientKey = FALSE;
    }
 
    /**
@@ -273,14 +280,15 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($UserID && $SetIdentity)
-               Gdn::Authenticator()->SetIdentity($UserID, $Persist);
+            if ($SetIdentity) {
+               Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
 
-            if (Gdn::Authenticator()->ReturningUser($this->User)) {
-               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
+               if (Gdn::Authenticator()->ReturningUser($this->User)) {
+                  $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+                  $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
+               }
             }
-
+            
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
 

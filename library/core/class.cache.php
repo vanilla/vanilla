@@ -46,6 +46,8 @@ abstract class Gdn_Cache {
    const FEATURE_NOPREFIX     = 'f_noprefix';
    // Allows forcing alternate key prefix
    const FEATURE_FORCEPREFIX  = 'f_forceprefix';
+   // Allows querying DB for missing keys, or firing a callback
+   const FEATURE_FALLBACK     = 'f_fallback';
    
    /**
    * Location - SERVER:IP, Filepath, etc
@@ -122,18 +124,6 @@ abstract class Gdn_Cache {
       return $CacheObject;
    }
    
-   public static function ActiveEnabled($ForceEnable = FALSE) {
-      $AllowCaching = FALSE;
-      
-      if (defined('CACHE_ENABLED_OVERRIDE'))
-         $AllowCaching |= CACHE_ENABLED_OVERRIDE;
-         
-      $AllowCaching |= C('Cache.Enabled', FALSE);
-      $AllowCaching |= $ForceEnable;
-      
-      return (bool)$AllowCaching;
-   }
-   
    /**
    * Gets the shortname of the currently active cache
    * 
@@ -164,6 +154,34 @@ abstract class Gdn_Cache {
       return $ActiveCache;
    }
    
+   /**
+    * Get the status of the active cache
+    * 
+    * Return whether or not the current cache method is enabled.
+    * 
+    * @param type $ForceEnable
+    * @return bool status of active cache
+    */
+   public static function ActiveEnabled($ForceEnable = FALSE) {
+      $AllowCaching = FALSE;
+      
+      if (defined('CACHE_ENABLED_OVERRIDE'))
+         $AllowCaching |= CACHE_ENABLED_OVERRIDE;
+         
+      $AllowCaching |= C('Cache.Enabled', FALSE);
+      $AllowCaching |= $ForceEnable;
+      
+      return (bool)$AllowCaching;
+   }
+   
+   /**
+    * Returns the storage data for the active cache
+    * 
+    * For FileCache, the folder. For Memcache, the server(s).
+    * 
+    * @param type $ForceMethod
+    * @return mixed Active Store Location
+    */
    public static function ActiveStore($ForceMethod = NULL) {
       $ActiveCache = self::ActiveCache();
       if (!is_null($ForceMethod))
@@ -208,6 +226,11 @@ abstract class Gdn_Cache {
    * @param string $Key Cache key used for storage
    * @param mixed $Value Value to be cached
    * @param array $Options
+   *   - FEATURE_COMPRESS: Allows items to be internally compressed/decompressed (bool)
+   *   - FEATURE_EXPIRY: Allows items to autoexpire (seconds)
+   *   - FEATURE_NOPREFIX: Allows disabling usage of key prefix (bool)
+   *   - FEATURE_FORCEPREFIX: Allows forcing alternate key prefix (string)
+   *   - FEATURE_FALLBACK: Allows querying DB for missing keys, or firing a callback (see Gdn_Cache->Fallback)
    * @return boolean TRUE on success or FALSE on failure.
    */
    abstract public function Store($Key, $Value, $Options = array());
@@ -288,6 +311,41 @@ abstract class Gdn_Cache {
    */
    abstract public function AddContainer($Options);
    
+   /**
+    * 
+    * 
+    * @param type $Key Cache key
+    * @param type $Options
+    * @return mixed
+    */
+   protected function Fallback($Key, $Options) {
+      $Fallback = GetValue(Gdn_Cache::FEATURE_FALLBACK, $Options, NULL);
+      if (is_null($Fallback))
+         return Gdn_Cache::CACHEOP_FAILURE;
+      
+      $FallbackType = array_shift($Fallback);
+      switch ($FallbackType) {
+         case 'query':
+            $QueryFallbackField = array_shift($Fallback);
+            $QueryFallbackCode = array_shift($Fallback);
+            $FallbackResult = Gdn::Database()->Query($QueryFallbackCode);
+            if ($FallbackResult->NumRows()) {
+               if (!is_null($QueryFallbackField))
+                  $FallbackResult = GetValue($QueryFallbackField, $FallbackResult->FirstRow(DATASET_TYPE_ARRAY));
+               else
+                  $FallbackResult = $FallbackResult->ResultArray();
+            }
+            break;
+         case 'callback':
+            $CallbackFallbackMethod = array_shift($Fallback);
+            $CallbackFallbackArgs = $Fallback;
+            $FallbackResult = call_user_func_array($CallbackFallbackMethod, $CallbackFallbackArgs);
+            break;
+      }
+      Gdn::Cache()->Store($Key, $FallbackResult);
+      return $FallbackResult;
+   }
+   
    public function GetPrefix($ForcePrefix = NULL, $WithRevision = TRUE) {
       static $ConfigPrefix = FALSE;
       
@@ -307,9 +365,9 @@ abstract class Gdn_Cache {
          
       }
       
-      // Lookup Revision if we have a prefix
+      // Lookup Revision if we have a prefix.
+      $RevisionNumber = FALSE;
       if ($WithRevision && $ConfigPrefix !== FALSE) {
-         $RevisionNumber = FALSE;
          $CacheRevision = $this->GetRevision($ConfigPrefix);
          if (!is_null($CacheRevision))
             $RevisionNumber = $CacheRevision;
@@ -368,6 +426,31 @@ abstract class Gdn_Cache {
          $Key = $this->GetPrefix($ForcePrefix).'!'.$Key;
       
       return $Key;
+   }
+   
+   /*
+    * Get the value of a store-specific option
+    * 
+    * The option keys are specific to the active cache type, but are always
+    * stored under $Configuration['Cache'][ActiveCacheName]['Option'][*].
+    * 
+    * @param string|integer $Option The option key to retrieve
+    * @return mixed The value associated with the given option key
+    */
+   public function Option($Option = NULL, $Default = NULL) {
+      static $ActiveOptions = NULL;
+      
+      if (is_null($ActiveOptions)) {
+         $ActiveCacheShortName = ucfirst($this->ActiveCache());
+         $OptionKey = "Cache.{$ActiveCacheShortName}.Option";
+         $ActiveOptions = C($OptionKey, array());
+      }
+      
+      if (is_null($Option) || !array_key_exists($Option, $ActiveOptions)) {
+         return $ActiveOptions;
+      }
+      
+      return GetValue($Option, $ActiveOptions, $Default);
    }
    
    /**

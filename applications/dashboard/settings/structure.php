@@ -88,6 +88,24 @@ $Construct
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
+// Make sure the system user is okay.
+$SystemUserID = C('Garden.SystemUserID');
+if ($SystemUserID) {
+   $SysUser = Gdn::UserModel()->Get($SystemUserID);
+
+   if (!$SysUser || GetValue('Deleted', $SysUser)) {
+      $SystemUserID = FALSE;
+      RemoveFromConfig('Garden.SystemUserID');
+   }
+}
+
+if (!$SystemUserID) {
+   // Try and find a system user.
+   $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
+   if ($SystemUserID)
+      SaveToConfig('Garden.SystemUserID', $SystemUserID);
+}
+
 // UserRole Table
 $Construct->Table('UserRole');
 
@@ -122,9 +140,10 @@ $Construct->Table('UserAuthentication')
 $Construct->Table('UserAuthenticationProvider')
    ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
    ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
+   ->Column('Name', 'varchar(50)', TRUE)
    ->Column('URL', 'varchar(255)', TRUE)
    ->Column('AssociationSecret', 'text', FALSE)
-   ->Column('AssociationHashMethod', array('HMAC-SHA1','HMAC-PLAINTEXT'), FALSE)
+   ->Column('AssociationHashMethod', 'varchar(20)', FALSE)
    ->Column('AuthenticateUrl', 'varchar(255)', TRUE)
    ->Column('RegisterUrl', 'varchar(255)', TRUE)
    ->Column('SignInUrl', 'varchar(255)', TRUE)
@@ -206,7 +225,7 @@ $PermissionModel->Define(array(
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
    'Garden.Moderation.Manage' => 'Garden.Users.Edit',
-   'Garden.AdvancedNotifcatons.Allow' => 'Garden.Settings.Manage'
+   'Garden.AdvancedNotifications.Allow' => 'Garden.Settings.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -409,6 +428,7 @@ $Construct->Table('Log')
    ->Column('DateInserted', 'datetime') // date item added to log
    ->Column('ParentRecordID', 'int', NULL, 'index')
    ->Column('Data', 'text', NULL) // the data from the record.
+   ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Regarding')
@@ -423,7 +443,7 @@ $Construct->Table('Regarding')
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)
    ->Column('Comment', 'text', FALSE)
-   ->Engine('InnoDB')
+   ->Column('Reports', 'int(11)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

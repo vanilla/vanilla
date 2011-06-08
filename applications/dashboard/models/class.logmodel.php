@@ -191,6 +191,10 @@ class LogModel extends Gdn_Pluggable {
       // Grab the record from the DB.
       $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
       foreach ($OldData as $Row) {
+         // Don't log the change if it's right after an insert.
+         if (isset($Row['DateInserted']) && (time() - Gdn_Format::ToTimestamp($Row['DateInserted'])) < 2 * 60)
+            continue;
+
          $Row['_New'] = $NewData;
          self::Insert($Operation, $RecordType, $Row);
       }
@@ -256,7 +260,6 @@ class LogModel extends Gdn_Pluggable {
          }
       }
 
-
       $Data = $Log['Data'];
       if (!isset($Columns[$Log['RecordType']])) {
          $Columns[$Log['RecordType']] = Gdn::SQL()->FetchColumns($Log['RecordType']);
@@ -297,9 +300,16 @@ class LogModel extends Gdn_Pluggable {
             }
 
             // Insert the record back into the db.
-            Gdn::SQL()
+            $ID = Gdn::SQL()
                ->Options('Ignore', TRUE)
                ->Insert($Log['RecordType'], $Set);
+            if (!$ID && isset($Log['RecordID']))
+               $ID = $Log['RecordID'];
+
+            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'User') {
+               Gdn::UserModel()->SaveRoles($ID, Gdn::UserModel()->NewUserRoleIDs());
+            }
+
             break;
       }
 

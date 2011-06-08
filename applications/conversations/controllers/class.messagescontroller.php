@@ -84,11 +84,18 @@ class MessagesController extends ConversationsController {
          }
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
-         if ($ConversationID !== FALSE)
-            $this->RedirectUrl = Url('messages/'.$ConversationID);
-      } else if ($Recipient != '') {
-         $this->Form->SetFormValue('To', $Recipient);
+         if ($ConversationID !== FALSE) {
+            $Target = $this->Form->GetFormValue('Target', 'messages/'.$ConversationID);
+            
+            $this->RedirectUrl = Url($Target);
+         }
+      } else {
+         if ($Recipient != '')
+            $this->Form->SetFormValue('To', $Recipient);
       }
+      if ($Target = Gdn::Request()->Get('Target'))
+            $this->Form->AddHidden('Target', $Target);
+
       $this->Render();      
    }
    
@@ -120,8 +127,11 @@ class MessagesController extends ConversationsController {
                $LastMessageID = $NewMessageID - 1;
             
             $Session = Gdn::Session();
-            $this->Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);   
-            $this->MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
+            $Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);   
+            $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
+            $this->Conversation = $Conversation;
+            $this->MessageData = $MessageData;
+
             $this->View = 'messages';
          } else {
             // Handle ajax based errors...
@@ -170,7 +180,8 @@ class MessagesController extends ConversationsController {
       $Result = $ConversationData->Result();
       $this->ConversationModel->JoinParticipants($Result);
       
-      $this->ConversationData = $ConversationData;
+      $this->ConversationData =& $ConversationData;
+      $this->SetData('Conversations', $Result);
       
       $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
       
@@ -283,6 +294,10 @@ class MessagesController extends ConversationsController {
          
          // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
          $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
+
+         // Send the hash link in.
+         if ($CountReadMessages > 1)
+            $this->AddDefinition('LocationHash', '#Item_'.$CountReadMessages);
       }
       
       // Fetch message data
@@ -299,14 +314,18 @@ class MessagesController extends ConversationsController {
       $Users = array();
       $InConversation = FALSE;
       foreach($this->RecipientData->Result() as $User) {
-         if($User->Deleted)
-            continue;
          $Count++;
          if($User->UserID == $Session->UserID) {
             $InConversation = TRUE;
             continue;
          }
-         $Users[] = UserAnchor($User);
+         if($User->Deleted) {
+            $Users[] = Wrap(UserAnchor($User), 'del', array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars($User->Name))));
+            $this->SetData('_HasDeletedUsers', TRUE);
+         } else
+            $Users[] = UserAnchor($User);
+
+         
       }
       if ($InConversation) {
          if(count($Users) == 0)

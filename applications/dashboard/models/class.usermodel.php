@@ -211,6 +211,28 @@ class UserModel extends Gdn_Model {
       $this->SetCalculatedFields($User);
       return $User;
    }
+   
+   public function GetByRole($Role) {
+      $RoleID = $Role; // Optimistic
+      if (is_string($Role)) {
+         $RoleModel = new RoleModel();
+         $Roles = $RoleModel->GetArray();
+         $RolesByName = array_flip($Roles);
+         
+         $RoleID = GetValue($Role, $RolesByName, NULL);
+         
+         // No such role
+         if (is_null($RoleID)) return new Gdn_DataSet();
+      }
+
+      return $this->SQL->Select('u.*')
+         ->From('User u')
+         ->Join('UserRole ur', 'u.UserID = ur.UserID')
+         ->Where('ur.RoleID', $RoleID, TRUE, FALSE)
+//         ->GroupBy('UserID')
+         ->OrderBy('DateInserted', 'desc')
+         ->Get();
+   }
 
    public function GetActiveUsers($Limit = 5) {
       $this->UserQuery();
@@ -448,26 +470,42 @@ class UserModel extends Gdn_Model {
          ->Limit($Limit, $Offset)
          ->Get();
    }
+   
+   /**
+    * Retrieves a "system user" id that can be used to perform non-real-person tasks.
+    */
+   public function GetSystemUserID() {
+      $SystemUserID = C('Garden.SystemUserID');
+      if ($SystemUserID)
+         return $SystemUserID;
+      
+      $SystemUserID = $this->SQL->Insert($this->Name, array(
+         'Name' => T('System'),
+         'Password' => RandomString('20'),
+         'HashMethod' => 'Random',
+         'Email' => 'system@domain.com',
+         'DateInserted' => Gdn_Format::ToDateTime(),
+         'Admin' => '2'
+      ));
+      
+      SaveToConfig('Garden.SystemUserID', $SystemUserID);
+      return $SystemUserID;
+   }
 
    public function Register($FormPostValues, $Options = array()) {
       $Valid = TRUE;
       $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
+      
+      // Throw an error if the registering user has an active session
+      if (Gdn::Session()->IsValid())
+         $this->Validation->AddValidationResult('Name', 'You are already registered.');
 
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
 
-      // Check for spam.
-      if ($Valid) {
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
-         if ($Spam) {
-            $Valid = FALSE;
-            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
-         }
-      }
-
       // Throw an event to allow plugins to block the registration.
+      unset($this->EventArguments['User']);
       $this->EventArguments['User'] = $FormPostValues;
-      
       $this->EventArguments['Valid'] =& $Valid;
       $this->FireEvent('BeforeRegister');
 
@@ -741,7 +779,7 @@ class UserModel extends Gdn_Model {
    public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
       if(is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
-         $RoleNames = preg_split('/\s*,\s*/', $RoleIDs);
+         $RoleNames = array_map('trim', explode(',', $RoleIDs));
          $RoleIDs = $this->SQL
             ->Select('r.RoleID')
             ->From('Role r')
@@ -993,6 +1031,13 @@ class UserModel extends Gdn_Model {
       }
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1057,6 +1102,13 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE)) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1091,8 +1143,9 @@ class UserModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
 
-      // Add & apply any extra validation rules:
-      $this->Validation->ApplyRule('Email', 'Email');
+      // Add & apply any extra validation rules.
+      if (GetValue('ValidateEmail', $Options, TRUE))
+         $this->Validation->ApplyRule('Email', 'Email');
 
       // TODO: DO I NEED THIS?!
       // Make sure that the checkbox val for email is saved as the appropriate enum
@@ -1102,6 +1155,13 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         if ($Spam) {
+            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
+            return;
+         }
+
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1336,7 +1396,7 @@ class UserModel extends Gdn_Model {
          $User = $this->Get($UserID);
          if ($User) {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
-				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(Gdn::Authenticator()->SignInUrl())));
+				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
 				$Email->To($User->Email);
 				//$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
 				$Email->Send();
@@ -1383,6 +1443,9 @@ class UserModel extends Gdn_Model {
       // Remove role associations
       $this->SQL->Delete('UserRole', array('UserID' => $UserID));
 
+      // Remove foreign account associations
+      $this->SQL->Delete('UserAuthentication', array('UserID' => $UserID));
+      
       // Remove the user's information
       $this->SQL->Update('User')
          ->Set(array(
@@ -1614,7 +1677,14 @@ class UserModel extends Gdn_Model {
       if (!is_array($Name))
          $Name = array($Name => $Value);
 
-      $Values = Gdn_Format::Serialize(array_merge($Values, $Name));
+      
+      $RawValues = array_merge($Values, $Name);
+      $Values = array();
+      foreach ($RawValues as $Key => $RawValue)
+         if (!is_null($RawValue))
+            $Values[$Key] = $RawValue;
+      
+      $Values = Gdn_Format::Serialize($Values);
 
       // Save the values back to the db
       return $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));
@@ -1792,6 +1862,10 @@ class UserModel extends Gdn_Model {
       $Session = Gdn::Session();
       $Sender = $this->Get($Session->UserID);
       $User = $this->Get($UserID);
+
+      if (!ValidateEmail($User->Email))
+         return;
+
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Welcome Aboard!'), $AppTitle));
@@ -1908,10 +1982,13 @@ class UserModel extends Gdn_Model {
          }
 
          if ($UserID) {
-            $RoleID = $this->NewUserRoleIDs();
+            $NewUserRoleIDs = $this->NewUserRoleIDs();
             
             // Save the roles.
-            $Roles = (array)GetValue('Roles', $Data, $RoleID);
+            $Roles = GetValue('Roles', $Data, FALSE);
+            if (empty($Roles))
+               $Roles = $NewUserRoleIDs;
+            
             $this->SaveRoles($UserID, $Roles, FALSE);
          }
       } else {

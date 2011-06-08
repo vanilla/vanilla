@@ -112,7 +112,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $Limit Max number of discussions to return.
     * @param array $Wheres SQL conditions.
     * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
-    * @return object SQL result.
+    * @return Gdn_DataSet SQL result.
     */
    public function Get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = NULL) {
       if ($Limit == '') 
@@ -175,6 +175,9 @@ class DiscussionModel extends VanillaModel {
 		// Change discussions returned based on additional criteria	
 		$this->AddDiscussionColumns($Data);
 		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
 		$this->FireEvent('AfterAddColumns');
@@ -199,6 +202,30 @@ class DiscussionModel extends VanillaModel {
          }
       }
    }
+   
+   public function AddDenormalizedViews(&$Discussions) {
+      if ($Discussions instanceof Gdn_DataSet) {
+         $Result = $Discussions->Result();
+         foreach($Result as &$Discussion) {
+            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
+            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
+                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
+            ));
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews = $CacheViews;
+         }
+      } else {
+         if (isset($Discussions->DiscussionID)) {
+            $Discussion = $Discussions;
+            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
+            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
+                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
+            ));
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews = $CacheViews;
+         }
+      }
+   }
 	
 	/**
     * Modifies discussion data before it is returned.
@@ -215,6 +242,9 @@ class DiscussionModel extends VanillaModel {
 		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
+         $Discussion->Name = Gdn_Format::Text($Discussion->Name);
+         $Discussion->Url = Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
 				if ($Discussion->CountCommentWatch) {
@@ -279,8 +309,14 @@ class DiscussionModel extends VanillaModel {
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
 
       // Get the discussion IDs of the announcements.
-      // TODO: Use caching.
+      $CacheKey = FALSE;
+      if (!$Wheres)
+         $CacheKey = 'Announcements';
+      elseif (is_array($Wheres) && isset($Wheres['d.CategoryID'])) {
+         $CacheKey = 'Announcements_'.$Wheres['d.CategoryID'];
+      }
       $this->SQL
+         ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
          ->Where('d.Announce', '1');
@@ -289,6 +325,10 @@ class DiscussionModel extends VanillaModel {
 
       $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
+
+      // Short circuit querying when there are no announcements.
+      if (count($AnnouncementIDs) == 0)
+         return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery();
       $this->SQL
@@ -326,15 +366,14 @@ class DiscussionModel extends VanillaModel {
       $Data = $this->SQL->Get();
 			
 		$this->AddDiscussionColumns($Data);
-		
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
 		$this->FireEvent('AfterAddColumns');
 
-
-
-
-		
 		return $Data;
    }
    
@@ -369,7 +408,7 @@ class DiscussionModel extends VanillaModel {
       if(is_null(self::$_CategoryPermissions)) {
          $Session = Gdn::Session();
          
-         if((is_object($Session->User) && $Session->User->Admin == '1')) {
+         if((is_object($Session->User) && $Session->User->Admin)) {
             self::$_CategoryPermissions = TRUE;
 			} elseif(C('Garden.Permissions.Disabled.Category')) {
 				if($Session->CheckPermission('Vanilla.Discussions.View'))
@@ -489,9 +528,14 @@ class DiscussionModel extends VanillaModel {
 		if ($Type != '')
 			$this->SQL->Where('d.Type', $Type);
 			
-		return $this->SQL
+		$Discussion = $this->SQL
          ->Get()
          ->FirstRow();
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Discussion);
+              
+      return $Discussion;
    }
 
    /**
@@ -536,6 +580,9 @@ class DiscussionModel extends VanillaModel {
 		) {
 			$Data->Closed = '1';
 		}
+      
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
 		
 		return $Data;
    }
@@ -552,7 +599,7 @@ class DiscussionModel extends VanillaModel {
    public function GetIn($DiscussionIDs) {
       $Session = Gdn::Session();
       $this->FireEvent('BeforeGetIn');
-      return $this->SQL
+      $Result = $this->SQL
          ->Select('d.*')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
@@ -572,6 +619,28 @@ class DiscussionModel extends VanillaModel {
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
          ->WhereIn('d.DiscussionID', $DiscussionIDs)
          ->Get();
+      
+      // Spliting views off to side table. Aggregate cached keys here.
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Result);
+      
+      return $Result;
+   }
+   
+   public static function GetViewsFallback($DiscussionID) {
+      
+      // Not found. Check main table.
+      $Views = GetValue('CountViews', Gdn::SQL()
+         ->Select('CountViews')
+         ->From('Discussion')
+         ->Where('DiscussionID', $DiscussionID)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY), NULL);
+      
+      // Found. Insert into denormalized table and return.
+      if (!is_null($Views))
+         return $Views;
+      
+      return NULL;
    }
    
    /**
@@ -657,7 +726,7 @@ class DiscussionModel extends VanillaModel {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
          if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', '', '', 1)->FirstRow()->CategoryID;
+            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
@@ -880,34 +949,38 @@ class DiscussionModel extends VanillaModel {
             left join (
               select
                 d.CategoryID,
-                count(d.DiscussionID) as CountDiscussions
+                coalesce(count(d.DiscussionID), 0) as CountDiscussions,
+                coalesce(sum(d.CountComments), 0) as CountComments
               from :_Discussion d
               $Where
               group by d.CategoryID
             ) d
               on c.CategoryID = d.CategoryID
-            set c.CountDiscussions = coalesce(d.CountDiscussions, 0)";
+            set 
+               c.CountDiscussions = coalesce(d.CountDiscussions, 0)
+               c.CountComments = coalesce(d.CountComments, 0)";
 			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
 			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');
 			
-		} elseif (is_numeric($CategoryID) && $CategoryID > 0) {
+		} elseif (is_numeric($CategoryID)) {
          $this->SQL
             ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->Select('d.CountComments', 'sum', 'CountComments')
             ->From('Discussion d')
             ->Where('d.CategoryID', $CategoryID);
          
 			$this->AddArchiveWhere();
 			
 			$Data = $this->SQL->Get()->FirstRow();
-         $Count = $Data ? $Data->CountDiscussions : 0;
+         $CountDiscussions = (int)GetValue('CountDiscussions', $Data, 0);
+         $CountComments = (int)GetValue('CountComments', $Data, 0);
          
-         if ($Count >= 0) {
-            $this->SQL
-               ->Update('Category')
-               ->Set('CountDiscussions', $Count)
-               ->Where('CategoryID', $CategoryID)
-               ->Put();
-         }
+         $this->SQL
+            ->Update('Category')
+            ->Set('CountDiscussions', $CountDiscussions)
+            ->Set('CountComments', $CountComments)
+            ->Where('CategoryID', $CategoryID)
+            ->Put();
       }
    }
 	
@@ -943,8 +1016,8 @@ class DiscussionModel extends VanillaModel {
     * @param mixed $ForceValue If set, overrides toggle behavior with this value.
     * @return mixed Value that was ultimately set for the field.
     */
-   public function SetProperty($DiscussionID, $Property, $ForceValue = FALSE) {
-      if ($ForceValue !== FALSE) {
+   public function SetProperty($DiscussionID, $Property, $ForceValue = NULL) {
+      if ($ForceValue !== NULL) {
          $Value = $ForceValue;
       } else {
          $Value = '1';
@@ -1025,12 +1098,29 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID) {
-      $this->SQL
-         ->Update('Discussion')
-         ->Set('CountViews', 'CountViews + 1', FALSE)
-         ->Where('DiscussionID', $DiscussionID)
-         ->Put();
+	public function AddView($DiscussionID, $Views = 0) {
+      $Views++;
+      if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+         $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
+         
+         // Increment. If not success, create key.
+         $Incremented = Gdn::Cache()->Increment($CacheKey);
+         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+            Gdn::Cache()->Store($CacheKey, $Views);
+         
+         // Every X views, writeback to Discussions
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
+            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
+            SET CountViews={$Views}
+            WHERE DiscussionID={$DiscussionID}");
+         }
+      } else {
+         $this->SQL
+            ->Update('Discussion')
+            ->Set('CountViews', 'CountViews + 1', FALSE)
+            ->Where('DiscussionID', $DiscussionID)
+            ->Put();
+      }
 	}
 
    /**
@@ -1159,16 +1249,16 @@ class DiscussionModel extends VanillaModel {
 		$BookmarkData = $this->GetBookmarkUsers($DiscussionID);
 
       $Data = $this->SQL
-         ->Select('CategoryID,InsertUserID')
+         ->Select('*')
          ->From('Discussion')
          ->Where('DiscussionID', $DiscussionID)
-         ->Get();
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       
       $UserID = FALSE;
       $CategoryID = FALSE;
-      if ($Data->NumRows() > 0) {
-         $UserID = $Data->FirstRow()->InsertUserID;
-         $CategoryID = $Data->FirstRow()->CategoryID;
+      if ($Data) {
+         $UserID = $Data['InsertUserID'];
+         $CategoryID = $Data['CategoryID'];
       }
       
       // Prep and fire event
@@ -1177,22 +1267,32 @@ class DiscussionModel extends VanillaModel {
       
       // Execute deletion of discussion and related bits
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
+
+      // Log all of the comment deletes.
+      $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
+      foreach ($Comments as $Comment) {
+         LogModel::Insert('Delete', 'Comment', $Comment);
+      }
+
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
+
+      LogModel::Insert('Delete', 'Discussion', $Data);
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
+      
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
       // Get the user's discussion count
-      $Data = $this->SQL
+      $CountDiscussions = $this->SQL
          ->Select('DiscussionID', 'count', 'CountDiscussions')
          ->From('Discussion')
          ->Where('InsertUserID', $UserID)
-         ->Get();
+         ->Get()->Value('CountDiscussions', 0);
       
       // Save the count to the user table
       $this->SQL
          ->Update('User')
-         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
+         ->Set('CountDiscussions', $CountDiscussions)
          ->Where('UserID', $UserID)
          ->Put();
 

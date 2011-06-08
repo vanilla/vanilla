@@ -30,7 +30,7 @@ window.emotify = (function(){
       
       // If smiley matches on manual regexp, reverse-lookup the smiley.
       if (!e) {
-        while (i < lookup.length && !lookup[i].regexp.test(text)) { i++ };
+        while (i < lookup.length && !lookup[i].regexp.test(text)) {i++};
         smiley = lookup[i].name;
         e = emoticons[smiley];
       }
@@ -77,7 +77,7 @@ window.emotify = (function(){
           regexp_str = alts.join('|');
           
           // Manual regexp, map regexp back to smiley so we can reverse-match.
-          lookup.push({ name: e, regexp: new RegExp( '^' + regexp_str + '$' ) });
+          lookup.push({name: e, regexp: new RegExp( '^' + regexp_str + '$' )});
         } else {
           // Generate regexp from smiley.
           regexp_str = e.replace(/(\W)/g, '\\$1');
@@ -199,10 +199,12 @@ $(function(){
   }
   
   emotify.emoticons(emoticons);
-  
-  $('div.Comment div.Message, div.Preview div.Message').livequery(function() {
-    $(this).html(emotify($(this).html()));
-  });
+
+  if (gdn.definition('FormatEmoticons', false)) {
+     $('div.Comment div.Message, div.Preview div.Message').livequery(function() {
+       $(this).html(emotify($(this).html()));
+     });
+  }
   
   // Insert a clickable icon list after the textbox
   $('textarea#Form_Body').livequery(function() {

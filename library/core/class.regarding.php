@@ -164,8 +164,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
       $CommentIDList = array();
       if ($Comments && $Comments instanceof Gdn_DataSet) {
          $Comments->DataSeek(-1);
-         while ($Comment = $Comments->NextRow())
+         while ($Comment = $Comments->NextRow()) {
+            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
+               continue;
             $CommentIDList[] = $Comment->CommentID;
+         }
       }
       $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
    }
@@ -193,16 +196,18 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
    public function DiscussionController_BeforeCommentBody_Handler($Sender) {
       $Context = strtolower($Sender->EventArguments['Type']);
-      if ($Context != 'discussion') return;
 
       $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], NULL);
       if (is_null($RegardingID) || $RegardingID < 0) return;
 
       try {
          $RegardingData = $this->RegardingModel()->GetID($RegardingID);
+         $EntityModelName = ucfirst(GetValue('ForeignType',$RegardingData)).'Model';
+         $EntityModel = new $EntityModelName();
+         $Entity = $EntityModel->GetID(GetValue('ForeignID',$RegardingData));
          $this->EventArguments = array_merge($this->EventArguments,array(
             'EventSender'     => $Sender,
-            'Entity'          => $Sender->EventArguments['Object'],
+            'Entity'          => $Entity,
             'RegardingData'   => $RegardingData,
             'Options'         => NULL
          ));

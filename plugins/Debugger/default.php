@@ -82,6 +82,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             }
             $String .= $QueryInfo['Method']
                .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
+               .(isset($QueryInfo['Cache']) ? '<div><b>Cache:</b> '.var_export($QueryInfo['Cache'], TRUE).'</div>' : '')
                .'<pre>'.htmlspecialchars($Query).';</pre>';
          }
       }

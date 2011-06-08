@@ -87,10 +87,13 @@ class DiscussionController extends VanillaController {
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
       if ($Offset == '')
-         $this->DiscussionModel->AddView($DiscussionID);
+         $this->DiscussionModel->AddView($DiscussionID, $this->Discussion->CountViews);
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
+         if ($this->Discussion->CountCommentWatch > 0 && $OffsetProvided == '')
+            $this->AddDefinition('LocationHash', '#Item_'.$this->Discussion->CountCommentWatch);
+
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
@@ -116,12 +119,12 @@ class DiscussionController extends VanillaController {
       // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
 
-      // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
-
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
+
+      // Make sure to set the user's discussion watch records
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -241,7 +244,7 @@ class DiscussionController extends VanillaController {
       // Get the discussionID
       $Comment = $this->CommentModel->GetID($CommentID);
       if (!$Comment)
-         Redirect('dashboard/home/filenotfound');
+         throw NotFoundException('Comment');
          
       $DiscussionID = $Comment->DiscussionID;
       
@@ -389,7 +392,12 @@ class DiscussionController extends VanillaController {
       ) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce');
+
+            $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+
+            $Announce = GetValue('Announce', $Discussion);
+            $this->DiscussionModel->SQL->Cache($CacheKeys);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)!$Announce);
          } else {
             $this->Form->AddError('ErrPermission');
          }
@@ -598,6 +606,14 @@ class DiscussionController extends VanillaController {
     * Alternate version of Index that uses the embed master view.
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      $this->Theme = 'default'; // Force the default theme on embedded comments
+      // Add some css to help with the transparent bg on embedded comments
+      if ($this->Head)
+         $this->Head->AddString('<style type="text/css">
+body { background: transparent !important; }
+ul.MessageList li.Item { background: #fff; }
+ul.MessageList li.Item.Mine { background: #E3F4FF; }
+</style>');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
@@ -608,15 +624,17 @@ class DiscussionController extends VanillaController {
       
       // Define incoming variables (prefer querystring parameters over method parameters)
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-      $DiscussionID = GetIncomingValue('DiscussionID', $DiscussionID);
+      $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
-      $ForeignID = GetIncomingValue('ForeignID', '');
-      $ForeignType = GetIncomingValue('ForeignType', '');
-      $ForeignName = GetIncomingValue('ForeignName', '');
-      $ForeignUrl = GetIncomingValue('ForeignUrl', '');
-      $ForeignBody = GetIncomingValue('ForeignBody', '');
-      $CategoryID = GetIncomingValue('CategoryID', '');
+      $ForeignID = GetIncomingValue('vanilla_identifier', '');
+      $ForeignType = GetIncomingValue('vanilla_type', '');
+      $ForeignName = GetIncomingValue('vanilla_name', '');
+      $ForeignUrl = GetIncomingValue('vanilla_url', '');
+      $this->SetData('ForeignUrl', $ForeignUrl);
+      $this->AddDefinition('ForeignUrl', $ForeignUrl);
+      $ForeignBody = GetIncomingValue('vanilla_body', '');
+      $CategoryID = GetIncomingValue('vanilla_category_id', '');
       
       // Retrieve the discussion record.
       $Discussion = FALSE;
@@ -624,9 +642,23 @@ class DiscussionController extends VanillaController {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       else if ($ForeignID != '' && $ForeignType != '')
          $Discussion = $this->DiscussionModel->GetForeignID($ForeignID, $ForeignType);
-      
+         
       // If no discussion record was found, but foreign id was provided, create it now
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
+         if ($ForeignName == '' || $ForeignBody == '') {
+            $PageInfo = FetchPageInfo($ForeignUrl);
+            if (!$PageInfo['Exception']) {
+               $ForeignName = $PageInfo['Title'];
+               $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
+                  .'<br />'
+                  .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
+                  .Wrap($PageInfo['Description'], 'p');
+                  
+               if (count($PageInfo['Images']) > 0)
+                  $ForeignBody = Anchor(Img($PageInfo['Images'][0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
+                     .$ForeignBody;
+            }
+         }
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')
             $Body = $ForeignUrl;
@@ -653,9 +685,15 @@ class DiscussionController extends VanillaController {
                }
             }
          }
-
-         $DiscussionID = $this->DiscussionModel->Save(
+         
+         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $DiscussionID = $this->DiscussionModel->SQL->Insert(
+            'Discussion',
             array(
+               'InsertUserID' => $SystemUserID,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'UpdateUserID' => $SystemUserID,
+               'DateUpdated' => Gdn_Format::ToDateTime(),
                'CategoryID' => $CategoryID == '' ? NULL : $CategoryID,
                'ForeignID' => $ForeignID,
                'Type' => $ForeignType,
@@ -755,4 +793,20 @@ class DiscussionController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
+   
+   /*
+    Used for debugging FetchPageInfo() (used above when creating a discussion for embedded comments).
+   public function FetchPage() {
+      $Url = GetIncomingValue('Url', 'http://markosullivan.ca');
+      $PageInfo = FetchPageInfo($Url);
+      if (GetValue('Exception', $PageInfo)) {
+         echo $PageInfo['Exception']->getMessage();
+      } else {
+         var_dump($PageInfo);
+      }
+         
+      die();
+   }
+   */
+   
 }

@@ -63,6 +63,24 @@ class VanillaHooks implements Gdn_IPlugin {
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
+         // Grab all of the discussions that the user has engaged in.
+         $DiscussionIDs = $Sender->SQL
+            ->Select('DiscussionID')
+            ->Select('CommentID', 'count', 'CountComments')
+            ->From('Comment')
+            ->Where('InsertUserID', $UserID)
+            ->GroupBy('DiscussionID')
+            ->Get()->ResultArray();
+
+         // Update the comment counts.
+         foreach ($DiscussionIDs as $Row) {
+            $Sender->SQL
+               ->Update('Discussion')
+               ->Set('CountComments', "CountComments - {$Row['CountComments']}", FALSE)
+               ->Where('DiscussionID', $Row['DiscussionID'])
+               ->Put();
+         }
+
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
 			$Sender->SQL->From('Comment')
@@ -102,10 +120,15 @@ class VanillaHooks implements Gdn_IPlugin {
     * @return bool Whether user has permission.
     */
    public function UserModel_GetCategoryViewPermission_Create($Sender) {
+      static $PermissionModel = NULL;
+
+
       $UserID = ArrayValue(0, $Sender->EventArguments, '');
 		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
 		if ($UserID && $CategoryID) {
-         $PermissionModel = Gdn::Authenticator()->GetPermissionModel();
+         if ($PermissionModel === NULL)
+            $PermissionModel = new PermissionModel();
+         
          $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $CategoryID);
          return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;
       }
@@ -360,7 +383,7 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Forum', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
    }
    

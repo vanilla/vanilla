@@ -45,10 +45,13 @@ class Gdn_Database {
    
    protected $_Structure = NULL;
    
+   protected $_IsPersistent = FALSE;
+   
    /** Get the PDO connection to the database.
     * @return PDO The connection to the database.
     */
    public function Connection() {
+      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
       if(!is_object($this->_Connection)) {
          try {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
@@ -99,7 +102,7 @@ class Gdn_Database {
    }
    
    public function CloseConnection() {
-      if (!Gdn::Config('Database.PersistentConnection')) {
+      if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
       }
@@ -216,22 +219,49 @@ class Gdn_Database {
       else
          $ReturnType = NULL;
 
-
 		if (isset($Options['Cache'])) {
          // Check to see if the query is cached.
-         $CacheKeys = (array)$Options['Cache'];
-         foreach ($CacheKeys as $CachKey) {
-            if ($ReturnType == 'DataSet') {
-               $Data = Gdn::Cache()->Get($CacheKey);
+         $CacheKeys = (array)GetValue('Cache',$Options,NULL);
+         $CacheOperation = GetValue('CacheOperation',$Options,NULL);
+         if (is_null($CacheOperation)) {
+            switch ($ReturnType) {
+               case 'DataSet':
+                  $CacheOperation = 'get';
+                  break;
+               case 'ID':
+               case NULL:
+                  $CacheOperation = 'remove';
+                  break;
+            }
+         }
+         
+         switch ($CacheOperation) {
+            case 'get':
+               foreach ($CacheKeys as $CacheKey) {
+                  $Data = Gdn::Cache()->Get($CacheKey);
+               }
 
-               if ($Data !== FALSE)
+               // Cache hit. Return.
+               if ($Data !== Gdn_Cache::CACHEOP_FAILURE)
                   return new Gdn_DataSet($Data);
+               
+               // Cache miss. Save later.
                $StoreCacheKey = $CacheKey;
                break;
-            } else {
-               // Remove the item from the cache.
-               Gdn::Cache()->Remove($CacheKey);
-            }
+            
+            case 'increment':
+            case 'decrement':
+               $CacheMethod = ucfirst($CacheOperation);
+               foreach ($CacheKeys as $CacheKey) {
+                  $CacheResult = Gdn::Cache()->$CacheMethod($CacheKey);
+               }
+               break;
+            
+            case 'remove':
+               foreach ($CacheKeys as $CacheKey) {
+                  $Res = Gdn::Cache()->Remove($CacheKey);
+               }
+               break;
          }
 		}
 
@@ -267,11 +297,12 @@ class Gdn_Database {
             $this->_CurrentResultSet = new Gdn_DataSet();
             $this->_CurrentResultSet->Connection = $this->Connection();
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
-
-            if (isset($StoreCacheKey)) {
-               Gdn::Cache()->Store($StoreCacheKey, $this->_CurrentResultSet->ResultArray());
-            }
          }
+      }
+      
+      if (isset($StoreCacheKey)) {
+         if ($CacheOperation == 'get')
+            Gdn::Cache()->Store($StoreCacheKey, (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet));
       }
       
       return $this->_CurrentResultSet;

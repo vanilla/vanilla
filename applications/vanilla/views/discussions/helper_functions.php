@@ -33,22 +33,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-   $Sender->FireEvent('BeforeDiscussionContent');
-   WriteOptions($Discussion, $Sender, $Session);
-
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
-         
-   if ($Sender->CanEditDiscussions) {
-      if (!property_exists($Sender, 'CheckedDiscussions')) {
-         $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
-         if (!is_array($Sender->CheckedDiscussions))
-            $Sender->CheckedDiscussions = array();
-      }
 
-      $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
-      echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
-   }
+   $Sender->FireEvent('BeforeDiscussionContent');
+
+   WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
@@ -66,6 +56,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
                echo '<strong>'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
 
+            $Sender->FireEvent('AfterCountMeta');
+
             if ($Discussion->LastCommentID != '') {
                echo '<span class="LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span>';
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';
@@ -75,7 +67,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'));
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode), 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>
@@ -146,18 +138,21 @@ function WriteFilterTabs(&$Sender) {
       ?>
    </ul>
    <?php
-   $DescendantData = GetValue('DescendantData', $Sender->Data);
-   $Category = GetValue('Category', $Sender->Data);
-   if ($DescendantData && $Category) {
-      echo '<div class="SubTab"><span class="BreadCrumb FirstCrumb">↳ </span>';
-      foreach ($DescendantData->Result() as $Descendant) {
-         // Ignore the root node
-         if ($Descendant->CategoryID > 0) {
-            echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
-            echo '<span class="BreadCrumb"> &rarr; </span>';
+   $Breadcrumbs = Gdn::Controller()->Data('Breadcrumbs');
+   if ($Breadcrumbs) {
+      echo '<div class="SubTab Breadcrumbs">';
+      $First = TRUE;
+      foreach ($Breadcrumbs as $Breadcrumb) {
+         if ($First) {
+            $Class = 'Breadcrumb FirstCrumb';
+            $First = FALSE;
+         } else {
+            $Class = 'Breadcrumb';
+            echo '<span class="Crumb"> &raquo; </span>';
          }
+         
+         echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
       }
-      echo $Category->Name;
       echo '</div>';
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))
@@ -165,9 +160,9 @@ function WriteFilterTabs(&$Sender) {
    
    if ($Sender->CanEditDiscussions) {
    ?>
-   <div class="Administration">
+   <span class="AdminCheck">
       <input type="checkbox" name="Toggle" />
-   </div>
+   </span>
    <?php } ?>
 </div>
    <?php
@@ -218,6 +213,18 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          </div>
       <?php
       }
+      // Admin check.
+      if ($Sender->CanEditDiscussions) {
+         if (!property_exists($Sender, 'CheckedDiscussions')) {
+            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+            if (!is_array($Sender->CheckedDiscussions))
+               $Sender->CheckedDiscussions = array();
+         }
+
+         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
+
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(

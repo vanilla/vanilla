@@ -11,7 +11,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 ?>
 <div class="Connect">
 	<h1><?php echo StringIsNullOrEmpty($ConnectSource) ? T("Sign in") : sprintf(T('%s Connect'), $ConnectSource); ?></h1>
-	<div class="Box">
+	<div>
 	<?php
 		echo $this->Form->Open();
 		echo $this->Form->Errors();
@@ -90,7 +90,8 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			</ul>
 	
 		<?php
-		echo Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer'));
+
+		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer')), '</div>';
 	
 		endif;
 		

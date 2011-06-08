@@ -27,6 +27,7 @@
             echo $this->Form->CheckBox('RememberMe', T('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
          ?>
       </li>
+      <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
       <li class="CreateAccount">
          <?php
             $Target = GetIncomingValue('Target', '');
@@ -36,6 +37,7 @@
             printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
          ?>
       </li>
+      <?php endif; ?>
    </ul>
    <?php
    echo $this->Form->Close();

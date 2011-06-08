@@ -30,6 +30,7 @@ $UpdateLastMessageID = $Construct->TableExists() && !$Construct->ColumnExists('L
 
 $Construct
    ->PrimaryKey('ConversationID')
+   ->Column('Subject', 'varchar(100)', NULL)
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
@@ -38,9 +39,9 @@ $Construct
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
-   ->Column('CountMessages', 'int')
-   ->Column('LastMessageID', 'int')
-   ->Column('RegardingID', 'int(11)', TRUE)
+   ->Column('CountMessages', 'int', 0)
+   ->Column('LastMessageID', 'int', NULL)
+   ->Column('RegardingID', 'int(11)', TRUE, 'index')
    ->Set($Explicit, $Drop);
 
 // Contains the user/conversation relationship. Keeps track of all users who are

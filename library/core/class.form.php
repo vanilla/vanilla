@@ -304,10 +304,19 @@ class Gdn_Form extends Gdn_Pluggable {
             $Instance = RemoveKeyFromArray($Instance, array('TextField', 'ValueField'));
             
             $Instance['id'] = $FieldName . $i;
+
+            if (is_array($ID)) {
+               $ValueField = ArrayValueI('ValueField', $Attributes, 'value');
+               $TextField = ArrayValueI('TextField', $Attributes, 'text');
+               $Text = GetValue($TextField, $ID, '');
+               $ID = GetValue($ValueField, $ID, '');
+            } else {
+               
+
+               if (is_numeric($Text))
+                  $Text = $ID;
+            }
             $Instance['value'] = $ID;
-            
-            if (is_numeric($Text)) 
-               $Text = $ID;
             
             if (is_array($CheckedValues) && in_array($ID, $CheckedValues)) {
                $Instance['checked'] = 'checked';

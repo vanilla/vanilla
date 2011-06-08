@@ -813,7 +813,8 @@ class UpdateModel extends Gdn_Model {
       $PluginManager = Gdn::PluginManager();
       $Plugins = $PluginManager->EnabledPlugins();
       foreach ($Plugins as $Key => $PluginInfo) {
-         $Plugin = $PluginManager->GetPluginInstance($Key, Gdn_PluginManager::ACCESS_PLUGINNAME);
+         $PluginName = GetValue('Index', $PluginInfo);
+         $Plugin = $PluginManager->GetPluginInstance($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
          if (method_exists($Plugin, 'Structure'))
             $Plugin->Structure();
       }

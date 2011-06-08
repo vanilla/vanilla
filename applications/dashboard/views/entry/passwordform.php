@@ -26,15 +26,17 @@
             echo $this->Form->CheckBox('RememberMe', T('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
          ?>
       </li>
+      <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
       <li class="CreateAccount">
          <?php
-            $Target = GetIncomingValue('Target', '');
+            $Target = $this->Target();
             if ($Target != '')
-               $Target = '?Target='.$Target;
+               $Target = '?Target='.urlencode($Target);
 
             printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
          ?>
       </li>
+      <?php endif; ?>
    </ul>
    <?php
    echo $this->Form->Close();
@@ -43,7 +45,7 @@
    <ul>
       <li>
          <?php
-            echo $this->Form->Label('Enter your Email address', 'Email');
+            echo $this->Form->Label('Enter your Email address or username', 'Email');
             echo $this->Form->TextBox('Email');
          ?>
       </li>

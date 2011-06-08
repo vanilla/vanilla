@@ -66,7 +66,11 @@ jQuery(document).ready(function($) {
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id');
-      lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      if (lastCommentID)
+         lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      else
+         lastCommentID = 0;
+         
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
@@ -158,8 +162,8 @@ jQuery(document).ready(function($) {
                $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');
                $(btn).parents('li').addClass('Active');
-               $(frm).find('textarea').after(json.Data);
-               $(frm).find('textarea').hide();
+               $(frm).find('#Form_Body').after(json.Data);
+               $(frm).find('#Form_Body').hide();
                
             } else if (!draft) {
                // Clean up the form
@@ -187,8 +191,9 @@ jQuery(document).ready(function($) {
                      $('ul.Discussion li:last').effect("highlight", {}, "slow");
                   }
                }
-               // Remove any "More" pager links
-               $('#PagerMore').remove();
+               // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
+               if (gdn.definition('PrependNewComments') != '1') // If prepending the latest comment, don't remove the pager.
+                  $('#PagerMore').remove();
 
                // Let listeners know that the comment was added.
                $(document).trigger('CommentAdded');
@@ -236,7 +241,7 @@ jQuery(document).ready(function($) {
          
       draftInp.val('');
       frm.find('div.Errors').remove();
-      $('div.Information').fadeOut('fast', function() { $(this).remove(); });
+      $('div.Information').fadeOut('fast', function() {$(this).remove();});
       $(frm).trigger('clearCommentForm');
    }
    
@@ -244,13 +249,13 @@ jQuery(document).ready(function($) {
    if ($.morepager)
       $('.MorePager').morepager({
          pageContainerSelector: 'ul.Discussion',
-         afterPageLoaded: function() { $(document).trigger('CommentPagingComplete'); }
+         afterPageLoaded: function() {$(document).trigger('CommentPagingComplete');}
       });
       
    // Autosave comments
    $('a.DraftButton').livequery(function() {
       var btn = this;
-      $('div.CommentForm textarea').autosave({ button: btn });
+      $('div.CommentForm textarea').autosave({button: btn});
    });
 
 
@@ -310,7 +315,7 @@ jQuery(document).ready(function($) {
             $.popup({}, json.ErrorMessage);
          } else {
             // Remove the affected row
-            $(row).slideUp('fast', function() { $(this).remove(); });
+            $(row).slideUp('fast', function() {$(this).remove();});
          }
       }
    });
@@ -355,28 +360,28 @@ jQuery(document).ready(function($) {
    getNewTimeout();
    
    /* Comment Checkboxes */
-   $('.HeadingTabs .Administration :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.MessageList .Administration :checkbox').attr('checked', 'checked');
+         $('.MessageList .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.MessageList .Administration :checkbox').removeAttr('checked');
+         $('.MessageList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.Administration :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.MessageList .Administration :checkbox');
+      var checkIDs = $('.MessageList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       var discussionID = gdn.definition('DiscussionID');
       checkIDs.each(function() {
-         item = $(this);
-         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+         checkID = $(this);
+         aCheckIDs[aCheckIDs.length] = {'checkId' : checkID.val() , 'checked' : checkID.attr('checked')};
       });
       $.ajax({
          type: "POST",
          url: gdn.url('/moderation/checkedcomments'),
-         data: { 'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey') },
+         data: {'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey')},
          dataType: "json",
          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            gdn.informMessage(XMLHttpRequest.responseText, { 'CssClass' : 'Dismissable' });
+            gdn.informMessage(XMLHttpRequest.responseText, {'CssClass' : 'Dismissable'});
          },
          success: function(json) {
             gdn.inform(json);

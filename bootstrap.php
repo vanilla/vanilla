@@ -110,27 +110,24 @@ Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 // Dispatcher.
 Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
+
 // Smarty Templating Engine
 Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
 Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
+
 // Slice handler
 Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
+
 // Remote Statistics
-Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactoryInstance);
+Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', NULL, Gdn::FactorySingleton);
+Gdn::Statistics();
+
+// Regarding
 Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', NULL, Gdn::FactorySingleton);
 Gdn::Regarding();
 
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
-if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
-	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
-	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA'); 
-	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
-	setlocale(LC_ALL, $SetLocale);
-	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::Config('EnabledApplications'), Gdn::Config('EnabledPlugins'));
-	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
-	unset($Gdn_Locale);
-}
 
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
@@ -154,6 +151,16 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+
+if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
+	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
+	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
+	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
+	setlocale(LC_ALL, $SetLocale);
+	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
+	unset($Gdn_Locale);
+}
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

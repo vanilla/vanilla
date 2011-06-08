@@ -112,6 +112,8 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user/applicants');
       $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
+      
+      $this->FireEvent('BeforeApplicants');
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $Action = $this->Form->GetValue('Submit');
@@ -153,7 +155,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
       foreach ($Data->Result() as $User) {
-         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
+         echo $User->Name.'|'.Gdn_Format::Text($User->UserID)."\n";
       }
       $this->Render();
    }
@@ -302,8 +304,13 @@ class UserController extends DashboardController {
          $UserModel = new UserModel();
          if (is_numeric($UserID)) {
             try {
+               $this->EventArguments['UserID'] = $UserID;
+               $this->FireEvent("Before{$Action}User");
+               
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
+               
+               $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;
                $this->Form->AddError(strip_tags($ex->getMessage()));

@@ -49,7 +49,6 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
-         'Vanilla.Categories.Use',
          'Vanilla.Archive.Date',
 			'Vanilla.Archive.Exclude',
 			'Garden.EditContentTimeout'
@@ -160,18 +159,18 @@ class SettingsController extends Gdn_Controller {
    }
    
    /**
-    * Display spam management options.
+    * Display flood control options.
     * 
     * @since 2.0.0
     * @access public
     */
-   public function Spam() {
+   public function FloodControl() {
       // Check permission
       $this->Permission('Vanilla.Spam.Manage');
       
       // Display options
       $this->Title(T('Spam'));
-      $this->AddSideMenu('vanilla/settings/spam');
+      $this->AddSideMenu('vanilla/settings/floodcontrol');
       
       // Load up config options we'll be setting
       $Validation = new Gdn_Validation();
@@ -244,7 +243,7 @@ class SettingsController extends Gdn_Controller {
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
       
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->AuthenticatedPostBack() == FALSE) {
 			$this->Form->AddHidden('CodeIsDefined', '0');
       } else {
 			// Form was validly submitted
@@ -455,10 +454,10 @@ class SettingsController extends Gdn_Controller {
       
 		// Define MaxDepthOptions
       $DepthData = array();
-      $DepthData['2'] = 'more than one level deep';
-      $DepthData['3'] = 'more than two levels deep';
-      $DepthData['4'] = 'more than three levels deep';
-      $DepthData['0'] = 'never';
+      $DepthData['2'] = sprintf(T('more than %s deep'), Plural(1, '%s level', '%s levels'));
+      $DepthData['3'] = sprintf(T('more than %s deep'), Plural(2, '%s level', '%s levels'));
+      $DepthData['4'] = sprintf(T('more than %s deep'), Plural(3, '%s level', '%s levels')) ;
+      $DepthData['0'] = T('never');
 		$this->SetData('MaxDepthData', $DepthData);
       
       // If seeing the form for the first time...

@@ -196,9 +196,10 @@ class ProfileController extends Gdn_Controller {
       } else {
          if (!$this->CanEditUsername)
             $this->Form->SetFormValue("Name", $User->Name);
-         
-         $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
-         $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
+         else {
+            $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+            $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
+         }
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->Get($this->User->UserID);
             $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');

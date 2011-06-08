@@ -41,7 +41,7 @@ class LogController extends DashboardController {
    }
 
    public function Count($Operation) {
-      $this->Permission('Garden.Moderation.Manager');
+      $this->Permission('Garden.Moderation.Manage');
 
       if ($Operation == 'edits')
          $Operation = array('edit', 'delete');

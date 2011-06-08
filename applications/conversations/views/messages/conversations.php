@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $Alt = FALSE;
+$SubjectsVisible = C('Conversations.Subjects.Visible');
+
 foreach ($this->ConversationData->Result() as $Conversation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $LastAuthor = UserBuilder($Conversation, 'LastMessage');
@@ -11,43 +13,58 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
    if ($Conversation->Format == 'Text')
-      $Message = nl2br(SliceString(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), 100));
+      $Message = (SliceString(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), 100));
    else
-      $Message = nl2br(SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), FALSE), 100));
+      $Message = (SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), FALSE), 100));
 
    if (StringIsNullOrEmpty(trim($Message)))
       $Message = T('Blank Message');
+
+
+   $this->EventArguments['Conversation'] = $Conversation;
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <?php if ($LastPhoto != '') { ?>
-   <div class="Photo"><?php echo $LastPhoto; ?></div>
-   <?php } ?>
+   <?php
+   $Names = '';
+   $PhotoUser = NULL;
+   foreach ($Conversation->Participants as $User) {
+      if (GetValue('UserID', $User) == Gdn::Session()->UserID)
+         continue;
+      $Names = ConcatSep(', ', $Names, GetValue('Name', $User));
+      if (!$PhotoUser && GetValue('Photo', $User))
+         $PhotoUser = $User;
+   }
+   ?>
    <div class="ItemContent Conversation">
-      <div class="Excerpt"><?php echo Anchor($Message, '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem, 'Message'); ?></div>
-      <div class="Meta">
-         <span><?php echo UserAnchor($LastAuthor, 'Name'); ?></span>
-         <span><?php echo Gdn_Format::Date($Conversation->DateLastMessage); ?></span>
-         <span><?php printf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages); ?></span>
-         <?php
-         if ($Conversation->CountNewMessages > 0) {
-            echo '<strong>'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
+      <?php
+      $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
+
+      if ($Names) {
+         echo '<h3 class="Users">';
+         
+         if ($PhotoUser) {
+            echo '<div class="Photo">'.UserPhoto($PhotoUser).'</div>';
          }
+
+         echo Anchor(htmlspecialchars($Names), $Url), '</h3>';
+      }
+      if ($SubjectsVisible && $Subject = GetValue('Subject', $Conversation)) {
+         echo '<div class="Subject"><b>'.Anchor(htmlspecialchars($Subject), $Url).'</b></div>';
+      }
+      ?>
+      <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
+      <div class="Meta">
+         <?php 
+         $this->FireEvent('BeforeConversationMeta');
+
+         echo '<span class="MetaItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span>';
+
+         if ($Conversation->CountNewMessages > 0) {
+            echo '<strong class="MetaItem">'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
+         }
+         
+         echo '<span class="MetaItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span>';
          ?>
-         <span class="MetaItem">
-            <span class="MetaLabel"><?php echo T('Participants'); ?></span>
-            <span class="MetaValue">
-               <?php
-               $First = TRUE;
-               foreach ($Conversation->Participants as $User) {
-                  if ($First)
-                     $First = FALSE;
-                  else
-                     echo ', ';
-                  echo UserAnchor($User, 'Name');
-               }
-               ?>
-            <span>
-         </span>
       </div>
    </div>
 </li>

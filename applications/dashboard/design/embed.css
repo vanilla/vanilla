@@ -1,0 +1,73 @@
+/*
+Includes CSS for pages where vanilla elements are embedded into other
+applications.
+*/
+
+/* Embedded Comment Counts */
+a.vanilla-comment-count-anchor {
+	text-decoration: none !important;
+}
+a.vanilla-comment-count-anchor:hover {
+	background: transparent;
+}
+.vanilla-credit,
+.vanilla-count-text,
+.vanilla-count {
+	font-family: "lucida grande",tahoma,verdana,arial,sans-serif !important;
+	font-size: 11px !important;
+	font-weight: normal !important;
+	text-decoration: none !important;
+	display: inline-block;
+	line-height: 14px !important;
+}
+.vanilla-count-text {
+	color: #3B5998 !important;
+	background: url('images/icon.png') 2px center no-repeat #E3F4FF !important;
+	border: 1px solid #CDE9FF !important;
+	border-radius: 3px !important;
+	-moz-border-radius: 3px !important;
+	-webkit-border-radius: 3px !important;
+	padding: 2px 2px 2px 20px !important;
+}
+a.vanilla-comment-count-anchor:hover .vanilla-count-text {
+	border: 1px solid #A9D3F0 !important;
+}
+.vanilla-count {
+	position: relative !important;
+	min-width: 15px !important;
+	text-align: center !important;
+	color: #333 !important;
+	background: #f2f2f2 !important;
+	border: 1px solid #BEC8CC !important;
+	padding: 1px 2px !important;
+	margin-left: 8px !important;
+}
+.vanilla-bubble-arrow {
+	top: 5px !important;
+	left: -5px !important;
+	position: absolute !important;
+	height: 7px !important;
+	width: 5px !important;
+	background: url('images/bubble-arrow.png') 0 0 no-repeat transparent !important;
+}
+.vanilla-credit {
+	padding: 2px 8px 0 !important;
+}
+.vanilla-anchor,
+.vanilla-anchor:hover {
+	font-size: 9px !important;
+	color: #888 !important;
+	text-decoration: none !important;
+}
+.vanilla-anchor:hover {
+	color: #333 !important;
+}
+.vanilla-logo {
+	line-height: 25px !important;
+	text-indent: -1000px !important;
+	vertical-align: baseline !important;
+	display: inline-block !important;
+	height: 22px !important;
+	width: 46px !important;
+	background: url('images/vanilla-logo-46px.png') 0 0 no-repeat;
+}

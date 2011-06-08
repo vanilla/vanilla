@@ -17,7 +17,7 @@ if ($Flag['Context'] == 'comment')
    
    echo substr($Report['FlaggedContent'], 0 , 500); 
    if(strlen($Report['FlaggedContent']) > 500)
-      echo '&hellip;';
+      echo '&#8230;';
    
    ?></blockquote>
 <?php echo Anchor(T('ViewFlagged', 'View &raquo;'), $Flag['URL']); ?>

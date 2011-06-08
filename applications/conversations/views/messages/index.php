@@ -1,11 +1,23 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo $this->Participants; ?></h1>
+<?php
+if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
+   echo '<h2>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';
+}
+
+if ($this->Data('_HasDeletedUsers')) {
+   echo '<div class="Info">', T('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';
+}
+?>
+<!--
 <div class="Tabs HeadingTabs ConversationTabs">
    <ul>
       <li><?php echo Anchor(T('Inbox'), '/messages/inbox'); ?></li>
    </ul>
-   <div class="SubTab"><?php echo $this->Participants; ?></div>
 </div>
+-->
 <?php
+$this->FireEvent('BeforeConversation');
 echo $this->Pager->ToString('less');
 ?>
 <ul class="MessageList Conversation">
@@ -20,7 +32,11 @@ echo $this->Pager->ToString('less');
    <?php
    echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
    echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox')), 'div', array('class' => 'TextBoxWrapper'));
-   echo $this->Form->Button('Send Message');
+
+   echo '<div class="Buttons">',
+      $this->Form->Button('Send Message'),
+      '</div>';
+
    echo $this->Form->Close();
    ?>
 </div>

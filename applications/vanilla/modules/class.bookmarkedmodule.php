@@ -14,13 +14,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class BookmarkedModule extends Gdn_Module {
    
    public function GetData($Limit = 10) {
-      $Session = Gdn::Session();
       $this->Data = FALSE;
-      if ($Session->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule')) {
+      if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')
             ->From('UserDiscussion')
-            ->Where('UserID', $Session->UserID)
+            ->Where('UserID', Gdn::Session()->UserID)
             ->Where('Bookmarked', 1)
             ->Get()->ResultArray();
          $BookmarkIDs = ConsolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
@@ -48,10 +47,10 @@ class BookmarkedModule extends Gdn_Module {
    public function ToString() {
       if (!isset($this->Data))
          $this->GetData();
-
+      
       if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
-
+      
       return '';
    }
 }

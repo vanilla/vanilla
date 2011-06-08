@@ -155,7 +155,7 @@ class ConversationMessageModel extends Gdn_Model {
     * @param array $FormPostValues Values submitted via form.
     * @return int Unique ID of message created or updated.
     */
-   public function Save($FormPostValues) {
+   public function Save($FormPostValues, $Conversation = NULL) {
       $Session = Gdn::Session();
       
       // Define the primary key in this model's table.
@@ -169,11 +169,14 @@ class ConversationMessageModel extends Gdn_Model {
       $MessageID = FALSE;
       if($this->Validate($FormPostValues)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         $Fields['Format'] = C('Conversations.Message.Format','Ham');
+         $Fields['Format'] = C('Garden.InputFormatter', '');
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
+         $this->LastMessageID = $MessageID;
          $ConversationID = ArrayValue('ConversationID', $Fields, 0);
-         $Px = $this->SQL->Database->DatabasePrefix;
+
+         if (!$Conversation)
+            $Conversation = $this->SQL->GetWhere('Conversation', array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
 
          // Get the new message count for the conversation.
          $SQLR = $this->SQL
@@ -199,10 +202,19 @@ class ConversationMessageModel extends Gdn_Model {
          $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.LastMessageID', $MessageID)
-            ->Set('uc.CountReadMessages', "case uc.UserID when {$Session->UserID} then $CountMessages else uc.CountReadMessages end", FALSE)
             ->Where('uc.ConversationID', $ConversationID)
             ->Where('uc.Deleted', '0')
             ->Where('uc.CountReadMessages', $CountMessages - 1)
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Put();
+
+         // Update the sending user.
+         $this->SQL
+            ->Update('UserConversation uc')
+            ->Set('uc.CountReadMessages', $CountMessages)
+            ->Set('Deleted', 0)
+            ->Where('ConversationID', $ConversationID)
+            ->Where('UserID', $Session->UserID)
             ->Put();
 
          // Incrememnt the users' inbox counts.
@@ -226,6 +238,9 @@ class ConversationMessageModel extends Gdn_Model {
 
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
+            if ($Session->UserID == $User->UserID)
+               continue; // don't notify self.
+
             // Notify the users of the new message.
             $ActivityID = $ActivityModel->Add(
                $Session->UserID,
@@ -236,7 +251,11 @@ class ConversationMessageModel extends Gdn_Model {
                "/messages/$ConversationID#$MessageID",
                FALSE
             );
-            $Story = ArrayValue('Body', $Fields, '');
+            $Story = GetValue('Body', $Fields, '');
+            
+            if (C('Conversations.Subjects.Visible')) {
+               $Story = ConcatSep("\n\n", GetValue('Subject', $Conversation, ''), $Story);
+            }
             $ActivityModel->SendNotification($ActivityID, $Story);
          }
       }

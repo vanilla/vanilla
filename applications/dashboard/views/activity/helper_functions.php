@@ -54,6 +54,8 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          <?php
          if ($Activity->AllowComments == '1' && $Session->IsValid())
             echo '<span class="AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
+         
+         $Sender->FireEvent('AfterMeta');
          ?>
       </div>
    </div>

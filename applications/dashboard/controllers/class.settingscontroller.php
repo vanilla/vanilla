@@ -630,7 +630,8 @@ class SettingsController extends DashboardController {
          // 'Basic' => "The applicants are granted access immediately.",
          'Captcha' => "New users fill out a simple form and are granted access immediately.",
          'Approval' => "New users are reviewed and approved by an administrator (that's you!).",
-         'Invitation' => "Existing members send invitations to new members."
+         'Invitation' => "Existing members send invitations to new members.",
+         'Connect' => "New users are only registered through SSO plugins."
       );
 
       // Options for how many invitations a role can send out per month.
@@ -678,9 +679,14 @@ class SettingsController extends DashboardController {
       $this->Render();
    }
 
-   public static function SortAddons(&$Array) {
+   public static function SortAddons(&$Array, $Filter = TRUE) {
       // Make sure every addon has a name.
       foreach ($Array as $Key => $Value) {
+         if ($Filter && GetValue('Hidden', $Value)) {
+            unset($Array[$Key]);
+            continue;
+         }
+
          $Name = GetValue('Name', $Value, $Key);
          SetValue('Name', $Array[$Key], $Name);
       }
@@ -897,7 +903,7 @@ class SettingsController extends DashboardController {
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
          try {
-            if (array_key_exists($Name, $Manager->$Enabled) === FALSE) {
+            if (array_key_exists($Name, $Manager->$Enabled()) === FALSE) {
                $Manager->$Remove($Name);
             }
          } catch (Exception $e) {
@@ -917,6 +923,52 @@ class SettingsController extends DashboardController {
       }
 
       Redirect('/settings/banner');
+   }
+   
+   public function GettingStarted() {
+      $this->SetData('Title', T('Getting Started'));
+      $this->AddSideMenu('dashboard/settings/gettingstarted');
+      $this->TextEnterEmails = T('Type email addresses separated by commas here...');
+      
+      if ($this->Form->AuthenticatedPostBack()) {
+         $Message = $this->Form->GetFormValue('InvitationMessage');
+         $Message .= "\n\n".Gdn::Request()->Url('/', TRUE);
+         $Message = trim($Message);
+         $Recipients = $this->Form->GetFormValue('Recipients');
+         if ($Recipients == $this->TextEnterEmails)
+            $Recipients = '';
+            
+         $Recipients = explode(',', $Recipients);
+         $CountRecipients = 0;
+         foreach ($Recipients as $Recipient) {
+            if (trim($Recipient) != '') {
+               $CountRecipients++;
+               if (!ValidateEmail($Recipient))
+                  $this->Form->AddError(sprintf(T('%s is not a valid email address'), $Recipient));
+            }
+         }
+         if ($CountRecipients == 0)
+            $this->Form->AddError(T('You must provide at least one recipient'));
+         if ($this->Form->ErrorCount() == 0) {
+            $Email = new Gdn_Email();
+            $Email->Subject(T('Check out my new community!'));
+            $Email->Message($Message);
+            foreach ($Recipients as $Recipient) {
+               if (trim($Recipient) != '') {
+                  $Email->To($Recipient);
+                  try {
+                     $Email->Send();
+                  } catch (Exception $ex) {
+                     $this->Form->AddError($ex);
+                  }
+               }
+            }
+         }
+         if ($this->Form->ErrorCount() == 0)
+            $this->InformMessage(T('Your invitations were sent successfully.'));
+      }
+      
+      $this->Render();
    }
    
 }

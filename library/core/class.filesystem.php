@@ -313,6 +313,8 @@ class Gdn_FileSystem {
             } elseif (!StringEndsWith($Name, '.'.$FileExtension)) {
              $Name .= '.'.$FileExtension;
             }
+         } else {
+            $Extension = $NameExtension;
          }
          $Name = rawurldecode($Name);
  
@@ -374,6 +376,9 @@ class Gdn_FileSystem {
     * @return void
     */
    public static function RemoveFolder($Path) {
+      if (!file_exists($Path))
+         return;
+
       if (is_file($Path)) {
          unlink($Path);
          return;

@@ -90,13 +90,13 @@ if (C('Vanilla.Categories.Use')) {
          
          echo "\n".'<li id="list_'.$Category->CategoryID.'">';
          // DEBUG: echo Wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
-         $CategoryUrl = Url('categories/'.$Category->UrlCode.'/', TRUE);
+         $CategoryUrl = Url('categories/'.rawurlencode($Category->UrlCode).'/', TRUE);
          echo Wrap(
             '<table'.($OpenCount > 0 ? ' class="Indented"' : '').'>
                <tr>
                   <td>
                      <strong>'.$Category->Name.'</strong>
-                     '.Anchor($CategoryUrl, $CategoryUrl).'
+                     '.Anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
                      './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/'
                   </td>

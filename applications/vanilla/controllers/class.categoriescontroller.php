@@ -65,9 +65,9 @@ class CategoriesController extends VanillaController {
     * @param string $CategoryIdentifier Unique category slug or ID.
     * @param int $Offset Number of discussions to skip.
     */
-   public function Index($CategoryIdentifier = '', $Offset = '0') {      
+   public function Index($CategoryIdentifier = '', $Page = '0') {
       if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
+         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
       else
          $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       
@@ -77,8 +77,8 @@ class CategoriesController extends VanillaController {
          return $this->Discussions();
       }
 			
-		// Load the Descendant Tree.
-      $this->SetData('DescendantData', $this->CategoryModel->GetDescendantsByCode($Category->UrlCode));
+		// Load the breadcrumbs
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
       
       $this->SetData('Category', $Category, TRUE);
 
@@ -112,16 +112,17 @@ class CategoriesController extends VanillaController {
       // Set discussion meta data.
       $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
       $this->FireEvent('BeforeGetDiscussions');
-      list($Offset, $Limit) = OffsetLimit($Offset, $this->EventArguments['PerPage']);
+      list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
       
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
          
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
+      $this->SetData('_Limit', $Limit);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -133,6 +134,8 @@ class CategoriesController extends VanillaController {
          $CountDiscussions,
          'categories/'.$CategoryIdentifier.'/%1$s'
       );
+      $this->SetData('_PagerUrl', 'categories/'.rawurlencode($CategoryIdentifier).'/{Page}');
+      $this->SetData('_Page', $Page);
 
       // Set the canonical Url.
       $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE)), TRUE));
@@ -148,6 +151,8 @@ class CategoriesController extends VanillaController {
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
+
+      $this->CanonicalUrl(Url('/categories', TRUE));
 
       // Render default view
       $this->Render();
@@ -179,6 +184,8 @@ class CategoriesController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);
+
+      $this->CanonicalUrl(Url('/categories/all', TRUE));
 
       $this->Render();
 	}
@@ -221,6 +228,9 @@ class CategoriesController extends VanillaController {
       
       // Set view and render
       $this->View = 'discussions';
+
+      $this->CanonicalUrl(Url('/categories', TRUE));
+      
       $this->Render();
    }
    

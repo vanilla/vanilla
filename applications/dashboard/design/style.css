@@ -112,13 +112,19 @@ p {
 .P {
    margin: 0.5em 0;
 }
-h1, h2 {
+h1 {
    font-size:140%;
    font-weight:bold;
    margin-bottom:10px;
 }
+h2 {
+   font-size:130%;
+   font-weight:bold;
+   margin-bottom:10px;
+}
 h3 {
-   font-size:140%;
+   font-size:120%;
+   font-weight: bold;
 }
 h4 {
    font-size: 120%;
@@ -135,6 +141,12 @@ a {
 a:hover {
    text-decoration: none;
    color: #ff0084;
+}
+img.Thumbnail {
+	max-height: 300px;
+	max-width: 100px;
+	float: left;
+	margin: 0 16px 0 0;
 }
 input.DateBox,
 input.InputBox,
@@ -172,6 +184,9 @@ input.InputBox:focus,
 textarea:focus {
    background: #ffe;
 }
+input.BigInput {
+   width: 100%;
+}
 textarea {
    line-height: 128%;
 }
@@ -203,6 +218,12 @@ a.Button,
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;
 	white-space: nowrap;
+}
+a.Button {
+   display: inline-block;
+   padding: 4px;
+   line-height: 100%;
+   margin: 3px auto;
 }
 
 input.Button {
@@ -496,6 +517,7 @@ body #Head h1 {
    font-size: 9px;
    line-height: 12px;
    font-weight: normal;
+	text-shadow: none;
 }
 
 /* Option (dropdown) Menus
@@ -512,6 +534,10 @@ ul.Options ul {
 }
 .DataList .Item.Active ul.Options {
     display:block;
+}
+
+.Item h3 {
+   font-size: 14px;
 }
 
 ul.Options {
@@ -1065,7 +1091,7 @@ ul.DataList li.Item {
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList div.Options {
+ul.DataList div.Options, .MessageList .Options {
    margin: 2px 4px 0 0;
 	position: absolute;
 	right: 0;
@@ -1083,6 +1109,7 @@ ul.DataList a.Title {
    font-weight: bold;
 }
 ul.DataList div.Title {
+   font-size: 14px;
    display: block;
    margin: 0;
 }
@@ -1134,6 +1161,11 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta a {
    color: #2b2d33;
 }
+
+ul.DataList div.Meta .Tag a {
+   color: #ffffff;
+}
+
 ul.DataList a.Delete,
 ul.DataList a.Delete:hover {
    border-radius: 0;
@@ -1393,6 +1425,10 @@ div.Preview div.Message blockquote,
 ul.MessageList div.Message blockquote {
    padding: 4px 16px;
    margin: 4px 0;
+}
+ul.MessageList div.Message small {
+	font-size: 11px;
+	color: #777;
 }
 
 code, pre {
@@ -1686,9 +1722,6 @@ table.PreferenceGroup td.Description {
 }
 
 /* ================================================= Tabs, Headings & Footers */
-div.MessageForm {
-	text-align: right;
-}
 div.MessageForm,
 div.Tabs,
 div.Headings {
@@ -1697,6 +1730,7 @@ div.Headings {
    padding: 5px 8px;
    margin: 0;
    background: #cfecff;
+   position: relative;
 }
 div.MessageForm div.Tabs {
 	padding: 0;
@@ -1812,23 +1846,36 @@ body.Discussion #Content,
 .DiscussionsTabs {
 	position: relative;
 }
-.Administration {
+
+.Tabs .AdminCheck {
+   position: absolute;
+   right: 26px;
+   bottom: 5px;
+}
+
+.AdminCheck {
+   display: inline-block;
+   height: 22px;
+   vertical-align: top;
+}
+
+/*.Administration {
 	width: 32px;
 	text-align: center;
 	padding: 4px 0 5px;
 	position: absolute;
 	left: -32px;
 	top: 0;
-}
-.Item .Administration {
+}*/
+/*.Item .Administration {
 	background: #f5f5f5;
 	border: 1px solid #BEC8CC;
 	border-width: 1px 0 0;
-}
-.DataList.Discussions .Item .Administration,
+}*/
+/*.DataList.Discussions .Item .Administration,
 .MessageList .Item .Administration {
 	top: -1px;
-}
+}*/
 
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {
@@ -1931,9 +1978,7 @@ div.Popup .Loading {
   text-align: center;
 }
 div.Popup h1,
-div.Popup h2,
-div.Connect h1,
-div.Connect h2 {
+div.Popup h2 {
 	font-size:120%;
 	font-weight:bold;
 	margin-bottom: 0;
@@ -2124,6 +2169,10 @@ ul.DataList li.Mine div.Meta a.Category {
    padding: 1px 4px;
 }
 
+.Tag a {
+   color: #FFFFFF;
+}
+
 ul.DataList div.Meta span.Announcement {
 	background: #777777;
 	color: #ffffff;
@@ -2177,7 +2226,7 @@ a.Bookmarking {
 }
 body.Discussion a.Bookmark {
    float: right;
-	margin: 13px 8px;
+	margin: 5px 0 0 8px;
 }
 
 body.Discussion .Back {
@@ -2187,8 +2236,7 @@ body.Discussion .Back {
 
 
 /* =================================================================== Drafts */
-ul.Discussions div.ItemContent,
-ul.Drafts div.ItemContent {
+.DataList .ItemContent {
    margin: 0 0 0 9px;
 }
 ul.Drafts div.ItemContent a.Title,
@@ -2200,20 +2248,16 @@ ul.Discussions div.ItemContent a.Title {
 li.Editing {
 	background: #E3F4FF;
 }
-div.CommentForm textarea {
+div.CommentForm textarea.TextBox {
    width: 100%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
 div.Comment div.CommentForm {
-	width: 98%;
 	background: none;
-	padding: 6px 4px;
+	padding: 6px 0px;
 	border: 0;
-}
-div.Comment div.CommentForm textarea {
-	width: 99%;	
 }
 #DiscussionForm label {
    font-size: 14px;
@@ -2259,6 +2303,9 @@ body.Post #Content {
 }
 #DiscussionForm div.Category label {
    padding: 0 8px 0 0;
+}
+div.CommentForm .Buttons {
+   text-align: right;
 }
 div.CommentForm a.Back,
 div.CommentForm a.Cancel {
@@ -2345,36 +2392,6 @@ div.AddPeople textarea.MultiComplete {
 div.AddPeople form div {
 	text-align: right;
 }
-
-
-/* ============================================================ Conversations */
-fieldset {
-  padding: 0px !important;
-}
-h2.NewConversation {
-  float: right;
-}
-h2.NewConversation a {
-  font-weight: bold;
-}
-body.Conversations h2 {
-  margin: 0;
-}
-ul.Conversations li.Active {
-  cursor: pointer;
-  background: #ffe;
-}
-ul.Conversations li.Item {
-	padding: 4px 5px;
-}
-ul.Conversations div.ItemContent {
-   margin:0 0 0 5px;
-}
-ul.Conversations div.Meta a.Name {
-	color: #1E79A7;
-	font-weight: bold;
-}
-
 
 /* ========================================================= Add Message Form */
 #MessageForm {
@@ -2696,14 +2713,13 @@ div.Entry {
 }
 div.Methods {
 	text-align: left;
-	font-size: 14px;
-	font-weight: bold;
 	position: absolute;
 	top: 33px;
 	bottom: 0;
 	right: 0;
 	padding: 12px 20px 6px;
 	line-height: 1;
+   width: 170px;
 }
 body#dashboard_entry_password div.Methods,
 body#dashboard_entry_signin div.Methods,
@@ -3261,27 +3277,6 @@ body.embed div.Connect h2 {
 	border-bottom: 1px solid #BEC8CC;
 	padding: 2px 8px 4px;
 	background: #f2f2f2;
-}
-.Credit {
-	padding: 0 8px;
-}
-.Credit a,
-.Credit a:hover {
-	font-size: 9px;
-	color: #888 !important;
-	text-decoration: none !important;
-}
-.Credit a:hover {
-	color: #333 !important;
-}
-.Credit .Logo {
-	line-height: 25px;
-	text-indent: -1000px;
-	vertical-align: baseline;
-	display: inline-block;
-	height: 22px;
-	width: 46px;
-	background: url('images/vanilla-logo-46px.png') 0 0 no-repeat;
 }
 /* ============================================================ Regarding */
 

@@ -40,7 +40,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       if ($Extension === NULL)
          $this->_AllowedFileExtensions = array();
 		elseif (is_array($Extension))
-			array_merge($this->_AllowedFileExtensions, $Extension);
+			$this->_AllowedFileExtensions = array_merge($this->_AllowedFileExtensions, $Extension);
 		else
 			$this->_AllowedFileExtensions[] = $Extension;
 	}
@@ -235,7 +235,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       static $Urls = NULL;
 
       if ($Urls === NULL) {
-         $Urls = array('' => Url('/uploads', TRUE));
+         $Urls = array('' => Asset('/uploads', TRUE));
          
          $Sender = new stdClass();
          $Sender->Returns = array();

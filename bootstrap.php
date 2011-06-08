@@ -129,6 +129,9 @@ Gdn::Regarding();
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 
+// Install a temporary locale for plugins that have a T() in their info strings.
+Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Dummy', NULL, Gdn::FactorySingleton, new Gdn_Dummy());
+
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	// Include the application's bootstrap.
@@ -152,7 +155,7 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
-if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
+//if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
 	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
 	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
@@ -160,7 +163,7 @@ if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
 	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
-}
+//}
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

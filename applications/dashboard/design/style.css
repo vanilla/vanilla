@@ -2306,7 +2306,7 @@ ul.Tabs li a.Active {
 /* Icons */
 ul.Tabs li a.EntryTabFor_password {
 	padding-left: 22px;
-	background-image: url('../../../themes/default/design/favicon.png');
+	background-image: url('images/icon.png');
 	background-position: 3px 4px;
 	background-repeat: no-repeat;
 }

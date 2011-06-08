@@ -284,7 +284,7 @@ class ProxyRequest {
          $Cookie .= "{$Key}={$EValue}";
       }
       $Response = '';
-      if (function_exists('curl_init') && !$Recycle) {
+      if ((function_exists('curl_init') && !$Recycle) || !function_exists('fsockopen')) {
 
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();

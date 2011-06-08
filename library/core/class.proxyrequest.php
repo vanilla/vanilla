@@ -33,7 +33,7 @@ class ProxyRequest {
       // Try to resolve hostname
       $HostAddress = gethostbyname($Host);
       if (ip2long($HostAddress) === FALSE) {
-         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): %2$s', $Host, "Could not resolve hostname"));
+         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): %s', $Host, "Could not resolve hostname"));
       }
       
       // Start off assuming recycling failed
@@ -63,7 +63,7 @@ class ProxyRequest {
       }
 
       if (!$Pointer)
-         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
+         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
 
       if ($Timeout > 0 && !$Recycle)
          stream_set_timeout($Pointer, $Timeout);
@@ -267,8 +267,10 @@ class ProxyRequest {
       $Scheme = GetValue('scheme', $UrlParts, 'http');
       $Host = GetValue('host', $UrlParts, '');
       $Port = GetValue('port', $UrlParts, '80');
+      if (empty($Port)) $Port = 80;
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
+      
       // Get the cookie.
       $Cookie = '';
       $EncodeCookies = TRUE;
@@ -357,7 +359,17 @@ class ProxyRequest {
          }
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
-            $Location = GetValue('Location', $ResponseHeaders);
+            $Location = GetValue('Location', $this->ResponseHeaders, NULL);
+            if (is_null($Location))
+               $Location = GetValue('location', $this->ResponseHeaders, NULL);
+            
+            if (is_null($Location))
+               throw new Exception("Received status code {$this->ResponseStatus} (redirect) but no 'Location' provided.");
+            
+            if (substr($Location,0,4) != 'http') {
+               $Location = ltrim($Location, '/');
+               $Location = "http://{$Host}/{$Location}";
+            }
             $Options['URL'] = $Location;
             return $this->Request($Options, $QueryParams);
          }

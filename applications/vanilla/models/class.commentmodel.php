@@ -238,19 +238,22 @@ class CommentModel extends VanillaModel {
     * @param int $TotalComments Total in entire discussion (hard limit).
 	 */
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
+      $NewComment = FALSE;
+      
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
          $CountWatch = $Limit + $Offset + 1; // Include the first comment (in the discussion table) in the count.
-         if ($CountWatch > $TotalComments)
+         if ($CountWatch > $TotalComments) {
             $CountWatch = $TotalComments;
+            $NewComment = TRUE;
+         }
             
          if (is_numeric($Discussion->CountCommentWatch)) {
-            $NewComment = FALSE;
             if (isset($Discussion->DateLastViewed))
                $NewComment |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
             // Update the watch data.
-				if ($NewComment || ($CountWatch != $Discussion->CountCommentWatch)) {
+				if ($NewComment || ($CountWatch > $Discussion->CountCommentWatch)) {
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',

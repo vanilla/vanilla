@@ -7,9 +7,9 @@
    foreach ($this->Data->Result() as $User) {
       echo '<li>';
 
-      if ($User['Deleted'])
+      if (GetValue('Deleted', $User))
          echo Wrap(UserAnchor($User, 'UserLink'), 'del',
-            array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars($User['Name'])))
+            array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars(GetValue('Name', $User))))
             );
       else
          echo Wrap(UserAnchor($User, 'UserLink'), 'strong');

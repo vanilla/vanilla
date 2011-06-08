@@ -207,15 +207,21 @@ class Gdn_UploadImage extends Gdn_Upload {
       return $Sender->EventArguments['Parsed'];
    }
    
-   public function GenerateTargetName($TargetFolder, $Extension = 'jpg') {
+   public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
       if (!$Extension) {
          $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
       }
 
-      $Name = RandomString(12);
-      while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
-         $Name = RandomString(12);
-      }
-      return $TargetFolder . DS . $Name . '.' . $Extension;
+      do {
+         if ($Chunk) {
+            $Name = RandomString(6);
+            $Subdir = RandomString(6);
+         } else {
+            $Name = RandomString(12);
+            $Subdir = '';
+         }
+         $Path = "$TargetFolder/$Subdir/$Name.$Extension";
+      } while(file_exists($Path));
+      return $Path;
    }
 }

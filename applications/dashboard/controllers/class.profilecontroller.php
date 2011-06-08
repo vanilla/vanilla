@@ -331,37 +331,35 @@ class ProfileController extends Gdn_Controller {
             $TmpImage = $UploadImage->ValidateUpload('Picture');
             
             // Generate the target image name.
-            $TargetImage = $UploadImage->GenerateTargetName(PATH_LOCAL_UPLOADS);
-            $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+            $TargetImage = $UploadImage->GenerateTargetName(PATH_LOCAL_UPLOADS, '', TRUE);
+            $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
+            $Subdir = StringBeginsWith(dirname($TargetImage), PATH_LOCAL_UPLOADS.'/', FALSE, TRUE);
 
-            // Delete any previously uploaded images.
+            // Delete any previously uploaded image.
             $UploadImage->Delete(ChangeBasename($this->User->Photo, 'p%s'));
-            // Don't delete this one because it hangs around in activity streams:
-            // @unlink(PATH_ROOT.'/uploads/'.ChangeBasename($this->User->Photo, 't%s'));
-            $UploadImage->Delete(ChangeBasename($this->User->Photo, 'n%s'));
             
             // Save the uploaded image in profile size.
             $Props = $UploadImage->SaveImageAs(
                $TmpImage,
-               'userpics/p'.$ImageBaseName,
+               "userpics/$Subdir/p$Basename",
                Gdn::Config('Garden.Profile.MaxHeight', 1000),
                Gdn::Config('Garden.Profile.MaxWidth', 250)
             );
-            $UserPhoto = sprintf($Props['SaveFormat'], 'userpics/'.$ImageBaseName);
+            $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
             
-            // Save the uploaded image in preview size
-            $UploadImage->SaveImageAs(
-               $TmpImage,
-               'userpics/t'.$ImageBaseName,
-               Gdn::Config('Garden.Preview.MaxHeight', 100),
-               Gdn::Config('Garden.Preview.MaxWidth', 75)
-            );
+//            // Save the uploaded image in preview size
+//            $UploadImage->SaveImageAs(
+//               $TmpImage,
+//               'userpics/t'.$ImageBaseName,
+//               Gdn::Config('Garden.Preview.MaxHeight', 100),
+//               Gdn::Config('Garden.Preview.MaxWidth', 75)
+//            );
 
             // Save the uploaded image in thumbnail size
             $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
             $UploadImage->SaveImageAs(
                $TmpImage,
-               'userpics/n'.$ImageBaseName,
+               "userpics/$Subdir/n$Basename",
                $ThumbSize,
                $ThumbSize,
                TRUE
@@ -585,7 +583,7 @@ class ProfileController extends Gdn_Controller {
             // Get the dimensions from the form.
             Gdn_UploadImage::SaveImageAs(
                $Source,
-               'userpics/'.ChangeBasename(basename($this->User->Photo), 'n%s'),
+               ChangeBasename($this->User->Photo, 'n%s'),
                $this->ThumbSize, $this->ThumbSize,
                array('Crop' => TRUE, 'SourceX' => $this->Form->GetValue('x'), 'SourceY' => $this->Form->GetValue('y'), 'SourceWidth' => $this->Form->GetValue('w'), 'SourceHeight' => $this->Form->GetValue('h')));
          } catch (Exception $Ex) {

@@ -32,7 +32,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    
    public function StartAuthenticator() {
       // Start the 'session'
-      Gdn::Session()->Start();
+      Gdn::Session()->Start(FALSE, FALSE);
       
       // Get list of enabled authenticators
       $AuthenticationSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());

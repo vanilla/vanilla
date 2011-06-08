@@ -23,6 +23,8 @@ class ProxyRequest {
    public $ContentType;
    public $ContentLength;
    
+   protected $Options;
+   
    public function __construct() {
       self::$ConnectionHandles = array();
    }
@@ -44,7 +46,7 @@ class ProxyRequest {
          $Pointer = &self::$ConnectionHandles[$HostAddress];
          $StreamMeta = stream_get_meta_data($Pointer);
          
-         if ($Pointer && !GetValue('timed_out', $StreamMeta)) {
+         if ($Pointer && !GetValue('timed_out', $StreamMeta) && !GetValue('eof', $StreamMeta)) {
             //echo " : Loaded existing pointer for {$HostAddress}\n";
             $Recycled = TRUE;
          } else {
@@ -65,7 +67,7 @@ class ProxyRequest {
       if (!$Pointer)
          throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
 
-      if ($Timeout > 0 && !$Recycle)
+      if ($Timeout > 0)
          stream_set_timeout($Pointer, $Timeout);
       
       return $Pointer;
@@ -131,6 +133,8 @@ class ProxyRequest {
 				$TransferEncoding = strtolower($Value);
       }
       
+      //print_r($this->ResponseHeaders);
+      
       // Normal connection close read
       if ($ConnectionMode == 'close') {
          while (!feof($Pointer)) {
@@ -144,6 +148,8 @@ class ProxyRequest {
          $TotalBytes = 0;
          do {
             $LeftToRead = $ContentLength - $TotalBytes;
+            if (!$LeftToRead) break;
+            
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
@@ -231,7 +237,8 @@ class ProxyRequest {
           'Recycle'        => FALSE,
           'Cookies'        => TRUE,
           'Headers'        => array(),
-          'CloseSession'   => TRUE
+          'CloseSession'   => TRUE,
+          'Redirected'     => FALSE
       );
 
       $this->ResponseHeaders = array();
@@ -241,7 +248,7 @@ class ProxyRequest {
       $this->ContentLength = 0;
       $this->ContentType = '';
       
-      $Options = array_merge($Defaults, $Options);
+      $this->Options = $Options = array_merge($Defaults, $Options);
 
       $RelativeURL = GetValue('URL', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
@@ -250,6 +257,7 @@ class ProxyRequest {
       $Recycle = GetValue('Recycle', $Options);
       $SendCookies = GetValue('Cookies', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
+      $Redirected = GetValue('Redirected', $Options);
       
       if ($CloseSesssion)
          @session_write_close();
@@ -349,7 +357,7 @@ class ProxyRequest {
 
          // Send the request headers
          $this->FsockSend($Pointer, $Header);
-
+         
          // Read from the server
          $this->FsockReceive($Pointer);
 
@@ -371,6 +379,7 @@ class ProxyRequest {
                $Location = "http://{$Host}/{$Location}";
             }
             $Options['URL'] = $Location;
+            $Options['Redirected'] = TRUE;
             return $this->Request($Options, $QueryParams);
          }
          

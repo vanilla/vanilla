@@ -431,8 +431,10 @@ class Gdn_Session {
 	 * guests can be imlemented.
 	 */
    private function _GetStashSession() {
+      $CookieName = C('Garden.Cookie.Name', 'Vanilla');
+
       // Grab the entire session record
-      $SessionID = GetValue('VanillaSessionID', $_COOKIE, '');
+      $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
       $Session = Gdn::SQL()
          ->Select()
          ->From('Session')
@@ -462,7 +464,7 @@ class Gdn_Session {
             ->FirstRow();
             
          // Save a session cookie
-         $Name = 'VanillaSessionID';
+         $Name = $CookieName.'SessionID';
          $Path = C('Garden.Cookie.Path', '/');
          $Domain = C('Garden.Cookie.Domain', '');
          $Expire = 0;

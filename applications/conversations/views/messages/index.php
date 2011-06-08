@@ -4,6 +4,10 @@
 if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
    echo '<h2>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';
 }
+
+if ($this->Data('_HasDeletedUsers')) {
+   echo '<div class="Info">', T('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';
+}
 ?>
 <!--
 <div class="Tabs HeadingTabs ConversationTabs">

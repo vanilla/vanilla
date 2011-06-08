@@ -127,8 +127,11 @@ class MessagesController extends ConversationsController {
                $LastMessageID = $NewMessageID - 1;
             
             $Session = Gdn::Session();
-            $this->Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);   
-            $this->MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
+            $Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);   
+            $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
+            $this->Conversation = $Conversation;
+            $this->MessageData = $MessageData;
+
             $this->View = 'messages';
          } else {
             // Handle ajax based errors...
@@ -311,17 +314,18 @@ class MessagesController extends ConversationsController {
       $Users = array();
       $InConversation = FALSE;
       foreach($this->RecipientData->Result() as $User) {
-         if($User->Deleted)
-            $CssClass = 'Deleted';
-         else
-            $CssClass = '';
-         
          $Count++;
          if($User->UserID == $Session->UserID) {
             $InConversation = TRUE;
             continue;
          }
-         $Users[] = UserAnchor($User, $CssClass);
+         if($User->Deleted) {
+            $Users[] = Wrap(UserAnchor($User), 'del', array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars($User->Name))));
+            $this->SetData('_HasDeletedUsers', TRUE);
+         } else
+            $Users[] = UserAnchor($User);
+
+         
       }
       if ($InConversation) {
          if(count($Users) == 0)

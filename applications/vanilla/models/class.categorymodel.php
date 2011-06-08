@@ -420,6 +420,8 @@ class CategoryModel extends Gdn_Model {
          ->Join('Discussion d', 'd.DiscussionID = co.DiscussionID', 'left')
          ->Where('c.AllowDiscussions', '1');
 
+      $this->FireEvent('AfterGetFullQuery');
+      
       if (Gdn::Session()->UserID > 0) {
          $UserID = Gdn::Session()->UserID;
          // Add in user/category stuff.

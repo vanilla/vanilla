@@ -38,7 +38,7 @@ class ConversationModel extends Gdn_Model {
     *
     * @param int $ViewingUserID Unique ID of current user.
     */
-   public function ConversationQuery($ViewingUserID) {
+   public function ConversationQuery($ViewingUserID, $Join = '') {
       $this->SQL
          ->Select('c.*')
          ->Select('lm.InsertUserID', '', 'LastMessageUserID')
@@ -159,11 +159,23 @@ class ConversationModel extends Gdn_Model {
     * @return Gdn_DataSet SQL result (single row).
     */
    public function GetID($ConversationID, $ViewingUserID = FALSE) {
-      $this->ConversationQuery($ViewingUserID);
-      return $this->SQL
-         ->Where('c.ConversationID', $ConversationID)
-         ->Get()
-         ->FirstRow();
+      // Get the conversation.
+      $Conversation = $this->GetWhere(array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
+
+      if ($ViewingUserID) {
+         $Data = $this->SQL->GetWhere(
+            'UserConversation',
+            array('ConversationID' => $ConversationID, 'UserID' => $ViewingUserID))
+            ->FirstRow(DATASET_TYPE_ARRAY);
+
+         // Convert the array.
+         $UserConversation = ArrayTranslate($Data, array('LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked'));
+         $UserConversation['CountNewMessages'] = $Conversation['CountMessages'] - $Data['CountReadMessages'];
+      } else {
+         $UserConversation = array('CountNewMessages' => 0, 'CountReadMessages' => $Conversation['CountMessages'], 'DateLastViewed' => $Conversation['DateUpdated']);
+      }
+      $Conversation = array_merge($Conversation, $UserConversation);
+      return (object)$Conversation;
    }
    
    /**
@@ -435,7 +447,7 @@ class ConversationModel extends Gdn_Model {
          
       // First define the current users in the conversation
       $OldContributorData = $this->GetRecipients($ConversationID);
-      $OldContributorUserIDs = ConsolidateArrayValuesByKey($OldContributorData->ResultArray(), 'UserID');
+      $OldContributorData = Gdn_DataSet::Index($OldContributorData, 'UserID');
       $AddedUserIDs = array();
       
       // Get some information about this conversation
@@ -449,7 +461,7 @@ class ConversationModel extends Gdn_Model {
       
       // Add the user(s) if they are not already in the conversation
       foreach ($UserID as $NewUserID) {
-         if (!in_array($NewUserID, $OldContributorUserIDs)) {
+         if (!array_key_exists($NewUserID, $OldContributorData)) {
             $AddedUserIDs[] = $NewUserID;
             $this->SQL->Insert('UserConversation', array(
                'UserID' => $NewUserID,
@@ -457,13 +469,19 @@ class ConversationModel extends Gdn_Model {
                'LastMessageID' => $ConversationData->LastMessageID,
                'CountReadMessages' => 0
             ));
+         } elseif ($OldContributorData[$NewUserID]->Deleted) {
+            $AddedUserIDs[] = $NewUserID;
+            
+            $this->SQL->Put('UserConversation',
+               array('Deleted' => 0),
+               array('ConversationID' => $ConversationID, 'UserID' => $NewUserID));
          }
       }
       if (count($AddedUserIDs) > 0) {
          $Session = Gdn::Session();
          
          // Update the Contributors field on the conversation
-         $Contributors = array_unique(array_merge($AddedUserIDs, $OldContributorUserIDs));
+         $Contributors = array_unique(array_merge($AddedUserIDs, array_keys($OldContributorData)));
          sort($Contributors);
          $this->SQL
             ->Update('Conversation')

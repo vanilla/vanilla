@@ -178,12 +178,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
    
-      if (Gdn::Config('Garden.UpdateMode', FALSE)) {
-         if (!Gdn::Session()->CheckPermission('Garden.Settings.GlobalPrivs')) {
-            // Updatemode, and this user is not root admin
+      try {
+         if (Gdn::Config('Garden.UpdateMode', FALSE) && !Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            // Updatemode, and this user is not an admin
+            $UpdateModeExceptions = array(
+                'utility'
+            );
+            $PathRequest = Gdn::Request()->Path();
+            foreach ($UpdateModeExceptions as $UpdateModeException)
+               if (StringBeginsWith ($PathRequest, $UpdateModeException))
+                  throw new Exception();
+                  
             $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
          }
-      }
+      } catch (Exception $e) {}
       
       $this->FireEvent('BeforeDispatch');
       $this->AnalyzeRequest($Request);

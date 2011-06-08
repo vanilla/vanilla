@@ -838,7 +838,13 @@ EOT;
    public static function Mentions($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Mentions');
-      } else {         
+      } else {
+         // Check for a custom formatter.
+         $Formatter = Gdn::Factory('MentionsFormatter');
+         if (is_object($Formatter)) {
+            return $Formatter->Format($Mixed);
+         }
+
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
             $Mixed = preg_replace(

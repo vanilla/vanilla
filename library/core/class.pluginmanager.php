@@ -757,7 +757,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
       unset($Lines);
       if ($PluginInfoString != '')
-         @eval($PluginInfoString);
+         eval($PluginInfoString);
 
       // Define the folder name and assign the class name for the newly added item
       if (isset(${$VariableName}) && is_array(${$VariableName})) {

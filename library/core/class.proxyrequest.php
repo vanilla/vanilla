@@ -224,7 +224,7 @@ class ProxyRequest {
       }
 
       $Defaults = array(
-          'Url'            => NULL,
+          'URL'            => NULL,
           'ConnectTimeout' => 5,
           'Timeout'        => 2,
           'Redirects'      => TRUE,

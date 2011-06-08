@@ -33,7 +33,7 @@ class ProxyRequest {
       // Try to resolve hostname
       $HostAddress = gethostbyname($Host);
       if (ip2long($HostAddress) === FALSE) {
-         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): %2$s', $HostAddress, "Could not resolve hostname"));
+         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): %2$s', $Host, "Could not resolve hostname"));
       }
       
       // Start off assuming recycling failed

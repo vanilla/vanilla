@@ -432,7 +432,7 @@ class CategoryModel extends Gdn_Model {
       }
 
       // Single record or full list?
-      if (is_numeric($CategoryID) && $CategoryID > 0) {
+      if (is_numeric($CategoryID) && $CategoryID != 0) {
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
       } else {
          $CategoryData = $this->SQL->OrderBy('TreeLeft', 'asc')->Get();

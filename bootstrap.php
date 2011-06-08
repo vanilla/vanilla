@@ -129,9 +129,6 @@ Gdn::Regarding();
 // Other objects.
 Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 
-// Install a temporary locale for plugins that have a T() in their info strings.
-Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Dummy', NULL, Gdn::FactorySingleton, new Gdn_Dummy());
-
 // Execute other application startup.
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 	// Include the application's bootstrap.

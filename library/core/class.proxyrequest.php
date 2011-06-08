@@ -230,7 +230,8 @@ class ProxyRequest {
           'Redirects'      => TRUE,
           'Recycle'        => FALSE,
           'Cookies'        => TRUE,
-          'Headers'        => array()
+          'Headers'        => array(),
+          'CloseSession'   => TRUE
       );
 
       $this->ResponseHeaders = array();
@@ -248,6 +249,10 @@ class ProxyRequest {
       $Timeout = GetValue('Timeout', $Options);
       $Recycle = GetValue('Recycle', $Options);
       $SendCookies = GetValue('Cookies', $Options);
+      $CloseSesssion = GetValue('CloseSession', $Options);
+      
+      if ($CloseSesssion)
+         @session_write_close();
 
       $Url = $RelativeURL;
       if (stristr($RelativeURL, '?'))

@@ -1049,7 +1049,7 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $DateTime, $Matches)) {
+      if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];
@@ -1057,7 +1057,7 @@ EOT;
          $Minute = ArrayValue(5, $Matches, 0);
          $Second = ArrayValue(6, $Matches, 0);
          return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
-      } elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $DateTime, $Matches)) {
+      } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];

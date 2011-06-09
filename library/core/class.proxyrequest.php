@@ -84,9 +84,8 @@ class ProxyRequest {
       do {
          $BytesWritten = fwrite($Pointer, substr($Data,$DataSent), $DataToSend-$DataSent);
          if (!$BytesWritten && $DataSent < $DataToSend) {
-            if ($StalledCount > 3) break;
+            if ($StalledCount > 20) break;
             $StalledCount++;
-            usleep(500);
             continue;
          }
          $DataSent += $BytesWritten;

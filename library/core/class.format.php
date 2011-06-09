@@ -419,21 +419,25 @@ class Gdn_Format {
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
+      $Now = time();
+      
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
-      $FTimestamp = $Timestamp;
-      if ($Session->UserID > 0)
-         $FTimestamp += ($Session->User->HourOffset * 3600);
+      if ($Session->UserID > 0) {
+         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
 
       if ($Format == '') {
          // If the timestamp was during the current day
-         if (date('Y m d', $Timestamp) == date('Y m d', time())) {
+         if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
             // Use the time format
             $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
-         } else if (date('Y', $Timestamp) == date('Y', time())) {
+         } else if (date('Y', $Timestamp) == date('Y', $Now)) {
             // If the timestamp is the same year, show the month and date
             $Format = T('Date.DefaultDayFormat', '%B %e');
-         } else if (date('Y', $Timestamp) != date('Y', time())) {
+         } else if (date('Y', $Timestamp) != date('Y', $Now)) {
             // If the timestamp is not the same year, just show the year
             $Format = T('Date.DefaultYearFormat', '%B %Y');
          } else {
@@ -444,11 +448,11 @@ class Gdn_Format {
 
       // Emulate %l and %e for Windows
       if (strpos($Format, '%l') !== false)
-          $Format = str_replace('%l', ltrim(strftime('%I', $FTimestamp), '0'), $Format);
+          $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
       if (strpos($Format, '%e') !== false)
-          $Format = str_replace('%e', ltrim(strftime('%d', $FTimestamp), '0'), $Format);
+          $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
 
-      return strftime($Format, $FTimestamp);
+      return strftime($Format, $Timestamp);
    }
    
    /**

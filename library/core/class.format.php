@@ -429,6 +429,12 @@ class Gdn_Format {
          $Now += $SecondsOffset;
       }
 
+      $Html = FALSE;
+      if (strcasecmp($Format, 'html') == 0) {
+         $Format = '';
+         $Html = TRUE;
+      }
+
       if ($Format == '') {
          // If the timestamp was during the current day
          if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
@@ -446,13 +452,20 @@ class Gdn_Format {
          }
       }
 
-      // Emulate %l and %e for Windows
+      $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
+
+      // Emulate %l and %e for Windows.
       if (strpos($Format, '%l') !== false)
           $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
       if (strpos($Format, '%e') !== false)
           $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
 
-      return strftime($Format, $Timestamp);
+      $Result = strftime($Format, $Timestamp);
+
+      if ($Html) {
+         $Result = Wrap($Result, 'span', array('title' => strftime($FullFormat, $Timestamp)));
+      }
+      return $Result;
    }
    
    /**

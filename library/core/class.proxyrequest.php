@@ -22,14 +22,19 @@ class ProxyRequest {
    
    public $ContentType;
    public $ContentLength;
+   public $ConnectionMode;
+   
+   public $ActionLog;
    
    protected $Options;
    
-   public function __construct() {
+   public function __construct($Loud = FALSE) {
       self::$ConnectionHandles = array();
+      
+      $this->Loud = $Loud;
    }
    
-   protected function FsockConnect($Host, $Port, $Options) {
+   protected function FsockConnect(&$Handle, $Host, $Port, $Options) {
       
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $ReadTimeout = GetValue('Timeout', $Options);
@@ -96,7 +101,8 @@ class ProxyRequest {
 
       stream_set_timeout($Pointer, $ReadTimeout);
       
-      return $Pointer;
+      $Handle = $Pointer;
+      return $HostAddress;
    }
    
    protected function FsockDisconnect(&$Pointer, $HostAddress = NULL) {
@@ -109,6 +115,9 @@ class ProxyRequest {
    }
    
    protected function FsockSend(&$Pointer, $Data) {
+      
+      $this->Action("Sending headers");
+      
       $DataSent = 0;
       $DataToSend = strlen($Data);
       $StalledCount = 0;
@@ -127,6 +136,9 @@ class ProxyRequest {
    }
    
    protected function FsockReceive(&$Pointer) {
+      
+      $this->Action("Reading response headers");
+      
       // Get the first line of the response headers, for the status
       do {
          $Status = trim(fgets($Pointer, $this->MaxReadSize));
@@ -136,7 +148,6 @@ class ProxyRequest {
          $this->ResponseHeaders['HTTP'] = $Status;
          break;
       } while (true);
-      
       
 		$this->ResponseStatus = $Matches[1];
       
@@ -151,7 +162,7 @@ class ProxyRequest {
          $this->ResponseHeaders[$Key] = $Value;
          
          if ($Key == 'Connection')
-				$ConnectionMode = strtolower($Value);
+				$this->ConnectionMode = $ConnectionMode = strtolower($Value);
          
 			if ($Key == 'Content-Length')
 				$this->ContentLength = (int)$Value;
@@ -165,65 +176,91 @@ class ProxyRequest {
       
       //print_r($this->ResponseHeaders);
       
-      // Normal connection close read
-      if ($ConnectionMode == 'close') {
-         while (!feof($Pointer)) {
-            $this->ResponseBody .= fread($Pointer, $this->MaxReadSize);
-         }
-         return $this->ResponseBody;
-      }
+      $Loud = ($ConnectionMode == 'close');
       
       // Keepalive, not chunked
       if (isset($this->ContentLength) && $TransferEncoding != 'chunked') {
-         $TotalBytes = 0;
+         
+         if ($ConnectionMode == 'close') {
+            $this->Action("Reading response body directly until feof because ConnectionMode = {$ConnectionMode}");
+            while (!feof($Pointer)) {
+               $this->ResponseBody .= fread($Pointer, $this->MaxReadSize);
+            }
+            return $this->ResponseBody;
+         }
+         
+         else {
+            $this->Action("Reading response body progressively based on ContentLength = {$this->ContentLength}");
+            $TotalBytes = 0;
+            do {
+               $LeftToRead = $this->ContentLength - $TotalBytes;
+               if (!$LeftToRead) break;
+
+               $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
+               $TotalBytes += $BytesRead = strlen($Data);
+               unset($Data);
+
+               if (feof($Pointer))
+                  break;
+            } while ($LeftToRead);
+            if ($TotalBytes < $this->ContentLength)
+               throw new Exception("Connection failed after {$TotalBytes}/{$this->ContentLength} bytes (te: normal)");
+
+            return $this->ResponseBody;
+         }
+      }
+      
+      if ($TransferEncoding == 'chunked') {
+         $this->Action("Reading response body in chunks because TE = {$TransferEncoding}");
+         
+         // Chunked encoding
          do {
-            $LeftToRead = $this->ContentLength - $TotalBytes;
-            if (!$LeftToRead) break;
+            $this->Action("  + scanning for a chunk");
+            $ChunkLength = rtrim(fgets($Pointer, $this->MaxReadSize));
+            $ChunkExtended = strpos($ChunkLength,';');
+            if ($ChunkExtended !== FALSE)
+               $ChunkLength = substr($ChunkLength, 0, $ChunkExtended);
             
-            $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
-            $TotalBytes += $BytesRead = strlen($Data);
-            unset($Data);
+            $this->Action("  + chunk: {$ChunkLength}");
             
-            if (feof($Pointer))
+            $ChunkLength = hexdec($ChunkLength);
+            if ($ChunkLength < 1) { 
+               //if ($Loud) die('zerochunk');
                break;
-         } while ($LeftToRead);
-         if ($TotalBytes < $this->ContentLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$this->ContentLength} bytes (te: normal)");
+            }
             
+            $this->Action("  + chunk dec len: {$ChunkLength}");
+
+            $TotalBytes = 0;
+            do {
+               $LeftToRead = $ChunkLength - $TotalBytes;
+               $this->Action("  + ltr: {$LeftToRead}");
+               if (!$LeftToRead) {
+                  $this->Action("  + break");
+                  break;
+               }
+               $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
+               $TotalBytes += $BytesRead = strlen($Data);
+               unset($Data);
+               
+               if (feof($Pointer))
+                  break;
+            } while ($LeftToRead);
+            if ($TotalBytes < $ChunkLength)
+               throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes (te: chunked)");
+
+            // Chunks are terminated by CRLF
+            $Rubbish = fgets($Pointer, $this->MaxReadSize);
+            
+            $this->Action("  + chunk terminator: {$Rubbish}");
+            $this->Action("  + chunk complete, chunksize = {$ChunkLength}");
+         } while ($ChunkLength);
+         
+         fgets($Pointer, $this->MaxReadSize);
          return $this->ResponseBody;
       }
       
-      // Chunked encoding
-      do {
-         $ChunkLength = rtrim(fgets($Pointer, $this->MaxReadSize));
-         $ChunkExtended = strpos($ChunkLength,';');
-         if ($ChunkExtended !== FALSE)
-            $ChunkLength = substr($ChunkLength, 0, $ChunkExtended);
-         
-         $ChunkLength = hexdec($ChunkLength);
-         if ($ChunkLength < 1) { break; }
-         
-         $TotalBytes = 0;
-         do {
-            $LeftToRead = $ChunkLength - $TotalBytes;
-            if (!$LeftToRead) break;
-            
-            $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
-            $TotalBytes += $BytesRead = strlen($Data);
-            unset($Data);
-            
-            if (feof($Pointer))
-               break;
-         } while ($LeftToRead);
-         if ($TotalBytes < $ChunkLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes (te: chunked)");
-         
-         // Chunks are terminated by CRLF
-			fgets($Pointer, $this->MaxReadSize);
-		} while ($ChunkLength);
-      fgets($Pointer, $this->MaxReadSize);
-      
-      return $this->ResponseBody;
+      throw new Exception("Unable to detect reading mode for incoming data");
    }
    
    protected function CurlReceive(&$Handler) {
@@ -284,6 +321,8 @@ class ProxyRequest {
       
       $this->ContentLength = 0;
       $this->ContentType = '';
+      $this->ConnectionMode = '';
+      $this->ActionLog = array();
       
       $this->Options = $Options = array_merge($Defaults, $Options);
 
@@ -307,6 +346,7 @@ class ProxyRequest {
       $Url .= http_build_query($QueryParams);
 
       //echo " : Requesting {$Url}\n";
+      $this->Action("Requesting {$Url}");
 
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -360,7 +400,8 @@ class ProxyRequest {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          
-         $Pointer = $this->FsockConnect($Host, 80, $Options);
+         $Pointer = FALSE;
+         $HostAddress = $this->FsockConnect($Pointer, $Host, 80, $Options);
 
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();
@@ -385,6 +426,8 @@ class ProxyRequest {
          if (strlen($Cookie) > 0 && $SendCookies)
             $SendHeaders[] = "Cookie: {$Cookie}";
 
+         $this->RequestHeaders = $SendHeaders;
+         
          $Header = "";
          foreach ($SendHeaders as $SendHeader) {
             $Header .= "{$SendHeader}\r\n";
@@ -398,9 +441,9 @@ class ProxyRequest {
          // Read from the server
          $this->FsockReceive($Pointer);
 
-         if (!$Recycle) {
+         if (!$Recycle || $this->ConnectionMode == 'close') {
             //echo " : Closing onetime pointer for {$HostAddress}\n";
-            $this->FsockDisconnect($Pointer);
+            $this->FsockDisconnect($Pointer, $HostAddress);
          }
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
@@ -419,23 +462,21 @@ class ProxyRequest {
             $Options['Redirected'] = TRUE;
             return $this->Request($Options, $QueryParams);
          }
-         
-         $StreamInfo = stream_get_meta_data($Pointer);
-         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
-            throw new Exception("Operation timed out after {$Timeout} seconds");
-         }
 
       } else {
          throw new Exception('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.');
       }
-
-      //echo " : Request complete\n\n";
-
-      //print_r($this->ResponseHeaders);
-      //echo "\n";
-      //echo $this->ResponseBody;
-      //echo "\n";
+      
       return $this->ResponseBody;
    }
    
+   protected function Action($Message, $Loud = NULL) {
+      if ($this->Loud || $Loud) {
+         echo "{$Message}\n";
+         flush();
+         ob_flush();
+      }
+      
+      $this->ActionLog[] = $Message;
+   }
 }

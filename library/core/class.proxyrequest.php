@@ -272,7 +272,7 @@ class ProxyRequest {
           'Timeout'              => 2,
           'Redirects'            => TRUE,
           'Recycle'              => FALSE,
-          'RequestsPerPointer'   => 30,
+          'RequestsPerPointer'   => 0,
           'Cookies'              => TRUE,
           'CloseSession'         => TRUE,
           'Redirected'           => FALSE

@@ -18,7 +18,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
          <td class="UsernameCell"><?php 
-            echo htmlspecialchars($Row['InsertName']);
+            echo UserAnchor($Row, '', array('Prefix' => 'Insert'));
 
             if ($Row['CountGroup'] > 1) {
                echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
@@ -45,12 +45,8 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                echo '</div>';
             ?>
          </td>
-         <td class="DateCell"><?php 
-            echo Gdn_Format::Date($Row['DateInserted']);
-
-            if ($Row['DateUpdated']) {
-               echo ' ', sprintf('updated %s ago', Gdn_Format::Seconds($Row['DateUpdated']));
-            }
+         <td class="DateCell"><?php
+            echo Gdn_Format::Date($Row['DateInserted'], 'html');
          ?></td>
       </tr>
       <?php

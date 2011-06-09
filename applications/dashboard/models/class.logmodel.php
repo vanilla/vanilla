@@ -282,9 +282,11 @@ class LogModel extends Gdn_Pluggable {
       }
 
       // Throw an event to see if the restore is being overridden.
+      $Handled = FALSE;
+      $this->EventArguments['Handled'] =& $Handled;
       $this->EventArguments['Log'] =& $Log;
       $this->FireEvent('BeforeRestore');
-      if (GetValue('Overridden', $Log))
+      if ($Handled)
          return; // a plugin handled the restore.
 
       // Keep track of a discussion ID so that it's count can be recalculated.
@@ -337,7 +339,7 @@ class LogModel extends Gdn_Pluggable {
             
             if (!$Log['RecordID']) {
                // This log entry was never in the table.
-               unset($TableName);
+//               unset($TableName);
                if (isset($Set['DateInserted'])) {
                   $Set['DateInserted'] = Gdn_Format::ToDateTime();
                }

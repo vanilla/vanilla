@@ -1032,7 +1032,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;
@@ -1103,7 +1103,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE)) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;
@@ -1156,7 +1156,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;

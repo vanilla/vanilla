@@ -133,12 +133,13 @@ if (!function_exists('Plural')) {
  */
 if (!function_exists('UserAnchor')) {
    function UserAnchor($User, $CssClass = '', $Options = array()) {
-      $User = (object)$User;
-      
+      $Px = GetValue('Prefix', $Options, '');
+      $Name = GetValue($Px.'Name', $User, T('Unknown'));
+
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.htmlspecialchars(Url('/profile/'.rawurlencode($User->Name))).'"'.$CssClass.'>'.htmlspecialchars($User->Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
    }
 }
 

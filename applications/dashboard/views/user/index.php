@@ -29,6 +29,10 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
          <th><?php echo T('Roles'); ?></th>
          <th class="Alt"><?php echo T('First Visit'); ?></th>
          <th><?php echo T('Last Visit'); ?></th>
+         <th><?php echo T('Last IP'); ?></th>
+         <?php
+         $this->FireEvent('UserCell');
+         ?>
          <?php if ($EditUser) { ?>
             <th><?php echo T('Options'); ?></th>
          <?php } ?>

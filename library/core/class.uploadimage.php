@@ -214,8 +214,8 @@ class Gdn_UploadImage extends Gdn_Upload {
 
       do {
          if ($Chunk) {
-            $Name = RandomString(6);
-            $Subdir = RandomString(6);
+            $Name = RandomString(12);
+            $Subdir = sprintf('%03d', mt_rand(0, 999));
          } else {
             $Name = RandomString(12);
             $Subdir = '';

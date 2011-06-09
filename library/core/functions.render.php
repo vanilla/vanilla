@@ -138,7 +138,7 @@ if (!function_exists('UserAnchor')) {
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.rawurlencode($User->Name))).'"'.$CssClass.'>'.htmlspecialchars($User->Name).'</a>';
    }
 }
 

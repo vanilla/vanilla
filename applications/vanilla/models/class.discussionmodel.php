@@ -770,11 +770,11 @@ class DiscussionModel extends VanillaModel {
                // Updating
                $Stored = $this->GetID($DiscussionID);
 
-               $LogData = (array)$Stored;
-               $LogData['_New'] = (array)$Fields;
-               LogModel::Insert('Edit', 'Discussion', $LogData);
-
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
+
+               $Fields['DiscussionID'] = $DiscussionID;
+               LogModel::LogChange('Edit', 'Discussion', (array)$Fields, (array)$Stored);
+
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
             } else {

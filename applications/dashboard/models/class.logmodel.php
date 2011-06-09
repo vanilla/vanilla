@@ -224,14 +224,19 @@ class LogModel extends Gdn_Pluggable {
       return $LogID;
    }
 
-   public static function LogChange($Operation, $RecordType, $NewData) {
+   public static function LogChange($Operation, $RecordType, $NewData, $OldData = NULL) {
       $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : $NewData[$RecordType.'ID'];
 
       // Grab the record from the DB.
-      $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
+      if ($OldData == NULL) {
+         $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
+      } elseif (!isset($OldData[0]))
+         $OldData = array($OldData);
+
       foreach ($OldData as $Row) {
+         
          // Don't log the change if it's right after an insert.
-         if (isset($Row['DateInserted']) && (time() - Gdn_Format::ToTimestamp($Row['DateInserted'])) < 2 * 60)
+         if (isset($Row['DateInserted']) && (time() - Gdn_Format::ToTimestamp($Row['DateInserted'])) < C('Garden.Log.FloodControl', 20) * 60)
             continue;
 
          $Row['_New'] = $NewData;

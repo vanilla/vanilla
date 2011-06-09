@@ -46,11 +46,13 @@ if ($min_errorLogger) {
 }
 
 if (isset($_GET['token'])) {
-    if (!ctype_alnum($_GET['token'])) {
+    define('MINIFY_TOKEN', $_GET['token']);
+
+    if (!preg_match('`[a-zA-Z0-9\.]`', $_GET['token'])) {
         header('HTTP/1.0 400 Bad Request');
         die('bad token');
     }
-    $queryfile = $min_cachePath . DIRECTORY_SEPARATOR . 'query_' . $_GET['token'];
+    $queryfile = $min_cachePath_local . DIRECTORY_SEPARATOR . 'query_' . $_GET['token'];
     if (!file_exists($queryfile)) {
         header('HTTP/1.0 404 File Not Found');
         die('bad token [file does not exist]');

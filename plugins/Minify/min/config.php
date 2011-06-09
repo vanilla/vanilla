@@ -4,6 +4,15 @@
  * @package Minify
  */
 
+error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+ini_set('display_errors', 'on');
+ini_set('track_errors', 1);
+
+define('PATH_ROOT', dirname(__FILE__).'/../../..');
+if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
+   define('APPLICATION', TRUE);
+	require(PATH_ROOT.'/conf/bootstrap.before.php');
+}
 
 /**
  * In 'debug' mode, Minify can combine files with no minification and 
@@ -44,8 +53,18 @@ $min_enableBuilder = false;
 //$min_cachePath = preg_replace('/^\\d+;/', '', session_save_path());
 $PathMin = dirname(__FILE__);
 $PathMinParts = explode('/', $PathMin);
-$min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
 
+if (defined('PATH_CACHE'))
+   $min_cachePath = PATH_CACHE.'/Minify';
+else
+   $min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
+if (defined('PATH_LOCAL_CACHE'))
+   $min_cachePath_local = PATH_LOCAL_CACHE.'/Minify';
+else
+   $min_cachePath_local = $min_cachePath;
+
+if (!file_exists(dirname($min_cachePath_local)))
+   mkdir(dirname($min_cachePath_local), 0777, TRUE);
 
 /**
  * Leave an empty string to use PHP's $_SERVER['DOCUMENT_ROOT'].

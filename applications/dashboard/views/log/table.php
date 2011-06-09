@@ -14,15 +14,20 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
    <tbody>
       <?php
       foreach ($this->Data('Log') as $Row):
+         $RecordLabel = GetValueR('Data.Type', $Row);
+         if (!$RecordLabel)
+            $RecordLabel = $Row['RecordType'];
+
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
          <td class="UsernameCell"><?php 
-            echo UserAnchor($Row, '', array('Prefix' => 'Insert'));
+            echo UserAnchor($Row, '', 'Insert');
 
-            if ($Row['CountGroup'] > 1) {
-               echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
-            }
+            if (!empty($Row['OtherUserIDs'])) {
+               $OtherUserIDs = explode(',',$Row['OtherUserIDs']);
+               echo ' '.Plural(count($OtherUserIDs), 'and %s other', 'and %s others').' ';
+            };
          ?></td>
          <td>
             <?php
@@ -37,11 +42,38 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                   }
                }
 
-               echo '<span class="Expander">', $this->FormatContent($Row), '</span>';
+               echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
 
-               echo '<div class="Tags">';
-               echo '<span class="Tag '.$Row['Operation'].'Tag">'.T($Row['Operation']).'</span> ';
-               echo '<span class="Tag '.$Row['RecordType'].'Tag">'.Anchor(T($Row['RecordType']), $Url).'</span> ';
+               echo '<div class="Meta-Container">';
+
+               echo '<span class="Tags">';
+               echo '<span class="Tag Tag-'.$Row['Operation'].'">'.T($Row['Operation']).'</span> ';
+               echo '<span class="Tag Tag-'.$RecordLabel.'">'.Anchor(T($RecordLabel), $Url).'</span> ';
+               echo '</span>';
+
+               if ($Row['RecordIPAddress']) {
+                  echo ' <span class="Meta">',
+                     '<span class="Meta-Label">IP</span> ',
+                     IPAnchor($Row['RecordIPAddress'], 'Meta-Value'),
+                     '</span> ';
+               }
+
+               if ($Row['CountGroup'] > 1) {
+                  echo ' <span class="Meta">',
+                  '<span class="Meta-Label">'.T('Reported').'</span> ',
+                  Wrap(Plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
+                  '</span> ';
+
+//                  echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
+               }
+
+               if ($Row['RecordName']) {
+                  echo ' <span class="Meta">',
+                     '<span class="Meta-Label">'.sprintf('%s by', T($RecordLabel)).'</span> ',
+                     UserAnchor($Row, 'Meta-Value', 'Record'),
+                     '</span> ';
+               }
+              
                echo '</div>';
             ?>
          </td>

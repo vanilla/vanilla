@@ -34,7 +34,7 @@ class LogModel extends Gdn_Pluggable {
             break;
          case 'Registration':
          case 'User':
-            $Result = $this->FormatRecord(array('Email', 'Name', 'RecordIPAddress' => 'IP', 'DiscoveryText'), $Data);
+            $Result = $this->FormatRecord(array('Email', 'Name', 'DiscoveryText'), $Data);
             break;
          default:
             $Result = '';

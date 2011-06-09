@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 ?>
 <table id="Log" class="AltColumns">
@@ -16,7 +17,13 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
-         <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
+         <td class="UsernameCell"><?php 
+            echo htmlspecialchars($Row['InsertName']);
+
+            if ($Row['CountGroup'] > 1) {
+               echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
+            }
+         ?></td>
          <td>
             <?php
                $Url = FALSE;
@@ -38,7 +45,13 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                echo '</div>';
             ?>
          </td>
-         <td class="DateCell"><?php echo Gdn_Format::Date($Row['DateInserted']); ?></td>
+         <td class="DateCell"><?php 
+            echo Gdn_Format::Date($Row['DateInserted']);
+
+            if ($Row['DateUpdated']) {
+               echo ' ', sprintf('updated %s ago', Gdn_Format::Seconds($Row['DateUpdated']));
+            }
+         ?></td>
       </tr>
       <?php
       endforeach;

@@ -38,7 +38,7 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel = Gdn::Factory('RoleModel');
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
-   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
+//   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
    $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
    $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
    $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
@@ -420,14 +420,19 @@ $Construct->Table('Tag')
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
-   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity'), FALSE, 'index')
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity'), FALSE, 'index')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')
+   ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
    ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('InsertIPAddress', 'varchar(15)', NULL)
+   ->Column('OtherUserIDs', 'varchar(255)', NULL)
+   ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')
    ->Column('Data', 'text', NULL) // the data from the record.
+   ->Column('CountGroup', 'int', NULL)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

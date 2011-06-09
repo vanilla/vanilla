@@ -32,8 +32,9 @@ class LogModel extends Gdn_Pluggable {
          case 'Comment':
             $Result = $this->FormatKey('Body', $Data);
             break;
+         case 'Registration':
          case 'User':
-            $Result = $this->FormatRecord(array('Email', 'Name', 'DiscoveryText'), $Data);
+            $Result = $this->FormatRecord(array('Email', 'Name', 'RecordIPAddress' => 'IP', 'DiscoveryText'), $Data);
             break;
          default:
             $Result = '';
@@ -54,10 +55,14 @@ class LogModel extends Gdn_Pluggable {
 
    public function FormatRecord($Keys, $Data) {
       $Result = array();
-      foreach ($Keys as $Key) {
-         if (!GetValue($Key, $Data))
+      foreach ($Keys as $Index => $Key) {
+         if (is_numeric($Index)) {
+            $Index = $Key;
+         }
+
+         if (!GetValue($Index, $Data))
             continue;
-         $Result[] = '<b>'.htmlspecialchars($Key).'</b>: '.htmlspecialchars(GetValue($Key, $Data));
+         $Result[] = '<b>'.htmlspecialchars($Key).'</b>: '.htmlspecialchars(GetValue($Index, $Data));
       }
       $Result = implode('<br />', $Result);
       return $Result;
@@ -148,10 +153,13 @@ class LogModel extends Gdn_Pluggable {
     *  - You can pass an additional _New element to tell the logger what the new data is.
     * @return int The log id.
     */
-   public static function Insert($Operation, $RecordType, $Data) {
+   public static function Insert($Operation, $RecordType, $Data, $Options = array()) {
       // Check to see if we are storing two versions of the data.
       if (($InsertUserID = self::_LogValue($Data, 'Log_InsertUserID')) === NULL) {
          $InsertUserID = Gdn::Session()->UserID;
+      }
+      if (($InsertIPAddress = self::_LogValue($Data, 'Log_InsertIPAddress')) == NULL) {
+         $InsertIPAddress = Gdn::Request()->IPAddress();
       }
       // Do some known translations for the parent record ID.
       if (($ParentRecordID = self::_LogValue($Data, 'ParentRecordID')) === NULL) {
@@ -171,8 +179,10 @@ class LogModel extends Gdn_Pluggable {
           'RecordType' => $RecordType,
           'RecordID' => self::_LogValue($Data, 'RecordID', $RecordType.'ID'),
           'RecordUserID' => self::_LogValue($Data, 'RecordUserID', 'UpdateUserID', 'InsertUserID'),
+          'RecordIPAddress' => self::_LogValue($Data, 'RecordIPAddress', 'LastIPAddress', 'InsertIPAddress'),
           'RecordDate' => self::_LogValue($Data, 'RecordDate', 'DateUpdated', 'DateInserted'),
           'InsertUserID' => $InsertUserID,
+          'InsertIPAddress' => $InsertIPAddress,
           'DateInserted' => Gdn_Format::ToDateTime(),
           'ParentRecordID' => $ParentRecordID,
           'Data' => serialize($Data)
@@ -180,8 +190,37 @@ class LogModel extends Gdn_Pluggable {
       if ($LogRow['RecordDate'] == NULL)
          $LogRow['RecordDate'] = Gdn_Format::ToDateTime();
 
-      // Insert the log entry.
-      $LogID = Gdn::SQL()->Insert('Log', $LogRow);
+      $GroupBy = GetValue('GroupBy', $Options);
+
+      if ($GroupBy) {
+         $GroupBy[] = 'Operation';
+         $GroupBy[] = 'RecordType';
+
+         // Check to see if there is a record already logged here.
+         $Where = array_combine($GroupBy, ArrayTranslate($LogRow, $GroupBy));
+         $LogRow2 = Gdn::SQL()->GetWhere('Log', $Where)->FirstRow(DATASET_TYPE_ARRAY);
+         if ($LogRow2) {
+            $LogID = $LogRow2['LogID'];
+
+            $OtherUserIDs = explode(',',$LogRow2['OtherUserIDs']);
+            if (!is_array($OtherUserIDs))
+               $OtherUserIDs = array();
+            
+            if ($InsertUserID != $LogRow2['InsertUserID'] && !in_array($InsertUserID, $OtherUserIDs)) {
+               $OtherUserIDs[] = $InsertUserID;
+            }
+            $Count = (int)$LogRow2['CountGroup'] + 1;
+            Gdn::SQL()->Put(
+               'Log',
+               array('OtherUserIDs' => implode(',', $OtherUserIDs), 'CountGroup' => $Count, 'DateUpdated' => Gdn_Format::ToDateTime()),
+               array('LogID' => $LogID));
+         } else {
+            $LogID = Gdn::SQL()->Insert('Log', $LogRow);
+         }
+      } else {
+         // Insert the log entry.
+         $LogID = Gdn::SQL()->Insert('Log', $LogRow);
+      }
       return $LogID;
    }
 
@@ -260,12 +299,17 @@ class LogModel extends Gdn_Pluggable {
          }
       }
 
+      if ($Log['RecordType'] == 'Registration')
+         $TableName = 'User';
+      else
+         $TableName = $Log['RecordType'];
+
       $Data = $Log['Data'];
-      if (!isset($Columns[$Log['RecordType']])) {
-         $Columns[$Log['RecordType']] = Gdn::SQL()->FetchColumns($Log['RecordType']);
+      if (!isset($Columns[$TableName])) {
+         $Columns[$TableName] = Gdn::SQL()->FetchColumns($TableName);
       }
       
-      $Set = array_flip($Columns[$Log['RecordType']]);
+      $Set = array_flip($Columns[$TableName]);
       // Set the sets from the data.
       foreach ($Set as $Key => $Value) {
          if (isset($Data[$Key]))
@@ -281,7 +325,7 @@ class LogModel extends Gdn_Pluggable {
             $Where = array($IDColumn => $Log['RecordID']);
             unset($Set[$IDColumn]);
             Gdn::SQL()->Put(
-               $Log['RecordType'],
+               $TableName,
                $Set,
                $Where);
 
@@ -293,7 +337,7 @@ class LogModel extends Gdn_Pluggable {
             
             if (!$Log['RecordID']) {
                // This log entry was never in the table.
-               unset($Set[$IDColumn]);
+               unset($TableName);
                if (isset($Set['DateInserted'])) {
                   $Set['DateInserted'] = Gdn_Format::ToDateTime();
                }
@@ -302,11 +346,11 @@ class LogModel extends Gdn_Pluggable {
             // Insert the record back into the db.
             $ID = Gdn::SQL()
                ->Options('Ignore', TRUE)
-               ->Insert($Log['RecordType'], $Set);
+               ->Insert($TableName, $Set);
             if (!$ID && isset($Log['RecordID']))
                $ID = $Log['RecordID'];
 
-            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'User') {
+            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'Registration') {
                Gdn::UserModel()->SaveRoles($ID, Gdn::UserModel()->NewUserRoleIDs());
             }
 

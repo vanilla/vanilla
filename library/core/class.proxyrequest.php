@@ -29,7 +29,13 @@ class ProxyRequest {
       self::$ConnectionHandles = array();
    }
    
-   protected function FsockConnect($Host, $Port, $Timeout, $Recycle) {
+   protected function FsockConnect($Host, $Port, $Options) {
+      
+      $ConnectTimeout = GetValue('ConnectTimeout', $Options);
+      $ReadTimeout = GetValue('Timeout', $Options);
+      $Recycle = GetValue('Recycle', $Options);
+      $RecycleFrequency = GetValue('RequestsPerPointer', $Options);
+      
       $Pointer = FALSE;
       
       // Try to resolve hostname
@@ -43,38 +49,63 @@ class ProxyRequest {
 
       // If we're trying to recycle, look for an existing handler
       if ($Recycle && array_key_exists($HostAddress, self::$ConnectionHandles)) {
-         $Pointer = &self::$ConnectionHandles[$HostAddress];
-         $StreamMeta = stream_get_meta_data($Pointer);
-         
-         if ($Pointer && !GetValue('timed_out', $StreamMeta) && !GetValue('eof', $StreamMeta)) {
+         $PointerInfo = &self::$ConnectionHandles[$HostAddress];
+         try {
+            if (!is_array($PointerInfo))
+               throw new Exception();
+            
+            if (!isset($PointerInfo['Handle']) || !$PointerInfo['Handle'])
+               throw new Exception();
+            
+            $Pointer = $PointerInfo['Handle'];
+            $StreamMeta = stream_get_meta_data($Pointer);
+
+            if (GetValue('timed_out', $StreamMeta) || GetValue('eof', $StreamMeta))
+               throw new Exception();
+            
+            if ($RecycleFrequency > 0 && GetValue('Requests', $PointerInfo) > $RecycleFrequency)
+               throw new Exception();
+            
             //echo " : Loaded existing pointer for {$HostAddress}\n";
             $Recycled = TRUE;
-         } else {
-            $Pointer = FALSE;
-            unset(self::$ConnectionHandles[$HostAddress]);
+            
+         } catch (Exception $e) {
+            $this->FsockDisconnect($Pointer, $HostAddress);
             //echo " : Threw away dead pointer for {$HostAddress}\n";
          }
       }
 
       if (!$Pointer) {
-         $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error, 30);
+         $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error, $ConnectTimeout);
          if ($Recycle && !$Recycled) {
             //echo " : Making a new reusable pointer for {$HostAddress}\n";
-            self::$ConnectionHandles[$HostAddress] = $Pointer;
+            self::$ConnectionHandles[$HostAddress] = array(
+                'Handle'         => $Pointer,
+                'Host'           => $Host,
+                'HostAddress'    => $HostAddress,
+                'HostPort'       => $Port,
+                'Requests'       => 0,
+                'BytesSent'      => 0,
+                'BytesReceived'  => 0
+            );
          }
       }
 
       if (!$Pointer)
          throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
 
-      if ($Timeout > 0)
-         stream_set_timeout($Pointer, $Timeout);
+      stream_set_timeout($Pointer, $ReadTimeout);
       
       return $Pointer;
    }
    
-   protected function FsockDisconnect($Pointer) {
-      @fclose($Pointer);
+   protected function FsockDisconnect(&$Pointer, $HostAddress = NULL) {
+      if ($Pointer)
+         @fclose($Pointer);
+      $Pointer = FALSE;
+      
+      if (!is_null($HostAddress) && array_key_exists($HostAddress, self::$ConnectionHandles))
+         unset(self::$ConnectionHandles[$HostAddress]);
    }
    
    protected function FsockSend(&$Pointer, $Data) {
@@ -143,18 +174,22 @@ class ProxyRequest {
       }
       
       // Keepalive, not chunked
-      if (isset($ContentLength) && $TransferEncoding != 'chunked') {
+      if (isset($this->ContentLength) && $TransferEncoding != 'chunked') {
          $TotalBytes = 0;
          do {
-            $LeftToRead = $ContentLength - $TotalBytes;
+            $LeftToRead = $this->ContentLength - $TotalBytes;
             if (!$LeftToRead) break;
             
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
-         } while ($BytesRead);
-         if ($TotalBytes < $ContentLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$ContentLength} bytes");
+            
+            if (feof($Pointer))
+               break;
+         } while ($LeftToRead);
+         if ($TotalBytes < $this->ContentLength)
+            throw new Exception("Connection failed after {$TotalBytes}/{$this->ContentLength} bytes (te: normal)");
+            
          return $this->ResponseBody;
       }
       
@@ -176,9 +211,12 @@ class ProxyRequest {
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
-         } while ($BytesRead && $LeftToRead);
+            
+            if (feof($Pointer))
+               break;
+         } while ($LeftToRead);
          if ($TotalBytes < $ChunkLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes");
+            throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes (te: chunked)");
          
          // Chunks are terminated by CRLF
 			fgets($Pointer, $this->MaxReadSize);
@@ -229,15 +267,15 @@ class ProxyRequest {
       }
 
       $Defaults = array(
-          'URL'            => NULL,
-          'ConnectTimeout' => 5,
-          'Timeout'        => 2,
-          'Redirects'      => TRUE,
-          'Recycle'        => FALSE,
-          'Cookies'        => TRUE,
-          'Headers'        => array(),
-          'CloseSession'   => TRUE,
-          'Redirected'     => FALSE
+          'URL'                  => NULL,
+          'ConnectTimeout'       => 5,
+          'Timeout'              => 2,
+          'Redirects'            => TRUE,
+          'Recycle'              => FALSE,
+          'RequestsPerPointer'   => 30,
+          'Cookies'              => TRUE,
+          'CloseSession'         => TRUE,
+          'Redirected'           => FALSE
       );
 
       $this->ResponseHeaders = array();
@@ -322,7 +360,7 @@ class ProxyRequest {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          
-         $Pointer = $this->FsockConnect($Host, 80, $ConnectTimeout, $Recycle);
+         $Pointer = $this->FsockConnect($Host, 80, $Options);
 
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();

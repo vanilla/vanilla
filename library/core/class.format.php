@@ -421,8 +421,9 @@ class Gdn_Format {
 
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
+      $FTimestamp = $Timestamp;
       if ($Session->UserID > 0)
-         $Timestamp += ($Session->User->HourOffset * 3600);
+         $FTimestamp += ($Session->User->HourOffset * 3600);
 
       if ($Format == '') {
          // If the timestamp was during the current day
@@ -443,11 +444,11 @@ class Gdn_Format {
 
       // Emulate %l and %e for Windows
       if (strpos($Format, '%l') !== false)
-          $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
+          $Format = str_replace('%l', ltrim(strftime('%I', $FTimestamp), '0'), $Format);
       if (strpos($Format, '%e') !== false)
-          $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
+          $Format = str_replace('%e', ltrim(strftime('%d', $FTimestamp), '0'), $Format);
 
-      return strftime($Format, $Timestamp);
+      return strftime($Format, $FTimestamp);
    }
    
    /**
@@ -532,6 +533,8 @@ class Gdn_Format {
    public static function FuzzyTime($Timestamp = NULL) {
       if (is_null($Timestamp))
          $Timestamp = time();
+      elseif (!is_numeric($Timestamp))
+         $Timestamp = self::ToTimestamp($Timestamp);
       
       $time = $Timestamp;
       //echo $time." is: ";
@@ -916,6 +919,10 @@ EOT;
     * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
     */
    public static function Seconds($Seconds) {
+      if (!is_numeric($Seconds)) {
+         $Seconds = abs(time() - self::ToTimestamp($Seconds));
+      }
+
       $Minutes = round($Seconds/60);
       $Hours = round($Seconds/3600);
       $Days = round($Seconds/86400);

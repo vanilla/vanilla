@@ -282,7 +282,7 @@ class FacebookPlugin extends Gdn_Plugin {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
-         array('AuthenticationKey' => 'Facebook'));
+         array('AuthenticationKey' => 'Facebook'), TRUE);
    }
 
    public function OnDisable() {

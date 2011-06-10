@@ -342,7 +342,7 @@ class SettingsController extends Gdn_Controller {
                try {
                   $this->CategoryModel->Delete($this->Category, $this->Form->GetValue('ReplacementCategoryID'));
                } catch (Exception $ex) {
-                  $this->Form->AddError($ex->getMessage());
+                  $this->Form->AddError($ex);
                }
                if ($this->Form->ErrorCount() == 0) {
                   $this->RedirectUrl = Url('vanilla/settings/managecategories');

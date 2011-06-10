@@ -1179,7 +1179,7 @@ class DiscussionModel extends VanillaModel {
 			->Set('CountBookmarks', $BookmarkCount)
 			->Where('DiscussionID', $DiscussionID)
 			->Put();
-			
+      $this->CountDiscussionBookmarks = $BookmarkCount;
 		
 		
 		// Prep and fire event	

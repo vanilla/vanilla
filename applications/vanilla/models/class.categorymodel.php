@@ -194,10 +194,6 @@ class CategoryModel extends Gdn_Model {
          
          // Delete the category
          $this->SQL->Delete('Category', array('CategoryID' => $Category->CategoryID));
-         
-         // If there is only one category, make sure that Categories are not used
-         $CountCategories = $this->Get()->NumRows();
-         SaveToConfig('Vanilla.Categories.Use', $CountCategories > 2);
       }
       // Make sure to reorganize the categories after deletes
       $this->RebuildTree();

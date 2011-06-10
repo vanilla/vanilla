@@ -450,8 +450,7 @@ class CategoryModel extends Gdn_Model {
       $this->SQL
          ->Select('c.*')
          ->From('Category c')
-         ->Where('c.UrlCode', $UrlCode)
-         ->Where('c.CategoryID >', 0);
+         ->Where('c.UrlCode', $UrlCode);
          
       $Data = $this->SQL
          ->Get()

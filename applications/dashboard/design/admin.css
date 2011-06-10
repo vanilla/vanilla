@@ -1220,7 +1220,7 @@ div.Popup h2 {
 	-moz-border-radius: 4px 4px 0 0;
 	font-size:14px;
 	font-weight:bold;
-	margin: -10px -10px 5px -10px;
+	margin: 0 0 5px 0;
 	color: #f8fdff;
 	background: url('images/dashboard-bg.png') top center repeat-x #014687;
 	border-bottom: 1px solid #000;

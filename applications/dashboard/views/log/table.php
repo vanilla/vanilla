@@ -73,6 +73,18 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                      UserAnchor($Row, 'Meta-Value', 'Record'),
                      '</span> ';
                }
+
+               // Write custom meta information.
+               $CustomMeta = GetValueR('Data._Meta', $Row, FALSE);
+               if (is_array($CustomMeta)) {
+                  foreach ($CustomMeta as $Key => $Value) {
+                     echo ' <span class="Meta">',
+                        '<span class="Meta-Label">'.T($Key).'</span> ',
+                        Wrap(htmlspecialchars($Value), 'span', array('class' => 'Meta-Value')),
+                        '</span>';
+
+                  }
+               }
               
                echo '</div>';
             ?>

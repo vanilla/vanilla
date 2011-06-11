@@ -11,12 +11,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Utility class that helps to render theme elements.
  *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
 class Gdn_Theme {
 

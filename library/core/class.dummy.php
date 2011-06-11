@@ -9,18 +9,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * A dummy class that returns itself on all method and property calls.
+ * A dummy class that returns itself on all method and property calls
+ * 
  * This class is useful for partial deliveries where parts of the page are not necessary,
  * but you don't want to have to check for them on every use.
  *
- * @author Todd Burry
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
-
 class Gdn_Dummy {
    public function __call ($Name, $Arguments ) {
       return $this;

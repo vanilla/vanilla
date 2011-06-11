@@ -11,13 +11,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * A template for handshake-aware authenticator classes.
  *
- * @author Tim Gunter
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.6
  */
-
 interface Gdn_IHandshake {
 
    /**

@@ -12,14 +12,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Handles install-side analytics gathering and sending.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
  * @since 2.0.17
- * @namespace Garden.Core
  */
-
 class Gdn_Statistics extends Gdn_Plugin {
    
    public function __construct() {

@@ -9,14 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * This is a cache implementation that caches nothing and always reports cache misses.
+ * This is a cache implementation that caches nothing and always reports cache misses
  * 
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.16
  */
- 
 class Gdn_Dirtycache extends Gdn_Cache {
    
    public function __construct() {

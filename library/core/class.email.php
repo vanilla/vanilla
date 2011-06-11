@@ -9,19 +9,22 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Object Representation of an email. All public methods return $this for
- * chaining purposes. ie. $Email->Subject('Hi')->Message('Just saying hi!')-
- * To('joe@vanillaforums.com')->Send();
+ * Object Representation of an email. 
+ * 
+ * All public methods return $this for chaining purposes. 
+ * ie. 
+ *   $Email
+ *     ->Subject('Hi')
+ *     ->Message('Just saying hi!')
+ *     ->To('joe@vanillaforums.com')
+ *     ->Send();
  *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @todo This class needs to be tested on a function mail server and with SMTP
- * @namespace Garden.Core
+ * @since 2.0
  */
-
 class Gdn_Email extends Gdn_Pluggable {
 
    /**

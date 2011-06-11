@@ -11,7 +11,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * A simple interface that all singletons must follow.
  *
- *
  * @author Mark O'Sullivan
  * @copyright 2009 Mark O'Sullivan
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -19,11 +18,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
-
-
-if (!defined('APPLICATION'))
-   exit();
-
 
 /**
  * A simple interface that all singletons must follow.

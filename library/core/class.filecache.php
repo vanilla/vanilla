@@ -11,12 +11,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * This is a cache implementation that stores its cache items in the filesystem.
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.16
  */
- 
 class Gdn_Filecache extends Gdn_Cache {
 
    const OPT_MOD_SPLIT = 65000;

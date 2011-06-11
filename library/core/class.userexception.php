@@ -9,7 +9,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * A wrapper for the Exception class so that methods can throw a specific application as a means of validation or user error, rather than a critical exception.
+ * UserException wrapper for control flow
+ * 
+ * A wrapper for the Exception class so that methods can throw a specific 
+ * exception as a means of validation or user error, rather than a critical 
+ * exception.
+ * 
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0.10
  */
 class Gdn_UserException extends Exception {
 	/** Constructs the Gdn_ApplicationException.

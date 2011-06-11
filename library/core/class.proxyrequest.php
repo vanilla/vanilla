@@ -8,8 +8,24 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+/**
+ * Wrapper for connecting to remote web systems and returning response
+ * 
+ * ProxyRequest allows developers to make encapsulated, reusable connections
+ * to remote systems and return the response as a string.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0.18
+ */
 class ProxyRequest {
    
+   /**
+    * Static cross-instance store of connection instances
+    * @var array
+    */
    protected static $ConnectionHandles;
    
    public $MaxReadSize = 4096;

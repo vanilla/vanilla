@@ -9,29 +9,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * The Pluggable class is extended by other classes to enable the plugins
- * and the custom event model in plugins. Any class that extends this class
- * has the ability to throw custom events at any time, which can then be
- * handled by plugins.
+ * The Pluggable class is extended by other classes to enable events
+ * 
+ * Any class that extends this class has the ability to throw custom events at 
+ * any time, which can then be handled by plugins.
  *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
- * The Pluggable class is extended by other classes to enable the plugins
- * and the custom event model in plugins. Any class that extends this class
- * has the ability to throw custom events at any time, which can then be
- * handled by plugins.
- *
- * @package Garden
+ * @since 2.0
  */
 abstract class Gdn_Pluggable extends Gdn_SliceProvider {
-
 
    /**
     * The name of the class that has been instantiated. Typically this will be

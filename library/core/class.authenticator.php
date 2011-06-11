@@ -9,19 +9,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * An abstract template for authenticator classes.
- *
+ * An abstract base class for authenticators
+ * 
+ * This class provides base functionality and sets up several abstract methods
+ * for all authenticators.
+ * 
  * @author Tim Gunter
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
- * An abstract template for authenticator classes.
- *
- * @package Garden
+ * @since 2.0.10
  */
 abstract class Gdn_Authenticator extends Gdn_Pluggable {
    

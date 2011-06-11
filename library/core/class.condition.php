@@ -9,13 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- *
- * @author Todd Burry
+ * 
+ * 
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
-
 class Gdn_Condition {
    const PERMISSION = 'permission';
    const REQUEST = 'request';
@@ -35,8 +36,11 @@ class Gdn_Condition {
    }
 
 
-   /** Convert the condition values in a given string to a conditions array.
-    *  This method is the opposite as Gdn_Condition::ToString().
+   /** 
+    * Convert the condition values in a given string to a conditions array.
+    * 
+    * This method is the opposite as Gdn_Condition::ToString().
+    * 
     * @param string $String
     * @return array A conditions array suitable to be passed to Gdn_Condition::Test().
     * @see Gdn_Condition::ToString().
@@ -54,7 +58,10 @@ class Gdn_Condition {
       return $Result;
    }
 
-   /** Test an array of conditions. This method only returns if every condition in the array is true.
+   /** 
+    * Test an array of conditions
+    * 
+    * This method only returns if every condition in the array is true.
     *
     * @param array $Conditions And array of conditons where each condition is itself an array with the following items:
     *  - 0: The type of condition. See the constants in Gdn_Condition for more information.
@@ -84,7 +91,8 @@ class Gdn_Condition {
          return FALSE;
    }
 
-   /** Test an individual condition.
+   /** 
+    * Test an individual condition.
     *
     * @param string $Type One of the types in this condition.
     * @param string $Field The field to test against.
@@ -136,7 +144,8 @@ class Gdn_Condition {
       return FALSE;
    }
 
-   /** Test a value against an expression.
+   /** 
+    * Test a value against an expression.
     *
     * @param mixed $Value The value to test.
     * @param string $Expr The expression to test against. The expression can have the following properties.
@@ -155,7 +164,8 @@ class Gdn_Condition {
       return $Result;
    }
 
-   /** Convert an array of conditions to a string.
+   /** 
+    * Convert an array of conditions to a string.
     *
     * @param array $Conditions An array of conditions. Each condition is itself an array.
     * @return string

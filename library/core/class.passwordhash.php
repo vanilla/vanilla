@@ -8,25 +8,16 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+include PATH_LIBRARY . '/vendors/phpass/PasswordHash.php';
+
 /**
  * Wrapper for the Portable PHP password hashing framework.
  *
  * @author Damien Lebrun
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-
-include PATH_LIBRARY . '/vendors/phpass/PasswordHash.php';
-
-
-/**
- * Wrapper for the Portable PHP password hashing framework.
- *
- * @namespace Garden.Core
+ * @since 2.0
  */
 class Gdn_PasswordHash extends PasswordHash {
 

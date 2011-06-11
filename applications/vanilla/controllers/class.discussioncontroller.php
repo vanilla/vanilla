@@ -329,6 +329,7 @@ class DiscussionController extends VanillaController {
       
       $this->SetJson('State', $State);
       $this->SetJson('CountBookmarks', $CountBookmarks);
+      $this->SetJson('CountDiscussionBookmarks', GetValue('CountDiscussionBookmarks', $this->DiscussionModel));
       $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
       $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
       $this->SetJson('MenuText', T('My Bookmarks'));

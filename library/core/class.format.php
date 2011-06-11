@@ -418,20 +418,31 @@ class Gdn_Format {
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
+      $Now = time();
+      
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
-      if ($Session->UserID > 0)
-         $Timestamp += ($Session->User->HourOffset * 3600);
+      if ($Session->UserID > 0) {
+         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+
+      $Html = FALSE;
+      if (strcasecmp($Format, 'html') == 0) {
+         $Format = '';
+         $Html = TRUE;
+      }
 
       if ($Format == '') {
          // If the timestamp was during the current day
-         if (date('Y m d', $Timestamp) == date('Y m d', time())) {
+         if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
             // Use the time format
             $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
-         } else if (date('Y', $Timestamp) == date('Y', time())) {
+         } else if (date('Y', $Timestamp) == date('Y', $Now)) {
             // If the timestamp is the same year, show the month and date
             $Format = T('Date.DefaultDayFormat', '%B %e');
-         } else if (date('Y', $Timestamp) != date('Y', time())) {
+         } else if (date('Y', $Timestamp) != date('Y', $Now)) {
             // If the timestamp is not the same year, just show the year
             $Format = T('Date.DefaultYearFormat', '%B %Y');
          } else {
@@ -440,13 +451,20 @@ class Gdn_Format {
          }
       }
 
-      // Emulate %l and %e for Windows
+      $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
+
+      // Emulate %l and %e for Windows.
       if (strpos($Format, '%l') !== false)
           $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
       if (strpos($Format, '%e') !== false)
           $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
 
-      return strftime($Format, $Timestamp);
+      $Result = strftime($Format, $Timestamp);
+
+      if ($Html) {
+         $Result = Wrap($Result, 'span', array('title' => strftime($FullFormat, $Timestamp)));
+      }
+      return $Result;
    }
    
    /**
@@ -531,6 +549,8 @@ class Gdn_Format {
    public static function FuzzyTime($Timestamp = NULL) {
       if (is_null($Timestamp))
          $Timestamp = time();
+      elseif (!is_numeric($Timestamp))
+         $Timestamp = self::ToTimestamp($Timestamp);
       
       $time = $Timestamp;
       //echo $time." is: ";
@@ -915,6 +935,10 @@ EOT;
     * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
     */
    public static function Seconds($Seconds) {
+      if (!is_numeric($Seconds)) {
+         $Seconds = abs(time() - self::ToTimestamp($Seconds));
+      }
+
       $Minutes = round($Seconds/60);
       $Hours = round($Seconds/3600);
       $Days = round($Seconds/86400);
@@ -1041,7 +1065,7 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $DateTime, $Matches)) {
+      if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];
@@ -1049,7 +1073,7 @@ EOT;
          $Minute = ArrayValue(5, $Matches, 0);
          $Second = ArrayValue(6, $Matches, 0);
          return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
-      } elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $DateTime, $Matches)) {
+      } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];

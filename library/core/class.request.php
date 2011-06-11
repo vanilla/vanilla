@@ -747,7 +747,7 @@ class Gdn_Request {
 
       if($Path == '') {
          $PathParts = explode('/', $this->Path());
-         $PathParts = array_map('urlencode', $PathParts);
+         $PathParts = array_map('rawurlencode', $PathParts);
          $Path = implode('/', $PathParts);
          // Grab the get parameters too.
          if (!$Query) {

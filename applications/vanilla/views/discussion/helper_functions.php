@@ -60,7 +60,13 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 			WriteOptionList($Object, $Sender, $Session);
 			?>
          <div class="CommentInfo">
-            <?php $Sender->FireEvent('CommentInfo'); ?>
+            <?php
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
+               echo ' '.IPAnchor($Object->InsertIPAddress).' ';
+            }
+
+            $Sender->FireEvent('CommentInfo');
+            ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>

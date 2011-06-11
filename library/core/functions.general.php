@@ -1715,7 +1715,7 @@ if (!function_exists('RandomString')) {
       $CharLen = strlen($Characters) - 1;
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;

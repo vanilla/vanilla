@@ -255,7 +255,6 @@ textarea.TextBox {
 select {
    font-family: arial;
    font-size: 14px;
-   color: #222;
    margin: 0;
    padding: 3px;
    }
@@ -568,7 +567,6 @@ form ul li {
    margin-bottom: 10px;
    padding: 0;
    font-size: 12px;
-   color: #555;
 }
 form ul li label {
    color: #000;
@@ -648,7 +646,6 @@ table tr.Last th {
 table th,
 table td {
    font-weight: normal;
-   color: #555;
    padding: 6px;
 }
 form ul li table label {
@@ -680,7 +677,7 @@ table.AltRows tbody tr.Enabled td.Info,
 table.AltColumns tbody tr.Enabled td.Info,
 table.AltRows tbody tr.Disabled td.Info,
 table.AltColumns tbody tr.Disabled td.Info {
-   color: #aaa;
+   color: #888;
 }
 table tbody td.Info span {
    padding: 0 6px;
@@ -1140,7 +1137,6 @@ body.Home #Content {
 	font-size: 20px;
 }
 
-
 /* =================================================================== Popups */
 div.Popup div.Messages {
    text-align: left;
@@ -1224,7 +1220,7 @@ div.Popup h2 {
 	-moz-border-radius: 4px 4px 0 0;
 	font-size:14px;
 	font-weight:bold;
-	margin-bottom: 0;
+	margin: 0 0 5px 0;
 	color: #f8fdff;
 	background: url('images/dashboard-bg.png') top center repeat-x #014687;
 	border-bottom: 1px solid #000;
@@ -1625,6 +1621,34 @@ div.Summary table tbody td {
    color: #fff;
 }
 
+.Tag-Spam {
+   background-color: #CF6E65;
+   color: #FFF6BF;
+}
+.Tag-Edit {
+   background-color: #F27527;
+}
+.Tag-Delete {
+   background-color: #C70028;
+}
+
+.Meta-Container {
+   margin-top: 10px;
+}
+
+.Meta-Container .Tags {
+   margin-right: 5px;
+}
+
+.Meta {
+   margin: 0 5px;
+   display: inline-block;
+}
+
+.Meta-Label {
+   color: #999;
+}
+
 .NumberedPager {
    font-size:16px;
    font-weight:bold;
@@ -1798,10 +1822,14 @@ ol.Sortable {
    text-align: center;
 }
 ins {
-   background: #DDFFDD;
+   background: #ddffdd;
+   color: #006600;
+   padding: 0 3px;
 }
 del {
-   background: #FFDDDD;
+   background: #ffeeee;
+   color: #bb0000;
+   padding: 0 3px;
 }
 
 

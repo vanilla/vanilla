@@ -153,6 +153,7 @@ function WriteFilterTabs(&$Sender) {
          
          echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
       }
+      $Sender->FireEvent('AfterBreadcrumbs');
       echo '</div>';
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))

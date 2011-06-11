@@ -115,6 +115,18 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('IPAnchor')) {
+   /**
+    * Returns an IP address with a link to the user search.
+    */
+   function IPAnchor($IP, $CssClass = '') {
+      if ($IP)
+         return Anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
+      else
+         return $IP;
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
@@ -132,13 +144,14 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = array()) {
-      $User = (object)$User;
-      
+   function UserAnchor($User, $CssClass = '', $Options = NULL) {
+      $Px = $Options;
+      $Name = GetValue($Px.'Name', $User, T('Unknown'));
+
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
    }
 }
 

@@ -110,6 +110,13 @@ class Gdn_Form extends Gdn_Pluggable {
    private $_IDCollection = array();
 
    /**
+    * @var mixed Undocumented 
+    * @since 2.0.18
+    * @access private
+    */
+   private $_NullValue;
+
+   /**
     * Constructor
     *
     * @param string $TableName
@@ -122,6 +129,8 @@ class Gdn_Form extends Gdn_Pluggable {
       
       // Get custom error class
       $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
+      // Values which will be converted into a real null
+      $this->_NullValue = C('Garden.Forms.NullValue');
       
       parent::__construct();
    }
@@ -1399,6 +1408,24 @@ class Gdn_Form extends Gdn_Pluggable {
    }
    
    /**
+    * Undocumented method.
+    * @todo Method needs a description.
+    */
+   public function NullValue($NewValue = NULL) {
+      if ($NewValue !== NULL) $this->_NullValue = $NewValue;
+      return $this->_NullValue;
+   }
+   
+   /**
+    * Undocumented method.
+    * @todo Method needs a description.
+    */
+   protected function _SetNullValue(&$Value, $FieldName) {
+      $Nulls = $this->NullValue();
+      if (is_array($Nulls) && in_array($Value, $Nulls, TRUE)) $Value = NULL;
+   }
+   
+   /**
     * If the form has been posted back, this method return an associative
     * array of $FieldName => $Value pairs which were sent in the form.
     *
@@ -1499,6 +1526,8 @@ class Gdn_Form extends Gdn_Pluggable {
                }
             }
          }
+         // Set desired values to null.
+         if (is_array($this->_NullValue)) array_walk($this->_FormValues, array($this, '_SetNullValue'));
       }
 
       // print_r($this->_FormValues);
@@ -1723,7 +1752,7 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($Valid === TRUE)
          return TRUE;
       else {
-         $this->AddError('@'.$Valid);
+         $this->AddError('@'.$Valid, $FieldName);
          return FALSE;
       }
       

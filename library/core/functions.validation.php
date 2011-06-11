@@ -33,6 +33,7 @@ if (!function_exists('ValidateCaptcha')) {
 
 if (!function_exists('ValidateRegex')) {
    function ValidateRegex($Value, $Regex) {
+      if ($Value === NULL) return TRUE;
       preg_match($Regex, $Value, $Matches);
       return is_array($Matches) && count($Matches) > 0 ? TRUE : FALSE;
    }
@@ -101,6 +102,7 @@ if (!function_exists('ValidateOldPassword')) {
 
 if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
+      if ($Value === NULL) return TRUE;
       $Result = PHPMailer::ValidateAddress($Value);
       $Result = (bool)$Result;
       return $Result;
@@ -109,9 +111,7 @@ if (!function_exists('ValidateEmail')) {
 
 if (!function_exists('ValidateWebAddress')) {
    function ValidateWebAddress($Value, $Field = '') {
-      if ($Value == '')
-         return TRUE; // Required picks up this error
-      
+      if ($Value === NULL) return TRUE; // Required picks up this error
       return filter_var($Value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== FALSE;
    }
 }
@@ -143,6 +143,7 @@ if (!function_exists('ValidateUsername')) {
 
 if (!function_exists('ValidateUrlString')) {
    function ValidateUrlString($Value, $Field = '') {
+      if ($Value === NULL) return TRUE;
       return ValidateRegex(
          $Value,
          '/^([\d\w_\-]+)?$/si'
@@ -222,7 +223,7 @@ if (!function_exists('ValidateBoolean')) {
 
 if (!function_exists('ValidateDecimal')) {
    function ValidateDecimal($Value, $Field) {
-       if (is_object($Field) && $Field->AllowNull && $Value === '') return TRUE;
+       if ($Value === NULL) return TRUE;
        return is_numeric($Value);
    }
 }

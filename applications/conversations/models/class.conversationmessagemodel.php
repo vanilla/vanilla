@@ -234,6 +234,7 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
             // ->Where('uc.LastMessageID', $MessageID)
             ->Where('uc.UserID <>', $Session->UserID)
+            ->Where('uc.Deleted', 0)
             ->Get();
 
          $ActivityModel = new ActivityModel();

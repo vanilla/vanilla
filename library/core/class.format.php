@@ -688,7 +688,7 @@ class Gdn_Format {
          } else {
             // The text does not contain html and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
-            $Result = htmlspecialchars($Mixed);
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -699,6 +699,55 @@ class Gdn_Format {
          
          return $Result;
       }
+   }
+
+   public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
+      $Regex = "`([<>])`i";
+      $Parts = preg_split($Regex, $Html, null, PREG_SPLIT_DELIM_CAPTURE);
+
+//      echo htmlspecialchars($Html);
+//      echo '<pre>';
+//      echo htmlspecialchars(print_r($Parts, TRUE));
+//      echo '</pre>';
+
+      $InTag = FALSE;
+      $InAnchor = FALSE;
+      $TagName = FALSE;
+
+      foreach ($Parts as $i => $Str) {
+         switch($Str) {
+            case '<':
+               $InTag = TRUE;
+               break;
+            case '>':
+               $InTag = FALSE;
+               break;
+            default;
+               if ($InTag) {
+                  if ($Str[0] == '/') {
+                     $TagName = preg_split('`\s`', substr($Str, 1), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = FALSE;
+                  } else {
+                     $TagName = preg_split('`\s`', trim($Str), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = TRUE;
+                  }
+               } else {
+                  if (!$InAnchor || !$SkipAnchors) {
+                     $Parts[$i] = call_user_func($Callback, $Str);
+                  }
+               }
+               break;
+         }
+      }
+
+//      return htmlspecialchars(implode('', $Parts));
+      return implode($Parts);
    }
 
    /** Formats the anchor tags around the links in text.
@@ -862,7 +911,7 @@ EOT;
          // Check for a custom formatter.
          $Formatter = Gdn::Factory('MentionsFormatter');
          if (is_object($Formatter)) {
-            return $Formatter->Format($Mixed);
+            return $Formatter->FormatMentions($Mixed);
          }
 
          // Handle @mentions.

@@ -95,7 +95,7 @@ class PostController extends VanillaController {
             }
             $aCategoryData[$CategoryID] = $CategoryName;
             $this->EventArguments['aCategoryData'] = &$aCategoryData;
-				$this->EventArguments['Category'] = &$Category;
+				$this->EventArguments['Category'] = $this->Category;
 				$this->FireEvent('AfterCategoryItem');
          }
          $this->CategoryData= $aCategoryData;

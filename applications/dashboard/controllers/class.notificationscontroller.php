@@ -56,7 +56,7 @@ class NotificationsController extends Gdn_Controller {
       
 		// Retrieve default preferences
 		$Preferences = array();
-		$DefaultPreferences = C('Preferences.Popup');
+		$DefaultPreferences = C('Preferences.Popup', array());
 		foreach ($DefaultPreferences as $Preference => $Val) {
 			if ($Val)
 				$Preferences[] = $Preference;

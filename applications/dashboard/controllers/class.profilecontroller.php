@@ -212,6 +212,13 @@ class ProfileController extends Gdn_Controller {
 
    public function Index($User = '', $Username = '', $UserID = '') {
       $this->GetUserInfo($User, $Username, $UserID);
+
+      if ($this->User->Admin == 2 && $this->Head) {
+         // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
+         $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+         $this->Head->AddTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
+      }
+
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications();
 		else

@@ -73,6 +73,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       // Make function work like it used to.
       $Args = func_get_args();
+      $SaveGig = FALSE;
       if (count($Args) > 5) {
          $Crop = GetValue(4, $Args, $Crop);
          $OutputType = GetValue(5, $Args, $OutputType);
@@ -83,6 +84,7 @@ class Gdn_UploadImage extends Gdn_Upload {
          $Crop = GetValue('Crop', $Options, $Crop);
          $OutputType = GetValue('OutputType', $Options, $OutputType);
          $ImageQuality = GetValue('ImageQuality', $Options, $ImageQuality);
+         $SaveGif = GetValue('SaveGif', $Options);
       }
 
       // Make sure type, height & width are properly defined.
@@ -152,49 +154,58 @@ class Gdn_UploadImage extends Gdn_Upload {
          $Width = $WidthSource;
       }
 
-      // Create GD image from the provided file, but first check if we have the necessary tools
-      $SourceImage = FALSE;
-      switch ($Type) {
-         case 1:
-            if (GetValue('GIF Read Support', $GdInfo) || GetValue('GIF Write Support', $GdInfo))
-               $SourceImage = imagecreatefromgif($Source);
-            break;
-         case 2:
-            if (GetValue('JPG Support', $GdInfo) || GetValue('JPEG Support', $GdInfo))
-               $SourceImage = imagecreatefromjpeg($Source);
-            break;
-         case 3:
-            if (GetValue('PNG Support', $GdInfo)) {
-               $SourceImage = imagecreatefrompng($Source);
-               imagealphablending($SourceImage, TRUE);
-            }
-            break;
+      $Process = TRUE;
+      if ($WidthSource <= $Width && $HeightSource <= $Height && $Type == 1 && $SaveGif) {
+         $Process = FALSE;
       }
-      
-      if (!$SourceImage)
-         throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
-      
-      // Create a new image from the raw source
-      if (function_exists('imagecreatetruecolor')) {
-         $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
-      } else
-         $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
 
-      if ($OutputType == 'png') {
-         imagealphablending($TargetImage, FALSE);
-         imagesavealpha($TargetImage, TRUE);
+      if ($Process) {
+         // Create GD image from the provided file, but first check if we have the necessary tools
+         $SourceImage = FALSE;
+         switch ($Type) {
+            case 1:
+               if (GetValue('GIF Read Support', $GdInfo) || GetValue('GIF Write Support', $GdInfo))
+                  $SourceImage = imagecreatefromgif($Source);
+               break;
+            case 2:
+               if (GetValue('JPG Support', $GdInfo) || GetValue('JPEG Support', $GdInfo))
+                  $SourceImage = imagecreatefromjpeg($Source);
+               break;
+            case 3:
+               if (GetValue('PNG Support', $GdInfo)) {
+                  $SourceImage = imagecreatefrompng($Source);
+                  imagealphablending($SourceImage, TRUE);
+               }
+               break;
+         }
+
+         if (!$SourceImage)
+            throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
+
+         // Create a new image from the raw source
+         if (function_exists('imagecreatetruecolor')) {
+            $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
+         } else
+            $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
+
+         if ($OutputType == 'png') {
+            imagealphablending($TargetImage, FALSE);
+            imagesavealpha($TargetImage, TRUE);
+         }
+
+         imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
+         imagedestroy($SourceImage);
+
+         // No need to check these, if we get here then whichever function we need will be available
+         if ($OutputType == 'gif')
+            imagegif($TargetImage, $TargetPath);
+         else if ($OutputType == 'png') {
+            imagepng($TargetImage, $TargetPath, (int)($ImageQuality/10));
+         } else
+            imagejpeg($TargetImage, $TargetPath, $ImageQuality);
+      } else {
+         copy($Source, $TargetPath);
       }
-         
-      imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
-      imagedestroy($SourceImage);
-      
-      // No need to check these, if we get here then whichever function we need will be available
-      if ($OutputType == 'gif')
-         imagegif($TargetImage, $TargetPath);
-      else if ($OutputType == 'png') {
-         imagepng($TargetImage, $TargetPath, (int)($ImageQuality/10));
-      } else
-         imagejpeg($TargetImage, $TargetPath, $ImageQuality);
 
       // Allow a plugin to move the file to a differnt location.
       $Sender = new stdClass();

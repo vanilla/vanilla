@@ -152,7 +152,7 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
-if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
+//if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
 	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
 	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
@@ -160,7 +160,7 @@ if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
 	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
-}
+//}
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

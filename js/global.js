@@ -1,18 +1,19 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
+   var d = new Date();
+   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getSeconds();
+
    // Set the ClientHour if there is an input looking for it.
    $('input:hidden[name$=ClientHour]').livequery(function() {
-      var d = new Date();
-      $(this).val(d.getHours());
+      $(this).val(clientDate);
    });
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {
-      var d = new Date();
       if (d.getHours() != $(this).val()) {
          $.post(
-            gdn.url('/utility/setclienthour/' + d.getHours() + '/' + gdn.definition('TransientKey')),
+            gdn.url('/utility/setclienthour/' + clientDate+ '/' + gdn.definition('TransientKey')),
             'DeliveryType=BOOL'
          );
       }
@@ -70,7 +71,7 @@ jQuery(document).ready(function($) {
    // current screen).
    if ($.fn.popup) {
       $('a.Popup').popup();
-		$('a.PopConfirm').popup({ 'confirm' : true, 'followConfirm' : true});
+		$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
    }
 
    $(".PopupWindow").live('click', function() {
@@ -140,7 +141,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout(function() { document.location.replace(RedirectUrl); }, 200);
+         setTimeout(function() {document.location.replace(RedirectUrl);}, 200);
       }
    }
 
@@ -347,7 +348,7 @@ jQuery(document).ready(function($) {
            $flyout.addClass('Progress');
             $.ajax({
                url: gdn.url(rel),
-               data: { DeliveryType: 'VIEW' },
+               data: {DeliveryType: 'VIEW'},
                success: function(data) {
                   $flyout.html(data);
                },
@@ -569,13 +570,13 @@ jQuery(document).ready(function($) {
 		if (!options['CssClass'])
 			options['CssClass'] = 'Dismissable AutoDismiss';
 		
-		gdn.inform({ 'InformMessages' : new Array(options) });
+		gdn.inform({'InformMessages' : new Array(options)});
 	}
    
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
-		informMessageStack = { 'InformMessages' : eval($.base64Decode(informMessageStack))};
+		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
 		gdn.inform(informMessageStack);
 	}
 	
@@ -588,7 +589,7 @@ jQuery(document).ready(function($) {
 			$.ajax({
 				type: "POST",
 				url: gdn.url('dashboard/notifications/inform'),
-				data: { 'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON' },
+				data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON'},
 				dataType: 'json',
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
@@ -609,7 +610,7 @@ jQuery(document).ready(function($) {
 		$.ajax({
 			type: "POST",
 			url: gdn.url('session/stash'),
-			data: { 'TransientKey' : gdn.definition('TransientKey'), 'Name' : name, 'Value' : value },
+			data: {'TransientKey' : gdn.definition('TransientKey'), 'Name' : name, 'Value' : value},
 			dataType: 'json',
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
 				gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');

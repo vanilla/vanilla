@@ -194,10 +194,6 @@ class CategoryModel extends Gdn_Model {
          
          // Delete the category
          $this->SQL->Delete('Category', array('CategoryID' => $Category->CategoryID));
-         
-         // If there is only one category, make sure that Categories are not used
-         $CountCategories = $this->Get()->NumRows();
-         SaveToConfig('Vanilla.Categories.Use', $CountCategories > 2);
       }
       // Make sure to reorganize the categories after deletes
       $this->RebuildTree();
@@ -432,7 +428,7 @@ class CategoryModel extends Gdn_Model {
       }
 
       // Single record or full list?
-      if (is_numeric($CategoryID) && $CategoryID > 0) {
+      if (is_numeric($CategoryID) && $CategoryID != 0) {
          return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
       } else {
          $CategoryData = $this->SQL->OrderBy('TreeLeft', 'asc')->Get();
@@ -454,8 +450,7 @@ class CategoryModel extends Gdn_Model {
       $this->SQL
          ->Select('c.*')
          ->From('Category c')
-         ->Where('c.UrlCode', $UrlCode)
-         ->Where('c.CategoryID >', 0);
+         ->Where('c.UrlCode', $UrlCode);
          
       $Data = $this->SQL
          ->Get()

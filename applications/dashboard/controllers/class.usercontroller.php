@@ -12,7 +12,7 @@ class UserController extends DashboardController {
 
    public $Uses = array('Database', 'Form');
 
-   public function Index($Keywords = '', $Page = '') {
+   public function Index($Keywords = '', $Page = '', $Order = '') {
       $this->Permission(
          array(
             'Garden.Users.Add',
@@ -53,7 +53,17 @@ class UserController extends DashboardController {
          $Filter = $Keywords;
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
-      $this->UserData = $UserModel->Search($Filter, 'u.Name', 'asc', $Limit, $Offset);
+
+      if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
+         $Order = 'u.'.$Order;
+         $OrderDir = 'desc';
+      } else {
+         $Order = 'u.Name';
+         $OrderDir = 'asc';
+      }
+
+
+      $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
@@ -160,9 +170,9 @@ class UserController extends DashboardController {
       $this->Render();
    }
 	
-   public function Browse($Keywords = '', $Page = '') {
+   public function Browse($Keywords = '', $Page = '', $Order = '') {
       $this->View = 'index';
-      $this->Index($Keywords, $Page);
+      $this->Index($Keywords, $Page, $Order = '');
    }
 
    public function Edit($UserID) {
@@ -323,6 +333,12 @@ class UserController extends DashboardController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
+   }
+
+   protected function _OrderUrl($Field) {
+      $Get = Gdn::Request()->Get();
+      $Get['order'] = $Field;
+      return Url('/dashboard/user?'.http_build_query($Get));
    }
 	
 	public function UsernameAvailable($Name = '') {

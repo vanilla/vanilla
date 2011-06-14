@@ -32,7 +32,7 @@ class SpamModel extends Gdn_Pluggable {
       // Set some information about the user in the data.
       TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
       
-      if ($RecordType == 'User') {
+      if ($RecordType == 'Registration') {
          TouchValue('Username', $Data, $Data['Name']);
       } else {
          TouchValue('Username', $Data, Gdn::Session()->User->Name);
@@ -42,8 +42,8 @@ class SpamModel extends Gdn_Pluggable {
       $Sp = self::_Instance();
       
       $Sp->EventArguments['RecordType'] = $RecordType;
-      $Sp->EventArguments['Data'] = $Data;
-      $Sp->EventArguments['Options'] = $Options;
+      $Sp->EventArguments['Data'] =& $Data;
+      $Sp->EventArguments['Options'] =& $Options;
       $Sp->EventArguments['IsSpam'] = FALSE;
 
       $Sp->FireEvent('CheckSpam');
@@ -51,7 +51,18 @@ class SpamModel extends Gdn_Pluggable {
 
       // Log the spam entry.
       if ($Spam && GetValue('Log', $Options, TRUE)) {
-         LogModel::Insert('Spam', $RecordType, $Data);
+         $LogOptions = array();
+         switch ($RecordType) {
+            case 'Registration':
+               $LogOptions['GroupBy'] = array('RecordIPAddress');
+               break;
+            case 'Comment':
+            case 'Discussion':
+               $LogOptions['GroupBy'] = array('RecordID');
+               break;
+         }
+
+         LogModel::Insert('Spam', $RecordType, $Data, $LogOptions);
       }
 
       return $Spam;

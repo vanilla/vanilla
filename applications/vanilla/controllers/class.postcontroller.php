@@ -70,34 +70,40 @@ class PostController extends VanillaController {
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
-      $this->Category = FALSE;
+      $Category = CategoryModel::Categories($this->CategoryID);
+      if (!$Category)
+         $Category = CategoryModel::Categories(-1);
+
+      $this->Category = (object)$Category;
+
       if ($UseCategories) {
-         $CategoryModel = new CategoryModel();
-         $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
+         $Categories = CategoryModel::Categories();
          $aCategoryData = array();
-         foreach ($CategoryData->Result() as $Category) {
-            if ($Category->CategoryID <= 0)
-               continue;
-            
-            if ($this->CategoryID == $Category->CategoryID)
-               $this->Category = $Category;
-            
-            $CategoryName = $Category->Name;   
-            if ($Category->Depth > 1) {
-               $CategoryName = '↳ '.$CategoryName;
-               $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
-               $CategoryName = str_replace(' ', '&#160;', $CategoryName);
+
+         foreach ($Categories as $CategoryID => $Category) {
+            if (!$DiscussionID || $this->CategoryID != $CategoryID) {
+               if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'])
+                  continue;
+
+               if ($Category['Archived'])
+                  continue;
             }
-            $aCategoryData[$Category->CategoryID] = $CategoryName;
+
+            $CategoryName = $Category['Name'];
+            if ($Category['Depth'] > 1) {
+               $CategoryName = str_pad($CategoryName, $Category['Depth'] - 2, '&#160;', STR_PAD_LEFT);
+            }
+            $aCategoryData[$CategoryID] = $CategoryName;
             $this->EventArguments['aCategoryData'] = &$aCategoryData;
-				$this->EventArguments['Category'] = &$Category;
+				$this->EventArguments['Category'] = $this->Category;
 				$this->FireEvent('AfterCategoryItem');
          }
-         $this->CategoryData = $aCategoryData;
+         $this->CategoryData= $aCategoryData;
       }
       
       // Check permission 
       if (isset($this->Discussion)) {
+         $Foo = 'bar';
          // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);

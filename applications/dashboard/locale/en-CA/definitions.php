@@ -139,6 +139,7 @@ $Definition['Date.DefaultFormat'] = '%B %e, %Y';
 $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
+$Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s New Plural'] = '%s new';
 

@@ -264,17 +264,22 @@ class UtilityController extends DashboardController {
       }
    }
 
-   public function SetClientHour($ClientHour = '', $TransientKey = '') {
+   public function SetClientHour($ClientDate = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
       $Success = FALSE;
+
+      $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
+
       if (
-			is_numeric($ClientHour)
+			is_numeric($ClientTimestamp)
 			&& $Session->UserID > 0
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientHour - date('G', time());
+			$HourOffset = $ClientTimestamp - time();
+         $HourOffset = round($HourOffset / 3600);
+
 			$UserModel->Update(array('HourOffset' => $HourOffset), array('UserID' => $Session->UserID));
 			$Success = TRUE;
       }

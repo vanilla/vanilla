@@ -679,7 +679,7 @@ class UserModel extends Gdn_Model {
                      if (strpos($Photo, '//'))
                         $PhotoUrl = $Photo;
                      else
-                        $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 't%s'));
+                        $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
 
                      AddActivity($UserID, 'PictureChange', Img($PhotoUrl, array('alt' => T('Thumbnail'))));
                   }
@@ -702,10 +702,10 @@ class UserModel extends Gdn_Model {
                // Report that the user was created
                $Session = Gdn::Session();
                AddActivity(
-                  $UserID,
+                  $Session->UserID,
                   GetValue('ActivityType', $Settings, 'JoinCreated'),
                   T('Welcome Aboard!'),
-                  $Session->UserID > 0 ? $Session->UserID : ''
+                  $UserID
                );
             }
             // Now update the role settings if necessary.
@@ -877,12 +877,12 @@ class UserModel extends Gdn_Model {
             );
          }
 
-         AddActivity(
-            $Session->UserID != 0 ? $Session->UserID : $UserID,
-            'RoleChange',
-            $Story,
-            $UserID
-         );
+//         AddActivity(
+//            $Session->UserID != 0 ? $Session->UserID : $UserID,
+//            'RoleChange',
+//            $Story,
+//            $UserID
+//         );
       }
    }
 
@@ -898,8 +898,13 @@ class UserModel extends Gdn_Model {
          unset($Where['Keywords']);
       }
 
-      // Check to see if the search exactly matches a role name.
-      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+      // Check for an IP address.
+      if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
+         $IPAddress = $Keywords;
+      } else {
+         // Check to see if the search exactly matches a role name.
+         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+      }
 
       $this->UserQuery();
       if ($ApplicantRoleID != 0) {
@@ -910,8 +915,14 @@ class UserModel extends Gdn_Model {
       if (isset($Where))
          $this->SQL->Where($Where);
 
-      if ($RoleID) {
+      if (isset($RoleID) && $RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } elseif (isset($IPAddress)) {
+         $this->SQL
+            ->BeginWhereGroup()
+            ->OrWhere('u.InsertIPAddress', $IPAddress)
+            ->OrWhere('u.LastIPAddress', $IPAddress)
+            ->EndWhereGroup();
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1032,7 +1043,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;
@@ -1103,7 +1114,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE)) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;
@@ -1156,7 +1167,7 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('User', $FormPostValues);
+         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
             $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
             return;

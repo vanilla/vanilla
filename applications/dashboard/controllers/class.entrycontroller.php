@@ -126,7 +126,7 @@ class EntryController extends Gdn_Controller {
       // Set up controller
       $this->View = 'auth/'.$Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default.
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
       $Target = $this->Target();
 
@@ -533,6 +533,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function Index() {
+      $this->View = 'SignIn';
       $this->SignIn();
    }
    
@@ -604,6 +605,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('entry.js');
       $this->SetData('Title', T('Sign In'));
 		$this->Form->AddHidden('Target', $this->Target());
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
       // Additional signin methods are set up with plugins.
       $Methods = array();
@@ -628,6 +630,10 @@ class EntryController extends Gdn_Controller {
             if (!$User) {
                $this->Form->AddError('ErrorCredentials');
             } else {
+               $ClientHour = $this->Form->GetFormValue('ClientHour');
+               $HourOffset = Gdn_Format::ToTimestamp($ClientHour) - time();
+               $HourOffset = round($HourOffset / 3600);
+
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
                if ($PasswordHash->CheckPassword($this->Form->GetFormValue('Password'), GetValue('Password', $User), GetValue('HashMethod', $User))) {
@@ -636,6 +642,10 @@ class EntryController extends Gdn_Controller {
                      $this->Form->AddError('ErrorPermission');
                      Gdn::Session()->End();
                   } else {
+                     if ($HourOffset != Gdn::Session()->User->HourOffset) {
+                        Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+                     }
+
                      $this->_SetRedirect();
                   }
                } else {
@@ -781,7 +791,7 @@ class EntryController extends Gdn_Controller {
       $this->View = 'handshake';
       $this->HandshakeScheme = $Authenticator->GetAuthenticationSchemeAlias();
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', $this->Target());
       
       $PreservedKeys = array(
@@ -925,7 +935,7 @@ class EntryController extends Gdn_Controller {
       // Make sure that the hour offset for new users gets defined when their account is created
       $this->AddJsFile('entry.js');
          
-      $this->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', $this->Target());
 
       $RegistrationMethod = $this->_RegistrationView();

@@ -889,6 +889,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
             break;
+         case 'exurl':
+            if (strpos($Field, '/') !== FALSE)
+               $Value = $Field;
+            $Result = ExternalUrl($Value);
+            break;
          case 'urlencode':
             $Result = urlencode($Value);
             break;

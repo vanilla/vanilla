@@ -145,34 +145,38 @@ class UtilityController extends DashboardController {
    }
 
    public function Update() {
-      // Check for permission or flood control.
-      // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-      $Now = time();
-      $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
+      try {
+         // Check for permission or flood control.
+         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+         $Now = time();
+         $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
 
-      if ($LastTime + (60 * 60 * 24) > $Now) {
-         // Check for flood control.
-         $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
-         if ($Count > 5) {
-            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-               // We are only allowing an update of 5 times every 24 hours.
-               throw PermissionException();
+         if ($LastTime + (60 * 60 * 24) > $Now) {
+            // Check for flood control.
+            $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
+            if ($Count > 5) {
+               if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+                  // We are only allowing an update of 5 times every 24 hours.
+                  throw PermissionException();
+               }
             }
+         } else {
+            $Count = 1;
          }
-      } else {
-         $Count = 1;
+         Gdn::Set('Garden.Update.LastTimestamp', $Now);
+         Gdn::Set('Garden.Update.Count', $Count);
+      } catch (Exception $e) {
+         
       }
-      Gdn::Set('Garden.Update.LastTimestamp', $Now);
-      Gdn::Set('Garden.Update.Count', $Count);
-
+      
       // Run the structure.
       $UpdateModel = new UpdateModel();
       $UpdateModel->RunStructure();
-
+      
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          SaveToConfig('Garden.Version', APPLICATION_VERSION);
       }
-
+      
       $this->SetData('Success', TRUE);
 
       $this->MasterView = 'empty';

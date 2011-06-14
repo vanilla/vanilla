@@ -349,8 +349,9 @@ class ProfileController extends Gdn_Controller {
             $Props = $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/p$Basename",
-               Gdn::Config('Garden.Profile.MaxHeight', 1000),
-               Gdn::Config('Garden.Profile.MaxWidth', 250)
+               C('Garden.Profile.MaxHeight', 1000),
+               C('Garden.Profile.MaxWidth', 250),
+               array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
             
@@ -369,7 +370,7 @@ class ProfileController extends Gdn_Controller {
                "userpics/$Subdir/n$Basename",
                $ThumbSize,
                $ThumbSize,
-               TRUE
+               array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             
          } catch (Exception $Ex) {

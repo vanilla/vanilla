@@ -533,6 +533,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function Index() {
+      $this->View = 'SignIn';
       $this->SignIn();
    }
    

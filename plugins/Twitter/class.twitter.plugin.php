@@ -71,10 +71,12 @@ class TwitterPlugin extends Gdn_Plugin {
 
       parse_str(GetValue(1, $UrlParts, ''), $Query);
       $Path = Gdn::Request()->Path();
-      $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
 
-//      if (isset($_GET['Target']))
-//         $Query['Target'] = $_GET['Target'];
+      $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+         if (ltrim($Target, '/') == 'entry/signin')
+            $Target = '/';
+      $Query['Target'] = $Target;
+
       if ($Popup)
          $Query['display'] = 'popup';
       $Result = $UrlParts[0].'?'.http_build_query($Query);

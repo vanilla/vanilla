@@ -12,19 +12,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
  *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
- * The Locale class is used to load, define, change, and render translations
- * for different locales. It is a singleton class.
- *
  * This class can be used through the Gdn object.
  * <b>Usage</b>:
  * <code>
@@ -32,6 +19,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * $String = T('Some Code', 'Default Text');
  * </code>
  *
+ * @author Mark O'Sullivan
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0
  * @see Gdn::Locale()
  * @see T()
  */

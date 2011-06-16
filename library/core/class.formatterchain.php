@@ -9,7 +9,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * This object facilitates chaining custom formatters for use in the Gdn_FormatObject.
+ * This object facilitates chaining custom formatters for use in the Gdn_Format object.
+ * 
  * A custom formatter is an object with a Format($String) method that formats a string in a particular way.
  * Certain calls to the various Gdn_Format methods (such as Html and To) will look for a custom formatter to use before formatting.
  *
@@ -17,6 +18,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *  - Create the object with a Format($String) method.
  *  - Call the static method Gdn_FormatterChain::Chain() to install it on top of the other formatter.
  *  - Depending on the priority you specified your formatter will be called before or after the existing formatter.
+ * 
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0
  */
 class Gdn_FormatterChain {
    /// Constants ///

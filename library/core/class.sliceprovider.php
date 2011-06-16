@@ -9,14 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Allows plugns and controllers to implement slices -- small asynchronously refreshable portions of the page
+ * Allows plugns and controllers to implement slices by extending a class
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
-
 class Gdn_SliceProvider {
 
    protected $SliceHandler;

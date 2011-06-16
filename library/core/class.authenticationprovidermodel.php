@@ -8,6 +8,15 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+/**
+ * Manages UserAuthenticationProviders
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0.10
+ */
 class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
    public function __construct() {

@@ -9,27 +9,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Represents, enforces integrity, and aids in the management of: data. This
- * generic model can be instantiated (with the table name it is intended to
+ * Represents, enforces integrity, and aids in the management of data from databases. 
+ * 
+ * This generic model can be instantiated (with the table name it is intended to
  * represent) and used directly, or it can be extended and overridden for more
  * complicated procedures related to different tables.
  *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
- * Represents, enforces integrity, and aids in the management of: data. This
- * generic model can be instantiated (with the table name it is intended to
- * represent) and used directly, or it can be extended and overridden for more
- * complicated procedures related to different tables.
- *
- * @package Garden
+ * @since 2.0
  */
 class Gdn_Model extends Gdn_Pluggable {
 

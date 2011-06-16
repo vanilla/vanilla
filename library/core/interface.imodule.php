@@ -10,21 +10,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * An interface for in-page modules.
- *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * 
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-
-/**
- * An interface for in-page modules.
- *
- * @package Garden
+ * @since 2.0
  */
 interface Gdn_IModule {
 //   public function __construct($Sender);

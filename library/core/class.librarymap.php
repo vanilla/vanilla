@@ -11,14 +11,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Handle the creation, usage, and deletion of file cache entries
  *
- * @author Tim Gunter
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.10
+ * @deprecated
  */
-
 class Gdn_LibraryMap {
    
    /**

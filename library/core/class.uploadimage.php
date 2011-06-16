@@ -10,6 +10,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * Handles uploading image files.
+ * 
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0
  */
 class Gdn_UploadImage extends Gdn_Upload {
 

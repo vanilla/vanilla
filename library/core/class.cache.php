@@ -9,13 +9,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- *
- * @author Tim Gunter
+ * Base class and facade for cache objects, and the cache layer itself.
+ * 
+ * This class serves two purposes: 
+ *  - As a base class for all cache objects to extends
+ *  - As a static facade providing a unified API for the cache layer
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.16
  */
- 
 abstract class Gdn_Cache {
    
    /**

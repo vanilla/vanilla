@@ -8,20 +8,18 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+if(!defined('VANILLA_FILE_PUT_FLAGS')) define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
+
 /**
  * Load files and either return their contents or send them to the browser.
  *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @author Mark O'Sullivan <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  * @todo Make this object deliver content with a save as dialogue.
  */
-
-if(!defined('VANILLA_FILE_PUT_FLAGS')) define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
-
 class Gdn_FileSystem {
 
    const O_CREATE = 1;

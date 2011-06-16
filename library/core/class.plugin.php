@@ -9,14 +9,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * A simple framework that all plugins should extend. Aside from the implementation of
- * Gdn_IPlugin, this class provides some convenience methods to make plugin development
- * easier and faster.
+ * Base class for plugins
+ * 
+ * Aside from the implementation of Gdn_IPlugin, this class provides some 
+ * convenience methods to make plugin development easier and faster. Plugins 
+ * that extend Gdn_Plugin can also throw events.
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.10
  */
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    

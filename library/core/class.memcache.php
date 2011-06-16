@@ -10,13 +10,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * This is a cache implementation that stores its cache items in memcached.
+ * 
+ * This cache object makes use of the 'Memcache' PECL extension and requires 
+ * that such an extension be installed.
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.16
  */
- 
 class Gdn_Memcache extends Gdn_Cache {
 
    const OPT_MOD_SPLIT = 65000;
@@ -31,6 +34,10 @@ class Gdn_Memcache extends Gdn_Cache {
    public function __construct() {
       parent::__construct();
       $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
+      
+      if (!class_exists('Memcache')) {
+         throw new Exception('PECL/Memcache was not found. See http://pecl.php.net/package/memcache');
+      }
       
       $this->Memcache = new Memcache;
       

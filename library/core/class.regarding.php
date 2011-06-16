@@ -9,16 +9,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
+ * Handles relating external actions to comments and discussions. 
+ * 
+ * Flagging, Praising, Reporting, etc
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0.18
  */
-
 class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
    public function __construct() {

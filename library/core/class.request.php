@@ -9,8 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
- * that can be accessed directly by the Dispatcher.
+ * Represents a Request to the application
+ * 
+ * Typically from the browser but potentially generated internally, in a format
+ * that can be accessed directly by the Dispatcher and other application objects.
  *
  * @method string RequestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
  * @method string RequestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
@@ -18,10 +20,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @method string RequestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
  * @method string RequestFolder($URI = NULL) Get/Set the Request script's Folder.
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
 class Gdn_Request {
 

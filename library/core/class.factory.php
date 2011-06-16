@@ -8,12 +8,21 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-
 /**
- * A factory used to create most objects in the core library.
- * If you have your own object that implements some base portion of the library you can install it in the factory
- * make sure your own object has the same properties/methods as the core object and then install it into this factory.
+ * A factory used to create most objects in the core library
+ * 
+ * If you have your own object that implements some base portion of the library 
+ * you can install it in the factory. Make sure your own object has the same 
+ * properties/methods as the core object and then install it into this factory.
  *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Garden
+ * @since 2.0
+ * 
  * @todo Localize the exception in this class.
  */
 class Gdn_Factory {

@@ -249,7 +249,13 @@ class FacebookPlugin extends Gdn_Plugin {
          }
 
          $Path = Gdn::Request()->Path();
-         $Args = array('Target' => GetValue('Target', $_GET, $Path ? $Path : '/'));
+
+         $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+         if (ltrim($Target, '/') == 'entry/signin')
+            $Target = '/';
+         $Args = array('Target' => $Target);
+
+
          $RedirectUri .= strpos($RedirectUri, '?') === FALSE ? '?' : '&';
          $RedirectUri .= http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;

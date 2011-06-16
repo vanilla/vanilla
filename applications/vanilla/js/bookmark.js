@@ -31,6 +31,8 @@ jQuery(document).ready(function($) {
                $(btn).attr('class', 'Bookmark');
                if (json.State == '1')
                   $(btn).addClass('Bookmarked');
+
+               $('.CountBookmarks', $(btn)).text(json.CountDiscussionBookmarks);
                   
             }
             $('a.MyBookmarks').html(json.MenuText+'<span>'+json.CountBookmarks+'</span>');

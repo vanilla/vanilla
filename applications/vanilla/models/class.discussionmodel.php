@@ -194,12 +194,19 @@ class DiscussionModel extends VanillaModel {
     * @param object $Data SQL result.
     */
    public function RemoveAnnouncements($Data) {
-      $Result = &$Data->Result();
+      $Result =& $Data->Result();
+      $Unset = FALSE;
+      
       foreach($Result as $Key => &$Discussion) {
          if ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
             // Unset discussions that are announced and not dismissed
             unset($Result[$Key]);
+            $Unset = TRUE;
          }
+      }
+      if ($Unset) {
+         // Make sure the discussions are still in order for json encoding.
+         $Result = array_values($Result);
       }
    }
    
@@ -1179,7 +1186,7 @@ class DiscussionModel extends VanillaModel {
 			->Set('CountBookmarks', $BookmarkCount)
 			->Where('DiscussionID', $DiscussionID)
 			->Put();
-			
+      $this->CountDiscussionBookmarks = $BookmarkCount;
 		
 		
 		// Prep and fire event	

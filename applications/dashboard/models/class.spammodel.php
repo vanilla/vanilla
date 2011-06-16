@@ -43,7 +43,7 @@ class SpamModel extends Gdn_Pluggable {
       
       $Sp->EventArguments['RecordType'] = $RecordType;
       $Sp->EventArguments['Data'] =& $Data;
-      $Sp->EventArguments['Options'] = $Options;
+      $Sp->EventArguments['Options'] =& $Options;
       $Sp->EventArguments['IsSpam'] = FALSE;
 
       $Sp->FireEvent('CheckSpam');

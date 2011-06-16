@@ -187,18 +187,21 @@ if (!function_exists('UserPhoto')) {
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
-      if ($User->Photo) {
-         if (!preg_match('`^https?://`i', $User->Photo)) {
-            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+
+      $Photo = $User->Photo;
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User);
+
+      if ($Photo) {
+         if (!preg_match('`^https?://`i', $Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
-            $PhotoUrl = $User->Photo;
+            $PhotoUrl = $Photo;
          }
          
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
             .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
             .'</a>';
-      } elseif (function_exists('UserPhotoDefault')) {
-         return UserPhotoDefault($User, $Options);
       } else {
          return '';
       }

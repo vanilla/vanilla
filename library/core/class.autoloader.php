@@ -244,6 +244,9 @@ class Gdn_Autoloader {
    
    public static function Lookup($ClassName, $Options = array()) {
       
+      if (!preg_match("/^[a-zA-Z0-9_\x7f-\xff]*$/", $ClassName))
+         return;
+      
       $MapType = self::GetMapType($ClassName);
       
       $DefaultOptions = array(

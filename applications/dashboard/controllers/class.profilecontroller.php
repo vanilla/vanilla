@@ -212,6 +212,13 @@ class ProfileController extends Gdn_Controller {
 
    public function Index($User = '', $Username = '', $UserID = '') {
       $this->GetUserInfo($User, $Username, $UserID);
+
+      if ($this->User->Admin == 2 && $this->Head) {
+         // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
+         $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+         $this->Head->AddTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
+      }
+
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications();
 		else
@@ -342,8 +349,9 @@ class ProfileController extends Gdn_Controller {
             $Props = $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/p$Basename",
-               Gdn::Config('Garden.Profile.MaxHeight', 1000),
-               Gdn::Config('Garden.Profile.MaxWidth', 250)
+               C('Garden.Profile.MaxHeight', 1000),
+               C('Garden.Profile.MaxWidth', 250),
+               array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
             
@@ -362,7 +370,7 @@ class ProfileController extends Gdn_Controller {
                "userpics/$Subdir/n$Basename",
                $ThumbSize,
                $ThumbSize,
-               TRUE
+               array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             
          } catch (Exception $Ex) {

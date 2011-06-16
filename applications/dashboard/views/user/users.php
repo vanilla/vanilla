@@ -25,8 +25,8 @@ foreach ($this->UserData->Result() as $User) {
          echo $RolesString;
          ?>
       </td>
-      <td class="Alt"><?php echo Gdn_Format::Date($User->DateFirstVisit); ?></td>
-      <td><?php echo Gdn_Format::Date($User->DateLastActive); ?></td>
+      <td class="Alt"><?php echo Gdn_Format::Date($User->DateFirstVisit, 'html'); ?></td>
+      <td><?php echo Gdn_Format::Date($User->DateLastActive, 'html'); ?></td>
       <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
       <?php
          $this->EventArgs['User'] = $User;

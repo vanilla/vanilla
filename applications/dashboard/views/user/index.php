@@ -24,11 +24,11 @@ echo $this->Form->Open(array('action' => Url('/user/browse')));
 <table id="Users" class="AltColumns">
    <thead>
       <tr>
-         <th><?php echo T('Username'); ?></th>
+         <th><?php echo Anchor(T('Username'), $this->_OrderUrl('Name')); ?></th>
          <th class="Alt"><?php echo T('Email'); ?></th>
          <th><?php echo T('Roles'); ?></th>
-         <th class="Alt"><?php echo T('First Visit'); ?></th>
-         <th><?php echo T('Last Visit'); ?></th>
+         <th class="Alt"><?php echo Anchor(T('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
+         <th><?php echo Anchor(T('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
          <th><?php echo T('Last IP'); ?></th>
          <?php
          $this->FireEvent('UserCell');

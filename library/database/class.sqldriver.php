@@ -1152,7 +1152,7 @@ abstract class Gdn_SQLDriver {
                unset($Set[$Key]);
                $Key = trim($Key, '`');
                
-               if (!$this->CaptureModifications && !isset($Row[$Key]))
+               if (!$this->CaptureModifications && !array_key_exists($Key,$Row))
                   continue;
 
                if (in_array($Key, array('DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID')))

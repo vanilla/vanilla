@@ -32,7 +32,7 @@ class vBulletinImportModel extends Gdn_Model {
     */
    public function ProcessAvatars() {
       $UploadImage = new Gdn_UploadImage();
-      $UserData = $this->SQL->Select('u.*')->From('User u')->Get();
+      $UserData = $this->SQL->Select('u.*')->From('User u')->Where('u.Photo is not null')->Get();
       foreach ($UserData->Result() as $User) {
          try {
             $Image = PATH_ROOT . DS . 'uploads' . DS . $User->Photo;

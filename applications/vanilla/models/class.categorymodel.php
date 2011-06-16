@@ -21,6 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoryModel extends Gdn_Model {
    public $Watching = FALSE;
+   public static $Categories = NULL;
 
    /**
     * Class constructor. Defines the related database table name.
@@ -53,10 +54,8 @@ class CategoryModel extends Gdn_Model {
       return $Watch;
    }
 
-   public static function &Categories($ID = FALSE) {
-      static $Categories = NULL;
-
-      if ($Categories == NULL) {
+   public static function Categories($ID = FALSE) {
+      if (self::$Categories == NULL) {
          $Sql = Gdn::SQL();
          $Sql = clone $Sql;
          $Session = Gdn::Session();
@@ -84,27 +83,25 @@ class CategoryModel extends Gdn_Model {
             $Category['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
             $Category['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          }
-         unset($Category);
+         self::$Categories = $Categories;
       }
 
       if ($ID !== FALSE) {
          if (!is_numeric($ID)) {
-            foreach ($Categories as $Category) {
+            foreach (self::$Categories as $Category) {
                if ($Category['UrlCode'] == $ID)
                   $ID = $Category['CategoryID'];
             }
          }
 
-         if (isset($Categories[$ID])) {
-            $Result =& $Categories[$ID];
+         if (isset(self::$Categories[$ID])) {
+            $Result = self::$Categories[$ID];
             return $Result;
          } else {
-            $NotFound = NULL;
-            $Result =& $NotFound;
-            return $Result;
+            return NULL;
          }
       } else {
-         $Result =& $Categories;
+         $Result = self::$Categories;
          return $Result;
       }
    }
@@ -291,46 +288,50 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
-    * Get all of the ancestor categorie above this one.
+    * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
     * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
     * @return array
     */
-   public static function GetAncestors($Category, $CheckPermissions = TRUE) {
+   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
       $Categories = self::Categories();
       $Result = array();
       
-      if (is_numeric($Category)) {
-         if (isset($Categories[$Category]))
-            $Category2 = $Categories[$Category];
+      // Grab the category by ID or url code.
+      if (is_numeric($CategoryID)) {
+         if (isset($Categories[$CategoryID]))
+            $Category = $Categories[$CategoryID];
       } else {
          foreach ($Categories as $ID => $Value) {
-            if ($Value['UrlCode'] == $Category) {
-               $Category2 = $Categories[$ID];
+            if ($Value['UrlCode'] == $CategoryID) {
+               $Category = $Categories[$ID];
                break;
             }
          }
       }
 
-      if (!isset($Category2))
+      if (!isset($Category))
          return $Result;
 
       // Build up the ancestor array by tracing back through parents.
-      $Result[$Category2['CategoryID']] = $Category2;
+      $Result[$Category['CategoryID']] = $Category;
       $Max = 20;
-      while (isset($Category2['Parent'])) {
-         if ($CheckPermissions && !$Category2['PermsDiscussionsView'])
-            return;
+      while (isset($Categories[$Category['ParentCategoryID']])) {
+         if ($CheckPermissions && !$Category['PermsDiscussionsView'])
+            continue;
+         
+         if ($Category['CategoryID'] == -1)
+            break;
 
-         if (is_numeric($Category))
-            $ID = $Category2['CategoryID'];
+         // Return by ID or code.
+         if (is_numeric($CategoryID))
+            $ID = $Category['CategoryID'];
          else
-            $ID = $Category2['UrlCode'];
+            $ID = $Category['UrlCode'];
 
-         $Result[$ID] = $Category2;
-         unset($Result[$ID]['Parent'], $Result[$ID]['Children']);
+         $Result[$ID] = $Category;
 
-         $Category2 = $Category2['Parent'];
+         $Category = $Categories[$Category['ParentCategoryID']];
 
          // Check for an infinite loop.
          if ($Max <= 0)
@@ -911,7 +912,7 @@ class CategoryModel extends Gdn_Model {
             else
                $Category['Read'] = FALSE;
          }
-         $Category['Children'] = array();
+         $Category['ChildIDs'] = array();
 		}
       
       $Keys = array_reverse(array_keys($Data));
@@ -919,13 +920,10 @@ class CategoryModel extends Gdn_Model {
          $Cat = $Data[$Key];
          $ParentID = $Cat['ParentCategoryID'];
 
-         if (isset($Data[$ParentID])) {
+         if (isset($Data[$ParentID]) && $ParentID != $Key) {
             $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
             $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
-            $Data[$ParentID]['Children'][] =& $Data[$Key];
-
-            if ($ParentID != $Cat['CategoryID'])
-               $Data[$Key]['Parent'] =& $Data[$ParentID];
+            $Data[$ParentID]['ChildIDs'][] = $Key;
          }
       }
 	}

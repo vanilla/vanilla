@@ -832,7 +832,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && $Format != 'url') {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {

@@ -88,7 +88,7 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 Gdn::Config()->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
-if (!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
+if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
    header('location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
@@ -164,7 +164,9 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
-Gdn::Authenticator()->StartAuthenticator();
+// Only run authenticators if Garden is fully installed
+if (Gdn::Config('Garden.Installed', FALSE))
+   Gdn::Authenticator()->StartAuthenticator();
 
 // Include a user-defined bootstrap.
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))

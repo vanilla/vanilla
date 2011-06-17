@@ -72,7 +72,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                $CommentIDs[] = str_replace('Comment_', '', $Comment);
          }
       }
-      // Load category data
+      // Load category data.
       $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if ($Sender->ShowCategorySelector) {
          $CategoryModel = new CategoryModel();
@@ -120,7 +120,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             // Update counts on both discussions
             $CommentModel = new CommentModel();
             $CommentModel->UpdateCommentCount($DiscussionID);
-            $CommentModel->UpdateUserCommentCounts($DiscussionID);
+//            $CommentModel->UpdateUserCommentCounts($DiscussionID);
             $CommentModel->UpdateCommentCount($NewDiscussionID);
    
             // Clear selections

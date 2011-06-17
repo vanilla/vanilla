@@ -189,7 +189,8 @@ class SplitMergePlugin extends Gdn_Plugin {
                   );
                   $CommentModel->Save(array(
                      'DiscussionID' => $DiscussionID,
-                     'Body' => sprintf(T('This discussion was merged into %s'), $DiscussionAnchor)
+                     'Body' => sprintf(T('This discussion was merged into %s'), $DiscussionAnchor),
+                     'Format' => 'Html'
                   ));
                   // Close non-merge discussions
                   $CommentModel->SQL->Update('Discussion')->Set('Closed', '1')->Where('DiscussionID', $DiscussionID)->Put();
@@ -197,7 +198,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    
                // Update counts on all affected discussions
                $CommentModel->UpdateCommentCount($DiscussionID);
-               $CommentModel->UpdateUserCommentCounts($DiscussionID);
+//               $CommentModel->UpdateUserCommentCounts($DiscussionID);
             }
    
             // Clear selections

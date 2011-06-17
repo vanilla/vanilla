@@ -785,8 +785,9 @@ class DiscussionModel extends VanillaModel {
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
             } else {
-               // Inserting
-					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+               // Inserting.
+               if (!GetValue('Format', $Fields))
+                  $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);

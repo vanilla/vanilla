@@ -534,8 +534,9 @@ class CommentModel extends VanillaModel {
                // Save the new value.
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
-               // Make sure that the comments get formatted in the method defined by Garden
-               $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+               // Make sure that the comments get formatted in the method defined by Garden.
+               if (!GetValue('Format', $Fields))
+                  $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Comment', $Fields);

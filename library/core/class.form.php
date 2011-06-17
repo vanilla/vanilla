@@ -56,7 +56,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    If a model is assigned, the model name is used instead.
     * @access public
     */
-   public $InputPrefix = '';
+   public $InputPrefix = 'Form';
 
    /**
     * @var string Form submit method. Options are 'post' or 'get'.
@@ -1274,7 +1274,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // forms sent with "get" method do not require authentication.
       //   return TRUE;
       //} else {
-      $KeyName = ConcatSep('/', $this->InputPrefix, 'TransientKey');
+      $KeyName = $this->InputPrefix . '/TransientKey';
       $PostBackKey = isset($_POST[$KeyName]) ? $_POST[$KeyName] : FALSE;
       $Session = Gdn::Session();
       // DEBUG:
@@ -1655,8 +1655,7 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function SetModel($Model, $DataSet = FALSE) {
       $this->_Model = $Model;
-      if (!empty($this->InputPrefix) && $Model->Name != $this->InputPrefix)
-         $this->InputPrefix = $Model->Name;
+      $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
    

@@ -66,7 +66,7 @@
          $.ajax({
             type: "POST",
             url: self.page_source,
-            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&TransientKey=' + gdn.definition('TransientKey', '') + self.extra_pager_data,
+            data: 'DeliveryType=VIEW&DeliveryMethod=JSON&Form/TransientKey=' + gdn.definition('TransientKey', '') + self.extra_pager_data,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                // Popup the error

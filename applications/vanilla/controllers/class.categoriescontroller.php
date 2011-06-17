@@ -77,7 +77,7 @@ class CategoriesController extends VanillaController {
          return $this->Discussions();
       }
 			
-		// Load the breadcrumbs
+		// Load the breadcrumbs.
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
       
       $this->SetData('Category', $Category, TRUE);

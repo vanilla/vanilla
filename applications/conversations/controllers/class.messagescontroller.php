@@ -280,7 +280,7 @@ class MessagesController extends ConversationsController {
       
       // Get limit
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
-         $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
+         $Limit = C('Conversations.Messages.PerPage', 50);
       
       // Calculate counts
       if (!is_numeric($this->Offset) || $this->Offset < 0) {

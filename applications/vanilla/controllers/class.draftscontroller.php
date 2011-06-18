@@ -51,7 +51,7 @@ class DraftsController extends VanillaController {
          $Offset = 0;
       
       // Set criteria & get drafts data
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      $Limit = C('Vanilla.Discussions.PerPage', 30);
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
       $this->DraftData = $this->DraftModel->Get($Session->UserID, $Offset, $Limit);

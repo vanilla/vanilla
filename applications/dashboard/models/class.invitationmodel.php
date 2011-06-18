@@ -118,7 +118,7 @@ class InvitationModel extends Gdn_Model {
          // Some information for the email
          $RegistrationUrl = ExternalUrl("entry/register/{$Invitation->Code}");
          
-         $AppTitle = Gdn::Config('Garden.Title');
+         $AppTitle = C('Garden.Title');
          $Email = new Gdn_Email();
          $Email->Subject(sprintf(T('[%s] Invitation'), $AppTitle));
          $Email->To($Invitation->Email);

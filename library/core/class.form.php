@@ -1016,8 +1016,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= $this->Hidden('TransientKey',
             array('value' => $Session->TransientKey()));
          // Also add a honeypot if Forms.HoneypotName has been defined
-         $HoneypotName = Gdn::Config(
-            'Garden.Forms.HoneypotName');
+         $HoneypotName = C('Garden.Forms.HoneypotName');
          if ($HoneypotName) $Return .= $this->Hidden($HoneypotName,
             array('Name' => $HoneypotName, 'style' => "display: none;"));
       }

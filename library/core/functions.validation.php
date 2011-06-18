@@ -25,7 +25,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!function_exists('ValidateCaptcha')) {
    function ValidateCaptcha($Value) {
-      $CaptchaPrivateKey = Gdn::Config('Garden.Registration.CaptchaPrivateKey', '');
+      $CaptchaPrivateKey = C('Garden.Registration.CaptchaPrivateKey', '');
       $Response = recaptcha_check_answer($CaptchaPrivateKey, ArrayValue('REMOTE_ADDR', $_SERVER, ''), ArrayValue('recaptcha_challenge_field', $_POST, ''), ArrayValue('recaptcha_response_field', $_POST, ''));
       return $Response->is_valid ?  TRUE : 'The reCAPTCHA value was not entered correctly. Please try again.';
    }

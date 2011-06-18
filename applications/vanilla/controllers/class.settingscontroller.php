@@ -72,14 +72,14 @@ class SettingsController extends Gdn_Controller {
 			$ConfigurationModel->Validation->ApplyRule('Garden.EditContentTimeout', 'Integer');
 			
 			// Grab old config values to check for an update.
-			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
-			$ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+			$ArchiveDateBak = C('Vanilla.Archive.Date');
+			$ArchiveExcludeBak = (bool)C('Vanilla.Archive.Exclude');
 			
 			// Save new settings
 			$Saved = $this->Form->Save();
 			if($Saved) {
-				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
-				$ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+				$ArchiveDate = C('Vanilla.Archive.Date');
+				$ArchiveExclude = (bool)C('Vanilla.Archive.Exclude');
 				
 				if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
 					$DiscussionModel = new DiscussionModel();

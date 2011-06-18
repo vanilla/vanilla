@@ -56,7 +56,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Tag = urldecode(GetValue('0', $Sender->RequestArgs, ''));
          $Page = GetValue('1', $Sender->RequestArgs, 'p1');
       }
-      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
    
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));

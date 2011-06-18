@@ -76,7 +76,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
          $this->_ThemeFolder = $Sender->Theme;
       } else {
          $this->_ApplicationFolder = 'dashboard';
-         $this->_ThemeFolder = Gdn::Config('Garden.Theme');
+         $this->_ThemeFolder = C('Garden.Theme');
       }
       if ($ApplicationFolder !== FALSE)
          $this->_ApplicationFolder = $ApplicationFolder;

@@ -116,7 +116,7 @@ class DiscussionModel extends VanillaModel {
     */
    public function Get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = NULL) {
       if ($Limit == '') 
-         $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
+         $Limit = C('Vanilla.Discussions.PerPage', 50);
 
       $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
       
@@ -246,7 +246,7 @@ class DiscussionModel extends VanillaModel {
     */
 	public function AddDiscussionColumns($Data) {
 		// Change discussions based on archiving.
-		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
+		$ArchiveTimestamp = Gdn_Format::ToTimestamp(C('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
@@ -291,9 +291,9 @@ class DiscussionModel extends VanillaModel {
 		if(is_null($Sql))
 			$Sql = $this->SQL;
 		
-		$Exclude = Gdn::Config('Vanilla.Archive.Exclude');
+		$Exclude = C('Vanilla.Archive.Exclude');
 		if($Exclude) {
-			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+			$ArchiveDate = C('Vanilla.Archive.Date');
 			if($ArchiveDate) {
 				$Sql->Where('d.DateLastComment >', $ArchiveDate);
 			}
@@ -311,7 +311,7 @@ class DiscussionModel extends VanillaModel {
 	 */
    public function GetAnnouncements($Wheres = '') {
       $Session = Gdn::Session();
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
+      $Limit = C('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
 
@@ -583,7 +583,7 @@ class DiscussionModel extends VanillaModel {
 		if (
 			$Data
          && $Data->DateLastComment
-			&& Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0))
+			&& Gdn_Format::ToTimestamp($Data->DateLastComment) <= Gdn_Format::ToTimestamp(C('Vanilla.Archive.Date', 0))
 		) {
 			$Data->Closed = '1';
 		}
@@ -718,7 +718,7 @@ class DiscussionModel extends VanillaModel {
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
-      $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
+      $MaxCommentLength = C('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
          $this->Validation->ApplyRule('Body', 'Length');
@@ -787,7 +787,7 @@ class DiscussionModel extends VanillaModel {
             } else {
                // Inserting.
                if (!GetValue('Format', $Fields))
-                  $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+                  $Fields['Format'] = C('Garden.InputFormatter', '');
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
@@ -942,8 +942,8 @@ class DiscussionModel extends VanillaModel {
     */
    public function UpdateDiscussionCount($CategoryID) {
 		if(strcasecmp($CategoryID, 'All') == 0) {
-			$Exclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
-			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+			$Exclude = (bool)C('Vanilla.Archive.Exclude');
+			$ArchiveDate = C('Vanilla.Archive.Date');
 			$Params = array();
 			$Where = '';
 			

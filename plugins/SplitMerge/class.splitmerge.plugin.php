@@ -68,7 +68,7 @@ class SplitMergePlugin extends Gdn_Plugin {
       $CommentIDs = array();
       foreach ($CheckedComments as $DiscID => $Comments) {
          foreach ($Comments as $Comment) {
-            if (substr($Comment, 0, 8) == 'Comment_' && $DiscID == $DiscussionID)
+            if ($DiscID == $DiscussionID)
                $CommentIDs[] = str_replace('Comment_', '', $Comment);
          }
       }
@@ -130,6 +130,8 @@ class SplitMergePlugin extends Gdn_Plugin {
             ModerationController::InformCheckedComments($Sender);
             $Sender->RedirectUrl = Url('discussion/'.$NewDiscussionID.'/'.Gdn_Format::Url($Data['Name']));
          }
+      } else {
+         $Sender->Form->SetValue('CategoryID', GetValue('CategoryID', $Discussion));
       }
       
       $Sender->Render($this->GetView('splitcomments.php'));

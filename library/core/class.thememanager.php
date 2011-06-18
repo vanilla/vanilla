@@ -319,7 +319,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    }
    
    public function EnabledTheme() {
-      $ThemeName = Gdn::Config('Garden.Theme', 'default');
+      $ThemeName = C('Garden.Theme', 'default');
       return $ThemeName;
    }
    

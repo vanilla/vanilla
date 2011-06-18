@@ -1076,8 +1076,8 @@ abstract class Gdn_SQLDriver {
          if ($Request == 'Version') {
             $this->_DatabaseInfo['Version'] = $this->Version();
          } else {
-            $this->_DatabaseInfo['HostName'] = Gdn::Config('Database.Host', '');
-            $this->_DatabaseInfo['DatabaseName'] = Gdn::Config('Database.Name', '');
+            $this->_DatabaseInfo['HostName'] = C('Database.Host', '');
+            $this->_DatabaseInfo['DatabaseName'] = C('Database.Name', '');
          }
       }
       if (array_key_exists($Request, $this->_DatabaseInfo) === TRUE) {

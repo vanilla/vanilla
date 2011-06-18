@@ -89,11 +89,11 @@ class Gdn_ApplicationManager {
     */
    public function EnabledApplications() {
       if (!is_array($this->_EnabledApplications)) {
-         $EnabledApplications = Gdn::Config('EnabledApplications', array('Dashboard' => 'dashboard'));
+         $EnabledApplications = C('EnabledApplications', array('Dashboard' => 'dashboard'));
          // Add some information about the applications to the array.
          foreach($EnabledApplications as $Name => $Folder) {
             $EnabledApplications[$Name] = array('Folder' => $Folder);
-            //$EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
+            //$EnabledApplications[$Name]['Version'] = C($Name.'.Version', '');
             $EnabledApplications[$Name]['Version'] = '';
             $EnabledApplications[$Name]['Index'] = $Name;
             // Get the application version from it's about file.
@@ -145,7 +145,7 @@ class Gdn_ApplicationManager {
     * @todo Undocumented method.
     */
    public function EnabledApplicationFolders() {
-      $EnabledApplications = Gdn::Config('EnabledApplications', array());
+      $EnabledApplications = C('EnabledApplications', array());
       $EnabledApplications['Dashboard'] = 'dashboard';
       return array_values($EnabledApplications);
    }

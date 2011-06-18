@@ -4,7 +4,7 @@ if (!is_array($this->Roles))
    $this->Roles = array();
 
 $this->FireEvent('BeforeInfo');
-if (Gdn::Config('Garden.Profile.ShowAbout')) {
+if (C('Garden.Profile.ShowAbout')) {
 ?>
 <div class="Info About">
    <h3><?php echo T('Basic Information'); ?></h3>

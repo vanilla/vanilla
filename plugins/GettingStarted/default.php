@@ -93,16 +93,16 @@ class GettingStartedPlugin extends Gdn_Plugin {
    // Record when the various actions are taken
    // 1. If the user edits the registration settings
    public function SaveStep($Step) {
-      if (Gdn::Config($Step, '') != '1')
+      if (C($Step, '') != '1')
          SaveToConfig($Step, '1');
          
       // If all of the steps are now completed, disable this plugin
       if (
-         Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1'
+         C('Plugins.GettingStarted.Registration', '0') == '1'
+         && C('Plugins.GettingStarted.Plugins', '0') == '1'
+         && C('Plugins.GettingStarted.Categories', '0') == '1'
+         && C('Plugins.GettingStarted.Profile', '0') == '1'
+         && C('Plugins.GettingStarted.Discussion', '0') == '1'
       ) {
          Gdn::PluginManager()->DisablePlugin('GettingStarted');
       }

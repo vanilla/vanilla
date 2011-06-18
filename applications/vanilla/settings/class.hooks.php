@@ -261,7 +261,7 @@ class VanillaHooks implements Gdn_IPlugin {
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      $Limit = C('Vanilla.Discussions.PerPage', 30);
       $CommentModel = new CommentModel();
       $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
       $CountComments = $Offset + $Sender->CommentData->NumRows();
@@ -319,7 +319,7 @@ class VanillaHooks implements Gdn_IPlugin {
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
       
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      $Limit = C('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('d.InsertUserID' => $Sender->User->UserID));
       $CountDiscussions = $Offset + $Sender->DiscussionData->NumRows();
@@ -396,7 +396,7 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Setup() {
       $Database = Gdn::Database();
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
+      $Drop = C('Vanilla.Version') === FALSE ? TRUE : FALSE;
       $Explicit = TRUE;
       
       // Call structure.php to update database

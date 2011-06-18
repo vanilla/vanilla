@@ -2002,7 +2002,7 @@ if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
-      	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+      	if(is_null($Charset)) $Charset = C('Garden.Charset', 'utf-8');
       	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
       } else {
          $Trim = substr($String, 0, $Length);

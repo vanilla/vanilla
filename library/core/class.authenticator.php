@@ -228,7 +228,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
       $TokenSecret = sha1(md5(implode('.',array($TokenKey,mt_rand(0,100000)))));
       $Timestamp = time();
       
-      $Lifetime = Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60);
+      $Lifetime = C('Garden.Authenticators.handshake.TokenLifetime', 60);
       if ($Lifetime == 0 && $TokenType == 'request')
          $Lifetime = 300;
       

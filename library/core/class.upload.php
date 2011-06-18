@@ -70,8 +70,8 @@ class Gdn_Upload extends Gdn_Pluggable {
 	}
 
 	public function Clear() {
-		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
-		$this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
+		$this->_MaxFileSize = self::UnformatFileSize(C('Garden.Upload.MaxFileSize', ''));
+		$this->_AllowedFileExtensions = C('Garden.Upload.AllowedFileExtensions', array());
 	}
 
    /**

@@ -129,7 +129,7 @@ class DraftModel extends VanillaModel {
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
-      $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
+      $MaxCommentLength = C('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
          $this->Validation->ApplyRule('Body', 'Length');

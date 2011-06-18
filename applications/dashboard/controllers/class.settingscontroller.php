@@ -297,7 +297,7 @@ class SettingsController extends DashboardController {
          // If changing locale, redefine locale sources:
          /*
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
-         if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
+         if ($NewLocale !== FALSE && C('Garden.Locale') != $NewLocale) {
             $ApplicationManager = new Gdn_ApplicationManager();
             $Locale = Gdn::Locale();
             $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
@@ -374,7 +374,7 @@ class SettingsController extends DashboardController {
       // Check to see if the application needs to phone-home for updates. Doing
       // this here because this method is always called when admin pages are
       // loaded regardless of the application loading them.
-      $UpdateCheckDate = Gdn::Config('Garden.UpdateCheckDate', '');
+      $UpdateCheckDate = C('Garden.UpdateCheckDate', '');
       if (
          $UpdateCheckDate == '' // was not previous defined
          || !IsTimestamp($UpdateCheckDate) // was not a valid timestamp
@@ -531,7 +531,7 @@ class SettingsController extends DashboardController {
       
       // Loop through all of the available plugins and mark them if they have an update available
       // Retrieve the list of plugins that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
       if (is_array($RequiredUpdates)) {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))
@@ -612,17 +612,17 @@ class SettingsController extends DashboardController {
       $this->SetData('_Roles', ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'RoleID', 'Name'));
       
       // Get the currently selected default roles
-      // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
+      // $this->ExistingRoleData = C('Garden.Registration.DefaultRoles');
       // if (is_array($this->ExistingRoleData) === FALSE)
       //    $this->ExistingRoleData = array();
          
       // Get currently selected InvitationOptions
-      $this->ExistingRoleInvitations = Gdn::Config('Garden.Registration.InviteRoles');
+      $this->ExistingRoleInvitations = C('Garden.Registration.InviteRoles');
       if (is_array($this->ExistingRoleInvitations) === FALSE)
          $this->ExistingRoleInvitations = array();
          
       // Get the currently selected Expiration Length
-      $this->InviteExpiration = Gdn::Config('Garden.Registration.InviteExpiration', '');
+      $this->InviteExpiration = C('Garden.Registration.InviteExpiration', '');
       
       // Registration methods.
       $this->RegistrationMethods = array(
@@ -815,7 +815,7 @@ class SettingsController extends DashboardController {
       
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
+      $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
       if (is_array($RequiredUpdates)) {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))

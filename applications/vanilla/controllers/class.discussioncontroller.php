@@ -250,7 +250,7 @@ class DiscussionController extends VanillaController {
       
       // Figure out how many comments are before this one
       $Offset = $this->CommentModel->GetOffset($Comment);
-      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+      $Limit = C('Vanilla.Comments.PerPage', 50);
       
       // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
       //$Offset = floor($Offset / $Limit) * $Limit;

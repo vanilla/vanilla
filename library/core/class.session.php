@@ -257,7 +257,7 @@ class Gdn_Session {
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!Gdn::Config('Garden.Installed')) return;
+      if (!C('Garden.Installed')) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -291,7 +291,7 @@ class Gdn_Session {
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
 
             // If the user hasn't been active in the session-time, update their date last active
-            $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
+            $SessionLength = C('Garden.Session.Length', '15 minutes');
             if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
                $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Gdn_Format::ToDateTime()));
 

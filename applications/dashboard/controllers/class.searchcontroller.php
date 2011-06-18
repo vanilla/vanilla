@@ -51,7 +51,7 @@ class SearchController extends Gdn_Controller {
 		$this->Title(T('Search'));
 
 		if(!is_numeric($Limit))
-			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
+			$Limit = C('Garden.Search.PerPage', 20);
 		
 		$Search = $this->Form->GetFormValue('Search');
       $Mode = $this->Form->GetFormValue('Mode');

@@ -785,7 +785,6 @@ class DiscussionModel extends VanillaModel {
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
             } else {
-               // Inserting
                // Inserting.
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = C('Garden.InputFormatter', '');

@@ -71,10 +71,10 @@ class PostController extends VanillaController {
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
       $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
       $Category = CategoryModel::Categories($this->CategoryID);
-      if (!$Category)
-         $Category = CategoryModel::Categories(-1);
-
-      $this->Category = (object)$Category;
+      if ($Category)
+         $this->Category = (object)$Category;
+      else
+         $this->Category = NULL;
 
       if ($UseCategories) {
          $Categories = CategoryModel::Categories();
@@ -99,6 +99,7 @@ class PostController extends VanillaController {
 				$this->FireEvent('AfterCategoryItem');
          }
          $this->CategoryData= $aCategoryData;
+         $this->SetData('Categories', $aCategoryData);
       }
       
       // Check permission 
@@ -127,10 +128,10 @@ class PostController extends VanillaController {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
-         } else if (isset($this->Draft))
+         } elseif (isset($this->Draft))
             $this->Form->SetData($this->Draft);
-         else
-            $this->Form->SetData(array('CategoryID' => $CategoryID));
+         elseif ($this->Category !== NULL)
+            $this->Form->SetData(array('CategoryID' => $this->Category->CategoryID));
             
       } else { // Form was submitted
          // Save as a draft?

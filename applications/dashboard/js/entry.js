@@ -50,7 +50,7 @@ jQuery(document).ready(function($) {
          return;
       }
 
-      var selectedName = $('input[name=UserSelect]:checked').val();
+      var selectedName = $('input[name=Form/UserSelect]:checked').val();
       if (!selectedName || selectedName == 'other') {
          var name = $('#Form_ConnectName').val();
          if (typeof(name) == 'string' && name != '') {
@@ -79,7 +79,7 @@ jQuery(document).ready(function($) {
 
    checkConnectName();
    $('#Form_ConnectName').blur(checkConnectName);
-   $('input[name=UserSelect]').click(checkConnectName);
+   $('input[name=Form/UserSelect]').click(checkConnectName);
    
    // Check to see if passwords match
    $('input[name=User/PasswordMatch]').blur(function() {

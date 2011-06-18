@@ -26,6 +26,7 @@ class SearchController extends Gdn_Controller {
 		
 		$Form = Gdn::Factory('Form');
 		$Form->Method = 'get';
+		$Form->InputPrefix = '';
 		
 		$this->Form = $Form;
 	}

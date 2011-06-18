@@ -534,7 +534,6 @@ class CommentModel extends VanillaModel {
                // Save the new value.
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
-               // Make sure that the comments get formatted in the method defined by Garden
                // Make sure that the comments get formatted in the method defined by Garden.
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = C('Garden.InputFormatter', '');

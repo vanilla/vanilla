@@ -758,10 +758,10 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
-         $Regex = "`(?:(</?)([a-z]+))|(/\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         $Regex = "`(?:(</?)([a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
-//         var_dump($Parts);
+//         echo '<pre>', print_r($Parts, TRUE), '</pre>';
 
          self::LinksCallback(NULL);
 
@@ -773,6 +773,7 @@ class Gdn_Format {
          return $Mixed;
       }
    }
+   
    protected static function LinksCallback($Matches) {
       static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
@@ -781,6 +782,7 @@ class Gdn_Format {
       if ($Matches === NULL) {
          $InTag = 0;
          $InAnchor = FALSE;
+         return;
       }
 
       $InOut = $Matches[1];
@@ -791,7 +793,7 @@ class Gdn_Format {
       if ($InOut == '<')
          $InTag++;
       elseif ($InOut == '</') {
-         $InTag--;
+         $InTag++;
          $InAnchor = FALSE;
       } elseif ($Matches[3])
          $InTag--;

@@ -179,7 +179,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
    
       try {
-         if (Gdn::Config('Garden.UpdateMode', FALSE) && !Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         if (C('Garden.UpdateMode', FALSE) && !Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
             // Updatemode, and this user is not an admin
             $UpdateModeExceptions = array(
                 'utility'

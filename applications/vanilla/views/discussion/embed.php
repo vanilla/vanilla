@@ -55,7 +55,7 @@ if ($this->Pager->LastPage()) {
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
       $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
-   $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
+   $this->AddDefinition('Vanilla_Comments_AutoRefresh', C('Vanilla.Comments.AutoRefresh', 0));
 }
 echo $this->Pager->ToString('more');
 ?>

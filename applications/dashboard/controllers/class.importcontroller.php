@@ -112,7 +112,7 @@ class ImportController extends DashboardController {
 
       if($Imp->CurrentStep < 1) {
          // Check to see if there is a file.
-         $ImportPath = Gdn::Config('Garden.Import.ImportPath');
+         $ImportPath = C('Garden.Import.ImportPath');
          $Validation = new Gdn_Validation();
 
 

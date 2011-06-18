@@ -35,11 +35,11 @@ class Gdn_CookieIdentity {
    
    public function Init($Config = NULL) {
       if (is_null($Config))
-         $Config = Gdn::Config('Garden.Cookie');
+         $Config = C('Garden.Cookie');
       elseif(is_string($Config))
-         $Config = Gdn::Config($Config);
+         $Config = C($Config);
          
-      $DefaultConfig = Gdn::Config('Garden.Cookie');         
+      $DefaultConfig = C('Garden.Cookie');         
       $this->CookieName = ArrayValue('Name', $Config, $DefaultConfig['Name']);
       $this->CookiePath = ArrayValue('Path', $Config, $DefaultConfig['Path']);
       $this->CookieDomain = ArrayValue('Domain', $Config, $DefaultConfig['Domain']);
@@ -187,10 +187,10 @@ class Gdn_CookieIdentity {
    public static function SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {
       
       if (is_null($Path))
-         $Path = Gdn::Config('Garden.Cookie.Path', '/');
+         $Path = C('Garden.Cookie.Path', '/');
 
       if (is_null($Domain))
-         $Domain = Gdn::Config('Garden.Cookie.Domain', '');
+         $Domain = C('Garden.Cookie.Domain', '');
 
       // If the domain being set is completely incompatible with the current domain then make the domain work.
       $CurrentHost = Gdn::Request()->Host();
@@ -198,10 +198,10 @@ class Gdn_CookieIdentity {
          $Domain = '';
    
       if (!$CookieHashMethod)
-         $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');
+         $CookieHashMethod = C('Garden.Cookie.HashMethod');
       
       if (!$CookieSalt)
-         $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
+         $CookieSalt = C('Garden.Cookie.Salt');
       
       // Create the cookie contents
       $Key = self::_Hash($KeyData, $CookieHashMethod, $CookieSalt);
@@ -232,10 +232,10 @@ class Gdn_CookieIdentity {
       }
       
       if (is_null($CookieHashMethod))
-         $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');
+         $CookieHashMethod = C('Garden.Cookie.HashMethod');
       
       if (is_null($CookieSalt))
-         $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
+         $CookieSalt = C('Garden.Cookie.Salt');
       
       $CookieData = explode('|', $_COOKIE[$CookieName]);
       if (count($CookieData) < 5) {
@@ -282,10 +282,10 @@ class Gdn_CookieIdentity {
    public static function DeleteCookie($CookieName, $Path = NULL, $Domain = NULL) {
 
       if (is_null($Path))
-         $Path = Gdn::Config('Garden.Cookie.Path');
+         $Path = C('Garden.Cookie.Path');
 
       if (is_null($Domain))
-         $Domain = Gdn::Config('Garden.Cookie.Domain');
+         $Domain = C('Garden.Cookie.Domain');
 
       $CurrentHost = Gdn::Request()->Host();
       if (!StringEndsWith($CurrentHost, trim($Domain, '.')))

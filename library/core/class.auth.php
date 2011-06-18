@@ -35,7 +35,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       Gdn::Session()->Start(FALSE, FALSE);
       
       // Get list of enabled authenticators
-      $AuthenticationSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $AuthenticationSchemes = C('Garden.Authenticator.EnabledSchemes', array());
       
       // Bring all enabled authenticator classes into the defined scope to allow them to be picked up by the plugin manager
       foreach ($AuthenticationSchemes as $AuthenticationSchemeAlias)
@@ -89,7 +89,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       }
       
       if ($AuthenticationSchemeAlias == 'default')
-         $AuthenticationSchemeAlias = Gdn::Config('Garden.Authenticator.DefaultScheme', 'password');
+         $AuthenticationSchemeAlias = C('Garden.Authenticator.DefaultScheme', 'password');
       
       // Lowercase always, for great justice
       $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
@@ -117,7 +117,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    
    public function EnableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = FALSE) {
       // Get list of currently enabled schemes.
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
       $ForceWrite = FALSE;
       
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
@@ -153,7 +153,7 @@ class Gdn_Auth extends Gdn_Pluggable {
       $ForceWrite = FALSE;
       
 		// Remove this authenticator from the enabled schemes collection.
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
       // If the list is empty (shouldnt ever be empty), add 'password' to it.
       if (!is_array($EnabledSchemes)) {
          $ForceWrite = TRUE;
@@ -186,7 +186,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    
    public function SetDefaultAuthenticator($AuthenticationSchemeAlias) {
       $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
       if (!in_array($AuthenticationSchemeAlias, $EnabledSchemes)) return FALSE;
 
       SaveToConfig('Garden.Authenticator.DefaultScheme', $AuthenticationSchemeAlias);
@@ -280,7 +280,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function IsPrimary($AuthenticationSchemeAlias) {
-      return ($AuthenticationSchemeAlias == strtolower(Gdn::Config('Garden.Authenticator.DefaultScheme', 'password')));
+      return ($AuthenticationSchemeAlias == strtolower(C('Garden.Authenticator.DefaultScheme', 'password')));
    }
    
    /**

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$AddonUrl = Gdn::Config('Garden.AddonUrl');
+$AddonUrl = C('Garden.AddonUrl');
 ?>
 <div class="Help Aside">
    <?php

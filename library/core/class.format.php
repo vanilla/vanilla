@@ -860,7 +860,7 @@ EOT;
          'normal'=>array( 640, 385),
          'big'  => array( 853, 505),
          'huge' => array(1280, 745));
-      $Size = Gdn::Config('Garden.Format.EmbedSize', 'normal');
+      $Size = C('Garden.Format.EmbedSize', 'normal');
       
       // We allow custom sizes <Width>x<Height>
       if (!isset($Sizes[$Size])) {

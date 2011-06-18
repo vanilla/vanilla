@@ -64,15 +64,15 @@ abstract class VanillaModel extends Gdn_Model {
       $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
       
       // Get spam config settings
-      $SpamCount = Gdn::Config('Vanilla.'.$Type.'.SpamCount');
+      $SpamCount = C('Vanilla.'.$Type.'.SpamCount');
       if (!is_numeric($SpamCount) || $SpamCount < 2)
          $SpamCount = 2; // 2 spam minimum
 
-      $SpamTime = Gdn::Config('Vanilla.'.$Type.'.SpamTime');
+      $SpamTime = C('Vanilla.'.$Type.'.SpamTime');
       if (!is_numeric($SpamTime) || $SpamTime < 0)
          $SpamTime = 30; // 30 second minimum spam span
          
-      $SpamLock = Gdn::Config('Vanilla.'.$Type.'.SpamLock');
+      $SpamLock = C('Vanilla.'.$Type.'.SpamLock');
       if (!is_numeric($SpamLock) || $SpamLock < 30)
          $SpamLock = 30; // 30 second minimum lockout
 

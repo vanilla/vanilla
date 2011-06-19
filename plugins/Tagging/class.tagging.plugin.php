@@ -425,7 +425,6 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
-      include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
       $TagModule = new TagModule($Sender);
       $TagModule->GetData($DiscussionID);
       $Sender->AddModule($TagModule);      

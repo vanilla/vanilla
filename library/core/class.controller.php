@@ -518,6 +518,20 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Data($Path, $Default = '' ) {
       $Result = GetValueR($Path, $this->Data, $Default);
+      
+      switch ($Default) {
+         case DEFAULT_ARRAY:
+            if (!is_array($Result))
+               $Result = array();
+            break;
+         case DEFAULT_DATASET:
+            if (!is_a($Result, 'Gdn_DataSet'))
+               $Result = new Gdn_DataSet();
+            break;
+         default:
+            
+      }
+      
       return $Result;
    }
 
@@ -1022,7 +1036,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View = $this->FetchView($View, $ControllerName, $ApplicationFolder);
          // Add the view to the asset container if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_VIEW)
-            $this->AddAsset($AssetName, $View, 'Content');
+            $this->AddAsset($AssetName, $View, 'View');
       }
 
       // Redefine the view as the entire asset contents if necessary
@@ -1085,7 +1099,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Add definitions to the page
             if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset('Foot', $this->DefinitionList());
+               $this->AddAsset('Foot', $this->DefinitionList(), 'Definitions');
 
             // Render
             $this->RenderMaster();

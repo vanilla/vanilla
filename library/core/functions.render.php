@@ -127,26 +127,136 @@ if (!function_exists('IPAnchor')) {
    }
 }
 
+if (!function_exists('Meta')) {
+   function Meta($Data, $Name, $Options = NULL) {
+      $Label = GetValue('Label', $Options, '');
+      $HasLabel = !empty($Label);
+      $Wrap = TRUE;
+      $Value = GetValue($Name, $Data, NULL);
+      
+      if (is_string($Options) || (is_array($Options) && isset($Options[0])))
+         $Options = array('Format' => (array)$Options);
+      
+      $Format = (array)GetValue('Format', $Options);
+      
+      switch (strtolower($Format[0])) {
+         case 'bignumber':
+            $Item = Gdn_Format::BigNumber($Value);
+            $HasLabel = TRUE;
+            break;
+         case 'callback':
+            $Item = call_user_func($Format[1], $Name, $Data);
+            break;
+         case 'date':
+            $Item = Gdn_Format::Date($Value, 'html');
+            $HasLabel = TRUE;
+            break;
+         case 'plural':
+            $Item = Plural($Value, $Format[1], $Format[2], GetValue(3, $Format, NULL));
+            break;
+         case 'sprintf':
+            $Item = sprintf($Format[1], $Value);
+            break;
+         case 'tag':
+            $Wrap = FALSE;
+            if (!is_array($Value))
+               $Value = $Value ? array($Label ? $Label : $Name) : array();
+            $Label = FALSE;
+         
+            $Item = array();
+            foreach ($Value as $Tag) {
+               $Item[] = Wrap(htmlspecialchars(T($Tag)), 'span', array('class' => "Tag Tag-$Tag"));
+            }
+            $Item = implode(' ', $Item);
+            break;
+         case 'user':
+            $Item = UserAnchor($Data, 'User-Inline', $Name);
+            $HasLabel = TRUE;
+            break;
+         default:
+            $Item = $Value;
+            $HasLabel = TRUE;
+      }
+      
+      if (empty($Item))
+         return NULL;
+      
+      $Result = '';
+      if ($HasLabel && $Label !== FALSE) {
+         if ($Label)
+            $Label = T($Label);
+         else {
+            $Label = T($Name, '');
+            if (!$Label)
+               $Label = UnCamelCase($Label);
+         }
+      }
+      if ($Label) {
+         $Result .= Wrap(htmlspecialchars($Label), 'span', array('class' => 'Meta-Label')).' ';
+         $ValueClass = 'Meta-Value';
+      } else {
+         $ValueClass = 'Meta-Value Meta-NameValue';
+      }
+      
+      if ($Wrap)
+         $Result .= Wrap($Item, 'span', array('class' => $ValueClass));
+      else
+         $Result .= $Item;
+      
+      return $Result;
+   }
+}
+
+if (!function_exists('MetaList')) {
+   function MetaList($Data, $MetaFormat) {
+      $Result = array();
+      foreach ($MetaFormat as $Name => $Options) {
+         $Meta = Meta($Data, $Name, $Options);
+         if ($Meta)
+            $Result[] = Wrap($Meta, 'li', array('class' => 'Meta'));
+      }
+      $Result = '<ul class="MetaList">'.implode("\n", $Result).'</ul>';
+      return $Result;
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
  * /applications/garden/locale/en-US/definitions.php.
  */
 if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-		// Make sure to fix comma-formatted numbers
+   function Plural($Number, $Singular, $Plural, $Zero = NULL) {
+      if ($Zero === NULL)
+         $Zero = $Plural;
+		
+      // Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      
+      switch ($WorkingNumber) {
+         case 0:
+            return $Zero ? sprintf(T($Zero), $Number) : '';
+         case 1:
+            return sprintf(T($Singular), $Number);
+         default;
+            return sprintf(T($Plural), $Number);
+      }
    }
+}
+
+function UnCamelCase($Str) {
+   $Str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $Str);
+   $Str = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $Str);
+   $Str = trim($Str);
+   return $Str;
 }
 
 /**
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = NULL) {
-      $Px = $Options;
-      $Name = GetValue($Px.'Name', $User, T('Unknown'));
+   function UserAnchor($User, $CssClass = '', $Prefix = NULL) {
+      $Name = GetValue($Prefix.'Name', $User, T('Unknown'));
 
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';

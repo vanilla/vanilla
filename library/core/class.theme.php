@@ -1,12 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+define('SECTION_ALL', 'ALL');
 
 /**
  * Utility class that helps to render theme elements.
@@ -18,7 +12,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @since 2.0
  */
 class Gdn_Theme {
-
    protected static $_AssetInfo = array();
    public static function AssetBegin($AssetContainer = 'Panel') {
       self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
@@ -225,6 +218,52 @@ class Gdn_Theme {
       }
       
       return 'unknown';
+   }
+   
+   /**
+    * @var array 
+    */
+   public static $Sections = array();
+   /**
+    *
+    * @param type $Section
+    * @return type 
+    * @since 2.1
+    */
+   public static function InSection($Section) {
+      if (is_array($Section)) {
+         foreach ($Section as $Section2) {
+            if (self::InSection($Section2))
+               return TRUE;
+         }
+         return FALSE;
+      } else {
+         return in_array($Section, self::$Sections);
+      }
+   }
+   
+   /**
+    * Add or remove a section.
+    * @param string|array $Section The section or array of sections to set.
+    * @param mixed $Value If null this will remove the section.
+    */
+   public static function SetSection($Section, $Value = TRUE) {
+      if (is_array($Section)) {
+         foreach ($Section as $Section2) {
+            if ($Section2 == SECTION_ALL)
+               continue; // prevent infinite recursion.
+            
+            self::SetSection($Section2, $Value);
+         }
+      } elseif ($Section == SECTION_ALL) {
+         self::SetSection(self::$Sections, $Value);
+      } else {
+         if ($Value === NULL) {
+            unset(self::$Sections[$Section]);
+         } elseif (!in_array($Section, self::$Sections)) {
+            self::$Sections[] = $Section;
+         }
+      }
    }
 
    public static function Text($Code, $Default) {

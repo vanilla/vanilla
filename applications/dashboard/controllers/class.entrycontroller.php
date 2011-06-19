@@ -1270,6 +1270,9 @@ class EntryController extends Gdn_Controller {
     */
    public function EmailConfirm($UserID, $EmailKey = '') {
       $User = $this->UserModel->GetID($UserID);
+      
+      if (!$User)
+         throw NotFoundException('User');
 
       $EmailConfirmed = $this->UserModel->ConfirmEmail($User, $EmailKey);
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());

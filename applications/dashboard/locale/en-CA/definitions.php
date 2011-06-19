@@ -19,14 +19,6 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
-if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-		// Make sure to fix comma-formatted numbers
-      $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
-   }
-}
-
 $Definition['Locale'] = 'en-CA';
 $Definition['_Locale'] = 'Locale';
 
@@ -141,6 +133,7 @@ $Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 $Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
+$Definition['%s New'] = '%s new';
 $Definition['%s New Plural'] = '%s new';
 
 $Definition['TermsOfService'] = 'Terms of Service';

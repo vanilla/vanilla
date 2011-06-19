@@ -433,6 +433,7 @@ class SettingsController extends DashboardController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
+      Gdn_Theme::SetSection('Dashboard');
    }
 
    public function Locales($Op = NULL, $LocaleKey = NULL, $TransientKey = NULL) {

@@ -165,6 +165,19 @@ class DiscussionsController extends VanillaController {
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
+      
+      Gdn_Theme::SetSection('DiscussionList');
+      
+      $MetaFormat = array(
+          'Announce' => array('Format' => 'Tag', 'Label' => 'Announcement'),
+          'Closed' => array('Format' => 'Tag'),
+          'CountComments' => array('Plural', '%s comment', '%s comments'),
+          'CountUnreadComments' => array('Plural', '%s New', '%s New Plural', FALSE),
+          'Last' => array('Format' => 'User', 'Label' => 'Most recent by'),
+          'DateLastComment' => array('Format' => 'Date', 'Label' => FALSE)
+          // 'CategoryID' => 'Category'
+      );
+      $this->SetData('_MetaFormat', $MetaFormat);
 			
 		$this->FireEvent('AfterInitialize');
    }

@@ -41,6 +41,7 @@ class ProfileController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       $this->AddModule('GuestModule');
+      Gdn_Theme::SetSection('Profile');
       parent::Initialize();
    }   
    

@@ -231,6 +231,7 @@ class DiscussionController extends VanillaController {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
       $this->Menu->HighlightRoute('/discussions');
+      Gdn_Theme::SetSection('Discussion');
    }
 
    /**

@@ -134,6 +134,22 @@ if (!function_exists('Meta')) {
       $Wrap = TRUE;
       $Value = GetValue($Name, $Data, NULL);
       
+      if ($Options === NULL) {
+         // Check to see if there are options defined for this name in the controller.
+         $Options = Gdn::Controller()->Data("_MetaFormat.$Name", NULL);
+         
+         if ($Options === NULL) {
+            // Try and infer a format based on the name.
+            if (StringBeginsWith($Name, 'Date')) {
+               $Options = array('Format' => 'Date');
+            } elseif (StringBeginsWith($Name, $Data)) {
+               $Options = array('Format' => 'BigNumber');
+            } else {
+               $Options = array();
+            }
+         }
+      }
+      
       if (is_string($Options) || (is_array($Options) && isset($Options[0])))
          $Options = array('Format' => (array)$Options);
       
@@ -208,7 +224,10 @@ if (!function_exists('Meta')) {
 }
 
 if (!function_exists('MetaList')) {
-   function MetaList($Data, $MetaFormat) {
+   function MetaList($Data, $MetaFormat = NULL) {
+      if (!$MetaFormat)
+         $MetaFormat = Gdn::Controller()->Data('_MetaFormat');
+      
       $Result = array();
       foreach ($MetaFormat as $Name => $Options) {
          $Meta = Meta($Data, $Name, $Options);

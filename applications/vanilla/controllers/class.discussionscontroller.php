@@ -77,8 +77,9 @@ class DiscussionsController extends VanillaController {
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
       
-      // Setup head
-		$this->Title(T('All Discussions'));
+      // Setup head.
+      if (!$this->Data('Title'))
+         $this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       

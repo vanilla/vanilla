@@ -276,6 +276,8 @@ function UnCamelCase($Str) {
 if (!function_exists('UserAnchor')) {
    function UserAnchor($User, $CssClass = '', $Prefix = NULL) {
       $Name = GetValue($Prefix.'Name', $User, T('Unknown'));
+      if (!$Name)
+         return '';
 
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';

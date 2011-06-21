@@ -317,8 +317,15 @@ class CategoryModel extends Gdn_Model {
       $Result[$Category['CategoryID']] = $Category;
       $Max = 20;
       while (isset($Categories[$Category['ParentCategoryID']])) {
-         if ($CheckPermissions && !$Category['PermsDiscussionsView'])
+         // Check for an infinite loop.
+         if ($Max <= 0)
+            break;
+         $Max--;
+         
+         if ($CheckPermissions && !$Category['PermsDiscussionsView']) {
+            $Category = $Categories[$Category['ParentCategoryID']];
             continue;
+         }
          
          if ($Category['CategoryID'] == -1)
             break;
@@ -332,11 +339,6 @@ class CategoryModel extends Gdn_Model {
          $Result[$ID] = $Category;
 
          $Category = $Categories[$Category['ParentCategoryID']];
-
-         // Check for an infinite loop.
-         if ($Max <= 0)
-            break;
-         $Max--;
       }
       $Result = array_reverse($Result, TRUE); // order for breadcrumbs
       return $Result;

@@ -24,8 +24,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 <li class="<?php echo $CssClass; ?>">
    <?php
       if ($Discussion->FirstPhoto) {
-         $PhotoImage = 'n'.basename($Discussion->FirstPhoto);
-         $PhotoUrl = Gdn_Upload::Url(dirname($Discussion->FirstPhoto).'/'.$PhotoImage);
+         $PhotoImage = $Discussion->FirstPhoto;
+         if (!StringBeginsWith($Discussion->FirstPhoto, 'http'))
+            $PhotoImage = ChangeBasename($Discussion->FirstPhoto, 'n%s');
+         $PhotoUrl = Gdn_Upload::Url($PhotoImage);
          echo Img($PhotoUrl, array('alt' => $Discussion->FirstName));
 		}
    ?>

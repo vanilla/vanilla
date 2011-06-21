@@ -575,7 +575,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError(strip_tags($e->getMessage()));
          }
          if ($this->Form->ErrorCount() == 0)
-            Redirect('/settings/plugins/'.$this->Filter);
+            Redirect('/settings/plugins/'.$this->Filter.'#'.strtolower($PluginName).'-plugin');
       }
       $this->Render();
    }

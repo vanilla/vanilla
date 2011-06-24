@@ -1204,6 +1204,13 @@ if (!function_exists('IsMobile')) {
       // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
       // if (strpos($UserAgent, 'windows') > 0)
       //   $Mobile = 0;
+      
+      $IsMobile = ($Mobile > 0);
+      
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if ($IsMobile && $ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
+         return NULL;
+      }
  
       return $Mobile > 0;
    }

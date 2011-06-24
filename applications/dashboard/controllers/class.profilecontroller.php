@@ -243,6 +243,15 @@ class ProfileController extends Gdn_Controller {
       $this->Render();
    }
    
+   public function NoMobile() {
+      $Expiration = time() + 172800;
+      $Expire = 0;
+      $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
+      $KeyData = $UserID."-{$Expiration}";
+      Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+      Redirect("/", 302);
+   }
+   
    public function Notifications($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
 		

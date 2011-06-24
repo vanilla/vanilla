@@ -328,6 +328,10 @@ class Gdn_Auth extends Gdn_Pluggable {
       $this->_Identity->SetIdentity($Value, $Persist);
    }
    
+   /**
+    *
+    * @return type Gdn_CookieIdentity
+    */
    public function Identity() {
       if (is_null($this->_Identity)) {
          $this->_Identity = Gdn::Factory('Identity');

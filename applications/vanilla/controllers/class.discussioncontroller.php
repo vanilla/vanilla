@@ -85,7 +85,7 @@ class DiscussionController extends VanillaController {
 
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
-      if ($Offset == '')
+      if ($Offset == '' && !in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML))
          $this->DiscussionModel->AddView($DiscussionID);
 
       $this->Offset = $Offset;

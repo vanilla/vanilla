@@ -1,84 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
 /**
- * Handles user information throughout a session. This class is a singleton.
- *
- * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @package Garden
- * @since 2.0
  */
-class Gdn_Session {
 
+class Gdn_Session extends Gdn_Pluggable {
+   /// PROPERTIES ///
 
-   /**
-    * Unique user identifier.
-    *
-    * @var int
-    */
-   public $UserID;
+   protected $_Session = array();
 
+   public $User = NULL;
 
-   /**
-    * A User object containing properties relevant to session
-    *
-    * @var object
-    */
-   public $User;
-
-
-   /**
-    * Attributes of the current user.
-    *
-    * @var object
-    */
-   protected $_Attributes;
-
-   /**
-    * Permissions of the current user.
-    *
-    * @var object
-    */
-   protected $_Permissions;
-
-
-   /**
-    * Preferences of the current user.
-    *
-    * @var object
-    */
-   protected $_Preferences;
-
-
-   /**
-    * The current user's transient key.
-    *
-    * @var object
-    */
-   protected $_TransientKey;
-
-
-   /**
-    * Private constructor prevents direct instantiation of object
-    *
-    */
-   public function __construct() {
-      $this->UserID = 0;
-      $this->User = FALSE;
-      $this->_Attributes = array();
-      $this->_Permissions = array();
-      $this->_Preferences = array();
-      $this->_TransientKey = FALSE;
-   }
+   public $UserID = 0;
+   
+   /// METHODS ///
 
    /**
     * Checks the currently authenticated user's permissions for the specified
@@ -96,7 +31,7 @@ class Gdn_Session {
       if (is_object($this->User)) {
          if ($this->User->Admin)
             return TRUE;
-         elseif ($this->User->Banned || GetValue('Deleted', $this->User))
+         elseif ($this->User->Banned)
             return FALSE;
       }
 
@@ -105,7 +40,7 @@ class Gdn_Session {
          $JunctionID = '';
 
       $Permissions = $this->GetPermissions();
-      if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+      if ($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
@@ -140,68 +75,17 @@ class Gdn_Session {
       }
    }
 
-   /**
-    * End a session
-    *
-    * @param Gdn_Authenticator $Authenticator
-    */
-   public function End($Authenticator = NULL) {
-      if ($Authenticator == NULL)
-         $Authenticator = Gdn::Authenticator();
+   public function End() {
+      $SessionID = $this->SessionID();
 
-      $Authenticator->AuthenticateWith()->DeAuthenticate();
-      
-      $this->UserID = 0;
-      $this->User = FALSE;
-      $this->_Attributes = array();
-      $this->_Permissions = array();
-      $this->_Preferences = array();
-      $this->_TransientKey = FALSE;
+      if ($SessionID) {
+         $this->SessionID(FALSE);
+         $this->SaveCookie(NULL);
+         Gdn::SQL()->Delete('Session', array('SessionID' => $SessionID));
+      }
    }
 
-   /**
-    * Returns all "allowed" permissions for the authenticated user in a
-    * one-dimensional array of permission names.
-    *
-    * @return array
-    */
-   public function GetPermissions() {
-      return is_array($this->_Permissions) ? $this->_Permissions : array();
-   }
-
-	/**
-    *
-    *
-	* @todo Add description.
-	* @param string|array $PermissionName
-	* @param mixed $Value
-	* @return NULL
-	*/
-
-	public function SetPermission($PermissionName, $Value = NULL) {
-		if (is_string($PermissionName)) {
-			if ($Value === NULL) $this->_Permissions[] = $PermissionName;
-			elseif (is_array($Value)) $this->_Permissions[$PermissionName] = $Value;
-		} elseif (is_array($PermissionName)) {
-			if (array_key_exists(0, $PermissionName))
-				foreach ($PermissionName as $Name) $this->SetPermission($Name);
-			else
-				foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
-		}
-    }
-
-   /**
-    * Gets the currently authenticated user's preference for the specified
-    * $PreferenceName.
-    *
-    * @param string $PreferenceName The name of the preference to get.
-    * @param mixed $DefaultValue The default value to return if the preference does not exist.
-    * @return mixed
-    */
-   public function GetPreference($PreferenceName, $DefaultValue = FALSE) {
-      return ArrayValue($PreferenceName, $this->_Preferences, $DefaultValue);
-   }
-
+   protected $_Attributes = array();
    /**
     * Gets the currently authenticated user's attribute for the specified
     * $AttributeName.
@@ -212,31 +96,51 @@ class Gdn_Session {
     */
    public function GetAttribute($AttributeName, $DefaultValue = FALSE) {
       if (is_array($this->_Attributes)) {
-         return ArrayValue($AttributeName, $this->_Attributes, $DefaultValue);
+         return GetValue($AttributeName, $this->_Attributes, $DefaultValue);
       }
       return $DefaultValue;
    }
 
+   protected $_Permissions = NULL;
    /**
+    * Returns all "allowed" permissions for the authenticated user in a
+    * one-dimensional array of permission names.
+    *
     * @return array
-    * @todo add doc
     */
-   public function GetAttributes() {
-      return is_array($this->_Attributes) ? $this->_Attributes : array();
+   public function GetPermissions($UserID = FALSE) {
+      if ($this->_Permissions === NULL) {
+         if (!is_object($this->User))
+            $this->_Permissions = Gdn::UserModel()->DefinePermissions($this->UserID, FALSE);
+         else {
+            $this->_Permissions = $this->User->Permissions;
+            if ($this->_Permissions === NULL)
+               $this->_Permissions = Gdn::UserModel()->DefinePermissions($this->UserID, FALSE);
+         }
+      }
+
+      return is_array($this->_Permissions) ? $this->_Permissions : array();
    }
 
-   /**
-    * This is the singleton method that return the static
-    * Configuration::Instance.
-    *
-    * @return Session
-    */
-   public static function GetInstance() {
-      if (!isset(self::$_Instance)) {
-         $c = __CLASS__;
-         self::$_Instance = new $c();
-      }
-      return self::$_Instance;
+   public function GetPreference($Key, $DefaultValue = FALSE) {
+      if (is_object($this->User))
+         return GetValue($Key, $this->User->Preferences, $DefaultValue);
+      return $DefaultValue;
+   }
+
+   public function Initialize() {
+      $Override = FALSE;
+      $this->EventArguments['Override'] =& $Override;
+      $this->FireEvent('Initialize');
+      if ($Override)
+         return;
+
+      // Load the session from the cookie.
+      $this->LoadCookie(TRUE);
+//      if (!$this->SessionID()) {
+//         // There is no session in the cooke so start a new one as a guest.
+//         $this->Start();
+//      }
    }
 
    /**
@@ -250,61 +154,68 @@ class Gdn_Session {
       return $this->UserID > 0;
    }
 
-   /**
-    * Authenticates the user with the provided Authenticator class.
-    *
-    * @param int $UserID The UserID to start the session with.
-    * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
-    */
-   public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!C('Garden.Installed')) return;
-      // Retrieve the authenticated UserID from the Authenticator module.
-      $UserModel = Gdn::Authenticator()->GetUserModel();
-      $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
-      $this->User = FALSE;
+   protected function LoadCookie($Clean = FALSE) {
+      $Name = C('Garden.Cookie.Name', 'Vanilla');
+      $SessionID = GetValue($Name, $_COOKIE);
+      if ($SessionID) {
+         // Grab the session from the database.
+         $Session = Gdn::SQL()->GetWhere('Session', array('SessionID' => $SessionID))->FirstRow(DATASET_TYPE_ARRAY);
 
-      // Now retrieve user information
-      if ($this->UserID > 0) {
-
-         // Instantiate a UserModel to get session info
-         $this->User = $UserModel->GetSession($this->UserID);
-
-         if ($this->User) {
-            if ($SetIdentity) {
-               Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
-
-               if (Gdn::Authenticator()->ReturningUser($this->User)) {
-                  $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-                  $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
-               }
+         if ($Session) {
+            $this->SessionID($SessionID);
+            $this->UserID = $Session['UserID'];
+            $this->TransientKey($Session['TransientKey']);
+            if ($this->UserID) {
+               // This is a user session.
+               $this->User = Gdn::UserModel()->GetSession($this->UserID);
+               $this->_Attributes =& $this->User->Attributes;
+               $this->_Permissions =& $this->User->Permissions;
+            } else {
+               // This is a guest session.
+               $Attributes = @unserialize($Session['Attributes']);
+               if (!is_array($Attributes))
+                  $Attributes = array();
+               $this->_Attributes =& $Attributes;
             }
-            
-            $UserModel->EventArguments['User'] =& $this->User;
-            $UserModel->FireEvent('AfterGetSession');
-
-            $this->_Permissions = Gdn_Format::Unserialize($this->User->Permissions);
-            $this->_Preferences = Gdn_Format::Unserialize($this->User->Preferences);
-            $this->_Attributes = Gdn_Format::Unserialize($this->User->Attributes);
-            $this->_TransientKey = is_array($this->_Attributes) ? ArrayValue('TransientKey', $this->_Attributes) : FALSE;
-
-            if ($this->_TransientKey === FALSE)
-               $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
-
-            // If the user hasn't been active in the session-time, update their date last active
-            $SessionLength = C('Garden.Session.Length', '15 minutes');
-            if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
-               $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Gdn_Format::ToDateTime()));
-
-         } else {
-            $this->UserID = 0;
-            $this->User = FALSE;
-            if ($SetIdentity)
-               Gdn::Authenticator()->SetIdentity(NULL);
+         } elseif($Clean) {
+            // Remove the erroneous cookie.
+            $this->SaveCookie(TRUE);
          }
       }
-      // Load guest permissions if necessary
-      if ($this->UserID == 0)
-         $this->_Permissions = Gdn_Format::Unserialize($UserModel->DefinePermissions(0));
+   }
+
+   protected function SaveCookie($Persist = FALSE) {
+      $Name = C('Garden.Cookie.Name', 'Vanilla');
+      $Path = C('Garden.Cookie.Path', '/');
+      $Domain = C('Garden.Cookie.Domain', '');
+      $SessionID = $this->SessionID();
+
+      if ($Persist === TRUE) {
+         $Expire = time() + 2592000;
+      } elseif ($Persist === FALSE) {
+         $Expire = 0;
+      } elseif ($Persist === NULL) {
+         $Expire = time() - 3600;
+         $SessionID = NULL;
+      } else {
+         $Expire = $Persist;
+      }
+      
+      setcookie($Name, $SessionID, $Expire, $Path, $Domain);
+      if ($SessionID === NULL)
+         unset($_COOKIE[$Name]);
+      else
+         $_COOKIE[$Name] = $SessionID;
+   }
+
+   protected $_SessionID = FALSE;
+
+   public function SessionID($NewValue = NULL) {
+      if ($NewValue != NULL) {
+         $this->_SessionID = $NewValue;
+      }
+
+      return $this->_SessionID;
    }
 
    /**
@@ -334,11 +245,14 @@ class Gdn_Session {
     * @todo check argument type
     */
    public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
+      if (!is_object($this->User))
+         return;
+
       if (!is_array($Name))
          $Name = array($Name => $Value);
 
       foreach($Name as $Key => $Val) {
-         $this->_Preferences[$Key] = $Val;
+         $this->User->Preferences[$Key] = $Val;
       }
 
       if ($SaveToDatabase && $this->UserID > 0) {
@@ -347,15 +261,100 @@ class Gdn_Session {
       }
    }
 
+//   public static function SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {
+//
+//      if (is_null($Path))
+//         $Path = Gdn::Config('Garden.Cookie.Path', '/');
+//
+//      if (is_null($Domain))
+//         $Domain = Gdn::Config('Garden.Cookie.Domain', '');
+//
+//      // If the domain being set is completely incompatible with the current domain then make the domain work.
+//      $CurrentHost = Gdn::Request()->Host();
+//      if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+//         $Domain = '';
+//
+//      if (!$CookieHashMethod)
+//         $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');
+//
+//      if (!$CookieSalt)
+//         $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
+//
+//      // Create the cookie contents
+//      $Key = self::_Hash($KeyData, $CookieHashMethod, $CookieSalt);
+//      $Hash = self::_HashHMAC($CookieHashMethod, $KeyData, $Key);
+//      $Cookie = array($KeyData,$Hash,time());
+//      if (!is_null($CookieContents)) {
+//         if (!is_array($CookieContents)) $CookieContents = array($CookieContents);
+//         $Cookie = array_merge($Cookie, $CookieContents);
+//      }
+//
+//      $CookieContents = implode('|',$Cookie);
+//
+//      // Create the cookie.
+//      setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain);
+//      $_COOKIE[$CookieName] = $CookieContents;
+//   }
+
+   public function Start($UserID = 0, $Save = TRUE, $Persist = FALSE) {
+      $SessionID = $this->SessionID();
+      if (!$SessionID) {
+         // Generate a new session.
+         $SessionID = md5(mt_rand());
+         $this->SessionID($SessionID);
+         $TransientKey = substr(md5(mt_rand()), 0, 12);
+
+         if ($Save) {
+            // Save the session information to the database.
+            Gdn::SQL()->Insert('Session', array('SessionID' => $SessionID, 'UserID' => $UserID, 'TransientKey' => $TransientKey, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime()));
+
+            // Set the session cookie.
+            $this->SaveCookie($Persist);
+         }
+      } else {
+         if ($Save) {
+            Gdn::SQL()->Put('Session', array('UserID' => $UserID, 'DateUpdated' => Gdn_Format::ToDateTime()), array('SessionID' => $SessionID));
+            $this->SaveCookie($Persist);
+         }
+      }
+      $this->UserID = $UserID;
+      // Grab the user.
+      if ($UserID > 0) {
+         $this->User = Gdn::UserModel()->GetSession($UserID);
+      } else {
+         $this->User = NULL;
+      }
+   }
+
+   /**
+	 * Place a name/value pair into the user's session stash.
+	 */
+	public function Stash($Name = '', $Value = NULL, $UnsetOnRetrieve = TRUE) {
+		if ($Name == '')
+			return;
+
+      if ($Value === NULL) {
+         $Result = $this->GetAttribute($Name);
+         if ($UnsetOnRetrieve) {
+            $this->SetAttribute($Name, NULL);
+         }
+      } else {
+         $this->SetAttribute($Name, $Value);
+         $Result = $Value;
+      }
+
+      return $Result;
+	}
+
+   protected $_TransientKey;
    /**
     * Returns the transient key for the authenticated user.
     *
     * @return string
-    * @todo check return type
     */
-   public function TransientKey($NewKey = NULL) {
-      if (!is_null($NewKey)) {
-         $this->_TransientKey = Gdn::Authenticator()->GetUserModel()->SetTransientKey($this->UserID, $NewKey);
+   public function TransientKey($NewValue = NULL) {
+      if ($NewValue) {
+         $this->_TransientKey = $NewValue;
       }
 
       if ($this->_TransientKey !== FALSE)
@@ -373,95 +372,6 @@ class Gdn_Session {
    public function ValidateTransientKey($ForeignKey, $ValidateUser = TRUE) {
       if ($ValidateUser && $this->UserID <= 0)
          return FALSE;
-      return $ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE;
+      return $this->_TransientKey && $ForeignKey == $this->_TransientKey;
    }
-	
-	/**
-	 * Place a name/value pair into the user's session stash.
-	 */
-	public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
-		if ($Name == '')
-			return;
-		
-      // Grab the user's session
-      $Session = $this->_GetStashSession();
-      if (!$Session)
-         return;
-      
-      $Attributes = unserialize($Session->Attributes);
-      if (!is_array($Attributes))
-         $Attributes = array();
-
-      // Stash or unstash the value depending on inputs
-      if ($Name != '' && $Value != '') {
-         $Attributes[$Name] = $Value;
-      } else if ($Name != '') {
-         $Value = GetValue($Name, $Attributes);
-			if ($UnsetOnRetrieve)
-				unset($Attributes[$Name]);
-      }
-      // Update the attributes
-      if ($Name != '') {
-         Gdn::SQL()->Update(
-            'Session',
-            array(
-               'Attributes' => serialize($Attributes)
-            ),
-            array(
-               'SessionID' => $Session->SessionID
-            )
-         )->Put();
-      }
-      return $Value;
-	}
-	   
-	/**
-	 * Used by $this->Stash() to create & manage sessions for users & guests.
-	 * This is a stop-gap solution until full session management for users &
-	 * guests can be imlemented.
-	 */
-   private function _GetStashSession() {
-      $CookieName = C('Garden.Cookie.Name', 'Vanilla');
-
-      // Grab the entire session record
-      $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
-      $Session = Gdn::SQL()
-         ->Select()
-         ->From('Session')
-         ->Where('SessionID', $SessionID)
-         ->Get()
-         ->FirstRow();
-
-      if (!$Session) {
-         $SessionID = md5(mt_rand());
-         $TransientKey = substr(md5(mt_rand()), 0, 12);
-         // Save the session information to the database.
-         Gdn::SQL()->Insert(
-            'Session',
-            array(
-               'SessionID' => $SessionID,
-               'UserID' => Gdn::Session()->UserID,
-               'TransientKey' => $TransientKey,
-               'DateInserted' => Gdn_Format::ToDateTime(),
-               'DateUpdated' => Gdn_Format::ToDateTime()
-            )
-         );
-         $Session = Gdn::SQL()
-            ->Select()
-            ->From('Session')
-            ->Where('SessionID', $SessionID)
-            ->Get()
-            ->FirstRow();
-            
-         // Save a session cookie
-         $Name = $CookieName.'SessionID';
-         $Path = C('Garden.Cookie.Path', '/');
-         $Domain = C('Garden.Cookie.Domain', '');
-         $Expire = 0;
-         setcookie($Name, $SessionID, $Expire, $Path, $Domain);
-      }
-      return $Session;
-   }
-
-
 }

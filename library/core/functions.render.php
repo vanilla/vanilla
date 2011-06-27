@@ -219,7 +219,7 @@ if (!function_exists('Meta')) {
       else
          $Result .= $Item;
       
-      return $Result;
+      return Wrap($Result, 'span', array('class' => 'Meta'));
    }
 }
 
@@ -232,9 +232,9 @@ if (!function_exists('MetaList')) {
       foreach ($MetaFormat as $Name => $Options) {
          $Meta = Meta($Data, $Name, $Options);
          if ($Meta)
-            $Result[] = Wrap($Meta, 'li', array('class' => 'Meta'));
+            $Result[] = $Meta;
       }
-      $Result = '<ul class="MetaList">'.implode("\n", $Result).'</ul>';
+      $Result = '<div class="MetaList">'.implode("\n", $Result).'</div>';
       return $Result;
    }
 }

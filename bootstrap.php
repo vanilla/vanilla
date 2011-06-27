@@ -166,7 +166,7 @@ require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
 // Only run authenticators if Garden is fully installed
 if (C('Garden.Installed', FALSE))
-   Gdn::Authenticator()->StartAuthenticator();
+   Gdn::Session()->Initialize();
 
 // Include a user-defined bootstrap.
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))

@@ -27,7 +27,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    public function Base_BeforeCheckComments_Handler($Sender) {
       $ActionMessage = &$Sender->EventArguments['ActionMessage'];
       $Discussion = $Sender->EventArguments['Discussion'];
-      if (Gdn::Session()->CheckPermission('Vanilla.Discussion.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $ActionMessage .= ' '.Anchor(T('Split'), 'vanilla/moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
    }
    
@@ -36,7 +36,7 @@ class SplitMergePlugin extends Gdn_Plugin {
     */
    public function Base_BeforeCheckDiscussions_Handler($Sender) {
       $ActionMessage = &$Sender->EventArguments['ActionMessage'];
-      if (Gdn::Session()->CheckPermission('Vanilla.Discussion.Edit', TRUE, 'Category', 'any'))
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any'))
          $ActionMessage .= ' '.Anchor(T('Merge'), 'vanilla/moderation/mergediscussions/', 'Merge Popup');
    }
 
@@ -59,7 +59,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          return;
       
       // Verify that the user has permission to perform the split
-      $Sender->Permission('Vanilla.Discussion.Edit', TRUE, 'Category', $Discussion->CategoryID);
+      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->CategoryID);
       
       $CheckedComments = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedComments', array());
       if (!is_array($CheckedComments))
@@ -170,7 +170,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          }
          if ($MergeDiscussion) {
             // Verify that the user has permission to perform the merge
-            $Sender->Permission('Vanilla.Discussion.Edit', TRUE, 'Category', $MergeDiscussion->CategoryID);
+            $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $MergeDiscussion->CategoryID);
             
             // Assign the comments to the new discussion record
             $DiscussionModel->SQL

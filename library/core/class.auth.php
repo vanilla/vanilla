@@ -30,7 +30,9 @@ class Gdn_Auth extends Gdn_Pluggable {
       parent::__construct();
    }
    
-   public function StartAuthenticator() {
+   public function StartAuthenticator($ForceStart = FALSE) {
+      if (!Gdn::Config('Garden.Installed') && !$ForceStart) return;
+      
       // Start the 'session'
       Gdn::Session()->Start(FALSE, FALSE);
       
@@ -328,6 +330,10 @@ class Gdn_Auth extends Gdn_Pluggable {
       $this->_Identity->SetIdentity($Value, $Persist);
    }
    
+   /**
+    *
+    * @return type Gdn_CookieIdentity
+    */
    public function Identity() {
       if (is_null($this->_Identity)) {
          $this->_Identity = Gdn::Factory('Identity');

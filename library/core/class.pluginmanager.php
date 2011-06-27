@@ -417,6 +417,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
    }
 
+   /**
+    * Check whether a plugin is enabled
+    * 
+    * @param string $PluginName
+    * @return bool
+    */
    public function CheckPlugin($PluginName) {
       if (array_key_exists($PluginName, $this->EnabledPlugins()))
          return TRUE;

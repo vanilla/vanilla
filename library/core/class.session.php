@@ -68,15 +68,7 @@ class Gdn_Session {
     */
    protected $_Preferences;
 
-   
-   /**
-    * Whether the session has been started
-    * 
-    * @var bool
-    */
-   protected $_Started = FALSE;
-   
-   
+
    /**
     * The current user's transient key.
     *
@@ -269,46 +261,6 @@ class Gdn_Session {
    }
 
    /**
-    * Sets a value in the $this->_Attributes array. This setting will persist
-    * only to the end of the page load. It is not intended for making permanent
-    * changes to user attributes.
-    *
-    * @param string|array $Name
-    * @param mixed $Value
-    * @todo check argument type
-    */
-   public function SetAttribute($Name, $Value = '') {
-      if (!is_array($Name))
-         $Name = array($Name => $Value);
-
-      foreach($Name as $Key => $Val) {
-         $this->_Attributes[$Key] = $Val;
-      }
-   }
-
-   /**
-    * Sets a value in the $this->_Preferences array. This setting will persist
-    * changes to user prefs.
-    *
-    * @param string|array $Name
-    * @param mixed $Value
-    * @todo check argument type
-    */
-   public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
-      if (!is_array($Name))
-         $Name = array($Name => $Value);
-
-      foreach($Name as $Key => $Val) {
-         $this->_Preferences[$Key] = $Val;
-      }
-
-      if ($SaveToDatabase && $this->UserID > 0) {
-         $UserModel = Gdn::UserModel();
-         $UserModel->SavePreference($this->UserID, $Name);
-      }
-   }
-   
-   /**
     * Authenticates the user with the provided Authenticator class.
     *
     * @param int $UserID The UserID to start the session with.
@@ -316,7 +268,6 @@ class Gdn_Session {
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
       if (!Gdn::Config('Garden.Installed')) return;
-      
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -364,17 +315,46 @@ class Gdn_Session {
       // Load guest permissions if necessary
       if ($this->UserID == 0)
          $this->_Permissions = Gdn_Format::Unserialize($UserModel->DefinePermissions(0));
-      
-      $this->_Started = TRUE;
    }
-   
+
    /**
-    * Whether the session has been started yet.
-    * 
-    * @return bool
+    * Sets a value in the $this->_Attributes array. This setting will persist
+    * only to the end of the page load. It is not intended for making permanent
+    * changes to user attributes.
+    *
+    * @param string|array $Name
+    * @param mixed $Value
+    * @todo check argument type
     */
-   public function Started() {
-      return $this->_Started;
+   public function SetAttribute($Name, $Value = '') {
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+
+      foreach($Name as $Key => $Val) {
+         $this->_Attributes[$Key] = $Val;
+      }
+   }
+
+   /**
+    * Sets a value in the $this->_Preferences array. This setting will persist
+    * changes to user prefs.
+    *
+    * @param string|array $Name
+    * @param mixed $Value
+    * @todo check argument type
+    */
+   public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+
+      foreach($Name as $Key => $Val) {
+         $this->_Preferences[$Key] = $Val;
+      }
+
+      if ($SaveToDatabase && $this->UserID > 0) {
+         $UserModel = Gdn::UserModel();
+         $UserModel->SavePreference($this->UserID, $Name);
+      }
    }
 
    /**

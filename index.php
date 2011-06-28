@@ -41,7 +41,8 @@ define('PATH_ROOT', dirname(__FILE__));
 require_once(PATH_ROOT.'/bootstrap.php');
 
 // 3. Run authenticators.
-Gdn::Authenticator()->StartAuthenticator();
+// TIM: Removed this change temporarily for .com hosting
+// Gdn::Authenticator()->StartAuthenticator();
 
 // 4. Create and configure the dispatcher.
 $Dispatcher = Gdn::Dispatcher();

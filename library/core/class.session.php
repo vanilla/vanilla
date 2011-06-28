@@ -315,7 +315,7 @@ class Gdn_Session {
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!Gdn::Config('Garden.Installed')) return;
+      if (!C('Garden.Installed', FALSE)) return;
       
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();

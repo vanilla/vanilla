@@ -776,20 +776,38 @@ class DiscussionModel extends VanillaModel {
             if ($DiscussionID > 0) {
                // Updating
                $Stored = $this->GetID($DiscussionID);
+               
+               // Clear the cache if necessary.
+               if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
+                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+
+                  $Announce = GetValue('Announce', $Discussion);
+                  $this->SQL->Cache($CacheKeys);
+               }
 
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
                $Fields['DiscussionID'] = $DiscussionID;
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, (array)$Stored);
+               
 
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
             } else {
-               // Inserting
-					$Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+               // Inserting.
+               if (!GetValue('Format', $Fields))
+                  $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
+               
+               // Clear the cache if necessary.
+               if (GetValue('Announce', $Fields)) {
+                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+
+                  $Announce = GetValue('Announce', $Discussion);
+                  $this->SQL->Cache($CacheKeys);
+               }
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);

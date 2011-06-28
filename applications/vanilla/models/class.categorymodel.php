@@ -71,17 +71,17 @@ class CategoryModel extends Gdn_Model {
                ->Join('UserCategory uc', 'c.CategoryID = uc.CategoryID and uc.UserID = '.Gdn::Session()->UserID, 'left');
          }
 
-         $Categories = $Sql->Get()->ResultArray();
+         $Categories = array_merge(array(), $Sql->Get()->ResultArray());
          $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
 //         unset($Categories[-1]); Don't unset, may need for counts later
          self::CalculateData($Categories);
 
          // Add permissions.
-         foreach ($Categories as $CategoryID => &$Category) {
-            $Category['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Category['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Category['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Category['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+         foreach ($Categories as $CID => $Category) {
+            $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
+            $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+            $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
+            $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          }
          self::$Categories = $Categories;
       }
@@ -317,8 +317,15 @@ class CategoryModel extends Gdn_Model {
       $Result[$Category['CategoryID']] = $Category;
       $Max = 20;
       while (isset($Categories[$Category['ParentCategoryID']])) {
-         if ($CheckPermissions && !$Category['PermsDiscussionsView'])
+         // Check for an infinite loop.
+         if ($Max <= 0)
+            break;
+         $Max--;
+         
+         if ($CheckPermissions && !$Category['PermsDiscussionsView']) {
+            $Category = $Categories[$Category['ParentCategoryID']];
             continue;
+         }
          
          if ($Category['CategoryID'] == -1)
             break;
@@ -332,11 +339,6 @@ class CategoryModel extends Gdn_Model {
          $Result[$ID] = $Category;
 
          $Category = $Categories[$Category['ParentCategoryID']];
-
-         // Check for an infinite loop.
-         if ($Max <= 0)
-            break;
-         $Max--;
       }
       $Result = array_reverse($Result, TRUE); // order for breadcrumbs
       return $Result;

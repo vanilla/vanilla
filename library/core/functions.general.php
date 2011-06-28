@@ -1165,11 +1165,18 @@ if (!function_exists('InSubArray')) {
 
 if (!function_exists('IsMobile')) {
    function IsMobile() {
+      static $IsMobile = 'unset';
+      
+      // Short circuit so we only do this work once per pageload
+      if ($IsMobile != 'unset') return $IsMobile;
+      
+      // Start out assuming not mobile
       $Mobile = 0;
+      
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1204,8 +1211,14 @@ if (!function_exists('IsMobile')) {
       // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
       // if (strpos($UserAgent, 'windows') > 0)
       //   $Mobile = 0;
- 
-      return $Mobile > 0;
+      
+      $IsMobile = ($Mobile > 0);
+      
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if (($Mobile > 0) && $ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+         $IsMobile = NULL;
+      
+      return $IsMobile;
    }
 }
 

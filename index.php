@@ -40,18 +40,21 @@ define('PATH_ROOT', dirname(__FILE__));
 // 2. Include the bootstrap to configure the framework.
 require_once(PATH_ROOT.'/bootstrap.php');
 
-// 3. Create and configure the dispatcher.
+// 3. Run authenticators.
+Gdn::Authenticator()->StartAuthenticator();
+
+// 4. Create and configure the dispatcher.
 $Dispatcher = Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
-// 4. Process the request.
+// 5. Process the request.
 $Dispatcher->Dispatch();
 $Dispatcher->Cleanup();
 
-// 5. Finish profiling and save results to disk, if requested
+// 6. Finish profiling and save results to disk, if requested
 if (defined('PROFILER') && PROFILER) {
    $xhprof_data = xhprof_disable();
    

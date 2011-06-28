@@ -1754,7 +1754,7 @@ if (!function_exists('Redirect')) {
       // assign status code
       $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
-      header("location: ".Url($Destination), TRUE, $SendCode);
+      header("Location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
    }

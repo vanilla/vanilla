@@ -1079,8 +1079,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
          
          // Make sure the database connection is closed before exiting.
-         $Database = Gdn::Database();
-         $Database->CloseConnection();
+         $this->Finalize();
          
          if (!check_utf8($this->_Json['Data']))
             $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
@@ -1186,6 +1185,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Remove values that should not be transmitted via api
       $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
       
+      // Make sure the database connection is closed before exiting.
       $this->Finalize();
 
       // Check for a special view.
@@ -1272,6 +1272,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return;
       }
 
+      // Make sure the database connection is closed before exiting.
       $this->Finalize();
       $this->SendHeaders();
 

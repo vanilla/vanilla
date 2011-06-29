@@ -71,6 +71,7 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function UpdateMode() {
+      $this->SetData('UpdateMode', TRUE);
       $this->Render();
    }
    

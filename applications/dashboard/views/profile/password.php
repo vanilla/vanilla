@@ -8,7 +8,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          // No password may have been set if they have only signed in with a connect plugin
-         if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla") {
+         if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
 	         echo $this->Form->Label('Old Password', 'OldPassword');
 	         echo $this->Form->Input('OldPassword', 'password');
          }

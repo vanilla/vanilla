@@ -167,7 +167,6 @@ require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 // Start Authenticators
 Gdn::Authenticator()->StartAuthenticator();
 
-
 // Include a user-defined bootstrap.
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
 	require_once(PATH_ROOT.'/conf/bootstrap.after.php');

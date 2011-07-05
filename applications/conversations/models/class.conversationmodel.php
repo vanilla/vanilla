@@ -50,7 +50,7 @@ class ConversationModel extends Gdn_Model {
          ->From('Conversation c');
 
 
-      if ($ViewingUserID) {
+      if ($ViewingUserID !== FALSE) {
          $this->SQL
             ->Select('c.CountMessages - uc.CountReadMessages', '', 'CountNewMessages')
             ->Select('uc.LastMessageID, uc.CountReadMessages, uc.DateLastViewed, uc.Bookmarked')

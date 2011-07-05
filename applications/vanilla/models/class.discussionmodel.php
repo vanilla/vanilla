@@ -569,6 +569,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('lcu.Name', '', 'LastName')
 			->Select('iu.Name', '', 'InsertName')
 			->Select('iu.Photo', '', 'InsertPhoto')
+         ->Select('iu.Email', '', 'InsertEmail')
          ->From('Discussion d')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')

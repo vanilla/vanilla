@@ -35,6 +35,11 @@ echo $Form->Errors();
             echo $Description;
             echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
             break;
+         case 'checkboxlist':
+            echo $Form->Label($LabelCode, $Row['Name']);
+            echo $Description;
+            echo $Form->CheckBoxList($Row['Name'], $Row['Items'], NULL, $Row['Options']);
+            break;
          case 'textbox':
             echo $Form->Label($LabelCode, $Row['Name']);
             echo $Description;

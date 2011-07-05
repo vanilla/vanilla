@@ -92,34 +92,7 @@ class Gdn_Autoloader {
                $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
                
                foreach ($EnabledApplications as $EnabledApplication) {
-                  $ApplicationPath = CombinePaths(array(PATH_APPLICATIONS."/{$EnabledApplication}"));
-                  
-                  $AppControllers = CombinePaths(array($ApplicationPath."/controllers"));
-                  self::RegisterMap(self::MAP_CONTROLLER, self::CONTEXT_APPLICATION, $AppControllers, array(
-                     'SearchSubfolders'      => FALSE,
-                     'Extension'             => $EnabledApplication
-                  ));
-                  
-                  $AppModels = CombinePaths(array($ApplicationPath."/models"));
-                  self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModels, array(
-                     'SearchSubfolders'      => FALSE,
-                     'Extension'             => $EnabledApplication,
-                     'ClassFilter'           => '*model'
-                  ));
-                  
-                  $AppModules = CombinePaths(array($ApplicationPath."/modules"));
-                  self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModules, array(
-                     'SearchSubfolders'      => FALSE,
-                     'Extension'             => $EnabledApplication,
-                     'ClassFilter'           => '*module'
-                  ));
-
-                  $AppLibrary = CombinePaths(array($ApplicationPath."/library"));
-                  self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppLibrary, array(
-                     'SearchSubfolders'      => FALSE,
-                     'Extension'             => $EnabledApplication,
-                     'ClassFilter'           => '*'
-                  ));
+                  self::AttachApplication($EnabledApplication);
                }
             }
             
@@ -156,6 +129,37 @@ class Gdn_Autoloader {
          break;
       }
    
+   }
+   
+   public static function AttachApplication($Application) {
+      $ApplicationPath = CombinePaths(array(PATH_APPLICATIONS."/{$Application}"));
+
+      $AppControllers = CombinePaths(array($ApplicationPath."/controllers"));
+      self::RegisterMap(self::MAP_CONTROLLER, self::CONTEXT_APPLICATION, $AppControllers, array(
+         'SearchSubfolders'      => FALSE,
+         'Extension'             => $Application
+      ));
+
+      $AppModels = CombinePaths(array($ApplicationPath."/models"));
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModels, array(
+         'SearchSubfolders'      => FALSE,
+         'Extension'             => $Application,
+         'ClassFilter'           => '*model'
+      ));
+
+      $AppModules = CombinePaths(array($ApplicationPath."/modules"));
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModules, array(
+         'SearchSubfolders'      => FALSE,
+         'Extension'             => $Application,
+         'ClassFilter'           => '*module'
+      ));
+
+      $AppLibrary = CombinePaths(array($ApplicationPath."/library"));
+      self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppLibrary, array(
+         'SearchSubfolders'      => FALSE,
+         'Extension'             => $Application,
+         'ClassFilter'           => '*'
+      ));
    }
    
    protected static function DoLookup($ClassName, $MapType) {

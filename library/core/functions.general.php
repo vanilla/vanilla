@@ -832,7 +832,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && $Format != 'url') {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {
@@ -888,6 +888,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             if (strpos($Field, '/') !== FALSE)
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
+            break;
+         case 'exurl':
+            if (strpos($Field, '/') !== FALSE)
+               $Value = $Field;
+            $Result = ExternalUrl($Value);
             break;
          case 'urlencode':
             $Result = urlencode($Value);
@@ -1164,7 +1169,7 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1990,7 +1995,7 @@ if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
-      	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+      	if(is_null($Charset)) $Charset = C('Garden.Charset', 'utf-8');
       	return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
       } else {
          $Trim = substr($String, 0, $Length);

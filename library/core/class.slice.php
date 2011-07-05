@@ -23,7 +23,7 @@ class Gdn_Slice {
 
    public function __construct() {
       $this->Dispatcher = new Gdn_Dispatcher();
-      $EnabledApplications = Gdn::Config('EnabledApplications');
+      $EnabledApplications = C('EnabledApplications');
       $this->Dispatcher->EnabledApplicationFolders($EnabledApplications);
       $this->Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
    }

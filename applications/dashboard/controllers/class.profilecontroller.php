@@ -41,6 +41,7 @@ class ProfileController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       $this->AddModule('GuestModule');
+      Gdn_Theme::SetSection('Profile');
       parent::Initialize();
    }   
    
@@ -175,7 +176,7 @@ class ProfileController extends Gdn_Controller {
       if ($Session->UserID != $this->User->UserID)
          $this->Permission('Garden.Users.Edit');
       
-      $this->CanEditUsername = Gdn::Config("Garden.Profile.EditUsernames");
+      $this->CanEditUsername = C("Garden.Profile.EditUsernames");
       $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
@@ -349,8 +350,9 @@ class ProfileController extends Gdn_Controller {
             $Props = $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/p$Basename",
-               Gdn::Config('Garden.Profile.MaxHeight', 1000),
-               Gdn::Config('Garden.Profile.MaxWidth', 250)
+               C('Garden.Profile.MaxHeight', 1000),
+               C('Garden.Profile.MaxWidth', 250),
+               array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
             
@@ -358,18 +360,18 @@ class ProfileController extends Gdn_Controller {
 //            $UploadImage->SaveImageAs(
 //               $TmpImage,
 //               'userpics/t'.$ImageBaseName,
-//               Gdn::Config('Garden.Preview.MaxHeight', 100),
-//               Gdn::Config('Garden.Preview.MaxWidth', 75)
+//               C('Garden.Preview.MaxHeight', 100),
+//               C('Garden.Preview.MaxWidth', 75)
 //            );
 
             // Save the uploaded image in thumbnail size
-            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+            $ThumbSize = C('Garden.Thumbnail.Size', 50);
             $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/n$Basename",
                $ThumbSize,
                $ThumbSize,
-               TRUE
+               array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
             );
             
          } catch (Exception $Ex) {
@@ -563,7 +565,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must first upload a picture before you can create a thumbnail.');
       
       // Define the thumbnail size
-      $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
+      $this->ThumbSize = C('Garden.Thumbnail.Size', 32);
       
       // Define the source (profile sized) picture & dimensions.
       $Basename = ChangeBasename($this->User->Photo, 'p%s');
@@ -698,11 +700,11 @@ class ProfileController extends Gdn_Controller {
                $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.Gdn_Format::Url($Session->User->Name).'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }
             // Don't allow account editing if it has been turned off.
-            if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
+            if (C('Garden.UserAccount.AllowEdit')) {
                $SideMenu->AddLink('Options', T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                $SideMenu->AddLink('Options', T('Change My Password'), '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
             }
-            if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
+            if (C('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
 
             $SideMenu->AddLink('Options', T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));

@@ -149,11 +149,11 @@ class Gdn_Database {
     */
    public function Init($Config = NULL) {
       if(is_null($Config))
-         $Config = Gdn::Config('Database');
+         $Config = C('Database');
       elseif(is_string($Config))
-         $Config = Gdn::Config($Config);
+         $Config = C($Config);
          
-      $DefaultConfig = Gdn::Config('Database');
+      $DefaultConfig = C('Database');
          
       $this->Engine = ArrayValue('Engine', $Config, $DefaultConfig['Engine']);
       $this->User = ArrayValue('User', $Config, $DefaultConfig['User']);

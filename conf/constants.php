@@ -40,6 +40,10 @@ define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
+// Defaults for returning from DATA functions.
+define('DEFAULT_DATASET', 'DATASET');
+define('DEFAULT_ARRAY', 'ARRAY');
+
 // Environment
 define('ENVIRONMENT_PHP_VERSION','5.2.0');
 

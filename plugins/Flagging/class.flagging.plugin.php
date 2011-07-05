@@ -362,7 +362,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                $User = $UserModel->GetID($UserID);
                $Email = new Gdn_Email();
                $Email->To($User->Email)
-                  ->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $Subject))
+                  ->Subject(sprintf(T('[%1$s] %2$s'), C('Garden.Title'), $Subject))
                   ->Message($EmailBody)
                   ->Send();
             }

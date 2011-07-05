@@ -5,7 +5,7 @@ $SortOrder = FALSE;
 $SortOrder = ArrayValue('ProfileTabOrder', $this->User->Preferences, FALSE);
 // If not in the user prefs, get the sort order from the application prefs.
 if ($SortOrder === FALSE)
-   $SortOrder = Gdn::Config('Garden.ProfileTabOrder');
+   $SortOrder = C('Garden.ProfileTabOrder');
 
 if (!is_array($SortOrder))
    $SortOrder = array();

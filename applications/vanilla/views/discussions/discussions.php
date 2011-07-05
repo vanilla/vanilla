@@ -5,15 +5,13 @@ if (!function_exists('WriteDiscussion'))
 
 	
 $Alt = '';
-if (property_exists($this, 'AnnounceData') && is_object($this->AnnounceData)) {
-	foreach ($this->AnnounceData->Result() as $Discussion) {
-		$Alt = $Alt == ' Alt' ? '' : ' Alt';
-		WriteDiscussion($Discussion, $this, $Session, $Alt);
-	}
+foreach ($this->Data('Announcements', DEFAULT_DATASET)->Result() as $Discussion) {
+   $Alt = $Alt == ' Alt' ? '' : ' Alt';
+   WriteDiscussion($Discussion, $this, $Session, $Alt);
 }
 
 $Alt = '';
-foreach ($this->DiscussionData->Result() as $Discussion) {
+foreach ($this->Data('Discussions', DEFAULT_DATASET)->Result() as $Discussion) {
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    WriteDiscussion($Discussion, $this, $Session, $Alt);
 }

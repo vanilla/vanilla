@@ -127,26 +127,157 @@ if (!function_exists('IPAnchor')) {
    }
 }
 
+if (!function_exists('Meta')) {
+   function Meta($Data, $Name, $Options = NULL) {
+      $Label = GetValue('Label', $Options, '');
+      $HasLabel = !empty($Label);
+      $Wrap = TRUE;
+      $Value = GetValue($Name, $Data, NULL);
+      
+      if ($Options === NULL) {
+         // Check to see if there are options defined for this name in the controller.
+         $Options = Gdn::Controller()->Data("_MetaFormat.$Name", NULL);
+         
+         if ($Options === NULL) {
+            // Try and infer a format based on the name.
+            if (StringBeginsWith($Name, 'Date')) {
+               $Options = array('Format' => 'Date');
+            } elseif (StringBeginsWith($Name, $Data)) {
+               $Options = array('Format' => 'BigNumber');
+            } else {
+               $Options = array();
+            }
+         }
+      }
+      
+      if (is_string($Options) || (is_array($Options) && isset($Options[0])))
+         $Options = array('Format' => (array)$Options);
+      
+      $Format = (array)GetValue('Format', $Options);
+      
+      switch (strtolower($Format[0])) {
+         case 'bignumber':
+            $Item = Gdn_Format::BigNumber($Value);
+            $HasLabel = TRUE;
+            break;
+         case 'callback':
+            $Item = call_user_func($Format[1], $Name, $Data);
+            break;
+         case 'date':
+            $Item = Gdn_Format::Date($Value, 'html');
+            $HasLabel = TRUE;
+            break;
+         case 'plural':
+            $Item = Plural($Value, $Format[1], $Format[2], GetValue(3, $Format, NULL));
+            break;
+         case 'sprintf':
+            $Item = sprintf($Format[1], $Value);
+            break;
+         case 'tag':
+            $Wrap = FALSE;
+            if (!is_array($Value))
+               $Value = $Value ? array($Label ? $Label : $Name) : array();
+            $Label = FALSE;
+         
+            $Item = array();
+            foreach ($Value as $Tag) {
+               $Item[] = Wrap(htmlspecialchars(T($Tag)), 'span', array('class' => "Tag Tag-$Tag"));
+            }
+            $Item = implode(' ', $Item);
+            break;
+         case 'user':
+            $Item = UserAnchor($Data, 'User-Inline', $Name);
+            $HasLabel = TRUE;
+            break;
+         default:
+            $Item = $Value;
+            $HasLabel = TRUE;
+      }
+      
+      if (empty($Item))
+         return NULL;
+      
+      $Result = '';
+      if ($HasLabel && $Label !== FALSE) {
+         if ($Label)
+            $Label = T($Label);
+         else {
+            $Label = T($Name, '');
+            if (!$Label)
+               $Label = UnCamelCase($Label);
+         }
+      }
+      if ($Label) {
+         $Result .= Wrap(htmlspecialchars($Label), 'span', array('class' => 'Meta-Label')).' ';
+         $ValueClass = 'Meta-Value';
+      } else {
+         $ValueClass = 'Meta-Value Meta-NameValue';
+      }
+      
+      if ($Wrap)
+         $Result .= Wrap($Item, 'span', array('class' => $ValueClass));
+      else
+         $Result .= $Item;
+      
+      return Wrap($Result, 'span', array('class' => 'Meta'));
+   }
+}
+
+if (!function_exists('MetaList')) {
+   function MetaList($Data, $MetaFormat = NULL) {
+      if (!$MetaFormat)
+         $MetaFormat = Gdn::Controller()->Data('_MetaFormat');
+      
+      $Result = array();
+      foreach ($MetaFormat as $Name => $Options) {
+         $Meta = Meta($Data, $Name, $Options);
+         if ($Meta)
+            $Result[] = $Meta;
+      }
+      $Result = '<div class="MetaList">'.implode("\n", $Result).'</div>';
+      return $Result;
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
  * /applications/garden/locale/en-US/definitions.php.
  */
 if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-		// Make sure to fix comma-formatted numbers
+   function Plural($Number, $Singular, $Plural, $Zero = NULL) {
+      if ($Zero === NULL)
+         $Zero = $Plural;
+		
+      // Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      
+      switch ($WorkingNumber) {
+         case 0:
+            return $Zero ? sprintf(T($Zero), $Number) : '';
+         case 1:
+            return sprintf(T($Singular), $Number);
+         default;
+            return sprintf(T($Plural), $Number);
+      }
    }
+}
+
+function UnCamelCase($Str) {
+   $Str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $Str);
+   $Str = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $Str);
+   $Str = trim($Str);
+   return $Str;
 }
 
 /**
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = NULL) {
-      $Px = $Options;
-      $Name = GetValue($Px.'Name', $User, T('Unknown'));
+   function UserAnchor($User, $CssClass = '', $Prefix = NULL) {
+      $Name = GetValue($Prefix.'Name', $User, T('Unknown'));
+      if (!$Name)
+         return '';
 
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
@@ -187,18 +318,21 @@ if (!function_exists('UserPhoto')) {
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
-      if ($User->Photo) {
-         if (!preg_match('`^https?://`i', $User->Photo)) {
-            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+
+      $Photo = $User->Photo;
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User);
+
+      if ($Photo) {
+         if (!preg_match('`^https?://`i', $Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
-            $PhotoUrl = $User->Photo;
+            $PhotoUrl = $Photo;
          }
          
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
             .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
             .'</a>';
-      } elseif (function_exists('UserPhotoDefault')) {
-         return UserPhotoDefault($User, $Options);
       } else {
          return '';
       }

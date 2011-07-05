@@ -32,7 +32,7 @@ class SetupController extends DashboardController {
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
       
-      $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
+      $Installed = C('Garden.Installed') ? TRUE : FALSE;
       if ($Installed)
          throw new Exception('Vanilla has already been installed.');
       
@@ -160,7 +160,7 @@ class SetupController extends DashboardController {
                     
             // If changing locale, redefine locale sources:
             $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
-            if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
+            if ($NewLocale !== FALSE && C('Garden.Locale') != $NewLocale) {
                $ApplicationManager = new Gdn_ApplicationManager();
                $Locale = Gdn::Locale();
                $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
@@ -169,7 +169,7 @@ class SetupController extends DashboardController {
             // Install db structure & basic data.
             $Database = Gdn::Database();
             $Database->Init();
-            $Drop = FALSE; // Gdn::Config('Garden.Version') === FALSE ? TRUE : FALSE;
+            $Drop = FALSE; // C('Garden.Version') === FALSE ? TRUE : FALSE;
             $Explicit = FALSE;
             try {
                include(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'structure.php');

@@ -14,9 +14,11 @@ class TagModule extends Gdn_Module {
    protected $_DiscussionID;
    
    public function __construct($Sender = '') {
+      parent::__construct($Sender);
       $this->_TagData = FALSE;
       $this->_DiscussionID = 0;
-      parent::__construct($Sender);
+      $this->Path(__FILE__);
+      $this->_ApplicationFolder = '';
    }
    
    public function GetData($DiscussionID = '') {
@@ -33,7 +35,7 @@ class TagModule extends Gdn_Module {
          ->Where('t.CountDiscussions >', 0, FALSE)
          ->OrderBy('t.CountDiscussions', 'desc')
          ->Limit(25)
-         ->Get();
+         ->Get()->ResultArray();
    }
 
    public function AssetTarget() {
@@ -41,35 +43,9 @@ class TagModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if ($this->_TagData->NumRows() == 0)
+      if (empty($this->_TagData))
          return '';
       
-      $String = '';
-      ob_start();
-      ?>
-      <div class="Box Tags">
-         <h4><?php echo T($this->_DiscussionID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
-         <ul class="PanelInfo">
-         <?php
-         foreach ($this->_TagData->Result() as $Tag) {
-            if ($Tag->Name != '') {
-         ?>
-            <li><strong><?php 
-                           if (urlencode($Tag->Name) == $Tag->Name) {
-                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
-                           } else {
-                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
-                           }
-                        ?></strong> <span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
-         <?php
-            }
-         }
-         ?>
-         </ul>
-      </div>
-      <?php
-      $String = ob_get_contents();
-      @ob_end_clean();
-      return $String;
+      return parent::ToString();
    }
 }

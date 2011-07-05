@@ -71,6 +71,7 @@ class DiscussionController extends VanillaController {
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
       // Setup
       $this->Title($this->Discussion->Name);
@@ -230,6 +231,7 @@ class DiscussionController extends VanillaController {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
       $this->Menu->HighlightRoute('/discussions');
+      Gdn_Theme::SetSection('Discussion');
    }
 
    /**
@@ -250,7 +252,7 @@ class DiscussionController extends VanillaController {
       
       // Figure out how many comments are before this one
       $Offset = $this->CommentModel->GetOffset($Comment);
-      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+      $Limit = C('Vanilla.Comments.PerPage', 50);
       
       // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
       //$Offset = floor($Offset / $Limit) * $Limit;

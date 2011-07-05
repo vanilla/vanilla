@@ -687,7 +687,7 @@ class Gdn_Format {
          } else {
             // The text does not contain html and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
-            $Result = htmlspecialchars($Mixed);
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -700,6 +700,55 @@ class Gdn_Format {
       }
    }
 
+   public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
+      $Regex = "`([<>])`i";
+      $Parts = preg_split($Regex, $Html, null, PREG_SPLIT_DELIM_CAPTURE);
+
+//      echo htmlspecialchars($Html);
+//      echo '<pre>';
+//      echo htmlspecialchars(print_r($Parts, TRUE));
+//      echo '</pre>';
+
+      $InTag = FALSE;
+      $InAnchor = FALSE;
+      $TagName = FALSE;
+
+      foreach ($Parts as $i => $Str) {
+         switch($Str) {
+            case '<':
+               $InTag = TRUE;
+               break;
+            case '>':
+               $InTag = FALSE;
+               break;
+            default;
+               if ($InTag) {
+                  if ($Str[0] == '/') {
+                     $TagName = preg_split('`\s`', substr($Str, 1), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = FALSE;
+                  } else {
+                     $TagName = preg_split('`\s`', trim($Str), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = TRUE;
+                  }
+               } else {
+                  if (!$InAnchor || !$SkipAnchors) {
+                     $Parts[$i] = call_user_func($Callback, $Str);
+                  }
+               }
+               break;
+         }
+      }
+
+//      return htmlspecialchars(implode('', $Parts));
+      return implode($Parts);
+   }
+
    /** Formats the anchor tags around the links in text.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
@@ -709,10 +758,10 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
-         $Regex = "`(?:(</?)([a-z]+))|(/\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         $Regex = "`(?:(</?)([a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
-//         var_dump($Parts);
+//         echo '<pre>', print_r($Parts, TRUE), '</pre>';
 
          self::LinksCallback(NULL);
 
@@ -724,6 +773,7 @@ class Gdn_Format {
          return $Mixed;
       }
    }
+   
    protected static function LinksCallback($Matches) {
       static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
@@ -732,6 +782,7 @@ class Gdn_Format {
       if ($Matches === NULL) {
          $InTag = 0;
          $InAnchor = FALSE;
+         return;
       }
 
       $InOut = $Matches[1];
@@ -742,7 +793,7 @@ class Gdn_Format {
       if ($InOut == '<')
          $InTag++;
       elseif ($InOut == '</') {
-         $InTag--;
+         $InTag++;
          $InAnchor = FALSE;
       } elseif ($Matches[3])
          $InTag--;
@@ -808,7 +859,7 @@ EOT;
          'normal'=>array( 640, 385),
          'big'  => array( 853, 505),
          'huge' => array(1280, 745));
-      $Size = Gdn::Config('Garden.Format.EmbedSize', 'normal');
+      $Size = C('Garden.Format.EmbedSize', 'normal');
       
       // We allow custom sizes <Width>x<Height>
       if (!isset($Sizes[$Size])) {
@@ -861,7 +912,7 @@ EOT;
          // Check for a custom formatter.
          $Formatter = Gdn::Factory('MentionsFormatter');
          if (is_object($Formatter)) {
-            return $Formatter->Format($Mixed);
+            return $Formatter->FormatMentions($Mixed);
          }
 
          // Handle @mentions.

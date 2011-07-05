@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
    <description><?php echo Gdn_Format::Text($this->Head->Title()); ?></description>
-   <language><?php echo Gdn::Config('Garden.Locale', 'en-US'); ?></language>
+   <language><?php echo C('Garden.Locale', 'en-US'); ?></language>
    <atom:link href="<?php echo Url('discussions/feed.rss'); ?>" rel="self" type="application/rss+xml" />
 <?php
 foreach ($this->DiscussionData->Result() as $Discussion) {

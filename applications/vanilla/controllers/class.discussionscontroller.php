@@ -60,6 +60,34 @@ class DiscussionsController extends VanillaController {
     */
    public $CategoryID;
    
+   public function __get($Name) {
+      switch ($Name) {
+         case 'Announcements':
+         case 'AnnounceData':
+            Deprecated("DiscussionsController->$Name", "DiscussionsController->Data('Announcements')");
+            return $this->Data('Announcements');
+         case 'Discussions':
+         case 'DiscussionData':
+            Deprecated("DiscussionsController->$Name", "DiscussionsController->Data('Discussions')");
+            return $this->Data('Discussions');
+         case 'Pager':
+            Deprecated('DiscussionsController->Pager', 'PagerModule::Write()');
+            
+            $PagerFactory = new Gdn_PagerFactory();
+            $this->EventArguments['PagerType'] = 'Pager';
+            $this->FireEvent('BeforeBuildPager');
+            $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+            $this->Pager->ClientID = 'Pager';
+            $this->Pager->Configure(
+               $Page,
+               $Limit,
+               $CountDiscussions,
+               'discussions/%1$s'
+            );
+            return $this->Pager;
+      }
+   }
+   
    /**
     * Default all discussions view: chronological by most recent comment.
     * 
@@ -77,8 +105,9 @@ class DiscussionsController extends VanillaController {
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
       
-      // Setup head
-		$this->Title(T('All Discussions'));
+      // Setup head.
+      if (!$this->Data('Title'))
+         $this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
@@ -92,31 +121,20 @@ class DiscussionsController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->Watching = TRUE;
       
-      // Get Discussion Count
+      // Get announcements.
+      $Announcements = $Page == 0 ? $DiscussionModel->GetAnnouncements() : new Gdn_DataSet(array());
+		$this->SetData('Announcements', $Announcements);
+      
+      // Get discussions.
+      $Discussions = $DiscussionModel->Get($Page, $Limit);
+      $this->SetData('Discussions', $Discussions, FALSE);
+      
+      // Get discussion Count
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
       
-      // Get Announcements
-      $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
-		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
+      $this->SetData('CountTotal', $CountDiscussions + $Announcements->NumRows());
       
-      // Get Discussions
-      $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
-      $this->SetData('Discussions', $this->DiscussionData, TRUE);
-      $this->SetJson('Loading', $Page . ' to ' . $Limit);
-
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-		$this->EventArguments['PagerType'] = 'Pager';
-		$this->FireEvent('BeforeBuildPager');
-      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Configure(
-         $Page,
-         $Limit,
-         $CountDiscussions,
-         'discussions/%1$s'
-      );
       if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'discussions/{Page}');
       $this->SetData('_Page', $Page);
@@ -165,6 +183,19 @@ class DiscussionsController extends VanillaController {
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
+      
+      Gdn_Theme::SetSection('DiscussionList');
+      
+      $MetaFormat = array(
+          'Announce' => array('Format' => 'Tag', 'Label' => 'Announcement'),
+          'Closed' => array('Format' => 'Tag'),
+          'CountComments' => array('Plural', '%s comment', '%s comments'),
+          'CountUnreadComments' => array('Plural', '%s New', '%s New Plural', FALSE),
+          'Last' => array('Format' => 'User', 'Label' => 'Most recent by'),
+          'DateLastComment' => array('Format' => 'Date', 'Label' => FALSE)
+          // 'CategoryID' => 'Category'
+      );
+      $this->SetData('_MetaFormat', $MetaFormat);
 			
 		$this->FireEvent('AfterInitialize');
    }

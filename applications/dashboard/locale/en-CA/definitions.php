@@ -19,14 +19,6 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
-if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
-		// Make sure to fix comma-formatted numbers
-      $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
-   }
-}
-
 $Definition['Locale'] = 'en-CA';
 $Definition['_Locale'] = 'Locale';
 
@@ -98,19 +90,19 @@ $Definition['EmailPassword'] = '%2$s has reset your password at %3$s. Your login
   Email: %6$s
   Password: %5$s
   Url: %4$s';
-$Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+$Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailWelcomeRegister'] = 'You have successfully registered for an account at {Title}. Here is your information:
 
   Username: {User.Name}
   Email: {User.Email}
 
-You can access the site at {/,url,domain}.';
+You can access the site at {/,exurl,domain}.';
 $Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
 
   Username: {User.Name}
   Connected With: {ProviderName}
 
-You can access the site at {/,url,domain}.';
+You can access the site at {/,exurl,domain}.';
 $Definition['PasswordRequest'] = 'Someone has requested to reset your password at %2$s. To reset your password, follow this link:
 
   %3$s
@@ -141,6 +133,7 @@ $Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 $Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
+$Definition['%s New'] = '%s new';
 $Definition['%s New Plural'] = '%s new';
 
 $Definition['TermsOfService'] = 'Terms of Service';

@@ -333,7 +333,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SelfUrl = '';
       $this->SyndicationMethod = SYNDICATION_NONE;
       $this->Theme = Theme();
-      $this->ThemeOptions = Gdn::Config('Garden.ThemeOptions', array());
+      $this->ThemeOptions = C('Garden.ThemeOptions', array());
       $this->View = '';
       $this->_CssFiles = array();
       $this->_JsFiles = array();
@@ -345,7 +345,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Headers = array(
          'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
          'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
-         'Content-Type' => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', ''), // PROPERLY ENCODE THE CONTENT
+         'Content-Type' => C('Garden.ContentType', '').'; charset='.C('Garden.Charset', ''), // PROPERLY ENCODE THE CONTENT
          'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT' // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
          // $Dispatcher->Header('Cache-Control', 'no-cache, must-revalidate'); // PREVENT PAGE CACHING: HTTP/1.1
          // $Dispatcher->Header('Pragma', 'no-cache'); // PREVENT PAGE CACHING: HTTP/1.0
@@ -518,6 +518,20 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Data($Path, $Default = '' ) {
       $Result = GetValueR($Path, $this->Data, $Default);
+      
+      switch ($Default) {
+         case DEFAULT_ARRAY:
+            if (!is_array($Result))
+               $Result = array();
+            break;
+         case DEFAULT_DATASET:
+            if (!is_a($Result, 'Gdn_DataSet'))
+               $Result = new Gdn_DataSet();
+            break;
+         default:
+            
+      }
+      
       return $Result;
    }
 
@@ -777,7 +791,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return $this->Assets[$AssetName];
       
       // Include the module sort
-      $Modules = Gdn::Config('Modules', array());
+      $Modules = C('Modules', array());
       if($this->ModuleSortContainer === FALSE)
          $ModuleSort = FALSE; // no sort wanted
       elseif(array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
@@ -879,7 +893,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Initialize() {
       if (is_object($this->Menu))
-         $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
+         $this->Menu->Sort = C('Garden.Menu.Sort');
    }
    
    public function JsFiles() {
@@ -1022,7 +1036,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View = $this->FetchView($View, $ControllerName, $ApplicationFolder);
          // Add the view to the asset container if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_VIEW)
-            $this->AddAsset($AssetName, $View, 'Content');
+            $this->AddAsset($AssetName, $View, 'View');
       }
 
       // Redefine the view as the entire asset contents if necessary
@@ -1085,7 +1099,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Add definitions to the page
             if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset('Foot', $this->DefinitionList());
+               $this->AddAsset('Foot', $this->DefinitionList(), 'Definitions');
 
             // Render
             $this->RenderMaster();
@@ -1183,6 +1197,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          case DELIVERY_METHOD_JSON:
          default:
+            header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->Get('callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');

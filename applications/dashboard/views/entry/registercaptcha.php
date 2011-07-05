@@ -2,9 +2,9 @@
 <h1><?php echo T("Apply for Membership") ?></h1>
 <div class="Box">
    <?php
-   $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
+   $TermsOfServiceUrl = C('Garden.TermsOfService', '#');
    $TermsOfServiceText = sprintf(T('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
-   $CaptchaPublicKey = Gdn::Config('Garden.Registration.CaptchaPublicKey');
+   $CaptchaPublicKey = C('Garden.Registration.CaptchaPublicKey');
    $Request = Gdn::Request();
    $CaptchaSSL = (StringBeginsWith(Url('/', TRUE), 'https') || Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'SERVER_PORT') == 443) ? TRUE : FALSE;
    

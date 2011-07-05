@@ -76,8 +76,9 @@ class CategoriesController extends VanillaController {
             throw NotFoundException();
          return $this->Discussions();
       }
+      Gdn_Theme::SetSection('DiscussionList');
 			
-		// Load the breadcrumbs
+		// Load the breadcrumbs.
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
       
       $this->SetData('Category', $Category, TRUE);
@@ -186,6 +187,7 @@ class CategoriesController extends VanillaController {
 		$this->AddModule($CategoryFollowToggleModule);
 
       $this->CanonicalUrl(Url('/categories/all', TRUE));
+      Gdn_Theme::SetSection('CategoryList');
 
       $this->Render();
 	}
@@ -217,7 +219,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
 			if ($Category->CategoryID > 0)
-				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));
+				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'd.Announce' => 0));
       }
       
       // Add modules

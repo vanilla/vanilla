@@ -68,11 +68,11 @@ class SplitMergePlugin extends Gdn_Plugin {
       $CommentIDs = array();
       foreach ($CheckedComments as $DiscID => $Comments) {
          foreach ($Comments as $Comment) {
-            if (substr($Comment, 0, 8) == 'Comment_' && $DiscID == $DiscussionID)
+            if ($DiscID == $DiscussionID)
                $CommentIDs[] = str_replace('Comment_', '', $Comment);
          }
       }
-      // Load category data
+      // Load category data.
       $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if ($Sender->ShowCategorySelector) {
          $CategoryModel = new CategoryModel();
@@ -106,6 +106,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          // Create a new discussion record
          $Data = $Sender->Form->FormValues();
          $Data['Body'] = sprintf(T('This discussion was created from comments split from: %s.'), Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/'));
+         $Data['Format'] = 'Html';
          $NewDiscussionID = $DiscussionModel->Save($Data);
          $Sender->Form->SetValidationResults($DiscussionModel->ValidationResults());
          
@@ -120,7 +121,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             // Update counts on both discussions
             $CommentModel = new CommentModel();
             $CommentModel->UpdateCommentCount($DiscussionID);
-            $CommentModel->UpdateUserCommentCounts($DiscussionID);
+//            $CommentModel->UpdateUserCommentCounts($DiscussionID);
             $CommentModel->UpdateCommentCount($NewDiscussionID);
    
             // Clear selections
@@ -129,6 +130,8 @@ class SplitMergePlugin extends Gdn_Plugin {
             ModerationController::InformCheckedComments($Sender);
             $Sender->RedirectUrl = Url('discussion/'.$NewDiscussionID.'/'.Gdn_Format::Url($Data['Name']));
          }
+      } else {
+         $Sender->Form->SetValue('CategoryID', GetValue('CategoryID', $Discussion));
       }
       
       $Sender->Render($this->GetView('splitcomments.php'));
@@ -188,7 +191,8 @@ class SplitMergePlugin extends Gdn_Plugin {
                   );
                   $CommentModel->Save(array(
                      'DiscussionID' => $DiscussionID,
-                     'Body' => sprintf(T('This discussion was merged into %s'), $DiscussionAnchor)
+                     'Body' => sprintf(T('This discussion was merged into %s'), $DiscussionAnchor),
+                     'Format' => 'Html'
                   ));
                   // Close non-merge discussions
                   $CommentModel->SQL->Update('Discussion')->Set('Closed', '1')->Where('DiscussionID', $DiscussionID)->Put();
@@ -196,7 +200,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    
                // Update counts on all affected discussions
                $CommentModel->UpdateCommentCount($DiscussionID);
-               $CommentModel->UpdateUserCommentCounts($DiscussionID);
+//               $CommentModel->UpdateUserCommentCounts($DiscussionID);
             }
    
             // Clear selections

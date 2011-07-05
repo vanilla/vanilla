@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-if (Gdn::Config('Garden.Profile.ShowAbout')) {
+if (C('Garden.Profile.ShowAbout')) {
 ?>
 <div class="Box About">
    <h4><?php echo T('About'); ?></h4>

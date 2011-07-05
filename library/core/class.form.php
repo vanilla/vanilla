@@ -53,7 +53,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    If a model is assigned, the model name is used instead.
     * @access public
     */
-   public $InputPrefix = 'Form';
+   public $InputPrefix = '';
 
    /**
     * @var string Form submit method. Options are 'post' or 'get'.
@@ -1013,8 +1013,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= $this->Hidden('TransientKey',
             array('value' => $Session->TransientKey()));
          // Also add a honeypot if Forms.HoneypotName has been defined
-         $HoneypotName = Gdn::Config(
-            'Garden.Forms.HoneypotName');
+         $HoneypotName = C('Garden.Forms.HoneypotName');
          if ($HoneypotName) $Return .= $this->Hidden($HoneypotName,
             array('Name' => $HoneypotName, 'style' => "display: none;"));
       }
@@ -1271,7 +1270,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // forms sent with "get" method do not require authentication.
       //   return TRUE;
       //} else {
-      $KeyName = $this->InputPrefix . '/TransientKey';
+      $KeyName = ConcatSep('/', $this->InputPrefix, 'TransientKey');
       $PostBackKey = isset($_POST[$KeyName]) ? $_POST[$KeyName] : FALSE;
       $Session = Gdn::Session();
       // DEBUG:
@@ -1652,7 +1651,8 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function SetModel($Model, $DataSet = FALSE) {
       $this->_Model = $Model;
-      $this->InputPrefix = $this->_Model->Name;
+      if ($this->InputPrefix && $this->InputPrefix != $this->_Model->Name)
+         $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
    

@@ -533,6 +533,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function Index() {
+      $this->View = 'SignIn';
       $this->SignIn();
    }
    
@@ -951,7 +952,7 @@ class EntryController extends Gdn_Controller {
     * @return string Method name.
     */
    protected function _RegistrationView() {
-      $RegistrationMethod = Gdn::Config('Garden.Registration.Method');
+      $RegistrationMethod = C('Garden.Registration.Method');
       if (!in_array($RegistrationMethod, array('Closed', 'Basic','Captcha','Approval','Invitation','Connect')))
          $RegistrationMethod = 'Basic';
          
@@ -1269,6 +1270,9 @@ class EntryController extends Gdn_Controller {
     */
    public function EmailConfirm($UserID, $EmailKey = '') {
       $User = $this->UserModel->GetID($UserID);
+      
+      if (!$User)
+         throw NotFoundException('User');
 
       $EmailConfirmed = $this->UserModel->ConfirmEmail($User, $EmailKey);
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());

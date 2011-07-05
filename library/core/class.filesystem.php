@@ -60,7 +60,7 @@ class Gdn_FileSystem {
       if(!is_array($SourceFolders))
          $SourceFolders = array($SourceFolders);
    
-      $BlackList = Gdn::Config('Garden.FolderBlacklist');
+      $BlackList = C('Garden.FolderBlacklist');
       if (!is_array($BlackList))
          $BlackList = array('.', '..');
          

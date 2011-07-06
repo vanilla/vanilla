@@ -65,11 +65,14 @@ class DiscussionModel extends VanillaModel {
 			->Select('d.CountBookmarks')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          ->Select('iu.Photo', '', 'FirstPhoto')
+         ->Select('iu.Email', '', 'FirstEmail')
          ->Select('d.Body') // <-- Need these for rss!
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
+         ->Select('lcu.Photo', '', 'LastPhoto')
+         ->Select('lcu.Email', '', 'LastEmail')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->Select('ca.PermissionCategoryID')

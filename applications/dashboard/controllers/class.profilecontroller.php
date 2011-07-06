@@ -58,24 +58,33 @@ class ProfileController extends Gdn_Controller {
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
          
-         // Update About if necessary
-         $ActivityType = 'WallComment';
+         // Update About if necessary.
          $SendNotification = TRUE;
          if ($Session->UserID == $this->User->UserID) {
             $SendNotification = FALSE;
             $this->UserModel->SaveAbout($Session->UserID, $Comment);
             $this->User->About = $Comment;
             $this->SetJson('UserData', $this->FetchView('user'));
+            
+            $ActivityUserID = $Session->UserID;
+            $RegardingUserID = $ActivityUserID;
             $ActivityType = 'AboutUpdate';
+         } else {
+            $ActivityUserID = $this->User->UserID;
+            $RegardingUserID = $Session->UserID;
+            $ActivityType = 'WallPost';
          }
+         
          $NewActivityID = $this->ActivityModel->Add(
-            $Session->UserID,
+            $ActivityUserID,
             $ActivityType,
             $Comment,
-            $this->User->UserID,
+            $RegardingUserID,
             '',
             '/profile/'.$this->ProfileUrl(),
-            $SendNotification);
+            FALSE);
+         
+         // TODO: Add a notification too.
 
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('dashboard/profile/'.$this->ProfileUrl());

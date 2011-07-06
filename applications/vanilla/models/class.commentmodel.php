@@ -52,6 +52,7 @@ class CommentModel extends VanillaModel {
       $this->SQL->Select('c.*')
          ->Select('iu.Name', '', 'InsertName')
          ->Select('iu.Photo', '', 'InsertPhoto')
+         ->Select('iu.Email', '', 'InsertEmail')
          ->Select('uu.Name', '', 'UpdateName')
          ->Select('du.Name', '', 'DeleteName')
          ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')

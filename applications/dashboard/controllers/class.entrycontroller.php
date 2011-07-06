@@ -208,6 +208,9 @@ class EntryController extends Gdn_Controller {
                         $UserID = Gdn::Session()->UserID;
                      else
                         $UserID = $AuthenticationResponse;
+                     
+                     header("X-Vanilla-Authenticated: yes");
+                     header("X-Vanilla-TransientKey: ".Gdn::Session()->TransientKey());
                      $Reaction = $Authenticator->SuccessResponse();
                }
             } catch (Exception $Ex) {

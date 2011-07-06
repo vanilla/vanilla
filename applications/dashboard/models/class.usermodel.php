@@ -479,14 +479,19 @@ class UserModel extends Gdn_Model {
       if ($SystemUserID)
          return $SystemUserID;
       
-      $SystemUserID = $this->SQL->Insert($this->Name, array(
+      $SystemUser = array(
          'Name' => T('System'),
          'Password' => RandomString('20'),
          'HashMethod' => 'Random',
          'Email' => 'system@domain.com',
          'DateInserted' => Gdn_Format::ToDateTime(),
          'Admin' => '2'
-      ));
+      );
+      
+      $this->EventArguments['SystemUser'] = &$SystemUser;
+      $this->FireEvent('BeforeSystemUser');
+      
+      $SystemUserID = $this->SQL->Insert($this->Name, $SystemUser);
       
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
       return $SystemUserID;

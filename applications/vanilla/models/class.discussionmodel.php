@@ -65,11 +65,14 @@ class DiscussionModel extends VanillaModel {
 			->Select('d.CountBookmarks')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
          ->Select('iu.Photo', '', 'FirstPhoto')
+         ->Select('iu.Email', '', 'FirstEmail')
          ->Select('d.Body') // <-- Need these for rss!
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
+         ->Select('lcu.Photo', '', 'LastPhoto')
+         ->Select('lcu.Email', '', 'LastEmail')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->Select('ca.PermissionCategoryID')
@@ -569,6 +572,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('lcu.Name', '', 'LastName')
 			->Select('iu.Name', '', 'InsertName')
 			->Select('iu.Photo', '', 'InsertPhoto')
+         ->Select('iu.Email', '', 'InsertEmail')
          ->From('Discussion d')
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
@@ -776,11 +780,20 @@ class DiscussionModel extends VanillaModel {
             if ($DiscussionID > 0) {
                // Updating
                $Stored = $this->GetID($DiscussionID);
+               
+               // Clear the cache if necessary.
+               if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
+                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+
+                  $Announce = GetValue('Announce', $Discussion);
+                  $this->SQL->Cache($CacheKeys);
+               }
 
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
                $Fields['DiscussionID'] = $DiscussionID;
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, (array)$Stored);
+               
 
                if($Stored->CategoryID != $Fields['CategoryID']) 
                   $StoredCategoryID = $Stored->CategoryID;
@@ -791,6 +804,14 @@ class DiscussionModel extends VanillaModel {
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
+               
+               // Clear the cache if necessary.
+               if (GetValue('Announce', $Fields)) {
+                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+
+                  $Announce = GetValue('Announce', $Discussion);
+                  $this->SQL->Cache($CacheKeys);
+               }
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);

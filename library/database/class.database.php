@@ -97,7 +97,7 @@ class Gdn_Database {
     * Begin a transaction on the database.
     */
    public function BeginTransaction() {
-      if(!$this->_InTransaction)
+      if (!$this->_InTransaction)
          $this->_InTransaction = $this->Connection()->beginTransaction();
    }
    
@@ -112,9 +112,8 @@ class Gdn_Database {
     * Commit a transaction on the database.
     */
    public function CommitTransaction() {
-      if($this->_InTransaction) {
+      if ($this->_InTransaction)
          $this->_InTransaction = !$this->Connection()->commit();
-      }
    }
 	
 	/**

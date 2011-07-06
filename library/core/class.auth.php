@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+      if (!C('Garden.Installed', FALSE) && !$ForceStart) return;
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -18,6 +19,10 @@ class Gdn_Auth {
    public function SetIdentity($Value, $Persist = FALSE) {
       Deprecated(__Function__, 'Gdn_Session::Start()');
       Gdn::Session()->Start($Value, TRUE, $Persist);
+   /**
+    *
+    * @return type Gdn_CookieIdentity
+    */
    }
 
    public function SignInUrl($Target = '/') {

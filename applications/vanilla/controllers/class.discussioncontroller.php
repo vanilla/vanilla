@@ -405,11 +405,13 @@ class DiscussionController extends VanillaController {
          }
       }
       
+      $Target = $this->Request->Get('Target', 'discussions');
+      
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('discussions');
+         Redirect($Target);
          
-      $this->RedirectUrl = Url('discussions');
+      $this->RedirectUrl = Url($Target);
       $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }

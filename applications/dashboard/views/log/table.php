@@ -32,7 +32,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
          <td>
             <?php
                $Url = FALSE;
-               if ($Row['Operation'] == 'Edit') {
+               if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
                   switch (strtolower($Row['RecordType'])) {
                      case 'discussion':
                         $Url = "/discussion/{$Row['RecordID']}/x/p1";

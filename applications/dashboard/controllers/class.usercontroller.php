@@ -241,8 +241,6 @@ class UserController extends DashboardController {
             $RequestedRoles = $this->Form->GetFormValue('RoleID');
             
             if (!is_array($RequestedRoles)) $RequestedRoles = array();
-            $RequestedRoles[] = 64;
-            $RequestedRoles[] = 16;
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
             

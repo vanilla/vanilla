@@ -20,7 +20,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * are: (string) Name, (bool) PrimaryKey, (string) Type, (bool) AllowNull,
  * (string) Default, (int) Length, (array) Enum.
  *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
+ * @since 2.0.16
  */
 
 if (!function_exists('ValidateCaptcha')) {
@@ -117,6 +122,13 @@ if (!function_exists('ValidateWebAddress')) {
 }
 
 if (!function_exists('ValidateUsernameRegex')) {
+   /**
+    * Builds and returns the regex used to validate usernames
+    * 
+    * @since 2.0.18
+    * @staticvar string $ValidateUsernameRegex Compiled username validation regex
+    * @return string Regex used to validate a username
+    */
    function ValidateUsernameRegex() {
       static $ValidateUsernameRegex;
       
@@ -131,6 +143,12 @@ if (!function_exists('ValidateUsernameRegex')) {
 }
 
 if (!function_exists('ValidateUsername')) {
+   /**
+    * Validates a username against the ValidateUsernameRegex
+    * 
+    * @param string $Value Username to validate
+    * @return boolean Whether the username is valid or not
+    */
    function ValidateUsername($Value, $Field = '') {
       $ValidateUsernameRegex = ValidateUsernameRegex();
       
@@ -159,6 +177,12 @@ if (!function_exists('ValidateUrlStringRelaxed')) {
 }
 
 if (!function_exists('ValidateDate')) {
+   /**
+    * Check if a date is valid, and in a proper format
+    * 
+    * @param type $Value
+    * @return boolean Validity of date
+    */
    function ValidateDate($Value) {
       // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
       if (empty($Value)) {
@@ -182,6 +206,14 @@ if (!function_exists('ValidateDate')) {
 }
 
 if (!function_exists('ValidateMinimumAge')) {
+   /**
+    * Check a provided age against a regex
+    * 
+    * @param type $Value
+    * @param type $Field
+    * @param type $FormPostedValues
+    * @return boolean|string TRUE, or string error on failure // ugh
+    */
    function ValidateMinimumAge($Value, $Field, $FormPostedValues) {
       $MinimumAge = C('Garden.Validate.MinimumAge', 13);
       // Dates should be in YYYY-MM-DD format

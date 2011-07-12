@@ -22,10 +22,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class ProxyRequest {
    
-   /**
-    * Static cross-instance store of connection instances
-    * @var array
-    */
    protected static $ConnectionHandles;
    
    public $MaxReadSize = 4096;
@@ -321,14 +317,17 @@ class ProxyRequest {
 
       $Defaults = array(
           'URL'                  => NULL,
+          'Method'               => 'GET',
           'ConnectTimeout'       => 5,
           'Timeout'              => 2,
           'Redirects'            => TRUE,
-          'Recycle'              => FALSE,
-          'RequestsPerPointer'   => 0,
-          'Cookies'              => TRUE,
-          'CloseSession'         => TRUE,
-          'Redirected'           => FALSE
+          'Recycle'              => FALSE,      // Whether to reuse this pointer if possible.
+          'RequestsPerPointer'   => 0,          // How often to recycle pointers reusable pointers.
+          'Cookies'              => TRUE,       // Send cookies?
+          'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
+          'Redirected'           => FALSE,      // Flag. Is this a redirected request?
+          'Debug'                => FALSE,      // Debug output on?
+          'Simulate'             => FALSE       // Don't actually request, just set up
       );
 
       $this->ResponseHeaders = array();
@@ -343,6 +342,7 @@ class ProxyRequest {
       $this->Options = $Options = array_merge($Defaults, $Options);
 
       $RelativeURL = GetValue('URL', $Options);
+      $RequestMethod = GetValue('Method', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
@@ -350,18 +350,37 @@ class ProxyRequest {
       $SendCookies = GetValue('Cookies', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
       $Redirected = GetValue('Redirected', $Options);
+      $Debug = GetValue('Debug', $Options, FALSE);
+      $Simulate = GetValue('Simulate', $Options);
       
       if ($CloseSesssion)
          @session_write_close();
+      
+      $OldVolume = $this->Loud;
+      if ($Debug)
+         $this->Loud = TRUE;
 
       $Url = $RelativeURL;
-      if (stristr($RelativeURL, '?'))
-         $Url .= '&';
-      else
-         $Url .= '?';
-      $Url .= http_build_query($QueryParams);
+      
+      $RequestMethod = strtoupper($RequestMethod);
+      $PostData = http_build_query($QueryParams);
+      switch ($RequestMethod) {
+         case 'POST':
+            
+            break;
+         
+         case 'GET':
+         default:
+            if (stristr($RelativeURL, '?'))
+               $Url .= '&';
+            else
+               $Url .= '?';
+            $Url .= $PostData;
+            break;
+      }
+      
 
-      //echo " : Requesting {$Url}\n";
+      if ($Debug) echo " : Requesting {$Url}\n";
       $this->Action("Requesting {$Url}");
 
       $UrlParts = parse_url($Url);
@@ -404,15 +423,15 @@ class ProxyRequest {
          if ($Cookie != '' && $SendCookies)
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
 
-         // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
-         // 
-         //if ($Query != '') {
-         //   curl_setopt($Handler, CURLOPT_POST, 1);
-         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
-         //}
-
+         if ($RequestMethod == 'POST') {
+            curl_setopt($Handler, CURLOPT_POST, 1);
+            curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
+         }
+         
          $this->CurlReceive($Handler);
 
+         if ($Simulate) return NULL;
+         
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          
@@ -421,7 +440,8 @@ class ProxyRequest {
 
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();
-         $SendHeaders[] = "GET $Path?$Query HTTP/1.1";
+         
+         $SendHeaders[] = "{$RequestMethod} $Path?$Query HTTP/1.1";
          $SendHeaders[] = "Host: {$HostHeader}";
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
@@ -441,16 +461,30 @@ class ProxyRequest {
 
          if (strlen($Cookie) > 0 && $SendCookies)
             $SendHeaders[] = "Cookie: {$Cookie}";
-
+            
+         if ($RequestMethod == 'POST') {
+            $SendHeaders[] = "Content-Type: application/x-www-form-urlencoded";
+            $PostDataLength = strlen($PostData);
+            $SendHeaders[] = "Content-Length: {$PostDataLength}";
+         }
+         
          $this->RequestHeaders = $SendHeaders;
          
          $Header = "";
          foreach ($SendHeaders as $SendHeader) {
             $Header .= "{$SendHeader}\r\n";
-            //echo " > {$SendHeader}\n";
+            if ($Debug) echo " > {$SendHeader}\n";
          }
          $Header .= "\r\n";
-
+         if ($RequestMethod == 'POST') {
+            if ($Debug) echo "Sending POST data\n";
+            $Header .= $PostData;
+            if ($Debug) echo " > {$PostData}\n";
+            $Header .= "\r\n";
+         }
+         
+         if ($Simulate) return NULL;
+         
          // Send the request headers
          $this->FsockSend($Pointer, $Header);
          
@@ -458,7 +492,7 @@ class ProxyRequest {
          $this->FsockReceive($Pointer);
 
          if (!$Recycle || $this->ConnectionMode == 'close') {
-            //echo " : Closing onetime pointer for {$HostAddress}\n";
+            if ($Debug) echo " : Closing onetime pointer for {$HostAddress}\n";
             $this->FsockDisconnect($Pointer, $HostAddress);
          }
 
@@ -483,6 +517,7 @@ class ProxyRequest {
          throw new Exception('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.');
       }
       
+      $this->Loud = $OldVolume;
       return $this->ResponseBody;
    }
    

@@ -104,6 +104,9 @@ $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
+$Configuration['Garden']['User']['ValidationRegex']             = "\d\w_";
+$Configuration['Garden']['User']['ValidationLength']            = "{3,20}";
+
 
 // Formatting
 $Configuration['Garden']['Format']['Mentions']                  = TRUE;

@@ -102,11 +102,12 @@ class Gdn_Locale extends Gdn_Pluggable {
     *  automatically force a remapping.
     */
    public function Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
+      
       $SafeLocaleName = preg_replace('/([^\w\d_-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
       $LocaleSources = array();
       
-      if(!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
-      if(!is_array($PluginWhiteList)) $PluginWhiteList = array();
+      if (!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
+      if (!is_array($PluginWhiteList)) $PluginWhiteList = array();
       
       Gdn_LibraryMap::PrepareCache('locale', NULL, 'tree');
       $LocaleSources = Gdn_LibraryMap::GetCache('locale',$SafeLocaleName);
@@ -134,7 +135,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          $Theme = C('Garden.Theme');
          if($Theme) {
             $ThemeLocalePath = PATH_THEMES."/$Theme/locale/$LocaleName.php";
-            if(file_exists($ThemeLocalePath))
+            if (file_exists($ThemeLocalePath))
                $LocaleSources[] = $ThemeLocalePath;
          }
 
@@ -184,8 +185,8 @@ class Gdn_Locale extends Gdn_Pluggable {
       $LocaleSources = Gdn_LibraryMap::GetCache('locale', $SafeLocaleName);
       if (is_null($SafeLocaleName))
          $LocaleSources = array();
-
-      $ConfLocaleOverride = PATH_LOCAL_CONF . DS . 'locale.php';
+      
+      $ConfLocaleOverride = PATH_LOCAL_CONF.'/locale.php';
       $Count = count($LocaleSources);
       for($i = 0; $i < $Count; ++$i) {
          if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last
@@ -239,6 +240,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @return string
     */
    public function Translate($Code, $Default = FALSE) {
+      
       if ($Default === FALSE)
          $Default = $Code;
 

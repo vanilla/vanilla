@@ -14,6 +14,21 @@ class LogModel extends Gdn_Pluggable {
    public function Delete($LogIDs) {
       if (!is_array($LogIDs))
          $LogIDs = explode(',', $LogIDs);
+      
+      // Get the log entries.
+      $Logs = Gdn::SQL()->GetWhere('Log', array('LogID' => $LogIDs))->ResultArray();
+      $Models = array();
+      $Models['Discussion'] = new DiscussionModel();
+      $Models['Comment'] = new CommentModel();
+      
+      foreach ($Logs as $Log) {
+         if ($Log['Operation'] == 'Moderate' && array_key_exists($Log['RecordType'], $Models)) {
+            // Also delete the record.
+            $Model = $Models[$Log['RecordType']];
+            $Model->Delete($Log['RecordID'], array('Log' => FALSE));
+         }
+      }
+      
       Gdn::SQL()->WhereIn('LogID', $LogIDs)->Delete('Log');
    }
 
@@ -209,7 +224,17 @@ class LogModel extends Gdn_Pluggable {
             if ($InsertUserID != $LogRow2['InsertUserID'] && !in_array($InsertUserID, $OtherUserIDs)) {
                $OtherUserIDs[] = $InsertUserID;
             }
-            $Count = (int)$LogRow2['CountGroup'] + 1;
+            
+            if (array_key_exists('OtherUserIDs', $Options)) {
+               $OtherUserIDs = array_merge($OtherUserIDs, $Options['OtherUserIDs']);
+               $OtherUserIDs = array_unique($OtherUserIDs);
+               $OtherUserIDs = array_diff($OtherUserIDs, array($InsertUserID));
+               
+               $Count = count($OtherUserIDs) + 1;
+            } else {
+               $Count = (int)$LogRow2['CountGroup'] + 1;
+            }
+            
             Gdn::SQL()->Put(
                'Log',
                array('OtherUserIDs' => implode(',', $OtherUserIDs), 'CountGroup' => $Count, 'DateUpdated' => Gdn_Format::ToDateTime()),

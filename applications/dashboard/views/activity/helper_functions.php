@@ -10,19 +10,20 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    $CssClass = 'Item Activity '.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
-   if (in_array($ActivityType, array('WallComment', 'AboutUpdate')))
+   if (in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate')))
       $CssClass .= ' Condensed';
       
    $Title = '';
    $Excerpt = $Activity->Story;
-   if (!in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
+   if (!in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
       $Title = '<div class="Title">'.Gdn_Format::ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
-   } else if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
+   } else if ($ActivityType == 'WallPost') {
       $RegardingUser = UserBuilder($Activity, 'Regarding');
+      $PhotoAnchor = UserPhoto($RegardingUser);
       $Title = '<div class="Title">'
-         .UserAnchor($Author, 'Title Name')
-         .' <span>&rarr;</span> '
          .UserAnchor($RegardingUser, 'Name')
+         .' <span>&rarr;</span> '
+         .UserAnchor($Author, 'Title Name')
          .'</div>';
       $Excerpt = Gdn_Format::Display($Excerpt);
    } else {

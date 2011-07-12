@@ -586,8 +586,9 @@ class UserModel extends Gdn_Model {
     * Generic save procedure.
     */
    public function Save($FormPostValues, $Settings = FALSE) {
+      
       // See if the user's related roles should be saved or not.
-      $SaveRoles = ArrayValue('SaveRoles', $Settings);
+      $SaveRoles = GetValue('SaveRoles', $Settings);
 
       // Define the primary key in this model's table.
       $this->DefineSchema();

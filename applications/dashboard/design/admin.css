@@ -1631,6 +1631,9 @@ div.Summary table tbody td {
 .Tag-Delete {
    background-color: #C70028;
 }
+.Tag-Moderate {
+   background-color: #ae0076;
+}
 
 .Meta-Container {
    margin-top: 10px;

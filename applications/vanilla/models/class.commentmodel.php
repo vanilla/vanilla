@@ -856,9 +856,10 @@ class CommentModel extends VanillaModel {
     * @access public
     *
     * @param int $CommentID Unique ID of the comment to be deleted.
+    * @param array $Options Additional options for the delete.
     * @param bool Always returns TRUE.
     */
-   public function Delete($CommentID) {
+   public function Delete($CommentID, $Options = array()) {
       $this->EventArguments['CommentID'] = $CommentID;
 
       // Grab the comment to check on it.
@@ -915,7 +916,8 @@ class CommentModel extends VanillaModel {
 
          // Log the deletion.
          unset($Data['LastCommentID'], $Data['DiscussionDateInserted']);
-         LogModel::Insert('Delete', 'Comment', $Data);
+         if (GetValue('Log', $Options, TRUE))
+            LogModel::Insert('Delete', 'Comment', $Data);
 
 			// Delete the comment.
 			$this->SQL->Delete('Comment', array('CommentID' => $CommentID));

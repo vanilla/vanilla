@@ -1273,7 +1273,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to delete.
     * @return bool Always returns TRUE.
     */
-   public function Delete($DiscussionID) {
+   public function Delete($DiscussionID, $Options = array()) {
 		// Retrieve the users who have bookmarked this discussion.
 		$BookmarkData = $this->GetBookmarkUsers($DiscussionID);
 
@@ -1297,15 +1297,20 @@ class DiscussionModel extends VanillaModel {
       // Execute deletion of discussion and related bits
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
 
+      $Log = GetValue('Log', $Options, TRUE);
+      if ($Log) {
+         LogModel::Insert('Delete', 'Discussion', $Data);
+      }
+      
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      foreach ($Comments as $Comment) {
-         LogModel::Insert('Delete', 'Comment', $Comment);
+      if ($Log || array_key_exists('LogOperation', $Options)) {
+         foreach ($Comments as $Comment) {
+            LogModel::Insert(GetValue('LogOperation', $Options, 'Delete'), 'Comment', $Comment);
+         }
       }
-
+      
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
-
-      LogModel::Insert('Delete', 'Discussion', $Data);
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
       
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));

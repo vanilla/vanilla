@@ -365,6 +365,22 @@ $SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'Unbanned'))->NumRows() == 0)
 $SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %3$s.', 'ProfileHeadline' => '%1$s un-banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Unbanned'), TRUE);
 
+$WallPostType = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->FirstRow(DATASET_TYPE_ARRAY);
+if (!$WallPostType) {
+   $WallPostTypeID = $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallPost', 'FullHeadline' => '%3$s wrote on %2$s %5$s.', 'ProfileHeadline' => '%3$s wrote:'));
+   $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->Value('ActivityTypeID');
+
+   // Update all old wall comments to wall posts.
+   $SQL->Update('Activity')
+      ->Set('ActivityTypeID', $WallPostTypeID)
+      ->Set('ActivityUserID', 'RegardingUserID', FALSE)
+      ->Set('RegardingUserID', 'InsertUserID', FALSE)
+      ->Where('ActivityTypeID', $WallCommentTypeID)
+      ->Where('RegardingUserID is not null')
+      ->Put();
+}
+
+
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('Activity')

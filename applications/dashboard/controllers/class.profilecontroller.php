@@ -43,7 +43,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddModule('GuestModule');
       Gdn_Theme::SetSection('Profile');
       parent::Initialize();
-   }   
+   }
    
    public function Activity($UserReference = '', $Username = '', $UserID = '', $Offset = '0') {
       $this->Permission('Garden.Profiles.View');
@@ -59,24 +59,33 @@ class ProfileController extends Gdn_Controller {
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
          
-         // Update About if necessary
-         $ActivityType = 'WallComment';
+         // Update About if necessary.
          $SendNotification = TRUE;
          if ($Session->UserID == $this->User->UserID) {
             $SendNotification = FALSE;
             $this->UserModel->SaveAbout($Session->UserID, $Comment);
             $this->User->About = $Comment;
             $this->SetJson('UserData', $this->FetchView('user'));
+            
+            $ActivityUserID = $Session->UserID;
+            $RegardingUserID = $ActivityUserID;
             $ActivityType = 'AboutUpdate';
+         } else {
+            $ActivityUserID = $this->User->UserID;
+            $RegardingUserID = $Session->UserID;
+            $ActivityType = 'WallPost';
          }
+         
          $NewActivityID = $this->ActivityModel->Add(
-            $Session->UserID,
+            $ActivityUserID,
             $ActivityType,
             $Comment,
-            $this->User->UserID,
+            $RegardingUserID,
             '',
             '/profile/'.$this->ProfileUrl(),
-            $SendNotification);
+            FALSE);
+         
+         // TODO: Add a notification too.
 
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('dashboard/profile/'.$this->ProfileUrl());
@@ -222,8 +231,10 @@ class ProfileController extends Gdn_Controller {
 
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications();
-		else
+		elseif (C('Garden.Profile.ShowActivities', TRUE))
 			return $this->Activity($User, $Username, $UserID);
+      else
+         return Gdn::Dispatcher()->Dispatch('/profile/discussions/'.ConcatSep('/', rawurlencode($User), rawurlencode($Username), rawurlencode($UserID)));
    }
    
    public function Invitations() {
@@ -760,7 +771,8 @@ class ProfileController extends Gdn_Controller {
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
 
-         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
+         if (C('Garden.Profile.ShowActivities', TRUE))
+            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
             
          $this->FireEvent('AddProfileTabs');
       }

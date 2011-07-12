@@ -8,8 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-require_once(PATH_LIBRARY.DS.'database'.DS.'class.database.php');
-
 class Gdn_DatabaseDebug extends Gdn_Database {
 	/// PROPERTIES ///
 	

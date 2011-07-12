@@ -186,8 +186,11 @@ class UserController extends DashboardController {
       $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
       $this->CanEditUsername = $this->CanEditUsername | Gdn::Session()->CheckPermission('Garden.Users.Edit');
 
-      $RoleModel = new Gdn_Model('Role');
-      $this->RoleData = $RoleModel->Get();
+      $RoleModel = new RoleModel();
+      $AllRoles = $RoleModel->GetArray();
+      
+      // By default, people with access here can freely assign all roles
+      $this->RoleData = $AllRoles;
 
       $UserModel = new UserModel();
       $this->User = $UserModel->Get($UserID);
@@ -198,31 +201,80 @@ class UserController extends DashboardController {
       // Make sure the form knows which item we are editing.
       $this->Form->AddHidden('UserID', $UserID);
 
-      if (!$this->Form->AuthenticatedPostBack()) {
-         $this->Form->SetData($this->User);
-         $this->UserRoleData = $UserModel->GetRoles($UserID);
-      } else {
-         if (!$this->CanEditUsername)
-            $this->Form->SetFormValue("Name", $this->User->Name);
+      try {
+         
+         $AllowEditing = TRUE;
+         $this->EventArguments['AllowEditing'] = &$AllowEditing;
+         $this->EventArguments['TargetUser'] = &$this->User;
+         
+         // These are all the 'effective' roles for this edit action. This list can
+         // be trimmed down from the real list to allow subsets of roles to be
+         // edited.
+         $this->EventArguments['RoleData'] = &$this->RoleData;
+         
+         $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
+         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
+         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
+         $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
+         $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
+         
+         $this->FireEvent("BeforeUserEdit");
+         $this->SetData('AllowEditing', $AllowEditing);
+         
+         if (!$this->Form->AuthenticatedPostBack()) {
+            $this->Form->SetData($this->User);
             
-         // If a new password was specified, add it to the form's collection
-         $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
-         $NewPassword = $this->Form->GetValue('NewPassword', '');
-         if ($ResetPassword !== FALSE)
-            $this->Form->SetFormValue('Password', $NewPassword);
+         } else {
+            if (!$this->CanEditUsername)
+               $this->Form->SetFormValue("Name", $this->User->Name);
+            
+            // If a new password was specified, add it to the form's collection
+            $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
+            $NewPassword = $this->Form->GetValue('NewPassword', '');
+            if ($ResetPassword !== FALSE)
+               $this->Form->SetFormValue('Password', $NewPassword);
+            
+            // Role changes
+            
+            // These are the new roles the editing user wishes to apply to the target
+            // user, adjusted for his ability to affect those roles
+            $RequestedRoles = $this->Form->GetFormValue('RoleID');
+            
+            if (!is_array($RequestedRoles)) $RequestedRoles = array();
+            $RequestedRoles[] = 64;
+            $RequestedRoles[] = 16;
+            $RequestedRoles = array_flip($RequestedRoles);
+            $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
+            
+            // These roles will stay turned on regardless of the form submission contents 
+            // because the editing user does not have permission to modify them
+            $ImmutableRoles = array_diff_key($AllRoles, $this->RoleData);
+            $UserImmutableRoles = array_intersect_key($ImmutableRoles, $this->UserRoleData);
+            
+            // Apply immutable roles
+            foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName)
+               $UserNewRoles[$IMRoleID] = $IMRoleName;
+            
+            // Put the data back into the forum object as if the user had submitted 
+            // this themselves
+            $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
+            
+            if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
+               if ($this->Form->GetValue('Password', '') != '')
+                  $UserModel->SendPasswordEmail($UserID, $NewPassword);
 
-         if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
-            if ($this->Form->GetValue('Password', '') != '')
-               $UserModel->SendPasswordEmail($UserID, $NewPassword);
-
-            $this->InformMessage(T('Your changes have been saved.'));
+               $this->InformMessage(T('Your changes have been saved.'));
+            }
+            
+            $this->UserRoleData = $UserNewRoles;
          }
-         $this->UserRoleData = $this->Form->GetFormValue('RoleID');
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
       }
-
+      
       $this->Render();
    }
-
+   
 	public function EmailAvailable($Email = '') {
 		$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;

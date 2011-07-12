@@ -82,29 +82,59 @@ class UserController extends DashboardController {
       $this->Title(T('Add User'));
 
       $this->AddSideMenu('dashboard/user');
+      
+      $RoleModel = new RoleModel();
+      $AllRoles = $RoleModel->GetArray();
+      
+      // By default, people with access here can freely assign all roles
+      $this->RoleData = $AllRoles;
+      
       $UserModel = new UserModel();
-      $RoleModel = new Gdn_Model('Role');
-      $this->RoleData = $RoleModel->Get();
-      $this->UserRoleData = FALSE;
       $this->User = FALSE;
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
+      
+      try {
+      
+         // These are all the 'effective' roles for this add action. This list can
+         // be trimmed down from the real list to allow subsets of roles to be
+         // edited.
+         $this->EventArguments['RoleData'] = &$this->RoleData;
 
-      if ($this->Form->AuthenticatedPostBack()) {
-         $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE));
-         if ($NewUserID !== FALSE) {
-            $Password = $this->Form->GetValue('Password', '');
-            $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');
-            $this->InformMessage(T('The user has been created successfully'));
-            $this->RedirectUrl = Url('dashboard/user');
+         $this->FireEvent("BeforeUserAdd");
+
+         if ($this->Form->AuthenticatedPostBack()) {
+
+            // These are the new roles the creating user wishes to apply to the target
+            // user, adjusted for his ability to affect those roles
+            $RequestedRoles = $this->Form->GetFormValue('RoleID');
+
+            if (!is_array($RequestedRoles)) $RequestedRoles = array();
+            $RequestedRoles = array_flip($RequestedRoles);
+            $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
+
+            // Put the data back into the forum object as if the user had submitted 
+            // this themselves
+            $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
+
+            $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE));
+            if ($NewUserID !== FALSE) {
+               $Password = $this->Form->GetValue('Password', '');
+               $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');
+               $this->InformMessage(T('The user has been created successfully'));
+               $this->RedirectUrl = Url('dashboard/user');
+            }
+
+            $this->UserRoleData = $UserNewRoles;
+         } else {
+            // Set the default roles.
+            $this->UserRoleData = C('Garden.Registration.DefaultRoles', array());
          }
-         $this->UserRoleData = $this->Form->GetFormValue('RoleID');
-      } else {
-         // Set the default roles.
-         $this->UserRoleData = C('Garden.Registration.DefaultRoles', array());
-      }
 
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
       $this->Render();
    }
 
@@ -338,18 +368,48 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user');
       $this->Title(T('Delete User'));
 
+      $RoleModel = new RoleModel();
+      $AllRoles = $RoleModel->GetArray();
+      
+      // By default, people with access here can freely assign all roles
+      $this->RoleData = $AllRoles;
+      
       $UserModel = new UserModel();
       $this->User = $UserModel->Get($UserID);
-      $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
-      $this->Method = $Method;
-      if ($Method != '')
-         $this->View = 'deleteconfirm';
+      
+      try {
          
-      if ($this->Form->AuthenticatedPostBack() && $Method != '') {
-         $UserModel->Delete($UserID, array('DeleteMethod' => $Method));
-         $this->View = 'deletecomplete';
-      }
+         $CanDelete = TRUE;
+         $this->EventArguments['CanDelete'] = &$CanDelete;
+         $this->EventArguments['TargetUser'] = &$this->User;
+         
+         // These are all the 'effective' roles for this delete action. This list can
+         // be trimmed down from the real list to allow subsets of roles to be
+         // edited.
+         $this->EventArguments['RoleData'] = &$this->RoleData;
+         
+         $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
+         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
+         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
+         $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
+         $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
+         
+         $this->FireEvent("BeforeUserDelete");
+         $this->SetData('CanDelete', $CanDelete);
+         
+         $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
+         $this->Method = $Method;
+         if ($Method != '')
+            $this->View = 'deleteconfirm';
 
+         if ($this->Form->AuthenticatedPostBack() && $Method != '') {
+            $UserModel->Delete($UserID, array('DeleteMethod' => $Method));
+            $this->View = 'deletecomplete';
+         }
+
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
       $this->Render();
    }
 

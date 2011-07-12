@@ -9,7 +9,7 @@ foreach ($this->CommentData->Result() as $Comment) {
 	<div class="ItemContent">
 		<?php echo Anchor(Gdn_Format::Text($Comment->DiscussionName), $Permalink, 'Title'); ?>
 		<div class="Excerpt"><?php
-			echo Anchor(SliceString(Gdn_Format::Text($Comment->Body, FALSE), 250), $Permalink);
+			echo Anchor(SliceString(Gdn_Format::Text(Gdn_Format::To($Comment->Body, $Comment->Format), FALSE), 250), $Permalink);
 		?></div>
 		<div class="Meta">
 			<span><?php printf(T('Comment by %s'), UserAnchor($User)); ?></span>

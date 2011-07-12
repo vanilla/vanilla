@@ -42,7 +42,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
-   }   
+   }
    
    public function Activity($UserReference = '', $Username = '', $UserID = '', $Offset = '0') {
       $this->Permission('Garden.Profiles.View');
@@ -230,8 +230,10 @@ class ProfileController extends Gdn_Controller {
 
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications();
-		else
+		elseif (C('Garden.Profile.ShowActivities', TRUE))
 			return $this->Activity($User, $Username, $UserID);
+      else
+         return Gdn::Dispatcher()->Dispatch('/profile/discussions/'.ConcatSep('/', rawurlencode($User), rawurlencode($Username), rawurlencode($UserID)));
    }
    
    public function Invitations() {
@@ -768,7 +770,8 @@ class ProfileController extends Gdn_Controller {
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
 
-         $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
+         if (C('Garden.Profile.ShowActivities', TRUE))
+            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
             
          $this->FireEvent('AddProfileTabs');
       }

@@ -66,7 +66,7 @@ class Gdn_Theme {
             break;
          case 'dashboard':
             $Path = 'dashboard/settings';
-            TouchValue('Permissions', $Options, 'Garden.Settings.Manage');
+            TouchValue('Permissions', $Options, array('Garden.Settings.Manage','Garden.Settings.View'));
             if (!$Text)
                $Text = T('Dashboard');
             break;
@@ -153,7 +153,7 @@ class Gdn_Theme {
             break;
       }
 
-      if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions']))
+      if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
 
       $Url = Gdn::Request()->Url($Path, $WithDomain);

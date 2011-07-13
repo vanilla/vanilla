@@ -165,7 +165,7 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
 // Start Authenticators
-Gdn::Authenticator()->StartAuthenticator();
+Gdn::Session()->Initialize();
 
 // Include a user-defined bootstrap.
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))

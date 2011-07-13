@@ -208,6 +208,7 @@ if($PermissionModel instanceof PermissionModel) {
 $PermissionModel->Define(array(
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
+   'Garden.Settings.View',
    'Garden.Routes.Manage',
    'Garden.Messages.Manage',
    'Garden.Applications.Manage',

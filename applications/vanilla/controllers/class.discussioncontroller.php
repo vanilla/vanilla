@@ -524,6 +524,8 @@ class DiscussionController extends VanillaController {
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
+      
+      $SuccessTarget = Url('/'.ltrim(GetIncomingValue('Target', '/'),'/'));
       if (
          is_numeric($DiscussionID)
          && $DiscussionID > 0
@@ -543,12 +545,12 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
+         Redirect($SuccessTarget);
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
+      $this->RedirectUrl = $SuccessTarget;
       $this->Render();         
    }
 

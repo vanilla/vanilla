@@ -807,18 +807,18 @@ class Gdn_Format {
 //      $End = $Matches[3];
 //      $Url = $Matches[4];
 
-      if ($InOut == '<')
+      if ($InOut == '<') {
          $InTag++;
-      elseif ($InOut == '</') {
+         if ($Tag == 'a')
+            $InAnchor = TRUE;
+      } elseif ($InOut == '</') {
          $InTag++;
-         $InAnchor = FALSE;
+         if ($Tag == 'a')
+            $InAnchor = FALSE;
       } elseif ($Matches[3])
          $InTag--;
 
-      if ($Tag == 'a')
-         $InAnchor = TRUE;
-
-      if (!isset($Matches[4]) || $InTag)
+      if (!isset($Matches[4]) || $InTag || $InAnchor)
          return $Matches[0];
       $Url = $Matches[4];
 

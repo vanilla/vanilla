@@ -217,6 +217,19 @@ class Gdn_Format {
       // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
       // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
    }
+   
+   /**
+    * Takes a mixed variable, filters unsafe things, renders BBCode and returns it.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function Auto($Mixed) {
+      $Formatter = C('Garden.InputFormatter');
+      if (!method_exists('Gdn_Format', $Formatter)) return $Mixed;
+      
+      return Gdn_Format::$Formatter($Mixed);
+   }
 
    /**
     * Takes a mixed variable.

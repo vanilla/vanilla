@@ -126,7 +126,7 @@ class CommentModel extends VanillaModel {
             ->WhereIn('d.CategoryID', $Perms);
       }
       
-      $this->OrderBy($this->SQL);
+      //$this->OrderBy($this->SQL);
 
       return $this->SQL->Get();
    }

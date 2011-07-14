@@ -30,7 +30,7 @@ class PermissionModel extends Gdn_Model {
 
       if (!$PermissionsCleared) {
          // Remove the cached permissions for all users.
-         $this->SQL->Put('User', array('Permissions' => ''));
+         Gdn::UserModel()->ClearPermissions();
          $PermissionsCleared = TRUE;
       }
    }

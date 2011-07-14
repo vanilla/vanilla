@@ -804,7 +804,8 @@ class CategoryModel extends Gdn_Model {
          }
          
          // Force the user permissions to refresh.
-         $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
+         Gdn::UserModel()->ClearPermissions();
+         
          // $this->RebuildTree();
       } else {
          $CategoryID = FALSE;

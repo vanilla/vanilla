@@ -315,7 +315,7 @@ class DiscussionsController extends VanillaController {
                ->Where('UserID', $UserID)
                ->Get()->Value('CountBookmarks', 0);
 
-            Gdn::SQL()->Put('User', array('CountBookmarks' => $CountBookmarks), array('UserID' => $UserID));
+            Gdn::UserModel()->SetField($UserID, 'CountBookmarks', $CountBookmarks);
          }
       }
       $this->SetData('CountBookmarks', $CountBookmarks);

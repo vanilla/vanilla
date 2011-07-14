@@ -121,7 +121,7 @@ class CommentModel extends VanillaModel {
       $Perms = DiscussionModel::CategoryPermissions();
       
       // Build main query
-      $this->CommentQuery();
+      $this->CommentQuery(TRUE, FALSE);
       $this->FireEvent('BeforeGet');
       $this->SQL
 			->Select('d.Name', '', 'DiscussionName')
@@ -139,7 +139,11 @@ class CommentModel extends VanillaModel {
       
       //$this->OrderBy($this->SQL);
 
-      return $this->SQL->Get();
+      $Data = $this->SQL->Get();
+      Gdn::UserModel()->JoinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+      
+      return $Data;
+      
    }
   
    /** 

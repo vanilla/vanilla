@@ -275,18 +275,18 @@ class Gdn_Session {
 
       // Now retrieve user information
       if ($this->UserID > 0) {
-
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
             if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+            }
 
-               if (Gdn::Authenticator()->ReturningUser($this->User)) {
-                  $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-                  $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
-               }
+            $Returning = Gdn::Authenticator()->ReturningUser($this->User);
+            if ($Returning) {
+               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
             
             $UserModel->EventArguments['User'] =& $this->User;

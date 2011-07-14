@@ -13,7 +13,8 @@ class UserModel extends Gdn_Model {
    const USERID_KEY = 'user.%d';
    const USERNAME_KEY = 'user.%s.name';
    const USERROLES_KEY = 'user.%d.roles';
-   //const USERROLES = 'user.%d.roles';
+   
+   static $UserCache = array();
    
    public $SessionColumns;
    
@@ -194,17 +195,21 @@ class UserModel extends Gdn_Model {
    }
 
    public function Get($UserID) {
+      
+      // Check page cache, then memcached
       $User = $this->GetUserFromCache($UserID, 'userid');
       
+      // If not, query DB
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $this->UserQuery();
-         $User = $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow();
+         $User = $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow(DATASET_TYPE_ARRAY);
          if ($User) {
+            // If success, build more data, then cache user
             $this->SetCalculatedFields($User);
             $this->UserCache($User);
          }
       } else {
-         echo "retrieved user {$ID} from cache\n";
+         echo __METHOD__."retrieved user {$ID} from cache\n";
       }
 
       return $User;
@@ -213,10 +218,23 @@ class UserModel extends Gdn_Model {
    public function GetByUsername($Username) {
 		if ($Username == '')
 		 	return FALSE;
-			
-      $this->UserQuery();
-      $User = $this->SQL->Where('u.Name', $Username)->Get()->FirstRow();
-      $this->SetCalculatedFields($User);
+      
+      // Check page cache, then memcached
+      $User = $this->GetUserFromCache($Username, 'name');
+      
+      if ($User === Gdn_Cache::CACHEOP_FAILURE) {
+         $this->UserQuery();
+         $User = $this->SQL->Where('u.Name', $Username)->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         if ($User) {
+            // If success, build more data, then cache user
+            $this->SetCalculatedFields($User);
+            $this->UserCache($User);
+         }
+      }
+      
+      // By default, FirstRow() gives stdClass
+      $User = (object)$User;
+      
       return $User;
    }
 	public function GetByEmail($Email) {
@@ -340,19 +358,28 @@ class UserModel extends Gdn_Model {
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
 
-   public function GetID($ID, $DatasetType = FALSE) {
+   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
+      
+      // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       
+      // If not, query DB
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
-         $User = parent::GetID($ID, $DatasetType);
-
+         $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
+         
          if ($User) {
+            // If success, build more data, then cache user
             $this->SetCalculatedFields($User);
             $this->UserCache($User);
          }
-      } else {
-         echo "retrieved user {$ID} from cache\n";
       }
+      
+      if (is_array($User) && $DatasetType == DATASET_TYPE_OBJECT)
+         $User = (object)$User;
+      
+      if (is_object($User) && $DatasetType == DATASET_TYPE_ARRAY)
+         $User = (array)$User;
+      
       return $User;
    }
 
@@ -436,48 +463,42 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetRoles($UserID) {
-      return $this->SQL->Select('r.RoleID, r.Name')
-         ->From('UserRole ur')
-         ->Join('Role r', 'ur.RoleID = r.RoleID')
-         ->Where('ur.UserID', $UserID)
-         ->Get();
+      $UserRolesKey = sprintf(self::USERROLES_KEY, $UserID);
+      $RolesDataArray = Gdn::Cache()->Get($UserRolesKey);
+      
+      if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
+         $RolesDataArray = $this->SQL->Select('r.RoleID, r.Name')
+            ->From('UserRole ur')
+            ->Join('Role r', 'ur.RoleID = r.RoleID')
+            ->Where('ur.UserID', $UserID)
+            ->Get()->Result(DATASET_TYPE_ARRAY);
+      }
+      return new Gdn_DataSet($RolesDataArray);
    }
 
    public function GetSession($UserID, $Refresh = FALSE) {
-      static $UserCache = array();
-
-      if(!$Refresh && array_key_exists($UserID, $UserCache)) {
-         return $UserCache[$UserID];
-      }
-
-      $this->SQL
-         ->Select('u.*')
-         //->Select('u.UserID, u.Name, u.Preferences, u.Permissions, u.Attributes, u.HourOffset, u.CountNotifications, u.Admin, u.DateLastActive')
-         //->Select('u.Photo', '', 'Photo')
-         ->From('User u')
-         // Removing this for now. Will break existing installs because you need to have a session to be authenticated to run the structure changes.
-         // ->Where('u.Deleted', 0)
-         ->Where('u.UserID', $UserID);
-         
-      if(is_array($this->SessionColumns)) {
-         $this->SQL->Select($this->SessionColumns);
-      }
-
-      $this->FireEvent('SessionQuery');
-
-      $User = $this->SQL
-         ->Get()
-         ->FirstRow();
-
-      if ($User && $User->Permissions == '')
-         $User->Permissions = $this->DefinePermissions($UserID);
+      // Ask for the user. This will check cache first.
+      $User = $this->GetID($UserID, DATASET_TYPE_OBJECT);
       
+      // TIM: Removed on Jul 14, 2011 for PennyArcade
+      //
+      //$this->FireEvent('SessionQuery');
+      //if (is_array($this->SessionColumns)) {
+      //   $this->SQL->Select($this->SessionColumns);
+      //}
+      //$User = $this->SQL
+      //   ->Get()
+      //   ->FirstRow();
+
+      if ($User && $User->Permissions == '') {
+         $User->Permissions = $this->DefinePermissions($UserID);
+         // Had to generate permissions. Clear cache so it is cached next time
+         $this->ClearCache($UserID);
+      }
+      
+      // Remove secret info from session
       unset($User->Password, $User->HashMethod);
-
-      $this->SetCalculatedFields($User);
-
-      $UserCache[$UserID] = $User;
-
+      
       return $User;
    }
 
@@ -761,7 +782,7 @@ class UserModel extends Gdn_Model {
       
       // Clear cached user data
       if (!$Insert && $UserID) {
-         $this->ClearCache($UserID);
+         $this->ClearCache($UserID, array('user'));
       }
       
       return $UserID;
@@ -853,7 +874,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleID));
       }
       
-      $this->UserCacheRoles($UserID, $RoleIDs);
+      $this->ClearCache($UserID, array('roles'));
       
       // 3. Remove the cached permissions for this user.
       // Note: they are not reset here because I want this action to be
@@ -1735,7 +1756,10 @@ class UserModel extends Gdn_Model {
       $Values = Gdn_Format::Serialize($Values);
 
       // Save the values back to the db
-      return $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));
+      $SaveResult = $this->SQL->Put('User', array($Column => $Values), array('UserID' => $UserID));
+      $this->ClearCache($UserID, array('user'));
+      
+      return $SaveResult;
    }
 
    /**
@@ -2134,7 +2158,6 @@ class UserModel extends Gdn_Model {
     * @return type user array or FALSE
     */
    protected function GetUserFromCache($UserToken, $TokenType) {
-      
       if ($TokenType == 'name') {
          $UserNameKey = sprintf(self::USERNAME_KEY, md5($UserToken));
          $UserID = Gdn::Cache()->Get($UserNameKey);
@@ -2145,6 +2168,11 @@ class UserModel extends Gdn_Model {
       
       if ($TokenType != 'userid') return FALSE;
       
+      // Check local page memory cache first
+      if (array_key_exists($UserID, self::$UserCache))
+         return self::$UserCache[$UserID];
+      
+      // Then memcached
       $UserKey = sprintf(self::USERID_KEY, $UserToken);
       $User = Gdn::Cache()->Get($UserKey);
       
@@ -2162,6 +2190,9 @@ class UserModel extends Gdn_Model {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;
+      
+      // Local memory page cache
+      self::$UserCache[$UserID] = $User;
       
       $UserKey = sprintf(self::USERID_KEY, $UserID);
       $Cached = $Cached & Gdn::Cache()->Store($UserKey, $User);
@@ -2194,14 +2225,21 @@ class UserModel extends Gdn_Model {
     * @param type $UserID
     * @return type 
     */
-   protected function ClearCache($UserID) {
+   protected function ClearCache($UserID, $CacheTypesToClear = NULL) {
       if (is_null($UserID) || !$UserID) return FALSE;
       
-      $UserKey = sprintf(self::USERID_KEY, $UserID);
-      Gdn::Cache()->Remove($UserKey);
-
-      $UserRolesKey = sprintf(self::USERROLES_KEY, $UserID);
-      Gdn::Cache()->Remove($UserRolesKey);
+      if (is_null($CacheTypesToClear))
+         $CacheTypesToClear = array('user', 'roles');
+      
+      if (in_array('user', $CacheTypesToClear)) {
+         $UserKey = sprintf(self::USERID_KEY, $UserID);
+         Gdn::Cache()->Remove($UserKey);
+      }
+      
+      if (in_array('roles', $CacheTypesToClear)) {
+         $UserRolesKey = sprintf(self::USERROLES_KEY, $UserID);
+         Gdn::Cache()->Remove($UserRolesKey);
+      }
       return TRUE;
    }
 }

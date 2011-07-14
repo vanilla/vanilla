@@ -241,7 +241,7 @@ class UserModel extends Gdn_Model {
          // Save the permissions to the user table
          $PermissionsSerialized = Gdn_Format::Serialize($Permissions);
          if ($UserID > 0)
-            $this->SQL->Put('User', array('Permissions' => $Permissions2), array('UserID' => $UserID));
+            $this->SQL->Put('User', array('Permissions' => $PermissionsSerialized), array('UserID' => $UserID));
       }
       
       if ($Serialize && is_null($PermissionsSerialized))
@@ -707,7 +707,7 @@ class UserModel extends Gdn_Model {
                   break;
                case 'CountBookmarks':
                   $Count = $this->SQL->GetCount('UserDiscussion', array('UserID' => $UserID, 'Bookmarked' => '1'));
-                  $this->SQL->Put('User', array('CountBookmarks', array('UserID' => $UserID)));
+                  $this->SetField($UserID, 'CountBookmarks', $Count);
                   break;
                default:
                   $Count = FALSE;
@@ -970,16 +970,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->Insert('UserRole', array('UserID' => $UserID, 'RoleID' => $InsertRoleID));
       }
       
-      $this->ClearCache($UserID, array('roles'));
-      
-      // 3. Remove the cached permissions for this user.
-      // Note: they are not reset here because I want this action to be
-      // performed in one place - /dashboard/library/core/class.session.php
-      // It is done in the session because when a role's permissions are changed
-      // I can then just erase all cached permissions on the user table for
-      // users that are assigned to that changed role - and they can reset
-      // themselves the next time the session is referenced.
-      $this->SQL->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
+      $this->ClearCache($UserID, array('roles', 'permissions'));
 
       if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->Get($UserID);
@@ -1991,7 +1982,7 @@ class UserModel extends Gdn_Model {
          // Remove the email key.
          if (isset($User['Attributes']['EmailKey'])) {
             unset($User['Attributes']['EmailKey']);
-            $this->SQL->Put('User', array('Attributes' => serialize($User['Attributes'])), array('UserID' => $User['UserID']));
+            $this->SaveAttribute($User['UserID'], $User['Attribute']);
          }
 
          return;
@@ -2006,7 +1997,8 @@ class UserModel extends Gdn_Model {
             $Attributes = array('EmailKey' => $Code);
          else
             $Attributes['EmailKey'] = $Code;
-         $this->SQL->Put('User', array('Attributes' => serialize($Attributes)), array('UserID' => $User['UserID']));
+         
+         $this->SaveAttribute($User['UserID'], $Attributes);
       }
       
       $AppTitle = Gdn::Config('Garden.Title');
@@ -2344,7 +2336,7 @@ class UserModel extends Gdn_Model {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       if (is_null($CacheTypesToClear))
-         $CacheTypesToClear = array('user', 'roles');
+         $CacheTypesToClear = array('user', 'roles', 'permissions');
       
       if (in_array('user', $CacheTypesToClear)) {
          $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
@@ -2354,6 +2346,15 @@ class UserModel extends Gdn_Model {
       if (in_array('roles', $CacheTypesToClear)) {
          $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
          Gdn::Cache()->Remove($UserRolesKey);
+      }
+      
+      if (in_array('permissions', $CacheTypesToClear)) {
+         Gdn::SQL()->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
+         
+         $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
+         $PermissionsKeyValue = Gdn::Cache()->Get($PermissionsIncrementKey);
+         $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsKeyValue));
+         Gdn::Cache()->Remove($UserPermissionsKey);
       }
       return TRUE;
    }

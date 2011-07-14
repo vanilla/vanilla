@@ -218,6 +218,17 @@ abstract class Gdn_Cache {
    */
    abstract public function Add($Key, $Value, $Options = array());
    
+   public function StripKey($Key, $Options) {
+      $UsePrefix = !GetValue(Gdn_Cache::FEATURE_NOPREFIX, $Options, FALSE);
+      $ForcePrefix = GetValue(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, NULL);
+      
+      if ($UsePrefix) {
+         $Key = substr($Key, strlen($this->GetPrefix($ForcePrefix)) + 1);
+      }
+      return $Key;
+      
+   }
+   
    /**
    * Store a value in the cache
    * 

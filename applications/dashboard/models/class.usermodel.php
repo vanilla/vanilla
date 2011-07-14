@@ -1948,8 +1948,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetAttribute($UserID, $Attribute, $DefaultValue = FALSE) {
-      $User = $this->GetID($UserID);
-      $Data = GetValue('Attributes', $User);
 //
 //      $Result = $DefaultValue;
 //      if ($Data !== FALSE) {
@@ -1960,7 +1958,7 @@ class UserModel extends Gdn_Model {
 //      }
       
       $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
-         $Attributes = (!is_array($Data)) ? Gdn_Format::Unserialize($Data->Attributes) : $Data;
+      $Result = GetValue($Attribute, $User['Attributes'], $DefaultValue);
       
       return $Result;
    }

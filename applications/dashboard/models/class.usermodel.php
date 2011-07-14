@@ -2364,7 +2364,7 @@ class UserModel extends Gdn_Model {
       $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
       
       $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
-      $PermissionsIncrement = $this->GetPermissionIncrement();
+      $PermissionsIncrement = $this->GetPermissionsIncrement();
       if ($PermissionsIncrement == 0)
          Gdn::Cache()->Store($PermissionsIncrementKey, 1);
       else

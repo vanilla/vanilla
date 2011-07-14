@@ -417,6 +417,10 @@ class UserModel extends Gdn_Model {
    public function GetIDs($IDs) {
       $Data = $this->SQL->GetWhere('User', array('UserID' => $IDs))->ResultArray();
       $Data = Gdn_DataSet::Index($Data, 'UserID');
+      foreach ($Data as $UserID => $User) {
+         $this->UserCache($User);
+      }
+      
       return $Data;
    }
 
@@ -2201,6 +2205,8 @@ class UserModel extends Gdn_Model {
          
          if ($UserID === Gdn_Cache::CACHEOP_FAILURE) return FALSE;
          $UserToken = $UserID; $TokenType = 'userid';
+      } else {
+         $UserID = $UserToken;
       }
       
       if ($TokenType != 'userid') return FALSE;

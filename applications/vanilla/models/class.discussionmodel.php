@@ -47,7 +47,7 @@ class DiscussionModel extends VanillaModel {
     *
     * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
     */
-   public function DiscussionSummaryQuery($AdditionalFields = array()) {
+   public function DiscussionSummaryQuery($AdditionalFields = array(), $Join = TRUE) {
       // Verify permissions (restricting by category if necessary)
       if ($this->Watching)
          $Perms = CategoryModel::CategoryWatch();
@@ -63,23 +63,29 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
 			->Select('d.CountBookmarks')
-         ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
-         ->Select('iu.Photo', '', 'FirstPhoto')
-         ->Select('iu.Email', '', 'FirstEmail')
+         
          ->Select('d.Body') // <-- Need these for rss!
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
-         ->Select('lcu.Name', '', 'LastName')
-         ->Select('lcu.Photo', '', 'LastPhoto')
-         ->Select('lcu.Email', '', 'LastEmail')
          ->Select('ca.Name', '', 'Category')
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->Select('ca.PermissionCategoryID')
          ->From('Discussion d')
-         ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left'); // Category
+      
+      if ($Join) {
+         $this->SQL
+            ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
+            ->Select('iu.Photo', '', 'FirstPhoto')
+            ->Select('iu.Email', '', 'FirstEmail')
+            ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
+         
+            ->Select('lcu.Name', '', 'LastName')
+            ->Select('lcu.Photo', '', 'LastPhoto')
+            ->Select('lcu.Email', '', 'LastEmail')
+            ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left'); // Last comment user
+      }
 		
 		// Add any additional fields that were requested	
 		if(is_array($AdditionalFields)) {
@@ -125,7 +131,7 @@ class DiscussionModel extends VanillaModel {
       
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
-      $this->DiscussionSummaryQuery($AdditionalFields);
+      $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
       $this->SQL
          ->Select('d.*');
          
@@ -177,6 +183,9 @@ class DiscussionModel extends VanillaModel {
 		
 		// Change discussions returned based on additional criteria	
 		$this->AddDiscussionColumns($Data);
+      
+      // Join in the users.
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
 		
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
@@ -340,7 +349,7 @@ class DiscussionModel extends VanillaModel {
       if (count($AnnouncementIDs) == 0)
          return new Gdn_DataSet();
 
-      $this->DiscussionSummaryQuery();
+      $this->DiscussionSummaryQuery(array(), FALSE);
       $this->SQL
          ->Select('d.*');
 
@@ -379,6 +388,8 @@ class DiscussionModel extends VanillaModel {
       
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
+      
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
       
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;

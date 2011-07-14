@@ -134,6 +134,37 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('AfterInsertUser');
       return $UserID;
    }
+   
+   public function JoinUsers(&$Data, $Columns, $Options = array()) {
+      // Grab all of the user fields that need to be joined.
+      $UserIDs = array();
+      foreach ($Data as $Row) {
+         foreach ($Columns as $ColumnName) {
+            $UserIDs[GetValue($ColumnName, $Row)] = 1;
+         }
+      }
+      
+      // Get the users.
+      $Users = $this->GetIDs(array_keys($UserIDs));
+      
+      $Prefixes = array();
+      foreach ($Columns as $ColumnName) {
+         $Prefixes[] = StringEndsWith($ColumnName, 'UserID', TRUE, TRUE);
+      }
+      
+      $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
+      
+      foreach ($Data as &$Row) {
+         foreach ($Prefixes as $Px) {
+            $ID = GetValue($Px.'UserID', $Row);
+            $User = GetValue($ID, $Users, FALSE);
+            
+            foreach ($Join as $Column) {
+               SetValue($Px.$Column, $Row, $User[$Column]);
+            }
+         }
+      }
+   }
 
    /**
     * $SafeData makes sure that the query does not return any sensitive
@@ -332,6 +363,12 @@ class UserModel extends Gdn_Model {
       if ($User)
          $this->SetCalculatedFields($User);
       return $User;
+   }
+   
+   public function GetIDs($IDs) {
+      $Data = $this->SQL->GetWhere('User', array('UserID' => $IDs))->ResultArray();
+      $Data = Gdn_DataSet::Index($Data, 'UserID');
+      return $Data;
    }
 
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {

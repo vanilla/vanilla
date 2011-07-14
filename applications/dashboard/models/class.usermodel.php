@@ -390,7 +390,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
-      
       // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       
@@ -417,7 +416,8 @@ class UserModel extends Gdn_Model {
    public function GetIDs($IDs) {
       $Data = $this->SQL->GetWhere('User', array('UserID' => $IDs))->ResultArray();
       $Data = Gdn_DataSet::Index($Data, 'UserID');
-      foreach ($Data as $UserID => $User) {
+      foreach ($Data as $UserID => &$User) {
+         $this->SetCalculatedFields($User);
          $this->UserCache($User);
       }
       
@@ -1893,20 +1893,25 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetAttribute($UserID, $Attribute, $DefaultValue = FALSE) {
-      $Data = $this->SQL
-         ->Select('Attributes')
-         ->From('User')
-         ->Where('UserID', $UserID)
-         ->Get()
-         ->FirstRow();
-
-      if ($Data !== FALSE) {
-         $Attributes = Gdn_Format::Unserialize($Data->Attributes);
-         if (is_array($Attributes))
-            return ArrayValue($Attribute, $Attributes, $DefaultValue);
-
-      }
-      return $DefaultValue;
+//      $Data = $this->SQL
+//         ->Select('Attributes')
+//         ->From('User')
+//         ->Where('UserID', $UserID)
+//         ->Get()
+//         ->FirstRow();
+//
+//      $Result = $DefaultValue;
+//      if ($Data !== FALSE) {
+//         $Attributes = Gdn_Format::Unserialize($Data->Attributes);
+//         if (is_array($Attributes))
+//            $Result = ArrayValue($Attribute, $Attributes, $DefaultValue);
+//
+//      }
+      
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Result = GetValue($Attribute, $User['Attributes'], $DefaultValue);
+      
+      return $Result;
    }
 
    public function SendEmailConfirmationEmail($User = NULL) {

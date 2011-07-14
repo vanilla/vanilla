@@ -48,18 +48,26 @@ class CommentModel extends VanillaModel {
     * 
     * @param bool $FireEvent Kludge to fix VanillaCommentReplies plugin.
     */
-   public function CommentQuery($FireEvent = TRUE) {
+   public function CommentQuery($FireEvent = TRUE, $Join = TRUE) {
       $this->SQL->Select('c.*')
-         ->Select('iu.Name', '', 'InsertName')
-         ->Select('iu.Photo', '', 'InsertPhoto')
-         ->Select('iu.Email', '', 'InsertEmail')
-         ->Select('uu.Name', '', 'UpdateName')
-         ->Select('du.Name', '', 'DeleteName')
-         ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
-         ->From('Comment c')
-         ->Join('User iu', 'c.InsertUserID = iu.UserID', 'left')
-         ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left')
-         ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
+//         ->Select('du.Name', '', 'DeleteName')
+//         ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
+//         ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
+         ->From('Comment c');
+      
+      if ($Join) {
+         $this->SQL
+            ->Select('iu.Name', '', 'InsertName')
+            ->Select('iu.Photo', '', 'InsertPhoto')
+            ->Select('iu.Email', '', 'InsertEmail')
+            ->Join('User iu', 'c.InsertUserID = iu.UserID', 'left')
+         
+            ->Select('uu.Name', '', 'UpdateName')
+            ->Select('uu.Photo', '', 'UpdatePhoto')
+            ->Select('uu.Email', '', 'UpdateEmail')
+            ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left');
+      }
+      
       if($FireEvent)
          $this->FireEvent('AfterCommentQuery');
    }
@@ -76,7 +84,7 @@ class CommentModel extends VanillaModel {
     * @return object SQL results.
     */
    public function Get($DiscussionID, $Limit, $Offset = 0) {
-      $this->CommentQuery();
+      $this->CommentQuery(TRUE, FALSE);
       $this->EventArguments['DiscussionID'] =& $DiscussionID;
       $this->EventArguments['Limit'] =& $Limit;
       $this->EventArguments['Offset'] =& $Offset;
@@ -88,6 +96,9 @@ class CommentModel extends VanillaModel {
       $this->OrderBy($this->SQL);
 
       $Result = $this->SQL->Get();
+      
+      Gdn::UserModel()->JoinUsers($Result, array('InsertUserID', 'UpdateUserID'));
+      
       $this->EventArguments['Comments'] =& $Result;
       $this->FireEvent('AfterGet');
       

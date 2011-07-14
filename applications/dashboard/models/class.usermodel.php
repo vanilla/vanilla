@@ -413,7 +413,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
-      
       // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       
@@ -1951,14 +1950,19 @@ class UserModel extends Gdn_Model {
    public function GetAttribute($UserID, $Attribute, $DefaultValue = FALSE) {
       $User = $this->GetID($UserID);
       $Data = GetValue('Attributes', $User);
-
-      if ($Data !== FALSE) {
+//
+//      $Result = $DefaultValue;
+//      if ($Data !== FALSE) {
+//         $Attributes = Gdn_Format::Unserialize($Data->Attributes);
+//         if (is_array($Attributes))
+//            $Result = ArrayValue($Attribute, $Attributes, $DefaultValue);
+//
+//      }
+      
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
          $Attributes = (!is_array($Data)) ? Gdn_Format::Unserialize($Data->Attributes) : $Data;
-         if (is_array($Attributes))
-            return ArrayValue($Attribute, $Attributes, $DefaultValue);
-
-      }
-      return $DefaultValue;
+      
+      return $Result;
    }
 
    public function SendEmailConfirmationEmail($User = NULL) {

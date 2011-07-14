@@ -453,9 +453,18 @@ if (!function_exists('ChangeBasename')) {
    }
 }
 
+// Smarty
 if (!function_exists('CheckPermission')) {
    function CheckPermission($PermissionName) {
       $Result = Gdn::Session()->CheckPermission($PermissionName);
+      return $Result;
+   }
+}
+
+// Smarty sux
+if (!function_exists('MultiCheckPermission')) {
+   function MultiCheckPermission($PermissionName) {
+      $Result = Gdn::Session()->CheckPermission($PermissionName, FALSE);
       return $Result;
    }
 }

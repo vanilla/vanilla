@@ -59,7 +59,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          return;
       
       // Verify that the user has permission to perform the split
-      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->CategoryID);
+      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
       
       $CheckedComments = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedComments', array());
       if (!is_array($CheckedComments))
@@ -170,7 +170,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          }
          if ($MergeDiscussion) {
             // Verify that the user has permission to perform the merge
-            $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $MergeDiscussion->CategoryID);
+            $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $MergeDiscussion->PermissionCategoryID);
             
             // Assign the comments to the new discussion record
             $DiscussionModel->SQL

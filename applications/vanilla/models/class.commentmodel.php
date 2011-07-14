@@ -605,26 +605,26 @@ class CommentModel extends VanillaModel {
       // the number of discussions created by the user that s/he has
       // unread messages in) if this comment was not added by the
       // discussion author.
-      $Data = $this->SQL
-         ->Select('d.InsertUserID')
-         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
-         ->From('Discussion d')
-         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
-         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
-         ->Where('w.CountComments >', 0)
-         ->Where('c.InsertUserID', $Session->UserID)
-         ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
-         ->GroupBy('d.InsertUserID')
-         ->Get();
-
-      if ($Data->NumRows() > 0) {
-         $UserData = $Data->FirstRow();
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
-            ->Where('UserID', $UserData->InsertUserID)
-            ->Put();
-      }
+//      $Data = $this->SQL
+//         ->Select('d.InsertUserID')
+//         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+//         ->From('Discussion d')
+//         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
+//         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
+//         ->Where('w.CountComments >', 0)
+//         ->Where('c.InsertUserID', $Session->UserID)
+//         ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
+//         ->GroupBy('d.InsertUserID')
+//         ->Get();
+//
+//      if ($Data->NumRows() > 0) {
+//         $UserData = $Data->FirstRow();
+//         $this->SQL
+//            ->Update('User')
+//            ->Set('CountUnreadDiscussions', $UserData->CountDiscussions)
+//            ->Where('UserID', $UserData->InsertUserID)
+//            ->Put();
+//      }
 
       $this->UpdateUser($Session->UserID, $IncUser && $Insert);
 

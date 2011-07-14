@@ -178,7 +178,16 @@ class Gdn_Memcached extends Gdn_Cache {
             $RealKeys[] = $this->MakeKey($MultiKey, $Options);
          
          $Data = $this->Memcache->getMulti($RealKeys);
-         if ($Data === FALSE) $Data = array();
+         
+         if (is_array($Data) && $Data !== FALSE) {
+            $Data2 = array();
+            foreach ($Data as $Index => $Value) {
+               $Data2[$this->StripKey($Index, $Options)] = $Value;
+            }
+            $Data = $Data2;
+         } else {
+            $Data = array();
+         }
       } else {
          $RealKey = $this->MakeKey($Key, $FinalOptions);
          $Data = $this->Memcache->get($RealKey);

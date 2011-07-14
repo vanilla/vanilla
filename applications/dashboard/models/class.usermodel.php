@@ -191,19 +191,20 @@ class UserModel extends Gdn_Model {
    }
 
    public function DefinePermissions($UserID, $Serialize = TRUE) {
-      $Data = Gdn::PermissionModel()->CachePermissions($UserID);
       
       if (Gdn::Cache()->ActiveEnabled()) {
-         $PermissionsKey = self::INC_PERMISSIONS_KEY;
-         $PermissionsIncrement = Gdn::Cache()->Get($PermissionsKey);
-
+         $PermissionsIncrement = $this->GetPermissionsIncrement();
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array(
             'UserID' => $UserID,
             'PermissionsIncrement' => $PermissionsIncrement
          ));
+         
          $CachePermissions = Gdn::Cache()->Get($UserPermissionsKey);
-         if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) return $CachePermissions;
+         if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) 
+            return $CachePermissions;
       }
+      
+      $Data = Gdn::PermissionModel()->CachePermissions($UserID);
       
       $Permissions = array();
       foreach($Data as $i => $Row) {
@@ -287,7 +288,8 @@ class UserModel extends Gdn_Model {
       }
       
       // By default, FirstRow() gives stdClass
-      $User = (object)$User;
+      if ($User !== FALSE)
+         $User = (object)$User;
       
       return $User;
    }
@@ -412,7 +414,7 @@ class UserModel extends Gdn_Model {
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
 
-   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
+   public function GetID($ID, $DatasetType = DATASET_TYPE_OBJECT) {
       // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       
@@ -2351,9 +2353,8 @@ class UserModel extends Gdn_Model {
       if (in_array('permissions', $CacheTypesToClear)) {
          Gdn::SQL()->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
          
-         $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
-         $PermissionsKeyValue = Gdn::Cache()->Get($PermissionsIncrementKey);
-         $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsKeyValue));
+         $PermissionsIncrement = $this->GetPermissionsIncrement();
+         $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
          Gdn::Cache()->Remove($UserPermissionsKey);
       }
       return TRUE;
@@ -2363,6 +2364,22 @@ class UserModel extends Gdn_Model {
       $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
       
       $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
-      Gdn::Cache()->Increment($PermissionsIncrementKey);
+      $PermissionsIncrement = $this->GetPermissionIncrement();
+      if ($PermissionsIncrement == 0)
+         Gdn::Cache()->Store($PermissionsIncrementKey, 1);
+      else
+         Gdn::Cache()->Increment($PermissionsIncrementKey);
+   }
+   
+   public function GetPermissionsIncrement() {
+      $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
+      $PermissionsKeyValue = Gdn::Cache()->Get($PermissionsIncrementKey);
+      
+      if (!$PermissionsKeyValue) {
+         $Stored = Gdn::Cache()->Store($PermissionsIncrementKey, 1);
+         return $Stored ? 1 : FALSE;
+      }
+      
+      return $PermissionsKeyValue;;
    }
 }

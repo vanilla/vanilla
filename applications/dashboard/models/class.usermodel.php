@@ -42,6 +42,7 @@ class UserModel extends Gdn_Model {
    public function ConfirmEmail($User, $EmailKey) {
       $Attributes = GetValue('Attributes', $User);
       $EmailKey2 = GetValue('EmailKey', $Attributes);
+      $UserID = GetValue('UserID', $User);
       
       if (!$EmailKey2 || $EmailKey != $EmailKey2) {
          $this->Validation->AddValidationResult('EmailKey', '@'.T('Couldn\'t confirm email.',
@@ -51,7 +52,7 @@ class UserModel extends Gdn_Model {
 
       // Update the user's roles.
       $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
-      $this->SaveRoles(GetValue('UserID', $User), $Roles, FALSE);
+      $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
       unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);

@@ -1529,22 +1529,21 @@ class UserModel extends Gdn_Model {
     */
    public function Approve($UserID, $Email) {
       $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
-
+      
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
          throw new Exception(T('ErrorRecordNotFound'));
       } else {
+         $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == $ApplicantRoleID)
-               $ApplicantFound = TRUE;
-         }
+         foreach ($AppRoles as $AppRole)
+            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
       }
 
       if ($ApplicantFound) {
          // Retrieve the default role(s) for new users
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
+         $RoleIDs = C('Garden.Registration.DefaultRoles', array(8));
 
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs, FALSE);

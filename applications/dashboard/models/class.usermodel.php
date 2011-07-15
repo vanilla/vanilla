@@ -1806,11 +1806,7 @@ class UserModel extends Gdn_Model {
     */
    public function SaveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
       // Load the existing values
-      $UserData = $this->SQL->Select($Column)
-         ->From('User')
-         ->Where('UserID', $UserID)
-         ->Get()
-         ->FirstRow();
+      $UserData = $this->GetID($UserID, DATASET_TYPE_OBJECT);
 
       if (!$UserData)
          throw new Exception(T('ErrorRecordNotFound'));

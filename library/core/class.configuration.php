@@ -61,6 +61,8 @@ class Gdn_Configuration {
     */
    protected $_Data = array();
    
+   const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';
+   
    public $NotFound = 'NOT_FOUND';
    
    /**
@@ -320,7 +322,7 @@ class Gdn_Configuration {
       else
          $this->_File = '';
       
-      $FileKey = 'ConfigFile-'.$File;
+      $FileKey = sprintf(self::CONFIG_FILE_CACHE_KEY, $File);
       $LoadedFromCache = FALSE; $UseCache = FALSE;
       if ($this->Caching()) {
          if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
@@ -513,7 +515,7 @@ class Gdn_Configuration {
       if ($FileContents === FALSE)
          trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
 
-      $FileKey = 'ConfigFile-'.$File;
+      $FileKey = sprintf(self::CONFIG_FILE_CACHE_KEY, $File);
       if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
          $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data);
 

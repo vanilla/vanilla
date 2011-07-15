@@ -42,6 +42,7 @@ class UserModel extends Gdn_Model {
    public function ConfirmEmail($User, $EmailKey) {
       $Attributes = GetValue('Attributes', $User);
       $EmailKey2 = GetValue('EmailKey', $Attributes);
+      $UserID = GetValue('UserID', $User);
       
       if (!$EmailKey2 || $EmailKey != $EmailKey2) {
          $this->Validation->AddValidationResult('EmailKey', '@'.T('Couldn\'t confirm email.',
@@ -51,7 +52,7 @@ class UserModel extends Gdn_Model {
 
       // Update the user's roles.
       $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
-      $this->SaveRoles(GetValue('UserID', $User), $Roles, FALSE);
+      $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
       unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
@@ -1528,22 +1529,21 @@ class UserModel extends Gdn_Model {
     */
    public function Approve($UserID, $Email) {
       $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
-
+      
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
          throw new Exception(T('ErrorRecordNotFound'));
       } else {
+         $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == $ApplicantRoleID)
-               $ApplicantFound = TRUE;
-         }
+         foreach ($AppRoles as $AppRole)
+            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
       }
 
       if ($ApplicantFound) {
          // Retrieve the default role(s) for new users
-         $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles', array(8));
+         $RoleIDs = C('Garden.Registration.DefaultRoles', array(8));
 
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
@@ -1634,28 +1634,28 @@ class UserModel extends Gdn_Model {
          ->Where('UserID', $UserID)
          ->Put();
 
+      // Remove user's cache rows
+      $this->ClearCache($UserID);
+      
       return TRUE;
    }
 
    public function Decline($UserID) {
+      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      
       // Make sure the user is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
          throw new Exception(T('ErrorRecordNotFound'));
       } else {
+         $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == C('Garden.Registration.ApplicantRoleID', 0))
-               $ApplicantFound = TRUE;
-         }
+         foreach ($AppRoles as $AppRole)
+            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
       }
 
       if ($ApplicantFound) {
-         // 1. Remove old role associations for this user
-         $this->SQL->Delete('UserRole', array('UserID' => $UserID));
-
-         // Remove the user
-         $this->SQL->Delete('User', array('UserID' => $UserID));
+         $this->Delete($UserID);
       }
       return TRUE;
    }
@@ -1806,16 +1806,16 @@ class UserModel extends Gdn_Model {
     */
    public function SaveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
       // Load the existing values
-      $UserData = $this->SQL->Select($Column)
-         ->From('User')
-         ->Where('UserID', $UserID)
-         ->Get()
-         ->FirstRow();
+      $UserData = $this->GetID($UserID, DATASET_TYPE_OBJECT);
 
       if (!$UserData)
          throw new Exception(T('ErrorRecordNotFound'));
 
-      $Values = unserialize($UserData->$Column);
+      $Values = GetValue($Column, $UserData);
+      
+      if (!is_array($Values) && !is_object($Values))
+         $Values = @unserialize($UserData->$Column);
+      
       // Throw an exception if the field was not empty but is also not an object or array
       if (is_string($Values) && $Values != '')
          throw new Exception(sprintf(T('Serialized column "%s" failed to be unserialized.'),$Column));
@@ -2246,8 +2246,10 @@ class UserModel extends Gdn_Model {
             ->Where('UserID', $RowID)
             ->Put();
       
-      $this->ClearCache($RowID);
-      
+      if (in_array($Property, array('Permissions')))
+         $this->ClearCache ($UserID, array('permissions'));
+      else
+         $this->UpdateUserCache($UserID, $Property, $Value);
 		return $Value;
    }
    
@@ -2280,6 +2282,12 @@ class UserModel extends Gdn_Model {
       $User = Gdn::Cache()->Get($UserKey);
       
       return $User;
+   }
+   
+   protected function UpdateUserCache($UserID, $Field, $Value) {
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      $User[$Field] = $Value;
+      $this->UserCache($User);
    }
    
    /**

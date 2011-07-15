@@ -45,7 +45,7 @@ $Editing = isset($this->Comment);
    if (!$NewOrDraft) 
       $CancelText = $CancelClass = 'Cancel';
 
-   echo Anchor(T($CancelText), 'discussions', $CancelClass);
+   echo Anchor(T($CancelText), '/', $CancelClass);
    
    $ButtonOptions = array('class' => 'Button CommentButton');
    /*

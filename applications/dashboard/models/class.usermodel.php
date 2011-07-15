@@ -1634,28 +1634,28 @@ class UserModel extends Gdn_Model {
          ->Where('UserID', $UserID)
          ->Put();
 
+      // Remove user's cache rows
+      $this->ClearCache($UserID);
+      
       return TRUE;
    }
 
    public function Decline($UserID) {
+      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      
       // Make sure the user is an applicant
       $RoleData = $this->GetRoles($UserID);
       if ($RoleData->NumRows() == 0) {
          throw new Exception(T('ErrorRecordNotFound'));
       } else {
+         $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($RoleData->Result() as $Role) {
-            if ($Role->RoleID == C('Garden.Registration.ApplicantRoleID', 0))
-               $ApplicantFound = TRUE;
-         }
+         foreach ($AppRoles as $AppRole)
+            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
       }
 
       if ($ApplicantFound) {
-         // 1. Remove old role associations for this user
-         $this->SQL->Delete('UserRole', array('UserID' => $UserID));
-
-         // Remove the user
-         $this->SQL->Delete('User', array('UserID' => $UserID));
+         $this->Delete($UserID);
       }
       return TRUE;
    }

@@ -2246,8 +2246,10 @@ class UserModel extends Gdn_Model {
             ->Where('UserID', $RowID)
             ->Put();
       
-      $this->ClearCache($RowID);
-      
+      if (in_array($Property, array('Permissions')))
+         $this->ClearCache ($UserID, array('permissions'));
+      else
+         $this->UpdateUserCache($UserID, $Property, $Value);
 		return $Value;
    }
    
@@ -2280,6 +2282,12 @@ class UserModel extends Gdn_Model {
       $User = Gdn::Cache()->Get($UserKey);
       
       return $User;
+   }
+   
+   protected function UpdateUserCache($UserID, $Field, $Value) {
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      $User[$Field] = $Value;
+      $this->UserCache($User);
    }
    
    /**

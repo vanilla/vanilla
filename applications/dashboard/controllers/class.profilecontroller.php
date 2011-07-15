@@ -274,13 +274,9 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo(); 
       $this->SetTabView('Notifications');
       $Session = Gdn::Session();
-      // Drop notification count back to zero.
-      $SQL = Gdn::SQL();
-      $SQL
-         ->Update('User')
-         ->Set('CountNotifications', '0')
-         ->Where('UserID', $Session->UserID)
-         ->Put();
+      
+      // Drop notification count back to zero.      
+      Gdn::UserModel()->SetField('CountNotification', '0');
       
       $this->ActivityModel = new ActivityModel();
       $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit);

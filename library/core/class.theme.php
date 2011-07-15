@@ -64,6 +64,19 @@ class Gdn_Theme {
          case 'activity':
             TouchValue('Permissions', $Options, 'Garden.Activity.View');
             break;
+         case 'category':
+            $Breadcrumbs = Gdn::Controller()->Data('Breadcrumbs');
+            if (is_array($Breadcrumbs) && count($Breadcrumbs) > 0) {
+               $Last = array_pop($Breadcrumbs);
+               $Path = GetValue('Url', $Last);
+               $DefaultText = GetValue('Name', $Last, T('Back'));
+            } else {
+               $Path = '/';
+               $DefaultText = C('Garden.Title', T('Back'));
+            }
+            if (!$Text)
+               $Text = $DefaultText;
+            break;
          case 'dashboard':
             $Path = 'dashboard/settings';
             TouchValue('Permissions', $Options, array('Garden.Settings.Manage','Garden.Settings.View'));

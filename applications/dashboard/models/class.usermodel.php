@@ -2247,9 +2247,9 @@ class UserModel extends Gdn_Model {
             ->Put();
       
       if (in_array($Property, array('Permissions')))
-         $this->ClearCache ($UserID, array('permissions'));
+         $this->ClearCache ($RowID, array('permissions'));
       else
-         $this->UpdateUserCache($UserID, $Property, $Value);
+         $this->UpdateUserCache($RowID, $Property, $Value);
 		return $Value;
    }
    

@@ -66,16 +66,17 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
-      if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
-      else
-         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
+//      if (!is_numeric($CategoryIdentifier))
+//         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
+//      else
+//         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
+      $Category = CategoryModel::Categories($CategoryIdentifier);
       
       if ($Category === FALSE) {
          if ($CategoryIdentifier)
             throw NotFoundException();
-         return $this->Discussions();
       }
+      $Category = (object)$Category;
 			
 		// Load the breadcrumbs.
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));

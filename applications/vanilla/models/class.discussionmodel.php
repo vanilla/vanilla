@@ -227,9 +227,7 @@ class DiscussionModel extends VanillaModel {
          $Result = $Discussions->Result();
          foreach($Result as &$Discussion) {
             $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
-                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
-            ));
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
             if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
                $Discussion->CountViews = $CacheViews;
          }
@@ -237,9 +235,7 @@ class DiscussionModel extends VanillaModel {
          if (isset($Discussions->DiscussionID)) {
             $Discussion = $Discussions;
             $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey,array(
-                Gdn_Cache::FEATURE_FALLBACK     => array('callback',array('DiscussionModel','GetViewsFallback'),$Discussion->DiscussionID)
-            ));
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
             if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
                $Discussion->CountViews = $CacheViews;
          }
@@ -582,6 +578,9 @@ class DiscussionModel extends VanillaModel {
          ->Where('d.DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow();
+      
+      if (!$Data)
+         return $Data;
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);

@@ -27,7 +27,7 @@ class CommentModel extends VanillaModel {
     * @access protected
     * @since 2.0.0
     */
-   protected $_OrderBy = array(array('c.DateInserted', ''));
+   protected $_OrderBy = array(array('c.CommentID', ''));
    
    /**
     * Class constructor. Defines the related database table name.
@@ -127,7 +127,7 @@ class CommentModel extends VanillaModel {
 			->Select('d.Name', '', 'DiscussionName')
 			->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
          ->Where('c.InsertUserID', $UserID)
-			->OrderBy('c.DateInserted', 'desc')
+			->OrderBy('c.CommentID', 'desc')
          ->Limit($Limit, $Offset);
       
       // Verify permissions (restricting by category if necessary)
@@ -892,7 +892,7 @@ class CommentModel extends VanillaModel {
 					->Select('c.CommentID, c.InsertUserID, c.DateInserted')
 					->From('Comment c')
 					->Where('c.DiscussionID', $Data['DiscussionID'])
-					->OrderBy('c.DateInserted', 'desc')
+					->OrderBy('c.CommentID', 'desc')
 					->Limit(1, 1)
 					->Get()->FirstRow(DATASET_TYPE_ARRAY);
             

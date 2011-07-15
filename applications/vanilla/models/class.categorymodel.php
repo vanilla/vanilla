@@ -450,14 +450,7 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetFullByUrlCode($UrlCode) {
-      $this->SQL
-         ->Select('c.*')
-         ->From('Category c')
-         ->Where('c.UrlCode', $UrlCode);
-         
-      $Data = $this->SQL
-         ->Get()
-         ->FirstRow();
+      $Data = (object)self::Categories($UrlCode);
 
       // Check to see if the user has permission for this category.
       // Get the category IDs.

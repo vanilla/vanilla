@@ -1811,7 +1811,11 @@ class UserModel extends Gdn_Model {
       if (!$UserData)
          throw new Exception(T('ErrorRecordNotFound'));
 
-      $Values = unserialize($UserData->$Column);
+      $Values = GetValue($Column, $UserData);
+      
+      if (!is_array($Values) && !is_object($Values))
+         $Values = @unserialize($UserData->$Column);
+      
       // Throw an exception if the field was not empty but is also not an object or array
       if (is_string($Values) && $Values != '')
          throw new Exception(sprintf(T('Serialized column "%s" failed to be unserialized.'),$Column));

@@ -407,7 +407,9 @@ class ActivityModel extends Gdn_Model {
 
       if ($User) {
          $Preferences = Gdn_Format::Unserialize($User->Preferences);
-         $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
+         $ConfigPreference = C('Preferences.Email.'.$Activity->ActivityType, '0');
+         if ($ConfigPreference !== FALSE)
+            $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, $ConfigPreference);
          if ($Preference) {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();

@@ -457,6 +457,9 @@ class UserModel extends Gdn_Model {
          
          // Query cache layer
          $CacheData = Gdn::Cache()->Get($Keys);
+         if (!is_array($CacheData))
+            $CacheData = array();
+            
          foreach ($CacheData as $RealKey => $User) {
             $ResultUserID = GetValue('UserID', $User);
             $Data[$ResultUserID] = $User;

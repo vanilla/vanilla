@@ -292,12 +292,7 @@ class ConversationModel extends Gdn_Model {
          }
          
          // And update the CountUnreadConversations count on each user related to the discussion.
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
-            ->WhereIn('UserID', $RecipientUserIDs)
-            ->Where('UserID <>', $Session->UserID)
-            ->Put();
+         $this->UpdateUserUnreadCount($RecipientUserIDs, TRUE);
 
          // Add notifications (this isn't done by the conversationmessagemodule
          // because the conversation has not yet been created at the time they are
@@ -367,13 +362,8 @@ class ConversationModel extends Gdn_Model {
          ->Where('uc.Deleted', 0)
          ->Get()->Value('CountUnread', 0);
 
-      if ($Save) {
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadConversations', $CountUnread)
-            ->Where('UserID', $UserID)
-            ->Put();
-      }
+      if ($Save)
+         Gdn::UserModel()->SetField($UserID, 'CountUnreadConversations', $CountUnread);
 
       return $CountUnread;
    }
@@ -489,8 +479,8 @@ class ConversationModel extends Gdn_Model {
             ->Where('ConversationID', $ConversationID)
             ->Put();
          
-         // NOTIFY ALL NEWLY ADDED USERS THAT THEY WERE ADDED TO THE CONVERSATION
          foreach ($AddedUserIDs as $AddedUserID) {
+            // And notify them that they were added to the conversation
             AddActivity(
                $Session->UserID,
                'AddedToConversation',
@@ -500,12 +490,37 @@ class ConversationModel extends Gdn_Model {
             );
          }
          
-         // Update the unread conversation count for each affected user
-         $this->SQL
-            ->Update('User')
-            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
-            ->WhereIn('UserID', $AddedUserIDs)
-            ->Put();
+         $this->UpdateUserUnreadCount($AddedUserIDs);
+      }
+   }
+   
+   public function UpdateUserUnreadCount($UserIDs, $SkipSelf = FALSE) {
+      
+      // Get the current user out of this array
+      if ($SkipSelf)
+         $UserIDs = array_diff($UserIDs, array(Gdn::Session()->UserID));
+      
+      // Update the CountUnreadConversations count on each user related to the discussion.
+      $this->SQL
+         ->Update('User')
+         ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
+         ->WhereIn('UserID', $UserIDs)
+         ->Put();
+         
+      // Query it back since it was an expression
+      $UserData = $this->SQL
+         ->Select('UserID')
+         ->Select('CountUnreadConversations')
+         ->From('User')
+         ->WhereIn('UserID', $UserIDs)
+         ->Get()->Result(DATASET_TYPE_ARRAY);
+
+      // Update the user caches
+      foreach ($UserData as $UpdateUser) {
+         $UpdateUserID = GetValue('UserID', $UpdateUser);
+         $CountUnreadConversations = GetValue('CountUnreadConversations', $UpdateUser);
+         $CountUnreadConversations = (is_numeric($CountUnreadConversations)) ? $CountUnreadConversations : 1;
+         Gdn::UserModel()->UpdateUserCache($UpdateUserID, 'CountUnreadConversations', $CountUnreadConversations);
       }
    }
 }

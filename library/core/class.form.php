@@ -486,6 +486,7 @@ class Gdn_Form extends Gdn_Pluggable {
       
       // Append the rows.
       $Result .= '<tbody>';
+      $CheckCount = 0;
       foreach($Rows as $RowName => $X) {
          $Result .= '<tr><th>';
          
@@ -505,6 +506,8 @@ class Gdn_Form extends Gdn_Pluggable {
                $Attributes = array('value' => $CheckBox['PostValue']);
                if($CheckBox['Value'])
                   $Attributes['checked'] = 'checked';
+//               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
+               $CheckCount++;
                   
                $Result .= $this->CheckBox($FieldName.'[]', '', $Attributes);
             } else {
@@ -1347,26 +1350,23 @@ class Gdn_Form extends Gdn_Pluggable {
       $tmp = $ID;
       $i = 1;
       if ($ForceUniqueID === TRUE) {
-         while(in_array($tmp, $this->_IDCollection)) {
-            $tmp = $ID . $i;
-            $i++;
+         if (array_key_exists($ID, $this->_IDCollection)) {
+            $tmp = $ID.$this->_IDCollection[$ID];
+            $this->_IDCollection[$ID]++;
+         } else {
+            $tmp = $ID;
+            $this->_IDCollection[$ID] = 1;
+            
          }
-         $this->_IDCollection[] = $tmp;
       } else {
          // If not forcing unique (ie. getting the id for a label's "for" tag),
          // get the last used copy of the requested id.
          $Found = FALSE;
-         while(in_array($tmp, $this->_IDCollection)) {
-            $Found = TRUE;
-            $tmp = $ID . $i;
-            $i++;
-         }
-         if ($Found == TRUE && $i > 2) {
-            $i = $i - 2;
-            $tmp = $ID . $i;
-         } else {
+         $Count = GetValue($ID, $this->_IDCollection, 0);
+         if ($Count <= 1)
             $tmp = $ID;
-         }
+         else
+            $tmp = $ID.($Count - 1);
       }
       return $tmp;
    }
@@ -1781,8 +1781,11 @@ class Gdn_Form extends Gdn_Pluggable {
    protected function _IDAttribute(
       $FieldName, $Attributes) {
       // ID from attributes overrides the default.
-      return ' id="' . ArrayValueI('id', $Attributes,
-         $this->EscapeID($FieldName)) . '"';
+      $ID = ArrayValueI('id', $Attributes, FALSE);
+      if (!$ID)
+         $ID = $this->EscapeID($FieldName);
+      
+      return ' id="'.htmlspecialchars($ID).'"';
    }
 
    /**

@@ -36,21 +36,22 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $Format, $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $Format = '<a href="{Url,html}">{Name,html}</a>', $HomeLink = TRUE) {
       $Result = '';
 
       if ($HomeLink) {
          if (!is_string($HomeLink))
             $HomeLink = T('Home');
-            $Result .= '<span class="Label"><a href="'.Url('/').'">'.$HomeLink.'</a></span>';
+            $Result .= '<span class="CrumbLabel"><a href="'.Url('/').'">'.$HomeLink.'</a></span> ';
       }
 
       foreach ($Data as $Row) {
-         $Label = '<span class="Label">'.FormatString($Format, $Row).'</span>';
-         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span>', $Result, $Label);
+         $Row['Url'] = Url($Row['Url']);
+         $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);
       }
 
-      $Result ='<span class="BreadCrumbs">'.$Result.'</span>';
+      $Result ='<span class="Breadcrumbs">'.$Result.'</span>';
       return $Result;
    }
    

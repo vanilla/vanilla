@@ -222,13 +222,9 @@ class DraftModel extends VanillaModel {
    public function UpdateUser($UserID) {
       // Retrieve a draft count
       $CountDrafts = $this->GetCount($UserID);
-         
-      // Save to the attributes column of the user table for this user.
-      $this->SQL
-         ->Update('User')
-         ->Set('CountDrafts', $CountDrafts)
-         ->Where('UserID', $UserID)
-         ->Put();
+      
+      // Update CountDrafts column of user table fot this user
+      Gdn::UserModel()->SetField($UserID, 'CountDrafts', $CountDrafts);
    }
 
 }

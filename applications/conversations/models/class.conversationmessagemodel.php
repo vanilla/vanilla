@@ -217,29 +217,41 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('UserID', $Session->UserID)
             ->Put();
 
-         // Incrememnt the users' inbox counts.
-         $this->SQL
-            ->Update('User u')
-            ->Join('UserConversation uc', 'u.UserID = uc.UserID')
-            ->Set('u.CountUnreadConversations', 'coalesce(u.CountUnreadConversations, 0) + 1', FALSE)
-            ->Where('uc.ConversationID', $ConversationID)
-            ->Where('uc.LastMessageID', $MessageID)
-            ->Where('uc.UserID <>', $Session->UserID)
-            ->Put();
-
-         // Grab the users that need to be notified.
-         $UnreadData = $this->SQL
-            ->Select('uc.UserID')
-            ->From('UserConversation uc')
-            ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
-            // ->Where('uc.LastMessageID', $MessageID)
-            ->Where('uc.UserID <>', $Session->UserID)
-            ->Where('uc.Deleted', 0)
-            ->Get();
+         // Find users involved in this conversation
+         $UserData = $this->SQL
+            ->Select('UserID')
+            ->Select('LastMessageID')
+            ->Select('Deleted')
+            ->From('UserConversation')
+            ->Where('ConversationID', $ConversationID)
+            ->Get()->Result(DATASET_TYPE_ARRAY);
+         
+         $UpdateCountUserIDs = array();
+         $NotifyUserIDs = array();
+         
+         // Collapse for call to UpdateUserCache and ActivityModel
+         foreach ($UserData as $UpdateUser) {
+            $LastMessageID = GetValue('LastMessageID', $UpdateUser);
+            $UserID = GetValue('UserID', $UpdateUser);
+            $Deleted = GetValue('Deleted', $UpdateUser);
+            
+            // Update unread for users that were up to date
+            if ($LastMessageID == $MessageID)
+               $UpdateCountUserIDs[] = $UserID;
+            
+            // Send activities to users that have not deleted the conversation
+            if (!$Deleted)
+               $NotifyUserIDs[] = $UserID;
+         }
+         
+         if (sizeof($UpdateCountUserIDs)) {
+            $ConversationModel = new ConversationModel();
+            $ConversationModel->UpdateUserUnreadCount($UpdateCountUserIDs, TRUE);
+         }
 
          $ActivityModel = new ActivityModel();
-         foreach ($UnreadData->Result() as $User) {
-            if ($Session->UserID == $User->UserID)
+         foreach ($NotifyUserIDs as $NotifyUserID) {
+            if ($Session->UserID == $NotifyUserID)
                continue; // don't notify self.
 
             // Notify the users of the new message.
@@ -247,9 +259,9 @@ class ConversationMessageModel extends Gdn_Model {
                $Session->UserID,
                'ConversationMessage',
                '',
-               $User->UserID,
+               $NotifyUserID,
                '',
-               "/messages/$ConversationID#$MessageID",
+               "/messages/{$ConversationID}#{$MessageID}",
                FALSE
             );
             $Story = GetValue('Body', $Fields, '');

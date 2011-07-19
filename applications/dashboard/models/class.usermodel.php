@@ -2263,7 +2263,7 @@ class UserModel extends Gdn_Model {
     * @param string $TokenType either 'userid' or 'name'
     * @return type user array or FALSE
     */
-   protected function GetUserFromCache($UserToken, $TokenType) {
+   public function GetUserFromCache($UserToken, $TokenType) {
       if ($TokenType == 'name') {
          $UserNameKey = FormatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
          $UserID = Gdn::Cache()->Get($UserNameKey);
@@ -2287,7 +2287,7 @@ class UserModel extends Gdn_Model {
       return $User;
    }
    
-   protected function UpdateUserCache($UserID, $Field, $Value) {
+   public function UpdateUserCache($UserID, $Field, $Value) {
       $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
       $User[$Field] = $Value;
       $this->UserCache($User);
@@ -2299,7 +2299,7 @@ class UserModel extends Gdn_Model {
     * @param type $User
     * @return type 
     */
-   protected function UserCache($User) {
+   public function UserCache($User) {
       $UserID = GetValue('UserID', $User, NULL);
       if (is_null($UserID) || !$UserID) return FALSE;
       
@@ -2327,7 +2327,7 @@ class UserModel extends Gdn_Model {
     * @param type $RoleIDs
     * @return type 
     */
-   protected function UserCacheRoles($UserID, $RoleIDs) {
+   public function UserCacheRoles($UserID, $RoleIDs) {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;
@@ -2343,7 +2343,7 @@ class UserModel extends Gdn_Model {
     * @param type $UserID
     * @return type 
     */
-   protected function ClearCache($UserID, $CacheTypesToClear = NULL) {
+   public function ClearCache($UserID, $CacheTypesToClear = NULL) {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       if (is_null($CacheTypesToClear))

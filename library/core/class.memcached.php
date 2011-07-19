@@ -34,7 +34,7 @@ class Gdn_Memcached extends Gdn_Cache {
       
       $this->Memcache = new Memcached;
       
-      $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, MEMCACHE_COMPRESSED);
+      $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, Memcached::OPT_COMPRESSION);
       $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);
       $this->RegisterFeature(Gdn_Cache::FEATURE_TIMEOUT);
       $this->RegisterFeature(Gdn_Cache::FEATURE_NOPREFIX);

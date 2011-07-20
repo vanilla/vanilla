@@ -267,8 +267,11 @@ class UserModel extends Gdn_Model {
             $this->UserCache($User);
          }
       }
+      
+      if ($User !== FALSE)
+         $User = (object)$User;
 
-      return (object)$User;
+      return $User;
    }
    
    public function GetByUsername($Username) {

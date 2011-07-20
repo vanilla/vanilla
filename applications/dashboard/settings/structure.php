@@ -316,6 +316,22 @@ $Construct->Table('Invitation')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
+   
+// Activity Table
+// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
+$Construct->Table('Activity')
+	->PrimaryKey('ActivityID')
+   ->Column('CommentActivityID', 'int', TRUE, 'key')
+   ->Column('ActivityTypeID', 'int')
+   ->Column('ActivityUserID', 'int', TRUE, 'key')
+   ->Column('RegardingUserID', 'int', TRUE, 'key')
+   ->Column('Story', 'text', TRUE)
+   ->Column('Route', 'varchar(255)', TRUE)
+   ->Column('CountComments', 'int', '0')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -380,23 +396,6 @@ if (!$WallPostType) {
       ->Where('RegardingUserID is not null')
       ->Put();
 }
-
-
-// Activity Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Activity')
-	->PrimaryKey('ActivityID')
-   ->Column('CommentActivityID', 'int', TRUE, 'key')
-   ->Column('ActivityTypeID', 'int')
-   ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE, 'key')
-   ->Column('Story', 'text', TRUE)
-   ->Column('Route', 'varchar(255)', TRUE)
-   ->Column('CountComments', 'int', '0')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Set($Explicit, $Drop);
 
 // Message Table
 $Construct->Table('Message')

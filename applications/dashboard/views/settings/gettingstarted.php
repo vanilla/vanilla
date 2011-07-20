@@ -8,7 +8,7 @@ echo $this->Form->Errors();
    <div class="Welcome">
       <h2><?php echo T('Getting Started with Vanilla'); ?></h2>
       <p><strong><?php echo T('Kick-start your community and increase user engagement.'); ?></strong></p>
-      <p><?php echo T("Vanilla is the simplest, most powerful community platform in the world. It's super duper easy to use. We suggest you start by watching this introductory video and continue with the steps below. Enjoy!"); ?></p>
+      <p><?php echo T("Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
       <a href="http://www.screenr.com/73r" target="_blank"><img src="<?php echo Asset('applications/dashboard/design/images/welcome-screenshot.png'); ?>" title="<?php echo T('Introduction to Vanilla'); ?>" /></a>
    </div>
    <div class="Step">

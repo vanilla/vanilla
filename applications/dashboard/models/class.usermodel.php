@@ -2287,9 +2287,14 @@ class UserModel extends Gdn_Model {
       return $User;
    }
    
-   public function UpdateUserCache($UserID, $Field, $Value) {
+   public function UpdateUserCache($UserID, $Field, $Value = NULL) {
       $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
-      $User[$Field] = $Value;
+      if (!is_array($Field))
+         $Field = array($Field => $Value);
+      
+      foreach ($Field as $f => $v) {
+         $User[$f] = $v;
+      }
       $this->UserCache($User);
    }
    

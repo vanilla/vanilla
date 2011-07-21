@@ -405,18 +405,16 @@ class CategoryModel extends Gdn_Model {
 
       // Build base query
       $this->SQL
-         ->Select('c.Name, c.CategoryID, c.TreeRight, c.TreeLeft, c.Depth, c.Description, c.CountDiscussions, c.CountComments, c.UrlCode, c.LastCommentID, c.PermissionCategoryID, c.Archived')
+         ->Select('c.*')
          ->Select('co.DateInserted', '', 'DateLastComment')
          ->Select('co.InsertUserID', '', 'LastCommentUserID')
-         ->Select('cu.Name', '', 'LastCommentName')
-         ->Select('cu.Photo', '', 'LastCommentPhoto')
-         ->Select('co.DiscussionID', '', 'LastDiscussionID')
          ->Select('d.Name', '', 'LastDiscussionName')
          ->Select('d.CountComments', '', 'LastDiscussionCountComments')
+         ->Select('d.InsertUserID', '', 'LastDiscussionUserID')
+         ->Select('d.DateInserted', '', 'DateLastDiscussion')
          ->From('Category c')
          ->Join('Comment co', 'c.LastCommentID = co.CommentID', 'left')
-         ->Join('User cu', 'co.InsertUserID = cu.UserID', 'left')
-         ->Join('Discussion d', 'd.DiscussionID = co.DiscussionID', 'left')
+         ->Join('Discussion d', 'd.DiscussionID = c.LastDiscussionID', 'left')
          ->Where('c.AllowDiscussions', '1');
 
       $this->FireEvent('AfterGetFullQuery');
@@ -436,6 +434,7 @@ class CategoryModel extends Gdn_Model {
       } else {
          $CategoryData = $this->SQL->OrderBy('TreeLeft', 'asc')->Get();
          $this->AddCategoryColumns($CategoryData);
+         Gdn::UserModel()->JoinUsers($CategoryData, array('LastCommentUserID', 'LastDiscussionUserID'));
          return $CategoryData;
       }
    }
@@ -877,6 +876,11 @@ class CategoryModel extends Gdn_Model {
                $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category->DateLastComment);
             else
                $Category->Read = FALSE;
+         }
+         
+         if (GetValue('LastCommentUserID', $Category) == NULL) {
+            SetValue('LastCommentUserID', $Category, GetValue('LastDiscussionUserID', $Category, NULL));
+            SetValue('DateLastComment', $Category, GetValue('DateLastDiscussion', $Category, NULL));
          }
 
          foreach ($Result2 as $Category2) {

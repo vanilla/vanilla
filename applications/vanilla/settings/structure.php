@@ -20,6 +20,8 @@ $Construct->Table('Category');
 $CategoryExists = $Construct->TableExists();
 $PermissionCategoryIDExists = $Construct->ColumnExists('PermissionCategoryID');
 
+$LastDiscussionIDExists = $Construct->ColumnExists('LastDiscussionID');
+
 $Construct->PrimaryKey('CategoryID')
    ->Column('ParentCategoryID', 'int', TRUE)
    ->Column('TreeLeft', 'int', TRUE)
@@ -39,8 +41,16 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime')
-   ->Column('LastCommentID', 'int', TRUE)
+   ->Column('LastCommentID', 'int', NULL)
+   ->Column('LastDiscussionID', 'int', NULL)
    ->Set($Explicit, $Drop);
+
+if (!$LastDiscussionIDExists) {
+   $SQL->Update('Category c')
+      ->Join('Comment cm', 'c.LastCommentID = cm.CommentID')
+      ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
+      ->Put();
+}
 
 $RootCategoryInserted = FALSE;
 if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {

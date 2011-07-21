@@ -649,6 +649,7 @@ class CommentModel extends VanillaModel {
 				
 				$this->SQL
 					->Update('Category')
+               ->Set('LastDiscussionID', $Discussion->DiscussionID)
 					->Set('LastCommentID', $Discussion->LastCommentID)
 					->Set('CountComments', $CountComments)
 					->Where('CategoryID', $Discussion->CategoryID)

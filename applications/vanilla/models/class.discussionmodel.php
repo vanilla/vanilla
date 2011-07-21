@@ -930,7 +930,7 @@ class DiscussionModel extends VanillaModel {
                $CategoryID = $Data->FirstRow()->CategoryID;
             
             // Update discussion counter for affected categories
-            $this->UpdateDiscussionCount($CategoryID);
+            $this->UpdateDiscussionCount($CategoryID, ($Insert ? $DiscussionID : FALSE));
             if ($StoredCategoryID)
                $this->UpdateDiscussionCount($StoredCategoryID);
 				
@@ -1009,7 +1009,7 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $CategoryID Unique ID of category we are updating.
     */
-   public function UpdateDiscussionCount($CategoryID) {
+   public function UpdateDiscussionCount($CategoryID, $DiscussionID = FALSE) {
 		if(strcasecmp($CategoryID, 'All') == 0) {
 			$Exclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
 			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
@@ -1051,6 +1051,12 @@ class DiscussionModel extends VanillaModel {
 			$Data = $this->SQL->Get()->FirstRow();
          $CountDiscussions = (int)GetValue('CountDiscussions', $Data, 0);
          $CountComments = (int)GetValue('CountComments', $Data, 0);
+         
+         if ($DiscussionID) {
+            $this->SQL
+               ->Set('LastDiscussionID', $DiscussionID)
+               ->Set('LastCommentID', NULL);
+         }
          
          $this->SQL
             ->Update('Category')

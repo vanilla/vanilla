@@ -33,8 +33,8 @@ class EmotifyPlugin implements Gdn_IPlugin {
     * @param Gdn_Controller $Sender
     */
 	private function _Emotify($Sender) {
-		$Sender->AddJsFile('plugins/Emotify/emotify.js');   
-      $Sender->AddCssFile('plugins/Emotify/emotify.css');
+		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');   
+      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
       $Sender->AddDefinition('FormatEmoticons', C('Plugins.Emotify.FormatEmoticons', TRUE));
 	}
 	

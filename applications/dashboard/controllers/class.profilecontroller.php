@@ -657,6 +657,9 @@ class ProfileController extends Gdn_Controller {
       if (!is_array($TabName)) {
 			if ($TabHtml == '')
 				$TabHtml = $TabName;
+         
+         if (!$CssClass && $TabUrl == Gdn::Request()->Path())
+            $CssClass = 'Active';
 				
          $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));
       }

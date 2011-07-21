@@ -943,6 +943,19 @@ if (!function_exists('ForceSSL')) {
    }
 }
 
+if (!function_exists('ForceNoSSL')) {
+   /**
+    * Checks the current url for SSL and redirects to SSL version if not
+    * currently on it. Call at the beginning of any method you want forced to
+    * be in SSL. Garden.AllowSSL must be TRUE in order for this function to
+    * work.
+    */
+   function ForceNoSSL() {
+      if (Gdn::Request()->Scheme() != 'http')
+         Redirect(Gdn::Request()->Url('', TRUE, FALSE));
+   }
+}
+
 // Formats values to be saved as PHP arrays.
 if (!function_exists('FormatArrayAssignment')) {
    function FormatArrayAssignment(&$Array, $Prefix, $Value) {

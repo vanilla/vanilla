@@ -117,6 +117,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @var string
     */
    private $_SyndicationMethod;
+   
+   const BLOCK_NEVER = 0;
+   const BLOCK_PERMISSION = 1;
+   const BLOCK_ANY = 2;
 
    /**
     * Class constructor.
@@ -177,39 +181,57 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
-   
-      try {
-         if (Gdn::Config('Garden.UpdateMode', FALSE) && !Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            // Updatemode, and this user is not an admin
-            $UpdateModeExceptions = array(
-                'utility',
-                'plugin'
-            );
-            $PathRequest = Gdn::Request()->Path();
-            foreach ($UpdateModeExceptions as $UpdateModeException)
-               if (StringBeginsWith ($PathRequest, $UpdateModeException))
-                  throw new Exception();
-                  
-            $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
-         }
-      } catch (Exception $e) {}
       
-      $this->FireEvent('BeforeDispatch');
-      $this->AnalyzeRequest($Request);
-            
-      // Send user to login page if this is a private community (with some minor exceptions)
-      if (
-         C('Garden.PrivateCommunity')
-         && $this->ControllerName() != 'EntryController'
-         && !Gdn::Session()->IsValid()
-         && !InArrayI($this->ControllerMethod(), array('UsernameAvailable', 'EmailAvailable', 'TermsOfService'))
-      ) {
+      // By default, all requests can be blocked by UpdateMode/PrivateCommunity
+      $CanBlock = self::BLOCK_ANY;
+      
+      try {
+         $BlockExceptions = array(
+             'utility'                 => self::BLOCK_NEVER,
+             'plugin'                  => self::BLOCK_NEVER,
+             'entry'                   => self::BLOCK_PERMISSION,
+             'user/usernameavailable'  => self::BLOCK_PERMISSION,
+             'user/emailavailable'     => self::BLOCK_PERMISSION,
+             'home/termsofservice'     => self::BLOCK_PERMISSION
+         );
+         
+         $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
+         $this->FireEvent('BeforeBlockDetect');
+         
+         $PathRequest = Gdn::Request()->Path();
+         foreach ($BlockExceptions as $BlockException => $BlockLevel)
+            if (StringBeginsWith ($PathRequest, $BlockException))
+               throw new Exception("Block detected", $BlockLevel);
+         
+         // Never block an admin
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+            throw new Exception("Block detected", self::BLOCK_NEVER);
+         
+         if (Gdn::Session()->IsValid())
+            throw new Exception("Block detected", self::BLOCK_PERMISSION);
+         
+      } catch (Exception $e) {
+         // BlockLevel
+         //  TRUE = Block any time
+         //  FALSE = Absolutely no blocking
+         //  NULL = Block for permissions (e.g. PrivateCommunity)
+         $CanBlock = $e->getCode();
+      }
+   
+      // If we're in updatemode and arent explicitly prevented from blocking, block
+      if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER)
+         $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
+      
+      // If we're in updatemode and can block, redirect to signin
+      if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
          Redirect('/entry/signin?Target='.urlencode($this->Request));
          exit();
       }
-
-      $ControllerName = $this->ControllerName();
       
+      $this->FireEvent('BeforeDispatch');
+      $this->AnalyzeRequest($Request);
+      
+      $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();

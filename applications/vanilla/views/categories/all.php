@@ -21,6 +21,7 @@ if (C('Vanilla.Categories.ShowTabs')) {
    <?php
 }
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
+   $Alt = FALSE;
    foreach ($this->CategoryData->Result() as $Category) {
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
@@ -50,9 +51,12 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                <div class="ItemContent Category '.$CssClasses.'">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
+            $Alt = FALSE;
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
-            $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.'">
+            $AltCss = $Alt ? ' Alt' : '';
+            $Alt = !$Alt;
+            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.'">
                <div class="ItemContent Category '.$CssClasses.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)

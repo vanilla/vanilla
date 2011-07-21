@@ -433,6 +433,10 @@ class UserModel extends Gdn_Model {
          }
       }
       
+      // Allow FALSE returns
+      if ($User === FALSE || is_null($User))
+         return FALSE;
+      
       if (is_array($User) && $DatasetType == DATASET_TYPE_OBJECT)
          $User = (object)$User;
       

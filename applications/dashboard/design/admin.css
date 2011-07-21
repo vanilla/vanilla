@@ -91,7 +91,6 @@ body {
 	padding: 0;
 	margin: 0 0 0 200px;
 	border-left: 1px solid #82bddd;
-	background: #fff;
 }
 .Hidden {
    display: none;
@@ -1109,7 +1108,7 @@ body.Home #Content {
 	margin: 0 auto;
 }
 #Content .SplashInfo {
-	margin: 80px 0;
+	margin: 80px 0 0 0;
 	border-top: 1px solid #a5d0e7;
 	border-bottom: 1px solid #a5d0e7;
 	background: #e2f4ff;

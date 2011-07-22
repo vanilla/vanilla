@@ -12,12 +12,15 @@ jQuery(document).ready(function($) {
          $(this).keydown(function() {
             if (autosaveOn == false) {
                autosaveOn = true;
-               $(textarea).next().animate({opacity: 1.0}, options.interval, function() {
-                  if ($(textarea).val() != '')
-                     $(options.button).click();
-                     
-                  autosaveOn = false;
-               });
+
+               setTimeout(
+                  function() {
+                     if ($(textarea).val() != '')
+                        $(options.button).click();
+
+                     autosaveOn = false;
+                  },
+                  options.interval);
             }
          });
       });

@@ -71,10 +71,12 @@ class TwitterPlugin extends Gdn_Plugin {
 
       parse_str(GetValue(1, $UrlParts, ''), $Query);
       $Path = Gdn::Request()->Path();
-      $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
 
-//      if (isset($_GET['Target']))
-//         $Query['Target'] = $_GET['Target'];
+      $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+         if (ltrim($Target, '/') == 'entry/signin')
+            $Target = '/';
+      $Query['Target'] = $Target;
+
       if ($Popup)
          $Query['display'] = 'popup';
       $Result = $UrlParts[0].'?'.http_build_query($Query);
@@ -270,7 +272,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Form->SetFormValue('ProviderName', 'Twitter');
       $Form->SetFormValue('Name', GetValue('screen_name', $Profile));
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
-      $Form->SetFormValue('Email', GetValue('screen_name', $Profile).'@foo.com');
+      $Form->SetFormValue('Email', GetValue('screen_name', $Profile).'@via.twitter.com');
       $Form->SetFormValue('Photo', GetValue('profile_image_url', $Profile));
       $Sender->SetData('Verified', TRUE);
    }

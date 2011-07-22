@@ -288,8 +288,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          if (!array_key_exists('Name', ${$VariableName}[$Item]))
             ${$VariableName}[$Item]['Name'] = $Item;
             
-         if (!array_key_exists('Folder', ${$VariableName}[$Item]))
-            ${$VariableName}[$Item]['Folder'] = $Item;
+         if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
+            ${$VariableName}[$Item]['Folder'] = basename(dirname($ThemeFile));
+         }
          
          return ${$VariableName}[$Item];
       } elseif ($VariableName !== NULL) {

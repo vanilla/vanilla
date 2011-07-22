@@ -453,9 +453,18 @@ if (!function_exists('ChangeBasename')) {
    }
 }
 
+// Smarty
 if (!function_exists('CheckPermission')) {
    function CheckPermission($PermissionName) {
       $Result = Gdn::Session()->CheckPermission($PermissionName);
+      return $Result;
+   }
+}
+
+// Smarty sux
+if (!function_exists('MultiCheckPermission')) {
+   function MultiCheckPermission($PermissionName) {
+      $Result = Gdn::Session()->CheckPermission($PermissionName, FALSE);
       return $Result;
    }
 }
@@ -832,7 +841,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && $Format != 'url') {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {
@@ -889,6 +898,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
             break;
+         case 'exurl':
+            if (strpos($Field, '/') !== FALSE)
+               $Value = $Field;
+            $Result = ExternalUrl($Value);
+            break;
          case 'urlencode':
             $Result = urlencode($Value);
             break;
@@ -926,6 +940,19 @@ if (!function_exists('ForceSSL')) {
          if (Gdn::Request()->Scheme() != 'https')
             Redirect(Gdn::Request()->Url('', TRUE, TRUE));
       }
+   }
+}
+
+if (!function_exists('ForceNoSSL')) {
+   /**
+    * Checks the current url for SSL and redirects to SSL version if not
+    * currently on it. Call at the beginning of any method you want forced to
+    * be in SSL. Garden.AllowSSL must be TRUE in order for this function to
+    * work.
+    */
+   function ForceNoSSL() {
+      if (Gdn::Request()->Scheme() != 'http')
+         Redirect(Gdn::Request()->Url('', TRUE, FALSE));
    }
 }
 
@@ -1160,11 +1187,18 @@ if (!function_exists('InSubArray')) {
 
 if (!function_exists('IsMobile')) {
    function IsMobile() {
+      static $IsMobile = 'unset';
+      
+      // Short circuit so we only do this work once per pageload
+      if ($IsMobile != 'unset') return $IsMobile;
+      
+      // Start out assuming not mobile
       $Mobile = 0;
+      
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1199,8 +1233,14 @@ if (!function_exists('IsMobile')) {
       // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
       // if (strpos($UserAgent, 'windows') > 0)
       //   $Mobile = 0;
- 
-      return $Mobile > 0;
+      
+      $IsMobile = ($Mobile > 0);
+      
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if (($Mobile > 0) && $ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+         $IsMobile = NULL;
+      
+      return $IsMobile;
    }
 }
 
@@ -1715,7 +1755,7 @@ if (!function_exists('RandomString')) {
       $CharLen = strlen($Characters) - 1;
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;
@@ -1736,7 +1776,7 @@ if (!function_exists('Redirect')) {
       // assign status code
       $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
-      header("location: ".Url($Destination), TRUE, $SendCode);
+      header("Location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
    }
@@ -2176,23 +2216,6 @@ if (!function_exists('TouchValue')) {
 
       return GetValue($Key, $Collection);
 	}
-}
-
-if (!function_exists('Translate')) {
-   /**
-	 * Translates a code into the selected locale's definition.
-	 *
-	 * @param string $Code The code related to the language-specific definition.
-    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
-	 * @param string $Default The default value to be displayed if the translation code is not found.
-	 * @return string The translated string or $Code if there is no value in $Default.
-	 * @deprecated
-	 * @see Gdn::Translate()
-	 */
-   function Translate($Code, $Default = '') {
-      trigger_error('Translate() is deprecated. Use T() instead.', E_USER_DEPRECATED);
-      return Gdn::Translate($Code, $Default);
-   }
 }
 
 if (!function_exists('TrueStripSlashes')) {

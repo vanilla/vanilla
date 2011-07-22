@@ -417,6 +417,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
    }
 
+   /**
+    * Check whether a plugin is enabled
+    * 
+    * @param string $PluginName
+    * @return bool
+    */
    public function CheckPlugin($PluginName) {
       if (array_key_exists($PluginName, $this->EnabledPlugins()))
          return TRUE;
@@ -757,7 +763,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
       unset($Lines);
       if ($PluginInfoString != '')
-         @eval($PluginInfoString);
+         eval($PluginInfoString);
 
       // Define the folder name and assign the class name for the newly added item
       if (isset(${$VariableName}) && is_array(${$VariableName})) {
@@ -914,7 +920,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    }
    
    public function DisablePlugin($PluginName) {
-      // Get the plugin and make sure it's name is the correct case.
+      // Get the plugin and make sure its name is the correct case.
       $Plugin = $this->GetPluginInfo($PluginName);
       if ($Plugin)
          $PluginName = $Plugin['Index'];
@@ -940,6 +946,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();
+      return TRUE;
    }
 
    public static function SplitAuthors($AuthorsString, $Format = 'html') {

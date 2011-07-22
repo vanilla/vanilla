@@ -11,9 +11,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  */
-function smarty_function_discussions_link($Params, &$Smarty) {
+function smarty_function_nomobile_link($Params, &$Smarty) {
+   $Path = GetValue('path', $Params, '', TRUE);
+   $Text = GetValue('text', $Params, '', TRUE);
    $Wrap = GetValue('wrap', $Params, 'li');
-   return Gdn_Theme::Link('/',
-      GetValue('text', $Params, T('Discussions')),
+   return Gdn_Theme::Link('profile/nomobile',
+      GetValue('text', $Params, T("Full Site")),
       GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

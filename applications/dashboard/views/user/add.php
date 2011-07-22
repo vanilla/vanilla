@@ -41,7 +41,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
-      <?php echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
+      <?php echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>
    </li>
 </ul>
 <?php echo $this->Form->Close('Save');

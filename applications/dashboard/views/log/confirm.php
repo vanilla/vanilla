@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Wrap">
+<div>
    <?php
    $ItemCount = $this->Data('ItemCount');
 

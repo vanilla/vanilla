@@ -60,7 +60,13 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 			WriteOptionList($Object, $Sender, $Session);
 			?>
          <div class="CommentInfo">
-            <?php $Sender->FireEvent('CommentInfo'); ?>
+            <?php
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
+               echo ' '.IPAnchor($Object->InsertIPAddress).' ';
+            }
+
+            $Sender->FireEvent('CommentInfo');
+            ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
@@ -104,7 +110,7 @@ function WriteOptionList($Object, $Sender, $Session) {
          
       // Can the user announce?
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</span>';
+         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</span>';
 
       // Can the user sink?
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))

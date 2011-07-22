@@ -102,9 +102,12 @@ class ConfigurationModule extends Gdn_Module {
          return $SchemaRow['LabelCode'];
 
       $LabelCode = trim(strrchr($SchemaRow['Name'], '.'), '.');
+
       // Split camel case labels into seperate words.
-      $LabelCode = preg_replace('`(?<![A-Z])([A-Z])`', ' $1', $LabelCode);
+      $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
+      $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
       $LabelCode = trim($LabelCode);
+
       return $LabelCode;
    }
 

@@ -216,7 +216,7 @@ class RoleModel extends Gdn_Model {
    }
 
    public static function SetUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
-      $UserIDs = ConsolidateArrayValuesByKey($Users, $UserIDColumn);
+      $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
       $UserRoles = Gdn::SQL()
          ->Select('ur.UserID, ur.RoleID, r.Name')
          ->From('UserRole ur')

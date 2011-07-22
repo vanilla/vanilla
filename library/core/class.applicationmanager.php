@@ -189,6 +189,9 @@ class Gdn_ApplicationManager {
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
       
+      // Hook directly into the autoloader and force it to load the newly tested application
+      Gdn_Autoloader::AttachApplication($ApplicationName);
+      
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
@@ -233,8 +236,7 @@ class Gdn_ApplicationManager {
       RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
 
       // Clear the object caches.
-      @unlink(PATH_LOCAL_CACHE.'/controller_map.ini');
-      @unlink(PATH_LOCAL_CACHE.'/library_map.ini');
+      Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();

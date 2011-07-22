@@ -16,7 +16,7 @@
  * @param int|bool $br Optional. If set, this will convert all remaining line-breaks after paragraphing. Default true.
  * @return string Text which has been converted into correct paragraph tags.
  */
-function wpautop($pee, $br = 1) {
+function vf_wpautop($pee, $br = 1) {
 
 	if ( trim($pee) === '' )
 		return '';
@@ -46,14 +46,14 @@ function wpautop($pee, $br = 1) {
 	$pee = preg_replace('!<p>\s*(</?' . $allblocks . '[^>]*>)!', "$1", $pee);
 	$pee = preg_replace('!(</?' . $allblocks . '[^>]*>)\s*</p>!', "$1", $pee);
 	if ($br) {
-		$pee = preg_replace_callback('/<(script|style).*?<\/\\1>/s', '_autop_newline_preservation_helper', $pee);
+		$pee = preg_replace_callback('/<(script|style).*?<\/\\1>/s', 'vf_autop_newline_preservation_helper', $pee);
 		$pee = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $pee); // optionally make line breaks
 		$pee = str_replace('<WPPreserveNewline />', "\n", $pee);
 	}
 	$pee = preg_replace('!(</?' . $allblocks . '[^>]*>)\s*<br />!', "$1", $pee);
 	$pee = preg_replace('!<br />(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)[^>]*>)!', '$1', $pee);
 	if (strpos($pee, '<pre') !== false)
-		$pee = preg_replace_callback('!(<pre[^>]*>)(.*?)</pre>!is', 'clean_pre', $pee );
+		$pee = preg_replace_callback('!(<pre[^>]*>)(.*?)</pre>!is', 'vf_clean_pre', $pee );
 	$pee = preg_replace( "|\n</p>$|", '</p>', $pee );
 
 	return $pee;
@@ -67,7 +67,7 @@ function wpautop($pee, $br = 1) {
  * @param array $matches preg_replace_callback matches array
  * @returns string
  */
-function _autop_newline_preservation_helper( $matches ) {
+function vf_autop_newline_preservation_helper( $matches ) {
 	return str_replace("\n", "<WPPreserveNewline />", $matches[0]);
 }
 
@@ -82,7 +82,7 @@ function _autop_newline_preservation_helper( $matches ) {
  * @param array|string $matches The array or string
  * @return string The pre block without paragraph/line-break conversion.
  */
-function clean_pre($matches) {
+function vf_clean_pre($matches) {
 	if ( is_array($matches) )
 		$text = $matches[1] . $matches[2] . "</pre>";
 	else

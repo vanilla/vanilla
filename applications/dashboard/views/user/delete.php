@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php printf(T('Delete User: %s'), UserAnchor($this->User)); ?></h1>
+<?php 
+   echo $this->Form->Errors(); 
+   if ($this->Data("CanDelete")) {
+?>
 <table class="Label AltRows">
    <thead>
       <tr>
@@ -27,3 +31,4 @@
       </tr>
    </tbody>
 </table>
+<?php } ?>

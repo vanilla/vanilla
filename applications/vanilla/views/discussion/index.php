@@ -1,8 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$DiscussionName = Gdn_Format::Text($this->Discussion->Name);;
+$DiscussionName = Gdn_Format::Text($this->Discussion->Name);
 if ($DiscussionName == '')
    $DiscussionName = T('Blank Discussion Topic');
+
+$this->EventArguments['DiscussionName'] = &$DiscussionName;
+$this->FireEvent('BeforeDiscussionTitle');
 
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
@@ -56,7 +59,7 @@ if ($this->Discussion->Closed == '1') {
    ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-      <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
 } else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
@@ -64,7 +67,7 @@ if ($this->Discussion->Closed == '1') {
 } else if ($Session->IsValid()) { ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('Commenting not allowed.'); ?></div>
-      <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
 } else {

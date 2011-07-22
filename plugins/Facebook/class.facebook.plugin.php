@@ -249,7 +249,13 @@ class FacebookPlugin extends Gdn_Plugin {
          }
 
          $Path = Gdn::Request()->Path();
-         $Args = array('Target' => GetValue('Target', $_GET, $Path ? $Path : '/'));
+
+         $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+         if (ltrim($Target, '/') == 'entry/signin')
+            $Target = '/';
+         $Args = array('Target' => $Target);
+
+
          $RedirectUri .= strpos($RedirectUri, '?') === FALSE ? '?' : '&';
          $RedirectUri .= http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
@@ -282,7 +288,7 @@ class FacebookPlugin extends Gdn_Plugin {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
-         array('AuthenticationKey' => 'Facebook'));
+         array('AuthenticationKey' => 'Facebook'), TRUE);
    }
 
    public function OnDisable() {

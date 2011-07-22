@@ -8,8 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-require_once(PATH_LIBRARY.DS.'database'.DS.'class.database.php');
-
 class Gdn_DatabaseDebug extends Gdn_Database {
 	/// PROPERTIES ///
 	
@@ -79,18 +77,23 @@ class Gdn_DatabaseDebug extends Gdn_Database {
       // Save the query for debugging
       // echo '<br />adding to queries: '.$Sql;
       $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
+      $SaveQuery = TRUE;
       if (isset($Options['Cache'])) {
          $CacheKeys = (array)$Options['Cache'];
          $Cache = array();
-
+         
+         $AllSet = TRUE;
          foreach ($CacheKeys as $CacheKey) {
             $Value = Gdn::Cache()->Get($CacheKey);
-            $Cache[$CacheKey] = $Value !== Gdn_Cache::CACHEOP_FAILURE;
+            $CacheValue = $Value !== Gdn_Cache::CACHEOP_FAILURE;
+            $AllSet &= $CacheValue;
+            $Cache[$CacheKey] = $CacheValue;
          }
+         $SaveQuery = !$AllSet;
          $Query['Cache'] = $Cache;
       }
-      
-      $this->_Queries[] = $Query;
+      if ($SaveQuery && !StringBeginsWith($Sql, 'set names'))
+         $this->_Queries[] = $Query;
 
       // Start the Query Timer
       $TimeStart = Now();

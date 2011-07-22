@@ -3,7 +3,7 @@
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces emoticons in forum comments with images.',
-	'Version' 	=>	 '1.0',
+	'Version' 	=>	 '1.0.1',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',
@@ -33,8 +33,8 @@ class EmotifyPlugin implements Gdn_IPlugin {
     * @param Gdn_Controller $Sender
     */
 	private function _Emotify($Sender) {
-		$Sender->AddJsFile('plugins/Emotify/emotify.js');   
-      $Sender->AddCssFile('plugins/Emotify/emotify.css');
+		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');   
+      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
       $Sender->AddDefinition('FormatEmoticons', C('Plugins.Emotify.FormatEmoticons', TRUE));
 	}
 	

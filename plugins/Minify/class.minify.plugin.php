@@ -64,6 +64,7 @@ class MinifyPlugin extends Gdn_Plugin {
             continue;
 
          // Strip any querystring off the href.
+         $HrefWithVersion = $Href;
          $Href = preg_replace('`\?.*`', '', $Href);
          
          // Strip BasePath & extra slash from Href (Minify adds an extra slash when substituting basepath)
@@ -98,14 +99,24 @@ class MinifyPlugin extends Gdn_Plugin {
       // Update HeadModule's $Tags
       $Head->Tags($Tags);
       
-      // Add minified CSS to HeadModule
-      $Head->AddCss($Url . 'token=' . $this->_PrepareToken($CssToCache), 'screen');
+      // Add minified CSS to HeadModule.
+      $Token = $this->_PrepareToken($CssToCache, ".css");
+      if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
+         $Head->AddCss("/cache/Minify/minify_$Token", 'screen', FALSE);
+      } else {
+         $Head->AddCss($Url.'token='.urlencode($Token), 'screen', FALSE);
+      }
       
       // Add global minified JS separately (and first)
       $Head->AddScript($Url . 'g=globaljs', 'text/javascript', -100);
       
-      // Add other minified JS to HeadModule
-      $Head->AddScript($Url . 'token=' . $this->_PrepareToken($JsToCache));
+      // Add other minified JS to HeadModule.
+      $Token = $this->_PrepareToken($JsToCache, '.js');
+      if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
+         $Head->AddScript("/cache/Minify/minify_$Token", 'text/javascript', NULL, FALSE);
+      } else {
+         $Head->AddScript($Url . 'token=' . $Token, 'text/javascript', NULL, FALSE);
+      }
    }
    
    /**
@@ -114,17 +125,19 @@ class MinifyPlugin extends Gdn_Plugin {
     * @param array $Files List of filenames
     * @return string $Token Unique identifier for file collection
     */
-   protected function _PrepareToken($Files) {
-      // Build token
+   protected function _PrepareToken($Files, $Suffix = '') {
+      // Build token.
       $Query = array('f' => implode(',', array_unique($Files)));
       if ($this->BasePath != '')
          $Query['b'] = $this->BasePath;
       $Query = serialize($Query);
-      $Token = md5($Query);
+      $Token = md5($Query).$Suffix;
       
-      // Save file name with token
-      $CacheFile = PATH_CACHE . DS . 'Minify' . DS . 'query_' . $Token;
+      // Save file name with token.
+      $CacheFile = PATH_LOCAL_CACHE."/Minify/query_$Token";
       if (!file_exists($CacheFile)) {
+         if (!file_exists(dirname($CacheFile)))
+            mkdir(dirname($CacheFile), 0777, TRUE);
          file_put_contents($CacheFile, $Query);
       }
       
@@ -135,7 +148,7 @@ class MinifyPlugin extends Gdn_Plugin {
     * Create 'Minify' cache folder.
     */
    public function Setup() {
-      $Folder = PATH_CACHE . DS . 'Minify';
+      $Folder = PATH_LOCAL_CACHE.'/Minify';
       if (!file_exists($Folder))
          @mkdir($Folder);
    }

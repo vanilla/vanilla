@@ -4,7 +4,7 @@
 $PluginInfo['Gravatar'] = array(
    'Name' => 'Gravatar',
    'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-   'Version' => '1.3',
+   'Version' => '1.3.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -16,53 +16,6 @@ $PluginInfo['Gravatar'] = array(
 // 1.3 Fixes - Changed UserBuilder override to also accept an array of user info
 
 class GravatarPlugin extends Gdn_Plugin {
-   
-   // Find all the places where UserBuilder is called, and make sure that there
-   // is a related $UserPrefix.'Email' field pulled from the database.
-	private function _JoinInsertEmail($Sender) {
-		$Sender->SQL->Select('iu.Email', '', 'InsertEmail');
-	}
-   public function AddonCommentModel_BeforeGet_Handler(&$Sender) {
-		$this->_JoinInsertEmail($Sender);
-   }
-   public function ConversationMessageModel_BeforeGet_Handler(&$Sender) {
-		$this->_JoinInsertEmail($Sender);
-   }
-	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
-		$this->_JoinInsertEmail($Sender);
-	}
-   public function CommentModel_BeforeGet_Handler(&$Sender) {
-		$this->_JoinInsertEmail($Sender);
-   }
-   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
-		$this->_JoinInsertEmail($Sender);
-   }
-	public function CommentModel_BeforeGetIDData_Handler($Sender) {
-		$this->_JoinInsertEmail($Sender);
-	}
-
-   public function ConversationModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail');
-   }
-   public function ActivityModel_BeforeGet_Handler(&$Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-         ->Select('ru.Email', '', 'RegardingEmail');
-   }
-	public function ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-         ->Select('ru.Email', '', 'RegardingEmail');
-	}
-   public function ActivityModel_BeforeGetComments_Handler(&$Sender) {
-      $Sender->SQL->Select('au.Email', '', 'ActivityEmail');
-   }
-   public function UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
-      $Sender->SQL->Select('u.Email');
-   }
-	
-	
-
    public function Setup() {
       // No setup required.
    }

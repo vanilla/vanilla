@@ -31,19 +31,31 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
       return TRUE;
    }
-   
-   public function Engine($Engine, $CheckAvailability=TRUE) {
-      $Engine = strtolower($Engine);
-      
-      if ($CheckAvailability) {
+
+   public function HasEngine($Engine) {
+      static $ViableEngines = NULL;
+
+      if ($ViableEngines === NULL) {
          $EngineList = $this->Database->Query("SHOW ENGINES;");
          $ViableEngines = array();
          while ($EngineList && $StorageEngine = $EngineList->Value('Engine', FALSE)) {
             $EngineName = strtolower($StorageEngine);
             $ViableEngines[$EngineName] = TRUE;
          }
-         
-         if (!array_key_exists($Engine, $ViableEngines))
+      }
+
+      if (array_key_exists($Engine, $ViableEngines))
+         return TRUE;
+      else
+         return FALSE;
+   }
+   
+   public function Engine($Engine, $CheckAvailability=TRUE) {
+      $Engine = strtolower($Engine);
+      
+      
+      if ($CheckAvailability) {
+         if (!$this->HasEngine($Engine))
             return $this;
       }
       
@@ -189,6 +201,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $this->_TableStorageEngine = 'myisam';
          else
             $this->_TableStorageEngine = C('Database.DefaultStorageEngine', 'innodb');
+         
+         if (!$this->HasEngine($this->_TableStorageEngine)) {
+            $this->_TableStorageEngine = 'myisam';
+         }
       }
       
       if ($this->_TableStorageEngine)

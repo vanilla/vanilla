@@ -346,12 +346,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
-         'Expires' =>  'Mon, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
+         'Expires' =>  'Sat, 26 Jul 1997 05:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
          'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
          'Content-Type' => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', ''), // PROPERLY ENCODE THE CONTENT
-         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT' // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
-         // $Dispatcher->Header('Cache-Control', 'no-cache, must-revalidate'); // PREVENT PAGE CACHING: HTTP/1.1
-         // $Dispatcher->Header('Pragma', 'no-cache'); // PREVENT PAGE CACHING: HTTP/1.0
+         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
+         'Cache-Control' => 'no-cache, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
+         'Pragma' => 'no-cache' // PREVENT PAGE CACHING: HTTP/1.0
       );
       $this->_ErrorMessages = '';
       $this->_InformMessages = array();
@@ -912,11 +912,29 @@ class Gdn_Controller extends Gdn_Pluggable {
       else
          $this->_Json['Targets'][] = $Item;
    }
+   
+   /**
+    * Define & return the master view.
+    */
+   public function MasterView() {
+      // Define some default master views unless one was explicitly defined
+      if ($this->MasterView == '') {
+         // If this is a syndication request, use the appropriate master view
+         if ($this->SyndicationMethod == SYNDICATION_ATOM)
+            $this->MasterView = 'atom';
+         else if ($this->SyndicationMethod == SYNDICATION_RSS)
+            $this->MasterView = 'rss';
+         else
+            $this->MasterView = 'default'; // Otherwise go with the default
+      }
+      return $this->MasterView;
+   }
 
    protected $_PageName = NULL;
 
-   /** Gets or sets the name of the page for the controller.
-    *  The page name is meant to be a friendly name suitable to be consumed by developers.
+   /**
+    * Gets or sets the name of the page for the controller.
+    * The page name is meant to be a friendly name suitable to be consumed by developers.
     *
     * @param string|NULL $Value A new value to set.
     */
@@ -1061,8 +1079,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
          
          // Make sure the database connection is closed before exiting.
-         $Database = Gdn::Database();
-         $Database->CloseConnection();
+         $this->Finalize();
          
          if (!check_utf8($this->_Json['Data']))
             $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
@@ -1168,6 +1185,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Remove values that should not be transmitted via api
       $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
       
+      // Make sure the database connection is closed before exiting.
       $this->Finalize();
 
       // Check for a special view.
@@ -1186,6 +1204,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          case DELIVERY_METHOD_JSON:
          default:
+            header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->Get('callback', FALSE)) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
@@ -1253,6 +1272,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return;
       }
 
+      // Make sure the database connection is closed before exiting.
       $this->Finalize();
       $this->SendHeaders();
 
@@ -1298,16 +1318,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function RenderMaster() {
       // Build the master view if necessary
       if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL))) {
-         // Define some default master views unless one was explicitly defined
-         if ($this->MasterView == '') {
-            // If this is a syndication request, use the appropriate master view
-            if ($this->SyndicationMethod == SYNDICATION_ATOM)
-               $this->MasterView = 'atom';
-            else if ($this->SyndicationMethod == SYNDICATION_RSS)
-               $this->MasterView = 'rss';
-            else
-               $this->MasterView = 'default'; // Otherwise go with the default
-         }
+         $this->MasterView = $this->MasterView();
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {

@@ -495,6 +495,9 @@ class Minify {
      */
     protected static function _getCacheId()
     {
+       if (defined('MINIFY_TOKEN'))
+          return MINIFY_TOKEN;
+
         return md5(serialize(array(
             Minify_Source::getDigest(self::$_controller->sources)
             ,self::$_options['minifiers'] 

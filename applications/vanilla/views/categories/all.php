@@ -65,10 +65,10 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
                      <span class="DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
                      <span class="CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
-                     if ($Category->LastCommentID != '' && $Category->LastDiscussionName != '') {
-                        $CatList .= '<span class="LastDiscussionName">'.sprintf(
+                     if ($Category->LastCommentID != '' && $Category->LastDiscussionTitle != '') {
+                        $CatList .= '<span class="LastDiscussionTitle">'.sprintf(
                               T('Most recent: %1$s by %2$s'),
-                              Anchor(SliceString($Category->LastDiscussionName, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName)),
+                              Anchor(SliceString($Category->LastDiscussionTitle, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionTitle)),
                               UserAnchor($LastComment)
                            ).'</span>'
                            .'<span class="LastCommentDate">'.Gdn_Format::Date($Category->DateLastComment).'</span>';

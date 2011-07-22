@@ -170,6 +170,7 @@ if (!function_exists('UserBuilder')) {
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
+      $User->Gender = property_exists($Object, $UserPrefix.'Gender') ? $Object->{$UserPrefix.'Gender'} : NULL;
       $User->Email = GetValue($UserPrefix.'Email', $Object, NULL);
 		return $User;
    }

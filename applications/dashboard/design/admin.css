@@ -225,6 +225,9 @@ textarea.TextBox {
    min-height: 100px;
    max-height: 500px;
 }
+input.WideInput {
+	width: 500px;
+}
 #Popup textarea.TextBox {
    width: 465px;
 }
@@ -393,6 +396,12 @@ div.DismissMessage a.Dismiss:hover {
 div.Box {
 	border: 1px solid #a5d0e7;
    background: #d3f0ff;
+}
+.Green {
+	color: #24AA09;
+   background-color: #dfffcb;
+	border: 1px solid #AAF091;
+	padding: 5px;
 }
 .Warning {
    background: #ff9;
@@ -979,6 +988,7 @@ div.Box h4.Active a {
 #Panel div.SiteSettings h4 { background-position: 164px -92px; }
 #Panel div.Import h4 { background-position: 164px -1139px; }
 #Panel div.Pages h4 { background-position: 166px -1244px; }
+#Panel div.Support h4 { background-position: 162px -1298px; }
 div.Box dl {
    border-bottom: 1px solid #aedefc;
    background: #f0fbff;

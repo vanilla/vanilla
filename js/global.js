@@ -766,7 +766,6 @@ jQuery(window).load(function() {
          t_img.css('width',t_width);
       else
          t_img.css('width','auto');
-         
       return false;
    }
    

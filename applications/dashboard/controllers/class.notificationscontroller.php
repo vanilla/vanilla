@@ -114,7 +114,7 @@ class NotificationsController extends Gdn_Controller {
                // Inform the user of new messages
                $Sender->InformMessage(
                   $UserPhoto
-                  .Wrap(Gdn_Format::ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
+                  .Wrap(ActivityHeadline($Notification, $Session->UserID), 'div', array('class' => 'Title'))
                   .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
                   'Dismissable AutoDismiss'.($UserPhoto == '' ? '' : ' HasIcon')
                );

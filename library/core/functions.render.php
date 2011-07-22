@@ -78,6 +78,19 @@ if (!function_exists('Anchor')) {
 }
 
 /**
+* Same as the Gdn_Format::ActivityHeadline()
+* Can be overridden in language definition files.
+* 
+* @see Gdn_Format::ActivityHeadline()
+* @return string
+*/
+if (!function_exists('ActivityHeadline')) {
+   function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
+      return Gdn_Format::ActivityHeadline($Activity, $ProfileUserID, $ViewingUserID);
+   }
+}
+
+/**
  * English "possessive" formatting.
  * This can be overridden in language definition files like:
  * /applications/garden/locale/en-US/definitions.php.

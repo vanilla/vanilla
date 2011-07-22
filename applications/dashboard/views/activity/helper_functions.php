@@ -16,7 +16,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
    $Title = '';
    $Excerpt = $Activity->Story;
    if (!in_array($ActivityType, array('WallComment', 'AboutUpdate'))) {
-      $Title = '<div class="Title">'.Gdn_Format::ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
+      $Title = '<div class="Title">'.ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
    } else if ($Activity->ActivityType == 'WallComment' && $Activity->RegardingUserID > 0 && (!property_exists($Sender, 'ProfileUserID') || $Sender->ProfileUserID != $Activity->RegardingUserID)) {
       $RegardingUser = UserBuilder($Activity, 'Regarding');
       $Title = '<div class="Title">'

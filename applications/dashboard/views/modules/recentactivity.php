@@ -19,7 +19,7 @@
             echo ' '.Gdn_Format::Display($Activity->Story).' ';
             echo '<em>'.Gdn_Format::Date($Activity->DateInserted).'</em>';
          } else {
-            echo Gdn_Format::ActivityHeadline($Activity);
+            echo ActivityHeadline($Activity);
             echo '<em>'.Gdn_Format::Date($Activity->DateInserted).'</em>';
             if ($Activity->Story != '') {
                echo '<div class="Story">';

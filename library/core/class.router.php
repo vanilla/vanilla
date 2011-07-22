@@ -15,7 +15,7 @@ class Gdn_Router extends Gdn_Pluggable {
          'NotAuthorized' => 'Not Authorized (401)',
          'NotFound'     => 'Not Found (404)'
       );
-      $this->ReservedRoutes = array('DefaultController', 'Default404', 'DefaultPermission', 'UpdateMode');
+      $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');
       $this->_LoadRoutes();
    }
    

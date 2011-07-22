@@ -46,6 +46,8 @@ class Gdn_Format {
     *  %7$s = he/she
     *  %8$s = route & routecode
     *  %9$s = gender suffix (some languages require this).
+    *  %10$s = regarding wall link
+    *  %11$s = activity route link
     *
     * @param object $Activity An object representation of the activity being formatted.
     * @param int $ProfileUserID If looking at a user profile, this is the UserID of the profile we are

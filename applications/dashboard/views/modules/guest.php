@@ -7,9 +7,9 @@
    <?php
    if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
       echo '<div class="P">';
-
-      echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), 'Button'.(SignInPopup() ? ' SignInPopup' : ''));
-      $Url = RegisterUrl($this->_Sender->SelfUrl);
+	  $Authenticator = Gdn::Authenticator();
+      echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->_Sender->SelfUrl), 'Button'.(SignInPopup() ? ' SignInPopup' : ''));
+      $Url = Gdn::Authenticator()->RegisterUrl($this->_Sender->SelfUrl);
       if(!empty($Url))
          echo ' '.Anchor(T('Apply for Membership'), $Url, 'Button ApplyButton');
 

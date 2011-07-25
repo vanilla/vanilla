@@ -72,7 +72,7 @@ class CategoriesController extends VanillaController {
 //         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       $Category = CategoryModel::Categories($CategoryIdentifier);
       
-      if ($Category === FALSE) {
+      if (empty($Category)) {
          if ($CategoryIdentifier)
             throw NotFoundException();
       }

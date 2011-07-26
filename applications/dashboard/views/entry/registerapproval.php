@@ -56,7 +56,7 @@
          ?>
       </li>
       <li class="Buttons">
-         <?php echo $this->Form->Button('Apply'); ?>
+         <?php echo $this->Form->Button('Apply for Membership'); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

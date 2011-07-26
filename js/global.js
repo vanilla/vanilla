@@ -2,7 +2,7 @@
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
    var d = new Date();
-   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getSeconds();
+   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
    // Set the ClientHour if there is an input looking for it.
    $('input:hidden[name$=ClientHour]').livequery(function() {
@@ -12,9 +12,9 @@ jQuery(document).ready(function($) {
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {
       if (d.getHours() != $(this).val()) {
-         $.post(
-            gdn.url('/utility/setclienthour/' + clientDate+ '/' + gdn.definition('TransientKey')),
-            'DeliveryType=BOOL'
+         $.get(
+            gdn.url('/utility/setclienthour'),
+            {'ClientDate': clientDate, 'TransientKey': gdn.definition('TransientKey'), 'DeliveryType': 'BOOL'}
          );
       }
    });

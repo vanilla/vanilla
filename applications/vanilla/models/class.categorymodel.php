@@ -20,6 +20,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class CategoryModel extends Gdn_Model {
+   const CACHE_KEY = 'Categories';
+   
    public $Watching = FALSE;
    public static $Categories = NULL;
 
@@ -56,33 +58,28 @@ class CategoryModel extends Gdn_Model {
 
    public static function Categories($ID = FALSE) {
       if (self::$Categories == NULL) {
-         $Sql = Gdn::SQL();
-         $Sql = clone $Sql;
-         $Session = Gdn::Session();
+         // Try and get the categories from the cache.
+         $Categories = Gdn::Cache()->Get(self::CACHE_KEY);
+         
+         if (!$Categories) {
+            $Sql = Gdn::SQL();
+            $Sql = clone $Sql;
+            $Session = Gdn::Session();
 
-         $Sql->Select('c.*')
-            ->Select('lc.DateInserted', '', 'DateLastComment')
-            ->From('Category c')
-            ->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
-            ->OrderBy('c.TreeLeft');
+            $Sql->Select('c.*')
+               ->Select('lc.DateInserted', '', 'DateLastComment')
+               ->From('Category c')
+               ->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+               ->OrderBy('c.TreeLeft');
 
-         if ($Session->UserID > 0) {
-            $Sql->Select('uc.DateMarkedRead as UserDateMarkedRead, uc.Unfollow')
-               ->Join('UserCategory uc', 'c.CategoryID = uc.CategoryID and uc.UserID = '.Gdn::Session()->UserID, 'left');
+            $Categories = array_merge(array(), $Sql->Get()->ResultArray());
+            $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
+            self::CalculateData($Categories);
+            Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
          }
-
-         $Categories = array_merge(array(), $Sql->Get()->ResultArray());
-         $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
-//         unset($Categories[-1]); Don't unset, may need for counts later
-         self::CalculateData($Categories);
-
-         // Add permissions.
-         foreach ($Categories as $CID => $Category) {
-            $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
-         }
+         
+         self::JoinUserData($Categories, TRUE);
+         
          self::$Categories = $Categories;
       }
 
@@ -104,6 +101,74 @@ class CategoryModel extends Gdn_Model {
          $Result = self::$Categories;
          return $Result;
       }
+   }
+   
+   public static function JoinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
+      $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCdode'));
+      foreach ($Data as &$Row) {
+         $ID = GetValue($Column, $Row);
+         $Category = self::Categories($ID);
+         foreach ($Join as $N => $V) {
+            if (is_numeric($N))
+               $N = $V;
+            
+            if ($Category)
+               $Value = $Category[$N];
+            else
+               $Value = NULL;
+            
+            SetValue($V, $Row, $Value);
+         }
+      }
+//      print_r($Data);
+//      die();
+   }
+   
+   public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
+      if ($AddUserCategory) {
+         if (Gdn::Session()->UserID) {
+            $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
+            $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
+         } else
+            $UserData = array();
+         
+         foreach ($Categories as $ID => $Category) {
+            $Row = GetValue($ID, $UserData);
+            if ($Row) {
+               $Categories[$ID]['UserDateMarkedRead'] = $Row['DateMarkedRead'];
+               $Categories[$ID]['Unfollow'] = $Row['Unfollow'];
+            } else {
+               $Categories[$ID]['UserDateMarkedRead'] = NULL;
+               $Categories[$ID]['Unfollow'] = FALSE;
+            }
+            
+            // Calculate the following field.
+            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
+            $Categories[$ID]['Following'] = $Following;
+
+            // Calculate the read field.
+            if (isset($Category['DateLastComment'])) {
+               $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
+               if (!$DateMarkedRead)
+                  $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+               if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
+                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
+               else
+                  $Categories[$ID]['Read'] = FALSE;
+            }
+            
+         }
+      }
+      
+      // Add permissions.
+      $Session = Gdn::Session();
+      foreach ($Categories as $CID => $Category) {
+         $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
+         $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+         $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
+         $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+      }
+      
    }
    
    /**
@@ -573,6 +638,7 @@ class CategoryModel extends Gdn_Model {
                array('CategoryID' => $Cat['CategoryID']));
          }
       }
+      $this->SetCache();
    }
 
    protected function _SetTree(&$Node, $Left = 1, $Depth = 0) {
@@ -726,7 +792,7 @@ class CategoryModel extends Gdn_Model {
       if ($this->SQL->Get()->NumRows())
          $this->Validation->AddValidationResult('UrlCode', 'The specified url code is already in use by another category.');
 
-		//	Prep and fire event
+		//	Prep and fire event.
 		$this->EventArguments['FormPostValues'] = &$FormPostValues;
 		$this->EventArguments['CategoryID'] = $CategoryID;
 		$this->FireEvent('BeforeSaveCategory');
@@ -743,6 +809,7 @@ class CategoryModel extends Gdn_Model {
             $AllowDiscussions = $OldCategory->AllowDiscussions; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
             $this->Update($Fields, array('CategoryID' => $CategoryID));
+            $this->SetCache($CategoryID, $Fields);
          } else {
             $CategoryID = $this->Insert($Fields);
 
@@ -815,6 +882,42 @@ class CategoryModel extends Gdn_Model {
             $Set,
             array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
       }
+   }
+   
+   public static function SetCache($ID = FALSE, $Data = FALSE) {
+      // Grab the categories from the cache.
+      $Categories = Gdn::Cache()->Get(self::CACHE_KEY);
+      self::$Categories = NULL;
+      
+      if (!$Categories)
+         return;
+      
+      if (!$ID) {
+         Gdn::Cache()->Remove(self::CACHE_KEY);
+         return;
+      }
+      
+      if (!array_key_exists($ID, $Categories)) {
+         Gdn::Cache()->Remove(self::CACHE_KEY);
+         return;
+      }
+      
+      $Category = $Categories[$ID];
+      $Category = array_merge($Category, $Data);
+      $Categories[$ID] = $Category;
+      Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+   }
+   
+   public function SetField($ID, $Property, $Value = FALSE) {
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+      
+      $this->SQL->Put($this->Name, $Property, array('CategoryID' => $ID));
+      
+      // Set the cache.
+      self::SetCache($ID, $Property);
+
+		return $Property;
    }
    
    public function ApplyUpdates() {
@@ -897,21 +1000,6 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = '/categories/'.rawurlencode($Category['UrlCode']);
-
-         // Calculate the following field.
-         $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
-         $Category['Following'] = $Following;
-
-         // Calculate the read field.
-         if (isset($Category['DateLastComment'])) {
-            $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
-            if (!$DateMarkedRead)
-               $DateMarkedRead = GetValue('DateMarkedRead', $Category);
-            if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
-               $Category['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
-            else
-               $Category['Read'] = FALSE;
-         }
          $Category['ChildIDs'] = array();
 		}
       

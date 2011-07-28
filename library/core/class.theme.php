@@ -84,6 +84,11 @@ class Gdn_Theme {
             if (!$Text)
                $Text = T('Dashboard');
             break;
+         case 'home':
+            $Path = '/';
+            if (!$Text)
+               $Text = T('Home');
+            break;
          case 'inbox':
             $Path = 'messages/inbox';
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');

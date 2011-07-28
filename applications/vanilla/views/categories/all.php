@@ -6,8 +6,6 @@ $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
-?>
-<?php
 
 if (C('Vanilla.Categories.ShowTabs')) {
    $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');

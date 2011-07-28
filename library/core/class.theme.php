@@ -55,11 +55,14 @@ class Gdn_Theme {
       return $Result;
    }
    
-   public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
+   public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
       $WithDomain = GetValue('WithDomain', $Options);
       $Target = GetValue('Target', $Options, '');
+      
+      if (is_null($Format))
+         $Format = '<a href="%url" class="%class">%text</a>';
 
       switch ($Path) {
          case 'activity':
@@ -98,6 +101,13 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
+            break;
+         case 'forumroot':
+            $Route = Gdn::Router()->GetDestination('DefaultForumRoot');
+            if (is_null($Route))
+               $Path = '/';
+            else
+               $Path = CombinePaths (array('/',$Route));
             break;
          case 'profile':
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');

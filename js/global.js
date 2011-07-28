@@ -2,7 +2,7 @@
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
    var d = new Date();
-   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getSeconds();
+   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
    // Set the ClientHour if there is an input looking for it.
    $('input:hidden[name$=ClientHour]').livequery(function() {
@@ -12,9 +12,9 @@ jQuery(document).ready(function($) {
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {
       if (d.getHours() != $(this).val()) {
-         $.post(
-            gdn.url('/utility/setclienthour/' + clientDate+ '/' + gdn.definition('TransientKey')),
-            'DeliveryType=BOOL'
+         $.get(
+            gdn.url('/utility/setclienthour'),
+            {'ClientDate': clientDate, 'TransientKey': gdn.definition('TransientKey'), 'DeliveryType': 'BOOL'}
          );
       }
    });
@@ -380,24 +380,6 @@ jQuery(document).ready(function($) {
          return false;
       }
    });
-	
-	// Shrink large images to fit into message space, and pop into new window when clicked.
-	$('div.Message img').livequery(function() {
-		var img = $(this);
-		var container = img.parents('div.Message');
-		if (img.width() > container.width()) {
-			img.css('width', container.width()).css('cursor', 'pointer');
-			img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-			img.next().click(function() {
-				window.open($(img).attr('src'));
-				return false;
-			});
-			img.click(function() {
-				window.open($(this).attr('src'));
-				return false;
-			})
-		}
-	});
 
    // Jump to the hash if desired.
    if (gdn.definition('LocationHash', 0) && window.location.hash == '') {
@@ -774,3 +756,34 @@ jQuery(document).ready(function($) {
 		}
 	});
 })(jQuery);
+
+// Shrink large images to fit into message space, and pop into new window when clicked.
+// This needs to happen in onload because otherwise the image sizes are not yet known.
+jQuery(window).load(function() {
+   
+   var toggler = function(t_img, t_width) {
+      if (t_img.css('width') == 'auto')
+         t_img.css('width',t_width);
+      else
+         t_img.css('width','auto');
+      return false;
+   }
+   
+   jQuery('div.Message img').each(function(i,img) {
+      var img = jQuery(img);
+      var container = img.parents('div.Message');
+      if (img.width() > container.width()) {
+         var smwidth = container.width();
+         
+         img.css('width', smwidth).css('cursor', 'pointer');
+         img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
+         
+         img.next().click(function() {
+            return toggler(img, smwidth);
+         });
+         img.click(function() {
+            return toggler(img, smwidth);
+         })
+      }
+   });
+});

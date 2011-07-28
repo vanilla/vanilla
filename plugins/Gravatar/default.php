@@ -36,7 +36,8 @@ if (!function_exists('UserBuilder')) {
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-      $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
+      $HTTPS = GetValue('HTTPS', $_SERVER, '');
+      $Protocol =  (strlen($HTTPS) || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
       if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = $Protocol.'gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))

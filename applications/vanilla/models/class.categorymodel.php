@@ -408,7 +408,7 @@ class CategoryModel extends Gdn_Model {
          ->Select('c.*')
          ->Select('co.DateInserted', '', 'DateLastComment')
          ->Select('co.InsertUserID', '', 'LastCommentUserID')
-         ->Select('d.Name', '', 'LastDiscussionName')
+         ->Select('d.Name', '', 'LastDiscussionTitle')
          ->Select('d.CountComments', '', 'LastDiscussionCountComments')
          ->Select('d.InsertUserID', '', 'LastDiscussionUserID')
          ->Select('d.DateInserted', '', 'DateLastDiscussion')

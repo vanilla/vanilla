@@ -70,15 +70,16 @@ class DiscussionsController extends VanillaController {
     */
    public function Index($Page = '0') {
       // Determine offset from $Page
-      list($Page, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE)), TRUE));
+      list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
       
       // Validate $Page
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
       
-      // Setup head
-		$this->Title(T('All Discussions'));
+      // Setup head.
+      if (!$this->Data('Title'))
+         $this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
@@ -102,6 +103,10 @@ class DiscussionsController extends VanillaController {
       
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
+      
+//      var_dump($this->DiscussionData);
+//      die();
+      
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
@@ -117,7 +122,8 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/%1$s'
       );
-      $this->SetData('_PagerUrl', 'discussions/{Page}');
+      if (!$this->Data('_PagerUrl'))
+         $this->SetData('_PagerUrl', 'discussions/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');
@@ -176,16 +182,12 @@ class DiscussionsController extends VanillaController {
     *
     * @param int $Offset Number of discussions to skip.
     */
-   public function Bookmarked($Offset = '0') {
+   public function Bookmarked($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
-      
-      // Validate $Offset
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
       
       // Set criteria & get discussions data
       $Session = Gdn::Session();
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Wheres = array('w.Bookmarked' => '1', 'w.UserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
       $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
@@ -208,6 +210,11 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/bookmarked/%1$s'
       );
+
+      $this->SetData('_PagerUrl', 'discussions/bookmarked/{Page}');
+      $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
+
 		$this->FireEvent('AfterBuildBookmarkedPager');
       
       // Deliver JSON data if necessary
@@ -234,15 +241,11 @@ class DiscussionsController extends VanillaController {
     *
     * @param int $Offset Number of discussions to skip.
     */
-   public function Mine($Offset = '0') {
+   public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
       
-      // Validate $Offset
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
-      
       // Set criteria & get discussions data
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
@@ -264,6 +267,11 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/mine/%1$s'
       );
+
+      $this->SetData('_PagerUrl', 'discussions/mine/{Page}');
+      $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
+
 		$this->FireEvent('AfterBuildMinePager');
       
       // Deliver JSON data if necessary
@@ -307,11 +315,52 @@ class DiscussionsController extends VanillaController {
                ->Where('UserID', $UserID)
                ->Get()->Value('CountBookmarks', 0);
 
-            Gdn::SQL()->Put('User', array('CountBookmarks' => $CountBookmarks), array('UserID' => $UserID));
+            Gdn::UserModel()->SetField($UserID, 'CountBookmarks', $CountBookmarks);
          }
       }
       $this->SetData('CountBookmarks', $CountBookmarks);
       $this->SetData('_Value', $CountBookmarks);
       $this->xRender('Value', 'utility', 'dashboard');
    }
+	
+	/**
+	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
+	 */
+	public function GetCommentCounts() {
+		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
+		if (!is_array($vanilla_identifier))
+			$vanilla_identifier = array($vanilla_identifier);
+			
+		$CountData = Gdn::SQL()
+			->Select('ForeignID, CountComments')
+			->From('Discussion')
+			->WhereIn('ForeignID', $vanilla_identifier)
+			->Get();
+		
+		$FinalData = array();
+		if ($CountData->NumRows() == 0) {
+			foreach ($vanilla_identifier as $identifier) {
+				$FinalData[$identifier] = 0;
+			}
+		} else {
+			$i = 0;
+			foreach ($CountData->Result() as $Row) {
+				while ($Row->ForeignID != $vanilla_identifier[$i]) {
+					$FinalData[$vanilla_identifier[$i]] = 0;
+					$i++;
+				}
+				$Row->CountComments--;
+				if ($Row->CountComments < 0)
+					$Row->CountComments = 0;
+	
+				$FinalData[$Row->ForeignID] = $Row->CountComments;
+				$i++;
+			}
+		}
+
+		$this->SetData('CountData', $FinalData);
+		$this->DeliveryMethod = DELIVERY_METHOD_JSON;
+		$this->DeliveryType = DELIVERY_TYPE_DATA;
+		$this->Render();
+	}
 }

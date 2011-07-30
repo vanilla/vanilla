@@ -15,7 +15,7 @@ ChangeLog
 $PluginInfo['embedvanilla'] = array(
    'Name' => '&lt;Embed&gt; Vanilla',
    'Description' => "Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you've created.",
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',

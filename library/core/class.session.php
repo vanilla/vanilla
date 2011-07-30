@@ -104,7 +104,7 @@ class Gdn_Session {
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Admin == '1')
+         if ($this->User->Admin)
             return TRUE;
          elseif ($this->User->Banned || GetValue('Deleted', $this->User))
             return FALSE;
@@ -115,7 +115,7 @@ class Gdn_Session {
          $JunctionID = '';
 
       $Permissions = $this->GetPermissions();
-      if ($JunctionID && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+      if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
             foreach ($Permission as $PermissionName) {
@@ -267,7 +267,7 @@ class Gdn_Session {
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!Gdn::Config('Garden.Installed')) return;
+      if (!C('Garden.Installed', FALSE)) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -275,19 +275,20 @@ class Gdn_Session {
 
       // Now retrieve user information
       if ($this->UserID > 0) {
-
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($UserID && $SetIdentity)
-               Gdn::Authenticator()->SetIdentity($UserID, $Persist);
+            if ($SetIdentity) {
+               Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+            }
 
-            if (Gdn::Authenticator()->ReturningUser($this->User)) {
+            $Returning = Gdn::Authenticator()->ReturningUser($this->User);
+            if ($Returning) {
                $HourOffset = GetValue('HourOffset', $this->User->Attributes);
                $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
-
+            
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
 
@@ -430,8 +431,10 @@ class Gdn_Session {
 	 * guests can be imlemented.
 	 */
    private function _GetStashSession() {
+      $CookieName = C('Garden.Cookie.Name', 'Vanilla');
+
       // Grab the entire session record
-      $SessionID = GetValue('VanillaSessionID', $_COOKIE, '');
+      $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
       $Session = Gdn::SQL()
          ->Select()
          ->From('Session')
@@ -461,7 +464,7 @@ class Gdn_Session {
             ->FirstRow();
             
          // Save a session cookie
-         $Name = 'VanillaSessionID';
+         $Name = $CookieName.'SessionID';
          $Path = C('Garden.Cookie.Path', '/');
          $Domain = C('Garden.Cookie.Domain', '');
          $Expire = 0;

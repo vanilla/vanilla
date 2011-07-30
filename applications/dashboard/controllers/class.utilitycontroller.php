@@ -145,33 +145,49 @@ class UtilityController extends DashboardController {
    }
 
    public function Update() {
-      // Check for permission or flood control.
-      // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-      $Now = time();
-      $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
+      try {
+         // Check for permission or flood control.
+         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+         $Now = time();
+         $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
 
-      if ($LastTime + (60 * 60 * 24) > $Now) {
-         // Check for flood control.
-         $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
-         if ($Count > 5) {
-            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-               // We are only allowing an update of 5 times every 24 hours.
-               throw PermissionException();
+         if ($LastTime + (60 * 60 * 24) > $Now) {
+            // Check for flood control.
+            $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
+            if ($Count > 5) {
+               if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+                  // We are only allowing an update of 5 times every 24 hours.
+                  throw PermissionException();
+               }
             }
+         } else {
+            $Count = 1;
          }
-      } else {
-         $Count = 1;
+         Gdn::Set('Garden.Update.LastTimestamp', $Now);
+         Gdn::Set('Garden.Update.Count', $Count);
+      } catch (Exception $e) {
+         
       }
-      Gdn::Set('Garden.Update.LastTimestamp', $Now);
-      Gdn::Set('Garden.Update.Count', $Count);
-
+      
       // Run the structure.
       $UpdateModel = new UpdateModel();
-      
       $UpdateModel->RunStructure();
+      
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         SaveToConfig('Garden.Version', APPLICATION_VERSION);
+      }
+      
       $this->SetData('Success', TRUE);
 
-      $this->MasterView = 'none';
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
+      $this->Render();
+   }
+   
+   public function Alive() {
+      $this->SetData('Success', TRUE);
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
       $this->Render();
    }
    
@@ -252,18 +268,23 @@ class UtilityController extends DashboardController {
       }
    }
 
-   public function SetClientHour($ClientHour = '', $TransientKey = '') {
+   public function SetClientHour($ClientDate = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
       $Success = FALSE;
+
+      $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
+
       if (
-			is_numeric($ClientHour)
+			is_numeric($ClientTimestamp)
 			&& $Session->UserID > 0
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientHour - date('G', time());
-			$UserModel->Update(array('HourOffset' => $HourOffset), array('UserID' => $Session->UserID));
+			$HourOffset = $ClientTimestamp - time();
+         $HourOffset = round($HourOffset / 3600);
+         
+			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
 			$Success = TRUE;
       }
          

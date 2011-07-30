@@ -189,6 +189,33 @@ if (!class_exists('HeadModule', FALSE)) {
       }
    
       /**
+       * Return all strings.
+       */
+      public function GetStrings() {
+         return $this->_Strings;
+      }
+
+      /**
+       * Return all Tags of the specified type (or all tags).
+       */
+      public function GetTags($RequestedType = '') {
+         // Make sure that css loads before js (for jquery)
+         usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+
+         if ($RequestedType == '')
+            return $this->_Tags;
+         
+         // Loop through each tag.
+         $Tags = array();
+         foreach ($this->_Tags as $Index => $Attributes) {
+            $Tag = $Attributes[self::TAG_KEY];
+            if ($TagType == $RequestedType)
+               $Tags[] = $Attributes;
+         }
+         return $Tags;
+      }
+   
+      /**
        * Sets the favicon location.
        *
        * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
@@ -247,14 +274,20 @@ if (!class_exists('HeadModule', FALSE)) {
 
          return $Cmp;
       }
-   
+      
+      /**
+       * Render the entire head module.
+       */
       public function ToString() {
          // Add the canonical Url if necessary.
          if (method_exists($this->_Sender, 'CanonicalUrl')) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
-            $CurrentUrl = Gdn::Request()->Url('', TRUE);
-            if ($CurrentUrl != $CanonicalUrl)
+            $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
+            $this->_Sender->CanonicalUrl($CanonicalUrl);
+            $CurrentUrl = Url('', TRUE);
+            if ($CurrentUrl != $CanonicalUrl) {
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+            }
          }
 
          $this->FireEvent('BeforeToString');

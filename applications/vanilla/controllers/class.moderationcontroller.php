@@ -3,7 +3,7 @@
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
 Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of empCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
@@ -58,6 +58,10 @@ class ModerationController extends VanillaController {
          // Form was posted, so accept changes to checked items.
          $DiscussionID = GetValue('DiscussionID', $_POST, 0);
          $CheckIDs = GetValue('CheckIDs', $_POST);
+         if (empty($CheckIDs))
+            $CheckIDs = array();
+         $CheckIDs = (array)$CheckIDs;
+         
          $CheckedComments = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedComments', array());
          if (!is_array($CheckedComments))
             $CheckedComments = array();
@@ -141,6 +145,10 @@ class ModerationController extends VanillaController {
       if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey)) {
          // Form was posted, so accept changes to checked items.
          $CheckIDs = GetValue('CheckIDs', $_POST);
+         if (empty($CheckIDs))
+            $CheckIDs = array();
+         $CheckIDs = (array)$CheckIDs;
+         
          $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
          if (!is_array($CheckedDiscussions))
             $CheckedDiscussions = array();
@@ -242,7 +250,7 @@ class ModerationController extends VanillaController {
        
       $CommentIDs = array();
       $DiscussionIDs = array();
-      foreach ($CheckedComments as $DiscD => $Comments) {
+      foreach ($CheckedComments as $DiscID => $Comments) {
          foreach ($Comments as $Comment) {
             if (substr($Comment, 0, 11) == 'Discussion_')
                $DiscussionIDs[] = str_replace('Discussion_', '', $Comment);
@@ -263,7 +271,7 @@ class ModerationController extends VanillaController {
          // Clear selections
          unset($CheckedComments[$DiscussionID]);
          Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
-         ModerationController::InformCheckSelections($this);
+         ModerationController::InformCheckedComments($this);
          $this->RedirectUrl = 'discussions';
       }
       

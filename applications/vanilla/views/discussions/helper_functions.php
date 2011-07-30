@@ -33,22 +33,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-   $Sender->FireEvent('BeforeDiscussionContent');
-   WriteOptions($Discussion, $Sender, $Session);
-
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
-         
-   if ($Sender->CanEditDiscussions) {
-      if (!property_exists($Sender, 'CheckedDiscussions')) {
-         $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
-         if (!is_array($Sender->CheckedDiscussions))
-            $Sender->CheckedDiscussions = array();
-      }
 
-      $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
-      echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
-   }
+   $Sender->FireEvent('BeforeDiscussionContent');
+
+   WriteOptions($Discussion, $Sender, $Session);
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
@@ -77,7 +67,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category'));
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode), 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>
@@ -163,6 +153,7 @@ function WriteFilterTabs(&$Sender) {
          
          echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
       }
+      $Sender->FireEvent('AfterBreadcrumbs');
       echo '</div>';
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))
@@ -170,9 +161,9 @@ function WriteFilterTabs(&$Sender) {
    
    if ($Sender->CanEditDiscussions) {
    ?>
-   <div class="Administration">
+   <span class="AdminCheck">
       <input type="checkbox" name="Toggle" />
-   </div>
+   </span>
    <?php } ?>
 </div>
    <?php
@@ -196,7 +187,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
 
       // Announce discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</li>';
 
       // Sink discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID))
@@ -223,6 +214,18 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          </div>
       <?php
       }
+      // Admin check.
+      if ($Sender->CanEditDiscussions) {
+         if (!property_exists($Sender, 'CheckedDiscussions')) {
+            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+            if (!is_array($Sender->CheckedDiscussions))
+               $Sender->CheckedDiscussions = array();
+         }
+
+         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
+
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(

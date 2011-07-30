@@ -63,6 +63,24 @@ class VanillaHooks implements Gdn_IPlugin {
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
+         // Grab all of the discussions that the user has engaged in.
+         $DiscussionIDs = $Sender->SQL
+            ->Select('DiscussionID')
+            ->Select('CommentID', 'count', 'CountComments')
+            ->From('Comment')
+            ->Where('InsertUserID', $UserID)
+            ->GroupBy('DiscussionID')
+            ->Get()->ResultArray();
+
+         // Update the comment counts.
+         foreach ($DiscussionIDs as $Row) {
+            $Sender->SQL
+               ->Update('Discussion')
+               ->Set('CountComments', "CountComments - {$Row['CountComments']}", FALSE)
+               ->Where('DiscussionID', $Row['DiscussionID'])
+               ->Put();
+         }
+
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
 			$Sender->SQL->From('Comment')
@@ -146,8 +164,8 @@ class VanillaHooks implements Gdn_IPlugin {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
          // Add the discussion tab
-         $Sender->AddProfileTab('Discussions', 'profile/discussions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Discussions', T('Discussions').CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"));
-         $Sender->AddProfileTab('Comments', 'profile/comments/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name), 'Comments', T('Comments').CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"));
+         $Sender->AddProfileTab('Discussions', 'profile/discussions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Discussions', T('Discussions').CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"));
+         $Sender->AddProfileTab('Comments', 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', T('Comments').CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"));
          // Add the discussion tab's CSS and Javascript.
          $Sender->AddJsFile('jquery.gardenmorepager.js');
          $Sender->AddJsFile('discussions.js');

@@ -98,7 +98,6 @@ window.vanilla.embed = function(host) {
    }
 
    processMessage = function(message) {
-//      console.log('processMessage: '+message);
       if (message[0] == 'height') {
          setHeight(message[1]);
       } else if (message[0] == 'location') {
@@ -108,7 +107,7 @@ window.vanilla.embed = function(host) {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {
                currentPath = message[1];
-               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
+               window.location.hash = '#'+currentPath; //replace(embedUrl + "#" + currentPath);
             }
          }
       } else if (message[0] == 'unload') {
@@ -148,6 +147,10 @@ window.vanilla.embed = function(host) {
    }
 
    vanillaUrl = function(path) {
+      if (host.indexOf('?') >= 0) {
+         path = path.replace('?', '&');
+      }
+      
       // What type of embed are we performing?
       var embed_type = typeof(vanilla_embed_type) == 'undefined' ? 'standard' : vanilla_embed_type;
       // Are we loading a particular discussion based on discussion_id?

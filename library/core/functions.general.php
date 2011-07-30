@@ -95,6 +95,47 @@ if (!function_exists('__autoload')) {
 spl_autoload_register('Gdn_Autoload', FALSE);
 */
 
+if (!function_exists('AbsoluteSource')) {
+   /**
+    * Takes a source path (ie. an image src from an html page), and an
+    * associated URL (ie. the page that the image appears on), and returns the
+    * absolute source (including url & protocol) path.
+    * @param string $SrcPath The source path to make absolute (if not absolute already).
+    * @param string $Url The full url to the page containing the src reference.
+    * @return string Absolute source path.
+    */
+   function AbsoluteSource($SrcPath, $Url) {
+      // If there is a scheme in the srcpath already, just return it.
+      if (!is_null(parse_url($SrcPath, PHP_URL_SCHEME)))
+         return $SrcPath;
+      
+      // Does SrcPath assume root?
+      if (in_array(substr($SrcPath, 0, 1), array('/', '\\')))
+         return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .$SrcPath;
+   
+      // Work with the path in the url & the provided src path to backtrace if necessary
+      $UrlPathParts = explode('/', str_replace('\\', '/', parse_url($Url, PHP_URL_PATH)));
+      $SrcParts = explode('/', str_replace('\\', '/', $SrcPath));
+      $Result = array();
+      foreach ($SrcParts as $Part) {
+         if (!$Part || $Part == '.')
+            continue;
+         
+         if ($Part == '..')
+            array_pop($UrlPathParts);
+         else
+            $Result[] = $Part;
+      }
+      // Put it all together & return
+      return parse_url($Url, PHP_URL_SCHEME)
+         .'://'
+         .parse_url($Url, PHP_URL_HOST)
+         .'/'.implode('/', array_filter(array_merge($UrlPathParts, $Result)));
+   }
+}
 
 if (!function_exists('AddActivity')) {
    /**
@@ -412,9 +453,18 @@ if (!function_exists('ChangeBasename')) {
    }
 }
 
+// Smarty
 if (!function_exists('CheckPermission')) {
    function CheckPermission($PermissionName) {
       $Result = Gdn::Session()->CheckPermission($PermissionName);
+      return $Result;
+   }
+}
+
+// Smarty sux
+if (!function_exists('MultiCheckPermission')) {
+   function MultiCheckPermission($PermissionName) {
+      $Result = Gdn::Session()->CheckPermission($PermissionName, FALSE);
       return $Result;
    }
 }
@@ -664,6 +714,80 @@ if (!function_exists('ExternalUrl')) {
    }
 }
 
+
+if (!function_exists('FetchPageInfo')) {
+   /**
+    * Examines the page at $Url for title, description & images. Be sure to check the resultant array for any Exceptions that occurred while retrieving the page. 
+    * @param string $Url The url to examine.
+    * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+    * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
+    */
+   function FetchPageInfo($Url, $Timeout = 0) {
+      $PageInfo = array(
+         'Url' => $Url,
+         'Title' => '',
+         'Description' => '',
+         'Images' => array(),
+         'Exception' => FALSE
+      );
+      try {
+         $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
+         $Dom = new DOMDocument();
+         @$Dom->loadHTML($PageHtml);
+         // Page Title
+         $TitleNodes = $Dom->getElementsByTagName('title');
+         $PageInfo['Title'] = $TitleNodes->length > 0 ? $TitleNodes->item(0)->nodeValue : '';
+         // Page Description
+         $MetaNodes = $Dom->getElementsByTagName('meta');
+         foreach($MetaNodes as $MetaNode) {
+            if (strtolower($MetaNode->getAttribute('name')) == 'description')
+               $PageInfo['Description'] = $MetaNode->getAttribute('content');
+         }
+         // Keep looking for page description?
+         if ($PageInfo['Description'] == '') {
+            $PNodes = $Dom->getElementsByTagName('p');
+            foreach($PNodes as $PNode) {
+               $PVal = $PNode->nodeValue;
+               if (strlen($PVal) > 90) {
+                  $PageInfo['Description'] = $PVal;
+                  break;
+               }
+            }
+         }
+         if (strlen($PageInfo['Description']) > 400)
+            $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+            
+         // Page Images (retrieve first 3 if bigger than 100w x 300h)
+         $Images = array();
+         $ImageNodes = $Dom->getElementsByTagName('img');
+         $i = 0;
+         foreach ($ImageNodes as $ImageNode) {
+            $Images[] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
+         }
+
+         // Sort by size, biggest one first
+         $ImageSort = array();
+         // Only look at first 10 images (speed!)
+         $i = 0;
+         foreach ($Images as $Image) {
+            $i++;
+            if ($i > 10)
+               break;
+            
+            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            if (!array_key_exists($Diag, $ImageSort))
+               $ImageSort[$Diag] = $Image;
+         }
+         krsort($ImageSort);
+         $PageInfo['Images'] = array_values($ImageSort);
+      } catch (Exception $ex) {
+         $PageInfo['Exception'] = $ex;
+      }
+      return $PageInfo;
+   }
+}
+
 /**
  * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
  *
@@ -717,7 +841,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && $Format != 'url') {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {
@@ -774,6 +898,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = $Field;
             $Result = Url($Value, $SubFormat == 'domain');
             break;
+         case 'exurl':
+            if (strpos($Field, '/') !== FALSE)
+               $Value = $Field;
+            $Result = ExternalUrl($Value);
+            break;
          case 'urlencode':
             $Result = urlencode($Value);
             break;
@@ -811,6 +940,19 @@ if (!function_exists('ForceSSL')) {
          if (Gdn::Request()->Scheme() != 'https')
             Redirect(Gdn::Request()->Url('', TRUE, TRUE));
       }
+   }
+}
+
+if (!function_exists('ForceNoSSL')) {
+   /**
+    * Checks the current url for SSL and redirects to SSL version if not
+    * currently on it. Call at the beginning of any method you want forced to
+    * be in SSL. Garden.AllowSSL must be TRUE in order for this function to
+    * work.
+    */
+   function ForceNoSSL() {
+      if (Gdn::Request()->Scheme() != 'http')
+         Redirect(Gdn::Request()->Url('', TRUE, FALSE));
    }
 }
 
@@ -891,6 +1033,12 @@ if (!function_exists('GetIncomingValue')) {
 
 if (!function_exists('GetMentions')) {
    function GetMentions($String) {
+      // Check for a custom mentions formatter and use it.
+      $Formatter = Gdn::Factory('MentionsFormatter');
+      if (is_object($Formatter)) {
+         return $Formatter->GetMentions($String);
+      }
+
       $Mentions = array();
       
       // This one grabs mentions that start at the beginning of $String
@@ -1039,11 +1187,18 @@ if (!function_exists('InSubArray')) {
 
 if (!function_exists('IsMobile')) {
    function IsMobile() {
+      static $IsMobile = 'unset';
+      
+      // Short circuit so we only do this work once per pageload
+      if ($IsMobile != 'unset') return $IsMobile;
+      
+      // Start out assuming not mobile
       $Mobile = 0;
+      
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1078,8 +1233,14 @@ if (!function_exists('IsMobile')) {
       // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
       // if (strpos($UserAgent, 'windows') > 0)
       //   $Mobile = 0;
- 
-      return $Mobile > 0;
+      
+      $IsMobile = ($Mobile > 0);
+      
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if (($Mobile > 0) && $ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+         $IsMobile = NULL;
+      
+      return $IsMobile;
    }
 }
 
@@ -1234,12 +1395,21 @@ if (!function_exists('PageNumber')) {
     *
     * @param int $Offset The database offset, starting at zero.
     * @param int $Limit The database limit, otherwise known as the page size.
-    * @param bool $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    * @param bool|string $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+    *  - bool: true means yes, false means no.
+    *  - string: The prefix for the page number.
+    * @param bool $First Whether or not to return the page number if it is the first page.
     */
-   function PageNumber($Offset, $Limit, $UrlParam = FALSE) {
+   function PageNumber($Offset, $Limit, $UrlParam = FALSE, $First = TRUE) {
       $Result = floor($Offset / $Limit) + 1;
-      if ($UrlParam)
+
+      if ($UrlParam !== FALSE && !$First && $Result == 1)
+         $Result = '';
+      elseif ($UrlParam === TRUE)
          $Result = 'p'.$Result;
+      elseif (is_string($UrlParam))
+         $Result = $UrlParam.$Result;
+
       return $Result;
    }
 }
@@ -1439,8 +1609,8 @@ if (!function_exists('ProxyRequest')) {
     */
    function ProxyRequest($Url, $Timeout = FALSE, $FollowRedirects = FALSE) {
       $OriginalTimeout = $Timeout;
-		if ($Timeout === FALSE)
-			$Timeout = C('Garden.SocketTimeout', 1.0);
+      if ($Timeout === FALSE)
+         $Timeout = C('Garden.SocketTimeout', 1.0);
 
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -1464,7 +1634,6 @@ if (!function_exists('ProxyRequest')) {
       }
       $Response = '';
       if (function_exists('curl_init')) {
-         
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
@@ -1472,6 +1641,7 @@ if (!function_exists('ProxyRequest')) {
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
@@ -1484,12 +1654,12 @@ if (!function_exists('ProxyRequest')) {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
          //}
-         
          $Response = curl_exec($Handler);
          $Success = TRUE;
          if ($Response == FALSE) {
             $Success = FALSE;
-            $Response = curl_error($Handler);
+            $Response = '';
+            throw new Exception(curl_error($Handler));
          }
          
          curl_close($Handler);
@@ -1570,7 +1740,7 @@ if (!function_exists('ProxyRequest')) {
          $Code = GetValue('StatusCode',$ResponseHeaders, 200);
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $ResponseHeaders)) {
-               $Location = GetValue('Location', $ResponseHeaders);
+               $Location = AbsoluteSource(GetValue('Location', $ResponseHeaders), $Url);
                return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
             }
          }
@@ -1585,7 +1755,7 @@ if (!function_exists('RandomString')) {
       $CharLen = strlen($Characters) - 1;
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;
@@ -1606,7 +1776,7 @@ if (!function_exists('Redirect')) {
       // assign status code
       $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
-      header("location: ".Url($Destination), TRUE, $SendCode);
+      header("Location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
    }
@@ -1769,6 +1939,29 @@ if (!function_exists('SafeGlob')) {
    }
 }
 
+if (!function_exists('SafeImage')) {
+   /**
+    * Examines the provided url & checks to see if there is a valid image on the other side. Optionally you can specify minimum dimensions.
+    * @param string $ImageUrl Full url (including http) of the image to examine.
+    * @param int $MinHeight Minimum height (in pixels) of image. 0 means any height.
+    * @param int $MinWidth Minimum width (in pixels) of image. 0 means any width.
+    * @return mixed The url of the image if safe, FALSE otherwise.
+    */
+   function SafeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
+      try {
+         list($Width, $Height, $Type, $Attributes) = getimagesize($ImageUrl);
+         if ($MinHeight > 0 && $MinHeight < $Height)
+            return FALSE;
+         
+         if ($MinWidth > 0 && $MinWidth < $Width)
+            return FALSE;
+      } catch (Exception $ex) {
+         return FALSE;
+      }
+      return $ImageUrl;
+   }
+}
+
 if (!function_exists('SafeParseStr')) {
    function SafeParseStr($Str, &$Output, $Original = NULL) {
       $Exploded = explode('&',$Str);
@@ -1910,21 +2103,23 @@ if (!function_exists('SmartAsset')) {
 if (!function_exists('StringBeginsWith')) {
    /** Checks whether or not string A begins with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringBeginsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0)
-         return TRUE;
-      else {
-         $Result = substr_compare($A, $B, 0, strlen($B), $CaseInsensitive) == 0;
+      elseif (strlen($Needle) == 0) {
          if ($Trim)
-            $Result = $Result ? substr($A, strlen($B)) : $A;
+            return $Haystack;
+         return TRUE;
+      } else {
+         $Result = substr_compare($Haystack, $Needle, 0, strlen($Needle), $CaseInsensitive) == 0;
+         if ($Trim)
+            $Result = $Result ? substr($Haystack, strlen($Needle)) : $Haystack;
          return $Result;
       }
    }
@@ -1933,21 +2128,23 @@ if (!function_exists('StringBeginsWith')) {
 if (!function_exists('StringEndsWith')) {
    /** Checks whether or not string A ends with string B.
     *
-    * @param string $A The main string to check.
-    * @param string $B The substring to check against.
+    * @param string $Haystack The main string to check.
+    * @param string $Needle The substring to check against.
     * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
     * @param bool Whether or not to trim $B off of $A if it is found.
     * @return bool|string Returns true/false unless $Trim is true.
     */
-   function StringEndsWith($A, $B, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($A) < strlen($B))
+   function StringEndsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
+      if (strlen($Haystack) < strlen($Needle))
          return FALSE;
-      elseif (strlen($B) == 0)
-         return TRUE;
-      else {
-         $Result = substr_compare($A, $B, -strlen($B), strlen($B), $CaseInsensitive) == 0;
+      elseif (strlen($Needle) == 0) {
          if ($Trim)
-            $Result = $Result ? substr($A, 0, -strlen($B)) : $A;
+            return $Haystack;
+         return TRUE;
+      } else {
+         $Result = substr_compare($Haystack, $Needle, -strlen($Needle), strlen($Needle), $CaseInsensitive) == 0;
+         if ($Trim)
+            $Result = $Result ? substr($Haystack, 0, -strlen($Needle)) : $Haystack;
          return $Result;
       }
    }
@@ -2019,23 +2216,6 @@ if (!function_exists('TouchValue')) {
 
       return GetValue($Key, $Collection);
 	}
-}
-
-if (!function_exists('Translate')) {
-   /**
-	 * Translates a code into the selected locale's definition.
-	 *
-	 * @param string $Code The code related to the language-specific definition.
-    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
-	 * @param string $Default The default value to be displayed if the translation code is not found.
-	 * @return string The translated string or $Code if there is no value in $Default.
-	 * @deprecated
-	 * @see Gdn::Translate()
-	 */
-   function Translate($Code, $Default = '') {
-      trigger_error('Translate() is deprecated. Use T() instead.', E_USER_DEPRECATED);
-      return Gdn::Translate($Code, $Default);
-   }
 }
 
 if (!function_exists('TrueStripSlashes')) {

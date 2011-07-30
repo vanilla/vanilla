@@ -7,60 +7,78 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Embed Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manages the embedding of a forum on a foreign page.
+ *
+ * @since 2.0.18
+ * @package Dashboard
+ */
 class EmbedController extends DashboardController {
-
+   /**
+    * Models to include.
+    * 
+    * @since 2.0.18
+    * @access public
+    * @var array
+    */
    public $Uses = array('Database', 'Form');
-
+   
+   /**
+    * Display the embedded forum.
+    * 
+    * @since 2.0.18
+    * @access public
+    */
    public function Index() {
       $this->AddSideMenu('dashboard/embed');
       $this->Title('Embed Vanilla');
       $this->Form = new Gdn_Form();
-		
-		$ThemeManager = new Gdn_ThemeManager();
-		$this->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
-      $this->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
-      $this->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
-		$this->SetData('EnabledThemeName', $this->Data('EnabledTheme.Name', $this->Data('EnabledTheme.Folder')));
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.EmbedDashboard'));
+      $ConfigurationModel->SetField(array('Garden.TrustedDomains'));
       
       $this->Form->SetModel($ConfigurationModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Format trusted domains as a string
+         $TrustedDomains = GetValue('Garden.TrustedDomains', $ConfigurationModel->Data);
+         if (is_array($TrustedDomains))
+            $TrustedDomains = implode("\n", $TrustedDomains);
+         
+         $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Plugins.EmbedVanilla.RemoteUrl', 'WebAddress', 'The remote url you specified could not be validated as a functional url to redirect to.');
+         // Format the trusted domains as an array based on newlines & spaces
+         $TrustedDomains = $this->Form->GetValue('Garden.TrustedDomains');
+         $TrustedDomains = explode(' ', str_replace("\n", ' ', $TrustedDomains));
+         $TrustedDomains = array_unique(array_map('trim', $TrustedDomains));
+         $this->Form->SetFormValue('Garden.TrustedDomains', $TrustedDomains);
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
+         
+         // Reformat array as string so it displays properly in the form
+         $this->Form->SetFormValue('Garden.TrustedDomains', implode("\n", $TrustedDomains));
       }
-		
-		// Handle changing the theme to the recommended one
-		$ThemeFolder = GetValue(0, $this->RequestArgs);
-		$TransientKey = GetValue(1, $this->RequestArgs);
-		$Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
-         try {
-            foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
-		         if ($ThemeInfo['Folder'] == $ThemeFolder)
-                  $ThemeManager->EnableTheme($ThemeName);
-            }
-         } catch (Exception $Ex) {
-            $this->Form->AddError($Ex);
-         }
-         if ($this->Form->ErrorCount() == 0)
-            Redirect('/plugin/embed');
-
-      }
-
+      
       $this->Render();
    }
-
+   
+   /**
+    * Allow for a custom embed theme.
+    * 
+    * @since 2.0.18
+    * @access public
+    */
    public function Theme() {
-      // Allow for a custom embed theme
+      // Do nothing by default
    }
 
 }

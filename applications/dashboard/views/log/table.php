@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 ?>
 <table id="Log" class="AltColumns">
@@ -13,21 +14,84 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
    <tbody>
       <?php
       foreach ($this->Data('Log') as $Row):
+         $RecordLabel = GetValueR('Data.Type', $Row);
+         if (!$RecordLabel)
+            $RecordLabel = $Row['RecordType'];
+
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
-         <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
+         <td class="UsernameCell"><?php 
+            echo UserAnchor($Row, '', 'Insert');
+
+            if (!empty($Row['OtherUserIDs'])) {
+               $OtherUserIDs = explode(',',$Row['OtherUserIDs']);
+               echo ' '.Plural(count($OtherUserIDs), 'and %s other', 'and %s others').' ';
+            };
+         ?></td>
          <td>
             <?php
-               echo '<span class="Expander">', $this->FormatContent($Row), '</span>';
+               $Url = FALSE;
+               if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
+                  switch (strtolower($Row['RecordType'])) {
+                     case 'discussion':
+                        $Url = "/discussion/{$Row['RecordID']}/x/p1";
+                        break;
+                     case 'comment':
+                        $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
+                  }
+               }
 
-               echo '<div class="Tags">';
-               echo '<span class="Tag '.$Row['Operation'].'Tag">'.T($Row['Operation']).'</span> ';
-               echo '<span class="Tag '.$Row['RecordType'].'Tag">'.T($Row['RecordType']).'</span> ';
+               echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
+
+               echo '<div class="Meta-Container">';
+
+               echo '<span class="Tags">';
+               echo '<span class="Tag Tag-'.$Row['Operation'].'">'.T($Row['Operation']).'</span> ';
+               echo '<span class="Tag Tag-'.$RecordLabel.'">'.Anchor(T($RecordLabel), $Url).'</span> ';
+               echo '</span>';
+
+               if ($Row['RecordIPAddress']) {
+                  echo ' <span class="Meta">',
+                     '<span class="Meta-Label">IP</span> ',
+                     IPAnchor($Row['RecordIPAddress'], 'Meta-Value'),
+                     '</span> ';
+               }
+
+               if ($Row['CountGroup'] > 1) {
+                  echo ' <span class="Meta">',
+                  '<span class="Meta-Label">'.T('Reported').'</span> ',
+                  Wrap(Plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
+                  '</span> ';
+
+//                  echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
+               }
+
+               if ($Row['RecordName']) {
+                  echo ' <span class="Meta">',
+                     '<span class="Meta-Label">'.sprintf('%s by', T($RecordLabel)).'</span> ',
+                     UserAnchor($Row, 'Meta-Value', 'Record'),
+                     '</span> ';
+               }
+
+               // Write custom meta information.
+               $CustomMeta = GetValueR('Data._Meta', $Row, FALSE);
+               if (is_array($CustomMeta)) {
+                  foreach ($CustomMeta as $Key => $Value) {
+                     echo ' <span class="Meta">',
+                        '<span class="Meta-Label">'.T($Key).'</span> ',
+                        Wrap(htmlspecialchars($Value), 'span', array('class' => 'Meta-Value')),
+                        '</span>';
+
+                  }
+               }
+              
                echo '</div>';
             ?>
          </td>
-         <td class="DateCell"><?php echo Gdn_Format::Date($Row['DateInserted']); ?></td>
+         <td class="DateCell"><?php
+            echo Gdn_Format::Date($Row['DateInserted'], 'html');
+         ?></td>
       </tr>
       <?php
       endforeach;

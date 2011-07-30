@@ -30,7 +30,7 @@ class PermissionModel extends Gdn_Model {
 
       if (!$PermissionsCleared) {
          // Remove the cached permissions for all users.
-         $this->SQL->Put('User', array('Permissions' => ''));
+         Gdn::UserModel()->ClearPermissions();
          $PermissionsCleared = TRUE;
       }
    }
@@ -77,6 +77,8 @@ class PermissionModel extends Gdn_Model {
          $Where = array('RoleID <>' => 0);
          if (!$JunctionTable)
             $Where['JunctionTable'] = NULL;
+         else
+            $Where['JunctionTable'] = $JunctionTable;
 
          $this->SQL
             ->Set($this->_Backtick($NewColumns), '', FALSE)

@@ -66,7 +66,11 @@ jQuery(document).ready(function($) {
       var comments = $('ul.Discussion li.Comment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id');
-      lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      if (lastCommentID)
+         lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
+      else
+         lastCommentID = 0;
+         
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
@@ -187,8 +191,9 @@ jQuery(document).ready(function($) {
                      $('ul.Discussion li:last').effect("highlight", {}, "slow");
                   }
                }
-               // Remove any "More" pager links
-               $('#PagerMore').remove();
+               // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
+               if (gdn.definition('PrependNewComments') != '1') // If prepending the latest comment, don't remove the pager.
+                  $('#PagerMore').remove();
 
                // Let listeners know that the comment was added.
                $(document).trigger('CommentAdded');
@@ -355,20 +360,20 @@ jQuery(document).ready(function($) {
    getNewTimeout();
    
    /* Comment Checkboxes */
-   $('.HeadingTabs .Administration :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.MessageList .Administration :checkbox').attr('checked', 'checked');
+         $('.MessageList .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.MessageList .Administration :checkbox').removeAttr('checked');
+         $('.MessageList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.Administration :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.MessageList .Administration :checkbox');
+      var checkIDs = $('.MessageList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       var discussionID = gdn.definition('DiscussionID');
       checkIDs.each(function() {
-         item = $(this);
-         aCheckIDs[aCheckIDs.length] = {'checkId' : item.val() , 'checked' : item.attr('checked')};
+         checkID = $(this);
+         aCheckIDs[aCheckIDs.length] = {'checkId' : checkID.val() , 'checked' : checkID.attr('checked')};
       });
       $.ajax({
          type: "POST",

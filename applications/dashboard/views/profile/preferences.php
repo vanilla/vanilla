@@ -28,7 +28,12 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
                $LastName = '';
                $i = 0;
                foreach ($Names as $Name) {
-                  echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                  $ConfigPref = C('Preferences.'.$Name, '0');
+                  if ($ConfigPref === FALSE) {
+                     echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
+                  } else {
+                     echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                  }
                   $LastName = $Name;
                   $i++;
                }

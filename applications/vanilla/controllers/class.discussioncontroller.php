@@ -71,6 +71,7 @@ class DiscussionController extends VanillaController {
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
       // Setup
       $this->Title($this->Discussion->Name);
@@ -329,6 +330,7 @@ class DiscussionController extends VanillaController {
       
       $this->SetJson('State', $State);
       $this->SetJson('CountBookmarks', $CountBookmarks);
+      $this->SetJson('CountDiscussionBookmarks', GetValue('CountDiscussionBookmarks', $this->DiscussionModel));
       $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
       $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
       $this->SetJson('MenuText', T('My Bookmarks'));
@@ -397,17 +399,19 @@ class DiscussionController extends VanillaController {
 
             $Announce = GetValue('Announce', $Discussion);
             $this->DiscussionModel->SQL->Cache($CacheKeys);
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', !$Announce);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)!$Announce);
          } else {
             $this->Form->AddError('ErrPermission');
          }
       }
       
+      $Target = $this->Request->Get('Target', 'discussions');
+      
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('discussions');
+         Redirect($Target);
          
-      $this->RedirectUrl = Url('discussions');
+      $this->RedirectUrl = Url($Target);
       $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
@@ -520,6 +524,8 @@ class DiscussionController extends VanillaController {
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
+      
+      $SuccessTarget = Url('/'.ltrim(GetIncomingValue('Target', '/'),'/'));
       if (
          is_numeric($DiscussionID)
          && $DiscussionID > 0
@@ -539,12 +545,12 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
+         Redirect($SuccessTarget);
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
+      $this->RedirectUrl = $SuccessTarget;
       $this->Render();         
    }
 
@@ -606,6 +612,15 @@ class DiscussionController extends VanillaController {
     * Alternate version of Index that uses the embed master view.
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
+      $this->Theme = 'default'; // Force the default theme on embedded comments
+      // Add some css to help with the transparent bg on embedded comments
+      if ($this->Head)
+         $this->Head->AddString('<style type="text/css">
+body { background: transparent !important; }
+ul.MessageList li.Item { background: #fff; }
+ul.MessageList li.Item.Mine { background: #E3F4FF; }
+</style>');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
@@ -623,6 +638,8 @@ class DiscussionController extends VanillaController {
       $ForeignType = GetIncomingValue('vanilla_type', '');
       $ForeignName = GetIncomingValue('vanilla_name', '');
       $ForeignUrl = GetIncomingValue('vanilla_url', '');
+      $this->SetData('ForeignUrl', $ForeignUrl);
+      $this->AddDefinition('ForeignUrl', $ForeignUrl);
       $ForeignBody = GetIncomingValue('vanilla_body', '');
       $CategoryID = GetIncomingValue('vanilla_category_id', '');
       
@@ -632,9 +649,23 @@ class DiscussionController extends VanillaController {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       else if ($ForeignID != '' && $ForeignType != '')
          $Discussion = $this->DiscussionModel->GetForeignID($ForeignID, $ForeignType);
-      
+         
       // If no discussion record was found, but foreign id was provided, create it now
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
+         if ($ForeignName == '' || $ForeignBody == '') {
+            $PageInfo = FetchPageInfo($ForeignUrl);
+            if (!$PageInfo['Exception']) {
+               $ForeignName = $PageInfo['Title'];
+               $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
+                  .'<br />'
+                  .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
+                  .Wrap($PageInfo['Description'], 'p');
+                  
+               if (count($PageInfo['Images']) > 0)
+                  $ForeignBody = Anchor(Img($PageInfo['Images'][0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
+                     .$ForeignBody;
+            }
+         }
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')
             $Body = $ForeignUrl;
@@ -661,9 +692,15 @@ class DiscussionController extends VanillaController {
                }
             }
          }
-
-         $DiscussionID = $this->DiscussionModel->Save(
+         
+         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $DiscussionID = $this->DiscussionModel->SQL->Insert(
+            'Discussion',
             array(
+               'InsertUserID' => $SystemUserID,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'UpdateUserID' => $SystemUserID,
+               'DateUpdated' => Gdn_Format::ToDateTime(),
                'CategoryID' => $CategoryID == '' ? NULL : $CategoryID,
                'ForeignID' => $ForeignID,
                'Type' => $ForeignType,
@@ -763,4 +800,20 @@ class DiscussionController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
+   
+   /*
+    Used for debugging FetchPageInfo() (used above when creating a discussion for embedded comments).
+   public function FetchPage() {
+      $Url = GetIncomingValue('Url', 'http://markosullivan.ca');
+      $PageInfo = FetchPageInfo($Url);
+      if (GetValue('Exception', $PageInfo)) {
+         echo $PageInfo['Exception']->getMessage();
+      } else {
+         var_dump($PageInfo);
+      }
+         
+      die();
+   }
+   */
+   
 }

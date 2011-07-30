@@ -23,10 +23,17 @@ class DashboardHooks implements Gdn_IPlugin {
       // Enable theme previewing
       if ($Session->IsValid()) {
          $PreviewThemeName = $Session->GetPreference('PreviewThemeName', '');
+			$PreviewThemeFolder = $Session->GetPreference('PreviewThemeFolder', '');
          if ($PreviewThemeName != '') {
             $Sender->Theme = $PreviewThemeName;
-            $Sender->AddAsset('Foot', $Sender->FetchView('previewtheme', 'settingscontroller', 'dashboard'));
-            $Sender->AddCssFile('previewtheme.css');
+				$Sender->InformMessage(
+					sprintf(T('You are previewing the %s theme.'), Wrap($PreviewThemeName, 'em'))
+						.'<div class="PreviewButtons">'
+						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewButton')
+						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewButton')
+						.'</div>',
+					'DoNotDismiss'
+				);
          }
       }
 
@@ -117,6 +124,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
       $Menu->AddLink('Moderation', T('Manage Spam').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Edit/Delete Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Ban List'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		

@@ -112,8 +112,13 @@ p {
 .P {
    margin: 0.5em 0;
 }
-h1, h2 {
+h1 {
    font-size:140%;
+   font-weight:bold;
+   margin-bottom:10px;
+}
+h2 {
+   font-size:130%;
    font-weight:bold;
    margin-bottom:10px;
 }
@@ -136,6 +141,12 @@ a {
 a:hover {
    text-decoration: none;
    color: #ff0084;
+}
+img.Thumbnail {
+	max-height: 300px;
+	max-width: 100px;
+	float: left;
+	margin: 0 16px 0 0;
 }
 input.DateBox,
 input.InputBox,
@@ -214,25 +225,20 @@ a.Button {
    line-height: 100%;
    margin: 3px auto;
 }
-
 input.Button {
 	font-size: 14px;
    font-weight: bold;
 }
-
 .Button:hover {
    color: #111;
    border: 1px solid #666;
 }
-
 .Button:focus {
    background: #eee;
 }
-
 .Buttons {
    margin-top: 10px;
 }
-
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -407,60 +413,48 @@ body #Head h1 {
 }
 #Head h1 a span {
    font-size: 24px;
-   color:#E4F7FE;
-   text-shadow:0 1px 0 #2595ba;   
+   color:#fff;
 }
-#Head h1 a:hover span {
-   color:#f3fcff;
+#Head .Search,
+#Head #Search {
+   position: absolute;
+   right: 0;
+   bottom: 6px;
+   text-align: right;
 }
 #Head form {
    float: right;
    width: 250px;
-   background: #fff;
    padding: 0;
-   margin: 15px 0 0;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
 }
 #Head form input.InputBox {
    width: 204px;
    border: 0;
-   padding: 4px 2px 4px 0;
+   padding: 4px;
+	margin: 0 6px 0 0;
    background: #fff;
-   margin: 0;
-   -moz-border-radius-topleft: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-top-left-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   border-top-left-radius: 2px;
-   border-bottom-left-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border: 2px;
+   border-bottom: 2px;
    color: #969696;
    font-size: 13px;
+	vertical-align: bottom;
 }
 #Head form input.Button {
-   border: 0;
-   width: 38px;
-   height: 26px;
-   background: #cfecff;
-   color: #1e79a7;
-   padding: 3px 0 4px;
-   margin: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
-   border-radius: 0;
-   -moz-border-radius-topright: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-top-right-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   border-top-right-radius: 2px;
-   border-bottom-right-radius: 2px;
-  	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;     	
+	font-size: 11px;
+	border: none;
 }
-#Menu ul {
-	display: none;
+div.Menu {
+   width: 960px;
+   margin: 0 auto;
+   position: relative;
+   text-align: left;
+   vertical-align: bottom;
+}
+ul#Menu {
+   display: inline-block;
+   margin-right: 280px;
+   vertical-align: bottom;
 }
 #Menu li {
    line-height: 27px;
@@ -492,9 +486,17 @@ body #Head h1 {
 }
 #Menu li.NonTab,
 #Menu li.NonTab a {
-   background: transparent;
-   border: 0;
    font-weight: normal;
+}
+#Menu ul {
+   background: #38abe3;
+}
+#Menu a {
+   color: #fff;
+}
+#Menu a:hover {
+   color: #fff;
+   text-decoration: underline;
 }
 #Menu a span,
 #Menu li.Active a span,
@@ -507,166 +509,11 @@ body #Head h1 {
    line-height: 12px;
    font-weight: normal;
 	text-shadow: none;
+   background: #f2fcff;
+   color: #299fc7;
 }
 
-/* Option (dropdown) Menus
-
-Menu takes a z-index of 100
-Option menu takes a z-index of 300
-
-*/
-ul.Options,
-ul.Options ul {
-   margin: 0;
-   padding: 0;
-   display: none;
-}
-.DataList .Item.Active ul.Options {
-    display:block;
-}
-
-.Item h3 {
-   font-size: 14px;
-}
-
-ul.Options {
-   z-index: 298;
-}
-ul.Options ul {
-   z-index: 300;
-   position: absolute;
-}
-ul.Options li {
-   float: right;
-   position: relative;
-   display: block;
-   list-style: none outside none;
-   padding: 0;
-   font-size: 11px;
-   line-height: 22px;
-}
-ul.Options h3 {
-   display: block;
-   cursor: pointer;
-   margin: 0;
-   padding: 0;
-}
-ul.Options li ul li {
-   float: none;
-   text-align: left;
-   margin: 0;
-   font-weight: normal;
-}
-ul.Options li ul li a {
-   width: 104px;
-   padding: 0 6px;
-   height: auto;
-}
-ul.Options a {
-   text-decoration: none;
-   display: block;
-   position: relative;
-   white-space: nowrap;
-   font-size: 11px;
-}
-ul.Options ul li {
-   display: block;
-   float: none;
-}
-ul.Options li.Parent strong {
-   display: block;
-   padding: 4px;
-   margin: 3px 4px 0 0;
-   font-size: 10px;
-   font-weight: normal;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
-   color: #555;
-   cursor: pointer;
-   line-height: 100%;
-}
-ul.Options li.Parent strong:focus,
-ul.Options li.Parent strong:hover {
-   color: #333;
-   border: 1px solid #888;
-}
-ul.Options li.Parent strong:focus {
-   background: #eee;
-}
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong {
-   color: #fff;
-   background: #9c9c9c !important;
-   border: 1px solid #9c9c9c;
-   -moz-border-radius-bottomleft: 0;
-   -moz-border-radius-bottomright: 0;
-   -webkit-border-bottom-left-radius: 0;
-   -webkit-border-bottom-right-radius: 0;
-   border-bottom-left-radius: 0;
-   border-bottom-right-radius: 0;
-}
-ul.Options li.Active {
-   background: none;
-}
-ul.Options li.Active ul {
-   -moz-border-radius-bottomleft: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   border-bottom-left-radius: 2px;
-   border-bottom-right-radius: 2px;
-   background: #444;
-   border: 1px solid #282828;
-}
-ul.Options li.Active ul li a {
-   background: none;
-}
-ul.Options li.Active a {
-   background: #efefef;
-   color: #fff;
-}
-ul.Options li.Active a:hover {
-   color: #fff;
-   background: #282828;
-}
-ul.Options li.Parent strong:hover,
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong,
-ul.Options li.Active ul {
-  	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0 0 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;     
-}
-
-
-ul.Options li.Active strong,
-ul.Options li.Active strong:hover,
-ul.Options li.Parent strong {
-   padding-right: 18px;
-   font-size: 11px;
-   background: url('images/buttons.png') right -96px no-repeat;
-}
-ul.Options li.Active strong,
-ul.Options li.Active strong:hover {
-   border: 1px solid #282828;
-   color: #fff;
-   background: url('images/buttons.png') right -144px no-repeat #282828 !important;
-}
-ul.Options li.Parent strong:hover {
-   box-shadow:1px 1px 2px #999999;
-   -moz-box-shadow:1px 1px 2px #999999;
-   -webkit-box-shadow:1px 1px 2px #999999;
-}
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong,
-ul.Options li.Active ul {
-   box-shadow:2px 2px 2px #999999;
-   -moz-box-shadow:2px 2px 2px #999999;
-   -webkit-box-shadow:2px 2px 2px #999999;
-}
-
+/* Option (dropdown) Menus */
 .OptionsMenu {
    display: inline-block;
    font-size: 10px;
@@ -694,11 +541,6 @@ ul.Options li.Active ul {
    -moz-user-select: none;
    -o-user-select: none;
 }
-/*.MenuTitle:hover {
-   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-}*/
 .Open .MenuTitle {
    border: 1px solid #282828;
    -moz-border-radius-bottomleft: 0;
@@ -740,7 +582,6 @@ ul.Options li.Active ul {
 .MenuItems li:hover {
    background: #282828;
 }
-
 .ToggleFlyout {
    cursor: pointer;
    position: relative;
@@ -756,53 +597,6 @@ ul.Options li.Active ul {
    z-index: 100;
 }
 
-.Center {
-   text-align: center;
-}
-
-
-/* ================================================================ Main Menu */
-div.Menu {
-   width: 960px;
-   margin: 0 auto;
-   position: relative;
-   text-align: left;
-   vertical-align: bottom;
-}
-ul#Menu {
-   display: inline-block;
-   margin-right: 280px;
-   vertical-align: bottom;
-}
-#Menu ul,
-#Menu li.Active {
-   background: #38abe3;
-}
-#Menu a,
-#Menu li.Active a {
-   color: #fff;
-}
-#Menu a:hover {
-   background: #2595cb;
-}
-#Menu a:hover,
-#Menu li.NonTab a:hover {
-   color: #fff !important;
-}
-/* Numbers next to menu items */
-#Menu a span,
-#Menu li.Active a span,
-#Menu li.Highlight a:hover span {
-   background: #f2fcff;
-   color: #299fc7;
-}
-
-#Head .Search, #Head #Search {
-   position: absolute;
-   right: 0;
-   bottom: 6px;
-   text-align: right;
-}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -930,11 +724,6 @@ ul.PanelInfo div.Meta strong {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	/*
-	box-shadow: 0px 0px 2px #777;
-	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;
-	*/
 	background: #FF0;
 	color:#000;
 	font-size:9px;
@@ -1046,7 +835,6 @@ ul.CategoryListWithHeadings li.Depth9 { padding-left: 175px !important; }
 ul.CategoryListWithHeadings li.Depth10 { padding-left: 200px !important; }
 ul.CategoryListWithHeadings li.Depth11 { padding-left: 225px !important; }
 ul.CategoryListWithHeadings li.Depth12 { padding-left: 250px !important; }
-
 div.Box.RecentUsers {
 	float: left;
 }
@@ -1080,7 +868,7 @@ ul.DataList li.Item {
 ul.DataList li.Item li.Item {
    border-bottom: none;
 }
-ul.DataList div.Options {
+ul.DataList div.Options, .MessageList .Options {
    margin: 2px 4px 0 0;
 	position: absolute;
 	right: 0;
@@ -1110,7 +898,6 @@ ul.DataList div.Meta {
    font-size: 11px;
    color: #70727c;
 }
-
 ul.DataList div.Excerpt {
    font-size: 12px;
 	line-height: 1.4;
@@ -1123,7 +910,6 @@ ul.DataList div.Excerpt p {
 	display: inline;
 	padding: 0;
 }
-/* ul.DataList div.Meta span a, */
 ul.DataList div.Meta span,
 ul.DataList div.Meta strong {
    margin-right: 12px;
@@ -1135,11 +921,6 @@ ul.DataList div.Meta strong {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	/*
-	box-shadow: 0px 0px 2px #777;
-	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;
-	*/
 	background: #FF0;
 	color:#000;
 	font-size:9px;
@@ -1150,11 +931,9 @@ ul.DataList div.Meta strong {
 ul.DataList div.Meta a {
    color: #2b2d33;
 }
-
 ul.DataList div.Meta .Tag a {
    color: #ffffff;
 }
-
 ul.DataList a.Delete,
 ul.DataList a.Delete:hover {
    border-radius: 0;
@@ -1196,12 +975,10 @@ ul.DataList .Unfollow {
 ul.DataList .Unfollow a {
    color: #888;
 }
-
 .Item .Inset {
    border-top: 1px solid #bec8cc;
    padding: 5px 0;
 }
-
 ul.Condensed li,
 li.Condensed {
 	clear: left;
@@ -1370,20 +1147,16 @@ ul.MessageList div.Meta span.Author a {
    font-size: 15px;
    font-weight: bold;
 }
-
 ul.MessageList div.Meta span {
    line-height: inherit;
 }
-
 ul.MessageList div.Meta div.CommentInfo {
    line-height: normal;
 }
-
 ul.MessageList div.Meta div.CommentInfo span {
    padding-left: 0px;
    padding-right: 10px;
 }
-
 div.Preview {
 	text-align: left;
 	background: #E3F4FF;
@@ -1415,7 +1188,10 @@ ul.MessageList div.Message blockquote {
    padding: 4px 16px;
    margin: 4px 0;
 }
-
+ul.MessageList div.Message small {
+	font-size: 11px;
+	color: #777;
+}
 code, pre {
    border-radius: 2px;
    -moz-border-radius: 2px;
@@ -1691,8 +1467,7 @@ div.Preferences h3 {
 table.PreferenceGroup thead td {
 	font-weight: bold;
 	border-top: 1px solid #aaa;
-	border-bottom: 1px solid #ccc;
-	background: #eee;
+	border-bottom: 1px solid #aaa;
 	padding: 2px 6px;
 }
 table.PreferenceGroup tbody td {
@@ -1715,6 +1490,7 @@ div.Headings {
    padding: 5px 8px;
    margin: 0;
    background: #cfecff;
+   position: relative;
 }
 div.MessageForm div.Tabs {
 	padding: 0;
@@ -1830,22 +1606,15 @@ body.Discussion #Content,
 .DiscussionsTabs {
 	position: relative;
 }
-.Administration {
-	width: 32px;
-	text-align: center;
-	padding: 4px 0 5px;
-	position: absolute;
-	left: -32px;
-	top: 0;
+.Tabs .AdminCheck {
+   position: absolute;
+   right: 26px;
+   bottom: 5px;
 }
-.Item .Administration {
-	background: #f5f5f5;
-	border: 1px solid #BEC8CC;
-	border-width: 1px 0 0;
-}
-.DataList.Discussions .Item .Administration,
-.MessageList .Item .Administration {
-	top: -1px;
+.AdminCheck {
+   display: inline-block;
+   height: 22px;
+   vertical-align: top;
 }
 
 /* ======================================================== Thumbnail Cropper */
@@ -2093,7 +1862,6 @@ div.Legal strong {
 }
 
 
-
 /* ================================ Vanilla ================================= */
 
 #Panel ul.Discussions {
@@ -2131,7 +1899,6 @@ ul.DataList div.Meta a.Category {
 ul.DataList li.Mine div.Meta a.Category {
    background: #eff7ff;
 }
-
 .Tag {
    background: #777777;
    border-radius: 2px;
@@ -2139,11 +1906,9 @@ ul.DataList li.Mine div.Meta a.Category {
    font-weight: bold;
    padding: 1px 4px;
 }
-
 .Tag a {
    color: #FFFFFF;
 }
-
 ul.DataList div.Meta span.Announcement {
 	background: #777777;
 	color: #ffffff;
@@ -2197,9 +1962,8 @@ a.Bookmarking {
 }
 body.Discussion a.Bookmark {
    float: right;
-	margin: 13px 8px;
+	margin: 5px 0 0 8px;
 }
-
 body.Discussion .Back {
    padding: 3px 6px;
    text-align: left;
@@ -2207,8 +1971,7 @@ body.Discussion .Back {
 
 
 /* =================================================================== Drafts */
-ul.Discussions div.ItemContent,
-ul.Drafts div.ItemContent {
+.DataList .ItemContent {
    margin: 0 0 0 9px;
 }
 ul.Drafts div.ItemContent a.Title,
@@ -2543,7 +2306,7 @@ ul.Tabs li a.Active {
 /* Icons */
 ul.Tabs li a.EntryTabFor_password {
 	padding-left: 22px;
-	background-image: url('../../../themes/default/design/favicon.png');
+	background-image: url('images/icon.png');
 	background-position: 3px 4px;
 	background-repeat: no-repeat;
 }
@@ -2597,7 +2360,6 @@ span.Incorrect {
    display: block;
    color: red;
 }
-
 body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
@@ -2629,7 +2391,6 @@ div.MultipleEntryMethods {
 .MultipleEntryMethods .Methods {
    border-left: solid 1px #BEC8CC;
 }
-
 body#dashboard_entry_handshake #Content input.InputBox,
 body#dashboard_entry_signin #Content input.InputBox,
 body#dashboard_entry_index #Content input.InputBox,
@@ -2756,14 +2517,11 @@ body#dashboard_entry_leave p.Leaving {
    padding: 20px 0 20px 50px;
 }
 
-
-
 /* External App Connect Designs */
 div.Connect h1,
 div.Connect h2 {
 	text-align: left;
 }
-
 div.ConnectInfo {
 	margin: 10px 0 0;
 	position: relative;
@@ -2893,7 +2651,6 @@ div.Errors pre {
 	-moz-box-shadow: 0px 0px 2px #333;
 	-webkit-box-shadow: 0px 0px 2px #333;  
 }
-
 div.Errors pre,
 div.Errors pre * {
 	background: #ffa !important;
@@ -3250,27 +3007,6 @@ body.embed div.Connect h2 {
 	padding: 2px 8px 4px;
 	background: #f2f2f2;
 }
-.Credit {
-	padding: 0 8px;
-}
-.Credit a,
-.Credit a:hover {
-	font-size: 9px;
-	color: #888 !important;
-	text-decoration: none !important;
-}
-.Credit a:hover {
-	color: #333 !important;
-}
-.Credit .Logo {
-	line-height: 25px;
-	text-indent: -1000px;
-	vertical-align: baseline;
-	display: inline-block;
-	height: 22px;
-	width: 46px;
-	background: url('images/vanilla-logo-46px.png') 0 0 no-repeat;
-}
 /* ============================================================ Regarding */
 
 div.RegardingEvent {
@@ -3288,28 +3024,23 @@ div.RegardingEvent {
    background: rgb(0, 0, 0) !important;
    background: rgba(0, 0, 0, 0.7) !important;
 }
-
 div.RegardingEvent span.InformSprite {
    top: 5px;
    left: 5px;
 }
-
 div.RegardingEvent a.ReportedUser,
 div.RegardingEvent a.ReportingUser {
    color: #CFECFF;
 }
-
 div.RegardingEvent div.ReportedReason {
    padding: 5px;
    font-style: italic;
 }
-
 div.RegardingEvent div.RegardingTime {
    font-size: 9px;
    text-transform: uppercase;
    color: #B1B1B1;
 }
-
 div.RegardingActions {
    position: relative;
    overflow: hidden;
@@ -3317,12 +3048,10 @@ div.RegardingActions {
    padding: 0px 10px;
    margin-bottom: 10px;
 }
-
 div.RegardingActions div.ActionButton {
    padding: 0px 5px 2px 5px;
    display: inline-block;
    margin-right: 4px;
-   
    color: #fff !important;
    text-shadow: 0 1px 1px #000;
    text-align: left !important;
@@ -3335,7 +3064,6 @@ div.RegardingActions div.ActionButton {
    background: rgb(0, 0, 0) !important;
    background: rgba(0, 0, 0, 0.7) !important;
 }
-
 div.RegardingActions div.ActionButton a {
    color: #CFECFF;
    font-size: 10px;

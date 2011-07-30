@@ -164,7 +164,7 @@ class Gdn_Memcache extends Gdn_Cache {
       $Expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
       
       $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Stored = $this->Memcache->set($RealKey, $Value);//, $Flags, $Expiry);
+      $Stored = $this->Memcache->set($RealKey, $Value, $Flags, $Expiry);
       return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
    

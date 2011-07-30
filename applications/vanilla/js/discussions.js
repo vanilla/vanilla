@@ -21,19 +21,19 @@ jQuery(document).ready(function($) {
       });
 
    /* Discussion Checkboxes */
-   $('.DiscussionsTabs .Administration :checkbox').click(function() {
+   $('.DiscussionsTabs .AdminCheck :checkbox').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .Administration :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.DataList .Administration :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.Administration :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.DataList .Administration :checkbox');
+      var checkIDs = $('.DataList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       checkIDs.each(function() {
-         item = $(this);
-         aCheckIDs[aCheckIDs.length] = { 'checkId' : item.val() , 'checked' : item.attr('checked') };
+         checkID = $(this);
+         aCheckIDs[aCheckIDs.length] = { 'checkId' : checkID.val() , 'checked' : checkID.attr('checked') };
       });
       $.ajax({
          type: "POST",

@@ -66,18 +66,19 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
-      if (!is_numeric($CategoryIdentifier))
-         $Category = $this->CategoryModel->GetFullByUrlCode(urlencode($CategoryIdentifier));
-      else
-         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
+//      if (!is_numeric($CategoryIdentifier))
+//         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
+//      else
+//         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
+      $Category = CategoryModel::Categories($CategoryIdentifier);
       
-      if ($Category === FALSE) {
+      if (empty($Category)) {
          if ($CategoryIdentifier)
             throw NotFoundException();
-         return $this->Discussions();
       }
+      $Category = (object)$Category;
 			
-		// Load the breadcrumbs
+		// Load the breadcrumbs.
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
       
       $this->SetData('Category', $Category, TRUE);
@@ -122,7 +123,7 @@ class CategoriesController extends VanillaController {
       $this->SetData('_Limit', $Limit);
       $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
       $this->SetData('AnnounceData', $AnnounceData, TRUE);
-      $this->SetData('DiscussionData', $DiscussionModel->Get($Offset, $Limit, $Wheres), TRUE);
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -151,6 +152,8 @@ class CategoriesController extends VanillaController {
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
+
+      $this->CanonicalUrl(Url('/categories', TRUE));
 
       // Render default view
       $this->Render();
@@ -183,6 +186,17 @@ class CategoriesController extends VanillaController {
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);
 
+      $this->CanonicalUrl(Url('/categories/all', TRUE));
+      
+      // Set a definition of the user's current timezone from the db. jQuery
+      // will pick this up, compare to the browser, and update the user's
+      // timezone if necessary.
+      $CurrentUser = Gdn::Session()->User;
+      if (is_object($CurrentUser)) {
+         $ClientHour = $CurrentUser->HourOffset + date('G', time());
+         $this->AddDefinition('SetClientHour', $ClientHour);
+      }
+
       $this->Render();
 	}
 
@@ -213,7 +227,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
 			if ($Category->CategoryID > 0)
-				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID));
+				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'd.Announce' => 0));
       }
       
       // Add modules
@@ -224,6 +238,9 @@ class CategoriesController extends VanillaController {
       
       // Set view and render
       $this->View = 'discussions';
+
+      $this->CanonicalUrl(Url('/categories', TRUE));
+      
       $this->Render();
    }
    

@@ -93,6 +93,28 @@ class LogController extends DashboardController {
       $this->AddJsFile('jquery.expander.js');
       $this->AddJsFile('jquery.ui.packed.js');
    }
+   
+   public function Moderation($Page = '') {
+      $this->Permission('Garden.Moderation.Manage');
+      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      $this->SetData('Title', T('Moderation Queue'));
+
+      $Where = array('Operation' => 'Moderate');
+      
+      $RecordCount = $this->LogModel->GetCountWhere($Where);
+      $this->SetData('RecordCount', $RecordCount);
+      if ($Offset >= $RecordCount)
+         $Offset = $RecordCount - $Limit;
+
+      $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
+      $this->SetData('Log', $Log);
+
+      if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+         $this->View = 'Table';
+
+      $this->AddSideMenu('dashboard/log/moderation');
+      $this->Render();
+   }
 
    public function Restore($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');

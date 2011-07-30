@@ -217,6 +217,19 @@ class Gdn_Format {
       // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
       // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
    }
+   
+   /**
+    * Takes a mixed variable, filters unsafe things, renders BBCode and returns it.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function Auto($Mixed) {
+      $Formatter = C('Garden.InputFormatter');
+      if (!method_exists('Gdn_Format', $Formatter)) return $Mixed;
+      
+      return Gdn_Format::$Formatter($Mixed);
+   }
 
    /**
     * Takes a mixed variable.
@@ -419,20 +432,31 @@ class Gdn_Format {
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
+      $Now = time();
+      
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
-      if ($Session->UserID > 0)
-         $Timestamp += ($Session->User->HourOffset * 3600);
+      if ($Session->UserID > 0) {
+         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+
+      $Html = FALSE;
+      if (strcasecmp($Format, 'html') == 0) {
+         $Format = '';
+         $Html = TRUE;
+      }
 
       if ($Format == '') {
          // If the timestamp was during the current day
-         if (date('Y m d', $Timestamp) == date('Y m d', time())) {
+         if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
             // Use the time format
             $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
-         } else if (date('Y', $Timestamp) == date('Y', time())) {
+         } else if (date('Y', $Timestamp) == date('Y', $Now)) {
             // If the timestamp is the same year, show the month and date
             $Format = T('Date.DefaultDayFormat', '%B %e');
-         } else if (date('Y', $Timestamp) != date('Y', time())) {
+         } else if (date('Y', $Timestamp) != date('Y', $Now)) {
             // If the timestamp is not the same year, just show the year
             $Format = T('Date.DefaultYearFormat', '%B %Y');
          } else {
@@ -441,13 +465,20 @@ class Gdn_Format {
          }
       }
 
-      // Emulate %l and %e for Windows
+      $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
+
+      // Emulate %l and %e for Windows.
       if (strpos($Format, '%l') !== false)
           $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
       if (strpos($Format, '%e') !== false)
           $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
 
-      return strftime($Format, $Timestamp);
+      $Result = strftime($Format, $Timestamp);
+
+      if ($Html) {
+         $Result = Wrap($Result, 'span', array('title' => strftime($FullFormat, $Timestamp)));
+      }
+      return $Result;
    }
    
    /**
@@ -529,55 +560,60 @@ class Gdn_Format {
    * @param int optional $Timestamp, otherwise time() is used
    * @return string
    */
-   public static function FuzzyTime($Timestamp = NULL) {
+   public static function FuzzyTime($Timestamp = NULL, $MorePrecise = FALSE) {
       if (is_null($Timestamp))
          $Timestamp = time();
+      elseif (!is_numeric($Timestamp))
+         $Timestamp = self::ToTimestamp($Timestamp);
       
       $time = $Timestamp;
-      //echo $time." is: ";
-      if ( ( $time = strtotime( $time ) ) == false ) {
-         return T('an unknown time');
-      }
-      define( 'NOW',        time() );
-      define( 'ONE_MINUTE', 60 );
-      define( 'ONE_HOUR',   3600 );
-      define( 'ONE_DAY',    86400 );
-      define( 'ONE_WEEK',   ONE_DAY*7 );
-      define( 'ONE_MONTH',  ONE_WEEK*4 );
-      define( 'ONE_YEAR',   ONE_MONTH*12 );
+
+      define('NOW',        time());
+      define('ONE_MINUTE', 60);
+      define('ONE_HOUR',   3600);
+      define('ONE_DAY',    86400);
+      define('ONE_WEEK',   ONE_DAY*7);
+      define('ONE_MONTH',  ONE_WEEK*4);
+      define('ONE_YEAR',   ONE_MONTH*12);
+      
+      $SecondsAgo = NOW - $time;
 
       // sod = start of day :)
-      $sod = mktime( 0, 0, 0, date( 'm', $time ), date( 'd', $time ), date( 'Y', $time ) );
-      $sod_now = mktime( 0, 0, 0, date( 'm', NOW ), date( 'd', NOW ), date( 'Y', NOW ) );
+      $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+      $sod_now = mktime(0, 0, 0, date('m', NOW), date('d', NOW), date('Y', NOW ));
 
       // used to convert numbers to strings
-      $convert = array( 1 => T('one'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven') );
+      $convert = array(1 => T('a'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven'));
 
       // today
-      if ( $sod_now == $sod ) {
-         if ( $time > NOW-(ONE_MINUTE*3) ) {
-            return T('just a moment ago');
-         } else if ( $time > NOW-(ONE_MINUTE*7) ) {
+      if ($sod_now == $sod) {
+         if ( $time > NOW-(ONE_MINUTE*3)) {
+            return T('just now');
+         } else if ($time > NOW-(ONE_MINUTE*7)) {
             return T('a few minutes ago');
-         } else if ( $time > NOW-(ONE_HOUR) ) {
+         } else if ($time > NOW-(ONE_HOUR)) {
+            if ($MorePrecise) {
+               $MinutesAgo = ceil($SecondsAgo / 60);
+               return sprintf(T('%s minutes ago'), $MinutesAgo);
+            }
             return T('less than an hour ago');
          }
-         return sprintf(T('today at %s'), date( 'g:ia', $time ));
+         return sprintf(T('today at %s'), date('g:ia', $time));
       }
 
       // yesterday
-      if ( ($sod_now-$sod) <= ONE_DAY ) {
-         if ( date( 'i', $time ) > (ONE_MINUTE+30) ) {
+      if (($sod_now - $sod) <= ONE_DAY) {
+         if (date('i', $time) > (ONE_MINUTE+30)) {
             $time += ONE_HOUR/2;
          }
-         return sprintf(T('yesterday around %s'), date( 'ga', $time ));
+         return sprintf(T('yesterday around %s'), date('ga', $time));
       }
 
       // within the last 5 days
-      if ( ($sod_now-$sod) <= (ONE_DAY*5) ) {
-         $str = date( 'l', $time );
-         $hour = date( 'G', $time );
-         if ( $hour < 12 ) {
+      if (($sod_now - $sod) <= (ONE_DAY*5)) {
+         $str = date('l', $time);
+         $hour = date('G', $time);
+         if ($hour < 12) {
             $str .= T(' morning');
          } else if ( $hour < 17 ) {
             $str .= T(' afternoon');
@@ -590,10 +626,10 @@ class Gdn_Format {
       }
 
       // number of weeks (between 1 and 3)...
-      if ( ($sod_now-$sod) < (ONE_WEEK*3.5) ) {
-         if ( ($sod_now-$sod) < (ONE_WEEK*1.5) ) {
+      if (($sod_now - $sod) < (ONE_WEEK*3.5)) {
+         if (($sod_now - $sod) < (ONE_WEEK*1.5)) {
             return T('about a week ago');
-         } else if ( ($sod_now-$sod) < (ONE_DAY*2.5) ) {
+         } else if (($sod_now - $sod) < (ONE_DAY*2.5)) {
             return T('about two weeks ago');
          } else {
             return T('about three weeks ago');
@@ -601,17 +637,17 @@ class Gdn_Format {
       }
 
       // number of months (between 1 and 11)...
-      if ( ($sod_now-$sod) < (ONE_MONTH*11.5) ) {
-         for ( $i = (ONE_WEEK*3.5), $m=0; $i < ONE_YEAR; $i += ONE_MONTH, $m++ ) {
-            if ( ($sod_now-$sod) <= $i ) {
+      if (($sod_now - $sod) < (ONE_MONTH*11.5)) {
+         for ($i = (ONE_WEEK*3.5), $m=0; $i < ONE_YEAR; $i += ONE_MONTH, $m++) {
+            if (($sod_now - $sod) <= $i) {
                return sprintf(T('about %s month%s ago'),$convert[$m],(($m>1)?'s':''));
             }
          }
       }
 
       // number of years...
-      for ( $i = (ONE_MONTH*11.5), $y=0; $i < (ONE_YEAR*10); $i += ONE_YEAR, $y++ ) {
-         if ( ($sod_now-$sod) <= $i ) {
+      for ($i = (ONE_MONTH*11.5), $y=0; $i < (ONE_YEAR*10); $i += ONE_YEAR, $y++) {
+         if (($sod_now - $sod) <= $i) {
             return sprintf(T('about %s year%s ago'),$convert[$y],(($y>1)?'s':''));
          }
       }
@@ -668,7 +704,7 @@ class Gdn_Format {
          } else {
             // The text does not contain html and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
-            $Result = htmlspecialchars($Mixed);
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -681,6 +717,55 @@ class Gdn_Format {
       }
    }
 
+   public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
+      $Regex = "`([<>])`i";
+      $Parts = preg_split($Regex, $Html, null, PREG_SPLIT_DELIM_CAPTURE);
+
+//      echo htmlspecialchars($Html);
+//      echo '<pre>';
+//      echo htmlspecialchars(print_r($Parts, TRUE));
+//      echo '</pre>';
+
+      $InTag = FALSE;
+      $InAnchor = FALSE;
+      $TagName = FALSE;
+
+      foreach ($Parts as $i => $Str) {
+         switch($Str) {
+            case '<':
+               $InTag = TRUE;
+               break;
+            case '>':
+               $InTag = FALSE;
+               break;
+            default;
+               if ($InTag) {
+                  if ($Str[0] == '/') {
+                     $TagName = preg_split('`\s`', substr($Str, 1), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = FALSE;
+                  } else {
+                     $TagName = preg_split('`\s`', trim($Str), 2);
+                     $TagName = $TagName[0];
+
+                     if ($TagName == 'a')
+                        $InAnchor = TRUE;
+                  }
+               } else {
+                  if (!$InAnchor || !$SkipAnchors) {
+                     $Parts[$i] = call_user_func($Callback, $Str);
+                  }
+               }
+               break;
+         }
+      }
+
+//      return htmlspecialchars(implode('', $Parts));
+      return implode($Parts);
+   }
+
    /** Formats the anchor tags around the links in text.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
@@ -690,10 +775,12 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
-         $Regex = "`((?:</?(?:a|img))|/\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
-//         var_dump($Parts);
+//         echo '<pre>', print_r($Parts, TRUE), '</pre>';
+
+         self::LinksCallback(NULL);
 
          $Mixed = preg_replace_callback(
             $Regex,
@@ -703,34 +790,46 @@ class Gdn_Format {
          return $Mixed;
       }
    }
+   
    protected static function LinksCallback($Matches) {
-      static $Width, $Height, $InAnchor = FALSE, $InImg = FALSE;
+      static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
          list($Width, $Height) = Gdn_Format::GetEmbedSize();
       }
-
-      $Tag = strtolower($Matches[1]);
-      if ($Tag == '<a')
-         $InAnchor = TRUE;
-      elseif ($Tag == '</a')
+      if ($Matches === NULL) {
+         $InTag = 0;
          $InAnchor = FALSE;
-      elseif ($Tag == '<img')
-         $InImg = TRUE;
-      elseif ($Tag == '</img')
-         $InImg = FALSE;
-      elseif ($Tag == '/>' && $InImg)
-         $InImg = FALSE;
+         return;
+      }
 
-      if (!isset($Matches[2]) || $InAnchor || $InImg)
+      $InOut = $Matches[1];
+      $Tag = strtolower($Matches[2]);
+//      $End = $Matches[3];
+//      $Url = $Matches[4];
+
+      if ($InOut == '<') {
+         $InTag++;
+         if ($Tag == 'a')
+            $InAnchor = TRUE;
+      } elseif ($InOut == '</') {
+         $InTag++;
+         if ($Tag == 'a')
+            $InAnchor = FALSE;
+      } elseif ($Matches[3])
+         $InTag--;
+
+      if (!isset($Matches[4]) || $InTag || $InAnchor)
          return $Matches[0];
+      $Url = $Matches[4];
 
-      $Url = $Matches[2];
-      if (preg_match('`(?:https?|ftp)://www.youtube.com\/watch\?v=([^&]+)`', $Url, $Matches) && C('Garden.Format.YouTube')) {
+      if ((preg_match('`(?:https?|ftp)://www\.youtube\.com\/watch\?v=([^&]+)`', $Url, $Matches) 
+         || preg_match('`(?:https?)://www\.youtu\.be\/([^&]+)`', $Url, $Matches)) 
+         && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
-      } elseif (preg_match('`(?:https?|ftp)://vimeo.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
+      } elseif (preg_match('`(?:https?|ftp)://vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[1];
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
@@ -828,7 +927,13 @@ EOT;
    public static function Mentions($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Mentions');
-      } else {         
+      } else {
+         // Check for a custom formatter.
+         $Formatter = Gdn::Factory('MentionsFormatter');
+         if (is_object($Formatter)) {
+            return $Formatter->FormatMentions($Mixed);
+         }
+
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
             $Mixed = preg_replace(
@@ -900,6 +1005,10 @@ EOT;
     * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
     */
    public static function Seconds($Seconds) {
+      if (!is_numeric($Seconds)) {
+         $Seconds = abs(time() - self::ToTimestamp($Seconds));
+      }
+
       $Minutes = round($Seconds/60);
       $Hours = round($Seconds/3600);
       $Days = round($Seconds/86400);
@@ -1026,7 +1135,9 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $DateTime, $Matches)) {
+      if (($TestTime = strtotime($DateTime)) !== FALSE) {
+         return $TestTime;
+      } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];
@@ -1034,7 +1145,7 @@ EOT;
          $Minute = ArrayValue(5, $Matches, 0);
          $Second = ArrayValue(6, $Matches, 0);
          return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
-      } elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $DateTime, $Matches)) {
+      } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
          $Month = $Matches[2];
          $Day = $Matches[3];

@@ -250,7 +250,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       
       if (!$Collapse) {
          // Create a new Regarding entry
-         $RegardingID = $RegardingModel->Save(array(
+         $RegardingPreSend = array(
             'Type'            => $this->Type,
             'ForeignType'     => $this->ForeignType,
             'ForeignID'       => $this->ForeignID,
@@ -261,8 +261,15 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             'ParentID'        => $this->ParentID,
             'ForeignURL'      => $this->ForeignURL,
             'Comment'         => $this->Comment,
-            'OriginalContent' => $this->OriginalContent
-         ));
+            'OriginalContent' => $this->OriginalContent,
+            'Reports'         => 1
+         );
+         
+         
+         $RegardingID = $RegardingModel->Save($RegardingPreSend);
+         
+         if (!$RegardingID)
+            return FALSE;
       }
       
       // Handle collaborations
@@ -290,6 +297,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      'Close'        => 0,
                      'RegardingID'  => $RegardingID
                   ));
+                  
+                  $DiscussionModel->UpdateDiscussionCount($CategoryID);
                } else {
                   // Add a comment to the existing discussion
                   
@@ -302,6 +311,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         'Body'         => $this->Comment,
                         'InsertUserID' => $this->UserID
                      ));
+                     
+                     $CommentModel->Save2($CommentID, TRUE);
                   }
                }
                

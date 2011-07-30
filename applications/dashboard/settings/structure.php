@@ -38,7 +38,7 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel = Gdn::Factory('RoleModel');
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
-   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
+//   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
    $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
    $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
    $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
@@ -61,7 +61,7 @@ $Construct
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
    ->Column('About', 'text', TRUE)
-   ->Column('Email', 'varchar(200)')
+   ->Column('Email', 'varchar(200)', FALSE, 'index')
    ->Column('ShowEmail', 'tinyint(1)', '0')
    ->Column('Gender', array('m', 'f'), 'm')
    ->Column('CountVisits', 'int', '0')
@@ -87,6 +87,24 @@ $Construct
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
+
+// Make sure the system user is okay.
+$SystemUserID = C('Garden.SystemUserID');
+if ($SystemUserID) {
+   $SysUser = Gdn::UserModel()->Get($SystemUserID);
+
+   if (!$SysUser || GetValue('Deleted', $SysUser)) {
+      $SystemUserID = FALSE;
+      RemoveFromConfig('Garden.SystemUserID');
+   }
+}
+
+if (!$SystemUserID) {
+   // Try and find a system user.
+   $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
+   if ($SystemUserID)
+      SaveToConfig('Garden.SystemUserID', $SystemUserID);
+}
 
 // UserRole Table
 $Construct->Table('UserRole');
@@ -190,6 +208,7 @@ if($PermissionModel instanceof PermissionModel) {
 $PermissionModel->Define(array(
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
+   'Garden.Settings.View',
    'Garden.Routes.Manage',
    'Garden.Messages.Manage',
    'Garden.Applications.Manage',
@@ -297,6 +316,22 @@ $Construct->Table('Invitation')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
+   
+// Activity Table
+// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
+$Construct->Table('Activity')
+	->PrimaryKey('ActivityID')
+   ->Column('CommentActivityID', 'int', TRUE, 'key')
+   ->Column('ActivityTypeID', 'int')
+   ->Column('ActivityUserID', 'int', TRUE, 'key')
+   ->Column('RegardingUserID', 'int', TRUE, 'key')
+   ->Column('Story', 'text', TRUE)
+   ->Column('Route', 'varchar(255)', TRUE)
+   ->Column('CountComments', 'int', '0')
+   ->Column('InsertUserID', 'int', TRUE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -328,8 +363,8 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinInvite'))->NumRows() == 
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinInvite', 'FullHeadline' => '%1$s accepted %4$s invitation for membership.', 'ProfileHeadline' => '%1$s accepted %4$s invitation for membership.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinApproved'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinApproved', 'FullHeadline' => '%1$s approved %4$s membership application.', 'ProfileHeadline' => '%1$s approved %4$s membership application.'));
-if ($SQL->GetWhere('ActivityType', array('Name' => 'JoinCreated'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinCreated', 'FullHeadline' => '%1$s created an account for %4$s.', 'ProfileHeadline' => '%1$s created an account for %4$s.'));
+$SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%1$s created an account for %3$s.', 'ProfileHeadline' => '%1$s created an account for %3$s.'), array('Name' => 'JoinCreated'), TRUE);
+
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)
@@ -347,21 +382,20 @@ $SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'Unbanned'))->NumRows() == 0)
 $SQL->Replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %3$s.', 'ProfileHeadline' => '%1$s un-banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Unbanned'), TRUE);
 
-// Activity Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Activity')
-	->PrimaryKey('ActivityID')
-   ->Column('CommentActivityID', 'int', TRUE, 'key')
-   ->Column('ActivityTypeID', 'int')
-   ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE, 'key')
-   ->Column('Story', 'text', TRUE)
-   ->Column('Route', 'varchar(255)', TRUE)
-   ->Column('CountComments', 'int', '0')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Set($Explicit, $Drop);
+$WallPostType = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->FirstRow(DATASET_TYPE_ARRAY);
+if (!$WallPostType) {
+   $WallPostTypeID = $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallPost', 'FullHeadline' => '%3$s wrote on %2$s %5$s.', 'ProfileHeadline' => '%3$s wrote:'));
+   $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->Value('ActivityTypeID');
+
+   // Update all old wall comments to wall posts.
+   $SQL->Update('Activity')
+      ->Set('ActivityTypeID', $WallPostTypeID)
+      ->Set('ActivityUserID', 'RegardingUserID', FALSE)
+      ->Set('RegardingUserID', 'InsertUserID', FALSE)
+      ->Where('ActivityTypeID', $WallCommentTypeID)
+      ->Where('RegardingUserID is not null')
+      ->Put();
+}
 
 // Message Table
 $Construct->Table('Message')
@@ -402,14 +436,19 @@ $Construct->Table('Tag')
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
-   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity'), FALSE, 'index')
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity'), FALSE, 'index')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')
+   ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
    ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('InsertIPAddress', 'varchar(15)', NULL)
+   ->Column('OtherUserIDs', 'varchar(255)', NULL)
+   ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')
    ->Column('Data', 'text', NULL) // the data from the record.
+   ->Column('CountGroup', 'int', NULL)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
@@ -425,7 +464,7 @@ $Construct->Table('Regarding')
    ->Column('ParentID', 'int(11)', TRUE)
    ->Column('ForeignURL', 'varchar(255)', TRUE)
    ->Column('Comment', 'text', FALSE)
-   ->Column('Reports', 'int(11)', FALSE)
+   ->Column('Reports', 'int(11)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

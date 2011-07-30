@@ -1,5 +1,4 @@
-jQuery(document).ready(function($) {
-   
+jQuery(document).ready(function($) {   
    if (typeof(gdn) == "undefined") {
       gdn = {};
       gdn.definition = function() {
@@ -8,14 +7,15 @@ jQuery(document).ready(function($) {
    }
       
    var currentHeight = null,
-      minHeight = 400,
-      remotePostMessage = null,
+      minHeight = 300,
+      remotePostMessage = function(message, target) {},
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',
       embedDashboard = gdn.definition('EmbedDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       pagePath = gdn.definition('Path', ''),
+      isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
       
@@ -31,13 +31,24 @@ jQuery(document).ready(function($) {
          var messages = [];
          messageUrl = function(message) {
             var id = Math.floor(Math.random() * 100000);
-            if (remoteUrl.substr(-1))
+            if (remoteUrl.substr(remoteUrl.length - 1) != '/')
                remoteUrl += '/';
                
             return remoteUrl + "/poll.html#poll:" + id + ":" + message;
          }
         
          remotePostMessage = function(message, target) {
+            if (message.indexOf(':') >= 0) {
+               // Check to replace a similar message.
+               var messageType = message.split(':')[0];
+               for (var i = 0; i < messages.length; i++) {
+                  var messageI = messages[i];
+                  if (messageI.length >= messageType.length && messageI.substr(0, messageType.length) == messageType) {
+                     messages[i] = message;
+                     return;
+                  }
+               }
+            }
             messages.push(message);
          }
         
@@ -51,12 +62,22 @@ jQuery(document).ready(function($) {
             }
          }
          
+         var nextMessageTime = new Date();
          setMessage = function() {
             if (messages.length == 0)
                return;
-            
+
+            var messageTime = new Date();
+            if (messageTime < nextMessageTime)
+               return;
+
+            messageTime.setSeconds(messageTime.getSeconds() + 2);
+            nextMessageTime = messageTime;
+
             var message = messages.splice(0, 1)[0];
-            document.getElementById('messageFrame').src = messageUrl(message);
+            var url = messageUrl(message);
+
+            document.getElementById('messageFrame').src = url;
          }
            
          $(function() {
@@ -90,10 +111,10 @@ jQuery(document).ready(function($) {
    if (inIframe) {
       setHeight = function() {
          var newHeight = document.body.offsetHeight;
+         if (newHeight < minHeight)
+            newHeight = minHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
-            if (currentHeight < minHeight)
-               currentHeight = minHeight;
                
             remotePostMessage('height:'+currentHeight, '*');
          }
@@ -102,10 +123,15 @@ jQuery(document).ready(function($) {
       setHeight();
       setInterval(setHeight, 300);
     
+      // Simulate a page unload when popups are opened (so they are scrolled into view).
+      $('body').bind('popupReveal', function() {
+         remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
+      });
+      
+      $(window).unload(function() { remotePostMessage('unload', '*'); });
       $('a').live('click', function() {
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
-            isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
             noTop = $(this).hasClass('SignOut');
                 
          if (isHttp && href.substr(0, webroot.length) != webroot) {
@@ -115,6 +141,22 @@ jQuery(document).ready(function($) {
             if (!noTop)
                $(this).attr('target', '_top');
                
+            // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
+            if ($(this).parents('.CreateAccount').length > 0) {
+               // Examine querystring parameters for a target & replace it with the embed page
+               var href = $(this).attr('href');
+               var targetIndex = href.indexOf('Target=');
+               if (targetIndex > 0) {
+                  var target = href.substring(targetIndex + 7);
+                  var afterTarget = '';
+                  if (target.indexOf('&') > 0)
+                     afterTarget = target.substring(target.indexOf('&'));
+                  
+                  $(this).attr('href', href.substring(0, targetIndex + 7)
+                     + encodeURIComponent(gdn.definition('ForeignUrl', ''))
+                     + afterTarget);
+               }
+            }
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
@@ -127,17 +169,16 @@ jQuery(document).ready(function($) {
             
             if (path != '')
                remotePostMessage('location:' + path, '*');
-               
-            // setLocation(pathroot + path + hash);
-            // return false;
+
          }
       });
-      
-      // Simulate a page unload when popups are opened (so they are scrolled into view).
-      $('body').bind('popupReveal', function() {
-         remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
-      });
-      
-      $(window).unload(function() { remotePostMessage('unload', '*'); });
+
+   }
+   
+   var path = gdn.definition('Path', '~');
+   if (path != '~' && !isEmbeddedComments) {
+      if (path.length > 0 && path[0] != '/')
+         path = '/'+path;
+      remotePostMessage('location:' + path, '*');
    }
 });

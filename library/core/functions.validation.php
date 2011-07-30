@@ -116,11 +116,27 @@ if (!function_exists('ValidateWebAddress')) {
    }
 }
 
+if (!function_exists('ValidateUsernameRegex')) {
+   function ValidateUsernameRegex() {
+      static $ValidateUsernameRegex;
+      
+      if (is_null($ValidateUsernameRegex)) {
+         $ValidateUsernameRegex = sprintf("[%s]%s",
+            C("Garden.User.ValidationRegex","\d\w_"),
+            C("Garden.User.ValidationLength","{3,20}"));
+      }
+      
+      return $ValidateUsernameRegex;
+   }
+}
+
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
+      $ValidateUsernameRegex = ValidateUsernameRegex();
+      
       return ValidateRegex(
          $Value,
-         '/^([\d\w_]{3,20})?$/si'
+         "/^({$ValidateUsernameRegex})?$/siu"
       );
    }
 }
@@ -134,10 +150,18 @@ if (!function_exists('ValidateUrlString')) {
    }
 }
 
+if (!function_exists('ValidateUrlStringRelaxed')) {
+   function ValidateUrlStringRelaxed($Value, $Field = '') {
+      if (preg_match('`[/\\\<>\'"]`', $Value))
+         return FALSE;
+      return TRUE;
+   }
+}
+
 if (!function_exists('ValidateDate')) {
    function ValidateDate($Value) {
       // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
-      if (strlen($Value) == 0) {
+      if (empty($Value)) {
 			return TRUE; // blank dates validated through required.
 		} else {
 			$Matches = array();

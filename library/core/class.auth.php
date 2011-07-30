@@ -31,8 +31,9 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function StartAuthenticator() {
+      if (!C('Garden.Installed', FALSE) && !$ForceStart) return;
       // Start the 'session'
-      Gdn::Session()->Start();
+      Gdn::Session()->Start(FALSE, FALSE);
       
       // Get list of enabled authenticators
       $AuthenticationSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
@@ -328,6 +329,10 @@ class Gdn_Auth extends Gdn_Pluggable {
       $this->_Identity->SetIdentity($Value, $Persist);
    }
    
+   /**
+    *
+    * @return type Gdn_CookieIdentity
+    */
    public function Identity() {
       if (is_null($this->_Identity)) {
          $this->_Identity = Gdn::Factory('Identity');
@@ -430,8 +435,10 @@ class Gdn_Auth extends Gdn_Pluggable {
          
       // Ask the authenticator for this URLType
       $Return = $Authenticator->GetURL($URLType);
+      
       // If it doesn't know, get the default from our config file
-      if (!$Return) $Return = C('Garden.Authenticator.'.$URLType);
+      if (!$Return) $Return = C('Garden.Authenticator.'.$URLType, FALSE);
+      if (!$Return) return FALSE;
       
       $ExtraReplacementParameters = array(
          'Path'   => $Redirect,

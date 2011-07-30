@@ -1,21 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$DiscussionName = Gdn_Format::Text($this->Discussion->Name);;
+$DiscussionName = Gdn_Format::Text($this->Discussion->Name);
 if ($DiscussionName == '')
    $DiscussionName = T('Blank Discussion Topic');
 
+$this->EventArguments['DiscussionName'] = &$DiscussionName;
+$this->FireEvent('BeforeDiscussionTitle');
+
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
-
-if ($Session->IsValid()) {
-   // Bookmark link
-   echo Anchor(
-      '<span>*</span>',
-      '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-      'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-      array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-   );
-}
 
 $PageClass = '';
 if($this->Pager->FirstPage()) 
@@ -23,6 +16,18 @@ if($this->Pager->FirstPage())
 	
 ?>
 <div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
+   <?php
+   if ($Session->IsValid()) {
+      // Bookmark link
+      echo Anchor(
+         '<span>*</span>',
+         '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
+         'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+      );
+   }
+   ?>
+
    <ul>
       <li><?php
          if (C('Vanilla.Categories.Use') == TRUE) {
@@ -33,11 +38,6 @@ if($this->Pager->FirstPage())
       ?></li>
    </ul>
    <div class="SubTab"><?php echo $DiscussionName; ?></div>
-   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use')) { ?>
-      <div class="Administration">
-         <input type="checkbox" name="Toggle" />
-      </div>
-   <?php } ?>
 </div>
 <?php $this->FireEvent('BeforeDiscussion'); ?>
 <ul class="MessageList Discussion <?php echo $PageClass; ?>">
@@ -59,7 +59,7 @@ if ($this->Discussion->Closed == '1') {
    ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-      <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
 } else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
@@ -67,7 +67,7 @@ if ($this->Discussion->Closed == '1') {
 } else if ($Session->IsValid()) { ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('Commenting not allowed.'); ?></div>
-      <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
 } else {

@@ -367,7 +367,7 @@ abstract class Gdn_SQLDriver {
    /**
     * Set the cache key for this transaction
     * 
-    * @param string $Key The cache key that this query will save into.
+    * @param string|array $Key The cache key (or array of keys) that this query will save into.
     * @return Gdn_SQLDriver $this
     */
    public function Cache($Key, $Operation = NULL, $Backing = NULL) {
@@ -1152,7 +1152,7 @@ abstract class Gdn_SQLDriver {
                unset($Set[$Key]);
                $Key = trim($Key, '`');
                
-               if (!$this->CaptureModifications && !isset($Row[$Key]))
+               if (!$this->CaptureModifications && !array_key_exists($Key,$Row))
                   continue;
 
                if (in_array($Key, array('DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID')))

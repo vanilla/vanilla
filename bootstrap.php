@@ -88,7 +88,7 @@ foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
 Gdn::Config()->Load(PATH_LOCAL_CONF.'/config.php', 'Use');
 
 // Redirect to the setup screen if Dashboard hasn't been installed yet.
-if (!Gdn::Config('Garden.Installed', FALSE) && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
+if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
    header('location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
@@ -152,7 +152,7 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 Gdn::PluginManager()->Start();
 Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
-if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
+//if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
 	$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
 	$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
@@ -160,10 +160,11 @@ if (!Gdn::FactoryExists(Gdn::AliasLocale)) {
 	$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
 	Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 	unset($Gdn_Locale);
-}
+//}
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
+// Start Authenticators
 Gdn::Authenticator()->StartAuthenticator();
 
 // Include a user-defined bootstrap.

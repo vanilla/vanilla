@@ -14,6 +14,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $CssClass = 'Item Comment';
    $Permalink = GetValue('Url', $Object, FALSE);
 
+   if (!property_exists($Sender, 'CanEditComments'))
+		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
+		
+
    if ($Type == 'Comment') {
       $Sender->EventArguments['Comment'] = $Object;   
       $Id = 'Comment_'.$Object->CommentID;
@@ -34,9 +38,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       $CssClass .= ' Alt';
    $Alt = !$Alt;
 	
-	if (!property_exists($Sender, 'CanEditComments'))
-		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-		
+	
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
@@ -56,16 +58,15 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          </span>
          <?php
 			WriteOptionList($Object, $Sender, $Session);
-			if ($Type == 'Comment' && $Sender->CanEditComments) {
-				if (!property_exists($Sender, 'CheckedComments'))
-					$Sender->CheckedComments = $Session->GetAttribute('CheckedComments', array());
-					
-				$ItemSelected = InSubArray($Id, $Sender->CheckedComments);
-				echo '<div class="Administration"><input type="checkbox" name="'.$Type.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
-			}
 			?>
          <div class="CommentInfo">
-            <?php $Sender->FireEvent('CommentInfo'); ?>
+            <?php
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
+               echo ' '.IPAnchor($Object->InsertIPAddress).' ';
+            }
+
+            $Sender->FireEvent('CommentInfo');
+            ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
@@ -109,7 +110,7 @@ function WriteOptionList($Object, $Sender, $Session) {
          
       // Can the user announce?
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'AnnounceDiscussion') . '</span>';
+         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</span>';
 
       // Can the user sink?
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
@@ -137,4 +138,23 @@ function WriteOptionList($Object, $Sender, $Session) {
    // Allow plugins to add options
    $Sender->FireEvent('CommentOptions');
    echo $Sender->Options;
+
+   if ($Sender->CanEditComments) {
+      if ($Sender->EventArguments['Type'] == 'Comment') {
+         $Id = $Object->CommentID;
+         echo '<div class="Options">';
+         if (!property_exists($Sender, 'CheckedComments'))
+            $Sender->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+
+         $ItemSelected = InSubArray($Id, $Sender->CheckedComments);
+         echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+         echo '</div>';
+      } else {
+         echo '<div class="Options">';
+
+         echo '<div class="AdminCheck"><input type="checkbox" name="Toggle"></div>';
+
+         echo '</div>';
+      }
+   }
 }

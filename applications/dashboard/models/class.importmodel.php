@@ -892,7 +892,7 @@ class ImportModel extends Gdn_Model {
          $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
 
       $PasswordHash = new Gdn_PasswordHash();
-      if ($PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
+      if ($this->Data('UseCurrentPassword') || $PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
          Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
       }
 

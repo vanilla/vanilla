@@ -104,7 +104,7 @@ class CategoryModel extends Gdn_Model {
    }
    
    public static function JoinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
-      $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCdode'));
+      $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCode'));
       foreach ($Data as &$Row) {
          $ID = GetValue($Column, $Row);
          $Category = self::Categories($ID);
@@ -120,8 +120,6 @@ class CategoryModel extends Gdn_Model {
             SetValue($V, $Row, $Value);
          }
       }
-//      print_r($Data);
-//      die();
    }
    
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
@@ -422,21 +420,18 @@ class CategoryModel extends Gdn_Model {
          ->Get();
    }
 
-   public function GetSubtree($ParentCategory) {
-
-
-      $this->SQL
-         ->Select('c.*')
-         ->From('Category c')
-         ->Join('Category d', 'c.TreeLeft >= d.TreeLeft and c.TreeRight <= d.TreeRight')
-         ->OrderBy('c.TreeLeft', 'asc');
-
-      if (is_numeric($ParentCategory))
-         $this->SQL->Where('d.CategoryID', $ParentCategory);
-      else
-         $this->SQL->Where('d.Code', $ParentCategory);
-
-      return $this->SQL->Get()->ResultArray();
+   public static function GetSubtree($ID) {
+      $Result = array();
+      $Category = self::Categories($ID);
+      if ($Category) {
+         $Result[$Category['CategoryID']] = $Category;
+         $ChildIDs = GetValue('ChildIDs', $Category);
+         
+         foreach ($ChildIDs as $ChildID) {
+            $Result = array_merge($Result, self::GetSubtree($ChildID));
+         }
+      }
+      return $Result;
    }
 
    /**

@@ -66,12 +66,11 @@ class VanillaSearchModel extends Gdn_Model {
 		
 		// Build base query
 		$this->SQL
-			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary')
+			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
 			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
 			->Select('d.DateInserted')
-			->Select('d.InsertUserID as UserID, u.Name, u.Photo')
-			->From('Discussion d')
-			->Join('User u', 'd.InsertUserID = u.UserID', 'left');
+			->Select('d.InsertUserID as UserID')
+			->From('Discussion d');
 		
 		// Execute query
 		$Result = $this->SQL->GetSelect();
@@ -103,13 +102,12 @@ class VanillaSearchModel extends Gdn_Model {
 		
 		// Build base query
 		$this->SQL
-			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary')
+			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
 			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
 			->Select('c.DateInserted')
-			->Select('c.InsertUserID as UserID, u.Name, u.Photo')
+			->Select('c.InsertUserID as UserID')
 			->From('Comment c')
-			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-			->Join('User u', 'u.UserID = c.InsertUserID', 'left');
+			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID');
 		
 		// Exectute query
 		$Result = $this->SQL->GetSelect();

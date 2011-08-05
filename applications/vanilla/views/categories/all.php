@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-include dirname(__FILE__).'/helper_functions.php';
+include($this->FetchViewLocation('helper_functions', 'categories'));
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');

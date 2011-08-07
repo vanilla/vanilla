@@ -77,8 +77,9 @@ class DiscussionsController extends VanillaController {
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
       
-      // Setup head
-		$this->Title(T('All Discussions'));
+      // Setup head.
+      if (!$this->Data('Title'))
+         $this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
@@ -102,6 +103,10 @@ class DiscussionsController extends VanillaController {
       
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
+      
+//      var_dump($this->DiscussionData);
+//      die();
+      
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
@@ -310,7 +315,7 @@ class DiscussionsController extends VanillaController {
                ->Where('UserID', $UserID)
                ->Get()->Value('CountBookmarks', 0);
 
-            Gdn::SQL()->Put('User', array('CountBookmarks' => $CountBookmarks), array('UserID' => $UserID));
+            Gdn::UserModel()->SetField($UserID, 'CountBookmarks', $CountBookmarks);
          }
       }
       $this->SetData('CountBookmarks', $CountBookmarks);

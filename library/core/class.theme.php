@@ -36,39 +36,61 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $Format, $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $Format = '<a href="{Url,html}">{Name,html}</a>', $HomeLink = TRUE) {
       $Result = '';
 
       if ($HomeLink) {
          if (!is_string($HomeLink))
             $HomeLink = T('Home');
-            $Result .= '<span class="Label"><a href="'.Url('/').'">'.$HomeLink.'</a></span>';
+            $Result .= '<span class="CrumbLabel"><a href="'.Url('/').'">'.$HomeLink.'</a></span> ';
       }
 
       foreach ($Data as $Row) {
-         $Label = '<span class="Label">'.FormatString($Format, $Row).'</span>';
-         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span>', $Result, $Label);
+         $Row['Url'] = Url($Row['Url']);
+         $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);
       }
 
-      $Result ='<span class="BreadCrumbs">'.$Result.'</span>';
+      $Result ='<span class="Breadcrumbs">'.$Result.'</span>';
       return $Result;
    }
    
-   public static function Link($Path, $Text = FALSE, $Format = '<a href="%url" class="%class">%text</a>', $Options = array()) {
+   public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
       $WithDomain = GetValue('WithDomain', $Options);
       $Target = GetValue('Target', $Options, '');
+      
+      if (is_null($Format))
+         $Format = '<a href="%url" class="%class">%text</a>';
 
       switch ($Path) {
          case 'activity':
             TouchValue('Permissions', $Options, 'Garden.Activity.View');
             break;
+         case 'category':
+            $Breadcrumbs = Gdn::Controller()->Data('Breadcrumbs');
+            if (is_array($Breadcrumbs) && count($Breadcrumbs) > 0) {
+               $Last = array_pop($Breadcrumbs);
+               $Path = GetValue('Url', $Last);
+               $DefaultText = GetValue('Name', $Last, T('Back'));
+            } else {
+               $Path = '/';
+               $DefaultText = C('Garden.Title', T('Back'));
+            }
+            if (!$Text)
+               $Text = $DefaultText;
+            break;
          case 'dashboard':
             $Path = 'dashboard/settings';
-            TouchValue('Permissions', $Options, 'Garden.Settings.Manage');
+            TouchValue('Permissions', $Options, array('Garden.Settings.Manage','Garden.Settings.View'));
             if (!$Text)
                $Text = T('Dashboard');
+            break;
+         case 'home':
+            $Path = '/';
+            if (!$Text)
+               $Text = T('Home');
             break;
          case 'inbox':
             $Path = 'messages/inbox';
@@ -79,6 +101,13 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
+            break;
+         case 'forumroot':
+            $Route = Gdn::Router()->GetDestination('DefaultForumRoot');
+            if (is_null($Route))
+               $Path = '/';
+            else
+               $Path = CombinePaths (array('/',$Route));
             break;
          case 'profile':
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
@@ -153,7 +182,7 @@ class Gdn_Theme {
             break;
       }
 
-      if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions']))
+      if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
 
       $Url = Gdn::Request()->Url($Path, $WithDomain);

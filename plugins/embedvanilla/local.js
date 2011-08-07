@@ -7,7 +7,7 @@ $(function() {
    }
       
    var currentHeight = null,
-      minHeight = 400,
+      minHeight = 600,
       remotePostMessage = null,
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',

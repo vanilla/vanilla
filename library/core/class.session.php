@@ -267,7 +267,7 @@ class Gdn_Session {
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!Gdn::Config('Garden.Installed')) return;
+      if (!C('Garden.Installed', FALSE)) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -275,18 +275,18 @@ class Gdn_Session {
 
       // Now retrieve user information
       if ($this->UserID > 0) {
-
          // Instantiate a UserModel to get session info
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
             if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+            }
 
-               if (Gdn::Authenticator()->ReturningUser($this->User)) {
-                  $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-                  $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
-               }
+            $Returning = Gdn::Authenticator()->ReturningUser($this->User);
+            if ($Returning) {
+               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
+               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
             
             $UserModel->EventArguments['User'] =& $this->User;
@@ -431,8 +431,10 @@ class Gdn_Session {
 	 * guests can be imlemented.
 	 */
    private function _GetStashSession() {
+      $CookieName = C('Garden.Cookie.Name', 'Vanilla');
+
       // Grab the entire session record
-      $SessionID = GetValue('VanillaSessionID', $_COOKIE, '');
+      $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
       $Session = Gdn::SQL()
          ->Select()
          ->From('Session')
@@ -462,7 +464,7 @@ class Gdn_Session {
             ->FirstRow();
             
          // Save a session cookie
-         $Name = 'VanillaSessionID';
+         $Name = $CookieName.'SessionID';
          $Path = C('Garden.Cookie.Path', '/');
          $Domain = C('Garden.Cookie.Domain', '');
          $Expire = 0;

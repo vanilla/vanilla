@@ -892,7 +892,7 @@ class ImportModel extends Gdn_Model {
          $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
 
       $PasswordHash = new Gdn_PasswordHash();
-      if ($PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
+      if ($this->Data('UseCurrentPassword') || $PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
          Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
       }
 
@@ -1504,7 +1504,10 @@ class ImportModel extends Gdn_Model {
 
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
       $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
-
+      if (!$this->ImportExists('Category', 'PermissionCategoryID')) {
+         $Sqls['Category.PermissionCategoryID'] = "update :_Category set PermissionCategoryID = -1";
+      }
+      
       if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
          $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
 

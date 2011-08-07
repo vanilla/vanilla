@@ -486,7 +486,11 @@ class Gdn {
     * @return string The translated string or $Code if there is no value in $Default.
     */
    public static function Translate($Code, $Default = FALSE) {
-      return Gdn::Locale()->Translate($Code, $Default);
+      $Locale = Gdn::Locale();
+      if ($Locale)
+         return $Locale->Translate($Code, $Default);
+      else
+         return $Default;
    }
    
    /**

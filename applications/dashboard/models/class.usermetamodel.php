@@ -49,7 +49,8 @@ class UserMetaModel extends Gdn_Model {
     * @return array results or $Default
     */
    public function GetUserMeta($UserID, $Key, $Default = NULL) {
-      $UserMetaQuery = Gdn::SQL()
+      $Sql = clone Gdn::SQL();
+      $UserMetaQuery = $Sql
          ->Select('*')
          ->From('UserMeta u');
          
@@ -59,7 +60,7 @@ class UserMetaModel extends Gdn_Model {
          $UserMetaQuery->Where('u.UserID', $UserID);
       
       if (stristr($Key, '%'))
-         $UserMetaQuery->Like('u.Name', $Key);
+         $UserMetaQuery->Where('u.Name like', $Key);
       else
          $UserMetaQuery->Where('u.Name', $Key);
       

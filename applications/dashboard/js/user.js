@@ -43,9 +43,9 @@ jQuery(document).ready(function($) {
    });
    
    // Make paging function in the user table
-   $('.MorePager').morepager({
-      pageContainerSelector: '#Users',
-      pagerInContainer: true
-   });
+//   $('.MorePager').morepager({
+//      pageContainerSelector: '#Users',
+//      pagerInContainer: true
+//   });
    
 });

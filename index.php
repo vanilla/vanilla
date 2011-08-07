@@ -1,6 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0.18b2');
+define('APPLICATION_VERSION', '2.0.18b3');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -44,6 +44,8 @@ require_once(PATH_ROOT.'/bootstrap.php');
 Gdn::Authenticator()->StartAuthenticator();
 
 // 3. Create and configure the dispatcher.
+// TIM: Removed this change temporarily for .com hosting
+// Gdn::Authenticator()->StartAuthenticator();
 $Dispatcher = Gdn::Dispatcher();
 
 $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();

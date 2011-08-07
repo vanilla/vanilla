@@ -71,6 +71,7 @@ class DiscussionController extends VanillaController {
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
       // Setup
       $this->Title($this->Discussion->Name);
@@ -329,6 +330,7 @@ class DiscussionController extends VanillaController {
       
       $this->SetJson('State', $State);
       $this->SetJson('CountBookmarks', $CountBookmarks);
+      $this->SetJson('CountDiscussionBookmarks', GetValue('CountDiscussionBookmarks', $this->DiscussionModel));
       $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
       $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
       $this->SetJson('MenuText', T('My Bookmarks'));
@@ -403,11 +405,13 @@ class DiscussionController extends VanillaController {
          }
       }
       
+      $Target = $this->Request->Get('Target', 'discussions');
+      
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect('discussions');
+         Redirect($Target);
          
-      $this->RedirectUrl = Url('discussions');
+      $this->RedirectUrl = Url($Target);
       $this->InformMessage(T('Your changes have been saved.'));
       $this->Render();         
    }
@@ -520,6 +524,8 @@ class DiscussionController extends VanillaController {
    public function Delete($DiscussionID = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
+      
+      $SuccessTarget = Url('/'.ltrim(GetIncomingValue('Target', '/'),'/'));
       if (
          is_numeric($DiscussionID)
          && $DiscussionID > 0
@@ -539,12 +545,12 @@ class DiscussionController extends VanillaController {
       
       // Redirect
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', '/vanilla/discussions'));
+         Redirect($SuccessTarget);
          
       if ($this->Form->ErrorCount() > 0)
          $this->SetJson('ErrorMessage', $this->Form->Errors());
          
-      $this->RedirectUrl = GetIncomingValue('Target', '/vanilla/discussions');
+      $this->RedirectUrl = $SuccessTarget;
       $this->Render();         
    }
 
@@ -606,6 +612,7 @@ class DiscussionController extends VanillaController {
     * Alternate version of Index that uses the embed master view.
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
       $this->Theme = 'default'; // Force the default theme on embedded comments
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)

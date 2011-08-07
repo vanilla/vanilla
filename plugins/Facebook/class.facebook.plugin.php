@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
-   'Version' => '0.1a',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -249,7 +249,13 @@ class FacebookPlugin extends Gdn_Plugin {
          }
 
          $Path = Gdn::Request()->Path();
-         $Args = array('Target' => GetValue('Target', $_GET, $Path ? $Path : '/'));
+
+         $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+         if (ltrim($Target, '/') == 'entry/signin' || empty($Target))
+            $Target = '/';
+         $Args = array('Target' => $Target);
+
+
          $RedirectUri .= strpos($RedirectUri, '?') === FALSE ? '?' : '&';
          $RedirectUri .= http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
@@ -282,7 +288,7 @@ class FacebookPlugin extends Gdn_Plugin {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
-         array('AuthenticationKey' => 'Facebook'));
+         array('AuthenticationKey' => 'Facebook'), TRUE);
    }
 
    public function OnDisable() {

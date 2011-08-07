@@ -119,7 +119,7 @@
     position: absolute;
     text-align: left;
     top: 1px;
-    right: 0;
+    right: -7px;
     cursor: pointer;
 }
 .EmotifyDropdownActive {

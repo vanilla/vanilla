@@ -25,7 +25,7 @@ $PluginInfo['Debugger'] = array(
 
 // Install the debugger database.
 $tmp = Gdn::FactoryOverwrite(TRUE);
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.database.debug.php', Gdn::FactorySingleton, array('Database'));
+Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
 Gdn::FactoryOverwrite($tmp);
 unset($tmp);
 

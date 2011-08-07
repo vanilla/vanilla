@@ -120,7 +120,7 @@ if (!function_exists('ValidateUsernameRegex')) {
    function ValidateUsernameRegex() {
       static $ValidateUsernameRegex;
       
-      if (is_null($ValidateUsernameRegex) || $Rebuild) {
+      if (is_null($ValidateUsernameRegex)) {
          $ValidateUsernameRegex = sprintf("[%s]%s",
             C("Garden.User.ValidationRegex","\d\w_"),
             C("Garden.User.ValidationLength","{3,20}"));

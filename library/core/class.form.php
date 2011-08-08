@@ -1799,17 +1799,8 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    protected function _NameAttribute($FieldName, $Attributes) {
       // Name from attributes overrides the default.
-      if(is_array($Attributes) && array_key_exists('Name', $Attributes)) {
-         $Name = $Attributes['Name'];
-      } else {
-         $Name = $this->EscapeFieldName($FieldName);
-      }
-      if(empty($Name))
-         $Result = '';
-      else
-         $Result = ' name="' . $Name . '"';
-
-      return $Result;
+      $Name = $this->EscapeFieldName(ArrayValueI('name', $Attributes, $FieldName));
+      return (empty($Name)) ? '' : ' name="' . $Name . '"';
    }
    
    /**

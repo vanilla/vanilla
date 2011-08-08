@@ -318,7 +318,7 @@ jQuery(document).ready(function($) {
    if (!gdn.elementSupports('input', 'placeholder')) {
       $('input:text').each(function() {
          var $this = $(this);
-         var placeholder = $this.attr('placeholder')+'!!';
+         var placeholder = $this.attr('placeholder');
          if (!$this.val() && placeholder) {
             $this.val(placeholder);
             $this.blur(function() {

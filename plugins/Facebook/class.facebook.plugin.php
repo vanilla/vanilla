@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
-   'Version' => '0.1a',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -251,7 +251,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $Path = Gdn::Request()->Path();
 
          $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
-         if (ltrim($Target, '/') == 'entry/signin')
+         if (ltrim($Target, '/') == 'entry/signin' || empty($Target))
             $Target = '/';
          $Args = array('Target' => $Target);
 

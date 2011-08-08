@@ -45,13 +45,6 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('LastDiscussionID', 'int', NULL)
    ->Set($Explicit, $Drop);
 
-if (!$LastDiscussionIDExists) {
-   $SQL->Update('Category c')
-      ->Join('Comment cm', 'c.LastCommentID = cm.CommentID')
-      ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
-      ->Put();
-}
-
 $RootCategoryInserted = FALSE;
 if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {
    $SQL->Insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
@@ -406,4 +399,12 @@ foreach ($Categories as $Category) {
       'Category',
       array('UrlCode' => $UrlCode),
       array('CategoryID' => $Category['CategoryID']));
+}
+
+// Moved this down here because it needs to run after GDN_Comment is created
+if (!$LastDiscussionIDExists) {
+   $SQL->Update('Category c')
+      ->Join('Comment cm', 'c.LastCommentID = cm.CommentID')
+      ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
+      ->Put();
 }

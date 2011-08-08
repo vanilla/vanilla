@@ -646,14 +646,13 @@ class CommentModel extends VanillaModel {
 					->Get()
 					->FirstRow()
 					->CountComments;
-				
-				$this->SQL
-					->Update('Category')
-               ->Set('LastDiscussionID', $Discussion->DiscussionID)
-					->Set('LastCommentID', $Discussion->LastCommentID)
-					->Set('CountComments', $CountComments)
-					->Where('CategoryID', $Discussion->CategoryID)
-					->Put();
+            
+            $CategoryModel = new CategoryModel();
+            
+            $CategoryModel->SetField($Discussion->CategoryID,
+               array('LastDiscussionID' => $Discussion->DiscussionID,
+                  'LastCommentID' => $Discussion->LastCommentID,
+                  'CountComments' => $CountComments));
 			}
 			
 			// Prepare the notification queue.

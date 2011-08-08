@@ -283,8 +283,8 @@ class UtilityController extends DashboardController {
          $UserModel = Gdn::UserModel();
 			$HourOffset = $ClientTimestamp - time();
          $HourOffset = round($HourOffset / 3600);
-
-			$UserModel->Update(array('HourOffset' => $HourOffset), array('UserID' => $Session->UserID));
+         
+			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
 			$Success = TRUE;
       }
          

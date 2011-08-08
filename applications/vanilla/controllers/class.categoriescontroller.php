@@ -72,7 +72,7 @@ class CategoriesController extends VanillaController {
 //         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       $Category = CategoryModel::Categories($CategoryIdentifier);
       
-      if ($Category === FALSE) {
+      if (empty($Category)) {
          if ($CategoryIdentifier)
             throw NotFoundException();
       }
@@ -187,6 +187,15 @@ class CategoriesController extends VanillaController {
 		$this->AddModule($CategoryFollowToggleModule);
 
       $this->CanonicalUrl(Url('/categories/all', TRUE));
+      
+      // Set a definition of the user's current timezone from the db. jQuery
+      // will pick this up, compare to the browser, and update the user's
+      // timezone if necessary.
+      $CurrentUser = Gdn::Session()->User;
+      if (is_object($CurrentUser)) {
+         $ClientHour = $CurrentUser->HourOffset + date('G', time());
+         $this->AddDefinition('SetClientHour', $ClientHour);
+      }
 
       $this->Render();
 	}

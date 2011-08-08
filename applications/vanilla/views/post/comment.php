@@ -45,7 +45,9 @@ $Editing = isset($this->Comment);
    if (!$NewOrDraft) 
       $CancelText = $CancelClass = 'Cancel';
 
-   echo Anchor(T($CancelText), '/', $CancelClass);
+   echo Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
+       'class' => $CancelClass
+   ));
    
    $ButtonOptions = array('class' => 'Button CommentButton');
    /*

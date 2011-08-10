@@ -59,6 +59,14 @@ jQuery(document).ready(function($) {
          
       return def;
    }
+   
+   gdn.elementSupports = function(element, attribute) {
+      var test = document.createElement(element);
+      if (attribute in test)
+         return true;
+      else
+         return false;
+   }
 
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
@@ -306,18 +314,35 @@ jQuery(document).ready(function($) {
       return urlFormat.replace("{Path}", path);
    };
 
-   // Fill the search input with "search" if empty and blurred
-   var searchText = gdn.definition('Search', 'Search');
-   if (!$('div.Search input.InputBox').val())
-      $('div.Search input.InputBox').val(searchText);
-   $('div.Search input.InputBox').blur(function() {
-      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
-         $(this).val(searchText);
-   });
-   $('div.Search input.InputBox').focus(function() {
-      if ($(this).val() == searchText)
-         $(this).val('');
-   });
+   // Fill in placeholders.
+   if (!gdn.elementSupports('input', 'placeholder')) {
+      $('input:text').each(function() {
+         var $this = $(this);
+         var placeholder = $this.attr('placeholder');
+         if (!$this.val() && placeholder) {
+            $this.val(placeholder);
+            $this.blur(function() {
+               $(this).val(placeholder);
+            });
+            $this.focus(function() {
+               if ($(this).val() == placeholder)
+                  $(this).val('');
+            });
+         }
+      });
+   }
+   
+//   var searchText = gdn.definition('Search', 'Search');
+//   if (!$('div.Search input.InputBox').val())
+//      $('div.Search input.InputBox').val(searchText);
+//   $('div.Search input.InputBox').blur(function() {
+//      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
+//         $(this).val(searchText);
+//   });
+//   $('div.Search input.InputBox').focus(function() {
+//      if ($(this).val() == searchText)
+//         $(this).val('');
+//   });
 
    $.fn.popin = function(options) {
      this.each(function(i, elem) {

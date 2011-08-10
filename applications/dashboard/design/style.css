@@ -345,7 +345,7 @@ div.MorePager a.Loading {
 #PagerMore {
    margin-bottom: 1px;
 }
-.NumberedPager {
+.NumberedPager, .PrevNextPager {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;

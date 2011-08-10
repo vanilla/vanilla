@@ -114,12 +114,13 @@ class Gdn_Autoloader {
                         $FullPluginPath = CombinePaths(array($SearchPath, $PluginFolder));
                         self::RegisterMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $FullPluginPath, array(
                            'SearchSubfolders'      => TRUE,
-                           'Extension'             => $SearchPathName
+                           'Extension'             => $SearchPathName,
+                           'Structure'             => Gdn_Autoloader_Map::STRUCTURE_SPLIT,
+                           'SplitTopic'            => strtolower($PluginFolder)
                         ));
                      }
                   }
                }
-               
             }
 
          break;
@@ -545,6 +546,19 @@ class Gdn_Autoloader_Map {
    const LOOKUP_CLASS_MASK = 'class.%s.php';
    const LOOKUP_INTERFACE_MASK = 'interface.%s.php';
    
+   /**
+    * Map file structure type
+    * 
+    *  flat - file contains one topic, 'cache', with all classname -> file entries in a single list
+    *  split - file contains a topic for each path, with only that path's files in the list
+    * 
+    * @const string
+    */
+   const STRUCTURE_FLAT = 'flat';
+   const STRUCTURE_SPLIT = 'split';
+   
+   const TOPIC_DEFAULT = 'cache';
+   
    protected $MapInfo;
    protected $Map;
    protected $Ignore;
@@ -560,6 +574,7 @@ class Gdn_Autoloader_Map {
       $ContextPrefix = GetValue('ContextPrefix', $Options, NULL);
       $MapIdentifier = GetValue('MapIdentifier', $Options, NULL);
       $SaveToDisk = GetValue('SaveToDisk', $Options, TRUE);
+      $FileStructure = GetValue('Structure', $Options, self::STRUCTURE_FLAT);
       
       $MapName = $MapType;
       if (!is_null($ExtensionName))
@@ -579,16 +594,27 @@ class Gdn_Autoloader_Map {
          'contexttype'  => $ContextType,
          'extension'    => $ExtensionName,
          'dirty'        => FALSE,
-         'save'         => $SaveToDisk
+         'save'         => $SaveToDisk,
+         'structure'    => $FileStructure
       );
    }
    
    public function AddPath($SearchPath, $Options) {
-      $this->Paths[$SearchPath] = array(
+      $PathOptions = array(
          'path'         => $SearchPath,
          'recursive'    => (bool)GetValue('SearchSubfolders', $Options),
-         'filter'       => GetValue('ClassFilter', $Options)
+         'filter'       => GetValue('ClassFilter', $Options),
+         'topic'        => self::TOPIC_DEFAULT
       );
+      
+      if ($this->MapInfo['structure'] == self::STRUCTURE_SPLIT) {
+         $SplitTopic = GetValue('SplitTopic', $Options, NULL);
+         if (is_null($SplitTopic))
+            throw new Exception("Trying to use 'split' structure but no SplitTopic provided. Path: {$SearchPath}");
+         $PathOptions['topic'] = $SplitTopic;
+      }
+      
+      $this->Paths[$SearchPath] = $PathOptions;
    }
    
    public function ContextType() {
@@ -646,18 +672,51 @@ class Gdn_Autoloader_Map {
          
          // Loading cache data from disk
          if (file_exists($OnDiskMapFile)) {
-            $MapContents = parse_ini_file($OnDiskMapFile, FALSE);
-            if ($MapContents != FALSE && is_array($MapContents)) {
+            $Structure = GetValue('structure', $this->MapInfo);
+            $MapContents = parse_ini_file($OnDiskMapFile, TRUE);
+            
+            try {
+               // Detect legacy flat files which are now stored split
+               if ($Structure == self::STRUCTURE_SPLIT && array_key_exists(self::TOPIC_DEFAULT, $MapContents))
+                  throw new Exception();
+               
+               // Bad file?
+               if ($MapContents == FALSE || !is_array($MapContents))
+                  throw new Exception();
+               
+               // All's well that ends well. Load the cache.
                $this->Map = $MapContents;
-            } else
+            } catch (Exception $Ex) {
                @unlink($OnDiskMapFile);
+            }
          }
       }
    
+      // Always look by lowercase classname
       $ClassName = strtolower($ClassName);
-      if (array_key_exists($ClassName, $this->Map)) {
-         return GetValue($ClassName, $this->Map);
+      
+      switch ($this->MapInfo['structure']) {
+         case 'split':
+            // This file stored split, so look for this class in each virtual sub-path, by topic
+            foreach ($this->Paths as $Path => $PathOptions) {
+               $LookupSplitTopic = GetValue('topic', $PathOptions);
+               if (array_key_exists($LookupSplitTopic, $this->Map) && array_key_exists($ClassName, $this->Map[$LookupSplitTopic])) {
+                  return GetValue($ClassName, $this->Map[$LookupSplitTopic]);
+               }
+            }
+            break;
+         
+         default:
+         case 'flat':
+            // This file is stored flat, so just look in the DEFAULT_TOPIC
+            $LookupSplitTopic = self::TOPIC_DEFAULT;
+            if (array_key_exists($LookupSplitTopic, $this->Map) && array_key_exists($ClassName, $this->Map[$LookupSplitTopic])) {
+               return GetValue($ClassName, $this->Map[$LookupSplitTopic]);
+            }
+            break;
       }
+      
+      
       // Look at the filesystem, too
       if (!$MapOnly) {
          if (substr($ClassName, 0, 4) == 'gdn_')
@@ -678,7 +737,8 @@ class Gdn_Autoloader_Map {
             $File = $this->FindFile($Path, $Files, $Recursive);
             
             if ($File !== FALSE) {
-               $this->Map[$ClassName] = $File;
+               $SplitTopic = GetValue('topic', $PathOptions, self::TOPIC_DEFAULT);
+               $this->Map[$SplitTopic][$ClassName] = $File;
                $this->MapInfo['dirty'] = TRUE;
                
                return $File;
@@ -702,13 +762,15 @@ class Gdn_Autoloader_Map {
          return FALSE;
          
       $MapName = GetValue('name', $this->MapInfo);
-      $OnDisk = GetValue('ondisk', $this->MapInfo);
       $FileName = GetValue('ondisk', $this->MapInfo);
       
-      $MapContents = "[cache]\n";
-      foreach ($this->Map as $ClassName => $Location) {
-         $MapContents .= "{$ClassName} = \"{$Location}\"\n";
+      $MapContents = '';
+      foreach ($this->Map as $SplitTopic => $TopicFiles) {
+         $MapContents .= "[{$SplitTopic}]\n";
+         foreach ($TopicFiles as $ClassName => $Location)
+            $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
+      
       try {
          Gdn_FileSystem::SaveFile($FileName, $MapContents, LOCK_EX);
       }

@@ -50,38 +50,48 @@ abstract class Gdn_Cache {
    const FEATURE_FALLBACK     = 'f_fallback';
    
    /**
-   * Location - SERVER:IP, Filepath, etc
-   */
+    * Location - SERVER:IP, Filepath, etc
+    */
    const CONTAINER_LOCATION   = 'c_location';
    
    /**
-   * Persistent - Whether to use connect() or pconnect() where applicable
-   */
+    * Persistent - Whether to use connect() or pconnect() where applicable
+    */
    const CONTAINER_PERSISTENT = 'c_persistent';
    
    /**
-   * Weight - Allows for differently weighted storage locations
-   */
+    * Pool Size - When using pconnect(), how many connections should we use in the pool?
+    */
+   const CONTAINER_POOLSIZE = 'c_poolsize';
+   
+   /**
+    * Pool Key - When using pconnect(), what should the pool key look like?
+    */
+   const CONTAINER_POOLKEY = 'c_poolkey';
+   
+   /**
+    * Weight - Allows for differently weighted storage locations
+    */
    const CONTAINER_WEIGHT     = 'c_weight';
    
    /**
-   * Persistent - Retry delay inverval in seconds
-   */
+    * Persistent - Retry delay inverval in seconds
+    */
    const CONTAINER_RETRYINT = 'c_retryint';
    
    /**
-   * Timeout - How long to wait before timing out while connecting
-   */
+    * Timeout - How long to wait before timing out while connecting
+    */
    const CONTAINER_TIMEOUT    = 'c_timeout';
    
    /**
-   * Online - If this container is available for requests
-   */
+    * Online - If this container is available for requests
+    */
    const CONTAINER_ONLINE     = 'c_online';
    
    /**
-   * Callback - Method to call if the location fails to be added
-   */
+    * Callback - Method to call if the location fails to be added
+    */
    const CONTAINER_CALLBACK   = 'c_callback';
    
    const CACHEOP_FAILURE = FALSE;
@@ -462,6 +472,31 @@ abstract class Gdn_Cache {
       }
       
       return GetValue($Option, $ActiveOptions, $Default);
+   }
+   
+   /*
+    * Get the value of a store-specific config
+    * 
+    * The option keys are generic and cross-cache, but are always
+    * stored under $Configuration['Cache'][ActiveCacheName]['Config'][*].
+    * 
+    * @param string|integer $Key The config key to retrieve
+    * @return mixed The value associated with the given config key
+    */
+   public function Config($Key = NULL, $Default = NULL) {
+      static $ActiveConfig = NULL;
+      
+      if (is_null($ActiveConfig)) {
+         $ActiveCacheShortName = ucfirst($this->ActiveCache());
+         $ConfigKey = "Cache.{$ActiveCacheShortName}.Config";
+         $ActiveConfig = C($ConfigKey, array());
+      }
+      
+      if (is_null($Key) || !array_key_exists($Key, $ActiveConfig)) {
+         return $ActiveConfig;
+      }
+      
+      return GetValue($Key, $ActiveConfig, $Default);
    }
    
    /**

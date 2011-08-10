@@ -81,6 +81,19 @@ class Gdn_PasswordHash extends PasswordHash {
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);
             break;
+         case 'punbb':
+            $Parts = explode('$', $StoredHash);
+            $StoredHash = GetValue(0, $Parts);
+            $StoredSalt = GetValue(1, $Parts);
+            
+            if (md5($Password) == $StoredHash)
+               $Result = TRUE;
+            elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
+               $Result = TRUE;
+            else
+               $Result = FALSE;
+            
+            break;
          case 'reset':
             throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
             break;

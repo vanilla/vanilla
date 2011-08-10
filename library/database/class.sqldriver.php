@@ -1627,7 +1627,6 @@ abstract class Gdn_SQLDriver {
 
       $QueryOptions = array('ReturnType' => $ReturnType);
       if (!is_null($this->_CacheKey)) {
-         $Foo = 'bar';
          $QueryOptions['Cache'] = $this->_CacheKey;
       }
       

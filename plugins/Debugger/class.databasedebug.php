@@ -39,12 +39,16 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 	
 	private static function FormatExpr($Expr) {
 		if(is_array($Expr)) {
-			$Result = '';
-			foreach($Expr as $Key => $Value) {
-				if(strlen($Result) > 0)
-					$Result .= ', ';
-				$Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::FormatExpr($Value);
-			}
+         if (count($Expr) > 3) {
+            $Result = count($Expr);
+         } else {
+            $Result = '';
+            foreach($Expr as $Key => $Value) {
+               if(strlen($Result) > 0)
+                  $Result .= ', ';
+               $Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::FormatExpr($Value);
+            }
+         }
 			return 'array(' . $Result . ')';
 		} elseif(is_null($Expr)) {
 			return 'NULL';

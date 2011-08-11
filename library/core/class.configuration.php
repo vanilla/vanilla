@@ -695,10 +695,6 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       if (!is_array($$Name))
          $$Name = array();
       
-      // Store these settings for later re-application
-      if ($Dynamic)
-         $this->_Dynamic = $$Name;
-      
       // We're caching, using the cache, and this data was not loaded from cache.
       // Write it there now.
       if (Gdn::Config()->Caching() && $UseCache && !$LoadedFromCache) {

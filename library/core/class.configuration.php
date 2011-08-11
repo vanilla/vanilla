@@ -839,7 +839,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       if ($this->EventArguments['ConfigNoSave']) return NULL;
       
       echo " > running save\n";
-      switch ($Type) {
+      switch ($this->Type) {
          case 'file':
             if (empty($this->Source))
                trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);

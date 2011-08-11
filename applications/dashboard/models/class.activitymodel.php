@@ -266,6 +266,13 @@ class ActivityModel extends Gdn_Model {
       } else {
          $AddActivity = TRUE;
       }
+      
+      if ($Notify) {
+         // Only add the activity if the user wants to be notified in some way.
+         $RegardingUser = Gdn::UserModel()->GetID($RegardingUserID);
+         if (!self::NotficationPreference($ActivityType, GetValue('Preferences', $RegardingUser)))
+            return FALSE;
+      }
          
       // If this is a notification, increment the regardinguserid's count
       if ($AddActivity && $Notify) {
@@ -312,6 +319,22 @@ class ActivityModel extends Gdn_Model {
       }
       
       return $ActivityID;
+   }
+   
+   public static function NotficationPreference($ActivityType, $Preferences, $Type = NULL) {
+      if ($Type === NULL) {
+         $Result = self::NotficationPreference($ActivityType, $Preferences, 'Email')
+            || self::NotificationPreference($ActivityType, $Preferences, 'Popup');
+         return $Result;
+      }
+      
+      $ConfigPreference = C('Preferences.Email.'.$ActivityType, '0');
+      if ($ConfigPreference !== FALSE)
+         $Preference = ArrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
+      else
+         $Preference = FALSE;
+      
+      return $Preference;
    }
    
    public function SendNotification($ActivityID, $Story = '') {

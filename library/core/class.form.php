@@ -241,7 +241,6 @@ class Gdn_Form extends Gdn_Pluggable {
       }  
       
       // Opening select tag
-      $FieldName = GetValue('FieldName', $Options, 'CategoryID');
       $Return = '<select';
       $Return .= $this->_IDAttribute($FieldName, $Options);
       $Return .= $this->_NameAttribute($FieldName, $Options);

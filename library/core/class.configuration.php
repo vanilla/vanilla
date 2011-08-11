@@ -209,7 +209,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::Save().
     */
    public function Set($Name, $Value, $Overwrite = TRUE, $Save = TRUE) {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       
       // Make sure the config settings are in the right format
       if (!is_array($this->Data))
@@ -239,7 +239,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  echo " > setting '{$Name}' to '{$Value}'\n";
+                  //echo " > setting '{$Name}' to '{$Value}'\n";
                   $Settings[$Key] = Gdn_Format::Serialize($Value);
                }
             } else {
@@ -254,7 +254,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
       }
       
       if ($Save) {
-         echo " > calling dynamic set\n";
+         //echo " > calling dynamic set\n";
          $this->Dynamic->Set($Name, $Value, $Overwrite);
       }
    }
@@ -550,7 +550,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
    }
    
    public function SaveToConfig($Name, $Value = '', $Options = array()) {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       
       $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);
@@ -570,7 +570,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
          if (!$v && $RemoveEmpty) {
             $this->Remove($k);
          } else {
-            echo " > about to Set\n";
+            //echo " > about to Set\n";
             $Result = $Result & $this->Set($k, $v, TRUE, $Save);
          }
       }
@@ -579,13 +579,13 @@ class Gdn_Configuration extends Gdn_Pluggable {
    }
    
    public function Shutdown() {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       foreach ($this->Sources as $Source)
          $Source->Shutdown();
    }
    
    public function __destruct() {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       $this->Shutdown();
    }
    
@@ -778,7 +778,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    }
    
    public function Set($Name, $Value = NULL, $Overwrite = TRUE) {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       
       // Make sure this source' config settings are in the right format
       if (!is_array($this->Settings))
@@ -808,7 +808,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  echo " > setting '{$Name}' to '{$Value}'\n";
+                  //echo " > setting '{$Name}' to '{$Value}'\n";
                   $Settings[$Key] = Gdn_Format::Serialize($Value);
                   $this->Dirty = TRUE;
                }
@@ -825,7 +825,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    }
    
    public function Save() {
-      echo __METHOD__."\n";
+      //echo __METHOD__."\n";
       
       if (!$this->Dirty) return;
       
@@ -838,7 +838,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       if ($this->EventArguments['ConfigNoSave']) return NULL;
       
-      echo " > running save\n";
+      //echo " > running save\n";
       switch ($this->Type) {
          case 'file':
             if (empty($this->Source))

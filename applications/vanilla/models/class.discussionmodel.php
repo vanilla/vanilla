@@ -989,7 +989,7 @@ class DiscussionModel extends VanillaModel {
          $Discussion = $this->GetID($Discussion);
       }
 
-      // Grab all of the users that are need to be notified.
+      // Grab all of the users that need to be notified.
       $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
 
       foreach ($Data as $Row) {

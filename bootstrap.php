@@ -45,11 +45,9 @@ Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 
 // Load default baseline Garden configurations
 Gdn::Config()->Load(PATH_CONF.'/config-defaults.php');
-echo " > test: ".C('TestValue')."\n";
 
 // Load installation-specific configuration so that we know what apps are enabled
 Gdn::Config()->Load(PATH_CONF.'/config.php', 'Configuration', TRUE);
-echo " > test: ".C('TestValue')."\n";
 
 Gdn::Config()->Caching(TRUE);
 

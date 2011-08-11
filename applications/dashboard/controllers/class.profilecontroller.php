@@ -687,6 +687,9 @@ class ProfileController extends Gdn_Controller {
          
          // Check that we have the necessary tools to allow image uploading
          $AllowImages = Gdn_UploadImage::CanUploadImages();
+			
+			// Is the photo hosted remotely?
+			$RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
          
          if ($this->User->UserID != $ViewingUserID) {
             // Include user js files for people with edit users permissions
@@ -697,7 +700,7 @@ class ProfileController extends Gdn_Controller {
             
             // Add profile options for everyone
             $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
-            if ($this->User->Photo != '' && $AllowImages) {
+            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
                $SideMenu->AddLink('Options', T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
                $SideMenu->AddLink('Options', T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
             }
@@ -713,7 +716,7 @@ class ProfileController extends Gdn_Controller {
             if ($AllowImages)
                $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
                
-            if ($this->User->Photo != '' && $AllowImages) {
+            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
                $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
                $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.Gdn_Format::Url($Session->User->Name).'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
             }

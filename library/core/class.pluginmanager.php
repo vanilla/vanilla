@@ -804,7 +804,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $this->AlternatePluginSearchPaths = array();
 
          // Add default search path(s) to list
-         $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 'local';
          $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 'core';
 
          // Check for, and load, alternate search paths from config

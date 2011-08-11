@@ -47,7 +47,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
 	public static function CanUpload($UploadPath=NULL) {
 		if (is_null($UploadPath))
-			$UploadPath = PATH_LOCAL_UPLOADS;
+			$UploadPath = PATH_UPLOADS;
 
 		if (ini_get('file_uploads') != 1)
 			return FALSE;
@@ -82,7 +82,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       $this->FireEvent('CopyLocal');
       if (!$LocalPath) {
-         $LocalPath = PATH_LOCAL_UPLOADS.'/'.$Parsed['Name'];
+         $LocalPath = PATH_UPLOADS.'/'.$Parsed['Name'];
       }
       return $LocalPath;
    }
@@ -102,7 +102,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->FireEvent('Delete');
 
       if (!$Handled) {
-         $Path = PATH_LOCAL_UPLOADS.'/'.ltrim($Name, '/');
+         $Path = PATH_UPLOADS.'/'.ltrim($Name, '/');
          @unlink($Path);
       }
    }
@@ -132,8 +132,8 @@ class Gdn_Upload extends Gdn_Pluggable {
       if (preg_match('`^https?://`', $Name)) {
          $Result = array('Name' => $Name, 'Type' => 'external', 'SaveName' => $Name, 'SaveFormat' => '%s', 'Url' => $Name, );
          return $Result;
-      } elseif (StringBeginsWith($Name, PATH_LOCAL_UPLOADS)) {
-         $Name = ltrim(substr($Name, strlen(PATH_LOCAL_UPLOADS)), '/');
+      } elseif (StringBeginsWith($Name, PATH_UPLOADS)) {
+         $Name = ltrim(substr($Name, strlen(PATH_UPLOADS)), '/');
          // This is an upload.
          $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
       } elseif (preg_match ('`^~([^/]*)/(.*)$`', $Name, $Matches)) {
@@ -208,7 +208,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       // Check to see if the event handled the save.
       if (!$Handled) {
-         $Target = PATH_LOCAL_UPLOADS.'/'.$Parsed['Name'];
+         $Target = PATH_UPLOADS.'/'.$Parsed['Name'];
          if (!file_exists(dirname($Target)))
             mkdir(dirname($Target));
          

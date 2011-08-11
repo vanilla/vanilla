@@ -1592,7 +1592,7 @@ class UserModel extends Gdn_Model {
       // Remove photos
       $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
-         @unlink(PATH_LOCAL_UPLOADS.DS.$Photo->Name);
+         @unlink(PATH_UPLOADS.DS.$Photo->Name);
       }
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       

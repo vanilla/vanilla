@@ -61,12 +61,12 @@ class Gdn_LibraryMap {
          );
          
          // Loading cache for the first time by name+path only... import data now.
-         if (file_exists(PATH_LOCAL_CACHE.DS.$OnDiskCacheName)) {
-            $CacheContents = parse_ini_file(PATH_LOCAL_CACHE.DS.$OnDiskCacheName, TRUE);
+         if (file_exists(PATH_CACHE.DS.$OnDiskCacheName)) {
+            $CacheContents = parse_ini_file(PATH_CACHE.DS.$OnDiskCacheName, TRUE);
             if ($CacheContents != FALSE && is_array($CacheContents)) {
                self::Import($CacheName, $CacheContents);
             } else
-               @unlink(PATH_LOCAL_CACHE.DS.$OnDiskCacheName);
+               @unlink(PATH_CACHE.DS.$OnDiskCacheName);
          }
       }
       
@@ -106,7 +106,7 @@ class Gdn_LibraryMap {
          return self::PrepareCache($CacheName);
          
       self::$_Caches[$CacheName]['cache'] = array();
-      @unlink(PATH_LOCAL_CACHE.DS.self::$_Caches[$CacheName]['ondisk']);
+      @unlink(PATH_CACHE.DS.self::$_Caches[$CacheName]['ondisk']);
    }
    
    /**
@@ -234,7 +234,7 @@ class Gdn_LibraryMap {
          }
       }
       try {
-         Gdn_FileSystem::SaveFile(PATH_LOCAL_CACHE.DS.$FileName, $CacheContents, LOCK_EX);
+         Gdn_FileSystem::SaveFile(PATH_CACHE.DS.$FileName, $CacheContents, LOCK_EX);
       }
       catch (Exception $e) {}
    }

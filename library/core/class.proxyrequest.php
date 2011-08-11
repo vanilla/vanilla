@@ -39,7 +39,6 @@ class ProxyRequest {
    }
    
    protected function FsockConnect(&$Handle, $Host, $Port, $Options) {
-      
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $ReadTimeout = GetValue('Timeout', $Options);
       $Recycle = GetValue('Recycle', $Options);
@@ -101,7 +100,7 @@ class ProxyRequest {
       }
 
       if (!$Pointer)
-         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
+         throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Host, $ErrorNumber, $Error));
 
       stream_set_timeout($Pointer, $ReadTimeout);
       
@@ -300,7 +299,7 @@ class ProxyRequest {
    }
    
    public function Request($Options, $QueryParams = NULL) {
-   
+      
       if (is_string($Options)) {
          $Options = array(
              'URL'      => $Options

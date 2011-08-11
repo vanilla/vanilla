@@ -20,7 +20,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 			echo '<div class="P">';
 				echo '<div class="Category">';
 				echo $this->Form->Label('Category', 'CategoryID'), ' ';
-				echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+				echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
 				echo '</div>';
 			echo '</div>';
       }

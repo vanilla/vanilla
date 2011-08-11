@@ -97,9 +97,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Register hooked methods
       $this->RegisterPlugins();
-
+      
       $this->Started = TRUE;
-
+      $this->FireEvent('AfterStart');
    }
 
    public function Started() {

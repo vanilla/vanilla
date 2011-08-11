@@ -1862,19 +1862,7 @@ if (!function_exists('RemoteIP')) {
 
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_LOCAL_CONF.DS.'config.php';
-      $Config->Load($Path, 'Save');
-      if (!is_array($Name))
-         $Name = array($Name);
-      
-      foreach ($Name as $k) {
-         $Config->Remove($k);
-      }
-      $Result = $Config->Save($Path);
-      if ($Result)
-         $Config->Load($Path, 'Use');
-      return $Result;
+      Gdn::Config()->RemoveFromConfig($Name);
    }
 }
 
@@ -2024,35 +2012,7 @@ if (!function_exists('SaveToConfig')) {
     * @return bool: Whether or not the save was successful. NULL if no changes were necessary.
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
-      // Don't save the value if it hasn't changed.
-      /*
-      Tim: The world ain't ready for you yet, son
-      if (is_string($Name) && C($Name) == $Value)
-         return NULL;
-      */
-      
-      $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
-      $RemoveEmpty = GetValue('RemoveEmpty', $Options);
-
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_LOCAL_CONF.DS.'config.php';
-      $Config->Load($Path, 'Save');
-
-      if (!is_array($Name))
-         $Name = array($Name => $Value);
-
-      foreach ($Name as $k => $v) {
-         if (!$v && $RemoveEmpty) {
-            $Config->Remove($k);
-         } else {
-            $Config->Set($k, $v, TRUE, $Save);
-         }
-      }
-
-      if ($Save)
-         return $Config->Save($Path);
-      else
-         return TRUE;
+      Gdn::Config()->SaveToConfig($Name, $Value, $Options);
    }
 }
 

@@ -4,12 +4,13 @@
  */
 
 // If you want to change where the garden libraries are located on your server, edit these paths:
-define('PATH_APPLICATIONS', PATH_ROOT . DS . 'applications');
-define('PATH_CACHE', PATH_ROOT . DS . 'cache');
-define('PATH_LIBRARY', PATH_ROOT . DS . 'library');
-define('PATH_PLUGINS', PATH_ROOT . DS . 'plugins');
-define('PATH_THEMES', PATH_ROOT . DS . 'themes');
-define('PATH_UPLOADS', PATH_ROOT . DS . 'uploads');
+define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
+define('PATH_CACHE', PATH_ROOT.'/cache');
+define('PATH_PLUGINS', PATH_ROOT.'/plugins');
+define('PATH_THEMES', PATH_ROOT.'/themes');
+define('PATH_UPLOADS', PATH_ROOT.'/uploads');
+define('PATH_LIBRARY', PATH_ROOT.'/library');
+define('PATH_LIBRARY_CORE', PATH_LIBRARY.'/core');
 
 // Delivery type enumerators:
 define('DELIVERY_TYPE_ALL', 'ALL'); // Deliver an entire page

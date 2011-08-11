@@ -5,6 +5,8 @@
 // values for configuration settings.
 $Configuration = array();
 
+$Configuration['TestValue'] = 'config-defaults';
+
 $Configuration['EnabledApplications']['Dashboard']             = 'dashboard';
 
 $Configuration['Database']['Engine']                           = 'MySQL';

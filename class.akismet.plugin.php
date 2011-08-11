@@ -24,7 +24,8 @@ class AkismetPlugin extends Gdn_Plugin {
 
    public function CheckAkismet($RecordType, $Data) {
       $Key = C('Plugins.Akismet.Key');
-      if (!$Key)
+      $UserID = $this->UserID();
+      if (!$Key || !$UserID)
          return FALSE;
 
       static $Akismet;
@@ -40,6 +41,27 @@ class AkismetPlugin extends Gdn_Plugin {
       $Result = $Akismet->isCommentSpam();
       return $Result;
    }
+   
+   public function Structure() {
+      // Get a user for operations.
+      $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Akismet', 'Admin' => 2))->Value('UserID');
+
+      if (!$UserID) {
+         $UserID = Gdn::SQL()->Insert('User', array(
+            'Name' => 'Akismet',
+            'Password' => RandomString('20'),
+            'HashMethod' => 'Random',
+            'Email' => 'akismet@domain.com',
+            'DateInserted' => Gdn_Format::ToDateTime(),
+            'Admin' => '2'
+         ));
+      }
+      SaveToConfig('Plugins.Akismet.UserID', $UserID);
+   }
+   
+   public function UserID() {
+      return C('Plugins.Akismet.UserID', NULL);
+   }
 
    /// EVENT HANDLERS ///
 
@@ -48,19 +70,21 @@ class AkismetPlugin extends Gdn_Plugin {
          return; // don't double check
 
       $RecordType = $Args['RecordType'];
-      $Data = $Args['Data'];
+      $Data =& $Args['Data'];
 
 
       switch ($RecordType) {
          case 'User':
-            $Data['Name'] = '';
-            $Data['Body'] = GetValue('DiscoveryText', $Data);
-            $Result = $this->CheckAkismet($RecordType, $Data);
+//            $Data['Name'] = '';
+//            $Data['Body'] = GetValue('DiscoveryText', $Data);
+//            $Result = $this->CheckAkismet($RecordType, $Data);
             break;
          case 'Comment':
          case 'Discussion':
          case 'Activity':
             $Result = $this->CheckAkismet($RecordType, $Data);
+            if ($Result)
+               $Data['Log_InsertUserID'] = $this->UserID();
             break;
       }
       $Sender->EventArguments['IsSpam'] = $Result;

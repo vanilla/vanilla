@@ -492,6 +492,7 @@ class UserModel extends Gdn_Model {
          
          foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
             $Data[$DatabaseUserID] = $DatabaseUser;
+            $this->SetCalculatedFields($DatabaseUser);
             $this->UserCache($DatabaseUser);
          }
       }

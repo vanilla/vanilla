@@ -233,7 +233,7 @@ class Gdn_ApplicationManager {
       }
 
       // 2. Disable it
-      RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
+      RemoveFromConfig("EnabledApplications.{$ApplicationName}");
 
       // Clear the object caches.
       Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);

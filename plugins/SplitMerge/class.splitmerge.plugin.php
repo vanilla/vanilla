@@ -74,31 +74,6 @@ class SplitMergePlugin extends Gdn_Plugin {
       }
       // Load category data.
       $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-      if ($Sender->ShowCategorySelector) {
-         $CategoryModel = new CategoryModel();
-         $CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
-         $aCategoryData = array();
-         foreach ($CategoryData->Result() as $Category) {
-            if ($Category->CategoryID <= 0)
-               continue;
-            
-            if ($Discussion->CategoryID == $Category->CategoryID)
-               $Sender->Category = $Category;
-            
-            $CategoryName = $Category->Name;   
-            if ($Category->Depth > 1) {
-               $CategoryName = '↳ '.$CategoryName;
-               $CategoryName = str_pad($CategoryName, strlen($CategoryName) + $Category->Depth - 2, ' ', STR_PAD_LEFT);
-               $CategoryName = str_replace(' ', '&#160;', $CategoryName);
-            }
-            $aCategoryData[$Category->CategoryID] = $CategoryName;
-            $Sender->EventArguments['aCategoryData'] = &$aCategoryData;
-				$Sender->EventArguments['Category'] = &$Category;
-				$Sender->FireEvent('AfterCategoryItem');
-         }
-         $Sender->CategoryData = $aCategoryData;
-      }
-      
       $CountCheckedComments = count($CommentIDs);
       $Sender->SetData('CountCheckedComments', $CountCheckedComments);
       // Perform the split
@@ -117,7 +92,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                ->Set('DiscussionID', $NewDiscussionID)
                ->WhereIn('CommentID', $CommentIDs)
                ->Put();
-            
+					
             // Update counts on both discussions
             $CommentModel = new CommentModel();
             $CommentModel->UpdateCommentCount($DiscussionID);

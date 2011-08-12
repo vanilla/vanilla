@@ -76,31 +76,8 @@ class PostController extends VanillaController {
       else
          $this->Category = NULL;
 
-      if ($UseCategories) {
-         $Categories = CategoryModel::Categories();
-         $aCategoryData = array();
-
-         foreach ($Categories as $CategoryID => $Category) {
-            if (!$DiscussionID || $this->CategoryID != $CategoryID) {
-               if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'])
-                  continue;
-
-               if ($Category['Archived'])
-                  continue;
-            }
-
-            $CategoryName = $Category['Name'];
-            if ($Category['Depth'] > 1) {
-               $CategoryName = str_pad($CategoryName, $Category['Depth'] - 2, '&#160;', STR_PAD_LEFT);
-            }
-            $aCategoryData[$CategoryID] = $CategoryName;
-            $this->EventArguments['aCategoryData'] = &$aCategoryData;
-				$this->EventArguments['Category'] = $this->Category;
-				$this->FireEvent('AfterCategoryItem');
-         }
-         $this->CategoryData= $aCategoryData;
-         $this->SetData('Categories', $aCategoryData);
-      }
+      if ($UseCategories)
+			$CategoryData = CategoryModel::Categories();
       
       // Check permission 
       if (isset($this->Discussion)) {
@@ -144,7 +121,7 @@ class PostController extends VanillaController {
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
             if (!is_object($this->Category) && isset($FormValues['CategoryID']))
-               $this->Category = $aCategoryData[$FormValues['CategoryID']];
+               $this->Category = $CategoryData[$FormValues['CategoryID']];
 
             if (is_object($this->Category)) {
                // Check category permissions.

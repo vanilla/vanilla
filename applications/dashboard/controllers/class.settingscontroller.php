@@ -775,7 +775,7 @@ class SettingsController extends DashboardController {
          if (!$this->Form->IsPostBack()) {
             foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
                $Default = GetValue('Default', $Options, '');
-               $Value = C("ThemeOptions.{$Key}", '#DEFAULT#');
+               $Value = C("ThemeOption.{$Key}", '#DEFAULT#');
                if ($Value === '#DEFAULT#')
                   $Value = $Default;
 

@@ -298,13 +298,15 @@ class ProxyRequest {
       return $this->ResponseBody;
    }
    
-   public function Request($Options, $QueryParams = NULL) {
+   public function Request($Options, $QueryParams = NULL, $Files = NULL) {
       
-      if (is_string($Options)) {
-         $Options = array(
-             'URL'      => $Options
-         );
-      }
+      /*
+       * Allow requests that just want to use defaults to provide a string instead
+       * of an optionlist.
+       */
+      
+      if (is_string($Options))
+         $Options = array('URL' => $Options);
 
       $Defaults = array(
           'URL'                  => NULL,
@@ -312,6 +314,7 @@ class ProxyRequest {
           'ConnectTimeout'       => 5,
           'Timeout'              => 2,
           'Redirects'            => TRUE,
+          'SSLNoVerify'          => FALSE,
           'Recycle'              => FALSE,      // Whether to reuse this pointer if possible.
           'RequestsPerPointer'   => 0,          // How often to recycle pointers reusable pointers.
           'Cookies'              => TRUE,       // Send cookies?
@@ -320,25 +323,26 @@ class ProxyRequest {
           'Debug'                => FALSE,      // Debug output on?
           'Simulate'             => FALSE       // Don't actually request, just set up
       );
+      
+      $this->Options = $Options = array_merge($Defaults, $Options);
 
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
       $this->ResponseBody = "";
-      
       $this->ContentLength = 0;
       $this->ContentType = '';
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      $this->Options = $Options = array_merge($Defaults, $Options);
-      
       if (is_null($QueryParams)) $QueryParams = array();
+      if (is_null($Files)) $Files = array();
 
       $RelativeURL = GetValue('URL', $Options);
       $RequestMethod = GetValue('Method', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
+      $SSLNoVerify = GetValue('SSLNoVerify', $Options);
       $Recycle = GetValue('Recycle', $Options);
       $SendCookies = GetValue('Cookies', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
@@ -346,24 +350,43 @@ class ProxyRequest {
       $Debug = GetValue('Debug', $Options, FALSE);
       $Simulate = GetValue('Simulate', $Options);
       
-      if ($CloseSesssion)
-         @session_write_close();
-      
       $OldVolume = $this->Loud;
       if ($Debug)
          $this->Loud = TRUE;
 
       $Url = $RelativeURL;
+      $PostData = $QueryParams;
+      
+      /*
+       * If files were provided, preprocess the list and exclude files that don't
+       * exist. Also, change the method to POST if it is currently GET and there 
+       * are valid files to send.
+       */
+      
+      $SendFiles = array();
+      foreach ($Files as $File => $FilePath)
+         if (file_exists($FilePath))
+            $SendFiles[$File] = $FilePath;
+      
+      $FileTransfer = (bool)sizeof($SendFiles);
+      if ($FileTransfer && $Method == "GET") {
+         $this->Options['Method'] = 'POST';
+         $RequestMethod = GetValue('Method', $Options);
+      }
+      
+      /*
+       * Parse Query Parameters and collapse into a querystring in the case of
+       * GETs.
+       */
       
       $RequestMethod = strtoupper($RequestMethod);
-      $PostData = http_build_query($QueryParams);
       switch ($RequestMethod) {
          case 'POST':
-            
             break;
          
          case 'GET':
          default:
+            $PostData = http_build_query($PostData);
             if (stristr($RelativeURL, '?'))
                $Url .= '&';
             else
@@ -372,22 +395,24 @@ class ProxyRequest {
             break;
       }
       
-
-      if ($Debug) echo " : Requesting {$Url}\n";
       $this->Action("Requesting {$Url}");
 
       $UrlParts = parse_url($Url);
-      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Scheme = strtolower(GetValue('scheme', $UrlParts, 'http'));
       $Host = GetValue('host', $UrlParts, '');
       $Port = GetValue('port', $UrlParts, '80');
       if (empty($Port)) $Port = 80;
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
+      $UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
-      // Get the cookie.
+      /*
+       * ProxyRequest can masquerade as the current user, so collect and encode
+       * their current cookies as the default case is to send them.
+       */
+      
       $Cookie = '';
       $EncodeCookies = TRUE;
-
       foreach($_COOKIE as $Key => $Value) {
          if (strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
@@ -395,29 +420,45 @@ class ProxyRequest {
          if (strlen($Cookie) > 0)
             $Cookie .= '; ';
 
-         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
-         $Cookie .= "{$Key}={$EValue}";
+         $EncodedValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EncodedValue}";
       }
+      
+      // This prevents problems for sites that use sessions.
+      if ($CloseSesssion)
+         @session_write_close();
+      
       $Response = '';
-      if ((function_exists('curl_init') && !$Recycle) || !function_exists('fsockopen')) {
+      
+      /**
+       * Use cURL if it is available
+       */
+      if (function_exists('curl_init') && !$Recycle) {
 
-         //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
-         curl_setopt($Handler, CURLOPT_HEADER, 1);
+         curl_setopt($Handler, CURLOPT_HEADER, TRUE);
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, TRUE);
          curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
-         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
+         
+         if ($UseSSL) {
+            curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, !$SSLNoVerify);
+            curl_setopt($Handler, CURLOPT_SSL_VERIFYHOST, !$SSLNoVerify);
+         }
          
          if ($Timeout > 0)
             curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
 
          if ($Cookie != '' && $SendCookies)
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
-
+         
          if ($RequestMethod == 'POST') {
-            curl_setopt($Handler, CURLOPT_POST, 1);
+            if ($FileTransfer)
+               foreach ($SendFiles as $File => $FilePath)
+                  $PostData[$File] = "@{$FilePath}";
+            curl_setopt($Handler, CURLOPT_POST, TRUE);
             curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
          }
          
@@ -428,6 +469,12 @@ class ProxyRequest {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          
+         if ($UseSSL)
+            throw new Exception("SSL not supported by ProxyRequest via fsockopen.");
+         
+         if ($FileTransfer)
+            throw new Exception("File Transfer not supported by ProxyRequest via fsockopen.");
+         
          $Pointer = FALSE;
          $HostAddress = $this->FsockConnect($Pointer, $Host, 80, $Options);
 
@@ -436,8 +483,8 @@ class ProxyRequest {
          
          $SendHeaders[] = "{$RequestMethod} $Path?$Query HTTP/1.1";
          $SendHeaders[] = "Host: {$HostHeader}";
-            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
-            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+         // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+         // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
          //$SendHeaders[] = "User-Agent: Vanilla/2.0 RunnerBot";
          $SendHeaders[] = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1";
          $SendHeaders[] = "Accept: */*";
@@ -456,6 +503,7 @@ class ProxyRequest {
             $SendHeaders[] = "Cookie: {$Cookie}";
             
          if ($RequestMethod == 'POST') {
+            $PostData = http_build_query($PostData);
             $SendHeaders[] = "Content-Type: application/x-www-form-urlencoded";
             $PostDataLength = strlen($PostData);
             $SendHeaders[] = "Content-Length: {$PostDataLength}";

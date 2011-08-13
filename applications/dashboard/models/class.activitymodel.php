@@ -369,6 +369,9 @@ class ActivityModel extends Gdn_Model {
                )
             );
             
+            $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
+            $this->EventArguments = $Notification;
+            $this->FireEvent('BeforeSendNotification');
             try {
                $Email->Send();
             } catch (Exception $ex) {
@@ -399,10 +402,18 @@ class ActivityModel extends Gdn_Model {
          if (is_array($Notifications)) {
             // Only send out one notification per user.
             $Notification = $Notifications[0];
+            
+            
             $Email = $Notification['Email'];
-            if (is_object($Email))
-               $Email->Send();
-
+            if (is_object($Email)) {
+               $this->EventArguments = $Notification;
+               $this->FireEvent('BeforeSendNotification');
+            
+               try {
+                  $Email->Send();
+               } catch(Exception $Ex) {
+               }
+            }
          }
       }
 
@@ -426,13 +437,15 @@ class ActivityModel extends Gdn_Model {
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
          $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
-      $User = $this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+      $User = Gdn::UserModel()->GetID($Activity->RegardingUserID, DATASET_TYPE_OBJECT); //$this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 
       if ($User) {
          $Preferences = Gdn_Format::Unserialize($User->Preferences);
          $ConfigPreference = C('Preferences.Email.'.$Activity->ActivityType, '0');
          if ($ConfigPreference !== FALSE)
             $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, $ConfigPreference);
+         else
+            $Preference = FALSE;
          if ($Preference) {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
@@ -443,14 +456,14 @@ class ActivityModel extends Gdn_Model {
                sprintf(
                   T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
                   $ActivityHeadline,
-                  Url($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+                  ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
                   $Story
                )
             );
             if (!array_key_exists($User->UserID, $this->_NotificationQueue))
                $this->_NotificationQueue[$User->UserID] = array();
 
-            $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email);
+            $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
             if ($Position == 'first')
                $this->_NotificationQueue[$User->UserID] = array_merge(array($Notification), $this->_NotificationQueue[$User->UserID]);
             else

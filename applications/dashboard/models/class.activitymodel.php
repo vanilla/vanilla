@@ -270,8 +270,10 @@ class ActivityModel extends Gdn_Model {
       if ($Notify) {
          // Only add the activity if the user wants to be notified in some way.
          $RegardingUser = Gdn::UserModel()->GetID($RegardingUserID);
-         if (!self::NotficationPreference($ActivityType, GetValue('Preferences', $RegardingUser)))
+         if ($SendEmail != 'Force' && !self::NotificationPreference($ActivityType, GetValue('Preferences', $RegardingUser))) {
+//            echo "User doesn't want to be notified...";
             return FALSE;
+         }
       }
          
       // If this is a notification, increment the regardinguserid's count
@@ -313,18 +315,19 @@ class ActivityModel extends Gdn_Model {
       // Send a notification to the user.
       if ($Notify) {
          if ($QueueEmail)
-            $this->QueueNotification($ActivityID, $Story);
+            $this->QueueNotification($ActivityID, $Story, 'last', $SendEmail == 'Force');
          else
-            $this->SendNotification($ActivityID, $Story);
+            $this->SendNotification($ActivityID, $Story, $SendEmail == 'Force');
       }
       
       return $ActivityID;
    }
    
-   public static function NotficationPreference($ActivityType, $Preferences, $Type = NULL) {
+   public static function NotificationPreference($ActivityType, $Preferences, $Type = NULL) {
       if ($Type === NULL) {
-         $Result = self::NotficationPreference($ActivityType, $Preferences, 'Email')
-            || self::NotificationPreference($ActivityType, $Preferences, 'Popup');
+         $Result = self::NotificationPreference($ActivityType, $Preferences, 'Email')
+                || self::NotificationPreference($ActivityType, $Preferences, 'Popup');
+         
          return $Result;
       }
       
@@ -337,7 +340,7 @@ class ActivityModel extends Gdn_Model {
       return $Preference;
    }
    
-   public function SendNotification($ActivityID, $Story = '') {
+   public function SendNotification($ActivityID, $Story = '', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);
       if (!is_object($Activity))
          return;
@@ -349,11 +352,16 @@ class ActivityModel extends Gdn_Model {
          $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
          $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
-      $User = $this->SQL->Select('Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
+      
+      $User = Gdn::UserModel()->GetID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
       if ($User) {
-         $Preferences = Gdn_Format::Unserialize($User->Preferences);
-         $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
+         if ($Force)
+            $Preference = $Force;
+         else {
+            $Preferences = $User->Preferences;
+            $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
+         }
          if ($Preference) {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
@@ -425,7 +433,7 @@ class ActivityModel extends Gdn_Model {
    /**
     * Queue a notification for sending.
     */
-   public function QueueNotification($ActivityID, $Story = '', $Position = 'last') {
+   public function QueueNotification($ActivityID, $Story = '', $Position = 'last', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);
       if (!is_object($Activity))
          return;
@@ -440,17 +448,22 @@ class ActivityModel extends Gdn_Model {
       $User = Gdn::UserModel()->GetID($Activity->RegardingUserID, DATASET_TYPE_OBJECT); //$this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
 
       if ($User) {
-         $Preferences = Gdn_Format::Unserialize($User->Preferences);
-         $ConfigPreference = C('Preferences.Email.'.$Activity->ActivityType, '0');
-         if ($ConfigPreference !== FALSE)
-            $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, $ConfigPreference);
-         else
-            $Preference = FALSE;
+         if ($Force)
+            $Preference = $Force;
+         else {
+            $Preferences = Gdn_Format::Unserialize($User->Preferences);
+            $ConfigPreference = C('Preferences.Email.'.$Activity->ActivityType, '0');
+            if ($ConfigPreference !== FALSE)
+               $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, $ConfigPreference);
+            else
+               $Preference = FALSE;
+         }
+         
          if ($Preference) {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-            $Email->To($User->Email, $User->Name);
+//            $Email->To($User->Email, $User->Name);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(

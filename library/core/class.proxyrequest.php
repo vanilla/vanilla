@@ -279,9 +279,7 @@ class ProxyRequest {
          return $this->ResponseBody;
       }
       
-      $ResponseParts = explode("\r\n\r\n", $Response);
-
-      $ResponseHeaderData = trim(array_shift($ResponseParts));
+      $ResponseHeaderData = trim(array_shift(curl_getinfo($Handler, CURLINFO_HEADER_OUT)));
       $ResponseHeaderLines = explode("\n",$ResponseHeaderData);
 
       // Parse header status line
@@ -294,11 +292,11 @@ class ProxyRequest {
          $this->ResponseHeaders[$Key] = $Value;
       }
       
-      $this->ResponseBody = trim(implode("\r\n\r\n",$ResponseParts));
+      $this->ResponseBody = trim($Response);
       return $this->ResponseBody;
    }
    
-   public function Request($Options, $QueryParams = NULL, $Files = NULL) {
+   public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
       /*
        * Allow requests that just want to use defaults to provide a string instead
@@ -334,8 +332,9 @@ class ProxyRequest {
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      if (is_null($QueryParams)) $QueryParams = array();
-      if (is_null($Files)) $Files = array();
+      if (!is_array($QueryParams)) $QueryParams = array();
+      if (!is_array($Files)) $Files = array();
+      if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
       $RelativeURL = GetValue('URL', $Options);
       $RequestMethod = GetValue('Method', $Options);
@@ -373,6 +372,15 @@ class ProxyRequest {
          $this->Options['Method'] = 'POST';
          $RequestMethod = GetValue('Method', $Options);
       }
+      
+      /*
+       * If extra headers were provided, preprocess the list into the correct 
+       * format for inclusion into both cURL and fsockopen header queues.
+       */
+      
+      $SendExtraHeaders = array();
+      foreach ($ExtraHeaders as $ExtraHeader => $ExtraHeaderValue)
+         $SendExtraHeaders[] = "{$ExtraHeader}: {$ExtraHeaderValue}";
       
       /*
        * Parse Query Parameters and collapse into a querystring in the case of
@@ -433,12 +441,13 @@ class ProxyRequest {
       /**
        * Use cURL if it is available
        */
-      if (function_exists('curl_init') && !$Recycle) {
+      if (function_exists('curl_init') && (!$Recycle || $UseSSL || $FileTransfer)) {
 
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
-         curl_setopt($Handler, CURLOPT_HEADER, TRUE);
+         curl_setopt($Handler, CURLOPT_HEADER, FALSE);
+         curl_setopt($Handler, CURLINFO_HEADER_OUT, TRUE);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, TRUE);
          curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
@@ -453,6 +462,9 @@ class ProxyRequest {
 
          if ($Cookie != '' && $SendCookies)
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+         
+         if (sizeof($SendExtraHeaders))
+            curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
          
          if ($RequestMethod == 'POST') {
             if ($FileTransfer)
@@ -501,6 +513,9 @@ class ProxyRequest {
 
          if (strlen($Cookie) > 0 && $SendCookies)
             $SendHeaders[] = "Cookie: {$Cookie}";
+            
+         if (sizeof($SendExtraHeaders))
+            $SendHeaders = array_merge($SendHeaders, $SendExtraHeaders);
             
          if ($RequestMethod == 'POST') {
             $PostData = http_build_query($PostData);

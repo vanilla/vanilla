@@ -422,7 +422,19 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $AppFolder The application folder that should contain the JS file. Default is to use the application folder that this controller belongs to.
     */
    public function AddJsFile($FileName, $AppFolder = '', $Options = NULL) {
-      $this->_JsFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
+      $JsInfo = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
+      
+      if (StringBeginsWith($AppFolder, 'plugins/')) {
+         $Name = StringBeginsWith($AppFolder, 'plugins/', TRUE, TRUE);
+         $Info = Gdn::PluginManager()->GetPluginInfo($Name, Gdn_PluginManager::ACCESS_PLUGINNAME);
+         if ($Info) {
+            $JsInfo['Version'] = GetValue('Version', $Info);
+         }
+      } else {
+         $JsInfo['Version'] = APPLICATION_VERSION;
+      }
+      
+      $this->_JsFiles[] = $JsInfo;
    }
 
    /**
@@ -1409,7 +1421,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             
             // And now search for/add all JS files
-            foreach ($this->_JsFiles as $JsInfo) {
+            foreach ($this->_JsFiles as $Index => $JsInfo) {
                $JsFile = $JsInfo['FileName'];
 
                if (strpos($JsFile, '//') !== FALSE) {
@@ -1465,6 +1477,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                   $Options = (array)$JsInfo['Options'];
                   $Options['path'] = $JsPath;
+                  $Version = GetValue('Version', $JsInfo);
+                  if ($Version)
+                     TouchValue('version', $Options, $Version);
 
                   $this->Head->AddScript($JsSrc, 'text/javascript', $Options);
                }

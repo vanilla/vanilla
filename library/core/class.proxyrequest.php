@@ -279,7 +279,8 @@ class ProxyRequest {
          return $this->ResponseBody;
       }
       
-      $ResponseHeaderData = trim(array_shift(curl_getinfo($Handler, CURLINFO_HEADER_OUT)));
+      $HeaderInfo = curl_getinfo($Handler, CURLINFO_HEADER_OUT);
+      $ResponseHeaderData = trim($HeaderInfo);
       $ResponseHeaderLines = explode("\n",$ResponseHeaderData);
 
       // Parse header status line

@@ -242,8 +242,7 @@ class Gdn_Factory {
     * @param string $Alias The object alias to uninstall.
     */
    public function Uninstall($Alias) {
-      if(array_key_exists($this->_Objects, $Alias))
-         unset($this->_Objects[$Alias]);
+      if (array_key_exists($Alias, $this->_Objects)) unset($this->_Objects[$Alias]);
    }
    
    /** 

@@ -402,6 +402,8 @@ class ProxyRequest {
       if ((function_exists('curl_init') && !$Recycle) || !function_exists('fsockopen')) {
 
          //$Url = $Scheme.'://'.$Host.$Path;
+         $this->Action("cURL");
+
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
@@ -427,6 +429,7 @@ class ProxyRequest {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
+         $this->Action("fsockopen");
          
          $Pointer = FALSE;
          $HostAddress = $this->FsockConnect($Pointer, $Host, 80, $Options);

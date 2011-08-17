@@ -26,7 +26,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	public function Base_AfterCommentFormat_Handler($Sender) {
 		if (!C('Plugins.Emotify.FormatEmoticons'))
 			return;
-		
+
 		$Object = $Sender->EventArguments['Object'];
 		$Object->FormatBody = $this->DoEmoticons($Object->FormatBody);
 		$Sender->EventArguments['Object'] = $Object;
@@ -41,8 +41,15 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 */
 	public static function GetEmoticons() {
 		return array(
+			':)]' => '100',
+			';))' => '71',
+			':)>-' => '67',
+			':)&gt;-' => '67',
+			':))' => '21',
 			':)' => '1',
 			':-)' => '1',
+			':(|)' => '51',
+			':((' => '20',
 			':(' => '2',
 			':-(' => '2',
 			';)' => '3',
@@ -66,6 +73,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			':*' => '11',
 			'=((' => '12',
 			':-O' => '13',
+			':O)' => '34',
 			':O' => '13',
 			'X(' => '14',
 			':>' => '15',
@@ -78,11 +86,9 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			'>:-)' => '19',
 			'&gt;:)' => '19',
 			'&gt;:-)' => '19',
-			':((' => '20',
 			':-((' => '20',
 			":'(" => '20',
 			":'-(" => '20',
-			':))' => '21',
 			':-))' => '21',
 			':|' => '22',
 			':-|' => '22',
@@ -97,11 +103,12 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			'8-|' => '29',
 			'L-)' => '30',
 			':-&' => '31',
+			':-&amp;' => '31',
 			':0&amp;' => '31',
 			':-$' => '32',
 			'[-(' => '33',
-			':O)' => '34',
 			'8-}' => '35',
+			'&lt;:-P' => '36',
 			'<:-P' => '36',
 			'(:|' => '37',
 			'=P~' => '38',
@@ -127,7 +134,6 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			':@)' => '49',
 			'3:-O' => '50',
 			'3:-o' => '50',
-			':(|)' => '51',
 			'~:>' => '52',
 			'~:&gt;' => '52',
 			'@};-' => '53',
@@ -147,13 +153,10 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			'$-)' => '64',
 			':-\"' => '65',
 			'b-(' => '66',
-			':)>-' => '67',
-			':)&gt;-' => '67',
 			'[-X' => '68',
-			'\\:D/": ["69',
+			'\\:D/' => '69',
 			'>:/' => '70',
 			'&gt;:/' => '70',
-			';))' => '71',
 			'o->' => '72',
 			'o-&gt;' => '72',
 			'o=>' => '73',
@@ -164,7 +167,6 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			'^:)^' => '77',
 			':-j' => '78',
 			'(*)' => '79',
-			':)]' => '100',
 			':-c' => '101',
 			'~X(' => '102',
 			':-h' => '103',
@@ -230,6 +232,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	
 	public function Setup() {
 		SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
+		SaveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
 	}
 	
 }

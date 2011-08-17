@@ -57,6 +57,7 @@ class ConversationMessageModel extends Gdn_Model {
       return $this->SQL
          ->Select('cm.*')
          ->Select('iu.Name', '', 'InsertName')
+         ->Select('iu.Email', '', 'InsertEmail')
          ->Select('iu.Photo', '', 'InsertPhoto')
          ->From('ConversationMessage cm')
          ->Join('Conversation c', 'cm.ConversationID = c.ConversationID')
@@ -70,6 +71,18 @@ class ConversationMessageModel extends Gdn_Model {
          ->OrderBy('cm.DateInserted', 'asc')
          ->Limit($Limit, $Offset)
          ->Get();
+   }
+   
+   /**
+    * Get the data from the model based on its primary key.
+    *
+    * @param mixed $ID The value of the primary key in the database.
+    * @param string $DatasetType The format of the result dataset.
+    * @return Gdn_DataSet
+    */
+   public function GetID($ID, $DatasetType = FALSE) {
+      $Result = $this->GetWhere(array("MessageID" => $ID))->FirstRow($DatasetType);
+      return $Result;
    }
    
    /**
@@ -169,7 +182,7 @@ class ConversationMessageModel extends Gdn_Model {
       $MessageID = FALSE;
       if($this->Validate($FormPostValues)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         $Fields['Format'] = C('Garden.InputFormatter', '');
+         TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
          $this->LastMessageID = $MessageID;

@@ -4,14 +4,11 @@
    <?php
    echo $this->Form->Open();
    echo $this->Form->Errors();
-
    echo '<div class="Message">';
 
-   if ($this->Form->ErrorCount() == 0) {
+   if ($this->Form->ErrorCount() == 0)
       echo T('Your request has been sent.', 'Your request has been sent. Check your email for further instructions.');
-   }
 
    echo '</div>';
-
    echo $this->Form->Close(); ?>
 </div>

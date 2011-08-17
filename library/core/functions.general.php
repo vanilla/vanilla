@@ -1762,6 +1762,29 @@ if (!function_exists('RandomString')) {
    }
 }
 
+if (!function_exists('BetterRandomString')) {
+   function BetterRandomString($Length, $CharacterOptions = 'A0') {
+      $CharacterClasses = array(
+          'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          'a' => 'abcdefghijklmnopqrstuvwxyz',
+          '0' => '0123456789',
+          '!' => '~!@#$^&*_+-'
+      );
+
+      $Characters = '';
+      for ($i=0;$i<strlen($CharacterOptions);$i++)
+         $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+
+      $CharLen = strlen($Characters) - 1;
+      $String = '' ;
+      for ($i = 0; $i < $Length; ++$i) {
+        $Offset = rand() % $CharLen;
+        $String .= substr($Characters, $Offset, 1);
+      }
+      return $String;
+   }
+}
+
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)

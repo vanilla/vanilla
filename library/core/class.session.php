@@ -265,6 +265,7 @@ class Gdn_Session {
     *
     * @param int $UserID The UserID to start the session with.
     * @param bool $SetIdentity Whether or not to set the identity (cookie) or make this a one request session.
+    * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
       if (!C('Garden.Installed', FALSE)) return;

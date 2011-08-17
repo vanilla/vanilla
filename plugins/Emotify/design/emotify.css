@@ -128,7 +128,7 @@
 .EmoticonContainer {
     position: absolute;
     top: 21px;
-    right: 0;
+    right: -8px;
     border: 1px solid #aaa;
     border-bottom: 0;
     border-right: 0;
@@ -139,6 +139,7 @@
     -moz-box-shadow: 2px 2px 4px #777;
     -webkit-box-shadow: 2px 2px 4px #777;
     z-index: 1000;
+	 background: #eee;
 }
 .EmoticonBox {
     background-color: #fff;

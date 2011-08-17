@@ -78,19 +78,6 @@ if (!function_exists('Anchor')) {
 }
 
 /**
-* Same as the Gdn_Format::ActivityHeadline()
-* Can be overridden in language definition files.
-* 
-* @see Gdn_Format::ActivityHeadline()
-* @return string
-*/
-if (!function_exists('ActivityHeadline')) {
-   function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
-      return Gdn_Format::ActivityHeadline($Activity, $ProfileUserID, $ViewingUserID);
-   }
-}
-
-/**
  * English "possessive" formatting.
  * This can be overridden in language definition files like:
  * /applications/garden/locale/en-US/definitions.php.
@@ -128,6 +115,18 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('IPAnchor')) {
+   /**
+    * Returns an IP address with a link to the user search.
+    */
+   function IPAnchor($IP, $CssClass = '') {
+      if ($IP)
+         return Anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
+      else
+         return $IP;
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
@@ -145,13 +144,19 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = array()) {
-      $User = (object)$User;
+   function UserAnchor($User, $CssClass = '', $Options = NULL) {
+      static $NameUnique = NULL;
+      if ($NameUnique === NULL)
+         $NameUnique = C('Garden.Registration.NameUnique');
       
+      $Px = $Options;
+      $Name = GetValue($Px.'Name', $User, T('Unknown'));
+      $UserID = GetValue($Px.'UserID', $User, 0);
+
       if ($CssClass != '')
          $CssClass = ' class="'.$CssClass.'"';
 
-      return '<a href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$CssClass.'>'.$User->Name.'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
    }
 }
 
@@ -170,7 +175,7 @@ if (!function_exists('UserBuilder')) {
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-      $User->Gender = property_exists($Object, $UserPrefix.'Gender') ? $Object->{$UserPrefix.'Gender'} : '';
+      $User->Email = GetValue($UserPrefix.'Email', $Object, NULL);
 		return $User;
    }
 }
@@ -188,18 +193,21 @@ if (!function_exists('UserPhoto')) {
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
-      if ($User->Photo) {
-         if (!preg_match('`^https?://`i', $User->Photo)) {
-            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+
+      $Photo = $User->Photo;
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User);
+
+      if ($Photo) {
+         if (!preg_match('`^https?://`i', $Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
-            $PhotoUrl = $User->Photo;
+            $PhotoUrl = $Photo;
          }
          
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
             .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
             .'</a>';
-      } elseif (function_exists('UserPhotoDefault')) {
-         return UserPhotoDefault($User, $Options);
       } else {
          return '';
       }
@@ -213,7 +221,11 @@ if (!function_exists('UserUrl')) {
     * @return string The url suitable to be passed into the Url() function.
     */
    function UserUrl($User) {
-      return '/profile/'.rawurlencode(GetValue('Name', $User));
+      static $NameUnique = NULL;
+      if ($NameUnique === NULL)
+         $NameUnique = C('Garden.Registration.NameUnique');
+      
+      return '/profile/'.($NameUnique ? '' : GetValue('UserID', $User, 0).'/').rawurlencode(GetValue('Name', $User));
    }
 }
 

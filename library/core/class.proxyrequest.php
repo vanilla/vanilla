@@ -443,7 +443,8 @@ class ProxyRequest {
        * Use cURL if it is available
        */
       if (function_exists('curl_init') && (!$Recycle || $UseSSL || $FileTransfer)) {
-
+         $this->Action("cURL");
+         
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
@@ -481,6 +482,7 @@ class ProxyRequest {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
+         $this->Action("fsockopen");
          
          if ($UseSSL)
             throw new Exception("SSL not supported by ProxyRequest via fsockopen.");

@@ -1280,7 +1280,7 @@ class EntryController extends Gdn_Controller {
       $EmailConfirmed = $this->UserModel->ConfirmEmail($User, $EmailKey);
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());
 
-      if ($EmailConfirmed && !Gdn::Session()->IsValid()) {
+      if ($EmailConfirmed) {
          $UserID = GetValue('UserID', $User);
          Gdn::Session()->Start($UserID);
       }
@@ -1301,7 +1301,7 @@ class EntryController extends Gdn_Controller {
    public function EmailConfirmRequest($UserID = '') {
       if ($UserID && !Gdn::Session()->CheckPermission('Garden.Users.Edit'))
          $UserID = '';
-
+      
       $this->UserModel->SendEmailConfirmationEmail($UserID);
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());
       $this->Render();

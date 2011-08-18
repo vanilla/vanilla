@@ -752,7 +752,9 @@ class Gdn_Form extends Gdn_Pluggable {
     *               $DataSet that contains the
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
-    *   IncludeNull Include a blank row?           FALSE
+    *   IncludeNull TRUE to include a blank row    FALSE
+    *               String to create disabled 
+    *               first option.
     *   InlineErrors  Show inline error message?   TRUE
     *               Allows disabling per-dropdown
     *               for multi-fields like Date()
@@ -785,8 +787,11 @@ class Gdn_Form extends Gdn_Pluggable {
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
-      $IncludeNull = ArrayValueI('IncludeNull', $Attributes);
-      if ($IncludeNull === TRUE) $Return .= "<option value=\"\"></option>\n";
+      $IncludeNull = ArrayValueI('IncludeNull', $Attributes, FALSE);
+      if ($IncludeNull === TRUE) 
+         $Return .= "<option value=\"\"></option>\n";
+      elseif ($IncludeNull)
+         $Return .= "<option value=\"\">$IncludeNull</option>\n";
 
       if (is_object($DataSet)) {
          $FieldsExist = FALSE;

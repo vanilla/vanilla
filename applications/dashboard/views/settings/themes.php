@@ -133,12 +133,13 @@ if ($AddonUrl != '')
                <?php
                   echo '<h4>';
                      echo $ThemeUrl != '' ? Url($ScreenName, $ThemeUrl) : $ScreenName;
+							/*
                      if ($Version != '')
                         $Info = sprintf(T('Version %s'), $Version);
                         
                      if ($Author != '')
                         $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
-      
+							*/
                   echo '</h4>';
                   
                   if ($PreviewUrl !== FALSE) {

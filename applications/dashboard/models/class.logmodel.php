@@ -206,6 +206,16 @@ class LogModel extends Gdn_Pluggable {
          $LogRow['RecordDate'] = Gdn_Format::ToDateTime();
 
       $GroupBy = GetValue('GroupBy', $Options);
+      
+      // Make sure we aren't grouping by null values.
+      if (is_array($GroupBy)) {
+         foreach ($GroupBy as $Name) {
+            if (GetValue($Name, $LogRow) === NULL) {
+               $GroupBy = FALSE;
+               break;
+            }
+         }
+      }
 
       if ($GroupBy) {
          $GroupBy[] = 'Operation';

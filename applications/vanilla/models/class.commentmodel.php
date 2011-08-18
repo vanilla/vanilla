@@ -27,7 +27,7 @@ class CommentModel extends VanillaModel {
     * @access protected
     * @since 2.0.0
     */
-   protected $_OrderBy = array(array('c.CommentID', ''));
+   protected $_OrderBy = array(array('c.DateInserted', ''));
    
    /**
     * Class constructor. Defines the related database table name.

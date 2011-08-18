@@ -748,25 +748,20 @@ class SettingsController extends DashboardController {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
 
-            SaveToConfig(array(
+            $ConfigSaveData = array(
                'Garden.ThemeOptions.Styles.Key' => $StyleKey,
-               'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename")));
+               'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename"));
+            
             // Save the text to the locale.
             $Translations = array();
             foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
                $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
-               $Translations['Theme_'.$Key] = $Value;
+               $ConfigSaveData["ThemeOption.{$Key}"] = $Value;
                //$this->Form->SetFormValue('Text_'.$Key, $Value);
             }
-            if (count($Translations) > 0) {
-               try {
-                  Gdn::Locale()->SaveTranslations($Translations);
-                  Gdn::Locale()->Refresh();
-               } catch (Exception $Ex) {
-                  $this->Form->AddError($Ex);
-               }
-            }
 
+            SaveToConfig($ConfigSaveData);
+            
             $this->InformMessage(T("Your changes have been saved."));
          } elseif ($Style) {
             SaveToConfig(array(
@@ -780,7 +775,7 @@ class SettingsController extends DashboardController {
          if (!$this->Form->IsPostBack()) {
             foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
                $Default = GetValue('Default', $Options, '');
-               $Value = T('Theme_'.$Key, '#DEFAULT#');
+               $Value = C("ThemeOption.{$Key}", '#DEFAULT#');
                if ($Value === '#DEFAULT#')
                   $Value = $Default;
 

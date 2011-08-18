@@ -710,8 +710,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             )
          );
          $ValidationResults = $this->DiscussionModel->ValidationResults();
-         if (count($ValidationResults) == 0 && $DiscussionID > 0)
+         if (count($ValidationResults) == 0 && $DiscussionID > 0) {
             $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            // Update the category discussion count
+            if ($CategoryID > 0)
+               $this->DiscussionModel->UpdateDiscussionCount($CategoryID, $DiscussionID);
+
+         }
       }
       
       // If no discussion was found, 404

@@ -28,7 +28,17 @@ class PagerModule extends Gdn_Module {
     * 'Pager';
     */
    public $CssClass;
+   
+   /**
+    * The number of records in the current page.
+    * @var int 
+    */
+   public $CurrentRecords = FALSE;
 
+   /**
+    * The default number of records per page.
+    * @var int
+    */
    public static $DefaultPageSize = 30;
 
    /**
@@ -318,8 +328,14 @@ class PagerModule extends Gdn_Module {
          $Pager .= Anchor(T('Previous'), self::FormatUrl($this->Url, $PageParam), 'Previous');
       }
       
-      $PageParam = 'p'.($CurrentPage + 1);
-      $Pager = ConcatSep(' ', $Pager, Anchor('Next', self::FormatUrl($this->Url, $PageParam), 'Next'));
+      $HasNext = TRUE;
+      if ($this->CurrentRecords !== FALSE && $this->CurrentRecords < $this->Limit)
+         $HasNext = FALSE;
+      
+      if ($HasNext) {
+         $PageParam = 'p'.($CurrentPage + 1);
+         $Pager = ConcatSep(' ', $Pager, Anchor('Next', self::FormatUrl($this->Url, $PageParam), 'Next'));
+      }
       
       $ClientID = $this->ClientID;
       $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
@@ -351,6 +367,7 @@ class PagerModule extends Gdn_Module {
 
       $Pager->Limit = GetValue('Limit', $Options, $Pager->Controller()->Data('_Limit', $Pager->Limit));
       $Pager->HtmlBefore = GetValue('HtmlBefore', $Options, GetValue('HtmlBefore', $Pager, ''));
+      $Pager->CurrentRecords = GetValue('CurrentRecords', $Options, FALSE);
 
       // Try and figure out the offset based on the parameters coming in to the controller.
       if (!$Pager->Offset) {

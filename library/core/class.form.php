@@ -1868,6 +1868,7 @@ class Gdn_Form extends Gdn_Pluggable {
          'valuefield',
          'includenull',
          'yearrange',
+         'fields',
          'inlineerrors');
       $Return = '';
       

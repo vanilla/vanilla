@@ -7,9 +7,9 @@
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2010, Tim Gunter 
- * @license Proprietary
- * @package Api
- * @since 1.0
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0.18
  */
 
 class ProxyRequest {
@@ -312,6 +312,7 @@ class ProxyRequest {
           'Method'               => 'GET',
           'ConnectTimeout'       => 5,
           'Timeout'              => 2,
+          'SaveAs'               => NULL,
           'Redirects'            => TRUE,
           'SSLNoVerify'          => FALSE,
           'Recycle'              => FALSE,      // Whether to reuse this pointer if possible.

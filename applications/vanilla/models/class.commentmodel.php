@@ -714,11 +714,13 @@ class CommentModel extends VanillaModel {
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
             $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
 				$ActivityModel->QueueNotification($ActivityID, $Story);
+            $NotifiedUsers[] = $Session->UserID;
 			}
 
          // Throw an event for users to add their own events.
          $this->EventArguments['Comment'] = $Fields;
          $this->EventArguments['Discussion'] = $Discussion;
+         $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
          $this->EventArguments['ActivityModel'] = $ActivityModel;
          $this->FireEvent('BeforeNotification');
 				
@@ -748,16 +750,19 @@ class CommentModel extends VanillaModel {
       $UserModel = Gdn::UserModel();
       $UserMayView = $UserModel->GetCategoryViewPermission($Discussion->InsertUserID, $Discussion->CategoryID);
       
-      if ($Discussion->InsertUserID != $ActivityUserID && $UserMayView)
-			$ActivityModel->Add(
+      if ($Discussion->InsertUserID != $ActivityUserID && ($UserMayView || $SendEmail == 'Force')) {
+			$ActivityID = $ActivityModel->Add(
 				$ActivityUserID,
 				'DiscussionComment',
-				Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
+				Anchor(Gdn_Format::Text($Discussion->Name), "discussion/comment/$CommentID/#Comment_$CommentID"),
 				$Discussion->InsertUserID,
 				'',
 				'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
 				$SendEmail
 			);
+         return $ActivityID;
+      }
+      
 	}
    
    /**

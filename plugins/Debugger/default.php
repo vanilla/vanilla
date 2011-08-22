@@ -20,7 +20,8 @@ $PluginInfo['Debugger'] = array(
    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca', 
+   'MobileFriendly' => TRUE,
 );
 
 // Install the debugger database.

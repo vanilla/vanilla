@@ -517,10 +517,7 @@ function Picker() {
          var DateParts = DatePart.split('-');
          
          // Retardo month indexing from 0
-         if (DateParts[1][0] == '0')
-            DateParts[1] = DateParts[1][1];
-
-         DateParts[1] = parseInt(DateParts[1]) - 1;
+         DateParts[1] = parseInt(DateParts[1], 10) - 1;
          CurrentDate.setFullYear(DateParts[0]);
          CurrentDate.setMonth(DateParts[1]);
          CurrentDate.setDate(DateParts[2]);

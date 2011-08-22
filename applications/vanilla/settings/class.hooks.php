@@ -83,15 +83,8 @@ class VanillaHooks implements Gdn_IPlugin {
          
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
          
-         // Erase the user's dicussions
-         $Sender->SQL->Update('Discussion')
-            ->Set('Body', T('The user and all related content has been deleted.'))
-            ->Set('Format', 'Deleted')
-            ->Where('InsertUserID', $UserID)
-            ->Put();
-         
-         // Delete the user's dicussions where noone else has posted
-         $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID, 'CountComments<=' => 0));
+         // Delete the user's dicussions 
+         $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
          // Erase the user's dicussions
          $Sender->SQL->Update('Discussion')

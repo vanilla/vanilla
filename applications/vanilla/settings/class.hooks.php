@@ -80,9 +80,27 @@ class VanillaHooks implements Gdn_IPlugin {
                ->Where('DiscussionID', $Row['DiscussionID'])
                ->Put();
          }
-
+         
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         
+         // Erase the user's dicussions
+         $Sender->SQL->Update('Discussion')
+            ->Set('Body', T('The user and all related content has been deleted.'))
+            ->Set('Format', 'Deleted')
+            ->Where('InsertUserID', $UserID)
+            ->Put();
+         
+         // Delete the user's dicussions where noone else has posted
+         $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID, 'CountComments<=' => 0));
       } else if ($DeleteMethod == 'wipe') {
+         // Erase the user's dicussions
+         $Sender->SQL->Update('Discussion')
+            ->Set('Body', T('The user and all related content has been deleted.'))
+            ->Set('Format', 'Deleted')
+            ->Where('InsertUserID', $UserID)
+            ->Put();
+         
+         // Erase the user's comments
 			$Sender->SQL->From('Comment')
 				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
 				->Delete('Comment c', array('d.InsertUserID' => $UserID));
@@ -95,7 +113,6 @@ class VanillaHooks implements Gdn_IPlugin {
       } else {
          // Leave comments
       }
-		$Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
 
       // Remove the user's profile information related to this application
       $Sender->SQL->Update('User')

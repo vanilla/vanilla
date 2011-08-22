@@ -435,7 +435,7 @@ $Construct->Table('Tag')
 
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity'), FALSE, 'index')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record

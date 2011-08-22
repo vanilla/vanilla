@@ -594,10 +594,10 @@ class Gdn_Validation {
       foreach ($this->Results() as $Name => $Value) {
          if (is_array($Value)) {
             foreach ($Value as $Code) {
-               $Errors[] = sprintf(T($Code), T($Name));
+               $Errors[] = trim(sprintf(T($Code), T($Name)), '.');
             }
          } else {
-            $Errors[] = sprintf(T($Value), T($Name));
+            $Errors[] = trim(sprintf(T($Value), T($Name)), '.');
          }
       }
       

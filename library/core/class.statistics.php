@@ -556,7 +556,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          return $this->Register();
       }
       
-      // Add a pageview entry
+      // Add a pageview entry.
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
       
@@ -583,6 +583,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
       if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE))
          Gdn::Set('Garden.Analytics.AutoStructure', NULL);
+      
+      // Fire an event for plugins to track their own stats.
+      // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
+      $this->EventArguments['Path'] = Gdn::Request()->Post('Path');
+      $this->FireEvent('Tick');
 
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = self::LastSentDate();

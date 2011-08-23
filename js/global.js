@@ -427,6 +427,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          type: 'post',
          url: StatsURL,
+         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
          success: function(json) {
             gdn.inform(json);
          }

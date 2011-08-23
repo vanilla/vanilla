@@ -1690,6 +1690,10 @@ div.Overlay {
   width: 100%;
   height: 100%;
 }
+.MSIE div.Overlay {
+   background: gray;
+   filter: alpha(opacity=0);
+}
 div.Popup {
   position: absolute;
   width: 100%;

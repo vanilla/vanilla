@@ -312,6 +312,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    public function Load($File, $Name = 'Configuration', $Dynamic = FALSE) {
       $ConfigurationSource = Gdn_ConfigurationSource::FromFile($File, $Name);
+      if (!$ConfigurationSource) return FALSE;
       $SourceTag = "file:{$File}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       

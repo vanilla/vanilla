@@ -71,7 +71,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             
             // Check Cache
             $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
-            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey);
+            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
             
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
             if ($CacheHit && is_array($SearchPathCache)) {
@@ -99,7 +99,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                   continue;
                
                $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache);
+               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
             }
             
             $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);

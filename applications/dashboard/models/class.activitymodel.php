@@ -187,11 +187,12 @@ class ActivityModel extends Gdn_Model {
       $this->FireEvent('BeforeGetNotificationsSince');
 		if (is_array($FilterToActivityTypeIDs))
 			$this->SQL->WhereIn('a.ActivityTypeID', $FilterToActivityTypeIDs);
+      else
+         $this->SQL->Where('t.Notify', '1');
 		
       $Result = $this->SQL
          ->Where('RegardingUserID', $UserID)
          ->Where('a.ActivityID >', $LastActivityID)
-         ->Where('t.Notify', '1')
          ->Limit($Limit, 0)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();

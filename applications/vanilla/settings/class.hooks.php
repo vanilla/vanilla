@@ -388,6 +388,24 @@ class VanillaHooks implements Gdn_IPlugin {
       }
    }
    
+   public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
+      $Path = GetValue('Path', $Args);
+      if (preg_match('`discussion\/(\d+)`i', $Path, $Matches)) {
+         $DiscussionID = $Matches[1];
+      } elseif(preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches)) {
+         $CommentID = $Matches[1];
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID);
+         $DiscussionID = GetValue('DiscussionID', $Comment);
+      }
+      
+      if (isset($DiscussionID)) {
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID($DiscussionID);
+         $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));
+      }
+   }
+   
    /**
 	 * Adds items to dashboard menu.
 	 * 

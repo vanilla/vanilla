@@ -1,6 +1,10 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
+   if ($.browser.msie) {
+      $('body').addClass('MSIE');
+   }
+   
    var d = new Date();
    var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
@@ -423,6 +427,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          type: 'post',
          url: StatsURL,
+         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
          success: function(json) {
             gdn.inform(json);
          }

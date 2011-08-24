@@ -854,12 +854,13 @@ class UserModel extends Gdn_Model {
    
                // Define the other required fields:
                $Fields['Email'] = $Email;
-   
-               // And insert the new user
-               $UserID = $this->_Insert($Fields);
-   
+               
+               $Fields['Roles'] = $RoleIDs;
                // Make sure that the user is assigned to one or more roles:
-               $SaveRoles = TRUE;
+               $SaveRoles = FALSE;
+   
+               // And insert the new user.
+               $UserID = $this->_Insert($Fields, $Settings);
    
                // Report that the user was created
                $Session = Gdn::Session();

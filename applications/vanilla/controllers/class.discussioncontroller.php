@@ -87,8 +87,9 @@ class DiscussionController extends VanillaController {
 
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
-      if ($Offset == '')
-         $this->DiscussionModel->AddView($DiscussionID, $this->Discussion->CountViews);
+      // NOTE: This has been moved to an event fired from analyticstick.
+//      if ($Offset == '')
+//         $this->DiscussionModel->AddView($DiscussionID, $this->Discussion->CountViews);
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {

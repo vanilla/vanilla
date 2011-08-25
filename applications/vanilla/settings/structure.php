@@ -191,6 +191,10 @@ $Construct->Table('Draft')
 // X added a discussion
 if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewDiscussion', 'FullHeadline' => '%1$s started a %8$s.', 'ProfileHeadline' => '%1$s started a %8$s.', 'RouteCode' => 'discussion', 'Public' => '0'));
+
+// X commented on a discussion.
+if ($SQL->GetWhere('ActivityType', array('Name' => 'NewComment'))->NumRows() == 0)
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0'));
    
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)

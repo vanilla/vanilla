@@ -919,8 +919,10 @@ class DiscussionModel extends VanillaModel {
 					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
                try {
-                  $this->NotifyNewDiscussion(array('DiscussionID' => $DiscussionID, 'Name' => $DiscussionName, 'InsertUserID' => $Session->UserID));
+                  $Fields['DiscussionID'] = $DiscussionID;
+                  $this->NotifyNewDiscussion($Fields);
                } catch(Exception $Ex) {
+                  throw $Ex;
                }
             }
             
@@ -991,10 +993,24 @@ class DiscussionModel extends VanillaModel {
 
       // Grab all of the users that need to be notified.
       $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      
+      // Grab all of their follow/unfollow preferences.
+      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
+      $CategoryID = $Discussion['CategoryID'];
+      $UserPrefs = $this->SQL
+         ->Select('*')
+         ->From('UserCategory')
+         ->Where('CategoryID', $CategoryID)
+         ->WhereIn('UserID', $UserIDs)
+         ->Get()->ResultArray();
+      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
 
       foreach ($Data as $Row) {
          $UserID = $Row['UserID'];
          if ($UserID == $Discussion['InsertUserID'])
+            continue;
+         
+         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
             continue;
 
          AddActivity($Discussion['InsertUserID'],

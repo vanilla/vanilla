@@ -882,12 +882,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param mixed $Options An array of options for the message. If not an array, it is assumed to be a string of CSS classes to apply to the message.
     */
    public function InformMessage($Message, $Options = 'Dismissable AutoDismiss') {
-      if (!$Message)
-         return;
-      
       // If $Options isn't an array of options, accept it as a string of css classes to be assigned to the message.
       if (!is_array($Options))
          $Options = array('CssClass' => $Options);
+      
+      if (!$Message && !array_key_exists('id', $Options))
+         return;
       
       $Options['Message'] = $Message;
       $this->_InformMessages[] = $Options;

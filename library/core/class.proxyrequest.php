@@ -457,7 +457,8 @@ class ProxyRequest {
       $Scheme = strtolower(GetValue('scheme', $UrlParts, 'http'));
       $Host = GetValue('host', $UrlParts, '');
       $Port = GetValue('port', $UrlParts, '80');
-      if (empty($Port)) $Port = 80;
+      if (empty($Port)) $Port = ($Scheme == 'https') ? 443 : 80;
+      
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;

@@ -418,13 +418,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
       if (!is_array($Name))
          $Name = array($Name);
       
-      $this->EventArguments['ConfigSave'] = $Save;
-      $this->EventArguments['ConfigPerform'] = TRUE;
-      $this->EventArguments['ConfigName'] = $Name;
-      $this->FireEvent('BeforeRemoveFromConfig');
-      
-      if (!$this->EventArguments['ConfigPerform']) return;
-      
       // Remove specified entries
       foreach ($Name as $k)
          $this->Remove($k, $Save);
@@ -554,13 +547,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
       
       if (!is_array($Name))
          $Name = array($Name => $Value);
-      
-      $this->EventArguments['ConfigSave'] = $Save;
-      $this->EventArguments['ConfigPerform'] = TRUE;
-      $this->EventArguments['ConfigName'] = $Name;
-      $this->FireEvent('BeforeSaveToConfig');
-      
-      if (!$this->EventArguments['ConfigPerform']) return;
       
       // Apply changes one by one
       $Result = TRUE;

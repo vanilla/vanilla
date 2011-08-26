@@ -106,6 +106,9 @@ class UserModel extends Gdn_Model {
     * are inserted in various methods depending on registration setups).
     */
    protected function _Insert($Fields, $Options = array()) {
+      $this->EventArguments['InsertFields'] =& $Fields;
+      $this->FireEvent('BeforeInsertUser');
+      
       // Massage the roles for email confirmation.
       if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
          TouchValue('Attributes', $Fields, array());

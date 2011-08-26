@@ -454,14 +454,21 @@ class ProxyRequest {
       $this->Action("Requesting {$Url}");
 
       $UrlParts = parse_url($Url);
+      
+      // Extract scheme
       $Scheme = strtolower(GetValue('scheme', $UrlParts, 'http'));
       $this->Action(" scheme: {$Scheme}");
+      
+      // Extract hostname
       $Host = GetValue('host', $UrlParts, '');
       $this->Action(" host: {$Host}");
+      
+      // Extract / deduce port
       $Port = GetValue('port', $UrlParts, NULL);
       if (empty($Port)) $Port = ($Scheme == 'https') ? 443 : 80;
       $this->Action(" port: {$Port}");
       
+      // Extract Path&Query
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;

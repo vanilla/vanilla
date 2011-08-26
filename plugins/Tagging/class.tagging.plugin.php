@@ -265,7 +265,12 @@ class TaggingPlugin extends Gdn_Plugin {
       $Data = array();
       $Database = Gdn::Database();
       if ($Query) {
-         $TagData = $Database->SQL()->Select('TagID, Name')->From('Tag')->Like('Name', $Query)->Get();
+         $Test = Gdn::SQL()->Limit(1)->Get('Tag')->FirstRow(DATASET_TYPE_ARRAY);
+         if (isset($Test['Archived'])) {
+            Gdn::SQL()->Where('Archived', 0);
+         }
+         
+         $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Like('Name', $Query)->Limit(20)->Get();
          foreach ($TagData as $Tag) {
             $Data[] = array('id' => $Tag->Name, 'name' => $Tag->Name);
          }

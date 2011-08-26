@@ -253,6 +253,31 @@ class Gdn_Validation {
          
       $this->_ApplyRule($FieldName, $RuleName, $CustomError);
    }
+   
+   /**
+    * Apply an array of validation rules all at once.
+    * @param array $Fields 
+    */
+   public function ApplyRules($Fields) {
+      foreach ($Fields as $Index => $Row) {
+         $Validation = GetValue('Validation', $Row);
+         if (!$Validation)
+            continue;
+         
+         $FieldName = GetValue('Name', $Row, $Index);
+         if (is_string($Validation)) {
+            $this->ApplyRule($FieldName, $Validation);
+         } elseif (is_array($Validation)) {
+            foreach ($Validation as $Rule) {
+               if (is_array($Rule)) {
+                  $this->ApplyRule($FieldName, $Rule[0], $Rule[1]);
+               } else {
+                  $this->ApplyRule($FieldName, $Rule);
+               }
+            }
+         }
+      }
+   }
       
    protected function _ApplyRule($FieldName, $RuleName, $CustomError = '') {
       if (!is_array($this->_FieldRules))

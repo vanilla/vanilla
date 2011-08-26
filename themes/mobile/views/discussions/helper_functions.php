@@ -23,13 +23,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-      if ($Discussion->FirstPhoto) {
-         $PhotoImage = $Discussion->FirstPhoto;
-         if (!StringBeginsWith($Discussion->FirstPhoto, 'http'))
-            $PhotoImage = ChangeBasename($Discussion->FirstPhoto, 'n%s');
-         $PhotoUrl = Gdn_Upload::Url($PhotoImage);
-         echo Img($PhotoUrl, array('alt' => $Discussion->FirstName));
-		}
+      echo UserPhoto(UserBuilder($Discussion, 'First'));
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>

@@ -886,6 +886,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!is_array($Options))
          $Options = array('CssClass' => $Options);
       
+      if (!$Message && !array_key_exists('id', $Options))
+         return;
+      
       $Options['Message'] = $Message;
       $this->_InformMessages[] = $Options;
    }

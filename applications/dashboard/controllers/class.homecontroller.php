@@ -47,7 +47,7 @@ class HomeController extends Gdn_Controller {
     */
    public function Index() {
       $this->View = 'FileNotFound';
-      $this->Render();
+      $this->FileNotFound();
    }
    
    /**
@@ -58,9 +58,10 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function FileNotFound() {
-      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+         header("HTTP/1.0 404", TRUE, 404);
          $this->Render();
-      else
+      } else
          $this->RenderException(NotFoundException());
    }
    
@@ -71,6 +72,7 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function UpdateMode() {
+      header("HTTP/1.0 503", TRUE, 503);
       $this->SetData('UpdateMode', TRUE);
       $this->Render();
    }
@@ -82,6 +84,7 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function Deleted() {
+      header("HTTP/1.0 410", TRUE, 410);
       $this->Render();
    }
    
@@ -112,9 +115,10 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function Permission() {
-      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+         header("HTTP/1.0 401", TRUE, 401);
          $this->Render();
-      else
+      } else
          $this->RenderException(PermissionException());
    }
    

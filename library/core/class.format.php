@@ -307,23 +307,27 @@ class Gdn_Format {
     * @return string The formatted number.
     * @todo Make this locale aware.
     */
-   public static function BigNumber($Number) {
+   public static function BigNumber($Number, $Format = '') {
       if (!is_numeric($Number))
          return $Number;
 
       if ($Number >= 1000000000) {
-         $Number = $Number / 1000000000;
+         $Number2 = $Number / 1000000000;
          $Suffix = "B";
       } elseif ($Number >= 1000000) {
-         $Number = $Number / 1000000;
+         $Number2 = $Number / 1000000;
          $Suffix = "M";
       } elseif ($Number >= 1000) {
-         $Number = $Number / 1000;
+         $Number2 = $Number / 1000;
          $Suffix = "K";
       }
 
       if (isset($Suffix)) {
-         return number_format($Number, 1).$Suffix;
+         $Result = number_format($Number2, 1).$Suffix;
+         if ($Format == 'html') {
+            $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
+         }
+         return $Result;
       } else {
          return $Number;
       }
@@ -1062,7 +1066,7 @@ EOT;
          return self::To($Mixed, 'Text');
       else {
          $Charset = C('Garden.Charset', 'UTF-8');
-         $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', ' ', html_entity_decode($Mixed, ENT_QUOTES, $Charset))), ENT_QUOTES, $Charset);
+         $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n", html_entity_decode($Mixed, ENT_QUOTES, $Charset))), ENT_QUOTES, $Charset);
          if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
             $Result = nl2br(trim($Result));
          return $Result;

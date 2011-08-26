@@ -165,6 +165,7 @@ class FacebookPlugin extends Gdn_Plugin {
          curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
          curl_setopt($C, CURLOPT_URL, $Url);
          $Contents = curl_exec($C);
+//         $Contents = ProxyRequest($Url);
          $Info = curl_getinfo($C);
          if (strpos(GetValue('content_type', $Info, ''), '/javascript') !== FALSE) {
             $Tokens = json_decode($Contents, TRUE);
@@ -214,8 +215,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
    public function GetProfile($AccessToken) {
       $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
-
-      $Contents = file_get_contents($Url);
+      $Contents = ProxyRequest($Url);
       $Profile = json_decode($Contents, TRUE);
       return $Profile;
    }
@@ -274,8 +274,6 @@ class FacebookPlugin extends Gdn_Plugin {
    
    public function Setup() {
       $Error = '';
-      if (!ini_get('allow_url_fopen'))
-         $Error = ConcatSep("\n", $Error, 'This plugin requires the allow_url_fopen php.ini setting.');
       if (!function_exists('curl_init'))
          $Error = ConcatSep("\n", $Error, 'This plugin requires curl.');
       if ($Error)

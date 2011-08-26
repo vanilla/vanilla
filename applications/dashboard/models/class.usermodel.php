@@ -106,6 +106,9 @@ class UserModel extends Gdn_Model {
     * are inserted in various methods depending on registration setups).
     */
    protected function _Insert($Fields, $Options = array()) {
+      $this->EventArguments['InsertFields'] =& $Fields;
+      $this->FireEvent('BeforeInsertUser');
+      
       // Massage the roles for email confirmation.
       if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
          TouchValue('Attributes', $Fields, array());
@@ -854,12 +857,13 @@ class UserModel extends Gdn_Model {
    
                // Define the other required fields:
                $Fields['Email'] = $Email;
-   
-               // And insert the new user
-               $UserID = $this->_Insert($Fields);
-   
+               
+               $Fields['Roles'] = $RoleIDs;
                // Make sure that the user is assigned to one or more roles:
-               $SaveRoles = TRUE;
+               $SaveRoles = FALSE;
+   
+               // And insert the new user.
+               $UserID = $this->_Insert($Fields, $Settings);
    
                // Report that the user was created
                $Session = Gdn::Session();

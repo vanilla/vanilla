@@ -240,8 +240,10 @@ class SettingsController extends Gdn_Controller {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
-      // Load all roles with editable permissions
+      // Load all roles with editable permissions.
       $this->RoleArray = $RoleModel->GetArray();
+      
+      $this->FireEvent('AddEditCategory');
       
       if ($this->Form->AuthenticatedPostBack() == FALSE) {
 			$this->Form->AddHidden('CodeIsDefined', '0');
@@ -390,6 +392,8 @@ class SettingsController extends Gdn_Controller {
       
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();
+      
+      $this->FireEvent('AddEditCategory');
       
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($this->Category);

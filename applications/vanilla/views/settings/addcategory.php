@@ -35,7 +35,11 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Description', array('MultiLine' => TRUE));
       ?>
    </li>
-	
+   <?php
+   echo $this->Form->Simple(
+      $this->Data('_ExtendedFields', array()),
+      array('Wrap' => array('', '')));
+   ?>
 	<?php if(count($this->PermissionData) > 0) { ?>
    <li id="Permissions">
       <?php

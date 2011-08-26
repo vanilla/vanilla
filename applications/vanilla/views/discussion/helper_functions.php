@@ -57,6 +57,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             ?>
          </span>
          <?php
+         if ($Source = GetValue('Source', $Object)) {
+            echo sprintf(T('via %s'), T($Source.' Source', $Source));
+         }
+         
 			WriteOptionList($Object, $Sender, $Session);
 			?>
          <div class="CommentInfo">

@@ -98,7 +98,7 @@ class ProfileController extends Gdn_Controller {
       } else {
          $this->ProfileUserID = $this->User->UserID;
 			$Limit = 50;
-         $this->ActivityData = $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit);
+         $this->SetData('ActivityData', $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit), TRUE);
 			$TotalRecords = $this->ActivityModel->GetCount($this->User->UserID);
          if ($this->ActivityData->NumRows() > 0) {
             $ActivityData = $this->ActivityData->Result();

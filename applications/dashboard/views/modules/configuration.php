@@ -22,6 +22,11 @@ echo $Form->Errors();
          $Description = '<div class="Info">'.$Description.'</div>';
 
       switch (strtolower($Row['Control'])) {
+         case 'categorydropdown':
+            echo $Form->Label($LabelCode, $Row['Name']);
+            echo $Description;
+            echo $Form->CategoryDropDown($Row['Name'], $Row['Options']);
+            break;
          case 'checkbox':
             echo $Description;
             echo $Form->CheckBox($Row['Name'], T($LabelCode));

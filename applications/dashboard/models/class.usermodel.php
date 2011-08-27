@@ -41,10 +41,10 @@ class UserModel extends Gdn_Model {
 
    public function ConfirmEmail($User, $EmailKey) {
       $Attributes = GetValue('Attributes', $User);
-      $EmailKey2 = GetValue('EmailKey', $Attributes);
+      $StoredEmailKey = GetValue('EmailKey', $Attributes);
       $UserID = GetValue('UserID', $User);
       
-      if (!$EmailKey2 || $EmailKey != $EmailKey2) {
+      if (!$StoredEmailKey || $EmailKey != $StoredEmailKey) {
          $this->Validation->AddValidationResult('EmailKey', '@'.T('Couldn\'t confirm email.',
             'We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.'));
          return FALSE;
@@ -52,6 +52,9 @@ class UserModel extends Gdn_Model {
 
       // Update the user's roles.
       $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
+      $this->EventArguments['ConfirmUserID'] = $UserID;
+      $this->EventArguments['ConfirmUserRoles'] = &$Roles;
+      $this->FireEvent('BeforeConfirmEmail');
       $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
@@ -103,6 +106,9 @@ class UserModel extends Gdn_Model {
     * are inserted in various methods depending on registration setups).
     */
    protected function _Insert($Fields, $Options = array()) {
+      $this->EventArguments['InsertFields'] =& $Fields;
+      $this->FireEvent('BeforeInsertUser');
+      
       // Massage the roles for email confirmation.
       if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
          TouchValue('Attributes', $Fields, array());
@@ -501,6 +507,7 @@ class UserModel extends Gdn_Model {
          
          foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
             $Data[$DatabaseUserID] = $DatabaseUser;
+            $this->SetCalculatedFields($DatabaseUser);
             $this->UserCache($DatabaseUser);
          }
       }
@@ -859,12 +866,13 @@ class UserModel extends Gdn_Model {
    
                // Define the other required fields:
                $Fields['Email'] = $Email;
-   
-               // And insert the new user
-               $UserID = $this->_Insert($Fields);
-   
+               
+               $Fields['Roles'] = $RoleIDs;
                // Make sure that the user is assigned to one or more roles:
-               $SaveRoles = TRUE;
+               $SaveRoles = FALSE;
+   
+               // And insert the new user.
+               $UserID = $this->_Insert($Fields, $Settings);
    
                // Report that the user was created
                $Session = Gdn::Session();
@@ -1983,10 +1991,10 @@ class UserModel extends Gdn_Model {
       elseif (is_string($User)) {
          $User = $this->GetByEmail($User);
       }
-
+      
       if (!$User)
          throw NotFoundException('User');
-
+      
       $User = (array)$User;
 
       if (is_string($User['Attributes']))

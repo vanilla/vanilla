@@ -160,8 +160,8 @@ function Picker() {
       var PercStart = (MilliStartDiff / this.Axis.Diff.Milli) * 100;
       var PercEnd = (MilliEndDiff / this.Axis.Diff.Milli) * 100;
       
-      this.DoMoveHandle(this.HandleStart, PercStart);
-      this.DoMoveHandle(this.HandleEnd, PercEnd);
+      this.DoMoveHandle(this.HandleStart, PercStart, false, RangeStart);
+      this.DoMoveHandle(this.HandleEnd, PercEnd, false, RangeEnd);
       
       this.SyncSlider();
      
@@ -205,7 +205,7 @@ function Picker() {
       $(this.Range).css('width',PercDiff+'%');
    }
    
-   Picker.prototype.DoMoveHandle = function(Handle, ProposedPercX, Manual) {
+   Picker.prototype.DoMoveHandle = function(Handle, ProposedPercX, Manual, SetDate) {
       if (Manual != true && this.Nudge == true) {
          var AllowedMinMax = Handle.get(0).limit();
          if (ProposedPercX > AllowedMinMax.right || ProposedPercX < AllowedMinMax.left) {
@@ -220,6 +220,10 @@ function Picker() {
       RealPercX = (RealPercX > AllowedMinMax.right) ? AllowedMinMax.right : RealPercX;
       var CurrentPercX = this.ToPerc($(Handle).css('left'));
       $(Handle).css('left',RealPercX+'%');
+      
+      if (SetDate != undefined) {
+         Handle.html(this.GetStrDate(SetDate));
+      }
       
       return {
          'Ref': AllowedMinMax.Ref,
@@ -511,17 +515,24 @@ function Picker() {
 
       CurrentDate = false;      
       if (DateType == 'string') {
-   
          var CurrentDate = new Date();
-         var DatePart = DateItem.split(' ').shift();
-         var DateParts = DatePart.split('-');
          
-         // Retardo month indexing from 0
-         DateParts[1] = parseInt(DateParts[1]) - 1;
-         
-         CurrentDate.setFullYear(DateParts[0]);
-         CurrentDate.setMonth(DateParts[1]);
-         CurrentDate.setDate(DateParts[2]);
+         var dateRegex1 = /(\d{1,2})\/(\d{1,2})\/(\d{4})/;
+         var dateMatch = dateRegex1.exec(DateItem);
+         if (dateMatch != null) {
+            CurrentDate.setMonth(parseInt(dateMatch[1], 10) - 1);
+            CurrentDate.setDate(dateMatch[2]);
+            CurrentDate.setFullYear(dateMatch[3]);
+         } else {
+            var DatePart = DateItem.split(' ').shift();
+            var DateParts = DatePart.split('-');
+
+            // Retardo month indexing from 0
+            DateParts[1] = parseInt(DateParts[1], 10) - 1;
+            CurrentDate.setFullYear(DateParts[0]);
+            CurrentDate.setMonth(DateParts[1]);
+            CurrentDate.setDate(DateParts[2]);
+         }
       }
       else {
          return new Date(DateItem);

@@ -80,9 +80,20 @@ class VanillaHooks implements Gdn_IPlugin {
                ->Where('DiscussionID', $Row['DiscussionID'])
                ->Put();
          }
-
+         
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         
+         // Delete the user's dicussions 
+         $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
+         // Erase the user's dicussions
+         $Sender->SQL->Update('Discussion')
+            ->Set('Body', T('The user and all related content has been deleted.'))
+            ->Set('Format', 'Deleted')
+            ->Where('InsertUserID', $UserID)
+            ->Put();
+         
+         // Erase the user's comments
 			$Sender->SQL->From('Comment')
 				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
 				->Delete('Comment c', array('d.InsertUserID' => $UserID));
@@ -95,7 +106,6 @@ class VanillaHooks implements Gdn_IPlugin {
       } else {
          // Leave comments
       }
-		$Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
 
       // Remove the user's profile information related to this application
       $Sender->SQL->Update('User')
@@ -129,7 +139,13 @@ class VanillaHooks implements Gdn_IPlugin {
          if ($PermissionModel === NULL)
             $PermissionModel = new PermissionModel();
          
-         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $CategoryID);
+         $Category = CategoryModel::Categories($CategoryID);
+         if ($Category)
+            $PermissionCategoryID = $Category['PermissionCategoryID'];
+         else
+            $PermissionCategoryID = -1;
+         
+         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
          return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
@@ -194,6 +210,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow'))
          $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');
+         $Sender->Preferences['Notifications']['Email.NewComment'] = array(T('Notify me when people comment on a discussion.'), 'Meta');
 //      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
    }
 	
@@ -369,6 +386,24 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Spam.Manage';
+      }
+   }
+   
+   public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
+      $Path = GetValue('Path', $Args);
+      if (preg_match('`discussion\/(\d+)`i', $Path, $Matches)) {
+         $DiscussionID = $Matches[1];
+      } elseif(preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches)) {
+         $CommentID = $Matches[1];
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID);
+         $DiscussionID = GetValue('DiscussionID', $Comment);
+      }
+      
+      if (isset($DiscussionID)) {
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID($DiscussionID);
+         $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));
       }
    }
    

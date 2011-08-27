@@ -1,6 +1,10 @@
 
 // This file contains javascript that is global to the entire Garden application
 jQuery(document).ready(function($) {
+   if ($.browser.msie) {
+      $('body').addClass('MSIE');
+   }
+   
    var d = new Date();
    var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
@@ -58,6 +62,14 @@ jQuery(document).ready(function($) {
       }
          
       return def;
+   }
+   
+   gdn.elementSupports = function(element, attribute) {
+      var test = document.createElement(element);
+      if (attribute in test)
+         return true;
+      else
+         return false;
    }
 
    // Go to notifications if clicking on a user's notification count
@@ -306,18 +318,40 @@ jQuery(document).ready(function($) {
       return urlFormat.replace("{Path}", path);
    };
 
-   // Fill the search input with "search" if empty and blurred
-   var searchText = gdn.definition('Search', 'Search');
-   if (!$('div.Search input.InputBox').val())
-      $('div.Search input.InputBox').val(searchText);
-   $('div.Search input.InputBox').blur(function() {
-      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
-         $(this).val(searchText);
-   });
-   $('div.Search input.InputBox').focus(function() {
-      if ($(this).val() == searchText)
-         $(this).val('');
-   });
+   // Fill in placeholders.
+   if (!gdn.elementSupports('input', 'placeholder')) {
+      $('input:text').each(function() {
+         var $this = $(this);
+         var placeholder = $this.attr('placeholder');
+         
+         if (!$this.val() && placeholder) {
+            $this.val(placeholder);
+            $this.blur(function() {
+               $this.val(placeholder);
+            });
+            $this.focus(function() {
+               if ($this.val() == placeholder)
+                  $this.val('');
+            });
+            $this.closest('form').bind('submit', function() {
+               if ($this.val() == placeholder)
+                  $this.val('');
+            });
+         }
+      });
+   }
+   
+//   var searchText = gdn.definition('Search', 'Search');
+//   if (!$('div.Search input.InputBox').val())
+//      $('div.Search input.InputBox').val(searchText);
+//   $('div.Search input.InputBox').blur(function() {
+//      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
+//         $(this).val(searchText);
+//   });
+//   $('div.Search input.InputBox').focus(function() {
+//      if ($(this).val() == searchText)
+//         $(this).val('');
+//   });
 
    $.fn.popin = function(options) {
      this.each(function(i, elem) {
@@ -393,6 +427,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          type: 'post',
          url: StatsURL,
+         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
          success: function(json) {
             gdn.inform(json);
          }

@@ -258,6 +258,6 @@ class Gdn_Theme {
    }
 
    public static function Text($Code, $Default) {
-      return T('Theme_'.$Code, $Default);
+      return C("ThemeOption.{$Code}", T('Theme_'.$Code, $Default));
    }
 }

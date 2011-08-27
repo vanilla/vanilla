@@ -23,7 +23,7 @@ echo Wrap(sprintf(
       <?php
          echo '<p><div class="Category">';
          echo $this->Form->Label('Category', 'CategoryID'), ' ';
-         echo $this->Form->DropDown('CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID'));
+         echo $this->Form->CategoryDropDown();
          echo '</div></p>';
       ?>
    </li>

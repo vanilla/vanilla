@@ -1615,7 +1615,7 @@ if (!function_exists('ProxyRequest')) {
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
       $Host = GetValue('host', $UrlParts, '');
-      $Port = GetValue('port', $UrlParts, '80');
+      $Port = GetValue('port', $UrlParts, $Scheme == 'https' ? '443' : '80');
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
       // Get the cookie.
@@ -1638,6 +1638,7 @@ if (!function_exists('ProxyRequest')) {
          $Handler = curl_init();
          curl_setopt($Handler, CURLOPT_URL, $Url);
          curl_setopt($Handler, CURLOPT_PORT, $Port);
+         curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, FALSE);
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
@@ -1756,6 +1757,29 @@ if (!function_exists('RandomString')) {
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
         $Offset = mt_rand() % $CharLen;
+        $String .= substr($Characters, $Offset, 1);
+      }
+      return $String;
+   }
+}
+
+if (!function_exists('BetterRandomString')) {
+   function BetterRandomString($Length, $CharacterOptions = 'A0') {
+      $CharacterClasses = array(
+          'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          'a' => 'abcdefghijklmnopqrstuvwxyz',
+          '0' => '0123456789',
+          '!' => '~!@#$^&*_+-'
+      );
+
+      $Characters = '';
+      for ($i=0;$i<strlen($CharacterOptions);$i++)
+         $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+
+      $CharLen = strlen($Characters) - 1;
+      $String = '' ;
+      for ($i = 0; $i < $Length; ++$i) {
+        $Offset = rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
       return $String;

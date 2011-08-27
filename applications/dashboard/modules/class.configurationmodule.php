@@ -107,6 +107,8 @@ class ConfigurationModule extends Gdn_Module {
       $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
       $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
       $LabelCode = trim($LabelCode);
+      
+      $LabelCode = StringEndsWith($LabelCode, " ID", TRUE, TRUE);
 
       return $LabelCode;
    }

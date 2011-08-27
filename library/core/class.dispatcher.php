@@ -187,12 +187,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       try {
          $BlockExceptions = array(
-             'utility'                 => self::BLOCK_NEVER,
-             'plugin'                  => self::BLOCK_NEVER,
-             'entry'                   => self::BLOCK_PERMISSION,
-             'user/usernameavailable'  => self::BLOCK_PERMISSION,
-             'user/emailavailable'     => self::BLOCK_PERMISSION,
-             'home/termsofservice'     => self::BLOCK_PERMISSION
+             '/utility(\/.*)?$/'                   => self::BLOCK_NEVER,
+             '/plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
+             '/entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
+             '/user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
+             '/user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
+             '/home\/termsofservice(\/.*)?$/'      => self::BLOCK_PERMISSION
          );
          
          $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
@@ -200,7 +200,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          $PathRequest = Gdn::Request()->Path();
          foreach ($BlockExceptions as $BlockException => $BlockLevel)
-            if (StringBeginsWith ($PathRequest, $BlockException))
+            if (preg_match($BlockException, $PathRequest))
                throw new Exception("Block detected", $BlockLevel);
          
          // Never block an admin

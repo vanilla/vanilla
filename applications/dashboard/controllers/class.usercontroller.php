@@ -118,7 +118,7 @@ class UserController extends DashboardController {
             // this themselves
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
 
-            $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE));
+            $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE, 'NoConfirmEmail' => TRUE));
             if ($NewUserID !== FALSE) {
                $Password = $this->Form->GetValue('Password', '');
                $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');

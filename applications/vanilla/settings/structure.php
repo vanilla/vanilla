@@ -51,7 +51,7 @@ if ($SQL->GetWhere('Category', array('CategoryID' => -1))->NumRows() == 0) {
    $RootCategoryInserted = TRUE;
 }
 
-if ($Drop) {
+if ($Drop || !$CategoryExists) {
    $SQL->Insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::ToDateTime(), 'DateUpdated' => Gdn_Format::ToDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
    if (!C('Garden.Permissions.Disabled.Category')) {
@@ -191,6 +191,10 @@ $Construct->Table('Draft')
 // X added a discussion
 if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewDiscussion', 'FullHeadline' => '%1$s started a %8$s.', 'ProfileHeadline' => '%1$s started a %8$s.', 'RouteCode' => 'discussion', 'Public' => '0'));
+
+// X commented on a discussion.
+if ($SQL->GetWhere('ActivityType', array('Name' => 'NewComment'))->NumRows() == 0)
+   $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0'));
    
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)

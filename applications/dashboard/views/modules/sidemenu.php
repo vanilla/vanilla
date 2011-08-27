@@ -18,7 +18,7 @@
          // Loop through all the links in the group.
          foreach ($Item['Links'] as $Link) {
             echo "\n  <li".Attribute($Link['Attributes']).">",
-               Anchor($Link['Text'], $Link['Url']);
+               Anchor($Link['Text'], $Link['Url']),
                '</li>';
          }
 

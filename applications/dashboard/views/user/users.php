@@ -33,12 +33,15 @@ foreach ($this->UserData->Result() as $User) {
          $this->FireEvent('UserCell');
       ?>
       <?php if ($EditUser || $DeleteUser) { ?>
-         <td><?php
+         <td><?php   
          if ($EditUser)
             echo Anchor(T('Edit'), '/user/edit/'.$User->UserID, 'Popup SmallButton');
             
          if ($DeleteUser && $User->UserID != $Session->User->UserID)
             echo Anchor(T('Delete'), '/user/delete/'.$User->UserID, 'SmallButton');
+         
+         $this->EventArguments['User'] = $User;
+         $this->FireEvent('UserListOptions');
          ?></td>
       <?php } ?>
    </tr>

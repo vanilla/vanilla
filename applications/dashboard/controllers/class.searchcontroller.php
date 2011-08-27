@@ -46,13 +46,13 @@ class SearchController extends Gdn_Controller {
       parent::Initialize();
    }
 	
-	public function Index($Offset = 0, $Limit = NULL) {
+	public function Index($Page = '') {
 		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
 		$this->Title(T('Search'));
-
-		if(!is_numeric($Limit))
-			$Limit = Gdn::Config('Garden.Search.PerPage', 20);
+      
+      list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
+      $this->SetData('_Limit', $Limit);
 		
 		$Search = $this->Form->GetFormValue('Search');
       $Mode = $this->Form->GetFormValue('Mode');
@@ -64,8 +64,10 @@ class SearchController extends Gdn_Controller {
          $this->Form->AddError($Ex);
          $ResultSet = array();
       } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
          $ResultSet = array();
       }
+      Gdn::UserModel()->JoinUsers($ResultSet, array('UserID'));
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
 		if($ResultSet)

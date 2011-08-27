@@ -430,12 +430,13 @@ $Construct->Table('Tag')
    ->Column('Name', 'varchar(255)', 'unique')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Column('Archived', 'tinyint(1)', 0)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity'), FALSE, 'index')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record

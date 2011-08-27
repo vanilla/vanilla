@@ -32,7 +32,27 @@ class Gdn_Memcached extends Gdn_Cache {
       parent::__construct();
       $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
       
-      $this->Memcache = new Memcached;
+      // Allow persistent connections
+      
+      /**
+       * EXTREMELY IMPORTANT NOTE!!
+       * There is a bug in Libmemcached which causes persistent connections not 
+       * to be recycled, thereby initiating a spiral of memory loss. DO NOT USE
+       * THIS UNLESS YOU ARE QUITE CERTAIN THIS IS SOLVED!
+       */
+      
+      $Persist = $this->Config(Gdn_Cache::CONTAINER_PERSISTENT);
+      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT)) {
+         $PoolSize = $this->Config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
+         $PoolKeyFormat = $this->Config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
+         $PoolIndex = mt_rand(1, $PoolSize);
+         $PoolKey = sprintf($PoolKeyFormat, $PoolIndex);
+         $this->Memcache = new Memcached($PoolKey);
+         
+         var_dump($this->Memcache->isPersistent());
+      } else {
+         $this->Memcache = new Memcached;
+      }
       
       $this->RegisterFeature(Gdn_Cache::FEATURE_COMPRESS, Memcached::OPT_COMPRESSION);
       $this->RegisterFeature(Gdn_Cache::FEATURE_EXPIRY);
@@ -48,18 +68,9 @@ class Gdn_Memcached extends Gdn_Cache {
          Gdn_Cache::FEATURE_FORCEPREFIX   => NULL
       );
       
-//      $this->Memcache->setOption(Memcached::OPT_DISTRIBUTION, GetValue(Gdn_Cache::CONTAINER_PERSISTENT,$FinalContainer))
-//      
-//      $this->Memcache->setOption(Memcached::OPT_COMPRESSION, GetValue(Gdn_Cache::CONTAINER_PERSISTENT,$FinalContainer))
-//         GetValue(Gdn_Cache::CONTAINER_TIMEOUT,$FinalContainer),
-//         GetValue(Gdn_Cache::CONTAINER_RETRYINT,$FinalContainer),
-//         GetValue(Gdn_Cache::CONTAINER_ONLINE,$FinalContainer),
-//         GetValue(Gdn_Cache::CONTAINER_CALLBACK,$FinalContainer)
-//      );
-      
       foreach ($this->Option(NULL, array()) as $Option => $OptValue)
          $this->Memcache->setOption($Option, $OptValue);
-
+      
    }
    
    /**

@@ -68,11 +68,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
-         ->Select('ca.Name', '', 'Category')
-         ->Select('ca.UrlCode', '', 'CategoryUrlCode')
-         ->Select('ca.PermissionCategoryID')
-         ->From('Discussion d')
-         ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left'); // Category
+         ->From('Discussion d');
       
       if ($Join) {
          $this->SQL
@@ -84,7 +80,13 @@ class DiscussionModel extends VanillaModel {
             ->Select('lcu.Name', '', 'LastName')
             ->Select('lcu.Photo', '', 'LastPhoto')
             ->Select('lcu.Email', '', 'LastEmail')
-            ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left'); // Last comment user
+            ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
+         
+            ->Select('ca.Name', '', 'Category')
+            ->Select('ca.UrlCode', '', 'CategoryUrlCode')
+            ->Select('ca.PermissionCategoryID')
+            ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left'); // Category
+         
       }
 		
 		// Add any additional fields that were requested	
@@ -186,6 +188,9 @@ class DiscussionModel extends VanillaModel {
       
       // Join in the users.
       Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
+//      print_r($Data);
+//      die();
 		
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
@@ -386,6 +391,7 @@ class DiscussionModel extends VanillaModel {
          $this->AddDenormalizedViews($Data);
       
       Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
       
 		// Prep and fire event
 		$this->EventArguments['Data'] = $Data;
@@ -435,25 +441,24 @@ class DiscussionModel extends VanillaModel {
          } else {
             $SQL = Gdn::SQL();
             
-            $Data = $SQL
-               ->Select('c.CategoryID')
-               ->From('Category c')
-               ->Permission('Vanilla.Discussions.View', 'c', 'PermissionCategoryID', 'Category')
-               ->Get();
+            $Categories = CategoryModel::Categories();
+            $IDs = array();
             
-            $Data = $Data->ResultArray();
+            foreach ($Categories as $ID => $Category) {
+               if ($Category['PermsDiscussionsView']) {
+                  $IDs[] = $ID;
+               }
+            }
 
             // Check to see if the user has permission to all categories. This is for speed.
-            $CategoryCount = $SQL
-               ->Select('c.CategoryID', 'count', 'CategoryCount')
-               ->From('Category c')
-               ->Get()->Value('CategoryCount', 0);
-            if (count($Data) == $CategoryCount)
+            $CategoryCount = count($Categories);
+            
+            if (count($IDs) == $CategoryCount)
                self::$_CategoryPermissions = TRUE;
             else {
                self::$_CategoryPermissions = array();
-               foreach($Data as $Row) {
-                  self::$_CategoryPermissions[] = ($Escape ? '@' : '').$Row['CategoryID'];
+               foreach($IDs as $ID) {
+                  self::$_CategoryPermissions[] = ($Escape ? '@' : '').$ID;
                }
             }
          }
@@ -621,6 +626,7 @@ class DiscussionModel extends VanillaModel {
       // Join in the users.
       $Data = array($Data);
       Gdn::UserModel()->JoinUsers($Data, array('LastUserID', 'InsertUserID'));
+      CategoryModel::JoinCategories($Data);
       $Data = $Data[0];
       
 //         ->Select('lcu.Name', '', 'LastName')
@@ -913,8 +919,10 @@ class DiscussionModel extends VanillaModel {
 					
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
                try {
-                  $this->NotifyNewDiscussion(array('DiscussionID' => $DiscussionID, 'Name' => $DiscussionName, 'InsertUserID' => $Session->UserID));
+                  $Fields['DiscussionID'] = $DiscussionID;
+                  $this->NotifyNewDiscussion($Fields);
                } catch(Exception $Ex) {
+                  throw $Ex;
                }
             }
             
@@ -983,12 +991,26 @@ class DiscussionModel extends VanillaModel {
          $Discussion = $this->GetID($Discussion);
       }
 
-      // Grab all of the users that are need to be notified.
+      // Grab all of the users that need to be notified.
       $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      
+      // Grab all of their follow/unfollow preferences.
+      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
+      $CategoryID = $Discussion['CategoryID'];
+      $UserPrefs = $this->SQL
+         ->Select('*')
+         ->From('UserCategory')
+         ->Where('CategoryID', $CategoryID)
+         ->WhereIn('UserID', $UserIDs)
+         ->Get()->ResultArray();
+      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
 
       foreach ($Data as $Row) {
          $UserID = $Row['UserID'];
          if ($UserID == $Discussion['InsertUserID'])
+            continue;
+         
+         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
             continue;
 
          AddActivity($Discussion['InsertUserID'],
@@ -1058,12 +1080,10 @@ class DiscussionModel extends VanillaModel {
                ->Set('LastCommentID', NULL);
          }
          
-         $this->SQL
-            ->Update('Category')
-            ->Set('CountDiscussions', $CountDiscussions)
-            ->Set('CountComments', $CountComments)
-            ->Where('CategoryID', $CategoryID)
-            ->Put();
+         $CategoryModel = new CategoryModel();
+         $CategoryModel->SetField($CategoryID,
+            array('CountDiscussions' => $CountDiscussions,
+               'CountComments' => $CountComments));
       }
    }
 	

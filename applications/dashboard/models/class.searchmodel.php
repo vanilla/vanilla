@@ -84,7 +84,7 @@ class SearchModel extends Gdn_Model {
          if (strpos($Search, '+') !== FALSE || strpos($Search, '-') !== FALSE)
             $SearchMode = 'boolean';
          else
-            $SearcMode = 'match';
+            $SearchMode = 'match';
       } else {
          $this->_SearchMode = $SearchMode;
       }

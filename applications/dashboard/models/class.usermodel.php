@@ -145,6 +145,13 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
    
+   /**
+    * Add user data to a result set.
+    *
+    * @param object $Data Results we need to associate user data with.
+    * @param array $Columns Database columns containing UserIDs to get data for.
+    * @param array $Options Optionally pass list of user data to collect with key 'Join'.
+    */
    public function JoinUsers(&$Data, $Columns, $Options = array()) {
       // Grab all of the user fields that need to be joined.
       $UserIDs = array();
@@ -157,11 +164,13 @@ class UserModel extends Gdn_Model {
       // Get the users.
       $Users = $this->GetIDs(array_keys($UserIDs));
       
+      // Get column name prefix (ex: 'Insert' from 'InsertUserID')
       $Prefixes = array();
       foreach ($Columns as $ColumnName) {
          $Prefixes[] = StringEndsWith($ColumnName, 'UserID', TRUE, TRUE);
       }
       
+      // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
       $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
       
       foreach ($Data as &$Row) {

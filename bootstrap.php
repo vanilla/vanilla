@@ -8,7 +8,7 @@
  * No Garden features are available yet.
  */
 if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
-	require_once(PATH_ROOT.'/conf/bootstrap.before.php');
+   require_once(PATH_ROOT.'/conf/bootstrap.before.php');
 
 /**
  * Define Core Constants
@@ -59,7 +59,7 @@ Gdn::Config()->Caching(TRUE);
  * here, but some things have already been loaded and are immutable.
  */
 if (file_exists(PATH_CONF.'/bootstrap.early.php'))
-	require_once(PATH_CONF.'/bootstrap.early.php');
+   require_once(PATH_CONF.'/bootstrap.early.php');
 
 Debug(C('Debug', FALSE));
 
@@ -87,7 +87,7 @@ Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 // Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder)
-	Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+   Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
    
 /**
  * Installer Redirect
@@ -110,7 +110,7 @@ Gdn::Config()->OverlayDynamic();
  * managers.
  */
 if (file_exists(PATH_CONF.'/bootstrap.late.php'))
-	require_once(PATH_CONF.'/bootstrap.late.php');
+   require_once(PATH_CONF.'/bootstrap.late.php');
 
 /**
  * Factory Services
@@ -163,15 +163,15 @@ Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 
 // Applications startup
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
-	// Include the application's bootstrap.
-	$Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
-	if (file_exists($Gdn_Path))
-		include_once($Gdn_Path);
-		
-	// Include the application's hooks.
-	$Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
+   // Include the application's bootstrap.
+   $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
+   if (file_exists($Gdn_Path))
+      include_once($Gdn_Path);
+      
+   // Include the application's hooks.
+   $Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
    if (file_exists($Hooks_Path))
-		include_once($Hooks_Path);
+      include_once($Hooks_Path);
 }
 
 unset($Gdn_EnabledApplications);
@@ -214,7 +214,7 @@ Gdn::Authenticator()->StartAuthenticator();
  * is handled.
  */
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
-	require_once(PATH_ROOT.'/conf/bootstrap.after.php');
-	
+   require_once(PATH_ROOT.'/conf/bootstrap.after.php');
+   
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.'/functions.render.php');

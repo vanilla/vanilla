@@ -87,7 +87,7 @@ Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 // Load the configurations for the installed items.
 $Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
 foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder)
-	Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php", 'Use');
+	Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
    
 /**
  * Installer Redirect

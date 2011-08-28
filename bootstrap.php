@@ -55,7 +55,7 @@ Gdn::Config()->Caching(TRUE);
  * Bootstrap Early
  * 
  * A lot of the framework is loaded now, most importantly the autoloader, 
- * default configs and the general and error functions. More control is possible 
+ * default config and the general and error functions. More control is possible 
  * here, but some things have already been loaded and are immutable.
  */
 if (file_exists(PATH_CONF.'/bootstrap.early.php'))
@@ -102,6 +102,15 @@ if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(
 
 // Re-apply loaded user settings
 Gdn::Config()->OverlayDynamic();
+
+/**
+ * Bootstrap Late
+ * 
+ * All configurations are loaded, as well as the Application, Plugin and Theme 
+ * managers.
+ */
+if (file_exists(PATH_CONF.'/bootstrap.late.php'))
+	require_once(PATH_CONF.'/bootstrap.late.php');
 
 /**
  * Factory Services

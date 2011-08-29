@@ -82,6 +82,6 @@ if (defined('PROFILER') && PROFILER) {
    //
    $run_id = $xhprof_runs->save_run($xhprof_data, $xhprof_namespace);
 
-   echo CombinePaths(array("http://{$XHPROF_SERVER_NAME}","/index.php?run={$run_id}&source={$xhprof_namespace}\n"));
+   echo CombinePaths(array("http://{$XHPROF_SERVER_NAME}","/?run={$run_id}&source={$xhprof_namespace}\n"));
 
 }

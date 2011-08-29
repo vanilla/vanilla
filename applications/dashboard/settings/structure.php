@@ -430,6 +430,7 @@ $Construct->Table('Tag')
    ->Column('Name', 'varchar(255)', 'unique')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Column('Archived', 'tinyint(1)', 0)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

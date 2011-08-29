@@ -713,9 +713,16 @@ class CommentModel extends VanillaModel {
          // Record user-comment activity.
          if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
             $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
-				$ActivityModel->QueueNotification($ActivityID, $Story);
-            $NotifiedUsers[] = $Session->UserID;
+            if ($ActivityID) {
+               $ActivityModel->QueueNotification($ActivityID, $Story);
+               $NotifiedUsers[] = $Session->UserID;
+            }
 			}
+         
+         // Record advanced notifications.
+         if ($Discussion !== FALSE) {
+            $this->RecordAdvancedNotications($ActivityModel, $Discussion, $Fields, $NotifiedUsers);
+         }
 
          // Throw an event for users to add their own events.
          $this->EventArguments['Comment'] = $Fields;
@@ -764,6 +771,54 @@ class CommentModel extends VanillaModel {
       }
       
 	}
+   
+   /**
+    * Record advanced notifications for users.
+    * 
+    * @param ActivityModel $ActivityModel
+    * @param array $Discussion
+    * @param int $CommentID
+    * @param array $NotifiedUsers 
+    */
+   public function RecordAdvancedNotications($ActivityModel, $Discussion, $Comment, &$NotifiedUsers) {
+      // Grab all of the users that need to be notified.
+      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      
+      // Grab all of their follow/unfollow preferences.
+      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
+      $CategoryID = GetValue('CategoryID', $Discussion);
+      $UserPrefs = $this->SQL
+         ->Select('*')
+         ->From('UserCategory')
+         ->Where('CategoryID', $CategoryID)
+         ->WhereIn('UserID', $UserIDs)
+         ->Get()->ResultArray();
+      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
+      
+      $CommentID = $Comment['CommentID'];
+      
+      
+      foreach ($UserIDs as $UserID) {
+//         if ($UserID == $Comment['InsertUserID'])
+//            continue;
+         
+         if (in_array($UserID, $NotifiedUsers))
+            continue;
+         
+         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
+            continue;
+         
+         $ActivityID = AddActivity($Comment['InsertUserID'],
+            'NewComment',
+            Gdn_Format::Text(Gdn_Format::To($Comment['Body'], $Comment['Format'])),
+            $UserID,
+            "/discussion/comment/$CommentID#Comment_$CommentID",
+            TRUE);
+         
+         $ActivityModel->QueueNotification($ActivityID);
+         $NotifiedUsers[] = $UserID;
+      }
+   }
    
    /**
     * Updates the CountComments value on the discussion based on the CommentID being saved. 

@@ -1067,11 +1067,36 @@ class Gdn_Form extends Gdn_Pluggable {
 
       return '<label for="' . $For . '"' . $this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\n";
    }
+   
+   /**
+    * Generate a friendly looking label translation code from a camel case variable name
+    * @param string|array $Item The item to generate the label from.
+    *  - string: Generate the label directly from the item.
+    *  - array: Generate the label from the item as if it is a schema row passed to Gdn_Form::Simple().
+    * @return string 
+    */
+   public static function LabelCode($Item) {
+      if (is_array($Item)) {
+         if (isset($Item['LabelCode']))
+            return $Item['LabelCode'];
 
-   /// <param name="DataObject" type="object">
-   /// An object containing the properties that represent the field names being
-   /// placed in the controls returned by $this.
-   /// </param>
+         $LabelCode = $Item['Name'];
+      } else {
+         $LabelCode = $Item;
+      }
+      
+      
+      if (strpos($LabelCode, '.') !== FALSE)
+         $LabelCode = trim(strrchr($LabelCode, '.'), '.');
+
+      // Split camel case labels into seperate words.
+      $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
+      $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
+      $LabelCode = trim($LabelCode);
+
+      return $LabelCode;
+   }
+
    /**
     * Returns the xhtml for the opening of the form (the form tag and all
     * hidden elements).
@@ -1399,7 +1424,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $PostBackKey = isset($_POST[$KeyName]) ? $_POST[$KeyName] : FALSE;
       $Session = Gdn::Session();
       // DEBUG:
-      //echo '<div>KeyName: '.$KeyName.'</div>';
+      //$Result .= '<div>KeyName: '.$KeyName.'</div>';
       //echo '<div>PostBackKey: '.$PostBackKey.'</div>';
       //echo '<div>TransientKey: '.$Session->TransientKey().'</div>';
       //echo '<div>AuthenticatedPostBack: ' . ($Session->ValidateTransientKey($PostBackKey) ? 'Yes' : 'No');
@@ -1806,6 +1831,82 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function ShowErrors() {
       $this->_InlineErrors = TRUE;
+   }
+   
+   /**
+    * Generates a multi-field form from a schema.
+    * @param array $Schema An array where each item of the array is a row that identifies a form field with the following information:
+    *  - Name: The name of the form field.
+    *  - Control: The type of control used for the field. This is one of the control methods on the Gdn_Form object.
+    *  - LabelCode: The translation code for the label. Optional.
+    *  - Description: An optional description for the field.
+    *  - Items: If the control is a list control then its items are specified here.
+    *  - Options: Additional options to be passed into the control.
+    * @param type $Options Additional options to pass into the form.
+    *  - Wrap: A two item array specifying the text to wrap the form in.
+    *  - ItemWrap: A two item array specifying the text to wrap each form item in.
+    */
+   public function Simple($Schema, $Options = array()) {
+      $Result = GetValueR('Wrap.0', $Options, '<ul>');
+      
+      $ItemWrap = GetValue('ItemWrap', $Options, array("<li>\n  ", "\n</li>\n"));
+      
+      foreach ($Schema as $Index => $Row) {
+         if (is_string($Row))
+            $Row = array('Name' => $Index, 'Control' => $Row);
+         
+         if (!isset($Row['Name']))
+            $Row['Name'] = $Index;
+         if (!isset($Row['Options']))
+            $Row['Options'] = array();
+         
+         $Result .= $ItemWrap[0];
+
+         $LabelCode = self::LabelCode($Row);
+         
+         $Description = GetValue('Description', $Row, '');
+         if ($Description)
+            $Description = '<div class="Info">'.$Description.'</div>';
+         
+         TouchValue('Control', $Row, 'TextBox');
+
+         switch (strtolower($Row['Control'])) {
+            case 'categorydropdown':
+               $Result .= $this->Label($LabelCode, $Row['Name'])
+                       . $Description
+                       .$this->CategoryDropDown($Row['Name'] = $Row['Options']);
+               break;
+            case 'checkbox':
+               $Result .= $Description
+                       . $this->CheckBox($Row['Name'], T($LabelCode));
+               break;
+            case 'dropdown':
+               $Result .= $this->Label($LabelCode, $Row['Name'])
+                       . $Description
+                       . $this->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
+               break;
+            case 'radiolist':
+               $Result .= $Description
+                       . $this->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
+               break;
+            case 'checkboxlist':
+               $Result .= $this->Label($LabelCode, $Row['Name'])
+                       . $Description
+                       . $this->CheckBoxList($Row['Name'], $Row['Items'], NULL, $Row['Options']);
+               break;
+            case 'textbox':
+               $Result .= $this->Label($LabelCode, $Row['Name'])
+                       . $Description
+                       . $this->TextBox($Row['Name'], $Row['Options']);
+               break;
+            default:
+               $Result .= "Error a control type of {$Row['Control']} is not supported.";
+               break;
+         }
+         $Result .= $ItemWrap[1];
+      }
+      $Result .= GetValueR('Wrap.1', $Options, '</ul>');
+      return $Result;
    }
 
    /**

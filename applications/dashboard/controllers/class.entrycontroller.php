@@ -332,8 +332,11 @@ class EntryController extends Gdn_Controller {
       if ($UserID) {
          // The user is already connected.
          $this->Form->SetFormValue('UserID', $UserID);
+         
+         $Data = $this->Form->FormValues();
+         
          // Synchronize the user's data.
-         $UserModel->Save($this->Data);
+         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
 
          // Sign the user in.
          Gdn::Session()->Start($UserID);
@@ -389,7 +392,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE));
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

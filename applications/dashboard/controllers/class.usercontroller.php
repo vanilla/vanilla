@@ -229,7 +229,7 @@ class UserController extends DashboardController {
       $this->RoleData = $AllRoles;
 
       $UserModel = new UserModel();
-      $this->User = $UserModel->Get($UserID);
+      $this->User = $UserModel->GetID($UserID);
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
@@ -381,7 +381,7 @@ class UserController extends DashboardController {
       $this->RoleData = $AllRoles;
       
       $UserModel = new UserModel();
-      $this->User = $UserModel->Get($UserID);
+      $this->User = $UserModel->GetID($UserID);
       
       try {
          

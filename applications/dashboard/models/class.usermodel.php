@@ -267,26 +267,25 @@ class UserModel extends Gdn_Model {
       return $Serialize ? $PermissionsSerialized : $Permissions;
    }
 
-   public function Get($UserID) {
-      
-      // Check page cache, then memcached
-      $User = $this->GetUserFromCache($UserID, 'userid');
-      
-      // If not, query DB
-      if ($User === Gdn_Cache::CACHEOP_FAILURE) {
-         $this->UserQuery();
-         $User = $this->SQL->Where('u.UserID', $UserID)->Get()->FirstRow(DATASET_TYPE_ARRAY);
-         if ($User) {
-            // If success, build more data, then cache user
-            $this->SetCalculatedFields($User);
-            $this->UserCache($User);
-         }
+   /**
+    * Default Gdn_Model::Get() behavior.
+    * 
+    * Prior to 2.0.18 it incorrectly behaved like GetID.
+    * This method can be deleted entirely once it's been deprecated long enough.
+    *
+    * @since 2.0.0
+    * @return object DataSet
+    */
+   public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      if (is_numeric($OrderFields)) {
+         // They're using the old version that was a misnamed GetID()
+         Deprecated('UserModel->Get()', 'UserModel->GetID()');
+         $Result = $this->GetID($OrderFields);
       }
-      
-      if ($User !== FALSE)
-         $User = (object)$User;
-
-      return $User;
+      else {
+         $Result = parent::Get($OrderFields, $OrderDirection, $Limit, $Offset);
+      }
+      return $Result;  
    }
    
    public function GetByUsername($Username) {

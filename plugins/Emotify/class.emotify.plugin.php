@@ -3,7 +3,7 @@
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces emoticons in forum comments with images.',
-	'Version' 	=>	 '2.0',
+	'Version' 	=>	 '2.0.1',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',
@@ -24,7 +24,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Replace emoticons in comments.
 	 */
 	public function Base_AfterCommentFormat_Handler($Sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons'))
+		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 
 		$Object = $Sender->EventArguments['Object'];
@@ -192,7 +192,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Replace emoticons in comment preview.
 	 */
 	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons'))
+		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 		
 		$Sender->Comment->Body = $this->DoEmoticons($Sender->Comment->Body);
@@ -231,7 +231,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	}
 	
 	public function Setup() {
-		SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
+		//SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
 		SaveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
 	}
 	

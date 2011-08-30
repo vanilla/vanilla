@@ -35,14 +35,14 @@ class vBulletinImportModel extends Gdn_Model {
       $UserData = $this->SQL->Select('u.*')->From('User u')->Where('u.Photo is not null')->Get();
       
       // Make sure the avatars folder exists.
-      if (!file_exists(PATH_ROOT.'/uploads/userpics'))
-         mkdir(PATH_ROOT.'/uploads/userpics');
+      if (!file_exists(PATH_UPLOADS.'/userpics'))
+         mkdir(PATH_UPLOADS.'/userpics');
       
-      $ProfileHeight = Gdn::Config('Garden.Profile.MaxHeight', 1000);
-      $ProfileWidth = Gdn::Config('Garden.Profile.MaxWidth', 250);
-      $PreviewHeight = Gdn::Config('Garden.Preview.MaxHeight', 100);
-      $PreviewWidth = Gdn::Config('Garden.Preview.MaxWidth', 75);
-      $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+      $ProfileHeight = C('Garden.Profile.MaxHeight', 1000);
+      $ProfileWidth = C('Garden.Profile.MaxWidth', 250);
+      $PreviewHeight = C('Garden.Preview.MaxHeight', 100);
+      $PreviewWidth = C('Garden.Preview.MaxWidth', 75);
+      $ThumbSize = C('Garden.Thumbnail.Size', 50);
       
       foreach ($UserData->Result() as $User) {
          try {
@@ -52,23 +52,15 @@ class vBulletinImportModel extends Gdn_Model {
             // Save profile size
             $UploadImage->SaveImageAs(
                $Image,
-               PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
+               PATH_UPLOADS.'/userpics/p'.$ImageBaseName,
                $ProfileHeight,
                $ProfileWidth
-            );
-            
-            // Save preview size
-            $UploadImage->SaveImageAs(
-               $Image,
-               PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
-               $PreviewHeight,
-               $PreviewWidth
             );
             
             // Save thumbnail size
             $UploadImage->SaveImageAs(
                $Image,
-               PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName,
+               PATH_UPLOADS.'/userpics/n'.$ImageBaseName,
                $ThumbSize,
                $ThumbSize,
                TRUE

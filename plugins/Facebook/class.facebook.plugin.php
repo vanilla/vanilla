@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -215,7 +215,13 @@ class FacebookPlugin extends Gdn_Plugin {
 
    public function GetProfile($AccessToken) {
       $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
-      $Contents = ProxyRequest($Url);
+//      $C = curl_init();
+//      curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
+//      curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
+//      curl_setopt($C, CURLOPT_URL, $Url);
+//      $Contents = curl_exec($C);
+//      $Contents = ProxyRequest($Url);
+      $Contents = file_get_contents($Url);
       $Profile = json_decode($Contents, TRUE);
       return $Profile;
    }

@@ -33,6 +33,8 @@ class vBulletinImportModel extends Gdn_Model {
    public function ProcessAvatars() {
       $UploadImage = new Gdn_UploadImage();
       $UserData = $this->SQL->Select('u.*')->From('User u')->Where('u.Photo is not null')->Get();
+<<<<<<< HEAD
+=======
       
       // Make sure the avatars folder exists.
       if (!file_exists(PATH_ROOT.'/uploads/userpics'))
@@ -44,6 +46,7 @@ class vBulletinImportModel extends Gdn_Model {
       $PreviewWidth = Gdn::Config('Garden.Preview.MaxWidth', 75);
       $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
       
+>>>>>>> 927f95dc08af906622dc4ddf8cb4d919d8ef8062
       foreach ($UserData->Result() as $User) {
          try {
             $Image = PATH_ROOT . DS . 'uploads' . DS . $User->Photo;

@@ -188,7 +188,7 @@ class ProfileController extends Gdn_Controller {
       $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
-      $User = $UserModel->Get($this->User->UserID);
+      $User = $UserModel->GetID($this->User->UserID);
       $this->Form->SetModel($UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -210,7 +210,7 @@ class ProfileController extends Gdn_Controller {
             $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
          if ($this->Form->Save() !== FALSE) {
-            $User = $UserModel->Get($this->User->UserID);
+            $User = $UserModel->GetID($this->User->UserID);
             $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             $this->RedirectUrl = Url('/profile/'.$this->ProfileUrl($User->Name));
          }
@@ -830,9 +830,9 @@ class ProfileController extends Gdn_Controller {
 		   
       $this->Roles = array();
       if ($UserReference == '') {
-         $this->User = $this->UserModel->Get(Gdn::Session()->UserID);
+         $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
       } else if (is_numeric($UserReference) && $Username != '') {
-         $this->User = $this->UserModel->Get($UserReference);
+         $this->User = $this->UserModel->GetID($UserReference);
       } else {
          $this->User = $this->UserModel->GetByUsername($UserReference);
       }

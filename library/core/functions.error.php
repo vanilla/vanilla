@@ -52,7 +52,10 @@ function Gdn_ExceptionHandler($Exception) {
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
       // prevent headers already sent error
-      if(!headers_sent()) header('Content-Type: text/html; charset=utf-8');
+      if(!headers_sent()) {
+         header("HTTP/1.0 500", TRUE, 500);
+         header('Content-Type: text/html; charset=utf-8');
+      }
       
       $SenderMessage = $Message;
       $SenderObject = 'PHP';

@@ -7,9 +7,21 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
+/**
+ * Notifications Controller
+ * @package Dashboard
+ */
 
+/**
+ * Creates and sends notifications to user.
+ *
+ * @since 2.0.18
+ * @package Dashboard
+ */
 class NotificationsController extends Gdn_Controller {
-   
+   /**
+    * CSS, JS and module includes.
+    */
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
@@ -24,7 +36,10 @@ class NotificationsController extends Gdn_Controller {
    }   
    
    /**
-    * Adds inform messages to response for inclusion in pages dynamically.
+    * Adds inform messages to response for inclusion in pages dynamically. 
+    *
+    * @since 2.0.18
+    * @access public
     */
    public function Inform() {
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
@@ -38,8 +53,14 @@ class NotificationsController extends Gdn_Controller {
    
    /**
     * Grabs all new notifications and adds them to the sender's inform queue.
-    * Note: This method gets called by dashboard's hooks file to display new
-    * notifications on every pageload.
+    *
+    * This method gets called by dashboard's hooks file to display new
+    * notifications on every pageload. 
+    *
+    * @since 2.0.18
+    * @access public
+    *
+    * @param object $Sender The object calling this method.
     */
    public static function InformNotifications($Sender) {
       $Session = Gdn::Session();

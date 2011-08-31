@@ -163,6 +163,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
                return $After['Sort'] + 0.1;
             return $After['_Sort'] + 0.1;
          }
+         
          return $A['_Sort'];
       }
       

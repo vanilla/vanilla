@@ -10,12 +10,19 @@
 /**
  * A brief description of the controller.
  *
+ * Your app will automatically be able to find any models from your app when you instantiate them.
+ * You can also access the UserModel and RoleModel (in Dashboard) from anywhere in the framework.
+ *
  * @since 1.0
  * @package Skeleton
  */
 class SkeletonController extends Gdn_Controller {
+   /** @var array List of objects to prep. They will be available as $this->$Name. */
+   $this->Uses = array('Form');
+   
    /**
-    * Do-nothing construct to let children constructs bubble up.
+    * If you use a constructor, always call parent.
+    * Delete this if you don't need it.
     *
     * @access public
     */

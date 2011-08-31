@@ -2,30 +2,28 @@
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Dashboard
  */
 
+/**
+ * Non-activity action logging.
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class LogController extends DashboardController {
-   /// PROPERTIES ///
+   /** @var array Objects to prep. */
+   public $Uses = array('Form', 'LogModel');
 
    /**
-    * @var Gdn_Form
+    * Confirmation page.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param string $Action Type of action.
+    * @param array $LogIDs Numeric IDs of items to confirm.
     */
-   public $Form;
-
-   /**
-    * @var LogModel
-    */
-   public $LogModel;
-
-
-   /// METHODS ///
-   public function  __construct() {
-      parent::__construct();
-      
-      $this->Form = new Gdn_Form();
-      $this->LogModel = new LogModel();
-   }
-
    public function Confirm($Action, $LogIDs = '') {
       $this->Permission('Garden.Moderation.Manage');
 
@@ -39,7 +37,15 @@ class LogController extends DashboardController {
 
       $this->Render();
    }
-
+   
+   /**
+    * Count log items.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param string $Operation Comma-separated ist of action types to find.
+    */
    public function Count($Operation) {
       $this->Permission('Garden.Moderation.Manage');
 
@@ -54,13 +60,29 @@ class LogController extends DashboardController {
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
-
+   
+   /**
+    * Delete logs.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param array $LogIDs Numeric IDs of logs to delete.
+    */
    public function Delete($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
    }
-
+   
+   /**
+    * View list of edits (edit/delete actions).
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param int $Page Page number.
+    */
    public function Edits($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
@@ -82,11 +104,25 @@ class LogController extends DashboardController {
       $this->AddSideMenu('dashboard/log/edits');
       $this->Render();
    }
-
+   
+   /**
+    * Convenience method to call model's FormatContent.
+    *
+    * @since 2.0.?
+    * @access protected
+    *
+    * @param object $Log.
+    */
    protected function FormatContent($Log) {
       return $this->LogModel->FormatContent($Log);
    }
-
+   
+   /**
+    * Always triggered first. Add Javascript files.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       $this->AddJsFile('log.js');
@@ -94,6 +130,14 @@ class LogController extends DashboardController {
       $this->AddJsFile('jquery.ui.packed.js');
    }
    
+   /**
+    * View moderation logs.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param int $Page Page number.
+    */
    public function Moderation($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
@@ -116,6 +160,14 @@ class LogController extends DashboardController {
       $this->Render();
    }
 
+   /**
+    * Restore logs.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param array $LogIDs List of log IDs.
+    */
    public function Restore($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
 
@@ -127,8 +179,14 @@ class LogController extends DashboardController {
       $this->LogModel->Recalculate();
    }
 
-
-
+   /**
+    * View spam logs.
+    *
+    * @since 2.0.?
+    * @access public
+    *
+    * @param int $Page Page number.
+    */
    public function Spam($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);

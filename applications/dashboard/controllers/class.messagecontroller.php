@@ -7,14 +7,26 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
+/**
+ * Message Controller
+ * @package Dashboard
+ */
 
 /**
  * Messages are used to display (optionally dismissable) information in various parts of the applications.
+ *
+ * @package Dashboard
  */
 class MessageController extends DashboardController {
-   
+   /** @var array Objects to prep. */
    public $Uses = array('Form', 'MessageModel');
    
+   /**
+    * Form to create a new message.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Add() {
       $this->Permission('Garden.Messages.Manage');
       // Use the edit form with no MessageID specified.
@@ -22,6 +34,12 @@ class MessageController extends DashboardController {
       $this->Edit();
    }
    
+   /**
+    * Delete a message.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Delete($MessageID = '', $TransientKey = FALSE) {
       $this->Permission('Garden.Messages.Manage');
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
@@ -39,6 +57,12 @@ class MessageController extends DashboardController {
       $this->Render();      
    }
    
+   /**
+    * Dismiss a message (per user).
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Dismiss($MessageID = '', $TransientKey = FALSE) {
       $Session = Gdn::Session();
       
@@ -54,6 +78,12 @@ class MessageController extends DashboardController {
       $this->Render();      
    }
    
+   /**
+    * Form to edit an existing message.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Edit($MessageID = '') {
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('messages.js');
@@ -90,6 +120,12 @@ class MessageController extends DashboardController {
       $this->Render();
    }
    
+   /**
+    * Main page. Show all messages.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Index() {
       $this->Permission('Garden.Messages.Manage');
       $this->AddSideMenu('dashboard/message');
@@ -104,12 +140,24 @@ class MessageController extends DashboardController {
       $this->Render();
    }
    
+   /**
+    * Always triggers first. Highlight path.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }   
    
+   /**
+    * Get descriptions of asset locations on page.
+    *
+    * @since 2.0.0
+    * @access protected
+    */
    protected function _GetAssetData() {
       $AssetData = array();
       $AssetData['Content'] = 'Above Main Content';
@@ -119,6 +167,12 @@ class MessageController extends DashboardController {
       return $AssetData;
    }
    
+   /**
+    * Get descriptions of asset locations across site.
+    *
+    * @since 2.0.0
+    * @access protected
+    */
    protected function _GetLocationData() {
       $ControllerData = array();
       $ControllerData['[Base]'] = 'Every Page';

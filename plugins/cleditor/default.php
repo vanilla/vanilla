@@ -38,12 +38,16 @@ some glitches.
 v0.5: 02NOV2010 - by Tim @ Vanilla
 - Fixed:
 -- 1. Added backreference to the cleditor JS object and attached it to the textarea, for external interaction
-*/
+ 
+v1.1 31AUG2011 - by Todd @ Vanilla
+- Fixed:
+-- 1. Fixed js error with new versions of jQuery.
+ */
 
 $PluginInfo['cleditor'] = array(
    'Name' => 'CLEditor jQuery WYSIWYG',
    'Description' => '<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -73,7 +77,7 @@ class cleditorPlugin extends Gdn_Plugin {
 		
 		// Add the CLEditor to the form
 		$Sender->RemoveJsFile('jquery.autogrow.js');
-		$Sender->AddJsFile('jquery.cleditor.min.js', 'plugins/cleditor');
+		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor');
 		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
 		$Sender->Head->AddString('
 <style type="text/css">
@@ -95,7 +99,7 @@ a.PreviewButton {
 				e.data.editor.clear();
 			});
 		});
-	})(jQuery);
+	});
 </script>');
    }
 

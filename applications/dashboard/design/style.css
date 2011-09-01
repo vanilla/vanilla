@@ -1544,6 +1544,17 @@ div.Tabs li.Active a {
    background: #fff;
    color: #474747;
 }
+
+.Count {
+   background: none repeat scroll 0 0 #1E79A7;
+   border-radius: 3px 3px 3px 3px;
+   color: #EAF4FD;
+   font-size: 80%;
+   font-weight: normal;
+   line-height: 1;
+   padding: 0 .8ex;
+}
+
 div.Tabs li a span {
    line-height: 1;
    font-size: 80%;
@@ -1556,6 +1567,7 @@ div.Tabs li a span {
    color: #eaf4fd;
    margin: 0 0 0 4px;
 }
+
 div.Tabs div.SubTab {
 	margin: 10px 0 0;
 	padding: 4px 8px;
@@ -3084,15 +3096,27 @@ div.RegardingActions div.ActionButton a {
    width: 40px;
 }
 
+
 .PhotoGrid {
-   line-height: 100%;
+   line-height: 1;
+   margin: 2px -2px;
 }
 
 .PhotoGrid img {
-   margin: 3px;
+   margin: 2px;
    vertical-align: text-bottom;
+   height: 32px;
+   width: 32px;
 }
 
-.PhotoGrid img.ProfilePhotoSmall {
-   margin: 2px;
+.PhotoGridSmall {
+   line-height: 1;
+   margin: 1px -1px;
+}
+
+.PhotoGridSmall img {
+   margin: 1px;
+   vertical-align: text-bottom;
+   height: 24px;
+   width: 24px;
 }

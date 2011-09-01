@@ -3073,3 +3073,26 @@ div.RegardingActions div.ActionButton a {
    font-size: 10px;
    text-transform: uppercase;
 }
+
+.ProfilePhotoSmall {
+   height: 24px;
+   width: 24px;
+}
+
+.ProfilePhotoMedium {
+   height: 40px;
+   width: 40px;
+}
+
+.PhotoGrid {
+   line-height: 100%;
+}
+
+.PhotoGrid img {
+   margin: 3px;
+   vertical-align: text-bottom;
+}
+
+.PhotoGrid img.ProfilePhotoSmall {
+   margin: 2px;
+}

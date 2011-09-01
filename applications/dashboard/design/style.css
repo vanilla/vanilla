@@ -1546,13 +1546,16 @@ div.Tabs li.Active a {
 }
 
 .Count {
-   background: none repeat scroll 0 0 #1E79A7;
-   border-radius: 3px 3px 3px 3px;
-   color: #EAF4FD;
+   background: #444;
+   background-color: rgba(0, 0, 0, .6);
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+   color: #fff;
    font-size: 80%;
    font-weight: normal;
-   line-height: 1;
-   padding: 0 .8ex;
+   padding: 1px .8ex;
 }
 
 div.Tabs li a span {

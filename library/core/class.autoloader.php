@@ -352,7 +352,6 @@ class Gdn_Autoloader {
    }
    
    public static function RegisterMap($MapType, $ContextType, $SearchPath, $Options = array()) {
-   
       $DefaultOptions = array(
          'SearchSubfolders'      => TRUE,
          'Extension'             => NULL,

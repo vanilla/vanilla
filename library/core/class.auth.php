@@ -15,9 +15,9 @@ class Gdn_Auth extends Gdn_Pluggable {
    protected $_Authenticators = array();
    
    protected $_Protocol = 'http';
-   protected $_Identity = null;
-   protected $_UserModel = null;
-   protected $_PermissionModel = null;
+   protected $_Identity = NULL;
+   protected $_UserModel = NULL;
+   protected $_PermissionModel = NULL;
    
    protected $_AllowHandshake;
 

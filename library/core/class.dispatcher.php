@@ -173,6 +173,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * Analyzes the supplied query string and decides how to dispatch the request.
     */
    public function Dispatch($ImportRequest = NULL, $Permanent = TRUE) {
+      
       if ($ImportRequest && is_string($ImportRequest))
          $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
       
@@ -416,7 +417,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       $PathAndQuery = $Request->PathAndQuery();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
-
+      
       // We have a route. Take action.
       if ($MatchRoute !== FALSE) {
          switch ($MatchRoute['Type']) {
@@ -476,11 +477,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       try {
       
-         // 1] if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
+         // if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
          if (in_array($Parts[0], $this->EnabledApplicationFolders()))
             $this->FindController(1, $Parts);
          
-         // 2] if no match, see if the first argument is a controller
+         // if no match, see if the first argument is a controller
          $this->FindController(0, $Parts);
          
          throw new GdnDispatcherControllerNotFoundException();
@@ -501,9 +502,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    
    protected function FindController($ControllerKey, $Parts) {
       
-      $Application = GetValue($ControllerKey-1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
+      $Application = GetValue($ControllerKey-1, $Parts, NULL);
 
       // Check for a file extension on the controller.
       $Ext = strrchr($Controller, '.');
@@ -515,6 +516,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          }
       }
       
+      // If we're loading from a fully qualified path, prioritize this app's library
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(
             Gdn_Autoloader::CONTEXT_APPLICATION, 
@@ -524,10 +526,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             Gdn_Autoloader::PRIORITY_ONCE);
       }
       
-      
       $ControllerName = $Controller.'Controller';
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-      
       if ($ControllerPath !== FALSE) {
          
          // This was a guess search with no specified application. Look up

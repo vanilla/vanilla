@@ -85,8 +85,7 @@ Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for the installed items.
-$Gdn_EnabledApplications = Gdn::Config('EnabledApplications', array());
-foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder)
+foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder)
    Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
    
 /**
@@ -162,7 +161,7 @@ Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
  */
 
 // Applications startup
-foreach ($Gdn_EnabledApplications as $ApplicationName => $ApplicationFolder) {
+foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
    // Include the application's bootstrap.
    $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
    if (file_exists($Gdn_Path))

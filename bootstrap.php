@@ -173,7 +173,6 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
       include_once($Hooks_Path);
 }
 
-unset($Gdn_EnabledApplications);
 unset($Gdn_Path);
 unset($Hooks_Path);
 

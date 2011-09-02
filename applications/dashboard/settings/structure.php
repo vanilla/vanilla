@@ -91,7 +91,7 @@ $Construct
 // Make sure the system user is okay.
 $SystemUserID = C('Garden.SystemUserID');
 if ($SystemUserID) {
-   $SysUser = Gdn::UserModel()->Get($SystemUserID);
+   $SysUser = Gdn::UserModel()->GetID($SystemUserID);
 
    if (!$SysUser || GetValue('Deleted', $SysUser)) {
       $SystemUserID = FALSE;

@@ -60,8 +60,9 @@ if (!class_exists('SideMenuModule', FALSE)) {
       }
       
       public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {
-         if (!array_key_exists($Group, $this->Items))
-            $this->Items[$Group] = array('Group' => $Group, 'Links' => array());
+         if (!array_key_exists($Group, $this->Items)) {
+            $this->AddItem($Group, T($Group));
+         }
          if ($Text === FALSE) {
             // This link is the group heading.
             $this->Items[$Group]['Url'] = $Url;

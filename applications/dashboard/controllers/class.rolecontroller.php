@@ -7,14 +7,40 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * RBAC (Role Based Access Control)
+ * Role Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * RBAC (Role Based Access Control) system.
+ *
+ * @since 2.0.0
+ * @package Dashboard
  */
 class RoleController extends DashboardController {
-   
+   /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form', 'RoleModel');
    
+   /**
+    * Set menu path. Automatically run on every use.
+    *
+    * @since 2.0.0
+    * @access public
+    */
+   public function Initialize() {
+      parent::Initialize();
+      if ($this->Menu)
+         $this->Menu->HighlightRoute('/dashboard/settings');
+   }
+   
+   /**
+    * Create new role.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Add() {
 		if(!$this->_Permission())
 			return;
@@ -26,6 +52,12 @@ class RoleController extends DashboardController {
       $this->Edit();
    }
    
+   /**
+    * Remove a role.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Delete($RoleID = FALSE) {
 		if(!$this->_Permission())
 			return;
@@ -66,7 +98,13 @@ class RoleController extends DashboardController {
       }
       $this->Render();
    }
-
+   
+   /**
+    * Manage default role assignments.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function DefaultRoles() {
       $this->Permission('Garden.Roles.Manage');
       $this->AddSideMenu('');
@@ -106,7 +144,13 @@ class RoleController extends DashboardController {
 
       $this->Render();
    }
-
+   
+   /**
+    * Show a warning if default roles are not setup yet.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function DefaultRolesWarning() {
       // Check to see if there are no default roles for guests or members.
       $DefaultRolesWarning = FALSE;
@@ -130,6 +174,12 @@ class RoleController extends DashboardController {
       }
    }
    
+   /**
+    * Edit a role.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Edit($RoleID = FALSE) {
 		if(!$this->_Permission())
 			return;
@@ -170,7 +220,13 @@ class RoleController extends DashboardController {
       
       $this->Render();
    }
-      
+   
+   /**
+    * Show list of roles.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Index() {
 		$this->Permission('Garden.Roles.Manage');
 
@@ -181,13 +237,13 @@ class RoleController extends DashboardController {
       $this->RoleData = $this->RoleModel->Get();
       $this->Render();
    }
-   
-   public function Initialize() {
-      parent::Initialize();
-      if ($this->Menu)
-         $this->Menu->HighlightRoute('/dashboard/settings');
-   }
 
+   /**
+    * Do permission check.
+    *
+    * @since 2.0.0
+    * @access protected
+    */
 	protected function _Permission() {
       $this->Permission('Garden.Roles.Manage');
 		if(!C('Garden.Roles.Manage', TRUE)) {

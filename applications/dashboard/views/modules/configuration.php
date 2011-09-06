@@ -37,6 +37,7 @@ echo $Form->Errors();
             echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
             break;
          case 'radiolist':
+            echo $Form->Label($LabelCode, $Row['Name']);
             echo $Description;
             echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
             break;

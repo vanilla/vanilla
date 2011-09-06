@@ -190,7 +190,7 @@ if (!function_exists('UserPhoto')) {
          $Options = array('LinkClass' => $Options);
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 

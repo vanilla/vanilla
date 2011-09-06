@@ -7,30 +7,48 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Search Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manages basic searching.
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class SearchController extends Gdn_Controller {
+   /** @var array Models to automatically instantiate. */
+   public $Uses = array('Database');
+   
+   // Object initialization
+   public $Form;
+   public $SearchModel;   
 
    /**
-    * @var Gdn_Form
+    * Object instantiation & form prep.
     */
-   public $Form;
-
-   public $SearchModel;
-
-   public $Uses = array('Database');
-
 	public function __construct() {
 		parent::__construct();
-
+   
+      // Object instantiation
       $this->SearchModel = new SearchModel();
-		
 		$Form = Gdn::Factory('Form');
+		
+		// Form prep
 		$Form->Method = 'get';
 		$Form->InputPrefix = '';
-		
 		$this->Form = $Form;
 	}
 	
+	/**
+    * Add JS, CSS, modules. Automatically run on every use.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
@@ -46,6 +64,13 @@ class SearchController extends Gdn_Controller {
       parent::Initialize();
    }
 	
+	/**
+    * Default search functionality.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $Page Page number.
+    */
 	public function Index($Page = '') {
 		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');

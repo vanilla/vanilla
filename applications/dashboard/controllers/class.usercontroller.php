@@ -7,11 +7,43 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * User Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manage users.
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class UserController extends DashboardController {
-
+   /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form');
-
+   
+   /**
+    * Highlight menu path. Automatically run on every use.
+    *
+    * @since 2.0.0
+    * @access public
+    */
+   public function Initialize() {
+      parent::Initialize();
+      if ($this->Menu)
+         $this->Menu->HighlightRoute('/dashboard/settings');
+   }
+   
+   /**
+    * User management list.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param mixed $Keywords Term or array of terms to filter list of users.
+    * @param int $Page Page number.
+    * @param string $Order Sort order for list.
+    */
    public function Index($Keywords = '', $Page = '', $Order = '') {
       $this->Permission(
          array(
@@ -22,12 +54,14 @@ class UserController extends DashboardController {
          '',
          FALSE
       );
+      
+      // Page setup
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
       $this->Title(T('Users'));
-
       $this->AddSideMenu('dashboard/user');
-
+      
+      // Form setup
       $this->Form->Method = 'get';
 
       // Input Validation.
@@ -45,7 +79,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       list($Offset, $Limit) = OffsetLimit($Page, 30);
-
+      
       $Filter = $this->_GetFilter();
       if ($Filter)
          $Filter['Keywords'] = $Keywords;
@@ -53,7 +87,8 @@ class UserController extends DashboardController {
          $Filter = $Keywords;
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
-
+      
+      // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
          $Order = 'u.'.$Order;
          $OrderDir = 'desc';
@@ -62,7 +97,7 @@ class UserController extends DashboardController {
          $OrderDir = 'asc';
       }
 
-
+      // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       RoleModel::SetUserRoles($this->UserData->Result());
       
@@ -75,12 +110,19 @@ class UserController extends DashboardController {
 
       $this->Render();
    }
-
+   
+   /**
+    * Create a user.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Add() {
       $this->Permission('Garden.Users.Add');
+      
+      // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Add User'));
-
       $this->AddSideMenu('dashboard/user');
       
       $RoleModel = new RoleModel();
@@ -96,10 +138,8 @@ class UserController extends DashboardController {
       $this->Form->SetModel($UserModel);
       
       try {
-      
          // These are all the 'effective' roles for this add action. This list can
-         // be trimmed down from the real list to allow subsets of roles to be
-         // edited.
+         // be trimmed down from the real list to allow subsets of roles to be edited.
          $this->EventArguments['RoleData'] = &$this->RoleData;
 
          $this->FireEvent("BeforeUserAdd");
@@ -137,7 +177,13 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-
+   
+   /**
+    * Show how many applicants are in the queue.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function ApplicantCount() {
       $this->Permission('Garden.Applicants.Manage');
 
@@ -153,6 +199,12 @@ class UserController extends DashboardController {
          echo '<span class="Alert">', $Count, '</span>';
    }
 	
+	/**
+    * Show applicants queue.
+    *
+    * @since 2.0.0
+    * @access public
+    */
 	public function Applicants() {
       $this->Permission('Garden.Users.Approve');
       $this->AddSideMenu('dashboard/user/applicants');
@@ -177,11 +229,19 @@ class UserController extends DashboardController {
       $this->View = 'applicants';
       $this->Render();
    }
-
-	public function Approve($UserID = '', $PostBackKey = '') {
+   
+   /**
+    * Approve a user application.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID.
+    * @param string $TransientKey Security token.
+    */
+	public function Approve($UserID = '', $TransientKey = '') {
       $this->Permission('Garden.Users.Approve');
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($PostBackKey)) {
+      if ($Session->ValidateTransientKey($TransientKey)) {
          $Approved = $this->HandleApplicant('Approve', $UserID);
          if ($Approved) {
             $this->InformMessage(T('Your changes have been saved.'));
@@ -195,6 +255,12 @@ class UserController extends DashboardController {
       }
    }
 	
+	/**
+    * Autocomplete a username.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function AutoComplete() {
       $this->DeliveryType(DELIVERY_TYPE_NONE);
       $Q = GetIncomingValue('q');
@@ -206,18 +272,120 @@ class UserController extends DashboardController {
       $this->Render();
    }
 	
+	/**
+    * Page thru user list.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param mixed $Keywords Term or list of terms to limit search.
+    * @param int $Page Page number.
+    * @param string $Order Sort order.
+    */
    public function Browse($Keywords = '', $Page = '', $Order = '') {
       $this->View = 'index';
       $this->Index($Keywords, $Page, $Order = '');
    }
+   
+   /**
+    * Decline a user application.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID.
+    * @param string $TransientKey Security token.
+    */
+   public function Decline($UserID = '', $TransientKey = '') {
+      $this->Permission('Garden.Users.Approve');
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey)) {
+         if ($this->HandleApplicant('Decline', $UserID))
+            $this->InformMessage(T('Your changes have been saved.'));
+      }
 
+      if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
+         return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
+      } else {
+         $this->Applicants();
+      }
+   }
+   
+   /**
+    * Delete a user account.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID.
+    * @param string $Method Type of deletion to do (delete, keep, or wipe).
+    */
+   public function Delete($UserID = '', $Method = '') {
+      $this->Permission('Garden.Users.Delete');
+      $Session = Gdn::Session();
+      if($Session->User->UserID == $UserID)
+         trigger_error(ErrorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+      $this->AddSideMenu('dashboard/user');
+      $this->Title(T('Delete User'));
+
+      $RoleModel = new RoleModel();
+      $AllRoles = $RoleModel->GetArray();
+      
+      // By default, people with access here can freely assign all roles
+      $this->RoleData = $AllRoles;
+      
+      $UserModel = new UserModel();
+      $this->User = $UserModel->GetID($UserID);
+      
+      try {
+         
+         $CanDelete = TRUE;
+         $this->EventArguments['CanDelete'] = &$CanDelete;
+         $this->EventArguments['TargetUser'] = &$this->User;
+         
+         // These are all the 'effective' roles for this delete action. This list can
+         // be trimmed down from the real list to allow subsets of roles to be
+         // edited.
+         $this->EventArguments['RoleData'] = &$this->RoleData;
+         
+         $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
+         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
+         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
+         $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
+         $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
+         
+         $this->FireEvent("BeforeUserDelete");
+         $this->SetData('CanDelete', $CanDelete);
+         
+         $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
+         $this->Method = $Method;
+         if ($Method != '')
+            $this->View = 'deleteconfirm';
+
+         if ($this->Form->AuthenticatedPostBack() && $Method != '') {
+            $UserModel->Delete($UserID, array('DeleteMethod' => $Method));
+            $this->View = 'deletecomplete';
+         }
+
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
+      $this->Render();
+   }
+   
+   /**
+    * Edit a user account.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID.
+    */
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
+      
+      // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Edit User'));
-
       $this->AddSideMenu('dashboard/user');
       
+      // Determine if username can be edited
       $this->CanEditUsername = TRUE;
       $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
       $this->CanEditUsername = $this->CanEditUsername | Gdn::Session()->CheckPermission('Garden.Users.Edit');
@@ -309,6 +477,13 @@ class UserController extends DashboardController {
       $this->Render();
    }
    
+   /**
+    * Determine whether user can register with this email address.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $Email Email address to be checked.
+    */
 	public function EmailAvailable($Email = '') {
 		$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
@@ -325,7 +500,10 @@ class UserController extends DashboardController {
 	}
 
    /**
-    * @param Gdn_SQLDriver $SQL
+    * Get filter from current request.
+    *
+    * @since 2.0.0
+    * @access protected
     */
    protected function _GetFilter() {
       $Filter = $this->Request->Get('Filter');
@@ -350,77 +528,19 @@ class UserController extends DashboardController {
       }
       return FALSE;
    }
-
-   public function Decline($UserID = '', $PostBackKey = '') {
-      $this->Permission('Garden.Users.Approve');
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($PostBackKey)) {
-         if ($this->HandleApplicant('Decline', $UserID))
-            $this->InformMessage(T('Your changes have been saved.'));
-      }
-
-      if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-         return $this->Form->ErrorCount() == 0 ? TRUE : $this->Form->Errors();
-      } else {
-         $this->Applicants();
-      }
-   }
-
-   public function Delete($UserID = '', $Method = '') {
-      $this->Permission('Garden.Users.Delete');
-      $Session = Gdn::Session();
-      if($Session->User->UserID == $UserID)
-         trigger_error(ErrorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
-      $this->AddSideMenu('dashboard/user');
-      $this->Title(T('Delete User'));
-
-      $RoleModel = new RoleModel();
-      $AllRoles = $RoleModel->GetArray();
-      
-      // By default, people with access here can freely assign all roles
-      $this->RoleData = $AllRoles;
-      
-      $UserModel = new UserModel();
-      $this->User = $UserModel->GetID($UserID);
-      
-      try {
-         
-         $CanDelete = TRUE;
-         $this->EventArguments['CanDelete'] = &$CanDelete;
-         $this->EventArguments['TargetUser'] = &$this->User;
-         
-         // These are all the 'effective' roles for this delete action. This list can
-         // be trimmed down from the real list to allow subsets of roles to be
-         // edited.
-         $this->EventArguments['RoleData'] = &$this->RoleData;
-         
-         $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
-         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
-         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
-         $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
-         $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
-         
-         $this->FireEvent("BeforeUserDelete");
-         $this->SetData('CanDelete', $CanDelete);
-         
-         $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
-         $this->Method = $Method;
-         if ($Method != '')
-            $this->View = 'deleteconfirm';
-
-         if ($this->Form->AuthenticatedPostBack() && $Method != '') {
-            $UserModel->Delete($UserID, array('DeleteMethod' => $Method));
-            $this->View = 'deletecomplete';
-         }
-
-      } catch (Exception $Ex) {
-         $this->Form->AddError($Ex);
-      }
-      $this->Render();
-   }
-
+   
+   /**
+    * Handle a user application.
+    *
+    * @since 2.0.0
+    * @access private
+    * @see self::Decline, self::Approve
+    * @param string $Action Approve or Decline.
+    * @param int $UserID Unique ID.
+    */
    private function HandleApplicant($Action, $UserID) {
       $this->Permission('Garden.Users.Approve');
+      
       //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
          $this->Form->AddError('ErrorInput');
@@ -445,19 +565,57 @@ class UserController extends DashboardController {
       }
    }
 
-   public function Initialize() {
-      parent::Initialize();
-      if ($this->Menu)
-         $this->Menu->HighlightRoute('/dashboard/settings');
-   }
-
+   /**
+    * Build URL to order users by value passed.
+    *
+    * @since 2.0.0
+    * @access protected
+    * @param string $Field Column to order users by.
+    * @return string URL of user list with orderby query appended.
+    */
    protected function _OrderUrl($Field) {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
       return Url('/dashboard/user?'.http_build_query($Get));
+   }	
+   
+   /**
+    * Convenience function for listing users. At time of this writing, it is
+    * being used by wordpress widgets to display recently active users.
+    *
+    * @since 2.0.?
+    * @access public
+    * @param string $SortField The field to sort users with. Defaults to DateLastActive. Other options are: DateInserted, Name.
+    * @param string $SortDirection The direction to sort the users.
+    * @param int $Limit The number of users to show.
+    * @param int $Offset The offset to start listing users at.
+    */
+   public function Summary($SortField = 'DateLastActive', $SortDirection = 'desc', $Limit = 30, $Offset = 0) {
+      $this->Title(T('User Summary'));
+
+      // Input validation
+      $SortField = !in_array($SortField, array('DateLastActive', 'DateInserted', 'Name')) ? 'DateLastActive' : $SortField;
+      $SortDirection = $SortDirection == 'asc' ? 'asc' : 'desc';
+      $Limit = is_numeric($Limit) && $Limit < 100 && $Limit > 0 ? $Limit : 30;
+      $Offset = is_numeric($Offset) ? $Offset : 0;
+      
+      // Get user list
+      $UserModel = new UserModel();
+      $UserData = $UserModel->GetSummary('u.'.$SortField, $SortDirection, $Limit, $Offset);
+      $this->SetData('UserData', $UserData);
+      
+      $this->MasterView = 'empty';
+      $this->Render('filenotfound', 'home');
    }
-	
-	public function UsernameAvailable($Name = '') {
+   
+   /**
+    * Determine whether user can register with this username.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $Name Username to be checked.
+    */
+   public function UsernameAvailable($Name = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
       if ($Name != '') {
@@ -471,28 +629,4 @@ class UserController extends DashboardController {
       $this->Render();
    }
    
-   /**
-    * Convenience function for listing users. At time of this writing, it is
-    * being used by wordpress widgets to display recently active users.
-    *
-    * @param string $SortField The field to sort users with. Defaults to DateLastActive. Other options are: DateInserted, Name.
-    * @param string $SortDirection The direction to sort the users.
-    * @param int $Limit The number of users to show.
-    * @param int $Offset The offset to start listing users at.
-    */
-   public function Summary($SortField = 'DateLastActive', $SortDirection = 'desc', $Limit = 30, $Offset = 0) {
-      $this->Title(T('User Summary'));
-
-      // Input Validation
-      $SortField = !in_array($SortField, array('DateLastActive', 'DateInserted', 'Name')) ? 'DateLastActive' : $SortField;
-      $SortDirection = $SortDirection == 'asc' ? 'asc' : 'desc';
-      $Limit = is_numeric($Limit) && $Limit < 100 && $Limit > 0 ? $Limit : 30;
-      $Offset = is_numeric($Offset) ? $Offset : 0;
-
-      $UserModel = new UserModel();
-      $UserData = $UserModel->GetSummary('u.'.$SortField, $SortDirection, $Limit, $Offset);
-      $this->SetData('UserData', $UserData);
-      $this->MasterView = 'empty';
-      $this->Render('filenotfound', 'home');
-   }
 }

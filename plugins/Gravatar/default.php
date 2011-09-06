@@ -21,29 +21,17 @@ class GravatarPlugin extends Gdn_Plugin {
    }
 }
 
-if (!function_exists('UserBuilder')) {
-   /**
-    * Override the default UserBuilder function with one that switches the photo
-    * out with a gravatar url if the photo is empty.
-    */
-   function UserBuilder($Object, $UserPrefix = '') {
-		$Object = (object)$Object;
-      $User = new stdClass();
-      $UserID = $UserPrefix.'UserID';
-      $Name = $UserPrefix.'Name';
-      $Photo = $UserPrefix.'Photo';
-      $Email = $UserPrefix.'Email';
-      $User->UserID = $Object->$UserID;
-      $User->Name = $Object->$Name;
-      $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
+if (!function_exists('UserPhotoDefaultUrl')) {
+   function UserPhotoDefaultUrl($User) {
+      $Email = GetValue('Email', $User);
       $HTTPS = GetValue('HTTPS', $_SERVER, '');
       $Protocol =  (strlen($HTTPS) || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
-      if ($User->Photo == '' && property_exists($Object, $Email)) {
-         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
-            .'gravatar_id='.md5(strtolower($Object->$Email))
-            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
-            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
-      }
-		return $User;
+
+      $Url = $Protocol.'gravatar.com/avatar.php?'
+         .'gravatar_id='.md5(strtolower($Email))
+         .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+         .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 50);
+      
+      return $Url;
    }
 }

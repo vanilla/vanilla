@@ -99,7 +99,7 @@ jQuery(document).ready(function($) {
                else
                   msg = textStatus;
             }
-            msg = '<h1>Error</h1><p class="Wrap">' + msg + '</div>';
+            msg = '<h1>Error</h1><div class="Wrap AjaxError">' + msg + '</div>';
 
 
             $.popup({}, msg);

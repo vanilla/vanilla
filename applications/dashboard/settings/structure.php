@@ -225,8 +225,8 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
-   'Garden.Moderation.Manage' => 'Garden.Users.Edit',
-   'Garden.AdvancedNotifications.Allow' => 'Garden.Settings.Manage'
+   'Garden.Moderation.Manage',
+   'Garden.AdvancedNotifications.Allow'
    ));
 
 if (!$PermissionTableExists) {

@@ -13,10 +13,11 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <div class="Warning">
-         You are about to flag this <?php echo $this->Data['Plugin.Flagging.Data']['Context']; ?> for moderator review. If you're sure you want to do this,
-         please enter a brief reason/explanation below, then press 'Flag this!'.
+         <?php echo T('FlagForReview', "You are about to flag this for moderator review. If you're sure you want to do this,
+         please enter a brief reason below, then press 'Flag this!'."); ?>
       </div>
-      Link to content: <?php echo Anchor("{$UcContext} #{$ElementID}", $URL); ?> - by <?php echo $this->Data['Plugin.Flagging.Data']['ElementAuthor']; ?>
+      <?php echo T('FlagLinkContent', 'Link to content:') .' '. Anchor("{$UcContext} #{$ElementID}", $URL); ?> &ndash; 
+         <?php echo $this->Data['Plugin.Flagging.Data']['ElementAuthor']; ?>
    </li>
    <li>
       <?php

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
-   <?php echo T('The following content has been flagged by users for moderator review.'); ?>
+   <?php echo T('FlaggedContent', 'The following content has been flagged by users for moderator review.'); ?>
 </div>
 <div class="FilterMenu">
    <?php
@@ -34,7 +34,7 @@ if (C('Plugins.Flagging.Enabled')) {
    echo '<div class="FlaggedContent">';
    $NumFlaggedItems = count($this->FlaggedItems);
    if (!$NumFlaggedItems) {
-      echo T("There are no items awaiting moderation at this time.");
+      echo T('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
    } else {
       echo $NumFlaggedItems." ".Plural($NumFlaggedItems,"item","items")." in queue\n";
       foreach ($this->FlaggedItems as $URL => $FlaggedList) {
@@ -57,7 +57,7 @@ if (C('Plugins.Flagging.Enabled')) {
                                  else
                                     $OtherString = '';
                               ?>
-                              <span><?php echo T("Reported by: "); ?></span>
+                              <span><?php echo T('FlaggedBy', "Reported by:"); ?> </span>
                               <span><?php echo "<strong>".Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}")."</strong>{$OtherString} ".T('on').' '.$Flag['DateInserted']; ?></span>
                            </div>
                            <div class="FlaggedItemComment">"<?php echo $Flag['Comment']; ?>"</div>

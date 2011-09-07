@@ -31,9 +31,9 @@ if($this->Pager->FirstPage())
    <ul>
       <li><?php
          if (C('Vanilla.Categories.Use') == TRUE) {
-            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
+            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode, 'TabLink');
          } else {
-            echo Anchor(T('All Discussions'), 'discussions');
+            echo Anchor(T('All Discussions'), 'discussions', 'TabLink');
          }
       ?></li>
    </ul>

@@ -18,7 +18,7 @@ div.Connect h2 {
 	border-bottom: 1px solid #3b5998;
 }
 .Banner {
-	padding: 10px;
+	padding:  0 0 10px;
 	text-align: left;
 	position: relative;
 }
@@ -45,8 +45,8 @@ div.Connect h2 {
 .Banner ul li a.SignOut {
 	font-weight: normal;
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: 0;
+	right: 0;
 }
 .Banner ul li a span {
 	border-radius: 3px;
@@ -64,11 +64,10 @@ div.Connect h2 {
 #Content {
 	float: none;
 	width: auto;
-	margin: 0 280px 0 10px;
+	margin: 0 260px 0 0;
 }
 #Panel {
 	float: right;
-	margin-right: 10px;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
@@ -83,10 +82,10 @@ body.Profile div.SearchBox {
 body.Profile #Content {
 	float:none;
 	width: auto;
-	margin: 0 10px 0 280px;
+	margin: 0 0 0 260px;
 }
 body.Profile #Panel {
-	margin: 0 0 0 10px;
+	margin: 0;
 }
 form.Activity textarea {
 	width:99%;

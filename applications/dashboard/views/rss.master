@@ -6,7 +6,7 @@
 	xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
       <title><?php echo $this->Head->Title(); ?></title>
-      <link><?php echo Url('', TRUE, TRUE); ?></link>
+      <link><?php echo htmlspecialchars(Url('', TRUE, TRUE)); ?></link>
       <pubDate><?php echo date(DATE_RFC822); ?></pubDate>
       <?php
          $this->RenderAsset('RssHead');

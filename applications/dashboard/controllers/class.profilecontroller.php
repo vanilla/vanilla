@@ -324,8 +324,8 @@ class ProfileController extends Gdn_Controller {
 		elseif (C('Garden.Profile.ShowActivities', TRUE))
 			return $this->Activity($UserReference, $Username, $UserID);
       else
-         return Gdn::Dispatcher()->Dispatch('/profile/discussions/' .
-            ConcatSep('/', rawurlencode($UserReference, rawurlencode($Username), rawurlencode($UserID)));
+         return Gdn::Dispatcher()->Dispatch('/profile/discussions/'.
+            ConcatSep('/', rawurlencode($UserReference, rawurlencode($Username), rawurlencode($UserID))));
    }
    
    /** 

@@ -66,10 +66,6 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
-//      if (!is_numeric($CategoryIdentifier))
-//         $Category = $this->CategoryModel->GetFullByUrlCode($CategoryIdentifier);
-//      else
-//         $Category = $this->CategoryModel->GetFull($CategoryIdentifier);
       $Category = CategoryModel::Categories($CategoryIdentifier);
       
       if (empty($Category)) {
@@ -87,7 +83,7 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
-         $this->Head->Title($Category->Name);
+         $this->Head->Title(GetValue('Name', $Category, ''));
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
@@ -96,7 +92,7 @@ class CategoriesController extends VanillaController {
       }
       
       // Set CategoryID
-      $this->SetData('CategoryID', $this->Category->CategoryID, TRUE);
+      $this->SetData('CategoryID', GetValue('CategoryID', $Category), TRUE);
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
@@ -108,7 +104,7 @@ class CategoriesController extends VanillaController {
       $Wheres = array('d.CategoryID' => $this->CategoryID);
       
       // Check permission
-      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Category->PermissionCategoryID);
+      $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', GetValue('PermissionCategoryID', $Category));
       
       // Set discussion meta data.
       $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);

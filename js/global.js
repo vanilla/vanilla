@@ -98,6 +98,8 @@ jQuery(document).ready(function($) {
       var href = $this.attr('href');
       if ($this.attr('popupHref'))
          href = $this.attr('popupHref');
+      else
+         href += '&display=popup';
 
       var win = window.open(href, 'Window_' + id, "left="+left+",top="+top+",width="+width+",height="+height+",status=0,scrollbars=0");
       if (win)

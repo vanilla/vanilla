@@ -25,12 +25,13 @@ class TagModule extends Gdn_Module {
          $this->_DiscussionID = $DiscussionID;
          $SQL->Join('TagDiscussion td', 't.TagID = td.TagID')
             ->Where('td.DiscussionID', $DiscussionID);
+      } else {
+         $SQL->Where('t.CountDiscussions >', 0, FALSE);
       }
             
       $this->_TagData = $SQL
          ->Select('t.*')
          ->From('Tag t')
-         ->Where('t.CountDiscussions >', 0, FALSE)
          ->OrderBy('t.CountDiscussions', 'desc')
          ->Limit(25)
          ->Get();

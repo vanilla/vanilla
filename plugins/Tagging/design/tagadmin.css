@@ -21,6 +21,17 @@
 .Tag a {
    color: #1e79a7;
 }
+
+.Tag-Archived {
+   background: #ddd;
+   color: #666;
+   border-color: #666;
+}
+
+.Tag-Archived a {
+   color: #666;
+}
+
 a.TagName {
     margin: 0;
     padding: 4px 0 0 0;
@@ -44,6 +55,12 @@ a.TagName {
    color: #eaf4fd;
    margin: 0 0 0 1px;
 }
+
+.Tag-Archived .Count {
+   background-color: #666;
+   color: #eee;
+}
+
 a.Delete {
 	font-family: arial;
 	font-size: 22px;

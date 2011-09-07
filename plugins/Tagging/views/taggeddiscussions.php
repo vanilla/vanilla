@@ -7,7 +7,11 @@ include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php
-   echo $this->Pager->ToString('more');
+   $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+   if ($this->Data('_PagerUrl')) {
+      $PagerOptions['Url'] = $this->Data('_PagerUrl');
+   }
+   echo PagerModule::Write($PagerOptions);
 } else {
    ?>
    <div class="Empty"><?php printf(T('No items tagged with %s.'), htmlspecialchars($this->Tag)); ?></div>

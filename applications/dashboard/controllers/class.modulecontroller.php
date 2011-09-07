@@ -2,9 +2,18 @@
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @package Dashboard
  */
 
+/**
+ * Provides a way to widgetize modules.
+ *
+ * @package Dashboard
+ */
 class ModuleController extends Gdn_Controller {
+   /**
+    * Creates and renders an instance of a module.
+    */
    public function Index($Module, $AppFolder = '') {
       $ModuleClassExists = class_exists($Module);
 

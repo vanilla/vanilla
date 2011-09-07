@@ -5,7 +5,6 @@
  * Remember to rename this to FooHooks, where 'Foo' is you app's short name.
  */
 class SkeletonHooks implements Gdn_IPlugin {
-   
    /**
     * Example hook. You should delete this.
     *
@@ -24,11 +23,9 @@ class SkeletonHooks implements Gdn_IPlugin {
       // You need to manually include structure.php here for it to get run at install.
       include(PATH_APPLICATIONS . DS . 'skeleton' . DS . 'settings' . DS . 'structure.php');
 
-      // This just gets the version number and stores it in the config file. Good practice but optional.
-      $ApplicationInfo = array();
-      include(CombinePaths(array(PATH_APPLICATIONS . DS . 'skeleton' . DS . 'settings' . DS . 'about.php')));
-      $Version = ArrayValue('Version', ArrayValue('Skeleton', $ApplicationInfo, array()), 'Undefined');
-      SaveToConfig('Skeleton.Version', $Version);
+      // Stores a value in the config to indicate it has previously been installed.
+      // You can use if(C('Skeleton.Setup', FALSE)) to test whether to repeat part of your setup.
+      SaveToConfig('Skeleton.Setup', TRUE);
    }
    
    /**

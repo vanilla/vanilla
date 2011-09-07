@@ -7,11 +7,23 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Session Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Convenience access to current user's session.
+ *
+ * @since 2.0.?
+ * @package Dashboard
+ */
 class SessionController extends DashboardController {
-
    /**
     * Stash a value in the user's session, or unstash it if no value was provided to stash.
+    *
+    * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
     */
    public function Stash() {
       $this->DeliveryType(DELIVERY_TYPE_BOOL);

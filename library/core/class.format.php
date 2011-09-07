@@ -849,9 +849,16 @@ EOT;
             $Url = $Matches[1];
             $Punc = $Matches[2];
          }
+         
+         // Get human-readable text from url.
+         $Text = $Url;
+         if (strpos($Text ,'%') !== FALSE) {
+            $Text = rawurldecode($Text);
+            $Text = htmlspecialchars($Text, ENT_QUOTES, C('Garden.Charset', ''));
+         }
 
          $Result = <<<EOT
-<a href="$Url" target="_blank"$nofollow>$Url</a>$Punc
+<a href="$Url" target="_blank"$nofollow>$Text</a>$Punc
 EOT;
       }
       return $Result;

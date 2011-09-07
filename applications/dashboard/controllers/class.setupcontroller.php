@@ -7,14 +7,28 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Dashboard Setup Controller
+ * Setup Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manages installation of Dashboard.
+ *
+ * @since 2.0.0
+ * @package Dashboard
  */
 class SetupController extends DashboardController {
-   
+   /** @var array Models to automatically instantiate. */
    public $Uses = array('Form', 'Database');
-   	
+   
+   /**
+    * Add CSS & module, set error master view. Automatically run on every use.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
@@ -23,9 +37,13 @@ class SetupController extends DashboardController {
    }
    
    /**
-    * The summary of all settings available. The menu items displayed here are
-    * collected from each application's application controller and all plugin's
-    * definitions.
+    * The summary of all settings available. 
+    *
+    * The menu items displayed here are collected from each application's 
+    * application controller and all plugin's definitions.
+    *
+    * @since 2.0.0
+    * @access public
     */
    public function Index() {
       $this->ApplicationFolder = 'dashboard';
@@ -81,9 +99,12 @@ class SetupController extends DashboardController {
    /**
     * Allows the configuration of basic setup information in Garden. This
     * should not be functional after the application has been set up.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $RedirectUrl Where to send user afterward.
     */
    public function Configure($RedirectUrl = '') {
-      
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -233,6 +254,13 @@ class SetupController extends DashboardController {
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }
    
+   /**
+    * Check minimum requirements for Garden.
+    *
+    * @since 2.0.0
+    * @access private
+    * @return bool Whether platform passes requirement check.
+    */
    private function _CheckPrerequisites() {
       // Make sure we are running at least PHP 5.1
       if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0)

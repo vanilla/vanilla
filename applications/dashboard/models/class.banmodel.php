@@ -73,6 +73,15 @@ class BanModel extends Gdn_Model {
       }
    }
    
+   /**
+    * Ban users that meet conditions given.
+    *
+    * @since 2.0.18
+    * @access public
+    * @param array $Ban Data about the ban.
+    *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
+    *    Valid values for BanType are email, ipaddress or name.
+    */ 
    public function BanWhere($Ban) {
       $Result = array('u.Admin' => 0, 'u.Deleted' => 0);
       $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);

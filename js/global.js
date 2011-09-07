@@ -356,8 +356,10 @@ jQuery(document).ready(function($) {
 //   });
 
    $.fn.popin = function(options) {
-     this.each(function(i, elem) {
-        var url = $(elem).attr('rel');
+      var settings = $.extend({}, options);
+      
+      this.each(function(i, elem) {
+         var url = $(elem).attr('rel');
          var $elem = $(elem);
          $.ajax({
             url: gdn.url(url),
@@ -367,6 +369,9 @@ jQuery(document).ready(function($) {
             },
             complete: function() {
                $elem.removeClass('Progress TinyProgress');
+               if (settings.complete != undefined) {
+                  settings.complete($elem);
+               }
             }
          });
      });

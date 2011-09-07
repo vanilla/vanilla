@@ -91,7 +91,7 @@ $Construct
 // Make sure the system user is okay.
 $SystemUserID = C('Garden.SystemUserID');
 if ($SystemUserID) {
-   $SysUser = Gdn::UserModel()->Get($SystemUserID);
+   $SysUser = Gdn::UserModel()->GetID($SystemUserID);
 
    if (!$SysUser || GetValue('Deleted', $SysUser)) {
       $SystemUserID = FALSE;
@@ -428,9 +428,9 @@ if ($PhotoIDExists) {
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', 'unique')
+   ->Column('Type', 'varchar(10)', NULL, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
-   ->Column('Archived', 'tinyint(1)', 0)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

@@ -98,6 +98,8 @@ jQuery(document).ready(function($) {
       var href = $this.attr('href');
       if ($this.attr('popupHref'))
          href = $this.attr('popupHref');
+      else
+         href += '&display=popup';
 
       var win = window.open(href, 'Window_' + id, "left="+left+",top="+top+",width="+width+",height="+height+",status=0,scrollbars=0");
       if (win)
@@ -354,8 +356,10 @@ jQuery(document).ready(function($) {
 //   });
 
    $.fn.popin = function(options) {
-     this.each(function(i, elem) {
-        var url = $(elem).attr('rel');
+      var settings = $.extend({}, options);
+      
+      this.each(function(i, elem) {
+         var url = $(elem).attr('rel');
          var $elem = $(elem);
          $.ajax({
             url: gdn.url(url),
@@ -365,6 +369,9 @@ jQuery(document).ready(function($) {
             },
             complete: function() {
                $elem.removeClass('Progress TinyProgress');
+               if (settings.complete != undefined) {
+                  settings.complete($elem);
+               }
             }
          });
      });

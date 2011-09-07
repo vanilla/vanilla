@@ -638,13 +638,13 @@ if (!function_exists('decho')) {
     */
    function decho($Mixed, $Prefix = 'DEBUG: ') {
       if (Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
-         echo '<div style="text-align: left; padding: 0 4px;">'.$Prefix;
+         echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
          if (is_string($Mixed))
             echo $Mixed;
          else
-            var_dump($Mixed);
+            echo htmlspecialchars(print_r($Mixed, TRUE));
       
-         echo '</div>';
+         echo '</pre>';
       }
    }
 }

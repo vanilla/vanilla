@@ -305,6 +305,11 @@ class EntryController extends Gdn_Controller {
             $this->Form->AddError('There was an error fetching the connection data.');
          return $this->Render('ConnectError');
       }
+      
+      if (!$this->Form->GetFormValue('Email')) {
+         $this->Form->SetFormValue('EmailVisible', TRUE);
+         $this->Form->AddHidden('EmailVisible', TRUE);
+      }
 
       $FormData = $this->Form->FormValues(); // debug
 
@@ -337,10 +342,15 @@ class EntryController extends Gdn_Controller {
          
          // Synchronize the user's data.
          $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
+         
+         if ($Attributes = $this->Form->GetFormValue('Attributes')) {
+            $UserModel->SaveAttribute($UserID, $Attributes);
+         }
 
          // Sign the user in.
          Gdn::Session()->Start($UserID);
-         $this->_SetRedirect(TRUE);
+//         $this->_SetRedirect(TRUE);
+         $this->_SetRedirect($this->Request->Get('display') == 'popup');
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
@@ -358,6 +368,7 @@ class EntryController extends Gdn_Controller {
          else
             $ExistingUsers = array();
 
+         $NameUnique = C('Garden.Registration.NameUnique', TRUE);
          $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
          $CurrentUserID = Gdn::Session()->UserID;
 
@@ -366,6 +377,10 @@ class EntryController extends Gdn_Controller {
             if ($EmailUnique && $UserRow['Email'] == $this->Form->GetFormValue('Email')) {
                $EmailFound = $UserRow;
                break;
+            }
+            
+            if ($UserRow['Name'] == $this->Form->GetFormValue('Name')) {
+               $NameFound = $UserRow;
             }
 
             if ($CurrentUserID > 0 && $UserRow['UserID'] == $CurrentUserID) {
@@ -383,14 +398,22 @@ class EntryController extends Gdn_Controller {
                array('UserID' => 'current', 'Name' => sprintf(T('%s (Current)'), Gdn::Session()->User->Name)),
                $ExistingUsers);
          }
+         
+         if (!isset($NameFound)) {
+            $this->Form->SetFormValue('ConnectName', $this->Form->GetFormValue('Name'));
+         }
 
          $this->SetData('ExistingUsers', $ExistingUsers);
 
-         if ($this->Form->GetFormValue('Name') && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+         if ($this->Form->GetFormValue('Name') && ValidateRequired($this->Form->GetFormValue('Email')) && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
             // There is no existing user with the suggested name so we can just create the user.
             $User = $this->Form->FormValues();
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
+            $User['Source'] = $this->Form->GetFormValue('Provider');
+            $User['SourceID'] = $this->Form->GetFormValue('UniqueID');
+            $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
+            $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
             $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
@@ -401,6 +424,7 @@ class EntryController extends Gdn_Controller {
                       'UserID' => $UserID,
                       'Provider' => $this->Form->GetFormValue('Provider'),
                       'UniqueID' => $this->Form->GetFormValue('UniqueID')));
+               
                $this->Form->SetFormValue('UserID', $UserID);
 
                Gdn::Session()->Start($UserID);
@@ -442,7 +466,8 @@ class EntryController extends Gdn_Controller {
             }
          } else {
             // The user selected an existing user.
-
+            $ConnectNameEntered = FALSE;
+            
             if ($UserSelect == 'current') {
                if (Gdn::Session()->UserID == 0) {
                   // This shouldn't happen, but a use could sign out in another browser and click submit on this form.

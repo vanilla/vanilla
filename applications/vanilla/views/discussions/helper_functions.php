@@ -63,7 +63,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
                echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';
             } else {
                echo '<span class="LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span>';
-               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate).'</span>';
+               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate);
+               
+               if ($Source = GetValue('Source', $Discussion)) {
+                  echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
+               }
+               
+               echo '</span>';
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')

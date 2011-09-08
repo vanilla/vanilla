@@ -27,6 +27,9 @@ $PluginInfo['AllViewed'] = array(
 class AllViewedPlugin extends Gdn_Plugin {
    /**
     * Adds "Mark All Viewed" to main menu.
+    *
+    * @since 1.0
+    * @access public
     */
    public function Base_Render_Before($Sender) {
       // Add "Mark All Viewed" to menu
@@ -39,8 +42,11 @@ class AllViewedPlugin extends Gdn_Plugin {
    
    /**
     * Allows user to mark all discussions as viewed.
+    *
+    * @since 1.0
+    * @access public
     */
-   function DiscussionsController_MarkAllViewed_Create($Sender) {
+   public function DiscussionsController_MarkAllViewed_Create($Sender) {
       $UserModel = Gdn::UserModel();
       $UserModel->UpdateAllViewed();
       Redirect('discussions');
@@ -48,8 +54,11 @@ class AllViewedPlugin extends Gdn_Plugin {
    
    /**
     * Get the number of comments inserted since the given timestamp.
+    *
+    * @since 1.0
+    * @access public
     */
-   function GetCommentCountSince($DiscussionID, $DateSince) {
+   public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
@@ -68,7 +77,7 @@ class AllViewedPlugin extends Gdn_Plugin {
          ->Select('c.CommentID')
          ->From('Comment c')
          ->Where('DiscussionID', $DiscussionID)
-         ->Where('DateInserted >', Gdn_Format::ToDateTime($DateSince))
+         ->Where('DateInserted >', Gdn_Format::ToDateTime($DateAllViewed))
          ->GetCount();
    }
    
@@ -79,8 +88,10 @@ class AllViewedPlugin extends Gdn_Plugin {
     *    $this->EventArguments['Data'] = $Data;
     *    $this->FireEvent('AfterAddColumns');
     * @link http://vanillaforums.org/discussion/13227
+    * @since 1.0
+    * @access public
     */
-   function DiscussionModel_AfterAddColumns_Handler($Sender) {
+   public function DiscussionModel_AfterAddColumns_Handler($Sender) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
@@ -99,7 +110,10 @@ class AllViewedPlugin extends Gdn_Plugin {
 				   $Discussion->CountUnreadComments = 0; 
 			   }
             elseif (Gdn_Format::ToTimestamp($Discussion->DateLastViewed) == $DateAllViewed || !$Discussion->DateLastViewed) {
-               // AllViewed used since last "real" view, but new comments since then
+               // User clicked AllViewed
+			      // Discussion is older than click
+			      // Last comment is newer than click
+			      // No UserDiscussion record found OR UserDiscussion was set by AllViewed
 			      $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
 			   }
 			}
@@ -108,13 +122,17 @@ class AllViewedPlugin extends Gdn_Plugin {
    
    /**
     * Update user's AllViewed datetime.
+    *
+    * @since 1.0
+    * @access public
     */
-   function UserModel_UpdateAllViewed_Create($Sender) {
+   public function UserModel_UpdateAllViewed_Create($Sender) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
       
-      $UserID = $Session->User->UserID; // Can only activate on yourself
+      // Can only activate on yourself
+      $UserID = $Session->User->UserID; 
             
       // Validite UserID
       $UserID = (int) $UserID;
@@ -126,27 +144,32 @@ class AllViewedPlugin extends Gdn_Plugin {
       
       // Update User timestamp
       $Sender->SQL->Update('User')
-         ->Set('DateAllViewed', $AllViewed);
-      $Sender->SQL->Where('UserID', $UserID)->Put();
+         ->Set('DateAllViewed', $AllViewed)
+         ->Where('UserID', $UserID)
+         ->Put();
       
       // Update DateLastViewed = now
       $Sender->SQL->Update('UserDiscussion')
-         ->Set('DateLastViewed', $AllViewed) 
-         ->Where('UserID', $UserID)->Put();
+         ->Set('DateLastViewed', $AllViewed)
+         ->Where('UserID', $UserID)
+         ->Put();
       
       // Set in current session
       $Session->User->DateAllViewed = Gdn_Format::ToDateTime();
    }
    
    /**
-    * 1-Time on Enable
+    * 1-Time on Enable.
     */
    public function Setup() {
       $this->Structure();
    }
    
    /**
-    * Database changes
+    * Database changes.
+    *
+    * @since 1.0
+    * @access public
     */
    public function Structure() {
       $Structure = Gdn::Structure();

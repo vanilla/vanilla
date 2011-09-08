@@ -384,8 +384,13 @@ class ActivityModel extends Gdn_Model {
             try {
                $Email->Send();
                $Emailed = 2; // similar to http 200 OK
+            } catch (phpmailerException $pex) {
+               if ($pex->getCode() == PHPMailer::STOP_SERVER)
+                  $Emailed = 5;
+               else
+                  $Emailed = 4;
             } catch (Exception $ex) {
-               $Emailed = 4; // similar to http 4xx
+               $Emailed = 4; // similar to http 5xx
             }
             try {
                $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
@@ -417,8 +422,8 @@ class ActivityModel extends Gdn_Model {
             // Only send out one notification per user.
             $Notification = $Notifications[0];
             
-            
             $Email = $Notification['Email'];
+            
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
@@ -426,12 +431,17 @@ class ActivityModel extends Gdn_Model {
                try {
                   $Email->Send();
                   $Emailed = 2;
+               } catch (phpmailerException $pex) {
+                  if ($pex->getCode() == PHPMailer::STOP_SERVER)
+                     $Emailed = 5;
+                  else
+                     $Emailed = 4;
                } catch(Exception $Ex) {
                   $Emailed = 4;
                }
                
                try {
-                  $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+                  $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $Notification['ActivityID']));
                } catch (Exception $Ex) {
                }
             }

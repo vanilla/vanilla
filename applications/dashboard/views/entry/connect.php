@@ -32,14 +32,13 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 				$NameFormat = '';
 			}
 			
-			
 			$NameFormat = '%1$s';
 			echo sprintf(
 				$NameFormat,
 				'<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
 				'<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
 			
-			echo Wrap(T('Add Info &amp; Create Account'), 'h3');
+			echo Wrap(T('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
 			?>
 		</div>
 		<?php endif; ?>
@@ -52,21 +51,21 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 		else:
 			$ExistingUsers = (array)$this->Data('ExistingUsers', array());
 			$NoConnectName = $this->Data('NoConnectName');
-			$PasswordMessage = 'Leave blank unless connecting to an exising account.';
+			$PasswordMessage = T('ConnectLeaveBlank', 'Leave blank unless connecting to an exising account.');
 		?>
 			<ul>
 				<li>
 					<?php
 					if (count($ExistingUsers) == 1 && $NoConnectName) {
-						$PasswordMessage = 'Enter your existing account password.';
+						$PasswordMessage = T('ConnectExistingPassword', 'Enter your existing account password.');
 						$Row = reset($ExistingUsers);
-						echo '<div class="FinePrint">',T('You already have an account here.'),'</div>',
-							Wrap(sprintf(T('Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
+						echo '<div class="FinePrint">',T('ConnectAccountExists', 'You already have an account here.'),'</div>',
+							Wrap(sprintf(T('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
 						$this->AddDefinition('NoConnectName', TRUE);
 						echo $this->Form->Hidden('UserSelect', array('Value' => $Row['UserID']));
 					} else {
 						echo $this->Form->Label('Username', 'ConnectName');
-						echo '<div class="FinePrint">',T('Choose a name to identify yourself on the site.'),'</div>';
+						echo '<div class="FinePrint">',T('ConnectChooseName', 'Choose a name to identify yourself on the site.'),'</div>';
 	
 						if (count($ExistingUsers) > 0) {
 							foreach ($ExistingUsers as $Row) {
@@ -83,14 +82,13 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 				<li id="ConnectPassword">
 					<?php
 					echo $this->Form->Label('Password', 'ConnectPassword');
-					echo '<div class="FinePrint">',T($PasswordMessage),'</div>';
+					echo Wrap($PasswordMessage, 'div', array('class' => 'FinePrint'));
 					echo $this->Form->Input('ConnectPassword', 'password');
 					?>
 				</li>
 			</ul>
 	
 		<?php
-
 		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer')), '</div>';
 	
 		endif;

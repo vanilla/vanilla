@@ -13,6 +13,6 @@ echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Repo
 <?php echo T('Reason') . ': ' . $Reason; ?>
 
 
-<?php echo T('Flagged by') . ': ' . $Flag['UserName']; ?>
+<?php echo T('FlaggedBy', 'Reported by:') .' '. $Flag['UserName']; ?>
 
-<?php if ($DiscussionID) echo T('Discuss it') . ': ' . ExternalUrl('discussion/'.$DiscussionID); ?>
+<?php if ($DiscussionID) echo T('FlagDiscuss', 'Discuss it') . ': ' . ExternalUrl('discussion/'.$DiscussionID); ?>

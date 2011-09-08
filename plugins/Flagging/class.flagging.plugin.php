@@ -352,7 +352,7 @@ class FlaggingPlugin extends Gdn_Plugin {
          // Notify users with permission who've chosen to be notified
          if (!$FlagResult) { // Only send if this is first time it's being flagged.
             $Sender->SetData('Plugin.Flagging.DiscussionID', $DiscussionID);
-            $Subject = (isset($PrefixedDiscussionName)) ? $PrefixedDiscussionName : T('A discussion was flagged');
+            $Subject = (isset($PrefixedDiscussionName)) ? $PrefixedDiscussionName : T('FlagDiscussion', 'A discussion was flagged');
             $EmailBody = $Sender->FetchView($this->GetView('reportemail.php'));
             $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
             
@@ -368,7 +368,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             }
          }
                   
-         $Sender->InformMessage(T("Your complaint has been registered."));
+         $Sender->InformMessage(T('FlagSent', "Your complaint has been registered."));
       }
       $Sender->Render($this->GetView('flag.php'));
    }

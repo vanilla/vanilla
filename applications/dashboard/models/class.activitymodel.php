@@ -383,8 +383,13 @@ class ActivityModel extends Gdn_Model {
             $this->FireEvent('BeforeSendNotification');
             try {
                $Email->Send();
+               $Emailed = 2; // similar to http 200 OK
             } catch (Exception $ex) {
-               // Don't do anything with the exception.
+               $Emailed = 4; // similar to http 4xx
+            }
+            try {
+               $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+            } catch (Exception $Ex) {
             }
          }
       }
@@ -420,7 +425,14 @@ class ActivityModel extends Gdn_Model {
             
                try {
                   $Email->Send();
+                  $Emailed = 2;
                } catch(Exception $Ex) {
+                  $Emailed = 4;
+               }
+               
+               try {
+                  $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+               } catch (Exception $Ex) {
                }
             }
          }

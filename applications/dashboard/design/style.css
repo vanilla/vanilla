@@ -462,17 +462,20 @@ body #Head h1 {
    font-size: 24px;
    color:#fff;
 }
+#Head .Search,
 #Head #Search {
    position: absolute;
    right: 0;
    bottom: 6px;
    text-align: right;
 }
+#Head .Search form,
 #Head #Search form {
    float: right;
    width: 250px;
    padding: 0;
 }
+#Head .Search form input.InputBox,
 #Head #Search form input.InputBox {
    width: 204px;
    border: 0;
@@ -486,6 +489,7 @@ body #Head h1 {
    font-size: 13px;
 	vertical-align: bottom;
 }
+#Head .Search form input.Button,
 #Head #Search form input.Button {
 	font-size: 11px;
 	border: none;

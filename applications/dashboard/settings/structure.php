@@ -319,7 +319,10 @@ $Construct->Table('Invitation')
    
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Activity')
+$Construct->Table('Activity');
+$EmailedExists = $Construct->ColumnExists('Emailed');
+
+$Construct
 	->PrimaryKey('ActivityID')
    ->Column('CommentActivityID', 'int', TRUE, 'key')
    ->Column('ActivityTypeID', 'int')
@@ -331,7 +334,12 @@ $Construct->Table('Activity')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('Emailed', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
+
+if (!$EmailedExists) {
+   $SQL->Put('Activity', array('Emailed' => 1));
+}
 
 // ActivityType Table
 $Construct->Table('ActivityType')

@@ -7,13 +7,13 @@ $Editing = isset($this->Comment);
    <?php if (!$Editing) { ?>
    <div class="Tabs CommentTabs">
       <ul>
-         <li class="Active"><?php echo Anchor(T('Write Comment'), '#', 'WriteButton'); ?></li>
+         <li class="Active"><?php echo Anchor(T('Write Comment'), '#', 'WriteButton TabLink'); ?></li>
          <?php
          if (!$Editing)
-            echo '<li>'.Anchor(T('Preview'), '#', 'PreviewButton')."</li>\n";
+            echo '<li>'.Anchor(T('Preview'), '#', 'PreviewButton TabLink')."</li>\n";
          
          if ($NewOrDraft)
-            echo '<li>'.Anchor(T('Save Draft'), '#', 'DraftButton')."</li>\n";
+            echo '<li>'.Anchor(T('Save Draft'), '#', 'DraftButton TabLink')."</li>\n";
    
          $this->FireEvent('AfterCommentTabs');
          ?>

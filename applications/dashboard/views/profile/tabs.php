@@ -26,7 +26,7 @@ foreach ($this->_ProfileTabs as $TabCode => $TabInfo) {
       if (array_key_exists($TabCode, $this->_ProfileTabs)) {
          $TabInfo = GetValue($TabCode, $this->_ProfileTabs, array());
          $CssClass .= GetValue('CssClass', $TabInfo, '');
-         echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.Anchor(GetValue('TabHtml', $TabInfo, $TabCode), GetValue('TabUrl', $TabInfo))."</li>\r\n";
+         echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.Anchor(GetValue('TabHtml', $TabInfo, $TabCode), GetValue('TabUrl', $TabInfo), array('class' => 'TabLink'))."</li>\r\n";
       }
    }
    ?>

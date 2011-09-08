@@ -85,7 +85,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 
 function WriteFilterTabs(&$Sender) {
    $Session = Gdn::Session();
-   $Title = property_exists($Sender, 'Category') && is_object($Sender->Category) ? $Sender->Category->Name : T('All Discussions');
+   $Title = property_exists($Sender, 'Category') ? GetValue('Name', $Sender->Category, '') : '';
+   if ($Title == '')
+      $Title = T('All Discussions');
+      
    $Bookmarked = T('My Bookmarks');
    $MyDiscussions = T('My Discussions');
    $MyDrafts = T('My Drafts');
@@ -112,7 +115,7 @@ function WriteFilterTabs(&$Sender) {
 <div class="Tabs DiscussionsTabs">
    <ul>
       <?php $Sender->FireEvent('BeforeDiscussionTabs'); ?>
-      <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions'); ?></li>
+      <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?></li>
       <?php $Sender->FireEvent('AfterAllDiscussionsTab'); ?>
 
       <?php
@@ -122,22 +125,22 @@ function WriteFilterTabs(&$Sender) {
             $CssClass = 'Active';
          }
 
-         echo "<li class=\"$CssClass\">".Anchor(T('Categories'), '/categories/all').'</li>';
+         echo "<li class=\"$CssClass\">".Anchor(T('Categories'), '/categories/all', 'TabLink').'</li>';
       }
       ?>
       <?php if ($CountBookmarks > 0 || $Sender->RequestMethod == 'bookmarked') { ?>
-      <li<?php echo $Sender->RequestMethod == 'bookmarked' ? ' class="Active"' : ''; ?>><?php echo Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks'); ?></li>
+      <li<?php echo $Sender->RequestMethod == 'bookmarked' ? ' class="Active"' : ''; ?>><?php echo Anchor($Bookmarked, '/discussions/bookmarked', 'MyBookmarks TabLink'); ?></li>
       <?php
          $Sender->FireEvent('AfterBookmarksTab');
       }
       if ($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') {
       ?>
-      <li<?php echo $Sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions'); ?></li>
+      <li<?php echo $Sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions TabLink'); ?></li>
       <?php
       }
       if ($CountDrafts > 0 || $Sender->ControllerName == 'draftscontroller') {
       ?>
-      <li<?php echo $Sender->ControllerName == 'draftscontroller' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDrafts, '/drafts', 'MyDrafts'); ?></li>
+      <li<?php echo $Sender->ControllerName == 'draftscontroller' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDrafts, '/drafts', 'MyDrafts TabLink'); ?></li>
       <?php
       }
       $Sender->FireEvent('AfterDiscussionTabs');

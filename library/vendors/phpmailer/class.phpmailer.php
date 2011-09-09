@@ -330,6 +330,7 @@ class PHPMailer {
   const STOP_MESSAGE  = 0; // message only, continue processing
   const STOP_CONTINUE = 1; // message?, likely ok to continue processing
   const STOP_CRITICAL = 2; // message, plus full stop, critical error reached
+  const STOP_SERVER = 5; // message is fine, but the server din't accept the message.
 
   /////////////////////////////////////////////////
   // METHODS, VARIABLES
@@ -604,7 +605,7 @@ class PHPMailer {
     if ($this->SingleTo === true) {
       foreach ($this->SingleToArray as $key => $val) {
         if(!@$mail = popen($sendmail, 'w')) {
-          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
         }
         fputs($mail, "To: " . $val . "\n");
         fputs($mail, $header);
@@ -614,12 +615,12 @@ class PHPMailer {
         $isSent = ($result == 0) ? 1 : 0;
         $this->doCallback($isSent,$val,$this->cc,$this->bcc,$this->Subject,$body);
         if($result != 0) {
-          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
         }
       }
     } else {
       if(!@$mail = popen($sendmail, 'w')) {
-        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
       }
       fputs($mail, $header);
       fputs($mail, $body);
@@ -628,7 +629,7 @@ class PHPMailer {
       $isSent = ($result == 0) ? 1 : 0;
       $this->doCallback($isSent,$this->to,$this->cc,$this->bcc,$this->Subject,$body);
       if($result != 0) {
-        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
       }
     }
     return true;
@@ -703,7 +704,7 @@ class PHPMailer {
     $bad_rcpt = array();
 
     if(!$this->SmtpConnect()) {
-      throw new phpmailerException($this->Lang('smtp_connect_failed'), self::STOP_CRITICAL);
+      throw new phpmailerException($this->Lang('smtp_connect_failed'), self::STOP_SERVER);
     }
     $smtp_from = ($this->Sender == '') ? $this->From : $this->Sender;
     if(!$this->smtp->Mail($smtp_from)) {
@@ -754,7 +755,7 @@ class PHPMailer {
       throw new phpmailerException($this->Lang('recipients_failed') . $badaddresses);
     }
     if(!$this->smtp->Data($header . $body)) {
-      throw new phpmailerException($this->Lang('data_not_accepted'), self::STOP_CRITICAL);
+      throw new phpmailerException($this->Lang('data_not_accepted'), self::STOP_SERVER);
     }
     if($this->SMTPKeepAlive == true) {
       $this->smtp->Reset();
@@ -817,7 +818,7 @@ class PHPMailer {
         }
         $index++;
         if (!$connection) {
-          throw new phpmailerException($this->Lang('connect_host'));
+          throw new phpmailerException($this->Lang('connect_host'), self::STOP_SERVER);
         }
       }
     } catch (phpmailerException $e) {
@@ -1325,6 +1326,12 @@ class PHPMailer {
    */
   public function TextLine($value) {
     return $value . $this->LE;
+  }
+  
+  public function ThrowExceptions($NewValue = NULL) {
+     if ($NewValue !== NULL)
+        $this->exceptions = $NewValue;
+     return $this->exceptions;
   }
 
   /////////////////////////////////////////////////

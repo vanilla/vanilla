@@ -54,6 +54,14 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			$PasswordMessage = T('ConnectLeaveBlank', 'Leave blank unless connecting to an exising account.');
 		?>
 			<ul>
+            <?php if ($this->Form->GetFormValue('EmailVisible')): ?>
+            <li>
+               <?php
+               echo $this->Form->Label('Email', 'Email');
+               echo $this->Form->TextBox('Email');
+               ?>
+            </li>
+            <?php endif; ?>
 				<li>
 					<?php
 					if (count($ExistingUsers) == 1 && $NoConnectName) {

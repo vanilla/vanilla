@@ -1,21 +1,37 @@
 <?php if (!defined('APPLICATION')) exit();
-// Copyright Trademark Productions 2010
-
+/**
+ * 'Mark All Viewed' plugin for Vanilla Forums.
+ *
+ * v1.2 
+ * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
+ * - Removed spurious config checks and &s
+ *
+ * @package AllViewed
+ */
+ 
 $PluginInfo['AllViewed'] = array(
    'Name' => 'Mark All Viewed',
    'Description' => 'Allows users to mark all discussions as viewed.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://www.tmprod.com/web-development/vanilla.php',
+   'AuthorUrl' => '',
    'License' => 'GNU GPLv2'
 );
 
+/**
+ * Allows users to mark all discussions as viewed.
+ *
+ * @package AllViewed
+ */
 class AllViewedPlugin extends Gdn_Plugin {
    /**
     * Adds "Mark All Viewed" to main menu.
+    *
+    * @since 1.0
+    * @access public
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       // Add "Mark All Viewed" to menu
       $Session = Gdn::Session();
       if ($Sender->Menu && $Session->IsValid()) {
@@ -26,8 +42,11 @@ class AllViewedPlugin extends Gdn_Plugin {
    
    /**
     * Allows user to mark all discussions as viewed.
+    *
+    * @since 1.0
+    * @access public
     */
-   function DiscussionsController_MarkAllViewed_Create(&$Sender) {
+   public function DiscussionsController_MarkAllViewed_Create($Sender) {
       $UserModel = Gdn::UserModel();
       $UserModel->UpdateAllViewed();
       Redirect('discussions');
@@ -35,9 +54,11 @@ class AllViewedPlugin extends Gdn_Plugin {
    
    /**
     * Get the number of comments inserted since the given timestamp.
+    *
+    * @since 1.0
+    * @access public
     */
-   function GetCommentCountSince($DiscussionID, $DateSince) {
-      if (!C('Plugins.AllViewed.Enabled')) return;
+   public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
@@ -55,10 +76,9 @@ class AllViewedPlugin extends Gdn_Plugin {
       return $SQL
          ->Select('c.CommentID')
          ->From('Comment c')
-         ->Where('DiscussionID = '.$DiscussionID)
-         ->Where("DateInserted > '".$DateSince."'")
-         ->Get()
-         ->Count;
+         ->Where('DiscussionID', $DiscussionID)
+         ->Where('DateInserted >', Gdn_Format::ToDateTime($DateAllViewed))
+         ->GetCount();
    }
    
    /**
@@ -68,37 +88,51 @@ class AllViewedPlugin extends Gdn_Plugin {
     *    $this->EventArguments['Data'] = $Data;
     *    $this->FireEvent('AfterAddColumns');
     * @link http://vanillaforums.org/discussion/13227
+    * @since 1.0
+    * @access public
     */
-   function DiscussionModel_AfterAddColumns_Handler(&$Sender) {
-      if (!C('Plugins.AllViewed.Enabled')) return;
+   public function DiscussionModel_AfterAddColumns_Handler($Sender) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
       
-      // Recalculate New count with user's DateAllViewed   
-      $Sender->Data = GetValue('Data', $Sender->EventArguments, '');
-      $Result = &$Sender->Data->Result();
+      // Recalculate New count with user's DateAllViewed
       $DateAllViewed = Gdn_Format::ToTimestamp($Session->User->DateAllViewed);
-		foreach($Result as &$Discussion) {
+      foreach($Sender->EventArguments['Data']->Result() as $Discussion) {
 		   if ($DateAllViewed != 0) { // Only if they've used AllViewed
-			   if (Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed)
-				   $Discussion->CountUnreadComments = 0; // Covered by AllViewed
-            elseif ($Discussion->DateLastViewed == $DateAllViewed) // AllViewed used since last "real" view, but new comments since then
+			   if (Gdn_Format::ToTimestamp($Discussion->DateInserted) > $DateAllViewed) {
+			      // Discussion is newer than last 'AllViewed' click
+			      continue;
+			   }
+			   
+			   if (Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed) {
+				   // Covered by AllViewed
+				   $Discussion->CountUnreadComments = 0; 
+			   }
+            elseif (Gdn_Format::ToTimestamp($Discussion->DateLastViewed) == $DateAllViewed || !$Discussion->DateLastViewed) {
+               // User clicked AllViewed
+			      // Discussion is older than click
+			      // Last comment is newer than click
+			      // No UserDiscussion record found OR UserDiscussion was set by AllViewed
 			      $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
+			   }
 			}
 		}
    }
    
    /**
     * Update user's AllViewed datetime.
+    *
+    * @since 1.0
+    * @access public
     */
-   function UserModel_UpdateAllViewed_Create(&$Sender) {
-      if (!C('Plugins.AllViewed.Enabled')) return;
+   public function UserModel_UpdateAllViewed_Create($Sender) {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
       
-      $UserID = $Session->User->UserID; // Can only activate on yourself
+      // Can only activate on yourself
+      $UserID = $Session->User->UserID; 
             
       // Validite UserID
       $UserID = (int) $UserID;
@@ -110,40 +144,37 @@ class AllViewedPlugin extends Gdn_Plugin {
       
       // Update User timestamp
       $Sender->SQL->Update('User')
-         ->Set('DateAllViewed', $AllViewed);
-      $Sender->SQL->Where('UserID', $UserID)->Put();
+         ->Set('DateAllViewed', $AllViewed)
+         ->Where('UserID', $UserID)
+         ->Put();
       
       // Update DateLastViewed = now
       $Sender->SQL->Update('UserDiscussion')
-         ->Set('DateLastViewed', $AllViewed) 
-         ->Where('UserID', $UserID)->Put();
+         ->Set('DateLastViewed', $AllViewed)
+         ->Where('UserID', $UserID)
+         ->Put();
       
       // Set in current session
       $Session->User->DateAllViewed = Gdn_Format::ToDateTime();
    }
    
    /**
-    * 1-Time on Enable
+    * 1-Time on Enable.
     */
    public function Setup() {
       $this->Structure();
-      SaveToConfig('Plugins.AllViewed.Enabled', TRUE);
    }
    
    /**
-    * Database changes
+    * Database changes.
+    *
+    * @since 1.0
+    * @access public
     */
    public function Structure() {
       $Structure = Gdn::Structure();
       $Structure->Table('User')
          ->Column('DateAllViewed', 'datetime', NULL)
          ->Set();
-   }
-   
-   /**
-    * 1-Time on Disable
-    */
-   public function OnDisable() {
-      RemoveFromConfig('Plugins.AllViewed.Enabled');
    }
 }

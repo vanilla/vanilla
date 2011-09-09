@@ -383,8 +383,18 @@ class ActivityModel extends Gdn_Model {
             $this->FireEvent('BeforeSendNotification');
             try {
                $Email->Send();
+               $Emailed = 2; // similar to http 200 OK
+            } catch (phpmailerException $pex) {
+               if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
+                  $Emailed = 4;
+               else
+                  $Emailed = 5;
             } catch (Exception $ex) {
-               // Don't do anything with the exception.
+               $Emailed = 4; // similar to http 5xx
+            }
+            try {
+               $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+            } catch (Exception $Ex) {
             }
          }
       }
@@ -412,15 +422,27 @@ class ActivityModel extends Gdn_Model {
             // Only send out one notification per user.
             $Notification = $Notifications[0];
             
-            
             $Email = $Notification['Email'];
+            
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
             
                try {
                   $Email->Send();
+                  $Emailed = 2;
+               } catch (phpmailerException $pex) {
+                  if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
+                     $Emailed = 4;
+                  else
+                     $Emailed = 5;
                } catch(Exception $Ex) {
+                  $Emailed = 4;
+               }
+               
+               try {
+                  $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $Notification['ActivityID']));
+               } catch (Exception $Ex) {
                }
             }
          }
@@ -464,7 +486,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-//            $Email->To($User->Email, $User->Name);
+            $Email->To($User->Email, $User->Name);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(

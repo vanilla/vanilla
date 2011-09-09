@@ -385,10 +385,10 @@ class ActivityModel extends Gdn_Model {
                $Email->Send();
                $Emailed = 2; // similar to http 200 OK
             } catch (phpmailerException $pex) {
-               if ($pex->getCode() == PHPMailer::STOP_SERVER)
-                  $Emailed = 5;
-               else
+               if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
                   $Emailed = 4;
+               else
+                  $Emailed = 5;
             } catch (Exception $ex) {
                $Emailed = 4; // similar to http 5xx
             }
@@ -432,10 +432,10 @@ class ActivityModel extends Gdn_Model {
                   $Email->Send();
                   $Emailed = 2;
                } catch (phpmailerException $pex) {
-                  if ($pex->getCode() == PHPMailer::STOP_SERVER)
-                     $Emailed = 5;
-                  else
+                  if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
                      $Emailed = 4;
+                  else
+                     $Emailed = 5;
                } catch(Exception $Ex) {
                   $Emailed = 4;
                }

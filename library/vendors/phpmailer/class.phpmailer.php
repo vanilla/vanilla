@@ -818,7 +818,7 @@ class PHPMailer {
         }
         $index++;
         if (!$connection) {
-          throw new phpmailerException($this->Lang('connect_host'));
+          throw new phpmailerException($this->Lang('connect_host'), self::STOP_SERVER);
         }
       }
     } catch (phpmailerException $e) {

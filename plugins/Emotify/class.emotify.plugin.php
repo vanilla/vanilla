@@ -2,7 +2,7 @@
 
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
-	'Description' => 'Replaces emoticons in forum comments with images.',
+	'Description' => 'Replaces <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> (smilies) with friendly pictures.',
 	'Version' 	=>	 '2.0.1',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",

@@ -45,8 +45,8 @@ v1.1 31AUG2011 - by Todd @ Vanilla
  */
 
 $PluginInfo['cleditor'] = array(
-   'Name' => 'CLEditor jQuery WYSIWYG',
-   'Description' => '<a href="http://premiumsoftware.net/cleditor/" target="_blank">CLEditor</a> jQuery WYSIWYG plugin for Vanilla 2.',
+   'Name' => 'WYSIWYG (CLEditor)',
+   'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
    'Version' => '1.0.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',

@@ -153,6 +153,11 @@ class Gdn_Schema {
             $PrimaryKeys[] = $FieldName;
       }
       
-      return count($PrimaryKeys) == 1 ? $PrimaryKeys[0] : $PrimaryKeys;
+      if (count($PrimaryKeys) == 0)
+         return '';
+      elseif (count($PrimaryKeys) == 1)
+         return $PrimaryKeys[0];
+      else
+         return $PrimaryKeys;
    }
 }

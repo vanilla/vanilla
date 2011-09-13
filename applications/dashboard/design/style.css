@@ -1306,19 +1306,7 @@ links, sign in buttons, etc */
 }
 
 /* =============================================================== Categories */
-.CategoryList .Item {
-	margin: 0;
-	padding: 0;
-	border: 0 !important;
-}
-.CategoryList .ItemContent {
-	position: relative;
-	margin-top: -1px;
-	border: 1px solid #BEC8CC;
-	border-width: 1px 0;
-	padding: 4px 9px;
-}
-.Meta .ChildCategories {
+.ChildCategories {
 	border-top: 1px dotted #ddd;
 	display: block;
 }
@@ -1328,7 +1316,7 @@ links, sign in buttons, etc */
 .Meta .RSS img {
 	vertical-align: text-bottom;
 }
-.CategoryList .CategoryHeading {
+.CategoryHeading .ItemContent {
 	font-weight: bold;
 	font-size: 14px;
 }

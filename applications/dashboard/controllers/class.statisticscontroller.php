@@ -73,6 +73,10 @@ class StatisticsController extends DashboardController {
             SaveToConfig('Garden.Analytics.Enabled', TRUE);
          }
          
+         if ($Flow && $this->Form->GetFormValue('Reregister')) {
+            Gdn::Statistics()->Register();
+         }
+         
       }
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();

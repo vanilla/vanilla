@@ -43,7 +43,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
          echo '<h3 class="Users">';
          
          if ($PhotoUser) {
-            echo '<div class="Photo">'.UserPhoto($PhotoUser).'</div>';
+            echo '<div class="Author Photo">'.UserPhoto($PhotoUser).'</div>';
          }
 
          echo Anchor(htmlspecialchars($Names), $Url), '</h3>';

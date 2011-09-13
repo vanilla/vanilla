@@ -563,8 +563,14 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('Path', $this->_Definitions))
          $this->_Definitions['Path'] = Gdn::Request()->Path();
 
-      if (!array_key_exists('SignedIn', $this->_Definitions))
-         $this->_Definitions['SignedIn'] = (int)Gdn::Session()->IsValid();
+      if (!array_key_exists('SignedIn', $this->_Definitions)) {
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $SignedIn = 2;
+         } else {
+            $SignedIn = (int)Gdn::Session()->IsValid();
+         }
+         $this->_Definitions['SignedIn'] = $SignedIn;
+      }
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');

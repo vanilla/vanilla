@@ -1005,18 +1005,6 @@ a.BigButton:focus {
    color: #fff;
 }
 /* Condensed datalists make the main link & excerpt inline. */
-.DataList .Photo {
-	float: left;
-	/* padding: 0 10px 0 0; */
-	font-size: 11px;
-}
-.DataList .Photo img {
-	display: block;
-	height: 43px;
-	width: 43px;
-	overflow: hidden;
-	background: #eee;
-}
 .DataList .Unfollow {
    background: #eee;
 }
@@ -1171,7 +1159,7 @@ conversation messages, etc). */
    color: #777;
 	min-height: 40px;
 }
-.MessageList .Meta .Author img {
+.Item .Author img {
    height: 40px;
    width: 40px;
    border: 0;

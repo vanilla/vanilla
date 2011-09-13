@@ -63,12 +63,14 @@ class DashboardHooks implements Gdn_IPlugin {
       $MessageCache = Gdn::Config('Garden.Messages.Cache', array());
       $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
 		$Exceptions = array('[Base]');
-		if ($Sender->MasterView == 'admin')
-			$Exceptions[] = '[Admin]';
-		else if (in_array($Sender->MasterView, array('', 'default')))
+// 2011-09-09 - mosullivan - No longer allowing messages in dashboard
+//		if ($Sender->MasterView == 'admin')
+//			$Exceptions[] = '[Admin]';
+//		else if (in_array($Sender->MasterView, array('', 'default')))
+		if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
 			
-      if (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache)) {
+		if ($Sender->MasterView != 'admin' && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {

@@ -175,13 +175,15 @@ class MessageController extends DashboardController {
     */
    protected function _GetLocationData() {
       $ControllerData = array();
-      $ControllerData['[Base]'] = 'Every Page';
+      $ControllerData['[Base]'] = 'All Pages';
       $ControllerData['[NonAdmin]'] = 'All Forum Pages';
-      $ControllerData['[Admin]'] = 'All Dashboard Pages';
+      // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
+      // $ControllerData['[Admin]'] = 'All Dashboard Pages';
       $ControllerData['Dashboard/Profile/Index'] = 'Profile Page';
       $ControllerData['Vanilla/Discussions/Index'] = 'Discussions Page';
       $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
-      $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
+      // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
+      // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;
       $this->FireEvent('AfterGetLocationData');
       return $ControllerData;

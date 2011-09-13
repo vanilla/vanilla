@@ -40,7 +40,7 @@ if($this->Pager->FirstPage())
    <div class="SubTab"><?php echo $DiscussionName; ?></div>
 </div>
 <?php $this->FireEvent('BeforeDiscussion'); ?>
-<ul class="MessageList Discussion <?php echo $PageClass; ?>">
+<ul class="DataList MessageList Discussion <?php echo $PageClass; ?>">
    <?php echo $this->FetchView('comments'); ?>
 </ul>
 <?php

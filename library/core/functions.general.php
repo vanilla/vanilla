@@ -415,6 +415,22 @@ if (!function_exists('C')) {
    }
 }
 
+if (!function_exists('CTo')) {
+   function CTo(&$Data, $Name, $Value) {
+      $Name = explode('.', $Name);
+      $LastKey = array_pop($Name);
+      $Current =& $Data;
+      
+      foreach ($Name as $Key) {
+         if (!isset($Current[$Key]))
+            $Current[$Key] = array();
+         
+         $Current =& $Current[$Key];
+      }
+      $Current[$LastKey] = $Value;
+   }
+}
+
 if (!function_exists('CalculateNumberOfPages')) {
    /**
     * Based on the total number of items and the number of items per page,

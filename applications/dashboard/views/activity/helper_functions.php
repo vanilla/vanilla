@@ -45,7 +45,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
 
    if ($PhotoAnchor != '') {
    ?>
-   <div class="Photo"><?php echo $PhotoAnchor; ?></div>
+   <div class="Author Photo"><?php echo $PhotoAnchor; ?></div>
    <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
@@ -108,7 +108,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
 ?>
 <li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php if ($PhotoAnchor != '') { ?>
-   <div class="Photo"><?php echo $PhotoAnchor; ?></div>
+   <div class="Author Photo"><?php echo $PhotoAnchor; ?></div>
    <?php } ?>
    <div class="ItemContent ActivityComment">
       <?php echo UserAnchor($Author, 'Title Name'); ?>

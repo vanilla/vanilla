@@ -111,10 +111,14 @@ class Gdn_Statistics extends Gdn_Plugin {
    public function Check() {
       
       // If we're local and not allowed, or just directly disabled, short circuit here
-      if (!self::CheckIsEnabled()) return;
+      if (!self::CheckIsEnabled()) {
+         return;
+      }
       
       // If we're hitting an exception app, short circuit here
-      if (!self::CheckIsAllowed()) return;
+      if (!self::CheckIsAllowed()) {
+         return;
+      }
       
       // If the config file is not writable, show a warning to admin users and return
       $ConfFile = PATH_LOCAL_CONF.DS.'config.php';
@@ -128,8 +132,9 @@ class Gdn_Statistics extends Gdn_Plugin {
          return;
       }
       
-      // At this point there is nothing preventing stats from working, so queue a tick
+      // At this point there is nothing preventing stats from working, so queue a tick.
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
+      
    }
    
 
@@ -137,7 +142,9 @@ class Gdn_Statistics extends Gdn_Plugin {
    public static function CheckIsAllowed() {
       
       // If we've recently received an error response, wait until the throttle expires
-      if (self::Throttled()) return FALSE;
+      if (self::Throttled()) {
+         return FALSE;
+      }
       
       // These applications are not included in statistics
       $ExceptionApplications = array('dashboard');
@@ -320,7 +327,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          call_user_func($CallbackExecute, $JsonResponse, $RawResponse);
    }
    
-   protected function Register() {
+   public function Register() {
       
       // Set the time we last attempted to perform registration
       Gdn::Set('Garden.Analytics.Registering', time());
@@ -549,7 +556,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Check if we're registered with the central server already. If not, this request is 
       // hijacked and used to perform that task instead of sending stats or recording a tick.
       if (is_null($InstallationID)) {
-         $AttemptedRegistration = Gdn::Get('Garden.Analytics.Registering',FALSE);
+         $AttemptedRegistration = Gdn::Get('Garden.Analytics.Registering', FALSE);
          // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
          if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60) return;
       
@@ -597,6 +604,19 @@ class Gdn_Statistics extends Gdn_Plugin {
    
    public static function Time() {
       return time();
+   }
+   
+   public static function TimeSlot($SlotType = 'd', $Timestamp = FALSE) {
+      if (!$Timestamp)
+         $Timestamp = self::Time();
+      if ($SlotType == 'd')
+         $Result = gmdate('Ymd', $Timestamp);
+      elseif ($SlotType == 'm')
+         $Result = gmdate('Ym', $Timestamp).'00';
+      elseif ($SlotType == 'y')
+         $Result = gmdate('Y', $Timestamp).'0000';
+      
+      return $Result;
    }
    
    public static function TimeFromTimeSlot($TimeSlot) {

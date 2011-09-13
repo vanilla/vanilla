@@ -325,7 +325,7 @@ class ProfileController extends Gdn_Controller {
 			return $this->Activity($UserReference, $Username, $UserID);
       else
          return Gdn::Dispatcher()->Dispatch('/profile/discussions/'.
-            ConcatSep('/', rawurlencode($UserReference, rawurlencode($Username), rawurlencode($UserID))));
+            ConcatSep('/', rawurlencode($UserReference), rawurlencode($Username), rawurlencode($UserID)));
    }
    
    /** 

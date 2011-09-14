@@ -608,6 +608,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Args = array();
       $Get = array_change_key_case($Controller->Request->Get());
       $MissingArgs = array();
+      
+      if (count($MethArgs) == 0) {
+         // The method has no arguments so just pass all of the arguments in.
+         return;
+      }
 
       // Set all of the parameters.
       foreach ($MethArgs as $Index => $MethParam) {

@@ -198,6 +198,7 @@ class Gdn_Email extends Gdn_Pluggable {
          $this->FireEvent('SendMail');
       }
 
+      $this->PhpMailer->ThrowExceptions(TRUE);
       if (!$this->PhpMailer->Send()) {
          throw new Exception($this->PhpMailer->ErrorInfo);
       }

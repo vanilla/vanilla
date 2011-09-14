@@ -7,20 +7,40 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
 /**
- * Route Management
+ * Statistics Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Managing site statistic reporting.
+ *
+ * @since 2.0.17
+ * @package Dashboard
  */
 class StatisticsController extends DashboardController {
-   
+   /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
    
+   /**
+    * Highlight menu path. Automatically run on every use.
+    *
+    * @since 2.0.17
+    * @access public
+    */
    public function Initialize() {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
    
+   /**
+    * Statistics setup & configuration.
+    *
+    * @since 2.0.17
+    * @access public
+    */
    public function Index() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/statistics');
@@ -53,6 +73,10 @@ class StatisticsController extends DashboardController {
             SaveToConfig('Garden.Analytics.Enabled', TRUE);
          }
          
+         if ($Flow && $this->Form->GetFormValue('Reregister')) {
+            Gdn::Statistics()->Register();
+         }
+         
       }
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();
@@ -76,6 +100,12 @@ class StatisticsController extends DashboardController {
       $this->Render();
    }
    
+   /**
+    * Verify connection credentials.
+    *
+    * @since 2.0.17
+    * @access public
+    */
    public function Verify() {
       $CredentialsValid = Gdn::Statistics()->ValidateCredentials();
       $this->SetData('StatisticsVerified', $CredentialsValid);

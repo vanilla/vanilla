@@ -35,7 +35,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
 <table class="AltRows">
    <thead>
       <tr>
-         <th><?php echo T('Plugin'); ?></th>
+         <th colspan="2"><?php echo T('Plugin'); ?></th>
          <th><?php echo T('Description'); ?></th>
       </tr>
    </thead>
@@ -58,8 +58,11 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
       $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
       $RowClass = $Css;
       if ($Alt) $RowClass .= ' Alt';
+      $IconPath = '/plugins/'.GetValue('Folder', $PluginInfo, '').'/icon.png';
+      $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
       ?>
       <tr <?php echo 'id="'.Gdn_Format::Url(strtolower($PluginName)).'-plugin"', ' class="More '.$RowClass.'"'; ?>>
+         <td rowspan="2" class="Less"><?php echo Img($IconPath, array('class' => 'PluginIcon')); ?></td>
          <th><?php echo $ScreenName; ?></th>
          <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $PluginInfo, '')); ?></td>
       </tr>

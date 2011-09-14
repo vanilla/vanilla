@@ -353,6 +353,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          'Content-Type' => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
       );
+      
       $this->_ErrorMessages = '';
       $this->_InformMessages = array();
       $this->StatusMessage = '';
@@ -394,8 +395,8 @@ class Gdn_Controller extends Gdn_Pluggable {
     * use the application folder that this controller belongs to.
     *  - If you specify plugins/PluginName as $AppFolder then you can contain a CSS file in a plugin's design folder.
     */
-   public function AddCssFile($FileName, $AppFolder = '') {
-      $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
+   public function AddCssFile($FileName, $AppFolder = '', $Options = NULL) {
+      $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
    }
    
    /**
@@ -562,8 +563,14 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('Path', $this->_Definitions))
          $this->_Definitions['Path'] = Gdn::Request()->Path();
 
-      if (!array_key_exists('SignedIn', $this->_Definitions))
-         $this->_Definitions['SignedIn'] = (int)Gdn::Session()->IsValid();
+      if (!array_key_exists('SignedIn', $this->_Definitions)) {
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $SignedIn = 2;
+         } else {
+            $SignedIn = (int)Gdn::Session()->IsValid();
+         }
+         $this->_Definitions['SignedIn'] = $SignedIn;
+      }
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
@@ -900,6 +907,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * controller to do things like loading script and CSS into the head.
     */
    public function Initialize() {
+      if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
+         $this->_Headers['Content-Type'] = 'text/xml; charset='.C('Garden.Charset', '');
+      }
+      
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
    }
@@ -1414,7 +1425,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                if ($CssPath !== FALSE) {
                   $CssPath = substr($CssPath, strlen(PATH_ROOT));
                   $CssPath = str_replace(DS, '/', $CssPath);
-                  $this->Head->AddCss($CssPath, 'all');
+                  $this->Head->AddCss($CssPath, 'all', TRUE, $CssInfo['Options']);
                }
             }
 

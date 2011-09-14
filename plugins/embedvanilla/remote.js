@@ -184,7 +184,8 @@ window.vanilla.embed = function(host) {
             +'&ForeignBody='+encodeURIComponent(foreign_body)
             +'&CategoryID='+encodeURIComponent(category_id);
       } else 
-         return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
+         var timestamp = new Date().getTime();
+         return 'http://' + host + path + '&t=' + timestamp + '&remote=' + encodeURIComponent(embedUrl);
    }
 
    document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'"'+optStr('height', ' scrolling="no"', '')+' frameborder="0" border="0" width="'+optStr('width', '100%')+'" height="'+optStr('height', 1000)+'" style="width: '+optStr('width', '100%', '%spx')+'; height: '+optStr('height', 1000)+'px; border: 0; display: block;"></iframe>');

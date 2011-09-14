@@ -59,7 +59,7 @@ specific row, column, or the entire table.
   
   // Handle column heading clicks
   $(this).find('thead td').each(function() {
-      var columnIndex = $(this).attr('cellIndex');
+      var columnIndex = $(this).parent().children().index($(this)); //$(this).attr('cellIndex');
       var columnCount = $(this).siblings('td').length;
       var text = $(this).html();
       var anchor = document.createElement('a');

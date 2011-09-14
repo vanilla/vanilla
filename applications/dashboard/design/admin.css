@@ -1534,7 +1534,14 @@ table.AltColumns thead td.Alt {
 table th,
 table td {
 	padding: 6px 6px 6px 20px;
+	vertical-align: top;
 }
+table th.Less,
+table td.Less {
+	padding: 6px;
+}
+table tbody tr.More th.Less,
+table tbody tr.More td.Less,
 table tbody th,
 table tbody td {
 	border-bottom: 1px solid #e0e0e0;
@@ -2263,4 +2270,11 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 }
 #Content form .Step input.Button {
    margin: 0;
+}
+
+/* Plugins */
+.PluginIcon {
+	display: block;
+	height: 50px;
+	width: 50px;
 }

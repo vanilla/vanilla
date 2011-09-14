@@ -7,11 +7,59 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Utility Controller
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Perform miscellaneous operations for Dashboard.
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class UtilityController extends DashboardController {
-   
+   /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
    
+   /**
+    * Redirect to another page.
+    * @since 2.0.18b4
+    */
+   public function Redirect() {
+      $Args = func_get_args();
+      $Path = $this->Request->Path();
+      if (count($Args) > 0) {
+         if (in_array($Args[0], array('http', 'https'))) {
+            $Protocal = array_shift($Args);
+         } else {
+            $Protocal = 'http';
+         }
+         $Url = $Protocal.'://'.implode($Args, '/');
+      } else {
+         $Url = Url('/', TRUE);
+      }
+      
+      $Get = $this->Request->Get();
+      if (count($Get) > 0) {
+         $Query = '?'.http_build_query($Get);
+      } else {
+         $Query = '';
+      }
+      
+      Redirect($Url.$Query);
+   }
+   
+   /**
+    * Set the sort order for data on an arbitrary database table.
+    *
+    * Expect post values TransientKey, Target (redirect URL), Table (database table name),
+    * and TableID (an array of sort order => unique ID).
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function Sort() {
       $Session = Gdn::Session();
       $TransientKey = GetPostValue('TransientKey', '');
@@ -41,17 +89,20 @@ class UtilityController extends DashboardController {
    
    /**
     * Allows the setting of data into one of two serialized data columns on the
-    * user table: Preferences and Attributes. The method expects "Name" &
-    * "Value" to be in the $_POST collection. This method always saves to the
-    * row of the user id performing this action (ie. $Session->UserID). The
-    * type of property column being saved should be specified in the url:
-    *  ie. /dashboard/utility/set/preference/name/value/transientKey
-    *  or /dashboard/utility/set/attribute/name/value/transientKey
+    * user table: Preferences and Attributes. 
     *
-    * @param string The type of value being saved: preference or attribute.
-    * @param string The name of the property being saved.
-    * @param string The value of the property being saved.
-    * @param string A unique transient key to authenticate that the user intended to perform this action.
+    * The method expects "Name" & "Value" to be in the $_POST collection. This method always 
+    * saves to the row of the user id performing this action (ie. $Session->UserID). The
+    * type of property column being saved should be specified in the url:
+    * i.e. /dashboard/utility/set/preference/name/value/transientKey
+    * or /dashboard/utility/set/attribute/name/value/transientKey
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $UserPropertyColumn The type of value being saved: preference or attribute.
+    * @param string $Name The name of the property being saved.
+    * @param string $Value The value of the property being saved.
+    * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
     */
    public function Set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
@@ -79,6 +130,16 @@ class UtilityController extends DashboardController {
          $this->Render();
    }
    
+   /**
+    * Update database structure based on current definitions in each app's structure.php file.
+    *
+    * @since 2.0.?
+    * @access public
+    * @param string $AppName Unique app name or 'all' (default).
+    * @param int $CaptureOnly Whether to list changes rather than execture (0 or 1).
+    * @param int $Drop Whether to drop first (0 or 1).
+    * @param int $Explicit Whether to force to only columns currently listed (0 or 1).
+    */
    public function Structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
       $this->Permission('Garden.Settings.Manage');
       $Files = array();
@@ -143,7 +204,13 @@ class UtilityController extends DashboardController {
       $this->SetData('Title', T('Database Structure Upgrades'));
       $this->Render();
    }
-
+   
+   /**
+    * Run a structure update on the database.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function Update() {
       try {
          // Check for permission or flood control.
@@ -184,6 +251,12 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
    
+   /**
+    * Signs of life.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function Alive() {
       $this->SetData('Success', TRUE);
       $this->MasterView = 'empty';
@@ -191,8 +264,13 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
    
-   // Because you cannot send xmlhttprequests across domains, we need to use
-   // a proxy to check for updates.
+   /**
+    * Because you cannot send xmlhttprequests across domains, we need to use
+    * a proxy to check for updates.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function UpdateProxy() {
       $Fields = $_POST;
       foreach ($Fields as $Field => $Value) {
@@ -214,7 +292,13 @@ class UtilityController extends DashboardController {
       $Database = Gdn::Database();
       $Database->CloseConnection();
    }
-
+   
+   /**
+    * What the mothership said about update availability.
+    *
+    * @since 2.0.?
+    * @access public
+    */
    public function UpdateResponse() {
       // Get the message, response, and transientkey
       $Messages = TrueStripSlashes(GetValue('Messages', $_POST));
@@ -267,7 +351,15 @@ class UtilityController extends DashboardController {
          SaveToConfig($Save);
       }
    }
-
+   
+   /**
+    * Set the user's timezone (hour offset).
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $ClientDate Client-reported datetime.
+    * @param string $TransientKey Security token.
+    */
    public function SetClientHour($ClientDate = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Session = Gdn::Session();
@@ -291,6 +383,15 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
 	
+	/**
+    * Grab a feed from the mothership.
+    *
+    * @since 2.0.?
+    * @access public
+    * @param string $Type Type of feed.
+    * @param int $Length Number of items to get.
+    * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
+    */
 	public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
 		echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
 		$this->DeliveryType(DELIVERY_TYPE_NONE);

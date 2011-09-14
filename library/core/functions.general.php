@@ -330,6 +330,22 @@ if (!function_exists('C')) {
    }
 }
 
+if (!function_exists('CTo')) {
+   function CTo(&$Data, $Name, $Value) {
+      $Name = explode('.', $Name);
+      $LastKey = array_pop($Name);
+      $Current =& $Data;
+      
+      foreach ($Name as $Key) {
+         if (!isset($Current[$Key]))
+            $Current[$Key] = array();
+         
+         $Current =& $Current[$Key];
+      }
+      $Current[$LastKey] = $Value;
+   }
+}
+
 if (!function_exists('CalculateNumberOfPages')) {
    /**
     * Based on the total number of items and the number of items per page,
@@ -553,13 +569,13 @@ if (!function_exists('decho')) {
     */
    function decho($Mixed, $Prefix = 'DEBUG: ') {
       if (Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
-         echo '<div style="text-align: left; padding: 0 4px;">'.$Prefix;
+         echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
          if (is_string($Mixed))
             echo $Mixed;
          else
-            var_dump($Mixed);
+            echo htmlspecialchars(print_r($Mixed, TRUE));
       
-         echo '</div>';
+         echo '</pre>';
       }
    }
 }

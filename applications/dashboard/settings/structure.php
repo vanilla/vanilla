@@ -225,8 +225,8 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
-   'Garden.Moderation.Manage' => 'Garden.Users.Edit',
-   'Garden.AdvancedNotifications.Allow' => 'Garden.Settings.Manage'
+   'Garden.Moderation.Manage',
+   'Garden.AdvancedNotifications.Allow'
    ));
 
 if (!$PermissionTableExists) {
@@ -319,7 +319,10 @@ $Construct->Table('Invitation')
    
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Activity')
+$Construct->Table('Activity');
+$EmailedExists = $Construct->ColumnExists('Emailed');
+
+$Construct
 	->PrimaryKey('ActivityID')
    ->Column('CommentActivityID', 'int', TRUE, 'key')
    ->Column('ActivityTypeID', 'int')
@@ -331,7 +334,12 @@ $Construct->Table('Activity')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('Emailed', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
+
+if (!$EmailedExists) {
+   $SQL->Put('Activity', array('Emailed' => 1));
+}
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -428,9 +436,9 @@ if ($PhotoIDExists) {
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', 'unique')
+   ->Column('Type', 'varchar(10)', NULL, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
-   ->Column('Archived', 'tinyint(1)', 0)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

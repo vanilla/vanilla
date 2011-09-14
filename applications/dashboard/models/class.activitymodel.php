@@ -60,10 +60,14 @@ class ActivityModel extends Gdn_Model {
 
    public function GetWhere($Field, $Value = '') {
       $this->ActivityQuery();
-      return $this->SQL
+      $Result = $this->SQL
          ->Where($Field, $Value)
          ->OrderBy('a.DateInserted', 'desc')
          ->Get();
+
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function Get($UserID = '', $Offset = '0', $Limit = '50') {
@@ -91,10 +95,14 @@ class ActivityModel extends Gdn_Model {
          $this->SQL->Where('t.Public', '1');
 
       $this->FireEvent('BeforeGet');
-      return $this->SQL
+      $Result = $this->SQL
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function GetCount($UserID = '') {
@@ -136,7 +144,7 @@ class ActivityModel extends Gdn_Model {
          $Limit = 0;
       
       $this->ActivityQuery();
-      return $this->SQL
+      $Result = $this->SQL
          ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
          ->WhereIn('ur.RoleID', $RoleID)
          ->Where('a.CommentActivityID is null')
@@ -144,6 +152,10 @@ class ActivityModel extends Gdn_Model {
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+         
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function GetCountForRole($RoleID = '') {
@@ -383,8 +395,18 @@ class ActivityModel extends Gdn_Model {
             $this->FireEvent('BeforeSendNotification');
             try {
                $Email->Send();
+               $Emailed = 2; // similar to http 200 OK
+            } catch (phpmailerException $pex) {
+               if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
+                  $Emailed = 4;
+               else
+                  $Emailed = 5;
             } catch (Exception $ex) {
-               // Don't do anything with the exception.
+               $Emailed = 4; // similar to http 5xx
+            }
+            try {
+               $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+            } catch (Exception $Ex) {
             }
          }
       }
@@ -412,15 +434,27 @@ class ActivityModel extends Gdn_Model {
             // Only send out one notification per user.
             $Notification = $Notifications[0];
             
-            
             $Email = $Notification['Email'];
+            
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
             
                try {
                   $Email->Send();
+                  $Emailed = 2;
+               } catch (phpmailerException $pex) {
+                  if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
+                     $Emailed = 4;
+                  else
+                     $Emailed = 5;
                } catch(Exception $Ex) {
+                  $Emailed = 4;
+               }
+               
+               try {
+                  $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $Notification['ActivityID']));
+               } catch (Exception $Ex) {
                }
             }
          }
@@ -464,7 +498,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-//            $Email->To($User->Email, $User->Name);
+            $Email->To($User->Email, $User->Name);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(

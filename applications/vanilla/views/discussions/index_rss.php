@@ -4,7 +4,7 @@
    <atom:link href="<?php echo Url('discussions/feed.rss'); ?>" rel="self" type="application/rss+xml" />
 <?php
 foreach ($this->DiscussionData->Result() as $Discussion) {
-   ?>
+?>
    <item>
       <title><?php echo Gdn_Format::Text($Discussion->Name); ?></title>
       <link><?php echo Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE); ?></link>
@@ -13,5 +13,5 @@ foreach ($this->DiscussionData->Result() as $Discussion) {
       <guid isPermaLink="false"><?php echo $Discussion->DiscussionID . '@' . Url('/discussions'); ?></guid>
       <description><![CDATA[<?php echo Gdn_Format::To($Discussion->Body, $Discussion->Format); ?>]]></description>
    </item>
-   <?php
+<?php
 }

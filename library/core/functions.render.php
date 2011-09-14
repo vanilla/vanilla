@@ -172,10 +172,12 @@ if (!function_exists('UserBuilder')) {
       $UserID = $UserPrefix.'UserID';
       $Name = $UserPrefix.'Name';
       $Photo = $UserPrefix.'Photo';
+      $Gender = $UserPrefix.'Gender';
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
       $User->Email = GetValue($UserPrefix.'Email', $Object, NULL);
+      $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : NULL;
 		return $User;
    }
 }
@@ -190,7 +192,7 @@ if (!function_exists('UserPhoto')) {
          $Options = array('LinkClass' => $Options);
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 

@@ -1486,7 +1486,7 @@ class ImportModel extends Gdn_Model {
             set m.ForeignID = d.DiscussionID, m.ForeignTable = 'discussion'";
          }
 
-         $Sqls['Comment.FirstComment.Delete'] = "delete :_Comment c
+         $Sqls['Comment.FirstComment.Delete'] = "delete c.*
          from :_Comment c
          inner join :_Discussion d
            on d.FirstCommentID = c.CommentID";

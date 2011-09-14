@@ -39,15 +39,19 @@ v0.5: 02NOV2010 - by Tim @ Vanilla
 - Fixed:
 -- 1. Added backreference to the cleditor JS object and attached it to the textarea, for external interaction
  
-v1.1 31AUG2011 - by Todd @ Vanilla
+v1.0.1 31AUG2011 - by Todd @ Vanilla
 - Fixed:
 -- 1. Fixed js error with new versions of jQuery.
+
+v1.1 14SEPT2011 - by Linc @ Vanilla
+- Fixed:
+-- 1. Disabled CLEditor for IE6 or less if using Vanilla 2.0.18b5+.
  */
 
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.0.1',
+   'Version' => '1.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',

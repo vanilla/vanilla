@@ -958,6 +958,7 @@ a.BigButton:focus {
 	display: inline;
 	padding: 0;
 }
+.DataList.Discussions .Meta span,
 .DataList .Meta strong {
    margin-right: 12px;
 }

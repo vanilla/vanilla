@@ -569,7 +569,8 @@ class ProxyRequest {
          $Pointer = FALSE;
          $HostAddress = $this->FsockConnect($Pointer, $Host, 80, $Options);
 
-         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
+         $SendHost = (is_null($ForceHost)) ? $Host : $ForceHost;
+         $HostHeader = $SendHost.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();
          
          $SendHeaders[] = "{$RequestMethod} $Path?$Query HTTP/1.1";

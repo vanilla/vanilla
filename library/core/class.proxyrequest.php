@@ -340,6 +340,7 @@ class ProxyRequest {
 
       $Defaults = array(
           'URL'                  => NULL,
+          'Host'                 => NULL,
           'Method'               => 'GET',
           'ConnectTimeout'       => 5,
           'Timeout'              => 2,
@@ -371,6 +372,7 @@ class ProxyRequest {
 
       $RelativeURL = GetValue('URL', $Options);
       $RequestMethod = GetValue('Method', $Options);
+      $ForceHost = GetValue('Host', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
@@ -411,6 +413,10 @@ class ProxyRequest {
        * If extra headers were provided, preprocess the list into the correct 
        * format for inclusion into both cURL and fsockopen header queues.
        */
+      
+      // Tack on Host header if forced
+      if (!is_null($ForceHost))
+         $ExtraHeaders['Host'] = $ForceHost;
       
       $SendExtraHeaders = array();
       foreach ($ExtraHeaders as $ExtraHeader => $ExtraHeaderValue)

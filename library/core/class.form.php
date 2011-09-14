@@ -1307,12 +1307,12 @@ class Gdn_Form extends Gdn_Pluggable {
       // Show inline errors?
       $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
       
-      // Add error class to input element
-      if ($ShowErrors) 
-         $this->AddErrorClass($Attributes);
-
       $CssClass = ArrayValueI('class', $Attributes);
       if ($CssClass == FALSE) $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
+      
+      // Add error class to input element
+      if ($ShowErrors) $this->AddErrorClass($Attributes);
+      
       $Return = $MultiLine === TRUE ? '<textarea' : '<input type="text"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);

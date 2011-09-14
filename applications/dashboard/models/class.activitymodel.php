@@ -60,10 +60,14 @@ class ActivityModel extends Gdn_Model {
 
    public function GetWhere($Field, $Value = '') {
       $this->ActivityQuery();
-      return $this->SQL
+      $Result = $this->SQL
          ->Where($Field, $Value)
          ->OrderBy('a.DateInserted', 'desc')
          ->Get();
+
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function Get($UserID = '', $Offset = '0', $Limit = '50') {
@@ -91,10 +95,14 @@ class ActivityModel extends Gdn_Model {
          $this->SQL->Where('t.Public', '1');
 
       $this->FireEvent('BeforeGet');
-      return $this->SQL
+      $Result = $this->SQL
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function GetCount($UserID = '') {
@@ -136,7 +144,7 @@ class ActivityModel extends Gdn_Model {
          $Limit = 0;
       
       $this->ActivityQuery();
-      return $this->SQL
+      $Result = $this->SQL
          ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
          ->WhereIn('ur.RoleID', $RoleID)
          ->Where('a.CommentActivityID is null')
@@ -144,6 +152,10 @@ class ActivityModel extends Gdn_Model {
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+         
+      $this->EventArguments['Data'] =& $Result;
+      $this->FireEvent('AfterGet');
+      return $Result;
    }
    
    public function GetCountForRole($RoleID = '') {

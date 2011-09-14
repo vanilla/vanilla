@@ -958,7 +958,7 @@ a.BigButton:focus {
 	display: inline;
 	padding: 0;
 }
-.DataList .Meta span,
+.DataList.Discussions .Meta span,
 .DataList .Meta strong {
    margin-right: 12px;
 }
@@ -975,9 +975,6 @@ a.BigButton:focus {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
-}
-.DataList .Meta a {
-   color: #2b2d33;
 }
 .DataList .Meta .Tag a {
    color: #ffffff;

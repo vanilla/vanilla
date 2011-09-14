@@ -30,7 +30,7 @@ class UserMetaModel extends Gdn_Model {
    }
    
    /**
-    * Retries UserMeta information for a UserID / Key pair
+    * Retrieves UserMeta information for a UserID / Key pair
     * 
     * This method takes a $UserID or array of $UserIDs, and a $Key. It converts the
     * $Key to fully qualified format and then queries for the associated value(s). $Key

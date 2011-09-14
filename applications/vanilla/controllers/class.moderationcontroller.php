@@ -73,7 +73,7 @@ class ModerationController extends VanillaController {
             $HadCheckedComments = count($CheckedComments[$DiscussionID]) > 0; 
          }
          foreach ($CheckIDs as $Check) {
-            if ($Check['checked'] == 'true') {
+            if (GetValue('checked', $Check)) {
                if (!ArrayHasValue($CheckedComments, $Check['checkId']))
                   $CheckedComments[$DiscussionID][] = $Check['checkId'];
             } else {
@@ -154,10 +154,10 @@ class ModerationController extends VanillaController {
             $CheckedDiscussions = array();
             
          // Were there checked discussions before the form was posted?
-         $HadCheckedDiscussions = count($CheckedDiscussions) > 0; 
+         $HadCheckedDiscussions = count($CheckedDiscussions) > 0;
 
          foreach ($CheckIDs as $Check) {
-            if ($Check['checked'] == 'true') {
+            if (GetValue('checked', $Check)) {
                if (!ArrayHasValue($CheckedDiscussions, $Check['checkId']))
                   $CheckedDiscussions[] = $Check['checkId'];
             } else {

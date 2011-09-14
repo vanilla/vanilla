@@ -77,8 +77,8 @@ class cleditorPlugin extends Gdn_Plugin {
 		
 		// Add the CLEditor to the form
 		$Sender->RemoveJsFile('jquery.autogrow.js');
-		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor');
-		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
+		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', array('ie' => 'gt IE 6', 'notie' => TRUE));
+		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor', array('ie' => 'gt IE 6', 'notie' => TRUE));
 		$Sender->Head->AddString('
 <style type="text/css">
 a.PreviewButton {

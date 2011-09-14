@@ -395,8 +395,8 @@ class Gdn_Controller extends Gdn_Pluggable {
     * use the application folder that this controller belongs to.
     *  - If you specify plugins/PluginName as $AppFolder then you can contain a CSS file in a plugin's design folder.
     */
-   public function AddCssFile($FileName, $AppFolder = '') {
-      $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder);
+   public function AddCssFile($FileName, $AppFolder = '', $Options = NULL) {
+      $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
    }
    
    /**
@@ -1425,7 +1425,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                if ($CssPath !== FALSE) {
                   $CssPath = substr($CssPath, strlen(PATH_ROOT));
                   $CssPath = str_replace(DS, '/', $CssPath);
-                  $this->Head->AddCss($CssPath, 'all');
+                  $this->Head->AddCss($CssPath, 'all', TRUE, $CssInfo['Options']);
                }
             }
 

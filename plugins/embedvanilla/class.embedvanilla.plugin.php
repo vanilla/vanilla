@@ -26,6 +26,9 @@ $PluginInfo['embedvanilla'] = array(
 class EmbedVanillaPlugin extends Gdn_Plugin {
    
 	public function Base_Render_Before($Sender) {
+      // Set P3P header because IE won't allow cookies thru the iFrame without it
+      $Sender->SetHeader('P3P', 'CP="CAO PSA OUR"');
+      
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 

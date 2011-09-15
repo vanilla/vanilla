@@ -289,12 +289,6 @@ class ProxyRequest {
       $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
       $this->ContentLength = (int)curl_getinfo($Handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
       
-      if ($Response == FALSE) {
-         $Success = FALSE;
-         $this->ResponseBody = curl_error($Handler);
-         return $this->ResponseBody;
-      }
-      
       $RequestHeaderInfo = trim(curl_getinfo($Handler, CURLINFO_HEADER_OUT));
       $RequestHeaderLines = explode("\n",$RequestHeaderInfo);
       $Request = trim(array_shift($RequestHeaderLines));
@@ -308,6 +302,12 @@ class ProxyRequest {
       }
       $this->Action(" Request Headers: ".print_r($this->RequestHeaders,TRUE));
       $this->Action(" Response Headers: ".print_r($this->ResponseHeaders,TRUE));
+      
+      if ($Response == FALSE) {
+         $Success = FALSE;
+         $this->ResponseBody = curl_error($Handler);
+         return $this->ResponseBody;
+      }
       
       $this->ResponseBody = trim($Response);
       

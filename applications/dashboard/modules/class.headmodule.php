@@ -61,14 +61,26 @@ if (!class_exists('HeadModule', FALSE)) {
       /**
        * Adds a "link" tag to the head containing a reference to a stylesheet.
        *
-       * @param string The location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
-       * @param string Type media for the stylesheet. ie. "screen", "print", etc.
+       * @param string $HRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
+       * @param string $Media Type media for the stylesheet. ie. "screen", "print", etc.
+       * @param bool $AddVersion Whether to append version number as query string.
+       * @param array $Options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
        */
-      public function AddCss($HRef, $Media = '', $AddVersion = TRUE) {
-         $this->AddTag('link', array('rel' => 'stylesheet',
+      public function AddCss($HRef, $Media = '', $AddVersion = TRUE, $Options = NULL) {
+         $Properties = array(
+            'rel' => 'stylesheet',
             'type' => 'text/css',
             'href' => Asset($HRef, FALSE, $AddVersion),
-            'media' => $Media));
+            'media' => $Media);
+         
+         // Use same underscore convention as AddScript  
+         if (is_array($Options)) {
+            foreach ($Options as $Key => $Value) {
+               $Properties['_'.strtolower($Key)] = $Value;
+            }
+         }
+         
+         $this->AddTag('link', $Properties);
       }
 
       public function AddRss($HRef, $Title) {
@@ -324,17 +336,48 @@ if (!class_exists('HeadModule', FALSE)) {
                }
             }
             
-            $TagString = '<'.$Tag.Attribute($Attributes, '_');
-
-            if (array_key_exists(self::CONTENT_KEY, $Attributes))
-               $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
-            elseif ($Tag == 'script') {
-               $TagString .= '></script>';
-            } else
-               $TagString .= ' />';
-
-            $TagStrings[] = $TagString;
-         }
+            // If we set an IE conditional AND a "Not IE" condition, we will need to make a second pass.
+            do {
+               // Reset tag string
+               $TagString = '';
+            
+               // IE conditional? Validates condition.
+               $IESpecific = (isset($Attributes['_ie']) && preg_match('/((l|g)t(e)? )?IE [0-9\.]/', $Attributes['_ie']));
+               
+               // Only allow $NotIE if we're not doing a conditional this loop.
+               $NotIE = (!$IESpecific && isset($Attributes['_notie']));
+               
+               // Open IE conditional tag
+               if ($IESpecific) 
+                  $TagString .= '<!--[if '.$Attributes['_ie'].']>';
+               if ($NotIE)
+                  $TagString .= '<!--[if !IE]> -->';
+                  
+               // Build tag
+               $TagString .= '<'.$Tag.Attribute($Attributes, '_');
+               if (array_key_exists(self::CONTENT_KEY, $Attributes))
+                  $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
+               elseif ($Tag == 'script') {
+                  $TagString .= '></script>';
+               } else
+                  $TagString .= ' />';
+               
+               // Close IE conditional tag
+               if ($IESpecific) 
+                  $TagString .= '<![endif]-->';
+               if ($NotIE)
+                  $TagString .= '<!-- <![endif]-->';
+                  
+               // Cleanup (prevent infinite loop)
+               if ($IESpecific) 
+                  unset($Attributes['_ie']);
+                  
+               $TagStrings[] = $TagString;
+               
+            } while($IESpecific && isset($Attributes['_notie'])); // We need a second pass
+                      
+         } //endforeach
+         
          $Head .= implode("\n", array_unique($TagStrings));
 
          foreach ($this->_Strings as $String) {

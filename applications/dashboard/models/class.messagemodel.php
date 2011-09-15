@@ -10,14 +10,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class MessageModel extends Gdn_Model {
    
+   private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
+   
+   protected static $Messages;
+   
    /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Message');
+      
+      
    }
-   
-   private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
    
    /**
     * Returns a single message object for the specified id or FALSE if not found.

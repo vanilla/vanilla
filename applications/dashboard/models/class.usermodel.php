@@ -775,7 +775,7 @@ class UserModel extends Gdn_Model {
       $this->DefineSchema();
 
       // Add & apply any extra validation rules:
-      if (array_key_exists('Email', $FormPostValues))
+      if (array_key_exists('Email', $FormPostValues) && GetValue('ValidateEmail', $Settings, TRUE))
          $this->Validation->ApplyRule('Email', 'Email');
 
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
@@ -1409,10 +1409,11 @@ class UserModel extends Gdn_Model {
          $Fields['HourOffset'] = $HourOffset;
       }
 
-      // Set some required dates
-      $Fields[$this->DateInserted] = Gdn_Format::ToDateTime();
-      $Fields['DateFirstVisit'] = Gdn_Format::ToDateTime();
-      $Fields['DateLastActive'] = Gdn_Format::ToDateTime();
+      // Set some required dates.
+      $Now = Gdn_Format::ToDateTime();
+      $Fields[$this->DateInserted] = $Now;
+      $Fields['DateFirstVisit'] = $Now;
+      $Fields['DateLastActive'] = $Now;
    }
 
    /**
@@ -1666,9 +1667,6 @@ class UserModel extends Gdn_Model {
             'Attributes' => Gdn_Format::Serialize(array('State' => 'Deleted')),
             'DateSetInvitations' => null,
             'DateOfBirth' => null,
-            'DateFirstVisit' => null,
-            'DateLastActive' => null,
-//            'DateInserted' => '1975-09-16 00:00:00',
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'HourOffset' => '0',
             'Score' => null,

@@ -21,6 +21,8 @@ $(function() {
       return;
       
    if (inIframe) {
+      $('.SignInPopup').addClass('PopupWindow').removeClass('.SignInPopup');
+      
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
             return parent.postMessage(message, target);
@@ -142,7 +144,11 @@ $(function() {
          path = '/'+path;
       remotePostMessage('location:' + path, '*');
    } else {
+      
       $('a').live('click', function() {
+         if ($(this).hasClass('PopupWindow'))
+            return;
+         
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
 

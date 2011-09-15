@@ -71,6 +71,10 @@ jQuery(document).ready(function($) {
       else
          return false;
    }
+   
+   gdn.querySep = function(url) {
+      return url.indexOf('?') == -1 ? '?' : '&';
+   }
 
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
@@ -89,8 +93,8 @@ jQuery(document).ready(function($) {
    $(".PopupWindow").live('click', function() {
       var $this = $(this);
 
-      var width = $this.attr('popupWidth');
-      var height = $this.attr('popupHeight');
+      var width = $this.attr('popupWidth'); width = width ? width : 960;
+      var height = $this.attr('popupHeight'); height = height ? height : 600;
       var left = (screen.width - width) / 2;
       var top = (screen.height - height) / 2;
 
@@ -99,7 +103,7 @@ jQuery(document).ready(function($) {
       if ($this.attr('popupHref'))
          href = $this.attr('popupHref');
       else
-         href += '&display=popup';
+         href += gdn.querySep(href)+'display=popup';
 
       var win = window.open(href, 'Window_' + id, "left="+left+",top="+top+",width="+width+",height="+height+",status=0,scrollbars=0");
       if (win)

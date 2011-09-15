@@ -1002,7 +1002,7 @@ class UserModel extends Gdn_Model {
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
       if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
-         $User = $this->Get($UserID);
+         $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
          $OldRoles = FALSE;
@@ -1575,7 +1575,7 @@ class UserModel extends Gdn_Model {
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
 
          // Send out a notification to the user
-         $User = $this->Get($UserID);
+         $User = $this->GetID($UserID);
          if ($User) {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
 				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
@@ -2047,8 +2047,8 @@ class UserModel extends Gdn_Model {
 
    public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = NULL) {
       $Session = Gdn::Session();
-      $Sender = $this->Get($Session->UserID);
-      $User = $this->Get($UserID);
+      $Sender = $this->GetID($Session->UserID);
+      $User = $this->GetID($UserID);
 
       if (!ValidateEmail($User->Email))
          return;
@@ -2095,8 +2095,8 @@ class UserModel extends Gdn_Model {
 
    public function SendPasswordEmail($UserID, $Password) {
       $Session = Gdn::Session();
-      $Sender = $this->Get($Session->UserID);
-      $User = $this->Get($UserID);
+      $Sender = $this->GetID($Session->UserID);
+      $User = $this->GetID($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset'), $AppTitle));
@@ -2262,7 +2262,7 @@ class UserModel extends Gdn_Model {
       $this->EventArguments['UserID'] = $UserID;
       $this->FireEvent('AfterPasswordReset');
 
-      return $this->Get($UserID);
+      return $this->GetID($UserID);
    }
    
 	public function SetField($RowID, $Property, $Value = FALSE) {

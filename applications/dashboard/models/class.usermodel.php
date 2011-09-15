@@ -1020,7 +1020,7 @@ class UserModel extends Gdn_Model {
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
       if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
-         $User = $this->Get($UserID);
+         $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
          $OldRoles = FALSE;

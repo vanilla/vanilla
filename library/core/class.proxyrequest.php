@@ -510,8 +510,6 @@ class ProxyRequest {
          $this->Action(" Codepath: cURL");
          
          $Handler = curl_init();
-         curl_setopt($Handler, CURLOPT_URL, $Url);
-         curl_setopt($Handler, CURLOPT_PORT, $Port);
          curl_setopt($Handler, CURLOPT_HEADER, FALSE);
          curl_setopt($Handler, CURLINFO_HEADER_OUT, TRUE);
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, TRUE);
@@ -548,6 +546,10 @@ class ProxyRequest {
             curl_setopt($Handler, CURLOPT_POST, TRUE);
             curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
          }
+         
+         // Set URL
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          
          $this->CurlReceive($Handler);
 

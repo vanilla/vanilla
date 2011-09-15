@@ -255,6 +255,16 @@ class UtilityController extends DashboardController {
    }
    
    /**
+    * Because people try this a lot and get confused.
+    *
+    * @since 2.0.18
+    * @access public
+    */
+   public function Upgrade() {
+      $this->Update();
+   }
+   
+   /**
     * Signs of life.
     *
     * @since 2.0.?

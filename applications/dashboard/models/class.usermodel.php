@@ -66,37 +66,47 @@ class UserModel extends Gdn_Model {
 
    /** Connect a user with a foreign authentication system.
     *
-    * @param string $ForeignUserKey The user's unique key in the other authentication system.
+    * @param string $UniqueID The user's unique key in the other authentication system.
     * @param string $ProviderKey The key of the system providing the authentication.
     * @param array $UserData Data to go in the user table.
     * @return int The new/existing user ID.
     */
-   public function Connect($ForeignUserKey, $ProviderKey, $UserData) {
+   public function Connect($UniqueID, $ProviderKey, $UserData) {
       if (!isset($UserData['UserID'])) {
          // Check to see if the user already exists.
-         $ConnectUserID = $this->SQL->GetWhere('UserAuthentication',
-            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey))
-            ->Value('UserID', FALSE);
+         $Auth = $this->GetAuthentication($UniqueID, $ProviderKey);
+         $UserID = GetValue('UserID', $Auth);
 
-         if ($ConnectUserID !== FALSE)
-            $UserData['UserID'] = $ConnectUserID;
+         if ($UserID)
+            $UserData['UserID'] = $UserID;
       }
-
-      $NewUser = !isset($ConnectUserID) && !GetValue('UserID', $UserData);
-
-      // Save the user.
-      $UserID = $this->Save($UserData, array('ActivityType' => 'Join', 'CheckExisting' => TRUE));
-
-      // Add the user to the default role(s).
-      if ($UserID && $NewUser) {
-         $this->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
-      }
-
-      // Save the authentication.
-      if ($UserID && !isset($ConnectUserID)) {
-         $this->SQL->Replace('UserAuthentication',
-            array('UserID' => $UserID),
-            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey));
+      
+      if (isset($UserID)) {
+         // Save the user.
+         $this->Save($UserData, array('NoConfirmEmail' => TRUE));
+      } else {
+         // Create a new user.
+         $UserID = $this->InsertForBasic($UserData, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+         
+         if ($UserID) {
+            // Save the authentication.
+            $this->SaveAuthentication(array(
+                'ForeignUserKey' => $UniqueID, 
+                'ProviderKey' => $ProviderKey, 
+                'UserID' => $UserID
+            ));
+            
+            if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+               $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
+               if ($Provider) {
+                  try {
+                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => GetValue('Name', $Provider, C('Garden.Title'))));
+                  } catch (Exception $Ex) {
+                     // Do nothing if emailing doesn't work.
+                  }
+               }
+            }
+         }
       }
       return $UserID;
    }

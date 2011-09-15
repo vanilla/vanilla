@@ -129,8 +129,6 @@ class UserModel extends Gdn_Model {
             $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
          }
          $Fields['Roles'] = (array)C('Garden.Registration.ConfirmEmailRole');
-         if (!is_string($Fields['Attributes']))
-            $Fields['Attributes'] = serialize($Fields['Attributes']);
       }
 
       // Make sure to encrypt the password for saving...
@@ -142,6 +140,9 @@ class UserModel extends Gdn_Model {
 
       $Roles = GetValue('Roles', $Fields);
       unset($Fields['Roles']);
+      
+      if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes']))
+            $Fields['Attributes'] = serialize($Fields['Attributes']);
       
       $UserID = $this->SQL->Insert($this->Name, $Fields);
       if (is_array($Roles)) {
@@ -731,6 +732,9 @@ class UserModel extends Gdn_Model {
          $User = $this->SQL->GetWhere('User', array('Name' => $User))->FirstRow(DATASET_TYPE_ARRAY);
       elseif (is_object($User))
          $User = (array)$User;
+      
+      if (!$User)
+         return FALSE;
 
       if (array_key_exists($Column, $User) && $User[$Column] === NULL) {
             $UserID = $User['UserID'];
@@ -846,6 +850,10 @@ class UserModel extends Gdn_Model {
                if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
                   if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
                      return FALSE;
+               }
+               
+               if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
+                  $Fields['Attributes'] = serialize($Fields['Attributes']);
                }
    
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));

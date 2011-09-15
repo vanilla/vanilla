@@ -67,12 +67,7 @@ class TaggingPlugin extends Gdn_Plugin {
       }
       
       $Tag = StringEndsWith($Tag, '.rss', TRUE, TRUE);
-      $Foo = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
       list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
-      
-//      var_dump($Offset);
-//      var_dump($Limit);
-//      die(print_r($Foo, TRUE));
    
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
@@ -101,21 +96,14 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddModule($BookmarkedModule);
 
       $Sender->SetData('Category', FALSE, TRUE);
-      $DiscussionModel = new DiscussionModel();
-      $Tag = $DiscussionModel->SQL->Select()->From('Tag')->Where('Name', $Sender->Tag)->Get()->FirstRow();
-      $TagID = $Tag ? $Tag->TagID : 0;
-      
-      $CountDiscussions = $Tag ? $Tag->CountDiscussions : FALSE;
-      if ($Sender->Request->Get('DateFrom'))
-         $CountDiscussions = FALSE;
-      $Sender->SetData('CountDiscussions', $CountDiscussions);
-      
-      
+      $Sender->SetData('CountDiscussions', FALSE);
       
       $Sender->AnnounceData = FALSE;
 		$Sender->SetData('Announcements', array(), TRUE);
-      $DiscussionModel->FilterToTagID = $TagID;
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      
+      $DiscussionModel = new DiscussionModel();
+      $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
+      $Sender->DiscussionData = $DiscussionModel->Get(FALSE);
       
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -133,7 +121,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
-         $CountDiscussions,
+         FALSE,
          $PageUrlFormat
       );
       
@@ -237,15 +225,12 @@ class TaggingPlugin extends Gdn_Plugin {
     * Should we limit the discussion query to a specific tagid?
     * @param DiscussionModel $Sender
     */
-   public function DiscussionModel_BeforeGet_Handler($Sender) {
-      if (C('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToTagID')) {
-         $Sender->SQL->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID and td.TagID = '.$Sender->FilterToTagID);
-         
-         if ($DateFrom = Gdn::Request()->Get('DateFrom')) {
-            $Sender->SQL->Where('d.DateInserted >= ', $DateFrom);
-         }
-      }
-   }
+//   public function DiscussionModel_BeforeGet_Handler($Sender) {
+//      if (C('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToDiscussionIDs')) {
+//         $Sender->SQL->WhereIn('d.DiscussionID', $Sender->FilterToDiscussionIDs)
+//            ->Limit(FALSE);
+//      }
+//   }
    
    /**
     * Validate tags when saving a discussion.
@@ -316,6 +301,64 @@ class TaggingPlugin extends Gdn_Plugin {
       header("Content-type: application/json");
       echo json_encode($Data);
       exit();
+   }
+
+   /**
+    *
+    * @param Gdn_SQLDriver $Sql
+    */
+   protected function _SetTagSql($Sql, $Tag, $Limit, $Offset = 0, $Op = 'or') {
+      $SortField = 'd.DateLastComment';
+      $SortDirection = 'desc';
+      
+      $TagSql = clone Gdn::Sql();
+      
+      if ($DateFrom = Gdn::Request()->Get('DateFrom')) {
+         // Find the discussion ID of the first discussion created on or after the date from.
+         $DiscussionIDFrom = $TagSql->GetWhere('Discussion', array('DateInserted >= ' => $DateFrom), 'DiscussionID', 'asc', 1)->Value('DiscussionID');
+         $SortField = 'd.DiscussionID';
+      }
+      
+      $Tags = array_map('trim', explode(',', $Tag));
+      $TagIDs = $TagSql
+         ->Select('TagID')
+         ->From('Tag')
+         ->WhereIn('Name', $Tags)
+         ->Get()->ResultArray();
+      
+      $TagIDs = ConsolidateArrayValuesByKey($TagIDs, 'TagID');
+      
+      if ($Op == 'and' && count($Tags) > 1) {
+         $DiscussionIDs = $TagSql
+            ->Select('DiscussionID')
+            ->Select('TagID', 'count', 'CountTags')
+            ->From('TagDiscussion')
+            ->WhereIn('TagID', $TagIDs)
+            ->GroupBy('DiscussionID')
+            ->Having('CountTags >=', count($Tags))
+            ->Limit($Limit, $Offset)
+            ->OrderBy('DiscussionID', 'desc')
+            ->Get()->ResultArray();
+         
+         $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+         
+         $Sql->WhereIn('d.DiscussionID', $DiscussionIDs);
+         $SortField = 'd.DiscussionID';
+      } else {
+         $Sql
+            ->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
+            ->Limit($Limit, $Offset)
+            ->WhereIn('td.TagID', $TagIDs);
+         
+         if ($Op == 'and')
+            $SortField = 'd.DiscussionID';
+      }  
+      
+      // Set up the sort field and direction.
+      SaveToConfig(array(
+          'Vanilla.Discussions.SortField' => $SortField,
+          'Vanilla.Discussions.SortDirection' => $SortDirection),
+          FALSE);
    }
 
    /**

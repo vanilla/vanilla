@@ -669,7 +669,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
       $OverrideKey = ArrayValue($EventKey, $this->_MethodOverrideCollection, '');
       $OverrideKeyParts = explode('.', $OverrideKey);
-      if (count($PluginKeyParts) != 2)
+      if (count($OverrideKeyParts) != 2)
          return FALSE;
 
       list($OverrideClassName, $OverrideMethodName) = $OverrideKeyParts;

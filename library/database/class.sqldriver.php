@@ -251,7 +251,10 @@ abstract class Gdn_SQLDriver {
       return $this;
    }
 
-   public function ApplyParameters($Sql, $Parameters) {
+   public function ApplyParameters($Sql, $Parameters = NULL) {
+      if (!is_array($Parameters)) 
+         $Parameters = $this->_NamedParameters;
+         
       // Sort the parameters so that we don't have clashes.
       krsort($Parameters);
       foreach ($Parameters as $Key => $Value) {

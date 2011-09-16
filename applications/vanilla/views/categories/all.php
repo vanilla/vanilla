@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-include dirname(__FILE__).'/helper_functions.php';
+include($this->FetchViewLocation('helper_functions', 'categories'));
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
@@ -45,8 +45,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category '.$CssClasses.'">'.Gdn_Format::Text($Category->Name).'</div>'
+            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
             $Alt = FALSE;
@@ -54,7 +54,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $LastComment = UserBuilder($Category, 'LastComment');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
-            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.'">
+            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)

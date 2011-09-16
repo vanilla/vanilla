@@ -611,11 +611,20 @@ class Gdn_Statistics extends Gdn_Plugin {
          $Timestamp = self::Time();
       if ($SlotType == 'd')
          $Result = gmdate('Ymd', $Timestamp);
-      elseif ($SlotType == 'm')
+      elseif ($SlotType == 'w') {
+         $Sub = gmdate('N', $Timestamp) - 1;
+         $Timestamp = strtotime("-$Sub days", $Timestamp);
+         $Result = gmdate('Ymd', $Timestamp);
+      } elseif ($SlotType == 'm')
          $Result = gmdate('Ym', $Timestamp).'00';
       elseif ($SlotType == 'y')
          $Result = gmdate('Y', $Timestamp).'0000';
       
+      return $Result;
+   }
+   
+   public static function TimeSlotStamp($SlotType = 'd', $Timestamp = FALSE) {
+      $Result = self::TimeFromTimeSlot(self::TimeSlot('d', $Timestamp));
       return $Result;
    }
    

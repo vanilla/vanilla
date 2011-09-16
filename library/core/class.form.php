@@ -779,7 +779,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // Get value from attributes and ensure it's an array
       $Value = ArrayValueI('Value', $Attributes);
       if ($Value === FALSE) 
-         $Value = $this->GetValue($FieldName);
+         $Value = $this->GetValue($FieldName, GetValue('Default', $Attributes));
       if (!is_array($Value)) 
          $Value = array($Value);
          

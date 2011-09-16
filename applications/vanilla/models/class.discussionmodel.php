@@ -155,6 +155,9 @@ class DiscussionModel extends VanillaModel {
 		
 		$this->AddArchiveWhere($this->SQL);
       
+      
+      $this->SQL->Limit($Limit, $Offset);
+      
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
@@ -165,7 +168,7 @@ class DiscussionModel extends VanillaModel {
       
 		// Get sorting options from config
 		$SortField = $this->EventArguments['SortField'];
-		if (!in_array($SortField, array('d.DateLastComment', 'd.DateInserted')))
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
 			$SortField = 'd.DateLastComment';
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
@@ -175,9 +178,7 @@ class DiscussionModel extends VanillaModel {
 		$this->SQL->OrderBy($SortField, $SortDirection);
       
       // Set range and fetch
-      $Data = $this->SQL
-         ->Limit($Limit, $Offset)
-         ->Get();
+      $Data = $this->SQL->Get();
          
       // If not looking at discussions filtered by bookmarks or user, filter announcements out.
 		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
@@ -784,6 +785,14 @@ class DiscussionModel extends VanillaModel {
       
       // Get the DiscussionID from the form so we know if we are inserting or updating.
       $DiscussionID = ArrayValue('DiscussionID', $FormPostValues, '');
+      
+      // See if there is a source ID.
+      if (array_key_exists('SourceID', $FormPostValues)) {
+         $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
+         if ($DiscussionID)
+            $FormPostValues['DiscussionID'] = $DiscussionID;
+      }
+      
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
 		$this->EventArguments['Insert'] = $Insert;
       

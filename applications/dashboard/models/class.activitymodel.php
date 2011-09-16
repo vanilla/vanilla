@@ -383,7 +383,7 @@ class ActivityModel extends Gdn_Model {
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(
-                  T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+                  $Story == '' ? T('EmailNotification') : T('EmailStoryNotification'),
                   $ActivityHeadline,
                   ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                   $Story
@@ -502,7 +502,7 @@ class ActivityModel extends Gdn_Model {
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             $Email->Message(
                sprintf(
-                  T($Story == '' ? 'EmailNotification' : 'EmailStoryNotification'),
+                  $Story == '' ? T('EmailNotification') : T('EmailStoryNotification'),
                   $ActivityHeadline,
                   ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
                   $Story

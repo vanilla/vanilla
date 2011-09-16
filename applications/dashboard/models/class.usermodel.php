@@ -66,37 +66,47 @@ class UserModel extends Gdn_Model {
 
    /** Connect a user with a foreign authentication system.
     *
-    * @param string $ForeignUserKey The user's unique key in the other authentication system.
+    * @param string $UniqueID The user's unique key in the other authentication system.
     * @param string $ProviderKey The key of the system providing the authentication.
     * @param array $UserData Data to go in the user table.
     * @return int The new/existing user ID.
     */
-   public function Connect($ForeignUserKey, $ProviderKey, $UserData) {
+   public function Connect($UniqueID, $ProviderKey, $UserData) {
       if (!isset($UserData['UserID'])) {
          // Check to see if the user already exists.
-         $ConnectUserID = $this->SQL->GetWhere('UserAuthentication',
-            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey))
-            ->Value('UserID', FALSE);
+         $Auth = $this->GetAuthentication($UniqueID, $ProviderKey);
+         $UserID = GetValue('UserID', $Auth);
 
-         if ($ConnectUserID !== FALSE)
-            $UserData['UserID'] = $ConnectUserID;
+         if ($UserID)
+            $UserData['UserID'] = $UserID;
       }
-
-      $NewUser = !isset($ConnectUserID) && !GetValue('UserID', $UserData);
-
-      // Save the user.
-      $UserID = $this->Save($UserData, array('ActivityType' => 'Join', 'CheckExisting' => TRUE));
-
-      // Add the user to the default role(s).
-      if ($UserID && $NewUser) {
-         $this->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
-      }
-
-      // Save the authentication.
-      if ($UserID && !isset($ConnectUserID)) {
-         $this->SQL->Replace('UserAuthentication',
-            array('UserID' => $UserID),
-            array('ForeignUserKey' => $ForeignUserKey, 'ProviderKey' => $ProviderKey));
+      
+      if (isset($UserID)) {
+         // Save the user.
+         $this->Save($UserData, array('NoConfirmEmail' => TRUE));
+      } else {
+         // Create a new user.
+         $UserID = $this->InsertForBasic($UserData, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+         
+         if ($UserID) {
+            // Save the authentication.
+            $this->SaveAuthentication(array(
+                'ForeignUserKey' => $UniqueID, 
+                'ProviderKey' => $ProviderKey, 
+                'UserID' => $UserID
+            ));
+            
+            if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+               $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
+               if ($Provider) {
+                  try {
+                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => GetValue('Name', $Provider, C('Garden.Title'))));
+                  } catch (Exception $Ex) {
+                     // Do nothing if emailing doesn't work.
+                  }
+               }
+            }
+         }
       }
       return $UserID;
    }
@@ -119,8 +129,6 @@ class UserModel extends Gdn_Model {
             $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
          }
          $Fields['Roles'] = (array)C('Garden.Registration.ConfirmEmailRole');
-         if (!is_string($Fields['Attributes']))
-            $Fields['Attributes'] = serialize($Fields['Attributes']);
       }
 
       // Make sure to encrypt the password for saving...
@@ -132,6 +140,9 @@ class UserModel extends Gdn_Model {
 
       $Roles = GetValue('Roles', $Fields);
       unset($Fields['Roles']);
+      
+      if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes']))
+            $Fields['Attributes'] = serialize($Fields['Attributes']);
       
       $UserID = $this->SQL->Insert($this->Name, $Fields);
       if (is_array($Roles)) {
@@ -721,6 +732,9 @@ class UserModel extends Gdn_Model {
          $User = $this->SQL->GetWhere('User', array('Name' => $User))->FirstRow(DATASET_TYPE_ARRAY);
       elseif (is_object($User))
          $User = (array)$User;
+      
+      if (!$User)
+         return FALSE;
 
       if (array_key_exists($Column, $User) && $User[$Column] === NULL) {
             $UserID = $User['UserID'];
@@ -761,7 +775,7 @@ class UserModel extends Gdn_Model {
       $this->DefineSchema();
 
       // Add & apply any extra validation rules:
-      if (array_key_exists('Email', $FormPostValues))
+      if (array_key_exists('Email', $FormPostValues) && GetValue('ValidateEmail', $Settings, TRUE))
          $this->Validation->ApplyRule('Email', 'Email');
 
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
@@ -836,6 +850,10 @@ class UserModel extends Gdn_Model {
                if (ArrayValue('Name', $Fields, '') != '' || ArrayValue('Email', $Fields, '') != '') {
                   if (!$this->ValidateUniqueFields($Username, $Email, $UserID))
                      return FALSE;
+               }
+               
+               if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
+                  $Fields['Attributes'] = serialize($Fields['Attributes']);
                }
    
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
@@ -1002,7 +1020,7 @@ class UserModel extends Gdn_Model {
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
       if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
-         $User = $this->Get($UserID);
+         $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
          $OldRoles = FALSE;
@@ -1391,10 +1409,11 @@ class UserModel extends Gdn_Model {
          $Fields['HourOffset'] = $HourOffset;
       }
 
-      // Set some required dates
-      $Fields[$this->DateInserted] = Gdn_Format::ToDateTime();
-      $Fields['DateFirstVisit'] = Gdn_Format::ToDateTime();
-      $Fields['DateLastActive'] = Gdn_Format::ToDateTime();
+      // Set some required dates.
+      $Now = Gdn_Format::ToDateTime();
+      $Fields[$this->DateInserted] = $Now;
+      $Fields['DateFirstVisit'] = $Now;
+      $Fields['DateLastActive'] = $Now;
    }
 
    /**
@@ -1575,7 +1594,7 @@ class UserModel extends Gdn_Model {
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
 
          // Send out a notification to the user
-         $User = $this->Get($UserID);
+         $User = $this->GetID($UserID);
          if ($User) {
 				$Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
 				$Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
@@ -1648,9 +1667,6 @@ class UserModel extends Gdn_Model {
             'Attributes' => Gdn_Format::Serialize(array('State' => 'Deleted')),
             'DateSetInvitations' => null,
             'DateOfBirth' => null,
-            'DateFirstVisit' => null,
-            'DateLastActive' => null,
-//            'DateInserted' => '1975-09-16 00:00:00',
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'HourOffset' => '0',
             'Score' => null,
@@ -2047,8 +2063,8 @@ class UserModel extends Gdn_Model {
 
    public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = NULL) {
       $Session = Gdn::Session();
-      $Sender = $this->Get($Session->UserID);
-      $User = $this->Get($UserID);
+      $Sender = $this->GetID($Session->UserID);
+      $User = $this->GetID($UserID);
 
       if (!ValidateEmail($User->Email))
          return;
@@ -2095,8 +2111,8 @@ class UserModel extends Gdn_Model {
 
    public function SendPasswordEmail($UserID, $Password) {
       $Session = Gdn::Session();
-      $Sender = $this->Get($Session->UserID);
-      $User = $this->Get($UserID);
+      $Sender = $this->GetID($Session->UserID);
+      $User = $this->GetID($UserID);
       $AppTitle = Gdn::Config('Garden.Title');
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%s] Password Reset'), $AppTitle));
@@ -2262,7 +2278,7 @@ class UserModel extends Gdn_Model {
       $this->EventArguments['UserID'] = $UserID;
       $this->FireEvent('AfterPasswordReset');
 
-      return $this->Get($UserID);
+      return $this->GetID($UserID);
    }
    
 	public function SetField($RowID, $Property, $Value = FALSE) {

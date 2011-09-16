@@ -19,7 +19,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    
    $Sender->FireEvent('BeforeDiscussionName');
    
-   $DiscussionName = Gdn_Format::Text($Discussion->Name);
+   $DiscussionName = $Discussion->Name;
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
       

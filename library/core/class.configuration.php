@@ -311,7 +311,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * @return boolean
     */
    public function Load($File, $Name = 'Configuration', $Dynamic = FALSE) {
-      $ConfigurationSource = Gdn_ConfigurationSource::FromFile($File, $Name);
+      $ConfigurationSource = Gdn_ConfigurationSource::FromFile($this, $File, $Name);
       if (!$ConfigurationSource) return FALSE;
       $SourceTag = "file:{$File}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
@@ -336,7 +336,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * @return boolean
     */
    public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE) {
-      $ConfigurationSource = Gdn_ConfigurationSource::FromString($String, $Tag, $Name);
+      $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
       $SourceTag = "string:{$Tag}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       
@@ -612,14 +612,18 @@ function &ArrayMergeRecursiveDistinct(array &$array1, &$array2 = null)
 
 class Gdn_ConfigurationSource extends Gdn_Pluggable {
    
+   protected $Configuration;
+   
    protected $Type;
    protected $Source;
    protected $Group;
    protected $Settings;
    protected $Dirty;
    
-   public function __construct($Type, $Source, $Group, $Settings) {
+   public function __construct($Configuration, $Type, $Source, $Group, $Settings) {
       parent::__construct();
+      
+      $this->Configuration = $Configuration;
       
       $this->Type = $Type;
       $this->Source = $Source;
@@ -642,9 +646,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     * @param string $File Path to config file to load
     * @return Gdn_ConfigurationSource
     */
-   public static function FromFile($File, $Name = 'Configuration') {
+   public static function FromFile(&$Configuration, $File, $Name = 'Configuration') {
       $LoadedFromCache = FALSE; $UseCache = FALSE;
-      if (Gdn::Config()->Caching()) {
+      if ($Configuration->Caching()) {
          $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
          if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
             $UseCache = TRUE;
@@ -678,16 +682,16 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       // We're caching, using the cache, and this data was not loaded from cache.
       // Write it there now.
-      if (Gdn::Config()->Caching() && $UseCache && !$LoadedFromCache) {
+      if ($Configuration->Caching() && $UseCache && !$LoadedFromCache) {
          Gdn::Cache()->Store($FileKey, $$Name, array(
              Gdn_Cache::FEATURE_NOPREFIX => TRUE
          ));
       }
       
-      return new Gdn_ConfigurationSource('file', $File, $Name, $$Name);
+      return new Gdn_ConfigurationSource($Configuration, 'file', $File, $Name, $$Name);
    }
    
-   public static function FromString($String, $Tag, $Name = 'Configuration') {
+   public static function FromString($Configuration, $String, $Tag, $Name = 'Configuration') {
       // Define the variable properly.
       $$Name = NULL;
       
@@ -701,7 +705,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
-      return new Gdn_ConfigurationSource('string', $Tag, $Name, $$Name);
+      return new Gdn_ConfigurationSource($Configuration, 'string', $Tag, $Name, $$Name);
    }
    
    public function ToFile($File) {
@@ -854,7 +858,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
             // Save to cache if we're into that sort of thing
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
-            if (Gdn::Config()->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
+            if ($this->Configuration->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
                $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
                    Gdn_Cache::FEATURE_NOPREFIX => TRUE
                ));

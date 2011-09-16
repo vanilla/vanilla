@@ -78,13 +78,13 @@ body {
    font-size: small;
 }
 #Body {
-   width: 960px;
+   width: 990px;
    text-align: left;
    margin: 15px auto 0;
 }
 #Content {
    float: left;
-   width: 680px;
+   width: 730px;
    margin: 0 0 40px;
 }
 .Hidden {

@@ -108,7 +108,8 @@ class ProfileController extends Gdn_Controller {
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
       
-      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
+      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() 
+         && !StringIsNullOrEmpty($Comment) && CheckPermission('Garden.Profiles.Edit')) {
          // Active user has submitted a comment
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
          
@@ -458,7 +459,7 @@ class ProfileController extends Gdn_Controller {
     */
    public function Picture($UserReference = '', $Username = '') {
       // Permission checks
-      $this->Permission('Garden.SignIn.Allow');
+      $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          $this->Form->AddError('You must be authenticated in order to use this form.');
@@ -907,11 +908,11 @@ class ProfileController extends Gdn_Controller {
          } else {
             // Add profile options for the profile owner
             if ($AllowImages)
-               $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', FALSE, array('class' => 'PictureLink'));
+               $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
                
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-               $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', FALSE, array('class' => 'ThumbnailLink'));
-               $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.Gdn_Format::Url($Session->User->Name).'/'.$Session->TransientKey(), FALSE, array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', T('Remove My Picture'), '/profile/removepicture/'.$Session->UserID.'/'.Gdn_Format::Url($Session->User->Name).'/'.$Session->TransientKey(), 'Garden.Profiles.Edit', array('class' => 'RemovePictureLink'));
             }
             // Don't allow account editing if it has been turned off.
             if (Gdn::Config('Garden.UserAccount.AllowEdit')) {

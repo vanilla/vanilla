@@ -669,9 +669,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     * @param string $Name Optional setting name
     * @return Gdn_ConfigurationSource
     */
-   public static function FromFile(&$Parent, $File, $Name = 'Configuration') {
+   public static function FromFile($Parent, $File, $Name = 'Configuration') {
       $LoadedFromCache = FALSE; $UseCache = FALSE;
-      if ($Parent->Caching()) {
+      if ($Parent && $Parent->Caching()) {
          $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
          if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
             $UseCache = TRUE;
@@ -705,7 +705,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       // We're caching, using the cache, and this data was not loaded from cache.
       // Write it there now.
-      if ($Parent->Caching() && $UseCache && !$LoadedFromCache) {
+      if ($Parent && $Parent->Caching() && $UseCache && !$LoadedFromCache) {
          Gdn::Cache()->Store($FileKey, $$Name, array(
              Gdn_Cache::FEATURE_NOPREFIX => TRUE
          ));
@@ -723,7 +723,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     * @param string $Name Optional setting name
     * @return Gdn_ConfigurationSource 
     */
-   public static function FromString(&$Parent, $String, $Tag, $Name = 'Configuration') {
+   public static function FromString($Parent, $String, $Tag, $Name = 'Configuration') {
       // Define the variable properly.
       $$Name = NULL;
       
@@ -890,7 +890,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
             // Save to cache if we're into that sort of thing
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
-            if ($this->Configuration->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
+            if ($this->Configuration && $this->Configuration->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
                $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
                    Gdn_Cache::FEATURE_NOPREFIX => TRUE
                ));

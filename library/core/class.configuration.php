@@ -664,12 +664,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    /**
     * Load config fata from a file
     * 
+    * @param Gdn_Configuration $Parent Parent config object
     * @param string $File Path to config file to load
+    * @param string $Name Optional setting name
     * @return Gdn_ConfigurationSource
     */
-   public static function FromFile(&$Configuration, $File, $Name = 'Configuration') {
+   public static function FromFile(&$Parent, $File, $Name = 'Configuration') {
       $LoadedFromCache = FALSE; $UseCache = FALSE;
-      if ($Configuration->Caching()) {
+      if ($Parent->Caching()) {
          $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
          if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
             $UseCache = TRUE;
@@ -703,16 +705,25 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       // We're caching, using the cache, and this data was not loaded from cache.
       // Write it there now.
-      if ($Configuration->Caching() && $UseCache && !$LoadedFromCache) {
+      if ($Parent->Caching() && $UseCache && !$LoadedFromCache) {
          Gdn::Cache()->Store($FileKey, $$Name, array(
              Gdn_Cache::FEATURE_NOPREFIX => TRUE
          ));
       }
       
-      return new Gdn_ConfigurationSource($Configuration, 'file', $File, $Name, $$Name);
+      return new Gdn_ConfigurationSource($Parent, 'file', $File, $Name, $$Name);
    }
    
-   public static function FromString($Configuration, $String, $Tag, $Name = 'Configuration') {
+   /**
+    * Load config data from a string
+    * 
+    * @param Gdn_Configuration $Parent Parent config object
+    * @param string $String Config data string
+    * @param string $Tag Internal friendly name
+    * @param string $Name Optional setting name
+    * @return Gdn_ConfigurationSource 
+    */
+   public static function FromString(&$Parent, $String, $Tag, $Name = 'Configuration') {
       // Define the variable properly.
       $$Name = NULL;
       
@@ -726,7 +737,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
-      return new Gdn_ConfigurationSource($Configuration, 'string', $Tag, $Name, $$Name);
+      return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
    }
    
    public function ToFile($File) {

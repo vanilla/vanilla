@@ -82,10 +82,31 @@ class Gdn_Configuration extends Gdn_Pluggable {
       throw new Exception('DEPRECATED');
    }
    
+   /**
+    * Use caching when loading/saving configs
+    * 
+    * @param boolean $Caching Whether to use caching
+    * @return boolean
+    */
    public function Caching($Caching = NULL) {
       if (!is_null($Caching))
          $this->UseCaching = (bool)$Caching;
       return $this->UseCaching;
+   }
+   
+   /**
+    * Clear cache entry for this config file
+    * 
+    * @param type $ConfigFile
+    * @return void
+    */
+   public function ClearCache($ConfigFile) {
+      $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $ConfigFile);
+      if (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
+         Gdn::Cache()->Remove($FileKey,array(
+             Gdn_Cache::FEATURE_NOPREFIX => TRUE
+         ));
+      }
    }
    
    /**

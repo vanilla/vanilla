@@ -314,7 +314,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
          }
       }
       
-      if ($Save)
+      if ($Save && $this->Dynamic)
          $this->Dynamic->Remove($Name);
       
       return $Found;

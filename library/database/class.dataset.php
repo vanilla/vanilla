@@ -321,7 +321,7 @@ class Gdn_DataSet implements IteratorAggregate {
          if (isset($ChildColumn))
             $ParentColumn = $ChildColumn;
          elseif (isset($Table))
-            $ChildColumn = $Table.'ID';
+            $ParentColumn = $Table.'ID';
          else
             throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
       }
@@ -348,7 +348,14 @@ class Gdn_DataSet implements IteratorAggregate {
       $Sql->Select("$TableAlias.$ChildColumn");
       
       // Get the IDs to generate an in clause with.
-      $IDs = ConsolidateArrayValuesByKey($Data, $ParentColumn);
+      $IDs = array();
+      foreach ($Data as $Row) {
+         $Value = GetValue($ParentColumn, $Row);
+         if ($Value)
+            $IDs[$Value] = TRUE;
+      }
+      
+      $IDs = array_keys($IDs);
       $Sql->WhereIn($ChildColumn, $IDs);
       
       $ChildData = $Sql->Get()->ResultArray();

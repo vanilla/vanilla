@@ -40,6 +40,9 @@ define('PATH_ROOT', dirname(__FILE__));
 // 2. Include the bootstrap to configure the framework.
 require_once(PATH_ROOT.'/bootstrap.php');
 
+// 2a. Authentication
+Gdn::Authenticator()->StartAuthenticator();
+
 // 3. Create and configure the dispatcher.
 // TIM: Removed this change temporarily for .com hosting
 // Gdn::Authenticator()->StartAuthenticator();

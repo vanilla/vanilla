@@ -376,7 +376,7 @@ class ActivityModel extends Gdn_Model {
             $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::Config('Preferences.Email.'.$Activity->ActivityType));
          }
          if ($Preference) {
-            $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
+            $ActivityHeadline = Gdn_Format::Text(ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);
@@ -495,7 +495,7 @@ class ActivityModel extends Gdn_Model {
          }
          
          if ($Preference) {
-            $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
+            $ActivityHeadline = Gdn_Format::Text(ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);

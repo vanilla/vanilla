@@ -1942,7 +1942,7 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($Valid === TRUE)
          return TRUE;
       else {
-         $this->AddError('@'.$Valid);
+         $this->AddError('@'.$Valid, $FieldName);
          return FALSE;
       }
       

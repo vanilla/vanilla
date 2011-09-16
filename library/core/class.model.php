@@ -89,13 +89,13 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
    /**
-    * The name of the primary key field of this model. The default is 'id'. If
+    * The name of the primary key field of this model. The default is NULL. If
     * $this->DefineSchema() is called, this value will be automatically changed
     * to any primary key discovered when examining the table schema.
     *
     * @var string
     */
-   public $PrimaryKey = 'id';
+   public $PrimaryKey;
 
 
    /**
@@ -142,10 +142,9 @@ class Gdn_Model extends Gdn_Pluggable {
     * the table that this model represents. You can also explicitly set this
     * value with $this->Name.
     */
-   public function __construct($Name = '') {
-      if ($Name == '')
-         $Name = get_class($this);
-
+   public function __construct($Name = '', $PrimaryKey = NULL) {
+      if ($Name == '') $Name = get_class($this);
+      if (!$this->PrimaryKey) $this->PrimaryKey = ($PrimaryKey) ? $PrimaryKey : $Name.'ID';
       $this->Database = Gdn::Database();
       $this->SQL = $this->Database->SQL();
       $this->Validation = new Gdn_Validation();
@@ -170,11 +169,8 @@ class Gdn_Model extends Gdn_Pluggable {
       if (!isset($this->Schema)) {
          $this->Schema = new Gdn_Schema($this->Name, $this->Database);
          $this->PrimaryKey = $this->Schema->PrimaryKey($this->Name, $this->Database);
-         if (is_array($this->PrimaryKey)) {
-            //print_r($this->PrimaryKey);
-            $this->PrimaryKey = $this->PrimaryKey[0];
-         }
-
+         if (is_array($this->PrimaryKey)) $this->PrimaryKey = $this->PrimaryKey[0];
+         
          $this->Validation->ApplyRulesBySchema($this->Schema);
       }
    }
@@ -286,8 +282,8 @@ class Gdn_Model extends Gdn_Pluggable {
     * @todo add doc
     */
    public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
-      if(is_numeric($Where))
-         $Where = array($this->Name.'ID' => $Where);
+      if (is_numeric($Where)) 
+         $Where = array($this->PrimaryKey => $Where);
 
       if($ResetData) {
          $this->SQL->Delete($this->Name, $Where, $Limit);
@@ -353,7 +349,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @return Gdn_DataSet
     */
    public function GetID($ID, $DatasetType = FALSE) {
-      $Result = $this->GetWhere(array("{$this->Name}ID" => $ID))->FirstRow($DatasetType);
+      $Result = $this->GetWhere(array($this->PrimaryKey => $ID))->FirstRow($DatasetType);
       return $Result;
    }
 
@@ -445,57 +441,38 @@ class Gdn_Model extends Gdn_Pluggable {
          $Fields['UpdateIPAddress'] = Gdn::Request()->IpAddress();
       }
    }
+   
+  
+   /**
+   * @todo add doc here
+   */
+   public function SQL() {
+      return $this->SQL;
+   }
 
-	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
-		
-		if (!isset($this->Schema)) $this->DefineSchema();
-		// TODO: need to be sure that $this->PrimaryKey is only one primary key
-		$FieldName = $this->PrimaryKey;
-		
-		// Load the existing values
-		$Row = $this->SQL
-			->Select($Column)
-			->From($this->Name)
-			->Where($FieldName, $RowID)
-			->Get()
-			->FirstRow();
-		
-		if(!$Row) throw new Exception(T('ErrorRecordNotFound'));
-		$Values = Gdn_Format::Unserialize($Row->$Column);
-		
-		if (is_string($Values) && $Values != '')
-			throw new Exception(T('Serialized column failed to be unserialized.'));
-		
-		if (!is_array($Values)) $Values = array();
-		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
 
-		$Values = Gdn_Format::Serialize(array_merge($Values, $Name));
-		
-		// Save the values back to the db
-		return $this->SQL
-			->From($this->Name)
-			->Where($FieldName, $RowID)
-			->Set($Column, $Values)
-			->Put();
-	}
-    
-    
-	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
-		if (!isset($this->Schema)) $this->DefineSchema();
-		$PrimaryKey = $this->PrimaryKey;
+   /**
+   * @todo add doc here
+   */
+	public function SetProperty($RowID, $Field, $Value) {
+        $Operator = FALSE;
+        $EscapeString = TRUE;
+        if (strlen($Value) > 1) {
+           $Operator = substr($Value, 0, 1);
+           if (in_array($Operator, array('+', '-'))) $Value = substr($Value, 1);
+           else $Operator = FALSE;
+        }
         
-		if ($ForceValue !== FALSE) {
-            $Value = $ForceValue;
-		} else {
-            $Row = $this->GetID($RowID);
-            $Value = ($Row->$Property == '1' ? '0' : '1');
-		}
-		$this->SQL
-            ->Update($this->Name)
-            ->Set($Property, $Value)
-            ->Where($PrimaryKey, $RowID)
-            ->Put();
-		return $Value;
+        if ($Operator !== FALSE) {
+           $EscapeString = FALSE;
+           $Value = "$Field $Operator $Value";
+        }
+
+        return $this->SQL
+           ->Update($this->Name)
+           ->Set($Field, $Value, $EscapeString)
+           ->Where($this->PrimaryKey, $RowID)
+           ->Put();
    }
 }
 

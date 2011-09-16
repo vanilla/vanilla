@@ -292,7 +292,7 @@ if (!class_exists('HeadModule', FALSE)) {
        */
       public function ToString() {
          // Add the canonical Url if necessary.
-         if (method_exists($this->_Sender, 'CanonicalUrl')) {
+         if (method_exists($this->_Sender, 'CanonicalUrl') && !C('Garden.Modules.NoCanonicalUrl')) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
             $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
             $this->_Sender->CanonicalUrl($CanonicalUrl);

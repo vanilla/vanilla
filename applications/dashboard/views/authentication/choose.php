@@ -62,7 +62,6 @@
          var Chooser = $(e.target);
          var SliceElement = $('div.AuthenticationConfigure');
          var SliceObj = SliceElement.prop('Slice');
-         console.log(SliceObj);
          
          var ChooserVal = Chooser.val();
          var ChosenURL = (ConfigureList[ChooserVal]) ? ConfigureList[ChooserVal] : ((ConfigureList[ChooserVal] != 'undefined') ? '/dashboard/authentication/configure/'+ChooserVal : false);

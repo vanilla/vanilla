@@ -38,7 +38,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * Constructor
     */
    function __construct() {
-      $this->PhpMailer = new PHPMailer();
+      $this->PhpMailer = new PHPMailer(TRUE); // throw Exceptions
       $this->PhpMailer->CharSet = Gdn::Config('Garden.Charset', 'utf-8');
       $this->PhpMailer->SingleTo = Gdn::Config('Garden.Email.SingleTo', FALSE);
       $this->PhpMailer->PluginDir = PATH_LIBRARY.DS.'vendors'.DS.'phpmailer'.DS;
@@ -56,9 +56,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Bcc($RecipientEmail, $RecipientName = '') {
-      ob_start();
       $this->PhpMailer->AddBCC($RecipientEmail, $RecipientName);
-      ob_end_clean();
       return $this;
    }
    
@@ -71,9 +69,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Cc($RecipientEmail, $RecipientName = '') {
-      ob_start();
       $this->PhpMailer->AddCC($RecipientEmail, $RecipientName);
-      ob_end_clean();
       return $this;
    }
 
@@ -116,9 +112,8 @@ class Gdn_Email extends Gdn_Pluggable {
       
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
       
-      ob_start();
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
-      ob_end_clean();
+
       return $this;
    }
 
@@ -203,7 +198,7 @@ class Gdn_Email extends Gdn_Pluggable {
          throw new Exception($this->PhpMailer->ErrorInfo);
       }
       
-      return true;
+      return TRUE;
    }
    
    /**
@@ -218,9 +213,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
    
    public function AddTo($RecipientEmail, $RecipientName = ''){
-      ob_start();
       $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
-      ob_end_clean();
       return $this;
    }
    
@@ -231,44 +224,67 @@ class Gdn_Email extends Gdn_Pluggable {
     * @param string $RecipientName The recipient name associated with $RecipientEmail. If $RecipientEmail is
     * an array of email addresses, this value will be ignored.
     */
+   
    public function To($RecipientEmail, $RecipientName = '') {
-
-      if (is_string($RecipientEmail)) {
-         if (strpos($RecipientEmail, ',') > 0) {
-            $RecipientEmail = explode(',', $RecipientEmail);
-            // trim no need, PhpMailer::AddAnAddress() will do it
-            return $this->To($RecipientEmail, $RecipientName);
-         }
-         if ($this->PhpMailer->SingleTo) return $this->AddTo($RecipientEmail, $RecipientName);
-         if (!$this->_IsToSet){
-            $this->_IsToSet = TRUE;
-            $this->AddTo($RecipientEmail, $RecipientName);
-         } else
-            $this->Cc($RecipientEmail, $RecipientName);
-         return $this;
-         
-      } elseif ($RecipientEmail instanceof stdClass) {
-         $RecipientName = GetValue('Name', $RecipientEmail);
-         $RecipientEmail = GetValue('Email', $RecipientEmail);
-         return $this->To($RecipientEmail, $RecipientName);
       
-      } elseif ($RecipientEmail instanceof Gdn_DataSet) {
-         foreach($RecipientEmail->ResultObject() as $Object) $this->To($Object);
-         return $this;
-        
-      } elseif (is_array($RecipientEmail)) {
-         $Count = count($RecipientEmail);
-         if (!is_array($RecipientName)) $RecipientName = array_fill(0, $Count, '');
-         if ($Count == count($RecipientName)) {
-            $RecipientEmail = array_combine($RecipientEmail, $RecipientName);
-            foreach($RecipientEmail as $Email => $Name) $this->To($Email, $Name);
-         } else
-            trigger_error(ErrorMessage('Size of arrays do not match', 'Email', 'To'), E_USER_ERROR);
-         
-         return $this;
+       if (!is_string($RecipientEmail)) return $this->ToAll($RecipientEmail, $RecipientName);
+      
+      // Only allow one address in the "to" field. Append all extras to the "cc" field.
+      if (!$this->_IsToSet) {
+         $this->AddTo($RecipientEmail, $RecipientName);
+         $this->_IsToSet = TRUE;
       }
-      
-      trigger_error(ErrorMessage('Incorrect first parameter ('.GetType($RecipientEmail).') passed to function.', 'Email', 'To'), E_USER_ERROR);
+      else {
+         $this->Cc($RecipientEmail, $RecipientName);
+      }
+      return $this;
+   }
+   
+   
+    public function ToAll($Mixed, $Name = NULL, $Options = NULL) {
+        
+        $Prefix = GetValue('Prefix', $Options, '');
+
+        if (is_string($Mixed)) {
+            // Is it comma, semicolon separated emails?
+            $Emails = preg_split('/[,;]/', $Mixed, -1, PREG_SPLIT_NO_EMPTY);
+            $Names = array_fill(0, count($Emails), '');
+            return $this->ToAll($Emails, $Names, $Options);
+        }
+        if (is_object($Mixed)) {
+            if ($Mixed instanceof StdClass) {
+                $RecipientEmail = $Mixed->{$Prefix.'Email'};
+                $RecipientName = (property_exists($Mixed, $Prefix.'Name')) ? $Mixed->{$Prefix.'Name'} : '';
+                return $this->AddTo($RecipientEmail, $RecipientName);
+            }
+            if ($Mixed instanceof Gdn_DataSet) {
+                foreach ($Mixed->Result() as $Data) $this->ToAll($Data, NULL, $Options);
+                return $this;
+            }
+        }
+        if (is_array($Mixed)) {
+            if (array_key_exists($Prefix.'Email', $Mixed)) {
+                $RecipientEmail = $Mixed[$Prefix.'Email'];
+                $RecipientName = array_key_exists($Prefix.'Name', $Mixed) ? $Mixed[$Prefix.'Name'] : '';
+                return $this->AddTo($RecipientEmail, $RecipientName);
+            }
+            // Array of $Mixed collection, ex. Gdn_DataSet::Result()
+            if ($Name === NULL) foreach ($Mixed as $Data) $this->ToAll($Data, NULL, $Options);
+            else {
+                $Emails = array_values($Mixed);
+                $Name = array_values($Name);
+                // Check size of arrays
+                if (count($Name) != count($Emails)) throw new OutOfBoundsException(ErrorMessage('Size of arrays do not match', __CLASS__, __FUNCTION__), E_USER_ERROR);
+                for ($Count = count($Emails), $Index = 0; $Index < $Count; $Index++) {
+                    $this->AddTo($Emails[$Index], $Name[$Index]);
+                }
+                // $Mixed is Emails plain array and $Name is plain array same size? (HOLD)
+                // $Mixed is [Email] => Name?
+            }
+            return $this;
+        }
+        
+        throw new InvalidArgumentException(ErrorMessage('Incorrect first parameter: '.gettype($Mixed), __CLASS__, __FUNCTION__));
    }
    
    public function Charset($Use = ''){

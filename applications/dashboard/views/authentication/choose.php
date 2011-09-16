@@ -61,7 +61,7 @@
       $('select#Form_Garden-dot-Authentication-dot-Chooser').bind('change',function(e){
          var Chooser = $(e.target);
          var SliceElement = $('div.AuthenticationConfigure');
-         var SliceObj = SliceElement.attr('Slice');
+         var SliceObj = SliceElement.prop('Slice');
          
          var ChooserVal = Chooser.val();
          var ChosenURL = (ConfigureList[ChooserVal]) ? ConfigureList[ChooserVal] : ((ConfigureList[ChooserVal] != 'undefined') ? '/dashboard/authentication/configure/'+ChooserVal : false);

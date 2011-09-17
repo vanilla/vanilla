@@ -225,7 +225,7 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
-   'Garden.Profiles.Edit' => 1,
+   'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
    'Garden.Moderation.Manage',
    'Garden.AdvancedNotifications.Allow'
    ));
@@ -475,7 +475,7 @@ if ($Construct->TableExists('Tag')) {
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
-   ->Column('Type', 'varchar(10)', NULL, 'index')
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')

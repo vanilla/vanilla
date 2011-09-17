@@ -199,7 +199,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
    public function ColumnExists($ColumnName) {
       $Result = array_key_exists($ColumnName, $this->ExistingColumns());
       if (!$Result) {
-         foreach ($this->_Columns as $ColName => $Def) {
+         foreach ($this->ExistingColumns() as $ColName => $Def) {
             if (strcasecmp($ColumnName, $ColName) == 0)
                return TRUE;
          }

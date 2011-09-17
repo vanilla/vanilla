@@ -55,11 +55,14 @@ class PermissionModel extends Gdn_Model {
                $DefaultPermissions[$PermissionName] = 2;
             elseif ($Value === 1)
                $DefaultPermissions[$PermissionName] = 3;
+            elseif (!$Structure->ColumnExists($Value) && in_array($Value, $PermissionNames))
+               $DefaultPermissions[$PermissionName] = $PermissionNames[$Value] ? 3 : 2;
             else
                $DefaultPermissions[$PermissionName] = "`{$Value}`"; // default to another field
          }
-         if (!$Structure->ColumnExists($PermissionName))
+         if (!$Structure->ColumnExists($PermissionName)) {
             $NewColumns[$PermissionName] = is_numeric($DefaultPermissions[$PermissionName]) ? $DefaultPermissions[$PermissionName] - 2 : $DefaultPermissions[$PermissionName];
+         }
 
          // Define the column.
          $Structure->Column($PermissionName, $Type, 0);

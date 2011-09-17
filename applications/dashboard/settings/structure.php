@@ -204,7 +204,7 @@ if($PermissionModel instanceof PermissionModel) {
 		->Set($Explicit, $Drop);
 }
 
-// Define the set of permissions that garden uses.
+// Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
@@ -225,6 +225,7 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
+   'Garden.Profiles.Edit' => 1,
    'Garden.Moderation.Manage',
    'Garden.AdvancedNotifications.Allow'
    ));
@@ -235,7 +236,8 @@ if (!$PermissionTableExists) {
    $PermissionModel->Save(array(
       'RoleID' => 2,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 0
       ));
 
    // Set initial confirm email permissions.
@@ -243,7 +245,8 @@ if (!$PermissionTableExists) {
        'RoleID' => 3,
        'Garden.Signin.Allow' => 1,
        'Garden.Activity.View' => 1,
-       'Garden.Profiles.View' => 1
+       'Garden.Profiles.View' => 1,
+       'Garden.Profiles.Edit' => 0
        ));
 
    // Set initial applicant permissions.
@@ -251,7 +254,8 @@ if (!$PermissionTableExists) {
       'RoleID' => 4,
       'Garden.Signin.Allow' => 1,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 0
       ));
 
    // Set initial member permissions.
@@ -259,7 +263,8 @@ if (!$PermissionTableExists) {
       'RoleID' => 8,
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1
       ));
 
    // Set initial moderator permissions.
@@ -268,7 +273,8 @@ if (!$PermissionTableExists) {
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Moderation.Manage' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1
       ));
 
    // Set initial admininstrator permissions.
@@ -290,6 +296,7 @@ if (!$PermissionTableExists) {
       'Garden.Activity.Delete' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1,
       'Garden.AdvancedNotifications.Allow' => 1
       ));
 }

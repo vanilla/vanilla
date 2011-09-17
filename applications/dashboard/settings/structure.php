@@ -468,7 +468,7 @@ if ($Construct->TableExists('Tag')) {
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
-   ->Column('Type', 'varchar(10)', NULL, 'index')
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')

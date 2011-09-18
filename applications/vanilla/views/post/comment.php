@@ -40,10 +40,12 @@ $Editing = isset($this->Comment);
    $this->FireEvent('AfterBodyField');
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');
-   $CancelText = 'Back to Discussions';
+   $CancelText = T('Back to Discussions');
    $CancelClass = 'Back';
-   if (!$NewOrDraft) 
-      $CancelText = $CancelClass = 'Cancel';
+   if (!$NewOrDraft) {
+      $CancelText = T('Cancel');
+      $CancelClass = 'Cancel';
+   }
 
    echo Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
        'class' => $CancelClass

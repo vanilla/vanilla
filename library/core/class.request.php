@@ -319,7 +319,7 @@ class Gdn_Request {
     */
    protected function _LoadEnvironment() {
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
-      $this->_EnvironmentElement('ConfigStrips', Gdn::Config('Garden.StripWebRoot', FALSE));
+      $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
       $this->RequestHost(     isset($_SERVER['HTTP_HOST']) ? ArrayValue('HTTP_HOST',$_SERVER) : ArrayValue('SERVER_NAME',$_SERVER));
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? ArrayValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');

@@ -413,7 +413,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
          // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
          if (!GetValue('MobileFriendly', $PluginInfo))
-            $this->UnRegisterPlugin($PluginName);
+            $this->UnRegisterPlugin($PluginName.'Plugin');
       }
    }
 

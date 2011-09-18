@@ -25,8 +25,6 @@ class GravatarPlugin extends Gdn_Plugin {
 if (!function_exists('UserPhotoDefaultUrl')) {
    function UserPhotoDefaultUrl($User) {
       $Email = GetValue('Email', $User);
-      $Gender = $UserPrefix.'Gender';
-      $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : '';
       $HTTPS = GetValue('HTTPS', $_SERVER, '');
       $Protocol =  (strlen($HTTPS) || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
 

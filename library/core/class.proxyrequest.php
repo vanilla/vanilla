@@ -343,7 +343,7 @@ class ProxyRequest {
           'Host'                 => NULL,
           'Method'               => 'GET',
           'ConnectTimeout'       => 5,
-          'Timeout'              => 2,
+          'Timeout'              => 5,
           'SaveAs'               => NULL,
           'Redirects'            => TRUE,
           'SSLNoVerify'          => FALSE,
@@ -370,7 +370,14 @@ class ProxyRequest {
       if (!is_array($Files)) $Files = array();
       if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
-      $RelativeURL = GetValue('URL', $Options);
+      // Get the URL
+      $RelativeURL = GetValue('URL', $Options, NULL);
+      if (is_null($RelativeURL))
+         $RelativeURL = GetValue('Url', $Options, NULL);
+      
+      if (is_null($RelativeURL))
+         throw new Exception("No URL provided");
+      
       $RequestMethod = GetValue('Method', $Options);
       $ForceHost = GetValue('Host', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
@@ -449,11 +456,13 @@ class ProxyRequest {
          case 'GET':
          default:
             $PostData = http_build_query($PostData);
-            if (stristr($RelativeURL, '?'))
-               $Url .= '&';
-            else
-               $Url .= '?';
-            $Url .= $PostData;
+            if (strlen($PostData)) {
+               if (stristr($RelativeURL, '?'))
+                  $Url .= '&';
+               else
+                  $Url .= '?';
+               $Url .= $PostData;
+            }
             break;
       }
       
@@ -526,9 +535,10 @@ class ProxyRequest {
          if ($Timeout > 0)
             curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
 
-         if ($Cookie != '' && $SendCookies)
+         if ($Cookie != '' && $SendCookies) {
             $this->Action(" Sending client cookies");
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+         }
          
          if ($this->SaveFile) {
             $this->Action(" Saving to file: {$this->SaveFile}");

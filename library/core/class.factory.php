@@ -242,7 +242,7 @@ class Gdn_Factory {
     * @param string $Alias The object alias to uninstall.
     */
    public function Uninstall($Alias) {
-      if(array_key_exists($this->_Objects, $Alias))
+      if(array_key_exists($Alias, $this->_Objects))
          unset($this->_Objects[$Alias]);
    }
    
@@ -254,7 +254,7 @@ class Gdn_Factory {
     * Note: If $PropertyName is null then all of the dependencies will be uninstalled for $Alias.
     */
    public function UninstallDependency($Alias, $PropertyName = NULL) {
-      if(array_key_exists($this->_Dependencies, $Alias)) {
+      if(array_key_exists($Alias, $this->_Dependencies)) {
          if(is_null($PropertyName))
             unset($this->_Dependencies[$Alias]);
          elseif(array_key_exists($PropertyName, $this->_Dependencies[$Alias]))

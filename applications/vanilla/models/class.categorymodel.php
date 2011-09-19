@@ -34,7 +34,14 @@ class CategoryModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('Category');
    }
-
+   
+   /**
+    * 
+    * 
+    * @since 2.0.18
+    * @access public
+    * @return array Category IDs.
+    */
    public static function CategoryWatch() {
       $Categories = self::Categories();
       $AllCount = count($Categories);
@@ -55,7 +62,15 @@ class CategoryModel extends Gdn_Model {
 
       return $Watch;
    }
-
+   
+   /**
+    * 
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param int $ID
+    * @return object DataObject
+    */
    public static function Categories($ID = FALSE) {
       if (self::$Categories == NULL) {
          // Try and get the categories from the cache.
@@ -103,6 +118,15 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   /**
+    * 
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param array $Data Dataset.
+    * @param string $Column Name of database column.
+    * @param array $Options 'Join' key may contain array of columns to join on.
+    */
    public static function JoinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
       $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCode'));
       foreach ($Data as &$Row) {
@@ -122,6 +146,14 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   /**
+    * 
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param array $Categories
+    * @param bool $AddUserCategory
+    */
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
       if ($AddUserCategory) {
          if (Gdn::Session()->UserID) {
@@ -407,6 +439,14 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
+   /**
+    *
+    *
+    * @since 2.0.18
+    * @acces public
+    * @param string $Code Where condition.
+    * @return object DataSet
+    */
    public function GetDescendantsByCode($Code) {
       Deprecated('CategoryModel::GetDescendantsByCode', 'CategoryModel::GetAncestors');
 
@@ -420,6 +460,14 @@ class CategoryModel extends Gdn_Model {
          ->Get();
    }
 
+   /**
+    *
+    *
+    * @since 2.0.18
+    * @acces public
+    * @param int $ID
+    * @return array
+    */
    public static function GetSubtree($ID) {
       $Result = array();
       $Category = self::Categories($ID);
@@ -536,7 +584,16 @@ class CategoryModel extends Gdn_Model {
          ->Get();
       return $ChildData->NumRows() > 0 ? TRUE : FALSE;
    }
-
+   
+   /**
+    * 
+    *  
+    * @since 2.0.0
+    * @access public
+    * @param array $Data
+    * @param string $Permission
+    * @param string $Column
+    */
    public static function JoinModerators($Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
       $Moderators = Gdn::SQL()
          ->Select('u.UserID, u.Name, u.Photo, u.Email')
@@ -635,7 +692,16 @@ class CategoryModel extends Gdn_Model {
       }
       $this->SetCache();
    }
-
+   
+   /**
+    *
+    *
+    * @since 2.0.18
+    * @access protected
+    * @param array $Node
+    * @param int $Left
+    * @param int $Depth
+    */
    protected function _SetTree(&$Node, $Left = 1, $Depth = 0) {
       $Right = $Left + 1;
       
@@ -737,7 +803,16 @@ class CategoryModel extends Gdn_Model {
          }
       }
    }
-
+   
+   /**
+    * Utility method for sorting via usort.
+    *
+    * @since 2.0.18
+    * @access protected
+    * @param $A First element to compare.
+    * @param $B Second element to compare.
+    * @return int -1, 1, 0 (per usort)
+    */
    protected function _TreeSort($A, $B) {
       if ($A['left'] > $B['left'])
          return 1;
@@ -867,9 +942,16 @@ class CategoryModel extends Gdn_Model {
       
       return $CategoryID;
    }
-
+   
+   /**
+    * Grab the Category IDs of the tree.
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param int $CategoryID
+    * @param mixed $Set
+    */
    public function SaveUserTree($CategoryID, $Set) {
-      // Grab the Category IDs of the tree.
       $Categories = $this->GetSubtree($CategoryID);
       foreach ($Categories as $Category) {
          $this->SQL->Replace(
@@ -879,8 +961,15 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   /**
+    * Grab the categories from the cache.
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param int $ID
+    * @param array $Data
+    */
    public static function SetCache($ID = FALSE, $Data = FALSE) {
-      // Grab the categories from the cache.
       $Categories = Gdn::Cache()->Get(self::CACHE_KEY);
       self::$Categories = NULL;
       
@@ -915,9 +1004,14 @@ class CategoryModel extends Gdn_Model {
 		return $Property;
    }
    
+   /**
+    * If looking at the root node, make sure it exists and that the 
+    * nested set columns exist in the table.
+    * 
+    * @since 2.0.15
+    * @access public
+    */
    public function ApplyUpdates() {
-      // If looking at the root node, make sure it exists and that the nested
-      // set columns exist in the table (added in Vanilla 2.0.15)
       if (!C('Vanilla.NestedCategoriesUpdate')) {
          // Add new columns
          $Construct = Gdn::Database()->Structure();
@@ -990,6 +1084,13 @@ class CategoryModel extends Gdn_Model {
 		}
 	}
 
+   /**
+    * 
+    * 
+    * @since 2.0.18
+    * @access public
+    * @param array $Data Dataset.
+    */
    protected static function CalculateData(&$Data) {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];

@@ -195,7 +195,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
       $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));
       if (!$Sender->StampEnd)
-         $Sender->StampEnd = time();
+         $Sender->StampEnd = strtotime('yesterday');
          
       // If no date was provided, or the provided values were invalid, use defaults
       if (!$Sender->StampStart) {

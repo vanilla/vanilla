@@ -306,7 +306,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Sets[] = $Field." = ".$Value;
       }
 
-      $sql = 'update '.$this->_FromTables($Tables);
+      $sql = 'update '.($this->Options('Ignore') ? 'ignore ' : '').$this->_FromTables($Tables);
 
       if (count($this->_Joins) > 0) {
          $sql .= "\n";

@@ -117,8 +117,14 @@ class OpenIDPlugin extends Gdn_Plugin {
          return; // this will error out
 
       $this->EventArguments = $Args;
-      $OpenID = $this->GetOpenID();
-      if ($OpenID->validate()) {
+      
+      // Check session before retrieving
+      $Session = Gdn::Session();
+      $OpenID = $Session->Stash('OpenID', '', FALSE);
+      if (!$OpenID)
+         $OpenID = $this->GetOpenID();
+      
+      if ($Session->Stash('OpenID', '', FALSE) || $OpenID->validate()) {
          $Attr = $OpenID->getAttributes();
 
          $Form = $Sender->Form; //new Gdn_Form();
@@ -129,6 +135,7 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('FullName', GetValue('namePerson/first', $Attr).' '.GetValue('namePerson/last', $Attr));
          $Form->SetFormValue('Email', GetValue('contact/email', $Attr));
          $Sender->SetData('Verified', TRUE);
+         $Session->Stash('OpenID', $OpenID);
       }
    }
 

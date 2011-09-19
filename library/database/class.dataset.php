@@ -250,7 +250,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>prefix</b>: The name of the prefix to give the columns. Can't be used with <b>column</b>.
     * @param array $Options An array of extra options.
     *  - <b>sql</b>: A Gdn_SQLDriver with the child query.
-    *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_INNER.
+    *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_LEFT.
     */
    public static function Join(&$Data, $Columns, $Options = array()) {
       $Options = array_change_key_case($Options);
@@ -321,7 +321,7 @@ class Gdn_DataSet implements IteratorAggregate {
          if (isset($ChildColumn))
             $ParentColumn = $ChildColumn;
          elseif (isset($Table))
-            $ChildColumn = $Table.'ID';
+            $ParentColumn = $Table.'ID';
          else
             throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
       }
@@ -348,11 +348,18 @@ class Gdn_DataSet implements IteratorAggregate {
       $Sql->Select("$TableAlias.$ChildColumn");
       
       // Get the IDs to generate an in clause with.
-      $IDs = ConsolidateArrayValuesByKey($Data, $ParentColumn);
+      $IDs = array();
+      foreach ($Data as $Row) {
+         $Value = GetValue($ParentColumn, $Row);
+         if ($Value)
+            $IDs[$Value] = TRUE;
+      }
+      
+      $IDs = array_keys($IDs);
       $Sql->WhereIn($ChildColumn, $IDs);
       
       $ChildData = $Sql->Get()->ResultArray();
-      $ChildData = self::Index($ChildData, $ChildColumn, array('unique' => isset($ColumnPrefix)));
+      $ChildData = self::Index($ChildData, $ChildColumn, array('unique' => GetValue('unique', $Options, isset($ColumnPrefix))));
       
       $NotFound = array();
 

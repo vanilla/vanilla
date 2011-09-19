@@ -46,15 +46,15 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       <div class="Meta">
          <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>
          <?php if ($Discussion->Announce == '1') { ?>
-         <span class="Announcement"><?php echo T('Announcement'); ?></span>
+         <span class="Tag Announcement"><?php echo T('Announcement'); ?></span>
          <?php } ?>
          <?php if ($Discussion->Closed == '1') { ?>
-         <span class="Closed"><?php echo T('Closed'); ?></span>
+         <span class="Tag Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
          <span class="CommentCount"><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo '<strong>'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
+               echo '<strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
 
             $Sender->FireEvent('AfterCountMeta');
 
@@ -73,7 +73,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode), 'Category'));
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Tag Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

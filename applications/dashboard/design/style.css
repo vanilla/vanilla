@@ -787,7 +787,6 @@ body #Head h1 {
 }
 .PanelInfo .Active {
    background: #fff;
-   border-bottom: 1px solid #a3e6ff;
 }
 .PanelInfo .Active a {
    color: #1e79a7;
@@ -958,14 +957,14 @@ a.BigButton:focus {
 	display: inline;
 	padding: 0;
 }
-.DataList.Discussions .Meta span,
-.DataList .Meta strong {
+.Meta span,
+.Meta strong {
    margin-right: 12px;
 }
-.DataList .Meta .MetaLabel {
+.Meta .MetaLabel {
    margin-right: 2px;
 }
-.DataList .Meta strong {
+.HasNew {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -975,8 +974,9 @@ a.BigButton:focus {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
+   
 }
-.DataList .Meta .Tag a {
+.Tag a {
    color: #ffffff;
 }
 .DataList a.Delete,
@@ -1911,18 +1911,10 @@ div.Popup form ul li label.RadioLabel {
 */
 .Mine { background: #e3f4ff; }
 
-.DataList .Meta a.Category {
-   background: #fafafa;
-   padding: 2px 4px;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-}
-.DataList li.Mine .Meta a.Category {
-   background: #eff7ff;
-}
 .Tag {
    background: #777777;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    border-radius: 2px;
    color: #FFFFFF;
    font-weight: bold;
@@ -1931,27 +1923,16 @@ div.Popup form ul li label.RadioLabel {
 .Tag a {
    color: #FFFFFF;
 }
-.DataList .Meta .Announcement {
-	background: #777777;
-	color: #ffffff;
-	padding: 1px 4px;
-   border-radius: 2px;
-	-moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
-   font-weight: bold;
-}
-.DataList .Meta .Closed {
+.Tag.Closed {
 	background: #555555;
-   color: #ffffff;
-   font-weight: bold;
-	padding: 1px 4px;
-   border-radius: 2px;
-	-moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
 }
-
+.Tag.Category {
+   background: #f0f0f0;
+   font-weight: normal;
+}
+.Tag.Category a {
+   color: #000;
+}
 
 /* ================================================================= Comments */
 body.Discussion #Content {

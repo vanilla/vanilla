@@ -204,7 +204,7 @@ if($PermissionModel instanceof PermissionModel) {
 		->Set($Explicit, $Drop);
 }
 
-// Define the set of permissions that garden uses.
+// Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
@@ -225,6 +225,7 @@ $PermissionModel->Define(array(
    'Garden.Activity.Delete',
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
+   'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
    'Garden.Moderation.Manage',
    'Garden.AdvancedNotifications.Allow'
    ));
@@ -235,7 +236,8 @@ if (!$PermissionTableExists) {
    $PermissionModel->Save(array(
       'RoleID' => 2,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 0
       ));
 
    // Set initial confirm email permissions.
@@ -243,7 +245,8 @@ if (!$PermissionTableExists) {
        'RoleID' => 3,
        'Garden.Signin.Allow' => 1,
        'Garden.Activity.View' => 1,
-       'Garden.Profiles.View' => 1
+       'Garden.Profiles.View' => 1,
+       'Garden.Profiles.Edit' => 0
        ));
 
    // Set initial applicant permissions.
@@ -251,7 +254,8 @@ if (!$PermissionTableExists) {
       'RoleID' => 4,
       'Garden.Signin.Allow' => 1,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 0
       ));
 
    // Set initial member permissions.
@@ -259,7 +263,8 @@ if (!$PermissionTableExists) {
       'RoleID' => 8,
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1
       ));
 
    // Set initial moderator permissions.
@@ -268,7 +273,8 @@ if (!$PermissionTableExists) {
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Moderation.Manage' => 1,
-      'Garden.Profiles.View' => 1
+      'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1
       ));
 
    // Set initial admininstrator permissions.
@@ -290,6 +296,7 @@ if (!$PermissionTableExists) {
       'Garden.Activity.Delete' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
+      'Garden.Profiles.Edit' => 1,
       'Garden.AdvancedNotifications.Allow' => 1
       ));
 }
@@ -433,10 +440,42 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
+// This is a fix for erroneos unique constraint.
+if ($Construct->TableExists('Tag')) {
+   $Db = Gdn::Database();
+   $Px = Gdn::Database()->DatabasePrefix;
+   
+   $DupTags = Gdn::SQL()
+      ->Select('Name')
+      ->Select('TagID', 'min', 'TagID')
+      ->Select('TagID', 'count', 'CountTags')
+      ->From('Tag')
+      ->GroupBy('Name')
+      ->Having('CountTags >', 1)
+      ->Get()->ResultArray();
+   
+   foreach ($DupTags as $Row) {
+      $Name = $Row['Name'];
+      $TagID = $Row['TagID'];
+      // Get the tags that need to be deleted.
+      $DeleteTags = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name, 'TagID <> ' => $TagID))->ResultArray();
+      foreach ($DeleteTags as $DRow) {
+         // Update all of the discussions to the new tag.
+         Gdn::SQL()->Options('Ignore', TRUE)->Put(
+            'TagDiscussion', 
+            array('TagID' => $TagID), 
+            array('TagID' => $DRow['TagID']));
+         
+         // Delete the tag.
+         Gdn::SQL()->Delete('Tag', array('TagID' => $DRow['TagID']));
+      }
+   }
+}
+
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
-   ->Column('Name', 'varchar(255)', 'unique')
-   ->Column('Type', 'varchar(10)', NULL, 'index')
+   ->Column('Name', 'varchar(255)', FALSE, 'unique')
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Engine('InnoDB')

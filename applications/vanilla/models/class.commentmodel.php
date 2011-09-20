@@ -815,7 +815,7 @@ class CommentModel extends VanillaModel {
             "/discussion/comment/$CommentID#Comment_$CommentID",
             TRUE);
          
-         $ActivityModel->QueueNotification($ActivityID);
+//         $ActivityModel->QueueNotification($ActivityID);
          $NotifiedUsers[] = $UserID;
       }
    }

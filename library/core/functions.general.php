@@ -1832,9 +1832,12 @@ if (!function_exists('ReflectArgs')) {
     */
    function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
       $Result = array();
-
-      if (!method_exists($Controller, $Method))
-         return;
+      
+      if (is_string($Callback) && !function_exists($Callback))
+         throw new Exception("Function $Callback does not exist");
+      
+      if (is_array($Callback) && !method_exists($Callback[0], $Callback[1]))
+         throw new Exception("Method {$Callback[1]} does not exist.");
       
       if ($Args2 !== NULL)
          $Args1 = array_merge($Args2, $Args1);
@@ -1865,6 +1868,10 @@ if (!function_exists('ReflectArgs')) {
             $Args[$ParamName] = NULL;
             $MissingArgs[] = "{$Index}: {$ParamName}";
          }
+      }
+      
+      if (count($MissingArgs) > 0) {
+         throw new Exception("Missing arguments: ".implode(', ', $MissingArgs));
       }
 
       return $Args;

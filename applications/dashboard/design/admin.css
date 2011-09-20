@@ -105,7 +105,7 @@ body {
 	text-align: right;
 }
 .Wrap {
-   margin: 10px;
+   margin: 20px;
 }
 h1, h2, h3, h4, h5, h6 {
    color: #000;
@@ -113,6 +113,12 @@ h1, h2, h3, h4, h5, h6 {
    font-weight: normal;
    margin: 0;
 }
+
+hr {
+   border: none;
+   border-top: solid 1px #A5D0E7;
+}
+
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 }
@@ -142,8 +148,8 @@ h1, h2, h3, h4, h5, h6 {
 	padding: 0;
 }
 p {
-   margin: 0.5em 0;
-   line-height: 1.6em;
+   margin: .5em 0;
+   line-height: 1.4em;
 }
 small {
 	font-size: 12px;
@@ -315,8 +321,8 @@ a.Button {
    margin: 0;
    border-collapse: collapse;
    border-radius: 0;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
+   -webkit-border-radius: 0;
+   -moz-border-radius: 0;
    border-left-width: 0;
    min-width: 40px;
 }
@@ -325,12 +331,16 @@ a.Button {
    margin-top: 8px;
 }
 
+.ButtonList {
+   margin-right: 20px;
+}
+
 .ButtonList :first-child {
-   border-radius: 3px 0 0 3px;
+   border-radius: .5ex 0 0 .5ex;
    border-left-width: 1px;
 }
 .ButtonList :last-child {
-   border-radius: 0 3px 3px 0;
+   border-radius: 0 .5ex .5ex 0;
 }
 
 
@@ -1458,18 +1468,6 @@ table.SelectionGrid td.Active {
    background:#e2f4ff none repeat scroll 0 0;
 }
 
-
-#dashboard_user_browse #Content form div.Info,
-#dashboard_user_index #Content form div.Info {
-	padding: 10px 10px 0;
-}
-#dashboard_user_browse #Content form input.Button,
-#dashboard_user_index #Content form input.Button {
-	margin: 0 20px 10px;
-}
-#Content form input.Button {
-	margin: 0 20px 20px;
-}
 /* A general rule to remove padding from info (form adds it) */
 #Content form ul div.Info {
 	padding: 0;

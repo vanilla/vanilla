@@ -436,15 +436,17 @@ class ProfileController extends Gdn_Controller {
       
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $this->UserModel->DefineSchema();
-         // $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->FormValues());
+//         $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->FormValues());
          
          // No password may have been set if they have only signed in with a connect plugin
-		 if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
-	         $this->UserModel->Validation->ApplyRule('OldPassword', 'Required');
-	         $this->UserModel->Validation->ApplyRule('OldPassword', 'OldPassword', 'Your old password was incorrect.');
-		 }
+         if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
+   	      $this->UserModel->Validation->ApplyRule('OldPassword', 'Required');
+   	      $this->UserModel->Validation->ApplyRule('OldPassword', 'OldPassword', 'Your old password was incorrect.');
+         }
+         
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
+         
          if ($this->Form->Save()) {
 				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
             $this->Form->ClearInputs();
@@ -920,13 +922,13 @@ class ProfileController extends Gdn_Controller {
             }
             // Don't allow account editing if it has been turned off.
             if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
-				$SideMenu->AddLink('Options', T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+				   $SideMenu->AddLink('Options', T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                	
-				// No password may have been set if they have only signed in with a connect plugin
-				$passwordLabel = T('Change My Password');
-				if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
-					$passwordLabel = T('Set A Password');
-				$SideMenu->AddLink('Options', $passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
+				   // No password may have been set if they have only signed in with a connect plugin
+				   $passwordLabel = T('Change My Password');
+				   if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
+					   $passwordLabel = T('Set A Password');
+				   $SideMenu->AddLink('Options', $passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
             }
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));

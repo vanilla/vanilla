@@ -520,7 +520,7 @@ class ProfileController extends Gdn_Controller {
 //            );
 
             // Save the uploaded image in thumbnail size
-            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
             $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/n$Basename",

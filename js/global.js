@@ -315,7 +315,7 @@ jQuery(document).ready(function($) {
 
       var urlFormat = gdn.definition("UrlFormat", "");
       
-      if (path[0] == "/")
+      if (path.substr(0, 1) == "/")
          path = path.substr(1);
 
       if (urlFormat.indexOf("?") >= 0)

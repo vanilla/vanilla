@@ -92,6 +92,10 @@ jQuery(document).ready(function($) {
 
    $(".PopupWindow").live('click', function() {
       var $this = $(this);
+      
+      if ($this.hasClass('NoMSIE') && $.browser.misie) {
+         return;
+      }
 
       var width = $this.attr('popupWidth'); width = width ? width : 960;
       var height = $this.attr('popupHeight'); height = height ? height : 600;

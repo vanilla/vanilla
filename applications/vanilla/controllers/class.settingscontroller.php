@@ -426,8 +426,8 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('categories.js');
 //       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('js/library/jquery.alphanumeric.js');
-      $this->AddJsFile('js/library/nestedSortable.1.2.1/jquery-ui-1.8.2.custom.min.js');
-      $this->AddJsFile('js/library/nestedSortable.1.2.1/jquery.ui.nestedSortable.js');
+      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
+      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
       $this->Title(T('Categories'));
       
       // Get category data

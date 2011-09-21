@@ -118,7 +118,7 @@
     background: url('images/arrow.png') 0 0 no-repeat;
     position: absolute;
     text-align: left;
-    top: 1px;
+    top: -23px;
     right: -7px;
     cursor: pointer;
 }
@@ -127,7 +127,7 @@
 }
 .EmoticonContainer {
     position: absolute;
-    top: 21px;
+    top: 0px;
     right: -8px;
     border: 1px solid #aaa;
     border-bottom: 0;

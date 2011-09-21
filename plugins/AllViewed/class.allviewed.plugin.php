@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * 'Mark All Viewed' plugin for Vanilla Forums.
+ * 'All Viewed' plugin for Vanilla Forums.
  *
  * v1.2 
  * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
@@ -10,13 +10,14 @@
  */
  
 $PluginInfo['AllViewed'] = array(
-   'Name' => 'Mark All Viewed',
+   'Name' => 'All Viewed',
    'Description' => 'Allows users to mark all discussions as viewed.',
    'Version' => '1.2',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
    'AuthorUrl' => '',
-   'License' => 'GNU GPLv2'
+   'License' => 'GNU GPLv2',
+   'MobileFriendly' => TRUE
 );
 
 /**

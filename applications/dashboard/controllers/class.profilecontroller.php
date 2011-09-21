@@ -762,7 +762,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must first upload a picture before you can create a thumbnail.');
       
       // Define the thumbnail size
-      $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
+      $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
       
       // Define the source (profile sized) picture & dimensions.
       $Basename = ChangeBasename($this->User->Photo, 'p%s');

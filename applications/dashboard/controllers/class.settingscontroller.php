@@ -264,7 +264,7 @@ class SettingsController extends DashboardController {
                if ($ID)
                $this->Form->SetData($BanModel->GetID($ID));
             }
-            $this->SetData('_BanTypes', array('IPAddress' => 'IP Address', 'Email' => 'Email', 'Name' => 'Name'));
+            $this->SetData('_BanTypes', array('IPAddress' => T('IP Address'), 'Email' => T('Email'), 'Name' => T('Name')));
             $this->View = 'Ban';
             break;
          case 'delete':

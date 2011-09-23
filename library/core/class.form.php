@@ -1808,7 +1808,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function SetValidationResults($ValidationResults) {
       if (!is_array($this->_ValidationResults)) $this->_ValidationResults = array();
 
-      $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
+      $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $ValidationResults);
    }
 
    /**

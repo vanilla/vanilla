@@ -33,6 +33,8 @@ echo Wrap($this->Data('Title'), 'h1');
    <tbody>
       <?php
       foreach ($this->Data('PocketData') as $PocketRow) {
+      	 $MobileOnly = $PocketRow['MobileOnly'];
+      	 $MobileNever = $PocketRow['MobileNever'];
          echo '<tr'.($PocketRow['Disabled'] != Pocket::DISABLED ? '' : ' class="Disabled"').'>';
 
          echo '<td>',
@@ -44,8 +46,18 @@ echo Wrap($this->Data('Title'), 'h1');
             '</div>',
             '</td>';
 
-         echo '<td>',htmlspecialchars($PocketRow['Page']),'</td>';
-         echo '<td  class="Alt">', htmlspecialchars($PocketRow['Location']), '</td>';
+         echo '<td>',htmlspecialchars($PocketRow['Page']), '</td>';
+         echo '<td  class="Alt">', htmlspecialchars($PocketRow['Location']); 
+         if ($MobileOnly) {
+         	echo '<br>(', T('Shown only on mobile'), ')';
+         }
+         if ($MobileNever) {
+         	echo '<br>(', T('Hidden for mobile'), ')';
+         }
+         if ($MobileNever && $MobileOnly) {
+         	echo '<br><b>(', T('Hidden for everything!'), ')</b>';
+         }
+         echo'</td>';
          echo '<td>', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</td>';
          echo '<td  class="Alt">', $PocketRow['Notes'], '</td>';
 

@@ -20,6 +20,7 @@ $PluginInfo['Pockets'] = array(
    'RegisterPermissions' => array('Plugins.Pockets.Manage'),
    'SettingsUrl' => '/dashboard/plugin/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',
+   'MobileFriendly' => TRUE,
    'HasLocale' => TRUE
 );
 
@@ -389,6 +390,8 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function Structure($Explicit = FALSE, $Drop = FALSE) {
+   	  // It seems plugins need to be disabled and enabled for this to happen.
+   	  // Might want to warn users that upgrade.
       $St = Gdn::Structure();
       $St->Table('Pocket')
          ->PrimaryKey('PocketID')
@@ -402,6 +405,8 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('Condition', 'varchar(500)', NULL)
          ->Column('Disabled', 'smallint', '0') // set to a constant in class Pocket
          ->Column('Attributes', 'text', NULL)
+         ->Column('MobileOnly', 'tinyint', '0')
+         ->Column('MobileNever', 'tinyint', '0')
          ->Set($Explicit, $Drop);
    }
 

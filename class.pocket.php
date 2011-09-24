@@ -43,6 +43,14 @@ class Pocket {
 
    /** $var array The repeat frequency. */
    public $RepeatFrequency = array(1);
+   
+   /** $var array The repeat frequency. */
+   public $MobileOnly = FALSE;
+   
+   /** $var array The repeat frequency. */
+   public $MobileNever = FALSE;
+   
+   
 
    public function __construct($Location = '') {
       $this->Location = $Location;
@@ -54,6 +62,11 @@ class Pocket {
     *  @return bool
     */
    public function CanRender($Data) {
+   	  $IsMobile = IsMobile();
+   	  if (($this->MobileOnly && !$IsMobile) || ($this->MobileNever && $IsMobile)) {
+   	  	 return FALSE;
+   	  }
+
       // Check to see if the pocket is enabled.
       switch ($this->Disabled) {
          case Pocket::DISABLED:
@@ -112,6 +125,8 @@ class Pocket {
       $this->Location = $Data['Location'];
       $this->Name = $Data['Name'];
       $this->Page = $Data['Page'];
+      $this->MobileOnly = $Data['MobileOnly'];
+      $this->MobileNever = $Data['MobileNever'];
 
       // parse the frequency.
       $Repeat = $Data['Repeat'];

@@ -652,8 +652,8 @@ if (!function_exists('decho')) {
    /**
     * Echo's debug variables if user is root admin.
     */
-   function decho($Mixed, $Prefix = 'DEBUG: ') {
-      if (Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
+   function decho($Mixed, $Prefix = 'DEBUG: ', $Permission = FALSE) {
+      if (!$Permission || Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
          echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
          if (is_string($Mixed))
             echo $Mixed;
@@ -2049,11 +2049,8 @@ if (!function_exists('SaveToConfig')) {
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
       // Don't save the value if it hasn't changed.
-      /*
-      Tim: The world ain't ready for you yet, son
-      if (is_string($Name) && C($Name) == $Value)
-         return NULL;
-      */
+      if (GetValue('CheckExisting', $Options) && is_string($Name) && C($Name) == $Value)
+         return TRUE;
       
       $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
       $RemoveEmpty = GetValue('RemoveEmpty', $Options);

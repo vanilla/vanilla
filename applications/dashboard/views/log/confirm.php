@@ -1,13 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div>
    <?php
+   
    $ItemCount = $this->Data('ItemCount');
 
    if (!$ItemCount) {
       echo '<h1>', T('No Items Selected'), '</h1>';
-      echo '<p>', T('Make sure you select at least one item before continuing.'), '</p>';
+      echo '<p class="Wrap">', T('Make sure you select at least one item before continuing.'), '</p>';
    } else {
       echo '<h1>', T('Please Confirm'), '</h1>';
+      echo $this->Form->Open();
+      echo $this->Form->Errors();
 
       // Give a description of what is done.'
       switch (strtolower($this->Data('Action'))) {
@@ -46,6 +49,9 @@
          ' ',
          Anchor(T('No'), '#', array('class' => 'Button ConfirmNo', 'style' => 'display: inline-block; width: 50px')),
          '</div>';
+      
+      
+      echo $this->Form->Close();
    }
    ?>
 </div>

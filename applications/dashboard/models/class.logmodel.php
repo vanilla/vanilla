@@ -47,6 +47,9 @@ class LogModel extends Gdn_Pluggable {
          case 'Comment':
             $Result = $this->FormatKey('Body', $Data);
             break;
+         case 'Configuration':
+            $Result = $this->FormatConfiguration($Data);
+            break;
          case 'Registration':
          case 'User':
             $Result = $this->FormatRecord(array('Email', 'Name', 'DiscoveryText'), $Data);
@@ -55,6 +58,34 @@ class LogModel extends Gdn_Pluggable {
             $Result = '';
       }
       return $Result;
+   }
+   
+   public function FormatConfiguration($Data) {
+      $Old = $Data;
+      $New = $Data['_New'];
+      unset($Old['_New']);
+
+      $Old = Gdn_Configuration::Format($Old);
+      $New = Gdn_Configuration::Format($New);
+      $Diffs = $this->FormatDiff($Old, $New, 'raw');
+      
+      $Result = array();
+      foreach ($Diffs as $Diff) {
+         if(is_array($Diff)) {
+            if (!empty($Diff['del'])) {
+               $Result[] = '<del>'.implode("<br />\n", $Diff['del']).'</del>';
+            }
+            if (!empty($Diff['ins'])) {
+               $Result[] = '<ins>'.implode("<br />\n", $Diff['ins']).'</ins>';
+            }
+			}
+      }
+      
+      $Result = implode("<br />\n", $Result);
+      if ($Result)
+         return $Result;
+      else
+         return T('No Change');
    }
 
    public function FormatKey($Key, $Data) {
@@ -83,7 +114,7 @@ class LogModel extends Gdn_Pluggable {
       return $Result;
    }
 
-   public function FormatDiff($Old, $New) {
+   public function FormatDiff($Old, $New, $Method = 'html') {
       static $TinyDiff = NULL;
 
       if ($TinyDiff === NULL) {
@@ -91,7 +122,7 @@ class LogModel extends Gdn_Pluggable {
          $TinyDiff = new Tiny_diff();
       }
       
-      $Result = $TinyDiff->compare($Old, $New, 'html');
+      $Result = $TinyDiff->compare($Old, $New, $Method);
       return $Result;
    }
 
@@ -260,10 +291,10 @@ class LogModel extends Gdn_Pluggable {
    }
 
    public static function LogChange($Operation, $RecordType, $NewData, $OldData = NULL) {
-      $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : $NewData[$RecordType.'ID'];
+      $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : GetValue($RecordType.'ID', $NewData);
 
       // Grab the record from the DB.
-      if ($OldData == NULL) {
+      if ($OldData === NULL) {
          $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
       } elseif (!isset($OldData[0]))
          $OldData = array($OldData);
@@ -328,6 +359,10 @@ class LogModel extends Gdn_Pluggable {
       $this->FireEvent('BeforeRestore');
       if ($Handled)
          return; // a plugin handled the restore.
+      
+      if ($Log['RecordType'] == 'Configuration') {
+         throw new Gdn_UserException('Restoring configuration edits is currently not supported.');
+      }
 
       // Keep track of a discussion ID so that it's count can be recalculated.
       if ($Log['Operation'] != 'Edit') {
